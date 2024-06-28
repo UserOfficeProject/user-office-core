@@ -263,6 +263,8 @@ export default function createHandler() {
             }
           }
           break;
+        case Event.PROPOSALS_ASSIGNED_TO_TECHNIQUE:
+          break;
         default: {
           let changedObjectId: number;
           if (typeof (event as any)[event.key].primaryKey === 'number') {

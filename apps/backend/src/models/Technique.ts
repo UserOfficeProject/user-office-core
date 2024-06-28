@@ -13,3 +13,8 @@ export class TechniqueHasInstruments {
     public instrumentId: number
   ) {}
 }
+
+export class AssignProposalsToTechniquesArgs {
+  public techniqueIds: number[];
+  public proposalPk: number;
+}

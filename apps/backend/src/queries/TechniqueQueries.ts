@@ -51,4 +51,9 @@ export default class TechniqueQueries {
       return rejection('Could not get all techniques', { agent }, error);
     });
   }
+
+  @Authorized()
+  async getTechniquesByIds(agent: UserWithRole | null, techniqueIds: number[]) {
+    return await this.dataSource.getTechniquesByIds(techniqueIds);
+  }
 }

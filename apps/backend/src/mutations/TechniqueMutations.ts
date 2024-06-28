@@ -12,7 +12,10 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
-import { Technique } from '../models/Technique';
+import {
+  AssignProposalsToTechniquesArgs,
+  Technique,
+} from '../models/Technique';
 import { UserWithRole } from '../models/User';
 import { AssignInstrumentsToTechniqueArgs } from '../resolvers/mutations/AssignInstrumentsToTechnique';
 import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutation';
@@ -115,6 +118,22 @@ export default class TechniqueMutations {
       .catch((error) => {
         return rejection(
           `Could not remove assigned instruments from technique '${args.techniqueId}`,
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @EventBus(Event.PROPOSALS_ASSIGNED_TO_TECHNIQUE)
+  async assignProposalToTechniqueInternal(
+    agent: UserWithRole | null,
+    args: AssignProposalsToTechniquesArgs
+  ) {
+    return this.dataSource
+      .assignProposalToTechnique(args.proposalPk, args.techniqueIds)
+      .catch((error) => {
+        return rejection(
+          `Could not assign proposals to technique '${args.techniqueIds}`,
           { agent, args: args },
           error
         );

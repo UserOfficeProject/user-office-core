@@ -78,6 +78,7 @@ export enum Event {
   TECHNIQUE_DELETED = 'TECHNIQUE_DELETED',
   INSTRUMENTS_ASSIGNED_TO_TECHNIQUE = 'INSTRUMENTS_ASSIGNED_TO_TECHNIQUE',
   INSTRUMENTS_REMOVED_FROM_TECHNIQUE = 'INSTRUMENTS_REMOVED_FROM_TECHNIQUE',
+  PROPOSALS_ASSIGNED_TO_TECHNIQUE = 'PROPOSALS_ASSIGNED_TO_TECHNIQUE',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -320,5 +321,9 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE,
     'Event occurs when instruments are removed from a technique',
+  ],
+  [
+    Event.PROPOSALS_ASSIGNED_TO_TECHNIQUE,
+    'Event occurs when proposals are assigned to a technique',
   ],
 ]);

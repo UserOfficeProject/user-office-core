@@ -199,4 +199,43 @@ export default class PostgresTechniqueDataSource
       throw new Error(`Error removing instrument(s) from technique: ${error}`);
     }
   }
+
+  async assignProposalToTechnique(
+    proposalPk: number,
+    techniqueIds: number[]
+  ): Promise<boolean> {
+    const dataToInsert = techniqueIds.map((techniqueId) => ({
+      technique_id: techniqueId,
+      proposal_id: proposalPk,
+    }));
+
+    try {
+      const result = await database('technique_has_proposals').insert(
+        dataToInsert
+      );
+
+      if (result) {
+        return true;
+      } else {
+        throw new Error(
+          'Error assigning proposal to technique: no technique returned from insert'
+        );
+      }
+    } catch (error) {
+      throw new Error(`Error assigning proposal to technique: ${error}`);
+    }
+  }
+
+  async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {
+    return database
+      .select()
+      .from('techniques')
+      .whereIn('technique_id', techniqueIds)
+      .then((results: TechniqueRecord[]) =>
+        results.map(this.createTechniqueObject)
+      )
+      .catch((error) => {
+        throw new Error(`Error getting techniques: ${error}`);
+      });
+  }
 }

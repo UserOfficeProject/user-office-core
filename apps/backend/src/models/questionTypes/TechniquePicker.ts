@@ -53,15 +53,12 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     }
   },
   transformConfig: async (config, callId) => {
-    // call input is required ?
     const fallBackConfig = { ...config, techniques: [] };
     try {
-      //if (!callId) return fallBackConfig;
-
       const techniqueDataSource = container.resolve<TechniqueDataSource>(
         Tokens.TechniqueDataSource
       );
-      // Get all techniquues
+
       const techniques = await techniqueDataSource.getTechniques();
 
       return {
@@ -71,7 +68,7 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
         ),
       };
     } catch (err) {
-      logger.logError('Call Techniques fetch failed', {
+      logger.logError('Techniques fetch failed', {
         err,
       });
     }
@@ -85,15 +82,12 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
 
     const techniqueMutations = container.resolve(TechniqueMutations);
 
-    // Get proposal
-
     const proposal = await proposalDataSource.getByQuestionaryId(questionaryId);
 
     if (!proposal) {
       throw new GraphQLError('Proposal not found');
     }
 
-    // Get techniques
     const { value } = JSON.parse(answer.value);
     const techniqueIds = value
       ? Array.isArray(value)
@@ -105,11 +99,9 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
       return;
     }
 
-    // Assign the Proposals to Techniques
-    // New table technique_has_proposals is required?
-    //await techniqueMutations.assignProposalsToTechniqueInternal(null, {
-    //  techniqueIds,
-    //   proposalPks: [proposal.primaryKey],
-    // });
+    await techniqueMutations.assignProposalToTechniqueInternal(null, {
+      techniqueIds,
+      proposalPk: proposal.primaryKey,
+    });
   },
 };
