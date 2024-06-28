@@ -1,0 +1,7 @@
+query getTechniquesByIds($techniqueIds: [Int!]!) {
+  techniquesByIds(techniqueIds: $techniqueIds) {
+    id
+    name
+    shortCode
+  }
+}
