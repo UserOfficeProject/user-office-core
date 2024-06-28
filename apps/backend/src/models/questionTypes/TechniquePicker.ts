@@ -4,10 +4,9 @@ import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import FapMutations from '../../mutations/FapMutations';
-import InstrumentMutations from '../../mutations/InstrumentMutations';
+import { TechniqueDataSource } from '../../datasources/TechniqueDataSource';
+import TechniqueMutations from '../../mutations/TechniqueMutations';
 import { TechniquePickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -54,27 +53,25 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     }
   },
   transformConfig: async (config, callId) => {
+    // call input is required ?
     const fallBackConfig = { ...config, techniques: [] };
     try {
       if (!callId) return fallBackConfig;
 
-      const instrumentDataSource = container.resolve<InstrumentDataSource>(
-        Tokens.InstrumentDataSource
+      const techniqueDataSource = container.resolve<TechniqueDataSource>(
+        Tokens.TechniqueDataSource
       );
-
-      const instruments = await instrumentDataSource.getInstrumentsByCallId([
-        callId,
-      ]);
+      // Get all techniquues
+      const techniques = await techniqueDataSource.getTechniques();
 
       return {
         ...config,
-        instruments: instruments.map(
-          (instrument) =>
-            new TechniqueOptionClass(instrument.id, instrument.name)
+        techniques: techniques.techniques.map(
+          (technique) => new TechniqueOptionClass(technique.id, technique.name)
         ),
       };
     } catch (err) {
-      logger.logError('Call Instruments fetch failed', {
+      logger.logError('Call Techniques fetch failed', {
         err,
       });
     }
@@ -85,8 +82,10 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     const proposalDataSource = container.resolve<ProposalDataSource>(
       Tokens.ProposalDataSource
     );
-    const instrumentMutations = container.resolve(InstrumentMutations);
-    const fapMutation = container.resolve(FapMutations);
+
+    const techniqueMutations = container.resolve(TechniqueMutations);
+
+    // Get proposal
 
     const proposal = await proposalDataSource.getByQuestionaryId(questionaryId);
 
@@ -94,27 +93,23 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
       throw new GraphQLError('Proposal not found');
     }
 
+    // Get techniques
     const { value } = JSON.parse(answer.value);
-    const instrumentIds = value
+    const techniqueIds = value
       ? Array.isArray(value)
         ? value
         : [value]
       : null;
 
-    if (!instrumentIds?.length) {
+    if (!techniqueIds?.length) {
       return;
     }
 
-    // Assign the Proposals to Instruments
-    await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
-      instrumentIds,
-      proposalPks: [proposal.primaryKey],
-    });
-
-    // Assign the Proposals to FAPs using Call Instrument
-    await fapMutation.assignProposalsToFapsUsingCallInstrumentsInternal(null, {
-      instrumentIds: instrumentIds,
-      proposalPks: [proposal.primaryKey],
-    });
+    // Assign the Proposals to Techniques
+    // New table technique_has_instruments is required?
+    //await techniqueMutations.assignProposalsToTechniqueInternal(null, {
+    //  techniqueIds,
+    //   proposalPks: [proposal.primaryKey],
+    // });
   },
 };
