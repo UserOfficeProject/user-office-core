@@ -56,7 +56,7 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     // call input is required ?
     const fallBackConfig = { ...config, techniques: [] };
     try {
-      if (!callId) return fallBackConfig;
+      //if (!callId) return fallBackConfig;
 
       const techniqueDataSource = container.resolve<TechniqueDataSource>(
         Tokens.TechniqueDataSource
@@ -106,7 +106,7 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     }
 
     // Assign the Proposals to Techniques
-    // New table technique_has_instruments is required?
+    // New table technique_has_proposals is required?
     //await techniqueMutations.assignProposalsToTechniqueInternal(null, {
     //  techniqueIds,
     //   proposalPks: [proposal.primaryKey],
