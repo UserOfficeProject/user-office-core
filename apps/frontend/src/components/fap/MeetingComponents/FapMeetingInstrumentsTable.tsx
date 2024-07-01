@@ -138,7 +138,7 @@ const FapMeetingInstrumentsTable = ({
     if (instrumentToUnsubmit) {
       if (instrumentToUnsubmit.submitted) {
         const { unsubmitInstrumentInFap } = await api({
-          toastSuccessMessage: 'Instrument submitted!',
+          toastSuccessMessage: 'Instrument unsubmitted!',
         }).unsubmitInstrumentInFap({
           callId: selectedCall.id,
           instrumentId: instrumentToUnsubmit.id,

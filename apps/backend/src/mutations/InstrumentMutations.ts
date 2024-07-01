@@ -409,7 +409,7 @@ export default class InstrumentMutations {
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
-      return rejection('Submitting instrument in FAP is not permitted', {
+      return rejection('Unsubmitting instrument in FAP is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
         args,
