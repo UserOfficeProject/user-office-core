@@ -4,8 +4,10 @@ import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { TechniqueDataSource } from '../../datasources/TechniqueDataSource';
+import InstrumentMutations from '../../mutations/InstrumentMutations';
 import TechniqueMutations from '../../mutations/TechniqueMutations';
 import { TechniquePickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -80,6 +82,12 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
       Tokens.ProposalDataSource
     );
 
+    const instrumentDataSource = container.resolve<InstrumentDataSource>(
+      Tokens.InstrumentDataSource
+    );
+
+    const instrumentMutations = container.resolve(InstrumentMutations);
+
     const techniqueMutations = container.resolve(TechniqueMutations);
 
     const proposal = await proposalDataSource.getByQuestionaryId(questionaryId);
@@ -102,6 +110,16 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     await techniqueMutations.assignProposalToTechniqueInternal(null, {
       techniqueIds,
       proposalPk: proposal.primaryKey,
+    });
+
+    const allInstrumentsOnCall =
+      await instrumentDataSource.getInstrumentsByCallId(
+        Array.from([proposal.callId])
+      );
+
+    await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
+      proposalPks: [proposal.primaryKey],
+      instrumentIds: allInstrumentsOnCall.map((inst) => inst.id),
     });
   },
 };
