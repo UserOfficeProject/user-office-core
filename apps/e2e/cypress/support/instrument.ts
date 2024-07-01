@@ -13,8 +13,8 @@ import {
   RemoveProposalsFromInstrumentMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
-  SubmitInstrumentMutation,
-  SubmitInstrumentMutationVariables,
+  SubmitInstrumentInFapMutation,
+  SubmitInstrumentInFapMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -105,11 +105,11 @@ const setInstrumentAvailabilityTime = (
   return cy.wrap(request);
 };
 
-const submitInstrument = (
-  submitInstrumentInput: SubmitInstrumentMutationVariables
-): Cypress.Chainable<SubmitInstrumentMutation> => {
+const submitInstrumentInFap = (
+  submitInstrumentInFapInput: SubmitInstrumentInFapMutationVariables
+): Cypress.Chainable<SubmitInstrumentInFapMutation> => {
   const api = getE2EApi();
-  const request = api.submitInstrument(submitInstrumentInput);
+  const request = api.submitInstrumentInFap(submitInstrumentInFapInput);
 
   return cy.wrap(request);
 };
@@ -139,4 +139,4 @@ Cypress.Commands.add(
   'setInstrumentAvailabilityTime',
   setInstrumentAvailabilityTime
 );
-Cypress.Commands.add('submitInstrument', submitInstrument);
+Cypress.Commands.add('submitInstrumentInFap', submitInstrumentInFap);

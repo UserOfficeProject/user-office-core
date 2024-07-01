@@ -14,8 +14,8 @@ import {
   AddTechnicalReviewMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
-  SubmitInstrumentMutationVariables,
-  SubmitInstrumentMutation,
+  SubmitInstrumentInFapMutationVariables,
+  SubmitInstrumentInFapMutation,
   RemoveProposalsFromInstrumentMutationVariables,
   RemoveProposalsFromInstrumentMutation,
 } from '@user-office-software-libs/shared-types';
@@ -140,14 +140,14 @@ declare global {
       /**
        * Submit instrument in Fap meeting components
        *
-       * @returns {typeof submitInstrument}
+       * @returns {typeof submitInstrumentInFap}
        * @memberof Chainable
        * @example
-       *    cy.submitInstrument(submitInstrumentInput: SubmitInstrumentMutationVariables);
+       *    cy.submitInstrumentInFap(submitInstrumentInFapInput: SubmitInstrumentInFapMutationVariables);
        */
-      submitInstrument: (
-        submitInstrumentInput: SubmitInstrumentMutationVariables
-      ) => Cypress.Chainable<SubmitInstrumentMutation>;
+      submitInstrumentInFap: (
+        submitInstrumentInFapInput: SubmitInstrumentInFapMutationVariables
+      ) => Cypress.Chainable<SubmitInstrumentInFapMutation>;
     }
   }
 }

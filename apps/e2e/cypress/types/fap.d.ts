@@ -15,6 +15,8 @@ import {
   UpdateReviewMutation,
   GetProposalReviewsQueryVariables,
   GetProposalReviewsQuery,
+  ReorderFapMeetingDecisionProposalsMutationVariables,
+  ReorderFapMeetingDecisionProposalsMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -115,6 +117,18 @@ declare global {
       saveFapMeetingDecision: (
         saveFapMeetingDecisionInput: SaveFapMeetingDecisionMutationVariables
       ) => Cypress.Chainable<SaveFapMeetingDecisionMutation>;
+
+      /**
+       * Reorder FAP meeting decision proposals.
+       *
+       * @returns {typeof reorderFapMeetingDecisionProposals}
+       * @memberof Chainable
+       * @example
+       *    cy.reorderFapMeetingDecisionProposals(reorderFapMeetingDecisionProposalsInput: ReorderFapMeetingDecisionProposalsMutationVariables)
+       */
+      reorderFapMeetingDecisionProposals: (
+        reorderFapMeetingDecisionProposalsInput: ReorderFapMeetingDecisionProposalsMutationVariables
+      ) => Cypress.Chainable<ReorderFapMeetingDecisionProposalsMutation>;
     }
   }
 }

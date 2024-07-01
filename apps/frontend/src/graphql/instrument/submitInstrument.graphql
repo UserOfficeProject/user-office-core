@@ -1,3 +1,0 @@
-mutation submitInstrument($callId: Int!, $instrumentId: Int!, $fapId: Int!) {
-  submitInstrument(callId: $callId, instrumentId: $instrumentId, fapId: $fapId)
-}

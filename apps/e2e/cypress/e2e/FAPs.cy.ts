@@ -369,7 +369,7 @@ context('Fap reviews tests', () => {
       );
       cy.get('[data-cy="fap-selection"]').contains(instrument.name);
       cy.get('[data-cy="fap-selection"]').click();
-      cy.get('[data-cy="fap-selection-options"]').contains(fap1.code).click();
+      cy.get('[role="listbox"] li[role="option"]').contains(fap1.code).click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -2194,6 +2194,9 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
 
+      cy.get('[aria-label="Drag proposals to reorder"]')
+        .should('exist')
+        .and('not.be.disabled');
       cy.get('[aria-label="View proposal details"]').first().click();
 
       cy.get('[role="dialog"] > header + div').scrollTo('top');
@@ -2233,7 +2236,56 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('[aria-label="Detail panel visibility toggle"]').should('exist');
+
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('button[aria-label="Unsubmit instrument"]')
+        .should('exist')
+        .and('not.be.disabled');
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+
+      cy.get('[aria-label="Drag proposals to reorder"]').should('not.exist');
+
+      cy.intercept({ url: '/graphql', method: 'POST' }, (req) => {
+        if (req.body.operationName === 'reorderFapMeetingDecisionProposals') {
+          req.alias = 'reorderFapMeetingDecisionProposals';
+        }
+      });
+
+      // NOTE: Trying to catch the failure of cy.reorderFapMeetingDecisionProposals because instrument is submitted
+      cy.on('fail', (err) => {
+        if (
+          err.name === 'Error' &&
+          err.message.includes('reorderFapMeetingDecisionProposals')
+        ) {
+          expect(err.message).to.include(
+            'FAP instrument for selected proposals is submitted and reordering is not allowed'
+          );
+
+          return true;
+        }
+
+        throw err;
+      });
+
+      cy.reorderFapMeetingDecisionProposals({
+        reorderFapMeetingDecisionProposalsInput: {
+          proposals: [
+            {
+              fapId: createdFapId,
+              instrumentId: createdInstrumentId,
+              proposalPk: firstCreatedProposalPk,
+              rankOrder: 1,
+            },
+          ],
+        },
+      });
+
+      cy.wait('@reorderFapMeetingDecisionProposals').then((res) => {
+        expect(res.response?.body.data).to.eq(null);
+        expect(res.response?.body.error).to.haveOwnProperty('error');
+      });
     });
 
     it('Officer should be able to edit Fap Meeting form after instrument is submitted', () => {
@@ -2246,7 +2298,7 @@ context('Fap meeting components tests', () => {
           fapId: createdFapId,
         },
       });
-      cy.submitInstrument({
+      cy.submitInstrumentInFap({
         callId: initialDBData.call.id,
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
@@ -2256,7 +2308,8 @@ context('Fap meeting components tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Submit instrument"] button').should('be.disabled');
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
+      cy.get('button[aria-label="Unsubmit instrument"]').should('exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -2505,7 +2558,7 @@ context('Fap meeting components tests', () => {
           fapId: createdFapId,
         },
       });
-      cy.submitInstrument({
+      cy.submitInstrumentInFap({
         callId: initialDBData.call.id,
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
@@ -2513,7 +2566,7 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('not.exist');
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 
@@ -2602,7 +2655,7 @@ context('Fap meeting components tests', () => {
           fapId: createdFapId,
         },
       });
-      cy.submitInstrument({
+      cy.submitInstrumentInFap({
         callId: initialDBData.call.id,
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
@@ -2610,7 +2663,7 @@ context('Fap meeting components tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
-      cy.get('[aria-label="Submit instrument"] button').should('not.exist');
+      cy.get('button[aria-label="Submit instrument"]').should('not.exist');
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
 

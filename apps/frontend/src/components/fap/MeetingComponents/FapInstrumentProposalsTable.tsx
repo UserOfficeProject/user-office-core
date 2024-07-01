@@ -399,15 +399,17 @@ const FapInstrumentProposalsTable = ({
 
     return (
       <>
-        <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
-          <IconButton
-            style={{ cursor: 'grab' }}
-            color="inherit"
-            data-cy="drag-icon"
-          >
-            <DragHandle />
-          </IconButton>
-        </Tooltip>
+        {!fapInstrument.submitted && (
+          <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
+            <IconButton
+              style={{ cursor: 'grab' }}
+              color="inherit"
+              data-cy="drag-icon"
+            >
+              <DragHandle />
+            </IconButton>
+          </Tooltip>
+        )}
         {showViewIcon && (
           <Tooltip title="View proposal details">
             <IconButton
@@ -702,7 +704,7 @@ const FapInstrumentProposalsTable = ({
         {...props}
         unallocated-time-information={unallocatedTimeInformation}
         className={isLastAvailabilityZoneRow ? 'lastRowInAvailabilityZone' : ''}
-        draggable
+        draggable={!fapInstrument.submitted}
         onDragStart={(e: DragEvent<HTMLTableRowElement>) =>
           handleOnRowDragStart(e, rowData.tableData?.id)
         }
