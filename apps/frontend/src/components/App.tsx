@@ -449,16 +449,6 @@ const DefaultRoutes = () => {
                     />
                   }
                 />
-                {/* <Route
-                  path="/"
-                  element={
-                    <TitledRoute
-                      title="Proposals"
-                      setHeader={setHeader}
-                      element={<ProposalPage />}
-                    />
-                  }
-                /> */}
                 {isUserOfficer && (
                   <Route
                     path="/ExperimentPage"
@@ -903,40 +893,6 @@ const DefaultRoutes = () => {
                     }
                   />
                 )}
-                {/* <Can
-                  allowedRoles={[UserRole.USER_OFFICER]}
-                  yes={() => <Route element={<ProposalPage />} />}
-                  no={() => (
-                    <Can
-                      allowedRoles={[UserRole.USER]}
-                      yes={() => (
-                        <Route
-                          element={<OverviewPage userRole={UserRole.USER} />}
-                        />
-                      )}
-                      no={() => (
-                        <Can
-                          allowedRoles={[
-                            UserRole.FAP_REVIEWER,
-                            UserRole.FAP_CHAIR,
-                            UserRole.FAP_SECRETARY,
-                            UserRole.INSTRUMENT_SCIENTIST,
-                            UserRole.INTERNAL_REVIEWER,
-                          ]}
-                          yes={() => (
-                            <Route
-                              element={
-                                <OverviewPage
-                                  userRole={currentRole as UserRole}
-                                />
-                              }
-                            />
-                          )}
-                        />
-                      )}
-                    />
-                  )}
-                /> */}
               </Route>
             </Routes>
           </Suspense>

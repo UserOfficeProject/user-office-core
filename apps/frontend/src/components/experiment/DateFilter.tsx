@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
 import React from 'react';
-import { DateTimeParam, useQueryParams } from 'use-query-params';
 
 import { SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 import PresetDateSelector, { TimeSpan } from './PresetDateSelector';
+
+export const DEFAULT_DATE_FORMAT = 'dd-MM-yyyy';
 
 export function getRelativeDatesFromToday(period: TimeSpan): {
   from?: Date;
@@ -50,9 +49,9 @@ export function getRelativeDatesFromToday(period: TimeSpan): {
 }
 
 interface DateFilterProps {
-  from?: Date;
-  to?: Date;
-  onChange?: (from?: Date, to?: Date) => void;
+  from?: string;
+  to?: string;
+  onChange?: (format: string, from?: Date, to?: Date) => void;
 }
 
 function DateFilter(props: DateFilterProps) {
@@ -61,12 +60,7 @@ function DateFilter(props: DateFilterProps) {
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
-  const [, setQuery] = useQueryParams({
-    from: DateTimeParam,
-    to: DateTimeParam,
-  });
-
-  const inputDateFormat = format ?? 'yyyy-MM-dd';
+  const inputDateFormat = format ?? DEFAULT_DATE_FORMAT;
 
   return (
     <Grid container spacing={2}>
@@ -75,25 +69,27 @@ function DateFilter(props: DateFilterProps) {
           <DatePicker
             format={inputDateFormat}
             label="From"
-            value={(props.from as any) ?? null}
-            onChange={(startsAt: unknown) => {
-              setQuery({
-                from: (startsAt as DateTime)?.toJSDate(),
-                to: props.to,
-              });
+            value={
+              props.from
+                ? DateTime.fromFormat(props.from, inputDateFormat)
+                : null
+            }
+            onChange={(startsAt) => {
+              props.onChange?.(
+                inputDateFormat,
+                startsAt?.toJSDate(),
+                DateTime.fromFormat(props.to!, inputDateFormat).toJSDate()
+              );
               setPresetValue(null);
             }}
             sx={(theme) => ({ marginRight: theme.spacing(1) })}
-            slots={{
-              textField: (tfProps) => (
-                <TextField
-                  {...tfProps}
-                  fullWidth
-                  data-cy="from-date-picker"
-                  margin="none"
-                />
-              ),
+            slotProps={{
+              textField: {
+                margin: 'none',
+                fullWidth: true,
+              },
             }}
+            data-cy="from-date-picker"
           />
         </Grid>
 
@@ -101,25 +97,25 @@ function DateFilter(props: DateFilterProps) {
           <DatePicker
             format={inputDateFormat}
             label="To"
-            value={(props.to as any) ?? null}
-            onChange={(endsAt: unknown) => {
-              setQuery({
-                from: props.from,
-                to: (endsAt as DateTime)?.toJSDate(),
-              });
+            value={
+              props.to ? DateTime.fromFormat(props.to, inputDateFormat) : null
+            }
+            onChange={(endsAt) => {
+              props.onChange?.(
+                inputDateFormat,
+                DateTime.fromFormat(props.from!, inputDateFormat).toJSDate(),
+                endsAt?.toJSDate()
+              );
               setPresetValue(null);
             }}
-            sx={(theme) => ({ marginRight: theme.spacing(1) })}
-            slots={{
-              textField: (tfProps) => (
-                <TextField
-                  {...tfProps}
-                  fullWidth
-                  data-cy="to-date-picker"
-                  margin="none"
-                />
-              ),
+            slotProps={{
+              textField: {
+                margin: 'none',
+                fullWidth: true,
+              },
             }}
+            sx={(theme) => ({ marginRight: theme.spacing(1) })}
+            data-cy="to-date-picker"
           />
         </Grid>
         <Grid item sm={6} xs={12}>
@@ -127,7 +123,7 @@ function DateFilter(props: DateFilterProps) {
             value={presetValue}
             setValue={(val) => {
               const { from, to } = getRelativeDatesFromToday(val);
-              setQuery({ from, to });
+              props.onChange?.(inputDateFormat, from, to);
               setPresetValue(val);
             }}
           />

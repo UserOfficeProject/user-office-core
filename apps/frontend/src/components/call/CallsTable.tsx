@@ -93,13 +93,13 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     { title: 'Short Code', field: 'shortCode' },
     {
       title: `Start Date (${timezone})`,
-      field: 'formattedStartCall',
+      render: (rowdata) => toFormattedDateTime(rowdata.startCall),
       customSort: (a: Call, b: Call) =>
         new Date(a.startCall).getTime() - new Date(b.startCall).getTime(),
     },
     {
       title: `End Date (${timezone})`,
-      field: 'formattedEndCall',
+      render: (rowdata) => toFormattedDateTime(rowdata.endCall),
       customSort: (a: Call, b: Call) =>
         new Date(a.endCall).getTime() - new Date(b.endCall).getTime(),
     },
@@ -276,12 +276,6 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     />
   );
 
-  const callsWithFormattedData = calls.map((call) => ({
-    ...call,
-    formattedStartCall: toFormattedDateTime(call.startCall),
-    formattedEndCall: toFormattedDateTime(call.endCall),
-  }));
-
   return (
     <div data-cy="calls-table">
       <Grid container spacing={2}>
@@ -327,7 +321,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           </Typography>
         }
         columns={columns}
-        data={callsWithFormattedData}
+        data={calls}
         isLoading={loadingCalls}
         detailPanel={[
           {

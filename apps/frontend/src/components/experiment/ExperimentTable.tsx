@@ -1,19 +1,21 @@
 import { Typography } from '@mui/material';
 import { TFunction } from 'i18next';
+import { DateTime } from 'luxon';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, NumberParam, DateParam } from 'use-query-params';
+import { useQueryParams, NumberParam, StringParam } from 'use-query-params';
 
 import SuperMaterialTable, {
   DefaultQueryParams,
 } from 'components/common/SuperMaterialTable';
 import ProposalEsiDetailsButton from 'components/questionary/questionaryComponents/ProposalEsiBasis/ProposalEsiDetailsButton';
-import { GetScheduledEventsCoreQuery } from 'generated/sdk';
+import { GetScheduledEventsCoreQuery, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useScheduledEvents } from 'hooks/scheduledEvent/useScheduledEvents';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
+import { DEFAULT_DATE_FORMAT } from './DateFilter';
 import { ExperimentUrlQueryParamsType } from './ExperimentUrlQueryParamsType';
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
@@ -25,15 +27,16 @@ function ExperimentTable() {
       ...DefaultQueryParams,
       call: NumberParam,
       instrument: NumberParam,
-      from: DateParam,
-      to: DateParam,
+      from: StringParam,
+      to: StringParam,
     });
 
   const { scheduledEvents, setScheduledEvents, loadingEvents, setArgs } =
     useScheduledEvents({});
 
-  const { toFormattedDateTime } = useFormattedDateTime({
+  const { toFormattedDateTime, format } = useFormattedDateTime({
     shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
   const columns = (t: TFunction<'translation', undefined>) => [
@@ -82,8 +85,18 @@ function ExperimentTable() {
         callId: urlQueryParams.call,
         instrumentId: urlQueryParams.instrument,
         overlaps: {
-          from: urlQueryParams.from ? urlQueryParams.from : undefined,
-          to: urlQueryParams.to ? urlQueryParams.to : undefined,
+          from: urlQueryParams.from
+            ? DateTime.fromFormat(
+                urlQueryParams.from,
+                format || DEFAULT_DATE_FORMAT
+              )
+            : undefined,
+          to: urlQueryParams.to
+            ? DateTime.fromFormat(
+                urlQueryParams.to,
+                format || DEFAULT_DATE_FORMAT
+              )
+            : undefined,
         },
       },
     });
@@ -93,6 +106,7 @@ function ExperimentTable() {
     urlQueryParams.instrument,
     urlQueryParams.from,
     urlQueryParams.to,
+    format,
   ]);
 
   const ScheduledEventDetails = React.useCallback(

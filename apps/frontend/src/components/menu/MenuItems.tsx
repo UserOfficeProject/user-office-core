@@ -21,16 +21,20 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import i18n from 'i18n';
+import { DateTime } from 'luxon';
 import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useLocation } from 'react-router-dom';
-import { encodeDate } from 'use-query-params';
 
 import Tooltip from 'components/common/MenuTooltip';
-import { getRelativeDatesFromToday } from 'components/experiment/DateFilter';
+import {
+  DEFAULT_DATE_FORMAT,
+  getRelativeDatesFromToday,
+} from 'components/experiment/DateFilter';
 import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { Call, FeatureId, UserRole } from 'generated/sdk';
+import { Call, FeatureId, SettingsId, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
 import { TemplateMenuListItem } from './TemplateMenuListItem';
 import BoxIcon from '../common/icons/BoxIcon';
@@ -174,6 +178,9 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const proposalDisabled = callsData.length === 0;
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
+  const { format } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const isSchedulerEnabled = context.featuresMap.get(
     FeatureId.SCHEDULER
@@ -190,6 +197,11 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   )?.isEnabled;
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
+
+  const formattedDate = (value?: Date) =>
+    value
+      ? DateTime.fromJSDate(value).toFormat(format || DEFAULT_DATE_FORMAT)
+      : undefined;
 
   const user = (
     <div data-cy="user-menu-items">
@@ -249,7 +261,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         <Tooltip title="Experiments">
           <ListItemButton
             component={NavLink}
-            to={`/ExperimentPage?from=${encodeDate(from)}&to=${encodeDate(to)}`}
+            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
           >
             <ListItemIcon>
               <EventIcon />
