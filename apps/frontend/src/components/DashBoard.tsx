@@ -436,7 +436,7 @@ const Dashboard = () => {
             {isUserOfficer && (
               <TitledRoute
                 setHeader={setHeader}
-                title="Techniques"
+                title={i18n.format(t('Technique'), 'plural')}
                 path="/Techniques"
                 component={TechniquesPage}
               />

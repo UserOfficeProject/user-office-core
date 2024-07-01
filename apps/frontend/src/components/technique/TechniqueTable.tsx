@@ -1,10 +1,12 @@
 import { Column } from '@material-table/core';
-import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Dialog, DialogContent, Typography } from '@mui/material';
+import i18n from 'i18n';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
+import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -22,25 +24,6 @@ import {
   UserRole,
 } from '../../generated/sdk';
 
-const columns: Column<TechniqueFragment>[] = [
-  {
-    title: 'Name',
-    field: 'name',
-  },
-  {
-    title: 'Short code',
-    field: 'shortCode',
-  },
-  {
-    title: 'Description',
-    field: 'description',
-  },
-  {
-    title: 'Instruments',
-    render: (data) => data.instruments.length,
-  },
-];
-
 const TechniqueTable = () => {
   const {
     loadingTechniques,
@@ -57,10 +40,31 @@ const TechniqueTable = () => {
   const [selectedTechnique, setSelectedTechnique] =
     useState<TechniqueFragment | null>(null);
 
+  const { t } = useTranslation();
+
+  const columns: Column<TechniqueFragment>[] = [
+    {
+      title: 'Name',
+      field: 'name',
+    },
+    {
+      title: 'Short code',
+      field: 'shortCode',
+    },
+    {
+      title: 'Description',
+      field: 'description',
+    },
+    {
+      title: i18n.format(t('instrument'), 'plural'),
+      render: (data) => data.instruments.length,
+    },
+  ];
+
   const onTechniqueDelete = async (techniqueDeletedId: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Technique deleted successfully!',
+        toastSuccessMessage: t('Technique') + ' deleted successfully!',
       }).deleteTechnique({
         id: techniqueDeletedId as number,
       });
@@ -71,7 +75,7 @@ const TechniqueTable = () => {
     }
   };
 
-  const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
+  const AssignmentIndIcon = (): JSX.Element => <ScienceIcon />;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function setAssigningTechniqueId(technique: TechniqueFragment): void {
@@ -86,7 +90,11 @@ const TechniqueTable = () => {
       const techniqueId = selectedTechnique.id;
       if (instruments?.length) {
         await api({
-          toastSuccessMessage: `Instrument/s assigned to the selected technique successfully!`,
+          toastSuccessMessage:
+            t('instrument') +
+            '/s assigned to the selected ' +
+            i18n.format(t('Technique'), 'lowercase') +
+            ' successfully!',
         })
           .assignInstrumentsToTechnique({
             instrumentIds: instruments.map((instrument) => instrument.id),
@@ -100,9 +108,9 @@ const TechniqueTable = () => {
                     ...techniqueItem,
                     instruments: [...techniqueItem.instruments, ...instruments],
                   };
-                } else {
-                  return techniqueItem;
                 }
+
+                return techniqueItem;
               })
             );
           });
@@ -121,7 +129,11 @@ const TechniqueTable = () => {
       const techniqueId = selectedTechnique.id;
       if (instrumentIds?.length) {
         await api({
-          toastSuccessMessage: `Instrument/s removed from selected technique successfully!`,
+          toastSuccessMessage:
+            t('instrument') +
+            '/s removed from selected ' +
+            i18n.format(t('Technique'), 'lowercase') +
+            ' successfully!',
         })
           .removeInstrumentsFromTechnique({
             instrumentIds,
@@ -138,9 +150,9 @@ const TechniqueTable = () => {
                         !instrumentIds.find((id) => id === instrument.id)
                     ),
                   };
-                } else {
-                  return techniqueItem;
                 }
+
+                return techniqueItem;
               })
             );
           });
@@ -193,7 +205,7 @@ const TechniqueTable = () => {
           }}
           title={
             <Typography variant="h6" component="h2">
-              Techniques
+              {i18n.format(t('Technique'), 'plural')}
             </Typography>
           }
           columns={columns}
@@ -201,7 +213,13 @@ const TechniqueTable = () => {
           isLoading={loadingTechniques}
           detailPanel={[
             {
-              tooltip: 'Show Instruments and Permissions',
+              tooltip:
+                'Show ' +
+                i18n.format(
+                  i18n.format(t('instrument'), 'plural'),
+                  'lowercase'
+                ) +
+                ' and permissions',
               render: AssignedInstruments,
             },
           ]}
@@ -214,7 +232,12 @@ const TechniqueTable = () => {
               ? [
                   {
                     icon: AssignmentIndIcon,
-                    tooltip: 'Assign/remove instruments',
+                    tooltip:
+                      'Assign/remove ' +
+                      i18n.format(
+                        i18n.format(t('instrument'), 'plural'),
+                        'lowercase'
+                      ),
                     onClick: (_event: unknown, rowData: unknown): void =>
                       setAssigningTechniqueId(rowData as TechniqueFragment),
                   },

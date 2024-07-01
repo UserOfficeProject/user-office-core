@@ -2,6 +2,7 @@ import MaterialTable from '@material-table/core';
 import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Technique } from 'generated/sdk';
 
@@ -46,6 +47,8 @@ const AssignedInstrumentsTable = ({
 }: AssignedInstrumentsTableProps) => {
   const classes = useStyles();
 
+  const { t } = useTranslation();
+
   return (
     <div
       className={classes.root}
@@ -53,7 +56,7 @@ const AssignedInstrumentsTable = ({
     >
       <MaterialTable
         columns={instrumentContactColumns}
-        title={`Instrument Details`}
+        title={t('instrument') + ' Details'}
         data={technique.instruments}
         options={{
           search: false,

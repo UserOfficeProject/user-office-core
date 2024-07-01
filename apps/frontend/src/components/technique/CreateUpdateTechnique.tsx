@@ -36,7 +36,7 @@ const CreateUpdateTechnique = ({
         if (technique) {
           try {
             const { updateTechnique } = await api({
-              toastSuccessMessage: t('technique') + ' updated successfully!',
+              toastSuccessMessage: t('Technique') + ' updated successfully!',
             }).updateTechnique({
               ...values,
               techniqueId: technique.id,
@@ -49,7 +49,7 @@ const CreateUpdateTechnique = ({
         } else {
           try {
             const { createTechnique } = await api({
-              toastSuccessMessage: t('technique') + ' created successfully!',
+              toastSuccessMessage: t('Technique') + ' created successfully!',
             }).createTechnique(values);
 
             close(createTechnique);
@@ -63,7 +63,7 @@ const CreateUpdateTechnique = ({
         <Form>
           <Typography variant="h6" component="h1">
             {(technique ? 'Update ' : 'Create new ') +
-              i18n.format(t('technique'), 'lowercase')}
+              i18n.format(t('Technique'), 'lowercase')}
           </Typography>
           <Field
             name="name"

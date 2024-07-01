@@ -291,7 +291,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           <ListItemIcon>
             <Science />
           </ListItemIcon>
-          <ListItemText primary="Techniques" />
+          <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItem>
       </Tooltip>
       {isFapEnabled && (

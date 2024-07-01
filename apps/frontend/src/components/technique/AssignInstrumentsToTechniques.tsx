@@ -4,7 +4,9 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
+import i18n from 'i18n';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { InstrumentFragment } from 'generated/sdk';
@@ -29,6 +31,8 @@ const AssignInstrumentsToTechniques = ({
   const { instruments, loadingInstruments } = useInstruments();
 
   const uniqueInstrumentIds = getUniqueArray(currentlyAssignedInstrumentIds);
+
+  const { t } = useTranslation();
 
   return (
     <Container
@@ -82,14 +86,26 @@ const AssignInstrumentsToTechniques = ({
         {({ isSubmitting, values }): JSX.Element => (
           <Form>
             <Typography variant="h6" component="h1">
-              {`Assign instruments to technique`}
+              {'Assign ' +
+                i18n.format(
+                  i18n.format(t('instrument'), 'plural'),
+                  'lowercase'
+                ) +
+                ' to ' +
+                i18n.format(t('Technique'), 'lowercase')}
             </Typography>
 
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <FormikUIAutocomplete
                   name="selectedInstrumentIds"
-                  label="Select instruments"
+                  label={
+                    'Select ' +
+                    i18n.format(
+                      i18n.format(t('instrument'), 'plural'),
+                      'lowercase'
+                    )
+                  }
                   loading={loadingInstruments}
                   multiple={true}
                   items={instruments.map((instrument) => ({
@@ -97,15 +113,25 @@ const AssignInstrumentsToTechniques = ({
                     text: instrument.name,
                   }))}
                   disabled={isSubmitting}
-                  noOptionsText={'No Instruments'}
+                  noOptionsText={'No ' + i18n.format(t('instrument'), 'plural')}
                   data-cy="instrument-selection"
                 />
               </Grid>
             </Grid>
             {!values.selectedInstrumentIds.length && (
               <Alert severity="warning" data-cy="remove-instrument-alert">
-                {`Be aware that leaving instrument selection empty will remove
-                assigned instrument from technique.`}
+                {'Be aware that leaving the ' +
+                  i18n.format(
+                    i18n.format(t('instrument'), 'plural'),
+                    'lowercase'
+                  ) +
+                  ' selection empty will remove any assigned ' +
+                  i18n.format(
+                    i18n.format(t('instrument'), 'plural'),
+                    'lowercase'
+                  ) +
+                  ' from the ' +
+                  i18n.format(t('Technique'), 'lowercase')}
               </Alert>
             )}
             <Button
