@@ -108,9 +108,9 @@ const TechniqueTable = () => {
                     ...techniqueItem,
                     instruments: [...techniqueItem.instruments, ...instruments],
                   };
-                } else {
-                  return techniqueItem;
                 }
+
+                return techniqueItem;
               })
             );
           });
@@ -150,9 +150,9 @@ const TechniqueTable = () => {
                         !instrumentIds.find((id) => id === instrument.id)
                     ),
                   };
-                } else {
-                  return techniqueItem;
                 }
+
+                return techniqueItem;
               })
             );
           });
