@@ -67,6 +67,7 @@ export default class FapQueries {
     { fapId, callId }: { fapId: number; callId: number | null }
   ) {
     if (
+      agent?.isApiAccessToken ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
