@@ -9,6 +9,7 @@ import { QuestionaryComponentTechniquePicker } from './QuestionaryComponentTechn
 import { QuestionTechniquePickerForm } from './QuestionTechniquePickerForm';
 import { QuestionTemplateRelationTechniquePickerForm } from './QuestionTemplateRelationTechniquePickerForm';
 import TechniquePickerAnswerRenderer from './TechniquePickerAnswerRenderer';
+import TechniquePickerSearchCriteriaComponent from './TechniquePickerSearchCriteriaComponent';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const techniquePickerDefinition: QuestionaryComponentDefinition = {
@@ -27,6 +28,7 @@ export const techniquePickerDefinition: QuestionaryComponentDefinition = {
   },
   createYupValidationSchema: instrumentPickerValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || null,
+  searchCriteriaComponent: TechniquePickerSearchCriteriaComponent,
 };
 
 export {};
