@@ -107,7 +107,7 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
       return;
     }
 
-    await techniqueMutations.assignProposalToTechniqueInternal(null, {
+    await techniqueMutations.assignProposalToTechniquesInternal(null, {
       techniqueIds,
       proposalPk: proposal.primaryKey,
     });
