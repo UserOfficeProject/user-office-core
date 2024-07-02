@@ -43,6 +43,7 @@ export default function ProposalContainer(props: ProposalContainerProps) {
     (state: ProposalSubmissionState, action: Event) => {
       switch (action.type) {
         case 'ITEM_WITH_QUESTIONARY_CREATED':
+          // TODO: Check if we can use navigate here instead of replaceState.
           window.history.replaceState(
             null,
             '',

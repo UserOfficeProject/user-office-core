@@ -2,7 +2,7 @@ import Button from '@mui/material/Button';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
-import makeStyles from '@mui/styles/makeStyles';
+import { useTheme } from '@mui/material/styles';
 import {
   Form,
   Formik,
@@ -10,36 +10,11 @@ import {
   FormikHelpers,
   FormikValues,
 } from 'formik';
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from './ActionButtonContainer';
 import UOLoader from './UOLoader';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: '100%',
-  },
-  button: {
-    marginRight: theme.spacing(1),
-  },
-  instructions: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  stepper: {
-    padding: '20px 0 0',
-    flexWrap: 'wrap',
-  },
-  formErrors: {
-    color: theme.palette.error.main,
-    marginBottom: '10px',
-  },
-  step: {
-    cursor: 'pointer',
-    padding: theme.spacing(1),
-  },
-}));
 
 interface WizardProps
   extends Pick<
@@ -55,10 +30,12 @@ export const Wizard = ({
   onSubmit,
   shouldCreate,
 }: WizardProps) => {
+  const theme = useTheme();
   const [stepNumber, setStepNumber] = useState(0);
-  const steps = React.Children.toArray(children) as React.ReactElement[];
+  const steps = React.Children.toArray(
+    children as ReactNode
+  ) as React.ReactElement[];
   const [snapshot, setSnapshot] = useState(initialValues);
-  const classes = useStyles();
 
   const step = steps[stepNumber];
   const totalSteps = steps.length;
@@ -105,7 +82,10 @@ export const Wizard = ({
           <Stepper
             nonLinear
             activeStep={stepNumber}
-            className={classes.stepper}
+            sx={{
+              padding: '20px 0 0',
+              flexWrap: 'wrap',
+            }}
           >
             {steps.map((stepItem, index) => {
               const stepProps: {
@@ -117,7 +97,14 @@ export const Wizard = ({
               const labelProps: { optional?: React.ReactNode } = {};
 
               return (
-                <Step key={index} {...stepProps} className={classes.step}>
+                <Step
+                  key={index}
+                  {...stepProps}
+                  sx={{
+                    cursor: 'pointer',
+                    padding: theme.spacing(1),
+                  }}
+                >
                   <StepLabel {...labelProps}>{stepItem.props.title}</StepLabel>
                 </Step>
               );
@@ -129,7 +116,9 @@ export const Wizard = ({
               disabled={stepNumber === 0 || formik.isSubmitting}
               onClick={() => previous(formik.values)}
               fullWidth
-              className={classes.button}
+              sx={{
+                marginRight: theme.spacing(1),
+              }}
               variant="text"
             >
               Back
@@ -139,7 +128,9 @@ export const Wizard = ({
               data-cy={isLastStep ? 'submit' : 'next-step'}
               type="submit"
               fullWidth
-              className={classes.button}
+              sx={{
+                marginRight: theme.spacing(1),
+              }}
               disabled={formik.isSubmitting}
             >
               {formik.isSubmitting && <UOLoader size={14} />}

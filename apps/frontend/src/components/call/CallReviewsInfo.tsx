@@ -1,12 +1,12 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-mui';
-import { DatePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import DatePicker from 'components/common/FormikUIDatePicker';
+import TextField from 'components/common/FormikUITextField';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -27,7 +27,6 @@ const CallReviewAndNotification = () => {
   });
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
-  const mask = dateFormat?.replace(/[a-zA-Z]/g, '_');
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
@@ -46,8 +45,7 @@ const CallReviewAndNotification = () => {
           name="startReview"
           label="Start of review"
           id="start-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           component={DatePicker}
           inputProps={{ placeholder: dateFormat }}
@@ -64,8 +62,7 @@ const CallReviewAndNotification = () => {
           name="endReview"
           label="End of review"
           id="end-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           minDate={startReview}
           component={DatePicker}
@@ -82,8 +79,7 @@ const CallReviewAndNotification = () => {
           name="startFapReview"
           label="Start of Fap review"
           id="start-fap-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
@@ -97,8 +93,7 @@ const CallReviewAndNotification = () => {
           name="endFapReview"
           label="End of Fap review"
           id="end-fap-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           allowSameDateSelection
           minDate={startFapReview}

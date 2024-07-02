@@ -2,7 +2,7 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import Lock from '@mui/icons-material/Lock';
 import { Button } from '@mui/material';
 import React, { useContext, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { StringParam, useQueryParams } from 'use-query-params';
 
 import AnimatedEllipsis from 'components/AnimatedEllipsis';
@@ -39,7 +39,7 @@ function ExternalAuth() {
   const [urlQueryParams] = useQueryParams(ExternalAuthQueryParams);
 
   const unauthorizedApi = useUnauthorizedApi();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const isFirstRun = useRef<boolean>(true);
 
@@ -85,7 +85,7 @@ function ExternalAuth() {
             color="inherit"
             size="small"
             variant="outlined"
-            onClick={() => history.push('/')}
+            onClick={() => navigate('/')}
           >
             Cancel
           </Button>
@@ -104,7 +104,7 @@ function ExternalAuth() {
             color="inherit"
             size="small"
             variant="outlined"
-            onClick={() => history.push('/')}
+            onClick={() => navigate('/')}
           >
             Cancel
           </Button>

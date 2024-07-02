@@ -1,32 +1,9 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { makeStyles } from '@mui/styles';
-import clsx from 'clsx';
+import Box from '@mui/material/Box';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
 import { truncateString } from 'utils/truncateString';
-const useStyles = makeStyles(() => ({
-  container: {
-    position: 'relative',
-    display: 'inline-block',
-    cursor: 'pointer',
-  },
-  hidden: {
-    opacity: 0,
-  },
-  copyIcon: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    transition: 'all 0.15s ease-in-out',
-  },
-  positionRight: {
-    right: '-28px',
-  },
-  positionLeft: {
-    left: '-28px',
-  },
-}));
 
 interface CopyToClipboardProps {
   text: string;
@@ -38,7 +15,6 @@ const CopyToClipboard = (props: CopyToClipboardProps) => {
   const { successMessage, children, text, position = 'left' } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [showIcon, setShowIcon] = useState(false);
-  const classes = useStyles();
 
   const handleClick = () => {
     enqueueSnackbar(
@@ -58,22 +34,32 @@ const CopyToClipboard = (props: CopyToClipboardProps) => {
   };
 
   return (
-    <span
-      className={classes.container}
+    <Box
+      component="span"
+      sx={{
+        position: 'relative',
+        display: 'inline-block',
+        cursor: 'pointer',
+      }}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
       onClick={handleClick}
     >
       {children}
       <ContentCopyIcon
-        className={clsx({
-          [classes.hidden]: !showIcon,
-          [classes.copyIcon]: true,
-          [classes.positionRight]: position === 'right',
-          [classes.positionLeft]: position === 'left',
-        })}
+        sx={{
+          ...{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            transition: 'all 0.15s ease-in-out',
+          },
+          ...(!showIcon && { opacity: 0 }),
+          ...(position === 'right' && { right: '-28px' }),
+          ...(position === 'left' && { left: '-28px' }),
+        }}
       />
-    </span>
+    </Box>
   );
 };
 

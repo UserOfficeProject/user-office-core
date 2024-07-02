@@ -1,28 +1,24 @@
 import Box from '@mui/material/Box';
 import React, { useContext, useEffect } from 'react';
-import { RouteComponentProps, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 
 import UOLoader from './UOLoader';
 
-type ChangeRouteStateProps = {
-  newToken: string;
-};
-
-const ChangeRole = (props: RouteComponentProps) => {
+const ChangeRole = () => {
   const { handleNewToken } = useContext(UserContext);
-  const history = useHistory();
-  const newToken = (props.history.location.state as ChangeRouteStateProps)
-    ?.newToken;
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const newToken = state.newToken;
 
   useEffect(() => {
     if (newToken) {
       handleNewToken(newToken);
 
-      history.push('/');
+      navigate('/');
     }
-  }, [newToken, handleNewToken, history]);
+  }, [newToken, handleNewToken, navigate]);
 
   return (
     <Box

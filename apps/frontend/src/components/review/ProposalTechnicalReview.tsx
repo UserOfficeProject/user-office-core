@@ -1,21 +1,19 @@
 import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation/lib/Review';
-import { Formik, Form, Field, useFormikContext } from 'formik';
-import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
+import { Formik, Form, Field } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import { Prompt } from 'react-router';
 
-import { useCheckAccess } from 'components/common/Can';
 import {
   FileIdWithCaptionAndFigure,
   FileUploadComponent,
 } from 'components/common/FileUploadComponent';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -24,17 +22,12 @@ import {
   UserRole,
   Proposal,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
-
-const useStyles = makeStyles((theme) => ({
-  submitButton: {
-    marginLeft: theme.spacing(1),
-  },
-}));
 
 type TechnicalReviewFormType = {
   status: string;
@@ -60,7 +53,6 @@ const ProposalTechnicalReview = ({
 }: ProposalTechnicalReviewProps) => {
   const { api } = useDataApiWithFeedback();
   const [shouldSubmit, setShouldSubmit] = useState(false);
-  const classes = useStyles();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
@@ -94,17 +86,6 @@ const ProposalTechnicalReview = ({
       value: TechnicalReviewStatus.UNFEASIBLE,
     },
   ];
-
-  const PromptIfDirty = () => {
-    const formik = useFormikContext();
-
-    return (
-      <Prompt
-        when={formik.dirty && formik.submitCount === 0}
-        message="Changes you recently made in this tab will be lost! Are you sure?"
-      />
-    );
-  };
 
   const handleUpdateOrSubmit = async (
     values: TechnicalReviewFormType,
@@ -199,35 +180,21 @@ const ProposalTechnicalReview = ({
           }
         }}
       >
-        {({ isSubmitting, setFieldValue, values }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form>
             <PromptIfDirty />
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="status"
-                    shrink={!!values.status}
-                    required
-                  >
-                    Status
-                  </InputLabel>
-                  <Field
-                    name="status"
-                    type="text"
-                    component={Select}
-                    data-cy="technical-review-status"
-                    disabled={shouldDisableForm(isSubmitting)}
-                    MenuProps={{ 'data-cy': 'technical-review-status-options' }}
-                    required
-                  >
-                    {statusOptions.map(({ value, text }) => (
-                      <MenuItem value={value} key={value}>
-                        {text}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
+                <Field
+                  name="status"
+                  options={statusOptions}
+                  component={Select}
+                  inputLabel={{ htmlFor: 'status', required: true }}
+                  label="Status"
+                  data-cy="technical-review-status"
+                  required
+                  formControl={{ margin: 'normal' }}
+                />
               </Grid>
               <Grid item sm={6} xs={12}>
                 <Field
@@ -235,12 +202,11 @@ const ProposalTechnicalReview = ({
                   label={`Time allocation(${proposal.call?.allocationTimeUnit}s)`}
                   id="time-allocation-input"
                   type="number"
-                  component={TextField}
-                  fullWidth
-                  autoComplete="off"
                   data-cy="timeAllocation"
                   disabled={shouldDisableForm(isSubmitting)}
+                  component={TextField}
                   required
+                  autoComplete="off"
                 />
               </Grid>
               {(isUserOfficer || isInstrumentScientist) && (
@@ -355,11 +321,9 @@ const ProposalTechnicalReview = ({
                       name="submitted"
                       component={CheckboxWithLabel}
                       type="checkbox"
-                      Label={{
-                        label: 'Submitted',
-                      }}
-                      disabled={isSubmitting}
                       data-cy="is-review-submitted"
+                      Label={{ label: 'Submitted' }}
+                      disabled={isSubmitting}
                     />
                   )}
                   <Button
@@ -380,7 +344,7 @@ const ProposalTechnicalReview = ({
                         isSubmitting || data.submitted || isInternalReviewer
                       }
                       type="submit"
-                      className={classes.submitButton}
+                      sx={(theme) => ({ marginLeft: theme.spacing(1) })}
                       onClick={() => setShouldSubmit(true)}
                       data-cy="submit-technical-review"
                     >

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import MuiLink from '@mui/material/Link';
+import { useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import React, { useContext, useMemo, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -33,6 +33,7 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
   const isTabletOrMobile = useMediaQuery('(max-width: 1224px)');
   const isPortraitMode = useMediaQuery('(orientation: portrait)');
   const [logo, setLogo] = useState('');
+  const theme = useTheme();
 
   if (location.pathname === '/') document.title = 'User Office Dashboard';
   const logoFilename = settingsMap.get(
@@ -43,49 +44,6 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
     setLogo('/images/' + logoFilename);
   }, [logoFilename]);
 
-  const useStyles = makeStyles((theme) => ({
-    appBar: {
-      zIndex: isTabletOrMobile ? theme.zIndex.drawer : theme.zIndex.drawer + 1,
-      transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
-    appBarShift: {
-      marginLeft: isTabletOrMobile ? 0 : drawerWidth,
-      width: isTabletOrMobile ? '100%' : `calc(100% - ${drawerWidth}px)`,
-      transition: isTabletOrMobile
-        ? 'none'
-        : theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-    },
-    menuButton: {
-      marginRight: 15,
-    },
-    menuButtonHidden: {
-      display: isTabletOrMobile ? 'inline-flex' : 'none',
-    },
-    title: {
-      flexGrow: 1,
-    },
-    profileLink: {
-      color: theme.palette.common.white,
-      textDecoration: 'none',
-      borderBottom: '1px dashed',
-      borderBottomColor: theme.palette.common.white,
-      padding: '3px',
-      '&:hover': {
-        textDecoration: 'none',
-      },
-    },
-    horizontalSpacing: {
-      marginLeft: 'auto',
-      margin: theme.spacing(0, 0.5),
-    },
-  }));
-  const classes = useStyles();
   const { user, roles, currentRole } = useContext(UserContext);
   const settingsContext = useContext(SettingsContext);
   const humanReadableActiveRole = useMemo(
@@ -101,7 +59,25 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
   return (
     <AppBar
       position="fixed"
-      className={clsx(classes.appBar, open && classes.appBarShift)}
+      sx={{
+        zIndex: isTabletOrMobile
+          ? theme.zIndex.drawer
+          : theme.zIndex.drawer + 1,
+        transition: theme.transitions.create(['width', 'margin'], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+        ...(open && {
+          marginLeft: isTabletOrMobile ? 0 : drawerWidth,
+          width: isTabletOrMobile ? '100%' : `calc(100% - ${drawerWidth}px)`,
+          transition: isTabletOrMobile
+            ? 'none'
+            : theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+              }),
+        }),
+      }}
     >
       <Toolbar>
         <IconButton
@@ -109,7 +85,10 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
           color="inherit"
           aria-label="Open drawer"
           onClick={handleDrawerOpen}
-          className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+          sx={{
+            marginRight: 15,
+            ...(open && { display: isTabletOrMobile ? 'inline-flex' : 'none' }),
+          }}
           data-cy="open-drawer"
         >
           <MenuIcon />
@@ -125,36 +104,54 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
             variant="h6"
             color="inherit"
             noWrap
-            className={classes.title}
+            sx={{ flexGrow: 1 }}
           >
             {location.pathname === '/'
               ? 'User Office / Dashboard'
               : 'User Office / ' + header}
           </Typography>
         )}
-        <div className={classes.horizontalSpacing}>
+        <Box sx={{ marginLeft: 'auto', margin: theme.spacing(0, 0.5) }}>
           Logged in as{' '}
           {externalProfileLink ? (
-            <a
+            <MuiLink
               href={externalProfileLink}
               target="_blank"
               rel="noreferrer"
-              className={classes.profileLink}
+              sx={{
+                color: theme.palette.common.white,
+                textDecoration: 'none',
+                borderBottom: '1px dashed',
+                borderBottomColor: theme.palette.common.white,
+                padding: '3px',
+                '&:hover': {
+                  textDecoration: 'none',
+                },
+              }}
             >
               {user.email}
-            </a>
+            </MuiLink>
           ) : (
             <MuiLink
               data-cy="active-user-profile"
               component={Link}
               to={`/ProfilePage/${user.id}`}
-              className={classes.profileLink}
+              sx={{
+                color: theme.palette.common.white,
+                textDecoration: 'none',
+                borderBottom: '1px dashed',
+                borderBottomColor: theme.palette.common.white,
+                padding: '3px',
+                '&:hover': {
+                  textDecoration: 'none',
+                },
+              }}
             >
               {user.email}
             </MuiLink>
           )}
           {roles.length > 1 && ` (${humanReadableActiveRole})`}
-        </div>
+        </Box>
         <AccountActionButton />
       </Toolbar>
     </AppBar>

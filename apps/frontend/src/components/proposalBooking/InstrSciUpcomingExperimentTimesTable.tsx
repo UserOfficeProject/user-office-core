@@ -44,7 +44,7 @@ export default function InstrSciUpcomingExperimentTimesTable() {
           title="Upcoming experiments"
           options={{
             search: true,
-            padding: 'normal',
+            padding: 'default',
             emptyRowsWhenPaging: true,
             paging: true,
           }}

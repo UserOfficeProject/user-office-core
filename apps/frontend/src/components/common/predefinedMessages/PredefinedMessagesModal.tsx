@@ -1,12 +1,12 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/SaveOutlined';
+import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { Field, Form, Formik } from 'formik';
-import { Autocomplete } from 'formik-mui';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import { usePredefinedMessagesData } from 'hooks/predefinedMessage/usePredefinedMessagesData';

@@ -4,15 +4,14 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
-import { Formik, Form, Field, useFormikContext } from 'formik';
-import { CheckboxWithLabel, Select } from 'formik-mui';
+import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
-import { Prompt } from 'react-router';
 
-import { useCheckAccess } from 'components/common/Can';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import {
@@ -21,16 +20,11 @@ import {
   FapMeetingDecision,
   UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledPaper, StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
-
-const useStyles = makeStyles((theme) => ({
-  button: {
-    margin: theme.spacing(0, 0, 0, 1),
-  },
-}));
 
 type FinalRankingFormProps = {
   proposalData: Proposal;
@@ -51,7 +45,6 @@ const FinalRankingForm = ({
   instrumentId,
   fapId,
 }: FinalRankingFormProps) => {
-  const classes = useStyles();
   const [shouldClose, setShouldClose] = useState<boolean>(false);
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -76,17 +69,6 @@ const FinalRankingForm = ({
     { text: 'Reserved', value: ProposalEndStatus.RESERVED },
     { text: 'Rejected', value: ProposalEndStatus.REJECTED },
   ];
-
-  const PromptIfDirty = () => {
-    const formik = useFormikContext();
-
-    return (
-      <Prompt
-        when={formik.dirty && formik.submitCount === 0}
-        message="Changes you recently made in this tab will be lost! Are you sure?"
-      />
-    );
-  };
 
   const handleSubmit = async (values: typeof initialData) => {
     const shouldSubmitMeetingDecision =
@@ -280,7 +262,9 @@ const FinalRankingForm = ({
                           <Box
                             display="flex"
                             alignItems="center"
-                            className={classes.button}
+                            sx={(theme) => ({
+                              margin: theme.spacing(0, 0, 0, 1),
+                            })}
                           >
                             <UOLoader buttonSized />
                           </Box>
@@ -305,7 +289,9 @@ const FinalRankingForm = ({
                             setShouldSubmit(false);
                           }}
                           color={isUserOfficer ? 'primary' : 'secondary'}
-                          className={classes.button}
+                          sx={(theme) => ({
+                            margin: theme.spacing(0, 0, 0, 1),
+                          })}
                           data-cy="save"
                           disabled={shouldDisableForm(isSubmitting)}
                         >
@@ -318,7 +304,9 @@ const FinalRankingForm = ({
                             setShouldSubmit(false);
                           }}
                           color={isUserOfficer ? 'primary' : 'secondary'}
-                          className={classes.button}
+                          sx={(theme) => ({
+                            margin: theme.spacing(0, 0, 0, 1),
+                          })}
                           data-cy="saveAndContinue"
                           disabled={shouldDisableForm(isSubmitting)}
                         >
@@ -331,7 +319,9 @@ const FinalRankingForm = ({
                               setShouldClose(false);
                               setShouldSubmit(true);
                             }}
-                            className={classes.button}
+                            sx={(theme) => ({
+                              margin: theme.spacing(0, 0, 0, 1),
+                            })}
                             data-cy="submitFapMeeting"
                             disabled={shouldDisableForm(isSubmitting)}
                           >

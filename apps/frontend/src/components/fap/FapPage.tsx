@@ -1,11 +1,11 @@
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import { Fap, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
@@ -15,8 +15,8 @@ import FapMembers from './Members/FapMembers';
 import FapProposalsAndAssignmentsView from './Proposals/FapProposalsAndAssignmentsView';
 
 const FapPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const { loading, fap, setFap } = useFapData(parseInt(id));
+  const { id } = useParams();
+  const { loading, fap, setFap } = useFapData(id);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isFapChairOrSecretary = useCheckAccess([
     UserRole.FAP_CHAIR,

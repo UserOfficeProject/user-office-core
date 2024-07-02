@@ -46,7 +46,7 @@ const withPrompt = <T extends {}>(WrappedComponent: React.ComponentType<T>) => {
     }, [onPrompt, answer]);
 
     const prompt = useCallback(
-      (onPrompt, options: Options) => (): void => {
+      (onPrompt: FunctionType, options: Options) => (): void => {
         setOnPrompt(() => onPrompt);
         setOptions({ ...defaultOptions, ...options });
         setAnswer(options.prefilledAnswer);

@@ -1,13 +1,13 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { Tooltip } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Chip from '@mui/material/Chip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, FieldArrayRenderProps } from 'formik';
 import React, { useState, KeyboardEvent } from 'react';
 import * as Yup from 'yup';
@@ -18,14 +18,6 @@ import {
   EmailStatusActionRecipient,
   EmailStatusActionRecipients,
 } from 'generated/sdk';
-
-const useStyles = makeStyles((theme) => ({
-  eventDescription: {
-    margin: '-5px 0',
-    fontSize: 'small',
-    color: theme.palette.grey[400],
-  },
-}));
 
 type EmailActionConfigProps = {
   emailStatusActionConfig: EmailActionConfigType;
@@ -42,7 +34,6 @@ const EmailActionConfig = ({
   isRecipientRequired = false,
   isEmailTemplateRequired = false,
 }: EmailActionConfigProps) => {
-  const classes = useStyles();
   const [otherRecipientsValue, setOtherRecipientsValue] = useState('');
   const [otherRecipientsFieldError, setOtherRecipientsFieldError] = useState<
     string | null
@@ -225,9 +216,15 @@ const EmailActionConfig = ({
                     }
                     label={recipient.name}
                   />
-                  <p className={classes.eventDescription}>
+                  <Box
+                    sx={(theme) => ({
+                      margin: '-5px 0',
+                      fontSize: 'small',
+                      color: theme.palette.grey[400],
+                    })}
+                  >
                     {recipient.description}
-                  </p>
+                  </Box>
                 </Grid>
                 <Grid
                   item

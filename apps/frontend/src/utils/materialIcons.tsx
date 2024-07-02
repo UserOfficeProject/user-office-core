@@ -17,26 +17,56 @@ import Search from '@mui/icons-material/Search';
 import ViewColumn from '@mui/icons-material/ViewColumn';
 import React, { forwardRef } from 'react';
 
-export const tableIcons: Icons = {
-  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
-  Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
-  DetailPanel: forwardRef((props, ref) => (
+export const tableIcons: Icons<never> = {
+  Add: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <AddBox {...props} ref={ref} />
+  )),
+  Check: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <Check {...props} ref={ref} />
+  )),
+  Clear: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <Clear {...props} ref={ref} />
+  )),
+  Delete: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <DeleteOutline {...props} ref={ref} />
+  )),
+  DetailPanel: forwardRef<SVGSVGElement | null>((props, ref) => (
     <ChevronRight {...props} ref={ref} />
   )),
-  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
-  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
-  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-  PreviousPage: forwardRef((props, ref) => (
+  Edit: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <Edit {...props} ref={ref} />
+  )),
+  Export: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <SaveAlt {...props} ref={ref} />
+  )),
+  Filter: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <FilterList {...props} ref={ref} />
+  )),
+  FirstPage: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <FirstPage {...props} ref={ref} />
+  )),
+  LastPage: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <LastPage {...props} ref={ref} />
+  )),
+  NextPage: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <ChevronRight {...props} ref={ref} />
+  )),
+  PreviousPage: forwardRef<SVGSVGElement | null>((props, ref) => (
     <ChevronLeft {...props} ref={ref} />
   )),
-  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-  Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-  SortArrow: forwardRef((props, ref) => <ArrowUpward {...props} ref={ref} />),
-  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
+  ResetSearch: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <Clear {...props} ref={ref} />
+  )),
+  Search: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <Search {...props} ref={ref} />
+  )),
+  SortArrow: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <ArrowUpward {...props} ref={ref} />
+  )),
+  ThirdStateCheck: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <Remove {...props} ref={ref} />
+  )),
+  ViewColumn: forwardRef<SVGSVGElement | null>((props, ref) => (
+    <ViewColumn {...props} ref={ref} />
+  )),
 };

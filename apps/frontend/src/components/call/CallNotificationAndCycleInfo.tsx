@@ -1,11 +1,11 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-mui';
-import { DatePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 
+import DatePicker from 'components/common/FormikUIDatePicker';
+import TextField from 'components/common/FormikUITextField';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   CreateCallMutationVariables,
@@ -17,7 +17,7 @@ const CallCycleInfo = () => {
   const theme = useTheme();
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
-  const mask = dateFormat?.replace(/[a-zA-Z]/g, '_');
+
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
@@ -30,8 +30,7 @@ const CallCycleInfo = () => {
           name="startNotify"
           label="Start of notification period"
           id="start-notification-period-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
@@ -47,8 +46,7 @@ const CallCycleInfo = () => {
           name="endNotify"
           label="End of notification period"
           id="end-notification-period-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           minDate={startNotify}
           allowSameDateSelection
@@ -65,8 +63,7 @@ const CallCycleInfo = () => {
           name="startCycle"
           label="Start of cycle"
           id="start-cycle-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           component={DatePicker}
           inputProps={{ placeholder: dateFormat }}
@@ -83,8 +80,7 @@ const CallCycleInfo = () => {
           name="endCycle"
           label="End of cycle"
           id="end-cycle-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           minDate={startCycle}
           component={DatePicker}

@@ -10,7 +10,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -119,7 +119,7 @@ const ProposalTable = ({
   const [editProposalPk, setEditProposalPk] = useState(0);
   const { isInternalUser } = useContext(UserContext);
   if (editProposalPk) {
-    return <Redirect push to={`/ProposalEdit/${editProposalPk}`} />;
+    return <Navigate to={`/ProposalEdit/${editProposalPk}`} />;
   }
 
   const showReferenceText = (
@@ -242,7 +242,9 @@ const ProposalTable = ({
             tooltip: 'Clone proposal',
             onClick: (_event, rowData) => {
               api()
-                .getProposal({ primaryKey: rowData.primaryKey })
+                .getProposal({
+                  primaryKey: (rowData as PartialProposalsDataType).primaryKey,
+                })
                 .then((result) => {
                   setProposalToClone(result.proposal);
                   setOpenCallSelection(true);
@@ -270,7 +272,7 @@ const ProposalTable = ({
                 : !isPI
                   ? 'Only PI can delete proposal'
                   : 'Delete proposal',
-              disabled: !canDelete,
+              hidden: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(
                   async () => {

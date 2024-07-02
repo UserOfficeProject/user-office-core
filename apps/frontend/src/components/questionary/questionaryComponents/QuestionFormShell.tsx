@@ -1,6 +1,6 @@
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React from 'react';
 
@@ -13,22 +13,6 @@ import { Question } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    width: '100%',
-  },
-  heading: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-    display: 'flex',
-    alignItems: 'center',
-    color: theme.palette.grey[600],
-    '& SVG': {
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
-
 interface QuestionFormShellProps extends QuestionFormProps {
   validationSchema: unknown;
   confirm: WithConfirmType;
@@ -38,8 +22,6 @@ export const QuestionFormShell = withConfirm(
   (props: QuestionFormShellProps) => {
     const { question, validationSchema, confirm, children } = props;
     const { onUpdated, onDeleted, closeMe } = props;
-
-    const classes = useStyles();
     const { api } = useDataApiWithFeedback();
     const definition = getQuestionaryComponentDefinition(question.dataType);
 
@@ -78,8 +60,25 @@ export const QuestionFormShell = withConfirm(
       )();
 
     return (
-      <div className={classes.container}>
-        <Typography variant="h4" component="h1" className={classes.heading}>
+      <Box
+        sx={{
+          width: '100%',
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={(theme) => ({
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(1),
+            display: 'flex',
+            alignItems: 'center',
+            color: theme.palette.grey[600],
+            '& SVG': {
+              marginRight: theme.spacing(1),
+            },
+          })}
+        >
           {definition.icon}
           {definition.name}
         </Typography>
@@ -113,7 +112,7 @@ export const QuestionFormShell = withConfirm(
             </Form>
           )}
         </Formik>
-      </div>
+      </Box>
     );
   }
 );

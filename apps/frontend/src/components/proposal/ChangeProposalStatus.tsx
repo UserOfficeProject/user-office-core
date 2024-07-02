@@ -3,7 +3,6 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import i18n from 'i18n';
 import React from 'react';
@@ -18,16 +17,6 @@ const changeProposalStatusValidationSchema = yup.object().shape({
   selectedStatusId: yup.string().required('You must select proposal status'),
 });
 
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
-
 type ChangeProposalStatusProps = {
   close: () => void;
   changeStatusOnProposals: (status: ProposalStatus) => Promise<void>;
@@ -41,7 +30,6 @@ const ChangeProposalStatus = ({
   allSelectedProposalsHaveInstrument,
   selectedProposalStatuses,
 }: ChangeProposalStatusProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
@@ -81,7 +69,10 @@ const ChangeProposalStatus = ({
             <Typography
               variant="h6"
               component="h1"
-              className={classes.cardHeader}
+              sx={{
+                fontSize: '18px',
+                padding: '22px 0 0',
+              }}
             >
               Change proposal/s status
             </Typography>
@@ -129,7 +120,9 @@ const ChangeProposalStatus = ({
             <Button
               type="submit"
               fullWidth
-              className={classes.submit}
+              sx={(theme) => ({
+                margin: theme.spacing(3, 0, 2),
+              })}
               disabled={loadingProposalStatuses || isSubmitting}
               data-cy="submit-proposal-status-change"
             >

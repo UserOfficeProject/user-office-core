@@ -1,23 +1,10 @@
 import MaterialTable from '@material-table/core';
-import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Technique } from 'generated/sdk';
-
-// NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(() => ({
-  root: {
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      padding: '0 40px',
-      backgroundColor: '#fafafa',
-    },
-  },
-}));
 
 type AssignedInstrumentsTableProps = {
   technique: Technique;
@@ -45,13 +32,19 @@ const instrumentContactColumns = [
 const AssignedInstrumentsTable = ({
   technique,
 }: AssignedInstrumentsTableProps) => {
-  const classes = useStyles();
-
   const { t } = useTranslation();
 
   return (
-    <div
-      className={classes.root}
+    <Box
+      sx={{
+        '& tr:last-child td': {
+          border: 'none',
+        },
+        '& .MuiPaper-root': {
+          padding: '0 40px',
+          backgroundColor: '#fafafa',
+        },
+      }}
       data-cy="technique-instrument-assignments-table"
     >
       <MaterialTable
@@ -64,7 +57,7 @@ const AssignedInstrumentsTable = ({
           headerStyle: { backgroundColor: '#fafafa' },
         }}
       />
-    </div>
+    </Box>
   );
 };
 

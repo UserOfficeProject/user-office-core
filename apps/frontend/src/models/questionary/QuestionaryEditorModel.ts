@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import {
   Question,
@@ -186,6 +186,10 @@ export default function QuestionaryEditorModel(
   const api = useDataApi();
 
   useEffect(() => {
+    if (!templateId) {
+      return;
+    }
+
     api()
       .getTemplate({ templateId: parseInt(templateId) })
       .then((data) => {

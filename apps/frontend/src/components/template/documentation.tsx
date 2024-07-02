@@ -116,7 +116,7 @@ export default function PDFTemplateDocumentation() {
                           <h4>
                             {key}.{subKey}
                           </h4>
-                          <span>{documentation[key][subKey]}</span>
+                          <span>{documentation[key][subKey].toString()}</span>
                         </div>
                       ))}
                     </div>

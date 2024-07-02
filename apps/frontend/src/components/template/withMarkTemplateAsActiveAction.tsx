@@ -1,6 +1,5 @@
 import { MaterialTableProps } from '@material-table/core';
 import DoneIcon from '@mui/icons-material/Done';
-import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -9,12 +8,6 @@ import { useActiveTemplateId } from 'hooks/template/useActiveTemplateId';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { TemplateRowDataType } from './TemplatesTable';
-
-const useStyles = makeStyles((theme) => ({
-  inactive: {
-    color: theme.palette.grey.A100,
-  },
-}));
 
 type InputComponentType<T> = T & {
   actions?: MaterialTableProps<TemplateRowDataType>['actions'];
@@ -30,7 +23,6 @@ function withMarkTemplateAsActiveAction<T>(
   Component: React.ComponentType<InputComponentType<T>>
 ) {
   const WrappedComponent = (props: InputComponentType<T>) => {
-    const classes = useStyles();
     const { api } = useDataApiWithFeedback();
     const { activeTemplateId, setActiveTemplateId } = useActiveTemplateId(
       props.templateGroup
@@ -50,7 +42,7 @@ function withMarkTemplateAsActiveAction<T>(
                 <DoneIcon data-cy="mark-as-active" />
               ) : (
                 <DoneIcon
-                  className={classes.inactive}
+                  sx={(theme) => ({ color: theme.palette.grey.A100 })}
                   data-cy="mark-as-active"
                 />
               );

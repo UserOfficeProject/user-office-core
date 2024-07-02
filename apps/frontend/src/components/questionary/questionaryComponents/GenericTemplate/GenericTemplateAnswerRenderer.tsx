@@ -1,6 +1,7 @@
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import makeStyles from '@mui/styles/makeStyles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -10,23 +11,10 @@ import { Answer } from 'generated/sdk';
 import { useGenericTemplatesWithQuestionaryStatus } from 'hooks/genericTemplate/useGenericTemplatesWithQuestionaryStatus';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 
-const useStyles = makeStyles((theme) => ({
-  list: {
-    padding: 0,
-    margin: 0,
-    '& li': {
-      display: 'block',
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
-
 function GenericTemplateList(props: {
   genericTemplates: GenericTemplateCore[];
   onClick?: (genericTemplate: GenericTemplateCore) => void;
 }) {
-  const classes = useStyles();
-
   const genericTemplateLink = (genericTemplate: GenericTemplateCore) => (
     <Link href="#" onClick={() => props.onClick?.(genericTemplate)}>
       {genericTemplate.title}
@@ -34,13 +22,22 @@ function GenericTemplateList(props: {
   );
 
   return (
-    <ul className={classes.list}>
+    <List
+      sx={(theme) => ({
+        padding: 0,
+        margin: 0,
+        '& li': {
+          display: 'block',
+          marginRight: theme.spacing(1),
+        },
+      })}
+    >
       {props.genericTemplates.map((genericTemplate) => (
-        <li key={`genericTemplate-${genericTemplate.id}`}>
+        <ListItem key={`genericTemplate-${genericTemplate.id}`}>
           {genericTemplateLink(genericTemplate)}
-        </li>
+        </ListItem>
       ))}
-    </ul>
+    </List>
   );
 }
 

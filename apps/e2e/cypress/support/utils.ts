@@ -61,6 +61,8 @@ export const closedCall = {
   callFapReviewEnded: false,
 };
 
+const numbersOnly = (date: string): string => date.replace(/[^0-9]/gi, '');
+
 export const getE2EApi = (token?: string | null) => {
   // NOTE: Token is used when we want to do some action as a specific logged in user.
   const authHeader = `Bearer ${token ? token : Cypress.env('SVC_ACC_TOKEN')}`;
@@ -176,6 +178,20 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
   });
 };
 
+const setDatePickerValue = (selector: string, value: string) => {
+  console.log(selector, value);
+
+  return (
+    cy
+      .get(selector)
+      // NOTE: Clears the value from the datepicker
+      .type('{selectall}{backspace}')
+      // NOTE: Points to the first sub-field which is usually the date.
+      .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+      .type(numbersOnly(value))
+  );
+};
+
 const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
@@ -248,6 +264,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
+Cypress.Commands.add('setDatePickerValue', setDatePickerValue);
 Cypress.Commands.add('getTinyMceContent', getTinyMceContent);
 Cypress.Commands.add('testActionButton', testActionButton);
 Cypress.Commands.add('createApiAccessToken', createApiAccessToken);

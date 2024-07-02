@@ -1,6 +1,7 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
+import NotFound from 'components/common/NotFound';
 import SimpleTabs from 'components/common/SimpleTabs';
 import EventLogList from 'components/eventLog/EventLogList';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -8,8 +9,13 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import UpdateUserInformation from './UpdateUserInformation';
 import UpdateUserRoles from './UpdateUserRoles';
 
-function UserPage(props: { match: { params: { id: string } } }) {
-  const userId = parseInt(props.match.params.id);
+function UserPage() {
+  const { id } = useParams<{ id: string }>();
+
+  if (!id) {
+    return <NotFound />;
+  }
+  const userId = parseInt(id);
 
   return (
     <StyledContainer>
@@ -27,4 +33,4 @@ function UserPage(props: { match: { params: { id: string } } }) {
   );
 }
 
-export default withRouter(UserPage);
+export default UserPage;

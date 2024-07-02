@@ -1,10 +1,10 @@
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { InternalReview, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInternalReviewsData } from 'hooks/review/useInternalReviewData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';

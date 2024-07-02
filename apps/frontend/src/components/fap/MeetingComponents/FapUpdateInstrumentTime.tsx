@@ -3,20 +3,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React, { ChangeEvent, useState } from 'react';
 
 import { InstrumentWithAvailabilityTime } from 'generated/sdk';
+import { getMax32BitInteger } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
-
-const MAX_32_BIT_INTEGER = Math.pow(2, 31);
+const MAX_32_BIT_INTEGER = getMax32BitInteger();
 
 const width = '95%';
 
@@ -50,7 +44,6 @@ const AvailabilityTimeEditComponent = (
 );
 
 const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
-  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const [newTime, SetNewTime] = useState<string | undefined>(
     props.instrument.availabilityTime?.toString()
@@ -91,9 +84,11 @@ const FapUpdateInstrumentTime = (props: FapUpdateInstrumentTimeProps) => {
             {AvailabilityTimeEditComponent(newTime, SetNewTime)}
             <Button
               type="submit"
-              className={classes.submit}
+              sx={(theme) => ({
+                margin: theme.spacing(3, 0, 2),
+                width,
+              })}
               data-cy="submit-update-time"
-              sx={{ width }}
             >
               Update
             </Button>

@@ -5,7 +5,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useRolesData() {
   const api = useDataApi();
-  const [rolesData, setRolesData] = useState<GetRolesQuery['roles']>(null);
+  const [rolesData, setRolesData] = useState<GetRolesQuery['roles']>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

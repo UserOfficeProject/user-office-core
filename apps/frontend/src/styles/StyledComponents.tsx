@@ -63,7 +63,7 @@ export const StyledContainer = styled(Container, {
   };
 });
 
-export const StyledButtonContainer = styled('div')({
+export const StyledButtonContainer = styled(Box)({
   display: 'flex',
   justifyContent: 'flex-end',
 });

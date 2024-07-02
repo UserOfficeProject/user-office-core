@@ -35,6 +35,10 @@ fragment call on Call {
     scientists {
       ...basicUserDetails
     }
+    instrumentContact {
+      ...basicUserDetails
+    }
+    managerUserId
   }
   faps {
     id

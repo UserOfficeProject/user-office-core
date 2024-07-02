@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import MaterialTable, {
   MTableAction,
   MTableToolbar,
@@ -6,8 +5,8 @@ import MaterialTable, {
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import makeStyles from '@mui/styles/makeStyles';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useRef } from 'react';
 
@@ -89,17 +88,6 @@ function removeElement(
     ? newElements
     : elements;
 }
-const useStyles = makeStyles((theme) => ({
-  StyledButtonContainer: {
-    marginTop: theme.spacing(1),
-  },
-  customToolbar: {
-    '& .MuiToolbar-root': {
-      minHeight: 0,
-      height: 0,
-    },
-  },
-}));
 
 export const FormikUICustomTable = ({
   columns,
@@ -127,7 +115,6 @@ export const FormikUICustomTable = ({
   const transformedValues = dataTransforms.toTable(field.value);
   const [state, setState] = React.useState(transformedValues);
   const addActionRef = useRef<HTMLDivElement>(null);
-  const classes = useStyles();
 
   const handleChange = (newState: typeof state) => {
     setState(newState);
@@ -151,9 +138,16 @@ export const FormikUICustomTable = ({
             }
           },
           Toolbar: (props) => (
-            <div className={classes.customToolbar}>
+            <Box
+              sx={{
+                '& .MuiToolbar-root': {
+                  minHeight: 0,
+                  height: 0,
+                },
+              }}
+            >
               <MTableToolbar {...props} />
-            </div>
+            </Box>
           ),
         }}
         data={state}
@@ -211,7 +205,11 @@ export const FormikUICustomTable = ({
         }}
         {...props}
       />
-      <ActionButtonContainer className={classes.StyledButtonContainer}>
+      <ActionButtonContainer
+        sx={(theme) => ({
+          marginTop: theme.spacing(1),
+        })}
+      >
         <Button
           variant="outlined"
           onClick={() => addActionRef.current?.click()}

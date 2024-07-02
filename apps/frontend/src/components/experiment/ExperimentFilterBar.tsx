@@ -1,6 +1,7 @@
 import Grid from '@mui/material/Grid';
+import { DateTime } from 'luxon';
 import React from 'react';
-import { DateParam, NumberParam, useQueryParams } from 'use-query-params';
+import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
@@ -12,16 +13,25 @@ import DateFilter from './DateFilter';
 import { ExperimentUrlQueryParamsType } from './ExperimentUrlQueryParamsType';
 
 function ExperimentFilterBar() {
-  const [urlQueryParams] = useQueryParams<ExperimentUrlQueryParamsType>({
-    ...DefaultQueryParams,
-    call: NumberParam,
-    instrument: NumberParam,
-    from: DateParam,
-    to: DateParam,
-  });
+  const [urlQueryParams, setUrlQueryParams] =
+    useQueryParams<ExperimentUrlQueryParamsType>({
+      ...DefaultQueryParams,
+      call: NumberParam,
+      instrument: NumberParam,
+      from: StringParam,
+      to: StringParam,
+    });
 
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useCallsData();
+
+  const handleOnChange = (format: string, from?: Date, to?: Date) => {
+    setUrlQueryParams({
+      ...urlQueryParams,
+      from: from ? DateTime.fromJSDate(from).toFormat(format) : undefined,
+      to: to ? DateTime.fromJSDate(to).toFormat(format) : undefined,
+    });
+  };
 
   return (
     <Grid container spacing={2}>
@@ -47,6 +57,7 @@ function ExperimentFilterBar() {
         <DateFilter
           from={urlQueryParams.from ?? undefined}
           to={urlQueryParams.to ?? undefined}
+          onChange={handleOnChange}
           data-cy="date-filter"
         />
       </Grid>

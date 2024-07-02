@@ -1,29 +1,21 @@
 import Button from '@mui/material/Button';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { createFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Field, Form, Formik } from 'formik';
-import { Checkbox, TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import UOLoader from 'components/common/UOLoader';
 import { Fap } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 type AddFapProps = {
   close: (fapAdded: Fap | null) => void;
 };
 
 const AddFap = ({ close }: AddFapProps) => {
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   return (
@@ -88,24 +80,21 @@ const AddFap = ({ close }: AddFapProps) => {
             disabled={isExecutingCall}
           />
 
-          <FormControlLabel
-            control={
-              <Field
-                id="active"
-                name="active"
-                component={Checkbox}
-                type="checkbox"
-                inputProps={{ 'aria-label': 'primary checkbox' }}
-                data-cy="fapActive"
-              />
-            }
-            label="Active"
+          <Field
+            id="active"
+            name="active"
+            component={CheckboxWithLabel}
+            type="checkbox"
+            Label={{
+              label: 'Active',
+            }}
+            data-cy="fapActive"
           />
 
           <Button
             type="submit"
             fullWidth
-            className={classes.submit}
+            sx={(theme) => ({ margin: theme.spacing(3, 0, 2) })}
             data-cy="submit"
             disabled={isExecutingCall}
           >

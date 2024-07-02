@@ -1,23 +1,22 @@
+import { Droppable } from '@hello-pangea/dnd';
 import CloseIcon from '@mui/icons-material/Close';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Search from '@mui/icons-material/Search';
-import { Collapse } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
 import Grid from '@mui/material/Grid';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
-import clsx from 'clsx';
 import React, { useState } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
 
 import {
   getQuestionaryComponentDefinition,
@@ -83,53 +82,6 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
     null
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const classes = makeStyles(() => ({
-    container: {
-      alignItems: 'flex-start',
-      alignContent: 'flex-start',
-      flexBasis: '100%',
-      marginRight: '10px',
-      backgroundColor: theme.palette.grey[200],
-      boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
-      position: 'sticky',
-      top: 0,
-      borderLeft: `2px solid ${theme.palette.grey[200]}`,
-    },
-    appbar: {
-      background: 'transparent',
-      boxShadow: 'none',
-      paddingRight: 0,
-    },
-    toolbar: {
-      minHeight: '36px',
-      padding: '0 6px',
-    },
-    title: {
-      flexGrow: 1,
-      color: theme.palette.grey[600],
-      fontWeight: 'bold',
-    },
-    itemContainer: {
-      minHeight: '180px',
-      maxHeight: isExtraLargeScreen ? '1240px' : '660px',
-      overflowY: 'auto',
-      overflowX: 'hidden',
-    },
-    addQuestionMenuItem: {
-      minHeight: 0,
-    },
-    toolbarButton: {
-      cursor: 'pointer',
-      color: theme.palette.grey[600],
-    },
-    activeToolbarButton: {
-      color: theme.palette.primary.main,
-    },
-    fullWidthContainer: {
-      width: '100%',
-    },
-  }))();
 
   const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver ? theme.palette.primary.light : 'transparent',
@@ -201,31 +153,53 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
   return (
     <Grid
       container
-      className={classes.container}
+      sx={{
+        alignItems: 'flex-start',
+        alignContent: 'flex-start',
+        flexBasis: '100%',
+        marginRight: '10px',
+        backgroundColor: theme.palette.grey[200],
+        boxShadow: '5px 7px 9px -5px rgba(0,0,0,0.29)',
+        position: 'sticky',
+        top: 0,
+        borderLeft: `2px solid ${theme.palette.grey[200]}`,
+      }}
       id={props.id}
       data-cy="questionPicker"
     >
-      <AppBar position="static" className={classes.appbar}>
-        <Toolbar className={classes.toolbar}>
-          <span className={classes.title}>Question drawer</span>
+      <AppBar
+        position="static"
+        sx={{ background: 'transparent', boxShadow: 'none', paddingRight: 0 }}
+      >
+        <Toolbar sx={{ minHeight: '36px', padding: '0 6px' }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              color: theme.palette.grey[600],
+              fontWeight: 'bold',
+            }}
+          >
+            Question drawer
+          </Box>
           <Search
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className={clsx(
-              classes.toolbarButton,
-              isFilterOpen && classes.activeToolbarButton
-            )}
+            sx={{
+              cursor: 'pointer',
+              color: theme.palette.grey[600],
+              ...(isFilterOpen && { color: theme.palette.primary.main }),
+            }}
             data-cy="search-button"
           />
           <MoreVertIcon
             onClick={(event: React.MouseEvent<SVGSVGElement>) =>
               setAnchorEl(event.currentTarget)
             }
-            className={classes.toolbarButton}
+            sx={{ cursor: 'pointer', color: theme.palette.grey[600] }}
             data-cy="show-more-button"
           />
           <CloseIcon
             onClick={closeMe}
-            className={classes.toolbarButton}
+            sx={{ cursor: 'pointer', color: theme.palette.grey[600] }}
             data-cy="close-button"
           />
           <Menu
@@ -240,7 +214,9 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
               .map((definition) => {
                 return (
                   <MenuItem
-                    className={classes.addQuestionMenuItem}
+                    sx={{
+                      minHeight: 0,
+                    }}
                     onClick={() =>
                       onCreateNewQuestionClicked(definition.dataType)
                     }
@@ -259,7 +235,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
                 );
               })}
             <Divider />
-            <MenuItem className={classes.addQuestionMenuItem} onClick={closeMe}>
+            <MenuItem sx={{ minHeight: 0 }} onClick={closeMe}>
               <ListItemIcon>
                 <HighlightOffIcon />
               </ListItemIcon>
@@ -268,11 +244,7 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
           </Menu>
         </Toolbar>
       </AppBar>
-      <Collapse
-        in={isFilterOpen}
-        className={classes.fullWidthContainer}
-        unmountOnExit
-      >
+      <Collapse in={isFilterOpen} sx={{ width: '100%' }} unmountOnExit>
         <QuestionPickerFilter onChange={setQuestionFilter} />
       </Collapse>
       <Droppable droppableId="questionPicker" type="field">
@@ -281,8 +253,14 @@ export const QuestionPicker = (props: QuestionPickerProps) => {
             item
             xs={12}
             ref={provided.innerRef}
+            className="tinyScroll"
+            sx={{
+              minHeight: '180px',
+              maxHeight: isExtraLargeScreen ? '1240px' : '660px',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+            }}
             style={getListStyle(snapshot.isDraggingOver)}
-            className={`${classes.itemContainer} tinyScroll`}
             data-cy="question-list"
           >
             {getItems()}

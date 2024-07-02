@@ -13,7 +13,6 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useState } from 'react';
 
 import ImpersonateButton from 'components/common/ImpersonateButton';
@@ -23,17 +22,8 @@ import { getUniqueArrayBy } from 'utils/helperFunctions';
 
 import RoleSelection from './RoleSelection';
 
-const useStyles = makeStyles((theme) => ({
-  infoIcon: {
-    '& .MuiBadge-badge': {
-      top: theme.spacing(0.5),
-      right: theme.spacing(0.5),
-    },
-  },
-}));
-
 const AccountActionButton = () => {
-  const classes = useStyles();
+  // const classes = useStyles();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [show, setShow] = useState(false);
   const { roles, handleLogout, impersonatingUserId } = useContext(UserContext);
@@ -87,7 +77,14 @@ const AccountActionButton = () => {
               <InfoOutlinedIcon fontSize="small" />
             </Tooltip>
           }
-          className={classes.infoIcon}
+          sx={(theme) => ({
+            infoIcon: {
+              '& .MuiBadge-badge': {
+                top: theme.spacing(0.5),
+                right: theme.spacing(0.5),
+              },
+            },
+          })}
           invisible={!impersonatingUserId}
         >
           <IconButton

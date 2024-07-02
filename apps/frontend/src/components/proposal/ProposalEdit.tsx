@@ -3,7 +3,7 @@ import {
   ResourceId,
 } from '@user-office-software/duo-localisation';
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
@@ -15,7 +15,7 @@ import ProposalContainer from './ProposalContainer';
 export default function ProposalEdit() {
   const { proposalPk } = useParams<{ proposalPk: string }>();
 
-  const { proposalData } = useProposalData(+proposalPk);
+  const { proposalData } = useProposalData(proposalPk);
 
   if (!proposalData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;

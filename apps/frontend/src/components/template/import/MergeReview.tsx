@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import produce from 'immer';
 import React, { useCallback, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import {
@@ -29,7 +29,7 @@ const hasUnresolvedConflicts = (questionComparisons: QuestionComparison[]) =>
 
 export function MergeReview(props: MergeReviewProps) {
   const { api } = useDataApiWithFeedback();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -115,9 +115,7 @@ export function MergeReview(props: MergeReviewProps) {
       })
       .then((result) => {
         if (result.importTemplate) {
-          history.push(
-            `/QuestionaryEditor/${result.importTemplate.templateId}`
-          );
+          navigate(`/QuestionaryEditor/${result.importTemplate.templateId}`);
         }
       });
 

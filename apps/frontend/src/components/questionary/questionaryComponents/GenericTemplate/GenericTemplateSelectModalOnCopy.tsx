@@ -1,19 +1,17 @@
 import CloseIcon from '@mui/icons-material/Close';
-import {
-  Autocomplete,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from '@mui/material';
-import { IconButton } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { useTheme } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
@@ -51,33 +49,7 @@ const GenericTemplateSelectModalOnCopy = ({
   isMultipleCopySelect = false,
   handleGenericTemplateOnCopy,
 }: GenericTemplateSelectModalOnCopyProps) => {
-  const useStyles = makeStyles((theme) => ({
-    mainContainer: {
-      margin: theme.spacing(2, 0, 0),
-      padding: theme.spacing(0, 1),
-      justifyContent: 'center',
-      flexWrap: 'wrap',
-    },
-    cardHeader: {
-      textAlign: 'center',
-      fontSize: '18px',
-    },
-    buttonContainer: {
-      display: 'flex',
-      justifyContent: 'right',
-      marginTop: theme.spacing(3),
-    },
-    selectorContainer: {
-      minWidth: '100%',
-    },
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      zIndex: '1',
-    },
-  }));
-  const classes = useStyles();
+  const theme = useTheme();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
   const [genericTemplates, setGenericTemplates] = useState<
@@ -135,22 +107,46 @@ const GenericTemplateSelectModalOnCopy = ({
   const SelectMenuItem = isMultipleCopySelect ? MultiMenuItem : MenuItem;
 
   return (
-    <Container component="main" className={classes.mainContainer}>
+    <Container
+      component="main"
+      sx={{
+        margin: theme.spacing(2, 0, 0),
+        padding: theme.spacing(0, 1),
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+      }}
+    >
       <IconButton
         data-cy="close-modal-btn"
-        className={classes.closeButton}
         onClick={(): void => close()}
+        sx={{
+          position: 'absolute',
+          right: theme.spacing(1),
+          top: theme.spacing(1),
+          zIndex: '1',
+        }}
       >
         <CloseIcon />
       </IconButton>
 
-      <Typography variant="h6" component="h1" className={classes.cardHeader}>
+      <Typography
+        variant="h6"
+        component="h1"
+        sx={{
+          textAlign: 'center',
+          fontSize: '18px',
+        }}
+      >
         {copyButtonLabel || 'Copy'}
       </Typography>
 
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <div className={classes.selectorContainer}>
+          <Box
+            sx={{
+              minWidth: '100%',
+            }}
+          >
             <Autocomplete
               id="generic-template-proposal-select"
               aria-labelledby="generic-template-proposal-select-label"
@@ -241,11 +237,17 @@ const GenericTemplateSelectModalOnCopy = ({
                   })}
               </Select>
             </FormControl>
-          </div>
+          </Box>
         </Grid>
       </Grid>
 
-      <div className={classes.buttonContainer}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'right',
+          marginTop: theme.spacing(3),
+        }}
+      >
         {isExecutingCall && <UOLoader size="2em" />}
         <Button
           disabled={genericTemplateAnswer.length <= 0}
@@ -268,7 +270,7 @@ const GenericTemplateSelectModalOnCopy = ({
         >
           Save
         </Button>
-      </div>
+      </Box>
     </Container>
   );
 };

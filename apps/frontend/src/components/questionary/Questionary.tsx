@@ -1,10 +1,13 @@
-import { Step, Stepper, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Step from '@mui/material/Step';
+import Stepper from '@mui/material/Stepper';
+import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useRef, useEffect } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 
 import {
   createMissingContextErrorMessage,
@@ -22,27 +25,7 @@ interface QuestionaryProps {
 function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
   const isMobile = useMediaQuery('(max-width: 500px)');
 
-  const useStyles = makeStyles((theme) => ({
-    stepper: {
-      margin: theme.spacing(3, 0),
-      padding: theme.spacing(0, 1),
-      justifyContent: 'center',
-      flexWrap: 'wrap',
-    },
-    header: {
-      textAlign: 'center',
-    },
-    subHeader: {
-      color: theme.palette.grey[700],
-      textAlign: 'right',
-    },
-    root: {
-      width: '100%',
-      minWidth: isMobile ? 'inherit' : '500px', // Giving some minimum width for questionaries with short entries
-    },
-  }));
-
-  const classes = useStyles();
+  const theme = useTheme();
   const { state, dispatch } = useContext(QuestionaryContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
@@ -68,7 +51,12 @@ function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
       <Stepper
         nonLinear
         activeStep={state.stepIndex}
-        className={classes.stepper}
+        sx={{
+          margin: theme.spacing(3, 0),
+          padding: theme.spacing(0, 1),
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+        }}
         data-cy="questionary-stepper"
       >
         {state.wizardSteps.map((wizardStep, index) => {
@@ -117,20 +105,32 @@ function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
   };
 
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        width: '100%',
+        minWidth: isMobile ? 'inherit' : '500px',
+      }}
+    >
       <Typography
         variant="h4"
         component="h2"
-        className={classes.header}
+        sx={{ textAlign: 'center' }}
         ref={titleRef}
         data-cy="questionary-title"
       >
         {title}
       </Typography>
-      <Typography className={classes.subHeader}>{info}</Typography>
+      <Typography
+        sx={{
+          color: theme.palette.grey[700],
+          textAlign: 'right',
+        }}
+      >
+        {info}
+      </Typography>
       {getStepperNavig()}
       {getStepContent()}
-    </div>
+    </Box>
   );
 }
 

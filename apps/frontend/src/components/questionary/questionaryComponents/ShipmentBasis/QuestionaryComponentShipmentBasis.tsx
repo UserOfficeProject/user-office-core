@@ -1,6 +1,9 @@
-import { FormControl, InputLabel, Select, TextField } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import makeStyles from '@mui/styles/makeStyles';
+import Select from '@mui/material/Select';
+import { useTheme } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
 import { FormikErrors } from 'formik';
 import React, { useContext, useState } from 'react';
 
@@ -23,18 +26,6 @@ import {
   ShipmentSubmissionState,
 } from 'models/questionary/shipment/ShipmentSubmissionState';
 
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-    width: '100%',
-    boxSizing: 'border-box',
-  },
-  text: {
-    margin: theme.spacing(1),
-  },
-}));
-
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
 const samplesToSampleIds = (samples: Pick<Sample, 'id'>[]) =>
@@ -49,7 +40,7 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
   } = props;
 
   const fieldErrors = errors[id] as FormikErrors<Record<string, unknown>>;
-  const classes = useStyles();
+  const theme = useTheme();
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ShipmentContextType;
@@ -81,7 +72,14 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
 
   return (
     <div>
-      <FormControl className={classes.formControl}>
+      <FormControl
+        sx={{
+          marginTop: theme.spacing(1),
+          marginBottom: theme.spacing(1),
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      >
         <TextFieldNoSubmit
           value={title}
           label="Title"
@@ -99,7 +97,15 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
       </FormControl>
 
       {!loadingProposals && (
-        <FormControl className={classes.formControl} required>
+        <FormControl
+          sx={{
+            marginTop: theme.spacing(1),
+            marginBottom: theme.spacing(1),
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+          required
+        >
           <InputLabel id="proposal-id">Select proposal</InputLabel>
           <Select
             labelId="proposal-id"
@@ -124,7 +130,14 @@ function QuestionaryComponentShipmentBasis(props: BasicComponentProps) {
       )}
 
       {!loadingSamples && samples.length > 0 && (
-        <FormControl className={classes.formControl}>
+        <FormControl
+          sx={{
+            marginTop: theme.spacing(1),
+            marginBottom: theme.spacing(1),
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
           <InputLabel id="sample-ids">Select samples</InputLabel>
           <Select
             labelId="sample-ids"

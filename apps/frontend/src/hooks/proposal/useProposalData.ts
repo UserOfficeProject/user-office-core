@@ -11,7 +11,9 @@ export type ProposalDataTechnicalReview = NonNullable<
   ProposalData['technicalReviews']
 >[0];
 
-export function useProposalData(primaryKey: number | null | undefined) {
+export function useProposalData(
+  primaryKey: number | string | null | undefined
+) {
   const [proposalData, setProposalData] = useState<ProposalData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +25,10 @@ export function useProposalData(primaryKey: number | null | undefined) {
     if (primaryKey) {
       setLoading(true);
       api()
-        .getProposal({ primaryKey })
+        .getProposal({
+          primaryKey:
+            typeof primaryKey === 'string' ? parseInt(primaryKey) : primaryKey,
+        })
         .then((data) => {
           if (unmounted) {
             return;

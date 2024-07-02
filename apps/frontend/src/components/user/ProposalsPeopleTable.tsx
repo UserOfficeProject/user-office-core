@@ -2,8 +2,11 @@
 import MaterialTable, { Action } from '@material-table/core';
 import CloseIcon from '@mui/icons-material/Close';
 import Email from '@mui/icons-material/Email';
-import { Alert, AlertTitle, IconButton, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
 import React, { useState, useEffect, useContext } from 'react';
 
@@ -106,24 +109,6 @@ type PeopleTableProps = {
   >;
 };
 
-const useStyles = makeStyles({
-  tableWrapper: {
-    '& .MuiToolbar-gutters': {
-      paddingLeft: '0',
-      paddingRight: '0',
-      marginRight: '24px',
-    },
-  },
-  email: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'baseline',
-  },
-  alertMessage: {
-    paddingBottom: '10px',
-  },
-});
-
 const columns = [
   { title: 'Firstname', field: 'firstname' },
   { title: 'Surname', field: 'lastname' },
@@ -168,8 +153,6 @@ const ProposalsPeopleTable = ({
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
-
-  const classes = useStyles();
 
   useEffect(() => {
     if (!prevColabUsers.users) {
@@ -370,7 +353,7 @@ const ProposalsPeopleTable = ({
     >
       {() => (
         <>
-          <div className={classes.alertMessage}>
+          <Box sx={{ paddingBottom: '10px' }}>
             {displayError && (
               <Alert
                 severity="warning"
@@ -391,9 +374,18 @@ const ProposalsPeopleTable = ({
                 {emailSearchText}
               </Alert>
             )}
-          </div>
+          </Box>
 
-          <div data-cy="co-proposers" className={classes.tableWrapper}>
+          <Box
+            data-cy="co-proposers"
+            sx={{
+              '& .MuiToolbar-gutters': {
+                paddingLeft: '0',
+                paddingRight: '0',
+                marginRight: '24px',
+              },
+            }}
+          >
             <MaterialTable
               tableRef={tableRef}
               icons={tableIcons}
@@ -446,7 +438,7 @@ const ProposalsPeopleTable = ({
                 Toolbar: EmailSearchBar,
               }}
             />
-          </div>
+          </Box>
         </>
       )}
     </Formik>

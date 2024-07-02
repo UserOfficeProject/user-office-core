@@ -1,27 +1,11 @@
 import MaterialTable from '@material-table/core';
-import { makeStyles } from '@mui/styles';
+import Box from '@mui/material/Box';
 import React from 'react';
 
 import { GetScheduledEventsCoreQuery, TrainingStatus } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
-
-const useStyles = makeStyles(() => ({
-  root: {
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      padding: '0 40px',
-      backgroundColor: '#fafafa',
-    },
-  },
-  noVisit: {
-    textAlign: 'center',
-    padding: '20px',
-  },
-}));
 
 type RowType = NonNullable<
   GetScheduledEventsCoreQuery['scheduledEventsCore'][0]['visit']
@@ -36,7 +20,6 @@ interface ScheduledEventDetailsTableProps {
 function ExperimentVisitsTable({
   scheduledEvent,
 }: ScheduledEventDetailsTableProps) {
-  const classes = useStyles();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -88,11 +71,25 @@ function ExperimentVisitsTable({
   ];
 
   if (scheduledEvent.visit === null) {
-    return <div className={classes.noVisit}>Visit is not defined</div>;
+    return (
+      <Box sx={{ textAlign: 'center', padding: '20px' }}>
+        Visit is not defined
+      </Box>
+    );
   }
 
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        '& tr:last-child td': {
+          border: 'none',
+        },
+        '& .MuiPaper-root': {
+          padding: '0 40px',
+          backgroundColor: '#fafafa',
+        },
+      }}
+    >
       <MaterialTable
         title=""
         icons={tableIcons}
@@ -108,7 +105,7 @@ function ExperimentVisitsTable({
         }}
         data-cy="visit-registrations-table"
       />
-    </div>
+    </Box>
   );
 }
 

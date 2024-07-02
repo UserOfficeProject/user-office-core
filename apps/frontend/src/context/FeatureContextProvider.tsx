@@ -1,4 +1,4 @@
-import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
 import React from 'react';
 
 import { Feature, FeatureId } from 'generated/sdk';
@@ -9,16 +9,6 @@ interface FeatureContextData {
   readonly features: Feature[];
   readonly setFeatures: React.Dispatch<React.SetStateAction<Feature[]>>;
 }
-
-const useStyles = makeStyles({
-  loader: {
-    display: 'flex',
-    width: '100vw',
-    height: '100vh',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 const initialFeatureData: FeatureContextData = {
   featuresMap: new Map<FeatureId, Feature>(),
@@ -33,13 +23,21 @@ export const FeatureContextProvider = (props: {
   children: React.ReactNode;
 }) => {
   const { features, loadingFeatures, setFeatures } = useFeatures();
-  const classes = useStyles();
 
   if (loadingFeatures) {
     return (
-      <div className={classes.loader} data-cy="loading">
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100vw',
+          height: '100vh',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        data-cy="loading"
+      >
         Loading...
-      </div>
+      </Box>
     );
   }
 

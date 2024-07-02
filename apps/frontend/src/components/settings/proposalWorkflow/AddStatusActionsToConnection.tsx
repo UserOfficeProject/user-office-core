@@ -2,12 +2,13 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { FieldArray, Form, Formik } from 'formik';
 import React from 'react';
 
@@ -27,37 +28,6 @@ import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
 import EmailActionConfig from './EmailActionConfig';
 import RabbitMQActionConfig from './RabbitMQActionConfig';
 
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '20px',
-    padding: '22px 0 0',
-    '& .statusName': {
-      fontWeight: 'bold',
-    },
-  },
-  container: {
-    minHeight: 'auto',
-    maxHeight: 'calc(100vh - 315px)',
-    [theme.breakpoints.only('sm')]: {
-      maxHeight: 'calc(100vh - 345px)',
-    },
-    [theme.breakpoints.only('xs')]: {
-      maxHeight: 'calc(100vh - 475px)',
-    },
-    overflowY: 'auto',
-    overflowX: 'hidden',
-    marginTop: '10px',
-  },
-  submitContainer: {
-    margin: theme.spacing(2, 0, 2),
-  },
-  eventDescription: {
-    margin: '-5px 0',
-    fontSize: 'small',
-    color: theme.palette.grey[400],
-  },
-}));
-
 type AddStatusActionsToConnectionProps = {
   addStatusActionsToConnection: (
     connectionActions: ConnectionHasActionsInput[]
@@ -73,7 +43,7 @@ const AddStatusActionsToConnection = ({
   connectionStatusActions,
   isLoading,
 }: AddStatusActionsToConnectionProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const { statusActions, loadingStatusActions } = useStatusActionsData();
 
   const emailStatusActionConfig = connectionStatusActions?.find(
@@ -193,7 +163,15 @@ const AddStatusActionsToConnection = ({
     >
       {({ isSubmitting, values }): JSX.Element => (
         <Form>
-          <Typography className={classes.cardHeader}>
+          <Typography
+            sx={{
+              fontSize: '20px',
+              padding: '22px 0 0',
+              '& .statusName': {
+                fontWeight: 'bold',
+              },
+            }}
+          >
             Status actions that will be executed when proposals change to{' '}
             <span className="statusName">{statusName}</span> status
           </Typography>
@@ -253,9 +231,16 @@ const AddStatusActionsToConnection = ({
                           label={
                             <>
                               <p>{statusAction.name}</p>
-                              <p className={classes.eventDescription}>
+                              <Box
+                                component="p"
+                                sx={{
+                                  margin: '-5px 0',
+                                  fontSize: 'small',
+                                  color: theme.palette.grey[400],
+                                }}
+                              >
                                 {statusAction.description}
-                              </p>
+                              </Box>
                             </>
                           }
                         />

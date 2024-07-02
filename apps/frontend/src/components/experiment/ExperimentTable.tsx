@@ -1,54 +1,25 @@
 import { Typography } from '@mui/material';
 import { TFunction } from 'i18next';
+import { DateTime } from 'luxon';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, NumberParam, DateParam } from 'use-query-params';
+import { useQueryParams, NumberParam, StringParam } from 'use-query-params';
 
 import SuperMaterialTable, {
   DefaultQueryParams,
 } from 'components/common/SuperMaterialTable';
 import ProposalEsiDetailsButton from 'components/questionary/questionaryComponents/ProposalEsiBasis/ProposalEsiDetailsButton';
-import { GetScheduledEventsCoreQuery } from 'generated/sdk';
+import { GetScheduledEventsCoreQuery, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useScheduledEvents } from 'hooks/scheduledEvent/useScheduledEvents';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
+import { DEFAULT_DATE_FORMAT } from './DateFilter';
 import { ExperimentUrlQueryParamsType } from './ExperimentUrlQueryParamsType';
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
 type RowType = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
-
-const columns = (t: TFunction<'translation', undefined, 'translation'>) => [
-  {
-    title: 'Proposal ID',
-    field: 'proposal.proposalId',
-  },
-  {
-    title: 'Principal investigator',
-    render: (rowData: RowType) => getFullUserName(rowData.proposal.proposer),
-  },
-  {
-    title: 'Proposal',
-    field: 'proposal.title',
-  },
-  {
-    title: 'Experiment start',
-    field: 'startsAtFormatted',
-  },
-  {
-    title: 'Experiment end',
-    field: 'endsAtFormatted',
-  },
-  {
-    title: 'ESI',
-    field: 'esiFormatted',
-  },
-  {
-    title: t('instrument'),
-    field: 'instrument.name',
-  },
-];
 
 function ExperimentTable() {
   const [urlQueryParams, setUrlQueryParams] =
@@ -56,16 +27,55 @@ function ExperimentTable() {
       ...DefaultQueryParams,
       call: NumberParam,
       instrument: NumberParam,
-      from: DateParam,
-      to: DateParam,
+      from: StringParam,
+      to: StringParam,
     });
 
   const { scheduledEvents, setScheduledEvents, loadingEvents, setArgs } =
     useScheduledEvents({});
 
-  const { toFormattedDateTime } = useFormattedDateTime({
+  const { toFormattedDateTime, format } = useFormattedDateTime({
     shouldUseTimeZone: true,
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
+
+  const columns = (t: TFunction<'translation', undefined>) => [
+    {
+      title: 'Proposal ID',
+      field: 'proposal.proposalId',
+    },
+    {
+      title: 'Principal investigator',
+      render: (rowData: RowType) => getFullUserName(rowData.proposal.proposer),
+    },
+    {
+      title: 'Proposal',
+      field: 'proposal.title',
+    },
+    {
+      title: 'Experiment start',
+      field: 'startsAt',
+      render: (rowData: RowType) => toFormattedDateTime(rowData.startsAt),
+    },
+    {
+      title: 'Experiment end',
+      field: 'endsAt',
+      render: (rowData: RowType) => toFormattedDateTime(rowData.endsAt),
+    },
+    {
+      title: 'ESI',
+      render: (rowData: RowType) =>
+        rowData.esi ? (
+          <ProposalEsiDetailsButton esiId={rowData.esi?.id} />
+        ) : (
+          'No ESI'
+        ),
+    },
+    {
+      title: t('instrument'),
+      field: 'instrument.name',
+    },
+  ];
 
   const { t } = useTranslation();
 
@@ -75,8 +85,18 @@ function ExperimentTable() {
         callId: urlQueryParams.call,
         instrumentId: urlQueryParams.instrument,
         overlaps: {
-          from: urlQueryParams.from ? urlQueryParams.from : undefined,
-          to: urlQueryParams.to ? urlQueryParams.to : undefined,
+          from: urlQueryParams.from
+            ? DateTime.fromFormat(
+                urlQueryParams.from,
+                format || DEFAULT_DATE_FORMAT
+              )
+            : undefined,
+          to: urlQueryParams.to
+            ? DateTime.fromFormat(
+                urlQueryParams.to,
+                format || DEFAULT_DATE_FORMAT
+              )
+            : undefined,
         },
       },
     });
@@ -86,6 +106,7 @@ function ExperimentTable() {
     urlQueryParams.instrument,
     urlQueryParams.from,
     urlQueryParams.to,
+    format,
   ]);
 
   const ScheduledEventDetails = React.useCallback(
@@ -95,20 +116,9 @@ function ExperimentTable() {
     []
   );
 
-  const scheduledEventsFormatted = scheduledEvents.map((evt) => ({
-    ...evt,
-    startsAtFormatted: toFormattedDateTime(evt.startsAt),
-    endsAtFormatted: toFormattedDateTime(evt.endsAt),
-    esiFormatted: evt.esi ? (
-      <ProposalEsiDetailsButton esiId={evt.esi?.id} />
-    ) : (
-      'No ESI'
-    ),
-  }));
-
   return (
     <SuperMaterialTable
-      data={scheduledEventsFormatted}
+      data={scheduledEvents}
       setData={setScheduledEvents}
       icons={tableIcons}
       title={

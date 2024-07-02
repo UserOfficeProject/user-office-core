@@ -1,7 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined';
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -9,19 +7,20 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
-import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
-import useTheme from '@mui/material/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { updateUserValidationSchema } from '@user-office-software/duo-validation';
 import { Field, Form, Formik } from 'formik';
-import { Select, TextField } from 'formik-mui';
-import { DatePicker } from 'formik-mui-lab';
 import { DateTime } from 'luxon';
 import React, { useState, useContext } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import DatePicker from 'components/common/FormikUIDatePicker';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import ImpersonateButton from 'components/common/ImpersonateButton';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
@@ -34,32 +33,6 @@ import { useUserData } from 'hooks/user/useUserData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';
 
-const useStyles = makeStyles((theme) => ({
-  orcIdLabel: {
-    marginBottom: theme.spacing(1),
-  },
-  orcIdLink: {
-    marginTop: theme.spacing(3),
-  },
-  orcidIconSmall: {
-    verticalAlign: 'middle',
-    marginLeft: theme.spacing(0.5),
-    width: '16px',
-    height: '16px',
-    border: '0px',
-  },
-  orcIdContainer: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-    overflow: 'hidden',
-  },
-  chipSpace: {
-    '& > * + *': {
-      margin: theme.spacing(0.5),
-    },
-  },
-}));
-
 interface UpdateUserInformationProps {
   id: number;
 }
@@ -69,7 +42,7 @@ export default function UpdateUserInformation(
   const theme = useTheme();
   const { user } = useContext(UserContext);
   const { userData } = useUserData({ userId: props.id });
-  const { format, mask } = useFormattedDateTime({
+  const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { api } = useDataApiWithFeedback();
@@ -79,7 +52,6 @@ export default function UpdateUserInformation(
   const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const [countriesList, setCountriesList] = useState<Option[]>([]);
-  const classes = useStyles();
 
   // NOTE: User should be older than 18 years.
   const userMaxBirthDate = DateTime.now().minus({ years: 18 });
@@ -165,7 +137,7 @@ export default function UpdateUserInformation(
           id: props.id,
           ...values,
           nationality: +(values.nationality as number),
-          institutionId: +values.institutionId,
+          institutionId: values.institutionId ? +values.institutionId : null,
           gender:
             values.gender === 'other' ? values.othergender : values.gender,
         } as UpdateUserMutationVariables;
@@ -181,7 +153,13 @@ export default function UpdateUserInformation(
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
             User Information
-            <Box className={classes.chipSpace}>
+            <Box
+              sx={{
+                '& > * + *': {
+                  margin: theme.spacing(0.5),
+                },
+              }}
+            >
               {userData.placeholder && (
                 <Chip
                   color="primary"
@@ -195,98 +173,64 @@ export default function UpdateUserInformation(
           <Grid container spacing={3}>
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={DateAdapter}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="user_title"
-                    shrink={!!values.user_title}
-                    required
-                  >
-                    Title
-                  </InputLabel>
-                  <Field
-                    name="user_title"
-                    component={Select}
-                    data-cy="title"
-                    required
-                  >
-                    {userTitleOptions.map(({ value, text }) => (
-                      <MenuItem value={value} key={value}>
-                        {text}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
+                <Field
+                  name="user_title"
+                  options={userTitleOptions}
+                  component={Select}
+                  inputLabel={{ htmlFor: 'user_title', required: true }}
+                  label="Title"
+                  data-cy="title"
+                  required
+                />
                 <Field
                   name="firstname"
                   label="Firstname"
                   id="firstname-input"
-                  type="text"
                   component={TextField}
-                  fullWidth
+                  type="text"
                   data-cy="firstname"
                 />
                 <Field
                   name="middlename"
                   label="Middle name"
                   id="middlename-input"
-                  type="text"
                   component={TextField}
-                  fullWidth
+                  type="text"
                   data-cy="middlename"
                 />
                 <Field
                   name="lastname"
                   label="Lastname"
                   id="lastname-input"
-                  type="text"
                   component={TextField}
-                  fullWidth
+                  type="text"
                   data-cy="lastname"
                 />
                 <Field
                   name="preferredname"
                   label="Preferred name"
                   id="preferredname-input"
-                  type="text"
                   component={TextField}
-                  fullWidth
+                  type="text"
                   data-cy="preferredname"
                 />
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="gender"
-                    shrink={!!values.gender}
-                    required
-                  >
-                    Gender
-                  </InputLabel>
-                  <Field
-                    id="gender"
-                    name="gender"
-                    type="text"
-                    component={Select}
-                    data-cy="gender"
-                    required
-                  >
-                    {genderOptions.map(({ value, text }) => {
-                      return (
-                        <MenuItem value={value} key={value}>
-                          {text}
-                        </MenuItem>
-                      );
-                    })}
-                  </Field>
-                </FormControl>
+                <Field
+                  name="gender"
+                  component={Select}
+                  options={genderOptions}
+                  inputLabel={{ htmlFor: 'gender', required: true }}
+                  label="Gender"
+                  data-cy="gender"
+                  required
+                />
                 {values.gender === 'other' && (
                   <Field
                     name="othergender"
                     label="Please specify gender"
                     id="othergender-input"
-                    type="text"
                     component={TextField}
-                    fullWidth
+                    type="text"
                     data-cy="othergender"
-                    required
                   />
                 )}
                 <FormikUIAutocomplete
@@ -298,13 +242,11 @@ export default function UpdateUserInformation(
                   loading={!nationalities}
                   noOptionsText="No nationalities"
                 />
-
                 <Field
                   name="birthdate"
                   label="Birthdate"
                   id="birthdate-input"
-                  inputFormat={format}
-                  mask={mask}
+                  format={format}
                   inputProps={{ placeholder: format }}
                   component={DatePicker}
                   textField={{
@@ -320,8 +262,15 @@ export default function UpdateUserInformation(
               <FormControl fullWidth margin="normal">
                 <InputLabel shrink>
                   ORCID iD{' '}
-                  <img
-                    className={classes.orcidIconSmall}
+                  <Box
+                    component="img"
+                    sx={{
+                      verticalAlign: 'middle',
+                      marginLeft: theme.spacing(0.5),
+                      width: '16px',
+                      height: '16px',
+                      border: '0px',
+                    }}
                     src="/images/orcid.png"
                     alt="ORCID iD icon"
                   />
@@ -330,7 +279,7 @@ export default function UpdateUserInformation(
                   href={'https://orcid.org/' + values.oidcSub}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className={classes.orcIdLink}
+                  sx={{ marginTop: theme.spacing(3) }}
                 >
                   https://orcid.org/{values.oidcSub}
                 </Link>
@@ -339,12 +288,11 @@ export default function UpdateUserInformation(
                 name="username"
                 label="Username"
                 id="username-input"
-                type="text"
                 component={TextField}
-                fullWidth
+                type="text"
                 autoComplete="off"
                 data-cy="username"
-                disabled={true}
+                disabled
               />
               <FormikUIAutocomplete
                 name="institutionId"
@@ -354,16 +302,15 @@ export default function UpdateUserInformation(
                 loading={loadingInstitutions}
                 noOptionsText="No institutions"
               />
-              {+values.institutionId === 1 && (
+              {values.institutionId && +values.institutionId === 1 && (
                 <>
                   <Field
                     name="otherInstitution"
                     label="Please specify institution"
                     id="institution-input"
-                    type="text"
                     component={TextField}
+                    type="text"
                     margin="normal"
-                    fullWidth
                     data-cy="otherInstitution"
                     required
                   />
@@ -373,9 +320,8 @@ export default function UpdateUserInformation(
                 name="department"
                 label="Department"
                 id="department-input"
-                type="text"
                 component={TextField}
-                fullWidth
+                type="text"
                 data-cy="department"
                 required
               />
@@ -383,9 +329,8 @@ export default function UpdateUserInformation(
                 name="position"
                 label="Position"
                 id="position-input"
-                type="text"
                 component={TextField}
-                fullWidth
+                type="text"
                 data-cy="position"
                 required
               />
@@ -393,18 +338,16 @@ export default function UpdateUserInformation(
                 name="email"
                 label="E-mail"
                 id="email-input"
-                type="email"
                 component={TextField}
-                fullWidth
+                type="email"
                 data-cy="email"
               />
               <Field
                 name="telephone"
                 label="Telephone"
                 id="telephone-input"
-                type="text"
                 component={TextField}
-                fullWidth
+                type="text"
                 data-cy="telephone"
                 required
               />
@@ -412,9 +355,8 @@ export default function UpdateUserInformation(
                 name="telephone_alt"
                 label="Telephone Alt."
                 id="telephone-alt-input"
-                type="text"
                 component={TextField}
-                fullWidth
+                type="text"
                 data-cy="telephone-alt"
               />
             </Grid>

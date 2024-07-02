@@ -6,13 +6,12 @@ import {
   updateInstrumentValidationSchema,
 } from '@user-office-software/duo-validation/lib/Instrument';
 import { Field, Form, Formik, FormikProps } from 'formik';
-import { TextField } from 'formik-mui';
 import i18n from 'i18n';
-import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
@@ -161,14 +160,14 @@ const CreateUpdateInstrument = ({
             {(instrument ? 'Update ' : 'Create new ') +
               i18n.format(t('instrument'), 'lowercase')}
           </Typography>
+
           <Field
             name="name"
             id="name"
             label="Name"
-            type="text"
             component={TextField}
-            fullWidth
-            data-cy="name"
+            type="text"
+            data-cy="firstname"
             disabled={isExecutingCall}
             required
           />
@@ -178,7 +177,6 @@ const CreateUpdateInstrument = ({
             label="Short code"
             type="text"
             component={TextField}
-            fullWidth
             data-cy="shortCode"
             disabled={isExecutingCall}
             required
@@ -189,7 +187,6 @@ const CreateUpdateInstrument = ({
             label="Description"
             type="text"
             component={TextField}
-            fullWidth
             multiline
             maxRows="16"
             minRows="3"
@@ -211,9 +208,7 @@ const CreateUpdateInstrument = ({
                 text: getFullUserNameWithEmail(user),
                 value: user.id,
               }))}
-            InputProps={{
-              'data-cy': 'instrument-contact',
-            }}
+            data-cy="instrument-contact"
             required
           />
 
@@ -231,18 +226,6 @@ const CreateUpdateInstrument = ({
       )}
     </Formik>
   );
-};
-
-CreateUpdateInstrument.propTypes = {
-  instrument: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    shortCode: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    managerUserId: PropTypes.number.isRequired,
-    scientists: PropTypes.array.isRequired,
-  }),
-  close: PropTypes.func.isRequired,
 };
 
 export default CreateUpdateInstrument;

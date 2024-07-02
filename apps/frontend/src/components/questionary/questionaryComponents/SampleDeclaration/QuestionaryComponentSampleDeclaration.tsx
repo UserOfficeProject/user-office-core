@@ -1,5 +1,5 @@
-import { Paper } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import InputLabel from '@mui/material/InputLabel';
+import Paper from '@mui/material/Paper';
 import { Field, FieldProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
@@ -29,17 +29,6 @@ import {
   QuestionnairesListRow,
 } from '../QuestionnairesList';
 
-const useStyles = makeStyles((theme) => ({
-  questionLabel: {
-    opacity: 0.54,
-    fontWeight: 400,
-    fontSize: '1rem',
-  },
-  container: {
-    padding: '1rem',
-    marginTop: theme.spacing(1),
-  },
-}));
 const sampleToListRow = (sample: SampleCore): QuestionnairesListRow => {
   return {
     id: sample.id,
@@ -89,7 +78,6 @@ function QuestionaryComponentSampleDeclaration(
   ) as ProposalContextType;
 
   const { api } = useDataApiWithFeedback();
-  const classes = useStyles();
 
   const [selectedSample, setSelectedSample] =
     useState<SampleWithQuestionary | null>(null);
@@ -137,10 +125,17 @@ function QuestionaryComponentSampleDeclaration(
 
         return (
           <>
-            <label className={classes.questionLabel}>
+            <InputLabel
+              sx={{ opacity: 0.54, fontWeight: 400, fontSize: '1rem' }}
+            >
               {answer.question.question}
-            </label>
-            <Paper className={classes.container}>
+            </InputLabel>
+            <Paper
+              sx={(theme) => ({
+                padding: '1rem',
+                marginTop: theme.spacing(1),
+              })}
+            >
               <QuestionnairesList
                 addButtonLabel={config.addEntryButtonLabel}
                 data={field.value?.map(sampleToListRow) ?? []}

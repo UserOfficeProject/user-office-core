@@ -1,8 +1,7 @@
-import { ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { withStyles } from '@mui/styles';
+import { ToggleButton, ToggleButtonGroup, styled } from '@mui/material';
 import React from 'react';
 
-const StyledToggleButtonGroup = withStyles((theme) => ({
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   grouped: {
     margin: theme.spacing(0.5),
     border: 'none',
@@ -13,7 +12,7 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
       borderRadius: theme.shape.borderRadius,
     },
   },
-}))(ToggleButtonGroup);
+}));
 
 export enum TimeSpan {
   TODAY = 'TODAY',

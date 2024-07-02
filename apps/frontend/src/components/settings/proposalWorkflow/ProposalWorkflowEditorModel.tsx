@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import {
   StatusChangingEvent,
@@ -297,6 +297,10 @@ const ProposalWorkflowEditorModel = (
   const api = useDataApi();
 
   useEffect(() => {
+    if (!workflowId) {
+      return;
+    }
+
     api()
       .getProposalWorkflow({ proposalWorkflowId: parseInt(workflowId) })
       .then((data) => {

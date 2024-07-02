@@ -1,6 +1,7 @@
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import makeStyles from '@mui/styles/makeStyles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
@@ -10,23 +11,10 @@ import { Answer } from 'generated/sdk';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { SampleCore } from 'models/questionary/sample/SampleCore';
 
-const useStyles = makeStyles((theme) => ({
-  list: {
-    padding: 0,
-    margin: 0,
-    '& li': {
-      display: 'block',
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
-
 function SampleList(props: {
   samples: SampleCore[];
   onClick?: (sample: SampleCore) => void;
 }) {
-  const classes = useStyles();
-
   const sampleLink = (sample: SampleCore) => (
     <Link href="#" onClick={() => props.onClick?.(sample)}>
       {sample.title}
@@ -34,11 +22,20 @@ function SampleList(props: {
   );
 
   return (
-    <ul className={classes.list}>
+    <List
+      sx={(theme) => ({
+        padding: 0,
+        margin: 0,
+        '& li': {
+          display: 'block',
+          marginRight: theme.spacing(1),
+        },
+      })}
+    >
       {props.samples.map((sample) => (
-        <li key={`sample-${sample.id}`}>{sampleLink(sample)}</li>
+        <ListItem key={`sample-${sample.id}`}>{sampleLink(sample)}</ListItem>
       ))}
-    </ul>
+    </List>
   );
 }
 

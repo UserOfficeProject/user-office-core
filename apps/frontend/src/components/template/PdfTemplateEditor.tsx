@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import CodeMirror from '@uiw/react-codemirror';
 import { Field, FieldProps, Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
@@ -105,14 +105,17 @@ export default function PdfTemplateEditor() {
   const [template, setTemplate] = useState<Template | null>(null);
   const [pdfTemplate, setPdfTemplate] = useState<PdfTemplate | null>(null);
 
-  const { templateId: templateIdQueryParam } = useParams<{
+  const { templateId } = useParams<{
     templateId: string;
   }>();
-  const templateId = parseInt(templateIdQueryParam);
 
   useEffect(() => {
+    if (!templateId) {
+      return;
+    }
+
     api()
-      .getTemplate({ templateId })
+      .getTemplate({ templateId: parseInt(templateId) })
       .then(({ template }) => {
         setTemplate(template as Template);
         setPdfTemplate(template?.pdfTemplate as PdfTemplate);

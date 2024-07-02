@@ -1,20 +1,12 @@
 import Autocomplete from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
-import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { Call } from 'generated/sdk';
-
-const useStyles = makeStyles(() => ({
-  loadingText: {
-    minHeight: '32px',
-    marginTop: '16px',
-  },
-}));
 
 type CallFilterProps = {
   calls?: Call[];
@@ -31,7 +23,6 @@ const CallFilter = ({
   onChange,
   shouldShowAll,
 }: CallFilterProps) => {
-  const classes = useStyles();
   const [, setQuery] = useQueryParams({
     call: NumberParam,
   });
@@ -64,7 +55,7 @@ const CallFilter = ({
           Call
         </InputLabel>
         {isLoading ? (
-          <div className={classes.loadingText}>Loading...</div>
+          <Box sx={{ minHeight: '32px', marginTop: '16px' }}>Loading...</Box>
         ) : (
           <Autocomplete
             id="call-select"
@@ -96,14 +87,6 @@ const CallFilter = ({
       </FormControl>
     </>
   );
-};
-
-CallFilter.propTypes = {
-  calls: PropTypes.array,
-  isLoading: PropTypes.bool,
-  onChange: PropTypes.func,
-  shouldShowAll: PropTypes.bool,
-  callId: PropTypes.number,
 };
 
 export default CallFilter;

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { Call, InputMaybe } from 'generated/sdk';
+import { Call } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useCallData(callId?: InputMaybe<Call['id']>) {
+export function useCallData(callId?: string | null) {
   const [call, setCall] = useState<Call | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +13,7 @@ export function useCallData(callId?: InputMaybe<Call['id']>) {
     let unmounted = false;
     if (callId) {
       api()
-        .getCall({ callId })
+        .getCall({ callId: parseInt(callId) })
         .then((data) => {
           if (unmounted) {
             return;

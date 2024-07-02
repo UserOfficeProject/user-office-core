@@ -12,11 +12,11 @@ import Typography from '@mui/material/Typography';
 import React, { useState, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, UserRole, Fap } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useRenewToken } from 'hooks/common/useRenewToken';
 import { useFapReviewersData } from 'hooks/fap/useFapReviewersData';
 import { tableIcons } from 'utils/materialIcons';
