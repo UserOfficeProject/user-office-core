@@ -69,6 +69,7 @@ const MergeInstitutionsPage = lazy(
   () => import('./institution/MergeInstitutionPage')
 );
 const InstrumentsPage = lazy(() => import('./instrument/InstrumentsPage'));
+const TechniquesPage = lazy(() => import('./technique/TechniquesPage'));
 const HelpPage = lazy(() => import('./pages/HelpPage'));
 const PageEditor = lazy(() => import('./pages/PageEditor'));
 const ProposalChooseCall = lazy(() => import('./proposal/ProposalChooseCall'));
@@ -535,6 +536,18 @@ const DefaultRoutes = () => {
                         title={i18n.format(t('instrument'), 'plural')}
                         setHeader={setHeader}
                         element={<InstrumentsPage />}
+                      />
+                    }
+                  />
+                )}
+                {isUserOfficer && (
+                  <Route
+                    path="/Techniques"
+                    element={
+                      <TitledRoute
+                        title={i18n.format(t('Technique'), 'plural')}
+                        setHeader={setHeader}
+                        element={<TechniquesPage />}
                       />
                     }
                   />

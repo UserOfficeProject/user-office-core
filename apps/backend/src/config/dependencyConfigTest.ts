@@ -24,6 +24,7 @@ import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventD
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
+import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
@@ -63,6 +64,7 @@ mapClass(Tokens.SampleEsiDataSource, SampleEsiDataSourceMock);
 mapClass(Tokens.ScheduledEventDataSource, ScheduledEventDataSourceMock);
 mapClass(Tokens.ShipmentDataSource, ShipmentDataSourceMock);
 mapClass(Tokens.SystemDataSource, SystemDataSourceMock);
+mapClass(Tokens.TechniqueDataSource, TechniqueDataSourceMock);
 mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
