@@ -3,7 +3,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { FileDataSource } from '../datasources/IFileDataSource';
+import { FileDataSource } from '../datasources/FileDataSource';
 import { FileMetadata } from '../models/Blob';
 import { Rejection, rejection } from '../models/Rejection';
 @injectable()

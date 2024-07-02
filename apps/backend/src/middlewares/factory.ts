@@ -5,7 +5,7 @@ import { container } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
 import { Tokens } from '../config/Tokens';
-import { DownloadType } from '../factory/service';
+import { DownloadType } from '../factory/DownloadService';
 import { AuthJwtPayload, UserWithRole } from '../models/User';
 import pdfDownload from './factory/pdf/download';
 import pdfPreview from './factory/pdf/preview';
