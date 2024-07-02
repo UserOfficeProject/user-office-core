@@ -41,7 +41,8 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.title || 'Title',
     values?.description || 'Description',
     values?.pdfTemplateId || 1,
-    values?.isActive || true
+    values?.isActive || true,
+    values?.needTechReview || true
   );
 };
 
@@ -75,6 +76,7 @@ export const dummyCall = new Call(
   '',
   '',
   1,
+  true,
   true
 );
 
@@ -108,6 +110,7 @@ export const anotherDummyCall = new Call(
   '',
   '',
   1,
+  true,
   true
 );
 

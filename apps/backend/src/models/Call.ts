@@ -29,7 +29,8 @@ export class Call {
     public title: string,
     public description: string,
     public pdfTemplateId: number | undefined,
-    public isActive: boolean
+    public isActive: boolean,
+    public needTechReview: boolean
   ) {}
 }
 

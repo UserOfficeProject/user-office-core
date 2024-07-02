@@ -98,6 +98,9 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Boolean)
   public isActive: boolean;
+
+  @Field(() => Boolean)
+  public needTechReview: boolean;
 }
 
 @Resolver(() => Call)

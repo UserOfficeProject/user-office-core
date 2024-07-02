@@ -335,6 +335,7 @@ export interface CallRecord {
   readonly description: string;
   readonly pdf_template_id: number;
   readonly is_active: boolean;
+  readonly need_tech_review: boolean;
 }
 
 export interface PageTextRecord {
@@ -995,7 +996,8 @@ export const createCallObject = (call: CallRecord) => {
     call.title,
     call.description,
     call.pdf_template_id,
-    call.is_active
+    call.is_active,
+    call.need_tech_review
   );
 };
 

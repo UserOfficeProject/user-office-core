@@ -27,6 +27,9 @@ export class CreateCallInput {
   public endCallInternal?: Date;
 
   @Field()
+  public needTechReview: boolean;
+
+  @Field()
   public startReview: Date;
 
   @Field()

@@ -51,6 +51,7 @@ context('Proposal tests', () => {
     shortCode: faker.random.alphaNumeric(15),
     startCall: faker.date.past().toISOString(),
     endCall: faker.date.future().toISOString(),
+    needTechReview: true,
     startReview: currentDayStart,
     endReview: currentDayStart,
     startFapReview: currentDayStart,

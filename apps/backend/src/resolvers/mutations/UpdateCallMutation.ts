@@ -29,6 +29,9 @@ export class UpdateCallInput {
   @Field(() => Date, { nullable: true })
   public endCallInternal?: Date;
 
+  @Field(() => Boolean, { nullable: true })
+  public needTechReview?: boolean;
+
   @Field(() => Date, { nullable: true })
   public startReview?: Date;
 

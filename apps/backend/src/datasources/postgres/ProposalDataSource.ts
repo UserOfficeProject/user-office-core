@@ -1063,4 +1063,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         return proposal ? createProposalObject(proposal) : null;
       });
   }
+
+  async proposalNeedTechReview(proposalPk: number): Promise<boolean> {
+    return database
+      .select('c.need_tech_review')
+      .from('proposals as p')
+      .join('call as c', { 'p.call_id': 'c.call_id' })
+      .where('proposal_pk', proposalPk)
+      .first()
+      .then((value) => value.need_tech_review);
+  }
 }
