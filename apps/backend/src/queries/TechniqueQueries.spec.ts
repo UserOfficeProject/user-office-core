@@ -67,4 +67,16 @@ describe('Test Technique Queries', () => {
       techniqueQueries.getInstrumentsByTechniqueId(dummyUserWithRole, 1)
     ).resolves.toBe(null);
   });
+
+  test('A user officer can get techniques by ids', () => {
+    return expect(
+      techniqueQueries.getTechniquesByIds(dummyUserWithRole, [1, 2])
+    ).resolves.toStrictEqual([dummyTechnique1, dummyTechnique2]);
+  });
+
+  test('A not logged in user cannot get techniques by ids', () => {
+    return expect(
+      techniqueQueries.getTechniquesByIds(null, [1, 2])
+    ).resolves.toBe(null);
+  });
 });
