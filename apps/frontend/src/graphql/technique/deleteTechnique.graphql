@@ -1,0 +1,5 @@
+mutation deleteTechnique($id: Int!) {
+  deleteTechnique(id: $id) {
+    ...technique
+  }
+}

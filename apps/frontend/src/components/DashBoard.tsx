@@ -29,6 +29,7 @@ import MenuItems from './menu/MenuItems';
 import InformationModal from './pages/InformationModal';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
+import TechniquesPage from './technique/TechniquesPage';
 import TitledRoute from './TitledRoute';
 
 const CallPage = lazy(() => import('./call/CallPage'));
@@ -430,6 +431,14 @@ const Dashboard = () => {
                 title={i18n.format(t('instrument'), 'plural')}
                 path="/Instruments"
                 component={InstrumentsPage}
+              />
+            )}
+            {isUserOfficer && (
+              <TitledRoute
+                setHeader={setHeader}
+                title={i18n.format(t('Technique'), 'plural')}
+                path="/Techniques"
+                component={TechniquesPage}
               />
             )}
             <TitledRoute

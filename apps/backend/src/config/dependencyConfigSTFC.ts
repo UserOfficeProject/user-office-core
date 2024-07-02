@@ -22,6 +22,7 @@ import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledE
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
+import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
@@ -72,6 +73,7 @@ mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, StfcUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
+mapClass(Tokens.TechniqueDataSource, PostgresTechniqueDataSource);
 mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource

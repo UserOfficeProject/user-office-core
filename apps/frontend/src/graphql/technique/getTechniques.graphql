@@ -1,0 +1,8 @@
+query getTechniques {
+  techniques {
+    techniques {
+      ...technique
+    }
+    totalCount
+  }
+}
