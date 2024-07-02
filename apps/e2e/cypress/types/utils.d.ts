@@ -74,6 +74,18 @@ declare global {
        *    cy.setTinyMceContent('editorId', 'content to type inside the editor')
        */
       setTinyMceContent: (tinyMceId: string, content: string) => void;
+      /**
+       * Set value in Date and DateTime picker fetched by selector.
+       *
+       * @returns {typeof setDatePickerValue}
+       * @memberof Chainable
+       * @example
+       *    cy.setDatePickerValue('selector', '02072024')
+       */
+      setDatePickerValue: (
+        selector: string,
+        value: string
+      ) => Chainable<JQuery<HTMLElement>>;
 
       /**
        * Get content from TinyMCE editor fetched by editor id.

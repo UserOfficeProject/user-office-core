@@ -11,9 +11,6 @@ import { DateTime } from 'luxon';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
-const removeSpecialCharactersAndSpaces = (date: string): string =>
-  date.replace(/[^0-9]/gi, '');
-
 context('Calls tests', () => {
   let esiTemplateId: number;
   const esiTemplateName = faker.lorem.words(2);
@@ -177,37 +174,33 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
-      cy.get('[data-cy=start-date] input').clear();
+      cy.get('[data-cy=start-date] input').type('{selectall}{backspace}');
 
       cy.get('[data-cy="next-step"]').click();
 
       cy.contains('Invalid Date');
 
-      cy.get('[data-cy=start-date] input')
-        .type('{selectall}{backspace}')
-        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
-        .type(removeSpecialCharactersAndSpaces(invalidPastDate))
-        .should('have.value', invalidPastDate + ':mm');
+      cy.setDatePickerValue(
+        '[data-cy=start-date] input',
+        invalidPastDate
+      ).should('have.value', invalidPastDate + ':mm');
 
       cy.contains('Invalid Date');
 
-      cy.get('[data-cy=start-date] input')
-        .type('{selectall}{backspace}')
-        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
-        .type(removeSpecialCharactersAndSpaces(startDate))
-        .should('have.value', startDate);
+      cy.setDatePickerValue('[data-cy=start-date] input', startDate).should(
+        'have.value',
+        startDate
+      );
 
-      cy.get('[data-cy=end-date] input')
-        .type('{selectall}{backspace}')
-        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
-        .type(removeSpecialCharactersAndSpaces(invalidFutureDate))
-        .should('have.value', invalidFutureDate + ':mm');
+      cy.setDatePickerValue(
+        '[data-cy=end-date] input',
+        invalidFutureDate
+      ).should('have.value', invalidFutureDate + ':mm');
 
-      cy.get('[data-cy=end-date] input')
-        .type('{selectall}{backspace}')
-        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
-        .type(removeSpecialCharactersAndSpaces(endDate))
-        .should('have.value', endDate);
+      cy.setDatePickerValue('[data-cy=end-date] input', endDate).should(
+        'have.value',
+        endDate
+      );
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]')
@@ -278,22 +271,18 @@ context('Calls tests', () => {
 
       cy.get('[data-cy=end-date]').find('[data-testid="CalendarIcon"]').click();
 
-      cy.get('[role="dialog"] .MuiCalendarPicker-root .MuiPickersDay-root')
+      cy.get('[role="dialog"] .MuiDateCalendar-root .MuiPickersDay-root')
         .contains(yesterday)
         .closest('button')
         .should('be.disabled');
 
       cy.get('[data-cy=start-date] input').click();
 
-      cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(tomorrow)
-        .should('have.value', tomorrow);
+      cy.setDatePickerValue('[data-cy=start-date] input', tomorrow)
+        .should('have.value', tomorrow)
+        .blur();
 
-      cy.get('[data-cy=end-date]').should(
-        'include.text',
-        'End call date can not be before start call date'
-      );
+      cy.get('[data-cy=end-date] .Mui-error').should('exist');
     });
 
     it('A user-officer should not be able to create a call with intenal end date before call end date', function () {
@@ -329,20 +318,17 @@ context('Calls tests', () => {
         .contains(proposalInternalWorkflow.name)
         .click();
 
-      cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(tomorrow)
-        .should('have.value', tomorrow);
-
-      cy.get('[data-cy=end-call-internal-date] input')
-        .clear()
-        .type(yesterday)
-        .should('have.value', yesterday);
-
-      cy.get('[data-cy=end-call-internal-date]').should(
-        'include.text',
-        'Internal call end date can not be before call end date'
+      cy.setDatePickerValue('[data-cy=end-date] input', tomorrow).should(
+        'have.value',
+        tomorrow
       );
+
+      cy.setDatePickerValue(
+        '[data-cy=end-call-internal-date] input',
+        yesterday
+      ).should('have.value', yesterday);
+
+      cy.get('[data-cy=end-call-internal-date] .Mui-error').should('exist');
     });
 
     it('A user-officer should be able to create a call', () => {
@@ -366,15 +352,15 @@ context('Calls tests', () => {
         .type(callShortCode)
         .should('have.value', callShortCode);
 
-      cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(callStartDate)
-        .should('have.value', callStartDate);
+      cy.setDatePickerValue('[data-cy=start-date] input', callStartDate).should(
+        'have.value',
+        callStartDate
+      );
 
-      cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(callEndDate)
-        .should('have.value', callEndDate);
+      cy.setDatePickerValue('[data-cy=end-date] input', callEndDate).should(
+        'have.value',
+        callEndDate
+      );
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
