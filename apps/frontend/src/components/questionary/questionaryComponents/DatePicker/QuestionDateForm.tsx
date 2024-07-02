@@ -78,7 +78,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
 
         const component = includeTime ? DateTimePicker : DatePicker;
         const inputFormat = includeTime ? dateTimeFormat : dateFormat;
-        const mask = inputFormat?.replace(/[a-zA-Z]/g, '_');
 
         return (
           <>
@@ -136,8 +135,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   name="config.minDate"
                   id="Min-Time-Input"
                   label="Min"
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   ampm={false}
                   component={component}
                   showToolbar
@@ -153,8 +151,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   name="config.maxDate"
                   id="Max-Time-Input"
                   label="Max"
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   ampm={false}
                   component={component}
                   inputProps={{ placeholder: inputFormat }}
@@ -169,8 +166,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   name="config.defaultDate"
                   id="Default-Time-Input"
                   label="Default"
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   ampm={false}
                   component={component}
                   inputProps={{ placeholder: inputFormat }}

@@ -26,7 +26,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
   const { dispatch, state } = useContext(
     QuestionaryContext
   ) as VisitRegistrationContextType;
-  const { format, mask } = useFormattedDateTime({
+  const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
@@ -41,8 +41,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
       <Field
         name={`${id}.startsAt`}
         label="Visit start"
-        inputFormat={format}
-        mask={mask}
+        format={format}
         component={DatePicker}
         inputProps={{ placeholder: format }}
         variant="inline"
@@ -68,8 +67,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
       <Field
         name={`${id}.endsAt`}
         label="Visit end"
-        inputFormat={format}
-        mask={mask}
+        format={format}
         component={DatePicker}
         inputProps={{ placeholder: format }}
         variant="inline"

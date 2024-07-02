@@ -22,7 +22,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
   } = answer;
   const { tooltip, required, minDate, maxDate, includeTime } =
     answer.config as DateConfig;
-  const { format, mask } = useFormattedDateTime({
+  const { format } = useFormattedDateTime({
     settingsFormatToUse: includeTime
       ? SettingsId.DATE_TIME_FORMAT
       : SettingsId.DATE_FORMAT,
@@ -45,8 +45,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
           id={`${id}-id`}
           name={id}
           label={question}
-          inputFormat={format}
-          mask={mask}
+          format={format}
           component={component}
           inputProps={{ placeholder: format }}
           ampm={false}

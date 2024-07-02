@@ -35,6 +35,14 @@ export default {
 
     return { dateFormat, dateTimeFormat, statusFilter, reviewerFilter };
   },
+  getCorrectFormatCase: (string: string) => {
+    return string
+      .split(' ')
+      .map((part, index) =>
+        index === 0 ? part.toUpperCase() : part.toLowerCase()
+      )
+      .join(' ');
+  },
   call: {
     id: 1,
     shortCode: 'call 1',

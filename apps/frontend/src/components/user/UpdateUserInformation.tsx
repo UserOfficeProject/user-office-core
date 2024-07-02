@@ -246,7 +246,7 @@ export default function UpdateUserInformation(
                   name="birthdate"
                   label="Birthdate"
                   id="birthdate-input"
-                  inputFormat={format}
+                  format={format}
                   inputProps={{ placeholder: format }}
                   component={DatePicker}
                   textField={{

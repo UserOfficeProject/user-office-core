@@ -75,7 +75,6 @@ export const QuestionTemplateRelationDateForm = (
 
         const component = includeTime ? DateTimePicker : DatePicker;
         const inputFormat = includeTime ? dateTimeFormat : dateFormat;
-        const mask = inputFormat?.replace(/[a-zA-Z]/g, '_');
 
         return (
           <>
@@ -115,8 +114,7 @@ export const QuestionTemplateRelationDateForm = (
                   label="Min"
                   id="Min-input"
                   ampm={false}
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   component={component}
                   maxDate={defaultFieldMaxDate}
                   textField={{
@@ -130,8 +128,7 @@ export const QuestionTemplateRelationDateForm = (
                   label="Max"
                   id="Max-input"
                   ampm={false}
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   component={component}
                   minDate={defaultFieldMinDate}
                   textField={{
@@ -145,8 +142,7 @@ export const QuestionTemplateRelationDateForm = (
                   label="Default"
                   id="Default-input"
                   ampm={false}
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   component={component}
                   minDate={defaultFieldMinDate}
                   maxDate={defaultFieldMaxDate}

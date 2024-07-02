@@ -83,7 +83,7 @@ const CallGeneralInfo = ({
   loadingProposalWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
-  const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
+  const { format: dateTimeFormat, timezone } = useFormattedDateTime();
   const [internalCallDate, setInternalCallDate] = useState({
     showField: false,
     isValueSet: false,
@@ -214,9 +214,7 @@ const CallGeneralInfo = ({
           name="startCall"
           label={`Start (${timezone})`}
           id="start-call-input"
-          inputFormat={dateTimeFormat}
-          mask={mask}
-          // NOTE: We need to have ampm set to false because otherwise the mask doesn't work properly and suggestion format when you type is not shown at all
+          format={dateTimeFormat}
           ampm={false}
           component={DateTimePicker}
           inputProps={{ placeholder: dateTimeFormat }}
@@ -234,8 +232,7 @@ const CallGeneralInfo = ({
           name="endCall"
           label={`End (${timezone})`}
           id="end-call-input"
-          inputFormat={dateTimeFormat}
-          mask={mask}
+          format={dateTimeFormat}
           ampm={false}
           allowSameDateSelection
           component={DateTimePicker}
@@ -428,8 +425,7 @@ const CallGeneralInfo = ({
             name="endCallInternal"
             label={`End Internal (${timezone})`}
             id="end-call-internal-input"
-            inputFormat={dateTimeFormat}
-            mask={mask}
+            format={dateTimeFormat}
             ampm={false}
             allowSameDateSelection
             component={DateTimePicker}

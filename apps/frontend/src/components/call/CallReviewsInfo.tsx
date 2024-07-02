@@ -27,7 +27,6 @@ const CallReviewAndNotification = () => {
   });
   const { settingsMap } = useContext(SettingsContext);
   const dateFormat = settingsMap.get(SettingsId.DATE_FORMAT)?.settingsValue;
-  const mask = dateFormat?.replace(/[a-zA-Z]/g, '_');
   const formik = useFormikContext<
     CreateCallMutationVariables | UpdateCallMutationVariables
   >();
@@ -46,8 +45,7 @@ const CallReviewAndNotification = () => {
           name="startReview"
           label="Start of review"
           id="start-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           component={DatePicker}
           inputProps={{ placeholder: dateFormat }}
@@ -64,8 +62,7 @@ const CallReviewAndNotification = () => {
           name="endReview"
           label="End of review"
           id="end-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           minDate={startReview}
           component={DatePicker}
@@ -82,8 +79,7 @@ const CallReviewAndNotification = () => {
           name="startFapReview"
           label="Start of Fap review"
           id="start-fap-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           allowSameDateSelection
           component={DatePicker}
@@ -97,8 +93,7 @@ const CallReviewAndNotification = () => {
           name="endFapReview"
           label="End of Fap review"
           id="end-fap-review-input"
-          inputFormat={dateFormat}
-          mask={mask}
+          format={dateFormat}
           ampm={false}
           allowSameDateSelection
           minDate={startFapReview}
