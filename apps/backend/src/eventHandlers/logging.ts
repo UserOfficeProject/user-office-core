@@ -268,7 +268,7 @@ export default function createHandler() {
             }
           }
           break;
-        case Event.PROPOSALS_ASSIGNED_TO_TECHNIQUE:
+        case Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES:
           {
             let description = '';
             if (event.boolean && event.inputArgs) {
