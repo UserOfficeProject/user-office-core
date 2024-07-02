@@ -1,0 +1,43 @@
+name: Deploy Documentation for Release version
+on:
+  # This workflow runs when the "Bump version" workflow completes successfully
+  # It means that the version has been bumped and the release has been created so we can deploy the documentation for the new version
+  workflow_run:    
+    workflows: ["Bump version"]
+    types:
+      - completed
+    branches:
+      - main
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+      - uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: pip install mkdocs-material 
+      - run: pip install mike
+      - name: Build and Deploy
+        working-directory: ./documentation
+        run: |
+          VERSION=$(git describe --tags --abbrev=0)
+          echo "Deploying $VERSION"
+          git fetch origin
+          mike deploy --update-alias --push $VERSION latest
+          mike set-default latest --push
