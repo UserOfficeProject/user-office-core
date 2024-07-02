@@ -2304,6 +2304,8 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="submit-all-button"]').click();
 
+      cy.contains('Some proposals could not be submitted');
+
       cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
         'not.exist'
       );
@@ -2801,6 +2803,8 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="submit-all-button"]').click();
 
+      cy.contains('Some proposals could not be submitted');
+
       cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
         'not.exist'
       );
@@ -3024,7 +3028,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="submit-all-button"]').click();
 
-      cy.contains('Some Proposals Could not be Submitted');
+      cy.contains('Some proposals could not be submitted');
 
       cy.get('[data-cy="proposal-' + firstCreatedProposalId + '"]').should(
         'not.exist'
