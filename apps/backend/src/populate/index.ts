@@ -345,11 +345,9 @@ const createFaps = async () => {
             instrumentHasProposals.instrumentHasProposalIds[0],
         },
       ]);
-      await fapDataSource.assignMemberToFapProposal(
-        proposalPk,
-        fap.id,
-        [tmpUserId],
-        1
+      await fapDataSource.assignMembersToFapProposals(
+        [{ proposalPk, memberId: tmpUserId, fapProposalId: 1 }],
+        fap.id
       );
       await reviewDataSource.addUserForReview({
         proposalPk: proposalPk,

@@ -13,6 +13,15 @@ import { ResolverContext } from '../../context';
 import { UserRole } from '../../models/User';
 import { Fap } from '../types/Fap';
 
+@InputType()
+export class FapReviewAssignmentInput {
+  @Field(() => Int)
+  public memberId: number;
+
+  @Field(() => Int)
+  public proposalPk: number;
+}
+
 @ArgsType()
 export class UpdateMemberFapArgs {
   @Field(() => Int)
@@ -35,19 +44,10 @@ export class AssignReviewersToFapArgs {
 }
 
 @ArgsType()
-export class AssignFapReviewersToProposalArgs {
-  @Field(() => [Int])
-  public memberIds: number[];
+export class AssignFapReviewersToProposalsArgs {
+  @Field(() => [FapReviewAssignmentInput])
+  public assignments: FapReviewAssignmentInput[];
 
-  @Field(() => Int)
-  public fapId: number;
-
-  @Field(() => Int)
-  public proposalPk: number;
-}
-
-@ArgsType()
-export class MassAssignReviewsArgs {
   @Field(() => Int)
   public fapId: number;
 }
@@ -121,22 +121,14 @@ export class AssignMembersToFapMutation {
   }
 
   @Mutation(() => Fap)
-  async assignFapReviewersToProposal(
-    @Args() args: AssignFapReviewersToProposalArgs,
+  async assignFapReviewersToProposals(
+    @Args() args: AssignFapReviewersToProposalsArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.fap.assignFapReviewersToProposal(
+    return context.mutations.fap.assignFapReviewersToProposals(
       context.user,
       args
     );
-  }
-
-  @Mutation(() => Fap)
-  async massAssignFapReviews(
-    @Args() args: MassAssignReviewsArgs,
-    @Ctx() context: ResolverContext
-  ) {
-    return context.mutations.fap.massAssignFapReviews(context.user, args);
   }
 
   @Mutation(() => Fap)

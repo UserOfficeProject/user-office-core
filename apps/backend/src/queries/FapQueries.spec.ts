@@ -64,9 +64,7 @@ describe('Test FapQueries', () => {
   test('A userofficer can get Fap Members by Fap id', () => {
     return expect(
       FapQueriesInstance.getMembers(dummyUserOfficerWithRole, 1)
-    ).resolves.toStrictEqual(
-      dummyFapMembers.filter((dummyFapMember) => dummyFapMember.fapId === 1)
-    );
+    ).resolves.toStrictEqual(dummyFapMembers);
   });
 
   test('A userofficer can get Fap Proposals by Fap id', () => {

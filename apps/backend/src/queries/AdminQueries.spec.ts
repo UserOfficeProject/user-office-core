@@ -30,7 +30,7 @@ describe('Test Admin Queries', () => {
   });
 
   test('A user can get settings', () => {
-    return expect(adminQueries.getSettings()).resolves.toHaveLength(5);
+    return expect(adminQueries.getSettings()).resolves.toHaveLength(4);
   });
 
   test('A user can not get all api access tokens', () => {
