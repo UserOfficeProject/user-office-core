@@ -214,7 +214,7 @@ const FapMeetingInstrumentsTable = ({
             color: 'red',
           }}
         >
-          Some Proposals Could not be Submitted
+          Some proposals could not be submitted
         </DialogTitle>
         <DialogContent>
           <DialogContentText
