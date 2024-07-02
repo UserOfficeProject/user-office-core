@@ -156,4 +156,25 @@ describe('Test technique Mutations', () => {
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
   });
+
+  test('A logged in user officer can assign techniques to a proposal', async () => {
+    return expect(
+      techniqueMutations.assignProposalToTechniqueInternal(
+        dummyUserOfficerWithRole,
+        {
+          techniqueIds: [1, 2],
+          proposalPk: 1,
+        }
+      )
+    ).resolves.toBe(true);
+  });
+
+  test('A user cannot assign techniques to a proposal', async () => {
+    return expect(
+      techniqueMutations.assignProposalToTechniqueInternal(dummyUserWithRole, {
+        techniqueIds: [1, 2],
+        proposalPk: 1,
+      })
+    ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
 });
