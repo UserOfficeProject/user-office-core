@@ -27,3 +27,4 @@ import './workflow';
 import './fap';
 import './predefinedMessages';
 import './settings';
+import './technique';

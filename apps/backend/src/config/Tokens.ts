@@ -12,6 +12,7 @@ export const Tokens = {
   FileDataSource: Symbol('FileDataSource'),
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
   InstrumentDataSource: Symbol('InstrumentDataSource'),
+  TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   MailService: Symbol('MailService'),
   PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),

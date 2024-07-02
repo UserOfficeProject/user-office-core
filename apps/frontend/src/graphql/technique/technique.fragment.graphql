@@ -1,0 +1,9 @@
+fragment technique on Technique {
+  id
+  name
+  shortCode
+  description
+  instruments {
+    ...instrument
+  }
+}
