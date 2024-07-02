@@ -1,11 +1,11 @@
 import useTheme from '@mui/material/styles/useTheme';
-import TextField from '@mui/material/TextField';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
 import React, { useContext } from 'react';
 
 import DatePicker from 'components/common/FormikUIDatePicker';
+import TextField from 'components/common/FormikUITextField';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   CreateCallMutationVariables,

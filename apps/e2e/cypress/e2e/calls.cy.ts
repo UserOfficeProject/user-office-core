@@ -11,6 +11,9 @@ import { DateTime } from 'luxon';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
+const removeSpecialCharactersAndSpaces = (date: string): string =>
+  date.replace(/[^0-9]/gi, '');
+
 context('Calls tests', () => {
   let esiTemplateId: number;
   const esiTemplateName = faker.lorem.words(2);
@@ -134,7 +137,7 @@ context('Calls tests', () => {
     cy.should('not.contain', 'Calls');
 
     cy.visit('/CallPage');
-    cy.contains('My proposals');
+    cy.get('[data-cy="calls-table"]').should('not.exist');
   });
 
   describe('Call basic tests', () => {
@@ -180,28 +183,30 @@ context('Calls tests', () => {
 
       cy.contains('Invalid Date');
 
-      // NOTE: Luxon adapter still doesn't work well with newest MUI lab version to support placeholder text (https://github.com/mui/material-ui/issues/29851)
       cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(invalidPastDate)
-        .should('have.value', invalidPastDate + ':');
+        .type('{selectall}{backspace}')
+        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+        .type(removeSpecialCharactersAndSpaces(invalidPastDate))
+        .should('have.value', invalidPastDate + ':mm');
 
       cy.contains('Invalid Date');
 
       cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(startDate)
+        .type('{selectall}{backspace}')
+        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+        .type(removeSpecialCharactersAndSpaces(startDate))
         .should('have.value', startDate);
 
-      // NOTE: Luxon adapter still doesn't work well with newest MUI lab version to support placeholder text (https://github.com/mui/material-ui/issues/29851)
       cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(invalidFutureDate)
-        .should('have.value', invalidFutureDate + ':');
+        .type('{selectall}{backspace}')
+        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+        .type(removeSpecialCharactersAndSpaces(invalidFutureDate))
+        .should('have.value', invalidFutureDate + ':mm');
 
       cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(endDate)
+        .type('{selectall}{backspace}')
+        .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+        .type(removeSpecialCharactersAndSpaces(endDate))
         .should('have.value', endDate);
 
       cy.get('[data-cy="call-template"]').click();
@@ -238,10 +243,13 @@ context('Calls tests', () => {
       cy.get('[data-cy="submit"]').click();
 
       cy.get('[data-cy="cycle-comment"] input').should('be.focused');
-      cy.get('[data-cy="cycle-comment"] input:invalid').should(
-        'have.length',
-        1
-      );
+      cy.get('[data-cy="cycle-comment"] input').then(($input) => {
+        expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
+          'Please fill out this field.'
+        );
+      });
+      cy.get('[data-cy="cycle-comment"] input').blur();
+      cy.get('[data-cy="cycle-comment"] .Mui-error').should('exist');
     });
 
     it('A user-officer should not be able to create a call with end dates before start dates', () => {
@@ -1085,7 +1093,7 @@ context('Calls tests', () => {
       id: initialDBData.call.id,
       ...newCall,
       shortCode: initialDBData.call.shortCode,
-      endCall: DateTime.now().plus({ minutes: 1, seconds: 30 }),
+      endCall: DateTime.now().plus({ minutes: 1, seconds: 50 }),
       proposalWorkflowId: initialDBData.proposal.id,
     }).then(() => {
       cy.reload();
