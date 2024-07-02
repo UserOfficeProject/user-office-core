@@ -38,6 +38,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       config.variant = 'dropdown';
       config.instruments = [];
       config.isMultipleSelect = false;
+      config.requestTime = false;
 
       return config;
     },
@@ -99,8 +100,8 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       const { value } = JSON.parse(answer.value);
       const instrumentIds = value
         ? Array.isArray(value)
-          ? value
-          : [value]
+          ? value.map((i) => i.instrumentId)
+          : [value.instrumentId]
         : null;
 
       if (!instrumentIds?.length) {

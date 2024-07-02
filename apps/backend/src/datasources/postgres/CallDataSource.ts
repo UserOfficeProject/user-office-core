@@ -483,4 +483,20 @@ export default class PostgresCallDataSource implements CallDataSource {
       .first()
       .then((call: CallRecord) => (call ? false : true));
   }
+  public async getCallByQuestionId(questionId: string): Promise<Call> {
+    const records: CallRecord[] = await database('call')
+      .leftJoin(
+        'templates_has_questions',
+        'templates_has_questions.template_id',
+        'call.template_id'
+      )
+      .leftJoin(
+        'answers',
+        'answers.question_id',
+        'templates_has_questions.question_id'
+      )
+      .where('answers.question_id', questionId);
+
+    return createCallObject(records[0]);
+  }
 }

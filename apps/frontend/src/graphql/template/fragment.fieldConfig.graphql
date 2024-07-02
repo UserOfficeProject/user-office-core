@@ -159,6 +159,7 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     isMultipleSelect
+    requestTime
     instruments {
       id
       name
