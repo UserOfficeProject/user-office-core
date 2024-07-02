@@ -83,6 +83,8 @@ declare module 'knex/types/tables' {
 
   interface Tables {
     pdf_templates: PdfTemplateRecord;
+    techniques: TechniqueRecord;
+    technique_has_instruments: TechniqueHasInstrumentsRecord;
   }
 }
 
@@ -287,7 +289,7 @@ export interface TechnicalReviewRecord {
   readonly submitted: boolean;
   readonly reviewer_id: number;
   readonly files: string;
-  readonly technical_review_assignee_id: number;
+  readonly technical_review_assignee_id: number | null;
   readonly instrument_id: number;
 }
 
@@ -1295,3 +1297,16 @@ export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
     invite.claimed_by,
     invite.claimed_at
   );
+
+export interface TechniqueRecord {
+  readonly technique_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly full_count: number;
+}
+
+export interface TechniqueHasInstrumentsRecord {
+  readonly technique_id: number;
+  readonly instrument_id: number;
+}
