@@ -1152,7 +1152,7 @@ context('Instrument tests', () => {
         .should('exist');
     });
 
-    it.only('Instrument scientists should be able to see proposals but not submit reviews for calls that do not have technical reviews', () => {
+    it('Instrument scientists should be able to see proposals but not submit reviews for calls that do not have technical reviews', () => {
       cy.updateCall({ id: initialDBData.call.id, needTechReview: false });
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
