@@ -14,7 +14,7 @@ export class TechniqueHasInstruments {
   ) {}
 }
 
-export class AssignProposalsToTechniquesArgs {
-  public techniqueIds: number[];
+export class AssignProposalToTechniquesArgs {
   public proposalPk: number;
+  public techniqueIds: number[];
 }

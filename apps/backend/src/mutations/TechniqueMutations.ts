@@ -12,10 +12,7 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
-import {
-  AssignProposalsToTechniquesArgs,
-  Technique,
-} from '../models/Technique';
+import { AssignProposalToTechniquesArgs, Technique } from '../models/Technique';
 import { UserWithRole } from '../models/User';
 import { AssignInstrumentsToTechniqueArgs } from '../resolvers/mutations/AssignInstrumentsToTechnique';
 import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutation';
@@ -59,7 +56,7 @@ export default class TechniqueMutations {
       .update(args)
       .catch((error) => {
         return rejection(
-          `Could not update technique '${args.id}`,
+          `Could not update technique: '${args.id}`,
           { agent, args: args },
           error
         );
@@ -79,7 +76,7 @@ export default class TechniqueMutations {
       .delete(args.id)
       .catch((error) => {
         return rejection(
-          `Could not delete technique '${args.id}'`,
+          `Could not delete technique: '${args.id}'`,
           { agent, args: args },
           error
         );
@@ -99,7 +96,7 @@ export default class TechniqueMutations {
       .assignInstrumentsToTechnique(args.instrumentIds, args.techniqueId)
       .catch((error) => {
         return rejection(
-          `Could not assign instruments to technique '${args.techniqueId}`,
+          `Could not assign instruments to technique: '${args.techniqueId}`,
           { agent, args: args },
           error
         );
@@ -117,23 +114,32 @@ export default class TechniqueMutations {
       .removeInstrumentsFromTechnique(args.instrumentIds, args.techniqueId)
       .catch((error) => {
         return rejection(
-          `Could not remove assigned instruments from technique '${args.techniqueId}`,
+          `Could not remove assigned instruments from technique: '${args.techniqueId}`,
           { agent, args: args },
           error
         );
       });
   }
 
-  @EventBus(Event.PROPOSALS_ASSIGNED_TO_TECHNIQUE)
-  async assignProposalToTechniqueInternal(
+  @EventBus(Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES)
+  @Authorized([Roles.USER_OFFICER])
+  async assignProposalToTechnique(
     agent: UserWithRole | null,
-    args: AssignProposalsToTechniquesArgs
+    args: AssignProposalToTechniquesArgs
+  ) {
+    return this.assignProposalToTechniquesInternal(agent, args);
+  }
+
+  @EventBus(Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES)
+  async assignProposalToTechniquesInternal(
+    agent: UserWithRole | null,
+    args: AssignProposalToTechniquesArgs
   ) {
     return this.dataSource
-      .assignProposalToTechnique(args.proposalPk, args.techniqueIds)
+      .assignProposalToTechniques(args.proposalPk, args.techniqueIds)
       .catch((error) => {
         return rejection(
-          `Could not assign proposals to technique '${args.techniqueIds}`,
+          `Could not assign proposal to techniques: '${args.techniqueIds}`,
           { agent, args: args },
           error
         );

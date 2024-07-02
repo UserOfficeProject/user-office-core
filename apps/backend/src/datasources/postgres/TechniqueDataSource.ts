@@ -200,7 +200,7 @@ export default class PostgresTechniqueDataSource
     }
   }
 
-  async assignProposalToTechnique(
+  async assignProposalToTechniques(
     proposalPk: number,
     techniqueIds: number[]
   ): Promise<boolean> {

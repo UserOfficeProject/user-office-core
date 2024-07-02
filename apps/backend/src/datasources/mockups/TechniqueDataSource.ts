@@ -66,7 +66,7 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
     return true;
   }
 
-  async assignProposalToTechnique(
+  async assignProposalToTechniques(
     proposalPk: number,
     techniqueIds: number[]
   ): Promise<boolean> {
