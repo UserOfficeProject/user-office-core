@@ -38,28 +38,29 @@ export class StfcDownloadService implements DownloadService {
       downloadType === DownloadType.PDF
     ) {
       const data = properties?.data[0] as ProposalPDFData;
-
-      const callDataSource = container.resolve<CallDataSource>(
-        Tokens.CallDataSource
-      );
-
-      const call = await callDataSource.getCall(data.proposal.callId);
-
-      const facility = getFacilityName(call?.shortCode);
-
-      if (facility != null) {
-        const fileDataSource = container.resolve<FileDataSource>(
-          Tokens.FileDataSource
-        );
-        proposalPdfData = await fileDataSource.getBlobdata(
-          `${facility}-${data.proposal.proposalId}.pdf`
+      if (data.proposal.submitted) {
+        const callDataSource = container.resolve<CallDataSource>(
+          Tokens.CallDataSource
         );
 
-        if (proposalPdfData) {
-          isPdfAvailable = true;
-          fileName = `${data.proposal.proposalId}_${
-            data.principalInvestigator.lastname
-          }_${data.proposal.created.getUTCFullYear()}.pdf`;
+        const call = await callDataSource.getCall(data.proposal.callId);
+
+        const facility = getFacilityName(call?.shortCode);
+
+        if (facility != null) {
+          const fileDataSource = container.resolve<FileDataSource>(
+            Tokens.FileDataSource
+          );
+          proposalPdfData = await fileDataSource.getBlobdata(
+            `${facility}-${data.proposal.proposalId}.pdf`
+          );
+
+          if (proposalPdfData) {
+            isPdfAvailable = true;
+            fileName = `${data.proposal.proposalId}_${
+              data.principalInvestigator.lastname
+            }_${data.proposal.created.getUTCFullYear()}.pdf`;
+          }
         }
       }
     }
