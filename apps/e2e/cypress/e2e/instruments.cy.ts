@@ -1151,5 +1151,44 @@ context('Instrument tests', () => {
         .find('[data-cy="view-proposal-and-technical-review"]')
         .should('exist');
     });
+
+    it.only('Instrument scientists should be able to see proposals but not submit reviews for calls that do not have technical reviews', () => {
+      cy.updateCall({ id: initialDBData.call.id, needTechReview: false });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          const createdProposal2Id = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposal2Id,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposal2Id],
+            instrumentIds: [createdInstrumentId],
+          });
+        }
+      });
+      selectAllProposalsFilterStatus();
+      cy.get('#reviewer-selection').click();
+      cy.contains('All proposals').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]');
+
+      cy.contains(proposal2.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .click();
+
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.contains('No technical reviews found for the selected proposal');
+    });
   });
 });
