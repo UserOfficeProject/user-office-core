@@ -6,6 +6,7 @@ import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -26,6 +27,10 @@ export default function createHandler() {
 
   const techniqueDataSource = container.resolve<TechniqueDataSource>(
     Tokens.TechniqueDataSource
+  );
+
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
   );
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
@@ -263,7 +268,28 @@ export default function createHandler() {
             }
           }
           break;
-        case Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES:
+        case Event.PROPOSALS_ASSIGNED_TO_TECHNIQUE:
+          {
+            let description = '';
+            if (event.boolean && event.inputArgs) {
+              const obj = JSON.parse(event.inputArgs);
+              const techniques = await techniqueDataSource.getTechniquesByIds(
+                obj[0].techniqueIds
+              );
+
+              const proposal = await proposalDataSource.get(obj[0].proposalPk);
+
+              description = `Selected instruments: ${techniques?.map((technique) => technique.name).join(', ')} is attached to technique: ${proposal?.proposalId}`;
+
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].proposalPk,
+                description
+              );
+            }
+          }
           break;
         default: {
           let changedObjectId: number;
