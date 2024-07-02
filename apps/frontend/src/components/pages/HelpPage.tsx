@@ -11,13 +11,11 @@ const HelpPage = () => {
   );
 
   return (
-    <React.Fragment>
-      <StyledContainer>
-        <StyledPaper>
-          {loadingHelpContent ? null : parse(helpPageContent)}
-        </StyledPaper>
-      </StyledContainer>
-    </React.Fragment>
+    <StyledContainer maxWidth={false}>
+      <StyledPaper>
+        {loadingHelpContent ? null : parse(helpPageContent)}
+      </StyledPaper>
+    </StyledContainer>
   );
 };
 

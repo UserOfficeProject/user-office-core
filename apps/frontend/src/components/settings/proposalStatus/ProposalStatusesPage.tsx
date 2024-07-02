@@ -6,7 +6,7 @@ import ProposalStatusesTable from './ProposalStatusesTable';
 
 const ProposalStatusesPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <ProposalStatusesTable />
       </StyledPaper>

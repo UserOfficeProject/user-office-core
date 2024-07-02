@@ -8,7 +8,7 @@ import PageInputBox from './PageInputBox';
 
 export default function PageEditor() {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs
           tabNames={[

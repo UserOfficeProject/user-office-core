@@ -6,7 +6,7 @@ import UnitTable from './UnitTable';
 
 const UnitTablePage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <UnitTable />
       </StyledPaper>

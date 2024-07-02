@@ -6,7 +6,7 @@ import InstitutionTable from './InstitutionTable';
 
 const InstrumentsPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <InstitutionTable />
       </StyledPaper>

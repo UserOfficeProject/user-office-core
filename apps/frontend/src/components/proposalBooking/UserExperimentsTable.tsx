@@ -12,7 +12,7 @@ export default function UserExperimentTimesTable() {
     });
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <ExperimentsTable
           isLoading={loading}

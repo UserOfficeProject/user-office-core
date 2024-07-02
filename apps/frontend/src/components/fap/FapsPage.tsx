@@ -6,7 +6,7 @@ import FapsTable from './FapsTable';
 
 const FapsPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <FapsTable />
       </StyledPaper>

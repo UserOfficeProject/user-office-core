@@ -11,7 +11,7 @@ export default function SampleEsiPage() {
   const itemCountLabel = '# Sample ESIs';
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs tabNames={['Current', 'Archived']}>
           <DefaultTemplatesTable

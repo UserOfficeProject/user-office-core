@@ -14,7 +14,7 @@ export default function GenericTemplatesPage() {
     rowData.questionaryCount === 0;
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs tabNames={['Current', 'Archived']}>
           <DefaultTemplatesTable

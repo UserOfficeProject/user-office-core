@@ -20,7 +20,7 @@ export default function PeoplePage() {
   }
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper data-cy="people-table">
         <PeopleTable
           title="Users"

@@ -11,7 +11,7 @@ export default function ProposalEsiPage() {
   const itemCountLabel = 'Proposal safety reviews';
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs tabNames={['Current', 'Archived']}>
           <DefaultTemplatesTable

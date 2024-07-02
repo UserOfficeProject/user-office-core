@@ -6,7 +6,7 @@ import FeaturesTable from './FeaturesTable';
 
 const FeaturesPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <FeaturesTable />
       </StyledPaper>

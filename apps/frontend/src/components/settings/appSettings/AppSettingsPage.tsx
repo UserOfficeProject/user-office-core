@@ -6,7 +6,7 @@ import AppSettingsTable from './AppSettingsTable';
 
 const AppSettingsPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <AppSettingsTable />
       </StyledPaper>
