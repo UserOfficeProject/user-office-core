@@ -2227,20 +2227,26 @@ context('Fap meeting components tests', () => {
             fapId: createdFapId,
             memberIds: [fapMembers.reviewer2.id],
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: firstCreatedProposalPk,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer2.id],
-            proposalPk: firstCreatedProposalPk,
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer.id,
+              proposalPk: createdProposal.primaryKey,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer.id],
-            proposalPk: createdProposal.primaryKey,
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: createdProposal.primaryKey,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer2.id],
-            proposalPk: createdProposal.primaryKey,
           });
 
           // Manually changing the proposal status to be shown in the Faps. -------->
@@ -2727,20 +2733,26 @@ context('Fap meeting components tests', () => {
             fapId: createdFapId,
             memberIds: [fapMembers.reviewer2.id],
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: firstCreatedProposalPk,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer2.id],
-            proposalPk: firstCreatedProposalPk,
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer.id,
+              proposalPk: createdProposal.primaryKey,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer.id],
-            proposalPk: createdProposal.primaryKey,
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: createdProposal.primaryKey,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer2.id],
-            proposalPk: createdProposal.primaryKey,
           });
 
           // Manually changing the proposal status to be shown in the Faps. -------->
@@ -2952,20 +2964,26 @@ context('Fap meeting components tests', () => {
             fapId: createdFapId,
             memberIds: [fapMembers.reviewer2.id],
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: firstCreatedProposalPk,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer2.id],
-            proposalPk: firstCreatedProposalPk,
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: createdProposal.primaryKey,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer.id],
-            proposalPk: createdProposal.primaryKey,
           });
-          cy.assignFapReviewersToProposal({
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: createdProposal.primaryKey,
+            },
             fapId: createdFapId,
-            memberIds: [fapMembers.reviewer2.id],
-            proposalPk: createdProposal.primaryKey,
           });
 
           // Manually changing the proposal status to be shown in the Faps. -------->
