@@ -499,4 +499,12 @@ export class FapDataSourceMock implements FapDataSource {
   ): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
+
+  submitFapMeetings(
+    callId: number,
+    fapId: number,
+    userId?: number | undefined
+  ): Promise<FapProposal[]> {
+    throw new Error('Method not implemented.');
+  }
 }

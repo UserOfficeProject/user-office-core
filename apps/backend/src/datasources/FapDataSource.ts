@@ -141,4 +141,9 @@ export interface FapDataSource {
     reviewerId: number,
     rank: number
   ): Promise<boolean>;
+  submitFapMeetings(
+    callId: number,
+    fapId: number,
+    userId?: number
+  ): Promise<FapProposal[]>;
 }
