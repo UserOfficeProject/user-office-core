@@ -324,15 +324,12 @@ export default class InstrumentMutations {
 
   @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED)
   @ValidateArgs(submitInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER])
   async submitInstrument(
     agent: UserWithRole | null,
     args: InstrumentSubmitArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
+    if (!this.userAuth.isUserOfficer(agent)) {
       return rejection('Submitting instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
@@ -381,6 +378,8 @@ export default class InstrumentMutations {
           return this.fapDataSource.saveFapMeetingDecision({
             proposalPk: proposalWithRanking.proposalPk,
             rankOrder: proposalWithRanking.rankOrder,
+            instrumentId: args.instrumentId,
+            fapId: args.fapId,
           });
         })
       );

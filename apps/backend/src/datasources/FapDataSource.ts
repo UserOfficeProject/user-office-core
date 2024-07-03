@@ -75,7 +75,8 @@ export interface FapDataSource {
   getFapReviewerProposalCountCurrentRound(reviewerId: number): Promise<number>;
   getFapProposal(
     fapId: number,
-    proposalPk: number
+    proposalPk: number,
+    instrumentId?: number
   ): Promise<FapProposal | null>;
   getFapProposalsByInstrument(
     fapId: number,
@@ -100,10 +101,6 @@ export interface FapDataSource {
   ): Promise<Fap>;
   removeProposalsFromFaps(
     args: RemoveProposalsFromFapsArgs
-  ): Promise<FapProposal[]>;
-  removeProposalsFromFapsByInstrument(
-    proposalPk: number,
-    instrumentIds: number[]
   ): Promise<FapProposal[]>;
   assignMemberToFapProposal(
     proposalPk: number,
@@ -135,7 +132,8 @@ export interface FapDataSource {
     submittedBy?: number | null
   ): Promise<FapMeetingDecision>;
   getProposalsFapMeetingDecisions(
-    proposalPks: number[]
+    proposalPks: number[],
+    fapId?: number
   ): Promise<FapMeetingDecision[]>;
   getFapProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
@@ -150,4 +148,9 @@ export interface FapDataSource {
     reviewerId: number,
     rank: number
   ): Promise<boolean>;
+  submitFapMeetings(
+    callId: number,
+    fapId: number,
+    userId?: number
+  ): Promise<FapProposal[]>;
 }

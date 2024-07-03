@@ -90,8 +90,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   },
   {
     title: 'Reviewers',
-    field: 'assignments.length',
-    emptyValue: '-',
+    render: (data) => data.assignments?.length,
   },
   {
     title: 'Reviews',
@@ -291,6 +290,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     const { proposalReviews } = await api().getProposalReviews({
       proposalPk,
+      fapId: data.id,
     });
 
     if (!proposalReviews) {

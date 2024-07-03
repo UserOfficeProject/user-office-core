@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  TechnicalReviewStatus,
   TemplateCategoryId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -29,7 +30,13 @@ context('Proposal administration tests', () => {
   let createdInstrumentId: number;
 
   const instrument1 = {
-    name: faker.random.words(2),
+    name: `0000. ${faker.random.words(2)}`,
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: existingUserId,
+  };
+  const instrument2 = {
+    name: `1111. ${faker.random.words(2)}`,
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(5),
     managerUserId: existingUserId,
@@ -88,6 +95,19 @@ context('Proposal administration tests', () => {
       );
       cy.login('officer');
       cy.visit('/');
+    });
+
+    it('Should not be able to administer proposal if not assigned to instrument', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
+
+      cy.contains('Proposals').click();
+
+      cy.get('[data-cy=view-proposal]').click();
+      cy.finishedLoading();
+      cy.get('[role="dialog"]').contains('Admin').click();
+      cy.get('[data-cy="no-instrument-message"]').should('exist');
     });
 
     it('Should be able to set comment for user/manager and final status', function () {
@@ -299,11 +319,15 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=view-proposal]').click();
       cy.finishedLoading();
 
-      cy.get('[role="dialog"]').contains('Admin').click();
+      cy.get('[role="dialog"]').find('[role="tab"]').contains('Logs').click();
 
       cy.reload();
 
-      cy.get('[data-cy="commentForUser"]').should('exist');
+      cy.get('button[role="tab"]')
+        .contains('Logs')
+        .should('have.attr', 'aria-selected', 'true');
+
+      cy.get('[data-cy="event-logs-table"]').should('exist');
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
@@ -734,6 +758,90 @@ context('Proposal administration tests', () => {
       cy.get('table tbody tr').eq(0).contains(proposalFixedName);
     });
 
+    it('Should be able to sort propsals by instrument and technical review fields', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposalPk = result.createProposal.primaryKey;
+        if (proposalPk) {
+          cy.updateProposal({
+            proposalPk: proposalPk,
+            title: proposalFixedName,
+            abstract: proposalName2,
+            proposerId: existingUserId,
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [proposalPk],
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: proposalPk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            submitted: true,
+            reviewerId: initialDBData.users.officer.id,
+            instrumentId: createdInstrumentId,
+          });
+        }
+      });
+
+      cy.createInstrument(instrument2).then((result) => {
+        const instrumentId = result.createInstrument.id;
+        if (instrumentId) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: instrumentId }],
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [instrumentId],
+            proposalPks: [createdProposalPk],
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposalPk,
+            status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+            timeAllocation: 1,
+            submitted: true,
+            reviewerId: initialDBData.users.officer.id,
+            instrumentId: instrumentId,
+          });
+        }
+      });
+
+      cy.contains('Proposals').click();
+
+      cy.finishedLoading();
+
+      cy.get('th.MuiTableCell-root').contains('Instrument').click();
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(instrument1.name);
+      cy.get('table tbody tr').eq(1).contains(proposalName1);
+      cy.get('table tbody tr').eq(1).contains(instrument2.name);
+      cy.get('th.MuiTableCell-root').contains('Instrument').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(0).contains(proposalName1);
+      cy.get('table tbody tr').eq(0).contains(instrument2.name);
+      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(1).contains(instrument1.name);
+
+      cy.visit('/');
+
+      cy.finishedLoading();
+      cy.get('th.MuiTableCell-root').contains('Technical status').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(1).contains(proposalName1);
+      cy.get('table tbody tr').eq(1).contains(instrument2.name);
+      cy.get('table tbody tr').eq(0).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(0).contains(instrument1.name);
+      cy.get('th.MuiTableCell-root').contains('Technical status').click();
+      cy.finishedLoading();
+      cy.get('table tbody tr').eq(0).contains(proposalName1);
+      cy.get('table tbody tr').eq(0).contains(instrument2.name);
+      cy.get('table tbody tr').eq(1).contains(proposalFixedName);
+      cy.get('table tbody tr').eq(1).contains(instrument1.name);
+    });
+
     it('User officer should see Reviews tab before doing the Admin(management decision)', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
@@ -744,7 +852,7 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy=view-proposal]').first().click();
       cy.finishedLoading();
-      cy.get('[role="dialog"]').contains('Reviews').click();
+      cy.get('[role="dialog"]').contains('FAP reviews').click();
 
       cy.get('[role="dialog"]').contains('External reviews');
     });

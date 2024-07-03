@@ -545,10 +545,89 @@ context('Instrument tests', () => {
 
       cy.contains('Instrument updated successfully!');
     });
+
+    it('User officer should be able to filter proposals assigned to multiple instruments', () => {
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.createInstrument(instrument2).then(({ createInstrument }) => {
+        if (createInstrument) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createInstrument.id }],
+          });
+
+          cy.assignScientistsToInstrument({
+            instrumentId: createInstrument.id,
+            scientistIds: [scientist2.id],
+          });
+
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            ({ createProposal }) => {
+              if (createProposal) {
+                cy.updateProposal({
+                  proposalPk: createProposal.primaryKey,
+                  title: proposal2.title,
+                  abstract: proposal2.abstract,
+                });
+
+                cy.assignProposalsToInstruments({
+                  proposalPks: [createProposal.primaryKey],
+                  instrumentIds: [createdInstrumentId, createInstrument.id],
+                });
+
+                cy.updateTechnicalReviewAssignee({
+                  proposalPks: [createProposal.primaryKey],
+                  userId: scientist2.id,
+                  instrumentId: createInstrument.id,
+                });
+              }
+            }
+          );
+        }
+      });
+
+      cy.visit('/Proposals');
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[data-value="multi"]').click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
+      cy.contains(instrument1.name);
+      cy.contains(instrument2.name);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
+    });
   });
 
   describe('Instruments tests as instrument scientist role', () => {
     let createdInstrumentId: number;
+    let createdInstrument2Id: number;
     let createdProposalPk: number;
     let createdProposalId: string;
 
@@ -578,7 +657,7 @@ context('Instrument tests', () => {
       });
       cy.createInstrument(instrument2).then((result) => {
         if (result.createInstrument) {
-          const createdInstrument2Id = result.createInstrument.id;
+          createdInstrument2Id = result.createInstrument.id;
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
@@ -637,6 +716,64 @@ context('Instrument tests', () => {
       selectAllProposalsFilterStatus();
 
       cy.contains(proposal1.title);
+    });
+
+    it('Instrument scientist should be able to filter proposals assigned to multiple instruments where assigned as instrument scientist', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then(
+        ({ createProposal }) => {
+          if (createProposal) {
+            cy.updateProposal({
+              proposalPk: createProposal.primaryKey,
+              title: proposal2.title,
+              abstract: proposal2.abstract,
+            });
+
+            cy.assignProposalsToInstruments({
+              proposalPks: [createProposal.primaryKey],
+              instrumentIds: [createdInstrumentId, createdInstrument2Id],
+            });
+
+            cy.updateTechnicalReviewAssignee({
+              proposalPks: [createProposal.primaryKey],
+              userId: scientist2.id,
+              instrumentId: createdInstrument2Id,
+            });
+          }
+        }
+      );
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[data-value="multi"]').click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
     });
 
     it('Instrument scientist should have a call and instrument filter', () => {

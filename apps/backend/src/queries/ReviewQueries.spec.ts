@@ -24,12 +24,14 @@ test('A user can not get a review', () => {
 
 test('A userofficer can get reviews for a proposal', () => {
   return expect(
-    reviewQueries.reviewsForProposal(dummyUserOfficerWithRole, 10)
+    reviewQueries.reviewsForProposal(dummyUserOfficerWithRole, {
+      proposalPk: 10,
+    })
   ).resolves.toStrictEqual([dummyReview]);
 });
 
 test('A user can not get reviews for a proposal', () => {
   return expect(
-    reviewQueries.reviewsForProposal(dummyUserWithRole, 10)
+    reviewQueries.reviewsForProposal(dummyUserWithRole, { proposalPk: 10 })
   ).resolves.toStrictEqual(null);
 });

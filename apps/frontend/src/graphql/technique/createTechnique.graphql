@@ -1,0 +1,13 @@
+mutation createTechnique(
+  $name: String!
+  $shortCode: String!
+  $description: String!
+) {
+  createTechnique(
+    name: $name
+    shortCode: $shortCode
+    description: $description
+  ) {
+    ...technique
+  }
+}

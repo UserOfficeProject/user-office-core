@@ -312,7 +312,8 @@ export default class PostgresFapDataSource implements FapDataSource {
           query.andWhere('fp.call_id', callId);
         }
       })
-      .where('fp.fap_id', fapId);
+      .where('fp.fap_id', fapId)
+      .distinctOn('fp.proposal_pk');
 
     return fapProposals.map((fapProposal) =>
       createFapProposalObject(fapProposal)
@@ -324,25 +325,22 @@ export default class PostgresFapDataSource implements FapDataSource {
     callId: number
   ): Promise<BasicUserDetails[]> {
     const fapProposalReviewers: Array<
-      // eslint-disable-next-line prettier/prettier
       UserRecord & InstitutionRecord & CountryRecord
-    > =
-      // eslint-disable-next-line prettier/prettier
-      await database
-        .select(['users.*', 'institutions.*']) // Adjusted here
-        .from('fap_reviews as sr')
-        .join('fap_proposals as sp', {
-          'sr.proposal_pk': 'sp.proposal_pk',
-          'sr.fap_id': 'sp.fap_id',
-        })
-        .join('users', {
-          'users.user_id': 'sr.user_id',
-        })
-        .join('institutions', {
-          'users.institution_id': 'institutions.institution_id',
-        })
-        .where('sp.proposal_pk', proposalPk)
-        .andWhere('sp.call_id', callId);
+    > = await database
+      .select(['users.*', 'institutions.*'])
+      .from('fap_reviews as sr')
+      .join('fap_proposals as sp', {
+        'sr.proposal_pk': 'sp.proposal_pk',
+        'sr.fap_id': 'sp.fap_id',
+      })
+      .join('users', {
+        'users.user_id': 'sr.user_id',
+      })
+      .join('institutions', {
+        'users.institution_id': 'institutions.institution_id',
+      })
+      .where('sp.proposal_pk', proposalPk)
+      .andWhere('sp.call_id', callId);
 
     return fapProposalReviewers.map((fapProposalReviewer) =>
       createBasicUserObject(fapProposalReviewer)
@@ -458,7 +456,8 @@ export default class PostgresFapDataSource implements FapDataSource {
 
   async getFapProposal(
     fapId: number,
-    proposalPk: number
+    proposalPk: number,
+    instrumentId?: number
   ): Promise<FapProposal | null> {
     const fapProposal: FapProposalRecord = await database
       .select(['sp.*'])
@@ -467,7 +466,12 @@ export default class PostgresFapDataSource implements FapDataSource {
         'p.proposal_pk': 'sp.proposal_pk',
       })
       .where('sp.fap_id', fapId)
-      .where('sp.proposal_pk', proposalPk)
+      .andWhere('sp.proposal_pk', proposalPk)
+      .modify((query) => {
+        if (instrumentId) {
+          query.andWhere('sp.instrument_id', instrumentId);
+        }
+      })
       .first();
 
     return fapProposal ? createFapProposalObject(fapProposal) : null;
@@ -806,19 +810,6 @@ export default class PostgresFapDataSource implements FapDataSource {
     return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
   }
 
-  async removeProposalsFromFapsByInstrument(
-    proposalPk: number,
-    instrumentIds: number[]
-  ): Promise<FapProposal[]> {
-    const fapProposalRecords = await database('fap_proposals')
-      .where('proposal_pk', proposalPk)
-      .whereIn('instrument_id', instrumentIds)
-      .del()
-      .returning('*');
-
-    return fapProposalRecords.map((fpr) => createFapProposalObject(fpr));
-  }
-
   async assignMemberToFapProposals(
     proposalPks: number[],
     fapId: number,
@@ -1040,8 +1031,12 @@ export default class PostgresFapDataSource implements FapDataSource {
       recommendation?: ProposalEndStatus;
       submitted?: boolean;
       submitted_by?: number | null;
+      instrument_id: number;
+      fap_id: number;
     } = {
       proposal_pk: saveFapMeetingDecisionInput.proposalPk,
+      instrument_id: saveFapMeetingDecisionInput.instrumentId,
+      fap_id: saveFapMeetingDecisionInput.fapId,
     };
 
     const updateQuery = [];
@@ -1081,7 +1076,7 @@ export default class PostgresFapDataSource implements FapDataSource {
 
     const [fapMeetingDecisionRecord]: FapMeetingDecisionRecord[] = (
       await database.raw(
-        `? ON CONFLICT (proposal_pk)
+        `? ON CONFLICT (proposal_pk, instrument_id)
         DO UPDATE SET
         ${updateQuery.join(',')}
         RETURNING *;`,
@@ -1101,12 +1096,18 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getProposalsFapMeetingDecisions(
-    proposalPks: number[]
+    proposalPks: number[],
+    fapId?: number
   ): Promise<FapMeetingDecision[]> {
     return database
       .select()
       .from('fap_meeting_decisions')
       .whereIn('proposal_pk', proposalPks)
+      .modify((query) => {
+        if (fapId) {
+          query.andWhere('fap_id', fapId);
+        }
+      })
       .then((fapMeetingDecisionRecords: FapMeetingDecisionRecord[]) => {
         if (!fapMeetingDecisionRecords.length) {
           return [];
@@ -1260,5 +1261,59 @@ export default class PostgresFapDataSource implements FapDataSource {
 
         return true;
       });
+  }
+
+  async submitFapMeetings(
+    callId: number,
+    fapId: number,
+    userId?: number
+  ): Promise<FapProposal[]> {
+    const allProposals: FapProposalRecord[] = await database
+      .select('*')
+      .from('fap_proposals')
+      .where('fap_id', fapId)
+      .andWhere('call_id', callId);
+
+    const proposals: FapMeetingDecisionRecord[] = await database
+      .select('fm.*')
+      .from('fap_meeting_decisions as fm')
+      .leftJoin('fap_proposals as fp', function () {
+        this.on('fm.proposal_pk', '=', 'fp.proposal_pk').andOn(
+          'fm.instrument_id',
+          '=',
+          'fp.instrument_id'
+        );
+      })
+      .where('fp.fap_id', fapId)
+      .andWhere('fp.call_id', callId);
+
+    const readyProposals: FapMeetingDecisionRecord[] = proposals.filter(
+      (proposal) =>
+        proposal.comment_for_management &&
+        proposal.comment_for_user &&
+        proposal.recommendation
+    );
+
+    await Promise.all(
+      readyProposals.map((proposal) =>
+        this.saveFapMeetingDecision(
+          { ...createFapMeetingDecisionObject(proposal), submitted: true },
+          userId
+        )
+      )
+    );
+
+    const incompleteProposals = allProposals.filter(
+      (proposal) =>
+        !readyProposals.find(
+          (readyProp) =>
+            readyProp.proposal_pk === proposal.proposal_pk &&
+            readyProp.instrument_id === proposal.instrument_id
+        )
+    );
+
+    return incompleteProposals.map((proposal) =>
+      createFapProposalObject(proposal)
+    );
   }
 }

@@ -41,7 +41,10 @@ import {
   RemoveProposalsFromFapsArgs,
 } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { CreateFapArgs } from '../resolvers/mutations/CreateFapMutation';
-import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
+import {
+  SaveFapMeetingDecisionInput,
+  SubmitFapMeetingDecisionsInput,
+} from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
 import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
@@ -263,14 +266,18 @@ export default class FapMutations {
       );
 
     const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
-    const fapInstruments = callHasInstruments
-      .filter((callHasInstrument) => callHasInstrument.fapId)
-      .map((callHasInstrument) => ({
-        fapId: callHasInstrument.fapId,
-        instrumentId: callHasInstrument.instrumentId,
-      }));
 
     for (const callId of callIds) {
+      const fapInstruments = callHasInstruments
+        .filter(
+          (callHasInstrument) =>
+            callHasInstrument.fapId && callHasInstrument.callId === callId
+        )
+        .map((callHasInstrument) => ({
+          fapId: callHasInstrument.fapId,
+          instrumentId: callHasInstrument.instrumentId,
+        }));
+
       if (fapInstruments.length) {
         await this.assignProposalsToFapsInternal(agent, {
           proposalPks: proposals
@@ -423,7 +430,7 @@ export default class FapMutations {
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
       return rejection(
-        'Can not assign Fap reviewers to proposal because of insufficient permissions',
+        'Can not assign FAP reviewers to proposal because of insufficient permissions',
         { agent, args }
       );
     }
@@ -691,6 +698,19 @@ export default class FapMutations {
 
     const submittedBy = args.submitted ? (agent as UserWithRole).id : null;
 
+    const fapProposal = this.dataSource.getFapProposal(
+      args.fapId,
+      args.proposalPk,
+      args.instrumentId
+    );
+
+    if (!fapProposal) {
+      return rejection(
+        'Can not save FAP meeting decision to non existing FAP proposal',
+        { args }
+      );
+    }
+
     return this.dataSource
       .saveFapMeetingDecision(args, submittedBy)
       .catch((err) => {
@@ -710,7 +730,20 @@ export default class FapMutations {
   ): Promise<FapMeetingDecision | Rejection> {
     try {
       const allFapDecisions = await Promise.all(
-        args.proposals.map((proposal) => {
+        args.proposals.map(async (proposal) => {
+          const fapProposal = await this.dataSource.getFapProposal(
+            proposal.fapId,
+            proposal.proposalPk,
+            proposal.instrumentId
+          );
+
+          if (!fapProposal) {
+            return rejection(
+              'Can not save FAP meeting decision to non existing FAP proposal',
+              { args }
+            );
+          }
+
           return this.dataSource.saveFapMeetingDecision(proposal);
         })
       );
@@ -742,5 +775,17 @@ export default class FapMutations {
     } catch (error) {
       return rejection('Something went wrong', { args, error });
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async submitFapMeetings(
+    agent: UserWithRole | null,
+    args: SubmitFapMeetingDecisionsInput
+  ) {
+    return this.dataSource.submitFapMeetings(
+      args.callId,
+      args.fapId,
+      agent?.id
+    );
   }
 }

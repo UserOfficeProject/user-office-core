@@ -252,6 +252,8 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   'Dummy comment for user',
   'Dummy comment for management',
   true,
+  1,
+  1,
   1
 );
 
@@ -389,7 +391,8 @@ export class FapDataSourceMock implements FapDataSource {
 
   async getFapProposal(
     fapId: number,
-    proposalPk: number
+    proposalPk: number,
+    instrumentId?: number
   ): Promise<FapProposal | null> {
     return (
       dummyFapProposals.find(
@@ -599,27 +602,6 @@ export class FapDataSourceMock implements FapDataSource {
     throw new Error(`FAPs not found ${fapIds}`);
   }
 
-  async removeProposalsFromFapsByInstrument(
-    proposalPk: number,
-    instrumentIds: number[]
-  ) {
-    const fap = dummyFapProposals.find(
-      (element) =>
-        element.fapId &&
-        element.instrumentId &&
-        instrumentIds.includes(element.instrumentId) &&
-        element.proposalPk === proposalPk
-    );
-
-    if (fap) {
-      return [fap];
-    }
-
-    throw new Error(
-      `FAPs not found with proposalPk ${proposalPk} and instrumentId ${instrumentIds}`
-    );
-  }
-
   async assignMemberToFapProposal(
     proposalPk: number,
     fapId: number,
@@ -733,6 +715,14 @@ export class FapDataSourceMock implements FapDataSource {
     reviewer_id: number,
     rank: number
   ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  submitFapMeetings(
+    callId: number,
+    fapId: number,
+    userId?: number | undefined
+  ): Promise<FapProposal[]> {
     throw new Error('Method not implemented.');
   }
 }

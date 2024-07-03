@@ -198,16 +198,31 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
-  async getProposalReviews(id: number): Promise<Review[]> {
-    return database
-      .select()
-      .from('fap_reviews')
+  async getProposalReviews(
+    proposalPk: number,
+    fapId?: number
+  ): Promise<Review[]> {
+    const subQuery = database
+      .select('*')
+      .from('fap_reviews as fr')
       .join('fap_assignments', {
-        'fap_assignments.proposal_pk': 'fap_reviews.proposal_pk',
-        'fap_assignments.fap_member_user_id': 'fap_reviews.user_id',
+        'fap_assignments.proposal_pk': 'fr.proposal_pk',
+        'fap_assignments.fap_member_user_id': 'fr.user_id',
       })
-      .where('fap_reviews.proposal_pk', id)
-      .orderBy('fap_assignments.rank', 'asc')
+      .distinctOn('fr.review_id')
+      .where('fr.proposal_pk', proposalPk)
+      .modify((query) => {
+        if (fapId) {
+          query.andWhere('fr.fap_id', fapId);
+        }
+      })
+      .orderBy('fr.review_id', 'asc')
+      .as('fa');
+
+    return database
+      .select('*')
+      .from(subQuery)
+      .orderBy('fa.rank', 'asc')
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => createReviewObject(review));
       });
