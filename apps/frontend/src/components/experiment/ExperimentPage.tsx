@@ -7,7 +7,7 @@ import ExperimentTable from './ExperimentTable';
 
 function ExperimentPage() {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper data-cy="officer-scheduled-events-table">
         <ExperimentFilterBar />
         <ExperimentTable />

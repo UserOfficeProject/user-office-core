@@ -6,7 +6,7 @@ import TechniqueTable from './TechniqueTable';
 
 const TechniquesPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <TechniqueTable />
       </StyledPaper>
