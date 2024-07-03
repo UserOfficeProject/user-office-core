@@ -25,7 +25,7 @@ const FapPage = () => {
 
   if (loading) {
     return (
-      <StyledContainer>
+      <StyledContainer maxWidth={false}>
         <StyledPaper>
           <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
         </StyledPaper>
@@ -35,7 +35,7 @@ const FapPage = () => {
 
   if (!fap) {
     return (
-      <StyledContainer>
+      <StyledContainer maxWidth={false}>
         <StyledPaper>Fap not found</StyledPaper>
       </StyledContainer>
     );
@@ -97,7 +97,7 @@ const FapPage = () => {
   }
 
   return (
-    <StyledContainer maxWidth="xl">
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs tabNames={tabs.map((tab) => tab.name)}>
           {tabs.map((tab, index) => (
