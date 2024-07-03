@@ -49,7 +49,7 @@ export const dummyInstrumentWithManagementTime =
     10
   );
 
-const dummyInstruments = [dummyInstrument, dummyInstrument2];
+export const dummyInstruments = [dummyInstrument, dummyInstrument2];
 
 export const dummyInstrumentHasProposals = new InstrumentsHasProposals(
   [1],

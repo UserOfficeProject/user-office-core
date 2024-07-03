@@ -7,6 +7,7 @@ import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
@@ -22,6 +23,10 @@ export default function createHandler() {
     Tokens.InstrumentDataSource
   );
   const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
+
+  const techniqueDataSource = container.resolve<TechniqueDataSource>(
+    Tokens.TechniqueDataSource
+  );
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
@@ -182,6 +187,58 @@ export default function createHandler() {
             json,
             event.questionarystep.questionaryId.toString()
           );
+          break;
+        case Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE:
+          {
+            let description = '';
+            if (event.boolean && event.inputArgs) {
+              const obj = JSON.parse(event.inputArgs);
+              const instruments =
+                await instrumentDataSource.getInstrumentsByIds(
+                  obj[0].instrumentIds
+                );
+
+              const technique = await techniqueDataSource.getTechnique(
+                obj[0].techniqueId
+              );
+
+              description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is removed from technique: ${technique?.name}`;
+
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].techniqueId,
+                description
+              );
+            }
+          }
+          break;
+        case Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE:
+          {
+            let description = '';
+            if (event.boolean && event.inputArgs) {
+              const obj = JSON.parse(event.inputArgs);
+              const instruments =
+                await instrumentDataSource.getInstrumentsByIds(
+                  obj[0].instrumentIds
+                );
+
+              const technique = await techniqueDataSource.getTechnique(
+                obj[0].techniqueId
+              );
+
+              description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is attached to technique: ${technique?.name}`;
+
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].techniqueId,
+                description
+              );
+            }
+          }
           break;
         default: {
           let changedObjectId: number;
