@@ -19,7 +19,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useTheme } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
@@ -27,6 +26,7 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
+import TextField from 'components/common/FormikUITextField';
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
 import {
   DependenciesLogicOperator,
@@ -127,7 +127,8 @@ export default function QuestionaryEditorTopic(props: {
                 id="title"
                 type="text"
                 inputProps={{ maxLength: '32' }}
-                component={<TextField sx={{ margin: '3px 8px', flex: 1 }} />}
+                component={TextField}
+                sx={{ margin: '3px 8px', flex: 1 }}
                 value={values.title}
                 onChange={handleChange}
                 data-cy="topic-title-input"

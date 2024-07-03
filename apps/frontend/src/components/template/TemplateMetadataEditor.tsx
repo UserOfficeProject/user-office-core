@@ -5,12 +5,12 @@ import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
 import Paper from '@mui/material/Paper';
 import { useTheme } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import TextField from 'components/common/FormikUITextField';
 import { Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
@@ -110,7 +110,8 @@ export function TemplateMetadataEditor(props: {
             id="name"
             label="Name"
             type="text"
-            component={<TextField sx={{ margin: '5px 0 10px 0' }} />}
+            component={TextField}
+            sx={{ margin: '5px 0 10px 0' }}
             value={values.name}
             onChange={handleChange}
             fullWidth
@@ -122,7 +123,8 @@ export function TemplateMetadataEditor(props: {
             id="description"
             label="Description"
             type="text"
-            component={<TextField sx={{ margin: '5px 0 10px 0' }} />}
+            component={TextField}
+            sx={{ margin: '5px 0 10px 0' }}
             value={values.description}
             onChange={handleChange}
             fullWidth
