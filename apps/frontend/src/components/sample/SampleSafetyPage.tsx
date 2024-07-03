@@ -236,7 +236,7 @@ function SampleSafetyPage() {
           }}
         />
       )}
-      <StyledContainer>
+      <StyledContainer maxWidth={false}>
         <StyledPaper>
           <Grid container spacing={2}>
             <Grid item sm={3} xs={12}>

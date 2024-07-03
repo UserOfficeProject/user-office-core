@@ -27,7 +27,7 @@ export default function InstrSciUpcomingExperimentTimesTable() {
     });
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <InstrumentFilter
           shouldShowAll
