@@ -9,7 +9,7 @@ import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
+import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import {
@@ -20,6 +20,7 @@ import { Field, FieldArray, FieldArrayRenderProps, Form, Formik } from 'formik';
 import React from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
+import TextField from 'components/common/FormikUITextField';
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import {
@@ -49,6 +50,7 @@ const CreateUpdateApiAccessToken = ({
   close,
   apiAccessToken,
 }: CreateUpdateApiAccessTokenProps) => {
+  const theme = useTheme();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { queriesMutationsAndServices, loadingQueriesMutationsAndServices } =
     useQueriesMutationsAndServicesData();
@@ -303,19 +305,16 @@ const CreateUpdateApiAccessToken = ({
             id="accessToken"
             label="Access token"
             type="text"
-            component={
-              <TextField
-                sx={(theme) => ({
-                  '& input': {
-                    paddingRight: theme.spacing(0.5),
-                    color: 'rgba(0, 0, 0, 0.7)',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  },
-                })}
-              />
-            }
+            component={TextField}
+            sx={{
+              '& input': {
+                paddingRight: theme.spacing(0.5),
+                color: 'rgba(0, 0, 0, 0.7)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              },
+            }}
             fullWidth
             InputProps={{
               endAdornment: values.accessToken && (

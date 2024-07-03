@@ -1,8 +1,8 @@
-import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 

@@ -224,31 +224,27 @@ const FapMeetingInstrumentsTable = ({
           >
             The Following proposals could not be submitted
           </DialogContentText>
-          {Array.from(dialogOpen).map((proposals) => {
-            console.log(proposals);
-
-            return (
-              <>
-                <DialogContentText
-                  key={'instrument-' + proposals[0]}
-                  sx={{ ml: '10px', fontWeight: 'bold' }}
-                >
-                  {instrumentMap.get(proposals[0]) + ': '}
-                </DialogContentText>
-                {proposals[1].map((proposal) => {
-                  return (
-                    <DialogContentText
-                      data-cy={'proposal-' + proposal}
-                      key={'proposal-' + proposal}
-                      sx={{ ml: '15px' }}
-                    >
-                      {proposal}
-                    </DialogContentText>
-                  );
-                })}
-              </>
-            );
-          })}
+          {Array.from(dialogOpen).map((proposals) => (
+            <>
+              <DialogContentText
+                key={'instrument-' + proposals[0]}
+                sx={{ ml: '10px', fontWeight: 'bold' }}
+              >
+                {instrumentMap.get(proposals[0]) + ': '}
+              </DialogContentText>
+              {proposals[1].map((proposal) => {
+                return (
+                  <DialogContentText
+                    data-cy={'proposal-' + proposal}
+                    key={'proposal-' + proposal}
+                    sx={{ ml: '15px' }}
+                  >
+                    {proposal}
+                  </DialogContentText>
+                );
+              })}
+            </>
+          ))}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} data-cy="confirm-ok" variant="text">

@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
@@ -14,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import TextField from 'components/common/FormikUITextField';
 import InputDialog from 'components/common/InputDialog';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { Maybe, SampleStatus } from 'generated/sdk';

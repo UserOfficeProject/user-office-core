@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
+import MUITextField, { TextFieldProps } from '@mui/material/TextField';
 import { Field, Form, Formik } from 'formik';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
@@ -14,6 +14,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { PredefinedMessageKey } from './FormikUIPredefinedMessagesTextField';
+import TextField from '../FormikUITextField';
 import UOLoader from '../UOLoader';
 
 type PredefinedMessagesModalProps = {
@@ -264,7 +265,7 @@ const PredefinedMessagesModal = ({
                     return foundOption?.text || '';
                   }}
                   renderInput={(params: TextFieldProps) => (
-                    <TextField
+                    <MUITextField
                       {...params}
                       label="Select from predefined messages"
                       disabled={isSubmitting}

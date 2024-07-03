@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Box,
 } from '@mui/material';
 import Table from '@mui/material/Table';
@@ -20,6 +19,7 @@ import { updateTimeAllocationValidationSchema } from '@user-office-software/duo-
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import {
   InstrumentWithManagementTime,

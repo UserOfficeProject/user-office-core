@@ -1,5 +1,5 @@
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import MUITextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import {
   createProposalStatusValidationSchema,
@@ -9,6 +9,7 @@ import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -78,7 +79,7 @@ const CreateUpdateProposalStatus = ({
             label="Short code"
             type="text"
             component={
-              <TextField
+              <MUITextField
                 sx={{
                   ...(!!initialValues.shortCode && {
                     '& .MuiInputBase-root.Mui-disabled': {

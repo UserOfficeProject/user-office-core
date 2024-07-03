@@ -404,6 +404,7 @@ const ProposalsPeopleTable = ({
               totalCount={usersTableData.totalCount}
               isLoading={loading || loadingUsersData}
               options={{
+                search: true,
                 debounceInterval: 400,
                 pageSize,
                 selection,

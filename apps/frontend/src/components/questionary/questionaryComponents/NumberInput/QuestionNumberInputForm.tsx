@@ -7,14 +7,14 @@ import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import { useTheme } from '@mui/material/styles';
-import MaterialTextField from '@mui/material/TextField';
-import TextField from '@mui/material/TextField';
+import MUITextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
 import InputDialog from 'components/common/InputDialog';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -136,11 +136,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 }
                 renderInput={(params) => {
                   return (
-                    <MaterialTextField
-                      {...params}
-                      label="Units"
-                      margin="none"
-                    />
+                    <MUITextField {...params} label="Units" margin="none" />
                   );
                 }}
                 onChange={(_event, newValue) => {

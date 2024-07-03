@@ -15,7 +15,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   tableCellClasses,
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
@@ -29,6 +28,7 @@ import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import {

@@ -1,10 +1,10 @@
-import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
+import TextField from 'components/common/FormikUITextField';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { EmbellishmentConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';

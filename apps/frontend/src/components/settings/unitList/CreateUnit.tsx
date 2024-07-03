@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
@@ -7,6 +6,7 @@ import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { Unit } from 'generated/sdk';
 import { useQuantities } from 'hooks/admin/useQuantities';

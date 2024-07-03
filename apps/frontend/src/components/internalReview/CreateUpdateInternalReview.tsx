@@ -2,12 +2,12 @@ import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import { useTheme } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import { FeatureContext } from 'context/FeatureContextProvider';

@@ -1,11 +1,11 @@
 import Autocomplete from '@mui/material/Autocomplete';
-import MaterialTextField from '@mui/material/TextField';
-import TextField from '@mui/material/TextField';
+import MUITextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
@@ -89,7 +89,7 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
                 `${symbol} (${unit}) - ${quantity}`
               }
               renderInput={(params) => (
-                <MaterialTextField {...params} label="Units" margin="none" />
+                <MUITextField {...params} label="Units" margin="none" />
               )}
               onChange={(_event, newValue) => {
                 setSelectedUnits(newValue);

@@ -1,5 +1,5 @@
 import { Check, MergeType } from '@mui/icons-material';
-import { TextField, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { Institution } from 'generated/sdk';
 import { useCountries } from 'hooks/user/useCountries';

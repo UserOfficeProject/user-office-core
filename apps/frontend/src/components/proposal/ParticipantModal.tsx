@@ -71,6 +71,7 @@ const ParticipantModal = ({
     onUpdate: (data: BasicUserDetails[]) => addParticipants(data),
     invitationUserRole: invitationUserRole || userRole,
     setPrincipalInvestigator: setPrincipalInvestigator,
+    search: true,
   };
 
   const peopleTablesProps = {

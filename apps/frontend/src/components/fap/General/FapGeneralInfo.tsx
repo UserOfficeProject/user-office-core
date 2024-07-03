@@ -2,13 +2,13 @@ import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { updateFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
 import { Fap, UserRole } from 'generated/sdk';

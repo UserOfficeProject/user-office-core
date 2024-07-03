@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   NumberParam,
   StringParam,
@@ -111,18 +111,6 @@ const SimpleTabs = ({
       setQuery({ tab: tabValue });
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (isVerticalOrientation) {
-        setQuery({ verticalTab: undefined });
-      } else if (isInsideModal) {
-        setQuery({ modalTab: undefined });
-      } else {
-        setQuery({ tab: undefined });
-      }
-    };
-  }, [setQuery, isInsideModal, isVerticalOrientation]);
 
   const tabValue = isVerticalOrientation
     ? query.verticalTab

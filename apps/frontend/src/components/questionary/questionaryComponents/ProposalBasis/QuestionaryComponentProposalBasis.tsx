@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
+import TextField from 'components/common/FormikUITextField';
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';

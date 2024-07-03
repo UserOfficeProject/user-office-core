@@ -1,9 +1,10 @@
 import { MTableToolbar, Options } from '@material-table/core';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import { Form, Field } from 'formik';
 import React from 'react';
+
+import TextField from './FormikUITextField';
 
 // This component is used to retrieve a user from the database using an email.
 const EmailSearchBar = (props: Options<JSX.Element>) => (

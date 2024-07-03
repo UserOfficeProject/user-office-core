@@ -178,19 +178,14 @@ const setTinyMceContent = (tinyMceId: string, content: string) => {
   });
 };
 
-const setDatePickerValue = (selector: string, value: string) => {
-  console.log(selector, value);
-
-  return (
-    cy
-      .get(selector)
-      // NOTE: Clears the value from the datepicker
-      .type('{selectall}{backspace}')
-      // NOTE: Points to the first sub-field which is usually the date.
-      .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
-      .type(numbersOnly(value))
-  );
-};
+const setDatePickerValue = (selector: string, value: string) =>
+  cy
+    .get(selector)
+    // NOTE: Clears the value from the datepicker
+    .type('{selectall}{backspace}')
+    // NOTE: Points to the first sub-field which is usually the date.
+    .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+    .type(numbersOnly(value));
 
 const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');

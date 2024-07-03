@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { createFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Field, Form, Formik } from 'formik';
@@ -7,6 +6,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { Fap } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -53,6 +53,7 @@ const AddFap = ({ close }: AddFapProps) => {
             component={TextField}
             fullWidth
             data-cy="code"
+            required
             disabled={isExecutingCall}
           />
           <Field
@@ -66,6 +67,7 @@ const AddFap = ({ close }: AddFapProps) => {
             maxRows="16"
             minRows="3"
             data-cy="description"
+            required
             disabled={isExecutingCall}
           />
 

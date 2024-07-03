@@ -1,11 +1,11 @@
 import ListItemText from '@mui/material/ListItemText';
 import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';

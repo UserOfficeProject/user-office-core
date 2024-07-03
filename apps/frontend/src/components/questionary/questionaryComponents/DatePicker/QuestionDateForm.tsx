@@ -1,5 +1,4 @@
 import useTheme from '@mui/material/styles/useTheme';
-import TextField from '@mui/material/TextField';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
@@ -9,6 +8,7 @@ import * as Yup from 'yup';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import DatePicker from 'components/common/FormikUIDatePicker';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';

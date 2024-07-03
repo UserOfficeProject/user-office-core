@@ -77,6 +77,7 @@ const AssignFapMemberToProposalModal = ({
           data={members}
           isLoading={loadingMembers}
           columns={columns}
+          search
           onUpdate={(members: FapAssignedMember[]) =>
             assignMemberToFapProposal(members)
           }
