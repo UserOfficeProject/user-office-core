@@ -11,6 +11,7 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { FapMeetingDecision } from '../types/FapMeetingDecision';
+import { FapProposal } from '../types/FapProposal';
 
 @InputType()
 export class SaveFapMeetingDecisionInput {
@@ -39,6 +40,15 @@ export class SaveFapMeetingDecisionInput {
   public fapId: number;
 }
 
+@InputType()
+export class SubmitFapMeetingDecisionsInput {
+  @Field(() => Int)
+  public fapId: number;
+
+  @Field(() => Int)
+  public callId: number;
+}
+
 @Resolver()
 export class FapMeetingDecisionMutation {
   @Mutation(() => FapMeetingDecision)
@@ -50,6 +60,21 @@ export class FapMeetingDecisionMutation {
     return context.mutations.fap.saveFapMeetingDecision(
       context.user,
       saveFapMeetingDecisionInput
+    );
+  }
+}
+
+@Resolver()
+export class SubmitMeetingDecisionsMutation {
+  @Mutation(() => [FapProposal])
+  submitFapMeetingDecisions(
+    @Arg('SubmitFapMeetingDecisionsInput')
+    submitFapMeetingDecisionInput: SubmitFapMeetingDecisionsInput,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.mutations.fap.submitFapMeetings(
+      context.user,
+      submitFapMeetingDecisionInput
     );
   }
 }
