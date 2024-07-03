@@ -12,6 +12,7 @@ import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
 interface GeneralEvent {
+  id?: string;
   type: Event;
   key: string;
   loggedInUserId: number | null;
@@ -19,6 +20,20 @@ interface GeneralEvent {
   inputArgs?: string;
   description?: string;
   exchange?: string;
+  status?: EventStatus;
+  handlers?: EventHandlerInfo[];
+}
+
+export interface EventHandlerInfo {
+  name: string;
+  success: boolean;
+  message: string;
+}
+
+export enum EventStatus {
+  PENDING = 'PENDING',
+  SUCCESS = 'SUCCESS ',
+  FAILED = 'FAILED',
 }
 
 interface ProposalAcceptedEvent extends GeneralEvent {
