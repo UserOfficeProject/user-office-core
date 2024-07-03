@@ -1,0 +1,12 @@
+site_name: User Office Documentation
+theme:
+  name: material
+  features:
+    - navigation.top
+  palette:
+    primary: green
+    accent: green
+extra:
+  version:
+    provider: mike
+    default: latest
