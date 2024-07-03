@@ -45,8 +45,8 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
   @Field(() => String, { nullable: true })
   public files: string | null;
 
-  @Field(() => Int)
-  public technicalReviewAssigneeId: number;
+  @Field(() => Int, { nullable: true })
+  public technicalReviewAssigneeId: number | null;
 
   @Field(() => Int)
   public instrumentId: number;
