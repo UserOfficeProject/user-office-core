@@ -14,7 +14,7 @@ export default function SampleEsiPage() {
   const TableComponent = withMarkTemplateAsActiveAction(DefaultTemplatesTable);
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs tabNames={['Current', 'Archived']}>
           <TableComponent
