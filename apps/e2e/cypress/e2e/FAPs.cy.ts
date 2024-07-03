@@ -2973,7 +2973,7 @@ context('Fap meeting components tests', () => {
           });
           cy.assignFapReviewersToProposals({
             assignments: {
-              memberId: fapMembers.reviewer2.id,
+              memberId: fapMembers.reviewer.id,
               proposalPk: createdProposal.primaryKey,
             },
             fapId: createdFapId,
