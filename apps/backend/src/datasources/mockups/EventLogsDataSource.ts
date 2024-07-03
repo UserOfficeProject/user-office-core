@@ -20,20 +20,10 @@ export const dummyEventLogProposalCreated = new EventLog(
   '2',
   ''
 );
-export const dummyEventLogProposalSubmitted = new EventLog(
-  1,
-  2,
-  'PROPOSAL_SUBMITTED',
-  'row data of created proposal',
-  new Date('2020-03-09 08:30:12.23043+00'),
-  '2',
-  ''
-);
 
 export const dummyEventLogs = [
   dummyEventLogUserUpdated,
   dummyEventLogProposalCreated,
-  dummyEventLogProposalSubmitted,
 ];
 
 export class EventLogsDataSourceMock implements EventLogsDataSource {

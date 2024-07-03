@@ -158,7 +158,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     dummyProposal = dummyProposalFactory({ primaryKey: 1 });
     dummyProposalSubmitted = dummyProposalFactory({
       primaryKey: 2,
-      proposalId: '2',
       title: 'Submitted proposal',
       submitted: true,
       finalStatus: ProposalEndStatus.ACCEPTED,
@@ -416,9 +415,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   }
 
   async getProposalById(proposalId: string): Promise<Proposal | null> {
-    return (
-      allProposals.find((proposal) => proposal.proposalId === proposalId) ||
-      null
-    );
+    return dummyProposal.proposalId === proposalId ? dummyProposal : null;
   }
 }

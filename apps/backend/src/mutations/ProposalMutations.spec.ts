@@ -6,7 +6,6 @@ import {
   ProposalDataSourceMock,
   dummyProposalWithNotActiveCall,
   dummyProposalSubmitted,
-  dummyProposal,
 } from '../datasources/mockups/ProposalDataSource';
 import {
   dummyPrincipalInvestigatorWithRole,
@@ -15,20 +14,11 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { ApplicationEvent } from '../events/applicationEvents';
-import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { isRejection, Rejection } from '../models/Rejection';
 import ProposalMutations from './ProposalMutations';
 
-async function skipEmailHandler(event: ApplicationEvent) {
-  return;
-}
-const proposalMutations = container
-  .register(Tokens.EmailEventHandler, {
-    useValue: skipEmailHandler,
-  })
-  .resolve(ProposalMutations);
+const proposalMutations = container.resolve(ProposalMutations);
 
 let dataSource: ProposalDataSourceMock;
 
@@ -382,30 +372,4 @@ test('Proposal cannot be submitted without a call', () => {
       callId: -1,
     })
   ).resolves.not.toBeInstanceOf(Proposal);
-});
-
-test('User officer should not be able to send proposal email event to a proposal when event is not in event logs', () => {
-  return expect(
-    proposalMutations.sendEventEmail(dummyUserOfficerWithRole, {
-      proposalId: dummyProposal.proposalId,
-      event: Event.PROPOSAL_SUBMITTED,
-    })
-  ).resolves.not.toEqual(Event.PROPOSAL_SUBMITTED);
-});
-test('User officer should be able to send proposal email event to a proposal when event is in event logs', () => {
-  return expect(
-    proposalMutations.sendEventEmail(dummyUserOfficerWithRole, {
-      proposalId: dummyProposalSubmitted.proposalId,
-      event: Event.PROPOSAL_SUBMITTED,
-    })
-  ).resolves.toEqual(Event.PROPOSAL_SUBMITTED);
-});
-
-test('User should not be able to send proposal email events', () => {
-  return expect(
-    proposalMutations.sendEventEmail(dummyUserWithRole, {
-      proposalId: dummyProposalSubmitted.proposalId,
-      event: Event.PROPOSAL_SUBMITTED,
-    })
-  ).resolves.not.toEqual(Event.PROPOSAL_SUBMITTED);
 });
