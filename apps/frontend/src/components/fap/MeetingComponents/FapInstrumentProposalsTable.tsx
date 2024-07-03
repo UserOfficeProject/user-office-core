@@ -139,6 +139,16 @@ const FapInstrumentProposalsTable = ({
       field: 'proposal.proposalId',
     },
     {
+      title: 'Fap meeting submitted',
+      render: (rowData: FapProposal) => {
+        const submitted = rowData.proposal.fapMeetingDecisions?.find(
+          (fmd) => fmd.instrumentId === fapInstrument.id
+        )?.submitted;
+
+        return submitted ? 'Yes' : 'No';
+      },
+    },
+    {
       title: 'Principal Investigator',
       render: (rowData: FapProposal) => {
         return getFullUserName(rowData.proposal.proposer);
@@ -195,16 +205,6 @@ const FapInstrumentProposalsTable = ({
         } else {
           return -1;
         }
-      },
-    },
-    {
-      title: 'Fap meeting submitted',
-      render: (rowData: FapProposal) => {
-        const submitted = rowData.proposal.fapMeetingDecisions?.find(
-          (fmd) => fmd.instrumentId === fapInstrument.id
-        )?.submitted;
-
-        return submitted ? 'Yes' : 'No';
       },
     },
     {
