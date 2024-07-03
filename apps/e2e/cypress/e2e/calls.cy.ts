@@ -426,15 +426,15 @@ context('Calls tests', () => {
         .type(callShortCode)
         .should('have.value', callShortCode);
 
-      cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(callStartDate)
-        .should('have.value', callStartDate);
+      cy.setDatePickerValue('[data-cy=start-date] input', callStartDate).should(
+        'have.value',
+        callStartDate
+      );
 
-      cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(callEndDate)
-        .should('have.value', callEndDate);
+      cy.setDatePickerValue('[data-cy=end-date] input', callEndDate).should(
+        'have.value',
+        callEndDate
+      );
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
@@ -452,10 +452,10 @@ context('Calls tests', () => {
         .contains(proposalInternalWorkflow.name)
         .click();
 
-      cy.get('[data-cy=end-call-internal-date] input')
-        .clear()
-        .type(callInternalEndDate)
-        .should('have.value', callInternalEndDate);
+      cy.setDatePickerValue(
+        '[data-cy=end-call-internal-date] input',
+        callInternalEndDate
+      ).should('have.value', callInternalEndDate);
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -551,15 +551,15 @@ context('Calls tests', () => {
         proposalWorkflow.name
       );
 
-      cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(updatedCallStartDate)
-        .should('have.value', updatedCallStartDate);
+      cy.setDatePickerValue(
+        '[data-cy=start-date] input',
+        updatedCallStartDate
+      ).should('have.value', updatedCallStartDate);
 
-      cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(updatedCallEndDate)
-        .should('have.value', updatedCallEndDate);
+      cy.setDatePickerValue(
+        '[data-cy=end-date] input',
+        updatedCallEndDate
+      ).should('have.value', updatedCallEndDate);
 
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,
@@ -623,15 +623,15 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
-      cy.get('[data-cy=start-date] input')
-        .clear()
-        .type(updatedCallStartDate)
-        .should('have.value', updatedCallStartDate);
+      cy.setDatePickerValue(
+        '[data-cy=start-date] input',
+        updatedCallStartDate
+      ).should('have.value', updatedCallStartDate);
 
-      cy.get('[data-cy=end-date] input')
-        .clear()
-        .type(updatedCallEndDate)
-        .should('have.value', updatedCallEndDate);
+      cy.setDatePickerValue(
+        '[data-cy=end-date] input',
+        updatedCallEndDate
+      ).should('have.value', updatedCallEndDate);
 
       cy.get('#proposalWorkflowId-input').click();
 
@@ -641,10 +641,10 @@ context('Calls tests', () => {
         .contains(proposalInternalWorkflow.name)
         .click();
 
-      cy.get('[data-cy=end-call-internal-date] input')
-        .clear()
-        .type(callInternalEndDate)
-        .should('have.value', callInternalEndDate);
+      cy.setDatePickerValue(
+        '[data-cy=end-call-internal-date] input',
+        callInternalEndDate
+      ).should('have.value', callInternalEndDate);
 
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,
@@ -797,7 +797,7 @@ context('Calls tests', () => {
       );
       cy.contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[aria-label="Save"] button')
+        .find('button[aria-label="Save"]')
         .should('be.disabled');
 
       cy.get('[data-cy="availability-time"] input')
@@ -809,7 +809,7 @@ context('Calls tests', () => {
       );
       cy.contains(instrumentAssignedToCall.shortCode)
         .parent()
-        .find('[aria-label="Save"] button')
+        .find('button[aria-label="Save"]')
         .should('be.disabled');
     });
 
