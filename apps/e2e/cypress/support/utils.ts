@@ -174,8 +174,6 @@ const getEditorById = (win: Cypress.AUTWindow, tinyMceId: string) =>
 
 const setTinyMceContent = (tinyMceId: string, content: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
-  cy.get(`#${tinyMceId}`).focus();
-
   cy.window().then((win) => {
     const editor = getEditorById(win, tinyMceId);
     editor?.setContent(content);

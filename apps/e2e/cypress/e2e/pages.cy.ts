@@ -17,6 +17,10 @@ context('Page tests', () => {
     cy.contains('Set user homepage');
     cy.contains('Help').click();
 
+    // TODO: Check this and improve later
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(1000);
+
     cy.setTinyMceContent('HELPPAGE', faqContents);
 
     cy.contains('Update').click();
