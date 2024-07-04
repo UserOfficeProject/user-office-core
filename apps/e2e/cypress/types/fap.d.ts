@@ -5,10 +5,10 @@ import {
   CreateFapMutationVariables,
   AssignReviewersToFapMutationVariables,
   AssignReviewersToFapMutation,
+  AssignFapReviewersToProposalsMutationVariables,
+  AssignFapReviewersToProposalsMutation,
   AssignProposalsToFapsMutation,
   AssignProposalsToFapsMutationVariables,
-  AssignFapReviewersToProposalMutationVariables,
-  AssignFapReviewersToProposalMutation,
   SaveFapMeetingDecisionMutationVariables,
   SaveFapMeetingDecisionMutation,
   UpdateReviewMutationVariables,
@@ -73,14 +73,14 @@ declare global {
       /**
        * Assign Fap reviewers to proposal.
        *
-       * @returns {typeof assignFapReviewersToProposal}
+       * @returns {typeof assignFapReviewersToProposals}
        * @memberof Chainable
        * @example
-       *    cy.assignFapReviewersToProposal(assignFapReviewersToProposalInput: AssignFapReviewersToProposalMutationVariables)
+       *    cy.assignFapReviewersToProposals(assignFapReviewersToProposalsInput: AssignFapReviewersToProposalsMutationVariables)
        */
-      assignFapReviewersToProposal: (
-        assignFapReviewersToProposalInput: AssignFapReviewersToProposalMutationVariables
-      ) => Cypress.Chainable<AssignFapReviewersToProposalMutation>;
+      assignFapReviewersToProposals: (
+        assignFapReviewersToProposalInput: AssignFapReviewersToProposalsMutationVariables
+      ) => Cypress.Chainable<AssignFapReviewersToProposalsMutation>;
 
       /**
        * Update proposal Fap review.

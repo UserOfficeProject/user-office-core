@@ -5,8 +5,8 @@ import {
   AssignProposalsToFapsMutationVariables,
   AssignReviewersToFapMutation,
   AssignReviewersToFapMutationVariables,
-  AssignFapReviewersToProposalMutation,
-  AssignFapReviewersToProposalMutationVariables,
+  AssignFapReviewersToProposalsMutation,
+  AssignFapReviewersToProposalsMutationVariables,
   CreateFapMutation,
   CreateFapMutationVariables,
   GetProposalReviewsQuery,
@@ -15,7 +15,7 @@ import {
   SaveFapMeetingDecisionMutationVariables,
   UpdateReviewMutation,
   UpdateReviewMutationVariables,
-  ReorderFapMeetingDecisionProposalsMutation,
+  ReorderFapMeetingDecision`Mutation,
   ReorderFapMeetingDecisionProposalsMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
@@ -55,10 +55,10 @@ const assignReviewersToFap = (
   return cy.wrap(request);
 };
 
-const assignFapReviewersToProposal = (
-  assignFapReviewersToProposalInput: AssignFapReviewersToProposalMutationVariables
-): Cypress.Chainable<AssignFapReviewersToProposalMutation> => {
-  const request = api.assignFapReviewersToProposal(
+const assignFapReviewersToProposals = (
+  assignFapReviewersToProposalInput: AssignFapReviewersToProposalsMutationVariables
+): Cypress.Chainable<AssignFapReviewersToProposalsMutation> => {
+  const request = api.assignFapReviewersToProposals(
     assignFapReviewersToProposalInput
   );
 
@@ -104,8 +104,8 @@ Cypress.Commands.add('assignChairOrSecretary', assignChairOrSecretary);
 Cypress.Commands.add('assignReviewersToFap', assignReviewersToFap);
 Cypress.Commands.add('assignProposalsToFaps', assignProposalsToFaps);
 Cypress.Commands.add(
-  'assignFapReviewersToProposal',
-  assignFapReviewersToProposal
+  'assignFapReviewersToProposals',
+  assignFapReviewersToProposals
 );
 Cypress.Commands.add('getProposalReviews', getProposalReviews);
 Cypress.Commands.add('updateReview', updateReview);
