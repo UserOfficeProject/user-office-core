@@ -182,7 +182,10 @@ export default class InstrumentMutations {
           (i) => !args.instrumentIds.includes(i.id)
         );
 
-        if (proposalInstrumentsToRemove.length) {
+        if (
+          proposalInstrumentsToRemove.length &&
+          proposalInstruments.length !== proposalInstrumentsToRemove.length
+        ) {
           await Promise.all(
             proposalInstrumentsToRemove.map((i) => {
               return this.dataSource.removeProposalsFromInstrument(
