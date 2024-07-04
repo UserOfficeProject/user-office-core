@@ -87,7 +87,7 @@ function QuestionsPage() {
   };
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <QuestionsTableFilter
           onChange={(filter) => {

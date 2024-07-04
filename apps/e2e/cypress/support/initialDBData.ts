@@ -163,7 +163,7 @@ export default {
       dynamicMultipleChoice: {
         value: ['One'],
       },
-      instrumentPicker: { value: 1 },
+      instrumentPicker: { value: { instrumentId: '1', timeRequested: '0' } },
       textInput: {
         value: 'Text input answer from seeds',
       },

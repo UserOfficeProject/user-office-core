@@ -1,0 +1,5 @@
+query getTechnique($techniqueId: Int!) {
+  technique(techniqueId: $techniqueId) {
+    ...technique
+  }
+}

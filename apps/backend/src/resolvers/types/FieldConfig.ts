@@ -166,6 +166,9 @@ export class InstrumentPickerConfig extends ConfigBase {
 
   @Field(() => Boolean)
   isMultipleSelect: boolean;
+
+  @Field(() => Boolean)
+  requestTime: boolean;
 }
 
 @ObjectType()
