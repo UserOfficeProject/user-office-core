@@ -61,6 +61,7 @@ const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
                 key={call.id}
                 onClick={() => handleSelect(call.id, call.templateId)}
                 divider={true}
+                component="li"
               >
                 <ListItemText
                   primary={header}

@@ -68,7 +68,7 @@ export default function Select({
   formHelperText,
   options,
   ...selectProps
-}: SelectProps & { options: Option[] }) {
+}: SelectProps & { options: Option[]; 'data-cy': string }) {
   if (!options) {
     throw new Error(
       'Select cannot be used without a required options property'
@@ -80,6 +80,7 @@ export default function Select({
   const { children: formHelperTextChildren, ...formHelperTextProps } =
     formHelperText || {};
   const shouldDisplayFormHelperText = error || formHelperTextChildren;
+  const dataCy = selectProps['data-cy'];
 
   return (
     <FormControl
@@ -93,7 +94,11 @@ export default function Select({
       </InputLabel>
       <MuiSelect {...selectFieldProps}>
         {options.map(({ value, text }) => (
-          <MenuItem value={value} key={value}>
+          <MenuItem
+            value={value}
+            key={value}
+            data-cy={dataCy ? `${dataCy}-options` : undefined}
+          >
             {text}
           </MenuItem>
         ))}

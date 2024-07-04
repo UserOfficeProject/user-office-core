@@ -393,10 +393,12 @@ context('Template tests', () => {
 
       cy.window().then((win) => {
         return new Cypress.Promise((resolve) => {
-          win.tinyMCE.editors[richTextInputId].setContent(
-            richTextInputQuestion.answer
-          );
-          win.tinyMCE.editors[richTextInputId].fire('blur');
+          win.tinyMCE.EditorManager.get()
+            .find((editor) => editor.id === richTextInputId)
+            ?.setContent(richTextInputQuestion.answer);
+          win.tinyMCE.EditorManager.get()
+            .find((editor) => editor.id === richTextInputId)
+            ?.fire('blur');
 
           resolve();
         });

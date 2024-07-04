@@ -90,7 +90,6 @@
     "@types/node": "^18.0.0",
     "@types/react": "^18.3.3",
     "@types/react-test-renderer": "^18.3.0",
-    "@types/tinymce": "^4.6.9",
     "@types/yup": "^0.29.13",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",

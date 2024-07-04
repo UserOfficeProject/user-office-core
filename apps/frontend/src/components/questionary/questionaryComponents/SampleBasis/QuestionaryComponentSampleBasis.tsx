@@ -1,7 +1,7 @@
-import TextField from '@mui/material/TextField';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useState } from 'react';
 
+import TextField from 'components/common/FormikUITextField';
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
@@ -33,29 +33,27 @@ function QuestionaryComponentSampleBasis(props: BasicComponentProps) {
   }
 
   return (
-    <>
-      <Field
-        name={id}
-        id={`${id}-field`}
-        label={props.answer.question.question}
-        inputProps={{
-          onChange: (event: ChangeEvent<HTMLInputElement>) => {
-            setTitle(event.currentTarget.value);
-          },
-          onBlur: () => {
-            dispatch({
-              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-              itemWithQuestionary: { title: title },
-            });
-          },
-        }}
-        required
-        fullWidth
-        component={TextFieldNoSubmit}
-        data-cy="title-input"
-        margin="dense"
-      />
-    </>
+    <Field
+      name={id}
+      id={`${id}-field`}
+      label={props.answer.question.question}
+      inputProps={{
+        onChange: (event: ChangeEvent<HTMLInputElement>) => {
+          setTitle(event.currentTarget.value);
+        },
+        onBlur: () => {
+          dispatch({
+            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+            itemWithQuestionary: { title: title },
+          });
+        },
+      }}
+      required
+      fullWidth
+      component={TextFieldNoSubmit}
+      data-cy="title-input"
+      margin="dense"
+    />
   );
 }
 

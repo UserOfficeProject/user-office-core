@@ -29,6 +29,7 @@ export function QuestionnairesListItem({
     <ListItemButton
       onClick={() => onEditClick?.(record)}
       data-cy="questionnaires-list-item"
+      component="li"
     >
       <ListItemAvatar>
         <Avatar>

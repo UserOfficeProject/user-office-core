@@ -58,6 +58,7 @@ const DownloadMonitorDialog = ({
               backgroundColor: 'rgba(0, 0, 0, 0.8)',
             },
           }}
+          component="li"
         >
           <ListItemIcon sx={{ color: 'inherit' }}>
             <InboxIcon />

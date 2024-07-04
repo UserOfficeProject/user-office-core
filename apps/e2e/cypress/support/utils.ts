@@ -169,12 +169,16 @@ const dragElement = (
   return cy.get('@focusedElement');
 };
 
+const getEditorById = (win: Cypress.AUTWindow, tinyMceId: string) =>
+  win.tinyMCE.EditorManager.get().find((editor) => editor.id === tinyMceId);
+
 const setTinyMceContent = (tinyMceId: string, content: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
+  cy.get(`#${tinyMceId}`).focus();
 
   cy.window().then((win) => {
-    const editor = win.tinyMCE.editors[tinyMceId];
-    editor.setContent(content);
+    const editor = getEditorById(win, tinyMceId);
+    editor?.setContent(content);
   });
 };
 
@@ -191,9 +195,9 @@ const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
   return cy.window().then((win) => {
-    const editor = win.tinyMCE.editors[tinyMceId];
+    const editor = getEditorById(win, tinyMceId);
 
-    return editor.getContent();
+    return editor?.getContent();
   });
 };
 

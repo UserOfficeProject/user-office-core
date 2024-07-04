@@ -95,7 +95,11 @@ declare global {
        * @example
        *    cy.getTinyMceContent('editorId')
        */
-      getTinyMceContent: (tinyMceId: string) => Cypress.Chainable<string>;
+      getTinyMceContent: (
+        tinyMceId: string
+      ) =>
+        | Cypress.Chainable<Cypress.AUTWindow>
+        | Cypress.Chainable<string | Cypress.AUTWindow>;
 
       /**
        * Tests if action button in experiments table has the right state
@@ -132,14 +136,14 @@ declare global {
 
   interface Window {
     tinyMCE: {
-      editors: Record<
-        string,
-        {
-          setContent: (content: string) => void;
-          fire: (event: string) => void;
-          getContent: () => string;
-        }
-      >;
+      EditorManager: {
+        get(): {
+          id: string;
+          fire: EditorObservable['fire'];
+          setContent(content: string): string;
+          getContent(): string;
+        }[];
+      };
     };
   }
 }
