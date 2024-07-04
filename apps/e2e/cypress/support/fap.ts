@@ -15,7 +15,7 @@ import {
   SaveFapMeetingDecisionMutationVariables,
   UpdateReviewMutation,
   UpdateReviewMutationVariables,
-  ReorderFapMeetingDecision`Mutation,
+  ReorderFapMeetingDecisionProposalsMutation,
   ReorderFapMeetingDecisionProposalsMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
