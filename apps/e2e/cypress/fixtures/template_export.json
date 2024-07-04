@@ -14,6 +14,20 @@
             }, {
                 "categoryId": 1,
                 "config": {
+                    "isMultipleSelect": false,
+                    "required": false,
+                    "small_label": "",
+                    "techniques": [1,2],
+                    "tooltip": "",
+                    "variant": "dropdown"
+                },
+                "dataType": "TECHNIQUE_PICKER",
+                "id": "technique_picker_question",
+                "naturalKey": "technique_picker_question",
+                "question": "Technique Picker question from seeds"
+            }, {
+                "categoryId": 1,
+                "config": {
                     "addEntryButtonLabel": "Add",
                     "esiTemplateId": 3,
                     "maxEntries": null,
@@ -318,6 +332,34 @@
                 }
             }, {
                 "fields": [{
+                        "config": {
+                            "isMultipleSelect": false,
+                            "required": false,
+                            "small_label": "",
+                            "techniques": [],
+                            "tooltip": "",
+                            "variant": "dropdown"
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND",
+                        "question": {
+                            "categoryId": 1,
+                            "config": {
+                                "isMultipleSelect": false,
+                                "required": false,
+                                "small_label": "",
+                                "techniques": [],
+                                "tooltip": "",
+                                "variant": "dropdown"
+                            },
+                            "dataType": "TECHNIQUE_PICKER",
+                            "id": "technique_picker_question",
+                            "naturalKey": "technique_picker_question",
+                            "question": "Technique Picker question from seeds"
+                        },
+                        "sortOrder": 0,
+                        "topicId": 4
+                    }, {
                         "config": {
                             "addEntryButtonLabel": "Add",
                             "esiTemplateId": 3,

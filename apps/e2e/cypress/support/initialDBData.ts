@@ -208,6 +208,10 @@ export default {
     id: 2,
     name: 'Technique 2',
   },
+  technique3: {
+    id: 3,
+    name: 'Technique 3',
+  },
   fap: {
     id: 1,
     code: 'DEMAX',
