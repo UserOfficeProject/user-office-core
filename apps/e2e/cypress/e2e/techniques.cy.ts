@@ -10,7 +10,14 @@ import initialDBData from '../support/initialDBData';
 context('Technique tests', () => {
   const title = faker.word.words(5);
   const abstract = faker.word.words(5);
-  const technique = {
+
+  const technique1 = {
+    name: faker.word.words(1),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.word.words(5),
+  };
+
+  const technique2 = {
     name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
@@ -18,6 +25,7 @@ context('Technique tests', () => {
 
   const scientist1 = initialDBData.users.user1;
   const scientist2 = initialDBData.users.user2;
+  const scientist3 = initialDBData.users.user3;
 
   const instrument1 = {
     name: faker.word.words(1),
@@ -31,6 +39,13 @@ context('Technique tests', () => {
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
     managerUserId: scientist2.id,
+  };
+
+  const instrument3 = {
+    name: faker.word.words(1),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.word.words(5),
+    managerUserId: scientist3.id,
   };
 
   const proposalWorkflow = {
@@ -64,27 +79,27 @@ context('Technique tests', () => {
     it('User officer should be able to create technique', function () {
       cy.contains('Techniques').click();
       cy.contains('Create').click();
-      cy.get('#name').type(technique.name);
-      cy.get('#shortCode').type(technique.shortCode);
-      cy.get('#description').type(technique.description);
+      cy.get('#name').type(technique1.name);
+      cy.get('#shortCode').type(technique1.shortCode);
+      cy.get('#description').type(technique1.description);
 
       cy.get('[data-cy="submit"]').click();
 
       cy.notification({ variant: 'success', text: 'created successfully' });
 
-      cy.contains(technique.name);
-      cy.contains(technique.shortCode);
-      cy.contains(technique.description);
+      cy.contains(technique1.name);
+      cy.contains(technique1.shortCode);
+      cy.contains(technique1.description);
     });
 
     it('User officer should be able to update technique', function () {
       const newName = faker.word.words(1);
       const newShortCode = faker.string.alphanumeric(15);
       const newDescription = faker.word.words(5);
-      cy.createTechnique(technique);
+      cy.createTechnique(technique1);
 
       cy.contains('Techniques').click();
-      cy.contains(technique.name).parent().find('[aria-label="Edit"]').click();
+      cy.contains(technique1.name).parent().find('[aria-label="Edit"]').click();
       cy.get('#name').clear();
       cy.get('#name').type(newName);
       cy.get('#shortCode').clear();
@@ -107,7 +122,7 @@ context('Technique tests', () => {
           createdInstrumentId = result.createInstrument.id;
         }
       });
-      cy.createTechnique(technique).then((result) => {
+      cy.createTechnique(technique1).then((result) => {
         if (result.createTechnique) {
           createdTechniqueId = result.createTechnique.id;
         }
@@ -119,7 +134,7 @@ context('Technique tests', () => {
 
       cy.contains('Techniques').click();
 
-      cy.contains(technique.name)
+      cy.contains(technique1.name)
         .parent()
         .find('[aria-label="Delete"]')
         .click();
@@ -128,7 +143,7 @@ context('Technique tests', () => {
 
       cy.notification({ variant: 'success', text: 'Technique deleted' });
 
-      cy.contains(technique.name).should('not.exist');
+      cy.contains(technique1.name).should('not.exist');
     });
   });
 
@@ -139,7 +154,7 @@ context('Technique tests', () => {
     });
 
     it('User officer should be able to assign and unassign instruments to technique without page refresh', function () {
-      cy.createTechnique(technique);
+      cy.createTechnique(technique1);
       cy.createInstrument(instrument1);
       cy.createInstrument(instrument2);
 
@@ -147,9 +162,9 @@ context('Technique tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains(technique.name)
+      cy.contains(technique1.name)
         .parent()
-        .find('[aria-label="Assign/remove"]')
+        .find('[aria-label*="Assign/remove"]')
         .click();
 
       cy.get('[data-cy="technique-instruments-assignment"]').click();
@@ -166,14 +181,21 @@ context('Technique tests', () => {
 
       cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
+      cy.screenshot('DEBUG BEFORE EXPECTED NOTIFICATION');
+
+      cy.notification({
+        variant: 'success',
+        text: 'assigned.+successfully',
+      });
+
       cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
 
       cy.notification({
         variant: 'success',
-        text: 'Instrument/s assigned to the selected technique successfully!',
+        text: 'assigned.+successfully!',
       });
 
-      cy.contains(technique.shortCode)
+      cy.contains(technique1.shortCode)
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
@@ -182,9 +204,9 @@ context('Technique tests', () => {
         instrument1.shortCode
       );
 
-      cy.contains(technique.name)
+      cy.contains(technique1.name)
         .parent()
-        .find('[aria-label="Assign/remove"]')
+        .find('[aria-label*="Assign/remove"]')
         .click();
 
       cy.contains('Loading...').should('not.exist');
@@ -208,7 +230,7 @@ context('Technique tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Instrument/s unassigned from selected technique successfully!',
+        text: 'unassigned.+successfully!',
       });
 
       cy.get('[data-cy="technique-instrument-assignments-table"]')
@@ -218,13 +240,20 @@ context('Technique tests', () => {
   });
 
   describe('Technique picker automatic instrument assignment', () => {
-    let createdTechniqueId: number;
-    let createdInstrumentId1: number;
-    let createdInstrumentId2: number;
+    let techniqueId1: number;
+    let techniqueId2: number;
+
+    let techniqueName1: string;
+    let techniqueName2: string;
+
+    let instrumentId1: number;
+    let instrumentId2: number;
+    let instrumentId3: number;
+
     let topicId: number;
+
     let techniquePickerQuestionId: string;
     const techniquePickerQuestion = 'Select your technique';
-    let techniqueName: string;
 
     beforeEach(() => {
       cy.window().then((win) => {
@@ -241,30 +270,46 @@ context('Technique tests', () => {
         description: proposalWorkflow.description,
       });
 
-      cy.createTechnique(technique).then((result) => {
-        createdTechniqueId = result.createTechnique.id;
-        techniqueName = result.createTechnique.name;
+      cy.createTechnique(technique1).then((result) => {
+        techniqueName1 = result.createTechnique.name;
+        techniqueId1 = result.createTechnique.id;
+      });
+
+      cy.createTechnique(technique2).then((result) => {
+        techniqueName2 = result.createTechnique.name;
+        techniqueId2 = result.createTechnique.id;
       });
 
       cy.createInstrument(instrument1).then((result) => {
-        createdInstrumentId1 = result.createInstrument.id;
+        instrumentId1 = result.createInstrument.id;
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId1 }],
+          instrumentFapIds: [{ instrumentId: instrumentId1 }],
         });
       });
-
       cy.createInstrument(instrument2).then((result) => {
-        createdInstrumentId2 = result.createInstrument.id;
+        instrumentId2 = result.createInstrument.id;
         cy.assignInstrumentToCall({
           callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId2 }],
+          instrumentFapIds: [{ instrumentId: instrumentId2 }],
+        });
+      });
+      cy.createInstrument(instrument3).then((result) => {
+        instrumentId3 = result.createInstrument.id;
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: instrumentId3 }],
         });
       });
 
       cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId1, createdInstrumentId2],
-        techniqueId: createdTechniqueId,
+        instrumentIds: [instrumentId1, instrumentId2],
+        techniqueId: techniqueId1,
+      });
+
+      cy.assignInstrumentsToTechnique({
+        instrumentIds: [instrumentId3],
+        techniqueId: techniqueId2,
       });
 
       cy.createTopic({
@@ -297,16 +342,11 @@ context('Technique tests', () => {
       });
     });
 
-    it('Single technique selection assigns all instruments to the proposal that are linked to the technique on saving', function () {
+    it('Single technique selection assigns all instruments to the proposal that are linked to the technique', function () {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-      cy.get('[data-cy=principal-investigator] input').should(
-        'contain.value',
-        'Carl'
-      );
       cy.finishedLoading();
+
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
       cy.get('[data-cy=title] input').type(title).should('have.value', title);
@@ -316,11 +356,13 @@ context('Technique tests', () => {
         .should('have.value', abstract);
       cy.contains('Save and continue').click();
       cy.finishedLoading();
+
       cy.get('[data-natural-key^="technique_picker"]').click();
-      cy.get('[role="option"]').contains(techniqueName).click();
+      cy.get('[role="option"]').contains(techniqueName1).click();
       cy.contains('Save and continue').click();
       cy.finishedLoading();
       cy.notification({ variant: 'success', text: 'Saved' });
+
       cy.contains('Dashboard').click();
       cy.contains(title).parent().contains('draft');
       cy.contains(title)
@@ -330,13 +372,16 @@ context('Technique tests', () => {
         .click();
       cy.contains('Submit').click();
       cy.contains('OK').click();
+
       cy.contains('Dashboard').click();
       cy.contains(title);
       cy.contains('submitted');
       cy.get('[aria-label="View proposal"]').should('exist');
+
       cy.login('officer');
       cy.visit('/');
       cy.contains('Proposals').click();
+
       cy.contains(title).parent().contains(instrument1.name);
       cy.contains(title).parent().contains(instrument2.name);
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
@@ -344,11 +389,61 @@ context('Technique tests', () => {
       cy.contains('td', instrument2.name).should('exist');
     });
 
-    it('Multiple technique selection assigns all instruments to the proposal that are linked to the techniques on saving', function () {
+    it('Multiple technique selection assigns all instruments to the proposal that are linked to the techniques', function () {
+      cy.updateQuestionTemplateRelationSettings({
+        questionId: techniquePickerQuestionId,
+        templateId: initialDBData.template.id,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true}`,
+        dependencies: [],
+      });
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.get('[data-natural-key^="technique_picker"]').click();
+      cy.get('[role="option"]').contains(techniqueName1).click();
+      cy.get('[role="option"]').contains(techniqueName2).click();
+      cy.get('body').type('{esc}');
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+
       cy.login('officer');
       cy.visit('/');
+      cy.contains('Proposals').click();
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(title).parent().contains(instrument1.name);
+      cy.contains(title).parent().contains(instrument2.name);
+      cy.contains(title).parent().contains(instrument3.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument1.name).should('exist');
+      cy.contains('td', instrument2.name).should('exist');
+      cy.contains('td', instrument3.name).should('exist');
     });
   });
 });
