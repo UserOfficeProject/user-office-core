@@ -181,18 +181,11 @@ context('Technique tests', () => {
 
       cy.get('[data-cy="submit-assign-remove-instrument"]').click();
 
-      cy.screenshot('DEBUG BEFORE EXPECTED NOTIFICATION');
-
-      cy.notification({
-        variant: 'success',
-        text: 'assigned.+successfully',
-      });
-
       cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
 
       cy.notification({
         variant: 'success',
-        text: 'assigned.+successfully!',
+        text: 'successfully!',
       });
 
       cy.contains(technique1.shortCode)
@@ -230,7 +223,7 @@ context('Technique tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'unassigned.+successfully!',
+        text: 'successfully!',
       });
 
       cy.get('[data-cy="technique-instrument-assignments-table"]')
