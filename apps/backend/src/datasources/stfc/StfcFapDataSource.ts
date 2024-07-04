@@ -7,7 +7,6 @@ import {
   AssignReviewersToFapArgs,
 } from '../../resolvers/mutations/AssignMembersToFapMutation';
 import { FapDataSource } from '../FapDataSource';
-import AdminDataSource from '../postgres/AdminDataSource';
 import CallDataSource from '../postgres/CallDataSource';
 import PostgresFapDataSource from '../postgres/FapDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
@@ -19,7 +18,7 @@ export default class StfcFapDataSource
   implements FapDataSource
 {
   constructor() {
-    super(new CallDataSource(), new AdminDataSource());
+    super(new CallDataSource());
   }
 
   async assignChairOrSecretaryToFap(

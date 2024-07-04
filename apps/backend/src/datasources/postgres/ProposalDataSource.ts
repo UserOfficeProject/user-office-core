@@ -43,15 +43,17 @@ import {
 
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
-  technicalStatuses: "technical_reviews->0->'status'",
-  technicalTimeAllocations: "technical_reviews->0->'timeAllocation'",
-  technicalReviewAssignees:
+  'technicalReviews.status': "technical_reviews->0->'status'",
+  'technicalReviews.timeAllocation': "technical_reviews->0->'timeAllocation'",
+  // NOTE: For now sorting by first name only is completly fine because the full name is constructed from frist + last
+  technicalReviewAssigneesFullName:
     "technical_reviews->0->'technicalReviewAssignee'->'firstname'",
-  fapCodes: "faps->0->'code'",
+  'faps.code': "faps->0->'code'",
   callShortCode: 'call_short_code',
-  instrumentNames: "instruments->0->'name'",
+  'instruments.name': "instruments->0->'name'",
   statusName: 'proposal_status_id',
-  finalTimeAllocations: "instruments->0->'managementTimeAllocation'",
+  'instruments.managementTimeAllocation':
+    "instruments->0->'managementTimeAllocation'",
   proposalId: 'proposal_id',
   title: 'title',
   submitted: 'submitted',
@@ -373,11 +375,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.callId) {
           query.where('call_id', filter?.callId);
         }
-        if (filter?.instrumentId) {
+
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
           // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-            { instrumentId: filter?.instrumentId }
+            { instrumentId: filter.instrumentFilter.instrumentId }
           );
         }
 
@@ -467,7 +472,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.callId) {
           query.where('proposals.call_id', filter.callId);
         }
-        if (filter?.instrumentId) {
+        if (filter?.instrumentFilter?.instrumentId) {
           query
             .leftJoin(
               'instrument_has_proposals',
@@ -476,7 +481,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             )
             .where(
               'instrument_has_proposals.instrument_id',
-              filter.instrumentId
+              filter.instrumentFilter.instrumentId
             );
         }
 
@@ -576,11 +581,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             { userId: user.id }
           );
         }
-        if (filter?.instrumentId) {
+
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
           // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-            { instrumentId: filter?.instrumentId }
+            { instrumentId: filter.instrumentFilter?.instrumentId }
           );
         }
 

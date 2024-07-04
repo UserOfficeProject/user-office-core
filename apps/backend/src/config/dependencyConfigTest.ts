@@ -24,6 +24,7 @@ import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventD
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
+import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
@@ -35,6 +36,7 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { EventBus } from '../events/eventBus';
+import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { SampleEsiDataSourceMock } from './../datasources/mockups/SampleEsiDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
@@ -63,6 +65,7 @@ mapClass(Tokens.SampleEsiDataSource, SampleEsiDataSourceMock);
 mapClass(Tokens.ScheduledEventDataSource, ScheduledEventDataSourceMock);
 mapClass(Tokens.ShipmentDataSource, ShipmentDataSourceMock);
 mapClass(Tokens.SystemDataSource, SystemDataSourceMock);
+mapClass(Tokens.TechniqueDataSource, TechniqueDataSourceMock);
 mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
@@ -86,6 +89,8 @@ mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+
+mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 jest.mock('../decorators/EventBus', () => {
   return () => jest.fn();

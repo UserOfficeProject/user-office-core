@@ -49,4 +49,9 @@ export default class CallQueries {
 
     return this.dataSource.getCallsByInstrumentScientist(scientistId);
   }
+
+  @Authorized()
+  async getCallByQuestionId(user: UserWithRole | null, questionId: string) {
+    return this.dataSource.getCallByQuestionId(questionId);
+  }
 }

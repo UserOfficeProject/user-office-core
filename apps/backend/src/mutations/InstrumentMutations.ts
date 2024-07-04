@@ -182,7 +182,10 @@ export default class InstrumentMutations {
           (i) => !args.instrumentIds.includes(i.id)
         );
 
-        if (proposalInstrumentsToRemove.length) {
+        if (
+          proposalInstrumentsToRemove.length &&
+          proposalInstruments.length !== proposalInstrumentsToRemove.length
+        ) {
           await Promise.all(
             proposalInstrumentsToRemove.map((i) => {
               return this.dataSource.removeProposalsFromInstrument(
@@ -324,15 +327,12 @@ export default class InstrumentMutations {
 
   @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED)
   @ValidateArgs(submitInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  @Authorized([Roles.USER_OFFICER])
   async submitInstrument(
     agent: UserWithRole | null,
     args: InstrumentSubmitArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
+    if (!this.userAuth.isUserOfficer(agent)) {
       return rejection('Submitting instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,

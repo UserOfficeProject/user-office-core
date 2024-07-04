@@ -6,7 +6,7 @@ import ProposalWorkflowsTable from './ProposalWorkflowsTable';
 
 const ProposalWorkflowsPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <ProposalWorkflowsTable />
       </StyledPaper>
