@@ -77,6 +77,16 @@ export const QuestionInstrumentPickerFormCommon = ({
             label="Is multiple select"
           />
         )}
+        <FormControlLabel
+          control={
+            <Field
+              name="config.requestTime"
+              component={Checkbox}
+              type="checkbox"
+            />
+          }
+          label="Request time"
+        />
       </TitledContainer>
     </>
   );
