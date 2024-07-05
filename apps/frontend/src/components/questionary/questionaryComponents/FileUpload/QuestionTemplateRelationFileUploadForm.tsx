@@ -1,12 +1,10 @@
-import ListItemText from '@mui/material/ListItemText';
-import Select from '@mui/material/Select';
 import { Field } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
-import MultiMenuItem from 'components/common/MultiMenuItem';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { FileUploadConfig } from 'generated/sdk';
@@ -115,15 +113,12 @@ export const QuestionTemplateRelationFileUploadForm = (
                   component={Select}
                   data-cy="file_type"
                   labelId="fileType-label"
-                >
-                  {availableFileTypeOptions.map(({ value, label }) => {
-                    return (
-                      <MultiMenuItem value={value} key={value}>
-                        <ListItemText primary={label} />
-                      </MultiMenuItem>
-                    );
-                  })}
-                </Field>
+                  options={availableFileTypeOptions.map(({ label, value }) => ({
+                    text: label,
+                    value: value,
+                  }))}
+                  isMultiSelect={true}
+                />
                 <Field
                   name="config.max_files"
                   label="Max number of files"

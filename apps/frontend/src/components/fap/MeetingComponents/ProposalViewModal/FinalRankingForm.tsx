@@ -3,14 +3,13 @@ import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -206,13 +205,8 @@ const FinalRankingForm = ({
                         'data-cy': 'proposalFapMeetingRecommendation-options',
                       }}
                       required
-                    >
-                      {statusOptions.map(({ value, text }) => (
-                        <MenuItem value={value} key={value}>
-                          {text}
-                        </MenuItem>
-                      ))}
-                    </Field>
+                      options={statusOptions}
+                    />
                   </FormControl>
                 </Grid>
                 <Grid item sm={6} xs={12}>

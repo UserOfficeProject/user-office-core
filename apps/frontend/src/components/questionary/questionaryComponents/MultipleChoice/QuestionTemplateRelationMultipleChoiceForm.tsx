@@ -1,13 +1,13 @@
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
+import Select from 'components/common/FormikUISelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
@@ -71,15 +71,11 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
                     e.target.value === 'dropdown'
                   );
                 }}
-              >
-                {availableVariantOptions.map(({ value, label }) => {
-                  return (
-                    <MenuItem value={value} key={value}>
-                      {label}
-                    </MenuItem>
-                  );
-                })}
-              </Field>
+                options={availableVariantOptions.map(({ label, value }) => ({
+                  text: label,
+                  value: value,
+                }))}
+              />
             </FormControl>
             {showIsMultipleSelectCheckbox && (
               <Field

@@ -20,14 +20,14 @@ import {
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
+import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -186,15 +186,11 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                     e.target.value === 'dropdown'
                   );
                 }}
-              >
-                {availableVariantOptions.map(({ value, label }) => {
-                  return (
-                    <MenuItem value={value} key={value}>
-                      {label}
-                    </MenuItem>
-                  );
-                })}
-              </Field>
+                options={availableVariantOptions.map(({ label, value }) => ({
+                  text: label,
+                  value: value,
+                }))}
+              />
             </FormControl>
 
             {showIsMultipleSelectCheckbox && (

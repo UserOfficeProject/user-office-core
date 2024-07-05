@@ -3,19 +3,20 @@ import {
   FormControl,
   FormControlLabel,
   InputLabel,
-  MenuItem,
-  Select,
   SelectChangeEvent,
 } from '@mui/material';
 import { Field } from 'formik';
 import React, { useState } from 'react';
 
+import Select from 'components/common/FormikUISelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { InstrumentPickerConfig } from 'generated/sdk';
+
 const availableVariantOptions = [
   { label: 'Radio', value: 'radio' },
   { label: 'Dropdown', value: 'dropdown' },
 ];
+
 export const QuestionInstrumentPickerFormCommon = ({
   config,
 }: {
@@ -53,15 +54,11 @@ export const QuestionInstrumentPickerFormCommon = ({
             onChange={(e: SelectChangeEvent) => {
               setShowIsMultipleSelectCheckbox(e.target.value === 'dropdown');
             }}
-          >
-            {availableVariantOptions.map(({ value, label }) => {
-              return (
-                <MenuItem value={value} key={value}>
-                  {label}
-                </MenuItem>
-              );
-            })}
-          </Field>
+            options={availableVariantOptions.map(({ label, value }) => ({
+              text: label,
+              value: value,
+            }))}
+          />
         </FormControl>
 
         {showIsMultipleSelectCheckbox && (

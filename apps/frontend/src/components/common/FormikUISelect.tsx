@@ -3,12 +3,15 @@ import FormHelperText, {
   FormHelperTextProps,
 } from '@mui/material/FormHelperText';
 import InputLabel, { InputLabelProps } from '@mui/material/InputLabel';
+import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import MuiSelect, { SelectProps as MuiSelectProps } from '@mui/material/Select';
 import { FieldProps, getIn } from 'formik';
 import * as React from 'react';
 
 import { Option } from 'utils/utilTypes';
+
+import MultiMenuItem from './MultiMenuItem';
 
 export interface SelectProps
   extends FieldProps,
@@ -67,8 +70,13 @@ export default function Select({
   inputLabel,
   formHelperText,
   options,
+  isMultiSelect = false,
   ...selectProps
-}: SelectProps & { options: Option[]; 'data-cy': string }) {
+}: SelectProps & {
+  options: Option[];
+  'data-cy': string;
+  isMultiSelect?: boolean;
+}) {
   if (!options) {
     throw new Error(
       'Select cannot be used without a required options property'
@@ -93,15 +101,25 @@ export default function Select({
         {selectFieldProps.label}
       </InputLabel>
       <MuiSelect {...selectFieldProps}>
-        {options.map(({ value, text }) => (
-          <MenuItem
-            value={value}
-            key={value}
-            data-cy={dataCy ? `${dataCy}-options` : undefined}
-          >
-            {text}
-          </MenuItem>
-        ))}
+        {options.map(({ value, text }) => {
+          if (isMultiSelect) {
+            return (
+              <MultiMenuItem value={value} key={value}>
+                <ListItemText primary={text} />
+              </MultiMenuItem>
+            );
+          } else {
+            return (
+              <MenuItem
+                value={value}
+                key={value}
+                data-cy={dataCy ? `${dataCy}-options` : undefined}
+              >
+                {text}
+              </MenuItem>
+            );
+          }
+        })}
       </MuiSelect>
       {shouldDisplayFormHelperText && (
         <FormHelperText {...formHelperTextProps}>
