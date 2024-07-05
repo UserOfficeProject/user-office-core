@@ -2,6 +2,7 @@ import useTheme from '@mui/material/styles/useTheme';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
+import { DateTime } from 'luxon';
 import { useContext } from 'react';
 import React from 'react';
 
@@ -55,7 +56,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         InputLabelProps={{
           shrink: true,
         }}
-        onChange={(startsAt: Date | null) => {
+        onChange={(startsAt: DateTime) => {
           dispatch({
             type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
             itemWithQuestionary: { startsAt },
@@ -81,7 +82,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         InputLabelProps={{
           shrink: true,
         }}
-        onChange={(endsAt: Date | null) => {
+        onChange={(endsAt: DateTime) => {
           dispatch({
             type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
             itemWithQuestionary: { endsAt },

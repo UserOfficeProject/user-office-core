@@ -1,4 +1,5 @@
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import { DateTime } from 'luxon';
 import React from 'react';
 
 import { DataType } from 'generated/sdk';
@@ -23,6 +24,10 @@ export const visitBasisDefinition: QuestionaryComponentDefinition = {
   getYupInitialValue: ({ state }) => {
     const visitState = state as VisitRegistrationSubmissionState;
 
-    return visitState.registration;
+    return {
+      ...visitState.registration,
+      startsAt: DateTime.fromISO(visitState.registration.startsAt),
+      endsAt: DateTime.fromISO(visitState.registration.startsAt),
+    };
   },
 };
