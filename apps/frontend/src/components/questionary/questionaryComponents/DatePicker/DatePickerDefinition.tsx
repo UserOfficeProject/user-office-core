@@ -1,5 +1,6 @@
 import TodayIcon from '@mui/icons-material/Today';
 import { dateQuestionValidationSchema } from '@user-office-software/duo-validation';
+import { DateTime } from 'luxon';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
@@ -27,7 +28,11 @@ export const dateDefinition: QuestionaryComponentDefinition = {
     answerRenderer: DateAnswerRenderer,
   },
   createYupValidationSchema: dateQuestionValidationSchema,
-  getYupInitialValue: ({ answer }) => answer.value,
+  getYupInitialValue: ({ answer }) => {
+    const isString = typeof answer.value === 'string';
+
+    return isString ? DateTime.fromISO(answer.value) : answer.value;
+  },
   searchCriteriaComponent: DateSearchCriteriaInput,
   preSubmitTransform: preSubmitDateTransform,
 };

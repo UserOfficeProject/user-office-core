@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { TextFieldProps } from '@mui/material/TextField';
 import { PickerValidDate } from '@mui/x-date-pickers';
 import {
   DatePicker as MuiDatePicker,
@@ -37,22 +37,19 @@ export function fieldToDatePicker({
   const showError = getIn(touched, field.name) && !!fieldError;
 
   return {
-    slots: {
-      textField: (textFieldProps) => (
-        <TextField
-          {...textFieldProps}
-          error={showError}
-          helperText={showError ? fieldError : helperText}
-          label={label}
-          onBlur={
-            onBlur ??
-            function () {
-              setFieldTouched(field.name, true, true);
-            }
-          }
-          {...textField}
-        />
-      ),
+    slotProps: {
+      textField: (textFieldProps) => ({
+        ...textFieldProps,
+        error: showError,
+        helperText: showError ? fieldError : helperText,
+        label: label,
+        onBlur:
+          onBlur ??
+          function () {
+            setFieldTouched(field.name, true, true);
+          },
+        ...textField,
+      }),
     },
     disabled: disabled ?? isSubmitting,
     onChange:

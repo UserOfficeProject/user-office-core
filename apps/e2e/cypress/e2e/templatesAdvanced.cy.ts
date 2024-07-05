@@ -382,37 +382,34 @@ context('Template tests', () => {
       cy.contains(`${textQuestion.answer.length}/${textQuestion.maxChars}`);
       cy.get(`[data-cy='${dateId}.value'] button`).click();
       cy.contains('15').click();
-      cy.get(`[data-cy='${timeId}.value'] input`)
-        .clear()
-        .type(dateTimeFieldValue);
+      cy.setDatePickerValue(
+        `[data-cy='${timeId}.value'] input`,
+        dateTimeFieldValue
+      );
 
       cy.get(`#${multipleChoiceId}`).click();
       cy.contains(multipleChoiceQuestion.answers[0]).click();
       cy.contains(multipleChoiceQuestion.answers[2]).click();
       cy.get('body').type('{esc}');
 
-      cy.window().then((win) => {
-        return new Cypress.Promise((resolve) => {
-          win.tinyMCE.EditorManager.get()
-            .find((editor) => editor.id === richTextInputId)
-            ?.setContent(richTextInputQuestion.answer);
-          win.tinyMCE.EditorManager.get()
-            .find((editor) => editor.id === richTextInputId)
-            ?.fire('blur');
-
-          resolve();
-        });
-      });
+      cy.setTinyMceContent(richTextInputId, richTextInputQuestion.answer);
 
       cy.getTinyMceContent(richTextInputId).then((content) =>
         expect(content).to.have.string(richTextInputQuestion.answer)
       );
 
-      cy.get('[data-cy="rich-text-char-count"]').then((element) => {
-        expect(element.text()).to.be.equal(
-          `Characters: ${richTextInputQuestion.answer.length} / ${richTextInputQuestion.maxChars}`
-        );
-      });
+      // TODO: try to fix and improve this with waiting for iframe to load.
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(1000);
+
+      cy.get(`#${richTextInputId}`)
+        .parent()
+        .find('[data-cy="rich-text-char-count"]')
+        .then((element) => {
+          expect(element.text()).to.be.equal(
+            `Characters: ${richTextInputQuestion.answer.length} / ${richTextInputQuestion.maxChars}`
+          );
+        });
 
       cy.contains('Save and continue').click();
 
@@ -814,7 +811,7 @@ context('Template tests', () => {
       cy.get('[aria-label="Add image caption"]').click();
 
       cy.get('[data-cy="image-figure"] input').type('Fig_test');
-      cy.get('[data-cy="image-caption"] input').type('Test caption');
+      cy.get('[data-cy="image-caption"] input').type('Test caption').blur();
 
       cy.get('[data-cy="save-button"]').click();
 

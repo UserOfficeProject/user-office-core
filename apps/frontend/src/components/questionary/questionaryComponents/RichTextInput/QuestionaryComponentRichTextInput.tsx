@@ -23,7 +23,6 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   } = answer;
 
   const fieldError = getIn(errors, id);
-  const [stateValue, setStateValue] = useState(value);
   const isError = getIn(touched, id) && !!fieldError;
   const config = answer.config as RichTextInputConfig;
   const theme = useTheme();
@@ -44,7 +43,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
       <FormLabel sx={{ marginBottom: theme.spacing(2) }}>{question}</FormLabel>
       <Editor
         id={id}
-        initialValue={value}
+        value={value}
         init={{
           skin: false,
           content_css: false,
@@ -52,7 +51,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
            * Note:  if you add new styling options please make sure the HTML sanitizer rules
            *        on the BE is in sync, otherwise the result will be filtered
            */
-          plugins: ['preview advlist lists charmap wordcount'],
+          plugins: ['preview', 'advlist', 'lists', 'charmap', 'wordcount'],
           toolbar:
             'undo redo | bold italic underline strikethrough superscript subscript | ' +
             'fontsizeselect formatselect forecolor | ' +
@@ -60,16 +59,10 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
             'bullist numlist | outdent indent | charmap removeformat preview',
           branding: false,
           menubar: false,
-          init_instance_callback: (editor) => {
-            handleCharacterCount(editor);
-          },
         }}
         onEditorChange={(content, editor) => {
           handleCharacterCount(editor);
-          setStateValue(content);
-        }}
-        onBlur={() => {
-          onComplete(stateValue);
+          onComplete(content);
         }}
       />
       {config.max && (
