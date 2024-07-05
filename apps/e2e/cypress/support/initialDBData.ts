@@ -265,6 +265,7 @@ export default {
     fapSelection: { id: 4 },
     fapReview: {
       id: 5,
+      name: 'FAP_REVIEW',
     },
     fapMeeting: {
       id: 12,

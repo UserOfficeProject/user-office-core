@@ -172,6 +172,7 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="assign-selected-users"]').click();
     });
 
+    // NOTE: Failing because of table totalCount issue.
     it('should preserve the selected users after pagination', () => {
       // NOTE: Create 5 users
       new Array(5).fill(0).map((elem, index) => {

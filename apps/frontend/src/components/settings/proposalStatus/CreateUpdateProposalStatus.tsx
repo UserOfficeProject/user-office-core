@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import MUITextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import {
   createProposalStatusValidationSchema,
@@ -78,17 +77,14 @@ const CreateUpdateProposalStatus = ({
             id="shortCode"
             label="Short code"
             type="text"
-            component={
-              <MUITextField
-                sx={{
-                  ...(!!initialValues.shortCode && {
-                    '& .MuiInputBase-root.Mui-disabled': {
-                      color: 'rgba(0, 0, 0, 0.7) !important',
-                    },
-                  }),
-                }}
-              />
-            }
+            sx={{
+              ...(!!initialValues.shortCode && {
+                '& .MuiInputBase-root.Mui-disabled': {
+                  color: 'rgba(0, 0, 0, 0.7) !important',
+                },
+              }),
+            }}
+            component={TextField}
             fullWidth
             data-cy="shortCode"
             required

@@ -42,6 +42,7 @@ context('Settings tests', () => {
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
+      cy.finishedLoading();
       cy.contains('Create').click();
       cy.get('#shortCode').type(shortCode);
       cy.get('#name').type(name);
@@ -849,7 +850,11 @@ context('Settings tests', () => {
       cy.login('officer');
       cy.visit('/');
 
+      cy.get('.MuiTable-root tbody tr').should('exist');
+
       cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr').contains(proposalTitle);
 
       cy.get('.MuiTable-root tbody tr')
         .first()
@@ -1061,6 +1066,10 @@ context('Settings tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
+      // TODO: Try to fix and improve this
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(1000);
+
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
       if (
@@ -1128,6 +1137,8 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('.MuiTable-root tbody').contains(proposalTitle);
+
       cy.get('.MuiTable-root tbody')
         .first()
         .then((element) =>
@@ -1138,21 +1149,41 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.fapReview.name
+          )
+        );
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="5"]').click();
 
       cy.finishedLoading();
 
+      cy.get('.MuiTable-root tbody').contains(proposalTitle);
+
+      // TODO: Fix and improve this. It is most probably happening because of multiple requests sent for the same query. Investigate!
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(1000);
+
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.fapReview.name
+          )
+        );
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
 
       cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr').contains(updatedCall.shortCode);
+
+      // TODO: Fix and improve this
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(1000);
 
       cy.get('.MuiTable-root tbody tr')
         .first()

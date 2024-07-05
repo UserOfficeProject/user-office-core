@@ -5,9 +5,6 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
 import { Field, Form, Formik } from 'formik';
 import React, { useState, useContext } from 'react';
@@ -15,6 +12,8 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
@@ -195,16 +194,15 @@ const ProposalGrade = ({
               }
               data-cy="grade-proposal"
               labelId="grade-proposal-label"
-            >
-              {gradeDecimalPoints === 1 &&
-                [...Array(10)].map((e, i) => {
-                  return (
-                    <MenuItem value={i + 1} key={i}>
-                      {(i + 1).toString()}
-                    </MenuItem>
-                  );
-                })}
-            </Field>
+              options={
+                gradeDecimalPoints === 1
+                  ? [...Array(10)].map((e, i) => ({
+                      text: (i + 1).toString(),
+                      value: i + 1,
+                    }))
+                  : undefined
+              }
+            />
           </Box>
           <NavigationFragment isLoading={isSubmitting}>
             <ButtonWithDialog

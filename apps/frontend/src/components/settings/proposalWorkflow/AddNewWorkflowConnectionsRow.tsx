@@ -3,8 +3,6 @@ import Container from '@mui/material/Container';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
@@ -12,6 +10,7 @@ import React from 'react';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import Select from 'components/common/FormikUISelect';
 
 const addNewWorkflowConnectionsRowValidationSchema = yup.object().shape({
   selectedParentDroppableId: yup
@@ -94,15 +93,11 @@ const AddNewWorkflowConnectionsRow = ({
                     data-cy="numberOfColumns"
                     required
                     MenuProps={{ 'data-cy': 'numberOfColumnsOptions' }}
-                  >
-                    {[2, 3, 4].map((numberOfColumn) => {
-                      return (
-                        <MenuItem value={numberOfColumn} key={numberOfColumn}>
-                          {numberOfColumn}
-                        </MenuItem>
-                      );
-                    })}
-                  </Field>
+                    options={[2, 3, 4].map((numberOfColumn) => ({
+                      text: numberOfColumn.toString(),
+                      value: numberOfColumn,
+                    }))}
+                  />
                 </FormControl>
               </Grid>
             </Grid>
