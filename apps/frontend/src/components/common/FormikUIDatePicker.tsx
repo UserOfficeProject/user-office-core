@@ -6,6 +6,7 @@ import {
   DatePickerProps as MuiDatePickerProps,
 } from '@mui/x-date-pickers/DatePicker';
 import { FieldProps, getIn } from 'formik';
+import { DateTime } from 'luxon';
 import * as React from 'react';
 
 import { createErrorHandler } from 'utils/errorHandler';
@@ -17,7 +18,7 @@ export interface DatePickerProps
 }
 
 export function fieldToDatePicker({
-  field: { onChange: _onChange, ...field },
+  field: { onChange: _onChange, value, ...field },
   form: {
     isSubmitting,
     touched,
@@ -35,6 +36,7 @@ export function fieldToDatePicker({
 }: DatePickerProps): MuiDatePickerProps<PickerValidDate> {
   const fieldError = getIn(errors, field.name);
   const showError = getIn(touched, field.name) && !!fieldError;
+  const isStringValue = typeof value === 'string';
 
   return {
     slotProps: {
@@ -62,6 +64,8 @@ export function fieldToDatePicker({
       },
     onError:
       onError ?? createErrorHandler(fieldError, field.name, setFieldError),
+    // TODO: Investigate this because there might be a better solution how to solve it.
+    value: isStringValue ? DateTime.fromISO(value) : value,
     ...field,
     ...props,
   };
