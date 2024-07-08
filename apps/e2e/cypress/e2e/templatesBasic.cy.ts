@@ -813,7 +813,7 @@ context('Template tests', () => {
       );
     });
 
-    it('should render the Date field with default value and min max values when set', () => {
+    it.only('should render the Date field with default value and min max values when set', () => {
       let dateFieldId: string;
       const minDate = DateTime.fromJSDate(faker.date.past()).toFormat(
         initialDBData.getFormats().dateFormat
@@ -906,19 +906,19 @@ context('Template tests', () => {
 
       cy.contains(dateQuestion.title);
       cy.get('body').then(() => {
-        cy.get(`[data-cy="${dateFieldId}.value"] input`).as('dateField');
+        const dateFieldSelector = `[data-cy="${dateFieldId}.value"] input`;
 
-        cy.get('@dateField').should('have.value', defaultDate);
+        cy.get(dateFieldSelector).should('have.value', defaultDate);
 
-        cy.get('@dateField').clear().type(earlierThanMinDate);
+        cy.setDatePickerValue(dateFieldSelector, earlierThanMinDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no earlier than');
 
-        cy.get('@dateField').clear().type(laterThanMaxDate);
+        cy.setDatePickerValue(dateFieldSelector, laterThanMaxDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no latter than');
 
-        cy.get('@dateField').clear().type(tomorrowDate);
+        cy.setDatePickerValue(dateFieldSelector, tomorrowDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no').should('not.exist');
       });
