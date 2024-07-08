@@ -813,7 +813,7 @@ context('Template tests', () => {
       );
     });
 
-    it.only('should render the Date field with default value and min max values when set', () => {
+    it('should render the Date field with default value and min max values when set', () => {
       let dateFieldId: string;
       const minDate = DateTime.fromJSDate(faker.date.past()).toFormat(
         initialDBData.getFormats().dateFormat
