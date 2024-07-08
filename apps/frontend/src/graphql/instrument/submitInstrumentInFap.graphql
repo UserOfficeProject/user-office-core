@@ -1,0 +1,3 @@
+mutation submitInstrumentInFap($callId: Int!, $instrumentId: Int!, $fapId: Int!) {
+  submitInstrumentInFap(callId: $callId, instrumentId: $instrumentId, fapId: $fapId)
+}
