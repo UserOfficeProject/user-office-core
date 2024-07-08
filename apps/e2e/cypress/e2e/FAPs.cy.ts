@@ -35,6 +35,10 @@ function readWriteReview(
   cy.get('@dialog').contains('Technical review');
   cy.get('@dialog').contains('Grade');
 
+  // NOTE: This should be improved and investigated.
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(1000);
+
   cy.setTinyMceContent('comment', faker.lorem.words(3));
 
   if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
@@ -765,7 +769,9 @@ context('Fap reviews tests', () => {
         return false;
       });
       cy.login('officer');
-      cy.visit('/ProposalPage');
+      cy.visit('/Proposals');
+
+      cy.get('[data-cy="officer-proposals-table"]').should('exist');
 
       cy.get('[type="checkbox"]').first().check();
 
@@ -1213,6 +1219,11 @@ context('Fap reviews tests', () => {
         .parent()
         .find('[data-cy="grade-proposal-icon"]')
         .click();
+
+      // NOTE: This should be improved and investigated.
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(1000);
+
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
       if (
