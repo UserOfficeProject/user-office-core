@@ -1,6 +1,4 @@
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { updateFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
@@ -118,26 +116,21 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   }}
                 />
               )}
-              <FormControlLabel
-                control={
-                  <Field
-                    id="customGradeGuide"
-                    name="customGradeGuide"
-                    component={Checkbox}
-                    type="checkbox"
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                    checked={values.customGradeGuide}
-                    data-cy="custom-grade-guide"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      handleCustomGradeGuideChange(event);
-                      setFieldValue(
-                        'customGradeGuide',
-                        !values.customGradeGuide
-                      );
-                    }}
-                  />
-                }
-                label="Custom Grade Guide"
+              <Field
+                id="customGradeGuide"
+                name="customGradeGuide"
+                component={CheckboxWithLabel}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+                type="checkbox"
+                checked={values.customGradeGuide}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  handleCustomGradeGuideChange(event);
+                  setFieldValue('customGradeGuide', !values.customGradeGuide);
+                }}
+                Label={{
+                  label: 'Custom Grade Guide',
+                }}
+                data-cy="custom-grade-guide"
               />
             </Grid>
             <Grid item sm={6} xs={12}>

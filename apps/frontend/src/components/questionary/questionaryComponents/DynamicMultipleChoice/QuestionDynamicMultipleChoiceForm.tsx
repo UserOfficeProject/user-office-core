@@ -2,7 +2,6 @@ import { Help } from '@mui/icons-material';
 import {
   Box,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,7 +17,6 @@ import {
   tableCellClasses,
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
@@ -26,6 +24,7 @@ import { Field } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
@@ -157,16 +156,14 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            <FormControlLabel
-              control={
-                <Field
-                  name="config.required"
-                  component={Checkbox}
-                  type="checkbox"
-                  inputProps={{ 'data-cy': 'required' }}
-                />
-              }
-              label="Is required"
+            <Field
+              name="config.required"
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
+              data-cy="required"
             />
           </TitledContainer>
 
@@ -194,16 +191,14 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
             </FormControl>
 
             {showIsMultipleSelectCheckbox && (
-              <FormControlLabel
-                control={
-                  <Field
-                    name="config.isMultipleSelect"
-                    component={Checkbox}
-                    type="checkbox"
-                    inputProps={{ 'data-cy': 'is-multiple-select' }}
-                  />
-                }
-                label="Is multiple select"
+              <Field
+                name="config.isMultipleSelect"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Is multiple select',
+                }}
+                data-cy="is-multiple-select"
               />
             )}
           </TitledContainer>

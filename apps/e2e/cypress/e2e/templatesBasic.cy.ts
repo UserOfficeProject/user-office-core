@@ -501,6 +501,8 @@ context('Template tests', () => {
         .get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']")
         .click(); // get true from dropdown
 
+      cy.get('[data-cy="submit"]').focus();
+
       cy.contains('Update').click();
 
       // Check reordering
@@ -509,8 +511,8 @@ context('Template tests', () => {
         .dragElement([{ direction: 'up', length: 1 }]); // Move item to top, in case it isn't
 
       cy.contains(initialDBData.template.topic.title)
-        .closest('[data-rbd-draggable-context-id]') // new topic column
-        .find('[data-rbd-drag-handle-draggable-id]') // all questions
+        .closest('[data-rfd-draggable-context-id]') // new topic column
+        .find('[data-rfd-drag-handle-draggable-id]') // all questions
         .first() // first question
         .contains(textQuestion.title);
 
@@ -519,8 +521,8 @@ context('Template tests', () => {
         .dragElement([{ direction: 'down', length: 1 }]);
 
       cy.contains(initialDBData.template.topic.title)
-        .closest('[data-rbd-draggable-context-id]') // new topic column
-        .find('[data-rbd-drag-handle-draggable-id]') // all questions
+        .closest('[data-rfd-draggable-context-id]') // new topic column
+        .find('[data-rfd-drag-handle-draggable-id]') // all questions
         .first() // first question
         .should('not.contain', textQuestion);
 
@@ -564,7 +566,6 @@ context('Template tests', () => {
       cy.contains(multipleChoiceQuestion.answers[0])
         .parent()
         .find('[aria-label=Up]')
-        .find('[type=button]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[0])
@@ -580,7 +581,6 @@ context('Template tests', () => {
       cy.contains(multipleChoiceQuestion.answers[2])
         .parent()
         .find('[aria-label=Down]')
-        .find('[type=button]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[2])
@@ -1045,7 +1045,8 @@ context('Template tests', () => {
           question.badInput
         );
       }
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
       for (const question of questions) {
         cy.contains(question.failureMessage);
       }
@@ -1056,7 +1057,8 @@ context('Template tests', () => {
           .clear()
           .type(question.goodInput);
       }
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
       for (const question of questions) {
         cy.contains(question.failureMessage).should('not.exist');
       }
@@ -1710,7 +1712,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1744,7 +1747,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1778,7 +1782,8 @@ context('Template tests', () => {
 
       cy.contains(validFile);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({ variant: 'success', text: 'Saved' });
 
@@ -1810,7 +1815,8 @@ context('Template tests', () => {
 
       cy.contains(invalidFile);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1844,7 +1850,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1878,7 +1885,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({ variant: 'success', text: 'Saved' });
     });
