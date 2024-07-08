@@ -238,4 +238,19 @@ export default class PostgresTechniqueDataSource
         throw new Error(`Error getting techniques: ${error}`);
       });
   }
+
+  async getTechniquesByInstrumentIds(
+    instrumentIds: number[]
+  ): Promise<Technique[]> {
+    try {
+      const uniqueTechniqueIds = await database('technique_has_instruments')
+        .whereIn('instrument_id', instrumentIds)
+        .distinct()
+        .pluck('technique_id');
+
+      return this.getTechniquesByIds(uniqueTechniqueIds);
+    } catch (error) {
+      throw new Error(`Error getting techniques by instrument IDs: ${error}`);
+    }
+  }
 }

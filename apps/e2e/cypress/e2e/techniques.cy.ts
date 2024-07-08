@@ -23,9 +23,17 @@ context('Technique tests', () => {
     description: faker.word.words(5),
   };
 
+  const technique3 = {
+    name: faker.word.words(1),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.word.words(5),
+  };
+
   const scientist1 = initialDBData.users.user1;
   const scientist2 = initialDBData.users.user2;
   const scientist3 = initialDBData.users.user3;
+  const scientist4 = initialDBData.users.placeholderUser;
+  const scientist5 = initialDBData.users.reviewer;
 
   const instrument1 = {
     name: faker.word.words(1),
@@ -46,6 +54,20 @@ context('Technique tests', () => {
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
     managerUserId: scientist3.id,
+  };
+
+  const instrument4 = {
+    name: faker.word.words(1),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.word.words(5),
+    managerUserId: scientist4.id,
+  };
+
+  const instrument5 = {
+    name: faker.word.words(1),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.word.words(5),
+    managerUserId: scientist5.id,
   };
 
   const proposalWorkflow = {
@@ -145,13 +167,6 @@ context('Technique tests', () => {
 
       cy.contains(technique1.name).should('not.exist');
     });
-  });
-
-  describe('Advanced techniques tests as user officer role', () => {
-    beforeEach(() => {
-      cy.login('officer');
-      cy.visit('/');
-    });
 
     it('User officer should be able to assign and unassign instruments to technique without page refresh', function () {
       cy.createTechnique(technique1);
@@ -232,16 +247,20 @@ context('Technique tests', () => {
     });
   });
 
-  describe('Technique picker automatic instrument assignment', () => {
+  describe('Advanced techniques tests as user officer role', () => {
     let techniqueId1: number;
     let techniqueId2: number;
+    let techniqueId3: number;
 
     let techniqueName1: string;
     let techniqueName2: string;
+    let techniqueName3: string;
 
     let instrumentId1: number;
     let instrumentId2: number;
     let instrumentId3: number;
+    let instrumentId4: number;
+    let instrumentId5: number;
 
     let topicId: number;
 
@@ -254,10 +273,12 @@ context('Technique tests', () => {
       });
       cy.resetDB();
       cy.getAndStoreFeaturesEnabled();
+
       cy.createTemplate({
         name: 'Proposal Template with Technique Picker',
         groupId: TemplateGroupId.PROPOSAL,
       });
+
       cy.createProposalWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
@@ -280,6 +301,7 @@ context('Technique tests', () => {
           instrumentFapIds: [{ instrumentId: instrumentId1 }],
         });
       });
+
       cy.createInstrument(instrument2).then((result) => {
         instrumentId2 = result.createInstrument.id;
         cy.assignInstrumentToCall({
@@ -287,6 +309,7 @@ context('Technique tests', () => {
           instrumentFapIds: [{ instrumentId: instrumentId2 }],
         });
       });
+
       cy.createInstrument(instrument3).then((result) => {
         instrumentId3 = result.createInstrument.id;
         cy.assignInstrumentToCall({
@@ -377,7 +400,9 @@ context('Technique tests', () => {
 
       cy.contains(title).parent().contains(instrument1.name);
       cy.contains(title).parent().contains(instrument2.name);
+
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+
       cy.contains('td', instrument1.name).should('exist');
       cy.contains('td', instrument2.name).should('exist');
     });
@@ -433,10 +458,107 @@ context('Technique tests', () => {
       cy.contains(title).parent().contains(instrument1.name);
       cy.contains(title).parent().contains(instrument2.name);
       cy.contains(title).parent().contains(instrument3.name);
+
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+
       cy.contains('td', instrument1.name).should('exist');
       cy.contains('td', instrument2.name).should('exist');
       cy.contains('td', instrument3.name).should('exist');
+    });
+
+    it('When instruments are assigned to multiple techniques, only unique techniques are shown in the questionnaire', function () {
+      // Instruments 1 and 2 are now assigned to both techniques 1 and 2
+      cy.assignInstrumentsToTechnique({
+        instrumentIds: [instrumentId1, instrumentId2],
+        techniqueId: techniqueId2,
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.get('[data-natural-key^="technique_picker"]').click();
+
+      cy.get('[role="option"]')
+        .should('have.length', 2)
+        .then((options) => {
+          const techniques = [...options].map((option) => option.textContent);
+          expect(techniques).to.include.members([
+            techniqueName1,
+            techniqueName2,
+          ]);
+        });
+    });
+
+    it('Techniques options display in the questionnaire based on the instruments attached to the call', function () {
+      cy.createTechnique(technique3).then((result) => {
+        techniqueName3 = result.createTechnique.name;
+        techniqueId3 = result.createTechnique.id;
+      });
+
+      cy.createInstrument(instrument4).then((result) => {
+        instrumentId4 = result.createInstrument.id;
+
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [instrumentId4],
+          techniqueId: techniqueId3,
+        });
+      });
+
+      cy.createInstrument(instrument5).then((result) => {
+        instrumentId5 = result.createInstrument.id;
+
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [instrumentId5],
+          techniqueId: techniqueId1,
+        });
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.get('[data-natural-key^="technique_picker"]').click();
+
+      cy.get('[role="option"]')
+        .should('have.length', 2)
+        .then((options) => {
+          const techniques = [...options].map((option) => option.textContent);
+          /*
+          Technique 1 has an instrument 5 not attached to the call, but should
+          still show as there are other instruments attached. Technique 2
+          has all attached and should show.
+          */
+          expect(techniques).to.include.members([
+            techniqueName1,
+            techniqueName2,
+          ]);
+          /*
+          Technique 3 contains a single instrument 4 that is not attached
+          to the call, so it should therefore not show as an option.
+          */
+          expect(techniques).to.not.include.members([techniqueName3]);
+        });
     });
   });
 });

@@ -9,7 +9,9 @@ export interface TechniqueDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; techniques: Technique[] }>;
+  getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]>;
   getInstrumentsByTechniqueId(techniqueId: number): Promise<Instrument[]>;
+  getTechniquesByInstrumentIds(instrumentIds: number[]): Promise<Technique[]>;
   update(technique: Technique): Promise<Technique>;
   delete(techniqueId: number): Promise<Technique>;
   assignInstrumentsToTechnique(
@@ -24,5 +26,4 @@ export interface TechniqueDataSource {
     proposalPk: number,
     techniqueIds: number[]
   ): Promise<boolean>;
-  getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]>;
 }

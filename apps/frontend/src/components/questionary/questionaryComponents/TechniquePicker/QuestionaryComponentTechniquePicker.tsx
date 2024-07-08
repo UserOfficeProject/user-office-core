@@ -94,7 +94,6 @@ export function QuestionaryComponentTechniquePicker(
             data-natural-key={naturalKey}
             data-cy="dropdown-ul"
           >
-            {!config.isMultipleSelect && <MenuItem value={0}>None</MenuItem>}
             {config.techniques.map((technique) => {
               return (
                 <SelectMenuItem value={technique.id} key={technique.id}>

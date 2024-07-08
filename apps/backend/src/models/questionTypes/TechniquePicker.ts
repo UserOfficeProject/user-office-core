@@ -57,15 +57,26 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
   transformConfig: async (config, callId) => {
     const fallBackConfig = { ...config, techniques: [] };
     try {
+      if (!callId) return fallBackConfig;
+
       const techniqueDataSource = container.resolve<TechniqueDataSource>(
         Tokens.TechniqueDataSource
       );
+      const instrumentDataSource = container.resolve<InstrumentDataSource>(
+        Tokens.InstrumentDataSource
+      );
 
-      const techniques = await techniqueDataSource.getTechniques();
+      const instrumentsOnCall =
+        await instrumentDataSource.getInstrumentsByCallId([callId]);
+
+      const uniqueTechniques =
+        await techniqueDataSource.getTechniquesByInstrumentIds(
+          instrumentsOnCall.map((inst) => inst.id)
+        );
 
       return {
         ...config,
-        techniques: techniques.techniques.map(
+        techniques: uniqueTechniques.map(
           (technique) => new TechniqueOptionClass(technique.id, technique.name)
         ),
       };
