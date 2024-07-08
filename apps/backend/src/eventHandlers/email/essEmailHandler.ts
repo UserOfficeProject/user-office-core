@@ -7,14 +7,18 @@ import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { ApplicationEvent } from '../../events/applicationEvents';
+import { ApplicationEvent, EventStatus } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
+import { EventCallback } from '../../events/eventBus';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
-export async function essEmailHandler(event: ApplicationEvent) {
+export async function essEmailHandler(
+  event: ApplicationEvent,
+  eventHandlerCallBack: EventCallback
+) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
@@ -44,7 +48,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
       );
 
       if (!user || !inviter) {
-        logger.logError('Failed email invite', { user, inviter, event });
+        const errorMessage = 'Failed email invite';
+        logger.logError(errorMessage, { user, inviter, event });
+        eventHandlerCallBack(EventStatus.FAILED, errorMessage);
 
         return;
       }
@@ -54,11 +60,13 @@ export async function essEmailHandler(event: ApplicationEvent) {
       });
 
       if (!redeemCode[0]?.code) {
-        logger.logError('Failed email invite. No redeem code found', {
+        const errorMessage = 'Failed email invite. No redeem code found';
+        logger.logError(errorMessage, {
           user,
           inviter,
           event,
         });
+        eventHandlerCallBack(EventStatus.FAILED, errorMessage);
 
         return;
       }
@@ -83,10 +91,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
           recipients: [{ address: user.email }],
         })
         .then((res) => {
-          logger.logInfo('Successful email transmission', { res });
+          const successfulMessage = 'Successful email transmission';
+          logger.logInfo(successfulMessage, { res });
+
+          eventHandlerCallBack(EventStatus.SUCCESSFUL, successfulMessage);
         })
         .catch((err: string) => {
-          logger.logException('Failed email transmission', err);
+          const errorMessage = 'Failed email transmission';
+          logger.logException(errorMessage, err);
+          eventHandlerCallBack(EventStatus.FAILED, errorMessage);
         });
 
       return;
@@ -137,16 +150,21 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail(options)
         .then((res) => {
-          logger.logInfo('Emails sent on proposal submission:', {
+          const successfulMessage = 'Emails sent on proposal submission:';
+          logger.logInfo(successfulMessage, {
             result: res,
             event,
           });
+          eventHandlerCallBack(EventStatus.SUCCESSFUL, successfulMessage);
         })
         .catch((err: string) => {
-          logger.logError('Could not send email(s) on proposal submission:', {
+          const errorMessage =
+            'Could not send email(s) on proposal submission:';
+          logger.logError(errorMessage, {
             error: err,
             event,
           });
+          eventHandlerCallBack(EventStatus.FAILED, errorMessage);
         });
 
       return;
@@ -169,7 +187,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
       } else if (finalStatus === ProposalEndStatus.RESERVED) {
         templateId = 'Reserved-Proposal';
       } else {
-        logger.logError('Failed email notification', { event });
+        const errorMessage = 'Failed email notification';
+        logger.logError(errorMessage, { event });
+
+        eventHandlerCallBack(EventStatus.FAILED, errorMessage);
 
         return;
       }
@@ -198,16 +219,20 @@ export async function essEmailHandler(event: ApplicationEvent) {
           ],
         })
         .then((res) => {
-          logger.logInfo('Email sent on proposal notify:', {
+          const successfulMessage = 'Email sent on proposal notify:';
+          logger.logInfo(successfulMessage, {
             result: res,
             event,
           });
+          eventHandlerCallBack(EventStatus.SUCCESSFUL, successfulMessage);
         })
         .catch((err: string) => {
-          logger.logError('Could not send email on proposal notify:', {
+          const errorMessage = 'Could not send email on proposal notify:';
+          logger.logError(errorMessage, {
             error: err,
             event,
           });
+          eventHandlerCallBack(EventStatus.FAILED, errorMessage);
         });
 
       return;
@@ -252,26 +277,25 @@ export async function essEmailHandler(event: ApplicationEvent) {
             userID,
             proposalPk
           );
-          logger.logInfo('Email sent on Fap reviewer notify:', {
+          const successfulMessage = 'Email sent on Fap reviewer notify:';
+          logger.logInfo(successfulMessage, {
             result: res,
             event,
           });
+          eventHandlerCallBack(EventStatus.SUCCESSFUL, successfulMessage);
         })
         .catch((err: string) => {
-          logger.logError('Could not send email on Fap reviewer notify:', {
+          const errorMessage = 'Could not send email on Fap reviewer notify:';
+          logger.logError(errorMessage, {
             error: err,
             event,
           });
+          eventHandlerCallBack(EventStatus.FAILED, errorMessage);
         });
 
       return;
     }
     default: {
-      logger.logWarn('Could not send email(s):', {
-        error: 'Email send request not implemented by email handler',
-        event,
-      });
-
       return;
     }
   }
