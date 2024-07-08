@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { EventStatus } from '../../events/applicationEvents';
 import { EventLog as EventLogOrigin } from '../../models/EventLog';
 import { User } from './User';
 
@@ -16,6 +17,9 @@ import { User } from './User';
 export class EventLog {
   @Field(() => Int)
   public id: number;
+
+  @Field(() => String, { nullable: true })
+  public eventId: string;
 
   @Field(() => String)
   public eventType: string;
@@ -28,6 +32,9 @@ export class EventLog {
 
   @Field(() => String)
   public changedObjectId: string;
+
+  @Field(() => String, { nullable: true })
+  public eventStatus: EventStatus;
 
   @Field(() => String)
   public description: string;

@@ -5,6 +5,7 @@ import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
+import EventLogMutations from './mutations/EventLogMutations';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
@@ -108,6 +109,7 @@ const context: BasicResolverContext = {
     predefinedMessage: container.resolve(PredefinedMessageMutations),
     internalReview: container.resolve(InternalReviewMutations),
     technique: container.resolve(TechniqueMutations),
+    eventLogs: container.resolve(EventLogMutations),
   },
   clients: {
     scheduler: async () => {
