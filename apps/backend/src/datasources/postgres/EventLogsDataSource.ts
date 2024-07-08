@@ -1,3 +1,4 @@
+import { EventStatus } from '../../events/applicationEvents';
 import { EventLog } from '../../models/EventLog';
 import { EventLogsDataSource, EventLogFilter } from '../EventLogsDataSource';
 import database from './database';
@@ -9,8 +10,10 @@ export default class PostgresEventLogsDataSource
   private createEventLogObject(eventLog: EventLogRecord) {
     return new EventLog(
       eventLog.id,
+      eventLog.event_id,
       eventLog.changed_by,
       eventLog.event_type,
+      eventLog.event_status,
       eventLog.row_data,
       eventLog.event_tstamp,
       eventLog.changed_object_id,
@@ -19,10 +22,12 @@ export default class PostgresEventLogsDataSource
   }
 
   async set(
+    eventId: string,
     changedBy: number,
     eventType: string,
     rowData: string,
     changedObjectId: string,
+    eventStatus: EventStatus,
     description?: string
   ) {
     return database
@@ -32,6 +37,8 @@ export default class PostgresEventLogsDataSource
         row_data: rowData,
         changed_object_id: changedObjectId,
         description: description,
+        event_id: eventId,
+        event_status: eventStatus,
       })
       .returning('*')
       .into('event_logs')
@@ -70,6 +77,11 @@ export default class PostgresEventLogsDataSource
       .from('event_logs')
       .whereRaw(whereRawQuery)
       .orderBy('event_tstamp', 'asc')
+      .modify((query) => {
+        if (filter?.id) {
+          query.where('id', filter.id);
+        }
+      })
       .then((eventLogs: EventLogRecord[]) => {
         return eventLogs.map((eventLog) => this.createEventLogObject(eventLog));
       });

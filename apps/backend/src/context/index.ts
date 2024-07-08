@@ -4,6 +4,7 @@ import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
+import EventLogMutations from '../mutations/EventLogMutations';
 import FapMutations from '../mutations/FapMutations';
 import FeedbackMutations from '../mutations/FeedbackMutations';
 import FileMutations from '../mutations/FileMutations';
@@ -107,6 +108,7 @@ interface ResolverContextMutations {
   predefinedMessage: PredefinedMessageMutations;
   internalReview: InternalReviewMutations;
   technique: TechniqueMutations;
+  eventLogs: EventLogMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

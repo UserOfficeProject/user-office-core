@@ -1,5 +1,6 @@
 import { PdfTemplateRecord } from 'knex/types/tables';
 
+import { EventStatus } from '../../events/applicationEvents';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -386,8 +387,10 @@ export interface FileRecord {
 
 export interface EventLogRecord {
   readonly id: number;
+  readonly event_id: string | null;
   readonly changed_by: number | null;
   readonly event_type: string;
+  readonly event_status: EventStatus | null;
   readonly row_data: string;
   readonly event_tstamp: Date;
   readonly changed_object_id: string;
