@@ -157,11 +157,17 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED:
+        case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED:
           const [instrumentId] = event.instrumentshasproposals.instrumentIds;
           const instrument =
             await instrumentDataSource.getInstrument(instrumentId);
 
-          const description = `Submitted instrument: ${instrument?.name}`;
+          let description = `Submitted instrument: ${instrument?.name}`;
+          if (
+            event.type === Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED
+          ) {
+            description = `Unsubmitted instrument: ${instrument?.name}`;
+          }
 
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(
