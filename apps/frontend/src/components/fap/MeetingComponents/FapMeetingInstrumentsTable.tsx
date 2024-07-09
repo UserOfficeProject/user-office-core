@@ -1,6 +1,7 @@
 import AddAlarmIcon from '@mui/icons-material/AddAlarm';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
+import RemoveDone from '@mui/icons-material/RemoveDone';
 import {
   Button,
   Dialog,
@@ -96,7 +97,7 @@ const FapMeetingInstrumentsTable = ({
     instrumentMap.set(inst.id, inst.name);
   });
 
-  const submitInstrument = async (
+  const submitInstrumentInFap = async (
     instrumentToSubmit: InstrumentWithAvailabilityTime
   ) => {
     if (!selectedCall) {
@@ -118,14 +119,14 @@ const FapMeetingInstrumentsTable = ({
         );
 
       if (allProposalsOnInstrumentHaveRankings) {
-        const { submitInstrument } = await api({
-          toastSuccessMessage: 'Instrument submitted!',
-        }).submitInstrument({
+        const { submitInstrumentInFap } = await api({
+          toastSuccessMessage: 'Instrument submitted in FAP!',
+        }).submitInstrumentInFap({
           callId: selectedCall.id,
           instrumentId: instrumentToSubmit.id,
           fapId: fapId,
         });
-        if (submitInstrument) {
+        if (submitInstrumentInFap) {
           const newInstrumentsData = instrumentsData.map((instrument) => {
             if (instrument.id === instrumentToSubmit.id) {
               return { ...instrument, submitted: true };
@@ -144,7 +145,43 @@ const FapMeetingInstrumentsTable = ({
     }
   };
 
+  const unsubmitInstrumentInFap = async (
+    instrumentToUnsubmit: InstrumentWithAvailabilityTime
+  ) => {
+    if (!selectedCall) {
+      return;
+    }
+
+    if (instrumentToUnsubmit) {
+      if (instrumentToUnsubmit.submitted) {
+        const { unsubmitInstrumentInFap } = await api({
+          toastSuccessMessage: 'Instrument unsubmitted!',
+        }).unsubmitInstrumentInFap({
+          callId: selectedCall.id,
+          instrumentId: instrumentToUnsubmit.id,
+          fapId: fapId,
+        });
+        if (unsubmitInstrumentInFap) {
+          const newInstrumentsData = instrumentsData.map((instrument) => {
+            if (instrument.id === instrumentToUnsubmit.id) {
+              return { ...instrument, submitted: false };
+            }
+
+            return instrument;
+          });
+          setInstrumentsData(newInstrumentsData);
+        }
+      } else {
+        enqueueSnackbar('Proposal FAP instrument is not submitted', {
+          variant: 'error',
+          className: 'snackbar-error',
+        });
+      }
+    }
+  };
+
   const DoneAllIcon = (): JSX.Element => <DoneAll />;
+  const RemoveDoneIcon = (): JSX.Element => <RemoveDone />;
   const AddTimeIcon = (): JSX.Element => <AddAlarmIcon />;
 
   const accessDependentActions = [];
@@ -157,7 +194,7 @@ const FapMeetingInstrumentsTable = ({
           | InstrumentWithAvailabilityTime[]
       ) => ({
         icon: DoneAllIcon,
-        disabled: !!(rowData as InstrumentWithAvailabilityTime).submitted,
+        hidden: !!(rowData as InstrumentWithAvailabilityTime).submitted,
         onClick: (
           event: Event,
           rowData:
@@ -166,16 +203,44 @@ const FapMeetingInstrumentsTable = ({
         ) =>
           confirm(
             () => {
-              submitInstrument(rowData as InstrumentWithAvailabilityTime);
+              submitInstrumentInFap(rowData as InstrumentWithAvailabilityTime);
             },
             {
               title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `No further changes to Fap meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${t(
+              description: `No further changes to Fap meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
                 'instrument'
               )}?`,
             }
           )(),
         tooltip: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
+      }),
+      (
+        rowData:
+          | InstrumentWithAvailabilityTime
+          | InstrumentWithAvailabilityTime[]
+      ) => ({
+        icon: RemoveDoneIcon,
+        hidden: !(rowData as InstrumentWithAvailabilityTime).submitted,
+        onClick: (
+          event: Event,
+          rowData:
+            | InstrumentWithAvailabilityTime
+            | InstrumentWithAvailabilityTime[]
+        ) =>
+          confirm(
+            () => {
+              unsubmitInstrumentInFap(
+                rowData as InstrumentWithAvailabilityTime
+              );
+            },
+            {
+              title: 'Unsubmit ' + i18n.format(t('instrument'), 'lowercase'),
+              description: `This action will reopen the proposal reordering in the meeting components. Are you sure you want to unsubmit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
+                'instrument'
+              )}?`,
+            }
+          )(),
+        tooltip: 'Unsubmit ' + i18n.format(t('instrument'), 'lowercase'),
       })
     );
     accessDependentActions.push((rowData: InstrumentWithAvailabilityTime) => ({
