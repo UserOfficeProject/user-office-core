@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import MaterialTable, { Action } from '@material-table/core';
+import MaterialTable, {
+  Action,
+  Query,
+  QueryResult,
+} from '@material-table/core';
 import CloseIcon from '@mui/icons-material/Close';
 import Email from '@mui/icons-material/Email';
 import Alert from '@mui/material/Alert';
@@ -8,19 +12,19 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { Formik } from 'formik';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 
 import EmailSearchBar from 'components/common/EmailSearchBar';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { getCurrentUser } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
   UserRole,
   GetBasicUserDetailsByEmailQuery,
-  GetUsersQueryVariables,
   FeatureId,
+  BasicUserDetailsFragment,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { usePrevColabs } from 'hooks/user/usePrevColabs';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -50,7 +54,7 @@ const getUsersTableData = (
   users: BasicUserDetailsWithTableData,
   selectedUsers: BasicUserDetails[],
   invitedUsers: BasicUserDetails[],
-  query: GetUsersQueryVariables
+  query: Query<BasicUserDetails & { tableData: { checked: boolean } }>
 ) => {
   const queryInvitedUsersIds = invitedUsers.map(
     (user: BasicUserDetails) => user.id
@@ -63,18 +67,19 @@ const getUsersTableData = (
   // this helps users find someone in the list even if they are already there
 
   const invitedUsersFormatted = invitedUsers.filter((user) =>
-    query.filter
-      ? user.firstname.toLowerCase().includes(query.filter?.toLowerCase()) ||
-        user.lastname.toLowerCase().includes(query.filter?.toLowerCase()) ||
-        user.institution.toLowerCase().includes(query.filter?.toLowerCase())
+    query.search
+      ? user.firstname.toLowerCase().includes(query.search.toLowerCase()) ||
+        user.lastname.toLowerCase().includes(query.search.toLowerCase()) ||
+        user.institution.toLowerCase().includes(query.search.toLowerCase())
       : true
   );
 
   users = [...invitedUsersFormatted, ...users];
   const totalCount = users.length;
+  const offset = query.page * query.pageSize;
 
-  if (typeof query.first === 'number' && typeof query.offset === 'number')
-    users = users.slice(query.offset, query.offset + query.first);
+  if (typeof query.pageSize === 'number' && typeof offset === 'number')
+    users = users.slice(offset, offset + query.pageSize);
 
   return {
     users: users.map((user: BasicUserDetails) => ({
@@ -127,48 +132,26 @@ const ProposalsPeopleTable = ({
   title,
   userRole,
 }: PeopleTableProps) => {
-  const tableRef = React.useRef();
-  const [query, setQuery] = useState<
-    GetUsersQueryVariables & { refreshData: boolean }
-  >({
-    offset: 0,
-    first: 5,
-    filter: '',
+  const tableRef = React.createRef<MaterialTable<BasicUserDetailsFragment>>();
+  const [query] = useState<{
+    subtractUsers: number[];
+    userRole: UserRole | null;
+  }>({
     subtractUsers: selectedUsers ? selectedUsers : [],
     userRole: userRole ? userRole : null,
-    refreshData: false,
   });
 
   const featureContext = useContext(FeatureContext);
   const isEmailInviteEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
-  const { prevColabUsers, loadingUsersData } = usePrevColabs(query);
 
   const api = useDataApi();
-  const [loading, setLoading] = useState(false);
-  const [pageSize] = useState(10);
   const [sendUserEmail, setSendUserEmail] = useState(false);
   const [currentPageIds, setCurrentPageIds] = useState<number[]>([]);
   const [invitedUsers, setInvitedUsers] = useState<BasicUserDetails[]>([]);
   const [displayError, setDisplayError] = useState<boolean>(false);
   const [tableEmails, setTableEmails] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!prevColabUsers.users) {
-      return;
-    }
-
-    const page = query.offset ?? 0;
-    const size = query.first ?? 5;
-
-    const currentPage = [...invitedUsers, ...prevColabUsers.users].slice(
-      page,
-      page + size
-    );
-
-    setCurrentPageIds(currentPage.map(({ id }) => id));
-  }, [invitedUsers, prevColabUsers, query.first, query.offset]);
 
   if (sendUserEmail && invitationUserRole && action) {
     return (
@@ -277,14 +260,60 @@ const ProposalsPeopleTable = ({
     );
   }
 
-  const usersTableData = getUsersTableData(
-    prevColabUsers?.users,
-    selectedParticipants,
-    invitedUsers,
-    query
-  );
+  const fetchRemoteUsersData = (
+    tableQuery: Query<
+      BasicUserDetails & {
+        tableData: {
+          checked: boolean;
+        };
+      }
+    >
+  ) =>
+    new Promise<
+      QueryResult<
+        BasicUserDetails & {
+          tableData: {
+            checked: boolean;
+          };
+        }
+      >
+    >(async (resolve, reject) => {
+      try {
+        const userId = getCurrentUser()?.user.id as number;
 
-  const currentPage = (query.offset as number) / (query.first as number);
+        const { previousCollaborators } = await api().getPreviousCollaborators({
+          userId: userId,
+          filter: tableQuery.search,
+          first: tableQuery.pageSize,
+          offset: tableQuery.page * tableQuery.pageSize,
+          subtractUsers: query.subtractUsers,
+          userRole: query.userRole,
+        });
+
+        const usersTableData = getUsersTableData(
+          previousCollaborators?.users || [],
+          selectedParticipants || [],
+          invitedUsers,
+          tableQuery
+        );
+
+        const currentPage = [...invitedUsers, ...usersTableData.users].slice(
+          tableQuery.page,
+          tableQuery.page + tableQuery.pageSize
+        );
+
+        setCurrentPageIds(currentPage.map(({ id }) => id));
+
+        resolve({
+          data: usersTableData.users,
+          page: tableQuery.page,
+          totalCount: usersTableData.totalCount,
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
   const emailSearchText = isEmailInviteEnabled
     ? 'Please check the spelling and if the user has registered with us. If not found, the user can be added through email invite.'
     : 'Please check the spelling and if the user has registered with us or has the correct privacy settings to be found by this search.';
@@ -297,20 +326,17 @@ const ProposalsPeopleTable = ({
       onSubmit={async (values, { setFieldError, setFieldValue }) => {
         // If there is an email and it has not already been searched
         if (values.email && !tableEmails.includes(values.email)) {
-          setLoading(true);
           const userDetails = await getUserByEmail(values.email, api);
 
           if (!userDetails) {
             setDisplayError(true);
             setFieldError('email', 'No user found for the given email');
-            setLoading(false);
 
             return;
           }
 
           if (selectedUsers?.includes(userDetails.id)) {
             setFieldError('email', 'User is already on the proposal');
-            setLoading(false);
 
             return;
           }
@@ -318,7 +344,6 @@ const ProposalsPeopleTable = ({
           for (const selectedParticipant of selectedParticipants) {
             if (selectedParticipant.id === userDetails.id) {
               setFieldError('email', 'User is already selected');
-              setLoading(false);
 
               return;
             }
@@ -336,11 +361,10 @@ const ProposalsPeopleTable = ({
                 selectedParticipants.concat([userDetails])
               );
 
-            setQuery({ ...query, refreshData: !query.refreshData });
+            tableRef.current && tableRef.current.onQueryChange({});
           } else {
             setFieldError('email', 'Could not add user to Proposal');
           }
-          setLoading(false);
         } else if (tableEmails.includes(values.email)) {
           setFieldError(
             'email',
@@ -395,18 +419,15 @@ const ProposalsPeopleTable = ({
                 </Typography>
               }
               style={{ position: 'static' }}
-              page={currentPage}
               columns={columns}
               onSelectionChange={(selectedItems, selectedItem) =>
                 selectedParticipantsChanged(selectedItems, selectedItem)
               }
-              data={usersTableData.users}
-              totalCount={usersTableData.totalCount}
-              isLoading={loading || loadingUsersData}
+              data={fetchRemoteUsersData}
               options={{
                 search: true,
                 debounceInterval: 400,
-                pageSize,
+                pageSize: 10,
                 selection,
                 selectionProps: (rowdata: any) => ({
                   inputProps: {
@@ -426,15 +447,6 @@ const ProposalsPeopleTable = ({
                   nRowsSelected: '{0} User(s) Selected',
                 },
               }}
-              onPageChange={(page) =>
-                setQuery({ ...query, offset: page * (query.first as number) })
-              }
-              onSearchChange={(search) =>
-                setQuery({ ...query, filter: search })
-              }
-              onRowsPerPageChange={(rowsPerPage) =>
-                setQuery({ ...query, first: rowsPerPage })
-              }
               components={{
                 Toolbar: EmailSearchBar,
               }}
