@@ -28,9 +28,11 @@ export type ProposalUrlQueryParamsType = {
   reviewModal: QueryParamConfig<number | null | undefined>;
   compareOperator: QueryParamConfig<string | null | undefined>;
   questionId: QueryParamConfig<string | null | undefined>;
-  proposalid: QueryParamConfig<string | null | undefined>;
+  proposalId: QueryParamConfig<string | null | undefined>;
   value: QueryParamConfig<string | null | undefined>;
   dataType: QueryParamConfig<string | null | undefined>;
+  page: QueryParamConfig<number | null | undefined>;
+  pageSize: QueryParamConfig<number | null | undefined>;
 } & UrlQueryParamsType;
 
 export default function ProposalPage() {
@@ -42,10 +44,12 @@ export default function ProposalPage() {
       proposalStatus: NumberParam,
       reviewModal: NumberParam,
       questionId: StringParam,
-      proposalid: StringParam,
+      proposalId: StringParam,
       compareOperator: StringParam,
       value: StringParam,
       dataType: StringParam,
+      page: NumberParam,
+      pageSize: NumberParam,
     });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
@@ -57,8 +61,8 @@ export default function ProposalPage() {
       showMultiInstrumentProposals: false,
     },
     proposalStatusId: urlQueryParams.proposalStatus,
-    referenceNumbers: urlQueryParams.proposalid
-      ? [urlQueryParams.proposalid]
+    referenceNumbers: urlQueryParams.proposalId
+      ? [urlQueryParams.proposalId]
       : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });

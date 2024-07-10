@@ -211,6 +211,7 @@ const PeopleTable = ({
 
     setCurrentPageIds(data.map(({ id }) => id));
     tableRef.current && tableRef.current.onQueryChange({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.length]);
 
   if (sendUserEmail && invitationUserRole && action) {
