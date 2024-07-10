@@ -131,7 +131,7 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy="proposal-final-status"]').click();
 
-      cy.get('[data-cy="proposal-final-status-options"] li')
+      cy.get('li[data-cy="proposal-final-status-options"]')
         .contains('Accepted')
         .click();
 
@@ -702,6 +702,8 @@ context('Proposal administration tests', () => {
 
       cy.finishedLoading();
 
+      cy.contains(proposalFixedName);
+
       cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
         expect(element.text()).to.be.equal(
           officerProposalsTableAsTextAfterSort
@@ -972,38 +974,38 @@ context('Proposal administration tests', () => {
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('Exact').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_BEFORE);
-      cy.contains('Search').click();
+      cy.setDatePickerValue('input#date-value', DATE_BEFORE);
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('Exact').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_ANSWER);
-      cy.contains('Search').click();
+      cy.setDatePickerValue('input#date-value', DATE_ANSWER);
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('After').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_BEFORE);
-      cy.contains('Search').click();
+      cy.setDatePickerValue('input#date-value', DATE_BEFORE);
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('Before').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_BEFORE);
-      cy.contains('Search').click();
+      cy.setDatePickerValue('input#date-value', DATE_BEFORE);
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('After').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_AFTER);
-      cy.contains('Search').click();
+      cy.setDatePickerValue('input#date-value', DATE_AFTER);
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
 
       cy.get('[data-cy=comparator]').click();
       cy.get('[role=listbox]').contains('Before').click();
-      cy.get('[data-cy=value] input').clear().type(DATE_AFTER);
-      cy.contains('Search').click();
+      cy.setDatePickerValue('input#date-value', DATE_AFTER);
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
     });
 
@@ -1081,12 +1083,12 @@ context('Proposal administration tests', () => {
       cy.get('[role=listbox]')
         .contains(answers.proposal.numberInput.value.unit.symbol)
         .click();
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
         .type((answers.proposal.numberInput.value.value + 1).toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
 
       // NumberInput questions - Equals
@@ -1095,12 +1097,12 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=value] input')
         .clear()
         .type((answers.proposal.numberInput.value.value + 1).toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
         .type(answers.proposal.numberInput.value.value.toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
 
       // NumberInput questions - Less than
@@ -1109,12 +1111,12 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=value] input')
         .clear()
         .type((answers.proposal.numberInput.value.value - 1).toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
         .type((answers.proposal.numberInput.value.value + 1).toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
     });
 
@@ -1129,12 +1131,12 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=value] input')
         .clear()
         .type(answers.proposal.interval.value.max.toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
         .type((answers.proposal.interval.value.max + 1).toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
 
       // Interval question -  Greater than
@@ -1143,12 +1145,12 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=value] input')
         .clear()
         .type(answers.proposal.interval.value.min.toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('not.exist');
       cy.get('[data-cy=value] input')
         .clear()
         .type((answers.proposal.interval.value.min - 1).toString());
-      cy.contains('Search').click();
+      cy.get('[data-cy="search-btn"]').focus().click();
       cy.contains(proposal.title).should('exist');
     });
   });

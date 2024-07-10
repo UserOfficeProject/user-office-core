@@ -4,7 +4,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -77,19 +76,16 @@ function DateSearchCriteriaInput({
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
             format={format || undefined}
-            slots={{
-              textField: (props: TextFieldProps) => (
-                <TextField
-                  {...props}
-                  margin="none"
-                  size="small"
-                  fullWidth
-                  data-cy="value"
-                  InputLabelProps={{
-                    shrink: value ? true : undefined,
-                  }}
-                />
-              ),
+            slotProps={{
+              textField: {
+                margin: 'none',
+                size: 'small',
+                fullWidth: true,
+                InputLabelProps: {
+                  shrink: value ? true : undefined,
+                },
+                id: 'date-value',
+              },
             }}
             label={`Date(${format})`}
             value={value}
