@@ -358,7 +358,25 @@ context('Technique tests', () => {
       });
     });
 
-    it('Single technique selection assigns all instruments to the proposal that are linked to the technique', function () {
+    it('Single technique selection assigns all instruments to the proposal that are both linked to the technique and assigned to the call', function () {
+      cy.createInstrument(instrument4).then((result) => {
+        instrumentId4 = result.createInstrument.id;
+
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [instrumentId4],
+          techniqueId: techniqueId1,
+        });
+      });
+
+      cy.createInstrument(instrument5).then((result) => {
+        instrumentId5 = result.createInstrument.id;
+
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: instrumentId5 }],
+        });
+      });
+
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.finishedLoading();
@@ -401,13 +419,50 @@ context('Technique tests', () => {
       cy.contains(title).parent().contains(instrument1.name);
       cy.contains(title).parent().contains(instrument2.name);
 
+      // Instrument 3 is on a different technique
+      cy.contains(title)
+        .parent()
+        .contains(instrument3.name)
+        .should('not.exist');
+      // Instrument 4 is assigned to the technique but not the call
+      cy.contains(title)
+        .parent()
+        .contains(instrument4.name)
+        .should('not.exist');
+      // Instrument 5 is assigned to the call but not the technique
+      cy.contains(title)
+        .parent()
+        .contains(instrument5.name)
+        .should('not.exist');
+
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
 
       cy.contains('td', instrument1.name).should('exist');
       cy.contains('td', instrument2.name).should('exist');
+      cy.contains('td', instrument3.name).should('not.exist');
+      cy.contains('td', instrument4.name).should('not.exist');
+      cy.contains('td', instrument5.name).should('not.exist');
     });
 
-    it('Multiple technique selection assigns all instruments to the proposal that are linked to the techniques', function () {
+    it('Multiple technique selection assigns all instruments to the proposal that are both linked to the technique and assigned to the call', function () {
+      cy.createInstrument(instrument4).then((result) => {
+        instrumentId4 = result.createInstrument.id;
+
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [instrumentId4],
+          techniqueId: techniqueId1,
+        });
+      });
+
+      cy.createInstrument(instrument5).then((result) => {
+        instrumentId5 = result.createInstrument.id;
+
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: instrumentId5 }],
+        });
+      });
+
       cy.updateQuestionTemplateRelationSettings({
         questionId: techniquePickerQuestionId,
         templateId: initialDBData.template.id,
@@ -459,11 +514,24 @@ context('Technique tests', () => {
       cy.contains(title).parent().contains(instrument2.name);
       cy.contains(title).parent().contains(instrument3.name);
 
+      // Instrument 4 is assigned to technique 1 but not the call
+      cy.contains(title)
+        .parent()
+        .contains(instrument4.name)
+        .should('not.exist');
+      // Instrument 5 is assigned to the call but not any technique
+      cy.contains(title)
+        .parent()
+        .contains(instrument5.name)
+        .should('not.exist');
+
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
 
       cy.contains('td', instrument1.name).should('exist');
       cy.contains('td', instrument2.name).should('exist');
       cy.contains('td', instrument3.name).should('exist');
+      cy.contains('td', instrument4.name).should('not.exist');
+      cy.contains('td', instrument5.name).should('not.exist');
     });
 
     it('When instruments are assigned to multiple techniques, only unique techniques are shown in the questionnaire', function () {

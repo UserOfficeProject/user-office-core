@@ -243,12 +243,19 @@ export default class PostgresTechniqueDataSource
     instrumentIds: number[]
   ): Promise<Technique[]> {
     try {
-      const uniqueTechniqueIds = await database('technique_has_instruments')
-        .whereIn('instrument_id', instrumentIds)
-        .distinct()
-        .pluck('technique_id');
+      const uniqueTechniques: TechniqueRecord[] = await database(
+        'techniques as t'
+      )
+        .select('t.*')
+        .join('technique_has_instruments as thi', {
+          'thi.technique_id': 't.technique_id',
+        })
+        .whereIn('thi.instrument_id', instrumentIds)
+        .distinct();
 
-      return this.getTechniquesByIds(uniqueTechniqueIds);
+      return uniqueTechniques
+        ? uniqueTechniques.map((tech) => this.createTechniqueObject(tech))
+        : [];
     } catch (error) {
       throw new Error(`Error getting techniques by instrument IDs: ${error}`);
     }
