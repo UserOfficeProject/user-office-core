@@ -76,6 +76,9 @@ context('Technique tests', () => {
   };
 
   beforeEach(() => {
+    cy.window().then((win) => {
+      win.location.href = 'about:blank';
+    });
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
   });
@@ -139,7 +142,7 @@ context('Technique tests', () => {
       cy.get('@techniquesTable').should('contain', newDescription);
     });
 
-    it.only('User officer should be able to delete technique', function () {
+    it('User officer should be able to delete technique', function () {
       cy.createInstrument(instrument1)
         .then((result) => {
           if (result.createInstrument) {
@@ -275,12 +278,6 @@ context('Technique tests', () => {
     const techniquePickerQuestion = 'Select your technique';
 
     beforeEach(() => {
-      cy.window().then((win) => {
-        win.location.href = 'about:blank';
-      });
-      cy.resetDB();
-      cy.getAndStoreFeaturesEnabled();
-
       cy.createTemplate({
         name: 'Proposal Template with Technique Picker',
         groupId: TemplateGroupId.PROPOSAL,
@@ -317,23 +314,26 @@ context('Technique tests', () => {
         });
       });
 
-      cy.createInstrument(instrument3).then((result) => {
-        instrumentId3 = result.createInstrument.id;
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: instrumentId3 }],
+      cy.createInstrument(instrument3)
+        .then((result) => {
+          instrumentId3 = result.createInstrument.id;
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: instrumentId3 }],
+          });
+        })
+        .then(() => {
+          cy.assignInstrumentsToTechnique({
+            instrumentIds: [instrumentId1, instrumentId2],
+            techniqueId: techniqueId1,
+          });
+        })
+        .then(() => {
+          cy.assignInstrumentsToTechnique({
+            instrumentIds: [instrumentId3],
+            techniqueId: techniqueId2,
+          });
         });
-      });
-
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [instrumentId1, instrumentId2],
-        techniqueId: techniqueId1,
-      });
-
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [instrumentId3],
-        techniqueId: techniqueId2,
-      });
 
       cy.createTopic({
         templateId: initialDBData.template.id,
@@ -366,23 +366,25 @@ context('Technique tests', () => {
     });
 
     it('Single technique selection assigns all instruments to the proposal that are both linked to the technique and assigned to the call', function () {
-      cy.createInstrument(instrument4).then((result) => {
-        instrumentId4 = result.createInstrument.id;
+      cy.createInstrument(instrument4)
+        .then((result) => {
+          instrumentId4 = result.createInstrument.id;
 
-        cy.assignInstrumentsToTechnique({
-          instrumentIds: [instrumentId4],
-          techniqueId: techniqueId1,
+          cy.assignInstrumentsToTechnique({
+            instrumentIds: [instrumentId4],
+            techniqueId: techniqueId1,
+          });
+        })
+        .then(() => {
+          cy.createInstrument(instrument5).then((result) => {
+            instrumentId5 = result.createInstrument.id;
+
+            cy.assignInstrumentToCall({
+              callId: initialDBData.call.id,
+              instrumentFapIds: [{ instrumentId: instrumentId5 }],
+            });
+          });
         });
-      });
-
-      cy.createInstrument(instrument5).then((result) => {
-        instrumentId5 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: instrumentId5 }],
-        });
-      });
 
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -452,23 +454,25 @@ context('Technique tests', () => {
     });
 
     it('Multiple technique selection assigns all instruments to the proposal that are both linked to the technique and assigned to the call', function () {
-      cy.createInstrument(instrument4).then((result) => {
-        instrumentId4 = result.createInstrument.id;
+      cy.createInstrument(instrument4)
+        .then((result) => {
+          instrumentId4 = result.createInstrument.id;
 
-        cy.assignInstrumentsToTechnique({
-          instrumentIds: [instrumentId4],
-          techniqueId: techniqueId1,
+          cy.assignInstrumentsToTechnique({
+            instrumentIds: [instrumentId4],
+            techniqueId: techniqueId1,
+          });
+        })
+        .then(() => {
+          cy.createInstrument(instrument5).then((result) => {
+            instrumentId5 = result.createInstrument.id;
+
+            cy.assignInstrumentToCall({
+              callId: initialDBData.call.id,
+              instrumentFapIds: [{ instrumentId: instrumentId5 }],
+            });
+          });
         });
-      });
-
-      cy.createInstrument(instrument5).then((result) => {
-        instrumentId5 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: instrumentId5 }],
-        });
-      });
 
       cy.updateQuestionTemplateRelationSettings({
         questionId: techniquePickerQuestionId,
