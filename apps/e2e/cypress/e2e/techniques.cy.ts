@@ -96,6 +96,7 @@ context('Technique tests', () => {
     beforeEach(() => {
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
     });
 
     it('User officer should be able to create technique', function () {
@@ -138,23 +139,29 @@ context('Technique tests', () => {
       cy.get('@techniquesTable').should('contain', newDescription);
     });
 
-    it('User officer should be able to delete technique', function () {
-      cy.createInstrument(instrument1).then((result) => {
-        if (result.createInstrument) {
-          createdInstrumentId = result.createInstrument.id;
-        }
-      });
-      cy.createTechnique(technique1).then((result) => {
-        if (result.createTechnique) {
-          createdTechniqueId = result.createTechnique.id;
-        }
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId],
-        techniqueId: createdTechniqueId,
-      });
+    it.only('User officer should be able to delete technique', function () {
+      cy.createInstrument(instrument1)
+        .then((result) => {
+          if (result.createInstrument) {
+            createdInstrumentId = result.createInstrument.id;
+          }
+        })
+        .then(() => {
+          cy.createTechnique(technique1).then((result) => {
+            if (result.createTechnique) {
+              createdTechniqueId = result.createTechnique.id;
+            }
+          });
+        })
+        .then(() => {
+          cy.assignInstrumentsToTechnique({
+            instrumentIds: [createdInstrumentId],
+            techniqueId: createdTechniqueId,
+          });
+        });
 
       cy.contains('Techniques').click();
+      cy.finishedLoading();
 
       cy.contains(technique1.name)
         .parent()
