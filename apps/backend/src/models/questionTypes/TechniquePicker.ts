@@ -97,6 +97,10 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
       Tokens.InstrumentDataSource
     );
 
+    const techniqueDataSource = container.resolve<TechniqueDataSource>(
+      Tokens.TechniqueDataSource
+    );
+
     const instrumentMutations = container.resolve(InstrumentMutations);
 
     const techniqueMutations = container.resolve(TechniqueMutations);
@@ -128,9 +132,19 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
         Array.from([proposal.callId])
       );
 
+    const allInstrumentsOnTechniques =
+      await techniqueDataSource.getInstrumentsByTechniqueIds(techniqueIds);
+
+    const instrumentListToBeAssigned = allInstrumentsOnTechniques.filter(
+      (instrument) =>
+        allInstrumentsOnCall.find(
+          (selectedInstrument) => selectedInstrument.id === instrument.id
+        )
+    );
+
     await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
       proposalPks: [proposal.primaryKey],
-      instrumentIds: allInstrumentsOnCall.map((inst) => inst.id),
+      instrumentIds: instrumentListToBeAssigned.map((inst) => inst.id),
     });
   },
 };

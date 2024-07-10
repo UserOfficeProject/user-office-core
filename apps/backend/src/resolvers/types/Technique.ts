@@ -38,8 +38,8 @@ export class TechniqueResolver {
     @Ctx() context: ResolverContext
   ): Promise<Instrument[] | null> {
     const instruments =
-      context.queries.technique.dataSource.getInstrumentsByTechniqueId(
-        technique.id
+      context.queries.technique.dataSource.getInstrumentsByTechniqueIds(
+        Array.from([technique.id])
       );
 
     return isRejection(instruments) ? null : instruments;

@@ -91,8 +91,8 @@ export default class PostgresTechniqueDataSource
       });
   }
 
-  async getInstrumentsByTechniqueId(
-    techniqueId: number
+  async getInstrumentsByTechniqueIds(
+    techniqueIds: number[]
   ): Promise<Instrument[]> {
     return database
       .select()
@@ -100,7 +100,7 @@ export default class PostgresTechniqueDataSource
       .join('technique_has_instruments as tech_instr', {
         'instr.instrument_id': 'tech_instr.instrument_id',
       })
-      .where('technique_id', techniqueId)
+      .whereIn('technique_id', techniqueIds)
       .then((results: InstrumentRecord[]) =>
         results.map(createInstrumentObject)
       )

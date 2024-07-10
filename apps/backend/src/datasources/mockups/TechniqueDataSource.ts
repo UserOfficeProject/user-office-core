@@ -38,8 +38,8 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
     return { totalCount: dummyTechniques.length, techniques: dummyTechniques };
   }
 
-  async getInstrumentsByTechniqueId(
-    techniqueId: number
+  async getInstrumentsByTechniqueIds(
+    techniqueIds: number[]
   ): Promise<Instrument[]> {
     return dummyInstruments;
   }

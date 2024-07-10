@@ -10,7 +10,7 @@ export interface TechniqueDataSource {
     offset?: number
   ): Promise<{ totalCount: number; techniques: Technique[] }>;
   getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]>;
-  getInstrumentsByTechniqueId(techniqueId: number): Promise<Instrument[]>;
+  getInstrumentsByTechniqueIds(techniqueIds: number[]): Promise<Instrument[]>;
   getTechniquesByInstrumentIds(instrumentIds: number[]): Promise<Technique[]>;
   update(technique: Technique): Promise<Technique>;
   delete(techniqueId: number): Promise<Technique>;

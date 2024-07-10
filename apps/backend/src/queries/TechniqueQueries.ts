@@ -35,7 +35,7 @@ export default class TechniqueQueries {
     techniqueId: number
   ) {
     return await this.dataSource
-      .getInstrumentsByTechniqueId(techniqueId)
+      .getInstrumentsByTechniqueIds(Array.from([techniqueId]))
       .catch((error) => {
         return rejection(
           'Could not get instruments by technique ID',
