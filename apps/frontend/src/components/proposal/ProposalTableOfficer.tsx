@@ -26,7 +26,7 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
@@ -305,7 +305,7 @@ const ProposalTableOfficer = ({
   setUrlQueryParams,
   confirm,
 }: ProposalTableOfficerProps) => {
-  const tableRef = React.createRef<MaterialTableCore<ProposalViewData>>();
+  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
   const [openAssignment, setOpenAssignment] = useState(false);
   const [openInstrumentAssignment, setOpenInstrumentAssignment] =
     useState(false);
@@ -331,6 +331,9 @@ const ProposalTableOfficer = ({
   ) => {
     setActionsMenuAnchorElement(event.currentTarget);
   };
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
+  };
 
   const GetAppIconComponent = (): JSX.Element => (
     <GetAppIcon data-cy="download-proposals" />
@@ -345,6 +348,19 @@ const ProposalTableOfficer = ({
     <ListStatusIcon data-cy="change-proposal-status" />
   );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (isMounted) {
+      refreshTableData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(proposalFilter)]);
 
   const isTechnicalReviewEnabled = featureContext.featuresMap.get(
     FeatureId.TECHNICAL_REVIEW
@@ -434,17 +450,13 @@ const ProposalTableOfficer = ({
     );
 
   const handleClose = (selectedOption: string) => {
-    // TODO: Fetch the first proposal title here;
-    const firstSelectedProposalTitle = getSelectedProposalPks()[0];
+    const firstSelectedProposalTitle = getSelectedProposalsData()[0].title;
     if (selectedOption === PdfDownloadMenuOption.PDF) {
-      downloadPDFProposal(
-        getSelectedProposalPks(),
-        firstSelectedProposalTitle.toString()
-      );
+      downloadPDFProposal(getSelectedProposalPks(), firstSelectedProposalTitle);
     } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
       downloadPDFProposal(
         getSelectedProposalPks(),
-        firstSelectedProposalTitle.toString(),
+        firstSelectedProposalTitle,
         'zip'
       );
     } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
@@ -462,7 +474,7 @@ const ProposalTableOfficer = ({
         proposalPk,
       });
 
-      tableRef.current && tableRef.current.onQueryChange({});
+      refreshTableData();
     });
   };
 
@@ -470,7 +482,7 @@ const ProposalTableOfficer = ({
     getSelectedProposalPks().forEach(async (proposalPk) => {
       await api().deleteProposal({ proposalPk });
 
-      tableRef.current && tableRef.current.onQueryChange({});
+      refreshTableData();
     });
   };
 
@@ -494,7 +506,6 @@ const ProposalTableOfficer = ({
         fapInstruments: fapInstsruments,
       });
     } else {
-      // TODO: Get the fapIds here from all proposals and urlQuery selection
       const fapIdsFromSelectedProposals =
         getSelectedProposalsData()
           .map(
@@ -511,9 +522,8 @@ const ProposalTableOfficer = ({
         proposalPks: getSelectedProposalPks(),
         fapIds: getUniqueArray(fapIdsFromSelectedProposals),
       });
-
-      tableRef.current && tableRef.current.onQueryChange({});
     }
+    refreshTableData();
   };
 
   const assignProposalsToInstruments = async (
@@ -529,9 +539,6 @@ const ProposalTableOfficer = ({
         proposalPks: getSelectedProposalPks(),
         instrumentIds: instruments.map((instrument) => instrument.id),
       });
-
-      // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
-      // setTimeout(fetchProposalsData, 500);
     } else {
       await api({
         toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
@@ -543,7 +550,7 @@ const ProposalTableOfficer = ({
       });
     }
 
-    tableRef.current && tableRef.current.onQueryChange({});
+    refreshTableData();
   };
 
   const cloneProposalsToCall = async (call: Call) => {
@@ -559,7 +566,7 @@ const ProposalTableOfficer = ({
       proposalsToClonePk: proposalPks,
     });
 
-    tableRef.current && tableRef.current.onQueryChange({});
+    refreshTableData();
   };
 
   const changeStatusOnProposals = async (status: ProposalStatus) => {
@@ -572,7 +579,7 @@ const ProposalTableOfficer = ({
         proposalPks: proposalPks,
         statusId: status.id,
       });
-      tableRef.current && tableRef.current.onQueryChange({});
+      refreshTableData();
     }
   };
 
@@ -804,9 +811,8 @@ const ProposalTableOfficer = ({
             modalTab: undefined,
           });
 
-          tableRef.current && tableRef.current.onQueryChange({});
+          refreshTableData();
         }}
-        reviewItemId={proposalToReview?.primaryKey}
       >
         <ProposalReviewContent
           proposalPk={proposalToReview?.primaryKey as number}

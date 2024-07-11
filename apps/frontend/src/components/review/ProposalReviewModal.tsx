@@ -50,6 +50,7 @@ const ProposalReviewModal = ({
       });
   };
 
+  // TODO: Remove this after the InstrumentScientistProposalTable is refactored. The ProposalTableOfficer doesn't use this anymore.
   const handleClose = async () => {
     /**
      * TODO: This needs to be refactored a bit and instead of loading proposal before close we could use the proposal used in the modal content tabs.

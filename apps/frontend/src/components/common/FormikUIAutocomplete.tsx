@@ -105,6 +105,7 @@ type FormikUIAutocompleteProps = {
   InputProps?: Partial<InputProps> & { 'data-cy'?: string };
   multiple?: boolean;
   'data-cy'?: string;
+  onChange?: (_: React.SyntheticEvent<Element, Event>, value: number) => void;
 };
 
 const FormikUIAutocomplete = ({
@@ -166,6 +167,7 @@ const FormikUIAutocomplete = ({
       )}
       ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
       data-cy={props['data-cy']}
+      {...(props.onChange && { onChange: props.onChange })}
     />
   );
 };

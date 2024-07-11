@@ -1,19 +1,18 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/SaveOutlined';
-import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import MUITextField, { TextFieldProps } from '@mui/material/TextField';
 import { Field, Form, Formik } from 'formik';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { usePredefinedMessagesData } from 'hooks/predefinedMessage/usePredefinedMessagesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { PredefinedMessageKey } from './FormikUIPredefinedMessagesTextField';
+import FormikUIAutocomplete from '../FormikUIAutocomplete';
 import TextField from '../FormikUITextField';
 import UOLoader from '../UOLoader';
 
@@ -51,36 +50,15 @@ const PredefinedMessagesModal = ({
     message: message.message,
   }));
 
-  const [initialValues, setInitialValues] = useState<{
-    predefinedMessageId: number | null;
-    title: string;
-    message: string;
-  }>({
-    predefinedMessageId: null,
-    title: '',
+  const foundMessage = predefinedMessagesOptions.find(
+    (message) => message.message === selectedMessage
+  );
+
+  const initialValues = {
+    predefinedMessageId: foundMessage?.value || null,
+    title: foundMessage?.text || '',
     message: selectedMessage,
-  });
-
-  useEffect(() => {
-    const foundMessage = predefinedMessagesOptions.find(
-      (message) => message.message === initialValues.message
-    );
-
-    if (
-      foundMessage &&
-      foundMessage.value !== initialValues.predefinedMessageId
-    ) {
-      setInitialValues({
-        predefinedMessageId: foundMessage.value,
-        title: foundMessage.text,
-        message: foundMessage.message,
-      });
-    }
-  }, [
-    predefinedMessagesOptions,
-    initialValues.predefinedMessageId,
-    initialValues.message,
-  ]);
+  };
 
   const updatePredefinedMessage = async (values: {
     id: number;
@@ -131,30 +109,15 @@ const PredefinedMessagesModal = ({
     setFieldValue('message', newSelectedMessage?.message || '');
     setFieldValue('title', newSelectedMessage?.text || '');
     setFieldValue('predefinedMessageId', selectedItem);
-    setInitialValues({
-      predefinedMessageId: selectedItem,
-      title: newSelectedMessage?.text || '',
-      message: newSelectedMessage?.message || '',
-    });
   };
 
-  const handleSetFieldAndValue = (
-    field: 'title' | 'message',
-    value: string,
+  const handlePredefinedMessageDelete = async (
     setFieldValue: (
       field: string,
       value: number | string,
       shouldValidate?: boolean | undefined
     ) => void
   ) => {
-    setFieldValue(field, value);
-    setInitialValues({
-      ...initialValues,
-      [field]: value,
-    });
-  };
-
-  const handlePredefinedMessageDelete = async () => {
     confirm(
       async () => {
         if (!initialValues.predefinedMessageId) {
@@ -172,11 +135,8 @@ const PredefinedMessagesModal = ({
             predefinedMessage.id !== initialValues.predefinedMessageId
         );
         setPredefinedMessages(newPredefinedMessagesArray);
-        setInitialValues({
-          predefinedMessageId: null,
-          title: '',
-          message: '',
-        });
+        setFieldValue('message', '');
+        setFieldValue('title', '');
       },
       {
         title: 'Please confirm',
@@ -185,7 +145,10 @@ const PredefinedMessagesModal = ({
     )();
   };
 
-  const options = predefinedMessagesOptions.map((item) => item.value);
+  const options = predefinedMessagesOptions.map((item) => ({
+    text: item.text,
+    value: item.value,
+  }));
 
   return (
     <Dialog
@@ -241,13 +204,12 @@ const PredefinedMessagesModal = ({
               }}
             >
               <DialogContent>
-                <Field
-                  id="predefined-message-input"
+                <FormikUIAutocomplete
                   name="predefinedMessageId"
-                  component={Autocomplete}
+                  label="Select from predefined messages"
                   loading={loadingPredefinedMessages}
-                  options={options}
                   noOptionsText="No predefined messages"
+                  items={options}
                   onChange={(
                     _: React.SyntheticEvent<Element, Event>,
                     selectedItem: number
@@ -257,38 +219,14 @@ const PredefinedMessagesModal = ({
                       setFieldValue
                     )
                   }
-                  getOptionLabel={(option: number | string) => {
-                    const foundOption = predefinedMessagesOptions.find(
-                      (item) => item.value === option
-                    );
-
-                    return foundOption?.text || '';
-                  }}
-                  renderInput={(params: TextFieldProps) => (
-                    <MUITextField
-                      {...params}
-                      label="Select from predefined messages"
-                      disabled={isSubmitting}
-                      data-cy="predefined-message-select"
-                    />
-                  )}
-                  ListboxProps={{
-                    'data-cy': 'predefined-message-select-options',
-                  }}
+                  disabled={isSubmitting}
+                  data-cy="predefined-message-select"
                 />
                 <Field
                   name="title"
                   label="Predefined message title"
                   type="text"
                   component={TextField}
-                  value={initialValues.title}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    handleSetFieldAndValue(
-                      'title',
-                      e.target.value,
-                      setFieldValue
-                    );
-                  }}
                   fullWidth
                   data-cy="message-title"
                   disabled={isSubmitting}
@@ -303,14 +241,6 @@ const PredefinedMessagesModal = ({
                   data-cy="message"
                   multiline
                   rows="5"
-                  value={initialValues.message}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    handleSetFieldAndValue(
-                      'message',
-                      e.target.value,
-                      setFieldValue
-                    );
-                  }}
                   required
                   disabled={isSubmitting}
                 />
@@ -329,7 +259,7 @@ const PredefinedMessagesModal = ({
                   color="error"
                   disabled={isSubmitting || !initialValues.predefinedMessageId}
                   startIcon={<DeleteIcon />}
-                  onClick={handlePredefinedMessageDelete}
+                  onClick={() => handlePredefinedMessageDelete(setFieldValue)}
                   data-cy="delete-message"
                 >
                   Delete
