@@ -7,7 +7,6 @@ import React, { SetStateAction, useState } from 'react';
 import {
   DecodedValueMap,
   DelimitedArrayParam,
-  NumberParam,
   QueryParamConfig,
   SetQuery,
   StringParam,
@@ -17,20 +16,18 @@ import {
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import InputDialog from 'components/common/InputDialog';
-import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
+import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
   selection: QueryParamConfig<(string | null | never)[]>;
-  sortColumn: QueryParamConfig<number | null | undefined>;
   sortDirection: QueryParamConfig<string | null | undefined>;
   sortField?: QueryParamConfig<string | null | undefined>;
 };
 
 export const DefaultQueryParams = {
-  sortColumn: NumberParam,
   sortDirection: StringParam,
   search: StringParam,
   selection: withDefault(DelimitedArrayParam, []),
@@ -112,9 +109,9 @@ export function SuperMaterialTable<Entry extends EntryID>({
     options.searchText = urlQueryParams.search || undefined;
   }
 
-  columns = setSortDirectionOnSortColumn(
+  columns = setSortDirectionOnSortField(
     columns,
-    urlQueryParams?.sortColumn,
+    urlQueryParams?.sortField,
     urlQueryParams?.sortDirection
   );
 
@@ -258,12 +255,14 @@ export function SuperMaterialTable<Entry extends EntryID>({
                   : undefined,
             });
         }}
-        onOrderChange={(orderedColumnId, orderDirection) => {
+        onOrderCollectionChange={(orderByCollection) => {
+          const [orderBy] = orderByCollection;
           setUrlQueryParams &&
-            setUrlQueryParams({
-              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-              sortDirection: orderDirection ? orderDirection : undefined,
-            });
+            setUrlQueryParams((params) => ({
+              ...params,
+              sortField: orderBy?.orderByField,
+              sortDirection: orderBy?.orderDirection,
+            }));
         }}
       />
       {hasAccess.create && createModal && (

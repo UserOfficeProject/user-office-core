@@ -26,6 +26,7 @@ export type ProposalUrlQueryParamsType = {
   instrument: QueryParamConfig<string | null | undefined>;
   proposalStatus: QueryParamConfig<number | null | undefined>;
   reviewModal: QueryParamConfig<number | null | undefined>;
+  modalTab: QueryParamConfig<number | null | undefined>;
   compareOperator: QueryParamConfig<string | null | undefined>;
   questionId: QueryParamConfig<string | null | undefined>;
   proposalId: QueryParamConfig<string | null | undefined>;
@@ -43,6 +44,7 @@ export default function ProposalPage() {
       instrument: StringParam,
       proposalStatus: NumberParam,
       reviewModal: NumberParam,
+      modalTab: NumberParam,
       questionId: StringParam,
       proposalId: StringParam,
       compareOperator: StringParam,

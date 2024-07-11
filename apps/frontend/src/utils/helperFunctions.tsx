@@ -36,13 +36,16 @@ export const getUniqueArray = <T,>(array: (T | null)[]) =>
     return value !== null && self.indexOf(value) === index;
   });
 
-export const setSortDirectionOnSortColumn = (
+export const setSortDirectionOnSortField = (
   columns: Column<any>[],
-  sortColumn: number | null | undefined,
+  sortField: string | null | undefined,
   sortDirection: string | null | undefined
 ) => {
-  if (sortColumn !== undefined && sortColumn !== null && sortDirection) {
-    columns[sortColumn].defaultSort = sortDirection as SortDirectionType;
+  if (sortField !== undefined && sortField !== null && sortDirection) {
+    const fieldIndex = columns.findIndex(
+      (column) => column.field === sortField
+    );
+    columns[fieldIndex].defaultSort = sortDirection as SortDirectionType;
   }
 
   return columns;

@@ -1,4 +1,9 @@
-import { Action, Column, MTableToolbar } from '@material-table/core';
+import {
+  Action,
+  Column,
+  MTableToolbar,
+  OrderByCollection,
+} from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -54,7 +59,7 @@ import {
   addColumns,
   fromArrayToCommaSeparated,
   removeColumns,
-  setSortDirectionOnSortColumn,
+  setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -296,8 +301,10 @@ const ProposalTableInstrumentScientist = ({
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    proposalid: StringParam,
+    proposalId: StringParam,
     reviewer: withDefault(StringParam, reviewerFilter),
+    page: NumberParam,
+    pageSize: NumberParam,
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -310,8 +317,8 @@ const ProposalTableInstrumentScientist = ({
       showMultiInstrumentProposals: false,
     },
     proposalStatusId: urlQueryParams.proposalStatus,
-    referenceNumbers: urlQueryParams.proposalid
-      ? [urlQueryParams.proposalid]
+    referenceNumbers: urlQueryParams.proposalId
+      ? [urlQueryParams.proposalId]
       : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
@@ -557,13 +564,15 @@ const ProposalTableInstrumentScientist = ({
     }));
 
   const handleColumnSortOrderChange = (
-    orderedColumnId: number,
-    orderDirection: 'desc' | 'asc'
-  ) =>
-    setUrlQueryParams({
-      sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-      sortDirection: orderDirection ? orderDirection : undefined,
-    });
+    orderByCollection: OrderByCollection[]
+  ) => {
+    const [orderBy] = orderByCollection;
+    setUrlQueryParams((params) => ({
+      ...params,
+      sortField: orderBy?.orderByField,
+      sortDirection: orderBy?.orderDirection,
+    }));
+  };
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -658,9 +667,9 @@ const ProposalTableInstrumentScientist = ({
     removeColumns(columns, FapReviewColumns);
   }
 
-  columns = setSortDirectionOnSortColumn(
+  columns = setSortDirectionOnSortField(
     columns,
-    urlQueryParams.sortColumn,
+    urlQueryParams.sortField,
     urlQueryParams.sortDirection
   );
 
@@ -674,7 +683,7 @@ const ProposalTableInstrumentScientist = ({
   const proposalToReview = preselectedProposalsData.find(
     (proposal) =>
       proposal.primaryKey === urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalid
+      proposal.proposalId === urlQueryParams.proposalId
   );
 
   /** NOTE:
@@ -768,13 +777,13 @@ const ProposalTableInstrumentScientist = ({
               }
             })
           );
-          if (urlQueryParams.proposalid) {
+          if (urlQueryParams.proposalId) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
             setUrlQueryParams({
-              proposalid: undefined,
+              proposalId: undefined,
             });
           }
           setUrlQueryParams({
@@ -893,7 +902,7 @@ const ProposalTableInstrumentScientist = ({
         onSearchChange={handleSearchChange}
         onChangeColumnHidden={handleColumnHiddenChange}
         onSelectionChange={handleColumnSelectionChange}
-        onOrderChange={handleColumnSortOrderChange}
+        onOrderCollectionChange={handleColumnSortOrderChange}
         actions={tableActions}
       />
     </>
