@@ -15,6 +15,10 @@ import { Roles } from '../models/Role';
 import { Technique } from '../models/Technique';
 import { UserWithRole } from '../models/User';
 import { AssignInstrumentsToTechniqueArgs } from '../resolvers/mutations/AssignInstrumentsToTechnique';
+import {
+  AssignScientistsToTechniqueArgs,
+  RemoveScientistFromTechniqueArgs,
+} from '../resolvers/mutations/AssignScientistsToTechnique';
 import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutation';
 import { RemoveInstrumentsFromTechniqueArgs } from '../resolvers/mutations/RemoveInstrumentsFromTechnique';
 import { UpdateTechniqueArgs } from '../resolvers/mutations/UpdateTechniqueMutations';
@@ -116,6 +120,38 @@ export default class TechniqueMutations {
         return rejection(
           `Could not remove assigned instruments from technique '${args.techniqueId}`,
           { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async assignScientistsToTechnique(
+    agent: UserWithRole | null,
+    args: AssignScientistsToTechniqueArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .assignScientistsToTechnique(args.scientistIds, args.techniqueId)
+      .catch((error) => {
+        return rejection(
+          'Could not assign scientist/s to technique',
+          { agent, args },
+          error
+        );
+      });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async removeScientistFromTechnique(
+    agent: UserWithRole | null,
+    args: RemoveScientistFromTechniqueArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .removeScientistFromTechnique(args.scientistId, args.techniqueId)
+      .catch((error) => {
+        return rejection(
+          'Could not remove assigned scientist/s from technique',
+          { agent, args },
           error
         );
       });

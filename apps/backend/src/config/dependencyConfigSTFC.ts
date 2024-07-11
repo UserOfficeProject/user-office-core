@@ -29,6 +29,7 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import StfcFapDataSource from '../datasources/stfc/StfcFapDataSource';
 import StfcInstrumentDataSource from '../datasources/stfc/StfcInstrumentDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
+import StfcTechniqueDataSource from '../datasources/stfc/StfcTechniqueDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
@@ -100,3 +101,4 @@ mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.DownloadService, StfcDownloadService);
+mapClass(Tokens.TechniqueDataSource, StfcTechniqueDataSource);

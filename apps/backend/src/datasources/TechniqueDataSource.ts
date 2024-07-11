@@ -1,5 +1,6 @@
 import { Instrument } from '../models/Instrument';
 import { Technique } from '../models/Technique';
+import { BasicUserDetails } from '../models/User';
 import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutation';
 
 export interface TechniqueDataSource {
@@ -10,6 +11,7 @@ export interface TechniqueDataSource {
     offset?: number
   ): Promise<{ totalCount: number; techniques: Technique[] }>;
   getInstrumentsByTechniqueId(techniqueId: number): Promise<Instrument[]>;
+  getTechniqueScientists(techniqueId: number): Promise<BasicUserDetails[]>;
   update(technique: Technique): Promise<Technique>;
   delete(techniqueId: number): Promise<Technique>;
   assignInstrumentsToTechnique(
@@ -18,6 +20,14 @@ export interface TechniqueDataSource {
   ): Promise<boolean>;
   removeInstrumentsFromTechnique(
     instrumentIds: number[],
+    techniqueId: number
+  ): Promise<boolean>;
+  assignScientistsToTechnique(
+    scientistIds: number[],
+    techniqueId: number
+  ): Promise<boolean>;
+  removeScientistFromTechnique(
+    scientistIds: number,
     techniqueId: number
   ): Promise<boolean>;
 }
