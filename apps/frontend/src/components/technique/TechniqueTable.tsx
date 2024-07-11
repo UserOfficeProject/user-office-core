@@ -7,15 +7,18 @@ import { useQueryParams } from 'use-query-params';
 
 import { useCheckAccess } from 'components/common/Can';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import SimpleTabs from 'components/common/SimpleTabs';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
+import { StyledContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
+import AssignedScientistsTable from './AssignedScientistsTable';
 import AssignInstrumentsToTechniques from './AssignInstrumentsToTechniques';
 import CreateUpdateTechnique from './CreateUpdateTechnique';
 import {
@@ -118,11 +121,56 @@ const TechniqueTable = () => {
     }
   };
 
-  const AssignedInstruments = React.useCallback(({ rowData }) => {
-    return <AssignedInstrumentsTable technique={rowData} />;
-  }, []);
+  const AssignedInstruments = React.useCallback(
+    ({ rowData }) => {
+      const removeScientistFromTechnique = async (
+        scientistId: number,
+        techniqueId: number
+      ): Promise<void> => {
+        await api({
+          toastSuccessMessage:
+            'Scientist removed from ' +
+            i18n.format(t('Technique'), 'lowercase') +
+            ' successfully!',
+        })
+          .removeScientistFromTechnique({
+            scientistId,
+            techniqueId,
+          })
+          .then(() => {
+            setTechniques((techniques) =>
+              techniques.map((techniqueItem) => {
+                if (techniqueItem.id === techniqueId) {
+                  return {
+                    ...techniqueItem,
+                    scientists: techniqueItem.scientists.filter(
+                      (scientist) => scientist.id !== scientistId
+                    ),
+                  };
+                }
 
-  const removeIntrumentsFromTechnique = async (
+                return techniqueItem;
+              })
+            );
+          });
+      };
+
+      return (
+        <StyledContainer margin={[0]} padding={[1, 0, 0, 0]} maxWidth={false}>
+          <SimpleTabs tabNames={[`'instrument'`, `Assigned Scientist'`]}>
+            <AssignedInstrumentsTable technique={rowData} />
+            <AssignedScientistsTable
+              removeScientistFromTechnique={removeScientistFromTechnique}
+              technique={rowData}
+            />
+          </SimpleTabs>
+        </StyledContainer>
+      );
+    },
+    [api, setTechniques, t]
+  );
+
+  const removeInstrumentsFromTechnique = async (
     instrumentIds: number[]
   ): Promise<void> => {
     if (selectedTechnique) {
@@ -190,7 +238,7 @@ const TechniqueTable = () => {
             currentlyAssignedInstrumentIds={(
               selectedTechnique?.instruments || []
             ).map((instrument) => instrument.id)}
-            removeIntrumentsFromTechnique={removeIntrumentsFromTechnique}
+            removeInstrumentsFromTechnique={removeInstrumentsFromTechnique}
           />
         </DialogContent>
       </Dialog>

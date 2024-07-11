@@ -6,4 +6,7 @@ fragment technique on Technique {
   instruments {
     ...instrument
   }
+  scientists {
+    ...basicUserDetails
+  }
 }

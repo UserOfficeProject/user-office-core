@@ -69,7 +69,7 @@ const AssignedInstrumentsTable = ({
 };
 
 AssignedInstrumentsTable.propTypes = {
-  instrument: PropTypes.any.isRequired,
+  technique: PropTypes.any.isRequired,
 };
 
 export default AssignedInstrumentsTable;
