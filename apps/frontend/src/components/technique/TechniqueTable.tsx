@@ -132,8 +132,8 @@ const TechniqueTable = () => {
     await api({
       toastSuccessMessage: `Scientist assigned to technique successfully!`,
     }).assignScientistsToTechnique({
-      techniqueId: assigningTechniqueScientistsId as number,
       scientistIds: scientists.map((scientist) => scientist.id),
+      techniqueId: assigningTechniqueScientistsId as number,
     });
 
     setTechniques((techniques) =>

@@ -79,7 +79,7 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
     return true;
   }
   async removeScientistFromTechnique(
-    scientistIds: number,
+    scientistId: number,
     techniqueId: number
   ): Promise<boolean> {
     return true;

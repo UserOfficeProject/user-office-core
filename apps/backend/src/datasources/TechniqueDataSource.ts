@@ -27,7 +27,7 @@ export interface TechniqueDataSource {
     techniqueId: number
   ): Promise<boolean>;
   removeScientistFromTechnique(
-    scientistIds: number,
+    scientistId: number,
     techniqueId: number
   ): Promise<boolean>;
 }
