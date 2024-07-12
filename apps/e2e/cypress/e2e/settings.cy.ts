@@ -970,6 +970,8 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="submit"]').click();
 
+      cy.finishedLoading();
+
       cy.notification({
         variant: 'success',
         text: 'Proposal/s assigned to the selected Fap successfully',
