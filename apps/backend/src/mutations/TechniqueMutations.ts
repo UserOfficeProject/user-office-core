@@ -4,6 +4,8 @@ import {
   deleteTechniqueValidationSchema,
   removeInstrumentsFromTechniqueValidationSchema,
   updateTechniqueValidationSchema,
+  assignScientistsToTechniqueValidationSchema,
+  removeScientistFromTechniqueValidationSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
@@ -125,6 +127,7 @@ export default class TechniqueMutations {
       });
   }
 
+  @ValidateArgs(assignScientistsToTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async assignScientistsToTechnique(
     agent: UserWithRole | null,
@@ -141,6 +144,7 @@ export default class TechniqueMutations {
       });
   }
 
+  @ValidateArgs(removeScientistFromTechniqueValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async removeScientistFromTechnique(
     agent: UserWithRole | null,
