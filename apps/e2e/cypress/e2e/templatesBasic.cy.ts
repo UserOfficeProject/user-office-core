@@ -491,12 +491,12 @@ context('Template tests', () => {
 
       // Updating dependencies
       cy.get('[data-cy="add-dependency-button"]').click();
-      cy.get('#dependency-id').click();
+      cy.get('[data-cy="dependencyField"]').click();
       cy.get('[data-cy=question-relation-dialogue]')
         .get('#menu- > .MuiPaper-root > .MuiList-root > [tabindex="0"]')
         .click(); // get boolean question
 
-      cy.get('#dependencyValue').click();
+      cy.get('[data-cy="dependencyValue"]').click();
       cy.get('[data-cy=question-relation-dialogue]')
         .get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']")
         .click(); // get true from dropdown
@@ -1104,13 +1104,13 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').click();
+      cy.get('[data-cy="dependencyField"]').click();
 
       cy.get('[role="presentation"]')
         .contains(templateDependencies.questions.selectQuestion.title)
         .click();
 
-      cy.get('[id="dependencyValue"]').click();
+      cy.get('[data-cy="dependencyValue"]').click();
 
       cy.contains(
         templateDependencies.questions.selectQuestion.answer1
@@ -1196,13 +1196,13 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').click();
+      cy.get('[data-cy="dependencyField"]').click();
 
       cy.get('[role="presentation"]')
         .contains(initialDBData.questions.instrumentPicker.text)
         .click();
 
-      cy.get('[id="dependencyValue"]').click();
+      cy.get('[data-cy="dependencyValue"]').click();
 
       cy.contains(initialDBData.instrument1.name).click();
 
@@ -1282,7 +1282,7 @@ context('Template tests', () => {
       ) {
         cy.contains(fieldName).click();
         cy.get('[data-cy="add-dependency-button"]').click();
-        cy.get('[id="dependency-id"]').click();
+        cy.get('[data-cy="dependencyField"]').click();
 
         contains.forEach((field) => {
           cy.get('[role="listbox"]').contains(field);
@@ -1295,7 +1295,7 @@ context('Template tests', () => {
         if (select) {
           cy.get('[role="listbox"]').contains(select).click();
 
-          cy.get('[id="dependencyValue"]').click();
+          cy.get('[data-cy="dependencyValue"]').click();
           cy.get('[role="listbox"]').contains('true').click();
 
           cy.contains('Update').click();

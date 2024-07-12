@@ -595,25 +595,25 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').click();
+      cy.get('[data-cy="dependencyField"]').click();
 
       cy.get('[role="presentation"]')
         .contains(multipleChoiceQuestion.title)
         .click();
 
-      cy.get('[id="dependencyValue"]').click();
+      cy.get('[data-cy="dependencyValue"]').click();
 
       cy.contains(multipleChoiceQuestion.answers[1]).click();
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').last().click();
+      cy.get('[data-cy="dependencyField"]').last().click();
 
       cy.get('[role="presentation"]').contains(booleanQuestion).click();
 
-      cy.get('[id="dependencyValue"]').last().click();
+      cy.get('[data-cy="dependencyValue"]').last().click();
 
-      cy.contains('true').click();
+      cy.get('li[data-value="true"]').click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -686,13 +686,13 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').last().click();
+      cy.get('[data-cy="dependencyField"]').last().click();
 
       cy.get('[role="presentation"]')
         .contains(multipleChoiceQuestion.title)
         .click();
 
-      cy.get('[id="dependencyValue"]').last().click();
+      cy.get('[data-cy="dependencyValue"]').last().click();
 
       cy.contains(multipleChoiceQuestion.answers[1]).click();
 

@@ -178,6 +178,7 @@ const FormikUICustomDependencySelector = ({
               }
             }}
             required
+            data-cy="dependencyField"
           >
             {allAvailableFields.map((option) => {
               return (
@@ -212,6 +213,7 @@ const FormikUICustomDependencySelector = ({
             onChange={(event: SelectChangeEvent<EvaluatorOperator>) => {
               setOperator(event.target.value as EvaluatorOperator);
             }}
+            data-cy="dependencyOperator"
           >
             <MenuItem value={EvaluatorOperator.EQ.toString()}>equals</MenuItem>
             <MenuItem value={EvaluatorOperator.NEQ.toString()}>
@@ -234,6 +236,7 @@ const FormikUICustomDependencySelector = ({
               setDependencyValue(event.target.value);
             }}
             required
+            data-cy="dependencyValue"
           >
             {availableValues.map((option) => {
               return (
