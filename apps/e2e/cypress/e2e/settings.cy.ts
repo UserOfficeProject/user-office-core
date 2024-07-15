@@ -133,6 +133,8 @@ context('Settings tests', () => {
     const workflowDescription = faker.lorem.words(5);
     const proposalTitle = faker.lorem.words(2);
     const proposalAbstract = faker.lorem.words(5);
+    const proposal2Title = faker.lorem.words(2);
+    const proposal2Abstract = faker.lorem.words(5);
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
     const instrument1 = {
@@ -1371,6 +1373,83 @@ context('Settings tests', () => {
 
       cy.contains(firstProposalTitle).parent().contains('FAP_SELECTION');
       cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
+    });
+
+    it.only('Feasibility Reviews should only be assigned if the Workflow contains a Feasibility Review Status', function () {
+      createInstrumentAndAssignItToCall();
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [result.createProposal.primaryKey],
+          });
+        }
+      });
+
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: prevProposalStatusId,
+      }).then((result) => {
+        if (result.addProposalWorkflowStatus) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+          });
+        }
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: proposal2Title,
+            abstract: proposal2Abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [result.createProposal.primaryKey],
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.contains('No technical reviews found for the selected proposal');
+
+      cy.visit('/');
+
+      cy.contains(proposal2Title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.contains(
+        'No technical reviews found for the selected proposal'
+      ).should('not.exist');
     });
   });
 

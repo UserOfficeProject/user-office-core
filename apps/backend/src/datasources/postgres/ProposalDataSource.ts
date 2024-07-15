@@ -2,11 +2,13 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Event } from '../../events/event.enum';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
@@ -21,6 +23,7 @@ import {
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { ProposalDataSource } from '../ProposalDataSource';
+import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import {
   ProposalsFilter,
   QuestionFilterInput,
@@ -95,6 +98,11 @@ export async function calculateReferenceNumber(
 
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
+  constructor(
+    @inject(Tokens.ProposalSettingsDataSource)
+    private proposalSettingsDataSource: ProposalSettingsDataSource
+  ) {}
+
   async updateProposalTechnicalReviewer({
     userId,
     proposalPks,
@@ -1062,5 +1070,24 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((proposal: ProposalRecord) => {
         return proposal ? createProposalObject(proposal) : null;
       });
+  }
+
+  async proposalNeedTechReview(proposalPk: number): Promise<boolean> {
+    const proposalWorkflowId: number = await database
+      .select('c.proposal_workflow_id')
+      .from('proposals as p')
+      .join('call as c', { 'p.call_id': 'c.call_id' })
+      .where('proposal_pk', proposalPk)
+      .first()
+      .then((value) => value.proposal_workflow_id);
+
+    const proposalStatus: ProposalWorkflowConnection[] =
+      await this.proposalSettingsDataSource.getProposalWorkflowConnections(
+        proposalWorkflowId
+      );
+
+    return !!proposalStatus.find((status) =>
+      status.proposalStatus.name.match('FEASIBILITY')
+    );
   }
 }

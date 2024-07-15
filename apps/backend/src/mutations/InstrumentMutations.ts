@@ -208,38 +208,43 @@ export default class InstrumentMutations {
         );
         instrumentHasProposalIds.push(instrumentHasProposalId);
 
-        const technicalReview =
-          await this.reviewDataSource.getProposalInstrumentTechnicalReview(
-            proposalPk,
-            instrumentId
-          );
+        const needTechReview =
+          await this.proposalDataSource.proposalNeedTechReview(proposalPk);
 
-        if (technicalReview) {
-          await this.proposalDataSource.updateProposalTechnicalReviewer({
-            userId: instrument.managerUserId,
-            proposalPks: [proposalPk],
-            instrumentId: instrument.id,
-          });
-        } else {
-          await this.reviewDataSource.setTechnicalReview(
-            {
-              proposalPk: proposalPk,
-              comment: null,
-              publicComment: null,
-              reviewerId: instrument.managerUserId,
-              timeAllocation: null,
-              status: null,
-              files: null,
-              submitted: false,
+        if (needTechReview) {
+          const technicalReview =
+            await this.reviewDataSource.getProposalInstrumentTechnicalReview(
+              proposalPk,
+              instrumentId
+            );
+
+          if (technicalReview) {
+            await this.proposalDataSource.updateProposalTechnicalReviewer({
+              userId: instrument.managerUserId,
+              proposalPks: [proposalPk],
               instrumentId: instrument.id,
-            },
-            false
-          );
-          await this.proposalDataSource.updateProposalTechnicalReviewer({
-            userId: instrument.managerUserId,
-            proposalPks: [proposalPk],
-            instrumentId: instrument.id,
-          });
+            });
+          } else {
+            await this.reviewDataSource.setTechnicalReview(
+              {
+                proposalPk: proposalPk,
+                comment: null,
+                publicComment: null,
+                reviewerId: instrument.managerUserId,
+                timeAllocation: null,
+                status: null,
+                files: null,
+                submitted: false,
+                instrumentId: instrument.id,
+              },
+              false
+            );
+            await this.proposalDataSource.updateProposalTechnicalReviewer({
+              userId: instrument.managerUserId,
+              proposalPks: [proposalPk],
+              instrumentId: instrument.id,
+            });
+          }
         }
       }
     }
