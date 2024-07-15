@@ -118,6 +118,14 @@ context('Proposal tests', () => {
         description: proposalWorkflow.description,
       }).then((result) => {
         if (result.createProposalWorkflow) {
+          cy.addProposalWorkflowStatus({
+            droppableGroupId: 'proposalWorkflowConnections_0',
+            proposalStatusId:
+              initialDBData.proposalStatuses.feasibilityReview.id,
+            proposalWorkflowId: result.createProposalWorkflow.id,
+            sortOrder: 1,
+            prevProposalStatusId: 1,
+          });
           createdWorkflowId = result.createProposalWorkflow.id;
         }
       });
@@ -450,6 +458,7 @@ context('Proposal tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
+      cy.addFeasibilityReviewToDefaultWorkflow();
 
       const allocationTime = '10';
       cy.createInstrument(instrument1).then((result) => {
