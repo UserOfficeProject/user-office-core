@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { Knex } from 'knex';
 import { inject, injectable } from 'tsyringe';
@@ -625,7 +626,7 @@ export default class PostgresInstrumentDataSource
     }
   }
 
-  async submitInstrument(
+  async submitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
@@ -641,7 +642,7 @@ export default class PostgresInstrumentDataSource
 
     if (!records?.length) {
       throw new GraphQLError(
-        `Some record from fap_proposals not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+        `No fap_proposals found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
       );
     }
 
@@ -654,13 +655,57 @@ export default class PostgresInstrumentDataSource
       instrumentHasProposls.instrumentHasProposalIds.length !==
       proposalPks.length
     ) {
-      throw new GraphQLError(
-        `Some record from instrument proposals was not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+      logger.logWarn(
+        `Some record from instrument proposals were not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`,
+        {}
       );
     }
 
     return new InstrumentsHasProposals(
       instrumentHasProposls.instrumentHasProposalIds,
+      [instrumentId],
+      proposalPks,
+      true
+    );
+  }
+
+  async unsubmitInstrumentInFap(
+    proposalPks: number[],
+    instrumentId: number
+  ): Promise<InstrumentsHasProposals> {
+    const records: FapProposalRecord[] = await database('fap_proposals')
+      .update(
+        {
+          fap_meeting_instrument_submitted: false,
+        },
+        ['*']
+      )
+      .whereIn('proposal_pk', proposalPks)
+      .andWhere('instrument_id', instrumentId);
+
+    if (!records?.length) {
+      throw new GraphQLError(
+        `No fap_proposals found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`
+      );
+    }
+
+    const instrumentHasProposals = await this.getInstrumentHasProposals(
+      instrumentId,
+      proposalPks
+    );
+
+    if (
+      instrumentHasProposals.instrumentHasProposalIds.length !==
+      proposalPks.length
+    ) {
+      logger.logWarn(
+        `Some record from instrument proposals was not found with proposalPks: ${proposalPks} and instrumentId: ${instrumentId}`,
+        {}
+      );
+    }
+
+    return new InstrumentsHasProposals(
+      instrumentHasProposals.instrumentHasProposalIds,
       [instrumentId],
       proposalPks,
       true

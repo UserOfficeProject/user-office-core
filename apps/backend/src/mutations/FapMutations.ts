@@ -29,11 +29,10 @@ import { Roles } from '../models/Role';
 import { UserWithRole, UserRole } from '../models/User';
 import {
   UpdateMemberFapArgs,
-  AssignFapReviewersToProposalArgs,
   AssignReviewersToFapArgs,
   RemoveFapReviewerFromProposalArgs,
   AssignChairOrSecretaryToFapArgs,
-  MassAssignReviewsArgs,
+  AssignFapReviewersToProposalsArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
   AssignProposalsToFapsArgs,
@@ -421,60 +420,9 @@ export default class FapMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async assignFapReviewersToProposal(
+  async assignFapReviewersToProposals(
     agent: UserWithRole | null,
-    args: AssignFapReviewersToProposalArgs
-  ): Promise<Fap | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
-      return rejection(
-        'Can not assign FAP reviewers to proposal because of insufficient permissions',
-        { agent, args }
-      );
-    }
-
-    const fapProposal = await this.dataSource.getFapProposal(
-      args.fapId,
-      args.proposalPk
-    );
-
-    if (!fapProposal) {
-      return rejection(
-        'Can not assign FAP reviewers to non-existing FAP proposal',
-        { agent }
-      );
-    }
-
-    return this.dataSource
-      .assignMemberToFapProposal(
-        args.proposalPk,
-        args.fapId,
-        args.memberIds,
-        fapProposal.fapProposalId
-      )
-      .catch((err) => {
-        return rejection(
-          'Can not assign FAP reviewers to proposal',
-          { agent },
-          err
-        );
-      });
-  }
-
-  /**
-   * Assigns all remaining reviews needed for a FAP among its members. Attempts to distribute reviews as evenly as possible.
-   * Assumes there is ony one call in the review phase for a FAP at a time.
-   * @param agent User
-   * @param args ID of the FAP to mass assign reviews for
-   * @returns Updated FAP
-   */
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
-  @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async massAssignFapReviews(
-    agent: UserWithRole | null,
-    args: MassAssignReviewsArgs
+    args: AssignFapReviewersToProposalsArgs
   ): Promise<Fap | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -486,70 +434,30 @@ export default class FapMutations {
       );
     }
 
-    const reviewsToAssign = new Map<FapReviewer, FapProposal[]>();
-    const reviewersAssignedReviewsMap = new Map<FapReviewer, number>();
-    const reviewers = await this.dataSource.getReviewers(args.fapId);
-    const reviewsNeededMap =
-      await this.dataSource.getFapProposalToNumReviewsNeededMap(args.fapId);
-
-    for (const reviewer of reviewers) {
-      reviewersAssignedReviewsMap.set(
-        reviewer,
-        await this.dataSource.getFapReviewerProposalCountCurrentRound(
-          reviewer.userId
-        )
-      );
-    }
-
-    for (const fapProposal of [...reviewsNeededMap.keys()]) {
-      while ((reviewsNeededMap.get(fapProposal) ?? 0) > 0) {
-        const numReviewsNeeded = reviewsNeededMap.get(fapProposal) ?? 0;
-
-        const fapReviewer = await this.getReviewerWithMinNumReviews(
-          reviewersAssignedReviewsMap,
-          reviewsToAssign,
-          fapProposal.proposalPk,
-          args.fapId
-        );
-
-        const reviewersPendingAssignments =
-          reviewsToAssign.get(fapReviewer) ?? [];
-        reviewersPendingAssignments.push(fapProposal);
-        reviewsToAssign.set(fapReviewer, reviewersPendingAssignments);
-        reviewsNeededMap.set(fapProposal, numReviewsNeeded - 1);
-      }
-    }
-
-    for (const reviewer of [...reviewsToAssign.keys()]) {
-      const reviews =
-        reviewsToAssign.get(reviewer)?.map((review) => review.proposalPk) ?? [];
-      const fapProposalId = reviewsToAssign
-        .get(reviewer)
-        ?.find((rta) => rta.fapId === args.fapId)?.fapProposalId;
-
-      if (reviews.length > 0 && fapProposalId) {
-        this.dataSource
-          .assignMemberToFapProposals(
-            reviews,
+    const fapReviewAssignments = args.assignments.map(async (assignment) => {
+      return {
+        ...assignment,
+        fapProposalId: (
+          await this.dataSource.getFapProposal(
             args.fapId,
-            reviewer.userId,
-            fapProposalId
+            assignment.proposalPk
           )
+        )?.fapProposalId,
+      };
+    });
+
+    return Promise.all(fapReviewAssignments).then(
+      (resolvedFapReviewAssignments) =>
+        this.dataSource
+          .assignMembersToFapProposals(resolvedFapReviewAssignments, args.fapId)
           .catch((err) => {
             return rejection(
-              'Can not assign proposal to facility access panel',
+              'Can not assign FAP reviewers to proposals',
               { agent },
               err
             );
-          });
-      }
-    }
-
-    const updatedFap = await this.dataSource.getFap(args.fapId);
-
-    return updatedFap
-      ? updatedFap
-      : rejection('Can not fetch updated Fap', { agent });
+          })
+    );
   }
 
   async getReviewerWithMinNumReviews(
@@ -728,6 +636,25 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: ReorderFapMeetingDecisionProposalsInput
   ): Promise<FapMeetingDecision | Rejection> {
+    const [{ instrumentId, fapId, proposalPk }] = args.proposals;
+    const proposal = await this.proposalDataSource.get(proposalPk);
+    if (!proposal) {
+      return rejection('Proposal not found', { args });
+    }
+
+    const fapProposals = await this.dataSource.getFapProposalsByInstrument(
+      fapId,
+      instrumentId,
+      proposal.callId
+    );
+
+    if (fapProposals.every((fp) => fp.fapInstrumentMeetingSubmitted)) {
+      return rejection(
+        'FAP instrument for selected proposals is submitted and reordering is not allowed',
+        { args }
+      );
+    }
+
     try {
       const allFapDecisions = await Promise.all(
         args.proposals.map(async (proposal) => {
