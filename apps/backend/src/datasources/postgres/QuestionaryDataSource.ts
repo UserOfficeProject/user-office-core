@@ -479,29 +479,30 @@ export default class PostgresQuestionaryDataSource
             sourceQuestionaryId,
           }
         );
+        if (answers.rows && answers.rows.length > 0) {
+          await database('answers').insert(answers.rows).transacting(trx);
 
-        await database('answers').insert(answers.rows).transacting(trx);
-
-        if (markAsComplete) {
-          await database(
-            database.raw('?? (??, ??, ??)', [
-              'topic_completenesses',
-              'questionary_id',
-              'topic_id',
-              'is_complete',
-            ])
-          )
-            .insert(
-              database('topics')
-                .select(
-                  database.raw(`${targetQuestionaryId}, ??, ${true}`, [
-                    'topic_id',
-                  ])
-                )
-                .where('template_id', targetTemplateId),
-              ['questionary_id', 'topic_id', 'is_complete']
+          if (markAsComplete) {
+            await database(
+              database.raw('?? (??, ??, ??)', [
+                'topic_completenesses',
+                'questionary_id',
+                'topic_id',
+                'is_complete',
+              ])
             )
-            .transacting(trx);
+              .insert(
+                database('topics')
+                  .select(
+                    database.raw(`${targetQuestionaryId}, ??, ${true}`, [
+                      'topic_id',
+                    ])
+                  )
+                  .where('template_id', targetTemplateId),
+                ['questionary_id', 'topic_id', 'is_complete']
+              )
+              .transacting(trx);
+          }
         }
       });
     } catch (error) {
