@@ -1,35 +1,38 @@
-source: documentation/site
-paths:
-  uploads: uploads
-  static: ''
-  collections: ''
-  data: ''
+# Which collections CloudCannon will show in the CMS sidebar
 collections_config:
-  pages:
-    path:
-    output: false
-    url:
-    filter:
-    parse_branch_index:
-    name:
-    description: ''
-    icon: notes
-    documentation:
-    preview:
-    sort:
-    sort_options:
-    singular_name:
-    singular_key:
-    _editables:
-    _inputs:
-    _select_data:
-    _structures:
-    add_options:
-    create:
-    disable_add: false
-    disable_add_folder: false
-    disable_file_actions: false
-    new_preview_url:
-    schemas:
-    schema_key:
-timezone: Etc/UTC
+  docs:
+    name: Documentation
+    path: "docs"
+    output: true
+    url: "/[full_slug]/" # mkdocs' default url behavior for nested files
+
+# Where CloudCannon should put new files, and how it should build URLs
+paths:
+  uploads: "docs" # Put new files inside the docs folder
+  static: "docs" # Reference files in the docs folder as /<file>
+
+# The available buttons in the CloudCannon Content Editor
+_editables:
+  content:
+    link: true
+    blockquote: true
+    bold: true
+    format: "p h1 h2 h3 h4 h5 h6"
+    italic: true
+    strike: true
+    subscript: true
+    superscript: true
+    underline: true
+    bulletedlist: true
+    indent: true
+    numberedlist: true
+    outdent: true
+    code: true
+    embed: true
+    horizontalrule: true
+    image: true
+    table: true
+    undo: true
+    redo: true
+    removeformat: true
+    copyformatting: true
