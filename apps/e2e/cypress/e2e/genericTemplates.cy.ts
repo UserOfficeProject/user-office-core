@@ -765,9 +765,9 @@ context('GenericTemplates tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains(copyButtonLabel[0]).click();
+      cy.contains(copyButtonLabel).click();
 
-      cy.contains(copyButtonLabel[0]);
+      cy.contains(copyButtonLabel);
 
       cy.get('[data-cy="genericTemplateProposalTitle"]').click();
       cy.get('[role=presentation]').contains(proposalTitle[0]).click();
@@ -828,9 +828,9 @@ context('GenericTemplates tests', () => {
 
       cy.finishedLoading();
 
-      cy.contains(copyButtonLabel[0]).click();
+      cy.contains(copyButtonLabel).click();
 
-      cy.contains(copyButtonLabel[0]);
+      cy.contains(copyButtonLabel);
 
       cy.get('[data-cy="genericTemplateProposalTitle"]').click();
       cy.get('[role=presentation]').contains(proposalTitle[0]).click();
