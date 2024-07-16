@@ -1,0 +1,7 @@
+source: documentation/site
+paths:
+  uploads: uploads
+  static: ''
+  collections: ''
+  data: ''
+timezone: Etc/UTC
