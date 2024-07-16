@@ -510,7 +510,7 @@ export default class PostgresQuestionaryDataSource
         sourceQuestionaryId,
         targetQuestionaryId,
       });
-      throw new GraphQLError('Can not copy questions, answers');
+      throw new GraphQLError('Could not copy questionary answers');
     }
   }
 
