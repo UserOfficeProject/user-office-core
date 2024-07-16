@@ -7,8 +7,8 @@ services:
   proxy:
     image: traefik:2.10 # The official Traefik docker image
     command:
-      #- "--log.level=DEBUG"
-      - '--api.insecure=true'
+      #- "--log.level=DEBUG"asdasds
+      - '--api.insecuasdasre=true'
       - '--providers.docker=true'
       - '--providers.docker.exposedbydefault=false'
       - '--entrypoints.web.address=:80'
