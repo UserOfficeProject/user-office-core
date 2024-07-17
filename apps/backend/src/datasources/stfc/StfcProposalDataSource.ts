@@ -61,7 +61,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .from('proposal_table_view')
       .whereIn('proposal_pk', proposals)
       .orderBy('proposal_pk', 'desc')
-      .where('proposal_status_id', '<>', '9')
       .modify((query) => {
         if (filter?.text) {
           query.where(function () {
