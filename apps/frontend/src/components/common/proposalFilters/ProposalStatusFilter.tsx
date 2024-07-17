@@ -22,6 +22,7 @@ type ProposalStatusFilterProps = {
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
   proposalStatusId?: number;
+  hideStatus?: boolean;
 };
 
 const ProposalStatusFilter = ({
@@ -30,6 +31,7 @@ const ProposalStatusFilter = ({
   proposalStatusId,
   onChange,
   shouldShowAll,
+  hideStatus,
 }: ProposalStatusFilterProps) => {
   const classes = useStyles();
   const [, setQuery] = useQueryParams({
@@ -44,11 +46,49 @@ const ProposalStatusFilter = ({
    * NOTE: We might use https://material-ui.com/components/autocomplete/.
    * If we have lot of dropdown options to be able to search.
    */
+  if (!hideStatus) {
+    return (
+      <>
+        <FormControl fullWidth>
+          <InputLabel id="proposal-status-select-label" shrink>
+            Status
+          </InputLabel>
+          {isLoading ? (
+            <div className={classes.loadingText}>Loading...</div>
+          ) : (
+            <Select
+              id="proposal-status-select"
+              aria-labelledby="proposal-status-select-label"
+              onChange={(proposalStatus) => {
+                setQuery({
+                  proposalStatus: proposalStatus.target.value
+                    ? (proposalStatus.target.value as number)
+                    : undefined,
+                });
+                onChange?.(proposalStatus.target.value as number);
+              }}
+              value={proposalStatusId || 0}
+              defaultValue={0}
+              data-cy="status-filter"
+            >
+              {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
+              {proposalStatuses.map((proposalStatus) => (
+                <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
+                  {proposalStatus.name}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+        </FormControl>
+      </>
+    );
+  }
+
   return (
     <>
       <FormControl fullWidth>
         <InputLabel id="proposal-status-select-label" shrink>
-          Status
+          Remove Status
         </InputLabel>
         {isLoading ? (
           <div className={classes.loadingText}>Loading...</div>
@@ -66,9 +106,9 @@ const ProposalStatusFilter = ({
             }}
             value={proposalStatusId || 0}
             defaultValue={0}
-            data-cy="status-filter"
+            data-cy="hide-status-filter"
           >
-            {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
+            {shouldShowAll && <MenuItem value={0}>None</MenuItem>}
             {proposalStatuses.map((proposalStatus) => (
               <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
                 {proposalStatus.name}

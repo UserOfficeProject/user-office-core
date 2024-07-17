@@ -25,6 +25,7 @@ export function useProposalsCoreData(
     callId,
     instrumentFilter,
     proposalStatusId,
+    proposalHideStatusId,
     questionaryIds,
     text,
     questionFilter,
@@ -47,6 +48,7 @@ export function useProposalsCoreData(
               callId,
               instrumentFilter,
               proposalStatusId,
+              proposalHideStatusId,
               questionaryIds,
               referenceNumbers,
               questionFilter: questionFilter && {
@@ -93,6 +95,7 @@ export function useProposalsCoreData(
               callId,
               instrumentFilter,
               proposalStatusId,
+              proposalHideStatusId,
               questionaryIds,
               referenceNumbers,
               questionFilter: questionFilter && {
@@ -139,6 +142,7 @@ export function useProposalsCoreData(
       callId,
       instrumentFilter,
       proposalStatusId,
+      proposalHideStatusId,
       questionaryIds,
       text,
       questionFilter,

@@ -307,6 +307,7 @@ const ProposalTableInstrumentScientist = ({
       showMultiInstrumentProposals: false,
     },
     proposalStatusId: urlQueryParams.proposalStatus,
+    proposalHideStatusId: urlQueryParams.proposalStatus,
     referenceNumbers: urlQueryParams.proposalid
       ? [urlQueryParams.proposalid]
       : undefined,
@@ -329,6 +330,7 @@ const ProposalTableInstrumentScientist = ({
     useProposalsCoreData(
       {
         proposalStatusId: proposalFilter.proposalStatusId,
+        proposalHideStatusId: proposalFilter.proposalHideStatusId,
         instrumentFilter: proposalFilter.instrumentFilter,
         callId: proposalFilter.callId,
         questionFilter: proposalFilter.questionFilter,

@@ -389,6 +389,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.proposalStatusId) {
           query.where('proposal_status_id', filter?.proposalStatusId);
         }
+        if (filter?.proposalHideStatusId) {
+          query.where('proposal_status_id', '<>', filter?.proposalHideStatusId);
+        }
 
         if (filter?.shortCodes) {
           const filteredAndPreparedShortCodes = filter?.shortCodes

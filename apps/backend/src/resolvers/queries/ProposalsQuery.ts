@@ -63,6 +63,9 @@ export class ProposalsFilter {
   @Field(() => Int, { nullable: true })
   public proposalStatusId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public proposalHideStatusId?: number;
+
   @Field(() => [String], { nullable: true })
   public shortCodes?: string[];
 
