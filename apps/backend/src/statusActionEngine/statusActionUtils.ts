@@ -8,6 +8,7 @@ import { UserDataSource } from '../datasources/UserDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
+import { InstrumentWithManagementTime } from '../models/Instrument';
 import { BasicUserDetails, User } from '../models/User';
 import {
   EmailStatusActionRecipients,
@@ -56,6 +57,7 @@ export type EmailReadyType = {
   preferredName?: string;
   pi?: BasicUserDetails | null;
   coProposers?: BasicUserDetails[] | null;
+  instruments?: InstrumentWithManagementTime[];
 };
 
 /**
