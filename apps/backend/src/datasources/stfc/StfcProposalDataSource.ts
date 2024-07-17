@@ -29,22 +29,17 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .select('proposal_pk')
       .from('proposal_table_view')
       .join(
-        'call_has_instruments',
-        'call_has_instruments.call_id',
+        'call_has_instruments as chi',
+        'chi.call_id',
         '=',
         'proposal_table_view.call_id'
       )
-      .join(
-        'instruments',
-        'instruments.instrument_id',
-        '=',
-        'call_has_instruments.instrument_id'
-      )
+      .join('instruments as in', 'in.instrument_id', '=', 'chi.instrument_id')
       .leftJoin(
-        'instrument_has_scientists',
-        'instrument_has_scientists.instrument_id',
+        'instrument_has_scientists as ihs',
+        'ihs.instrument_id',
         '=',
-        'call_has_instruments.instrument_id'
+        'chi.instrument_id'
       )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
@@ -54,12 +49,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             { userId: user.id }
           );
         } else {
-          this.whereRaw(
-            'jsonb_path_exists(instruments, \'$[*].scientists[*].id \\? (@.type() == "number" && @ == :userId:)\')',
-            { userId: user.id }
-          ).orWhereRaw(
-            'jsonb_path_exists(instruments, \'$[*].managerUserId \\? (@.type() == "number" && @ == :userId:)\')',
-            { userId: user.id }
+          this.where('ihs.user_id', user.id).orWhere(
+            'in.manager_user_id',
+            user.id
           );
         }
       });
@@ -72,15 +64,16 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .where('proposal_status_id', '<>', '9')
       .modify((query) => {
         if (filter?.text) {
-          query
-            .where('title', 'ilike', `%${filter.text}%`)
-            .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
-            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-            .orWhereRaw(
-              'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
-              { searchText: filter.text }
-            );
+          query.where(function () {
+            this.where('title', 'ilike', `%${filter.text}%`)
+              .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
+              .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
+              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+              .orWhereRaw(
+                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+                { searchText: filter.text }
+              );
+          });
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
