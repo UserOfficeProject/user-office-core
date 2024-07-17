@@ -5,9 +5,8 @@ import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { resolveApplicationEventBus } from '../events';
-import { ApplicationEvent, EventStatus } from '../events/applicationEvents';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { EventCallback } from '../events/eventBus';
 import { ProposalEndStatus } from '../models/Proposal';
 import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
@@ -34,10 +33,7 @@ export default function createCustomHandler() {
   };
 
   // Handler for custom events that need special treatment
-  return async function customHandler(
-    event: ApplicationEvent,
-    eventHandlerCallBack: EventCallback
-  ) {
+  return async function customHandler(event: ApplicationEvent) {
     // if the original method failed
     // there is no point of moving forward
     if (event.isRejection) {
@@ -237,9 +233,10 @@ export default function createCustomHandler() {
             });
           }
         } catch (error) {
-          const errorMessage = `Error while trying to handle ${event.type} event for proposal: ${event.review.proposalPk}:`;
-          logger.logException(errorMessage, error);
-          eventHandlerCallBack(EventStatus.FAILED, errorMessage);
+          logger.logException(
+            `Error while trying to handle ${event.type} event for proposal: ${event.review.proposalPk}: `,
+            error
+          );
         }
         break;
       case Event.CALL_ENDED:
@@ -259,9 +256,10 @@ export default function createCustomHandler() {
             handleWorkflowEngineChange(event, proposalPks);
           }
         } catch (error) {
-          const errorMessage = `Error while trying to mark ${event.type} event as done and calling workflow engine on proposals with callId ${event.call.id}:`;
-          logger.logException(errorMessage, error);
-          eventHandlerCallBack(EventStatus.FAILED, errorMessage);
+          logger.logException(
+            `Error while trying to mark ${event.type} event as done and calling workflow engine on proposals with callId ${event.call.id}: `,
+            error
+          );
         }
 
         break;

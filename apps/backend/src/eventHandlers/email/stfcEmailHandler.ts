@@ -7,19 +7,15 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { ApplicationEvent, EventStatus } from '../../events/applicationEvents';
+import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { EventCallback } from '../../events/eventBus';
 import { Proposal } from '../../models/Proposal';
 import { SettingsId } from '../../models/Settings';
 import { User } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
-export async function stfcEmailHandler(
-  event: ApplicationEvent,
-  eventHandlerCallBack: EventCallback
-) {
+export async function stfcEmailHandler(event: ApplicationEvent) {
   //test for null
   if (event.isRejection) {
     return;
@@ -60,14 +56,10 @@ export async function stfcEmailHandler(
       } else if (isClf) {
         piEmailTemplate = 'clf-proposal-submitted-pi';
       } else {
-        const errorMessage =
-          'Could not send email because facility could not be determined from call title.';
-        logger.logError(errorMessage, {
-          event,
-          call,
-          callTitle: call?.shortCode,
-        });
-        eventHandlerCallBack(EventStatus.FAILED, errorMessage);
+        logger.logError(
+          'Could not send email because facility could not be determined from call title.',
+          { event, call, callTitle: call?.shortCode }
+        );
 
         return;
       }
@@ -156,21 +148,16 @@ export async function stfcEmailHandler(
         mailService
           .sendMail(emailSettings)
           .then((res: any) => {
-            const successfulMessage = 'Emails sent on proposal submission:';
-            logger.logInfo(successfulMessage, {
+            logger.logInfo('Emails sent on proposal submission:', {
               result: res,
               event,
             });
-            eventHandlerCallBack(EventStatus.SUCCESSFUL, successfulMessage);
           })
           .catch((err: string) => {
-            const errorMessage =
-              'Could not send email(s) on proposal submission:';
-            logger.logError(errorMessage, {
+            logger.logError('Could not send email(s) on proposal submission:', {
               error: err,
               event,
             });
-            eventHandlerCallBack(EventStatus.FAILED, errorMessage);
           });
       });
 
@@ -180,10 +167,10 @@ export async function stfcEmailHandler(
     case Event.CALL_CREATED: {
       if (event?.call) {
         if (!(process.env && process.env.FBS_EMAIL)) {
-          const errorMessage =
-            'Could not send email(s) on call creation, environmental variable (FBS_EMAIL) not found';
-          logger.logError(errorMessage, {});
-          eventHandlerCallBack(EventStatus.FAILED, errorMessage);
+          logger.logError(
+            'Could not send email(s) on call creation, environmental variable (FBS_EMAIL) not found',
+            {}
+          );
 
           return;
         }
@@ -203,27 +190,19 @@ export async function stfcEmailHandler(
         mailService
           .sendMail(emailSettings)
           .then((res: any) => {
-            const successfulMessage = 'Emails sent on call creation:';
-            logger.logInfo(successfulMessage, {
+            logger.logInfo('Emails sent on call creation:', {
               result: res,
               event,
             });
-            eventHandlerCallBack(EventStatus.SUCCESSFUL, successfulMessage);
           })
           .catch((err: string) => {
-            const errorMessage = 'Could not send email(s) on call creation:';
-            logger.logError(errorMessage, {
+            logger.logError('Could not send email(s) on call creation:', {
               error: err,
               event,
             });
-            eventHandlerCallBack(EventStatus.FAILED, errorMessage);
           });
       }
 
-      return;
-    }
-
-    default: {
       return;
     }
   }

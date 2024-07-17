@@ -19,10 +19,7 @@ export default class EventLogQueries {
   @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: UserWithRole | null,
-    filter: EventLogFilter = {
-      changedObjectId: '*',
-      eventType: '*',
-    }
+    filter: EventLogFilter = { changedObjectId: '*', eventType: '*' }
   ) {
     return await this.dataSource.get(filter);
   }

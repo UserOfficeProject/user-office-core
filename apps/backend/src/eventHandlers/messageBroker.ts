@@ -11,9 +11,9 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { ApplicationEvent, EventStatus } from '../events/applicationEvents';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
-import { EventCallback, EventHandler } from '../events/eventBus';
+import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
@@ -194,10 +194,7 @@ export async function createPostToRabbitMQHandler() {
     Tokens.ProposalDataSource
   );
 
-  return async (
-    event: ApplicationEvent,
-    eventHandlerCallBack: EventCallback
-  ) => {
+  return async (event: ApplicationEvent) => {
     // if the original method failed
     // there is no point of publishing any event
     if (event.isRejection) {
@@ -213,24 +210,11 @@ export async function createPostToRabbitMQHandler() {
       case Event.PROPOSAL_STATUS_ACTION_EXECUTED: {
         const jsonMessage = await getProposalMessageData(event.proposal);
 
-        await rabbitMQ
-          .sendMessageToExchange(
-            event.exchange || EXCHANGE_NAME,
-            event.type,
-            jsonMessage
-          )
-          .then(() =>
-            eventHandlerCallBack(
-              EventStatus.SUCCESSFUL,
-              'Message send to RabbitMQ exchange'
-            )
-          )
-          .catch(() =>
-            eventHandlerCallBack(
-              EventStatus.FAILED,
-              'Could not send message to RabbitMQ exchange'
-            )
-          );
+        await rabbitMQ.sendMessageToExchange(
+          event.exchange || EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
       case Event.INSTRUMENT_CREATED:
@@ -238,20 +222,11 @@ export async function createPostToRabbitMQHandler() {
       case Event.INSTRUMENT_DELETED: {
         const jsonMessage = JSON.stringify(event.instrument);
 
-        await rabbitMQ
-          .sendMessageToExchange(EXCHANGE_NAME, event.type, jsonMessage)
-          .then(() =>
-            eventHandlerCallBack(
-              EventStatus.SUCCESSFUL,
-              'Message send to RabbitMQ exchange'
-            )
-          )
-          .catch(() =>
-            eventHandlerCallBack(
-              EventStatus.FAILED,
-              'Could not send message to RabbitMQ exchange'
-            )
-          );
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
       case Event.TOPIC_ANSWERED: {
@@ -275,59 +250,32 @@ export async function createPostToRabbitMQHandler() {
 
         const jsonMessage = JSON.stringify(answers);
 
-        await rabbitMQ
-          .sendMessageToExchange(EXCHANGE_NAME, event.type, jsonMessage)
-          .then(() =>
-            eventHandlerCallBack(
-              EventStatus.SUCCESSFUL,
-              'Message send to RabbitMQ exchange'
-            )
-          )
-          .catch(() =>
-            eventHandlerCallBack(
-              EventStatus.FAILED,
-              'Could not send message to RabbitMQ exchange'
-            )
-          );
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
       case Event.CALL_CREATED: {
         const jsonMessage = JSON.stringify(event.call);
 
-        await rabbitMQ
-          .sendMessageToExchange(EXCHANGE_NAME, event.type, jsonMessage)
-          .then(() =>
-            eventHandlerCallBack(
-              EventStatus.SUCCESSFUL,
-              'Message send to RabbitMQ exchange'
-            )
-          )
-          .catch(() =>
-            eventHandlerCallBack(
-              EventStatus.FAILED,
-              'Could not send message to RabbitMQ exchange'
-            )
-          );
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
       case Event.USER_UPDATED:
       case Event.USER_DELETED: {
         const jsonMessage = JSON.stringify(event.user);
 
-        await rabbitMQ
-          .sendMessageToExchange(EXCHANGE_NAME, event.type, jsonMessage)
-          .then(() =>
-            eventHandlerCallBack(
-              EventStatus.SUCCESSFUL,
-              'Message send to RabbitMQ exchange'
-            )
-          )
-          .catch(() =>
-            eventHandlerCallBack(
-              EventStatus.FAILED,
-              'Could not send message to RabbitMQ exchange'
-            )
-          );
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
         break;
       }
     }

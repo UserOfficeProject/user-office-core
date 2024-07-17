@@ -36,13 +36,10 @@ export default function createHandler() {
     // NOTE: If the event is rejection than log that in the database as well. Later we will be able to see all errors that happened.
     if (event.isRejection) {
       await eventLogsDataSource.set(
-        event.eventId || null,
         event.loggedInUserId,
         event.type,
         json,
-        'error',
-        event.eventStatus || null,
-        event.description
+        'error'
       );
 
       return;
@@ -53,13 +50,10 @@ export default function createHandler() {
       switch (event.type) {
         case Event.EMAIL_INVITE:
           await eventLogsDataSource.set(
-            event.eventId || null,
             event.loggedInUserId,
             event.type,
             json,
-            event.emailinviteresponse.userId.toString(),
-            event.eventStatus || null,
-            event.description
+            event.emailinviteresponse.userId.toString()
           );
           break;
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
@@ -76,12 +70,10 @@ export default function createHandler() {
                   .join(', ')}`;
 
                 return eventLogsDataSource.set(
-                  event.eventId || null,
                   event.loggedInUserId,
                   event.type,
                   json,
                   proposalPk.toString(),
-                  event.eventStatus || null,
                   description
                 );
               }
@@ -99,12 +91,10 @@ export default function createHandler() {
                 .join(', ')}`;
 
               return eventLogsDataSource.set(
-                event.eventId || null,
                 event.loggedInUserId,
                 event.type,
                 json,
                 proposalPk.toString(),
-                event.eventStatus || null,
                 description
               );
             })
@@ -122,12 +112,10 @@ export default function createHandler() {
               const description = 'All proposal FAPs removed';
 
               return eventLogsDataSource.set(
-                event.eventId || null,
                 event.loggedInUserId,
                 event.type,
                 json,
                 fapProposal.proposalPk.toString(),
-                event.eventStatus || null,
                 description
               );
             })
@@ -145,12 +133,10 @@ export default function createHandler() {
               const description = `Status changed to: ${proposalStatus?.name}`;
 
               return eventLogsDataSource.set(
-                event.eventId || null,
                 event.loggedInUserId,
                 event.type,
                 json,
                 proposal.primaryKey.toString(),
-                event.eventStatus || null,
                 description
               );
             })
@@ -173,12 +159,10 @@ export default function createHandler() {
             event.instrumentshasproposals.proposalPks.map(
               async (proposalPk) => {
                 return eventLogsDataSource.set(
-                  event.eventId || null,
                   event.loggedInUserId,
                   event.type,
                   json,
                   proposalPk.toString(),
-                  event.eventStatus || null,
                   description
                 );
               }
@@ -190,24 +174,18 @@ export default function createHandler() {
         case Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN:
         case Event.PROPOSAL_FAP_MEETING_REORDER:
           await eventLogsDataSource.set(
-            event.eventId || null,
             event.loggedInUserId,
             event.type,
             json,
-            event.fapmeetingdecision.proposalPk.toString(),
-            event.eventStatus || null,
-            event.description
+            event.fapmeetingdecision.proposalPk.toString()
           );
           break;
         case Event.TOPIC_ANSWERED:
           await eventLogsDataSource.set(
-            event.eventId || null,
             event.loggedInUserId,
             event.type,
             json,
-            event.questionarystep.questionaryId.toString(),
-            event.eventStatus || null,
-            event.description
+            event.questionarystep.questionaryId.toString()
           );
           break;
         case Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE:
@@ -227,12 +205,10 @@ export default function createHandler() {
               description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is removed from technique: ${technique?.name}`;
 
               await eventLogsDataSource.set(
-                event.eventId || null,
                 event.loggedInUserId,
                 event.type,
                 json,
                 obj[0].techniqueId,
-                event.eventStatus || null,
                 description
               );
             }
@@ -255,12 +231,10 @@ export default function createHandler() {
               description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is attached to technique: ${technique?.name}`;
 
               await eventLogsDataSource.set(
-                event.eventId || null,
                 event.loggedInUserId,
                 event.type,
                 json,
                 obj[0].techniqueId,
-                event.eventStatus || null,
                 description
               );
             }
@@ -278,12 +252,10 @@ export default function createHandler() {
           const description = event.description || '';
 
           await eventLogsDataSource.set(
-            event.eventId || null,
             event.loggedInUserId,
             event.type,
             json,
             changedObjectId.toString(),
-            event.eventStatus || null,
             description
           );
           break;
