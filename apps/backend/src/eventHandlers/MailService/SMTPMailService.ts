@@ -98,6 +98,14 @@ export class SMTPMailService extends MailService {
       return { results: sendMailResults };
     }
 
+    let bccAddress: string;
+
+    if (options.bcc) {
+      bccAddress = options.bcc
+        .map((participant) => participant.address)
+        .join(';');
+    }
+
     options.recipients.forEach((participant) => {
       emailPromises.push(
         this._email.send({
@@ -111,11 +119,13 @@ export class SMTPMailService extends MailService {
                       : <string>process.env.SINK_EMAIL,
                     name: participant.address?.header_to,
                   },
+                  bcc: bccAddress,
                 }
               : {
                   to: isProduction
                     ? participant.address
                     : <string>process.env.SINK_EMAIL,
+                  bcc: bccAddress,
                 }),
           },
           locals: options.substitution_data,
