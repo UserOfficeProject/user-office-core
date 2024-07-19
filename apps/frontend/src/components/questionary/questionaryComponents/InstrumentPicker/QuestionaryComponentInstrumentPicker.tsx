@@ -173,7 +173,6 @@ export function QuestionaryComponentInstrumentPicker(
                         {value.instrumentName}:
                       </InputAdornment>
                     ),
-                    inputProps: { step: '0.5', min: '0.5' },
                   }}
                   data-time-request={value.instrumentId + '-time-request'}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -263,7 +262,7 @@ export function QuestionaryComponentInstrumentPicker(
           <RadioGroup
             id={id}
             name={id}
-            value={answer.value ?? null}
+            value={answer.value?.instrumentId ?? null}
             onChange={handleOnChange}
             className={
               config.instruments.length < 3
@@ -283,6 +282,9 @@ export function QuestionaryComponentInstrumentPicker(
               );
             })}
           </RadioGroup>
+          {config.requestTime && requestTimeForInstrument && (
+            <DynamicTimeFields />
+          )}
           {isError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );
