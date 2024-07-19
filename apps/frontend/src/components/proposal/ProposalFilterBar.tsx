@@ -112,26 +112,10 @@ const ProposalFilterBar = ({
           proposalStatuses={proposalStatuses?.data}
           isLoading={proposalStatuses?.isLoading}
           shouldShowAll={true}
-          hideStatus={false}
           onChange={(proposalStatusId) => {
             setProposalFilter({
               ...filter,
               proposalStatusId,
-            });
-          }}
-        />
-      </Grid>
-      <Grid item sm={3} xs={12}>
-        <ProposalStatusFilter
-          proposalStatusId={filter.proposalHideStatusId as number}
-          proposalStatuses={proposalStatuses?.data}
-          isLoading={proposalStatuses?.isLoading}
-          shouldShowAll={true}
-          hideStatus={true}
-          onChange={(proposalHideStatusId) => {
-            setProposalFilter({
-              ...filter,
-              proposalHideStatusId,
             });
           }}
         />
