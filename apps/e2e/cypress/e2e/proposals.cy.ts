@@ -1708,7 +1708,7 @@ context('Proposal tests', () => {
       cy.login('officer');
       cy.visit('/');
     });
-    it.only('Should be able to download proposal pdf for a proposal which contains instrument picker question', () => {
+    it('Should be able to download proposal pdf for a proposal which contains instrument picker question', () => {
       cy.createProposal({ callId: createdCallId }).then((result) => {
         if (result.createProposal) {
           createdProposalPk = result.createProposal.primaryKey;
