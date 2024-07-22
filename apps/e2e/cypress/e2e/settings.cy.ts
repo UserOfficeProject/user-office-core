@@ -1375,7 +1375,7 @@ context('Settings tests', () => {
       cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
     });
 
-    it.only('Feasibility Reviews should only be assigned if the Workflow contains a Feasibility Review Status', function () {
+    it('Feasibility Reviews should only be assigned if the Workflow contains a Feasibility Review Status', function () {
       createInstrumentAndAssignItToCall();
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
