@@ -231,3 +231,9 @@ export function fromArrayToCommaSeparated(
 ) {
   return itemsArray?.map((item) => item ?? '-').join(', ') || '-';
 }
+
+export const isLegacyCall = (cycleComment: Scalars['String']['input']) => {
+  return cycleComment === 'Created during legacy proposal import'
+    ? true
+    : false;
+};

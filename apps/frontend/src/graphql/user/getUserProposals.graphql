@@ -25,6 +25,7 @@ query getUserProposals {
         startCall
         endCall
         endCallInternal
+        cycleComment
       }
     }
   }
