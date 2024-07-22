@@ -23,26 +23,6 @@ export type CallRowObj = RowObj & {
   fapMeetingInComment?: string | null;
 };
 
-export const collectCallFapXLSXData = async (
-  callId: number,
-  user: UserWithRole
-) => {
-  const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
-  const call = await baseContext.queries.call.get(user, callId);
-  const filename = `${call?.shortCode}_FAP_Results.xlsx`;
-
-  const baseData = await Promise.all(
-    faps.map(async (fap) => {
-      return {
-        sheetName: fap.code,
-        rows: await collectFAPRowData(fap.id, callId, user),
-      };
-    })
-  );
-
-  return { data: baseData, filename: filename.replace(/\s+/g, '_') };
-};
-
 const collectFAPRowData = async (
   fapId: number,
   callId: number,
@@ -96,6 +76,26 @@ const collectFAPRowData = async (
         return arr.concat(inst);
       })
     : allRowData;
+};
+
+export const collectCallFapXLSXData = async (
+  callId: number,
+  user: UserWithRole
+) => {
+  const faps = await baseContext.queries.fap.dataSource.getFapsByCallId(callId);
+  const call = await baseContext.queries.call.get(user, callId);
+  const filename = `${call?.shortCode}_FAP_Results.xlsx`;
+
+  const baseData = await Promise.all(
+    faps.map(async (fap) => {
+      return {
+        sheetName: fap.code,
+        rows: await collectFAPRowData(fap.id, callId, user),
+      };
+    })
+  );
+
+  return { data: baseData, filename: filename.replace(/\s+/g, '_') };
 };
 
 function populateRow(row: CallRowObj): (string | number)[] {

@@ -102,6 +102,8 @@ export const collectFapXLSXRowData = async (
           proposal.proposer_id
         );
 
+        const piFullName = `${pi?.firstname} ${pi?.lastname}`;
+
         const proposalAnswers =
           await baseContext.queries.questionary.getQuestionarySteps(
             user,
@@ -115,7 +117,7 @@ export const collectFapXLSXRowData = async (
 
         return fapDataRow(
           proposal.proposal_pk,
-          `${pi?.firstname} ${pi?.lastname}`,
+          piFullName,
           proposal.average_grade,
           proposal.instrument_name,
           proposal.availability_time,
