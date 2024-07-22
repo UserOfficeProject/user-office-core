@@ -2,7 +2,6 @@ import querystring from 'querystring';
 import { Readable } from 'stream';
 import { ReadableStream } from 'stream/web';
 
-import { logger } from '@user-office-software/duo-logger';
 import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
 
@@ -35,15 +34,18 @@ export type XLSXMetaBase = MetaBase & { columns: string[] };
 
 const ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
-if (!ENDPOINT) {
-  logger.logError(
-    'Could not start application: the `USER_OFFICE_FACTORY_ENDPOINT` environment variable is missing. Exiting.',
-    {}
-  );
-  process.exit(1);
+export interface DownloadService {
+  callFactoryService<TData, TMeta extends MetaBase>(
+    downloadType: DownloadType,
+    type: PDFType | XLSXType | ZIPType,
+    properties: { data: TData[]; meta: TMeta; userRole: Role },
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
 }
 
-export default async function callFactoryService<TData, TMeta extends MetaBase>(
+export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
   downloadType: DownloadType,
   type: PDFType | XLSXType | ZIPType,
   properties: { data: TData[]; meta: TMeta; userRole: Role },

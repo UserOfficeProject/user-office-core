@@ -1,0 +1,20 @@
+site_name: User Office Documentation
+theme:
+  name: material
+  features:
+    - navigation.top
+    - content.tooltips
+  palette:
+    primary: green
+    accent: green
+extra:
+  version:
+    provider: mike
+    default: latest
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
+  - md_in_html
+  - pymdownx.snippets

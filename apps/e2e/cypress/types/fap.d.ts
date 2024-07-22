@@ -5,16 +5,18 @@ import {
   CreateFapMutationVariables,
   AssignReviewersToFapMutationVariables,
   AssignReviewersToFapMutation,
+  AssignFapReviewersToProposalsMutationVariables,
+  AssignFapReviewersToProposalsMutation,
   AssignProposalsToFapsMutation,
   AssignProposalsToFapsMutationVariables,
-  AssignFapReviewersToProposalMutationVariables,
-  AssignFapReviewersToProposalMutation,
   SaveFapMeetingDecisionMutationVariables,
   SaveFapMeetingDecisionMutation,
   UpdateReviewMutationVariables,
   UpdateReviewMutation,
   GetProposalReviewsQueryVariables,
   GetProposalReviewsQuery,
+  ReorderFapMeetingDecisionProposalsMutationVariables,
+  ReorderFapMeetingDecisionProposalsMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -71,14 +73,14 @@ declare global {
       /**
        * Assign Fap reviewers to proposal.
        *
-       * @returns {typeof assignFapReviewersToProposal}
+       * @returns {typeof assignFapReviewersToProposals}
        * @memberof Chainable
        * @example
-       *    cy.assignFapReviewersToProposal(assignFapReviewersToProposalInput: AssignFapReviewersToProposalMutationVariables)
+       *    cy.assignFapReviewersToProposals(assignFapReviewersToProposalsInput: AssignFapReviewersToProposalsMutationVariables)
        */
-      assignFapReviewersToProposal: (
-        assignFapReviewersToProposalInput: AssignFapReviewersToProposalMutationVariables
-      ) => Cypress.Chainable<AssignFapReviewersToProposalMutation>;
+      assignFapReviewersToProposals: (
+        assignFapReviewersToProposalInput: AssignFapReviewersToProposalsMutationVariables
+      ) => Cypress.Chainable<AssignFapReviewersToProposalsMutation>;
 
       /**
        * Update proposal Fap review.
@@ -115,6 +117,18 @@ declare global {
       saveFapMeetingDecision: (
         saveFapMeetingDecisionInput: SaveFapMeetingDecisionMutationVariables
       ) => Cypress.Chainable<SaveFapMeetingDecisionMutation>;
+
+      /**
+       * Reorder FAP meeting decision proposals.
+       *
+       * @returns {typeof reorderFapMeetingDecisionProposals}
+       * @memberof Chainable
+       * @example
+       *    cy.reorderFapMeetingDecisionProposals(reorderFapMeetingDecisionProposalsInput: ReorderFapMeetingDecisionProposalsMutationVariables)
+       */
+      reorderFapMeetingDecisionProposals: (
+        reorderFapMeetingDecisionProposalsInput: ReorderFapMeetingDecisionProposalsMutationVariables
+      ) => Cypress.Chainable<ReorderFapMeetingDecisionProposalsMutation>;
     }
   }
 }

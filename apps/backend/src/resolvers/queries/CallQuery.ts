@@ -12,4 +12,12 @@ export class CallQuery {
   ) {
     return context.queries.call.get(context.user, callId);
   }
+
+  @Query(() => Call, { nullable: true })
+  callByQuestionId(
+    @Arg('questionId', () => String) questionId: string,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.call.getCallByQuestionId(context.user, questionId);
+  }
 }
