@@ -13,6 +13,7 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
 import { Event } from 'generated/sdk';
 import { useProposalEventsData } from 'hooks/settings/useProposalEventsData';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
 const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
   selectedStatusChangingEvents: yup
@@ -60,9 +61,7 @@ const AddStatusChangingEventsToConnection = ({
             sx={{
               fontSize: '20px',
               padding: '22px 0 0',
-              '& .statusName': {
-                fontWeight: 'bold',
-              },
+              '& .statusName': BOLD_TEXT_STYLE,
             }}
           >
             Events that will trigger the change to{' '}

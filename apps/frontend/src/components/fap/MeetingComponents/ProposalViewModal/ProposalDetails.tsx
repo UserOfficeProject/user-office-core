@@ -10,6 +10,7 @@ import React from 'react';
 import { Proposal } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { StyledPaper } from 'styles/StyledComponents';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { average, getGradesFromReviews } from 'utils/mathFunctions';
 import { getFullUserName } from 'utils/user';
 
@@ -37,49 +38,49 @@ const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
           <Table sx={{ minWidth: 500 }}>
             <TableBody>
               <TableRow key="titleAndShortCode">
-                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
+                <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                   ID
                 </TableCell>
                 <TableCell width="25%">{proposal.proposalId}</TableCell>
-                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
+                <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                   Title
                 </TableCell>
                 <TableCell>{proposal.title}</TableCell>
               </TableRow>
               <TableRow key="abstractAndScore">
-                <TableCell sx={{ fontWeight: 'bold' }}>Abstract</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Abstract</TableCell>
                 <TableCell>{proposal.abstract}</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Average score</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Average score</TableCell>
                 <TableCell>
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
               </TableRow>
               <TableRow key="principalInvestigatorAndStatus">
-                <TableCell sx={{ fontWeight: 'bold' }}>
+                <TableCell sx={BOLD_TEXT_STYLE}>
                   Principal Investigator
                 </TableCell>
                 <TableCell>{getFullUserName(proposal.proposer)}</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Status</TableCell>
                 <TableCell>{proposal.status?.name}</TableCell>
               </TableRow>
               <TableRow key="coProposersAndCall">
-                <TableCell sx={{ fontWeight: 'bold' }}>Co-Proposers</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Co-Proposers</TableCell>
                 <TableCell>
                   {proposal.users
                     .map((user) => getFullUserName(user))
                     .join(', ')}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Call</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Call</TableCell>
                 <TableCell>{proposal.call?.shortCode}</TableCell>
               </TableRow>
               <TableRow key="ranking">
-                <TableCell sx={{ fontWeight: 'bold' }}>
+                <TableCell sx={BOLD_TEXT_STYLE}>
                   Initial Rank (by average score)
                 </TableCell>
                 <TableCell>
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Current Rank</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Current Rank</TableCell>
                 <TableCell>
                   {
                     proposal.fapMeetingDecisions?.find(
@@ -89,13 +90,13 @@ const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
                 </TableCell>
               </TableRow>
               <TableRow key="instrumentAndPdf">
-                <TableCell sx={{ fontWeight: 'bold' }}>Instrument</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Instrument</TableCell>
                 <TableCell>
                   {proposal.instruments
                     ?.map((instrument) => instrument?.name)
                     .join(', ')}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>PDF</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>PDF</TableCell>
                 <TableCell>
                   <Button
                     onClick={() =>

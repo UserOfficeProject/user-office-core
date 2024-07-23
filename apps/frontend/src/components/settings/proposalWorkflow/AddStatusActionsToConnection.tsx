@@ -24,6 +24,7 @@ import {
   RabbitMqActionDefaultConfig,
 } from 'generated/sdk';
 import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
 import EmailActionConfig from './EmailActionConfig';
 import RabbitMQActionConfig from './RabbitMQActionConfig';
@@ -167,9 +168,7 @@ const AddStatusActionsToConnection = ({
             sx={{
               fontSize: '20px',
               padding: '22px 0 0',
-              '& .statusName': {
-                fontWeight: 'bold',
-              },
+              '& .statusName': BOLD_TEXT_STYLE,
             }}
           >
             Status actions that will be executed when proposals change to{' '}

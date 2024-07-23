@@ -22,6 +22,7 @@ import {
   ConflictResolutionStrategy,
   QuestionComparisonStatus,
 } from 'generated/sdk';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
 export interface DiffInfo {
   heading: string;
@@ -122,7 +123,7 @@ export function ConflictResolver<T>(props: {
             <TableHead>
               <TableRow>
                 <TableCell>{getItemId(comparison)}</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>
+                <TableCell sx={BOLD_TEXT_STYLE}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -141,7 +142,7 @@ export function ConflictResolver<T>(props: {
                     label="Existing Question"
                   />
                 </TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>
+                <TableCell sx={BOLD_TEXT_STYLE}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -170,9 +171,7 @@ export function ConflictResolver<T>(props: {
                   }}
                   key={diffInfo.heading}
                 >
-                  <TableCell sx={{ fontWeight: 'bold' }}>
-                    {diffInfo.heading}
-                  </TableCell>
+                  <TableCell sx={BOLD_TEXT_STYLE}>{diffInfo.heading}</TableCell>
                   <TableCell>{diffInfo.existingVal}</TableCell>
                   <TableCell>{diffInfo.newVal}</TableCell>
                 </TableRow>

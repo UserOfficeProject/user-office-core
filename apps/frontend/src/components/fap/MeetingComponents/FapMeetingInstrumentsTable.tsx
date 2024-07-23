@@ -22,6 +22,7 @@ import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXFap } from 'hooks/fap/useDownloadXLSXFap';
 import { useInstrumentsByFapData } from 'hooks/instrument/useInstrumentsByFapData';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -282,11 +283,7 @@ const FapMeetingInstrumentsTable = ({
           Some proposals could not be submitted
         </DialogTitle>
         <DialogContent>
-          <DialogContentText
-            sx={{
-              fontWeight: 'bold',
-            }}
-          >
+          <DialogContentText sx={BOLD_TEXT_STYLE}>
             The Following proposals could not be submitted
           </DialogContentText>
           {Array.from(dialogOpen).map((proposals) => (

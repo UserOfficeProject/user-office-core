@@ -27,6 +27,7 @@ import {
   TechnicalReview,
 } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 
@@ -174,13 +175,13 @@ const TechnicalReviewInfo = ({
           <Table sx={{ minWidth: 500 }}>
             <TableBody>
               <TableRow key="statusAndTime">
-                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
+                <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                   Status
                 </TableCell>
                 <TableCell width="25%">
                   {technicalReview?.status || '-'}
                 </TableCell>
-                <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
+                <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                   Time allocation(
                   {fapProposalArgs.proposal.call?.allocationTimeUnit}s)
                   {hasWriteAccess && (
@@ -223,7 +224,7 @@ const TechnicalReviewInfo = ({
                 </TableCell>
               </TableRow>
               <TableRow key="comments">
-                <TableCell sx={{ fontWeight: 'bold' }}>
+                <TableCell sx={BOLD_TEXT_STYLE}>
                   Comments for the review panel
                 </TableCell>
                 <TableCell
@@ -231,7 +232,7 @@ const TechnicalReviewInfo = ({
                     __html: technicalReview?.publicComment || '-',
                   }}
                 />
-                <TableCell sx={{ fontWeight: 'bold' }}>Reviewer</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Reviewer</TableCell>
                 <TableCell>
                   {getFullUserName(technicalReview?.reviewer)}
                 </TableCell>

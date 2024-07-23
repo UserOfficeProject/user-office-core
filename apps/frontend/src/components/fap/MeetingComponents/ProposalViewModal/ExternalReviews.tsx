@@ -8,6 +8,7 @@ import React from 'react';
 
 import { Fap, Review } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { getFullUserName } from 'utils/user';
 
 type ExternalReviewsProps = {
@@ -32,13 +33,13 @@ const ExternalReviews = ({ reviews, faps }: ExternalReviewsProps) => (
         <Table sx={{ minWidth: 500 }}>
           <TableBody>
             <TableRow key="externalReviewsHeading">
-              <TableCell width="50%" sx={{ fontWeight: 'bold' }}>
+              <TableCell width="50%" sx={BOLD_TEXT_STYLE}>
                 Name
               </TableCell>
-              <TableCell width="25%" sx={{ fontWeight: 'bold' }}>
+              <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                 Score
               </TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Comment</TableCell>
+              <TableCell sx={BOLD_TEXT_STYLE}>Comment</TableCell>
             </TableRow>
             {reviews?.map((review) => (
               <TableRow key={`externalReviews_${review.id}_${review.userID}`}>

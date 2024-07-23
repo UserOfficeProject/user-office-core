@@ -234,3 +234,7 @@ export function fromArrayToCommaSeparated(
 }
 
 export const getMax32BitInteger = () => Math.pow(2, 31);
+
+export const BOLD_TEXT_STYLE = {
+  fontWeight: 'bold',
+};

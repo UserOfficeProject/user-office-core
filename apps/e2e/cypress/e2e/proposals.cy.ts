@@ -380,7 +380,7 @@ context('Proposal tests', () => {
       );
     });
 
-    // NOTE: This functionality should be refactored and the test as well.
+    // NOTE: This functionality should be refactored and the test as well. https://jira.esss.lu.se/browse/SWAP-4143
     // it('User officer should be able to select all prefetched proposals in the table', function () {
     //   const NUMBER_OF_PROPOSALS = 11;
     //   const DEFAULT_ROWS_PER_PAGE = 10;

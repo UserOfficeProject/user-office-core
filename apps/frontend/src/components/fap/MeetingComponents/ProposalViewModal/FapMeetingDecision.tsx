@@ -12,6 +12,7 @@ import {
   Instrument,
 } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
 type FapMeetingDecisionProps = {
   fapMeetingDecisions: Maybe<FapMeetingDecisionType[]>;
@@ -51,31 +52,17 @@ const FapMeetingDecision = ({
             <Table>
               <TableBody>
                 <TableRow key="statusAndTime">
-                  <TableCell
-                    width="25%"
-                    sx={{
-                      fontWeight: 'bold',
-                    }}
-                  >
+                  <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                     Rank
                   </TableCell>
                   <TableCell width="25%">{fmd.rankOrder || '-'}</TableCell>
-                  <TableCell
-                    width="25%"
-                    sx={{
-                      fontWeight: 'bold',
-                    }}
-                  >
+                  <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                     Fap meeting recommendation
                   </TableCell>
                   <TableCell width="25%">{fmd.recommendation || '-'}</TableCell>
                 </TableRow>
                 <TableRow key="comments">
-                  <TableCell
-                    sx={{
-                      fontWeight: 'bold',
-                    }}
-                  >
+                  <TableCell sx={BOLD_TEXT_STYLE}>
                     Comment for management
                   </TableCell>
                   <TableCell
@@ -83,13 +70,7 @@ const FapMeetingDecision = ({
                       __html: fmd.commentForManagement || '-',
                     }}
                   />
-                  <TableCell
-                    sx={{
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    Comment for user
-                  </TableCell>
+                  <TableCell sx={BOLD_TEXT_STYLE}>Comment for user</TableCell>
                   <TableCell
                     dangerouslySetInnerHTML={{
                       __html: fmd.commentForUser || '-',
