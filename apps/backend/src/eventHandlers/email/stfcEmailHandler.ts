@@ -28,12 +28,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const adminDataSource = container.resolve<AdminDataSource>(
-    Tokens.AdminDataSource
-  );
-
-  const bccAddress = (await adminDataSource.getSetting(SettingsId.BCC_EMAIL))
-    ?.settingsValue;
 
   switch (event.type) {
     /*
@@ -86,10 +80,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           participants
         );
 
-        if (bccAddress) {
-          piEmail.bcc = [{ address: bccAddress }];
-        }
-
         emailsToSend.push(piEmail);
       } else {
         logger.logError(
@@ -128,6 +118,10 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           instrumentRequested = '';
         }
 
+        const adminDataSource = container.resolve<AdminDataSource>(
+          Tokens.AdminDataSource
+        );
+
         const uoAddress = (
           await adminDataSource.getSetting(SettingsId.USER_OFFICE_EMAIL)
         )?.settingsValue;
@@ -140,10 +134,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
             participants,
             uoAddress
           );
-
-          if (bccAddress) {
-            uoRapidEmail.bcc = [{ address: bccAddress }];
-          }
 
           emailsToSend.push(uoRapidEmail);
         } else {
@@ -196,10 +186,6 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
           templateID,
           notificationEmailAddress
         );
-
-        if (bccAddress) {
-          emailSettings.bcc = [{ address: bccAddress }];
-        }
 
         mailService
           .sendMail(emailSettings)

@@ -3,7 +3,11 @@ import path from 'path';
 import { logger } from '@user-office-software/duo-logger';
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
+import { AdminDataSource } from '../../datasources/AdminDataSource';
+import { SettingsId } from '../../models/Settings';
 import { isProduction } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
 import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
@@ -72,6 +76,13 @@ export class SMTPMailService extends MailService {
   }
 
   async sendMail(options: EmailSettings): ResultsPromise<SendMailResults> {
+    const adminDataSource = container.resolve<AdminDataSource>(
+      Tokens.AdminDataSource
+    );
+
+    const bccAddress = (await adminDataSource.getSetting(SettingsId.BCC_EMAIL))
+      ?.settingsValue;
+
     const emailPromises: Promise<SendMailResults>[] = [];
 
     const sendMailResults: SendMailResults = {
@@ -96,14 +107,6 @@ export class SMTPMailService extends MailService {
       });
 
       return { results: sendMailResults };
-    }
-
-    let bccAddress: string;
-
-    if (options.bcc) {
-      bccAddress = options.bcc
-        .map((participant) => participant.address)
-        .join(';');
     }
 
     options.recipients.forEach((participant) => {
