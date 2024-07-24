@@ -440,7 +440,8 @@ export default class PostgresQuestionaryDataSource
 
   async copyAnswers(
     sourceQuestionaryId: number,
-    targetQuestionaryId: number
+    targetQuestionaryId: number,
+    markAsComplete: boolean
   ): Promise<void> {
     const sourceQuestionary = await this.getQuestionary(sourceQuestionaryId);
     const targetQuestionary = await this.getQuestionary(targetQuestionaryId);
@@ -453,30 +454,65 @@ export default class PostgresQuestionaryDataSource
         'Can not copy questions, because no template for the questionary was found'
       );
     }
-    await database.raw(
-      `
-      INSERT INTO 
-      answers(questionary_id, question_id, answer)
-      SELECT :targetQuestionaryId, question_id, answer FROM answers 
-      WHERE question_id IN (
-        SELECT question_id 
-        FROM templates_has_questions
-        WHERE question_id IN
-          (
-            SELECT question_id from templates_has_questions
-            WHERE template_id=:targetTemplateId
+
+    try {
+      await database.transaction(async (trx) => {
+        const answers = await database.raw(
+          `
+          SELECT ${targetQuestionaryId} as questionary_id, question_id, answer FROM answers 
+          WHERE question_id IN (
+            SELECT question_id 
+            FROM templates_has_questions
+            WHERE question_id IN
+              (
+                SELECT question_id from templates_has_questions
+                WHERE template_id=:targetTemplateId
+              )
+            AND template_id=:sourceTemplateId
           )
-        AND template_id=:sourceTemplateId
-      )
-      AND questionary_id = :sourceQuestionaryId
-  `,
-      {
-        targetQuestionaryId,
-        targetTemplateId,
-        sourceTemplateId,
+          AND questionary_id = :sourceQuestionaryId
+          `,
+          {
+            targetQuestionaryId,
+            targetTemplateId,
+            sourceTemplateId,
+            sourceQuestionaryId,
+          }
+        );
+        if (answers.rows && answers.rows.length > 0) {
+          await database('answers').insert(answers.rows).transacting(trx);
+
+          if (markAsComplete) {
+            await database(
+              database.raw('?? (??, ??, ??)', [
+                'topic_completenesses',
+                'questionary_id',
+                'topic_id',
+                'is_complete',
+              ])
+            )
+              .insert(
+                database('topics')
+                  .select(
+                    database.raw(`${targetQuestionaryId}, ??, ${true}`, [
+                      'topic_id',
+                    ])
+                  )
+                  .where('template_id', targetTemplateId),
+                ['questionary_id', 'topic_id', 'is_complete']
+              )
+              .transacting(trx);
+          }
+        }
+      });
+    } catch (error) {
+      logger.logError('Could not copy questionary answers', {
+        error,
         sourceQuestionaryId,
-      }
-    );
+        targetQuestionaryId,
+      });
+      throw new GraphQLError('Could not copy questionary answers');
+    }
   }
 
   async clone(
