@@ -38,6 +38,7 @@ export interface QuestionaryDataSource {
   ): Promise<Questionary>;
   copyAnswers(
     sourceQuestionaryId: number,
-    targetQuestionaryId: number
+    targetQuestionaryId: number,
+    markAsComplete?: boolean
   ): Promise<void>;
 }
