@@ -1618,9 +1618,10 @@ context('Template tests', () => {
   describe('File upload tests', () => {
     beforeEach(() => {
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/ProposalTemplates');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.get('table.MuiTable-root').should('exist');
+      cy.finishedLoading();
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -1633,7 +1634,9 @@ context('Template tests', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
-      cy.contains('New Proposal').click();
+      cy.get('[data-cy="user-menu-items"] [aria-label="New Proposal"]')
+        .should('not.have.class', 'Mui-disabled')
+        .click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type('title');
