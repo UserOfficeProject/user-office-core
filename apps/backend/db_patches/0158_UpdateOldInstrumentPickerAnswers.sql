@@ -6,7 +6,7 @@ BEGIN
       --QUERY TO UPDATE ANSWERS WITH SINGLE INSTRUMENT ID
       UPDATE answers 
       SET answer = jsonb_set(answer, '{value}', jsonb_build_object('instrumentId', answer->>'value','timeRequested',null)) 
-      WHERE question_id IN (SELECT question_id FROM  questions WHERE data_type='INSTRUMENT_PICKER' AND
+      WHERE jsonb_typeof(answer->'value')='number' and question_id IN (SELECT question_id FROM  questions WHERE data_type='INSTRUMENT_PICKER' AND
       (default_config->'isMultipleSelect' IS NULL OR default_config->>'isMultipleSelect' = 'false'));
 
       --SQL BLOCK TO UPDATE ANSWERS WITH MULTIPLE INSTRUMENT IDS
