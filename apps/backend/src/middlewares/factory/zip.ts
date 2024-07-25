@@ -51,6 +51,12 @@ router.get(`/${ZIPType.ATTACHMENT}/:proposal_pks`, async (req, res, next) => {
     if (!data) {
       throw new Error('Could not get attachments');
     }
+
+    const attachments = data.flatMap(({ attachments }) => attachments);
+    if (attachments.length === 0) {
+      return res.status(404).send('NO_ATTACHMENTS');
+    }
+
     downloadService.callFactoryService<ProposalAttachmentData, MetaBase>(
       DownloadType.ZIP,
       ZIPType.ATTACHMENT,

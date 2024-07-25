@@ -443,6 +443,9 @@ context('Proposal administration tests', () => {
         'attachment'
       );
 
+      cy.get('[role="alert"]').should('exist');
+      cy.get('[role="alert"]').contains('No attachments found');
+
       cy.contains(proposalFixedName)
         .parent()
         .find('input[type="checkbox"]')
@@ -463,6 +466,9 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         '2 selected items'
       );
+
+      cy.get('[role="alert"]').should('exist');
+      cy.get('[role="alert"]').contains('No attachments found');
     });
 
     it('Downloaded proposal filename format is RB_SURNAME_YYYY', function () {
