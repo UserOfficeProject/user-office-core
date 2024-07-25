@@ -18,3 +18,8 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde

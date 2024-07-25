@@ -1,4 +1,4 @@
-# Facility Access Panels  
+# FAPs
 
 ### **What are facility access panels?**
 

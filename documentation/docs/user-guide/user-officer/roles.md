@@ -1,27 +1,65 @@
 # Roles
 
-## User 
-Users are the visiting scientists who are applying for beamtime through proposals.
+There are many roles within User Office: 
 
-Main uses of UO:
-* Submitting Proposals
+??? info "User"
+    
+    The **Users** are the visiting scientists who are applying for beamtime through proposals.
+    
+    **Main uses of User Office:**
 
-## User Officer
-The User Office is part of the Research Coordination Office and is responsible for managing the administration of the user programme. This includes coordinating proposal submission, review and selection, preparing user visits to ESS for experiments and collating experiment reports and publications. 
+    * Submitting Proposals
 
-Main uses of UO:
-* Creating calls
-* Managing proposals
-* Coordinating review and selection
+??? info "User"
 
-## Instriment Scientist
+    The **User Officer** is part of the Research Coordination Office and is responsible for managing the administration of the user programme. This includes coordinating proposal submission, review and selection, preparing user visits to ESS for experiments and collating experiment reports and publications. 
 
-## Sample Safety Revieer
+    **Main uses of User Office:**
 
-## Internal Reviewer 
+    * Creating calls
+    * Managing proposals
+    * Coordinating review and selection
+    * Impersonating other users 
 
-## FAP Chair
+??? info "Instrument Scientist"
 
-## FAP Secretary
+    **Instrument Scientist**
 
-## FAP Reviewer
+    **Main uses of User Office:**
+
+??? info "Sample Safety Reviewer"
+
+    **Sample Safety Reviewer**
+
+    **Main uses of User Office:**
+
+??? info "Internal Reviewer"
+
+    **Internal Reviewer**
+
+    **Main uses of User Office:**
+
+??? info "FAP Chair"
+
+    **FAP Chair** are part of the Facility Access Panel (FAP)
+
+    **Main uses of User Office:**
+
+??? info "FAP Secretary"
+
+    **FAP Secratary** are part of the Facility Access Panel (FAP)
+
+    **Main uses of User Office:**
+
+??? info "FAP Reviewer"
+
+    **FAP Reviewer** are part of the Facility Access Panel (FAP)
+
+    **Main uses of User Office:**
+
+
+### How do I change roles?
+
+
+### How do I impersonate other users? 
+

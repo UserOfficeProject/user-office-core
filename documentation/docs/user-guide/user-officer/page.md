@@ -42,7 +42,7 @@ DEV team
 ## Grade guide 
 (link to carina's grade guide) There is also a grade guide in the FAP page
 
-# Page formatting tips
+### Page formatting tips
 To create a new page click on File > New document , or edit the pre-existing message.
 In Edit you may Undo and Redoactions, cut, copy, pasteand select alltext
 You may also view the source codeInsert a link or Image
