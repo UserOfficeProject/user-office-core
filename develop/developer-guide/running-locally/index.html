@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../CONTRIBUTING/">
+        <link rel="prev" href="../achitecture/">
       
       
-        <link rel="next" href="../running-locally/">
+        <link rel="next" href="../codebase-structure/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Architecture - User Office Documentation</title>
+        <title>Running locally - User Office Documentation</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#components" class="md-skip">
+        <a href="#prerequisites" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Architecture
+              Running locally
             
           </span>
         </div>
@@ -593,6 +593,27 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../achitecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -607,7 +628,7 @@
           
   
   <span class="md-ellipsis">
-    Architecture
+    Running locally
   </span>
   
 
@@ -618,7 +639,7 @@
         
   
   <span class="md-ellipsis">
-    Architecture
+    Running locally
   </span>
   
 
@@ -638,11 +659,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#components" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      Components
+      Prerequisites
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-with-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running with Docker Compose
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graphql-playground-and-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphQL Playground and Schema
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#npm-run-lint" class="md-nav__link">
+    <span class="md-ellipsis">
+      npm run lint
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -650,27 +731,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../running-locally/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Running locally
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -831,11 +891,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#components" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      Components
+      Prerequisites
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-with-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running with Docker Compose
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graphql-playground-and-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphQL Playground and Schema
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#npm-run-lint" class="md-nav__link">
+    <span class="md-ellipsis">
+      npm run lint
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -854,24 +974,55 @@
                   
 
 
-  <h1>Architecture</h1>
+  <h1>Running locally</h1>
 
-<p>The following picture shows the components of the User Office architecture.</p>
-<p><img alt="System overview" src="../../assets/images/system-overview.png" /></p>
-<h2 id="components">Components</h2>
-<p>The User Office application is a comprehensive system designed to handle user interactions, proposal submissions, reviews, and scheduling. 
-The architecture consists of several core components that interact through GraphQL and RabbitMQ for seamless communication and data flow.</p>
-<p>At the heart of the system is the User Office Core, which includes the User Office Frontend, responsible for the main user interface, 
-proposal submissions, reviews, and visits. The User Office Backend manages requests from the frontend, interfaces with the database, 
-and handles authentication services. Additionally, the User Office Factory generates PDF and Excel files for the frontend, while the
-User Office Cron performs asynchronous backend tasks such as user cleanup after inactivity.</p>
-<p>The User Office Gateway combines APIs from the scheduler backend and core backend, providing a unified GraphQL API essential for systems
-using the scheduler. The User Office Scheduler consists of two parts: the User Office Scheduler Frontend, which manages the scheduling 
-interface, and the User Office Scheduler Backend, which serves as the main source of scheduling information and interfaces with the core
-backend via RabbitMQ.</p>
-<p>External dependencies such as SciCat, NICOS, and Asset Management systems interface with the User Office application, ensuring efficient
-asset management and other related tasks. The entire system architecture is designed for robust and scalable performance, facilitating
-efficient user management, data handling, and background processing operations.</p>
+<p>To successfully run both the backend and frontend of the project locally, follow these steps:</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Ensure you have the following installed on your machine:</p>
+<ul>
+<li>Node.js</li>
+<li>npm</li>
+<li>Docker (if using Docker Compose)</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p><strong>1. Install Dependencies</strong></p>
+<p>Navigate to the root directory of your project and install all necessary dependencies:</p>
+<p><code>npm install</code></p>
+<p><strong>2. Start the Application</strong></p>
+<p>Start the application in development mode:</p>
+<p><code>npm run dev</code></p>
+<p>Alternatively, you can use:</p>
+<p><code>npm run start</code></p>
+<h2 id="configuration">Configuration</h2>
+<p><strong>Check the '.env' File</strong></p>
+<p>The application requires environment variables to be set. If a .env file is not present at startup, it will be generated using the example.development.env template.</p>
+<pre><code>Backend: apps/backend/.env
+Frontend: apps/frontend/.env
+</code></pre>
+<p>Ensure these files are correctly configured before starting the application. For more information about configuration, visit the <a href="../configuration/">Configuration tab</a></p>
+<h2 id="running-with-docker-compose">Running with Docker Compose</h2>
+<p>For testing purposes, you can use Docker Compose to quickly set up the project. Follow these steps:</p>
+<p><strong>1. Start Docker Compose</strong></p>
+<p>Navigate to the root directory of your project and run:</p>
+<p><code>docker compose up</code></p>
+<p><strong>2. Access the Application</strong></p>
+<ul>
+<li>Open your browser and visit <a href="http://localhost:33000">http://localhost:33000</a>.</li>
+<li>Use the following default credentials to log in:<ul>
+<li>User Officer: 'Aaron_Harris49@gmail.com' with password 'Test1234!'</li>
+<li>User: 'Javon4@hotmail.com' with password 'Test1234!'</li>
+</ul>
+</li>
+</ul>
+<h2 id="graphql-playground-and-schema">GraphQL Playground and Schema</h2>
+<p>The GraphQL Playground is an interactive, in-browser tool for writing, validating, and testing GraphQL queries. It provides a user-friendly interface to explore the GraphQL API.</p>
+<ul>
+<li>Open your browser and navigate to <a href="http://localhost:4000">http://localhost:4000</a>. This URL will direct you to the GraphQL Playground interface.</li>
+</ul>
+<h2 id="available-scripts">Available Scripts</h2>
+<h3 id="npm-run-lint"><code>npm run lint</code></h3>
+<p>Lints typescript code and log if there are any errors.<br></p>
+<p><code>npm run lint:fix</code> should be used if you want to fix all auto-fixable errors and warnings.</p>
 
 
 
