@@ -95,6 +95,11 @@ const PdfTemplatesPage = lazy(() => import('./template/PdfTemplatesPage'));
 const ProposalTemplatesPage = lazy(
   () => import('./template/ProposalTemplatesPage')
 );
+
+const FapReviewTemplatesPage = lazy(
+  () => import('./template/FapReviewTemplatesPage')
+);
+
 const QuestionsPage = lazy(() => import('./template/QuestionsPage'));
 const SampleEsiPage = lazy(() => import('./template/SampleEsiPage'));
 const SampleTemplatesPage = lazy(
@@ -467,6 +472,12 @@ const Dashboard = () => {
               title="Proposal Template"
               path="/ProposalTemplates"
               component={ProposalTemplatesPage}
+            />
+            <TitledRoute
+              setHeader={setHeader}
+              title="FAP Review Template"
+              path="/FapReviewTemplates"
+              component={FapReviewTemplatesPage}
             />
             <TitledRoute
               setHeader={setHeader}

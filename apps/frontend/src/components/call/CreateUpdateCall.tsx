@@ -43,6 +43,11 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
     useActiveTemplates(TemplateGroupId.PDF_TEMPLATE, call?.pdfTemplateId);
 
   const {
+    templates: fapReviewTemplates,
+    refreshTemplates: reloadFapReviewTemplates,
+  } = useActiveTemplates(TemplateGroupId.FAP_REVIEW, call?.fapReviewTemplateId);
+
+  const {
     proposalWorkflows,
     loadingProposalWorkflows,
     refreshProposalWorkflows: reloadProposalWorkflows,
@@ -72,6 +77,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         templateId: call.templateId,
         esiTemplateId: call.esiTemplateId,
         pdfTemplateId: call.pdfTemplateId,
+        fapReviewTemplateId: call.fapReviewTemplateId,
         proposalWorkflowId: call.proposalWorkflowId,
         referenceNumberFormat: call.referenceNumberFormat || '',
         startCall: getDateTimeFromISO(call.startCall),
@@ -106,6 +112,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         templateId: null,
         esiTemplateId: null,
         pdfTemplateId: null,
+        fapReviewTemplateId: null,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
@@ -148,10 +155,12 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
             reloadTemplates={reloadProposal}
             reloadEsi={reloadEsi}
             reloadPdfTemplates={reloadPdfTemplates}
+            reloadFapReviewTemplates={reloadFapReviewTemplates}
             reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
             pdfTemplates={pdfTemplates}
+            fapReviewTemplates={fapReviewTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}

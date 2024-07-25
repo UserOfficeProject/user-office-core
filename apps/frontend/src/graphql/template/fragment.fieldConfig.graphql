@@ -142,6 +142,12 @@ fragment fieldConfig on FieldConfig {
     tooltip
   }
 
+  ... on FapReviewBasisConfig {
+    small_label
+    required
+    tooltip
+  }
+
   ... on GenericTemplateBasisConfig {
     titlePlaceholder
     questionLabel

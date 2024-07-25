@@ -122,7 +122,16 @@ export const yetAnotherDummyFapAssignment = new FapAssignment(
   null
 );
 
-export const dummyFapReview = new Review(1, 1, 1, 'Dummy Fap review', 7, 0, 1);
+export const dummyFapReview = new Review(
+  1,
+  1,
+  1,
+  'Dummy Fap review',
+  7,
+  0,
+  1,
+  1
+);
 
 export const dummyFapProposal = new FapProposal(
   1,

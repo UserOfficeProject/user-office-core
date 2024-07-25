@@ -9,6 +9,7 @@ import {
   DateConfig,
   DynamicMultipleChoiceConfig,
   EmbellishmentConfig,
+  FapReviewBasisConfig,
   FeedbackBasisConfig,
   FileUploadConfig,
   GenericTemplateBasisConfig,
@@ -31,6 +32,7 @@ import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
 import { dynamicMultipleChoiceDefinition } from './DynamicMultipleChoice';
 import { embellishmentDefinition } from './Embellishment';
+import { fapReviewBasisDefinition } from './FapReviewBasis';
 import { feedbackBasisDefinition } from './FeedbackBasis';
 import { fileUploadDefinition } from './FileUpload';
 import { genericTemplateDefinition } from './GenericTemplate';
@@ -79,19 +81,21 @@ export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
                             ? RichTextInputConfig
                             : T extends DataType.VISIT_BASIS
                               ? VisitBasisConfig
-                              : T extends DataType.GENERIC_TEMPLATE_BASIS
-                                ? GenericTemplateBasisConfig
-                                : T extends DataType.PROPOSAL_ESI_BASIS
-                                  ? ProposalEsiBasisConfig
-                                  : T extends DataType.SAMPLE_ESI_BASIS
-                                    ? SampleEsiBasisConfig
-                                    : T extends DataType.FEEDBACK_BASIS
-                                      ? FeedbackBasisConfig
-                                      : T extends DataType.DYNAMIC_MULTIPLE_CHOICE
-                                        ? DynamicMultipleChoiceConfig
-                                        : T extends DataType.INSTRUMENT_PICKER
-                                          ? InstrumentPickerConfig
-                                          : never;
+                              : T extends DataType.FAP_REVIEW_BASIS
+                                ? FapReviewBasisConfig
+                                : T extends DataType.GENERIC_TEMPLATE_BASIS
+                                  ? GenericTemplateBasisConfig
+                                  : T extends DataType.PROPOSAL_ESI_BASIS
+                                    ? ProposalEsiBasisConfig
+                                    : T extends DataType.SAMPLE_ESI_BASIS
+                                      ? SampleEsiBasisConfig
+                                      : T extends DataType.FEEDBACK_BASIS
+                                        ? FeedbackBasisConfig
+                                        : T extends DataType.DYNAMIC_MULTIPLE_CHOICE
+                                          ? DynamicMultipleChoiceConfig
+                                          : T extends DataType.INSTRUMENT_PICKER
+                                            ? InstrumentPickerConfig
+                                            : never;
 
 export interface Question<T extends DataType> {
   /**
@@ -173,6 +177,7 @@ const registry = [
   textInputDefinition,
   dynamicMultipleChoiceDefinition,
   visitBasisDefinition,
+  fapReviewBasisDefinition,
   instrumentPickerDefinition,
 ];
 

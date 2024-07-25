@@ -275,6 +275,8 @@ export interface ReviewRecord {
   readonly grade: number;
   readonly status: number;
   readonly fap_id: number;
+  readonly questionary_id: number;
+  readonly full_count: number;
 }
 
 export interface TechnicalReviewRecord {
@@ -332,6 +334,7 @@ export interface CallRecord {
   readonly title: string;
   readonly description: string;
   readonly pdf_template_id: number;
+  readonly fap_review_template_id: number;
   readonly is_active: boolean;
 }
 
@@ -786,7 +789,8 @@ export const createReviewObject = (review: ReviewRecord) => {
     review.comment,
     review.grade,
     review.status,
-    review.fap_id
+    review.fap_id,
+    review.questionary_id
   );
 };
 
@@ -993,6 +997,7 @@ export const createCallObject = (call: CallRecord) => {
     call.title,
     call.description,
     call.pdf_template_id,
+    call.fap_review_template_id,
     call.is_active
   );
 };

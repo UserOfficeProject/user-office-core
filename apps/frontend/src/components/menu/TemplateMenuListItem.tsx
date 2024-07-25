@@ -121,6 +121,15 @@ export function TemplateMenuListItem() {
           </ListItem>
         </Tooltip>
 
+        <Tooltip title="FAP Review">
+          <ListItem component={NavLink} to="/FapReviewTemplates" button>
+            <ListItemIcon>
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary="FAP Review" />
+          </ListItem>
+        </Tooltip>
+
         <Tooltip title="Sample declaration">
           <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
             <ListItemIcon>

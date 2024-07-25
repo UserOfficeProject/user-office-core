@@ -57,6 +57,10 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('pdf_template_id', filter.pdfTemplateIds);
     }
 
+    if (filter?.fapReviewTemplateIds) {
+      query.whereIn('fap_review_template_id', filter.fapReviewTemplateIds);
+    }
+
     // if filter is explicitly set to true or false
     if (filter?.isActive === true) {
       query.where('is_active', true);
@@ -177,6 +181,7 @@ export default class PostgresCallDataSource implements CallDataSource {
             template_id: args.templateId,
             esi_template_id: args.esiTemplateId,
             pdf_template_id: args.pdfTemplateId,
+            fap_review_template_id: args.fapReviewTemplateId,
             allocation_time_unit: args.allocationTimeUnit,
             title: args.title,
             description: args.description,
@@ -355,6 +360,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               template_id: args.templateId,
               esi_template_id: args.esiTemplateId,
               pdf_template_id: args.pdfTemplateId,
+              fap_review_template_id: args.fapReviewTemplateId,
               allocation_time_unit: args.allocationTimeUnit,
               title: args.title,
               description: args.description,

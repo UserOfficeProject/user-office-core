@@ -26,10 +26,11 @@ import {
   useProposalData,
 } from 'hooks/proposal/useProposalData';
 import { useReviewData } from 'hooks/review/useReviewData';
+import { useBasicUserData } from 'hooks/user/useUserData';
 
-import ProposalGrade from './ProposalGrade';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
+import ReviewQuestionary from './ReviewQuestionary';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 import InternalReviews from '../internalReview/InternalReviews';
 
@@ -61,10 +62,12 @@ const ProposalReviewContent = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const { reviewData, setReviewData } = useReviewData(reviewId, fapId);
+  const { reviewData } = useReviewData(reviewId, fapId);
   const { proposalData, setProposalData, loading } = useProposalData(
     proposalPk || reviewData?.proposal?.primaryKey
   );
+
+  const { userData } = useBasicUserData(user.id);
 
   if (loading) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -183,13 +186,12 @@ const ProposalReviewContent = ({
     <div>No technical reviews found for the selected proposal</div>
   );
 
+  if (!userData) {
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
+  }
+
   const GradeTab = (
-    <ProposalGrade
-      onChange={() => {}}
-      review={reviewData}
-      setReview={setReviewData}
-      fapId={fapId as number} //grade is only used within Fap
-    />
+    <>{reviewData ? <ReviewQuestionary review={reviewData} /> : <></>}</>
   );
 
   const AllProposalReviewsTab = isUserOfficer && (

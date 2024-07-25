@@ -1156,6 +1156,7 @@ context('Fap reviews tests', () => {
                 grade: 2,
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
+                questionaryID: proposalReviews[0].questionaryID,
               });
             }
           });
@@ -1295,6 +1296,7 @@ context('Fap reviews tests', () => {
             grade: 5,
             status: ReviewStatus.SUBMITTED,
             fapID: createdFapId,
+            questionaryID: proposalReviews[0].questionaryID,
           });
         }
       });
@@ -1692,6 +1694,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 2 : 4,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -1709,6 +1712,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 1 : 5,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
