@@ -1068,10 +1068,6 @@ context('Settings tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      // TODO: Try to fix and improve this
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000);
-
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
       if (
@@ -1164,10 +1160,6 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody').contains(proposalTitle);
 
-      // TODO: Fix and improve this. It is most probably happening because of multiple requests sent for the same query. Investigate!
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000);
-
       cy.get('.MuiTable-root tbody tr')
         .first()
         .then((element) =>
@@ -1182,10 +1174,6 @@ context('Settings tests', () => {
       cy.finishedLoading();
 
       cy.get('.MuiTable-root tbody tr').contains(updatedCall.shortCode);
-
-      // TODO: Fix and improve this
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000);
 
       cy.get('.MuiTable-root tbody tr')
         .first()

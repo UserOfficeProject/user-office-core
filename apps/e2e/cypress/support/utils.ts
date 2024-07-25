@@ -173,7 +173,13 @@ const getEditorById = (win: Cypress.AUTWindow, tinyMceId: string) =>
   win.tinyMCE.EditorManager.get().find((editor) => editor.id === tinyMceId);
 
 const setTinyMceContent = (tinyMceId: string, content: string) => {
+  cy.window().should('have.property', 'tinymce'); // wait for tinyMCE
   cy.get(`#${tinyMceId}`).should('exist');
+
+  // NOTE: // wait for editor to be ready
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(1000);
+
   cy.window().then((win) => {
     const editor = getEditorById(win, tinyMceId);
     editor?.setContent(content);

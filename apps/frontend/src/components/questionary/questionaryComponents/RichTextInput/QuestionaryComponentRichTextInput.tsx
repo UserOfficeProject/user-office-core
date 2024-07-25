@@ -64,6 +64,9 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
           handleCharacterCount(editor);
           onComplete(content);
         }}
+        onInit={(_, editor) => {
+          handleCharacterCount(editor);
+        }}
       />
       {config.max && (
         <Box

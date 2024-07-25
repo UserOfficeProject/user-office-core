@@ -65,9 +65,9 @@ export function fieldToDatePicker({
     onError:
       onError ?? createErrorHandler(fieldError, field.name, setFieldError),
     // TODO: Investigate this because there might be a better solution how to solve it.
-    value: isStringValue ? DateTime.fromISO(value) : value,
     ...field,
     ...props,
+    value: isStringValue ? DateTime.fromISO(value) : value,
   };
 }
 

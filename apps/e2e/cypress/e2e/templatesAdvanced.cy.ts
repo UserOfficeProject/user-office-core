@@ -387,20 +387,16 @@ context('Template tests', () => {
         dateTimeFieldValue
       );
 
-      cy.get(`#${multipleChoiceId}`).click();
-      cy.contains(multipleChoiceQuestion.answers[0]).click();
-      cy.contains(multipleChoiceQuestion.answers[2]).click();
-      cy.get('body').type('{esc}');
-
       cy.setTinyMceContent(richTextInputId, richTextInputQuestion.answer);
 
       cy.getTinyMceContent(richTextInputId).then((content) =>
         expect(content).to.have.string(richTextInputQuestion.answer)
       );
 
-      // TODO: try to fix and improve this with waiting for iframe to load.
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000);
+      cy.get(`#${multipleChoiceId}`).click();
+      cy.contains(multipleChoiceQuestion.answers[0]).click();
+      cy.contains(multipleChoiceQuestion.answers[2]).click();
+      cy.get('body').type('{esc}');
 
       cy.get(`#${richTextInputId}`)
         .parent()

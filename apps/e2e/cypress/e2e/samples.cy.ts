@@ -270,9 +270,9 @@ context('Samples tests', () => {
 
       cy.finishedLoading();
 
-      // TODO: Check this and improve
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(200);
+      cy.get('span.MuiStepLabel-label')
+        .last()
+        .should('have.class', 'Mui-active');
 
       cy.get(
         '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
@@ -346,9 +346,10 @@ context('Samples tests', () => {
       ).click();
 
       cy.finishedLoading();
-      // TODO: Check this and improve
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(200);
+
+      cy.get('span.MuiStepLabel-label')
+        .last()
+        .should('have.class', 'Mui-active');
 
       cy.get(
         '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'

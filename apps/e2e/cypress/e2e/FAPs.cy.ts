@@ -35,10 +35,6 @@ function readWriteReview(
   cy.get('@dialog').contains('Technical review');
   cy.get('@dialog').contains('Grade');
 
-  // NOTE: This should be improved and investigated.
-  // eslint-disable-next-line cypress/no-unnecessary-waiting
-  cy.wait(1000);
-
   cy.setTinyMceContent('comment', faker.lorem.words(3));
 
   if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
@@ -70,10 +66,6 @@ function readWriteReview(
 
 function editFinalRankingForm() {
   cy.get('[role="dialog"] > header + div').scrollTo('top');
-
-  // NOTE: This should be improved and investigated.
-  // eslint-disable-next-line cypress/no-unnecessary-waiting
-  cy.wait(1000);
 
   cy.setTinyMceContent('commentForUser', faker.lorem.words(3));
   cy.setTinyMceContent('commentForManagement', faker.lorem.words(3));
@@ -1224,10 +1216,6 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      // NOTE: This should be improved and investigated.
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000);
-
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
       if (
@@ -2353,10 +2341,6 @@ context('Fap meeting components tests', () => {
 
       cy.get('[role="dialog"] > header + div').scrollTo('top');
 
-      // NOTE: This should be improved and investigated.
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000);
-
       cy.setTinyMceContent('commentForUser', 'Test');
       cy.setTinyMceContent('commentForManagement', 'Test');
 
@@ -3217,10 +3201,6 @@ context('Fap meeting components tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="grade-proposal-icon"]').click();
-
-      // NOTE: This should be improved and investigated.
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(1000);
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('#grade-proposal').type('0.001');
