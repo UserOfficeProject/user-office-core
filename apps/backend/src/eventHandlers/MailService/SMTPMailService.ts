@@ -80,8 +80,9 @@ export class SMTPMailService extends MailService {
       Tokens.AdminDataSource
     );
 
-    const bccAddress = (await adminDataSource.getSetting(SettingsId.BCC_EMAIL))
-      ?.settingsValue;
+    const bccAddress = (
+      await adminDataSource.getSetting(SettingsId.SMTP_BCC_EMAIL)
+    )?.settingsValue;
 
     const emailPromises: Promise<SendMailResults>[] = [];
 
