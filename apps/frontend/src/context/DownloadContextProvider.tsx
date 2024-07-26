@@ -252,7 +252,12 @@ export const DownloadContextProvider = ({
         await promptDownload(response);
       })
       .catch((error) => {
-        if (error !== 'EXTERNAL_TOKEN_INVALID' && error.name !== 'AbortError') {
+        if (error === 'NO_ATTACHMENTS') {
+          enqueueSnackbar('No attachments found', { variant: 'info' });
+        } else if (
+          error !== 'EXTERNAL_TOKEN_INVALID' &&
+          error.name !== 'AbortError'
+        ) {
           enqueueSnackbar('Failed to download file', { variant: 'error' });
         }
       })
