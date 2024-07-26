@@ -73,6 +73,7 @@ services:
       TZ: Europe/Stockholm
       DATE_FORMAT: dd-MM-yyyy
       DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+      # INITIAL_USER_OFFICER_EMAIL: 
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.services.backend.loadbalancer.server.port=4000'

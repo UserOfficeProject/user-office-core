@@ -26,7 +26,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { dummyUser } from '../datasources/mockups/UserDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Institution } from '../models/Institution';
-import { User } from '../models/User';
+import { User, UserRole } from '../models/User';
 import { OAuthAuthorization } from './OAuthAuthorization';
 
 describe('OAuthAuthorization', () => {
@@ -200,5 +200,105 @@ describe('OAuthAuthorization', () => {
     expect(
       (mockUserDataSource.update as jest.Mock).mock.calls[0][0].institutionId
     ).toBe(dummyUser.institutionId);
+  });
+
+  describe('upsertUser->create: INITIAL_USER_OFFICER_EMAIL', () => {
+    it('should assign USER_OFFICER role if the email is the INITIAL_USER_OFFICER_EMAIL', async () => {
+      process.env.INITIAL_USER_OFFICER_EMAIL = dummyUser.email;
+
+      jest.spyOn(mockUserDataSource, 'addUserRole').mockResolvedValue(true);
+      jest.spyOn(mockUserDataSource, 'getByOIDCSub').mockResolvedValue(null);
+      jest.spyOn(mockUserDataSource, 'getByEmail').mockResolvedValue(null);
+      jest
+        .spyOn(mockUserDataSource, 'create')
+        .mockResolvedValue({ ...dummyUser });
+
+      mockOpenIdLoginResponse({
+        user: dummyUser,
+      });
+
+      await oauthAuthorization.externalTokenLogin('valid', '', null);
+
+      expect(mockUserDataSource.addUserRole).toHaveBeenCalledWith({
+        userID: expect.any(Number),
+        roleID: UserRole.USER_OFFICER,
+      });
+    });
+
+    it('should assign USER role if the email is not the INITIAL_USER_OFFICER_EMAIL', async () => {
+      process.env.INITIAL_USER_OFFICER_EMAIL = 'someotheremail';
+
+      jest.spyOn(mockUserDataSource, 'addUserRole').mockResolvedValue(true);
+      jest.spyOn(mockUserDataSource, 'getByOIDCSub').mockResolvedValue(null);
+      jest.spyOn(mockUserDataSource, 'getByEmail').mockResolvedValue(null);
+
+      mockOpenIdLoginResponse({
+        user: dummyUser,
+      });
+
+      await oauthAuthorization.externalTokenLogin('valid', '', null);
+
+      expect(mockUserDataSource.addUserRole).toHaveBeenCalledWith({
+        userID: expect.any(Number),
+        roleID: UserRole.USER,
+      });
+    });
+
+    it('should assign USER role if INITIAL_USER_OFFICER_EMAIL is not set', async () => {
+      delete process.env.INITIAL_USER_OFFICER_EMAIL;
+      jest.spyOn(mockUserDataSource, 'addUserRole').mockResolvedValue(true);
+      jest.spyOn(mockUserDataSource, 'getByOIDCSub').mockResolvedValue(null);
+      jest.spyOn(mockUserDataSource, 'getByEmail').mockResolvedValue(null);
+
+      mockOpenIdLoginResponse({
+        user: dummyUser,
+      });
+
+      await oauthAuthorization.externalTokenLogin('valid', '', null);
+
+      expect(mockUserDataSource.addUserRole).toHaveBeenCalledWith({
+        userID: expect.any(Number),
+        roleID: UserRole.USER,
+      });
+    });
+
+    it.each([[null], [undefined], ['']])(
+      'should assign USER role if INITIAL_USER_OFFICER_EMAIL is not set and there is no email (%p)',
+      async (email: null | undefined | string) => {
+        delete process.env.INITIAL_USER_OFFICER_EMAIL;
+        jest.spyOn(mockUserDataSource, 'addUserRole').mockResolvedValue(true);
+        jest.spyOn(mockUserDataSource, 'getByOIDCSub').mockResolvedValue(null);
+        jest.spyOn(mockUserDataSource, 'getByEmail').mockResolvedValue(null);
+        jest
+          .spyOn(mockUserDataSource, 'create')
+          .mockResolvedValue({ ...dummyUser, email } as any);
+
+        mockOpenIdLoginResponse({
+          user: dummyUser,
+        });
+
+        await oauthAuthorization.externalTokenLogin('valid', '', null);
+
+        expect(mockUserDataSource.addUserRole).toHaveBeenCalledWith({
+          userID: expect.any(Number),
+          roleID: UserRole.USER,
+        });
+      }
+    );
+
+    it('should not assign any role if the user already exists', async () => {
+      jest.spyOn(mockUserDataSource, 'addUserRole').mockResolvedValue(true);
+      jest
+        .spyOn(mockUserDataSource, 'getByOIDCSub')
+        .mockResolvedValue(dummyUser);
+
+      mockOpenIdLoginResponse({
+        user: dummyUser,
+      });
+
+      await oauthAuthorization.externalTokenLogin('valid', '', null);
+
+      expect(mockUserDataSource.addUserRole).not.toHaveBeenCalled();
+    });
   });
 });
