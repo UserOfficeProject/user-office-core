@@ -16,7 +16,11 @@ Calls allow users’ proposals to be submitted within User Office. A call is a p
 
 ## **Templates**
 
-In order to set up a call, you must decide which [**templates**](templates_info) it will utilise.
+In order to set up a call, you must decide which [**templates**](templates.md) it will utilise.
+
+Templates are used to save and re-utilise predefined information across User Office.
+Calls are built using several different types of templates which can be edited and cloned. Templates carry information and serve many functions; for example, they may contain specific questions to be used within the call which users answer in their proposals. The template system is useful because it saves you having to do all the work from scratch every time. Furthermore, it allows for standardisation which is essential for data collection and analysis.
+
 
 There are several different types of templates utilised within Calls:
 
@@ -110,7 +114,7 @@ For further information on editing templates for calls, see the specific templat
 
 Lastly, you may also create templates to fully customise them to fit the research needs: 
 
-* [**How do I create Proposal templates?**](templates/2proposal_template.md)
+* [**How do I create Proposal templates?**](templates/proposal_template.md)
 
 * [**How do I create Proposal ESI templates?**](templates/proposalESI_template.md)
 
@@ -135,19 +139,17 @@ Calls are also assigned to Facility Access Panel(s) (FAPs) for review of the sub
 
 ### **How do I use FAPs within a call?** 
 
-In order to assign a FAP(s) to a call, you 
+There are several ways to assign a FAP to a call:
 
 **1. Use pre-existing FAPs**
 
-To utilise a pre-existing FAP within a call, simply select it from the drop-down menu. 
-Note: multiple FAPs can be selected within a single proposal if needed. 
+To utilise a pre-existing FAP within a call, simply select it from the 'Call FAPs' drop-down menu in the 'Reviews' section of the call. Note: multiple FAPs can be selected within a single call. 
 
 **2. Create FAPs**
 
 You may also create new FAPs if they have not yet been defined within the UOS system.
 
 * [**How do I create FAPs?**](fap.md)
-
 
 ## **Proposal Workflows**
 
@@ -159,18 +161,23 @@ Calls utilise proposal workflow
 
     Proposal workflow templates control how and when the User Office system will display information to different roles based on statuses. The workflow template manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customise workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflow templates ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
 
+There are several ways to assign a Proposal Worklow to a call:
+
+**1. Use pre-existing Proposal Workflows**
+
+To utilise a pre-existing Proposal workflow within a call, simply select it from the 'Proposal Workflow' drop-down menu in the 'General' section of the call. 
+
+**2. Create Proposal Workflows**
+
+You may also create new Proposal Workflow to fit the workflow needs:
 
 * [**How do I create Proposal Workflows?**](proposal_workflow.md)
 
 
-
-
-
-
-
 # **Step 2. Filling out the call contents** 
 
-Once you have the templates available, you can begin to fill out the call information:
+Once you have the necessary templates, FAPs and a Proposal Workflow defined for your call, you may begin to fill out the call information:
+
 Start by creating a Call with the 'Create call' {create call} button.
 When creating a call, the 'Create a call' page will pop-up and display three sections: **General**, **Reviews** and **Notification and cycle**.
 You can navigate between the sections by clicking on the headings or next and back buttons.
@@ -245,20 +252,21 @@ You can navigate between the sections by clicking on the headings or next and ba
 # **Step 3. Creating the call**
 Finally, before creating the call please ensure you have done the following: 
 
-
 !!! tip ""
 
     **TIP:** Call checklist:
 
     - Have I checked all the templates?
 
-    - Have I checked all the dates?
+    - Have I checked all the dates are correct? 
 
     - Have I checked which shipment, registration and feedback templates are marked as active?  
 
     - Have I checked that the user help page and FAQ pages contain all the necessary information for users?
 
-    Lastly, once you have filled out all of the call information, checked that it is correct and reviewed the call checklist you may now Create the call by clicking the 'Create' button on the Notification and Cycle page.
+Note: It is possible to edit call information after a call has been created, but please refer to the best practice information on [editing active calls](editing_calls).
+
+Lastly, once you have filled out all of the call information, checked that it is correct and reviewed the call checklist you may now Create the call by clicking the 'Create' button on the Notification and Cycle page.
 
 <figure markdown="span">  
     ![Congratulations!](/assets/images/congratulations.png){ width="500"}

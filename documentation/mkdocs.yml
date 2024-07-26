@@ -18,6 +18,7 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - abbr
   - attr_list
   - md_in_html
   - pymdownx.snippets
@@ -26,6 +27,7 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
+<<<<<<< Updated upstream
 nav:
   - Home: index.md
   - Getting started: 
@@ -45,3 +47,7 @@ nav:
   - Glossary: glossary.md
   - References: references.md
   
+=======
+
+
+>>>>>>> Stashed changes
