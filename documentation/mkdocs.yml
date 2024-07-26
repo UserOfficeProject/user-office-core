@@ -21,6 +21,11 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
 nav:
   - Home: index.md
   - Getting started: 
@@ -39,3 +44,4 @@ nav:
   - FAQ: faq.md
   - Glossary: glossary.md
   - References: references.md
+  
