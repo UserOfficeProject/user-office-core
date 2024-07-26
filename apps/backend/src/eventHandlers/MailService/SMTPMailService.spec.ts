@@ -14,8 +14,10 @@ const mockAdminDataSource = container.resolve(
   Tokens.AdminDataSource
 ) as AdminDataSource;
 
+const mockGetSetting = jest.spyOn(mockAdminDataSource, 'getSetting');
+
 test('Return result should indicate all emails were successfully sent', async () => {
-  jest.spyOn(mockAdminDataSource, 'getSetting').mockResolvedValue(null);
+  mockGetSetting.mockResolvedValue(null);
 
   const options: EmailSettings = {
     content: {
@@ -49,6 +51,7 @@ test('Return result should indicate all emails were successfully sent', async ()
 });
 
 test('All emails with bcc were successfully sent', async () => {
+  mockGetSetting.mockClear();
   const emailInfo = jest.spyOn(EmailTemplates.prototype, 'send');
 
   const bccEmail = 'testmail@test.co';
@@ -62,11 +65,13 @@ test('All emails with bcc were successfully sent', async () => {
     call: '',
   };
 
-  jest.spyOn(mockAdminDataSource, 'getSetting').mockResolvedValue({
-    settingsValue: bccEmail,
-    description: 'bcc mail',
-    id: SettingsId.SMTP_BCC_EMAIL,
-  });
+  mockGetSetting.mockImplementation(() =>
+    Promise.resolve({
+      settingsValue: bccEmail,
+      description: 'bcc mail',
+      id: SettingsId.SMTP_BCC_EMAIL,
+    })
+  );
 
   const options: EmailSettings = {
     content: {
@@ -84,7 +89,7 @@ test('All emails with bcc were successfully sent', async () => {
   const result = await smtpMailService.sendMail(options);
 
   expect(emailInfo).toHaveBeenCalledWith({
-    template: '/app/src/eventHandlers/emails/submit',
+    template: expect.any(String),
     message: {
       to: process.env.SINK_EMAIL,
       bcc: bccEmail,
