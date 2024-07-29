@@ -168,7 +168,7 @@ describe('Test Instrument Mutations', () => {
 
   test('A logged in user officer can submit instrument attached to a call from a Fap', () => {
     return expect(
-      instrumentMutations.submitInstrument(dummyUserOfficerWithRole, {
+      instrumentMutations.submitInstrumentInFap(dummyUserOfficerWithRole, {
         instrumentId: 1,
         callId: 1,
         fapId: 1,

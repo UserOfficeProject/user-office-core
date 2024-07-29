@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
@@ -96,6 +97,10 @@ export const emailActionHandler = async (
             Tokens.AdminDataSource
           );
 
+          const instrumentDataSource = container.resolve<InstrumentDataSource>(
+            Tokens.InstrumentDataSource
+          );
+
           const userOfficeEmail = (
             await adminDataSource.getSetting(SettingsId.USER_OFFICE_EMAIL)
           )?.settingsValue;
@@ -130,6 +135,10 @@ export const emailActionHandler = async (
               email: userOfficeEmail,
               proposals: [proposal],
               template: recipientWithTemplate.emailTemplate.id,
+              instruments:
+                await instrumentDataSource.getInstrumentsByProposalPk(
+                  proposal.primaryKey
+                ),
               pi:
                 (await usersDataSource.getBasicUserInfo(proposal.proposerId)) ||
                 null,
@@ -185,6 +194,7 @@ const sendMail = async (recipientsWithData: EmailReadyType[]) => {
             proposals: recipientWithData.proposals,
             pi: recipientWithData.pi,
             coProposers: recipientWithData.coProposers,
+            instruments: recipientWithData.instruments,
             // The firstName, lastName, preferredName of the main recipient
             firstName: recipientWithData.firstName,
             lastName: recipientWithData.lastName,

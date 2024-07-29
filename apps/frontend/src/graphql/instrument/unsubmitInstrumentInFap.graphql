@@ -1,0 +1,7 @@
+mutation unsubmitInstrumentInFap($callId: Int!, $instrumentId: Int!, $fapId: Int!) {
+  unsubmitInstrumentInFap(
+    callId: $callId
+    instrumentId: $instrumentId
+    fapId: $fapId
+  )
+}

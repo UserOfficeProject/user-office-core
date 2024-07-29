@@ -97,6 +97,19 @@ context('Proposal administration tests', () => {
       cy.visit('/');
     });
 
+    it('Should not be able to administer proposal if not assigned to instrument', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
+
+      cy.contains('Proposals').click();
+
+      cy.get('[data-cy=view-proposal]').click();
+      cy.finishedLoading();
+      cy.get('[role="dialog"]').contains('Admin').click();
+      cy.get('[data-cy="no-instrument-message"]').should('exist');
+    });
+
     it('Should be able to set comment for user/manager and final status', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
@@ -306,11 +319,15 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=view-proposal]').click();
       cy.finishedLoading();
 
-      cy.get('[role="dialog"]').contains('Admin').click();
+      cy.get('[role="dialog"]').find('[role="tab"]').contains('Logs').click();
 
       cy.reload();
 
-      cy.get('[data-cy="commentForUser"]').should('exist');
+      cy.get('button[role="tab"]')
+        .contains('Logs')
+        .should('have.attr', 'aria-selected', 'true');
+
+      cy.get('[data-cy="event-logs-table"]').should('exist');
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
@@ -426,6 +443,9 @@ context('Proposal administration tests', () => {
         'attachment'
       );
 
+      cy.get('[role="alert"]').should('exist');
+      cy.get('[role="alert"]').contains('No attachments found');
+
       cy.contains(proposalFixedName)
         .parent()
         .find('input[type="checkbox"]')
@@ -446,6 +466,9 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         '2 selected items'
       );
+
+      cy.get('[role="alert"]').should('exist');
+      cy.get('[role="alert"]').contains('No attachments found');
     });
 
     it('Downloaded proposal filename format is RB_SURNAME_YYYY', function () {

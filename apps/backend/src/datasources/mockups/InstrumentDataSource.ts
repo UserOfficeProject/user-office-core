@@ -49,7 +49,7 @@ export const dummyInstrumentWithManagementTime =
     10
   );
 
-const dummyInstruments = [dummyInstrument, dummyInstrument2];
+export const dummyInstruments = [dummyInstrument, dummyInstrument2];
 
 export const dummyInstrumentHasProposals = new InstrumentsHasProposals(
   [1],
@@ -233,11 +233,23 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return true;
   }
 
-  async submitInstrument(
+  async submitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
     return dummyInstrumentHasProposals;
+  }
+
+  async unsubmitInstrumentInFap(
+    proposalPks: number[],
+    instrumentId: number
+  ): Promise<InstrumentsHasProposals> {
+    const dummyInstrumentHasProposalsUnsbmitted = {
+      ...dummyInstrumentHasProposals,
+      submitted: false,
+    };
+
+    return dummyInstrumentHasProposalsUnsbmitted;
   }
 
   hasInstrumentScientistInstrument(
