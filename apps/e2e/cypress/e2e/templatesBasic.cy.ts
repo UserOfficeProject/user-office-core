@@ -732,9 +732,7 @@ context('Template tests', () => {
 
     it('User officer can clone template', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -750,9 +748,7 @@ context('Template tests', () => {
     it('User officer can delete template', () => {
       cy.cloneTemplate({ templateId: initialDBData.template.id });
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(`Copy of ${initialDBData.template.name}`)
         .parent()
@@ -767,9 +763,7 @@ context('Template tests', () => {
 
     it('User officer archive and unarchive template', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -798,9 +792,7 @@ context('Template tests', () => {
 
     it('User officer can view proposals on template', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -842,15 +834,9 @@ context('Template tests', () => {
         .toFormat(initialDBData.getFormats().dateFormat);
 
       cy.login('officer');
-      cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.get('[data-cy=show-more-button]').first().click();
 
@@ -926,14 +912,8 @@ context('Template tests', () => {
 
     it('should be able to create new unit from the Unit field', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.get('[data-cy=show-more-button]').first().click();
 
@@ -1006,15 +986,8 @@ context('Template tests', () => {
       ];
 
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       /* Create questions */
       for (const question of questions) {
@@ -1078,15 +1051,8 @@ context('Template tests', () => {
       });
 
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.createMultipleChoiceQuestion(
         templateDependencies.questions.selectQuestion.title,
@@ -1178,15 +1144,8 @@ context('Template tests', () => {
       });
 
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.createBooleanQuestion(
         templateDependencies.questions.booleanQuestion.title
@@ -1204,11 +1163,14 @@ context('Template tests', () => {
 
       cy.get('[data-cy="dependencyValue"]').click();
 
+      cy.finishedLoading();
+
       cy.contains(initialDBData.instrument1.name).click();
 
-      cy.get('[data-cy="question-relation-dialogue"]')
-        .contains(templateDependencies.questions.booleanQuestion.title)
-        .click();
+      cy.get('[data-cy="dependencyValue"] input').should(
+        'have.value',
+        initialDBData.instrument1.id
+      );
 
       cy.get('[data-cy="submit"]').click();
 
@@ -1261,15 +1223,8 @@ context('Template tests', () => {
       const field2 = 'boolean_2_' + Date.now();
       const field3 = 'boolean_3_' + Date.now();
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.createBooleanQuestion(field1);
       cy.createBooleanQuestion(field2);
@@ -1312,9 +1267,8 @@ context('Template tests', () => {
     it('User officer should be able to search questions', function () {
       createTopicWithQuestionsAndRelations();
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
+      cy.finishedLoading();
 
       // Create an empty template so we can search all question from the question picker
 
@@ -1400,9 +1354,9 @@ context('Template tests', () => {
       const resolvedQuestionTitle = 'General information';
 
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/ProposalTemplates');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.finishedLoading();
 
       cy.get('[data-cy=import-template-button]').click();
 
@@ -1445,9 +1399,9 @@ context('Template tests', () => {
 
     it('should export template in compatible format', () => {
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/ProposalTemplates');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.finishedLoading();
 
       cy.contains(initialDBData.template.name)
         .closest('TR')
@@ -1515,13 +1469,8 @@ context('Template tests', () => {
 
     beforeEach(() => {
       cy.login('officer');
-      cy.visit('/');
-      cy.navigateToTemplatesSubmenu('Proposal');
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find('[aria-label=Edit]')
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
     });
 
     it('Should render empty list if JSONPATH syntax is invalid', () => {

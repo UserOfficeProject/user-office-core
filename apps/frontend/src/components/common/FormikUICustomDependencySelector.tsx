@@ -44,6 +44,7 @@ const FormikUICustomDependencySelector = ({
   const [dependencyId, setDependencyId] = useState<string>(
     dependency.dependencyId || ''
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [operator, setOperator] = useState<EvaluatorOperator>(
     dependency.condition.condition || EvaluatorOperator.EQ
   );
@@ -68,9 +69,12 @@ const FormikUICustomDependencySelector = ({
   };
 
   useEffect(() => {
+    setIsLoading(true);
     if (dependencyId) {
       const depField = getFieldById(template.steps, dependencyId);
       if (!depField) {
+        setIsLoading(false);
+
         return;
       }
       if (depField.question.dataType === DataType.BOOLEAN) {
@@ -78,6 +82,7 @@ const FormikUICustomDependencySelector = ({
           { label: 'true', value: true },
           { label: 'false', value: false },
         ]);
+        setIsLoading(false);
       } else if (
         depField.question.dataType === DataType.SELECTION_FROM_OPTIONS
       ) {
@@ -88,8 +93,11 @@ const FormikUICustomDependencySelector = ({
             }
           )
         ); // use options
+        setIsLoading(false);
       } else if (depField.question.dataType === DataType.INSTRUMENT_PICKER) {
         if (form.submitCount) {
+          setIsLoading(false);
+
           return;
         }
 
@@ -104,6 +112,8 @@ const FormikUICustomDependencySelector = ({
                 }))
               );
             }
+
+            setIsLoading(false);
           });
       }
     }
@@ -238,13 +248,19 @@ const FormikUICustomDependencySelector = ({
             required
             data-cy="dependencyValue"
           >
-            {availableValues.map((option) => {
-              return (
-                <MenuItem value={option.value as string} key={option.label}>
-                  {option.label}
-                </MenuItem>
-              );
-            })}
+            {isLoading ? (
+              <MenuItem data-cy="loading" key="loading">
+                Loading...
+              </MenuItem>
+            ) : (
+              availableValues.map((option) => {
+                return (
+                  <MenuItem value={option.value as string} key={option.label}>
+                    {option.label}
+                  </MenuItem>
+                );
+              })
+            )}
           </Select>
         </FormControl>
       </Grid>
