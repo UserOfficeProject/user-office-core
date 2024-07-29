@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
-import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
@@ -275,15 +274,22 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
-  async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
-    const { userID, proposalPk, fapID } = args;
+  async addUserForReview(args: {
+    userID: number;
+    proposalPk: number;
+    fapID: number;
+    questionaryID: number;
+  }): Promise<Review> {
+    const { userID, proposalPk, fapID, questionaryID } = args;
 
+    // @TODO: add questionary_id
     return database
       .insert({
         user_id: userID,
         proposal_pk: proposalPk,
         status: ReviewStatus.DRAFT,
         fap_id: fapID,
+        questionary_id: questionaryID,
       })
       .returning('*')
       .into('fap_reviews')

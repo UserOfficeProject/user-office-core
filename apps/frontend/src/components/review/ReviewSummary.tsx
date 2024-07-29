@@ -70,8 +70,6 @@ function ReviewReview({ confirm }: ReviewSummaryProps) {
     return submissionDisabled;
   });
 
-  // Show a different submit confirmation if
-  // EDITABLE_SUBMITTED is an upcoming status
   useEffect(() => {
     async function initializeSubmissionMessage() {
       if (!fapReview.proposal?.callId || submitDisabled) {

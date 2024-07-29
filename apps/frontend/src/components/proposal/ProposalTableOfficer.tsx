@@ -175,7 +175,7 @@ let columns: Column<ProposalViewData>[] = [
 const technicalReviewColumns = [
   {
     title: 'Technical status',
-    field: 'technicalStatuses',
+    field: 'technicalReviews.status',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(
         rowData.technicalReviews?.map(
@@ -185,7 +185,7 @@ const technicalReviewColumns = [
   },
   {
     title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssignees',
+    field: 'technicalReviewAssigneesFullName',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(
         rowData.technicalReviews?.map((technicalReview) =>
@@ -195,7 +195,7 @@ const technicalReviewColumns = [
   },
   {
     title: 'Technical time allocation',
-    field: 'technicalTimeAllocations',
+    field: 'technicalReviews.timeAllocation',
     render: (rowData: ProposalViewData) =>
       `${fromArrayToCommaSeparated(
         rowData.technicalReviews?.map(
@@ -211,7 +211,7 @@ const instrumentManagementColumns = (
 ) => [
   {
     title: t('instrument'),
-    field: 'instrumentNames',
+    field: 'instruments.name',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(
         rowData.instruments?.map((instrument) => instrument.name)
@@ -224,13 +224,16 @@ const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
-    field: 'finalTimeAllocations',
-    emptyValue: '-',
+    field: 'instruments.managementTimeAllocation',
+    render: (rowData: ProposalViewData) =>
+      `${fromArrayToCommaSeparated(
+        rowData.instruments?.map((i) => i.managementTimeAllocation)
+      )} (${rowData.allocationTimeUnit}s)`,
     hidden: true,
   },
   {
     title: 'Fap',
-    field: 'fapCodes',
+    field: 'faps.code',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
   },
@@ -737,11 +740,6 @@ const ProposalTableOfficer = ({
     Object.assign(proposal, {
       id: proposal.primaryKey,
       rowActionButtons: RowActionButtons(proposal),
-      finalTimeAllocations: `${fromArrayToCommaSeparated(
-        proposal.instruments?.map(
-          (instrument) => instrument.managementTimeAllocation
-        )
-      )} (${proposal.allocationTimeUnit}s)`,
     })
   );
 
@@ -975,10 +973,10 @@ const ProposalTableOfficer = ({
           {
             icon: ExportIcon,
             tooltip: 'Export proposals in Excel',
-            onClick: (event, rowData): void => {
+            onClick: (): void => {
               downloadXLSXProposal(
-                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
-                (rowData as ProposalViewData[])[0].title
+                selectedProposals?.map((row) => row.primaryKey),
+                selectedProposals?.[0].title
               );
             },
             position: 'toolbarOnSelect',

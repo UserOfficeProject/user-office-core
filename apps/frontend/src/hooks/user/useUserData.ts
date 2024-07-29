@@ -58,7 +58,7 @@ export function useUserData({
 
 export function useUserWithReviewsData(filters?: {
   callId?: number;
-  instrumentId?: number;
+  instrumentId?: number | null;
   status?: ReviewStatus;
   reviewer?: ReviewerFilter;
 }) {

@@ -12,6 +12,7 @@ export const Tokens = {
   FileDataSource: Symbol('FileDataSource'),
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
   InstrumentDataSource: Symbol('InstrumentDataSource'),
+  TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   MailService: Symbol('MailService'),
   PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),
@@ -39,4 +40,5 @@ export const Tokens = {
   FapDataColumns: Symbol('FapDataColumns'),
   FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),
+  DownloadService: Symbol('DownloadService'),
 };

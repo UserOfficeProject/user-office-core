@@ -18,6 +18,7 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { AssignProposalsToFapsInput } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -29,11 +30,10 @@ import { Roles } from '../models/Role';
 import { UserWithRole, UserRole } from '../models/User';
 import {
   UpdateMemberFapArgs,
-  AssignFapReviewersToProposalArgs,
   AssignReviewersToFapArgs,
   RemoveFapReviewerFromProposalArgs,
   AssignChairOrSecretaryToFapArgs,
-  MassAssignReviewsArgs,
+  AssignFapReviewersToProposalsArgs,
 } from '../resolvers/mutations/AssignMembersToFapMutation';
 import {
   AssignProposalsToFapsArgs,
@@ -41,7 +41,10 @@ import {
   RemoveProposalsFromFapsArgs,
 } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { CreateFapArgs } from '../resolvers/mutations/CreateFapMutation';
-import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
+import {
+  SaveFapMeetingDecisionInput,
+  SubmitFapMeetingDecisionsInput,
+} from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { ReorderFapMeetingDecisionProposalsInput } from '../resolvers/mutations/ReorderFapMeetingDecisionProposalsMutation';
 import { SaveReviewerRankArg } from '../resolvers/mutations/SaveReviewerRankMutation';
 import { UpdateFapArgs } from '../resolvers/mutations/UpdateFapMutation';
@@ -61,7 +64,9 @@ export default class FapMutations {
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.QuestionaryDataSource)
+    public questionaryDataSource: QuestionaryDataSource
   ) {}
 
   @ValidateArgs(createFapValidationSchema)
@@ -263,14 +268,18 @@ export default class FapMutations {
       );
 
     const callIds = [...new Set(proposals.map((proposal) => proposal.callId))];
-    const fapInstruments = callHasInstruments
-      .filter((callHasInstrument) => callHasInstrument.fapId)
-      .map((callHasInstrument) => ({
-        fapId: callHasInstrument.fapId,
-        instrumentId: callHasInstrument.instrumentId,
-      }));
 
     for (const callId of callIds) {
+      const fapInstruments = callHasInstruments
+        .filter(
+          (callHasInstrument) =>
+            callHasInstrument.fapId && callHasInstrument.callId === callId
+        )
+        .map((callHasInstrument) => ({
+          fapId: callHasInstrument.fapId,
+          instrumentId: callHasInstrument.instrumentId,
+        }));
+
       if (fapInstruments.length) {
         await this.assignProposalsToFapsInternal(agent, {
           proposalPks: proposals
@@ -414,60 +423,9 @@ export default class FapMutations {
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async assignFapReviewersToProposal(
+  async assignFapReviewersToProposals(
     agent: UserWithRole | null,
-    args: AssignFapReviewersToProposalArgs
-  ): Promise<Fap | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
-      return rejection(
-        'Can not assign FAP reviewers to proposal because of insufficient permissions',
-        { agent, args }
-      );
-    }
-
-    const fapProposal = await this.dataSource.getFapProposal(
-      args.fapId,
-      args.proposalPk
-    );
-
-    if (!fapProposal) {
-      return rejection(
-        'Can not assign FAP reviewers to non-existing FAP proposal',
-        { agent }
-      );
-    }
-
-    return this.dataSource
-      .assignMemberToFapProposal(
-        args.proposalPk,
-        args.fapId,
-        args.memberIds,
-        fapProposal.fapProposalId
-      )
-      .catch((err) => {
-        return rejection(
-          'Can not assign FAP reviewers to proposal',
-          { agent },
-          err
-        );
-      });
-  }
-
-  /**
-   * Assigns all remaining reviews needed for a FAP among its members. Attempts to distribute reviews as evenly as possible.
-   * Assumes there is ony one call in the review phase for a FAP at a time.
-   * @param agent User
-   * @param args ID of the FAP to mass assign reviews for
-   * @returns Updated FAP
-   */
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
-  @EventBus(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL)
-  async massAssignFapReviews(
-    agent: UserWithRole | null,
-    args: MassAssignReviewsArgs
+    args: AssignFapReviewersToProposalsArgs
   ): Promise<Fap | Rejection> {
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -479,70 +437,54 @@ export default class FapMutations {
       );
     }
 
-    const reviewsToAssign = new Map<FapReviewer, FapProposal[]>();
-    const reviewersAssignedReviewsMap = new Map<FapReviewer, number>();
-    const reviewers = await this.dataSource.getReviewers(args.fapId);
-    const reviewsNeededMap =
-      await this.dataSource.getFapProposalToNumReviewsNeededMap(args.fapId);
+    const fapReviewAssignments = [];
 
-    for (const reviewer of reviewers) {
-      reviewersAssignedReviewsMap.set(
-        reviewer,
-        await this.dataSource.getFapReviewerProposalCountCurrentRound(
-          reviewer.userId
-        )
+    for (const assignment of args.assignments) {
+      const fapProposal = await this.dataSource.getFapProposal(
+        args.fapId,
+        assignment.proposalPk
       );
-    }
 
-    for (const fapProposal of [...reviewsNeededMap.keys()]) {
-      while ((reviewsNeededMap.get(fapProposal) ?? 0) > 0) {
-        const numReviewsNeeded = reviewsNeededMap.get(fapProposal) ?? 0;
-
-        const fapReviewer = await this.getReviewerWithMinNumReviews(
-          reviewersAssignedReviewsMap,
-          reviewsToAssign,
-          fapProposal.proposalPk,
-          args.fapId
+      if (!fapProposal) {
+        return rejection(
+          'Can not assign member to review because of an error',
+          { agent, args }
         );
-
-        const reviewersPendingAssignments =
-          reviewsToAssign.get(fapReviewer) ?? [];
-        reviewersPendingAssignments.push(fapProposal);
-        reviewsToAssign.set(fapReviewer, reviewersPendingAssignments);
-        reviewsNeededMap.set(fapProposal, numReviewsNeeded - 1);
       }
+
+      const fapCall = await this.callDataSource.getCall(fapProposal.callId);
+
+      if (!fapCall) {
+        return rejection(
+          'Can not assign member to review because of an error',
+          { agent, args }
+        );
+      }
+
+      const fapReviewQuestionary = await this.questionaryDataSource.create(
+        assignment.memberId,
+        fapCall.fapReviewTemplateId
+      );
+
+      fapReviewAssignments.push({
+        ...assignment,
+        fapProposalId: fapProposal.fapProposalId,
+        questionaryId: fapReviewQuestionary.questionaryId,
+      });
     }
 
-    for (const reviewer of [...reviewsToAssign.keys()]) {
-      const reviews =
-        reviewsToAssign.get(reviewer)?.map((review) => review.proposalPk) ?? [];
-      const fapProposalId = reviewsToAssign
-        .get(reviewer)
-        ?.find((rta) => rta.fapId === args.fapId)?.fapProposalId;
-
-      if (reviews.length > 0 && fapProposalId) {
+    return Promise.all(fapReviewAssignments).then(
+      (resolvedFapReviewAssignments) =>
         this.dataSource
-          .assignMemberToFapProposals(
-            reviews,
-            args.fapId,
-            reviewer.userId,
-            fapProposalId
-          )
+          .assignMembersToFapProposals(resolvedFapReviewAssignments, args.fapId)
           .catch((err) => {
             return rejection(
-              'Can not assign proposal to facility access panel',
+              'Can not assign FAP reviewers to proposals',
               { agent },
               err
             );
-          });
-      }
-    }
-
-    const updatedFap = await this.dataSource.getFap(args.fapId);
-
-    return updatedFap
-      ? updatedFap
-      : rejection('Can not fetch updated Fap', { agent });
+          })
+    );
   }
 
   async getReviewerWithMinNumReviews(
@@ -721,6 +663,25 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: ReorderFapMeetingDecisionProposalsInput
   ): Promise<FapMeetingDecision | Rejection> {
+    const [{ instrumentId, fapId, proposalPk }] = args.proposals;
+    const proposal = await this.proposalDataSource.get(proposalPk);
+    if (!proposal) {
+      return rejection('Proposal not found', { args });
+    }
+
+    const fapProposals = await this.dataSource.getFapProposalsByInstrument(
+      fapId,
+      instrumentId,
+      proposal.callId
+    );
+
+    if (fapProposals.every((fp) => fp.fapInstrumentMeetingSubmitted)) {
+      return rejection(
+        'FAP instrument for selected proposals is submitted and reordering is not allowed',
+        { args }
+      );
+    }
+
     try {
       const allFapDecisions = await Promise.all(
         args.proposals.map(async (proposal) => {
@@ -768,5 +729,17 @@ export default class FapMutations {
     } catch (error) {
       return rejection('Something went wrong', { args, error });
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async submitFapMeetings(
+    agent: UserWithRole | null,
+    args: SubmitFapMeetingDecisionsInput
+  ) {
+    return this.dataSource.submitFapMeetings(
+      args.callId,
+      args.fapId,
+      agent?.id
+    );
   }
 }

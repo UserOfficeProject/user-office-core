@@ -1,0 +1,12 @@
+mutation SubmitFapMeetingDecisions(
+  $submitFapMeetingDecisionsInput: SubmitFapMeetingDecisionsInput!
+) {
+  submitFapMeetingDecisions(
+    SubmitFapMeetingDecisionsInput: $submitFapMeetingDecisionsInput
+  ) {
+    instrumentId
+    proposal {
+      proposalId
+    }
+  }
+}

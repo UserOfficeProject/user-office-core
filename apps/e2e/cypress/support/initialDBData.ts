@@ -50,6 +50,14 @@ export default {
       title: 'Topic title',
     },
   },
+  fapReviewTemplate: {
+    id: 2,
+    name: 'default review template',
+    topic: {
+      id: 6,
+      title: 'Topic title',
+    },
+  },
   questions: {
     boolean: {
       id: 'boolean_question',
@@ -163,7 +171,7 @@ export default {
       dynamicMultipleChoice: {
         value: ['One'],
       },
-      instrumentPicker: { value: 1 },
+      instrumentPicker: { value: { instrumentId: '1', timeRequested: '0' } },
       textInput: {
         value: 'Text input answer from seeds',
       },

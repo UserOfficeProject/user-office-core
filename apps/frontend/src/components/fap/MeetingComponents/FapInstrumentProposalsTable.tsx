@@ -152,6 +152,16 @@ const FapInstrumentProposalsTable = ({
       field: 'proposal.proposalId',
     },
     {
+      title: 'Fap meeting submitted',
+      render: (rowData: FapProposal) => {
+        const submitted = rowData.proposal.fapMeetingDecisions?.find(
+          (fmd) => fmd.instrumentId === fapInstrument.id
+        )?.submitted;
+
+        return submitted ? 'Yes' : 'No';
+      },
+    },
+    {
       title: 'Principal Investigator',
       render: (rowData: FapProposal) => {
         return getFullUserName(rowData.proposal.proposer);
@@ -208,16 +218,6 @@ const FapInstrumentProposalsTable = ({
         } else {
           return -1;
         }
-      },
-    },
-    {
-      title: 'Fap meeting submitted',
-      render: (rowData: FapProposal) => {
-        const submitted = rowData.proposal.fapMeetingDecisions?.find(
-          (fmd) => fmd.instrumentId === fapInstrument.id
-        )?.submitted;
-
-        return submitted ? 'Yes' : 'No';
       },
     },
     {
@@ -399,15 +399,17 @@ const FapInstrumentProposalsTable = ({
 
     return (
       <>
-        <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
-          <IconButton
-            style={{ cursor: 'grab' }}
-            color="inherit"
-            data-cy="drag-icon"
-          >
-            <DragHandle />
-          </IconButton>
-        </Tooltip>
+        {!fapInstrument.submitted && (
+          <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
+            <IconButton
+              style={{ cursor: 'grab' }}
+              color="inherit"
+              data-cy="drag-icon"
+            >
+              <DragHandle />
+            </IconButton>
+          </Tooltip>
+        )}
         {showViewIcon && (
           <Tooltip title="View proposal details">
             <IconButton
@@ -702,7 +704,7 @@ const FapInstrumentProposalsTable = ({
         {...props}
         unallocated-time-information={unallocatedTimeInformation}
         className={isLastAvailabilityZoneRow ? 'lastRowInAvailabilityZone' : ''}
-        draggable
+        draggable={!fapInstrument.submitted}
         onDragStart={(e: DragEvent<HTMLTableRowElement>) =>
           handleOnRowDragStart(e, rowData.tableData?.id)
         }
