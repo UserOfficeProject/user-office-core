@@ -18,9 +18,18 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - abbr
   - attr_list
   - md_in_html
   - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 nav:
   - Home: index.md
   - Getting started: 
@@ -39,3 +48,4 @@ nav:
   - FAQ: faq.md
   - Glossary: glossary.md
   - References: references.md
+  
