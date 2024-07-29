@@ -75,6 +75,24 @@ export function toEssBasicUserDetails(
   );
 }
 
+function essBasicUserDetailsForMissingUser(
+  userNumber: number
+): BasicUserDetails {
+  return new BasicUserDetails(
+    userNumber,
+    'Missing',
+    'User ' + userNumber,
+    'Missing',
+    '',
+    1,
+    '',
+    new Date(),
+    true,
+    '',
+    ''
+  );
+}
+
 function toEssUser(stfcUser: StfcBasicPersonDetails): User {
   return new User(
     Number(stfcUser.userNumber),
@@ -238,7 +256,9 @@ export class StfcUserDataSource implements UserDataSource {
   async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
     return this.getStfcBasicPersonByUserNumber(String(id)).then(
       (stfcBasicPerson) =>
-        stfcBasicPerson ? toEssBasicUserDetails(stfcBasicPerson) : null
+        stfcBasicPerson
+          ? toEssBasicUserDetails(stfcBasicPerson)
+          : essBasicUserDetailsForMissingUser(id)
     );
   }
 
