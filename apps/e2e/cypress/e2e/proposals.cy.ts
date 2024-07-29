@@ -896,7 +896,7 @@ context('Proposal tests', () => {
       );
     });
 
-    it.only('User officer should reopen proposal', () => {
+    it('User officer should reopen proposal', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
       cy.get('[aria-label="View proposal"]').click();

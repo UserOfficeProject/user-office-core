@@ -1,7 +1,6 @@
 import { PaperProps } from '@mui/material';
 import React, { useState } from 'react';
 
-import CopyToClipboard from 'components/common/CopyToClipboard';
 import UOLoader from 'components/common/UOLoader';
 import Questionary from 'components/questionary/Questionary';
 import {
@@ -60,23 +59,11 @@ export default function ReviewQuestionary(props: ReviewQuestionaryProps) {
     customEventHandlers,
   ]);
 
-  const { id } = state.fapReview;
-
-  const info: JSX.Element | string =
-    (
-      <CopyToClipboard
-        text={id.toString()}
-        successMessage={`'${id.toString()}' copied to clipboard`}
-      >
-        {id.toString() ? `Proposal ID: ${id.toString()}` : ''}
-      </CopyToClipboard>
-    ) || 'DRAFT';
-
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
       <StyledContainer>
         <StyledPaper elevation={elevation}>
-          <Questionary title="Review" info={info} previewMode={previewMode} />
+          <Questionary title="Review" previewMode={previewMode} />
         </StyledPaper>
       </StyledContainer>
     </QuestionaryContext.Provider>

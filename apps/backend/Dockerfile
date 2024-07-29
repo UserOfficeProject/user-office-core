@@ -8,7 +8,6 @@ WORKDIR /home/node/app
 
 COPY --chown=node:node package*.json ./
 
-RUN npm config set strict-ssl false
 RUN npm ci --loglevel error --no-fund
 
 COPY --chown=node:node . .
@@ -27,7 +26,6 @@ COPY --from=build-stage --chown=node:node /home/node/app/db_patches ./db_patches
 COPY --from=build-stage --chown=node:node /home/node/app/build ./build
 COPY --from=build-stage --chown=node:node /home/node/app/package*.json ./
 
-RUN npm config set strict-ssl false
 RUN npm ci --only=production --loglevel error --no-fund
 
 ARG BUILD_VERSION=<unknown>
