@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export function createErrorHandler(
+export function createFormikErrorHandler(
   fieldError: unknown,
   fieldName: string,
   setFieldError: (field: string, message?: string) => void

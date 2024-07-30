@@ -9,7 +9,7 @@ import { FieldProps, getIn } from 'formik';
 import { DateTime } from 'luxon';
 import * as React from 'react';
 
-import { createErrorHandler } from 'utils/errorHandler';
+import { createFormikErrorHandler } from 'utils/errorHandler';
 
 export interface DateTimePickerProps
   extends FieldProps,
@@ -63,7 +63,8 @@ export function fieldToDateTimePicker({
         setFieldValue(field.name, date, true);
       },
     onError:
-      onError ?? createErrorHandler(fieldError, field.name, setFieldError),
+      onError ??
+      createFormikErrorHandler(fieldError, field.name, setFieldError),
     ...field,
     ...props,
     // TODO: Investigate this because there might be a better solution how to solve it.
