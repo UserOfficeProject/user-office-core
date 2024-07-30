@@ -532,6 +532,15 @@ context('Proposal tests', () => {
         ...newCall,
         proposalWorkflowId: createdWorkflowId,
       });
+
+      // Create an ended call to test if it is not available for cloning.
+      cy.createCall({
+        ...newCall,
+        shortCode: 'CALL_HAS_ENDED',
+        endCall: newCall.startCall,
+        proposalWorkflowId: createdWorkflowId,
+      });
+
       cy.submitProposal({ proposalPk: createdProposalPk });
 
       cy.login('user1', initialDBData.roles.user);
@@ -545,6 +554,11 @@ context('Proposal tests', () => {
       cy.get('[aria-label="Clone proposal"]').first().click();
 
       cy.get('[data-cy="call-selection"]').click();
+
+      cy.get('[data-cy="call-selection-options"]')
+        .contains('CALL_HAS_ENDED')
+        .should('not.exist');
+
       cy.get('[data-cy="call-selection-options"]')
         .contains(newCall.shortCode)
         .click();
