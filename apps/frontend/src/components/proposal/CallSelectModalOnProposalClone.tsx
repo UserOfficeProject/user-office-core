@@ -40,6 +40,7 @@ const CallSelectModalOnProposalsClone = ({
   const classes = useStyles();
   const { calls, loadingCalls } = useCallsData({
     isActive: true,
+    isEnded: false,
     templateIds: templateId ? [templateId] : undefined,
   });
 
