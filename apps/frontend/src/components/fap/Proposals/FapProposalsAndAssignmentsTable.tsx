@@ -183,7 +183,7 @@ const FapProposalsAndAssignmentsTable = ({
   const { enqueueSnackbar } = useSnackbar();
   const { featuresMap } = useContext(FeatureContext);
 
-  const useWarning = featuresMap.get(
+  const isUseConflictOfInterestWarningEnabled = featuresMap.get(
     FeatureId.USE_CONFLICT_OF_INTEREST_WARNING
   )?.isEnabled;
 
