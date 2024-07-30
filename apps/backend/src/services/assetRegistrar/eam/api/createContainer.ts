@@ -151,18 +151,15 @@ export async function createContainer(shipmentId: number) {
     senderPhone ?? 'No value',
     instruments?.map((instrument) => instrument.shortCode) ?? ['No value']
   );
+  console.log({ request });
+  const response = await performApiRequest('/equipment', request);
+  const responseJson = JSON.parse(response);
 
-  const response = await performApiRequest(request);
-
-  const regexFindEquipmentCode =
-    /<ns2:EQUIPMENTCODE>([0-9]*)<\/ns2:EQUIPMENTCODE>/;
-  const result = response.match(regexFindEquipmentCode);
-
-  if (!result || result.length < 2) {
+  if (!responseJson || responseJson.data != partCode) {
     throw createAndLogError('Unexpected response from EAM API', {
       response,
     });
   }
 
-  return result[1];
+  return responseJson.data;
 }

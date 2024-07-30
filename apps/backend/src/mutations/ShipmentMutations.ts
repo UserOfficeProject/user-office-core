@@ -134,6 +134,7 @@ export default class ShipmentMutations {
     }
 
     try {
+      console.log('*******************');
       const assetId = await this.assetRegistrarService.register(
         args.shipmentId
       );

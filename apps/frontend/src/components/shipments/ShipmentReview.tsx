@@ -99,7 +99,7 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
               }
             )()
           }
-          disabled={isSubmitted || isExecutingCall}
+          // disabled={isSubmitted || isExecutingCall}
         >
           {isSubmitted ? '✔ Submitted' : 'Submit'}
         </NavigButton>
