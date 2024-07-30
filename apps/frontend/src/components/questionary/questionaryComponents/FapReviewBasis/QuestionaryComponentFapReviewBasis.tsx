@@ -1,7 +1,7 @@
 import { Box, CssBaseline, FormHelperText, InputLabel } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import makeStyles from '@mui/styles/makeStyles';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { ErrorMessage, Field, Formik } from 'formik';
 import { Select, TextField } from 'formik-mui';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
@@ -71,8 +71,8 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   );
 
   const initialValues = {
-    grade: state?.fapReview.grade?.toString() || '',
-    comment: state?.fapReview.comment || '',
+    fap_review_grade: state?.fapReview.grade?.toString() || '',
+    fap_review_comment: state?.fapReview.comment || '',
     submitted: state?.fapReview.status === ReviewStatus.SUBMITTED,
     saveOnly: true,
     gradeGuide: fap?.gradeGuide,
@@ -92,14 +92,14 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
           onSubmit={async (): Promise<void> => {}}
         >
           {({ setFieldValue }) => (
-            <Form>
+            <>
               <CssBaseline />
               <InputLabel htmlFor="comment" shrink margin="dense" required>
                 Comment
               </InputLabel>
               <Editor
-                id={`${id}.comment`}
-                initialValue={initialValues.comment}
+                id="fap_review_comment"
+                initialValue={initialValues.fap_review_comment}
                 init={{
                   skin: false,
                   content_css: false,
@@ -134,7 +134,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
               <ErrorMessage name="comment" />
               <Box marginTop={1} width={150}>
                 <Field
-                  name={`${id}.grade`}
+                  name="fap_review_grade"
                   label="Grade"
                   component={gradeDecimalPoints === 1 ? Select : TextField}
                   MenuProps={{ 'data-cy': 'grade-proposal-options' }}
@@ -191,7 +191,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                   {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
                 </ButtonWithDialog>
               </NavigationFragment>
-            </Form>
+            </>
           )}
         </Formik>
       </div>

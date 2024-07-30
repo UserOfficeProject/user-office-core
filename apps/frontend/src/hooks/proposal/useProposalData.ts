@@ -20,8 +20,6 @@ export function useProposalData(primaryKey: number | null | undefined) {
   useEffect(() => {
     let unmounted = false;
 
-    console.log('useProposalData in', primaryKey);
-
     if (primaryKey) {
       setLoading(true);
       api()
@@ -30,8 +28,6 @@ export function useProposalData(primaryKey: number | null | undefined) {
           if (unmounted) {
             return;
           }
-
-          console.log('useProposalData out', primaryKey);
 
           setProposalData(data.proposal);
           setLoading(false);
