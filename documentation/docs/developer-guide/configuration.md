@@ -1,7 +1,7 @@
-### Purpose
+## Purpose
 
 Configuration options and details.
 
-### Contents
+## Contents
 
 Configuration files, environment variables and settings.

@@ -973,10 +973,10 @@ const ProposalTableOfficer = ({
           {
             icon: ExportIcon,
             tooltip: 'Export proposals in Excel',
-            onClick: (event, rowData): void => {
+            onClick: (): void => {
               downloadXLSXProposal(
-                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
-                (rowData as ProposalViewData[])[0].title
+                selectedProposals?.map((row) => row.primaryKey),
+                selectedProposals?.[0].title
               );
             },
             position: 'toolbarOnSelect',
