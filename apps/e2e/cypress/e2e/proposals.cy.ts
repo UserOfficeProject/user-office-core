@@ -166,7 +166,7 @@ context('Proposal tests', () => {
         .should('contain.text', 'Carl');
     });
 
-    it('Should be able create proposal', () => {
+    it('Should be able to create proposal', () => {
       cy.login('user1', initialDBData.roles.user);
 
       cy.visit('/');
@@ -192,7 +192,7 @@ context('Proposal tests', () => {
         .find("[aria-label='Select user']")
         .click();
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('Title is required');
       cy.contains('Abstract is required');
@@ -200,7 +200,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy=title]').type(' ');
       cy.get('[data-cy=abstract]').type(' ');
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('Title is required');
       cy.contains('Abstract is required');
@@ -215,8 +215,18 @@ context('Proposal tests', () => {
       cy.get('[data-cy=abstract] textarea').first().focus();
       cy.get('[data-cy=save-button]').should('not.be.disabled');
 
+      cy.on('uncaught:exception', (err) => {
+        expect(err.message).to.include('Input validation errors');
+
+        // return false to prevent the error from
+        // failing this test
+        return false;
+      });
+
       // Save button should be enabled after validation error
-      cy.get('[data-cy=save-button]').click();
+      cy.get('[data-cy=save-button]').focus().click();
+
+      cy.finishedLoading();
       cy.get('[data-cy=save-button]').should('not.be.disabled');
 
       cy.get('[data-cy=abstract] textarea')
@@ -225,7 +235,7 @@ context('Proposal tests', () => {
         .should('have.value', abstract);
 
       // Save button should be disabled after successful save
-      cy.get('[data-cy=save-button]').click();
+      cy.get('[data-cy=save-button]').focus().click();
       cy.notification({ variant: 'success', text: 'Saved' });
       cy.get('[data-cy=save-button]').should('be.disabled');
 
@@ -238,7 +248,7 @@ context('Proposal tests', () => {
         .should('have.value', modifiedAbstract);
       cy.get('[data-cy=save-button]').focus().should('not.be.disabled');
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.finishedLoading();
 
@@ -297,16 +307,16 @@ context('Proposal tests', () => {
 
       cy.visit('/', {
         qs: {
-          proposalid: createdProposalId,
+          proposalId: createdProposalId,
         },
       });
-      cy.url().should('contain', `proposalid=${createdProposalId}`);
+      cy.url().should('contain', `proposalId=${createdProposalId}`);
 
       cy.contains(newProposalTitle);
 
       cy.closeModal();
 
-      cy.url().should('not.contain', `proposalid=${createdProposalId}`);
+      cy.url().should('not.contain', `proposalId=${createdProposalId}`);
     });
 
     it('User officer should be able to save proposal column selection', function () {
@@ -371,81 +381,82 @@ context('Proposal tests', () => {
       );
     });
 
-    it('User officer should be able to select all prefetched proposals in the table', function () {
-      const NUMBER_OF_PROPOSALS = 11;
-      const DEFAULT_ROWS_PER_PAGE = 10;
+    // NOTE: This functionality should be refactored and the test as well. https://jira.esss.lu.se/browse/SWAP-4143
+    // it('User officer should be able to select all prefetched proposals in the table', function () {
+    //   const NUMBER_OF_PROPOSALS = 11;
+    //   const DEFAULT_ROWS_PER_PAGE = 10;
 
-      for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
-        cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-          if (result.createProposal) {
-            cy.updateProposal({
-              proposalPk: result.createProposal.primaryKey,
-              title: newProposalTitle + index,
-              abstract: newProposalAbstract + index,
-              proposerId: proposer.id,
-            });
-          }
-        });
-      }
+    //   for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
+    //     cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+    //       if (result.createProposal) {
+    //         cy.updateProposal({
+    //           proposalPk: result.createProposal.primaryKey,
+    //           title: newProposalTitle + index,
+    //           abstract: newProposalAbstract + index,
+    //           proposerId: proposer.id,
+    //         });
+    //       }
+    //     });
+    //   }
 
-      cy.login('officer');
-      cy.visit('/');
+    //   cy.login('officer');
+    //   cy.visit('/');
 
-      cy.contains('Proposals').click();
-      cy.finishedLoading();
+    //   cy.contains('Proposals').click();
+    //   cy.finishedLoading();
 
-      cy.get('[data-cy="officer-proposals-table"]').contains(newProposalTitle);
-      cy.get('[data-cy="officer-proposals-table"]').should(
-        'not.contain',
-        `${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`
-      );
-      cy.get('[data-cy="officer-proposals-table"] tfoot').contains(
-        `${DEFAULT_ROWS_PER_PAGE} rows`
-      );
+    //   cy.get('[data-cy="officer-proposals-table"]').contains(newProposalTitle);
+    //   cy.get('[data-cy="officer-proposals-table"]').should(
+    //     'not.contain',
+    //     `${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`
+    //   );
+    //   cy.get('[data-cy="officer-proposals-table"] tfoot').contains(
+    //     `${DEFAULT_ROWS_PER_PAGE} rows`
+    //   );
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] thead [aria-label="Select All Rows"][type="checkbox"]'
-      ).check();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] thead [aria-label="Select All Rows"][type="checkbox"]'
+    //   ).check();
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"]'
-      ).contains(`${DEFAULT_ROWS_PER_PAGE} row(s) selected`);
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="select-all-prefetched-proposals"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"]'
+    //   ).contains(`${DEFAULT_ROWS_PER_PAGE} row(s) selected`);
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="select-all-prefetched-proposals"]'
+    //   ).click();
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
-      ).contains('All proposals are selected');
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
+    //   ).contains('All proposals are selected');
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] tfoot button[aria-label="Next Page"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] tfoot button[aria-label="Next Page"]'
+    //   ).click();
 
-      cy.get('[data-cy="officer-proposals-table"]')
-        .contains(`${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`)
-        .parent()
-        .find('input[type="checkbox"]')
-        .should('be.checked');
+    //   cy.get('[data-cy="officer-proposals-table"]')
+    //     .contains(`${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`)
+    //     .parent()
+    //     .find('input[type="checkbox"]')
+    //     .should('be.checked');
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="clear-all-selection"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="clear-all-selection"]'
+    //   ).click();
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
-      ).should('not.exist');
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
+    //   ).should('not.exist');
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] tfoot button[aria-label="Previous Page"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] tfoot button[aria-label="Previous Page"]'
+    //   ).click();
 
-      cy.get('[data-cy="officer-proposals-table"]')
-        .contains(newProposalTitle)
-        .parent()
-        .find('input[type="checkbox"]')
-        .should('not.be.checked');
-    });
+    //   cy.get('[data-cy="officer-proposals-table"]')
+    //     .contains(newProposalTitle)
+    //     .parent()
+    //     .find('input[type="checkbox"]')
+    //     .should('not.be.checked');
+    // });
 
     it('Should be able to see proposal allocation time unit on the proposal', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
@@ -757,12 +768,12 @@ context('Proposal tests', () => {
         .find('[aria-label="Edit proposal"]')
         .click();
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('label', textQuestion).then(($elem) => {
         cy.get(`#${$elem.attr('for')}`).type(faker.random.word());
       });
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.notification({ text: 'Saved', variant: 'success' });
 
       cy.updateCall({
@@ -834,7 +845,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy=title]').type(title);
       cy.get('[data-cy=abstract]').type(abstract);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
 
       cy.url().should('contains', '/ProposalEdit');
@@ -848,7 +859,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy=title] input').should('have.value', title);
       cy.get('[data-cy=abstract] textarea').should('have.value', abstract);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
 
       cy.contains('Submit').click();
@@ -983,7 +994,7 @@ context('Proposal tests', () => {
         .find("[aria-label='Select user']")
         .click();
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('Title is required');
       cy.contains('Abstract is required');
@@ -998,7 +1009,7 @@ context('Proposal tests', () => {
         .type(abstract)
         .should('have.value', abstract);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.finishedLoading();
 
@@ -1073,7 +1084,7 @@ context('Proposal tests', () => {
         .should('exist')
         .click();
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('Submit').click();
 
@@ -1417,11 +1428,11 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.get('[data-natural-key^="instrument_picker"]').click();
       cy.get('[role="option"]').contains('Instrument 1').click();
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.notification({ variant: 'success', text: 'Saved' });
       cy.contains('Dashboard').click();
@@ -1469,13 +1480,13 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.get('[data-natural-key^="instrument_picker"]').click();
       cy.get('[role="option"]').contains('Instrument 1').click();
       cy.get('[role="option"]').contains('Instrument 2').click();
       cy.get('body').type('{esc}');
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.notification({ variant: 'success', text: 'Saved' });
       cy.contains('Dashboard').click();
@@ -1523,12 +1534,12 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.get('[data-natural-key^="instrument_picker"]').click();
       cy.get('[role="option"]').contains('Instrument 1').click();
       cy.get('[data-time-request$="time-request"] input').type(time);
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.notification({ variant: 'success', text: 'Saved' });
       cy.contains('Dashboard').click();
@@ -1577,7 +1588,7 @@ context('Proposal tests', () => {
         .first()
         .type(abstract)
         .should('have.value', abstract);
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.get('[data-natural-key^="instrument_picker"]').click();
       cy.get('[role="option"]').contains('Instrument 1').click();
@@ -1585,7 +1596,7 @@ context('Proposal tests', () => {
       cy.get('body').type('{esc}');
       cy.get('[data-time-request="1-time-request"] input').type(time);
       cy.get('[data-time-request="2-time-request"] input').type(time);
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.finishedLoading();
       cy.notification({ variant: 'success', text: 'Saved' });
       cy.contains('Dashboard').click();

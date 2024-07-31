@@ -3,16 +3,14 @@ import Container from '@mui/material/Container';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field, Form, Formik } from 'formik';
-import { Select } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import Select from 'components/common/FormikUISelect';
 
 const addNewWorkflowConnectionsRowValidationSchema = yup.object().shape({
   selectedParentDroppableId: yup
@@ -20,16 +18,6 @@ const addNewWorkflowConnectionsRowValidationSchema = yup.object().shape({
     .required('You must select parent droppable group id'),
   numberOfColumns: yup.string().required('You must enter number of columns'),
 });
-
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 type AddNewWorkflowConnectionsRowProps = {
   close: () => void;
@@ -45,8 +33,6 @@ const AddNewWorkflowConnectionsRow = ({
   addNewWorkflowConnectionsRow,
   parentDroppableIds,
 }: AddNewWorkflowConnectionsRowProps) => {
-  const classes = useStyles();
-
   const initialValues: {
     selectedParentDroppableId?: string;
     numberOfColumns?: number;
@@ -72,7 +58,7 @@ const AddNewWorkflowConnectionsRow = ({
       >
         {({ isSubmitting, values }): JSX.Element => (
           <Form>
-            <Typography className={classes.cardHeader}>
+            <Typography sx={{ fontSize: '18px', padding: '22px 0 0' }}>
               New workflow connection row
             </Typography>
 
@@ -107,22 +93,18 @@ const AddNewWorkflowConnectionsRow = ({
                     data-cy="numberOfColumns"
                     required
                     MenuProps={{ 'data-cy': 'numberOfColumnsOptions' }}
-                  >
-                    {[2, 3, 4].map((numberOfColumn) => {
-                      return (
-                        <MenuItem value={numberOfColumn} key={numberOfColumn}>
-                          {numberOfColumn}
-                        </MenuItem>
-                      );
-                    })}
-                  </Field>
+                    options={[2, 3, 4].map((numberOfColumn) => ({
+                      text: numberOfColumn.toString(),
+                      value: numberOfColumn,
+                    }))}
+                  />
                 </FormControl>
               </Grid>
             </Grid>
             <Button
               type="submit"
               fullWidth
-              className={classes.submit}
+              sx={(theme) => ({ margin: theme.spacing(3, 0, 2) })}
               disabled={isSubmitting}
               data-cy="submit"
             >

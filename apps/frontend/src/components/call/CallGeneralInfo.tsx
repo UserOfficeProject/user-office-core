@@ -1,10 +1,7 @@
 import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import {
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -13,23 +10,24 @@ import {
   InputAdornment,
   Link,
   Paper,
+  styled,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Theme,
   Typography,
   useTheme,
 } from '@mui/material';
-import { withStyles, makeStyles } from '@mui/styles';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
-import { TextField } from 'formik-mui';
-import { DateTimePicker } from 'formik-mui-lab';
 import React, { useContext, useEffect, useState } from 'react';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import DateTimePicker from 'components/common/FormikUIDateTimePicker';
+import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -43,16 +41,24 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
-const useStyles = makeStyles((theme) => ({
-  iconVerticalAlign: {
-    verticalAlign: 'middle',
-    marginLeft: theme.spacing(0.5),
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  head: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
   },
-  textRightAlign: {
-    marginLeft: 'auto',
-    marginRight: 0,
+  body: {
+    fontSize: 14,
   },
 }));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  root: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}));
+
 const CallGeneralInfo = ({
   loadingProposalWorkflows,
   proposalWorkflows,
@@ -81,14 +87,13 @@ const CallGeneralInfo = ({
   loadingProposalWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
-  const { format: dateTimeFormat, mask, timezone } = useFormattedDateTime();
+  const { format: dateTimeFormat, timezone } = useFormattedDateTime();
   const [internalCallDate, setInternalCallDate] = useState({
     showField: false,
     isValueSet: false,
   });
 
   const theme = useTheme();
-  const classes = useStyles();
 
   const templateOptions =
     templates?.map((template) => ({
@@ -192,28 +197,6 @@ const CallGeneralInfo = ({
     setOpen(false);
   };
 
-  const StyledTableCell = withStyles((theme: Theme) =>
-    createStyles({
-      head: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-      },
-      body: {
-        fontSize: 14,
-      },
-    })
-  )(TableCell);
-
-  const StyledTableRow = withStyles((theme: Theme) =>
-    createStyles({
-      root: {
-        '&:nth-of-type(odd)': {
-          backgroundColor: theme.palette.action.hover,
-        },
-      },
-    })
-  )(TableRow);
-
   function populateTable(format: string, refNumber: string) {
     return { format, refNumber };
   }
@@ -241,9 +224,7 @@ const CallGeneralInfo = ({
           name="startCall"
           label={`Start (${timezone})`}
           id="start-call-input"
-          inputFormat={dateTimeFormat}
-          mask={mask}
-          // NOTE: We need to have ampm set to false because otherwise the mask doesn't work properly and suggestion format when you type is not shown at all
+          format={dateTimeFormat}
           ampm={false}
           component={DateTimePicker}
           inputProps={{ placeholder: dateTimeFormat }}
@@ -261,8 +242,7 @@ const CallGeneralInfo = ({
           name="endCall"
           label={`End (${timezone})`}
           id="end-call-input"
-          inputFormat={dateTimeFormat}
-          mask={mask}
+          format={dateTimeFormat}
           ampm={false}
           allowSameDateSelection
           component={DateTimePicker}
@@ -363,8 +343,10 @@ const CallGeneralInfo = ({
           loading={loadingTemplates}
           noOptionsText="No templates"
           items={templateOptions}
-          InputProps={{ 'data-cy': 'call-template' }}
-          AdornmentIcon={<RefreshListIcon onClick={reloadTemplates} />}
+          InputProps={{
+            'data-cy': 'call-template',
+            endAdornment: <RefreshListIcon onClick={reloadTemplates} />,
+          }}
           required
         />
         <Link
@@ -372,10 +354,19 @@ const CallGeneralInfo = ({
             templateId ? `QuestionaryEditor/${templateId}` : 'ProposalTemplates'
           }
           target="_blank"
-          className={classes.textRightAlign}
+          sx={{
+            marginLeft: 'auto',
+            marginRight: 0,
+          }}
         >
           Edit selected template
-          <LaunchIcon fontSize="small" className={classes.iconVerticalAlign} />
+          <LaunchIcon
+            fontSize="small"
+            sx={{
+              verticalAlign: 'middle',
+              marginLeft: theme.spacing(0.5),
+            }}
+          />
         </Link>
       </FormControl>
       {featuresMap.get(FeatureId.RISK_ASSESSMENT)?.isEnabled && (
@@ -386,8 +377,10 @@ const CallGeneralInfo = ({
             loading={loadingTemplates}
             noOptionsText="No templates"
             items={esiTemplateOptions}
-            InputProps={{ 'data-cy': 'call-esi-template' }}
-            AdornmentIcon={<RefreshListIcon onClick={reloadEsi} />}
+            InputProps={{
+              'data-cy': 'call-esi-template',
+              endAdornment: <RefreshListIcon onClick={reloadEsi} />,
+            }}
             required
           />
           <Link
@@ -397,12 +390,18 @@ const CallGeneralInfo = ({
                 : 'EsiTemplates'
             }
             target="_blank"
-            className={classes.textRightAlign}
+            sx={{
+              marginLeft: 'auto',
+              marginRight: 0,
+            }}
           >
             Edit selected template
             <LaunchIcon
+              sx={{
+                verticalAlign: 'middle',
+                marginLeft: theme.spacing(0.5),
+              }}
               fontSize="small"
-              className={classes.iconVerticalAlign}
             />
           </Link>
         </FormControl>
@@ -413,8 +412,10 @@ const CallGeneralInfo = ({
         loading={loadingTemplates}
         noOptionsText="No templates"
         items={pdfTemplateOptions}
-        InputProps={{ 'data-cy': 'call-pdf-template' }}
-        AdornmentIcon={<RefreshListIcon onClick={reloadPdfTemplates} />}
+        InputProps={{
+          'data-cy': 'call-pdf-template',
+          endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
+        }}
       />
       <FormikUIAutocomplete
         name="fapReviewTemplateId"
@@ -422,8 +423,10 @@ const CallGeneralInfo = ({
         loading={loadingTemplates}
         noOptionsText="No templates"
         items={fapReviewTemplateOptions}
-        InputProps={{ 'data-cy': 'call-fap-review-template' }}
-        AdornmentIcon={<RefreshListIcon onClick={reloadFapReviewTemplates} />}
+        InputProps={{
+          'data-cy': 'call-fap-review-template',
+          endAdornment: <RefreshListIcon onClick={reloadFapReviewTemplates} />,
+        }}
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
@@ -433,8 +436,8 @@ const CallGeneralInfo = ({
         items={proposalWorkflowOptions}
         InputProps={{
           'data-cy': 'call-workflow',
+          endAdornment: <RefreshListIcon onClick={reloadProposalWorkflows} />,
         }}
-        AdornmentIcon={<RefreshListIcon onClick={reloadProposalWorkflows} />}
         required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
@@ -443,8 +446,7 @@ const CallGeneralInfo = ({
             name="endCallInternal"
             label={`End Internal (${timezone})`}
             id="end-call-internal-input"
-            inputFormat={dateTimeFormat}
-            mask={mask}
+            format={dateTimeFormat}
             ampm={false}
             allowSameDateSelection
             component={DateTimePicker}

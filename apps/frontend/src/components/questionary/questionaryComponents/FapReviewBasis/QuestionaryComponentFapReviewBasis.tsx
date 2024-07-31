@@ -1,12 +1,17 @@
-import { Box, CssBaseline, FormHelperText, InputLabel } from '@mui/material';
-import MenuItem from '@mui/material/MenuItem';
-import makeStyles from '@mui/styles/makeStyles';
+import {
+  Box,
+  CssBaseline,
+  FormHelperText,
+  InputLabel,
+  useTheme,
+} from '@mui/material';
 import { ErrorMessage, Field } from 'formik';
-import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
-import { useCheckAccess } from 'components/common/Can';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import Editor from 'components/common/TinyEditor';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -19,22 +24,13 @@ import { ReviewContextType } from 'components/review/ReviewQuestionary';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { BasicUserDetails, SettingsId, UserRole } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useBasicUserData } from 'hooks/user/useUserData';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 
 // const TextFieldNoSubmit = withPreventSubmit(TextField);
-
-const useStyles = makeStyles((theme) => ({
-  disabled: {
-    pointerEvents: 'none',
-    opacity: 0.7,
-  },
-  container: {
-    margin: theme.spacing(2, 0),
-  },
-}));
 
 function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const {
@@ -44,7 +40,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
     formikProps,
   } = props;
 
-  const classes = useStyles();
+  const theme = useTheme();
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ReviewContextType;
@@ -81,7 +77,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   // @TODO: check if TextFieldNoSubmit can be applied
   return (
     <div>
-      <div className={classes.container}>
+      <Box sx={{ margin: theme.spacing(2, 0) }}>
         {/* <Formik
           initialValues={initialValues}
           onSubmit={async (): Promise<void> => { }}
@@ -169,16 +165,15 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
               }
               data-cy="grade-proposal"
               labelId="grade-proposal-label"
-            >
-              {gradeDecimalPoints === 1 &&
-                [...Array(10)].map((e, i) => {
-                  return (
-                    <MenuItem value={i + 1} key={i}>
-                      {(i + 1).toString()}
-                    </MenuItem>
-                  );
-                })}
-            </Field>
+              options={
+                gradeDecimalPoints === 1
+                  ? [...Array(10)].map((e, i) => ({
+                      text: (i + 1).toString(),
+                      value: i + 1,
+                    }))
+                  : undefined
+              }
+            />
           </Box>
           <NavigationFragment>
             <ButtonWithDialog label="Grading guide" data-cy="grade-guide">
@@ -200,7 +195,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
         </>
         {/* )}
       </Formik> */}
-      </div>
+      </Box>
     </div>
   );
 }

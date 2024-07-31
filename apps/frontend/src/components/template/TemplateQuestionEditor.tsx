@@ -1,13 +1,8 @@
+import { Draggable, DraggingStyle, NotDraggingStyle } from '@hello-pangea/dnd';
 import LockIcon from '@mui/icons-material/Lock';
 import Grid from '@mui/material/Grid';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
-import {
-  Draggable,
-  DraggingStyle,
-  NotDraggingStyle,
-} from 'react-beautiful-dnd';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
 import {
@@ -23,55 +18,6 @@ import {
 } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
-const useStyles = makeStyles((theme) => ({
-  icon: {
-    color: theme.palette.grey[400],
-    justifyItems: 'flex-end',
-    justifyContent: 'flex-end',
-    display: 'flex',
-  },
-  question: {
-    color: '#000',
-    fontSize: '15px',
-    padding: '6px 0',
-  },
-  questionId: {
-    fontSize: '12px',
-    fontWeight: 'bold',
-    color: theme.palette.grey[800],
-  },
-  dependencies: {
-    fontSize: '12px',
-    color: theme.palette.grey[900],
-    display: 'flex',
-    padding: '10px 0 5px 0',
-    '& div': {
-      marginLeft: 'auto',
-      alignItems: 'center',
-      display: 'flex',
-      cursor: 'pointer',
-    },
-    '& ul': {
-      display: 'inline-block',
-      padding: '0',
-      margin: '0',
-      '& li': {
-        display: 'inline',
-        marginLeft: '3px',
-        listStyle: 'none',
-        '&:hover': {
-          transitionDuration: '300ms',
-          textDecoration: 'underline',
-          color: theme.palette.primary.main,
-        },
-      },
-    },
-  },
-  lockIcon: {
-    fontSize: '17px',
-  },
-}));
-
 export default function TemplateQuestionEditor(props: {
   data: TemplateTopicEditorData;
   index: number;
@@ -80,8 +26,6 @@ export default function TemplateQuestionEditor(props: {
   isHighlighted?: boolean;
 }) {
   const theme = useTheme();
-  const classes = useStyles();
-
   const [isHover, setIsHover] = useState<boolean>(false);
 
   const getItemStyle = (
@@ -116,7 +60,7 @@ export default function TemplateQuestionEditor(props: {
       : '||';
   const dependencyJsx = dependencies.length ? (
     <div>
-      <LockIcon className={classes.lockIcon} />
+      <LockIcon sx={{ fontSize: '17px' }} />
       <ul data-cy="dependency-list">
         {dependencies.map((dependency, i) => {
           dependencyComparator =
@@ -191,22 +135,69 @@ export default function TemplateQuestionEditor(props: {
           <Grid
             item
             xs={10}
-            className={classes.questionId}
+            sx={{
+              fontSize: '12px',
+              fontWeight: 'bold',
+              color: theme.palette.grey[800],
+            }}
             data-cy="proposal-question-id"
           >
             {props.data.naturalKey}
           </Grid>
-          <Grid item xs={2} className={classes.icon}>
+          <Grid
+            item
+            xs={2}
+            sx={{
+              color: theme.palette.grey[400],
+              justifyItems: 'flex-end',
+              justifyContent: 'flex-end',
+              display: 'flex',
+            }}
+          >
             {getTemplateFieldIcon(props.data.dataType)}
           </Grid>
 
-          <Grid item xs={10} className={classes.question}>
+          <Grid
+            item
+            xs={10}
+            sx={{ color: '#000', fontSize: '15px', padding: '6px 0' }}
+          >
             {questionDefinition.renderers
               ? questionDefinition.renderers.questionRenderer(props.data)
               : defaultRenderer.questionRenderer(props.data)}
           </Grid>
 
-          <Grid item xs={12} className={classes.dependencies}>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              fontSize: '12px',
+              color: theme.palette.grey[900],
+              display: 'flex',
+              padding: '10px 0 5px 0',
+              '& div': {
+                marginLeft: 'auto',
+                alignItems: 'center',
+                display: 'flex',
+                cursor: 'pointer',
+              },
+              '& ul': {
+                display: 'inline-block',
+                padding: '0',
+                margin: '0',
+                '& li': {
+                  display: 'inline',
+                  marginLeft: '3px',
+                  listStyle: 'none',
+                  '&:hover': {
+                    transitionDuration: '300ms',
+                    textDecoration: 'underline',
+                    color: theme.palette.primary.main,
+                  },
+                },
+              },
+            }}
+          >
             {dependencyJsx}
           </Grid>
         </Grid>

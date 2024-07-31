@@ -5,16 +5,16 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation/lib/Review';
-import { Field, Form, Formik, useFormikContext } from 'formik';
-import { Select, TextField, CheckboxWithLabel } from 'formik-mui';
+import { Field, Form, Formik } from 'formik';
 import React, { useState, useContext } from 'react';
-import { Prompt } from 'react-router';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
-import { useCheckAccess } from 'components/common/Can';
 import ErrorMessage from 'components/common/ErrorMessage';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
@@ -22,6 +22,7 @@ import NavigationFragment from 'components/questionary/NavigationFragment';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { ReviewStatus, Review, UserRole, SettingsId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -71,17 +72,6 @@ const ProposalGrade = ({
     submitted: review.status === ReviewStatus.SUBMITTED,
     saveOnly: true,
     gradeGuide: fap?.gradeGuide,
-  };
-
-  const PromptIfDirty = () => {
-    const formik = useFormikContext();
-
-    return (
-      <Prompt
-        when={formik.dirty && formik.submitCount === 0}
-        message="Changes you recently made in this tab will be lost! Are you sure?"
-      />
-    );
   };
 
   const isDisabled = (isSubmitting: boolean) =>
@@ -205,16 +195,15 @@ const ProposalGrade = ({
               }
               data-cy="grade-proposal"
               labelId="grade-proposal-label"
-            >
-              {gradeDecimalPoints === 1 &&
-                [...Array(10)].map((e, i) => {
-                  return (
-                    <MenuItem value={i + 1} key={i}>
-                      {(i + 1).toString()}
-                    </MenuItem>
-                  );
-                })}
-            </Field>
+              options={
+                gradeDecimalPoints === 1
+                  ? [...Array(10)].map((e, i) => ({
+                      text: (i + 1).toString(),
+                      value: i + 1,
+                    }))
+                  : undefined
+              }
+            />
           </Box>
           <NavigationFragment isLoading={isSubmitting}>
             <ButtonWithDialog

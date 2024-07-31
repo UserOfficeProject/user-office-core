@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
 const steps = [
   {
@@ -49,10 +50,10 @@ const steps = [
           Use this address for shipping
           <CopyToClipboard
             text={`European Spallation Source ERIC
-Transportgatan 5 – GATE E F03
-224 84 Lund`}
+              Transportgatan 5 – GATE E F03
+              224 84 Lund`}
           >
-            <Box sx={{ fontWeight: 'bold' }}>
+            <Box sx={BOLD_TEXT_STYLE}>
               European Spallation Source ERIC <br />
               Transportgatan 5 – GATE E F03 <br />
               224 84 Lund

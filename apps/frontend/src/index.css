@@ -257,3 +257,7 @@ div.MuiToolbar-root[class*='MTableToolbar-highlight'] {
 }
 
 /*------ Mobile view improvements ------*/
+
+.MuiBox-root .MuiIconButton-root:not(.Mui-disabled) {
+  color: inherit;
+}

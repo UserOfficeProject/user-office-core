@@ -17,17 +17,17 @@ import {
   tableCellClasses,
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { styled } from '@mui/material/styles';
 import { Field } from 'formik';
-import { Checkbox, Select, TextField } from 'formik-mui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import FormikUICustomTable from 'components/common/FormikUICustomTable';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import {
@@ -156,16 +156,14 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
           />
 
           <TitledContainer label="Constraints">
-            <FormControlLabel
-              control={
-                <Field
-                  name="config.required"
-                  component={Checkbox}
-                  type="checkbox"
-                  inputProps={{ 'data-cy': 'required' }}
-                />
-              }
-              label="Is required"
+            <Field
+              name="config.required"
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
+              data-cy="required"
             />
           </TitledContainer>
 
@@ -185,28 +183,22 @@ export const QuestionDynamicMultipleChoiceForm = (props: QuestionFormProps) => {
                     e.target.value === 'dropdown'
                   );
                 }}
-              >
-                {availableVariantOptions.map(({ value, label }) => {
-                  return (
-                    <MenuItem value={value} key={value}>
-                      {label}
-                    </MenuItem>
-                  );
-                })}
-              </Field>
+                options={availableVariantOptions.map(({ label, value }) => ({
+                  text: label,
+                  value: value,
+                }))}
+              />
             </FormControl>
 
             {showIsMultipleSelectCheckbox && (
-              <FormControlLabel
-                control={
-                  <Field
-                    name="config.isMultipleSelect"
-                    component={Checkbox}
-                    type="checkbox"
-                    inputProps={{ 'data-cy': 'is-multiple-select' }}
-                  />
-                }
-                label="Is multiple select"
+              <Field
+                name="config.isMultipleSelect"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Is multiple select',
+                }}
+                data-cy="is-multiple-select"
               />
             )}
           </TitledContainer>

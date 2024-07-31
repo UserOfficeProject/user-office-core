@@ -9,7 +9,6 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import AssignFapMemberToProposalModal, {
@@ -22,6 +21,7 @@ import ProposalReviewContent, {
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserRole, Review, SettingsId, Fap, ReviewStatus } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   useFapProposalsData,
   FapProposalType,
@@ -487,10 +487,7 @@ const FapProposalsAndAssignmentsTable = ({
       pIInstitutionConflictMap.size > 0 ||
       coIInstitutionConflictMap.size > 0;
 
-    const alertText: React.DetailedHTMLProps<
-      React.HTMLAttributes<HTMLUListElement>,
-      HTMLUListElement
-    >[] = [];
+    const alertText: JSX.Element[] = [];
 
     const selectedProposalPks = selectedProposals.map(
       (selectedProposal) => selectedProposal.proposalPk
@@ -498,51 +495,49 @@ const FapProposalsAndAssignmentsTable = ({
 
     for (const selectedProposalPk of selectedProposalPks) {
       alertText.push(
-        <>
-          <ul>
-            {(!!proposalPIsMap.get(selectedProposalPk) ||
-              !!proposalCoIsMap.get(selectedProposalPk) ||
-              !!pIInstitutionConflictMap.get(selectedProposalPk) ||
-              !!coIInstitutionConflictMap.get(selectedProposalPk)) && (
-              <li>Proposal: {selectedProposalPk}</li>
-            )}
-            {!!proposalPIsMap.get(selectedProposalPk) && (
-              <li>
-                PI: {getFullUserName(proposalPIsMap.get(selectedProposalPk))}
-              </li>
-            )}
-            {!!proposalCoIsMap.get(selectedProposalPk) && (
-              <li>
-                Co-proposers:{' '}
-                {proposalCoIsMap
-                  .get(selectedProposalPk)
-                  ?.map((selectedCoProposer) =>
-                    getFullUserName(selectedCoProposer)
-                  )
-                  .join(', ')}
-              </li>
-            )}
-            {!!pIInstitutionConflictMap.get(selectedProposalPk) && (
-              <li>
-                Same institution as PI:{' '}
-                {getFullUserName(
-                  pIInstitutionConflictMap.get(selectedProposalPk)
-                )}
-              </li>
-            )}
-            {!!coIInstitutionConflictMap.get(selectedProposalPk) && (
-              <li>
-                Same institution as co-proposers:{' '}
-                {coIInstitutionConflictMap
-                  .get(selectedProposalPk)
-                  ?.map((selectedCoProposer) =>
-                    getFullUserName(selectedCoProposer)
-                  )
-                  .join(', ')}
-              </li>
-            )}
-          </ul>
-        </>
+        <ul>
+          {(!!proposalPIsMap.get(selectedProposalPk) ||
+            !!proposalCoIsMap.get(selectedProposalPk) ||
+            !!pIInstitutionConflictMap.get(selectedProposalPk) ||
+            !!coIInstitutionConflictMap.get(selectedProposalPk)) && (
+            <li>Proposal: {selectedProposalPk}</li>
+          )}
+          {!!proposalPIsMap.get(selectedProposalPk) && (
+            <li>
+              PI: {getFullUserName(proposalPIsMap.get(selectedProposalPk))}
+            </li>
+          )}
+          {!!proposalCoIsMap.get(selectedProposalPk) && (
+            <li>
+              Co-proposers:{' '}
+              {proposalCoIsMap
+                .get(selectedProposalPk)
+                ?.map((selectedCoProposer) =>
+                  getFullUserName(selectedCoProposer)
+                )
+                .join(', ')}
+            </li>
+          )}
+          {!!pIInstitutionConflictMap.get(selectedProposalPk) && (
+            <li>
+              Same institution as PI:{' '}
+              {getFullUserName(
+                pIInstitutionConflictMap.get(selectedProposalPk)
+              )}
+            </li>
+          )}
+          {!!coIInstitutionConflictMap.get(selectedProposalPk) && (
+            <li>
+              Same institution as co-proposers:{' '}
+              {coIInstitutionConflictMap
+                .get(selectedProposalPk)
+                ?.map((selectedCoProposer) =>
+                  getFullUserName(selectedCoProposer)
+                )
+                .join(', ')}
+            </li>
+          )}
+        </ul>
       );
     }
 
@@ -760,7 +755,7 @@ const FapProposalsAndAssignmentsTable = ({
             headerSelectionProps: {
               inputProps: {
                 'aria-label': 'Select all rows',
-                'data-cy': 'select-all-table-rows',
+                id: 'select-all-table-rows',
               },
             },
           }}

@@ -13,8 +13,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
-import { useHistory } from 'react-router';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 
 import EsiIcon from 'components/common/icons/EsiIcon';
 import Tooltip from 'components/common/MenuTooltip';
@@ -68,10 +67,10 @@ function EsiTemplatesMenuListItem() {
 }
 
 export function TemplateMenuListItem() {
-  const history = useHistory();
+  const location = useLocation();
   const shouldExpand =
-    history.location.pathname === '/ProposalTemplates' ||
-    history.location.pathname === '/SampleDeclarationTemplates';
+    location.pathname === '/ProposalTemplates' ||
+    location.pathname === '/SampleDeclarationTemplates';
   const [isExpanded, setIsExpanded] = useState(shouldExpand);
   const context = useContext(FeatureContext);
   const isShipmentFeatureEnabled = !!context.featuresMap.get(FeatureId.SHIPPING)

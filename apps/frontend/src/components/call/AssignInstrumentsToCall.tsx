@@ -9,8 +9,8 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { UserContext } from 'context/UserContextProvider';
 import {
+  AssignInstrumentsToCallMutation,
   Instrument,
-  InstrumentWithAvailabilityTime,
   UserRole,
 } from 'generated/sdk';
 import { useFapsData } from 'hooks/fap/useFapsData';
@@ -55,10 +55,10 @@ const FapSelectionComponent = ({
 
 type AssignInstrumentsToCallProps = {
   assignInstrumentsToCall: (
-    instruments: InstrumentWithAvailabilityTime[]
+    instruments: AssignInstrumentsToCallMutation['assignInstrumentsToCall']['instruments']
   ) => void;
   callId: number;
-  assignedInstruments?: InstrumentWithAvailabilityTime[] | null;
+  assignedInstruments?: Instrument[] | null;
 };
 
 const AssignInstrumentsToCall = ({
@@ -67,9 +67,9 @@ const AssignInstrumentsToCall = ({
   assignedInstruments,
 }: AssignInstrumentsToCallProps) => {
   const { loadingInstruments, instruments } = useInstrumentsData();
-  const [selectedInstruments, setSelectedInstruments] = useState<
-    InstrumentWithAvailabilityTime[]
-  >([]);
+  const [selectedInstruments, setSelectedInstruments] = useState<Instrument[]>(
+    []
+  );
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
@@ -120,10 +120,7 @@ const AssignInstrumentsToCall = ({
       })),
     });
 
-    assignInstrumentsToCall(
-      response.assignInstrumentsToCall
-        .instruments as InstrumentWithAvailabilityTime[]
-    );
+    assignInstrumentsToCall(response.assignInstrumentsToCall.instruments);
   };
 
   return (
@@ -138,9 +135,7 @@ const AssignInstrumentsToCall = ({
         columns={columns}
         data={notAssignedInstruments}
         isLoading={loadingInstruments}
-        onSelectionChange={(data) =>
-          setSelectedInstruments(data as InstrumentWithAvailabilityTime[])
-        }
+        onSelectionChange={(data) => setSelectedInstruments(data)}
         options={{
           search: true,
           selection: true,
@@ -148,7 +143,7 @@ const AssignInstrumentsToCall = ({
             inputProps: { 'aria-label': 'Select All Rows' },
           },
           debounceInterval: 400,
-          selectionProps: (rowData: InstrumentWithAvailabilityTime) => ({
+          selectionProps: (rowData) => ({
             inputProps: {
               'aria-label': `${rowData.name}-${rowData.shortCode}-select`,
             },

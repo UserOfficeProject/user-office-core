@@ -10,7 +10,7 @@ export default function FapReviewTemplatesPage() {
   const api = useDataApi();
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs tabNames={['Current', 'Archived']}>
           <FapReviewTemplatesTable
