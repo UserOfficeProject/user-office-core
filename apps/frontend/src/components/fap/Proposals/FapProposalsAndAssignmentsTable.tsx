@@ -494,7 +494,7 @@ const FapProposalsAndAssignmentsTable = ({
     }
 
     const shouldShowWarning =
-      useWarning &&
+      isUseConflictOfInterestWarningEnabled &&
       (proposalPIsMap.size > 0 ||
         proposalCoIsMap.size > 0 ||
         pIInstitutionConflictMap.size > 0 ||
