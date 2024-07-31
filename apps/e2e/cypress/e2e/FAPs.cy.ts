@@ -28,7 +28,7 @@ function clickConfirmOk() {
   if (
     featureFlags
       .getEnabledFeatures()
-      .get(FeatureId.USE_CONFLICT_OF_INTEREST_WARNING)
+      .get(FeatureId.CONFLICT_OF_INTEREST_WARNING)
   ) {
     cy.get('[data-cy="confirm-ok"]').click();
   }

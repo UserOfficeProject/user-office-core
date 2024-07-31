@@ -184,7 +184,7 @@ const FapProposalsAndAssignmentsTable = ({
   const { featuresMap } = useContext(FeatureContext);
 
   const isUseConflictOfInterestWarningEnabled = featuresMap.get(
-    FeatureId.USE_CONFLICT_OF_INTEREST_WARNING
+    FeatureId.CONFLICT_OF_INTEREST_WARNING
   )?.isEnabled;
 
   const hasRightToAssignReviewers = useCheckAccess([
