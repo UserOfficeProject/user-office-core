@@ -3,31 +3,14 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FileCopy from '@mui/icons-material/FileCopy';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
-import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { MouseEvent } from 'react';
 
 import { QuestionnairesListRow } from './QuestionnairesList';
-
-const useStyles = makeStyles((theme) => ({
-  text: {
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-  },
-  icon: {
-    maxWidth: 'unset',
-  },
-  iconPadding: {
-    paddingLeft: theme.spacing(2),
-  },
-}));
 
 interface QuestionnairesListProps {
   record: QuestionnairesListRow;
@@ -42,13 +25,11 @@ export function QuestionnairesListItem({
   onDeleteClick,
   onCloneClick,
 }: QuestionnairesListProps) {
-  const classes = useStyles();
-
   return (
-    <ListItem
-      button
+    <ListItemButton
       onClick={() => onEditClick?.(record)}
       data-cy="questionnaires-list-item"
+      component="li"
     >
       <ListItemAvatar>
         <Avatar>
@@ -64,10 +45,18 @@ export function QuestionnairesListItem({
             <div>{record.label}</div>
           </Tooltip>
         }
-        className={classes.text}
+        sx={{
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+        }}
       />
       {onCloneClick && (
-        <ListItemIcon className={`${classes.icon} ${classes.iconPadding}`}>
+        <ListItemIcon
+          sx={(theme) => ({ maxWidth: 'unset', paddingLeft: theme.spacing(2) })}
+        >
           <IconButton
             edge="start"
             aria-label="clone"
@@ -84,7 +73,11 @@ export function QuestionnairesListItem({
       )}
 
       {onDeleteClick && (
-        <ListItemIcon className={classes.icon}>
+        <ListItemIcon
+          sx={{
+            maxWidth: 'unset',
+          }}
+        >
           <IconButton
             edge="end"
             aria-label="delete"
@@ -99,6 +92,6 @@ export function QuestionnairesListItem({
           </IconButton>
         </ListItemIcon>
       )}
-    </ListItem>
+    </ListItemButton>
   );
 }

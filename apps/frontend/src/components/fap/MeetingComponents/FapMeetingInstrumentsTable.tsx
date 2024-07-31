@@ -16,12 +16,13 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useCheckAccess } from 'components/common/Can';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import FapInstrumentProposalsTable from 'components/fap/MeetingComponents/FapInstrumentProposalsTable';
 import { Call, InstrumentWithAvailabilityTime, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXFap } from 'hooks/fap/useDownloadXLSXFap';
 import { useInstrumentsByFapData } from 'hooks/instrument/useInstrumentsByFapData';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -79,7 +80,7 @@ const FapMeetingInstrumentsTable = ({
   }));
 
   const FapInstrumentProposalsTableComponent = React.useCallback(
-    ({ rowData }) => {
+    ({ rowData }: { rowData: InstrumentWithAvailabilityTime }) => {
       return (
         <FapInstrumentProposalsTable
           fapId={fapId}
@@ -282,38 +283,30 @@ const FapMeetingInstrumentsTable = ({
           Some proposals could not be submitted
         </DialogTitle>
         <DialogContent>
-          <DialogContentText
-            sx={{
-              fontWeight: 'bold',
-            }}
-          >
+          <DialogContentText sx={BOLD_TEXT_STYLE}>
             The Following proposals could not be submitted
           </DialogContentText>
-          {Array.from(dialogOpen).map((proposals) => {
-            console.log(proposals);
-
-            return (
-              <>
-                <DialogContentText
-                  key={'instrument-' + proposals[0]}
-                  sx={{ ml: '10px', fontWeight: 'bold' }}
-                >
-                  {instrumentMap.get(proposals[0]) + ': '}
-                </DialogContentText>
-                {proposals[1].map((proposal) => {
-                  return (
-                    <DialogContentText
-                      data-cy={'proposal-' + proposal}
-                      key={'proposal-' + proposal}
-                      sx={{ ml: '15px' }}
-                    >
-                      {proposal}
-                    </DialogContentText>
-                  );
-                })}
-              </>
-            );
-          })}
+          {Array.from(dialogOpen).map((proposals) => (
+            <>
+              <DialogContentText
+                key={'instrument-' + proposals[0]}
+                sx={{ ml: '10px', fontWeight: 'bold' }}
+              >
+                {instrumentMap.get(proposals[0]) + ': '}
+              </DialogContentText>
+              {proposals[1].map((proposal) => {
+                return (
+                  <DialogContentText
+                    data-cy={'proposal-' + proposal}
+                    key={'proposal-' + proposal}
+                    sx={{ ml: '15px' }}
+                  >
+                    {proposal}
+                  </DialogContentText>
+                );
+              })}
+            </>
+          ))}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} data-cy="confirm-ok" variant="text">

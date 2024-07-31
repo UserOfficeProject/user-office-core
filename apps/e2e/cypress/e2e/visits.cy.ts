@@ -252,6 +252,8 @@ context('visits tests', () => {
         .first()
         .click();
 
+      cy.finishedLoading();
+
       cy.get('[role="dialog"]')
         .contains('Carlsson')
         .parent()

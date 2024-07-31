@@ -4,7 +4,7 @@ import { QuestionaryStep } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useBlankQuestionaryStepsDataByCallId(
-  callId: number | undefined | null
+  callId: number | string | undefined | null
 ) {
   const [questionarySteps, setQuestionarySteps] = useState<
     QuestionaryStep[] | null
@@ -18,7 +18,9 @@ export function useBlankQuestionaryStepsDataByCallId(
       return;
     }
     api()
-      .getBlankQuestionaryStepsByCallId({ callId })
+      .getBlankQuestionaryStepsByCallId({
+        callId: typeof callId === 'string' ? parseInt(callId) : callId,
+      })
       .then((data) => {
         setQuestionarySteps(data.blankQuestionaryStepsByCallId);
         setLoading(false);

@@ -36,13 +36,16 @@ export const getUniqueArray = <T,>(array: (T | null)[]) =>
     return value !== null && self.indexOf(value) === index;
   });
 
-export const setSortDirectionOnSortColumn = (
+export const setSortDirectionOnSortField = (
   columns: Column<any>[],
-  sortColumn: number | null | undefined,
+  sortField: string | null | undefined,
   sortDirection: string | null | undefined
 ) => {
-  if (sortColumn !== undefined && sortColumn !== null && sortDirection) {
-    columns[sortColumn].defaultSort = sortDirection as SortDirectionType;
+  if (sortField !== undefined && sortField !== null && sortDirection) {
+    const fieldIndex = columns.findIndex(
+      (column) => column.field === sortField
+    );
+    columns[fieldIndex].defaultSort = sortDirection as SortDirectionType;
   }
 
   return columns;
@@ -186,7 +189,7 @@ export const denseTableColumn = <T extends object>(
       if (typeof columnData === 'string' && columnData.length > 45) {
         return (
           <span title={columnData}>
-            {column.render ? column.render(rowData, 'row') : columnData}
+            {column.render ? column.render(rowData) : columnData}
           </span>
         );
       } else {
@@ -194,9 +197,7 @@ export const denseTableColumn = <T extends object>(
           return column.lookup[columnData as keyof object];
         }
 
-        return (
-          <>{column.render ? column.render(rowData, 'row') : columnData}</>
-        );
+        return <>{column.render ? column.render(rowData) : columnData}</>;
       }
     },
     cellStyle: {
@@ -231,3 +232,9 @@ export function fromArrayToCommaSeparated(
 ) {
   return itemsArray?.map((item) => item ?? '-').join(', ') || '-';
 }
+
+export const getMax32BitInteger = () => Math.pow(2, 31);
+
+export const BOLD_TEXT_STYLE = {
+  fontWeight: 'bold',
+};
