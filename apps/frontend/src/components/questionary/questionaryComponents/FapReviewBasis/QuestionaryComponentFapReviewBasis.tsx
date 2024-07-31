@@ -1,11 +1,12 @@
 import { Box, CssBaseline, FormHelperText, InputLabel } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import makeStyles from '@mui/styles/makeStyles';
-import { ErrorMessage, Field, Formik } from 'formik';
-import { Select, TextField } from 'formik-mui';
+import { ErrorMessage, Field } from 'formik';
+import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
+import { useCheckAccess } from 'components/common/Can';
 import Editor from 'components/common/TinyEditor';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
@@ -16,7 +17,7 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { ReviewContextType } from 'components/review/ReviewQuestionary';
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { BasicUserDetails, ReviewStatus, SettingsId } from 'generated/sdk';
+import { BasicUserDetails, SettingsId, UserRole } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useFapData } from 'hooks/fap/useFapData';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
@@ -40,6 +41,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
     answer: {
       question: { id },
     },
+    formikProps,
   } = props;
 
   const classes = useStyles();
@@ -47,18 +49,19 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
     QuestionaryContext
   ) as ReviewContextType;
 
-  const [localComment, setLocalComment] = useState(state?.fapReview.comment);
-  const [localGrade, setLocalGrade] = useState(state?.fapReview.grade);
+  const [localComment, setLocalComment] = useState(state?.fapReview?.comment);
+  const [localGrade, setLocalGrade] = useState(state?.fapReview?.grade);
   const [numberOfChars, setNumberOfChars] = useState(0);
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { userData } = useBasicUserData(state?.fapReview.reviewer?.id);
+  const { userData } = useBasicUserData(state?.fapReview?.reviewer?.id);
   const [, setPIData] = useState<BasicUserDetails | null>(null);
   const { settingsMap } = useContext(SettingsContext);
-  const { fap } = useFapData(state?.fapReview.fapID);
+  const { fap } = useFapData(state?.fapReview?.fapID);
 
   useEffect(() => {
     if (userData !== null) {
@@ -70,14 +73,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
     settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
   );
 
-  const initialValues = {
-    fap_review_grade: state?.fapReview.grade?.toString() || '',
-    fap_review_comment: state?.fapReview.comment || '',
-    submitted: state?.fapReview.status === ReviewStatus.SUBMITTED,
-    saveOnly: true,
-    gradeGuide: fap?.gradeGuide,
-  };
-
   const handleCharacterCount = (editor: TinyMCEEditor) => {
     const wordCount = editor.plugins.wordcount;
     setNumberOfChars(wordCount.body.getCharacterCount());
@@ -87,113 +82,124 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   return (
     <div>
       <div className={classes.container}>
-        <Formik
+        {/* <Formik
           initialValues={initialValues}
-          onSubmit={async (): Promise<void> => {}}
+          onSubmit={async (): Promise<void> => { }}
         >
-          {({ setFieldValue }) => (
-            <>
-              <CssBaseline />
-              <InputLabel htmlFor="comment" shrink margin="dense" required>
-                Comment
-              </InputLabel>
-              <Editor
-                id="fap_review_comment"
-                initialValue={initialValues.fap_review_comment}
-                init={{
-                  skin: false,
-                  content_css: false,
-                  plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
-                  toolbar: 'bold italic',
-                  branding: false,
-                  init_instance_callback: (editor) => {
-                    handleCharacterCount(editor);
-                  },
-                }}
-                onEditorChange={(content, editor) => {
-                  const isStartContentDifferentThanCurrent =
-                    editor.startContent !==
-                    editor.contentDocument.body.innerHTML;
+          {({ setFieldValue }) => ( */}
+        <>
+          <CssBaseline />
+          <InputLabel htmlFor="comment" shrink margin="dense" required>
+            Comment
+          </InputLabel>
+          <Editor
+            id={`${id}.comment`}
+            initialValue={formikProps.initialValues[id]['comment']}
+            init={{
+              skin: false,
+              content_css: false,
+              plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
+              toolbar: 'bold italic',
+              branding: false,
+              init_instance_callback: (editor) => {
+                handleCharacterCount(editor);
+              },
+            }}
+            onEditorChange={(content, editor) => {
+              const isStartContentDifferentThanCurrent =
+                editor.startContent !== editor.contentDocument.body.innerHTML;
 
-                  if (isStartContentDifferentThanCurrent || editor.isDirty()) {
-                    handleCharacterCount(editor);
-                    setFieldValue(`${id}.grade`, content);
-                    setLocalComment(content);
-                  }
+              if (isStartContentDifferentThanCurrent || editor.isDirty()) {
+                handleCharacterCount(editor);
+                //setFieldValue(`${id}.comment`, content); @TODO: fix
+                setLocalComment(content);
+              }
+            }}
+            onBlur={() => {
+              dispatch({
+                type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                itemWithQuestionary: { comment: localComment },
+              });
+            }}
+          />
+          <FormHelperText>
+            Characters: {numberOfChars} / {6000}
+          </FormHelperText>
+          <ErrorMessage name="comment" />
+          <Box marginTop={1} width={150}>
+            <Field
+              name={`${id}.grade`}
+              label="Grade"
+              component={gradeDecimalPoints === 1 ? Select : TextField}
+              MenuProps={{ 'data-cy': 'grade-proposal-options' }}
+              formControl={{
+                fullWidth: true,
+                required: true,
+                margin: 'normal',
+              }}
+              inputProps={
+                gradeDecimalPoints === 1
+                  ? {
+                      id: 'grade-proposal',
+                      onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                        setLocalGrade(+event.target.value),
+                      onBlur: () => {
+                        dispatch({
+                          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                          itemWithQuestionary: { grade: localGrade },
+                        });
+                      },
+                    }
+                  : {
+                      id: 'grade-proposal',
+                      step: gradeDecimalPoints,
+                      inputMode: 'decimal',
+                      type: 'number',
+                      min: '1',
+                      max: '10',
+                      onChange: (event: ChangeEvent<HTMLInputElement>) =>
+                        setLocalGrade(+event.target.value),
+                      onBlur: () => {
+                        dispatch({
+                          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                          itemWithQuestionary: { grade: localGrade },
+                        });
+                      },
+                    }
+              }
+              data-cy="grade-proposal"
+              labelId="grade-proposal-label"
+            >
+              {gradeDecimalPoints === 1 &&
+                [...Array(10)].map((e, i) => {
+                  return (
+                    <MenuItem value={i + 1} key={i}>
+                      {(i + 1).toString()}
+                    </MenuItem>
+                  );
+                })}
+            </Field>
+          </Box>
+          <NavigationFragment>
+            <ButtonWithDialog label="Grading guide" data-cy="grade-guide">
+              {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
+            </ButtonWithDialog>
+            {hasAccessRights && (
+              <Field
+                id="submitted"
+                name="submitted"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Submitted',
                 }}
-                onBlur={() => {
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                    itemWithQuestionary: { comment: localComment },
-                  });
-                }}
+                data-cy="is-grade-submitted"
               />
-              <FormHelperText>
-                Characters: {numberOfChars} / {6000}
-              </FormHelperText>
-              <ErrorMessage name="comment" />
-              <Box marginTop={1} width={150}>
-                <Field
-                  name="fap_review_grade"
-                  label="Grade"
-                  component={gradeDecimalPoints === 1 ? Select : TextField}
-                  MenuProps={{ 'data-cy': 'grade-proposal-options' }}
-                  formControl={{
-                    fullWidth: true,
-                    required: true,
-                    margin: 'normal',
-                  }}
-                  inputProps={
-                    gradeDecimalPoints === 1
-                      ? {
-                          id: 'grade-proposal',
-                          onChange: (event: ChangeEvent<HTMLInputElement>) =>
-                            setLocalGrade(+event.target.value),
-                          onBlur: () => {
-                            dispatch({
-                              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                              itemWithQuestionary: { grade: localGrade },
-                            });
-                          },
-                        }
-                      : {
-                          id: 'grade-proposal',
-                          step: gradeDecimalPoints,
-                          inputMode: 'decimal',
-                          type: 'number',
-                          min: '1',
-                          max: '10',
-                          onChange: (event: ChangeEvent<HTMLInputElement>) =>
-                            setLocalGrade(+event.target.value),
-                          onBlur: () => {
-                            dispatch({
-                              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                              itemWithQuestionary: { grade: localGrade },
-                            });
-                          },
-                        }
-                  }
-                  data-cy="grade-proposal"
-                  labelId="grade-proposal-label"
-                >
-                  {gradeDecimalPoints === 1 &&
-                    [...Array(10)].map((e, i) => {
-                      return (
-                        <MenuItem value={i + 1} key={i}>
-                          {(i + 1).toString()}
-                        </MenuItem>
-                      );
-                    })}
-                </Field>
-              </Box>
-              <NavigationFragment>
-                <ButtonWithDialog label="Grading guide" data-cy="grade-guide">
-                  {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
-                </ButtonWithDialog>
-              </NavigationFragment>
-            </>
-          )}
-        </Formik>
+            )}
+          </NavigationFragment>
+        </>
+        {/* )}
+      </Formik> */}
       </div>
     </div>
   );

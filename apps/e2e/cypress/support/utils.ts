@@ -40,6 +40,7 @@ export const updatedCall = {
   cycleComment: faker.lorem.word(10),
   surveyComment: faker.lorem.word(10),
   templateId: initialDBData.template.id,
+  fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
 };
 
 export const closedCall = {
@@ -58,6 +59,7 @@ export const closedCall = {
   cycleComment: faker.lorem.word(10),
   surveyComment: faker.lorem.word(10),
   templateId: initialDBData.template.id,
+  fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
   callFapReviewEnded: false,
 };
 

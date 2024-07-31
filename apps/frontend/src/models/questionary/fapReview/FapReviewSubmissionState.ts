@@ -16,7 +16,7 @@ export class FapReviewSubmissionState extends QuestionarySubmissionState {
   }
 
   getItemId(): number {
-    return this.fapReview.fapID;
+    return this.fapReview.id;
   }
 
   get itemWithQuestionary() {

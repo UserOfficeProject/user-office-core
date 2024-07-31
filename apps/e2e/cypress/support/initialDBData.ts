@@ -52,7 +52,7 @@ export default {
   },
   fapReviewTemplate: {
     id: 2,
-    name: 'default review template',
+    name: 'default fap review template',
     topic: {
       id: 6,
       title: 'Topic title',

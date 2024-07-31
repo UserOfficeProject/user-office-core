@@ -35,7 +35,9 @@ function readWriteReview(
   cy.get('@dialog').contains('Technical review');
   cy.get('@dialog').contains('Grade');
 
-  cy.setTinyMceContent('comment', faker.lorem.words(3));
+  cy.contains('New fap review').click();
+
+  cy.setTinyMceContent('fap_review_comment', faker.lorem.words(3));
 
   if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
     cy.get('@dialog').get('[data-cy="grade-proposal"]').click();

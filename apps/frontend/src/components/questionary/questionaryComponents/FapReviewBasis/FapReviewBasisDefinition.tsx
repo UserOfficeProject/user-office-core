@@ -24,6 +24,9 @@ export const fapReviewBasisDefinition: QuestionaryComponentDefinition = {
   getYupInitialValue: ({ state }) => {
     const fapReviewState = state as FapReviewSubmissionState;
 
-    return fapReviewState.fapReview;
+    return {
+      comment: fapReviewState.fapReview.comment || '',
+      grade: fapReviewState.fapReview.grade?.toString() || '',
+    };
   },
 };
