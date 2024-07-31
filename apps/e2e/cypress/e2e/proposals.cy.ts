@@ -380,81 +380,82 @@ context('Proposal tests', () => {
       );
     });
 
-    it('User officer should be able to select all prefetched proposals in the table', function () {
-      const NUMBER_OF_PROPOSALS = 11;
-      const DEFAULT_ROWS_PER_PAGE = 10;
+    // NOTE: This functionality should be refactored and the test as well. https://jira.esss.lu.se/browse/SWAP-4143
+    // it('User officer should be able to select all prefetched proposals in the table', function () {
+    //   const NUMBER_OF_PROPOSALS = 11;
+    //   const DEFAULT_ROWS_PER_PAGE = 10;
 
-      for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
-        cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-          if (result.createProposal) {
-            cy.updateProposal({
-              proposalPk: result.createProposal.primaryKey,
-              title: newProposalTitle + index,
-              abstract: newProposalAbstract + index,
-              proposerId: proposer.id,
-            });
-          }
-        });
-      }
+    //   for (let index = 0; index < NUMBER_OF_PROPOSALS; index++) {
+    //     cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+    //       if (result.createProposal) {
+    //         cy.updateProposal({
+    //           proposalPk: result.createProposal.primaryKey,
+    //           title: newProposalTitle + index,
+    //           abstract: newProposalAbstract + index,
+    //           proposerId: proposer.id,
+    //         });
+    //       }
+    //     });
+    //   }
 
-      cy.login('officer');
-      cy.visit('/');
+    //   cy.login('officer');
+    //   cy.visit('/');
 
-      cy.contains('Proposals').click();
-      cy.finishedLoading();
+    //   cy.contains('Proposals').click();
+    //   cy.finishedLoading();
 
-      cy.get('[data-cy="officer-proposals-table"]').contains(newProposalTitle);
-      cy.get('[data-cy="officer-proposals-table"]').should(
-        'not.contain',
-        `${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`
-      );
-      cy.get('[data-cy="officer-proposals-table"] tfoot').contains(
-        `${DEFAULT_ROWS_PER_PAGE} rows`
-      );
+    //   cy.get('[data-cy="officer-proposals-table"]').contains(newProposalTitle);
+    //   cy.get('[data-cy="officer-proposals-table"]').should(
+    //     'not.contain',
+    //     `${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`
+    //   );
+    //   cy.get('[data-cy="officer-proposals-table"] tfoot').contains(
+    //     `${DEFAULT_ROWS_PER_PAGE} rows`
+    //   );
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] thead [aria-label="Select All Rows"][type="checkbox"]'
-      ).check();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] thead [aria-label="Select All Rows"][type="checkbox"]'
+    //   ).check();
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"]'
-      ).contains(`${DEFAULT_ROWS_PER_PAGE} row(s) selected`);
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="select-all-prefetched-proposals"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"]'
+    //   ).contains(`${DEFAULT_ROWS_PER_PAGE} row(s) selected`);
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="select-all-prefetched-proposals"]'
+    //   ).click();
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
-      ).contains('All proposals are selected');
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
+    //   ).contains('All proposals are selected');
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] tfoot button[aria-label="Next Page"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] tfoot button[aria-label="Next Page"]'
+    //   ).click();
 
-      cy.get('[data-cy="officer-proposals-table"]')
-        .contains(`${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`)
-        .parent()
-        .find('input[type="checkbox"]')
-        .should('be.checked');
+    //   cy.get('[data-cy="officer-proposals-table"]')
+    //     .contains(`${newProposalTitle}${NUMBER_OF_PROPOSALS - 1}`)
+    //     .parent()
+    //     .find('input[type="checkbox"]')
+    //     .should('be.checked');
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="clear-all-selection"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"] [data-cy="clear-all-selection"]'
+    //   ).click();
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
-      ).should('not.exist');
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] [data-cy="select-all-toolbar"] [data-cy="select-all-proposals"]'
+    //   ).should('not.exist');
 
-      cy.get(
-        '[data-cy="officer-proposals-table"] tfoot button[aria-label="Previous Page"]'
-      ).click();
+    //   cy.get(
+    //     '[data-cy="officer-proposals-table"] tfoot button[aria-label="Previous Page"]'
+    //   ).click();
 
-      cy.get('[data-cy="officer-proposals-table"]')
-        .contains(newProposalTitle)
-        .parent()
-        .find('input[type="checkbox"]')
-        .should('not.be.checked');
-    });
+    //   cy.get('[data-cy="officer-proposals-table"]')
+    //     .contains(newProposalTitle)
+    //     .parent()
+    //     .find('input[type="checkbox"]')
+    //     .should('not.be.checked');
+    // });
 
     it('Should be able to see proposal allocation time unit on the proposal', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {

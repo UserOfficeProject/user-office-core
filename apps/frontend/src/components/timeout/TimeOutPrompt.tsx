@@ -17,7 +17,10 @@ function IdleTimeoutPrompt(props: IdleTimeoutPromptProps): JSX.Element {
   return (
     <Dialog fullWidth data-cy="timeout-dialog" open={props.isIdle}>
       <DialogTitle
-        sx={(theme) => ({ marginTop: '12px', color: theme.palette.error.main })}
+        sx={(theme) => ({
+          marginTop: theme.spacing(1.5),
+          color: theme.palette.error.main,
+        })}
       >
         {'Warning'}
       </DialogTitle>
