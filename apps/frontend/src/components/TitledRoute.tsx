@@ -1,22 +1,22 @@
-import React, { useEffect } from 'react';
-import { Route, RouteProps } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { RouteProps, useLocation } from 'react-router-dom';
 
-interface PageProps extends RouteProps {
+import PageLayout from './PageLayout';
+
+type PageProps = RouteProps & {
   title: string;
-  setHeader: React.Dispatch<React.SetStateAction<string>>;
-}
+};
 
 const TitledRoute = (props: PageProps) => {
-  document.title = props.title;
-  // NOTE: useEffect to fix warning about updating component(Dashboard) while rendering another component(TitledRoute)
+  const location = useLocation();
+  const [header, setHeader] = useState('User Office');
+
   useEffect(() => {
-    props.setHeader(props.title);
-  });
+    document.title = props.title;
+    setHeader(props.title);
+  }, [location, props]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { title, ...rest } = props;
-
-  return <Route {...rest} />;
+  return <PageLayout header={header}>{props.element}</PageLayout>;
 };
 
 export default TitledRoute;

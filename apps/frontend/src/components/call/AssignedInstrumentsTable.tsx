@@ -1,7 +1,6 @@
 import { Column, EditComponentProps } from '@material-table/core';
-import { Autocomplete } from '@mui/material';
+import { Autocomplete, Box } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
 import i18n from 'i18n';
 import PropTypes from 'prop-types';
 import React, { ChangeEvent, useContext } from 'react';
@@ -16,24 +15,11 @@ import {
   UserRole,
 } from 'generated/sdk';
 import { useFapsData } from 'hooks/fap/useFapsData';
+import { getMax32BitInteger } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-const MAX_32_BIT_INTEGER = Math.pow(2, 31);
-
-// NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(() => ({
-  root: {
-    '& tr:last-child td': {
-      border: 'none',
-      textAlign: 'left',
-    },
-    '& .MuiPaper-root': {
-      padding: '0 40px',
-      backgroundColor: '#fafafa',
-    },
-  },
-}));
+const MAX_32_BIT_INTEGER = getMax32BitInteger();
 
 type AssignedInstrumentsTableProps = {
   call: Call;
@@ -114,7 +100,6 @@ const AssignedInstrumentsTable = ({
   setInstrumentAvailabilityTime,
   assignInstrumentsToCall,
 }: AssignedInstrumentsTableProps) => {
-  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
@@ -245,7 +230,19 @@ const AssignedInstrumentsTable = ({
 
   return (
     <>
-      <div className={classes.root} data-cy="call-instrument-assignments-table">
+      <Box
+        sx={{
+          '& tr:last-child td': {
+            border: 'none',
+            textAlign: 'left',
+          },
+          '& .MuiPaper-root': {
+            padding: '0 40px',
+            backgroundColor: '#fafafa',
+          },
+        }}
+        data-cy="call-instrument-assignments-table"
+      >
         <MaterialTable
           icons={tableIcons}
           columns={assignmentColumns}
@@ -319,7 +316,7 @@ const AssignedInstrumentsTable = ({
             debounceInterval: 400,
           }}
         />
-      </div>
+      </Box>
     </>
   );
 };

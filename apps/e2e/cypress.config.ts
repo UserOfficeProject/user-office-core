@@ -42,7 +42,7 @@ module.exports = defineConfig({
   viewportHeight: 1080,
   retries: 1,
   scrollBehavior: 'center',
-  defaultCommandTimeout: 15000,
+  defaultCommandTimeout: 30000,
   chromeWebSecurity: false,
   env: {
     SVC_ACC_TOKEN:

@@ -42,6 +42,7 @@ context('Settings tests', () => {
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
+      cy.finishedLoading();
       cy.contains('Create').click();
       cy.get('#shortCode').type(shortCode);
       cy.get('#name').type(name);
@@ -849,7 +850,11 @@ context('Settings tests', () => {
       cy.login('officer');
       cy.visit('/');
 
+      cy.get('.MuiTable-root tbody tr').should('exist');
+
       cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr').contains(proposalTitle);
 
       cy.get('.MuiTable-root tbody tr')
         .first()
@@ -964,6 +969,8 @@ context('Settings tests', () => {
       cy.get('[data-cy="fap-selection-options"] li').first().click();
 
       cy.get('[data-cy="submit"]').click();
+
+      cy.finishedLoading();
 
       cy.notification({
         variant: 'success',
@@ -1128,6 +1135,8 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('.MuiTable-root tbody').contains(proposalTitle);
+
       cy.get('.MuiTable-root tbody')
         .first()
         .then((element) =>
@@ -1138,21 +1147,33 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.fapReview.name
+          )
+        );
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="5"]').click();
 
       cy.finishedLoading();
 
+      cy.get('.MuiTable-root tbody').contains(proposalTitle);
+
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.fapReview.name
+          )
+        );
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
 
       cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr').contains(updatedCall.shortCode);
 
       cy.get('.MuiTable-root tbody tr')
         .first()
