@@ -6,22 +6,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
 import { DataType, Question } from 'generated/sdk';
 import { useProposalsData } from 'hooks/proposal/useProposalsData';
-
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 type ProposalAttachmentDownloadProps = {
   close: () => void;
@@ -37,7 +26,6 @@ const ProposalAttachmentDownload = ({
   referenceNumbers,
   downloadProposalAttachment,
 }: ProposalAttachmentDownloadProps) => {
-  const classes = useStyles();
   const { proposalsData, loading } = useProposalsData({ referenceNumbers });
   const { enqueueSnackbar } = useSnackbar();
   const [selectedAttachmentsQuestions, setSelectedAttachmentsQuestions] =
@@ -97,7 +85,14 @@ const ProposalAttachmentDownload = ({
       maxWidth="xs"
       data-cy="proposal-attachment-download"
     >
-      <Typography variant="h6" component="h1" className={classes.cardHeader}>
+      <Typography
+        variant="h6"
+        component="h1"
+        sx={{
+          fontSize: '18px',
+          padding: '22px 0 0',
+        }}
+      >
         Download attachment on proposal/s
       </Typography>
 
@@ -150,7 +145,9 @@ const ProposalAttachmentDownload = ({
         <Grid item xs={6}>
           <Button
             fullWidth
-            className={classes.submit}
+            sx={(theme) => ({
+              margin: theme.spacing(3, 0, 2),
+            })}
             disabled={loading || selectedAttachmentsQuestions.length <= 0}
             data-cy="proposalAttachmentDownloadButton"
             onClick={() => {

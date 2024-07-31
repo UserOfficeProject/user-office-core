@@ -74,6 +74,18 @@ declare global {
        *    cy.setTinyMceContent('editorId', 'content to type inside the editor')
        */
       setTinyMceContent: (tinyMceId: string, content: string) => void;
+      /**
+       * Set value in Date and DateTime picker fetched by selector.
+       *
+       * @returns {typeof setDatePickerValue}
+       * @memberof Chainable
+       * @example
+       *    cy.setDatePickerValue('selector', '02072024')
+       */
+      setDatePickerValue: (
+        selector: string,
+        value: string
+      ) => Chainable<JQuery<HTMLElement>>;
 
       /**
        * Get content from TinyMCE editor fetched by editor id.
@@ -83,7 +95,11 @@ declare global {
        * @example
        *    cy.getTinyMceContent('editorId')
        */
-      getTinyMceContent: (tinyMceId: string) => Cypress.Chainable<string>;
+      getTinyMceContent: (
+        tinyMceId: string
+      ) =>
+        | Cypress.Chainable<Cypress.AUTWindow>
+        | Cypress.Chainable<string | Cypress.AUTWindow>;
 
       /**
        * Tests if action button in experiments table has the right state
@@ -120,14 +136,14 @@ declare global {
 
   interface Window {
     tinyMCE: {
-      editors: Record<
-        string,
-        {
-          setContent: (content: string) => void;
-          fire: (event: string) => void;
-          getContent: () => string;
-        }
-      >;
+      EditorManager: {
+        get(): {
+          id: string;
+          fire: EditorObservable['fire'];
+          setContent(content: string): string;
+          getContent(): string;
+        }[];
+      };
     };
   }
 }

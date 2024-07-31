@@ -270,6 +270,10 @@ context('Samples tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('span.MuiStepLabel-label')
+        .last()
+        .should('have.class', 'Mui-active');
+
       cy.get(
         '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
       ).click();
@@ -342,6 +346,10 @@ context('Samples tests', () => {
       ).click();
 
       cy.finishedLoading();
+
+      cy.get('span.MuiStepLabel-label')
+        .last()
+        .should('have.class', 'Mui-active');
 
       cy.get(
         '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'

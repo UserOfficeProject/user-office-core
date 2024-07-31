@@ -1,11 +1,12 @@
 import { Collapse, FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';

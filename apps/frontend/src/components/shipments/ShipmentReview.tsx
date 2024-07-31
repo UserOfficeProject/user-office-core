@@ -1,6 +1,7 @@
 import GetAppIcon from '@mui/icons-material/GetApp';
-import { Link } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import Link from '@mui/material/Link';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import React, { useContext } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
@@ -25,13 +26,6 @@ type ShipmentReviewProps = {
   confirm: WithConfirmType;
 };
 
-const useStyles = makeStyles(() => ({
-  sampleList: {
-    listStyle: 'none',
-    padding: 0,
-  },
-}));
-
 function ShipmentReview({ confirm }: ShipmentReviewProps) {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { state, dispatch } = useContext(
@@ -43,7 +37,6 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
 
   const { proposalData } = useProposalData(state.shipment.proposalPk);
   const downloadShipmentLabel = useDownloadPDFShipmentLabel();
-  const classes = useStyles();
 
   if (!proposalData) {
     return <UOLoader />;
@@ -64,11 +57,11 @@ function ShipmentReview({ confirm }: ShipmentReviewProps) {
     {
       label: 'Samples',
       value: (
-        <ul className={classes.sampleList}>
+        <List sx={{ listStyle: 'none', padding: 0 }}>
           {state.shipment.samples.map((sample) => (
-            <li key={sample.id}>{sample.title}</li>
+            <ListItem key={sample.id}>{sample.title}</ListItem>
           ))}
-        </ul>
+        </List>
       ),
     },
   ];

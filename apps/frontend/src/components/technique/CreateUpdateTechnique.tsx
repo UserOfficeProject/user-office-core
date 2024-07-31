@@ -1,11 +1,15 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import {
+  createTechniqueValidationSchema,
+  updateTechniqueValidationSchema,
+} from '@user-office-software/duo-validation/lib/Technique';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { TechniqueFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -58,8 +62,13 @@ const CreateUpdateTechnique = ({
           }
         }
       }}
+      validationSchema={
+        !!technique
+          ? updateTechniqueValidationSchema
+          : createTechniqueValidationSchema
+      }
     >
-      {() => (
+      {({ isValid }) => (
         <Form>
           <Typography variant="h6" component="h1">
             {(technique ? 'Update ' : 'Create new ') +
@@ -106,7 +115,7 @@ const CreateUpdateTechnique = ({
             sx={{ marginTop: 2 }}
             fullWidth
             data-cy="submit"
-            disabled={isExecutingCall}
+            disabled={!isValid || isExecutingCall}
           >
             {isExecutingCall && <UOLoader size={14} />}
             {technique ? 'Update' : 'Create'}

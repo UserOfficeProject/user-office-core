@@ -1,11 +1,12 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
-import { DatePicker } from 'formik-mui-lab';
+import { DateTime } from 'luxon';
 import { useContext } from 'react';
 import React from 'react';
 
+import DatePicker from 'components/common/FormikUIDatePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
   createMissingContextErrorMessage,
@@ -26,7 +27,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
   const { dispatch, state } = useContext(
     QuestionaryContext
   ) as VisitRegistrationContextType;
-  const { format, mask } = useFormattedDateTime({
+  const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
@@ -41,8 +42,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
       <Field
         name={`${id}.startsAt`}
         label="Visit start"
-        inputFormat={format}
-        mask={mask}
+        format={format}
         component={DatePicker}
         inputProps={{ placeholder: format }}
         variant="inline"
@@ -56,7 +56,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         InputLabelProps={{
           shrink: true,
         }}
-        onChange={(startsAt: Date | null) => {
+        onChange={(startsAt: DateTime) => {
           dispatch({
             type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
             itemWithQuestionary: { startsAt },
@@ -68,8 +68,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
       <Field
         name={`${id}.endsAt`}
         label="Visit end"
-        inputFormat={format}
-        mask={mask}
+        format={format}
         component={DatePicker}
         inputProps={{ placeholder: format }}
         variant="inline"
@@ -83,7 +82,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         InputLabelProps={{
           shrink: true,
         }}
-        onChange={(endsAt: Date | null) => {
+        onChange={(endsAt: DateTime) => {
           dispatch({
             type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
             itemWithQuestionary: { endsAt },
