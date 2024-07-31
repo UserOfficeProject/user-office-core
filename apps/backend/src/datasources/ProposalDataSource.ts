@@ -97,5 +97,5 @@ export interface ProposalDataSource {
   ): Promise<void>;
   getRelatedUsersOnProposals(id: number): Promise<number[]>;
   getProposalById(proposalId: string): Promise<Proposal | null>;
-  proposalNeedTechReview(proposalPk: number): Promise<boolean>;
+  doesProposalNeedTechReview(proposalPk: number): Promise<boolean>;
 }

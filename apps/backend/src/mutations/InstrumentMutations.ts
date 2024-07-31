@@ -209,7 +209,7 @@ export default class InstrumentMutations {
         instrumentHasProposalIds.push(instrumentHasProposalId);
 
         const needTechReview =
-          await this.proposalDataSource.proposalNeedTechReview(proposalPk);
+          await this.proposalDataSource.doesProposalNeedTechReview(proposalPk);
 
         if (needTechReview) {
           const technicalReview =

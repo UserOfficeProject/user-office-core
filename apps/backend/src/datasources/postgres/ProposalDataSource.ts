@@ -1072,7 +1072,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async proposalNeedTechReview(proposalPk: number): Promise<boolean> {
+  async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
     const proposalWorkflowId: number = await database
       .select('c.proposal_workflow_id')
       .from('proposals as p')
