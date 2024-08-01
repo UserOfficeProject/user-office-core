@@ -1,11 +1,11 @@
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
 import { ChangeEvent, default as React, useContext } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
@@ -82,11 +82,13 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
                 label="Template name"
                 noOptionsText="No active templates"
                 items={templateOptions}
-                InputProps={{ 'data-cy': 'template-id' }}
+                InputProps={{
+                  'data-cy': 'template-id',
+                  endAdornment: (
+                    <RefreshListIcon onClick={refreshSampleTemplates} />
+                  ),
+                }}
                 TextFieldProps={{ margin: 'none' }}
-                AdornmentIcon={
-                  <RefreshListIcon onClick={refreshSampleTemplates} />
-                }
                 required
               />
               <Link
@@ -105,10 +107,12 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
                   label="ESI template name"
                   noOptionsText="No active templates"
                   items={ESITemplateOptions}
-                  InputProps={{ 'data-cy': 'esi-template-id' }}
-                  AdornmentIcon={
-                    <RefreshListIcon onClick={refreshEsiTemplates} />
-                  }
+                  InputProps={{
+                    'data-cy': 'esi-template-id',
+                    endAdornment: (
+                      <RefreshListIcon onClick={refreshEsiTemplates} />
+                    ),
+                  }}
                   TextFieldProps={{ margin: 'none' }}
                 />
                 <Link

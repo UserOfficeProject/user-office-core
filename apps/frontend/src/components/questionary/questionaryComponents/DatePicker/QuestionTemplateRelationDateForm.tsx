@@ -1,12 +1,14 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
-import { DatePicker, DateTimePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import DatePicker from 'components/common/FormikUIDatePicker';
+import DateTimePicker from 'components/common/FormikUIDateTimePicker';
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -73,7 +75,6 @@ export const QuestionTemplateRelationDateForm = (
 
         const component = includeTime ? DateTimePicker : DatePicker;
         const inputFormat = includeTime ? dateTimeFormat : dateFormat;
-        const mask = inputFormat?.replace(/[a-zA-Z]/g, '_');
 
         return (
           <>
@@ -113,8 +114,7 @@ export const QuestionTemplateRelationDateForm = (
                   label="Min"
                   id="Min-input"
                   ampm={false}
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   component={component}
                   maxDate={defaultFieldMaxDate}
                   textField={{
@@ -128,8 +128,7 @@ export const QuestionTemplateRelationDateForm = (
                   label="Max"
                   id="Max-input"
                   ampm={false}
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   component={component}
                   minDate={defaultFieldMinDate}
                   textField={{
@@ -143,8 +142,7 @@ export const QuestionTemplateRelationDateForm = (
                   label="Default"
                   id="Default-input"
                   ampm={false}
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   component={component}
                   minDate={defaultFieldMinDate}
                   maxDate={defaultFieldMaxDate}

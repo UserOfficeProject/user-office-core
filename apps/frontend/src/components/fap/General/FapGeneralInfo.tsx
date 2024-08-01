@@ -1,18 +1,16 @@
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { updateFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import FapGradeGuide from 'components/fap/FapGradeGuide';
 import { Fap, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -23,16 +21,8 @@ type FapPageProps = {
   onFapUpdate: (fap: Fap) => void;
 };
 
-const useStyles = makeStyles({
-  button: {
-    marginTop: '25px',
-    marginLeft: '10px',
-  },
-});
-
 const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const fap = { ...data };
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
@@ -126,26 +116,21 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   }}
                 />
               )}
-              <FormControlLabel
-                control={
-                  <Field
-                    id="customGradeGuide"
-                    name="customGradeGuide"
-                    component={Checkbox}
-                    type="checkbox"
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                    checked={values.customGradeGuide}
-                    data-cy="custom-grade-guide"
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      handleCustomGradeGuideChange(event);
-                      setFieldValue(
-                        'customGradeGuide',
-                        !values.customGradeGuide
-                      );
-                    }}
-                  />
-                }
-                label="Custom Grade Guide"
+              <Field
+                id="customGradeGuide"
+                name="customGradeGuide"
+                component={CheckboxWithLabel}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+                type="checkbox"
+                checked={values.customGradeGuide}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  handleCustomGradeGuideChange(event);
+                  setFieldValue('customGradeGuide', !values.customGradeGuide);
+                }}
+                Label={{
+                  label: 'Custom Grade Guide',
+                }}
+                data-cy="custom-grade-guide"
               />
             </Grid>
             <Grid item sm={6} xs={12}>
@@ -170,22 +155,16 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                 }
                 disabled={!hasAccessRights || isExecutingCall}
               />
-              <FormControlLabel
-                control={
-                  <Field
-                    id="active"
-                    name="active"
-                    type="checkbox"
-                    component={Checkbox}
-                    checked={values.active}
-                    onChange={(): void =>
-                      setFieldValue('active', !values.active)
-                    }
-                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                    disabled={!hasAccessRights || isExecutingCall}
-                  />
-                }
-                label="Active"
+              <Field
+                id="active"
+                name="active"
+                component={CheckboxWithLabel}
+                type="checkbox"
+                Label={{
+                  label: 'Active',
+                }}
+                data-cy="fapActive"
+                disabled={!hasAccessRights || isExecutingCall}
               />
             </Grid>
           </Grid>
@@ -194,7 +173,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
               <Button
                 disabled={isExecutingCall}
                 type="submit"
-                className={classes.button}
+                sx={{ marginTop: '25px', marginLeft: '10px' }}
                 data-cy="submit"
               >
                 {isExecutingCall && <UOLoader size={14} />}

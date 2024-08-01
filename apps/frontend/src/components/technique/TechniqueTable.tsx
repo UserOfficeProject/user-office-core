@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SimpleTabs from 'components/common/SimpleTabs';
 import SuperMaterialTable, {
@@ -14,6 +13,7 @@ import SuperMaterialTable, {
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import ParticipantModal from 'components/proposal/ParticipantModal';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -26,6 +26,7 @@ import CreateUpdateTechnique from './CreateUpdateTechnique';
 import {
   BasicUserDetails,
   InstrumentFragment,
+  Technique,
   TechniqueFragment,
   UserRole,
 } from '../../generated/sdk';
@@ -153,7 +154,7 @@ const TechniqueTable = () => {
   };
 
   const AssignedInstruments = React.useCallback(
-    ({ rowData }) => {
+    ({ rowData }: { rowData: Technique }) => {
       const removeScientistFromTechnique = async (
         scientistId: number,
         techniqueId: number

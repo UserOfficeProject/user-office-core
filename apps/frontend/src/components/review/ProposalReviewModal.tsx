@@ -7,25 +7,10 @@ import Slide from '@mui/material/Slide';
 import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions/transition';
 import Typography from '@mui/material/Typography';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { Proposal } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    appBar: {
-      position: 'relative',
-    },
-    title: {
-      marginLeft: theme.spacing(2),
-      flex: 1,
-      color: theme.palette.primary.contrastText,
-    },
-  })
-);
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -51,7 +36,6 @@ const ProposalReviewModal = ({
   reviewItemId,
   children,
 }: ProposalReviewModalProps) => {
-  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
 
   const loadProposal = async () => {
@@ -66,6 +50,7 @@ const ProposalReviewModal = ({
       });
   };
 
+  // TODO: Remove this after the InstrumentScientistProposalTable is refactored. The ProposalTableOfficer doesn't use this anymore.
   const handleClose = async () => {
     /**
      * TODO: This needs to be refactored a bit and instead of loading proposal before close we could use the proposal used in the modal content tabs.
@@ -87,7 +72,7 @@ const ProposalReviewModal = ({
         onClose={(): Promise<void> => handleClose()}
         TransitionComponent={Transition}
       >
-        <AppBar className={classes.appBar}>
+        <AppBar sx={{ position: 'relative' }}>
           <Toolbar>
             <IconButton
               edge="start"
@@ -98,7 +83,15 @@ const ProposalReviewModal = ({
             >
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" component="h1" className={classes.title}>
+            <Typography
+              variant="h6"
+              component="h1"
+              sx={(theme) => ({
+                marginLeft: theme.spacing(2),
+                flex: 1,
+                color: theme.palette.primary.contrastText,
+              })}
+            >
               {title}
             </Typography>
           </Toolbar>

@@ -1,6 +1,5 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { Button, Collapse, Grid, TextField, Autocomplete } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect, useState, ReactElement } from 'react';
 
 import { getQuestionaryComponentDefinition } from 'components/questionary/QuestionaryComponentRegistry';
@@ -64,17 +63,9 @@ const extractSearchableQuestions = (
     ); // only searchable questions
 };
 
-const useStyles = makeStyles((theme) => ({
-  questionList: {
-    flex: 1,
-    marginBottom: theme.spacing(1),
-  },
-}));
-
 function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
   const { loading: isLoadingQuestionarySteps, questionarySteps } =
     useBlankQuestionaryStepsDataByCallId(callId);
-  const classes = useStyles();
 
   const { questionFilterQuery, setQuestionFilterQuery } =
     useQuestionFilterQueryParams();
@@ -150,7 +141,7 @@ function QuestionaryFilter({ onSubmit, callId }: QuestionaryFilterProps) {
               handleSubmit(undefined); // submitting because it feels intuitive that filter is cleared if no question is selected
             }
           }}
-          className={classes.questionList}
+          sx={(theme) => ({ flex: 1, marginBottom: theme.spacing(1) })}
           value={selectedQuestion}
           data-cy="question-list"
         />

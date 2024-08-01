@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import { env } from 'process';
+
 import { logger } from '@user-office-software/duo-logger';
 import { OpenIdClient } from '@user-office-software/openid';
 import { ValidTokenSet } from '@user-office-software/openid/lib/model/ValidTokenSet';
@@ -180,12 +182,30 @@ export class OAuthAuthorization extends UserAuthorization {
         undefined
       );
 
+      const roleID = this.getUserRole(newUser);
+
       await this.userDataSource.addUserRole({
         userID: newUser.id,
-        roleID: UserRole.USER,
+        roleID,
       });
+
+      if (roleID === UserRole.USER_OFFICER) {
+        logger.logInfo('Initial User Officer created', {
+          email: newUser.email,
+        });
+      }
 
       return newUser;
     }
+  }
+
+  private getUserRole(newUser: { id: number; email: string }): UserRole {
+    const roleID =
+      env.INITIAL_USER_OFFICER_EMAIL &&
+      newUser.email === env.INITIAL_USER_OFFICER_EMAIL
+        ? UserRole.USER_OFFICER
+        : UserRole.USER;
+
+    return roleID;
   }
 }
