@@ -2,19 +2,11 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
-import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { BooleanConfig } from 'generated/sdk';
-
-const useStyles = makeStyles({
-  checkboxPadding: {
-    paddingTop: 0,
-    paddingBottom: 0,
-  },
-});
 
 export function QuestionaryComponentBoolean(props: BasicComponentProps) {
   const {
@@ -33,8 +25,6 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
   useEffect(() => {
     setStateValue(answer.value || false);
   }, [answer]);
-
-  const classes = useStyles();
 
   return (
     <FormControl
@@ -56,7 +46,10 @@ export function QuestionaryComponentBoolean(props: BasicComponentProps) {
             inputProps={{
               'aria-label': 'primary checkbox',
             }}
-            className={classes.checkboxPadding}
+            sx={{
+              paddingTop: 0,
+              paddingBottom: 0,
+            }}
             data-natural-key={naturalKey}
           />
         }

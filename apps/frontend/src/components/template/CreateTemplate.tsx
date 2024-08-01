@@ -2,9 +2,9 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { createTemplateValidationSchema } from '@user-office-software/duo-validation/lib/Template';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import React from 'react';
 
+import TextField from 'components/common/FormikUITextField';
 import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 

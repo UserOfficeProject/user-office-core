@@ -1,61 +1,19 @@
 import { Check, Close } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
 import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { useTheme } from '@mui/material/styles';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import TextField from 'components/common/FormikUITextField';
 import { Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    padding: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-  },
-
-  label: {
-    color: theme.palette.grey[900],
-    fontSize: 'small',
-    margin: '5px 0 0 0',
-  },
-  templateName: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    paddingBottom: '10px',
-  },
-  templateDescription: {
-    fontSize: '16px',
-    whiteSpace: 'pre-wrap',
-    paddingBottom: '5px',
-  },
-
-  inputField: {
-    margin: '5px 0 10px 0',
-  },
-
-  editableField: {
-    cursor: 'pointer',
-    '& > svg': {
-      color: 'transparent',
-      marginLeft: theme.spacing(1),
-      transition: '300ms',
-    },
-    '&:hover': {
-      '& > svg': {
-        color: theme.palette.grey[600],
-      },
-    },
-  },
-  StyledButtonContainer: {
-    margin: `${theme.spacing(1)} 0 0 0`,
-  },
-}));
 export function TemplateMetadataEditor(props: {
   template: Template;
   dispatch: React.Dispatch<Event>;
@@ -63,21 +21,71 @@ export function TemplateMetadataEditor(props: {
   const { template, dispatch } = props;
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const classes = useStyles();
+  const theme = useTheme();
 
   const staticJSX = (
     <div onClick={() => setIsEditMode(true)} data-cy="edit-metadata">
-      <label className={classes.label}>Name</label>
-      <div className={clsx(classes.templateName, classes.editableField)}>
+      <InputLabel
+        sx={{
+          color: theme.palette.grey[900],
+          fontSize: 'small',
+          margin: '5px 0 0 0',
+        }}
+      >
+        Name
+      </InputLabel>
+      <Box
+        sx={{
+          fontSize: '24px',
+          fontWeight: 'bold',
+          paddingBottom: '10px',
+          cursor: 'pointer',
+          '& > svg': {
+            color: 'transparent',
+            marginLeft: theme.spacing(1),
+            transition: '300ms',
+          },
+          '&:hover': {
+            '& > svg': {
+              color: theme.palette.grey[600],
+            },
+          },
+        }}
+      >
         {template.name}
         <EditIcon fontSize="small" />
-      </div>
+      </Box>
 
-      <label className={classes.label}>Description</label>
-      <div className={clsx(classes.templateDescription, classes.editableField)}>
+      <InputLabel
+        sx={{
+          color: theme.palette.grey[900],
+          fontSize: 'small',
+          margin: '5px 0 0 0',
+        }}
+      >
+        Description
+      </InputLabel>
+      <Box
+        sx={{
+          fontSize: '16px',
+          whiteSpace: 'pre-wrap',
+          paddingBottom: '5px',
+          cursor: 'pointer',
+          '& > svg': {
+            color: 'transparent',
+            marginLeft: theme.spacing(1),
+            transition: '300ms',
+          },
+          '&:hover': {
+            '& > svg': {
+              color: theme.palette.grey[600],
+            },
+          },
+        }}
+      >
         {template.description}
         <EditIcon fontSize="small" />
-      </div>
+      </Box>
     </div>
   );
   const inputJSX = (
@@ -103,9 +111,9 @@ export function TemplateMetadataEditor(props: {
             label="Name"
             type="text"
             component={TextField}
+            sx={{ margin: '5px 0 10px 0' }}
             value={values.name}
             onChange={handleChange}
-            className={classes.inputField}
             fullWidth
             InputProps={{ 'data-cy': 'template-name' }}
           />
@@ -116,13 +124,13 @@ export function TemplateMetadataEditor(props: {
             label="Description"
             type="text"
             component={TextField}
+            sx={{ margin: '5px 0 10px 0' }}
             value={values.description}
             onChange={handleChange}
-            className={classes.inputField}
             fullWidth
             InputProps={{ 'data-cy': 'template-description' }}
           />
-          <ActionButtonContainer className={classes.StyledButtonContainer}>
+          <ActionButtonContainer sx={{ margin: `${theme.spacing(1)} 0 0 0` }}>
             <IconButton
               disabled={isSubmitting}
               onClick={() => setIsEditMode(false)}
@@ -145,5 +153,9 @@ export function TemplateMetadataEditor(props: {
 
   const body = isEditMode ? inputJSX : staticJSX;
 
-  return <Paper className={classes.container}>{body}</Paper>;
+  return (
+    <Paper sx={{ padding: theme.spacing(3), marginBottom: theme.spacing(3) }}>
+      {body}
+    </Paper>
+  );
 }

@@ -1,28 +1,20 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { createProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { ProposalWorkflow } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 type CreateProposalWorkflowProps = {
   close: (proposalWorkflowAdded: ProposalWorkflow | null) => void;
 };
 
 const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = {
@@ -79,7 +71,9 @@ const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
           <Button
             type="submit"
             fullWidth
-            className={classes.submit}
+            sx={(theme) => ({
+              margin: theme.spacing(3, 0, 2),
+            })}
             data-cy="submit"
             disabled={isExecutingCall}
           >

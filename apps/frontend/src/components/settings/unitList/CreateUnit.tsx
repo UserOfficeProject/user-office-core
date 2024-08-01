@@ -1,23 +1,16 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { Unit } from 'generated/sdk';
 import { useQuantities } from 'hooks/admin/useQuantities';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 type CreateUnitProps = {
   close: (unitAdded: Unit | null) => void;
@@ -25,7 +18,6 @@ type CreateUnitProps = {
 };
 
 const CreateUnit = ({ close, unit }: CreateUnitProps) => {
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { quantities, loadingQuantities } = useQuantities();
 
@@ -127,7 +119,9 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
           <Button
             type="submit"
             fullWidth
-            className={classes.submit}
+            sx={(theme) => ({
+              margin: theme.spacing(3, 0, 2),
+            })}
             data-cy="submit"
             disabled={isExecutingCall}
           >
