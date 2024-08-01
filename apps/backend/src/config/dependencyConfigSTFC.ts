@@ -21,6 +21,7 @@ import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSo
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
+import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
@@ -79,7 +80,7 @@ mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource
 );
-
+mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);

@@ -1310,3 +1310,19 @@ export interface TechniqueHasInstrumentsRecord {
   readonly technique_id: number;
   readonly instrument_id: number;
 }
+
+export interface StatusActionsLogRecord {
+  readonly status_actions_log_id: number;
+  readonly parent_status_actions_log_id: number;
+  readonly connection_id: number;
+  readonly action_id: number;
+  readonly status_actions_step: string;
+  readonly status_actions_by: null;
+  readonly status_actions_successful: boolean;
+  readonly status_actions_message: string;
+  readonly status_actions_tstamp: Date;
+}
+export interface StatusActionsLogHasProposalRecord {
+  readonly status_actions_log_id: number;
+  readonly proposal_pk: number;
+}

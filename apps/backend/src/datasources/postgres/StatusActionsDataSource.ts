@@ -99,6 +99,32 @@ export default class PostgresStatusActionsDataSource
     return proposalStatusActions;
   }
 
+  async getConnectionStatusAction(
+    proposalWorkflowConnectionId: number,
+    proposalStatusActionId: number
+  ): Promise<ConnectionHasStatusAction> {
+    const proposalActionStatusRecord: ProposalStatusActionRecord &
+      ProposalWorkflowConnectionHasActionsRecord & {
+        config: typeof ProposalStatusActionConfig;
+      } = await database
+      .select()
+      .from('proposal_status_actions as psa')
+      .join('proposal_workflow_connection_has_actions as pwca', {
+        'pwca.action_id': 'psa.proposal_status_action_id',
+      })
+      .where('pwca.action_id', proposalStatusActionId)
+      .andWhere('pwca.connection_id', proposalWorkflowConnectionId)
+      .first();
+
+    if (!proposalActionStatusRecord) {
+      throw new GraphQLError(
+        `Proposal status action not found ActionId: ${proposalStatusActionId} connectionId: ${proposalWorkflowConnectionId}`
+      );
+    }
+
+    return this.createConnectionStatusActionObject(proposalActionStatusRecord);
+  }
+
   async updateConnectionStatusAction(
     proposalStatusAction: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction> {

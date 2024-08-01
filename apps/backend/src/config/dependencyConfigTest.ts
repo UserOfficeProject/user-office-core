@@ -29,6 +29,7 @@ import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSourc
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
+import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
@@ -74,6 +75,7 @@ mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource
 );
+mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 
