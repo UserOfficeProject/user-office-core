@@ -38,6 +38,8 @@ context('User login tests', () => {
       cy.login('officer');
       cy.contains('Institutions').click();
 
+      cy.finishedLoading();
+
       cy.get('input[aria-label="Search"]')
         .focus()
         .type(userOneInstitutionInfo.institution_name);
@@ -68,6 +70,8 @@ context('User login tests', () => {
 
       cy.login('officer');
       cy.contains('Institutions').click();
+
+      cy.finishedLoading();
 
       cy.get('input[aria-label="Search"]')
         .focus()

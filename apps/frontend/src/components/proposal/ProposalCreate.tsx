@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
+import NotFound from 'components/common/NotFound';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Call, QuestionaryStep } from 'generated/sdk';
@@ -54,15 +55,17 @@ export default function ProposalCreate() {
     callId: string;
     templateId: string;
   }>();
-  const { questionarySteps } = useBlankQuestionaryStepsDataByCallId(
-    parseInt(callId)
-  );
+  const { questionarySteps } = useBlankQuestionaryStepsDataByCallId(callId);
 
   // get call using api
-  const { call } = useCallData(+callId);
+  const { call } = useCallData(callId);
   const { userData } = useBasicUserData(user.id);
   if (!questionarySteps || !call || !userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
+  }
+
+  if (!templateId || !callId) {
+    return <NotFound />;
   }
 
   return (

@@ -16,7 +16,7 @@ type ExperimentTimesTableProps = {
 };
 
 const columns: (
-  t: TFunction<'translation', undefined, 'translation'>
+  t: TFunction<'translation', undefined>
 ) => Column<ProposalScheduledEvent>[] = (t) => [
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },

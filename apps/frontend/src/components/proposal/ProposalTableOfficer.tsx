@@ -1,4 +1,10 @@
-import { Action, Column, MTableToolbar } from '@material-table/core';
+import MaterialTableCore, {
+  Action,
+  Column,
+  MTableToolbar,
+  Query,
+  QueryResult,
+} from '@material-table/core';
 import Delete from '@mui/icons-material/Delete';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Email from '@mui/icons-material/Email';
@@ -14,6 +20,10 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import {
+  ResourceId,
+  getTranslation,
+} from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useState } from 'react';
@@ -34,7 +44,6 @@ import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
-  Proposal,
   ProposalsFilter,
   ProposalStatus,
   InstrumentFragment,
@@ -47,17 +56,13 @@ import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
-import {
-  ProposalViewData,
-  useProposalsCoreData,
-} from 'hooks/proposal/useProposalsCoreData';
+import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import {
   addColumns,
   fromArrayToCommaSeparated,
-  fromProposalToProposalView,
   getUniqueArray,
   removeColumns,
-  setSortDirectionOnSortColumn,
+  setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -100,13 +105,6 @@ export type QueryParameters = {
 };
 
 let columns: Column<ProposalViewData>[] = [
-  {
-    title: 'Actions',
-    cellStyle: { padding: 0 },
-    sorting: false,
-    removable: false,
-    field: 'rowActionButtons',
-  },
   {
     title: 'Proposal ID',
     field: 'proposalId',
@@ -207,7 +205,7 @@ const technicalReviewColumns = [
 ];
 
 const instrumentManagementColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
+  t: TFunction<'translation', undefined>
 ) => [
   {
     title: t('instrument'),
@@ -238,8 +236,6 @@ const FapReviewColumns = [
       fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
   },
 ];
-
-const PREFETCH_SIZE = 200;
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
 
 /**
@@ -249,15 +245,15 @@ const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
  */
 const ToolbarWithSelectAllPrefetched = (props: {
   actions: Action<ProposalViewData>[];
-  selectedRows: ProposalViewData[];
-  data: ProposalViewData[];
+  selectedCount: number;
+  dataManager: { data: ProposalViewData[] };
 }) => {
   const selectAllAction = props.actions.find(
     (action) => action.hidden && action.tooltip === SELECT_ALL_ACTION_TOOLTIP
   );
-  const tableHasData = !!props.data.length;
+  const tableHasData = !!props.dataManager.data.length;
   const allItemsSelectedOnThePage =
-    props.selectedRows.length === props.data.length;
+    props.selectedCount === props.dataManager.data.length;
 
   return (
     <div data-cy="select-all-toolbar">
@@ -274,7 +270,9 @@ const ToolbarWithSelectAllPrefetched = (props: {
               All proposals are selected.
               <Button
                 variant="text"
-                onClick={() => selectAllAction.onClick(null, props.data)}
+                onClick={() =>
+                  selectAllAction.onClick(null, props.dataManager.data)
+                }
                 data-cy="clear-all-selection"
               >
                 Clear selection
@@ -282,11 +280,12 @@ const ToolbarWithSelectAllPrefetched = (props: {
             </>
           ) : (
             <>
-              All {props.selectedRows.length} proposals on this page are
-              selected.
+              All {props.selectedCount} proposals on this page are selected.
               <Button
                 variant="text"
-                onClick={() => selectAllAction.onClick(null, props.data)}
+                onClick={() =>
+                  selectAllAction.onClick(null, props.dataManager.data)
+                }
                 data-cy="select-all-prefetched-proposals"
               >
                 Select all {selectAllAction.iconProps?.defaultValue} proposals
@@ -306,18 +305,13 @@ const ProposalTableOfficer = ({
   setUrlQueryParams,
   confirm,
 }: ProposalTableOfficerProps) => {
+  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
   const [openAssignment, setOpenAssignment] = useState(false);
   const [openInstrumentAssignment, setOpenInstrumentAssignment] =
     useState(false);
   const [openChangeProposalStatus, setOpenChangeProposalStatus] =
     useState(false);
-  const [selectedProposals, setSelectedProposals] = useState<
-    ProposalSelectionType[]
-  >([]);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-  const [preselectedProposalsData, setPreselectedProposalsData] = useState<
-    ProposalViewData[]
-  >([]);
   const [openCallSelection, setOpenCallSelection] = useState(false);
   const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
     useState<null | HTMLElement>(null);
@@ -332,108 +326,14 @@ const ProposalTableOfficer = ({
   >('proposalColumnsOfficer', null);
   const featureContext = useContext(FeatureContext);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const [query, setQuery] = useState<QueryParameters>({
-    first: PREFETCH_SIZE,
-    offset: 0,
-    sortField: urlQueryParams?.sortField,
-    sortDirection: urlQueryParams?.sortDirection ?? undefined,
-    searchText: urlQueryParams?.search ?? undefined,
-  });
-  const {
-    loading,
-    setProposalsData,
-    proposalsData,
-    totalCount,
-    fetchProposalsData,
-  } = useProposalsCoreData(proposalFilter, query);
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     setActionsMenuAnchorElement(event.currentTarget);
   };
-  const handleClose = (selectedOption: string) => {
-    if (selectedOption === PdfDownloadMenuOption.PDF) {
-      downloadPDFProposal(
-        selectedProposals?.map((proposal) => proposal.primaryKey),
-        selectedProposals?.[0].title
-      );
-    } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
-      downloadPDFProposal(
-        selectedProposals?.map((proposal) => proposal.primaryKey),
-        selectedProposals?.[0].title,
-        'zip'
-      );
-    } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
-      setOpenDownloadAttachment(true);
-    }
-    setActionsMenuAnchorElement(null);
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
   };
-  useEffect(() => {
-    setPreselectedProposalsData(proposalsData);
-  }, [proposalsData, query]);
-
-  useEffect(() => {
-    let isMounted = true;
-    let endSlice = rowsPerPage * (currentPage + 1);
-    endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
-    if (isMounted) {
-      setTableData(
-        preselectedProposalsData.slice(
-          (currentPage * rowsPerPage) % PREFETCH_SIZE,
-          endSlice
-        )
-      );
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentPage, rowsPerPage, preselectedProposalsData, query]);
-
-  useEffect(() => {
-    if (urlQueryParams.selection.length > 0) {
-      const selection = new Set(urlQueryParams.selection);
-      setPreselectedProposalsData((preselectedProposalsData) => {
-        const selected: ProposalSelectionType[] = [];
-        const preselected = preselectedProposalsData.map((proposal) => {
-          if (selection.has(proposal.primaryKey.toString())) {
-            selected.push({
-              primaryKey: proposal.primaryKey,
-              callId: proposal.callId,
-              instruments: proposal.instruments || [],
-              fapInstruments: proposal.fapInstruments,
-              statusId: proposal.statusId,
-              title: proposal.title,
-              proposalId: proposal.proposalId,
-            });
-          }
-
-          return {
-            ...proposal,
-            tableData: {
-              checked: selection.has(proposal.primaryKey.toString()),
-            },
-          };
-        });
-
-        setSelectedProposals(selected);
-
-        return preselected;
-      });
-    } else {
-      setPreselectedProposalsData((proposalsData) =>
-        proposalsData.map((proposal) => ({
-          ...proposal,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          tableData: { ...(proposal as any).tableData, checked: false },
-        }))
-      );
-      setSelectedProposals([]);
-    }
-  }, [proposalsData, urlQueryParams.selection]);
 
   const GetAppIconComponent = (): JSX.Element => (
     <GetAppIcon data-cy="download-proposals" />
@@ -448,6 +348,19 @@ const ProposalTableOfficer = ({
     <ListStatusIcon data-cy="change-proposal-status" />
   );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (isMounted) {
+      refreshTableData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(proposalFilter)]);
 
   const isTechnicalReviewEnabled = featureContext.featuresMap.get(
     FeatureId.TECHNICAL_REVIEW
@@ -475,6 +388,20 @@ const ProposalTableOfficer = ({
       </IconButton>
     </Tooltip>
   );
+
+  if (!columns.find((column) => column.field === 'rowActionButtons')) {
+    columns = [
+      {
+        title: 'Actions',
+        cellStyle: { padding: 0 },
+        sorting: false,
+        removable: false,
+        field: 'rowActionButtons',
+        render: RowActionButtons,
+      },
+      ...columns,
+    ];
+  }
 
   if (isTechnicalReviewEnabled) {
     addColumns(columns, technicalReviewColumns);
@@ -510,33 +437,52 @@ const ProposalTableOfficer = ({
     }));
   }
 
+  const getSelectedProposalPks = () =>
+    urlQueryParams.selection.length
+      ? urlQueryParams.selection
+          .filter((proposalPk): proposalPk is string => proposalPk !== null)
+          .map((proposalPk) => +proposalPk)
+      : [];
+
+  const getSelectedProposalsData = () =>
+    tableData.filter((item) =>
+      urlQueryParams.selection.includes(item.primaryKey.toString())
+    );
+
+  const handleClose = (selectedOption: string) => {
+    const firstSelectedProposalTitle = getSelectedProposalsData()[0].title;
+    if (selectedOption === PdfDownloadMenuOption.PDF) {
+      downloadPDFProposal(getSelectedProposalPks(), firstSelectedProposalTitle);
+    } else if (selectedOption === PdfDownloadMenuOption.ZIP) {
+      downloadPDFProposal(
+        getSelectedProposalPks(),
+        firstSelectedProposalTitle,
+        'zip'
+      );
+    } else if (selectedOption === DownloadMenuOption.ATTACHMENT) {
+      setOpenDownloadAttachment(true);
+    }
+    setActionsMenuAnchorElement(null);
+  };
+
   // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
   const emailProposals = (): void => {
-    selectedProposals.forEach(async (proposal) => {
+    getSelectedProposalPks().forEach(async (proposalPk) => {
       await api({
         toastSuccessMessage: 'Notification sent successfully',
       }).notifyProposal({
-        proposalPk: proposal.primaryKey,
+        proposalPk,
       });
 
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => ({
-          ...prop,
-          notified: prop.primaryKey === proposal.primaryKey,
-        }))
-      );
+      refreshTableData();
     });
   };
 
   const deleteProposals = (): void => {
-    selectedProposals.forEach(async (proposal) => {
-      await api().deleteProposal({ proposalPk: proposal.primaryKey });
+    getSelectedProposalPks().forEach(async (proposalPk) => {
+      await api().deleteProposal({ proposalPk });
 
-      setProposalsData((proposalsData) =>
-        proposalsData.filter(
-          ({ primaryKey }) => primaryKey !== proposal.primaryKey
-        )
-      );
+      refreshTableData();
     });
   };
 
@@ -556,49 +502,28 @@ const ProposalTableOfficer = ({
         toastSuccessMessage:
           'Proposal/s assigned to the selected Fap successfully!',
       }).assignProposalsToFaps({
-        proposalPks: selectedProposals.map(
-          (selectedProposal) => selectedProposal.primaryKey
-        ),
+        proposalPks: getSelectedProposalPks(),
         fapInstruments: fapInstsruments,
       });
-
-      // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
-      setTimeout(fetchProposalsData, 500);
     } else {
+      const fapIdsFromSelectedProposals =
+        getSelectedProposalsData()
+          .map(
+            (selectedProposal) =>
+              selectedProposal.fapInstruments
+                ?.filter((fapInstrument) => !!fapInstrument.fapId)
+                .map((fapInstrument) => fapInstrument.fapId) || []
+          )
+          .flat() || [];
+
       await api({
         toastSuccessMessage: 'Proposal/s removed from the Fap successfully!',
       }).removeProposalsFromFaps({
-        proposalPks: selectedProposals.map(
-          (selectedProposal) => selectedProposal.primaryKey
-        ),
-        fapIds: getUniqueArray(
-          selectedProposals
-            .map(
-              (selectedProposal) =>
-                selectedProposal.fapInstruments
-                  ?.filter((fapInstrument) => !!fapInstrument.fapId)
-                  .map((fapInstrument) => fapInstrument.fapId) || []
-            )
-            .flat() || []
-        ),
+        proposalPks: getSelectedProposalPks(),
+        fapIds: getUniqueArray(fapIdsFromSelectedProposals),
       });
-
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (
-            selectedProposals.find(
-              (selectedProposal) =>
-                selectedProposal.primaryKey === prop.primaryKey
-            )
-          ) {
-            prop.faps = null;
-            prop.fapInstruments = null;
-          }
-
-          return prop;
-        })
-      );
     }
+    refreshTableData();
   };
 
   const assignProposalsToInstruments = async (
@@ -611,14 +536,9 @@ const ProposalTableOfficer = ({
           'lowercase'
         )} successfully!`,
       }).assignProposalsToInstruments({
-        proposalPks: selectedProposals.map(
-          (selectedProposal) => selectedProposal.primaryKey
-        ),
+        proposalPks: getSelectedProposalPks(),
         instrumentIds: instruments.map((instrument) => instrument.id),
       });
-
-      // NOTE: We use a timeout because, when selecting and assigning lot of proposals at once, the workflow needs a little bit of time to update proposal statuses.
-      setTimeout(fetchProposalsData, 500);
     } else {
       await api({
         toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
@@ -626,100 +546,52 @@ const ProposalTableOfficer = ({
           'lowercase'
         )} successfully!`,
       }).removeProposalsFromInstrument({
-        proposalPks: selectedProposals.map(
-          (selectedProposal) => selectedProposal.primaryKey
-        ),
+        proposalPks: getSelectedProposalPks(),
       });
-
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (
-            selectedProposals.find(
-              (selectedProposal) =>
-                selectedProposal.primaryKey === prop.primaryKey
-            )
-          ) {
-            prop.instruments = null;
-          }
-
-          return prop;
-        })
-      );
     }
+
+    refreshTableData();
   };
 
   const cloneProposalsToCall = async (call: Call) => {
-    if (!call?.id || !selectedProposals.length) {
+    const proposalPks = getSelectedProposalPks();
+    if (!call?.id || !proposalPks.length) {
       return;
     }
 
-    const proposalsToClonePk = selectedProposals.map(
-      (selectedProposal) => selectedProposal.primaryKey
-    );
-
-    const { cloneProposals } = await api({
+    await api({
       toastSuccessMessage: 'Proposal/s cloned successfully',
     }).cloneProposals({
       callId: call.id,
-      proposalsToClonePk,
+      proposalsToClonePk: proposalPks,
     });
 
-    if (proposalsData && cloneProposals) {
-      const newClonedProposals = cloneProposals.map((resultProposal) =>
-        fromProposalToProposalView(resultProposal as Proposal)
-      );
-
-      const newProposalsData = [...newClonedProposals, ...proposalsData];
-
-      setProposalsData(newProposalsData);
-    }
+    refreshTableData();
   };
 
   const changeStatusOnProposals = async (status: ProposalStatus) => {
-    if (status?.id && selectedProposals?.length) {
-      const shouldAddPluralLetter = selectedProposals.length > 1 ? 's' : '';
+    const proposalPks = getSelectedProposalPks();
+    if (status?.id && proposalPks.length) {
+      const shouldAddPluralLetter = proposalPks.length > 1 ? 's' : '';
       await api({
         toastSuccessMessage: `Proposal${shouldAddPluralLetter} status changed successfully!`,
       }).changeProposalsStatus({
-        proposalPks: selectedProposals.map(
-          (selectedProposal) => selectedProposal.primaryKey
-        ),
+        proposalPks: proposalPks,
         statusId: status.id,
       });
-      const shouldChangeSubmittedValue = status.shortCode === 'DRAFT';
-
-      setProposalsData((proposalsData) =>
-        proposalsData.map((prop) => {
-          if (
-            selectedProposals.find(
-              (selectedProposal) =>
-                selectedProposal.primaryKey === prop.primaryKey
-            )
-          ) {
-            prop.statusId = status.id;
-            prop.statusName = status.name;
-            prop.statusDescription = status.description;
-
-            if (shouldChangeSubmittedValue) {
-              prop.submitted = false;
-            }
-          }
-
-          return prop;
-        })
-      );
+      refreshTableData();
     }
   };
 
-  columns = setSortDirectionOnSortColumn(
+  columns = setSortDirectionOnSortField(
     columns,
-    urlQueryParams.sortColumn,
+    urlQueryParams.sortField,
     urlQueryParams.sortDirection
   );
-  const proposalToReview = preselectedProposalsData.find(
+  const proposalToReview = tableData.find(
     (proposal) =>
       proposal.primaryKey === urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalid
+      proposal.proposalId === urlQueryParams.proposalId
   );
 
   const userOfficerProposalReviewTabs = [
@@ -732,21 +604,87 @@ const ProposalTableOfficer = ({
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
-  /** NOTE:
-   * Including the id property for https://material-table-core.com/docs/breaking-changes#id
-   * Including the action buttons as property to avoid the console warning(https://github.com/material-table-core/core/issues/286)
-   */
-  const preselectedProposalDataWithIdAndRowActions = tableData.map((proposal) =>
-    Object.assign(proposal, {
-      id: proposal.primaryKey,
-      rowActionButtons: RowActionButtons(proposal),
-    })
-  );
+  // const shouldShowSelectAllAction =
+  //   totalCount <= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
+  // const allPrefetchedProposalsSelected =
+  //   preselectedProposalsData.length === urlQueryParams.selection.length;
 
-  const shouldShowSelectAllAction =
-    totalCount <= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
-  const allPrefetchedProposalsSelected =
-    preselectedProposalsData.length === urlQueryParams.selection.length;
+  const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
+    new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+      try {
+        const [orderBy] = tableQuery.orderByCollection;
+        const {
+          callId,
+          instrumentFilter,
+          proposalStatusId,
+          questionaryIds,
+          text,
+          questionFilter,
+          referenceNumbers,
+        } = proposalFilter;
+
+        const { proposalsView } = await api().getProposalsCore({
+          filter: {
+            callId: callId,
+            instrumentFilter: instrumentFilter,
+            proposalStatusId: proposalStatusId,
+            questionaryIds: questionaryIds,
+            referenceNumbers: referenceNumbers,
+            questionFilter: questionFilter && {
+              ...questionFilter,
+              value:
+                JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+            }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
+            text: text,
+          },
+          sortField: orderBy?.orderByField,
+          sortDirection: orderBy?.orderDirection,
+          first: tableQuery.pageSize,
+          offset: tableQuery.page * tableQuery.pageSize,
+          searchText: tableQuery.search,
+        });
+
+        const tableData =
+          proposalsView?.proposalViews.map((proposal) => {
+            const selection = new Set(urlQueryParams.selection);
+
+            const proposalData = {
+              ...proposal,
+              status: proposal.submitted ? 'Submitted' : 'Open',
+              technicalReviews: proposal.technicalReviews?.map(
+                (technicalReview) => ({
+                  ...technicalReview,
+                  status: getTranslation(technicalReview.status as ResourceId),
+                })
+              ),
+              finalStatus: getTranslation(proposal.finalStatus as ResourceId),
+            } as ProposalViewData;
+
+            if (urlQueryParams.selection.length > 0) {
+              return {
+                ...proposalData,
+                tableData: {
+                  checked: selection.has(proposal.primaryKey.toString()),
+                },
+              };
+            } else {
+              return proposalData;
+            }
+          }) || [];
+
+        setTableData(tableData);
+
+        resolve({
+          data: tableData,
+          page: tableQuery.page,
+          totalCount: proposalsView?.totalCount || 0,
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+
+  const selectedProposalsData = getSelectedProposalsData();
 
   return (
     <>
@@ -762,10 +700,10 @@ const ProposalTableOfficer = ({
           <AssignProposalsToFaps
             assignProposalsToFaps={assignProposalsToFaps}
             close={(): void => setOpenAssignment(false)}
-            proposalFapInstruments={selectedProposals
+            proposalFapInstruments={selectedProposalsData
               .map((selectedProposal) => selectedProposal.fapInstruments)
               .flat()}
-            proposalInstruments={selectedProposals.map(
+            proposalInstruments={selectedProposalsData.map(
               (selectedProposal) => selectedProposal.instruments
             )}
           />
@@ -783,10 +721,10 @@ const ProposalTableOfficer = ({
           <AssignProposalsToInstruments
             assignProposalsToInstruments={assignProposalsToInstruments}
             close={(): void => setOpenInstrumentAssignment(false)}
-            callIds={selectedProposals.map(
+            callIds={selectedProposalsData.map(
               (selectedProposal) => selectedProposal.callId
             )}
-            instrumentIds={selectedProposals
+            instrumentIds={selectedProposalsData
               .map((selectedProposal) =>
                 (selectedProposal.instruments || []).map(
                   (instrument) => instrument.id
@@ -808,10 +746,10 @@ const ProposalTableOfficer = ({
           <ChangeProposalStatus
             changeStatusOnProposals={changeStatusOnProposals}
             close={(): void => setOpenChangeProposalStatus(false)}
-            selectedProposalStatuses={selectedProposals.map(
+            selectedProposalStatuses={selectedProposalsData.map(
               (selectedProposal) => selectedProposal.statusId
             )}
-            allSelectedProposalsHaveInstrument={selectedProposals.every(
+            allSelectedProposalsHaveInstrument={selectedProposalsData.every(
               (selectedProposal) => selectedProposal.instruments?.length
             )}
           />
@@ -839,7 +777,7 @@ const ProposalTableOfficer = ({
         <DialogContent>
           <ProposalAttachmentDownload
             close={(): void => setOpenDownloadAttachment(false)}
-            referenceNumbers={selectedProposals.map(
+            referenceNumbers={selectedProposalsData.map(
               (selectedProposal) => selectedProposal.proposalId
             )}
             downloadProposalAttachment={(
@@ -860,31 +798,21 @@ const ProposalTableOfficer = ({
       <ProposalReviewModal
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!proposalToReview}
-        setProposalReviewModalOpen={(updatedProposal?: Proposal) => {
-          setProposalsData(
-            proposalsData.map((proposal) => {
-              if (proposal.primaryKey === updatedProposal?.primaryKey) {
-                return {
-                  ...fromProposalToProposalView(updatedProposal),
-                  fapInstruments: proposal.fapInstruments,
-                };
-              } else {
-                return proposal;
-              }
-            })
-          );
-          if (urlQueryParams.proposalid) {
-            setUrlQueryParams({
-              proposalid: undefined,
-            });
+        setProposalReviewModalOpen={() => {
+          if (urlQueryParams.proposalId) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
           }
-          setUrlQueryParams({ reviewModal: undefined });
+          setUrlQueryParams({
+            reviewModal: undefined,
+            proposalId: undefined,
+            modalTab: undefined,
+          });
+
+          refreshTableData();
         }}
-        reviewItemId={proposalToReview?.primaryKey}
       >
         <ProposalReviewContent
           proposalPk={proposalToReview?.primaryKey as number}
@@ -892,6 +820,7 @@ const ProposalTableOfficer = ({
         />
       </ProposalReviewModal>
       <MaterialTable
+        tableRef={tableRef}
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
@@ -899,9 +828,7 @@ const ProposalTableOfficer = ({
           </Typography>
         }
         columns={columns}
-        data={preselectedProposalDataWithIdAndRowActions}
-        totalCount={totalCount}
-        page={currentPage}
+        data={fetchRemoteProposalsData}
         localization={{
           toolbar: {
             nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
@@ -911,32 +838,26 @@ const ProposalTableOfficer = ({
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}
         onPageChange={(page, pageSize) => {
-          const newOffset =
-            Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
-          if (page !== currentPage && newOffset != query.offset) {
-            setQuery({ ...query, offset: newOffset });
-          }
-          setCurrentPage(page);
-        }}
-        onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
-        isLoading={loading}
-        onSearchChange={(searchText) => {
-          setQuery({
-            ...query,
-            searchText: searchText ? searchText : undefined,
+          setUrlQueryParams({
+            page,
+            pageSize,
           });
-          setUrlQueryParams({ search: searchText ? searchText : undefined });
+        }}
+        onSearchChange={(searchText) => {
+          setUrlQueryParams({
+            search: searchText ? searchText : undefined,
+            page: searchText ? 0 : urlQueryParams.page,
+          });
         }}
         onSelectionChange={(selectedItems) => {
-          setUrlQueryParams((params) => ({
-            ...params,
+          setUrlQueryParams({
             selection:
               selectedItems.length > 0
                 ? selectedItems.map((selectedItem) =>
                     selectedItem.primaryKey.toString()
                   )
                 : undefined,
-          }));
+          });
         }}
         options={{
           search: true,
@@ -952,6 +873,8 @@ const ProposalTableOfficer = ({
               'aria-label': `${rowdata.title}-select`,
             },
           }),
+          pageSize: urlQueryParams.pageSize || undefined,
+          initialPage: urlQueryParams.search ? 0 : urlQueryParams.page || 0,
         }}
         actions={[
           {
@@ -973,10 +896,10 @@ const ProposalTableOfficer = ({
           {
             icon: ExportIcon,
             tooltip: 'Export proposals in Excel',
-            onClick: (event, rowData): void => {
+            onClick: (): void => {
               downloadXLSXProposal(
-                (rowData as ProposalViewData[]).map((row) => row.primaryKey),
-                (rowData as ProposalViewData[])[0].title
+                selectedProposalsData?.map((row) => row.primaryKey),
+                selectedProposalsData?.[0].title
               );
             },
             position: 'toolbarOnSelect',
@@ -1043,27 +966,27 @@ const ProposalTableOfficer = ({
             position: 'toolbarOnSelect',
           },
           {
-            tooltip: shouldShowSelectAllAction,
+            // tooltip: shouldShowSelectAllAction,
             icon: DoneAllIcon,
             hidden: true,
-            iconProps: {
-              hidden: allPrefetchedProposalsSelected,
-              defaultValue: preselectedProposalsData.length,
-            },
+            // iconProps: {
+            //   hidden: allPrefetchedProposalsSelected,
+            //   defaultValue: preselectedProposalsData.length,
+            // },
             onClick: () => {
-              if (allPrefetchedProposalsSelected) {
-                setUrlQueryParams((params) => ({
-                  ...params,
-                  selection: undefined,
-                }));
-              } else {
-                setUrlQueryParams((params) => ({
-                  ...params,
-                  selection: preselectedProposalsData.map((proposal) =>
-                    proposal.primaryKey.toString()
-                  ),
-                }));
-              }
+              // if (allPrefetchedProposalsSelected) {
+              //   setUrlQueryParams((params) => ({
+              //     ...params,
+              //     selection: undefined,
+              //   }));
+              // } else {
+              //   setUrlQueryParams((params) => ({
+              //     ...params,
+              //     selection: preselectedProposalsData.map((proposal) =>
+              //       proposal.primaryKey.toString()
+              //     ),
+              //   }));
+              // }
             },
             position: 'toolbarOnSelect',
           },
@@ -1081,28 +1004,12 @@ const ProposalTableOfficer = ({
 
           setLocalStorageValue(proposalColumns);
         }}
-        onOrderChange={(orderedColumnId, orderDirection) => {
-          setUrlQueryParams &&
-            setUrlQueryParams((params) => ({
-              ...params,
-              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-              sortField:
-                orderedColumnId >= 0
-                  ? columns[orderedColumnId].field?.toString()
-                  : undefined,
-              sortDirection: orderDirection ? orderDirection : undefined,
-            }));
-          if (orderDirection && orderedColumnId > 0) {
-            setQuery({
-              ...query,
-              sortField: columns[orderedColumnId].field?.toString(),
-              sortDirection: orderDirection,
-            });
-          } else {
-            delete query.sortField;
-            delete query.sortDirection;
-            setQuery(query);
-          }
+        onOrderCollectionChange={(orderByCollection) => {
+          const [orderBy] = orderByCollection;
+          setUrlQueryParams({
+            sortField: orderBy?.orderByField,
+            sortDirection: orderBy?.orderDirection,
+          });
         }}
       />
     </>

@@ -3,11 +3,14 @@ theme:
   name: material
   features:
     - navigation.top
+    - navigation.tabs
+    - navigation.tabs.sticky
     - content.tooltips
   palette:
     primary: green
     accent: green
 extra:
+  generator: false
   version:
     provider: mike
     default: latest
@@ -15,6 +18,34 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - abbr
   - attr_list
   - md_in_html
   - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+nav:
+  - Home: index.md
+  - Getting started: 
+      - Quick start: quick-start.md
+  - User Guide:
+      - Overview: user-guide/overview.md
+      - Basic User: user-guide/user/user.md
+      - User officer: user-guide/user-officer/user-officer.md
+  - Developer Guide:
+      - Contributing: developer-guide/CONTRIBUTING.md
+      - Architecture: developer-guide/achitecture.md
+      - Running locally: developer-guide/running-locally.md
+      - Codebase structure: developer-guide/codebase-structure.md
+      - API documentation: developer-guide/api-documentation.md
+      - Configuration: developer-guide/configuration.md
+  - FAQ: faq.md
+  - Glossary: glossary.md
+  - References: references.md
+  

@@ -3,37 +3,22 @@ import Dialog from '@mui/material/Dialog';
 import MuiDialogActions from '@mui/material/DialogActions';
 import MuiDialogContent from '@mui/material/DialogContent';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
+import { styled } from '@mui/system';
 import parse from 'html-react-parser';
-import PropTypes from 'prop-types';
 import React from 'react';
 
-const useStyles = makeStyles((theme) => ({
-  buttonLink: {
-    background: 'none',
-    border: 'none',
-    padding: 0,
-    fontSize: '8px;',
-    fontFamily: 'arial',
-    color: theme.palette.primary.main,
-    textDecoration: 'underline',
-    cursor: 'pointer',
-  },
-}));
-
-const DialogContent = withStyles((theme) => ({
+const DialogContent = styled(MuiDialogContent)(({ theme }) => ({
   root: {
     padding: theme.spacing(2),
   },
-}))(MuiDialogContent);
+}));
 
-const DialogActions = withStyles((theme) => ({
+const DialogActions = styled(MuiDialogActions)(({ theme }) => ({
   root: {
     margin: 0,
     padding: theme.spacing(1),
   },
-}))(MuiDialogActions);
+}));
 
 type InformationDialogProps = {
   /** Content of the information modal. */
@@ -46,7 +31,6 @@ type InformationDialogProps = {
 
 const InformationDialog = (props: InformationDialogProps) => {
   const [open, setOpen] = React.useState(false);
-  const classes = useStyles();
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -61,7 +45,16 @@ const InformationDialog = (props: InformationDialogProps) => {
   return (
     <>
       <Button
-        className={classes.buttonLink}
+        sx={(theme) => ({
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          fontSize: '8px;',
+          fontFamily: 'arial',
+          color: theme.palette.primary.main,
+          textDecoration: 'underline',
+          cursor: 'pointer',
+        })}
         onClick={handleClickOpen}
         style={props.linkStyle}
         variant="text"
@@ -84,12 +77,6 @@ const InformationDialog = (props: InformationDialogProps) => {
       </Dialog>
     </>
   );
-};
-
-InformationDialog.propTypes = {
-  text: PropTypes.string,
-  linkText: PropTypes.string,
-  linkStyle: PropTypes.objectOf(PropTypes.string),
 };
 
 export default InformationDialog;

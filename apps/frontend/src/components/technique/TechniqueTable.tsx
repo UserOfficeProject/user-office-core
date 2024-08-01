@@ -5,12 +5,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -20,6 +20,7 @@ import AssignInstrumentsToTechniques from './AssignInstrumentsToTechniques';
 import CreateUpdateTechnique from './CreateUpdateTechnique';
 import {
   InstrumentFragment,
+  Technique,
   TechniqueFragment,
   UserRole,
 } from '../../generated/sdk';
@@ -118,9 +119,12 @@ const TechniqueTable = () => {
     }
   };
 
-  const AssignedInstruments = React.useCallback(({ rowData }) => {
-    return <AssignedInstrumentsTable technique={rowData} />;
-  }, []);
+  const AssignedInstruments = React.useCallback(
+    ({ rowData }: { rowData: Technique }) => {
+      return <AssignedInstrumentsTable technique={rowData} />;
+    },
+    []
+  );
 
   const removeIntrumentsFromTechnique = async (
     instrumentIds: number[]

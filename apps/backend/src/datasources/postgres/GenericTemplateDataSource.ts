@@ -165,38 +165,11 @@ export default class PostgresGenericTemplateDataSource
         `Can not create generic template because topic does not exist ID: ${templateId}`
       );
     }
-    await this.questionaryDataSource
-      .copyAnswers(sourceQuestionaryId, newGenericTemplate.questionaryId)
-      .then(async () => {
-        if (
-          subTemplate.config.isCompleteOnCopy &&
-          subTemplate.config.isCompleteOnCopy === true
-        ) {
-          await database(
-            database.raw('?? (??, ??, ??)', [
-              'topic_completenesses',
-              'questionary_id',
-              'topic_id',
-              'is_complete',
-            ])
-          )
-            .insert(
-              database('topics')
-                .select(
-                  database.raw(`${questionaryId}, ??, ${true}`, ['topic_id'])
-                )
-                .where('template_id', templateId),
-              ['questionary_id', 'topic_id', 'is_complete']
-            )
-            .then((result) => {
-              if (!result) {
-                throw new GraphQLError(
-                  `Could not set generic template topic(s) as complete ID: ${templateId}`
-                );
-              }
-            });
-        }
-      });
+    await this.questionaryDataSource.copyAnswers(
+      sourceQuestionaryId,
+      newGenericTemplate.questionaryId,
+      !!subTemplate.config.isCompleteOnCopy
+    );
 
     return newGenericTemplate;
   }

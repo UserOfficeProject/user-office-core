@@ -53,7 +53,8 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
     .startOf('day');
   const currentDayEnd = DateTime.now()
     .setZone(timezone || undefined)
-    .endOf('day');
+    .endOf('day')
+    .set({ second: 0, millisecond: 0 });
 
   const getDateTimeFromISO = (value: string) =>
     DateTime.fromISO(value, {

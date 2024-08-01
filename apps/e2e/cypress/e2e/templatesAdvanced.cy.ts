@@ -382,35 +382,30 @@ context('Template tests', () => {
       cy.contains(`${textQuestion.answer.length}/${textQuestion.maxChars}`);
       cy.get(`[data-cy='${dateId}.value'] button`).click();
       cy.contains('15').click();
-      cy.get(`[data-cy='${timeId}.value'] input`)
-        .clear()
-        .type(dateTimeFieldValue);
+      cy.setDatePickerValue(
+        `[data-cy='${timeId}.value'] input`,
+        dateTimeFieldValue
+      );
+
+      cy.setTinyMceContent(richTextInputId, richTextInputQuestion.answer);
+
+      cy.getTinyMceContent(richTextInputId).then((content) =>
+        expect(content).to.have.string(richTextInputQuestion.answer)
+      );
 
       cy.get(`#${multipleChoiceId}`).click();
       cy.contains(multipleChoiceQuestion.answers[0]).click();
       cy.contains(multipleChoiceQuestion.answers[2]).click();
       cy.get('body').type('{esc}');
 
-      cy.window().then((win) => {
-        return new Cypress.Promise((resolve) => {
-          win.tinyMCE.editors[richTextInputId].setContent(
-            richTextInputQuestion.answer
+      cy.get(`#${richTextInputId}`)
+        .parent()
+        .find('[data-cy="rich-text-char-count"]')
+        .then((element) => {
+          expect(element.text()).to.be.equal(
+            `Characters: ${richTextInputQuestion.answer.length} / ${richTextInputQuestion.maxChars}`
           );
-          win.tinyMCE.editors[richTextInputId].fire('blur');
-
-          resolve();
         });
-      });
-
-      cy.getTinyMceContent(richTextInputId).then((content) =>
-        expect(content).to.have.string(richTextInputQuestion.answer)
-      );
-
-      cy.get('[data-cy="rich-text-char-count"]').then((element) => {
-        expect(element.text()).to.be.equal(
-          `Characters: ${richTextInputQuestion.answer.length} / ${richTextInputQuestion.maxChars}`
-        );
-      });
 
       cy.contains('Save and continue').click();
 
@@ -596,25 +591,25 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').click();
+      cy.get('[data-cy="dependencyField"]').click();
 
       cy.get('[role="presentation"]')
         .contains(multipleChoiceQuestion.title)
         .click();
 
-      cy.get('[id="dependencyValue"]').click();
+      cy.get('[data-cy="dependencyValue"]').click();
 
       cy.contains(multipleChoiceQuestion.answers[1]).click();
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').last().click();
+      cy.get('[data-cy="dependencyField"]').last().click();
 
       cy.get('[role="presentation"]').contains(booleanQuestion).click();
 
-      cy.get('[id="dependencyValue"]').last().click();
+      cy.get('[data-cy="dependencyValue"]').last().click();
 
-      cy.contains('true').click();
+      cy.get('li[data-value="true"]').click();
 
       cy.get('[data-cy="submit"]').click();
 
@@ -687,13 +682,13 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').last().click();
+      cy.get('[data-cy="dependencyField"]').last().click();
 
       cy.get('[role="presentation"]')
         .contains(multipleChoiceQuestion.title)
         .click();
 
-      cy.get('[id="dependencyValue"]').last().click();
+      cy.get('[data-cy="dependencyValue"]').last().click();
 
       cy.contains(multipleChoiceQuestion.answers[1]).click();
 
@@ -812,7 +807,7 @@ context('Template tests', () => {
       cy.get('[aria-label="Add image caption"]').click();
 
       cy.get('[data-cy="image-figure"] input').type('Fig_test');
-      cy.get('[data-cy="image-caption"] input').type('Test caption');
+      cy.get('[data-cy="image-caption"] input').type('Test caption').blur();
 
       cy.get('[data-cy="save-button"]').click();
 
