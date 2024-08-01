@@ -24,6 +24,16 @@ const fapMembers = {
   reviewer2: initialDBData.users.user3,
 };
 
+function clickConfirmOk() {
+  if (
+    featureFlags
+      .getEnabledFeatures()
+      .get(FeatureId.CONFLICT_OF_INTEREST_WARNING)
+  ) {
+    cy.get('[data-cy="confirm-ok"]').click();
+  }
+}
+
 function readWriteReview(
   { shouldSubmit, isReviewer } = { shouldSubmit: false, isReviewer: false }
 ) {
@@ -440,7 +450,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -497,7 +507,7 @@ context('Fap reviews tests', () => {
       cy.contains('2 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -556,7 +566,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'error',
@@ -613,7 +623,7 @@ context('Fap reviews tests', () => {
       cy.contains('2 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -889,7 +899,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -1038,7 +1048,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
