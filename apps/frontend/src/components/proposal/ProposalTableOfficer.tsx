@@ -1040,9 +1040,7 @@ const ProposalTableOfficer = ({
                   );
 
                   if (foundProposalData) {
-                    return {
-                      ...foundProposalData,
-                    };
+                    return foundProposalData
                   } else {
                     return sp as ProposalViewData;
                   }
