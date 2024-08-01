@@ -60,7 +60,7 @@ export default class StatusActionsLogsMutations {
       (item): item is WorkflowEngineProposalType => !!item
     );
   }
-  private async replayStatusActionLog(
+  private async executeStatusActionsLog(
     statusActionsLog: StatusActionsLog,
     agent: UserWithRole | null
   ): Promise<boolean | Rejection> {
@@ -132,6 +132,6 @@ export default class StatusActionsLogsMutations {
       });
     }
 
-    return this.replayStatusActionLog(statusActionsLog, agent);
+    return this.executeStatusActionsLog(statusActionsLog, agent);
   }
 }
