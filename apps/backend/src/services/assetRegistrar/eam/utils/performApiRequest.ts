@@ -1,39 +1,42 @@
+import { Agent } from 'undici';
+
 import { createAndLogError } from './createAndLogError';
 import { getEnvOrThrow } from './getEnvOrThrow';
 
 export async function performApiRequest(uri: string, requestData: object) {
   try {
-    console.log('1-----------------');
-    // const accessToken = await getToken();
-    console.log('2-----------------');
-    console.log(getEnvOrThrow('EAM_API_URL') + uri);
     const response = await fetch(getEnvOrThrow('EAM_API_URL') + uri, {
       method: 'POST',
       body: JSON.stringify(requestData),
       headers: {
         'Content-Type': 'application/json',
-        // INFOR_USER: 'SRV_USEROFFICE',
-        // INFOR_PASSWORD: 'Q500Xuib31977427',
-        // INFOR_TENANT: 'DS_MP_1',
-        // INFOR_ORGANIZATION: 'ESS',
+        INFOR_USER: getEnvOrThrow('EAM_AUTH_USER'),
+        INFOR_PASSWORD: getEnvOrThrow('EAM_AUTH_PASSWORD'),
+        INFOR_TENANT: getEnvOrThrow('EAM_AUTH_TENANT'),
+        INFOR_ORGANIZATION: getEnvOrThrow('EAM_AUTH_ORGANIZATION'),
       },
+      dispatcher: new Agent({
+        connect: {
+          rejectUnauthorized: getEnvOrThrow('EAM_SKIP_SSL_CERT_SECURITY')
+            ? false
+            : true,
+        },
+      }),
     });
-    console.log('3-----------------');
-    const data = await response.text();
-    console.log('4-----------------');
+    const data = await response.json();
     if (!response.ok) {
       throw createAndLogError('Failed to execute registerAssetInEAM', {
         data,
+        url: getEnvOrThrow('EAM_API_URL') + uri,
+        requestData,
       });
     }
-    console.log({ data });
 
     return data;
   } catch (error) {
-    console.log('###########################');
-    console.log({ error });
     throw createAndLogError('Error while calling EAM API', {
       error,
+      url: getEnvOrThrow('EAM_API_URL') + uri,
       requestData,
     });
   }

@@ -91,7 +91,7 @@ export async function createContainer(shipmentId: number) {
     Tokens.InstrumentDataSource
   );
 
-  const partCode = getEnvOrThrow('EAM_PART_CODE');
+  const equipmentPartCode = getEnvOrThrow('EAM_EQUIPMENT_PART_CODE');
 
   const shipment = await shipmentDataSource.getShipment(shipmentId);
   if (!shipment) {
@@ -130,7 +130,7 @@ export async function createContainer(shipmentId: number) {
 
   // TODO: Review the instruments code representation
   const request = getRequest(
-    partCode,
+    equipmentPartCode,
     proposal.proposalId,
     proposal.title,
     weight,
@@ -151,15 +151,12 @@ export async function createContainer(shipmentId: number) {
     senderPhone ?? 'No value',
     instruments?.map((instrument) => instrument.shortCode) ?? ['No value']
   );
-  console.log({ request });
   const response = await performApiRequest('/equipment', request);
-  const responseJson = JSON.parse(response);
-
-  if (!responseJson || responseJson.data != partCode) {
+  if (!response) {
     throw createAndLogError('Unexpected response from EAM API', {
       response,
     });
   }
 
-  return responseJson.data;
+  return response.data;
 }
