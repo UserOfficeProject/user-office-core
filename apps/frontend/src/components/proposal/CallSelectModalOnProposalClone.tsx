@@ -27,6 +27,8 @@ const CallSelectModalOnProposalsClone = ({
 }: CallSelectModalOnProposalsCloneProps) => {
   const { calls, loadingCalls } = useCallsData({
     isActive: true,
+    isActiveInternal: true,
+    isEnded: false,
     templateIds: templateId ? [templateId] : undefined,
   });
 

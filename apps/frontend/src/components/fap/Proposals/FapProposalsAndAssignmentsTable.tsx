@@ -6,7 +6,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -19,7 +19,15 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import { UserRole, Review, SettingsId, Fap, ReviewStatus } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import {
+  UserRole,
+  Review,
+  SettingsId,
+  Fap,
+  ReviewStatus,
+  FeatureId,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
@@ -173,6 +181,11 @@ const FapProposalsAndAssignmentsTable = ({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { enqueueSnackbar } = useSnackbar();
+  const { featuresMap } = useContext(FeatureContext);
+
+  const isUseConflictOfInterestWarningEnabled = featuresMap.get(
+    FeatureId.CONFLICT_OF_INTEREST_WARNING
+  )?.isEnabled;
 
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -481,10 +494,11 @@ const FapProposalsAndAssignmentsTable = ({
     }
 
     const shouldShowWarning =
-      proposalPIsMap.size > 0 ||
-      proposalCoIsMap.size > 0 ||
-      pIInstitutionConflictMap.size > 0 ||
-      coIInstitutionConflictMap.size > 0;
+      isUseConflictOfInterestWarningEnabled &&
+      (proposalPIsMap.size > 0 ||
+        proposalCoIsMap.size > 0 ||
+        pIInstitutionConflictMap.size > 0 ||
+        coIInstitutionConflictMap.size > 0);
 
     const alertText: JSX.Element[] = [];
 
