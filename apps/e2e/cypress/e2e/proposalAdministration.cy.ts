@@ -767,6 +767,7 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to sort propsals by instrument and technical review fields', () => {
+      cy.addFeasibilityReviewToDefaultWorkflow();
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposalPk = result.createProposal.primaryKey;
         if (proposalPk) {
