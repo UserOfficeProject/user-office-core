@@ -5,7 +5,9 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { TechniqueDataSource } from '../../datasources/TechniqueDataSource';
+import TechniqueMutations from '../../mutations/TechniqueMutations';
 import { TechniquePickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -84,5 +86,34 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     }
 
     return fallBackConfig;
+  },
+  async onBeforeSave(questionaryId, questionTemplateRelation, answer) {
+    const proposalDataSource = container.resolve<ProposalDataSource>(
+      Tokens.ProposalDataSource
+    );
+
+    const techniqueMutations = container.resolve(TechniqueMutations);
+
+    const proposal = await proposalDataSource.getByQuestionaryId(questionaryId);
+
+    if (!proposal) {
+      throw new GraphQLError('Proposal not found');
+    }
+
+    const { value } = JSON.parse(answer.value);
+    const techniqueIds = value
+      ? Array.isArray(value)
+        ? value
+        : [value]
+      : null;
+
+    if (!techniqueIds?.length) {
+      return;
+    }
+
+    await techniqueMutations.assignProposalToTechniquesInternal(null, {
+      techniqueIds,
+      proposalPk: proposal.primaryKey,
+    });
   },
 };
