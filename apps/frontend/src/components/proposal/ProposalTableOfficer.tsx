@@ -318,7 +318,7 @@ const ProposalTableOfficer = ({
   const [openChangeProposalStatus, setOpenChangeProposalStatus] =
     useState(false);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-  const [totalCount, setTotalCount] = useState<number>(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [openCallSelection, setOpenCallSelection] = useState(false);
   const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
     useState<null | HTMLElement>(null);
@@ -1040,7 +1040,7 @@ const ProposalTableOfficer = ({
                   );
 
                   if (foundProposalData) {
-                    return foundProposalData
+                    return foundProposalData;
                   } else {
                     return sp as ProposalViewData;
                   }
