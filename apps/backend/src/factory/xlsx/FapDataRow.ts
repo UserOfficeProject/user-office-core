@@ -1,3 +1,6 @@
+import { stripHtml } from 'string-strip-html';
+
+import { CallRowObj } from './callFaps';
 import { RowObj } from './fap';
 
 export function getDataRow(
@@ -40,4 +43,28 @@ export function populateRow(row: RowObj) {
     row.propFapRankOrder ?? '<missing>',
     row.inAvailZone ?? '<missing>',
   ];
+}
+
+export function callFapPopulateRow(row: CallRowObj): (string | number)[] {
+  const individualReviews = row.reviews?.flatMap((rev) => [
+    rev.grade,
+    rev.comment && stripHtml(rev.comment).result,
+  ]);
+
+  return [
+    row.propShortCode ?? '<missing>',
+    row.propTitle ?? '<missing>',
+    row.principalInv,
+    row.instrName ?? '<missing>',
+    row.instrAvailTime ?? '<missing>',
+    row.techReviewTimeAllocation ?? '<missing>',
+    row.fapTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
+    row.propReviewAvgScore ?? '<missing>',
+    row.propFapRankOrder ?? '<missing>',
+    row.inAvailZone ?? '<missing>',
+    row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
+    row.fapMeetingDecision ?? '<missing>',
+    row.fapMeetingInComment ?? '<missing>',
+    row.fapMeetingExComment ?? '<missing>',
+  ].concat(individualReviews ? individualReviews : []);
 }

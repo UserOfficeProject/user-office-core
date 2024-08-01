@@ -3,6 +3,7 @@ import { stripHtml } from 'string-strip-html';
 import { StfcUserDataSource } from '../../../datasources/stfc/StfcUserDataSource';
 import { QuestionaryStep } from '../../../models/Questionary';
 import { Review } from '../../../models/Review';
+import { CallRowObj } from '../callFaps';
 import { RowObj } from '../fap';
 import { getDataRow } from '../FapDataRow';
 
@@ -69,5 +70,26 @@ export function populateStfcRow(row: RowObj) {
     row.daysRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
+  ].concat(individualReviews ? individualReviews : []);
+}
+
+export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
+  const individualReviews = row.reviews?.flatMap((rev) => [
+    rev.grade,
+    rev.comment && stripHtml(rev.comment).result,
+  ]);
+
+  return [
+    row.propShortCode ?? '<missing>',
+    row.principalInv ?? '<missing>',
+    row.piCountry ?? '<missing>',
+    row.instrName ?? '<missing>',
+    row.daysRequested ?? '<missing>',
+    row.propTitle ?? '<missing>',
+    row.propReviewAvgScore ?? '<missing>',
+    row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
+    row.fapMeetingDecision ?? '<missing>',
+    row.fapMeetingInComment ?? '<missing>',
+    row.fapMeetingExComment ?? '<missing>',
   ].concat(individualReviews ? individualReviews : []);
 }

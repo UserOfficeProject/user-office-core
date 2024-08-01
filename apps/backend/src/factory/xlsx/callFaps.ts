@@ -7,8 +7,14 @@ import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserWithRole } from '../../models/User';
 import { RowObj, collectFapXLSXRowData } from './fap';
+import { callFapPopulateRow } from './FapDataRow';
+import { callFapStfcPopulateRow } from './stfc/StfcFapDataRow';
 
 const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
+
+const callFapDataRow = container.resolve<
+  typeof callFapPopulateRow | typeof callFapStfcPopulateRow
+>(Tokens.PopulateCallRow);
 
 const ProposalEndStatusStringValue = {
   [ProposalEndStatus.UNSET]: 'Unset',
@@ -65,7 +71,7 @@ const collectFAPRowData = async (
     const instName: (string | number)[][] = [[inst.sheetName]];
 
     const sortedData = sortByRankOrAverageScore(inst.rows).map(
-      (row: CallRowObj) => populateRow(row)
+      (row: CallRowObj) => callFapDataRow(row)
     );
 
     return instName.concat(sortedData);
@@ -98,43 +104,11 @@ export const collectCallFapXLSXData = async (
   return { data: baseData, filename: filename.replace(/\s+/g, '_') };
 };
 
-function populateRow(row: CallRowObj): (string | number)[] {
-  const individualReviews = row.reviews?.flatMap((rev) => [
-    rev.grade,
-    rev.comment && stripHtml(rev.comment).result,
-  ]);
-
-  return [
-    row.propShortCode ?? '<missing>',
-    row.principalInv ?? '<missing>',
-    row.piCountry ?? '<missing>',
-    row.instrName ?? '<missing>',
-    row.daysRequested ?? '<missing>',
-    row.propTitle ?? '<missing>',
-    row.propReviewAvgScore ?? '<missing>',
-    row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
-    row.fapMeetingDecision ?? '<missing>',
-    row.fapMeetingInComment ?? '<missing>',
-    row.fapMeetingExComment ?? '<missing>',
-  ].concat(individualReviews ? individualReviews : []);
-}
-
-export const CallFapDataColumns = [
-  'Proposal Reference Number',
-  'Principal Investigator',
-  'PI Country',
-  'Instrument Name',
-  'Requested User Time',
-  'Proposal Title',
-  'Average score',
+export const CallExtraFapDataColumns = [
   'Fap Time allocation',
   'Fap Meeting Decision',
   'Fap Meeting Comment for User',
   'Fap Meeting Internal Comment',
-  'Reviewer 1 score',
-  'Reviewer 1 review comment',
-  'Reviewer 2 score',
-  'Reviewer 2 review comment',
 ];
 
 const sortByRankOrder = (a: RowObj, b: RowObj) => {

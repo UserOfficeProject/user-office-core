@@ -11,7 +11,7 @@ import {
 } from '../../factory/DownloadService';
 import { getCurrentTimestamp } from '../../factory/util';
 import {
-  CallFapDataColumns,
+  CallExtraFapDataColumns,
   collectCallFapXLSXData,
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
@@ -154,7 +154,7 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
     const meta: XLSXMetaBase = {
       singleFilename: filename,
       collectionFilename: filename,
-      columns: CallFapDataColumns,
+      columns: fapDataColumns.concat(CallExtraFapDataColumns),
     };
 
     const userRole = req.user.currentRole;
