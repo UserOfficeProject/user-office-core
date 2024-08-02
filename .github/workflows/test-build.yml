@@ -378,7 +378,6 @@ jobs:
           EAM_AUTH_PASSWORD: dummyEAMsecret
           EAM_AUTH_TENANT: dummyTenant
           EAM_AUTH_ORGANIZATION: dummyOrg
-          EAM_SKIP_SSL_CERT_SECURITY: true
           EAM_EQUIPMENT_PART_CODE: 12413
           AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
           AUTH_CLIENT_ID: useroffice

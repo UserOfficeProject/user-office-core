@@ -138,8 +138,6 @@ export default class ShipmentMutations {
         args.shipmentId
       );
 
-      // const assetId = '123456789';
-
       return this.shipmentDataSource
         .update({
           shipmentId: args.shipmentId,

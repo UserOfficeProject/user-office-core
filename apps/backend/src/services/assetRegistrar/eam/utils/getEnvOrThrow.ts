@@ -6,7 +6,6 @@ type EnvVars =
   | 'EAM_AUTH_PASSWORD'
   | 'EAM_AUTH_TENANT'
   | 'EAM_AUTH_ORGANIZATION'
-  | 'EAM_SKIP_SSL_CERT_SECURITY'
   | 'EAM_EQUIPMENT_PART_CODE';
 
 export function getEnvOrThrow(envVariable: EnvVars) {

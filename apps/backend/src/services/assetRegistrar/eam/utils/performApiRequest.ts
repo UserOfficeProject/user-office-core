@@ -1,5 +1,3 @@
-import { Agent } from 'undici';
-
 import { createAndLogError } from './createAndLogError';
 import { getEnvOrThrow } from './getEnvOrThrow';
 
@@ -15,13 +13,6 @@ export async function performApiRequest(uri: string, requestData: object) {
         INFOR_TENANT: getEnvOrThrow('EAM_AUTH_TENANT'),
         INFOR_ORGANIZATION: getEnvOrThrow('EAM_AUTH_ORGANIZATION'),
       },
-      dispatcher: new Agent({
-        connect: {
-          rejectUnauthorized: getEnvOrThrow('EAM_SKIP_SSL_CERT_SECURITY')
-            ? false
-            : true,
-        },
-      }),
     });
     const data = await response.json();
     if (!response.ok) {
