@@ -160,7 +160,7 @@ context('Personal information tests', () => {
       cy.contains('Proposals to grade');
 
       cy.get('[data-cy="FapRoles-menu-items"]')
-        .find('.MuiListItem-root')
+        .find('.MuiListItemButton-root')
         .should('have.length', 2);
     });
 

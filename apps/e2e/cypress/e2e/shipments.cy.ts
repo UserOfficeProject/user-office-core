@@ -151,6 +151,8 @@ context('Shipments tests', () => {
     cy.get(`[data-natural-key=${SENDER_ZIP_CODE_KEY}]`).type(zip);
     cy.get(`[data-natural-key=${SENDER_CITY_COUNTRY_KEY}]`).type(city);
 
+    cy.get('[data-cy=save-and-continue-button]').focus();
+
     cy.get('[data-cy=save-and-continue-button]').click();
 
     cy.contains('Submit').click();

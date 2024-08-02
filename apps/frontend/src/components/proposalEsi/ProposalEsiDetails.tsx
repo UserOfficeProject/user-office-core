@@ -1,4 +1,5 @@
-import makeStyles from '@mui/styles/makeStyles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -10,16 +11,9 @@ import { useEsi } from 'hooks/esi/useEsi';
 interface ProposalEsiDetailsProps {
   esiId: number;
 }
-const useStyles = makeStyles(() => ({
-  sampleList: {
-    listStyle: 'none',
-    padding: 0,
-  },
-}));
 
 function ProposalEsiDetails(props: ProposalEsiDetailsProps) {
   const { esi } = useEsi(props.esiId);
-  const classes = useStyles();
 
   if (!esi) {
     return <UOLoader />;
@@ -31,11 +25,16 @@ function ProposalEsiDetails(props: ProposalEsiDetailsProps) {
     {
       label: 'Samples for the experiment',
       value: (
-        <ul className={classes.sampleList}>
+        <List
+          sx={{
+            listStyle: 'none',
+            padding: 0,
+          }}
+        >
           {esi.sampleEsis.map((esi) => (
-            <li key={esi.sampleId}>{esi.sample.title}</li>
+            <ListItem key={esi.sampleId}>{esi.sample.title}</ListItem>
           ))}
-        </ul>
+        </List>
       ),
     },
   ];

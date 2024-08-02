@@ -12,7 +12,6 @@ import {
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -20,14 +19,6 @@ import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { InstrumentPickerConfig } from 'generated/sdk';
 
-const useStyles = makeStyles(() => ({
-  horizontalLayout: {
-    flexDirection: 'row',
-  },
-  verticalLayout: {
-    flexDirection: 'column',
-  },
-}));
 /* InstrumentIdAndTime is used to save the 
 instrument id and requested time in database*/
 interface InstrumentIdAndTime {
@@ -41,10 +32,10 @@ interface InstrumentIdNameAndTime {
   instrumentName?: string;
   timeRequested?: string;
 }
+
 export function QuestionaryComponentInstrumentPicker(
   props: BasicComponentProps
 ) {
-  const classes = useStyles();
   const {
     answer,
     onComplete,
@@ -264,11 +255,9 @@ export function QuestionaryComponentInstrumentPicker(
             name={id}
             value={answer.value?.instrumentId ?? null}
             onChange={handleOnChange}
-            className={
-              config.instruments.length < 3
-                ? classes.horizontalLayout
-                : classes.verticalLayout
-            }
+            sx={{
+              flexDirection: config.instruments.length < 3 ? 'row' : 'column',
+            }}
             data-cy="radio-ul"
           >
             {config.instruments.map((instrument) => {

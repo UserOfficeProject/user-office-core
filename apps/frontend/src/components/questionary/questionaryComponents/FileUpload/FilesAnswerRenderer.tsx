@@ -1,5 +1,6 @@
 import Link from '@mui/material/Link';
-import makeStyles from '@mui/styles/makeStyles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import React from 'react';
 
 import { FileIdWithCaptionAndFigure } from 'components/common/FileUploadComponent';
@@ -7,21 +8,8 @@ import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegis
 import { useFilesMetadata } from 'hooks/file/useFilesMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
 
-const useStyles = makeStyles((theme) => ({
-  list: {
-    padding: 0,
-    margin: 0,
-    '& li': {
-      display: 'block',
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
-
 function DownloadableFileList(props: { fileIds: string[] }) {
   const { fileIds } = props;
-
-  const classes = useStyles();
   const { files } = useFilesMetadata({ fileIds });
 
   const downloadLink = (file: FileMetaData) => (
@@ -31,11 +19,20 @@ function DownloadableFileList(props: { fileIds: string[] }) {
   );
 
   return (
-    <ul className={classes.list}>
+    <List
+      sx={(theme) => ({
+        padding: 0,
+        margin: 0,
+        '& li': {
+          display: 'block',
+          marginRight: theme.spacing(1),
+        },
+      })}
+    >
       {files.map((file) => (
-        <li key={`file-id-${file.fileId}`}>{downloadLink(file)}</li>
+        <ListItem key={`file-id-${file.fileId}`}>{downloadLink(file)}</ListItem>
       ))}
-    </ul>
+    </List>
   );
 }
 
