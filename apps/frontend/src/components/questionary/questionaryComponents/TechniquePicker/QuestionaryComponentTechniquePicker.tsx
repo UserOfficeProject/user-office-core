@@ -9,7 +9,6 @@ import {
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -18,19 +17,9 @@ import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { TechniquePickerConfig } from 'generated/sdk';
 import { toArray } from 'utils/helperFunctions';
 
-const useStyles = makeStyles(() => ({
-  horizontalLayout: {
-    flexDirection: 'row',
-  },
-  verticalLayout: {
-    flexDirection: 'column',
-  },
-}));
-
 export function QuestionaryComponentTechniquePicker(
   props: BasicComponentProps
 ) {
-  const classes = useStyles();
   const {
     answer,
     onComplete,
@@ -114,11 +103,9 @@ export function QuestionaryComponentTechniquePicker(
             name={id}
             value={answer.value ?? null}
             onChange={handleOnChange}
-            className={
-              config.techniques.length < 3
-                ? classes.horizontalLayout
-                : classes.verticalLayout
-            }
+            sx={{
+              flexDirection: config.techniques.length < 3 ? 'row' : 'column',
+            }}
             data-cy="radio-ul"
           >
             {config.techniques.map((technique) => {

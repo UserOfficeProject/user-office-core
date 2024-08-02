@@ -6,9 +6,10 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { Field } from 'formik';
-import { Checkbox, Select } from 'formik-mui';
 import React, { useState } from 'react';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { TechniquePickerConfig } from 'generated/sdk';
 const availableVariantOptions = [
@@ -30,7 +31,7 @@ export const QuestionTechniquePickerFormCommon = ({
           control={
             <Field
               name="config.required"
-              component={Checkbox}
+              component={CheckboxWithLabel}
               type="checkbox"
               inputProps={{ 'data-cy': 'required' }}
             />
@@ -68,7 +69,7 @@ export const QuestionTechniquePickerFormCommon = ({
             control={
               <Field
                 name="config.isMultipleSelect"
-                component={Checkbox}
+                component={CheckboxWithLabel}
                 type="checkbox"
                 inputProps={{ 'data-cy': 'is-multiple-select' }}
               />
