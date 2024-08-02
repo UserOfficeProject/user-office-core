@@ -12,7 +12,7 @@ import { StatusActionsLogsFilter } from '../resolvers/queries/StatusActionsLogsQ
 export default class StatusActionsLogsQueries {
   constructor(
     @inject(Tokens.StatusActionsLogsDataSource)
-    private dataSource: StatusActionsLogsDataSource
+    public dataSource: StatusActionsLogsDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])

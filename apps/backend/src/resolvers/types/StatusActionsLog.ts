@@ -12,6 +12,7 @@ import {
 import { ResolverContext } from '../../context';
 import { StatusActionsLog as StatusActionsLogOrigin } from '../../models/StatusActionsLog';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
+import { Proposal } from './Proposal';
 import { EmailStatusActionRecipients } from './ProposalStatusActionConfig';
 import { User } from './User';
 
@@ -65,6 +66,27 @@ export class StatusActionsLogResolver {
     return context.queries.proposalSettings.statusActionsDataSource.getConnectionStatusAction(
       statusActionsLog.connectionId,
       statusActionsLog.actionId
+    );
+  }
+
+  @FieldResolver(() => [Proposal])
+  async proposals(
+    @Root() statusActionsLog: StatusActionsLogOrigin,
+    @Ctx() context: ResolverContext
+  ): Promise<Proposal[] | null> {
+    if (!statusActionsLog.statusActionsLogId) {
+      return null;
+    }
+    const statusActionsProposals =
+      await context.queries.statusActionsLogs.dataSource.getStatusActionsLogHasProposals(
+        statusActionsLog.statusActionsLogId
+      );
+    if (!statusActionsProposals || statusActionsProposals.length < 1) {
+      return null;
+    }
+
+    return context.queries.proposal.dataSource.getProposalsByPks(
+      statusActionsProposals.map((proposal) => proposal.proposalPk)
     );
   }
 }
