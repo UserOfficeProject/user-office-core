@@ -44,6 +44,7 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+    cy.addFeasibilityReviewToDefaultWorkflow();
   });
 
   // TODO: Maybe this should be moved to permission testing.
