@@ -350,10 +350,9 @@ const sendMail = async (
     const fulfilled = results.filter((result) => result.status === 'fulfilled');
 
     if (errors.length < 1 && fulfilled.length > 0) {
-      const message = 'Email(s) successfully sent';
-      statusActionLogger(true, message);
+      statusActionLogger(true, 'Email(s) successfully sent');
 
-      return message;
+      return results;
     }
 
     statusActionLogger(false, 'Email(s) could not be sent');

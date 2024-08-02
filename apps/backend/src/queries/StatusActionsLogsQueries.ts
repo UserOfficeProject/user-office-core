@@ -22,4 +22,12 @@ export default class StatusActionsLogsQueries {
   ): Promise<StatusActionsLog[] | null> {
     return this.dataSource.getStatusActionsLogs(filter);
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getStatusActionsLog(
+    agent: UserWithRole | null,
+    statusActionsLogId: number
+  ): Promise<StatusActionsLog | null> {
+    return this.dataSource.getStatusActionsLog(statusActionsLogId);
+  }
 }

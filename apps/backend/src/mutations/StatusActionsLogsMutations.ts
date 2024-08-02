@@ -28,7 +28,7 @@ export default class StatusActionsLogsMutations {
     private proposalSettingsDataSource: ProposalSettingsDataSource
   ) {}
 
-  async getStatusEngineReadyProposals(
+  private async getStatusEngineReadyProposals(
     proposals: Proposal[]
   ): Promise<WorkflowEngineProposalType[]> {
     if (proposals.length < 1) {

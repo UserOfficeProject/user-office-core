@@ -1,7 +1,7 @@
 export class StatusActionsLog {
   constructor(
     public statusActionsLogId: number,
-    public parentStatusActionsLogId: number,
+    public parentStatusActionsLogId: number | null,
     public connectionId: number,
     public actionId: number,
     public statusActionsStep: string,
