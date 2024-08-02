@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('0158_AddStatusActionsLogsTables.sql', 'Farai Mutambara', 'Add Status Actions Logs', '2024-07-22') THEN
+  IF register_patch('0160_AddStatusActionsLogsTables.sql', 'Farai Mutambara', 'Add Status Actions Logs', '2024-07-22') THEN
     BEGIN
        CREATE TABLE IF NOT EXISTS status_actions_logs(
             status_actions_log_id serial PRIMARY KEY,
