@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { injectable } from 'tsyringe';
 
 import { ProposalStatus } from '../../models/ProposalStatus';
 import { ProposalWorkflow } from '../../models/ProposalWorkflow';
@@ -19,6 +20,7 @@ import {
   ProposalWorkflowRecord,
 } from './records';
 
+@injectable()
 export default class PostgresProposalSettingsDataSource
   implements ProposalSettingsDataSource
 {
