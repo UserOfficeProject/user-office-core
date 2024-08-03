@@ -4,7 +4,10 @@ import { QuestionaryComponentDefinition } from 'components/questionary/Questiona
 
 export const createFapReviewBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] =
   () => {
-    const schema = Yup.object().shape({});
+    const schema = Yup.object().shape({
+      comment: Yup.string(),
+      grade: Yup.string(),
+    });
 
     //@TODO add validation for user, comment length (?)
 

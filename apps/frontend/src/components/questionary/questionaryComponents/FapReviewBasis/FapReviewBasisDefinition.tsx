@@ -1,7 +1,7 @@
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import DescriptionIcon from '@mui/icons-material/Description';
 import React from 'react';
 
-import { DataType } from 'generated/sdk';
+import { DataType, ReviewStatus } from 'generated/sdk';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 
 import { createFapReviewBasisValidationSchema } from './createFapReviewBasisValidationSchema';
@@ -19,7 +19,7 @@ export const fapReviewBasisDefinition: QuestionaryComponentDefinition = {
     QuestionTemplateRelationFapReviewBasisForm,
   readonly: true,
   creatable: false,
-  icon: <FlightTakeoffIcon />,
+  icon: <DescriptionIcon />,
   createYupValidationSchema: createFapReviewBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
     const fapReviewState = state as FapReviewSubmissionState;
@@ -27,6 +27,7 @@ export const fapReviewBasisDefinition: QuestionaryComponentDefinition = {
     return {
       comment: fapReviewState.fapReview.comment || '',
       grade: fapReviewState.fapReview.grade?.toString() || '',
+      submitted: fapReviewState.fapReview.status === ReviewStatus.SUBMITTED,
     };
   },
 };
