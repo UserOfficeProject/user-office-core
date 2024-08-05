@@ -64,6 +64,6 @@ The GraphQL Playground is an interactive, in-browser tool for writing, validatin
 
 ### `npm run lint`
 
-Lints typescript code and log if there are any errors.<br>
+Lints typescript code and log if there are any errors.
 
 `npm run lint:fix` should be used if you want to fix all auto-fixable errors and warnings.
