@@ -718,6 +718,10 @@ const FapProposalsAndAssignmentsTable = ({
 
   const maxPageLength = FapProposalsWitIdAndFormattedDate.length;
 
+  const pageSizeOptions = [5, 10, 20, maxPageLength]
+    .sort()
+    .filter((n) => n <= maxPageLength);
+
   return (
     <>
       <ProposalReviewModal
@@ -768,9 +772,7 @@ const FapProposalsAndAssignmentsTable = ({
             search: true,
             selection: true,
             pageSize: Math.min(10, maxPageLength),
-            pageSizeOptions: [5, 10, 20, maxPageLength]
-              .sort()
-              .filter((n) => n <= maxPageLength),
+            pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
               inputProps: {
                 'aria-label': 'Select all rows',
