@@ -47,6 +47,7 @@ export interface FapDataSource {
   ): Promise<Fap[]>;
   getUserFaps(id: number, role: Role): Promise<Fap[]>;
   getFapsByCallId(callId: number): Promise<Fap[]>;
+  // TODO: This should be removed as we have getFapsByProposalPk and getFapsByProposalPks
   getFapByProposalPk(proposalPk: number): Promise<Fap | null>;
   getFapsByProposalPks(proposalPks: number[]): Promise<FapProposal[]>;
   getFapsByProposalPk(proposalPk: number): Promise<Fap[]>;
@@ -56,6 +57,7 @@ export interface FapDataSource {
     proposalPk: number,
     reviewerId: number | null
   ): Promise<FapAssignment[]>;
+  getAllFapProposalAssignments(proposalPk: number): Promise<FapAssignment[]>;
   getFapReviewsByCallAndStatus(
     callIds: number[],
     status: ReviewStatus
@@ -128,6 +130,7 @@ export interface FapDataSource {
     proposalPks: number[],
     fapId?: number
   ): Promise<FapMeetingDecision[]>;
+  getAllFapMeetingDecisions(fapId: number): Promise<FapMeetingDecision[]>;
   getFapProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]>;

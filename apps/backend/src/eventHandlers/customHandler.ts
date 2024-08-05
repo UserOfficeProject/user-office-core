@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { resolveApplicationEventBus } from '../events';
@@ -21,6 +22,7 @@ export default function createCustomHandler() {
   const reviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
   );
+  const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
 
   const getProposalByPk = async (proposalPk: number) => {
     const foundProposal = await proposalDataSource.get(proposalPk);
@@ -193,6 +195,56 @@ export default function createCustomHandler() {
             key: 'proposal',
             loggedInUserId: event.loggedInUserId,
           });
+
+          const foundFap = await fapDataSource.getFap(
+            event.fapmeetingdecision.fapId
+          );
+
+          const allFapProposals = await fapDataSource.getFapProposals(
+            event.fapmeetingdecision.fapId,
+            foundProposal.callId
+          );
+
+          const allMeetingDecisions =
+            await fapDataSource.getAllFapMeetingDecisions(
+              event.fapmeetingdecision.fapId
+            );
+
+          if (
+            foundFap &&
+            allFapProposals.length === allMeetingDecisions.length &&
+            allMeetingDecisions.every((item) => item.submitted)
+          ) {
+            eventBus.publish({
+              type: Event.FAP_ALL_MEETINGS_SUBMITTED,
+              fap: foundFap,
+              isRejection: false,
+              key: 'fap',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
+
+          const allProposalFapMeetingDecisions =
+            await fapDataSource.getProposalsFapMeetingDecisions([
+              event.fapmeetingdecision.proposalPk,
+            ]);
+
+          const allProposalFaps = await fapDataSource.getFapsByProposalPk(
+            event.fapmeetingdecision.proposalPk
+          );
+
+          if (
+            allProposalFaps.length === allProposalFapMeetingDecisions.length &&
+            allProposalFapMeetingDecisions.every((item) => item.submitted)
+          ) {
+            eventBus.publish({
+              type: Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED,
+              proposal: foundProposal,
+              isRejection: false,
+              key: 'proposal',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
         }
         break;
       }
@@ -210,12 +262,14 @@ export default function createCustomHandler() {
 
       case Event.PROPOSAL_FAP_REVIEW_SUBMITTED:
         try {
-          const allProposalReviews = await reviewDataSource.getProposalReviews(
-            event.review.proposalPk
-          );
+          const allFapProposalReviews =
+            await reviewDataSource.getProposalReviews(
+              event.review.proposalPk,
+              event.review.fapID
+            );
 
           const allOtherReviewsSubmitted = checkAllReviewsSubmittedOnProposal(
-            allProposalReviews,
+            allFapProposalReviews,
             event.review
           );
 
@@ -231,6 +285,35 @@ export default function createCustomHandler() {
               key: 'proposal',
               loggedInUserId: event.loggedInUserId,
             });
+
+            // NOTE: This should fetch all the proposal reviews in all FAPs
+            const allFapsProposalReviews =
+              await reviewDataSource.getProposalReviews(
+                event.review.proposalPk
+              );
+
+            const allProposalReviewsSubmittedInAllPanels =
+              checkAllReviewsSubmittedOnProposal(
+                allFapsProposalReviews,
+                event.review
+              );
+            const allProposalAssignments =
+              await fapDataSource.getAllFapProposalAssignments(
+                event.review.proposalPk
+              );
+
+            if (
+              allFapsProposalReviews.length >= allProposalAssignments.length &&
+              allProposalReviewsSubmittedInAllPanels
+            ) {
+              eventBus.publish({
+                type: Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED_FOR_ALL_PANELS,
+                proposal: foundProposal,
+                isRejection: false,
+                key: 'proposal',
+                loggedInUserId: event.loggedInUserId,
+              });
+            }
           }
         } catch (error) {
           logger.logException(

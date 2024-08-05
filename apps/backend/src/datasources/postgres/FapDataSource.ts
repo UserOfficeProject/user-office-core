@@ -286,6 +286,18 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
+  async getAllFapProposalAssignments(
+    proposalPk: number
+  ): Promise<FapAssignment[]> {
+    const fapAssignments: FapAssignmentRecord[] = await database
+      .from('fap_assignments')
+      .where('proposal_pk', proposalPk);
+
+    return fapAssignments.map((fapAssignment) =>
+      createFapAssignmentObject(fapAssignment)
+    );
+  }
+
   async getFapProposals(
     fapId: number,
     callId: number | null
@@ -1001,6 +1013,24 @@ export default class PostgresFapDataSource implements FapDataSource {
     }
 
     return createFapMeetingDecisionObject(fapMeetingDecisionRecord);
+  }
+
+  async getAllFapMeetingDecisions(
+    fapId: number
+  ): Promise<FapMeetingDecision[]> {
+    return database
+      .select()
+      .from('fap_meeting_decisions')
+      .where('fap_id', fapId)
+      .then((fapMeetingDecisionRecords: FapMeetingDecisionRecord[]) => {
+        if (!fapMeetingDecisionRecords.length) {
+          return [];
+        }
+
+        return fapMeetingDecisionRecords.map((fapMeetingDecisionRecord) =>
+          createFapMeetingDecisionObject(fapMeetingDecisionRecord)
+        );
+      });
   }
 
   async getProposalsFapMeetingDecisions(

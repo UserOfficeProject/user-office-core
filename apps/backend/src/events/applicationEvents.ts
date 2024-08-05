@@ -158,6 +158,21 @@ interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
   proposal: Proposal;
 }
 
+interface FapAllMeetingsSubmittedEvent extends GeneralEvent {
+  type: Event.FAP_ALL_MEETINGS_SUBMITTED;
+  fap: Fap;
+}
+
+interface ProposalAllFapReviewsSubmittedForAllPanelsEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED_FOR_ALL_PANELS;
+  proposal: Proposal;
+}
+
+interface ProposalAllFapMeetingsSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED;
+  proposal: Proposal;
+}
+
 interface ProposalStatusChangedByWorkflowEvent extends GeneralEvent {
   type: Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW;
   proposal: Proposal;
@@ -382,6 +397,9 @@ export type ApplicationEvent =
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
   | ProposalBookingTimeSlotsRemovedEvent
+  | FapAllMeetingsSubmittedEvent
+  | ProposalAllFapReviewsSubmittedForAllPanelsEvent
+  | ProposalAllFapMeetingsSubmittedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent

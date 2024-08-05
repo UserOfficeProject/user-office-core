@@ -21,6 +21,8 @@ export enum Event {
   PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED',
   PROPOSAL_FAP_MEETING_SAVED = 'PROPOSAL_FAP_MEETING_SAVED',
   PROPOSAL_FAP_MEETING_SUBMITTED = 'PROPOSAL_FAP_MEETING_SUBMITTED',
+  PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED = 'PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED',
+  PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED_FOR_ALL_PANELS = 'PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED_FOR_ALL_PANELS',
   PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN = 'PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN',
   PROPOSAL_FAP_MEETING_REORDER = 'PROPOSAL_FAP_MEETING_REORDER',
   PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED = 'PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED',
@@ -47,6 +49,7 @@ export enum Event {
   FAP_MEMBER_ASSIGNED_TO_PROPOSAL = 'FAP_MEMBER_ASSIGNED_TO_PROPOSAL',
   FAP_MEMBER_REMOVED_FROM_PROPOSAL = 'FAP_MEMBER_REMOVED_FROM_PROPOSAL',
   FAP_REVIEWER_NOTIFIED = 'FAP_REVIEWER_NOTIFIED',
+  FAP_ALL_MEETINGS_SUBMITTED = 'FAP_ALL_MEETINGS_SUBMITTED',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_ACTION_EXECUTED = 'PROPOSAL_STATUS_ACTION_EXECUTED',
@@ -139,7 +142,7 @@ export const EventLabel = new Map<Event, string>([
   ],
   [
     Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED,
-    'Event occurs when all FAP reviews on a proposal are submitted',
+    'Event occurs when all FAP reviews on a proposal are submitted for the current FAP',
   ],
   [
     Event.PROPOSAL_FAP_MEETING_SAVED,
@@ -148,6 +151,14 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_FAP_MEETING_SUBMITTED,
     'Event occurs when FAP meeting is submitted on a proposal',
+  ],
+  [
+    Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED,
+    'Event occurs when all the FAP meetings are submitted for a specific proposal',
+  ],
+  [
+    Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED_FOR_ALL_PANELS,
+    'Event occurs when all proposal FAP reviews are submitted throughout all the FAPs',
   ],
   [
     Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN,
@@ -222,6 +233,10 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL,
     'Event occurs when FAP member is removed from proposal for review',
+  ],
+  [
+    Event.FAP_ALL_MEETINGS_SUBMITTED,
+    'Event occurs when all the FAP meetings are submitted for all of the proposals',
   ],
   [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
   [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
