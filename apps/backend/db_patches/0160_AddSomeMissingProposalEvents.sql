@@ -5,7 +5,7 @@ BEGIN
 
         ALTER TABLE proposal_events ADD COLUMN fap_all_meetings_submitted BOOLEAN DEFAULT FALSE;
         ALTER TABLE proposal_events ADD COLUMN proposal_all_fap_meetings_submitted BOOLEAN DEFAULT FALSE;
-        ALTER TABLE proposal_events ADD COLUMN proposal_all_fap_reviews_submitted_for_all_panels BOOLEAN DEFAULT FALSE;
+        ALTER TABLE proposal_events ADD COLUMN proposal_all_reviews_submitted_for_all_faps BOOLEAN DEFAULT FALSE;
 
     END IF;
 END;

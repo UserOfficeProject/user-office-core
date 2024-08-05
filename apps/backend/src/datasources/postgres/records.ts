@@ -606,7 +606,7 @@ export interface ProposalEventsRecord {
   readonly proposal_fap_review_submitted: boolean;
   readonly proposal_fap_meeting_submitted: boolean;
   readonly proposal_all_fap_meetings_submitted: boolean;
-  readonly proposal_all_fap_reviews_submitted_for_all_panels: boolean;
+  readonly proposal_all_reviews_submitted_for_all_faps: boolean;
   readonly proposal_instrument_submitted: boolean;
   readonly proposal_accepted: boolean;
   readonly proposal_reserved: boolean;

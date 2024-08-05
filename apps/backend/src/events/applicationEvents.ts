@@ -164,7 +164,7 @@ interface FapAllMeetingsSubmittedEvent extends GeneralEvent {
 }
 
 interface ProposalAllFapReviewsSubmittedForAllPanelsEvent extends GeneralEvent {
-  type: Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED_FOR_ALL_PANELS;
+  type: Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS;
   proposal: Proposal;
 }
 

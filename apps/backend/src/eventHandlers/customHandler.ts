@@ -307,7 +307,7 @@ export default function createCustomHandler() {
               allProposalReviewsSubmittedInAllPanels
             ) {
               eventBus.publish({
-                type: Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED_FOR_ALL_PANELS,
+                type: Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS,
                 proposal: foundProposal,
                 isRejection: false,
                 key: 'proposal',
