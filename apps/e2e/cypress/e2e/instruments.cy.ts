@@ -44,6 +44,7 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+    cy.addFeasibilityReviewToDefaultWorkflow();
   });
 
   // TODO: Maybe this should be moved to permission testing.
@@ -343,6 +344,45 @@ context('Instrument tests', () => {
         'contain',
         `Reviewed by ${scientist2.firstName} ${scientist2.lastName}`
       );
+    });
+
+    it('Proposal should have technical review even if workflow status name changes but the shortCode contains FEASIBILITY', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
+
+      const newStatusName = faker.lorem.words(2);
+
+      cy.login('officer', initialDBData.roles.userOfficer);
+      cy.visit('/ProposalStatuses');
+
+      cy.contains('FEASIBILITY_REVIEW')
+        .closest('tr')
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="name"] input').clear().type(newStatusName);
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.get('[data-cy="officer-menu-items"]')
+        .find('[aria-label="Proposals"]')
+        .click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.get('[data-cy="timeAllocation"]').should('exist');
     });
 
     it('User Officer should be able to re-open submitted technical review', function () {

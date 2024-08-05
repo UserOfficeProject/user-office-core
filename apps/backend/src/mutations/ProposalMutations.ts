@@ -565,10 +565,11 @@ export default class ProposalMutations {
     if (
       await this.callDataSource.isCallEnded(callId, checkIfInternalCallActive)
     ) {
-      return rejection(
-        'Can not clone proposal because the call is not active',
-        { callId, agent, sourceProposal }
-      );
+      return rejection('Cannot clone the proposal because the call has ended', {
+        callId,
+        agent,
+        sourceProposal,
+      });
     }
 
     const call = await this.callDataSource.getCall(callId);

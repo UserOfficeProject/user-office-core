@@ -119,6 +119,14 @@ context('Proposal tests', () => {
         description: proposalWorkflow.description,
       }).then((result) => {
         if (result.createProposalWorkflow) {
+          cy.addProposalWorkflowStatus({
+            droppableGroupId: 'proposalWorkflowConnections_0',
+            proposalStatusId:
+              initialDBData.proposalStatuses.feasibilityReview.id,
+            proposalWorkflowId: result.createProposalWorkflow.id,
+            sortOrder: 1,
+            prevProposalStatusId: 1,
+          });
           createdWorkflowId = result.createProposalWorkflow.id;
         }
       });
@@ -462,6 +470,7 @@ context('Proposal tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
+      cy.addFeasibilityReviewToDefaultWorkflow();
 
       const allocationTime = '10';
       cy.createInstrument(instrument1).then((result) => {
@@ -544,6 +553,15 @@ context('Proposal tests', () => {
         ...newCall,
         proposalWorkflowId: createdWorkflowId,
       });
+
+      // Create an ended call to test if it is not available for cloning.
+      cy.createCall({
+        ...newCall,
+        shortCode: 'CALL_HAS_ENDED',
+        endCall: newCall.startCall,
+        proposalWorkflowId: createdWorkflowId,
+      });
+
       cy.submitProposal({ proposalPk: createdProposalPk });
 
       cy.login('user1', initialDBData.roles.user);
@@ -557,6 +575,11 @@ context('Proposal tests', () => {
       cy.get('[aria-label="Clone proposal"]').first().click();
 
       cy.get('[data-cy="call-selection"]').click();
+
+      cy.get('[data-cy="call-selection-options"]')
+        .contains('CALL_HAS_ENDED')
+        .should('not.exist');
+
       cy.get('[data-cy="call-selection-options"]')
         .contains(newCall.shortCode)
         .click();
