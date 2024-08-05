@@ -13,6 +13,9 @@ export interface StatusActionsLogsDataSource {
   getStatusActionsLog(
     statusActionsLogId: number
   ): Promise<StatusActionsLog | null>;
+  getStatusActionsLogReplays(
+    statusActionsLogId: number
+  ): Promise<StatusActionsLog[] | null>;
   getStatusActionsLogs(
     filter?: StatusActionsLogsFilter
   ): Promise<StatusActionsLog[] | null>;

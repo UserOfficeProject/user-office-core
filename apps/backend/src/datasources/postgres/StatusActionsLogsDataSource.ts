@@ -102,10 +102,24 @@ export default class PostgresStatusActionsLogsDataSource
 
     return this.createStatusActionsLogObject(statusActionsLog);
   }
+
+  async getStatusActionsLogReplays(statusActionsLogId: number) {
+    return database
+      .select('*')
+      .from('status_actions_logs')
+      .where('parent_status_actions_log_id', statusActionsLogId)
+      .orderBy('status_actions_tstamp', 'asc')
+      .then((statusActionsLogs: StatusActionsLogRecord[]) => {
+        return statusActionsLogs.map((statusActionsLog) =>
+          this.createStatusActionsLogObject(statusActionsLog)
+        );
+      });
+  }
   async getStatusActionsLogs(filter?: StatusActionsLogsFilter) {
     return database
       .select('*')
       .from('status_actions_logs')
+      .whereNull('parent_status_actions_log_id')
       .modify((query) => {
         if (filter?.statusActionsLogIds) {
           query.whereIn('status_actions_log_id', filter.statusActionsLogIds);

@@ -20,6 +20,18 @@ export const dummyStatusActionsLog = new StatusActionsLog(
   'Email(s) successfully sent',
   new Date()
 );
+
+export const dummyStatusActionsLogReplay = new StatusActionsLog(
+  2,
+  1,
+  1,
+  1,
+  EmailStatusActionRecipients.OTHER,
+  null,
+  true,
+  'Email(s) successfully sent',
+  new Date()
+);
 export const dummyConnectionHasStatusAction = new StatusActionsLogHasProposal(
   1,
   1
@@ -28,6 +40,11 @@ export const dummyConnectionHasStatusAction = new StatusActionsLogHasProposal(
 export class StatusActionsLogsDataSourceMock
   implements StatusActionsLogsDataSource
 {
+  async getStatusActionsLogReplays(
+    statusActionsLogId: number
+  ): Promise<StatusActionsLog[] | null> {
+    return [dummyStatusActionsLogReplay];
+  }
   async create(args: StatusActionsLogsArgs): Promise<StatusActionsLog> {
     return { ...args, ...dummyStatusActionsLog };
   }

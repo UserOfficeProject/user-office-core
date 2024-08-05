@@ -89,4 +89,18 @@ export class StatusActionsLogResolver {
       statusActionsProposals.map((proposal) => proposal.proposalPk)
     );
   }
+
+  @FieldResolver(() => [StatusActionsLog])
+  async replays(
+    @Root() statusActionsLog: StatusActionsLogOrigin,
+    @Ctx() context: ResolverContext
+  ): Promise<StatusActionsLogOrigin[] | null> {
+    if (!statusActionsLog.statusActionsLogId) {
+      return null;
+    }
+
+    return context.queries.statusActionsLogs.dataSource.getStatusActionsLogReplays(
+      statusActionsLog.statusActionsLogId
+    );
+  }
 }
