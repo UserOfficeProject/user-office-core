@@ -279,7 +279,7 @@ export default function createHandler() {
 
               const proposal = await proposalDataSource.get(obj[0].proposalPk);
 
-              description = `Selected instruments: ${techniques?.map((technique) => technique.name).join(', ')} is attached to technique: ${proposal?.proposalId}`;
+              description = `Selected techniques: ${techniques?.map((technique) => technique.name).join(', ')} is attached to proposal: ${proposal?.proposalId}`;
 
               await eventLogsDataSource.set(
                 event.loggedInUserId,

@@ -1,5 +1,5 @@
 import { Science } from '@mui/icons-material';
-import { instrumentPickerValidationSchema } from '@user-office-software/duo-validation';
+import { techniquePickerValidationSchema } from '@user-office-software/duo-validation';
 import React from 'react';
 
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
@@ -26,7 +26,7 @@ export const techniquePickerDefinition: QuestionaryComponentDefinition = {
     answerRenderer: (answer) => <TechniquePickerAnswerRenderer {...answer} />,
     questionRenderer: defaultRenderer.questionRenderer,
   },
-  createYupValidationSchema: instrumentPickerValidationSchema,
+  createYupValidationSchema: techniquePickerValidationSchema,
   getYupInitialValue: ({ answer }) => answer.value || null,
   searchCriteriaComponent: TechniquePickerSearchCriteriaComponent,
 };
