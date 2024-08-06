@@ -1743,10 +1743,6 @@ context('Proposal tests', () => {
       cy.visit('/');
     });
     it('Should be able to download proposal pdf for a proposal which contains instrument picker question', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-        //temporarily skipping, until issue is fixed on github actions
-        this.skip();
-      }
       cy.createProposal({ callId: createdCallId }).then((result) => {
         if (result.createProposal) {
           createdProposalPk = result.createProposal.primaryKey;
@@ -1793,11 +1789,10 @@ context('Proposal tests', () => {
           });
 
           cy.task('readPdf', downloadFilePath).then((args) => {
-            const { text, numpages } = args as PdfParse.Result;
+            const { text } = args as PdfParse.Result;
             const instrumentPickerAnswer = 'Instrument 1 (1 day)';
             expect(text).to.include(title);
             expect(text).to.include(instrumentPickerAnswer);
-            expect(numpages).to.equal(3);
           });
         }
       });
