@@ -228,6 +228,8 @@ function initializationBeforeTests() {
           proposerId: initialDBData.users.user1.id,
         });
 
+        cy.submitProposal({ proposalPk: createdProposal.primaryKey });
+
         // Manually changing the proposal status to be shown in the Faps. -------->
         cy.changeProposalsStatus({
           statusId: initialDBData.proposalStatuses.fapReview.id,
@@ -797,6 +799,33 @@ context('Fap reviews tests', () => {
       });
     });
 
+    it('Should be able to see how many proposals are assigned to a fap', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.login('officer');
+
+      cy.visit(`/Faps`);
+
+      cy.contains(fap1.code).parent().parent().contains('1');
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        faps: [createdFapId],
+        callFapReviewEnded: true,
+      });
+
+      cy.visit(`/Faps`);
+
+      cy.contains(fap1.code).parent().parent().contains('0');
+    });
+
     it('Should be able to see how many proposals are assigned to a reviewer', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
@@ -817,9 +846,6 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-
-      cy.visit(`/FapPage/${createdFapId}?tab=1`);
-      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
 
       cy.updateCall({
         id: initialDBData.call.id,
