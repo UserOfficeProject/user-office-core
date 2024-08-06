@@ -81,9 +81,9 @@ export interface FapDataSource {
     instrumentId?: number
   ): Promise<FapProposal | null>;
   getFapProposalsByInstrument(
-    fapId: number,
     instrumentId: number,
-    callId: number
+    callId: number,
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ): Promise<FapProposal[]>;
   getMembers(fapId: number): Promise<FapReviewer[]>;
   getReviewers(fapId: number): Promise<FapReviewer[]>;

@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { resolveApplicationEventBus } from '../events';
@@ -18,6 +19,9 @@ import { handleWorkflowEngineChange } from './proposalWorkflow';
 export default function createCustomHandler() {
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
+  );
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
   );
   const reviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
@@ -180,6 +184,41 @@ export default function createCustomHandler() {
           default:
             break;
         }
+        break;
+      }
+      case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED: {
+        const foundProposals = await proposalDataSource.getProposalsByPks(
+          event.instrumentshasproposals.proposalPks
+        );
+
+        for (const proposal of foundProposals) {
+          const instruments =
+            await instrumentDataSource.getInstrumentsByProposalPk(
+              proposal.primaryKey
+            );
+
+          if (!instruments.length) {
+            break;
+          }
+
+          const instrumentHasProposals =
+            await instrumentDataSource.getInstrumentsHasProposal(
+              instruments.map((i) => i.id),
+              proposal.primaryKey,
+              proposal.callId
+            );
+
+          if (instrumentHasProposals.submitted) {
+            eventBus.publish({
+              type: Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED,
+              instrumentshasproposals: instrumentHasProposals,
+              isRejection: false,
+              key: 'instrumentshasproposals',
+              loggedInUserId: event.loggedInUserId,
+            });
+          }
+        }
+
         break;
       }
       case Event.PROPOSAL_FAP_MEETING_SAVED: {
