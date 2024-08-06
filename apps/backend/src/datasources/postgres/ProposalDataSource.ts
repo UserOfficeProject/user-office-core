@@ -1087,7 +1087,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
 
     return !!proposalStatus.find((status) =>
-      status.proposalStatus.name.match('FEASIBILITY')
+      status.proposalStatus.shortCode.match('FEASIBILITY')
     );
   }
 }
