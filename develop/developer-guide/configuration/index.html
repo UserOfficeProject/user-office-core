@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/configuration/">
       
       
-        <link rel="prev" href="../api-documentation/">
+        <link rel="prev" href="../running-locally/">
       
       
-        <link rel="next" href="../../faq/">
+        <link rel="next" href="../achitecture/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#purpose" class="md-skip">
+        <a href="#environment-variables" class="md-skip">
           Skip to content
         </a>
       
@@ -1148,74 +1148,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../achitecture/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Architecture
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../running-locally/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Running locally
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../codebase-structure/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Codebase structure
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api-documentation/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    API documentation
   </span>
   
 
@@ -1274,20 +1211,122 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#environment-variables" class="md-nav__link">
     <span class="md-ellipsis">
-      Purpose
+      Environment Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eam-configuration-ess-specific" class="md-nav__link">
+    <span class="md-ellipsis">
+      EAM Configuration (ESS-specific)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#logging-configuration-graylog" class="md-nav__link">
     <span class="md-ellipsis">
-      Contents
+      Logging Configuration (Graylog)
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orcid-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      ORCID Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-office-factory-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      User Office Factory Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      OAuth Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OAuth Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-oauth-configuration-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example OAuth Configuration (Google)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-application-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Application Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initial-user-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initial User Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rabbitmq-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      RabbitMQ Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduler-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scheduler Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Email Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1295,6 +1334,69 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../achitecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../codebase-structure/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Codebase structure
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-documentation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API documentation
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1412,20 +1514,122 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#purpose" class="md-nav__link">
+  <a href="#environment-variables" class="md-nav__link">
     <span class="md-ellipsis">
-      Purpose
+      Environment Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#eam-configuration-ess-specific" class="md-nav__link">
+    <span class="md-ellipsis">
+      EAM Configuration (ESS-specific)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#logging-configuration-graylog" class="md-nav__link">
     <span class="md-ellipsis">
-      Contents
+      Logging Configuration (Graylog)
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orcid-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      ORCID Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-office-factory-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      User Office Factory Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#oauth-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      OAuth Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OAuth Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-oauth-configuration-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example OAuth Configuration (Google)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-application-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Application Settings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initial-user-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initial User Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rabbitmq-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      RabbitMQ Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduler-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scheduler Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#email-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Email Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1446,10 +1650,95 @@
 
   <h1>Configuration</h1>
 
-<h2 id="purpose">Purpose</h2>
-<p>Configuration options and details.</p>
-<h2 id="contents">Contents</h2>
-<p>Configuration files, environment variables and settings.</p>
+<p>This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. The configuration is managed through a <code>.env</code> file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your <code>.env</code> file. </p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The <code>DEPENDENCY_CONFIG</code> variable is crucial for the User Office application. It enables, disables, or modifies various features based on the specified configuration. You can find the different configuration files in the <code>apps/backend/src/config</code> directory.</p>
+</blockquote>
+<p>The <code>.env</code> file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. For more detailed information, refer to the <a href="https://www.npmjs.com/package/dotenv">dotenv documentation</a>.</p>
+<h2 id="environment-variables">Environment Variables</h2>
+<h3 id="eam-configuration-ess-specific">EAM Configuration (ESS-specific)</h3>
+<p>The EAM (Enterprise Asset Management) section includes variables that configure API access and authentication.</p>
+<ul>
+<li><strong>EAM_API_URL</strong>: Specifies the API URL for EAM services.</li>
+<li><strong>EAM_AUTH_CLIENT_ID</strong>: The client ID for EAM authentication.</li>
+<li><strong>EAM_AUTH_CLIENT_SECRET</strong>: The client secret for EAM authentication.</li>
+<li><strong>EAM_AUTH_HOST</strong>: The authentication host for EAM.</li>
+<li><strong>EAM_AUTH_PASS</strong>: The password for EAM authentication.</li>
+<li><strong>EAM_AUTH_USER</strong>: The username for EAM authentication.</li>
+<li><strong>EAM_PART_CODE</strong>: The part code used in EAM operations.</li>
+</ul>
+<h3 id="logging-configuration-graylog">Logging Configuration (Graylog)</h3>
+<p>To enable local logging via Graylog, uncomment and configure the following variables:</p>
+<ul>
+<li><strong>GRAYLOG_SERVER</strong>: The address of the Graylog server.</li>
+<li><strong>GRAYLOG_PORT</strong>: The port for the Graylog server.</li>
+</ul>
+<h3 id="orcid-configuration">ORCID Configuration</h3>
+<p>The ORCID section is used for integrating with the ORCID API for user identification and authentication.</p>
+<ul>
+<li><strong>ORCID_TOKEN_URL</strong>: The URL for obtaining ORCID tokens.</li>
+<li><strong>ORCID_API_URL</strong>: The ORCID API URL.</li>
+<li><strong>ORCID_CLIENT_ID</strong>: The client ID for ORCID API access.</li>
+<li><strong>ORCID_CLIENT_SECRET</strong>: The client secret for ORCID API access.</li>
+</ul>
+<h3 id="user-office-factory-configuration">User Office Factory Configuration</h3>
+<p>The User Office Factory configuration includes an endpoint for generating user office data.</p>
+<ul>
+<li><strong>USER_OFFICE_FACTORY_ENDPOINT</strong>: The endpoint URL for the User Office Factory.</li>
+</ul>
+<h3 id="oauth-configuration">OAuth Configuration</h3>
+<p>OAuth settings allow the application to authenticate users via an OAuth provider.</p>
+<ul>
+<li><strong>AUTH_DISCOVERY_URL</strong>: The URL for OAuth discovery.</li>
+<li><strong>AUTH_CLIENT_ID</strong>: The client ID for OAuth.</li>
+<li><strong>AUTH_CLIENT_SECRET</strong>: The client secret for OAuth.</li>
+</ul>
+<h4 id="example-oauth-configuration-google">Example OAuth Configuration (Google)</h4>
+<p>To use Google OAuth, you can set the following:</p>
+<div class="highlight"><pre><span></span><code>AUTH_DISCOVERY_URL=https://accounts.google.com/.well-known/openid-configuration
+AUTH_CLIENT_ID=123456789-abcdef.apps.googleusercontent.com
+AUTH_CLIENT_SECRET=ABCDEF-0123456789
+</code></pre></div>
+<h3 id="general-application-settings">General Application Settings</h3>
+<p>These settings cover the general configuration of the application environment.</p>
+<ul>
+<li><strong>NODE_ENV</strong>: Specifies the environment (e.g., development, production).</li>
+<li><strong>DEPENDENCY_CONFIG</strong>: Indicates which dependency configuration to use (<code>e2e</code>, <code>ess</code>, <code>stfc</code>, <code>test</code>). Defaults to the standard configuration if not provided.</li>
+<li><strong>PING_PUBLIC_CRT</strong>: Public certificate for ping operations.</li>
+<li><strong>DATABASE_URL</strong>: The URL for the database connection.</li>
+<li><strong>BASE_URL</strong>: The base URL for the application.</li>
+<li><strong>JWT_TOKEN_LIFE</strong>: The lifetime of JWT tokens.</li>
+<li><strong>JWT_SECRET</strong>: The secret key for JWT.</li>
+<li><strong>SPARKPOST_TOKEN</strong>: The Sparkpost token for email services (if applicable).</li>
+<li><strong>TZ</strong>: The timezone setting (e.g., Europe/Stockholm).</li>
+<li><strong>DATE_FORMAT</strong>: The format for displaying dates.</li>
+<li><strong>DATE_TIME_FORMAT</strong>: The format for displaying date and time.</li>
+</ul>
+<h3 id="initial-user-configuration">Initial User Configuration</h3>
+<p>This setting specifies the email address of the initial user officer:</p>
+<ul>
+<li><strong>INITIAL_USER_OFFICER_EMAIL</strong>: The email address of the initial user officer.</li>
+</ul>
+<h3 id="rabbitmq-configuration">RabbitMQ Configuration</h3>
+<p>RabbitMQ is used for messaging and queueing. Uncomment and configure the following variables to enable RabbitMQ:</p>
+<ul>
+<li><strong>RABBITMQ_HOSTNAME</strong>: The hostname for RabbitMQ.</li>
+<li><strong>RABBITMQ_USERNAME</strong>: The username for RabbitMQ.</li>
+<li><strong>RABBITMQ_PASSWORD</strong>: The password for RabbitMQ.</li>
+<li><strong>RABBITMQ_CORE_EXCHANGE_NAME</strong>: The core exchange name for RabbitMQ.</li>
+<li><strong>RABBITMQ_SCHEDULER_EXCHANGE_NAME</strong>: The scheduler exchange name for RabbitMQ.</li>
+<li><strong>RABBITMQ_EVENT_SCHEDULING_QUEUE_NAME</strong>: The queue name for event scheduling in RabbitMQ.</li>
+</ul>
+<h3 id="scheduler-configuration">Scheduler Configuration</h3>
+<p>The scheduler endpoint is used for managing scheduled tasks:</p>
+<ul>
+<li><strong>SCHEDULER_ENDPOINT</strong>: The endpoint URL for the scheduler.</li>
+</ul>
+<h3 id="email-configuration">Email Configuration</h3>
+<p>The email configuration includes a sink email address for testing purposes:</p>
+<ul>
+<li><strong>SINK_EMAIL</strong>: The email address to receive sink emails.</li>
+</ul>
 
 
 
