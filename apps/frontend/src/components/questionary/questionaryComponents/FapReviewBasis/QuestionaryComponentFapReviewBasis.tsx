@@ -52,12 +52,19 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const [localComment, setLocalComment] = useState(
     state?.fapReview?.comment || ''
   );
-  const [localGrade, setLocalGrade] = useState(state?.fapReview?.grade ?? '');
+  const [localGrade, setLocalGrade] = useState(
+    state?.fapReview?.grade?.toString() ?? ''
+  );
   const [localSubmitted, setLocalSubmitted] = useState<boolean>(
     state?.fapReview?.status === ReviewStatus.SUBMITTED
   );
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
+
+  useEffect(() => {
+    setLocalSubmitted(state?.fapReview?.status === ReviewStatus.SUBMITTED);
+    setLocalGrade(state?.fapReview.grade?.toString() || '');
+  }, [state]);
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
@@ -85,6 +92,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
 
   const gradeFieldId = `${id}.grade`;
   const submittedFieldId = `${id}.submitted`;
+  const commentFieldId = `${id}.comment`;
 
   // @TODO: check if TextFieldNoSubmit can be applied
   return (
@@ -94,8 +102,9 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
         <InputLabel htmlFor="comment" shrink margin="dense" required>
           Comment
         </InputLabel>
+
         <Editor
-          id="comment"
+          id={commentFieldId}
           initialValue={state?.fapReview?.comment || ''}
           init={{
             skin: false,
@@ -113,7 +122,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
 
             if (isStartContentDifferentThanCurrent || editor.isDirty()) {
               handleCharacterCount(editor);
-              //formikProps.setFieldValue("comment", content);
               setLocalComment(content);
             }
           }}
@@ -127,11 +135,11 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
         <FormHelperText>
           Characters: {numberOfChars} / {6000}
         </FormHelperText>
-        <ErrorMessage name="comment" />
+        <ErrorMessage name={commentFieldId} />
         <Box marginTop={1} width={150}>
           <Field
             name={gradeFieldId}
-            value={localGrade ?? ''}
+            value={localGrade}
             label="Grade"
             component={gradeDecimalPoints === 1 ? Select : TextField}
             MenuProps={{ 'data-cy': 'grade-proposal-options' }}
@@ -145,7 +153,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                 ? {
                     id: 'grade-proposal',
                     onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                      setLocalGrade(+event.target.value);
+                      setLocalGrade(event.target.value);
                     },
                     onBlur: () => {
                       dispatch({
@@ -162,7 +170,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                     min: '1',
                     max: '10',
                     onChange: (event: ChangeEvent<HTMLInputElement>) =>
-                      setLocalGrade(+event.target.value),
+                      setLocalGrade(event.target.value),
                     onBlur: () => {
                       dispatch({
                         type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
@@ -191,7 +199,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             <Field
               id={submittedFieldId}
               name={submittedFieldId}
-              value={localSubmitted}
               checked={localSubmitted}
               component={CheckboxWithLabel}
               onChange={(evt: ChangeEvent<HTMLInputElement>) => {
