@@ -719,7 +719,7 @@ const FapProposalsAndAssignmentsTable = ({
   const maxPageLength = FapProposalsWitIdAndFormattedDate.length;
 
   const pageSizeOptions = [5, 10, 20, maxPageLength]
-    .sort()
+    .sort((a, b) => a - b)
     .filter((n) => n <= maxPageLength);
 
   return (
