@@ -318,8 +318,8 @@ const ProposalTableInstrumentScientist = ({
     },
     proposalStatusId: urlQueryParams.proposalStatus,
     excludeProposalStatusIds: [9],
-    referenceNumbers: urlQueryParams.proposalid
-      ? [urlQueryParams.proposalid]
+    referenceNumbers: urlQueryParams.proposalId
+      ? [urlQueryParams.proposalId]
       : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
