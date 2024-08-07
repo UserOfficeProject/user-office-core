@@ -79,9 +79,9 @@ context('Event log tests', () => {
       });
 
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/People');
 
-      cy.contains('People').click();
+      cy.finishedLoading();
 
       cy.get('[aria-label="Search"]').type(user.lastName);
 

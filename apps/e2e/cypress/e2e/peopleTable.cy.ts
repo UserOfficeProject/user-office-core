@@ -199,6 +199,7 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('10 rows').click();
       cy.get('[data-value=5]').click();
 
+      let index = 0;
       for (const email of emails) {
         cy.finishedLoading();
         cy.get('[data-cy=email]').clear().type(email);
@@ -206,7 +207,16 @@ context('PageTable component tests', () => {
         cy.get('[data-cy="findUser"]').click();
         cy.finishedLoading();
 
+        if (index >= 5) {
+          cy.get('[role="presentation"] .MuiAlert-message').contains(
+            'We cannot find that email'
+          );
+
+          cy.get('[data-cy=email]').clear();
+        }
+
         cy.get('@modal').find('tr[index="0"] input').uncheck();
+        index++;
       }
 
       cy.finishedLoading();
@@ -215,23 +225,27 @@ context('PageTable component tests', () => {
       cy.get('[data-cy="findUser"]').click();
       cy.finishedLoading();
 
-      cy.get('@modal').contains('1 user(s) selected');
+      cy.get('@modal').contains('5 user(s) selected');
       cy.get('@modal').contains(/1-5 of [0-9]+/);
 
-      cy.get('@modal').find('tr[index="1"] input').check();
+      cy.get('@modal').find('tr[index="1"] input').uncheck();
 
-      cy.get('@modal').contains('2 user(s) selected');
+      cy.get('@modal').contains('4 user(s) selected');
 
       cy.finishedLoading();
       cy.get('@modal').find('button[aria-label="Next Page"]').click();
 
+      cy.finishedLoading();
+
       cy.get('@modal').find('tr[index="0"] input').check();
-      cy.get('@modal').contains('3 user(s) selected');
+      cy.get('@modal').contains('5 user(s) selected');
 
       cy.get('@modal').find('button[aria-label="Previous Page"]').click();
 
-      cy.get('@modal').find('tr[index="1"] input:checked');
-      cy.get('@modal').contains('3 user(s) selected');
+      cy.finishedLoading();
+
+      cy.get('@modal').find('tr[index="0"] input:checked');
+      cy.get('@modal').contains('5 user(s) selected');
 
       cy.get('@modal').find('thead th input').check();
       cy.get('@modal').contains('6 user(s) selected');
@@ -239,6 +253,7 @@ context('PageTable component tests', () => {
       cy.get('@modal').contains('1 user(s) selected');
 
       cy.get('@modal').find('button[aria-label="Next Page"]').click();
+      cy.finishedLoading();
       cy.get('@modal').find('tr[index="0"] input:checked');
       cy.get('@modal').contains('1 user(s) selected');
       cy.get('[data-cy="assign-selected-users"]').click();
@@ -267,6 +282,8 @@ context('PageTable component tests', () => {
       cy.get('[role="presentation"] [role="dialog"]').as('modal');
 
       cy.get('@modal').contains('0 user(s) selected');
+
+      cy.finishedLoading();
 
       cy.get('@modal')
         .contains(initialDBData.users.user2.firstName)
@@ -521,7 +538,11 @@ context('PageTable component tests', () => {
 
       cy.get('[data-cy="findUser"]').click();
 
+      cy.finishedLoading();
+
       cy.get('[data-cy="assign-selected-users"]').click();
+
+      cy.finishedLoading();
 
       cy.get('[data-cy="assign-as-pi"]').click();
 

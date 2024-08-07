@@ -1,12 +1,12 @@
-import Grid from '@mui/material/Grid';
-import LinearProgress from '@mui/material/LinearProgress';
-import { useSnackbar } from 'notistack';
-import React from 'react';
 import {
   DragDropContext,
   DraggableLocation,
   DropResult,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
+import Grid from '@mui/material/Grid';
+import LinearProgress from '@mui/material/LinearProgress';
+import { useSnackbar } from 'notistack';
+import React from 'react';
 
 import {
   ProposalStatus,

@@ -35,6 +35,14 @@ export default {
 
     return { dateFormat, dateTimeFormat, statusFilter, reviewerFilter };
   },
+  getCorrectFormatCase: (string: string) => {
+    return string
+      .split(' ')
+      .map((part, index) =>
+        index === 0 ? part.toUpperCase() : part.toLowerCase()
+      )
+      .join(' ');
+  },
   call: {
     id: 1,
     shortCode: 'call 1',
@@ -257,6 +265,7 @@ export default {
     fapSelection: { id: 4 },
     fapReview: {
       id: 5,
+      name: 'FAP_REVIEW',
     },
     fapMeeting: {
       id: 12,

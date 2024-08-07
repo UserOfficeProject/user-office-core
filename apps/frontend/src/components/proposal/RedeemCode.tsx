@@ -1,10 +1,10 @@
 import { Button, Typography } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import TextField from 'components/common/FormikUITextField';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 interface RedeemCodeProps {

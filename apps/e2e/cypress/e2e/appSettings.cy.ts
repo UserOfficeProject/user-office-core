@@ -31,7 +31,9 @@ context('App settings tests', () => {
       cy.get('[data-cy="start-date"] input').should(
         'have.attr',
         'placeholder',
-        initialDBData.getFormats().dateTimeFormat
+        initialDBData.getCorrectFormatCase(
+          initialDBData.getFormats().dateTimeFormat
+        )
       );
 
       cy.get('[data-cy="close-modal-btn"]').click();
@@ -83,7 +85,7 @@ context('App settings tests', () => {
       cy.get('[data-cy="start-date"] input').should(
         'have.attr',
         'placeholder',
-        newDateTimeFormat
+        initialDBData.getCorrectFormatCase(newDateTimeFormat)
       );
     });
 

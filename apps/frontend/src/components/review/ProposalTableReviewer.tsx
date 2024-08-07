@@ -1,4 +1,4 @@
-import { Column } from '@material-table/core';
+import { Column, OrderByCollection } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import RateReviewIcon from '@mui/icons-material/RateReview';
@@ -25,10 +25,7 @@ import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
-import {
-  capitalize,
-  setSortDirectionOnSortColumn,
-} from 'utils/helperFunctions';
+import { capitalize, setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -61,7 +58,7 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
       : undefined; // if the selected status is not a valid status assume we want to see everything
 
 const columns: (
-  t: TFunction<'translation', undefined, 'translation'>
+  t: TFunction<'translation', undefined>
 ) => Column<UserWithReview>[] = (t) => [
   {
     title: 'Actions',
@@ -162,9 +159,9 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     }
   ): JSX.Element => <DoneAll {...props} />;
 
-  const sortedColumns = setSortDirectionOnSortColumn(
+  const sortedColumns = setSortDirectionOnSortField(
     columns(t),
-    urlQueryParams.sortColumn,
+    urlQueryParams.sortField,
     urlQueryParams.sortDirection
   );
 
@@ -268,13 +265,13 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleColumnSortOrderChange = (
-    orderedColumnId: number,
-    orderDirection: 'desc' | 'asc'
+    orderByCollection: OrderByCollection[]
   ) => {
+    const [orderBy] = orderByCollection;
     setUrlQueryParams((params) => ({
       ...params,
-      sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-      sortDirection: orderDirection ? orderDirection : undefined,
+      sortField: orderBy?.orderByField,
+      sortDirection: orderBy?.orderDirection,
     }));
   };
 
@@ -453,7 +450,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
           }),
         }}
         onSelectionChange={handleColumnSelectionChange}
-        onOrderChange={handleColumnSortOrderChange}
+        onOrderCollectionChange={handleColumnSortOrderChange}
         localization={{
           toolbar: {
             nRowsSelected: '{0} proposal(s) selected',

@@ -72,6 +72,16 @@ declare global {
       addConnectionStatusActions: (
         addConnectionStatusActionsInput: AddConnectionStatusActionsMutationVariables
       ) => Cypress.Chainable<AddConnectionStatusActionsMutation>;
+
+      /**
+       * Add feasibility review to default workflow.
+       *
+       * @returns {typeof AddProposalWorkflowStatusMutation}
+       * @memberof Chainable
+       * @example
+       *    cy.addFeasibilityReviewToDefaultWorkflow()
+       */
+      addFeasibilityReviewToDefaultWorkflow: () => Cypress.Chainable<AddProposalWorkflowStatusMutation>;
     }
   }
 }

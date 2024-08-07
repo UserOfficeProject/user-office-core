@@ -2,7 +2,6 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import List from '@mui/material/List';
-import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 import { StyledButtonContainer } from 'styles/StyledComponents';
@@ -28,30 +27,6 @@ export interface QuestionnairesListProps {
   style?: React.CSSProperties;
 }
 
-const useStyles = makeStyles((theme) => ({
-  questionnairesList: {
-    padding: 0,
-    marginBottom: '10px',
-    '& li': {
-      paddingLeft: 0,
-      paddingRight: 0,
-    },
-  },
-  emptyList: {
-    display: 'flex',
-    justifyContent: 'center',
-    fontStyle: 'italic',
-    padding: theme.spacing(2),
-    color: theme.palette.grey[500],
-  },
-  buttonContainer: {
-    flex: '1 1 0px',
-    '& button': {
-      marginLeft: 6,
-    },
-  },
-}));
-
 export function QuestionnairesList({
   onAddNewClick,
   onDeleteClick,
@@ -65,17 +40,33 @@ export function QuestionnairesList({
   canCopy,
   copyButtonLabel,
 }: QuestionnairesListProps) {
-  const classes = useStyles();
   const isListEmpty = data.length === 0;
 
   return (
     <>
       {isListEmpty ? (
-        <div className={classes.emptyList}>The list is empty</div>
+        <Box
+          sx={(theme) => ({
+            display: 'flex',
+            justifyContent: 'center',
+            fontStyle: 'italic',
+            padding: theme.spacing(2),
+            color: theme.palette.grey[500],
+          })}
+        >
+          The list is empty
+        </Box>
       ) : (
         <List
           component="ul"
-          className={classes.questionnairesList}
+          sx={{
+            padding: 0,
+            marginBottom: '10px',
+            '& li': {
+              paddingLeft: 0,
+              paddingRight: 0,
+            },
+          }}
           style={{ ...style }}
         >
           {data.map((record) => {
@@ -93,7 +84,14 @@ export function QuestionnairesList({
       )}
       <Box display="flex" alignItems="center">
         {`${data.length} item(s)`}
-        <StyledButtonContainer className={classes.buttonContainer}>
+        <StyledButtonContainer
+          sx={{
+            flex: '1 1 0px',
+            '& button': {
+              marginLeft: 6,
+            },
+          }}
+        >
           {canCopy && (
             <Button
               onClick={onCopyClick}

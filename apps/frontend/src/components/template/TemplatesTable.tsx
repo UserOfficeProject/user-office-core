@@ -10,7 +10,7 @@ import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -47,7 +47,7 @@ const TemplatesTable = ({
 }: TemplatesTableProps & { confirm: WithConfirmType }) => {
   const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
   const { api } = useDataApiWithFeedback();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
@@ -194,10 +194,9 @@ const TemplatesTable = ({
   };
 
   const editTemplate = (templateId: number) =>
-    templateGroup === TemplateGroupId.PDF_TEMPLATE
-      ? history.push(`/PdfTemplateEditor/${templateId}`)
-      : history.push(`/QuestionaryEditor/${templateId}`);
-
+    navigate(
+      `/${templateGroup === TemplateGroupId.PDF_TEMPLATE ? 'PdfTemplateEditor' : 'QuestionaryEditor'}/${templateId}`
+    );
   const customActions = actions || [];
   const EditIconComponent = () => <Edit />;
   const FileCopyIconComponent = () => <FileCopy />;
@@ -307,7 +306,7 @@ const TemplatesTable = ({
           startIcon={<PublishIcon />}
           type="button"
           onClick={() => {
-            history.push('/ImportTemplate');
+            navigate('/ImportTemplate');
           }}
           data-cy="import-template-button"
         >

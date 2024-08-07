@@ -3,12 +3,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import Edit from '@mui/icons-material/Edit';
 import { IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { SetStateAction, useState } from 'react';
 import {
   DecodedValueMap,
   DelimitedArrayParam,
-  NumberParam,
   QueryParamConfig,
   SetQuery,
   StringParam,
@@ -18,28 +16,18 @@ import {
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import InputDialog from 'components/common/InputDialog';
-import { setSortDirectionOnSortColumn } from 'utils/helperFunctions';
+import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
-
-const useStyles = makeStyles((theme) => ({
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-  },
-}));
 
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
   selection: QueryParamConfig<(string | null | never)[]>;
-  sortColumn: QueryParamConfig<number | null | undefined>;
   sortDirection: QueryParamConfig<string | null | undefined>;
   sortField?: QueryParamConfig<string | null | undefined>;
 };
 
 export const DefaultQueryParams = {
-  sortColumn: NumberParam,
   sortDirection: StringParam,
   search: StringParam,
   selection: withDefault(DelimitedArrayParam, []),
@@ -85,7 +73,6 @@ export function SuperMaterialTable<Entry extends EntryID>({
 }: MaterialTableProps<Entry> & SuperProps<Entry>) {
   const [show, setShow] = useState(false);
   const [editObject, setEditObject] = useState<Entry | null>(null);
-  const classes = useStyles();
 
   let { data, columns } = props;
   const {
@@ -122,9 +109,9 @@ export function SuperMaterialTable<Entry extends EntryID>({
     options.searchText = urlQueryParams.search || undefined;
   }
 
-  columns = setSortDirectionOnSortColumn(
+  columns = setSortDirectionOnSortField(
     columns,
-    urlQueryParams?.sortColumn,
+    urlQueryParams?.sortField,
     urlQueryParams?.sortDirection
   );
 
@@ -205,7 +192,11 @@ export function SuperMaterialTable<Entry extends EntryID>({
       >
         <IconButton
           data-cy="close-modal-btn"
-          className={classes.closeButton}
+          sx={(theme) => ({
+            position: 'absolute',
+            right: theme.spacing(1),
+            top: theme.spacing(1),
+          })}
           onClick={() => {
             setEditObject(null);
             setShow(false);
@@ -264,12 +255,14 @@ export function SuperMaterialTable<Entry extends EntryID>({
                   : undefined,
             });
         }}
-        onOrderChange={(orderedColumnId, orderDirection) => {
+        onOrderCollectionChange={(orderByCollection) => {
+          const [orderBy] = orderByCollection;
           setUrlQueryParams &&
-            setUrlQueryParams({
-              sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-              sortDirection: orderDirection ? orderDirection : undefined,
-            });
+            setUrlQueryParams((params) => ({
+              ...params,
+              sortField: orderBy?.orderByField,
+              sortDirection: orderBy?.orderDirection,
+            }));
         }}
       />
       {hasAccess.create && createModal && (
@@ -288,7 +281,4 @@ export function SuperMaterialTable<Entry extends EntryID>({
   );
 }
 
-export default React.memo(
-  SuperMaterialTable,
-  (prevProps, nextProps) => prevProps.isLoading === nextProps.isLoading
-) as typeof SuperMaterialTable;
+export default SuperMaterialTable;
