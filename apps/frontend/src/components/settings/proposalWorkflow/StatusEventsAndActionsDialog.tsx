@@ -3,8 +3,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
+import { useTheme } from '@mui/material/styles';
 import React, { Dispatch, SetStateAction } from 'react';
 
 import SimpleTabs from 'components/common/SimpleTabs';
@@ -16,20 +15,6 @@ import {
 import AddStatusActionsToConnection from './AddStatusActionsToConnection';
 import AddStatusChangingEventsToConnection from './AddStatusChangingEventsToConnection';
 import { EventType, Event } from './ProposalWorkflowEditorModel';
-
-const useStyles = makeStyles((theme) => ({
-  dialogContent: {
-    overflow: 'hidden',
-    [theme.breakpoints.only('xs')]: {
-      overflow: 'auto',
-    },
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-  },
-}));
 
 type StatusEventsAndActionsDialogProps = {
   workflowConnection: ProposalWorkflowConnection | null;
@@ -46,7 +31,6 @@ const StatusEventsAndActionsDialog = ({
   dispatch,
   isLoading,
 }: StatusEventsAndActionsDialogProps) => {
-  const classes = useStyles();
   const theme = useTheme();
 
   const close = () => {
@@ -66,12 +50,23 @@ const StatusEventsAndActionsDialog = ({
       <DialogTitle>Status events and actions</DialogTitle>
       <IconButton
         data-cy="close-modal"
-        className={classes.closeButton}
+        sx={{
+          position: 'absolute',
+          right: theme.spacing(1),
+          top: theme.spacing(1),
+        }}
         onClick={close}
       >
         <CloseIcon />
       </IconButton>
-      <DialogContent className={classes.dialogContent}>
+      <DialogContent
+        sx={{
+          overflow: 'hidden',
+          [theme.breakpoints.only('xs')]: {
+            overflow: 'auto',
+          },
+        }}
+      >
         <SimpleTabs
           tabNames={['Next status events', 'Status actions']}
           tabPanelPadding={theme.spacing(0, 3)}

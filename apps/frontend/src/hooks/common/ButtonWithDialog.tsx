@@ -1,7 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton } from '@mui/material';
+import Box from '@mui/material/Box';
 import Button, { ButtonProps } from '@mui/material/Button';
-import makeStyles from '@mui/styles/makeStyles';
+import IconButton from '@mui/material/IconButton';
 import React from 'react';
 
 import InputDialog from 'components/common/InputDialog';
@@ -12,21 +12,9 @@ interface ButtonWithDialogProps extends ButtonProps {
   disabled?: boolean;
 }
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    width: '500px',
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-  },
-}));
-
 function ButtonWithDialog(props: ButtonWithDialogProps) {
   const { children, label, ...rest } = props;
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const classes = useStyles();
 
   return (
     <>
@@ -36,18 +24,22 @@ function ButtonWithDialog(props: ButtonWithDialogProps) {
       <InputDialog open={isDialogOpen}>
         <IconButton
           data-cy="close-dialog"
-          className={classes.closeButton}
+          sx={(theme) => ({
+            position: 'absolute',
+            right: theme.spacing(1),
+            top: theme.spacing(1),
+          })}
           onClick={() => {
             setIsDialogOpen(false);
           }}
         >
           <CloseIcon />
         </IconButton>
-        <div className={classes.container}>
+        <Box sx={{ width: '500px' }}>
           {React.cloneElement(children, {
             onClose: () => setIsDialogOpen(false),
           })}
-        </div>
+        </Box>
       </InputDialog>
     </>
   );

@@ -1,4 +1,4 @@
-import makeStyles from '@mui/styles/makeStyles';
+import InputLabel from '@mui/material/InputLabel';
 import { Field, FieldProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
@@ -30,13 +30,6 @@ import {
   QuestionnairesListRow,
 } from '../QuestionnairesList';
 
-const useStyles = makeStyles(() => ({
-  questionLabel: {
-    opacity: 0.54,
-    fontWeight: 400,
-    fontSize: '1rem',
-  },
-}));
 const genericTemplateToListRow = (
   genericTemplate: GenericTemplateCore
 ): QuestionnairesListRow => {
@@ -85,7 +78,6 @@ function QuestionaryComponentGenericTemplate(
   ) as ProposalContextType;
 
   const { api } = useDataApiWithFeedback();
-  const classes = useStyles();
 
   const [selectedGenericTemplate, setSelectedGenericTemplate] =
     useState<GenericTemplateWithQuestionary | null>(null);
@@ -232,9 +224,11 @@ function QuestionaryComponentGenericTemplate(
 
         return (
           <div>
-            <label className={classes.questionLabel}>
+            <InputLabel
+              sx={{ opacity: 0.54, fontWeight: 400, fontSize: '1rem' }}
+            >
               {answer.question.question}
-            </label>
+            </InputLabel>
             <QuestionnairesList
               addButtonLabel={config.addEntryButtonLabel}
               copyButtonLabel={config.copyButtonLabel || undefined}

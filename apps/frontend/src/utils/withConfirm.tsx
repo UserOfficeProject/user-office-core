@@ -5,7 +5,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { ReactElement, useCallback, useState } from 'react';
 
 import { FunctionType } from './utilTypes';
@@ -22,15 +21,8 @@ const defaultOptions = {
   onCancel: (): void => {},
 };
 
-const useStyles = makeStyles(() => ({
-  title: {
-    marginTop: '12px',
-  },
-}));
-
 function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
   return function WithConfirmComponent(props: Omit<T, 'confirm'>): JSX.Element {
-    const classes = useStyles();
     const [onConfirm, setOnConfirm] = useState<FunctionType | null>(null);
     const [options, setOptions] = useState<Options>(defaultOptions);
     const {
@@ -53,7 +45,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
       handleClose();
     }, [onCancel, handleClose]);
     const handleConfirm = useCallback(
-      (...args) => {
+      (...args: [event: React.MouseEvent<HTMLButtonElement, MouseEvent>]) => {
         if (onConfirm) {
           onConfirm(...args);
         }
@@ -63,7 +55,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
     );
     /* Returns function opening the dialog, passed to the wrapped component. */
     const confirm = useCallback(
-      (onConfirm, options: Options) => (): void => {
+      (onConfirm: FunctionType, options: Options) => (): void => {
         setOnConfirm(() => onConfirm);
 
         setOptions({
@@ -85,7 +77,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
           data-cy="confirmation-dialog"
         >
           {title && (
-            <DialogTitle className={classes.title}>{title}</DialogTitle>
+            <DialogTitle sx={{ marginTop: '12px' }}>{title}</DialogTitle>
           )}
           {description && (
             <DialogContent>

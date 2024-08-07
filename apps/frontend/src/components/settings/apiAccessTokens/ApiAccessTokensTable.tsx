@@ -2,13 +2,13 @@ import { Typography } from '@mui/material';
 import React from 'react';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
 import { UserRole, PermissionsWithAccessToken } from 'generated/sdk';
 import { useApiAccessTokensData } from 'hooks/admin/useApiAccessTokensData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';

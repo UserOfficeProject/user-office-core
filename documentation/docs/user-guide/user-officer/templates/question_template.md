@@ -9,14 +9,14 @@ What are question templates?
 
 Question templates can be utilised within the following templates:
 
-* [**Proposal templates**](templates/proposal_template.md)
-* [**Proposal ESI templates**](templates/proposalESI_template.md)
-* [**Sample ESI templates**](templates/sampleESI_template.md)
-* [**Feedback templates**](templates/feedback_template.md)
+* [**Proposal templates**](proposal_template.md)
+* [**Proposal ESI templates**](proposalESI_template.md)
+* [**Sample ESI templates**](sampleESI_template.md)
+* [**Feedback templates**](feedback_template.md)
 * [**Sub Templates**](sub_template.md)
-* [**Sample declaration templates**](templates/sampledec_template.md)
-* [**Shipment declarationt templates**](templates/shipment_template.md)
-* [**Visit registration templates**](templates/visit_template.md)
+* [**Sample declaration templates**](sampledec_template.md)
+* [**Shipment declarationt templates**](shipment_template.md)
+* [**Visit registration templates**](visit_template.md)
 
 # **How do I edit question templates**
 
@@ -28,7 +28,7 @@ When editing a quesiton template you have two options
 
 # **How do I create question templates?**
 
-* In the main menu, navigate to the template page you wish to create the question for ([**Proposal templates**](templates/proposal_template.md), [**Proposal ESI templates**](templates/proposalESI_template.md),[**Sample ESI templates**](templates/sampleESI_template.md), [**Feedback templates**](templates/feedback_template.md), [**Sub Templates**](sub_template.md), [**Sample declaration templates**](templates/sampledec_template.md), [**Shipment declarationt templates**](templates/shipment_template.md), [**Visit registration templates**](templates/visit_template.md))
+* In the main menu, navigate to the template page you wish to create the question for ([**Proposal templates**](proposal_template.md), [**Proposal ESI templates**](proposalESI_template.md),[**Sample ESI templates**](sampleESI_template.md), [**Feedback templates**](feedback_template.md), [**Sub Templates**](sub_template.md), [**Sample declaration templates**](sampledec_template.md), [**Shipment declarationt templates**](shipment_template.md), [**Visit registration templates**](visit_template.md))
 
 * Within the chosen template page, create or edit a pre-existing template. 
 (In this example, we wish to create questions for a Proposal template:)
@@ -52,7 +52,7 @@ Note: depending on which template you are creating questions for, certain questi
 
 ??? info "Boolean"
 
-    ![Boolean](/assets/images/boolean.png){ align=left width="350"}
+    ![Boolean](../../../assets/images/boolean.png){ align=left width="350"}
 
     **Boolean:** A checkbox question type which can have one of the two possible values; true or false ('Yes' or 'No')
 
@@ -68,7 +68,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Date"
     **Date:**
 
-    ![Date](/assets/images/date.png){ align=left width="350"}
+    ![Date](../../../assets/images/date.png){ align=left width="350"}
 
     Allows users to specify a date which can be selected from a calendar tool 
 
@@ -88,7 +88,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Embellishment"
     **Embellishment:**
 
-    ![Embellishment](/assets/images/embellishment.png){ align=left width="350"}
+    ![Embellishment](../../../assets/images/embellishment.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -100,7 +100,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "File Upload"
     **File Upload**
 
-    ![File Upload](/assets/images/file_upload.png){ align=left width="350"}
+    ![File Upload](../../../assets/images/file_upload.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -111,7 +111,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Sub Template"
     **Sub Template**
 
-    ![Sub Template](/assets/images/sub_template.png){ align=left width="350"}
+    ![Sub Template](../../../assets/images/sub_template.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -122,7 +122,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Interval"
     **Interval**
 
-    ![Interval](/assets/images/interval.png){ align=left width="350"}
+    ![Interval](../../../assets/images/interval.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -133,7 +133,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Multiple choice"
     **Multiple choice**
 
-    ![Multiple choice](/assets/images/multiple_choice.png){ align=left width="350"}
+    ![Multiple choice](../../../assets/images/multiple_choice.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -144,7 +144,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Dynamic multiple choice"
     **Dynamic Multiple Choice**
 
-    ![Dynamic Multiple Choice](/assets/images/dynamic_choice.png){ align=left width="350"}
+    ![Dynamic Multiple Choice](../../../assets/images/dynamic_choice.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -155,7 +155,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Number"
     **Number**
 
-    ![Number](/assets/images/number.png){ align=left width="350"}
+    ![Number](../../../assets/images/number.png){ align=left width="350"}
 
     * **Key:** The question key
     * **Question:**
@@ -165,7 +165,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Rich text input"
     **Rich Text Input**
 
-    ![Rich Text Input](/assets/images/rich_text.png){ align=left width="350"}
+    ![Rich Text Input](../../../assets/images/rich_text.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -177,7 +177,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Sample declaration"
     **Sample Declaration**
 
-    ![Sample Declaration](/assets/images/sample_declaration.png){ align=left width="350"}
+    ![Sample Declaration](../../../assets/images/sample_declaration.png){ align=left width="350"}
 
     > * **Sample declaration template**
 
@@ -192,7 +192,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Text input"
     **Text input**
 
-    ![Text Input](/assets/images/text_input.png){ align=left width="350"}
+    ![Text Input](../../../assets/images/text_input.png){ align=left width="350"}
 
     * **Key:** The question key
 
@@ -203,7 +203,7 @@ Note: depending on which template you are creating questions for, certain questi
 ??? info "Instrument Picker"
     **Instrument Picker**
 
-    ![Instrument Picker](/assets/images/instrument_picker.png){ align=left width="350"}
+    ![Instrument Picker](../../../assets/images/instrument_picker.png){ align=left width="350"}
 
     * ***Key:** The question key
     * **Question:**

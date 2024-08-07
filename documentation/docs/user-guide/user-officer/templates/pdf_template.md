@@ -9,7 +9,7 @@ Note: The standard PDF template () can be utilised for calls and serves as an ex
 * Go to the main menu and select Templates
 * From the dropdown menu, choose PDF
 
-**2. Create a New PDF Template**
+**2. Create a new PDF Template**
 
 * On the PDF template page, click the Create button
 * Enter a name for your new PDF template. You may also provide an optional description

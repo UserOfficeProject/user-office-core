@@ -3,17 +3,16 @@ import {
   ExpandMore,
   Inbox as InboxIcon,
 } from '@mui/icons-material';
-import {
-  Paper,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Collapse,
-  CircularProgress,
-  Button,
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import Collapse from '@mui/material/Collapse';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Paper from '@mui/material/Paper';
+import { useTheme } from '@mui/material/styles';
 import crossFetch from 'cross-fetch';
 import { useSnackbar } from 'notistack';
 import React, { useState, useContext, useRef } from 'react';
@@ -22,36 +21,6 @@ import { downloadBlob } from 'utils/downloadBlob';
 
 import { UserContext } from './UserContextProvider';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    position: 'fixed',
-    bottom: 0,
-    right: theme.spacing(0.5),
-    width: 360,
-    zIndex: theme.zIndex.snackbar,
-  },
-  header: {
-    borderBottom: 0,
-    backgroundColor: theme.palette.text.primary,
-    color: theme.palette.background.paper,
-    paddingTop: theme.spacing(1.5),
-    paddingBottom: theme.spacing(1.5),
-    borderRadius: `${theme.shape.borderRadius}px ${theme.shape.borderRadius}px 0 0`,
-    '&:hover': {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    },
-  },
-  headerIcon: {
-    color: 'inherit',
-  },
-  nestedItem: {
-    paddingLeft: `${theme.spacing(2)}px !important`,
-  },
-  listItemText: {
-    flexBasis: 0,
-  },
-}));
-
 const DownloadMonitorDialog = ({
   items,
   cancel,
@@ -59,32 +28,58 @@ const DownloadMonitorDialog = ({
   items: InProgressItem[];
   cancel: (id: string) => void;
 }) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const [open, setOpen] = useState(true);
 
   const handleToggle = () => setOpen((open) => !open);
 
   return (
-    <Paper elevation={3} className={classes.root}>
+    <Paper
+      elevation={3}
+      sx={{
+        position: 'fixed',
+        bottom: 0,
+        right: theme.spacing(0.5),
+        width: 360,
+        zIndex: theme.zIndex.snackbar,
+      }}
+    >
       <List component="div" disablePadding data-cy="preparing-download-dialog">
-        <ListItem button onClick={handleToggle} className={classes.header}>
-          <ListItemIcon className={classes.headerIcon}>
+        <ListItemButton
+          onClick={handleToggle}
+          sx={{
+            borderBottom: 0,
+            backgroundColor: theme.palette.text.primary,
+            color: theme.palette.background.paper,
+            paddingTop: theme.spacing(1.5),
+            paddingBottom: theme.spacing(1.5),
+            borderRadius: `${theme.shape.borderRadius}px ${theme.shape.borderRadius}px 0 0`,
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            },
+          }}
+          component="li"
+        >
+          <ListItemIcon sx={{ color: 'inherit' }}>
             <InboxIcon />
           </ListItemIcon>
           <ListItemText primary="Preparing download" />
           {open ? <ExpandLess /> : <ExpandMore />}
-        </ListItem>
+        </ListItemButton>
         <Collapse in={open} timeout="auto">
           <List component="div" disablePadding>
             {items.map((item) => {
               return (
-                <ListItem key={item.id} className={classes.nestedItem}>
+                <ListItem
+                  key={item.id}
+                  sx={{ paddingLeft: `${theme.spacing(2)}px !important` }}
+                >
                   <ListItemIcon>
                     <CircularProgress size={24} />
                   </ListItemIcon>
                   <ListItemText
                     data-cy="preparing-download-dialog-item"
-                    className={classes.listItemText}
+                    sx={{ flexBasis: 0 }}
                     primaryTypographyProps={{
                       noWrap: true,
                       variant: 'caption',
