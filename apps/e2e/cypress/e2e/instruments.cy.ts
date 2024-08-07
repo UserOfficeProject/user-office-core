@@ -5,10 +5,10 @@ import {
   FeatureId,
   SettingsId,
 } from '@user-office-software-libs/shared-types';
-import settings from 'cypress/support/settings';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
   cy.get('[data-cy="status-filter"]').click();

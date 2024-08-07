@@ -6,12 +6,12 @@ import {
   TechnicalReviewStatus,
   TemplateCategoryId,
 } from '@user-office-software-libs/shared-types';
-import settings from 'cypress/support/settings';
 import { DateTime } from 'luxon';
 import PdfParse from 'pdf-parse';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 context('Proposal administration tests', () => {
   const proposalName1 = faker.lorem.words(3);

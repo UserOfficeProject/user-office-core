@@ -7,11 +7,11 @@ import {
   FeatureId,
   SettingsId,
 } from '@user-office-software-libs/shared-types';
-import settings from 'cypress/support/settings';
 import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 context('Proposal tests', () => {

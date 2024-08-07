@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { FeatureId, SettingsId } from '@user-office-software-libs/shared-types';
-import settings from 'cypress/support/settings';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 const scientist1 = initialDBData.users.user1;
 const scientist2 = initialDBData.users.user2;
