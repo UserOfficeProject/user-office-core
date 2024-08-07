@@ -42,7 +42,7 @@
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --quiet --fix",
     "cy:open": "cypress open --e2e",
-    "cy:run": "cypress run --e2e",
+    "cy:run": "cypress run --e2e --spec cypress/e2e/FAPs.cy.ts",
     "cy:run:action": "cypress run --spec \"${CYPRES_SPEC_PATTERN}\" --browser chrome --e2e"
   }
 }

@@ -50,20 +50,21 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   ) as ReviewContextType;
 
   const [localComment, setLocalComment] = useState(
-    state?.fapReview?.comment || ''
+    state?.fapReview.comment || ''
   );
   const [localGrade, setLocalGrade] = useState(
-    state?.fapReview?.grade?.toString() ?? ''
+    state?.fapReview.grade || undefined
   );
   const [localSubmitted, setLocalSubmitted] = useState<boolean>(
-    state?.fapReview?.status === ReviewStatus.SUBMITTED
+    state?.fapReview.status === ReviewStatus.SUBMITTED
   );
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   useEffect(() => {
-    setLocalSubmitted(state?.fapReview?.status === ReviewStatus.SUBMITTED);
-    setLocalGrade(state?.fapReview.grade?.toString() || '');
+    setLocalSubmitted(state?.fapReview.status === ReviewStatus.SUBMITTED);
+    setLocalGrade(state?.fapReview.grade || undefined);
+    setLocalComment(state?.fapReview.comment || '');
   }, [state]);
 
   if (!state || !dispatch) {
@@ -104,8 +105,8 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
         </InputLabel>
 
         <Editor
-          id={commentFieldId}
-          initialValue={state?.fapReview?.comment || ''}
+          id="comment"
+          initialValue={state?.fapReview.comment || ''}
           init={{
             skin: false,
             content_css: false,
@@ -153,7 +154,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                 ? {
                     id: 'grade-proposal',
                     onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                      setLocalGrade(event.target.value);
+                      setLocalGrade(+event.target.value);
                     },
                     onBlur: () => {
                       dispatch({
@@ -170,7 +171,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                     min: '1',
                     max: '10',
                     onChange: (event: ChangeEvent<HTMLInputElement>) =>
-                      setLocalGrade(event.target.value),
+                      setLocalGrade(+event.target.value),
                     onBlur: () => {
                       dispatch({
                         type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
@@ -241,8 +242,8 @@ const fapReviewBasisPreSubmit =
         status: status,
         fapID: fapID,
         questionaryID: questionaryID,
-        grade: grade!,
-        comment: comment!,
+        grade: grade || 0,
+        comment: comment || '',
       });
 
       dispatch({

@@ -47,7 +47,13 @@ function readWriteReview(
 
   cy.contains('New fap review').click();
 
-  cy.setTinyMceContent('fap_review_comment', faker.lorem.words(3));
+  const commentContent = faker.lorem.words(3);
+
+  cy.setTinyMceContent('comment', commentContent);
+
+  cy.getTinyMceContent('comment').then((content) =>
+    expect(content).to.have.string(commentContent)
+  );
 
   if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
     cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
@@ -57,17 +63,20 @@ function readWriteReview(
     cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
   }
 
+  cy.get(`#comment_ifr`).first().focus().click();
+
   if (shouldSubmit) {
     if (isReviewer) {
-      cy.get('[data-cy="submit-grade"]').click();
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
     } else {
       cy.get('[data-cy="is-grade-submitted"]').click();
     }
   }
 
   if (!isReviewer) {
-    cy.get('@dialog').contains('Save').click();
+    cy.get('[data-cy=save-button]').focus().click();
     cy.notification({ variant: 'success', text: 'Updated' });
   }
 
