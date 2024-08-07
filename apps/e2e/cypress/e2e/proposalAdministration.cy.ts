@@ -2,9 +2,11 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  SettingsId,
   TechnicalReviewStatus,
   TemplateCategoryId,
 } from '@user-office-software-libs/shared-types';
+import settings from 'cypress/support/settings';
 import { DateTime } from 'luxon';
 import PdfParse from 'pdf-parse';
 
@@ -767,7 +769,14 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to sort propsals by instrument and technical review fields', () => {
-      cy.addFeasibilityReviewToDefaultWorkflow();
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        cy.addFeasibilityReviewToDefaultWorkflow();
+      }
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposalPk = result.createProposal.primaryKey;
         if (proposalPk) {

@@ -13,6 +13,7 @@ import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegist
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
+import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
@@ -22,6 +23,7 @@ import {
 } from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { removeDuplicates } from '../../utils/helperFunctions';
+import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 import {
@@ -100,7 +102,9 @@ export async function calculateReferenceNumber(
 export default class PostgresProposalDataSource implements ProposalDataSource {
   constructor(
     @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.AdminDataSource)
+    private AdminDataSource: AdminDataSource
   ) {}
 
   async updateProposalTechnicalReviewer({
@@ -1073,6 +1077,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
+    const getWorkflowStatus = (
+      await this.AdminDataSource.getSetting(
+        SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS
+      )
+    )?.settingsValue;
+
+    if (!getWorkflowStatus) {
+      return true;
+    }
+
     const proposalWorkflowId: number = await database
       .select('c.proposal_workflow_id')
       .from('proposals as p')
@@ -1087,7 +1101,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
 
     return !!proposalStatus.find((status) =>
-      status.proposalStatus.shortCode.match('FEASIBILITY')
+      status.proposalStatus.shortCode.match(getWorkflowStatus)
     );
   }
 }

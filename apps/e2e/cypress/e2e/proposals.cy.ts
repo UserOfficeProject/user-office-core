@@ -5,7 +5,9 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
   FeatureId,
+  SettingsId,
 } from '@user-office-software-libs/shared-types';
+import settings from 'cypress/support/settings';
 import { DateTime } from 'luxon';
 
 import featureFlags from '../support/featureFlags';
@@ -469,7 +471,14 @@ context('Proposal tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
-      cy.addFeasibilityReviewToDefaultWorkflow();
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        cy.addFeasibilityReviewToDefaultWorkflow();
+      }
 
       const allocationTime = '10';
       cy.createInstrument(instrument1).then((result) => {

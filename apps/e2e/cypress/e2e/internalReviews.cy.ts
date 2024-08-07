@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import { FeatureId, SettingsId } from '@user-office-software-libs/shared-types';
+import settings from 'cypress/support/settings';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -24,7 +25,13 @@ let numberOfScientistsAndManagerAssignedToCreatedInstrument: number;
 context('Internal Review tests', () => {
   beforeEach(function () {
     cy.resetDB();
-    cy.addFeasibilityReviewToDefaultWorkflow();
+    if (
+      settings
+        .getEnabledSettings()
+        .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !== 'FEASIBILITY'
+    ) {
+      cy.addFeasibilityReviewToDefaultWorkflow();
+    }
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();

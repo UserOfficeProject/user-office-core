@@ -3,7 +3,9 @@ import {
   ReviewerFilter,
   TechnicalReviewStatus,
   FeatureId,
+  SettingsId,
 } from '@user-office-software-libs/shared-types';
+import settings from 'cypress/support/settings';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -44,7 +46,13 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
-    cy.addFeasibilityReviewToDefaultWorkflow();
+    if (
+      settings
+        .getEnabledSettings()
+        .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !== 'FEASIBILITY'
+    ) {
+      cy.addFeasibilityReviewToDefaultWorkflow();
+    }
   });
 
   // TODO: Maybe this should be moved to permission testing.
