@@ -6,11 +6,11 @@
 _______________________________________________________
 
 
-![Call](/assets/images/call.png){ width="500" }
+![Call](../../assets/images/call.png){ width="500" }
 
 _______________________________________________________
 
-![workflow](/assets/images/workflow.png){ width="500" }
+![workflow](../../assets/images/workflow.png){ width="500" }
 
 _______________________________________________________
 
@@ -43,25 +43,25 @@ All how-to guides:
 
 ### **Creating templates**
 
-* #### [How do I create a proposal template?](proposal_template.md)
+* #### [How do I create a proposal template?](templates/proposal_template.md)
 
-* #### [How do I create a feedback template?](feedback_template.md)
+* #### [How do I create a feedback template?](templates/feedback_template.md)
 
-* #### [How do I create a PDF template?](pdf_template.md)
+* #### [How do I create a PDF template?](templates/pdf_template.md)
 
-* #### [How do I create a proposal ESI template?](proposalESI_template.md)
+* #### [How do I create a proposal ESI template?](templates/proposalESI_template.md)
 
-* #### [How do I create a question template?](question_template.md)
+* #### [How do I create a question template?](templates/question_template.md)
 
-* #### [How do I create a sample declaration template?](sampledec_template.md)
+* #### [How do I create a sample declaration template?](templates/sampledec_template.md)
 
-* #### [How do I create a sample ESI template?](sampleESI_template.md)
+* #### [How do I create a sample ESI template?](templates/sampleESI_template.md)
 
-* #### [How do I create a shipment declaration template?](shipment_template.md)
+* #### [How do I create a shipment declaration template?](templates/shipment_template.md)
 
-* #### [How do I create a sub template?](sub_template.md)
+* #### [How do I create a sub template?](templates/sub_template.md)
 
-* #### [How do I create a visit registration template?](visit_template.md)
+* #### [How do I create a visit registration template?](templates/visit_template.md)
 
 * #### [How do I create a proposal workflow?](proposal_workflow.md)
 
@@ -82,43 +82,43 @@ All how-to guides:
 
 ### **Editing templates**
 
-* #### [How do I edit a proposal template?](proposal_template.md)
+* #### [How do I edit a proposal template?](templates/proposal_template.md)
 
-* #### [How do I edit a feedback template?](feedback_template.md)
+* #### [How do I edit a feedback template?](templates/feedback_template.md)
 
-* #### [How do I edit a PDF template?](pdf_template.md)
+* #### [How do I edit a PDF template?](templates/pdf_template.md)
 
-* #### [How do I edit a proposal ESI template?](proposalESI_template.md)
+* #### [How do I edit a proposal ESI template?](templates/proposalESI_template.md)
 
-* #### [How do I edit a question template?](question_template.md)
+* #### [How do I edit a question template?](templates/question_template.md)
 
-* #### [How do I edit a sample declaration template?](sampledec_template.md)
+* #### [How do I edit a sample declaration template?](templates/sampledec_template.md)
 
-* #### [How do I edit a sample ESI template?](sampleESI_template.md)
+* #### [How do I edit a sample ESI template?](templates/sampleESI_template.md)
 
-* #### [How do I edit a shipment declaration template?](shipment_template.md)
+* #### [How do I edit a shipment declaration template?](templates/shipment_template.md)
 
-* #### [How do I edit a sub template?](sub_template.md)
+* #### [How do I edit a sub template?](templates/sub_template.md)
 
-* #### [How do I edit a visit registration template?](visit_template.md)
+* #### [How do I edit a visit registration template?](templates/visit_template.md)
 
 * #### [How do I edit a proposal workflow?](proposal_workflow.md)
 
 
 ## **Configure the system**
 
-* #### [How do I change the look of the UI?](UI.md)
+* #### [How do I change the look of the UI?](placeholder.md)
 
 
 ## **Dev tools**
 
-* #### [How do I use API access tokens?](API.md)
+* #### [How do I use API access tokens?](placeholder.md)
 
 * #### [How do I use features?](features.md)
 
-* #### [How do I use App settings?](app_settings)
+* #### [How do I use App settings?](placeholder.md)
 
-* #### [How do I edit a PDF](API.md)
+* #### [How do I edit a PDF](placeholder.md)
  
 
 # Glossary Links
