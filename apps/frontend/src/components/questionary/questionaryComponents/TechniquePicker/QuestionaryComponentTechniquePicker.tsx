@@ -52,8 +52,16 @@ export function QuestionaryComponentTechniquePicker(
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
     const newValue = event.target.value || null;
+    let techniques: number[] | number = [] || {};
+    if (Array.isArray(newValue) && newValue.length > 0) {
+      techniques = newValue.map((id) => {
+        return +id;
+      });
+    } else if (typeof newValue === 'string') {
+      techniques = +newValue;
+    }
 
-    onComplete(newValue);
+    onComplete(techniques);
   };
 
   const SelectMenuItem = config.isMultipleSelect ? MultiMenuItem : MenuItem;
