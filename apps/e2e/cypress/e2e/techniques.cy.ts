@@ -337,9 +337,7 @@ context('Technique tests', () => {
             techniqueId: techniqueId2,
           });
         });
-    });
 
-    it('When instruments are assigned to multiple techniques, only unique techniques are shown in the questionnaire', function () {
       cy.createTopic({
         templateId: initialDBData.template.id,
         sortOrder: 1,
@@ -354,19 +352,23 @@ context('Technique tests', () => {
             dataType: DataType.TECHNIQUE_PICKER,
           }).then((result) => {
             techniquePickerQuestionId = result.createQuestion.id;
-            cy.updateQuestion({
-              id: result.createQuestion.id,
-              question: techniquePickerQuestion,
-              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
-            });
-            cy.createQuestionTemplateRelation({
-              questionId: techniquePickerQuestionId,
-              templateId: initialDBData.template.id,
-              sortOrder: 0,
-              topicId: topicId,
-            });
           });
         }
+      });
+    });
+
+    it('When instruments are assigned to multiple techniques, only unique techniques are shown in the questionnaire', function () {
+      cy.updateQuestion({
+        id: techniquePickerQuestionId,
+        question: techniquePickerQuestion,
+        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
+      });
+
+      cy.createQuestionTemplateRelation({
+        questionId: techniquePickerQuestionId,
+        templateId: initialDBData.template.id,
+        sortOrder: 0,
+        topicId: topicId,
       });
 
       // Instruments 1 and 2 are now assigned to both techniques 1 and 2
@@ -400,9 +402,7 @@ context('Technique tests', () => {
             techniqueName2,
           ]);
         });
-    });
 
-    it('Techniques options display in the questionnaire based on the instruments attached to the call', function () {
       cy.createTopic({
         templateId: initialDBData.template.id,
         sortOrder: 1,
@@ -417,19 +417,23 @@ context('Technique tests', () => {
             dataType: DataType.TECHNIQUE_PICKER,
           }).then((result) => {
             techniquePickerQuestionId = result.createQuestion.id;
-            cy.updateQuestion({
-              id: result.createQuestion.id,
-              question: techniquePickerQuestion,
-              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
-            });
-            cy.createQuestionTemplateRelation({
-              questionId: techniquePickerQuestionId,
-              templateId: initialDBData.template.id,
-              sortOrder: 0,
-              topicId: topicId,
-            });
           });
         }
+      });
+    });
+
+    it('Techniques options display in the questionnaire based on the instruments attached to the call', function () {
+      cy.updateQuestion({
+        id: techniquePickerQuestionId,
+        question: techniquePickerQuestion,
+        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
+      });
+
+      cy.createQuestionTemplateRelation({
+        questionId: techniquePickerQuestionId,
+        templateId: initialDBData.template.id,
+        sortOrder: 0,
+        topicId: topicId,
       });
 
       cy.createTechnique(technique3).then((result) => {
@@ -493,33 +497,17 @@ context('Technique tests', () => {
     });
 
     it('When instruments are assigned to multiple techniques, only unique techniques are shown in the questionnaire - Radio variant', function () {
-      cy.createTopic({
+      cy.updateQuestion({
+        id: techniquePickerQuestionId,
+        question: techniquePickerQuestion,
+        config: `{"variant":"radio","isMultipleSelect":false,"required":true}`,
+      });
+
+      cy.createQuestionTemplateRelation({
+        questionId: techniquePickerQuestionId,
         templateId: initialDBData.template.id,
-        sortOrder: 1,
-      }).then((topicResult) => {
-        if (topicResult.createTopic) {
-          topicId =
-            topicResult.createTopic.steps[
-              topicResult.createTopic.steps.length - 1
-            ].topic.id;
-          cy.createQuestion({
-            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-            dataType: DataType.TECHNIQUE_PICKER,
-          }).then((result) => {
-            techniquePickerQuestionId = result.createQuestion.id;
-            cy.updateQuestion({
-              id: result.createQuestion.id,
-              question: techniquePickerQuestion,
-              config: `{"variant":"radio","isMultipleSelect":false,"required":true}`,
-            });
-            cy.createQuestionTemplateRelation({
-              questionId: techniquePickerQuestionId,
-              templateId: initialDBData.template.id,
-              sortOrder: 0,
-              topicId: topicId,
-            });
-          });
-        }
+        sortOrder: 0,
+        topicId: topicId,
       });
 
       // Instruments 1 and 2 are now assigned to both techniques 1 and 2
@@ -547,33 +535,17 @@ context('Technique tests', () => {
     });
 
     it('Techniques options display in the questionnaire based on the instruments attached to the call - Radio variant', function () {
-      cy.createTopic({
+      cy.updateQuestion({
+        id: techniquePickerQuestionId,
+        question: techniquePickerQuestion,
+        config: `{"variant":"radio","isMultipleSelect":false,"required":true}`,
+      });
+
+      cy.createQuestionTemplateRelation({
+        questionId: techniquePickerQuestionId,
         templateId: initialDBData.template.id,
-        sortOrder: 1,
-      }).then((topicResult) => {
-        if (topicResult.createTopic) {
-          topicId =
-            topicResult.createTopic.steps[
-              topicResult.createTopic.steps.length - 1
-            ].topic.id;
-          cy.createQuestion({
-            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-            dataType: DataType.TECHNIQUE_PICKER,
-          }).then((result) => {
-            techniquePickerQuestionId = result.createQuestion.id;
-            cy.updateQuestion({
-              id: result.createQuestion.id,
-              question: techniquePickerQuestion,
-              config: `{"variant":"radio","isMultipleSelect":false,"required":true}`,
-            });
-            cy.createQuestionTemplateRelation({
-              questionId: techniquePickerQuestionId,
-              templateId: initialDBData.template.id,
-              sortOrder: 0,
-              topicId: topicId,
-            });
-          });
-        }
+        sortOrder: 0,
+        topicId: topicId,
       });
 
       cy.createTechnique(technique3).then((result) => {
