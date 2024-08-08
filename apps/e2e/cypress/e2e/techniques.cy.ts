@@ -589,5 +589,70 @@ context('Technique tests', () => {
       cy.contains(techniqueName2);
       cy.contains(techniqueName3).should('not.exist');
     });
+
+    it.only('User able to choose multiple techniques while submitting proposal', function () {
+      cy.updateQuestion({
+        id: techniquePickerQuestionId,
+        question: techniquePickerQuestion,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true}`,
+      });
+
+      cy.createQuestionTemplateRelation({
+        questionId: techniquePickerQuestionId,
+        templateId: initialDBData.template.id,
+        sortOrder: 0,
+        topicId: topicId,
+      });
+
+      cy.createTechnique(technique3).then((result) => {
+        techniqueName3 = result.createTechnique.name;
+        techniqueId3 = result.createTechnique.id;
+      });
+
+      cy.createInstrument(instrument4).then((result) => {
+        instrumentId4 = result.createInstrument.id;
+
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [instrumentId4],
+          techniqueId: techniqueId3,
+        });
+      });
+
+      cy.createInstrument(instrument5).then((result) => {
+        instrumentId5 = result.createInstrument.id;
+
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [instrumentId5],
+          techniqueId: techniqueId1,
+        });
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.get('[data-natural-key^="technique_picker"]').click();
+      cy.contains(techniqueName1).click();
+
+      cy.contains(techniqueName2).click();
+
+      cy.get('body').click();
+
+      cy.contains('Save and continue').click();
+      cy.finishedLoading();
+
+      cy.contains(techniqueName1);
+      cy.contains(techniqueName2);
+    });
   });
 });
