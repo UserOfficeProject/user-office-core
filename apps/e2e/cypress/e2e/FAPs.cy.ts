@@ -847,16 +847,19 @@ context('Fap reviews tests', () => {
 
       cy.login('officer');
 
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get('[data-cy="fap-reviewers-table"]').contains('1');
+
       cy.updateCall({
         id: initialDBData.call.id,
-        ...closedCall,
         proposalWorkflowId: createdWorkflowId,
         esiTemplateId: createdEsiTemplateId,
         faps: [createdFapId],
+        callFapReviewEnded: true,
       });
 
       cy.visit(`/FapPage/${createdFapId}?tab=1`);
-      cy.get('[data-cy="fap-reviewers-table"]').contains('1');
+      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
     });
   });
 
