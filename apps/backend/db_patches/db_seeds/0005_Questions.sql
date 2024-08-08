@@ -29,7 +29,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'boolean_question', 1, 5, 3, '{
+    'boolean_question', 1, 6, 3, '{
             "tooltip": "",
             "required": false,
             "small_label": ""
@@ -40,7 +40,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    1, 'boolean_question', '{"value": true }'
+    2, 'boolean_question', '{"value": true }'
   );
 -- Date
 INSERT INTO questions(
@@ -66,14 +66,14 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'date_question', 1, 5, 5, '{ "tooltip": "","required": false,"small_label": "" }'
+    'date_question', 1, 6, 5, '{ "tooltip": "","required": false,"small_label": "" }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    1, 'date_question', '{"value": "2030-01-01" }'
+    2, 'date_question', '{"value": "2030-01-01" }'
   );
 -- Embellishment
 INSERT INTO questions(
@@ -96,7 +96,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'embellishment_question', 1, 5, 9, 
+    'embellishment_question', 1, 6, 9, 
     '{ "tooltip": "", "required": false, "small_label": "" }'
   );
 INSERT INTO answers(
@@ -104,7 +104,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    1, 'embellishment_question', '{"value": "<h1>Embellishment value<h1>" }'
+    2, 'embellishment_question', '{"value": "<h1>Embellishment value<h1>" }'
   );
 -- File upload
 INSERT INTO questions(
@@ -127,14 +127,14 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'file_upload_question', 1, 5, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}'
+    'file_upload_question', 1, 6, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    1, 'file_upload_question', '{
+    2, 'file_upload_question', '{
     "value": [{"id": "1c4b2ca8-f849-42db-b5d6-35aba2b26f8b"}]}'
   );
 -- INTERVAL
@@ -171,7 +171,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'interval_question', 1, 5, 4, '{
+    'interval_question', 1, 6, 4, '{
         "units": [
             {
                 "id": "meter",
@@ -191,7 +191,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    1, 'interval_question', '{
+    2, 'interval_question', '{
     "value": {
         "max": 100,
         "min": 1,
@@ -240,7 +240,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'number_question', 1, 5, 2, '{
+    'number_question', 1, 6, 2, '{
         "units": [
             {
                 "id": "meter",
@@ -268,7 +268,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    1, 'number_question', '{
+    2, 'number_question', '{
     "value": {
         "unit": {
             "id": "centimeter",
@@ -303,7 +303,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'rich_text_input_question', 1, 5, 
+    'rich_text_input_question', 1, 6, 
     8, '{ "tooltip": "", "required": false, "small_label": "" }'
   );
 INSERT INTO answers(
@@ -311,7 +311,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    1, 'rich_text_input_question', '{"value": "<b>Rich text input value</b>" }'
+    2, 'rich_text_input_question', '{"value": "<b>Rich text input value</b>" }'
   );
 -- Selection from options
 INSERT INTO questions(
@@ -336,14 +336,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'selection_from_options_question', 
-    1, 5, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+    1, 6, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    1, 'selection_from_options_question', 
+    2, 'selection_from_options_question', 
     '{"value": ["One"] }'
   );
 
@@ -370,14 +370,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'dynamic_multiple_choice_question', 
-    1, 5, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}'
+    1, 6, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    1, 'dynamic_multiple_choice_question', 
+    2, 'dynamic_multiple_choice_question', 
     '{"value": ["One"] }'
   );
 
@@ -402,14 +402,14 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'text_input_question', 1, 5, 7, '{ "tooltip": "", "required": false, "small_label": "" }'
+    'text_input_question', 1, 6, 7, '{ "tooltip": "", "required": false, "small_label": "" }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    1, 'text_input_question', '{"value": "Text input answer from seeds" }'
+    2, 'text_input_question', '{"value": "Text input answer from seeds" }'
   );
 
 
@@ -437,14 +437,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'instrument_picker_question', 
-    1, 5, 6, '{"variant":"dropdown","options":[1, 2]}'
+    1, 6, 6, '{"variant":"dropdown","options":[1, 2]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    1, 'instrument_picker_question', 
+    2, 'instrument_picker_question', 
     '{"value": 1 }'
   );
 

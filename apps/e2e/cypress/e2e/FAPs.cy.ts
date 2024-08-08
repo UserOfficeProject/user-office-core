@@ -744,15 +744,12 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="presentation"] [role="tab"]').contains('Grade').click();
 
-      cy.get('[role="presentation"] form button[type="submit"]').should(
-        'not.be.disabled'
-      );
+      cy.contains('New fap review').click();
 
       cy.get('[data-cy="is-grade-submitted"]').click();
 
-      cy.get('[role="presentation"] form button[type="submit"]').click();
-
-      cy.notification({ variant: 'success', text: 'Updated' });
+      cy.get('[data-cy=save-button]').focus().click();
+      cy.notification({ variant: 'success', text: 'Saved' });
 
       cy.closeModal();
       cy.get('[role="dialog"]').should('not.exist');
@@ -981,13 +978,10 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      cy.get('[data-cy="submit-grade"]').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-      cy.finishedLoading();
-
-      cy.get('[data-cy="save-grade"]').should('be.disabled');
-      cy.get('[data-cy="submit-grade"]').should('be.disabled');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Submitted').should('be.disabled');
 
       cy.visit(`/FapPage/${createdFapId}?tab=2`);
       cy.finishedLoading();
@@ -1109,14 +1103,12 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      cy.get('[data-cy="submit-grade"]').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Submitted').should('be.disabled');
 
       cy.finishedLoading();
-
-      cy.get('[data-cy="save-grade"]').should('be.disabled');
-      cy.get('[data-cy="submit-grade"]').should('be.disabled');
     });
   });
 
@@ -1260,16 +1252,15 @@ context('Fap reviews tests', () => {
         cy.get('[data-cy="grade-proposal"]').click().click().type('1');
       }
 
-      cy.get('[data-cy=submit-grade]').click();
-      cy.get('[data-cy=confirm-ok]').click();
+      cy.get(`#comment_ifr`).first().focus().click();
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.get('[data-cy="button-submit-proposal"]').focus().click();
+      cy.contains('OK').click();
+
       cy.finishedLoading();
-      cy.notification({ variant: 'success', text: 'Submitted' });
+
       cy.closeModal();
-
-      cy.contains(proposal1.title).parent().contains('Submitted');
-
-      cy.get('[data-cy="submit-proposal-reviews"]').click();
-      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         text: 'Proposals review submitted successfully',
