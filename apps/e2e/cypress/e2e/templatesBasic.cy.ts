@@ -1219,7 +1219,7 @@ context('Template tests', () => {
       );
     });
 
-    it.only('User officer can add technique picker question as a dependency', () => {
+    it('User officer can add technique picker question as a dependency', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
         if (createdProposal) {
@@ -1257,10 +1257,9 @@ context('Template tests', () => {
         .contains(initialDBData.questions.techniquePicker.text)
         .click();
 
-      cy.screenshot('DEBUG 1');
       cy.get('[id="dependencyValue"]').click();
 
-      cy.screenshot('DEBUG 1.1');
+      cy.finishedLoading();
 
       cy.contains(initialDBData.technique1.name).click();
 
@@ -1268,8 +1267,6 @@ context('Template tests', () => {
         'have.value',
         initialDBData.technique1.id
       );
-
-      cy.screenshot('DEBUG 2');
 
       cy.get('[data-cy="submit"]').click();
 
@@ -1294,11 +1291,9 @@ context('Template tests', () => {
         templateDependencies.questions.booleanQuestion.title
       );
 
-      cy.screenshot('DEBUG 3');
       cy.contains(initialDBData.questions.techniquePicker.text)
         .parent()
         .click();
-      cy.screenshot('DEBUG 4');
       cy.contains(initialDBData.technique1.name).click();
 
       // Dependee is visible
@@ -1307,13 +1302,11 @@ context('Template tests', () => {
         templateDependencies.questions.booleanQuestion.title
       );
 
-      cy.screenshot('DEBUG 5');
       cy.contains(initialDBData.questions.techniquePicker.text)
         .parent()
         .click();
       cy.contains(initialDBData.technique2.name).click();
 
-      cy.screenshot('DEBUG 6');
       // Dependee is NOT visible again
       cy.get('main form').should(
         'not.contain.text',

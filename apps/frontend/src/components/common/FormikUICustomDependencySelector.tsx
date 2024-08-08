@@ -117,6 +117,8 @@ const FormikUICustomDependencySelector = ({
           });
       } else if (depField.question.dataType === DataType.TECHNIQUE_PICKER) {
         if (form.submitCount) {
+          setIsLoading(false);
+
           return;
         }
 
@@ -131,6 +133,8 @@ const FormikUICustomDependencySelector = ({
                 }))
               );
             }
+
+            setIsLoading(false);
           });
       }
     }
