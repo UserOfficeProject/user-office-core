@@ -1164,7 +1164,6 @@ context('Template tests', () => {
       cy.get('[data-cy="dependencyValue"]').click();
 
       cy.finishedLoading();
-      cy.screenshot('DEBUG 1.1');
 
       cy.contains(initialDBData.instrument1.name).click();
 
