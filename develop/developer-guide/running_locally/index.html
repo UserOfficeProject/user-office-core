@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/api-documentation/">
+        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/running_locally/">
       
       
-        <link rel="prev" href="../codebase-structure/">
+        <link rel="prev" href="../CONTRIBUTING/">
       
       
-        <link rel="next" href="../../faq/">
+        <link rel="next" href="../configuration/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>API documentation - User Office Documentation</title>
+        <title>Running locally - User Office Documentation</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-documentation" class="md-skip">
+        <a href="#prerequisites" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API documentation
+              Running locally
             
           </span>
         </div>
@@ -194,10 +194,10 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../quick-start/" class="md-tabs__link">
+        <a href="../../quick_start/" class="md-tabs__link">
           
   
-  Getting started
+  Getting Started
 
         </a>
       </li>
@@ -394,7 +394,7 @@
             
   
   <span class="md-ellipsis">
-    Getting started
+    Getting Started
   </span>
   
 
@@ -404,7 +404,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Getting started
+            Getting Started
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../quick-start/" class="md-nav__link">
+      <a href="../../quick_start/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1145,10 +1145,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../running-locally/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Running locally
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1157,6 +1175,93 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-with-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running with Docker Compose
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graphql-playground-and-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphQL Playground and Schema
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Scripts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#npm-run-lint" class="md-nav__link">
+    <span class="md-ellipsis">
+      npm run lint
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1211,11 +1316,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../codebase-structure/" class="md-nav__link">
+      <a href="../api_documentation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Codebase structure
+    API documentation
   </span>
   
 
@@ -1229,124 +1334,18 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    API documentation
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../step-by-step/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    API documentation
+    Step-by-Step Guide
   </span>
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
-    <span class="md-ellipsis">
-      Introduction
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#user-office-core-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      User Office Core API
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="User Office Core API">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#user-office-frontend" class="md-nav__link">
-    <span class="md-ellipsis">
-      User Office Frontend
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="User Office Frontend">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#graphql-endpoints" class="md-nav__link">
-    <span class="md-ellipsis">
-      GraphQL Endpoints
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-models" class="md-nav__link">
-    <span class="md-ellipsis">
-      Data Models
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Handling
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1456,8 +1455,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1466,38 +1463,64 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#introduction" class="md-nav__link">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      Introduction
+      Prerequisites
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#user-office-core-api" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      User Office Core API
+      Installation
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="User Office Core API">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#user-office-frontend" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
-      User Office Frontend
+      Configuration
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="User Office Frontend">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running-with-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running with Docker Compose
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graphql-playground-and-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphQL Playground and Schema
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Scripts
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Scripts">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#graphql-endpoints" class="md-nav__link">
+  <a href="#npm-run-lint" class="md-nav__link">
     <span class="md-ellipsis">
-      GraphQL Endpoints
+      npm run lint
     </span>
   </a>
   
@@ -1505,29 +1528,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-models" class="md-nav__link">
-    <span class="md-ellipsis">
-      Data Models
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Handling
-    </span>
-  </a>
   
 </li>
       
@@ -1546,30 +1546,55 @@
                   
 
 
-<h1 id="api-documentation">API Documentation</h1>
-<h2 id="introduction">Introduction</h2>
-<p>The User Office application API provides endpoints to manage user interactions, proposal submissions, reviews, and scheduling. The API is primarily based on GraphQL, with some REST endpoints for specific functions.</p>
-<h2 id="user-office-core-api">User Office Core API</h2>
-<h3 id="user-office-frontend">User Office Frontend</h3>
-<h4 id="graphql-endpoints">GraphQL Endpoints</h4>
-<p><strong>Base URL</strong>: <a href="https://staging.useroffice.ess.eu/graphql">https://staging.useroffice.ess.eu/graphql</a></p>
-<p><strong>Queries</strong></p>
+  <h1>Running locally</h1>
+
+<p>To successfully run both the backend and frontend of the project locally, follow these steps:</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Ensure you have the following installed on your machine:</p>
 <ul>
-<li><code>x</code></li>
-<li><strong>Description</strong>: Fetches details of a user by ID.</li>
-<li><strong>Example</strong>:</li>
-<li><strong>Description</strong>: Retrieves proposals based on status.</li>
-<li><strong>Example</strong>:</li>
+<li>Node.js</li>
+<li>npm</li>
+<li>Docker (if using Docker Compose)</li>
 </ul>
-<p><strong>Mutations</strong></p>
-<h2 id="data-models">Data Models</h2>
-<h2 id="error-handling">Error Handling</h2>
+<h2 id="installation">Installation</h2>
+<p><strong>1. Install Dependencies</strong></p>
+<p>Navigate to the root directory of your project and install all necessary dependencies:</p>
+<p><code>npm install</code></p>
+<p><strong>2. Start the Application</strong></p>
+<p>Start the application in development mode:</p>
+<p><code>npm run dev</code></p>
+<p>Alternatively, you can use:</p>
+<p><code>npm run start</code></p>
+<h2 id="configuration">Configuration</h2>
+<p><strong>Check the <code>.env</code> File</strong></p>
+<p>The application requires environment variables to be set. If a .env file is not present at startup, it will be generated using the example.development.env template.</p>
+<pre><code>Backend: apps/backend/.env
+Frontend: apps/frontend/.env
+</code></pre>
+<p>Ensure these files are correctly configured before starting the application. For more information about configuration, visit the <a href="../configuration/">Configuration tab</a></p>
+<h2 id="running-with-docker-compose">Running with Docker Compose</h2>
+<p>For testing purposes, you can use Docker Compose to quickly set up the project. Follow these steps:</p>
+<p><strong>1. Start Docker Compose</strong></p>
+<p>Navigate to the root directory of your project and run:</p>
+<p><code>docker compose up</code></p>
+<p><strong>2. Access the Application</strong></p>
 <ul>
-<li><strong>400 Bad Request</strong>: The request could not be understood or was missing required parameters.</li>
-<li><strong>401 Unauthorized</strong>: Authentication failed or user does not have permissions for the requested operation.</li>
-<li><strong>404 Not Found</strong>: The requested resource could not be found.</li>
-<li><strong>500 Internal Server Error</strong>: An error occurred on the server.</li>
+<li>Open your browser and visit <a href="http://localhost:33000">http://localhost:33000</a>.</li>
+<li>Use the following default credentials to log in:<ul>
+<li>User Officer: 'Aaron_Harris49@gmail.com' with password 'Test1234!'</li>
+<li>User: 'Javon4@hotmail.com' with password 'Test1234!'</li>
 </ul>
+</li>
+</ul>
+<h2 id="graphql-playground-and-schema">GraphQL Playground and Schema</h2>
+<p>The GraphQL Playground is an interactive, in-browser tool for writing, validating, and testing GraphQL queries. It provides a user-friendly interface to explore the GraphQL API.</p>
+<ul>
+<li>Open your browser and navigate to <a href="http://localhost:4000">http://localhost:4000</a>. This URL will direct you to the GraphQL Playground interface.</li>
+</ul>
+<h2 id="available-scripts">Available Scripts</h2>
+<h3 id="npm-run-lint"><code>npm run lint</code></h3>
+<p>Lints typescript code and log if there are any errors.</p>
+<p><code>npm run lint:fix</code> should be used if you want to fix all auto-fixable errors and warnings.</p>
 
 
 

@@ -14,7 +14,7 @@
         <link rel="prev" href="../configuration/">
       
       
-        <link rel="next" href="../codebase-structure/">
+        <link rel="next" href="../api_documentation/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -194,10 +194,10 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../quick-start/" class="md-tabs__link">
+        <a href="../../quick_start/" class="md-tabs__link">
           
   
-  Getting started
+  Getting Started
 
         </a>
       </li>
@@ -394,7 +394,7 @@
             
   
   <span class="md-ellipsis">
-    Getting started
+    Getting Started
   </span>
   
 
@@ -404,7 +404,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Getting started
+            Getting Started
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../quick-start/" class="md-nav__link">
+      <a href="../../quick_start/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1148,7 +1148,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../running-locally/" class="md-nav__link">
+      <a href="../running_locally/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1238,6 +1238,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integration-and-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration and Communication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      External Dependencies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1256,11 +1280,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../codebase-structure/" class="md-nav__link">
+      <a href="../api_documentation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Codebase structure
+    API documentation
   </span>
   
 
@@ -1277,11 +1301,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../api-documentation/" class="md-nav__link">
+      <a href="../step-by-step/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    API documentation
+    Step-by-Step Guide
   </span>
   
 
@@ -1409,6 +1433,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integration-and-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration and Communication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      External Dependencies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1431,19 +1479,35 @@
 <p>The following picture shows the components of the User Office architecture.</p>
 <p><img alt="System overview" src="../../assets/images/system-overview.png" /></p>
 <h2 id="components">Components</h2>
-<p>The User Office application is a comprehensive system designed to handle user interactions, proposal submissions, reviews, and scheduling. 
-The architecture consists of several core components that interact through GraphQL and RabbitMQ for seamless communication and data flow.</p>
-<p>At the heart of the system is the User Office Core, which includes the User Office Frontend, responsible for the main user interface, 
-proposal submissions, reviews, and visits. The User Office Backend manages requests from the frontend, interfaces with the database, 
-and handles authentication services. Additionally, the User Office Factory generates PDF and Excel files for the frontend, while the
-User Office Cron performs asynchronous backend tasks such as user cleanup after inactivity.</p>
-<p>The User Office Gateway combines APIs from the scheduler backend and core backend, providing a unified GraphQL API essential for systems
-using the scheduler. The User Office Scheduler consists of two parts: the User Office Scheduler Frontend, which manages the scheduling 
-interface, and the User Office Scheduler Backend, which serves as the main source of scheduling information and interfaces with the core
-backend via RabbitMQ.</p>
-<p>External dependencies such as SciCat, NICOS, and Asset Management systems interface with the User Office application, ensuring efficient
-asset management and other related tasks. The entire system architecture is designed for robust and scalable performance, facilitating
-efficient user management, data handling, and background processing operations.</p>
+<p>The User Office application leverages a modular architecture with several interconnected components that interact through GraphQL and RabbitMQ.</p>
+<p><strong>User Office Core</strong></p>
+<ul>
+<li>Frontend: Manages the main user interface for proposal submissions, reviews, and visits.</li>
+<li>Backend: Handles requests from the frontend, interfaces with the database, and manages authentication services.</li>
+</ul>
+<p><strong>User Office Factory</strong></p>
+<ul>
+<li>Generates PDF and Excel files for the frontend, supporting data export and reporting functionalities.</li>
+</ul>
+<p><strong>User Office Cron</strong></p>
+<ul>
+<li>Performs asynchronous backend tasks, such as user cleanup after periods of inactivity, ensuring smooth system operations.</li>
+</ul>
+<h3 id="integration-and-communication">Integration and Communication</h3>
+<p><strong>User Office Gateway</strong></p>
+<ul>
+<li>Combines APIs from the scheduler backend and core backend, providing a unified GraphQL API crucial for systems utilizing the scheduler.</li>
+</ul>
+<p><strong>User Office Scheduler</strong></p>
+<ul>
+<li>Frontend: Manages the scheduling interface for users.</li>
+<li>Backend: Serves as the primary source of scheduling information and communicates with the core backend via RabbitMQ for real-time data exchange.</li>
+</ul>
+<h3 id="external-dependencies">External Dependencies</h3>
+<p><strong>SciCat, NICOS, and Asset Management Systems</strong> </p>
+<ul>
+<li>These external systems interface with the User Office application to ensure efficient asset management and integration with external resources, enhancing the overall functionality and data management capabilities.</li>
+</ul>
 
 
 
