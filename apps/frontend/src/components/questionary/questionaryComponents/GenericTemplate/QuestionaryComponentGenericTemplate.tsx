@@ -1,9 +1,10 @@
+import { DialogContent } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import { Field, FieldProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
-import StyledModal from 'components/common/StyledModal';
+import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
@@ -232,7 +233,7 @@ function QuestionaryComponentGenericTemplate(
             <QuestionnairesList
               addButtonLabel={config.addEntryButtonLabel}
               copyButtonLabel={config.copyButtonLabel || undefined}
-              canCopy={config.canCopy}
+              canCopy={true}
               data={field.value?.map(genericTemplateToListRow) ?? []}
               maxEntries={config.maxEntries || undefined}
               onEditClick={(item) =>
@@ -253,8 +254,10 @@ function QuestionaryComponentGenericTemplate(
               }}
               onCloneClick={(item) => {
                 prompt((answer) => copyGenericTemplate(item.id, answer), {
+                  title: 'Clone the template',
                   question: 'Title',
                   prefilledAnswer: `Copy of ${item.label}`,
+                  okBtnLabel: 'Clone',
                 })();
               }}
               onAddNewClick={() => createGenericTemplate()}
@@ -266,7 +269,7 @@ function QuestionaryComponentGenericTemplate(
 
             <ErrorMessage name={answerId} />
 
-            <StyledModal
+            <StyledDialog
               onClose={() => {
                 const newStateItems = field.value.map((genericTemplate) =>
                   genericTemplate.id === selectedGenericTemplate?.id
@@ -290,78 +293,90 @@ function QuestionaryComponentGenericTemplate(
               open={selectedGenericTemplate !== null}
               data-cy="genericTemplate-declaration-modal"
             >
-              {selectedGenericTemplate ? (
-                <GenericTemplateContainer
-                  genericTemplate={selectedGenericTemplate}
-                  genericTemplateUpdated={(updatedGenericTemplate) => {
-                    const newStateItems = field.value.map((genericTemplate) =>
-                      genericTemplate.id === updatedGenericTemplate.id
-                        ? updatedGenericTemplate
-                        : genericTemplate
-                    );
+              <DialogContent>
+                {selectedGenericTemplate ? (
+                  <GenericTemplateContainer
+                    genericTemplate={selectedGenericTemplate}
+                    genericTemplateUpdated={(updatedGenericTemplate) => {
+                      const newStateItems = field.value.map(
+                        (genericTemplate) =>
+                          genericTemplate.id === updatedGenericTemplate.id
+                            ? updatedGenericTemplate
+                            : genericTemplate
+                      );
 
-                    updateFieldValueAndState(
-                      newStateItems,
-                      GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
-                    );
-                  }}
-                  genericTemplateCreated={(newGenericTemplate) => {
-                    const newStateItems = [...field.value, newGenericTemplate];
+                      updateFieldValueAndState(
+                        newStateItems,
+                        GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                      );
+                    }}
+                    genericTemplateCreated={(newGenericTemplate) => {
+                      const newStateItems = [
+                        ...field.value,
+                        newGenericTemplate,
+                      ];
 
-                    updateFieldValueAndState(
-                      newStateItems,
-                      GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
-                    );
-                  }}
-                  genericTemplateEditDone={() => {
-                    // refresh all genericTemplates
-                    api()
-                      .getGenericTemplatesWithQuestionaryStatus({
-                        filter: {
-                          questionId: answer.question.id,
-                          proposalPk: state.proposal.primaryKey,
-                        },
-                      })
-                      .then((result) => {
-                        updateFieldValueAndState(
-                          result.genericTemplates,
-                          GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
-                        );
-                      });
+                      updateFieldValueAndState(
+                        newStateItems,
+                        GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                      );
+                    }}
+                    genericTemplateEditDone={() => {
+                      // refresh all genericTemplates
+                      api()
+                        .getGenericTemplatesWithQuestionaryStatus({
+                          filter: {
+                            questionId: answer.question.id,
+                            proposalPk: state.proposal.primaryKey,
+                          },
+                        })
+                        .then((result) => {
+                          updateFieldValueAndState(
+                            result.genericTemplates,
+                            GENERIC_TEMPLATE_EVENT.ITEMS_MODIFIED
+                          );
+                        });
 
-                    setSelectedGenericTemplate(null);
-                  }}
-                  title={answer.question.question}
-                ></GenericTemplateContainer>
-              ) : (
-                <UOLoader />
-              )}
-            </StyledModal>
+                      setSelectedGenericTemplate(null);
+                    }}
+                    title={answer.question.question}
+                  ></GenericTemplateContainer>
+                ) : (
+                  <UOLoader />
+                )}
+              </DialogContent>
+            </StyledDialog>
             {openGenericTemplateSelectionOnCopyModal && (
-              <StyledModal
+              <StyledDialog
                 aria-labelledby="generic-template-selection-on-copy-modal-label"
                 aria-describedby="generic-template-selection-on-copy-modal"
                 open={openGenericTemplateSelectionOnCopyModal}
                 onClose={(): void =>
                   setOpenGenericTemplateSelectionOnCopyModal(false)
                 }
+                title={config.copyButtonLabel || 'Copy Sub Template'}
+                fullWidth
+                maxWidth="sm"
               >
-                <GenericTemplateSelectModalOnCopy
-                  close={(): void =>
-                    setOpenGenericTemplateSelectionOnCopyModal(false)
-                  }
-                  filter={{
-                    questionId: answerId,
-                  }}
-                  currentProposalPk={state.proposal.primaryKey}
-                  copyButtonLabel={config.copyButtonLabel}
-                  isMultipleCopySelect={config.isMultipleCopySelect || false}
-                  question={answer.question.question}
-                  handleGenericTemplateOnCopy={(
-                    copyAnswersInput: CopyAnswerInput[]
-                  ) => createGenericTemplateWithCopiedAnswers(copyAnswersInput)}
-                />
-              </StyledModal>
+                <DialogContent dividers>
+                  <GenericTemplateSelectModalOnCopy
+                    close={(): void =>
+                      setOpenGenericTemplateSelectionOnCopyModal(false)
+                    }
+                    filter={{
+                      questionId: answerId,
+                    }}
+                    currentProposalPk={state.proposal.primaryKey}
+                    isMultipleCopySelect={config.isMultipleCopySelect || false}
+                    question={answer.question.question}
+                    handleGenericTemplateOnCopy={(
+                      copyAnswersInput: CopyAnswerInput[]
+                    ) =>
+                      createGenericTemplateWithCopiedAnswers(copyAnswersInput)
+                    }
+                  />
+                </DialogContent>
+              </StyledDialog>
             )}
           </div>
         );

@@ -63,7 +63,7 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
       {() => (
         <Form>
           <Typography variant="h6" component="h1">
-            Create new units
+            Create new unit
           </Typography>
 
           <Field

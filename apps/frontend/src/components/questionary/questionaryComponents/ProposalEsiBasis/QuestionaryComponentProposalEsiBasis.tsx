@@ -5,6 +5,7 @@ import FileCopy from '@mui/icons-material/FileCopy';
 import {
   Button,
   Checkbox,
+  DialogContent,
   Divider,
   IconButton,
   List,
@@ -18,7 +19,7 @@ import React, { MouseEvent, useContext, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import BoxIcon from 'components/common/icons/BoxIcon';
-import StyledModal from 'components/common/StyledModal';
+import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalEsiContextType } from 'components/proposalEsi/ProposalEsiContainer';
@@ -120,7 +121,6 @@ function QuestionaryComponentProposalEsiBasis(
           });
 
           const sample = result.createSample;
-
           if (sample !== null) {
             dispatch({ type: 'ESI_SAMPLE_CREATED', sample: sample });
             declareEsi(sample.id);
@@ -367,7 +367,10 @@ function QuestionaryComponentProposalEsiBasis(
                     async (title) => {
                       addNewSample(title);
                     },
-                    { question: 'Name of the sample' }
+                    {
+                      question: 'Name of the sample',
+                      title: 'Create New Sample',
+                    }
                   )()
                 }
                 variant="outlined"
@@ -383,41 +386,45 @@ function QuestionaryComponentProposalEsiBasis(
               {`${declaredEsis.length ?? 0} of
               ${state?.esi?.proposal.samples?.length ?? 0} samples selected`}
             </Typography>
-            <StyledModal
+            <StyledDialog
               onClose={() => setSelectedSampleEsi(null)}
               open={selectedSampleEsi !== null}
               data-cy="sample-esi-modal"
+              maxWidth="md"
+              fullWidth
             >
-              {selectedSampleEsi ? (
-                <SampleEsiContainer
-                  esi={selectedSampleEsi}
-                  onUpdate={(updatedSampleEsi) => {
-                    const newValue = field.value.map((sampleEsi) =>
-                      sampleEsi.sampleId === updatedSampleEsi.sampleId
-                        ? updatedSampleEsi
-                        : sampleEsi
-                    );
-                    dispatch({
-                      type: 'ESI_SAMPLE_ESI_UPDATED',
-                      sampleEsi: updatedSampleEsi,
-                    });
-                    form.setFieldValue(answerId, newValue);
-                  }}
-                  onSubmitted={() => {
-                    // refresh all samples
-                    api()
-                      .getEsi({ esiId: state!.esi.id })
-                      .then((result) => {
-                        form.setFieldValue(answerId, result.esi?.sampleEsis);
+              <DialogContent>
+                {selectedSampleEsi ? (
+                  <SampleEsiContainer
+                    esi={selectedSampleEsi}
+                    onUpdate={(updatedSampleEsi) => {
+                      const newValue = field.value.map((sampleEsi) =>
+                        sampleEsi.sampleId === updatedSampleEsi.sampleId
+                          ? updatedSampleEsi
+                          : sampleEsi
+                      );
+                      dispatch({
+                        type: 'ESI_SAMPLE_ESI_UPDATED',
+                        sampleEsi: updatedSampleEsi,
                       });
+                      form.setFieldValue(answerId, newValue);
+                    }}
+                    onSubmitted={() => {
+                      // refresh all samples
+                      api()
+                        .getEsi({ esiId: state!.esi.id })
+                        .then((result) => {
+                          form.setFieldValue(answerId, result.esi?.sampleEsis);
+                        });
 
-                    setSelectedSampleEsi(null);
-                  }}
-                ></SampleEsiContainer>
-              ) : (
-                <UOLoader />
-              )}
-            </StyledModal>
+                      setSelectedSampleEsi(null);
+                    }}
+                  ></SampleEsiContainer>
+                ) : (
+                  <UOLoader />
+                )}
+              </DialogContent>
+            </StyledDialog>
           </>
         );
       }}

@@ -1,11 +1,11 @@
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import React, { ReactElement, useCallback, useState } from 'react';
+
+import StyledDialog from 'components/common/StyledDialog';
 
 import { FunctionType } from './utilTypes';
 
@@ -69,18 +69,16 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
     return (
       <>
         <WrappedComponent {...(props as T)} confirm={confirm} />
-        <Dialog
+        <StyledDialog
           fullWidth
           {...dialogProps}
           open={!!onConfirm}
           onClose={handleCancel}
           data-cy="confirmation-dialog"
+          title={title}
         >
-          {title && (
-            <DialogTitle sx={{ marginTop: '12px' }}>{title}</DialogTitle>
-          )}
           {description && (
-            <DialogContent>
+            <DialogContent dividers>
               <DialogContentText>{description}</DialogContentText>
               {alertText && <Alert severity="warning">{alertText}</Alert>}
             </DialogContent>
@@ -103,7 +101,7 @@ function withConfirm<T>(WrappedComponent: React.ComponentType<T>) {
               {confirmationText}
             </Button>
           </DialogActions>
-        </Dialog>
+        </StyledDialog>
       </>
     );
   };

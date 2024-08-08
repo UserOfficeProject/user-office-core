@@ -1,10 +1,8 @@
-import CloseIcon from '@mui/icons-material/Close';
-import Box from '@mui/material/Box';
+import { DialogContent } from '@mui/material';
 import Button, { ButtonProps } from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
 import React from 'react';
 
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 
 interface ButtonWithDialogProps extends ButtonProps {
   children: JSX.Element & { onClose?: () => void };
@@ -21,26 +19,18 @@ function ButtonWithDialog(props: ButtonWithDialogProps) {
       <Button variant="text" onClick={() => setIsDialogOpen(true)} {...rest}>
         {label}
       </Button>
-      <InputDialog open={isDialogOpen}>
-        <IconButton
-          data-cy="close-dialog"
-          sx={(theme) => ({
-            position: 'absolute',
-            right: theme.spacing(1),
-            top: theme.spacing(1),
-          })}
-          onClick={() => {
-            setIsDialogOpen(false);
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-        <Box sx={{ width: '500px' }}>
+      <StyledDialog
+        open={isDialogOpen}
+        fullWidth
+        maxWidth="sm"
+        onClose={() => setIsDialogOpen(false)}
+      >
+        <DialogContent dividers>
           {React.cloneElement(children, {
             onClose: () => setIsDialogOpen(false),
           })}
-        </Box>
-      </InputDialog>
+        </DialogContent>
+      </StyledDialog>
     </>
   );
 }

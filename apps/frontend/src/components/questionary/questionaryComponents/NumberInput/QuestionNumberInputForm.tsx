@@ -1,10 +1,9 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CloseIcon from '@mui/icons-material/Close';
 import LaunchIcon from '@mui/icons-material/Launch';
+import { DialogContent } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
-import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import { useTheme } from '@mui/material/styles';
 import MUITextField from '@mui/material/TextField';
@@ -15,7 +14,7 @@ import * as Yup from 'yup';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
@@ -190,7 +189,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               ]}
             />
           </TitledContainer>
-          <InputDialog
+          <StyledDialog
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
             data-cy="unit-modal"
@@ -201,21 +200,10 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               setShow(false);
             }}
           >
-            <IconButton
-              sx={{
-                position: 'absolute',
-                right: theme.spacing(1),
-                top: theme.spacing(1),
-              }}
-              data-cy="close-modal-btn"
-              onClick={() => {
-                setShow(false);
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-            <CreateUnit close={onCreated} unit={null} />
-          </InputDialog>
+            <DialogContent>
+              <CreateUnit close={onCreated} unit={null} />
+            </DialogContent>
+          </StyledDialog>
         </>
       )}
     </QuestionFormShell>

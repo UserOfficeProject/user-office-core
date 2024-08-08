@@ -1,8 +1,7 @@
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
+import { DialogContent } from '@mui/material';
 import React from 'react';
 
-import StyledModal from 'components/common/StyledModal';
+import StyledDialog from 'components/common/StyledDialog';
 import { createQuestionTemplateRelationForm } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionTemplateRelation, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
@@ -20,26 +19,16 @@ export default function QuestionTemplateRelationEditor(props: {
   }
 
   return (
-    <StyledModal
+    <StyledDialog
       open={props.field != null}
       data-cy="question-relation-dialogue"
+      onClose={props.closeMe}
+      fullWidth
+      maxWidth="md"
     >
-      <>
+      <DialogContent>
         <TemplateEditLabel pageType={'Template'} />
-        <IconButton
-          data-cy="close-modal-btn"
-          sx={(theme) => ({
-            position: 'absolute',
-            right: theme.spacing(1),
-            top: theme.spacing(1),
-            '& > svg': {
-              color: theme.palette.grey[600],
-            },
-          })}
-          onClick={props.closeMe}
-        >
-          <CloseIcon />
-        </IconButton>
+
         {createQuestionTemplateRelationForm({
           questionRel: props.field,
           onOpenQuestionClicked: (question) => {
@@ -63,7 +52,7 @@ export default function QuestionTemplateRelationEditor(props: {
           closeMe: props.closeMe,
           template: props.template,
         })}
-      </>
-    </StyledModal>
+      </DialogContent>
+    </StyledDialog>
   );
 }
