@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('0160_OptionalTechReviewsSetting.sql', 'TCMeldrum', 'Optional Technical Reviews Setting', '2024-07-17') THEN
+  IF register_patch('0160_OptionalTechReviewsSetting.sql', 'TCMeldrum', 'Optional Technical Reviews Setting', '2024-08-07') THEN
     BEGIN
 
       INSERT INTO settings(settings_id, description) 

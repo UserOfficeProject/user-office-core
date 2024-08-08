@@ -1077,13 +1077,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
-    const getWorkflowStatus = (
+    const workflowStatus = (
       await this.AdminDataSource.getSetting(
         SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS
       )
     )?.settingsValue;
 
-    if (!getWorkflowStatus) {
+    if (!workflowStatus) {
       return true;
     }
 
@@ -1101,7 +1101,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
 
     return !!proposalStatus.find((status) =>
-      status.proposalStatus.shortCode.match(getWorkflowStatus)
+      status.proposalStatus.shortCode.match(workflowStatus)
     );
   }
 }
