@@ -59,6 +59,8 @@ function readWriteReview(
     cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
 
     cy.get('[role="listbox"] > [role="option"]').first().click();
+
+    cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
   } else {
     cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
   }
@@ -77,7 +79,7 @@ function readWriteReview(
 
   if (!isReviewer) {
     cy.get('[data-cy=save-button]').focus().click();
-    cy.notification({ variant: 'success', text: 'Updated' });
+    cy.notification({ variant: 'success', text: 'Saved' });
   }
 
   cy.closeModal();
