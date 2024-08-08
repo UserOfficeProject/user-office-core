@@ -51,13 +51,15 @@ export function QuestionaryComponentTechniquePicker(
   );
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
-    const newValue = event.target.value || null;
+    const newValue = event.target.value;
+
     let techniques: number[] | number = [] || {};
+
     if (Array.isArray(newValue) && newValue.length > 0) {
       techniques = newValue.map((id) => {
         return +id;
       });
-    } else if (typeof newValue === 'string') {
+    } else {
       techniques = +newValue;
     }
 
