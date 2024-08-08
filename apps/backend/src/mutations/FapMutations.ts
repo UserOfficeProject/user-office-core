@@ -670,9 +670,9 @@ export default class FapMutations {
     }
 
     const fapProposals = await this.dataSource.getFapProposalsByInstrument(
-      fapId,
       instrumentId,
-      proposal.callId
+      proposal.callId,
+      { fapId }
     );
 
     if (fapProposals.every((fp) => fp.fapInstrumentMeetingSubmitted)) {

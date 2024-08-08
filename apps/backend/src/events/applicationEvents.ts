@@ -149,6 +149,11 @@ interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   instrumentshasproposals: InstrumentsHasProposals;
 }
 
+interface ProposalAllFapInstrumentSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED;
+  instrumentshasproposals: InstrumentsHasProposals;
+}
+
 interface ProposalInstrumentUnsubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED;
   instrumentshasproposals: InstrumentsHasProposals;
@@ -156,6 +161,21 @@ interface ProposalInstrumentUnsubmittedEvent extends GeneralEvent {
 
 interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FAP_MEETING_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface FapAllMeetingsSubmittedEvent extends GeneralEvent {
+  type: Event.FAP_ALL_MEETINGS_SUBMITTED;
+  fap: Fap;
+}
+
+interface ProposalAllFapReviewsSubmittedForAllPanelsEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS;
+  proposal: Proposal;
+}
+
+interface ProposalAllFapMeetingsSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED;
   proposal: Proposal;
 }
 
@@ -397,6 +417,10 @@ export type ApplicationEvent =
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
   | ProposalBookingTimeSlotsRemovedEvent
+  | FapAllMeetingsSubmittedEvent
+  | ProposalAllFapReviewsSubmittedForAllPanelsEvent
+  | ProposalAllFapMeetingsSubmittedEvent
+  | ProposalAllFapInstrumentSubmittedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
