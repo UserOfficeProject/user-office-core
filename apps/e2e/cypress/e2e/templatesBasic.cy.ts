@@ -1130,7 +1130,7 @@ context('Template tests', () => {
       );
     });
 
-    it.only('User officer can add instrument picker question as a dependency', () => {
+    it('User officer can add instrument picker question as a dependency', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
         if (createdProposal) {
@@ -1340,7 +1340,7 @@ context('Template tests', () => {
         });
 
         if (contains.length === 0) {
-          cy.get('[role="listbox"]').children().should('have.length', 3);
+          cy.get('[role="listbox"]').children().should('have.length', 4);
         }
 
         if (select) {
