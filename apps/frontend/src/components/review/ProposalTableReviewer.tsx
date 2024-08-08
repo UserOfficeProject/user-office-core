@@ -420,6 +420,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         }}
       >
         <ProposalReviewContent
+          proposalPk={proposalToReview?.proposalPk}
           reviewId={urlQueryParams.reviewModal}
           tabNames={reviewerProposalReviewTabs}
           fapId={

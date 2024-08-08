@@ -187,14 +187,14 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
 
 const fapReviewBasisPreSubmit =
   () =>
-  async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
+  async ({ api, state }: SubmitActionDependencyContainer) => {
     const fapReview = (state as FapReviewSubmissionState).fapReview;
     const { id, comment, grade, fapID, status, questionaryID } = fapReview;
 
     const returnValue = state.questionary.questionaryId;
 
     if (id > 0) {
-      const result = await api.updateReview({
+      await api.updateReview({
         reviewID: id,
         status: status,
         fapID: fapID,
@@ -202,15 +202,6 @@ const fapReviewBasisPreSubmit =
         grade: grade || 0,
         comment: comment || '',
       });
-
-      dispatch({
-        type: 'ITEM_WITH_QUESTIONARY_LOADED',
-        itemWithQuestionary: {
-          ...fapReview,
-          ...result.updateReview,
-        },
-      });
-    } else {
     }
 
     return returnValue;
