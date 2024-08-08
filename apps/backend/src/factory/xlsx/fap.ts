@@ -100,9 +100,9 @@ export const collectFaplXLSXData = async (
   const instrumentsFapProposals = await Promise.all(
     instruments.map((instrument) => {
       return baseContext.queries.fap.getFapProposalsByInstrument(user, {
-        fapId,
-        callId,
         instrumentId: instrument.id,
+        callId,
+        fapId,
       });
     })
   );

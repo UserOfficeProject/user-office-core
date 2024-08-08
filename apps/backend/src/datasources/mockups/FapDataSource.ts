@@ -336,9 +336,9 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getFapProposalsByInstrument(
-    fapId: number,
     instrumentId: number,
-    callId: number
+    callId: number,
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ) {
     return dummyFapProposals.filter((proposal) => proposal.fapId === fapId);
   }
@@ -369,6 +369,12 @@ export class FapDataSourceMock implements FapDataSource {
         assignment.fapId === fapId &&
         assignment.proposalPk === proposalPk &&
         (reviewerId !== null ? assignment.fapMemberUserId === reviewerId : true)
+    );
+  }
+
+  async getAllFapProposalAssignments(proposalPk: number) {
+    return dummyFapAssignments.filter(
+      (assignment) => assignment.proposalPk === proposalPk
     );
   }
 
@@ -468,6 +474,12 @@ export class FapDataSourceMock implements FapDataSource {
 
   async getProposalsFapMeetingDecisions(
     proposalPks: number[]
+  ): Promise<FapMeetingDecision[]> {
+    return [dummyFapMeetingDecision];
+  }
+
+  async getAllFapMeetingDecisions(
+    fapId: number
   ): Promise<FapMeetingDecision[]> {
     return [dummyFapMeetingDecision];
   }

@@ -224,6 +224,35 @@ export default class PostgresInstrumentDataSource
       });
   }
 
+  async getInstrumentsHasProposal(
+    instrumentIds: number[],
+    proposalPk: number,
+    callId: number
+  ): Promise<InstrumentsHasProposals> {
+    return database
+      .select<InstrumentHasProposalRecord[]>('*')
+      .from('instrument_has_proposals')
+      .whereIn('instrument_id', instrumentIds)
+      .andWhere('proposal_pk', proposalPk)
+      .then(async (ihp) => {
+        const instrumentsWithSubmittedFlag =
+          await this.checkIfAllProposalsOnInstrumentSubmitted(
+            ihp.map((i) => ({
+              instrument_id: i.instrument_id,
+            })) as InstrumentWithAvailabilityTimeRecord[],
+            callId,
+            { proposalPk }
+          );
+
+        return new InstrumentsHasProposals(
+          ihp.map((i) => i.instrument_has_proposals_id),
+          instrumentIds,
+          [proposalPk],
+          instrumentsWithSubmittedFlag.every((i) => i.submitted)
+        );
+      });
+  }
+
   async getUserInstruments(userId: number): Promise<Instrument[]> {
     return database
       .select([
@@ -398,8 +427,8 @@ export default class PostgresInstrumentDataSource
 
   async checkIfAllProposalsOnInstrumentSubmitted(
     instruments: InstrumentWithAvailabilityTimeRecord[],
-    fapId: number,
-    callId: number
+    callId: number,
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ): Promise<InstrumentWithAvailabilityTimeRecord[]> {
     const instrumentsWithSubmittedFlag: InstrumentWithAvailabilityTimeRecord[] =
       [];
@@ -407,9 +436,9 @@ export default class PostgresInstrumentDataSource
     for (const instrument of instruments) {
       const allProposalsOnInstrument =
         await this.fapDataSource.getFapProposalsByInstrument(
-          fapId,
           instrument.instrument_id,
-          callId
+          callId,
+          { fapId, proposalPk }
         );
 
       const allProposalsOnInstrumentSubmitted = allProposalsOnInstrument.every(
@@ -493,8 +522,8 @@ export default class PostgresInstrumentDataSource
         const instrumentsWithSubmittedFlag =
           await this.checkIfAllProposalsOnInstrumentSubmitted(
             instruments,
-            fapId,
-            callId
+            callId,
+            { fapId }
           );
 
         const result = instrumentsWithSubmittedFlag.map((instrument) => {
