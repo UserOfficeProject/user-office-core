@@ -13,6 +13,12 @@ BEGIN
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 1, NULL);
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 3, NULL);
 
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (1, 1);
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (1, 3);
+
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (2, 1);
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (2, 3);
+
   INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (1, NOW(), 1);
 
   INSERT INTO proposals 

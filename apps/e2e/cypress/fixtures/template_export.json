@@ -222,11 +222,12 @@
                     "small_label": "",
                     "techniques": [],
                     "tooltip": "",
-                    "variant": "dropdown"
+                    "variant": "dropdown",
+                    "options": [1, 2]
                 },
                 "dataType": "TECHNIQUE_PICKER",
-                "id": "technique_picker_1720083181887",
-                "naturalKey": "technique_picker_1720083181887",
+                "id": "technique_picker_question",
+                "naturalKey": "technique_picker_question",
                 "question": "Technique Picker question from seeds"
             }
         ],
@@ -744,6 +745,7 @@
                             "small_label": "",
                             "techniques": [],
                             "tooltip": "",
+                            "options": [1, 2],
                             "variant": "dropdown"
                         },
                         "dependencies": [],
@@ -755,12 +757,13 @@
                                 "required": false,
                                 "small_label": "",
                                 "techniques": [],
+                                "options": [1, 2],
                                 "tooltip": "",
                                 "variant": "dropdown"
                             },
                             "dataType": "TECHNIQUE_PICKER",
-                            "id": "technique_picker_1720083181887",
-                            "naturalKey": "technique_picker_1720083181887",
+                            "id": "technique_picker_question",
+                            "naturalKey": "technique_picker_question",
                             "question": "Technique Picker question from seeds"
                         },
                         "sortOrder": 0,
