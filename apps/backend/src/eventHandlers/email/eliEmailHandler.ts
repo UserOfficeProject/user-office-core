@@ -102,7 +102,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
             email: user.email,
             inviterName: inviter.firstname,
             inviterLastname: inviter.lastname,
-            //inviterOrg: inviter.organisation,
             redeemCode: redeemCode[0].code,
           },
           recipients: [{ address: user.email }],
@@ -175,9 +174,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
     case Event.USER_CREATED: {
       if (process.env.NODE_ENV === 'development') {
-        //await userDataSource.setUserEmailVerified(
-        //    event.userlinkresponse.user.id
-        //);
         logger.logInfo('Set user as verified without sending email', {
           userId: event.userlinkresponse.user.id,
           event,
@@ -244,15 +240,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
             proposalTitle: event.proposal.title,
             commentForUser: event.proposal.commentForUser,
           },
-          recipients: [
-            { address: principalInvestigator.email },
-            /*{
-                          address: {
-                            email: 'useroffice@esss.se',
-                            header_to: principalInvestigator.email,
-                          },
-                        },*/
-          ],
+          recipients: [{ address: principalInvestigator.email }],
         })
         .then((res: any) => {
           logger.logInfo('Email sent on proposal notify:', {
