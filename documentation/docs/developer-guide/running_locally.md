@@ -28,7 +28,7 @@ Ensure you have the following installed on your machine:
 
 ## Configuration
 
-**Check the '.env' File**
+**Check the `.env` File**
 
 The application requires environment variables to be set. If a .env file is not present at startup, it will be generated using the example.development.env template.
 

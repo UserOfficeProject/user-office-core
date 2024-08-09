@@ -737,6 +737,15 @@ const ProposalTableOfficer = ({
   const allPrefetchedProposalsSelected =
     totalCount === urlQueryParams.selection.length;
 
+  const proposalFapInstruments = selectedProposalsData
+    .filter((item) => !!item.instruments)
+    .map((selectedProposal) => selectedProposal.fapInstruments)
+    .flat();
+
+  const proposalsInstruments = selectedProposalsData
+    .filter((item) => !!item.instruments)
+    .map((selectedProposal) => selectedProposal.instruments);
+
   return (
     <>
       <Dialog
@@ -751,12 +760,8 @@ const ProposalTableOfficer = ({
           <AssignProposalsToFaps
             assignProposalsToFaps={assignProposalsToFaps}
             close={(): void => setOpenAssignment(false)}
-            proposalFapInstruments={selectedProposalsData
-              .map((selectedProposal) => selectedProposal.fapInstruments)
-              .flat()}
-            proposalInstruments={selectedProposalsData.map(
-              (selectedProposal) => selectedProposal.instruments
-            )}
+            proposalFapInstruments={proposalFapInstruments}
+            proposalInstruments={proposalsInstruments}
           />
         </DialogContent>
       </Dialog>
