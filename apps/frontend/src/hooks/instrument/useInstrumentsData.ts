@@ -13,21 +13,13 @@ import { useDataApi } from 'hooks/common/useDataApi';
 export function useInstrumentsData(callIds?: number[]): {
   loadingInstruments: boolean;
   instruments: InstrumentFragment[];
-  setInstrumentsWithLoading: Dispatch<SetStateAction<InstrumentFragment[]>>;
+  setInstruments: Dispatch<SetStateAction<InstrumentFragment[]>>;
 } {
   const [instruments, setInstruments] = useState<InstrumentFragment[]>([]);
   const [loadingInstruments, setLoadingInstruments] = useState(true);
   const { currentRole } = useContext(UserContext);
 
   const api = useDataApi();
-
-  const setInstrumentsWithLoading = (
-    data: SetStateAction<InstrumentFragment[]>
-  ) => {
-    setLoadingInstruments(true);
-    setInstruments(data);
-    setLoadingInstruments(false);
-  };
 
   useEffect(() => {
     let unmounted = false;
@@ -79,6 +71,6 @@ export function useInstrumentsData(callIds?: number[]): {
   return {
     loadingInstruments,
     instruments,
-    setInstrumentsWithLoading,
+    setInstruments,
   };
 }

@@ -24,6 +24,7 @@ let numberOfScientistsAndManagerAssignedToCreatedInstrument: number;
 context('Internal Review tests', () => {
   beforeEach(function () {
     cy.resetDB();
+    cy.addFeasibilityReviewToDefaultWorkflow();
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();

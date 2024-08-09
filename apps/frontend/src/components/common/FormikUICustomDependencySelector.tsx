@@ -3,7 +3,6 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { FormikProps, FormikValues } from 'formik';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 
@@ -23,15 +22,6 @@ import {
 } from 'models/questionary/QuestionaryFunctions';
 import { FunctionType } from 'utils/utilTypes';
 
-const useStyles = makeStyles((theme) => ({
-  menuItem: {
-    display: 'flex',
-    alignItems: 'center',
-    '& SVG': {
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
 const FormikUICustomDependencySelector = ({
   field,
   template,
@@ -54,6 +44,7 @@ const FormikUICustomDependencySelector = ({
   const [dependencyId, setDependencyId] = useState<string>(
     dependency.dependencyId || ''
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [operator, setOperator] = useState<EvaluatorOperator>(
     dependency.condition.condition || EvaluatorOperator.EQ
   );
@@ -62,8 +53,6 @@ const FormikUICustomDependencySelector = ({
   >(dependency.condition.params || '');
 
   const [availableValues, setAvailableValues] = useState<Option[]>([]);
-
-  const classes = useStyles();
   const api = useDataApi();
 
   const updateFormik = (): void => {
@@ -80,9 +69,12 @@ const FormikUICustomDependencySelector = ({
   };
 
   useEffect(() => {
+    setIsLoading(true);
     if (dependencyId) {
       const depField = getFieldById(template.steps, dependencyId);
       if (!depField) {
+        setIsLoading(false);
+
         return;
       }
       if (depField.question.dataType === DataType.BOOLEAN) {
@@ -90,6 +82,7 @@ const FormikUICustomDependencySelector = ({
           { label: 'true', value: true },
           { label: 'false', value: false },
         ]);
+        setIsLoading(false);
       } else if (
         depField.question.dataType === DataType.SELECTION_FROM_OPTIONS
       ) {
@@ -100,8 +93,11 @@ const FormikUICustomDependencySelector = ({
             }
           )
         ); // use options
+        setIsLoading(false);
       } else if (depField.question.dataType === DataType.INSTRUMENT_PICKER) {
         if (form.submitCount) {
+          setIsLoading(false);
+
           return;
         }
 
@@ -116,6 +112,8 @@ const FormikUICustomDependencySelector = ({
                 }))
               );
             }
+
+            setIsLoading(false);
           });
       }
     }
@@ -190,12 +188,19 @@ const FormikUICustomDependencySelector = ({
               }
             }}
             required
+            data-cy="dependencyField"
           >
             {allAvailableFields.map((option) => {
               return (
                 <MenuItem
                   value={option.question.id}
-                  className={classes.menuItem}
+                  sx={(theme) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    '& SVG': {
+                      marginRight: theme.spacing(1),
+                    },
+                  })}
                   key={option.question.id}
                 >
                   {option.question.question}
@@ -218,6 +223,7 @@ const FormikUICustomDependencySelector = ({
             onChange={(event: SelectChangeEvent<EvaluatorOperator>) => {
               setOperator(event.target.value as EvaluatorOperator);
             }}
+            data-cy="dependencyOperator"
           >
             <MenuItem value={EvaluatorOperator.EQ.toString()}>equals</MenuItem>
             <MenuItem value={EvaluatorOperator.NEQ.toString()}>
@@ -240,14 +246,21 @@ const FormikUICustomDependencySelector = ({
               setDependencyValue(event.target.value);
             }}
             required
+            data-cy="dependencyValue"
           >
-            {availableValues.map((option) => {
-              return (
-                <MenuItem value={option.value as string} key={option.label}>
-                  {option.label}
-                </MenuItem>
-              );
-            })}
+            {isLoading ? (
+              <MenuItem data-cy="loading" key="loading">
+                Loading...
+              </MenuItem>
+            ) : (
+              availableValues.map((option) => {
+                return (
+                  <MenuItem value={option.value as string} key={option.label}>
+                    {option.label}
+                  </MenuItem>
+                );
+              })
+            )}
           </Select>
         </FormControl>
       </Grid>

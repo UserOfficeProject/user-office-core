@@ -1,4 +1,4 @@
-import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
 import React from 'react';
 
 import { Settings, SettingsId } from 'generated/sdk';
@@ -9,16 +9,6 @@ interface SettingsContextData {
   readonly settings: Settings[];
   readonly setSettings: React.Dispatch<React.SetStateAction<Settings[]>>;
 }
-
-const useStyles = makeStyles({
-  loader: {
-    display: 'flex',
-    width: '100vw',
-    height: '100vh',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 const initialSettingsData: SettingsContextData = {
   settingsMap: new Map<SettingsId, Settings>(),
@@ -33,13 +23,21 @@ export const SettingsContextProvider = (props: {
   children: React.ReactNode;
 }) => {
   const { settings, loadingSettings, setSettings } = useSettings();
-  const classes = useStyles();
 
   if (loadingSettings) {
     return (
-      <div className={classes.loader} data-cy="loading">
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100vw',
+          height: '100vh',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        data-cy="loading"
+      >
         Loading...
-      </div>
+      </Box>
     );
   }
 

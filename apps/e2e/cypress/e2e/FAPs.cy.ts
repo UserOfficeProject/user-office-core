@@ -26,6 +26,16 @@ const fapMembers = {
   reviewer2: initialDBData.users.user3,
 };
 
+function clickConfirmOk() {
+  if (
+    featureFlags
+      .getEnabledFeatures()
+      .get(FeatureId.CONFLICT_OF_INTEREST_WARNING)
+  ) {
+    cy.get('[data-cy="confirm-ok"]').click();
+  }
+}
+
 function readWriteReview(
   { shouldSubmit, isReviewer } = { shouldSubmit: false, isReviewer: false }
 ) {
@@ -176,6 +186,13 @@ function createWorkflowAndEsiTemplate() {
     const workflow = result.createProposalWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: 'proposalWorkflowConnections_0',
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: 1,
+      });
 
       cy.createTemplate({
         name: 'default esi template',
@@ -435,7 +452,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -492,7 +509,7 @@ context('Fap reviews tests', () => {
       cy.contains('2 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -551,7 +568,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'error',
@@ -608,7 +625,7 @@ context('Fap reviews tests', () => {
       cy.contains('2 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -767,7 +784,9 @@ context('Fap reviews tests', () => {
         return false;
       });
       cy.login('officer');
-      cy.visit('/ProposalPage');
+      cy.visit('/Proposals');
+
+      cy.get('[data-cy="officer-proposals-table"]').should('exist');
 
       cy.get('[type="checkbox"]').first().check();
 
@@ -882,7 +901,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -1031,7 +1050,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -1215,6 +1234,7 @@ context('Fap reviews tests', () => {
         .parent()
         .find('[data-cy="grade-proposal-icon"]')
         .click();
+
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
       if (
@@ -2648,7 +2668,7 @@ context('Fap meeting components tests', () => {
       cy.finishedLoading();
 
       cy.get(
-        '[data-cy="fap-assignments-table"] [data-cy="select-all-table-rows"]'
+        '[data-cy="fap-assignments-table"] #select-all-table-rows'
       ).click();
 
       cy.get('[data-cy="download-fap-proposals"]').click();

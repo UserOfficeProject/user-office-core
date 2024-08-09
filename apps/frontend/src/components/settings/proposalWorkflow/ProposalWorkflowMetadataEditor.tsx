@@ -1,43 +1,18 @@
 import EditIcon from '@mui/icons-material/Edit';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
 import { updateProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import TextField from 'components/common/FormikUITextField';
 import { ProposalWorkflow } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 
 import { Event, EventType } from './ProposalWorkflowEditorModel';
 
-const useStyles = makeStyles((theme) => ({
-  workflowName: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    paddingBottom: '5px',
-  },
-  workflowDescription: {
-    fontSize: '16px',
-    whiteSpace: 'pre-wrap',
-  },
-  container: {
-    padding: theme.spacing(3),
-    marginTop: theme.spacing(3),
-    marginBottom: theme.spacing(3),
-  },
-  button: {
-    margin: '25px 10px 0 10px',
-    '&:first-child': {
-      marginLeft: '0',
-    },
-    '&:last-child': {
-      marginRight: '0',
-    },
-  },
-}));
 const ProposalWorkflowMetadataEditor = ({
   proposalWorkflow,
   dispatch,
@@ -47,19 +22,27 @@ const ProposalWorkflowMetadataEditor = ({
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const classes = useStyles();
-
   const staticJSX = (
     <div data-cy="proposal-workflow-metadata-container">
-      <div className={classes.workflowName}>{proposalWorkflow.name}</div>
-      <div className={classes.workflowDescription}>
+      <Box sx={{ fontSize: '24px', fontWeight: 'bold', paddingBottom: '5px' }}>
+        {proposalWorkflow.name}
+      </Box>
+      <Box sx={{ fontSize: '16px', whiteSpace: 'pre-wrap' }}>
         {proposalWorkflow.description}
-      </div>
+      </Box>
       <StyledButtonContainer>
         <Button
           startIcon={<EditIcon />}
           onClick={() => setIsEditMode(true)}
-          className={classes.button}
+          sx={{
+            margin: '25px 10px 0 10px',
+            '&:first-child': {
+              marginLeft: '0',
+            },
+            '&:last-child': {
+              marginRight: '0',
+            },
+          }}
           data-cy="Edit-button"
         >
           Edit
@@ -110,7 +93,15 @@ const ProposalWorkflowMetadataEditor = ({
               variant="text"
               color="secondary"
               onClick={() => setIsEditMode(false)}
-              className={classes.button}
+              sx={{
+                margin: '25px 10px 0 10px',
+                '&:first-child': {
+                  marginLeft: '0',
+                },
+                '&:last-child': {
+                  marginRight: '0',
+                },
+              }}
             >
               Cancel
             </Button>
@@ -118,7 +109,15 @@ const ProposalWorkflowMetadataEditor = ({
               disabled={isSubmitting}
               data-cy="submit"
               type="submit"
-              className={classes.button}
+              sx={{
+                margin: '25px 10px 0 10px',
+                '&:first-child': {
+                  marginLeft: '0',
+                },
+                '&:last-child': {
+                  marginRight: '0',
+                },
+              }}
             >
               Update
             </Button>
@@ -130,7 +129,17 @@ const ProposalWorkflowMetadataEditor = ({
 
   const body = isEditMode ? inputJSX : staticJSX;
 
-  return <Paper className={classes.container}>{body}</Paper>;
+  return (
+    <Paper
+      sx={(theme) => ({
+        padding: theme.spacing(3),
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(3),
+      })}
+    >
+      {body}
+    </Paper>
+  );
 };
 
 export default ProposalWorkflowMetadataEditor;

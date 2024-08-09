@@ -1,29 +1,17 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import {
   createProposalStatusValidationSchema,
   updateProposalStatusValidationSchema,
 } from '@user-office-software/duo-validation/lib/ProposalStatuses';
 import { Field, Form, Formik } from 'formik';
-import { TextField } from 'formik-mui';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
 import { ProposalStatus } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  darkerDisabledTextField: {
-    '& .MuiInputBase-root.Mui-disabled': {
-      color: 'rgba(0, 0, 0, 0.7) !important',
-    },
-  },
-}));
 
 type CreateUpdateProposalStatusProps = {
   close: (proposalStatusAdded: ProposalStatus | null) => void;
@@ -34,7 +22,6 @@ const CreateUpdateProposalStatus = ({
   close,
   proposalStatus,
 }: CreateUpdateProposalStatusProps) => {
-  const classes = useStyles();
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = proposalStatus
@@ -90,10 +77,14 @@ const CreateUpdateProposalStatus = ({
             id="shortCode"
             label="Short code"
             type="text"
+            sx={{
+              ...(!!initialValues.shortCode && {
+                '& .MuiInputBase-root.Mui-disabled': {
+                  color: 'rgba(0, 0, 0, 0.7) !important',
+                },
+              }),
+            }}
             component={TextField}
-            className={
-              !!initialValues.shortCode ? classes.darkerDisabledTextField : ''
-            }
             fullWidth
             data-cy="shortCode"
             required
@@ -128,7 +119,7 @@ const CreateUpdateProposalStatus = ({
           <Button
             type="submit"
             fullWidth
-            className={classes.submit}
+            sx={(theme) => ({ margin: theme.spacing(3, 0, 2) })}
             data-cy="submit"
             disabled={isExecutingCall}
           >

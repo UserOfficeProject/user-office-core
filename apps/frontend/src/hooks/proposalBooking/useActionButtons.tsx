@@ -5,7 +5,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import SchoolIcon from '@mui/icons-material/School';
 import { DateTime } from 'luxon';
 import React, { ReactNode, useContext } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import BoxIcon from 'components/common/icons/BoxIcon';
 import EsiIcon from 'components/common/icons/EsiIcon';
@@ -74,7 +74,7 @@ interface UseActionButtonsArgs {
   eventUpdated: (updatedEvent: ProposalScheduledEvent) => void;
 }
 export function useActionButtons(args: UseActionButtonsArgs) {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { openModal, closeModal, eventUpdated } = args;
 
@@ -148,9 +148,9 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState,
       () => {
         if (event?.esi) {
-          history.push(`/UpdateEsi/${event.esi.id}`);
+          navigate(`/UpdateEsi/${event.esi.id}`);
         } else {
-          history.push(`/CreateEsi/${event.id}`);
+          navigate(`/CreateEsi/${event.id}`);
         }
       }
     );
@@ -245,7 +245,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <SchoolIcon data-cy="finish-training-icon" />,
       buttonState,
       () => {
-        history.push('/training');
+        navigate('/training');
       }
     );
   };
@@ -267,7 +267,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
       () => {
-        history.push(`/DeclareShipments/${event.id}`);
+        navigate(`/DeclareShipments/${event.id}`);
       }
     );
   };
@@ -295,9 +295,9 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState,
       () => {
         if (event?.feedback) {
-          history.push(`/UpdateFeedback/${event.feedback.id}`);
+          navigate(`/UpdateFeedback/${event.feedback.id}`);
         } else {
-          history.push(`/CreateFeedback/${event.id}`);
+          navigate(`/CreateFeedback/${event.id}`);
         }
       }
     );
