@@ -33,6 +33,9 @@ export class UpdateFapArgs {
 
   @Field(() => Boolean)
   public active: boolean;
+
+  @Field(() => String, { nullable: true })
+  public files: string | null;
 }
 
 @Resolver()

@@ -6,6 +6,7 @@ fragment fap on Fap {
   gradeGuide
   customGradeGuide
   active
+  files
   fapChairs {
     ...basicUserDetails
   }
