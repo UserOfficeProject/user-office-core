@@ -18,7 +18,10 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
-import { AssignProposalsToFapsInput } from './postgres/records';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from './postgres/records';
 
 export interface FapDataSource {
   create(
@@ -144,6 +147,7 @@ export interface FapDataSource {
     reviewerId: number,
     rank: number
   ): Promise<boolean>;
+  getFapReviewData(callId: number, fapId: number): Promise<FapReviewsRecord[]>;
   submitFapMeetings(
     callId: number,
     fapId: number,
