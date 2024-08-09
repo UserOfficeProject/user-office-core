@@ -88,7 +88,10 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
 
-  const isXpressRouteEnabled = useXpressAccess([UserRole.USER_OFFICER]);
+  const isXpressRouteEnabled = useXpressAccess([
+    UserRole.USER_OFFICER,
+    UserRole.INSTRUMENT_SCIENTIST,
+  ]);
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
@@ -279,6 +282,14 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItemButton>
+      {isXpressRouteEnabled && (
+        <ListItemButton component={NavLink} to="/XpressProposals">
+          <ListItemIcon>
+            <FolderOpen />
+          </ListItemIcon>
+          <ListItemText primary="Xpress Proposals" />
+        </ListItemButton>
+      )}
       {isInstrumentManagementEnabled && (
         <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>
