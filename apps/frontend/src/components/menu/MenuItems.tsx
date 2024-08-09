@@ -27,6 +27,7 @@ import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
@@ -86,6 +87,8 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const isSampleSafetyEnabled = context.featuresMap.get(
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
+
+  const isXpressRouteEnabled = useXpressAccess([UserRole.USER_OFFICER]);
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
@@ -148,6 +151,16 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           <ListItemText primary="Proposals" />
         </ListItemButton>
       </Tooltip>
+      {isXpressRouteEnabled && (
+        <Tooltip title="Xpress Proposals">
+          <ListItemButton component={NavLink} to="/XpressProposals">
+            <ListItemIcon>
+              <FolderOpen />
+            </ListItemIcon>
+            <ListItemText primary="Xpress Proposals" />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
           <ListItemButton
