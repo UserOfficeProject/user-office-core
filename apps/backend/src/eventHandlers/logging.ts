@@ -170,6 +170,29 @@ export default function createHandler() {
           );
 
           break;
+        case Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED: {
+          const instrumentIds = event.instrumentshasproposals.instrumentIds;
+          const instruments =
+            await instrumentDataSource.getInstrumentsByIds(instrumentIds);
+
+          const description = `Submitted instrument${instruments.length > 1 ? 's' : ''}: ${instruments?.map((i) => i.name).join(', ')}`;
+
+          await Promise.all(
+            event.instrumentshasproposals.proposalPks.map(
+              async (proposalPk) => {
+                return eventLogsDataSource.set(
+                  event.loggedInUserId,
+                  event.type,
+                  json,
+                  proposalPk.toString(),
+                  description
+                );
+              }
+            )
+          );
+
+          break;
+        }
         case Event.PROPOSAL_FAP_MEETING_SAVED:
         case Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN:
         case Event.PROPOSAL_FAP_MEETING_REORDER:

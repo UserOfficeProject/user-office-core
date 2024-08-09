@@ -347,9 +347,9 @@ export default class InstrumentMutations {
 
     const allInstrumentProposals =
       await this.fapDataSource.getFapProposalsByInstrument(
-        args.fapId,
         args.instrumentId,
-        args.callId
+        args.callId,
+        { fapId: args.fapId }
       );
 
     const submittedFapInstrumentProposalPks = allInstrumentProposals.map(
@@ -426,9 +426,9 @@ export default class InstrumentMutations {
 
     const allInstrumentProposals =
       await this.fapDataSource.getFapProposalsByInstrument(
-        args.fapId,
         args.instrumentId,
-        args.callId
+        args.callId,
+        { fapId: args.fapId }
       );
 
     const proposalPksToUnsubmit = allInstrumentProposals.map(
