@@ -880,8 +880,6 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=call-filter]').click();
 
       cy.get('[role=listbox]').contains('call 1').first().click();
-
-      cy.get('[data-cy=question-search-toggle]').click();
     });
 
     it('Should be able to search Boolean question', () => {

@@ -842,7 +842,7 @@ context('Instrument tests', () => {
       cy.get('[role="listbox"]').contains('All').click();
       cy.finishedLoading();
 
-      cy.get('[data-cy=question-search-toggle]').should('exist');
+      cy.contains(proposal1.title);
 
       // TODO: This could be tested in the questions or templates where we test other question filters.
       // cy.get('[data-cy=question-list]').click();
