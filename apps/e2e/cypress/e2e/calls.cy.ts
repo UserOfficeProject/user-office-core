@@ -238,7 +238,7 @@ context('Calls tests', () => {
       cy.get('[data-cy="cycle-comment"] input').should('be.focused');
       cy.get('[data-cy="cycle-comment"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Please fill out this field.'
+          'Please fill in this field.'
         );
       });
       cy.get('[data-cy="cycle-comment"] input').blur();
@@ -715,7 +715,7 @@ context('Calls tests', () => {
         .find('[type="checkbox"]')
         .check();
 
-      cy.contains('Assign Instrument').click();
+      cy.get('[data-cy="assign-instrument-to-call"]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 

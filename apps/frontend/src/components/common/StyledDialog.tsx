@@ -39,6 +39,7 @@ function StyledDialog(props: DialogProps & { title?: string }) {
       )}
       {props.onClose && (
         <IconButton
+          data-cy="close-modal-btn"
           aria-label="close"
           onClick={(e) => props.onClose?.(e, 'escapeKeyDown')}
           sx={{
