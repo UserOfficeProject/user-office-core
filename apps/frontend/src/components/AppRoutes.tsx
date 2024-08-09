@@ -8,6 +8,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { CallsFilter, FeatureId, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
@@ -147,6 +148,7 @@ const AppRoutes = () => {
   const isSampleSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
+  const isXpressRouteEnabled = useXpressAccess([UserRole.USER_OFFICER]);
 
   const { currentRole, isInternalUser } = useContext(UserContext);
   function getDashBoardCallFilter(): CallsFilter {
@@ -213,6 +215,17 @@ const AppRoutes = () => {
           path="/Proposals"
           element={<TitledRoute title="Proposals" element={<ProposalPage />} />}
         />
+        {isXpressRouteEnabled && (
+          <Route
+            path="/XpressProposals"
+            element={
+              <TitledRoute
+                title="Xpress Proposals"
+                element={<ProposalPage />}
+              />
+            }
+          />
+        )}
         {isUserOfficer && (
           <Route
             path="/ExperimentPage"
