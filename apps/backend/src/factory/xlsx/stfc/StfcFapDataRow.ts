@@ -1,26 +1,26 @@
 import { stripHtml } from 'string-strip-html';
 
 import { StfcUserDataSource } from '../../../datasources/stfc/StfcUserDataSource';
-import { FapProposal } from '../../../models/Fap';
-import { FapMeetingDecision } from '../../../models/FapMeetingDecision';
-import { InstrumentWithAvailabilityTime } from '../../../models/Instrument';
-import { Proposal } from '../../../models/Proposal';
 import { QuestionaryStep } from '../../../models/Questionary';
 import { Review } from '../../../models/Review';
-import { TechnicalReview } from '../../../models/TechnicalReview';
+import { CallRowObj } from '../callFaps';
 import { RowObj } from '../fap';
 import { getDataRow } from '../FapDataRow';
 
 const stfcUserDataSource = new StfcUserDataSource();
 
 export async function getStfcDataRow(
+  proposalPk: number,
   piName: string,
   proposalAverageScore: number,
-  instrument: InstrumentWithAvailabilityTime,
-  fapMeetingDecision: FapMeetingDecision | null,
-  proposal: Proposal | null,
-  technicalReview: TechnicalReview | null,
-  fapProposal: FapProposal | null,
+  instrument: string,
+  instrumentAvailabilityTime: number,
+  fapTimeAllocation: number | null,
+  proposalTitle: string,
+  proposalId: number | null,
+  technicalReviewTimeAllocation: number | null,
+  propFapRankOrder: number | null,
+  proposer_id: number | null,
   proposalAnswers: QuestionaryStep[] | null,
   reviews: Review[] | null
 ) {
@@ -30,25 +30,26 @@ export async function getStfcDataRow(
     ?.value.value;
 
   const piDetails = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers([
-    proposal?.proposerId.toString() ?? '',
+    proposer_id?.toString() ?? '',
   ]);
 
   const piCountry = piDetails.find(
-    (user) => user.userNumber === proposal?.proposerId.toString()
+    (user) => user.userNumber === proposer_id?.toString()
   )?.country;
 
   return {
     ...getDataRow(
+      proposalPk,
       piName,
       proposalAverageScore,
       instrument,
-      fapMeetingDecision,
-      proposal,
-      technicalReview,
-      fapProposal
+      instrumentAvailabilityTime,
+      fapTimeAllocation,
+      proposalTitle,
+      proposalId,
+      technicalReviewTimeAllocation,
+      propFapRankOrder
     ),
-    instrName: instrument.name,
-    feedback: fapMeetingDecision?.commentForUser,
     daysRequested,
     reviews,
     piCountry: piCountry,
@@ -69,5 +70,26 @@ export function populateStfcRow(row: RowObj) {
     row.daysRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
+  ].concat(individualReviews ? individualReviews : []);
+}
+
+export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
+  const individualReviews = row.reviews?.flatMap((rev) => [
+    rev.grade,
+    rev.comment && stripHtml(rev.comment).result,
+  ]);
+
+  return [
+    row.propShortCode ?? '<missing>',
+    row.principalInv ?? '<missing>',
+    row.piCountry ?? '<missing>',
+    row.instrName ?? '<missing>',
+    row.daysRequested ?? '<missing>',
+    row.propTitle ?? '<missing>',
+    row.propReviewAvgScore ?? '<missing>',
+    row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
+    row.fapMeetingDecision ?? '<missing>',
+    row.fapMeetingInComment ?? '<missing>',
+    row.fapMeetingExComment ?? '<missing>',
   ].concat(individualReviews ? individualReviews : []);
 }
