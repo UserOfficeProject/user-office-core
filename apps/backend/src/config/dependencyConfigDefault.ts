@@ -44,7 +44,11 @@ import { createApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
-import { getDataRow, populateRow } from '../factory/xlsx/FapDataRow';
+import {
+  callFapPopulateRow,
+  getDataRow,
+  populateRow,
+} from '../factory/xlsx/FapDataRow';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureBaseEnvironment } from './base/configureBaseEnvironment';
 import { Tokens } from './Tokens';
@@ -96,6 +100,7 @@ mapClass(Tokens.MailService, SkipSendMailService);
 mapValue(Tokens.FapDataColumns, FapDataColumns);
 mapValue(Tokens.FapDataRow, getDataRow);
 mapValue(Tokens.PopulateRow, populateRow);
+mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
 
 mapValue(Tokens.EmailEventHandler, skipEmailHandler);
 

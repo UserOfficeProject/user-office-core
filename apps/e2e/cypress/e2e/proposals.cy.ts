@@ -7,6 +7,7 @@ import {
   FeatureId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
+import PdfParse from 'pdf-parse';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
@@ -41,6 +42,8 @@ context('Proposal tests', () => {
   let createdWorkflowId: number;
   let createdProposalPk: number;
   let createdProposalId: string;
+  let createdCallId: number;
+  let createdTemplateId: number;
   const textQuestion = faker.random.words(2);
 
   const currentDayStart = DateTime.now().startOf('day');
@@ -1648,6 +1651,159 @@ context('Proposal tests', () => {
         'td',
         `${instrument2.name} (${time} ${AllocationTimeUnits.DAY})`
       ).should('exist');
+    });
+  });
+  describe('Proposal PDF generation with instrument picker question', () => {
+    const instrumentPickerQuestion = 'Select your Instrument';
+    const instrument = {
+      name: 'Instrument 1',
+      shortCode: 'Instrument 1',
+      description: 'Instrument 1',
+      managerUserId: initialDBData.users.user1.id,
+    };
+    const instrument2 = {
+      name: 'Instrument 2',
+      shortCode: 'Instrument 2',
+      description: 'Instrument 2',
+      managerUserId: initialDBData.users.user1.id,
+    };
+    let topicId: number;
+    let instrumentPickerQuestionId: string;
+
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+      cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
+      cy.createTemplate({
+        name: 'Proposal Template with Instrument Picker',
+        groupId: TemplateGroupId.PROPOSAL,
+      }).then((result) => {
+        if (result.createTemplate) {
+          createdTemplateId = result.createTemplate.templateId;
+
+          cy.createTopic({
+            templateId: createdTemplateId,
+            sortOrder: 1,
+          }).then((topicResult) => {
+            if (!topicResult.createTopic) {
+              throw new Error('Can not create topic');
+            }
+
+            topicId =
+              topicResult.createTopic.steps[
+                topicResult.createTopic.steps.length - 1
+              ].topic.id;
+            cy.createQuestion({
+              categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+              dataType: DataType.INSTRUMENT_PICKER,
+            }).then((result) => {
+              instrumentPickerQuestionId = result.createQuestion.id;
+              cy.updateQuestion({
+                id: instrumentPickerQuestionId,
+                question: instrumentPickerQuestion,
+                config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":true}`,
+              });
+              cy.createQuestionTemplateRelation({
+                questionId: instrumentPickerQuestionId,
+                templateId: createdTemplateId,
+                sortOrder: 0,
+                topicId: topicId,
+              });
+            });
+          });
+        }
+      });
+      cy.createCall({
+        ...newCall,
+        allocationTimeUnit: AllocationTimeUnits.DAY,
+        proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+        templateId: createdTemplateId,
+      }).then((response) => {
+        if (response.createCall) {
+          createdCallId = response.createCall.id;
+          cy.createInstrument(instrument).then((result) => {
+            cy.assignInstrumentToCall({
+              callId: createdCallId,
+              instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+            });
+          });
+          cy.createInstrument(instrument2).then((result) => {
+            cy.assignInstrumentToCall({
+              callId: createdCallId,
+              instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+            });
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+    });
+    it('Should be able to download proposal pdf for a proposal which contains instrument picker question', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        /*temporarily skipping, there is some issue on github actions which fails 
+        when downloading pdfs specifically in stfc enviroment
+        (error message - Bad status code : 500)
+        This test passes in local environment.
+       */
+        this.skip();
+      }
+      cy.createProposal({ callId: createdCallId }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId = result.createProposal.proposalId;
+          const proposal = result.createProposal;
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            proposerId: proposer.id,
+            title: title,
+            abstract: abstract,
+          });
+          cy.answerTopic({
+            isPartialSave: false,
+            questionaryId: proposal.questionaryId,
+            topicId: topicId,
+            answers: [
+              {
+                questionId: instrumentPickerQuestionId,
+                value: `{"value":{"instrumentId": "1", "timeRequested": "1"}}`,
+              },
+            ],
+          });
+          cy.submitProposal({
+            proposalPk: result.createProposal.primaryKey,
+          });
+
+          const token = window.localStorage.getItem('token');
+
+          if (!token) {
+            throw new Error('Token not provided');
+          }
+          const currentYear = new Date().getFullYear();
+          const downloadedFileName = `${createdProposalId}_${initialDBData.users.officer.lastName}_${currentYear}.pdf`;
+          const downloadsFolder = Cypress.config('downloadsFolder');
+          const downloadFilePath = `${downloadsFolder}/${downloadedFileName}`;
+
+          cy.task('downloadFile', {
+            url: `${Cypress.config(
+              'baseUrl'
+            )}/download/pdf/proposal/${createdProposalPk}`,
+            token: token,
+            filename: downloadedFileName,
+            downloadsFolder: downloadsFolder,
+          });
+
+          cy.task('readPdf', downloadFilePath).then((args) => {
+            const { text } = args as PdfParse.Result;
+            const instrumentPickerAnswer = 'Instrument 1 (1 day)';
+            expect(text).to.include(title);
+            expect(text).to.include(instrumentPickerAnswer);
+          });
+        }
+      });
     });
   });
 });
