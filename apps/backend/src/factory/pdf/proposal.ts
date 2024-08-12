@@ -14,10 +14,12 @@ import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { DownloadOptions } from '../../middlewares/factory/factoryServices';
+import { Call } from '../../models/Call';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Instrument } from '../../models/Instrument';
 import { Proposal } from '../../models/Proposal';
 import { getTopicActiveAnswers } from '../../models/ProposalModelFunctions';
-import { QuestionaryStep } from '../../models/Questionary';
+import { Answer, QuestionaryStep } from '../../models/Questionary';
 import { isRejection } from '../../models/Rejection';
 import { Review } from '../../models/Review';
 import { Sample } from '../../models/Sample';
@@ -27,6 +29,7 @@ import {
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
+import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { PdfTemplate } from '../../resolvers/types/PdfTemplate';
 import { getFileAttachments, Attachment } from '../util';
 import {
@@ -100,6 +103,43 @@ const getQuestionary = async (questionaryId: number) => {
   return questionary;
 };
 
+const instrumentPickerAnswer = (
+  answer: Answer,
+  instruments: Instrument[],
+  call: Call
+): string => {
+  const instrumentPickerConfig = answer.config as InstrumentPickerConfig;
+  if (instrumentPickerConfig.requestTime) {
+    const instrumentWithTime = instruments?.map((i) => {
+      const filtered = Array.isArray(answer.value)
+        ? answer.value.find(
+            (v: {
+              instrumentId: string;
+              instrumentName: string;
+              timeRequested: number;
+            }) => Number(v.instrumentId) == i.id
+          )
+        : answer.value;
+
+      return (
+        i.name +
+        ' (' +
+        filtered.timeRequested +
+        ' ' +
+        call.allocationTimeUnit +
+        ') '
+      );
+    });
+
+    return instrumentWithTime?.join(', ');
+  } else {
+    const instrumentWithTime = instruments?.length
+      ? instruments.map((instrument) => instrument.name).join(', ')
+      : '';
+
+    return instrumentWithTime;
+  }
+};
 const addTopicInformation = async (
   proposalPDFData: ProposalPDFData,
   questionarySteps: QuestionaryStep[],
@@ -147,17 +187,23 @@ const addTopicInformation = async (
           )
           .map((genericTemplate) => genericTemplate);
       } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
-        const instrumentIds = Array.isArray(answer.value)
-          ? answer.value
-          : [answer.value];
+        const ids = Array.isArray(answer.value)
+          ? answer.value.map((v: { instrumentId: string }) =>
+              Number(v.instrumentId)
+            )
+          : [Number(answer.value?.instrumentId || '0')];
         const instrumentDataSource = container.resolve<InstrumentDataSource>(
           Tokens.InstrumentDataSource
         );
-        const instruments =
-          await instrumentDataSource.getInstrumentsByIds(instrumentIds);
-        answer.value = instruments?.length
-          ? instruments.map((instrument) => instrument.name).join(', ')
-          : '';
+        const callDataSource = container.resolve<CallDataSource>(
+          Tokens.CallDataSource
+        );
+        const instruments = await instrumentDataSource.getInstrumentsByIds(ids);
+
+        const call = await callDataSource.getCallByQuestionId(
+          answer.question.id
+        );
+        answer.value = instrumentPickerAnswer(answer, instruments, call);
       }
     }
 
@@ -333,17 +379,18 @@ export const collectProposalPDFData = async (
           )
           .map((genericTemplate) => genericTemplate);
       } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
-        const instrumentIds = Array.isArray(answer.value)
-          ? answer.value
-          : [answer.value];
+        const ids = Array.isArray(answer.value)
+          ? answer.value.map((v: { instrumentId: string }) =>
+              Number(v.instrumentId)
+            )
+          : [Number(answer.value?.instrumentId || '0')];
         const instruments =
-          await baseContext.queries.instrument.getInstrumentsByIds(
-            user,
-            instrumentIds
-          );
-        answer.value = instruments?.length
-          ? instruments.map((instrument) => instrument.name).join(', ')
-          : '';
+          await baseContext.queries.instrument.getInstrumentsByIds(user, ids);
+        const call = await baseContext.queries.call.getCallByQuestionId(
+          user,
+          answer.question.id
+        );
+        answer.value = instrumentPickerAnswer(answer, instruments, call);
       }
     }
 

@@ -41,6 +41,7 @@ import { createApplicationEventBus } from '../events';
 import { StfcDownloadService } from '../factory/StfcDownloadService';
 import { StfcFapDataColumns } from '../factory/xlsx/stfc/StfcFapDataColumns';
 import {
+  callFapStfcPopulateRow,
   getStfcDataRow,
   populateStfcRow,
 } from '../factory/xlsx/stfc/StfcFapDataRow';
@@ -90,6 +91,7 @@ mapClass(Tokens.MailService, SMTPMailService);
 mapValue(Tokens.FapDataColumns, StfcFapDataColumns);
 mapValue(Tokens.FapDataRow, getStfcDataRow);
 mapValue(Tokens.PopulateRow, populateStfcRow);
+mapValue(Tokens.PopulateCallRow, callFapStfcPopulateRow);
 
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 

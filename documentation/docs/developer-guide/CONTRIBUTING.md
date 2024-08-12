@@ -1,6 +1,6 @@
 Thank you for considering contributing to User Office Project!
 
-You can find the repo [here](https://github.com/UserOfficeProject/user-office-core).
+You can find the repo [here](https://github.com/UserOfficeProject/user-office-core) and a detailed step-by-step guide with an example on how to create new functionality [here](step-by-step.md).
 
 If you're planning to contribute to this project by adding new functionality, we encourage you to discuss it first in the Discussions tab. This helps ensure that your proposed changes align with the project's goals and prevents duplicate efforts. Here's how you can initiate a discussion:
 
