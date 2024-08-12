@@ -810,6 +810,7 @@ context('General facility access panel tests', () => {
       );
 
       cy.login(fapMembers.secretary);
+      cy.changeActiveRole(initialDBData.roles.fapSecretary);
 
       cy.visit(`/FapPage/1?tab=2`);
 
@@ -854,6 +855,7 @@ context('General facility access panel tests', () => {
       );
 
       cy.login(fapMembers.chair);
+      cy.changeActiveRole(initialDBData.roles.fapChair);
 
       cy.visit(`/FapPage/1?tab=2`);
 
@@ -895,6 +897,7 @@ context('General facility access panel tests', () => {
       );
 
       cy.login(fapMembers.reviewer);
+      cy.changeActiveRole(initialDBData.roles.fapReviewer);
 
       cy.visit(`/FapPage/1?tab=1`);
 

@@ -1290,7 +1290,7 @@ context('Fap reviews tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[role="tablist"] [role="tab"]').should('have.length', 1);
+      cy.get('[role="tablist"] [role="tab"]').should('have.length', 2);
 
       cy.finishedLoading();
 
