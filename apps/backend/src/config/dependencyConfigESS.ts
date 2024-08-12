@@ -39,7 +39,11 @@ import {
 import { createApplicationEventBus } from '../events';
 import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
-import { getDataRow, populateRow } from '../factory/xlsx/FapDataRow';
+import {
+  callFapPopulateRow,
+  getDataRow,
+  populateRow,
+} from '../factory/xlsx/FapDataRow';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { isProduction } from '../utils/helperFunctions';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
@@ -88,6 +92,7 @@ mapClass(Tokens.MailService, SparkPostMailService);
 mapValue(Tokens.FapDataColumns, FapDataColumns);
 mapValue(Tokens.FapDataRow, getDataRow);
 mapValue(Tokens.PopulateRow, populateRow);
+mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
 
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 

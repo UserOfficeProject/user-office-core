@@ -8,7 +8,13 @@ import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, ProposalView, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-import { QueryParameters } from '../../components/proposal/ProposalTableOfficer';
+type QueryParameters = {
+  first?: number;
+  offset?: number;
+  sortField?: string | undefined;
+  sortDirection?: string | undefined;
+  searchText?: string | undefined;
+};
 
 export function useProposalsCoreData(
   filter: ProposalsFilter,

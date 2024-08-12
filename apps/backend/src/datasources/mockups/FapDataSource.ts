@@ -19,7 +19,10 @@ import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignPro
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { FapDataSource } from '../FapDataSource';
-import { AssignProposalsToFapsInput } from '../postgres/records';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from '../postgres/records';
 import { basicDummyUser } from './UserDataSource';
 
 export const dummyFap = new Fap(
@@ -509,6 +512,10 @@ export class FapDataSourceMock implements FapDataSource {
     reviewer_id: number,
     rank: number
   ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  getFapReviewData(callId: number, fapId: number): Promise<FapReviewsRecord[]> {
     throw new Error('Method not implemented.');
   }
 

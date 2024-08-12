@@ -741,6 +741,58 @@ context('Proposal administration tests', () => {
         .should('have.attr', 'aria-sort', 'ascending');
     });
 
+    it('Should not save table sort if it is not present in the url', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalFixedName,
+            abstract: proposalName2,
+          });
+        }
+      });
+      let officerProposalsTableAsTextBeforeSort = '';
+
+      cy.contains('Proposals').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
+        officerProposalsTableAsTextBeforeSort = element.text();
+      });
+
+      cy.contains('Title')
+        .parent()
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Calls').click();
+
+      cy.finishedLoading();
+
+      cy.contains(initialDBData.call.shortCode);
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Proposals').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposalFixedName);
+
+      cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
+        expect(element.text()).to.be.equal(
+          officerProposalsTableAsTextBeforeSort
+        );
+      });
+
+      cy.contains('Title')
+        .parent()
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .should('not.have.attr', 'aria-sort', 'ascending');
+    });
+
     it('Should preserve the ordering when row is selected', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {

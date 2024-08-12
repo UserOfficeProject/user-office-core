@@ -51,6 +51,7 @@ import {
   InstitutionRecord,
   AssignProposalsToFapsInput,
   CountryRecord,
+  FapReviewsRecord,
 } from './records';
 
 @injectable()
@@ -1208,6 +1209,17 @@ export default class PostgresFapDataSource implements FapDataSource {
 
         return true;
       });
+  }
+
+  async getFapReviewData(
+    callId: number,
+    fapId: number
+  ): Promise<FapReviewsRecord[]> {
+    return await database
+      .select('*')
+      .from('review_data')
+      .where('fap_id', fapId)
+      .andWhere('call_id', callId);
   }
 
   async submitFapMeetings(
