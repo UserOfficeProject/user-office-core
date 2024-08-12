@@ -128,9 +128,7 @@ export default class PostgresTechniqueDataSource
         (
           usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
         ) => {
-          const users = usersRecord.map((user) => createBasicUserObject(user));
-
-          return users;
+          return usersRecord.map((user) => createBasicUserObject(user));
         }
       );
   }
@@ -235,15 +233,9 @@ export default class PostgresTechniqueDataSource
       user_id: scientistId,
     }));
 
-    const result = await database('technique_has_scientists').insert(
-      dataToInsert
-    );
-
-    if (result) {
-      return true;
-    } else {
-      return false;
-    }
+    return await database('technique_has_scientists')
+      .insert(dataToInsert)
+      .then((result) => !!result.length);
   }
 
   async removeScientistFromTechnique(

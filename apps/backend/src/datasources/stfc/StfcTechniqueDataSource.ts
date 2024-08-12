@@ -31,9 +31,7 @@ export default class StfcTechniqueDataSource extends PostgresTechniqueDataSource
         (
           usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
         ) => {
-          const users = usersRecord.map((user) => createBasicUserObject(user));
-
-          return users;
+          return usersRecord.map((user) => createBasicUserObject(user));
         }
       );
 
