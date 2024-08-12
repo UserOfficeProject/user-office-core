@@ -1,14 +1,13 @@
 import NavigateNext from '@mui/icons-material/NavigateNext';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { Fragment, useContext } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { Call } from 'generated/sdk';
@@ -16,26 +15,18 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { timeRemaining } from 'utils/Time';
 
-const useStyles = makeStyles(() => ({
-  date: {
-    display: 'block',
-    fontStyle: 'italic',
-  },
-}));
-
 type ProposalChooseCallProps = {
   callsData: Call[];
 };
 
 const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
-  const history = useHistory();
-  const classes = useStyles();
+  const navigate = useNavigate();
   const { toFormattedDateTime } = useFormattedDateTime();
   const { isInternalUser } = useContext(UserContext);
 
   const handleSelect = (callId: number, templateId: number | null) => {
     const url = `/ProposalCreate/${callId}/${templateId}`;
-    history.push(url);
+    navigate(url);
   };
 
   return (
@@ -66,25 +57,37 @@ const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
               );
 
             return (
-              <ListItem
-                button
+              <ListItemButton
                 key={call.id}
                 onClick={() => handleSelect(call.id, call.templateId)}
                 divider={true}
+                component="li"
               >
                 <ListItemText
                   primary={header}
                   secondaryTypographyProps={{ component: 'div' }}
                   secondary={
                     <>
-                      <Typography component="p" className={classes.date}>
+                      <Typography
+                        component="p"
+                        sx={{
+                          display: 'block',
+                          fontStyle: 'italic',
+                        }}
+                      >
                         {`Application deadline: ${toFormattedDateTime(
                           call.endCall
                         )} ${timeRemainFormatter(timeRemainingText)}`}
                       </Typography>
 
                       {isInternalUser && (
-                        <Typography component="p" className={classes.date}>
+                        <Typography
+                          component="p"
+                          sx={{
+                            display: 'block',
+                            fontStyle: 'italic',
+                          }}
+                        >
                           {`Internal deadline:  ${toFormattedDateTime(
                             call.endCallInternal
                           )}
@@ -106,7 +109,7 @@ const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
                     <NavigateNext />
                   </IconButton>
                 </ListItemSecondaryAction>
-              </ListItem>
+              </ListItemButton>
             );
           })}
         </List>

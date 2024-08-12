@@ -1,27 +1,13 @@
 import MaterialTable from '@material-table/core';
-import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
 import i18n from 'i18n';
-import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useCheckAccess } from 'components/common/Can';
 import { Instrument, BasicUserDetails, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-// NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles(() => ({
-  root: {
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      padding: '0 40px',
-      backgroundColor: '#fafafa',
-    },
-  },
-}));
 
 type AssignedScientistsTableProps = {
   instrument: Instrument;
@@ -67,7 +53,6 @@ const AssignedScientistsTable = ({
   instrument,
   removeAssignedScientistFromInstrument,
 }: AssignedScientistsTableProps) => {
-  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
@@ -85,8 +70,16 @@ const AssignedScientistsTable = ({
   };
 
   return (
-    <div
-      className={classes.root}
+    <Box
+      sx={{
+        '& tr:last-child td': {
+          border: 'none',
+        },
+        '& .MuiPaper-root': {
+          padding: '0 40px',
+          backgroundColor: '#fafafa',
+        },
+      }}
       data-cy="instrument-scientist-assignments-table"
     >
       <MaterialTable
@@ -127,13 +120,8 @@ const AssignedScientistsTable = ({
           headerStyle: { backgroundColor: '#fafafa' },
         }}
       />
-    </div>
+    </Box>
   );
-};
-
-AssignedScientistsTable.propTypes = {
-  instrument: PropTypes.any.isRequired,
-  removeAssignedScientistFromInstrument: PropTypes.func.isRequired,
 };
 
 export default AssignedScientistsTable;

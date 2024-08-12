@@ -1,9 +1,10 @@
-import makeStyles from '@mui/styles/makeStyles';
+import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material/styles';
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
+import TextField from 'components/common/FormikUITextField';
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
@@ -20,16 +21,6 @@ import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSub
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
-const useStyles = makeStyles((theme) => ({
-  disabled: {
-    pointerEvents: 'none',
-    opacity: 0.7,
-  },
-  container: {
-    margin: theme.spacing(2, 0),
-  },
-}));
-
 function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const {
     answer: {
@@ -37,8 +28,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     },
     formikProps,
   } = props;
+  const theme = useTheme();
 
-  const classes = useStyles();
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ProposalContextType;
@@ -89,7 +80,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 
   return (
     <div>
-      <div className={classes.container}>
+      <Box sx={{ margin: theme.spacing(2, 0) }}>
         <Field
           name={`${id}.title`}
           label="Title"
@@ -139,16 +130,16 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
             shrink: true,
           }}
         />
-      </div>
+      </Box>
       <ProposalParticipant
         principalInvestigator={piData}
         setPrincipalInvestigator={principalInvestigatorChanged}
-        className={classes.container}
+        sx={{ margin: theme.spacing(2, 0) }}
         loadingPrincipalInvestigator={loading}
       />
       <Participants
         title="Co-Proposers"
-        className={classes.container}
+        sx={{ margin: theme.spacing(2, 0) }}
         principalInvestigator={piData}
         setPrincipalInvestigator={principalInvestigatorChanged}
         setUsers={coInvestigatorChanged}

@@ -26,9 +26,10 @@ export type ProposalUrlQueryParamsType = {
   instrument: QueryParamConfig<string | null | undefined>;
   proposalStatus: QueryParamConfig<number | null | undefined>;
   reviewModal: QueryParamConfig<number | null | undefined>;
+  modalTab: QueryParamConfig<number | null | undefined>;
   compareOperator: QueryParamConfig<string | null | undefined>;
   questionId: QueryParamConfig<string | null | undefined>;
-  proposalid: QueryParamConfig<string | null | undefined>;
+  proposalId: QueryParamConfig<string | null | undefined>;
   value: QueryParamConfig<string | null | undefined>;
   dataType: QueryParamConfig<string | null | undefined>;
 } & UrlQueryParamsType;
@@ -41,8 +42,9 @@ export default function ProposalPage() {
       instrument: StringParam,
       proposalStatus: NumberParam,
       reviewModal: NumberParam,
+      modalTab: NumberParam,
       questionId: StringParam,
-      proposalid: StringParam,
+      proposalId: StringParam,
       compareOperator: StringParam,
       value: StringParam,
       dataType: StringParam,
@@ -57,8 +59,8 @@ export default function ProposalPage() {
       showMultiInstrumentProposals: false,
     },
     proposalStatusId: urlQueryParams.proposalStatus,
-    referenceNumbers: urlQueryParams.proposalid
-      ? [urlQueryParams.proposalid]
+    referenceNumbers: urlQueryParams.proposalId
+      ? [urlQueryParams.proposalId]
       : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
   });

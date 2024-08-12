@@ -157,6 +157,14 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return dummyInstrumentHasProposals;
   }
 
+  async getInstrumentsHasProposal(
+    instrumentIds: number[],
+    proposalPk: number,
+    callId: number
+  ) {
+    return dummyInstrumentHasProposals;
+  }
+
   async assignProposalToInstrument(
     proposalPk: number,
     instrumentId: number

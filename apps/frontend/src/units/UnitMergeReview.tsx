@@ -2,7 +2,7 @@ import { Button, Card, CardContent, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import produce from 'immer';
 import React, { useCallback, useState } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import { ConflictResolver, DiffInfo } from 'components/common/ConflictResolver';
@@ -32,7 +32,7 @@ export function UnitMergeReview(props: UnitMergeReviewProps) {
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
-  const history = useHistory();
+  const navigate = useNavigate();
   const templateExport = props.data;
   const { version, json, errors } = templateExport;
   const exportDate = toFormattedDateTime(templateExport.exportDate);
@@ -72,7 +72,7 @@ export function UnitMergeReview(props: UnitMergeReviewProps) {
           }
         ),
       })
-      .then(() => history.push('/Units'));
+      .then(() => navigate('/Units'));
 
   const getDiffInfo = (comparison: UnitComparison): DiffInfo[] => {
     const { newUnit, existingUnit } = comparison;

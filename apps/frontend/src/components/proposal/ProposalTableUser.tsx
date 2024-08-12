@@ -29,7 +29,9 @@ export type PartialProposalsDataType = {
       | 'isActive'
       | 'isActiveInternal'
       | 'referenceNumberFormat'
-      | 'cycleComment'
+      | 'startCall'
+      | 'endCall'
+      | 'endCallInternal'
     >
   >;
   proposerId?: number;

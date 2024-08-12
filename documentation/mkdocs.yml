@@ -1,13 +1,17 @@
 site_name: User Office Documentation
+site_url: 'https://userofficeproject.github.io/user-office-core/'
 theme:
   name: material
   features:
     - navigation.top
+    - navigation.tabs
+    - navigation.tabs.sticky
     - content.tooltips
   palette:
     primary: green
     accent: green
 extra:
+  generator: false
   version:
     provider: mike
     default: latest
@@ -15,6 +19,59 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - abbr
   - attr_list
   - md_in_html
   - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+nav:
+  - Home: index.md
+  - Getting Started: 
+      - Quick start: quick_start.md
+  - User Guide:
+      - Overview: user-guide/overview.md
+      - Basic User: user-guide/user/user.md
+      - User Officer:
+          - Introduction: user-guide/user-officer/user-officer.md
+          - Creating call: user-guide/user-officer/creating_call.md
+          - Editing call: user-guide/user-officer/editing_call.md
+          - Fap: user-guide/user-officer/fap.md
+          - Feasibility review: user-guide/user-officer/feasibility_review.md
+          - Features: user-guide/user-officer/features.md
+          - Page: user-guide/user-officer/page.md
+          - Proposal workflow: user-guide/user-officer/proposal_workflow.md
+          - Proposal: user-guide/user-officer/proposal.md
+          - Roles: user-guide/user-officer/roles.md
+          - Videos: user-guide/user-officer/videos.md
+          - Templates:
+              - What are templates?: user-guide/user-officer/templates/templates.md
+              - PDF template: user-guide/user-officer/templates/pdf_template.md
+              - Feedback template: user-guide/user-officer/templates/feedback_template.md
+              - Proposal template: user-guide/user-officer/templates/proposal_template.md
+              - Proposal ESI template: user-guide/user-officer/templates/proposalESI_template.md
+              - Question template: user-guide/user-officer/templates/question_template.md
+              - Sample DEC template: user-guide/user-officer/templates/sampledec_template.md
+              - Sample ESI template: user-guide/user-officer/templates/sampleESI_template.md
+              - Shipment template: user-guide/user-officer/templates/shipment_template.md
+              - Sub template: user-guide/user-officer/templates/sub_template.md
+              - Visit template: user-guide/user-officer/templates/visit_template.md
+  - Developer Guide:
+      - Contributing: developer-guide/CONTRIBUTING.md
+      - Running Locally: developer-guide/running_locally.md
+      - Configuration: developer-guide/configuration.md
+      - Step-by-Step Guide: developer-guide/step-by-step.md
+      - Architecture: developer-guide/achitecture.md
+      - API Documentation: developer-guide/api_documentation.md
+      - Documentation Changes: developer-guide/documentation_changes.md
+  - FAQ: faq.md
+  - Glossary: glossary.md
+  - References: references.md
+  - Placeholder: user-guide/user-officer/placeholder.md
+  

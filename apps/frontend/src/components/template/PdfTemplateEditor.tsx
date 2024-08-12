@@ -1,17 +1,17 @@
 import { html } from '@codemirror/lang-html';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import CodeMirror from '@uiw/react-codemirror';
 import { Field, FieldProps, Form, Formik } from 'formik';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import { PdfTemplate, Template } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel from 'models/questionary/QuestionaryEditorModel';
-import { StyledButtonContainer, StyledPaper } from 'styles/StyledComponents';
+import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import PDFTemplateDocumentation from './documentation';
@@ -75,7 +75,7 @@ const TemplateEditor = <
                 <Box sx={{ my: 3 }}>
                   <CodeMirror
                     minHeight="200px"
-                    maxHeight="600px"
+                    maxHeight="60vh"
                     extensions={[html()]}
                     onChange={(value) => {
                       setFieldValue(name, value);
@@ -104,15 +104,18 @@ export default function PdfTemplateEditor() {
   const [loading, setLoading] = useState<boolean>(true);
   const [template, setTemplate] = useState<Template | null>(null);
   const [pdfTemplate, setPdfTemplate] = useState<PdfTemplate | null>(null);
-
-  const { templateId: templateIdQueryParam } = useParams<{
+  const [editorWidth, setEditorWidth] = useState(50);
+  const pdfEditorContainerRef = useRef<HTMLDivElement>(null);
+  const { templateId } = useParams<{
     templateId: string;
   }>();
-  const templateId = parseInt(templateIdQueryParam);
-
   useEffect(() => {
+    if (!templateId) {
+      return;
+    }
+
     api()
-      .getTemplate({ templateId })
+      .getTemplate({ templateId: parseInt(templateId) })
       .then(({ template }) => {
         setTemplate(template as Template);
         setPdfTemplate(template?.pdfTemplate as PdfTemplate);
@@ -120,12 +123,47 @@ export default function PdfTemplateEditor() {
       });
   }, [api, templateId]);
 
+  const handleMouseMove = (e: MouseEvent) => {
+    if (pdfEditorContainerRef.current) {
+      const windowWidth = window.innerWidth; // Total width of the window
+      const containerWidth = pdfEditorContainerRef.current.offsetWidth; // Width of the container
+      const sidebarWidth = windowWidth - containerWidth; // Width of the sidebar
+
+      const newEditorWidth =
+        ((e.clientX - sidebarWidth) / containerWidth) * 100;
+      setEditorWidth(newEditorWidth);
+    }
+  };
+
+  const handleMouseUp = () => {
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseDown = () => {
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
   return loading ? (
     <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
   ) : (
-    <Grid container spacing={2} padding={2}>
-      <Grid item sm={6}>
-        <StyledPaper>
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          height: '90vh',
+        }}
+        ref={pdfEditorContainerRef}
+      >
+        <Box
+          sx={{
+            border: '1px solid rgba(0, 0, 0, 0.3)',
+            width: `${editorWidth}%`,
+            overflow: 'auto',
+          }}
+        >
           {template && pdfTemplate && (
             <SimpleTabs
               tabNames={[
@@ -184,13 +222,24 @@ export default function PdfTemplateEditor() {
               />
             </SimpleTabs>
           )}
-        </StyledPaper>
-      </Grid>
-      <Grid item sm={6}>
-        <StyledPaper>
+        </Box>
+        <Box
+          sx={{
+            cursor: 'ew-resize',
+            width: '15px',
+          }}
+          onMouseDown={handleMouseDown}
+        />
+        <Box
+          sx={{
+            border: '1px solid rgba(0, 0, 0, 0.3)',
+            width: `${100 - editorWidth}%`,
+            overflow: 'auto',
+          }}
+        >
           {pdfTemplate && <PdfTemplateEditorViewer pdfTemplate={pdfTemplate} />}
-        </StyledPaper>
-      </Grid>
-    </Grid>
+        </Box>
+      </Box>
+    </>
   );
 }
