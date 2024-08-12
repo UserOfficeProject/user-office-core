@@ -1,10 +1,12 @@
+import { groupBy } from 'lodash';
 import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
+import { FapDataSource } from '../../datasources/FapDataSource';
 import { Review } from '../../models/Review';
 import { UserWithRole } from '../../models/User';
-import { average, getGrades } from '../../utils/mathFunctions';
+import { collectCallFapXLSXData } from './callFaps';
 import { getDataRow } from './FapDataRow';
 import { getStfcDataRow } from './stfc/StfcFapDataRow';
 
@@ -14,6 +16,7 @@ type FapXLSXData = Array<{
 }>;
 
 export type RowObj = {
+  proposalPk: number;
   propShortCode?: string;
   propTitle?: string;
   principalInv: string;
@@ -37,6 +40,8 @@ const fapDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
 const populateRow = container.resolve<(row: RowObj) => (string | number)[]>(
   Tokens.PopulateRow
 );
+
+const fapDataSource: FapDataSource = container.resolve(Tokens.FapDataSource);
 
 const sortByRankOrder = (a: RowObj, b: RowObj) => {
   if (a.propFapRankOrder === b.propFapRankOrder) {
@@ -74,192 +79,94 @@ const sortByRankOrAverageScore = (data: RowObj[]) => {
     });
 };
 
-export const collectFaplXLSXData = async (
+export const collectFapXLSXRowData = async (
+  fapId: number,
+  callId: number,
+  user: UserWithRole
+): Promise<{ sheetName: string; rows: RowObj[] }[]> => {
+  const baseData = await fapDataSource.getFapReviewData(callId, fapId);
+
+  const instrumentData = groupBy(baseData, 'instrument_id');
+
+  const out: { sheetName: string; rows: RowObj[] }[] = [];
+
+  for (const instrument in instrumentData) {
+    const records = instrumentData[instrument];
+
+    const sheetName = records[0].instrument_name;
+
+    const rows = await Promise.all(
+      records.map(async (proposal) => {
+        const pi = await baseContext.queries.user.getBasic(
+          user,
+          proposal.proposer_id
+        );
+
+        const piFullName = `${pi?.firstname} ${pi?.lastname}`;
+
+        const proposalAnswers =
+          await baseContext.queries.questionary.getQuestionarySteps(
+            user,
+            proposal.questionary_id
+          );
+
+        const reviews = await baseContext.queries.review.reviewsForProposal(
+          user,
+          { proposalPk: proposal.proposal_pk, fapId: fapId }
+        );
+
+        return fapDataRow(
+          proposal.proposal_pk,
+          piFullName,
+          proposal.average_grade,
+          proposal.instrument_name,
+          proposal.availability_time,
+          proposal.fap_time_allocation,
+          proposal.title,
+          proposal.proposal_id,
+          proposal.time_allocation,
+          proposal.rank_order,
+          proposal.proposer_id,
+          proposalAnswers,
+          reviews
+        );
+      })
+    );
+
+    out.push({
+      sheetName:
+        // Sheet names can't exceed 31 characters
+        // use the short code and cut everything after 30 chars
+        sheetName.substring(0, 30),
+      rows,
+    });
+  }
+
+  return out;
+};
+
+export const collectFapXLSXData = async (
   fapId: number,
   callId: number,
   user: UserWithRole
 ): Promise<{ data: FapXLSXData; filename: string }> => {
+  collectCallFapXLSXData(fapId, user);
+
   const fap = await baseContext.queries.fap.get(user, fapId);
   const call = await baseContext.queries.call.get(user, callId);
-
-  // TODO: decide on filename
   const filename = `Fap-${fap?.code}-${call?.shortCode}.xlsx`;
 
-  const instruments =
-    await baseContext.queries.instrument.getInstrumentsByFapId(user, {
-      fapId,
-      callId,
-    });
+  const data = await collectFapXLSXRowData(fapId, callId, user);
 
-  if (!instruments) {
-    throw new Error(
-      `Fap with ID '${fapId}'/Call with ID '${callId}' not found, or the user has insufficient rights`
-    );
-  }
-
-  const instrumentsFapProposals = await Promise.all(
-    instruments.map((instrument) => {
-      return baseContext.queries.fap.getFapProposalsByInstrument(user, {
-        instrumentId: instrument.id,
-        callId,
-        fapId,
-      });
-    })
-  );
-
-  const instrumentsProposals = await Promise.all(
-    instrumentsFapProposals.map((fapProposalPks) => {
-      if (!fapProposalPks) {
-        const instrumentIds = instruments.map(({ id }) => id).join(', ');
-
-        throw new Error(
-          `Fap with ID '${fapId}'/` +
-            `Call with ID '${callId}/'` +
-            `Instruments with IDs '${instrumentIds}' not found, or the user has insufficient rights`
-        );
-      }
-
-      return Promise.all(
-        fapProposalPks.map(({ proposalPk }) =>
-          baseContext.queries.proposal.dataSource.get(proposalPk)
-        )
-      );
-    })
-  );
-
-  const proposalsReviews = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.review.reviewsForProposal(user, {
-                proposalPk: proposal.primaryKey,
-                fapId: fapId,
-              })
-            : null
-        )
-      );
-    })
-  );
-
-  const proposalsTechnicalReviews = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.review.technicalReviewsForProposal(
-                user,
-                proposal.primaryKey
-              )
-            : null
-        )
-      );
-    })
-  );
-
-  const proposalsFapMeetingDecisions = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.fap.getProposalFapMeetingDecisions(user, {
-                proposalPk: proposal.primaryKey,
-                fapId: fapId,
-              })
-            : null
-        )
-      );
-    })
-  );
-
-  const proposalsPrincipalInvestigators = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.user.getBasic(user, proposal.proposerId)
-            : null
-        )
-      );
-    })
-  );
-
-  const instrumentProposalsAnswers = await Promise.all(
-    instrumentsProposals.map((proposals) => {
-      return Promise.all(
-        proposals.map((proposal) =>
-          proposal
-            ? baseContext.queries.questionary.getQuestionarySteps(
-                user,
-                proposal.questionaryId
-              )
-            : null
-        )
-      );
-    })
-  );
-
-  const out: FapXLSXData = [];
-
-  await Promise.all(
-    instruments.map(async (instrument, indx) => {
-      const proposals = instrumentsProposals[indx];
-      const proposalReviews = proposalsReviews[indx];
-      const proposalPrincipalInvestigators =
-        proposalsPrincipalInvestigators[indx];
-      const technicalReviews = proposalsTechnicalReviews[indx];
-      const fapProposals = instrumentsFapProposals[indx];
-      const fapMeetingDecisions = proposalsFapMeetingDecisions[indx];
-      const proposalsAnswers = instrumentProposalsAnswers[indx];
-
-      const rows = await Promise.all(
-        proposals.map(async (proposal, pIndx) => {
-          const { firstname = '<missing>', lastname = '<missing>' } =
-            proposalPrincipalInvestigators[pIndx] ?? {};
-          const technicalReview =
-            technicalReviews[pIndx]?.find(
-              (technicalReview) =>
-                technicalReview.instrumentId === instrument.id
-            ) || null;
-          const reviews = proposalReviews[pIndx];
-          const fapProposal = fapProposals?.[pIndx];
-          const proposalFapMeetingDecisions = fapMeetingDecisions[pIndx];
-          const proposalAnswers = proposalsAnswers[pIndx];
-
-          const proposalAverageScore = average(getGrades(reviews)) || 0;
-
-          const piFullName = `${firstname} ${lastname}`;
-          const fapMeetingDecision =
-            proposalFapMeetingDecisions?.find(
-              (fmd) => fmd.instrumentId === instrument.id
-            ) || null;
-
-          return fapDataRow(
-            piFullName,
-            proposalAverageScore,
-            instrument,
-            fapMeetingDecision,
-            proposal,
-            technicalReview,
-            fapProposal ? fapProposal : null,
-            proposalAnswers,
-            reviews
-          );
-        })
-      );
-
-      out.push({
-        sheetName:
-          // Sheet names can't exceed 31 characters
-          // use the short code and cut everything after 30 chars
-          instrument.shortCode.substring(0, 30),
-        rows: sortByRankOrAverageScore(rows).map((row) => populateRow(row)),
-      });
-    })
-  );
+  const transformedData: FapXLSXData = data.map((sheet) => {
+    return {
+      sheetName: sheet.sheetName,
+      rows: sortByRankOrAverageScore(sheet.rows).map((row) => populateRow(row)),
+    };
+  });
 
   return {
-    data: out,
     filename: filename.replace(/\s+/g, '_'),
+    data: transformedData,
   };
 };
