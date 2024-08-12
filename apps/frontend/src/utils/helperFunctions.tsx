@@ -46,6 +46,8 @@ export const setSortDirectionOnSortField = (
       (column) => column.field === sortField
     );
     columns[fieldIndex].defaultSort = sortDirection as SortDirectionType;
+  } else {
+    columns.forEach((column) => (column.defaultSort = undefined));
   }
 
   return columns;
