@@ -88,6 +88,7 @@ export default function ProposalPage() {
           }}
           setProposalFilter={setProposalFilter}
           filter={proposalFilter}
+          hiddenStatuses={[]}
         />
         <ProposalTableOfficer
           proposalFilter={proposalFilter}

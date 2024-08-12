@@ -847,6 +847,9 @@ const ProposalTableInstrumentScientist = ({
               }}
               setProposalFilter={setProposalFilter}
               filter={proposalFilter}
+              hiddenStatuses={
+                proposalFilter.excludeProposalStatusIds as number[]
+              }
             />
           </Grid>
         </Grid>
