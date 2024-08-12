@@ -59,7 +59,7 @@ const shouldMoveToNextStatus = (
   return allNextStatusRulesFulfilled;
 };
 
-const checkIfProposalNeedsToChangeStatusAgain = async ({
+const checkIfConditionsForNextStatusAreMet = async ({
   nextWorkflowConnections,
   proposalWorkflow,
   proposalSettingsDataSource,
@@ -244,7 +244,7 @@ export const workflowEngine = async (
                 );
 
               if (updatedProposal) {
-                checkIfProposalNeedsToChangeStatusAgain({
+                checkIfConditionsForNextStatusAreMet({
                   nextWorkflowConnections,
                   proposalWorkflow,
                   proposalSettingsDataSource,
