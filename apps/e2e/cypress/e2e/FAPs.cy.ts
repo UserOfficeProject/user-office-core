@@ -17,12 +17,24 @@ import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
 import { updatedCall, closedCall } from '../support/utils';
 
+faker.seed(1);
+
 const fapMembers = {
   chair: initialDBData.users.user2,
   secretary: initialDBData.users.user3,
   reviewer: initialDBData.users.reviewer,
   reviewer2: initialDBData.users.user3,
 };
+
+function clickConfirmOk() {
+  if (
+    featureFlags
+      .getEnabledFeatures()
+      .get(FeatureId.CONFLICT_OF_INTEREST_WARNING)
+  ) {
+    cy.get('[data-cy="confirm-ok"]').click();
+  }
+}
 
 function readWriteReview(
   { shouldSubmit, isReviewer } = { shouldSubmit: false, isReviewer: false }
@@ -174,6 +186,13 @@ function createWorkflowAndEsiTemplate() {
     const workflow = result.createProposalWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: 'proposalWorkflowConnections_0',
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: 1,
+      });
 
       cy.createTemplate({
         name: 'default esi template',
@@ -433,7 +452,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -490,7 +509,7 @@ context('Fap reviews tests', () => {
       cy.contains('2 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -549,7 +568,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'error',
@@ -606,7 +625,7 @@ context('Fap reviews tests', () => {
       cy.contains('2 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -765,7 +784,9 @@ context('Fap reviews tests', () => {
         return false;
       });
       cy.login('officer');
-      cy.visit('/ProposalPage');
+      cy.visit('/Proposals');
+
+      cy.get('[data-cy="officer-proposals-table"]').should('exist');
 
       cy.get('[type="checkbox"]').first().check();
 
@@ -880,7 +901,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -1029,7 +1050,7 @@ context('Fap reviews tests', () => {
       cy.contains('1 user(s) selected');
       cy.contains('Update').click();
 
-      cy.get('[data-cy="confirm-ok"]').click();
+      clickConfirmOk();
 
       cy.notification({
         variant: 'success',
@@ -1213,6 +1234,7 @@ context('Fap reviews tests', () => {
         .parent()
         .find('[data-cy="grade-proposal-icon"]')
         .click();
+
       cy.setTinyMceContent('comment', faker.lorem.words(3));
 
       if (
@@ -2646,7 +2668,7 @@ context('Fap meeting components tests', () => {
       cy.finishedLoading();
 
       cy.get(
-        '[data-cy="fap-assignments-table"] [data-cy="select-all-table-rows"]'
+        '[data-cy="fap-assignments-table"] #select-all-table-rows'
       ).click();
 
       cy.get('[data-cy="download-fap-proposals"]').click();
@@ -2655,6 +2677,156 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         proposal1.title
       );
+    });
+
+    it('Officer should be be able to download of all FAP meetings in excel', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+
+        cy.wrap(createdProposal.proposalId).as('proposal2Id');
+
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 5,
+            submitted: true,
+            reviewerId: 0,
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.assignProposalsToFaps({
+            fapInstruments: [
+              { instrumentId: createdInstrumentId, fapId: createdFapId },
+            ],
+            proposalPks: [createdProposal.primaryKey],
+          });
+
+          cy.assignReviewersToFap({
+            fapId: createdFapId,
+            memberIds: [fapMembers.reviewer2.id],
+          });
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: firstCreatedProposalPk,
+            },
+            fapId: createdFapId,
+          });
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer.id,
+              proposalPk: createdProposal.primaryKey,
+            },
+            fapId: createdFapId,
+          });
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: createdProposal.primaryKey,
+            },
+            fapId: createdFapId,
+          });
+
+          // Manually changing the proposal status to be shown in the Faps. -------->
+          cy.changeProposalsStatus({
+            statusId: initialDBData.proposalStatuses.fapReview.id,
+            proposalPks: [createdProposal.primaryKey],
+          });
+
+          cy.getProposalReviews({
+            proposalPk: firstCreatedProposalPk,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
+                  grade: index ? 2 : 4,
+                  status: ReviewStatus.SUBMITTED,
+                  fapID: createdFapId,
+                });
+              });
+            }
+          });
+
+          cy.getProposalReviews({
+            proposalPk: createdProposal.primaryKey,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
+                  grade: index ? 1 : 5,
+                  status: ReviewStatus.SUBMITTED,
+                  fapID: createdFapId,
+                });
+              });
+            }
+          });
+
+          cy.saveFapMeetingDecision({
+            saveFapMeetingDecisionInput: {
+              commentForManagement: 'test',
+              commentForUser: 'test',
+              proposalPk: firstCreatedProposalPk,
+              submitted: true,
+              recommendation: ProposalEndStatus.ACCEPTED,
+              instrumentId: createdInstrumentId,
+              fapId: createdFapId,
+            },
+          });
+
+          cy.saveFapMeetingDecision({
+            saveFapMeetingDecisionInput: {
+              commentForManagement: 'test2',
+              commentForUser: 'test2',
+              proposalPk: createdProposal.primaryKey,
+              submitted: true,
+              recommendation: ProposalEndStatus.ACCEPTED,
+              instrumentId: createdInstrumentId,
+              fapId: createdFapId,
+            },
+          });
+        }
+      });
+
+      cy.login('officer');
+      cy.visit(`/Calls`);
+
+      cy.contains(updatedCall.shortCode)
+        .parent()
+        .find('[aria-label="Export Fap Data"]')
+        .click();
+
+      const downloadsFolder = Cypress.config('downloadsFolder');
+      const fileName = `${updatedCall.shortCode}_FAP_Results.xlsx`;
+
+      cy.readFile(`${downloadsFolder}/${fileName}`)
+        .should('exist')
+        .then(() => {
+          cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
+            (actualExport) => {
+              cy.fixture('exampleCallFapExport.json').then((expectedExport) => {
+                expect(expectedExport).to.deep.equal(actualExport);
+              });
+            }
+          );
+        });
     });
   });
 

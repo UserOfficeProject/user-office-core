@@ -6,11 +6,11 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -44,11 +44,8 @@ const columns: Column<InstrumentFragment>[] = [
 ];
 
 const InstrumentTable = () => {
-  const {
-    loadingInstruments,
-    instruments,
-    setInstrumentsWithLoading: setInstruments,
-  } = useInstrumentsData();
+  const { loadingInstruments, instruments, setInstruments } =
+    useInstrumentsData();
 
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
@@ -105,7 +102,7 @@ const InstrumentTable = () => {
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
   const AssignedScientists = React.useCallback(
-    ({ rowData }) => {
+    ({ rowData }: { rowData: InstrumentFragment }) => {
       const removeAssignedScientistFromInstrument = (
         scientistToRemoveId: number,
         instrumentToRemoveFromId: number

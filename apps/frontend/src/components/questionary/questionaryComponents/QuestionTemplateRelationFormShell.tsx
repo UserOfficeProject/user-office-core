@@ -1,7 +1,7 @@
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
 import React from 'react';
 
@@ -12,28 +12,6 @@ import {
 } from 'components/questionary/QuestionaryComponentRegistry';
 import { FieldDependencyInput, QuestionTemplateRelation } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    width: '100%',
-  },
-  heading: {
-    marginTop: theme.spacing(2),
-    marginBottom: '21px',
-    display: 'flex',
-    alignItems: 'center',
-    color: theme.palette.grey[600],
-    '& SVG': {
-      marginRight: theme.spacing(1),
-    },
-  },
-  naturalKey: {
-    fontSize: '16px',
-    paddingLeft: '21px',
-    display: 'block',
-    marginBottom: '16px',
-  },
-}));
 
 // Have this until GQL accepts Union types
 // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
@@ -50,7 +28,6 @@ const prepareDependencies = (dependency: FieldDependencyInput) => {
 export const QuestionTemplateRelationFormShell = (
   props: QuestionTemplateRelationFormProps & { validationSchema: unknown }
 ) => {
-  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const definition = getQuestionaryComponentDefinition(
     props.questionRel.question.dataType
@@ -93,8 +70,21 @@ export const QuestionTemplateRelationFormShell = (
   };
 
   return (
-    <div className={classes.container}>
-      <Typography variant="h4" component="h1" className={classes.heading}>
+    <Box sx={{ width: '100%' }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        sx={(theme) => ({
+          marginTop: theme.spacing(2),
+          marginBottom: '21px',
+          display: 'flex',
+          alignItems: 'center',
+          color: theme.palette.grey[600],
+          '& SVG': {
+            marginRight: theme.spacing(1),
+          },
+        })}
+      >
         {definition.icon}
         {definition.name}
       </Typography>
@@ -105,7 +95,12 @@ export const QuestionTemplateRelationFormShell = (
           props.onOpenQuestionClicked?.(props.questionRel.question);
           props.closeMe?.();
         }}
-        className={classes.naturalKey}
+        sx={{
+          fontSize: '16px',
+          paddingLeft: '21px',
+          display: 'block',
+          marginBottom: '16px',
+        }}
       >
         Edit {props.questionRel.question.naturalKey}
       </Link>
@@ -138,6 +133,6 @@ export const QuestionTemplateRelationFormShell = (
           </Form>
         )}
       </Formik>
-    </div>
+    </Box>
   );
 };

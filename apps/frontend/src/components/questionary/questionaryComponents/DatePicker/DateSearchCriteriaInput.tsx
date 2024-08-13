@@ -1,16 +1,12 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import DatePicker from '@mui/lab/DatePicker';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import {
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  TextFieldProps,
-  useTheme,
-} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import { useTheme } from '@mui/material/styles';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTime } from 'luxon';
 import React, { useState, useEffect } from 'react';
 
@@ -23,7 +19,7 @@ function DateSearchCriteriaInput({
   searchCriteria,
 }: SearchCriteriaInputProps) {
   const theme = useTheme();
-  const { format, mask } = useFormattedDateTime({
+  const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const [value, setValue] = useState<DateTime | null>(
@@ -79,20 +75,18 @@ function DateSearchCriteriaInput({
       <Grid item xs={6}>
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
-            inputFormat={format || undefined}
-            mask={mask}
-            renderInput={(props: TextFieldProps) => (
-              <TextField
-                {...props}
-                margin="none"
-                size="small"
-                fullWidth
-                data-cy="value"
-                InputLabelProps={{
+            format={format || undefined}
+            slotProps={{
+              textField: {
+                margin: 'none',
+                size: 'small',
+                fullWidth: true,
+                InputLabelProps: {
                   shrink: value ? true : undefined,
-                }}
-              />
-            )}
+                },
+                id: 'date-value',
+              },
+            }}
             label={`Date(${format})`}
             value={value}
             onChange={(date: DateTime | null) => {

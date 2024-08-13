@@ -60,9 +60,9 @@ export class FapQuery {
     @Ctx() context: ResolverContext
   ): Promise<FapProposal[] | null> {
     return context.queries.fap.getFapProposalsByInstrument(context.user, {
-      fapId,
       instrumentId,
       callId,
+      fapId,
     });
   }
 }

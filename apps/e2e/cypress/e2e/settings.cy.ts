@@ -42,6 +42,7 @@ context('Settings tests', () => {
 
       cy.contains('Settings').click();
       cy.contains('Proposal statuses').click();
+      cy.finishedLoading();
       cy.contains('Create').click();
       cy.get('#shortCode').type(shortCode);
       cy.get('#name').type(name);
@@ -133,6 +134,8 @@ context('Settings tests', () => {
     const workflowDescription = faker.lorem.words(5);
     const proposalTitle = faker.lorem.words(2);
     const proposalAbstract = faker.lorem.words(5);
+    const proposal2Title = faker.lorem.words(2);
+    const proposal2Abstract = faker.lorem.words(5);
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
     const instrument1 = {
@@ -849,7 +852,11 @@ context('Settings tests', () => {
       cy.login('officer');
       cy.visit('/');
 
+      cy.get('.MuiTable-root tbody tr').should('exist');
+
       cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr').contains(proposalTitle);
 
       cy.get('.MuiTable-root tbody tr')
         .first()
@@ -964,6 +971,8 @@ context('Settings tests', () => {
       cy.get('[data-cy="fap-selection-options"] li').first().click();
 
       cy.get('[data-cy="submit"]').click();
+
+      cy.finishedLoading();
 
       cy.notification({
         variant: 'success',
@@ -1128,6 +1137,8 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('.MuiTable-root tbody').contains(proposalTitle);
+
       cy.get('.MuiTable-root tbody')
         .first()
         .then((element) =>
@@ -1138,21 +1149,33 @@ context('Settings tests', () => {
 
       cy.get('.MuiTable-root tbody')
         .first()
-        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.fapReview.name
+          )
+        );
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="5"]').click();
 
       cy.finishedLoading();
 
+      cy.get('.MuiTable-root tbody').contains(proposalTitle);
+
       cy.get('.MuiTable-root tbody tr')
         .first()
-        .then((element) => expect(element.text()).to.contain('FAP_REVIEW'));
+        .then((element) =>
+          expect(element.text()).to.contain(
+            initialDBData.proposalStatuses.fapReview.name
+          )
+        );
 
       cy.get('[data-cy="status-filter"]').click();
       cy.get('[role="listbox"] [data-value="1"]').click();
 
       cy.finishedLoading();
+
+      cy.get('.MuiTable-root tbody tr').contains(updatedCall.shortCode);
 
       cy.get('.MuiTable-root tbody tr')
         .first()
@@ -1371,6 +1394,83 @@ context('Settings tests', () => {
 
       cy.contains(firstProposalTitle).parent().contains('FAP_SELECTION');
       cy.contains(secondProposalTitle).parent().contains('NOT_FEASIBLE');
+    });
+
+    it('Feasibility Reviews should only be assigned if the Workflow contains a Feasibility Review Status', function () {
+      createInstrumentAndAssignItToCall();
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [result.createProposal.primaryKey],
+          });
+        }
+      });
+
+      cy.addProposalWorkflowStatus({
+        droppableGroupId: workflowDroppableGroupId,
+        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+        proposalWorkflowId: createdWorkflowId,
+        sortOrder: 1,
+        prevProposalStatusId: prevProposalStatusId,
+      }).then((result) => {
+        if (result.addProposalWorkflowStatus) {
+          cy.addStatusChangingEventsToConnection({
+            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
+          });
+        }
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: proposal2Title,
+            abstract: proposal2Abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [result.createProposal.primaryKey],
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains(proposalTitle)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.contains('No technical reviews found for the selected proposal');
+
+      cy.visit('/');
+
+      cy.contains(proposal2Title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.contains(
+        'No technical reviews found for the selected proposal'
+      ).should('not.exist');
     });
   });
 

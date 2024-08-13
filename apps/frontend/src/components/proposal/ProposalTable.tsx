@@ -10,7 +10,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import PropTypes from 'prop-types';
 import React, { useContext, useEffect, useState } from 'react';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -119,7 +119,7 @@ const ProposalTable = ({
   const [editProposalPk, setEditProposalPk] = useState(0);
   const { isInternalUser } = useContext(UserContext);
   if (editProposalPk) {
-    return <Redirect push to={`/ProposalEdit/${editProposalPk}`} />;
+    return <Navigate to={`/ProposalEdit/${editProposalPk}`} />;
   }
 
   const showReferenceText = (
@@ -237,6 +237,7 @@ const ProposalTable = ({
                 ),
             };
           },
+<<<<<<< HEAD
           () => {
             return {
               icon: FileCopy,
@@ -251,6 +252,21 @@ const ProposalTable = ({
               },
             }
 
+=======
+          {
+            icon: FileCopy,
+            tooltip: 'Clone proposal',
+            onClick: (_event, rowData) => {
+              api()
+                .getProposal({
+                  primaryKey: (rowData as PartialProposalsDataType).primaryKey,
+                })
+                .then((result) => {
+                  setProposalToClone(result.proposal);
+                  setOpenCallSelection(true);
+                });
+            },
+>>>>>>> 58ccbbd83b039c4f9afc6a7110ba4924e0ac2a8f
           },
           {
             icon: GetAppIcon,
@@ -273,7 +289,7 @@ const ProposalTable = ({
                 : !isPI
                   ? 'Only PI can delete proposal'
                   : 'Delete proposal',
-              disabled: !canDelete,
+              hidden: !canDelete,
               onClick: (_event, rowData) =>
                 confirm(
                   async () => {
