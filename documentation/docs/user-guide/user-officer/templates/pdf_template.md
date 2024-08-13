@@ -1,26 +1,38 @@
-# PDF templates
+## PDF templates
 
-# How do I create PDF templates?
+??? info "PDF templates" 
 
-Note: The standard PDF template () can be utilised for calls and serves as an example of a default template
+    [**PDF templates**](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
-**1. Navigate to the PDF Templates page**
+    ______________________________________________________________________________________
 
-* Go to the main menu and select Templates
-* From the dropdown menu, choose PDF
+    <figure markdown="span">  
+        ![PDF Template](/assets/images/pdf_template.png){ width="450"}
+        <figcaption>**PDF template**</figcaption>
+    </figure>
+    
 
-**2. Create a new PDF Template**
+    
 
-* On the PDF template page, click the Create button
+# **How do I create PDF templates?**
+
+## **Step 1. Navigate to the PDF Templates page**
+
+* Go to the main menu and select `TEMPLATES`
+* From the dropdown menu, choose `PDF`
+
+## **Step 2. Create a new PDF Template**
+
+* On the PDF template page, click the `CREATE` button
 * Enter a name for your new PDF template. You may also provide an optional description
-* Click Create to proceed
+* Click `CREATE` to proceed
 
-**3. Edit the PDF Template**
+## **Step 3. Edit the PDF Template**
 
-* In the PDF template editor, you can modify various sections of the template including the body, header, footer, sample declaration, and dummy data. Use the code editor to customize elements such as font, text size, colour, and formatting. (Link to dev guide) 
-* The editor provides a preview feature so you can see changes in real-time
-To see information on the PDF template documentation, open the help page
+* In the PDF template editor, you can modify various sections of the template including the body, header, footer, sample declaration, and dummy data. Use the code editor to customize elements such as font, text size, colour, and formatting. The editor provides a preview feature so you can see changes in real-time. To see information on the PDF template documentation, open the `HELP` page.
 
-**4. Update your changes**
+## **Step 4. Update your changes**
 
-* Once you are satisfied with your edits, click the Update button to save and apply the changes to the PDF template
+* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template
+
+______________________________________________________________________________________
