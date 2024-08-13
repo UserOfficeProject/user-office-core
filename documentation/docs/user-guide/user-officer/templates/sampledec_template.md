@@ -1,2 +1,3 @@
 # Sample Declaration Templates
 
+# test
