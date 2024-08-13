@@ -400,7 +400,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getFapReviewerProposalCountCurrentRound(
+  async getCurrentFapReviewerProposalCount(
     reviewerId: number
   ): Promise<number> {
     const callFilter = {
