@@ -5,15 +5,17 @@
 
 _______________________________________________________
 
-![Call](../../assets/images/call.png){ width="400" }
+![Call](../../assets/images/call.png){ width="500" }
 
 * ### [How do I create a call?](creating_call.md) 
 
-![workflow](../../assets/images/workflow.png){ width="400" }
+![Workflow](../../assets/images/workflow.png){ width="500" }
 
 * ### [How do I create a proposal workflow?](proposal_workflow.md)
 
+![Templates](../../assets/images/templates.png){ width="500"}
 
+* ### [How do I create templates?](templates/templates.md)
 _______________________________________________________
 
 Video tutorials:
