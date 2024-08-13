@@ -1147,4 +1147,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       status.proposalStatus.shortCode.match(workflowStatus)
     );
   }
+
+  async getTechniqueScientistProposals(
+    user: UserWithRole,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    return { totalCount: 0, proposals: [] };
+  }
 }
