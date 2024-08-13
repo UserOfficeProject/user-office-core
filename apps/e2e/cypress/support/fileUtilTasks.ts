@@ -2,6 +2,7 @@ import fs from 'fs';
 
 import fetch from 'cross-fetch';
 import pdf from 'pdf-parse';
+import * as xlsx from 'xlsx';
 
 export function downloadFile(args: {
   url: string;
@@ -58,4 +59,12 @@ export const unzip = (args: { source: string; destination: string }) => {
   zip.extractAllTo(args.destination);
 
   return 'Files extracted to' + args.destination;
+};
+
+export const convertXlsxToJson = (filePath: string) => {
+  const workbook = xlsx.readFile(filePath);
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  const jsonData = xlsx.utils.sheet_to_json(worksheet);
+
+  return jsonData;
 };
