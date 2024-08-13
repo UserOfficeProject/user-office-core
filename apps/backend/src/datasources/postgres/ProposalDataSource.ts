@@ -417,15 +417,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
-          query
-            .whereRaw('proposal_id ILIKE ?', `%${searchText}%`)
-            .orWhereRaw('title ILIKE ?', `%${searchText}%`)
-            .orWhereRaw('proposal_status_name ILIKE ?', `%${searchText}%`)
-            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-            .orWhereRaw(
-              'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
-              { searchText }
-            );
+          query.andWhere((qb) =>
+            qb
+              .orWhereRaw('proposal_id ILIKE ?', `%${searchText}%`)
+              .orWhereRaw('title ILIKE ?', `%${searchText}%`)
+              .orWhereRaw('proposal_status_name ILIKE ?', `%${searchText}%`)
+              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+              .orWhereRaw(
+                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+                { searchText }
+              )
+          );
         }
 
         if (sortField && sortDirection) {
@@ -569,15 +571,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.text) {
-          query
-            .where('title', 'ilike', `%${filter.text}%`)
-            .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
-            .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
-            // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-            .orWhereRaw(
-              'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
-              { searchText: filter.text }
-            );
+          query.andWhere((qb) =>
+            qb
+              .orWhereRaw('title ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('proposal_id ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('proposal_status_name ILIKE ?', `%${filter.text}%`)
+              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+              .orWhereRaw(
+                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+                { searchText: filter.text }
+              )
+          );
         }
         if (filter?.callId) {
           query.where('call_id', filter.callId);
@@ -1087,7 +1091,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
 
     return !!proposalStatus.find((status) =>
-      status.proposalStatus.name.match('FEASIBILITY')
+      status.proposalStatus.shortCode.match('FEASIBILITY')
     );
   }
 }

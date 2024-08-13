@@ -29,12 +29,14 @@ import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
+import { SetURLSearchParams, useSearchParams } from 'react-router-dom';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ListStatusIcon from 'components/common/icons/ListStatusIcon';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import UOLoader from 'components/common/UOLoader';
 import AssignProposalsToFaps from 'components/fap/Proposals/AssignProposalsToFaps';
 import AssignProposalsToInstruments from 'components/instrument/AssignProposalsToInstruments';
 import ProposalReviewContent, {
@@ -96,13 +98,13 @@ export type ProposalSelectionType = {
   statusId: number;
 };
 
-export type QueryParameters = {
-  first?: number;
-  offset?: number;
-  sortField?: string | undefined;
-  sortDirection?: string | undefined;
-  searchText?: string | undefined;
-};
+interface ProposalTableSearchParams extends URLSearchParams {
+  search?: string;
+  sortDirection?: string;
+  sortField?: string;
+  page?: string;
+  pageSize?: string;
+}
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -237,6 +239,7 @@ const FapReviewColumns = [
   },
 ];
 const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
+const DEFAULT_PAGE_SIZE = 10;
 
 /**
  * NOTE: This toolbar "select all" option works only with all prefetched proposals. Currently that value is set to "PREFETCH_SIZE=200"
@@ -254,6 +257,7 @@ const ToolbarWithSelectAllPrefetched = (props: {
   const tableHasData = !!props.dataManager.data.length;
   const allItemsSelectedOnThePage =
     props.selectedCount === props.dataManager.data.length;
+  const isLoading = selectAllAction?.iconProps?.className?.includes('loading');
 
   return (
     <div data-cy="select-all-toolbar">
@@ -274,6 +278,7 @@ const ToolbarWithSelectAllPrefetched = (props: {
                   selectAllAction.onClick(null, props.dataManager.data)
                 }
                 data-cy="clear-all-selection"
+                disabled={isLoading}
               >
                 Clear selection
               </Button>
@@ -287,11 +292,13 @@ const ToolbarWithSelectAllPrefetched = (props: {
                   selectAllAction.onClick(null, props.dataManager.data)
                 }
                 data-cy="select-all-prefetched-proposals"
+                disabled={isLoading}
               >
                 Select all {selectAllAction.iconProps?.defaultValue} proposals
               </Button>
             </>
           )}
+          {isLoading && <UOLoader size={20} sx={{ verticalAlign: 'middle' }} />}
         </Box>
       )}
     </div>
@@ -312,10 +319,13 @@ const ProposalTableOfficer = ({
   const [openChangeProposalStatus, setOpenChangeProposalStatus] =
     useState(false);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [openCallSelection, setOpenCallSelection] = useState(false);
   const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
     useState<null | HTMLElement>(null);
   const [openDownloadAttachment, setOpenDownloadAttachment] = useState(false);
+  const [allProposalSelectionLoading, setAllProposalSelectionLoading] =
+    useState(false);
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadProposalAttachment = useDownloadProposalAttachment();
   const downloadXLSXProposal = useDownloadXLSXProposal();
@@ -325,6 +335,10 @@ const ProposalTableOfficer = ({
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
   const featureContext = useContext(FeatureContext);
+  const [searchParams, setSearchParams]: [
+    ProposalTableSearchParams,
+    SetURLSearchParams,
+  ] = useSearchParams();
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -585,9 +599,10 @@ const ProposalTableOfficer = ({
 
   columns = setSortDirectionOnSortField(
     columns,
-    urlQueryParams.sortField,
-    urlQueryParams.sortDirection
+    searchParams.get('sortField'),
+    searchParams.get('sortDirection')
   );
+
   const proposalToReview = tableData.find(
     (proposal) =>
       proposal.primaryKey === urlQueryParams.reviewModal ||
@@ -603,11 +618,6 @@ const ProposalTableOfficer = ({
     PROPOSAL_MODAL_TAB_NAMES.ADMIN,
     PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
-
-  // const shouldShowSelectAllAction =
-  //   totalCount <= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
-  // const allPrefetchedProposalsSelected =
-  //   preselectedProposalsData.length === urlQueryParams.selection.length;
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
     new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
@@ -673,6 +683,7 @@ const ProposalTableOfficer = ({
           }) || [];
 
         setTableData(tableData);
+        setTotalCount(proposalsView?.totalCount || 0);
 
         resolve({
           data: tableData,
@@ -684,7 +695,56 @@ const ProposalTableOfficer = ({
       }
     });
 
+  const fetchProposalCoreBasicData = async () => {
+    const {
+      callId,
+      instrumentFilter,
+      proposalStatusId,
+      questionaryIds,
+      text,
+      questionFilter,
+      referenceNumbers,
+    } = proposalFilter;
+
+    const { proposalsView } = await api().getProposalCoreBasic({
+      filter: {
+        callId: callId,
+        instrumentFilter: instrumentFilter,
+        proposalStatusId: proposalStatusId,
+        questionaryIds: questionaryIds,
+        referenceNumbers: referenceNumbers,
+        questionFilter: questionFilter && {
+          ...questionFilter,
+          value: JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+        }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
+        text: text,
+      },
+      searchText: urlQueryParams.search,
+    });
+
+    return proposalsView?.proposalViews;
+  };
+
   const selectedProposalsData = getSelectedProposalsData();
+
+  const pageSize = searchParams.get('pageSize');
+  const page = searchParams.get('page');
+  const search = searchParams.get('search');
+  const shouldShowSelectAllAction =
+    totalCount > (pageSize ? +pageSize : DEFAULT_PAGE_SIZE)
+      ? SELECT_ALL_ACTION_TOOLTIP
+      : undefined;
+  const allPrefetchedProposalsSelected =
+    totalCount === urlQueryParams.selection.length;
+
+  const proposalFapInstruments = selectedProposalsData
+    .filter((item) => !!item.instruments)
+    .map((selectedProposal) => selectedProposal.fapInstruments)
+    .flat();
+
+  const proposalsInstruments = selectedProposalsData
+    .filter((item) => !!item.instruments)
+    .map((selectedProposal) => selectedProposal.instruments);
 
   return (
     <>
@@ -700,12 +760,8 @@ const ProposalTableOfficer = ({
           <AssignProposalsToFaps
             assignProposalsToFaps={assignProposalsToFaps}
             close={(): void => setOpenAssignment(false)}
-            proposalFapInstruments={selectedProposalsData
-              .map((selectedProposal) => selectedProposal.fapInstruments)
-              .flat()}
-            proposalInstruments={selectedProposalsData.map(
-              (selectedProposal) => selectedProposal.instruments
-            )}
+            proposalFapInstruments={proposalFapInstruments}
+            proposalInstruments={proposalsInstruments}
           />
         </DialogContent>
       </Dialog>
@@ -838,15 +894,15 @@ const ProposalTableOfficer = ({
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}
         onPageChange={(page, pageSize) => {
-          setUrlQueryParams({
-            page,
-            pageSize,
+          setSearchParams({
+            page: page.toString(),
+            pageSize: pageSize.toString(),
           });
         }}
         onSearchChange={(searchText) => {
-          setUrlQueryParams({
-            search: searchText ? searchText : undefined,
-            page: searchText ? 0 : urlQueryParams.page,
+          setSearchParams({
+            search: searchText ? searchText : '',
+            page: searchText ? '0' : page || '',
           });
         }}
         onSelectionChange={(selectedItems) => {
@@ -861,7 +917,7 @@ const ProposalTableOfficer = ({
         }}
         options={{
           search: true,
-          searchText: urlQueryParams.search || undefined,
+          searchText: search || undefined,
           selection: true,
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
@@ -873,8 +929,8 @@ const ProposalTableOfficer = ({
               'aria-label': `${rowdata.title}-select`,
             },
           }),
-          pageSize: urlQueryParams.pageSize || undefined,
-          initialPage: urlQueryParams.search ? 0 : urlQueryParams.page || 0,
+          pageSize: pageSize ? +pageSize : undefined,
+          initialPage: search ? 0 : page ? +page : 0,
         }}
         actions={[
           {
@@ -898,7 +954,9 @@ const ProposalTableOfficer = ({
             tooltip: 'Export proposals in Excel',
             onClick: (): void => {
               downloadXLSXProposal(
-                selectedProposalsData?.map((row) => row.primaryKey),
+                urlQueryParams.selection
+                  .filter((item): item is string => !!item)
+                  .map((item) => +item),
                 selectedProposalsData?.[0].title
               );
             },
@@ -966,27 +1024,51 @@ const ProposalTableOfficer = ({
             position: 'toolbarOnSelect',
           },
           {
-            // tooltip: shouldShowSelectAllAction,
+            tooltip: shouldShowSelectAllAction,
             icon: DoneAllIcon,
             hidden: true,
-            // iconProps: {
-            //   hidden: allPrefetchedProposalsSelected,
-            //   defaultValue: preselectedProposalsData.length,
-            // },
-            onClick: () => {
-              // if (allPrefetchedProposalsSelected) {
-              //   setUrlQueryParams((params) => ({
-              //     ...params,
-              //     selection: undefined,
-              //   }));
-              // } else {
-              //   setUrlQueryParams((params) => ({
-              //     ...params,
-              //     selection: preselectedProposalsData.map((proposal) =>
-              //       proposal.primaryKey.toString()
-              //     ),
-              //   }));
-              // }
+            iconProps: {
+              hidden: allPrefetchedProposalsSelected,
+              defaultValue: totalCount,
+              className: allProposalSelectionLoading ? 'loading' : '',
+            },
+            onClick: async () => {
+              setAllProposalSelectionLoading(true);
+              if (allPrefetchedProposalsSelected) {
+                setUrlQueryParams({
+                  selection: undefined,
+                });
+                refreshTableData();
+              } else {
+                const selectedProposalsData =
+                  await fetchProposalCoreBasicData();
+
+                if (!selectedProposalsData) {
+                  return;
+                }
+
+                // NOTE: Adding the missing data in the tableData state variable because some proposal group actions use additional data than primaryKey.
+                const newTableData = selectedProposalsData?.map((sp) => {
+                  const foundProposalData = tableData.find(
+                    (td) => td.primaryKey === sp.primaryKey
+                  );
+
+                  if (foundProposalData) {
+                    return foundProposalData;
+                  } else {
+                    return sp as ProposalViewData;
+                  }
+                });
+
+                setTableData(newTableData);
+                setUrlQueryParams({
+                  selection: selectedProposalsData?.map((item) =>
+                    item.primaryKey.toString()
+                  ),
+                });
+              }
+
+              setAllProposalSelectionLoading(false);
             },
             position: 'toolbarOnSelect',
           },
@@ -1006,10 +1088,15 @@ const ProposalTableOfficer = ({
         }}
         onOrderCollectionChange={(orderByCollection) => {
           const [orderBy] = orderByCollection;
-          setUrlQueryParams({
-            sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
-          });
+
+          if (!orderBy) {
+            setSearchParams({});
+          } else {
+            setSearchParams({
+              sortField: orderBy?.orderByField,
+              sortDirection: orderBy?.orderDirection,
+            });
+          }
         }}
       />
     </>

@@ -19,7 +19,10 @@ import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignPro
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { FapDataSource } from '../FapDataSource';
-import { AssignProposalsToFapsInput } from '../postgres/records';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from '../postgres/records';
 import { basicDummyUser } from './UserDataSource';
 
 export const dummyFap = new Fap(
@@ -336,9 +339,9 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getFapProposalsByInstrument(
-    fapId: number,
     instrumentId: number,
-    callId: number
+    callId: number,
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ) {
     return dummyFapProposals.filter((proposal) => proposal.fapId === fapId);
   }
@@ -369,6 +372,12 @@ export class FapDataSourceMock implements FapDataSource {
         assignment.fapId === fapId &&
         assignment.proposalPk === proposalPk &&
         (reviewerId !== null ? assignment.fapMemberUserId === reviewerId : true)
+    );
+  }
+
+  async getAllFapProposalAssignments(proposalPk: number) {
+    return dummyFapAssignments.filter(
+      (assignment) => assignment.proposalPk === proposalPk
     );
   }
 
@@ -472,6 +481,12 @@ export class FapDataSourceMock implements FapDataSource {
     return [dummyFapMeetingDecision];
   }
 
+  async getAllFapMeetingDecisions(
+    fapId: number
+  ): Promise<FapMeetingDecision[]> {
+    return [dummyFapMeetingDecision];
+  }
+
   async getFapProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]> {
@@ -497,6 +512,10 @@ export class FapDataSourceMock implements FapDataSource {
     reviewer_id: number,
     rank: number
   ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  getFapReviewData(callId: number, fapId: number): Promise<FapReviewsRecord[]> {
     throw new Error('Method not implemented.');
   }
 

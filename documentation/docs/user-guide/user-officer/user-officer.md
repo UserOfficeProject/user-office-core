@@ -5,12 +5,14 @@
 
 _______________________________________________________
 
+![Call](../../assets/images/call.png){ width="400" }
 
-![Call](/assets/images/call.png){ width="500" }
+* ### [How do I create a call?](creating_call.md) 
 
-_______________________________________________________
+![workflow](../../assets/images/workflow.png){ width="400" }
 
-![workflow](/assets/images/workflow.png){ width="500" }
+* ### [How do I create a proposal workflow?](proposal_workflow.md)
+
 
 _______________________________________________________
 
@@ -18,7 +20,7 @@ Video tutorials:
 
 Overview and intruduction to User Office:
 
-* #### [Part I: How do I use templates?](videos.md)
+* #### [Part I: How do I create templates?](videos.md)
 
 * #### [Part II: How do I use workflows?](videos.md)
 
@@ -43,28 +45,31 @@ All how-to guides:
 
 ### **Creating templates**
 
-* #### [How do I create a proposal template?](proposal_template.md)
+* #### [How do I create a proposal template?](templates/proposal_template.md)
 
-* #### [How do I create a feedback template?](feedback_template.md)
+* #### [How do I create a feedback template?](templates/feedback_template.md)
 
-* #### [How do I create a PDF template?](pdf_template.md)
+* #### [How do I create a PDF template?](templates/pdf_template.md)
 
-* #### [How do I create a proposal ESI template?](proposalESI_template.md)
+* #### [How do I create a proposal ESI template?](templates/proposalESI_template.md)
 
-* #### [How do I create a question template?](question_template.md)
+* #### [How do I create a question template?](templates/question_template.md)
 
-* #### [How do I create a sample declaration template?](sampledec_template.md)
+* #### [How do I create a sample declaration template?](templates/sampledec_template.md)
 
-* #### [How do I create a sample ESI template?](sampleESI_template.md)
+* #### [How do I create a sample ESI template?](templates/sampleESI_template.md)
 
-* #### [How do I create a shipment declaration template?](shipment_template.md)
+* #### [How do I create a shipment declaration template?](templates/shipment_template.md)
 
-* #### [How do I create a sub template?](sub_template.md)
+* #### [How do I create a sub template?](templates/sub_template.md)
 
-* #### [How do I create a visit registration template?](visit_template.md)
+* #### [How do I create a visit registration template?](templates/visit_template.md)
+
+### **Creating Proposal Workflows**
 
 * #### [How do I create a proposal workflow?](proposal_workflow.md)
 
+* #### [How do I create a proposal status?](proposal_workflow.md)
 
 ### **Feasibility review**
 
@@ -82,46 +87,46 @@ All how-to guides:
 
 ### **Editing templates**
 
-* #### [How do I edit a proposal template?](proposal_template.md)
+* #### [How do I edit a proposal template?](templates/proposal_template.md)
 
-* #### [How do I edit a feedback template?](feedback_template.md)
+* #### [How do I edit a feedback template?](templates/feedback_template.md)
 
-* #### [How do I edit a PDF template?](pdf_template.md)
+* #### [How do I edit a PDF template?](templates/pdf_template.md)
 
-* #### [How do I edit a proposal ESI template?](proposalESI_template.md)
+* #### [How do I edit a proposal ESI template?](templates/proposalESI_template.md)
 
-* #### [How do I edit a question template?](question_template.md)
+* #### [How do I edit a question template?](templates/question_template.md)
 
-* #### [How do I edit a sample declaration template?](sampledec_template.md)
+* #### [How do I edit a sample declaration template?](templates/sampledec_template.md)
 
-* #### [How do I edit a sample ESI template?](sampleESI_template.md)
+* #### [How do I edit a sample ESI template?](templates/sampleESI_template.md)
 
-* #### [How do I edit a shipment declaration template?](shipment_template.md)
+* #### [How do I edit a shipment declaration template?](templates/shipment_template.md)
 
-* #### [How do I edit a sub template?](sub_template.md)
+* #### [How do I edit a sub template?](templates/sub_template.md)
 
-* #### [How do I edit a visit registration template?](visit_template.md)
+* #### [How do I edit a visit registration template?](templates/visit_template.md)
 
 * #### [How do I edit a proposal workflow?](proposal_workflow.md)
 
 
 ## **Configure the system**
 
-* #### [How do I change the look of the UI?](UI.md)
+* #### [How do I change the look of the UI?](placeholder.md)
 
 
 ## **Dev tools**
 
-* #### [How do I use API access tokens?](API.md)
+* #### [How do I use API access tokens?](placeholder.md)
 
 * #### [How do I use features?](features.md)
 
-* #### [How do I use App settings?](app_settings)
+* #### [How do I use App settings?](placeholder.md)
 
-* #### [How do I edit a PDF](API.md)
+* #### [How do I edit a PDF](placeholder.md)
  
 
-# Glossary Links
+# [User Officer Glossary](glossary.md)
 
 * [What are calls?](placeholder.md)
 * [What are templates?](placeholder.md)
@@ -130,7 +135,7 @@ All how-to guides:
 * [What are FAPs?](placeholder.md)
 * [What are feedback templates?](placeholder.md)
 * [What are PDF templates?](placeholder.md)
-* [What are proposal ESI templatse?](placeholder.md)
+* [What are proposal ESI templates?](placeholder.md)
 * [What are question templates?](placeholder.md)
 * [What are sample declaration templates?](placeholder.md)
 * [What are sample ESI templates?](placeholder.md)
