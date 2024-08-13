@@ -51,6 +51,7 @@ import {
   InstitutionRecord,
   AssignProposalsToFapsInput,
   CountryRecord,
+  FapReviewsRecord,
 } from './records';
 
 @injectable()
@@ -286,6 +287,18 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
+  async getAllFapProposalAssignments(
+    proposalPk: number
+  ): Promise<FapAssignment[]> {
+    const fapAssignments: FapAssignmentRecord[] = await database
+      .from('fap_assignments')
+      .where('proposal_pk', proposalPk);
+
+    return fapAssignments.map((fapAssignment) =>
+      createFapAssignmentObject(fapAssignment)
+    );
+  }
+
   async getFapProposals(
     fapId: number,
     callId: number | null
@@ -479,9 +492,9 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getFapProposalsByInstrument(
-    fapId: number,
     instrumentId: number,
-    callId: number
+    callId: number,
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select([
@@ -498,8 +511,17 @@ export default class PostgresFapDataSource implements FapDataSource {
       .join('proposal_statuses as ps', {
         'p.status_id': 'ps.proposal_status_id',
       })
-      .where('fp.fap_id', fapId)
-      .andWhere('fp.instrument_id', instrumentId);
+      .where('fp.instrument_id', instrumentId)
+      .modify((query) => {
+        if (fapId) {
+          query.andWhere('fp.fap_id', fapId);
+        }
+      })
+      .modify((query) => {
+        if (proposalPk) {
+          query.andWhere('fp.proposal_pk', proposalPk);
+        }
+      });
 
     return fapProposals.map((fapProposal) =>
       createFapProposalObject(fapProposal)
@@ -1023,6 +1045,24 @@ export default class PostgresFapDataSource implements FapDataSource {
     return createFapMeetingDecisionObject(fapMeetingDecisionRecord);
   }
 
+  async getAllFapMeetingDecisions(
+    fapId: number
+  ): Promise<FapMeetingDecision[]> {
+    return database
+      .select()
+      .from('fap_meeting_decisions')
+      .where('fap_id', fapId)
+      .then((fapMeetingDecisionRecords: FapMeetingDecisionRecord[]) => {
+        if (!fapMeetingDecisionRecords.length) {
+          return [];
+        }
+
+        return fapMeetingDecisionRecords.map((fapMeetingDecisionRecord) =>
+          createFapMeetingDecisionObject(fapMeetingDecisionRecord)
+        );
+      });
+  }
+
   async getProposalsFapMeetingDecisions(
     proposalPks: number[],
     fapId?: number
@@ -1189,6 +1229,17 @@ export default class PostgresFapDataSource implements FapDataSource {
 
         return true;
       });
+  }
+
+  async getFapReviewData(
+    callId: number,
+    fapId: number
+  ): Promise<FapReviewsRecord[]> {
+    return await database
+      .select('*')
+      .from('review_data')
+      .where('fap_id', fapId)
+      .andWhere('call_id', callId);
   }
 
   async submitFapMeetings(
