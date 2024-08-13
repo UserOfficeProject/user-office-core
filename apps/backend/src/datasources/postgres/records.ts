@@ -442,6 +442,23 @@ export interface FapAssignmentRecord {
   readonly rank: number | null;
 }
 
+export interface FapReviewsRecord {
+  readonly proposal_pk: number;
+  readonly proposal_id: number;
+  readonly title: string;
+  readonly instrument_name: string;
+  readonly availability_time: number;
+  readonly time_allocation: number;
+  readonly fap_id: number;
+  readonly rank_order: number;
+  readonly call_id: number;
+  readonly proposer_id: number;
+  readonly instrument_id: number;
+  readonly fap_time_allocation: number;
+  readonly average_grade: number;
+  readonly questionary_id: number;
+}
+
 export interface FapReviewerRecord {
   readonly user_id: number;
   readonly fap_id: number;
@@ -605,6 +622,9 @@ export interface ProposalEventsRecord {
   readonly proposal_sample_safe: boolean;
   readonly proposal_fap_review_submitted: boolean;
   readonly proposal_fap_meeting_submitted: boolean;
+  readonly proposal_all_fap_meetings_submitted: boolean;
+  readonly proposal_all_reviews_submitted_for_all_faps: boolean;
+  readonly proposal_all_fap_meeting_instrument_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
   readonly proposal_accepted: boolean;
   readonly proposal_reserved: boolean;

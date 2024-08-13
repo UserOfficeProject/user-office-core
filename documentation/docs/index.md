@@ -22,4 +22,4 @@ The European Spallation Source (ESS) started building this software in 2018 with
 The Science and Technology Facilities Council (STFC) joined the collaboration with the ESS in 2020. The software has been used to accept proposals for facilities at STFC since late 2021 and has been rolled out to the ISIS Neutron and Muon Source, and the Central Laser Facility.
 
 ## Quickstart
-- [Get started here](quick-start.md)
+- [Get started here](quick_start.md)

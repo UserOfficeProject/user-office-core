@@ -29,6 +29,7 @@ import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
+import { SetURLSearchParams, useSearchParams } from 'react-router-dom';
 import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -97,13 +98,13 @@ export type ProposalSelectionType = {
   statusId: number;
 };
 
-export type QueryParameters = {
-  first?: number;
-  offset?: number;
-  sortField?: string | undefined;
-  sortDirection?: string | undefined;
-  searchText?: string | undefined;
-};
+interface ProposalTableSearchParams extends URLSearchParams {
+  search?: string;
+  sortDirection?: string;
+  sortField?: string;
+  page?: string;
+  pageSize?: string;
+}
 
 let columns: Column<ProposalViewData>[] = [
   {
@@ -334,6 +335,10 @@ const ProposalTableOfficer = ({
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
   const featureContext = useContext(FeatureContext);
+  const [searchParams, setSearchParams]: [
+    ProposalTableSearchParams,
+    SetURLSearchParams,
+  ] = useSearchParams();
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -594,9 +599,10 @@ const ProposalTableOfficer = ({
 
   columns = setSortDirectionOnSortField(
     columns,
-    urlQueryParams.sortField,
-    urlQueryParams.sortDirection
+    searchParams.get('sortField'),
+    searchParams.get('sortDirection')
   );
+
   const proposalToReview = tableData.find(
     (proposal) =>
       proposal.primaryKey === urlQueryParams.reviewModal ||
@@ -721,12 +727,24 @@ const ProposalTableOfficer = ({
 
   const selectedProposalsData = getSelectedProposalsData();
 
+  const pageSize = searchParams.get('pageSize');
+  const page = searchParams.get('page');
+  const search = searchParams.get('search');
   const shouldShowSelectAllAction =
-    totalCount > (urlQueryParams.pageSize || DEFAULT_PAGE_SIZE)
+    totalCount > (pageSize ? +pageSize : DEFAULT_PAGE_SIZE)
       ? SELECT_ALL_ACTION_TOOLTIP
       : undefined;
   const allPrefetchedProposalsSelected =
     totalCount === urlQueryParams.selection.length;
+
+  const proposalFapInstruments = selectedProposalsData
+    .filter((item) => !!item.instruments)
+    .map((selectedProposal) => selectedProposal.fapInstruments)
+    .flat();
+
+  const proposalsInstruments = selectedProposalsData
+    .filter((item) => !!item.instruments)
+    .map((selectedProposal) => selectedProposal.instruments);
 
   return (
     <>
@@ -742,12 +760,8 @@ const ProposalTableOfficer = ({
           <AssignProposalsToFaps
             assignProposalsToFaps={assignProposalsToFaps}
             close={(): void => setOpenAssignment(false)}
-            proposalFapInstruments={selectedProposalsData
-              .map((selectedProposal) => selectedProposal.fapInstruments)
-              .flat()}
-            proposalInstruments={selectedProposalsData.map(
-              (selectedProposal) => selectedProposal.instruments
-            )}
+            proposalFapInstruments={proposalFapInstruments}
+            proposalInstruments={proposalsInstruments}
           />
         </DialogContent>
       </Dialog>
@@ -880,15 +894,15 @@ const ProposalTableOfficer = ({
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}
         onPageChange={(page, pageSize) => {
-          setUrlQueryParams({
-            page,
-            pageSize,
+          setSearchParams({
+            page: page.toString(),
+            pageSize: pageSize.toString(),
           });
         }}
         onSearchChange={(searchText) => {
-          setUrlQueryParams({
-            search: searchText ? searchText : undefined,
-            page: searchText ? 0 : urlQueryParams.page,
+          setSearchParams({
+            search: searchText ? searchText : '',
+            page: searchText ? '0' : page || '',
           });
         }}
         onSelectionChange={(selectedItems) => {
@@ -903,7 +917,7 @@ const ProposalTableOfficer = ({
         }}
         options={{
           search: true,
-          searchText: urlQueryParams.search || undefined,
+          searchText: search || undefined,
           selection: true,
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },
@@ -915,8 +929,8 @@ const ProposalTableOfficer = ({
               'aria-label': `${rowdata.title}-select`,
             },
           }),
-          pageSize: urlQueryParams.pageSize || undefined,
-          initialPage: urlQueryParams.search ? 0 : urlQueryParams.page || 0,
+          pageSize: pageSize ? +pageSize : undefined,
+          initialPage: search ? 0 : page ? +page : 0,
         }}
         actions={[
           {
@@ -1074,10 +1088,15 @@ const ProposalTableOfficer = ({
         }}
         onOrderCollectionChange={(orderByCollection) => {
           const [orderBy] = orderByCollection;
-          setUrlQueryParams({
-            sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
-          });
+
+          if (!orderBy) {
+            setSearchParams({});
+          } else {
+            setSearchParams({
+              sortField: orderBy?.orderByField,
+              sortDirection: orderBy?.orderDirection,
+            });
+          }
         }}
       />
     </>
