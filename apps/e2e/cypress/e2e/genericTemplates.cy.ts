@@ -1570,7 +1570,7 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy="clone"]').eq(0).click();
 
-      cy.contains('Clone').click();
+      cy.contains('button', 'Clone').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
