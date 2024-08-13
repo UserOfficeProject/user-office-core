@@ -238,7 +238,7 @@ context('Calls tests', () => {
       cy.get('[data-cy="cycle-comment"] input').should('be.focused');
       cy.get('[data-cy="cycle-comment"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Please fill in this field.'
+          'Please fill out this field.'
         );
       });
       cy.get('[data-cy="cycle-comment"] input').blur();
