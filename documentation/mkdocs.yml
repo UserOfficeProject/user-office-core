@@ -64,11 +64,12 @@ nav:
               - Visit template: user-guide/user-officer/templates/visit_template.md
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
-      - Running locally: developer-guide/running_locally.md
+      - Running Locally: developer-guide/running_locally.md
       - Configuration: developer-guide/configuration.md
-      - Architecture: developer-guide/achitecture.md
-      - API documentation: developer-guide/api_documentation.md
       - Step-by-Step Guide: developer-guide/step-by-step.md
+      - Architecture: developer-guide/achitecture.md
+      - API Documentation: developer-guide/api_documentation.md
+      - Documentation Changes: developer-guide/documentation_changes.md
   - FAQ: faq.md
   - Glossary: glossary.md
   - References: references.md

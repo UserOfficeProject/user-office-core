@@ -32,8 +32,6 @@ export type ProposalUrlQueryParamsType = {
   proposalId: QueryParamConfig<string | null | undefined>;
   value: QueryParamConfig<string | null | undefined>;
   dataType: QueryParamConfig<string | null | undefined>;
-  page: QueryParamConfig<number | null | undefined>;
-  pageSize: QueryParamConfig<number | null | undefined>;
 } & UrlQueryParamsType;
 
 export default function ProposalPage() {
@@ -50,8 +48,6 @@ export default function ProposalPage() {
       compareOperator: StringParam,
       value: StringParam,
       dataType: StringParam,
-      page: NumberParam,
-      pageSize: NumberParam,
     });
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: urlQueryParams.call,
