@@ -244,7 +244,7 @@ export const workflowEngine = async (
                 );
 
               if (updatedProposal) {
-                checkIfConditionsForNextStatusAreMet({
+                await checkIfConditionsForNextStatusAreMet({
                   nextWorkflowConnections,
                   proposalWorkflow,
                   proposalSettingsDataSource,
