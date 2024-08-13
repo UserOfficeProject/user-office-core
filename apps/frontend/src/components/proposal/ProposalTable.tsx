@@ -21,7 +21,7 @@ import { Call, FeatureId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
-import { isCallEnded, isLegacyCall } from 'utils/helperFunctions';
+import { isCallEnded} from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { timeAgo } from 'utils/Time';
@@ -237,13 +237,10 @@ const ProposalTable = ({
                 ),
             };
           },
-          (rowData) => {
-            const canCopy = !isLegacyCall(rowData.call?.cycleComment);
-
+          () => {
             return {
               icon: FileCopy,
               tooltip: 'Clone proposal',
-              disabled: !canCopy,
               onClick: (_event, rowData) => {
                 api()
                   .getProposal({ primaryKey: rowData.primaryKey })
