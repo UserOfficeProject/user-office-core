@@ -268,4 +268,91 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     return await super.cloneProposal(sourceProposal, call);
   }
+
+  async getTechniqueScientistProposals(
+    user: UserWithRole,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    const proposals = database
+      .select('proposal_pk')
+      .from('proposal_table_view')
+      .join(
+        'technique_has_proposals as thp',
+        'thp.proposal_id',
+        '=',
+        'proposal_table_view.proposal_pk'
+      )
+      .join('techniques as tech', 'tech.technique_id', '=', 'thp.technique_id')
+      .leftJoin(
+        'technique_has_scientists as ths',
+        'ths.technique_id',
+        '=',
+        'thp.technique_id'
+      )
+      .where(function () {
+        if (user.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST) {
+          this.where('ths.user_id', user.id);
+        }
+      });
+
+    const result = database
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('proposal_table_view')
+      .whereIn('proposal_pk', proposals)
+      .modify((query) => {
+        if (filter?.text) {
+          query.where(function () {
+            this.where('title', 'ilike', `%${filter.text}%`)
+              .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
+              .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`);
+          });
+        }
+        if (filter?.callId) {
+          query.where('call_id', filter.callId);
+        }
+
+        if (filter?.techniqueFilter?.techniqueId) {
+          query.where('technique_id', filter?.techniqueFilter?.techniqueId);
+        }
+
+        if (filter?.proposalStatusId) {
+          query.where('proposal_status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.shortCodes) {
+          const filteredAndPreparedShortCodes = filter?.shortCodes
+            .filter((shortCode) => shortCode)
+            .join('|');
+
+          query.whereRaw(
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          );
+        }
+
+        if (filter?.referenceNumbers) {
+          query.whereIn('proposal_id', filter.referenceNumbers);
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then((proposals: ProposalViewRecord[]) => {
+        const props = proposals.map((proposal) =>
+          createProposalViewObject(proposal)
+        );
+
+        return {
+          totalCount: proposals[0] ? proposals[0].full_count : 0,
+          proposals: props,
+        };
+      });
+
+    return result;
+  }
 }

@@ -44,6 +44,18 @@ export class InstrumentFilterInput {
 }
 
 @InputType()
+export class TechniqueFilterInput {
+  @Field(() => Int, { nullable: true })
+  public techniqueId: number;
+
+  @Field(() => Boolean)
+  public showMultiTechniqueProposals: boolean;
+
+  @Field(() => Boolean)
+  public showAllProposals: boolean;
+}
+
+@InputType()
 export class ProposalsFilter {
   @Field(() => String, { nullable: true })
   public text?: string;
@@ -80,6 +92,9 @@ export class ProposalsFilter {
 
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
+
+  @Field(() => TechniqueFilterInput, { nullable: true })
+  public techniqueFilter?: TechniqueFilterInput;
 }
 
 @ArgsType()
