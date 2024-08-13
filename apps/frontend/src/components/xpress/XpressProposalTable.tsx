@@ -1,4 +1,4 @@
-import MaterialTable from '@material-table/core';
+import MaterialTable, { OrderByCollection } from '@material-table/core';
 import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
@@ -117,7 +117,7 @@ const XpressProposalTable = () => {
           };
         })
       );
-      setSelectedProposals(selectedProposals);
+      setSelectedProposals(selected);
     } else {
       setPreselectedProposalsData(
         proposalsData.map((proposal) => ({
@@ -170,15 +170,27 @@ const XpressProposalTable = () => {
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
-      const updatedSelection = proposalDataWithIdAndRowActions.filter((row) =>
-        selection.has(row.proposalId)
+      const selected: ProposalViewData[] = [];
+      setPreselectedProposalsData(
+        proposalsData.map((proposal) => {
+          if (selection.has(proposal.primaryKey.toString())) {
+            selected.push(proposal);
+          }
+
+          return {
+            ...proposal,
+            tableData: {
+              checked: selection.has(proposal.primaryKey.toString()),
+            },
+          };
+        })
       );
 
-      setSelectedProposals(updatedSelection);
+      setSelectedProposals(selected);
     } else {
       setSelectedProposals([]);
     }
-  }, [proposalDataWithIdAndRowActions, urlQueryParams.selection]);
+  }, [proposalsData, urlQueryParams.selection]);
 
   const handleSelectionChange = (rows: ProposalData[]) => {
     setUrlQueryParams((params) => ({
@@ -187,6 +199,15 @@ const XpressProposalTable = () => {
         rows.length > 0
           ? rows.map((row) => row.proposalId.toString())
           : undefined,
+    }));
+  };
+
+  const handleSortOrderChange = (orderByCollection: OrderByCollection[]) => {
+    const [orderBy] = orderByCollection;
+    setUrlQueryParams((params) => ({
+      ...params,
+      sortField: orderBy?.orderByField,
+      sortDirection: orderBy?.orderDirection,
     }));
   };
 
@@ -200,21 +221,17 @@ const XpressProposalTable = () => {
       isLoading={loading}
       options={{
         search: true,
-        searchText: undefined,
+        searchText: urlQueryParams.search || undefined,
         selection: true,
         headerSelectionProps: {
           inputProps: { 'aria-label': 'Select All Rows' },
         },
         debounceInterval: 600,
         columnsButton: true,
-        selectionProps: (rowData: ProposalData) => ({
-          inputProps: {
-            'aria-label': `${rowData.title}-select`,
-          },
-        }),
         pageSize: 20,
       }}
       onSelectionChange={handleSelectionChange}
+      onOrderCollectionChange={handleSortOrderChange}
       onSearchChange={handleSearchChange}
       onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
       onPageChange={(page, pageSize) => {
@@ -230,6 +247,11 @@ const XpressProposalTable = () => {
           });
         }
         setCurrentPage(page);
+      }}
+      localization={{
+        toolbar: {
+          nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
+        },
       }}
     />
   );
