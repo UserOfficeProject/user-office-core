@@ -4,9 +4,13 @@ import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
+import { useCallsData } from 'hooks/call/useCallsData';
+import { useTechniquesData } from 'hooks/technique/useTechniquesData';
+import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
 
 import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
+import XpressProposalFilterBar from './XpressProposalFilterBar';
 
 export interface ProposalData {
   proposalId: string;
@@ -15,10 +19,12 @@ export interface ProposalData {
 }
 
 const XpressProposalTable = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedProposals, setSelectedProposals] = useState<ProposalData[]>(
     []
   );
-
+  const { techniques, loadingTechniques } = useTechniquesData();
+  const { calls, loadingCalls } = useCallsData();
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const PREFETCH_SIZE = 200;
@@ -212,48 +218,66 @@ const XpressProposalTable = () => {
   };
 
   return (
-    <MaterialTable<ProposalData>
-      icons={tableIcons}
-      title={'Xpress Proposals'}
-      columns={columns}
-      data={proposalDataWithIdAndRowActions}
-      totalCount={20}
-      isLoading={loading}
-      options={{
-        search: true,
-        searchText: urlQueryParams.search || undefined,
-        selection: true,
-        headerSelectionProps: {
-          inputProps: { 'aria-label': 'Select All Rows' },
-        },
-        debounceInterval: 600,
-        columnsButton: true,
-        pageSize: 20,
-      }}
-      onSelectionChange={handleSelectionChange}
-      onOrderCollectionChange={handleSortOrderChange}
-      onSearchChange={handleSearchChange}
-      onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
-      onPageChange={(page, pageSize) => {
-        const newOffset =
-          Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
-        if (page !== currentPage && newOffset != queryParameters.query.offset) {
-          setQueryParameters({
-            searchText: queryParameters.searchText,
-            query: {
-              ...queryParameters.query,
-              offset: newOffset,
-            },
-          });
-        }
-        setCurrentPage(page);
-      }}
-      localization={{
-        toolbar: {
-          nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
-        },
-      }}
-    />
+    <>
+      <StyledContainer maxWidth={false}>
+        <StyledPaper data-cy="xpress-proposals-table">
+          <XpressProposalFilterBar
+            calls={{ data: calls, isLoading: loadingCalls }}
+            techniques={{
+              data: techniques,
+              isLoading: loadingTechniques,
+            }}
+            setProposalFilter={setProposalFilter}
+            filter={proposalFilter}
+          />
+          <MaterialTable<ProposalData>
+            icons={tableIcons}
+            title={'Xpress Proposals'}
+            columns={columns}
+            data={proposalDataWithIdAndRowActions}
+            totalCount={20}
+            isLoading={loading}
+            options={{
+              search: true,
+              searchText: urlQueryParams.search || undefined,
+              selection: true,
+              headerSelectionProps: {
+                inputProps: { 'aria-label': 'Select All Rows' },
+              },
+              debounceInterval: 600,
+              columnsButton: true,
+              pageSize: 20,
+            }}
+            onSelectionChange={handleSelectionChange}
+            onOrderCollectionChange={handleSortOrderChange}
+            onSearchChange={handleSearchChange}
+            onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
+            onPageChange={(page, pageSize) => {
+              const newOffset =
+                Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
+              if (
+                page !== currentPage &&
+                newOffset != queryParameters.query.offset
+              ) {
+                setQueryParameters({
+                  searchText: queryParameters.searchText,
+                  query: {
+                    ...queryParameters.query,
+                    offset: newOffset,
+                  },
+                });
+              }
+              setCurrentPage(page);
+            }}
+            localization={{
+              toolbar: {
+                nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
+              },
+            }}
+          />
+        </StyledPaper>
+      </StyledContainer>
+    </>
   );
 };
 
