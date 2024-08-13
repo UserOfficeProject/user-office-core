@@ -237,22 +237,6 @@ const ProposalTable = ({
                 ),
             };
           },
-<<<<<<< HEAD
-          () => {
-            return {
-              icon: FileCopy,
-              tooltip: 'Clone proposal',
-              onClick: (_event, rowData) => {
-                api()
-                  .getProposal({ primaryKey: rowData.primaryKey })
-                  .then((result) => {
-                    setProposalToClone(result.proposal);
-                    setOpenCallSelection(true);
-                  });
-              },
-            }
-
-=======
           {
             icon: FileCopy,
             tooltip: 'Clone proposal',
@@ -266,7 +250,6 @@ const ProposalTable = ({
                   setOpenCallSelection(true);
                 });
             },
->>>>>>> 58ccbbd83b039c4f9afc6a7110ba4924e0ac2a8f
           },
           {
             icon: GetAppIcon,
