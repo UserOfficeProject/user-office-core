@@ -424,4 +424,13 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
     return true;
   }
+
+  async getTechniqueScientistProposals(
+    scientist: UserWithRole,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return { totalCount: 1, proposals: [dummyProposalView] };
+  }
 }

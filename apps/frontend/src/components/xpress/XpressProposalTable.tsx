@@ -1,24 +1,60 @@
 import MaterialTable from '@material-table/core';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import { ProposalsFilter } from 'generated/sdk';
 import { tableIcons } from 'utils/materialIcons';
+
+import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
 
 export interface ProposalData {
   proposalId: string;
   title: string;
-  submittedDate: string;
+  submitted: boolean;
 }
 
 const XpressProposalTable = () => {
   const [selectedProposals, setSelectedProposals] = useState<ProposalData[]>(
     []
   );
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const PREFETCH_SIZE = 200;
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
-    technique: StringParam,
+    technique: NumberParam,
+    proposalId: StringParam,
+  });
+
+  type QueryParameters = {
+    query: {
+      first?: number;
+      offset?: number;
+    };
+    searchText?: string | undefined;
+  };
+  const [queryParameters, setQueryParameters] = useState<QueryParameters>({
+    query: {
+      first: PREFETCH_SIZE,
+      offset: 0,
+    },
+    searchText: urlQueryParams.search ?? undefined,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
+    callId: urlQueryParams.call,
+    techniqueFilter: {
+      techniqueId: urlQueryParams.technique ? +urlQueryParams.technique : null,
+      showAllProposals: !urlQueryParams.technique,
+      showMultiTechniqueProposals: false,
+    },
+    referenceNumbers: urlQueryParams.proposalId
+      ? [urlQueryParams.proposalId]
+      : undefined,
   });
 
   const columns = [
@@ -40,26 +76,101 @@ const XpressProposalTable = () => {
     },
     {
       title: 'Date submitted',
-      field: 'submittedDate',
+      field: 'submitted',
       ...{ width: 'auto' },
     },
   ];
 
-  const dummyRows: ProposalData[] = useMemo<ProposalData[]>(
-    () => [
-      { proposalId: '001', title: 'Proposal 1', submittedDate: '2024-08-01' },
-      { proposalId: '002', title: 'Proposal 2', submittedDate: '2024-08-03' },
-      { proposalId: '003', title: 'Proposal 3', submittedDate: '2024-08-05' },
-      { proposalId: '004', title: 'Proposal 4', submittedDate: '2024-08-07' },
-      { proposalId: '005', title: 'Proposal 5', submittedDate: '2024-08-09' },
-    ],
-    []
-  );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { loading, proposalsData, totalCount, setProposalsData } =
+    useProposalsCoreData({
+      proposalStatusId: proposalFilter.proposalStatusId,
+      techniqueFilter: proposalFilter.techniqueFilter,
+      callId: proposalFilter.callId,
+      referenceNumbers: proposalFilter.referenceNumbers,
+    });
+
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
+  const [preselectedProposalsData, setPreselectedProposalsData] = useState<
+    ProposalViewData[]
+  >([]);
+
+  useEffect(() => {
+    setPreselectedProposalsData(proposalsData);
+  }, [proposalsData]);
 
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
       const selection = new Set(urlQueryParams.selection);
-      const updatedSelection = dummyRows.filter((row) =>
+      const selected: ProposalViewData[] = [];
+      setPreselectedProposalsData(
+        proposalsData.map((proposal) => {
+          if (selection.has(proposal.primaryKey.toString())) {
+            selected.push(proposal);
+          }
+
+          return {
+            ...proposal,
+            tableData: {
+              checked: selection.has(proposal.primaryKey.toString()),
+            },
+          };
+        })
+      );
+      setSelectedProposals(selectedProposals);
+    } else {
+      setPreselectedProposalsData(
+        proposalsData.map((proposal) => ({
+          ...proposal,
+          tableData: { checked: false },
+        }))
+      );
+      setSelectedProposals([]);
+    }
+  }, [proposalsData, urlQueryParams.selection]);
+
+  useEffect(() => {
+    setPreselectedProposalsData(proposalsData);
+  }, [proposalsData]);
+
+  useEffect(() => {
+    let isMounted = true;
+    let endSlice = rowsPerPage * (currentPage + 1);
+    endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
+    if (isMounted) {
+      setTableData(
+        preselectedProposalsData.slice(
+          (currentPage * rowsPerPage) % PREFETCH_SIZE,
+          endSlice
+        )
+      );
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentPage, rowsPerPage, preselectedProposalsData]);
+
+  const handleSearchChange = (searchText: string) => {
+    setQueryParameters({
+      ...queryParameters,
+      searchText: searchText ? searchText : undefined,
+    });
+    setUrlQueryParams({ search: searchText ? searchText : undefined });
+  };
+
+  const proposalDataWithIdAndRowActions = tableData.map((proposal) => {
+    return {
+      proposalId: proposal.proposalId,
+      title: proposal.title,
+      submitted: proposal.submitted,
+    };
+  });
+
+  useEffect(() => {
+    if (urlQueryParams.selection.length > 0) {
+      const selection = new Set(urlQueryParams.selection);
+      const updatedSelection = proposalDataWithIdAndRowActions.filter((row) =>
         selection.has(row.proposalId)
       );
 
@@ -67,7 +178,7 @@ const XpressProposalTable = () => {
     } else {
       setSelectedProposals([]);
     }
-  }, [dummyRows, urlQueryParams.selection]);
+  }, [proposalDataWithIdAndRowActions, urlQueryParams.selection]);
 
   const handleSelectionChange = (rows: ProposalData[]) => {
     setUrlQueryParams((params) => ({
@@ -79,17 +190,14 @@ const XpressProposalTable = () => {
     }));
   };
 
-  const handleSearchChange = (searchText: string) => {
-    setUrlQueryParams({ search: searchText ? searchText : undefined });
-  };
-
   return (
     <MaterialTable<ProposalData>
       icons={tableIcons}
       title={'Xpress Proposals'}
       columns={columns}
-      data={dummyRows}
+      data={proposalDataWithIdAndRowActions}
       totalCount={20}
+      isLoading={loading}
       options={{
         search: true,
         searchText: undefined,
@@ -108,6 +216,21 @@ const XpressProposalTable = () => {
       }}
       onSelectionChange={handleSelectionChange}
       onSearchChange={handleSearchChange}
+      onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
+      onPageChange={(page, pageSize) => {
+        const newOffset =
+          Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
+        if (page !== currentPage && newOffset != queryParameters.query.offset) {
+          setQueryParameters({
+            searchText: queryParameters.searchText,
+            query: {
+              ...queryParameters.query,
+              offset: newOffset,
+            },
+          });
+        }
+        setCurrentPage(page);
+      }}
     />
   );
 };
