@@ -12,8 +12,6 @@
     </figure>
     
 
-    
-
 # **How do I create PDF templates?**
 
 ## **Step 1. Navigate to the PDF Templates page**

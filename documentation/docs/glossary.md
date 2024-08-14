@@ -54,7 +54,6 @@ Alphabetical list of terms and their definitions.
     * [Institutions](placeholder.md)
 
 
-
 ??? info "**J**"
 
     * 
@@ -101,7 +100,7 @@ Alphabetical list of terms and their definitions.
 
 ??? info "**R**"
 
-    * 
+    * [Roles](placeholder.md)
 
 
 ??? info "**S**"

@@ -32,49 +32,51 @@
 
 Icon functions
 
-Proposals - :material-folder-outline:
-Experiments - :material-calendar:
-Calls - :material-calendar-blank:
-People - :fontawesome-solid-user-group:
-Instruments - :material-microscope:
-Techniques -
-FAPs - 
-Pages - :material-cog-box:
-Institutions - :material-bank:
-Templates -
-PDF -
-Proposal -
-Sample declaration -
-Sub template -
-Shipment declaration - :material-truck:
-Visit registration - :material-airplane-takeoff:
-ESI -
-Proposal ESI -
-Sample ESI -
-Feedback - :material-message-alert:
-Questions - 
-Sample safety -
-Settings - :material-cog:
-Units - :material-sigma:
-Proposal statuses - :material-folder-cog-outline:
-Proposal workflows - 
-API access tokens - :material-key:
-Features - 
-App settings - 
+* Proposals - :material-folder-outline:
+* Experiments - :material-calendar:
+* Calls - :material-calendar-blank:
+* People - :fontawesome-solid-user-group:
+* Instruments - :material-microscope:
+* Techniques -
+* FAPs - 
+* Pages - :material-cog-box:
+* Institutions - :material-bank:
+* Templates - :material-text-box-multiple:
+* PDF -
+* Proposal templates -
+* Sample declaration -
+* Sub template -
+* Shipment declaration - :material-truck:
+* Visit registration - :material-airplane-takeoff:
+* ESI -
+* Proposal ESI -
+* Sample ESI - :material-inbox:
+* Feedback - :material-message-alert:
+* Questions - :material-comment-question:
+* Sample safety -
+* Settings - :material-cog:
+* Units - :material-sigma:
+* Proposal statuses - :material-folder-cog-outline:
+* Proposal workflows - 
+* API access tokens - :material-key:
+* Features - 
+* App settings - 
+
+Profile
+
+* Profile - 
+* Roles - :material-account-supervisor-circle:
 
 
-Profile - 
-Roles - :material-account-supervisor-circle:
+Tools
 
-
-
-Search - 
-Delete - :material-delete:
-Edit - :material-pencil:
-Clone -
-Share - :material-share-variant:
-Select - :fontawesome-regular-square:
-Show columns - :material-view-column:
-Mark as active - 
-Rename - :material-rename-box:
+* Search - :material-magnify:
+* Delete - :material-delete:
+* Edit - :material-pencil:
+* Clone -
+* Share - :material-share-variant:
+* Select - :fontawesome-regular-square:
+* Show columns - :material-view-column:
+* Mark as active - 
+* Rename - :material-rename-box:
 

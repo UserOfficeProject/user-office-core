@@ -35,12 +35,14 @@ All how-to guides:
 ### **Calls**
 * #### [How do I create a call?](creating_call.md) 
 
+* #### [How do I edit an active call?](editing_call.md)
+
 
 ### **Managing proposals**
 
 * #### [How do I edit a users' proposal?](proposal.md)
 
-* #### [How do I impersonate users?](roles.md)
+* #### [How do I impersonate users? (see what the user sees)](roles.md)
 
 * #### [How do I revert submitted proposals back to draft status?](proposal.md)
 
