@@ -31,7 +31,7 @@ There are several different types of templates utilised within Calls:
 
 ??? info "PDF templates" 
 
-    [**PDF templates**](pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document formats for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+    [**PDF templates**](pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
     ______________________________________________________________________________________
 
@@ -71,4 +71,7 @@ There are several different types of templates utilised within Calls:
         <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
     </figure>
 
-* [Using templates within a call](../creating_call.md)
+* [How do I use templates within a call?](../creating_call.md)
+
+______________________________________________________________________________________
+

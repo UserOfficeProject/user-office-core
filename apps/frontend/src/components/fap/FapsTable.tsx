@@ -47,7 +47,7 @@ const columns: Column<Fap>[] = [
   },
   {
     title: '# proposals',
-    field: 'proposalCount',
+    field: 'proposalCurrentCount',
   },
 ];
 
