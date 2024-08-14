@@ -237,8 +237,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       );
     }
 
-    const proposals = await super.cloneProposal(sourceProposal, call);
-
-    return proposals;
+    return await super.cloneProposal(sourceProposal, call);
   }
 }
