@@ -84,6 +84,26 @@ export class FapResolvers {
     });
   }
 
+  @FieldResolver(() => [FapProposalCount])
+  async fapChairsCurrentProposalCounts(
+    @Root() fap: Fap,
+    @Ctx() context: ResolverContext
+  ) {
+    if (!fap.fapSecretariesUserIds) {
+      return [];
+    }
+
+    return fap.fapSecretariesUserIds.map((fapSecretariesUserId) => {
+      return {
+        userId: fapSecretariesUserId,
+        count:
+          context.queries.fap.dataSource.getCurrentFapReviewerProposalCount(
+            fapSecretariesUserId
+          ),
+      };
+    });
+  }
+
   @FieldResolver(() => [BasicUserDetails])
   async fapSecretaries(@Root() fap: Fap, @Ctx() context: ResolverContext) {
     if (!fap.fapSecretariesUserIds) {
@@ -109,6 +129,26 @@ export class FapResolvers {
         userId: fapSecretariesUserId,
         count:
           context.queries.fap.dataSource.getFapReviewerProposalCount(
+            fapSecretariesUserId
+          ),
+      };
+    });
+  }
+
+  @FieldResolver(() => [FapProposalCount])
+  async fapSecretariesCurrentProposalCounts(
+    @Root() fap: Fap,
+    @Ctx() context: ResolverContext
+  ) {
+    if (!fap.fapSecretariesUserIds) {
+      return [];
+    }
+
+    return fap.fapSecretariesUserIds.map((fapSecretariesUserId) => {
+      return {
+        userId: fapSecretariesUserId,
+        count:
+          context.queries.fap.dataSource.getCurrentFapReviewerProposalCount(
             fapSecretariesUserId
           ),
       };
