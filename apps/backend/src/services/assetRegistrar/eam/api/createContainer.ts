@@ -152,11 +152,6 @@ export async function createContainer(shipmentId: number) {
     instruments?.map((instrument) => instrument.shortCode) ?? ['No value']
   );
   const response = await performApiRequest('/equipment', request);
-  if (!response) {
-    throw createAndLogError('Unexpected response from EAM API', {
-      response,
-    });
-  }
 
   return response.data;
 }
