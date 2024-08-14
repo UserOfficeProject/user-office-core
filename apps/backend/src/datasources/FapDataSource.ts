@@ -77,8 +77,9 @@ export interface FapDataSource {
     callId: number
   ): Promise<BasicUserDetails[]>;
   getFapProposalCount(fapId: number): Promise<number>;
+  getCurrentFapProposalCount(fapId: number): Promise<number>;
   getFapReviewerProposalCount(reviewerId: number): Promise<number>;
-  getFapReviewerProposalCountCurrentRound(reviewerId: number): Promise<number>;
+  getCurrentFapReviewerProposalCount(reviewerId: number): Promise<number>;
   getFapProposal(
     fapId: number,
     proposalPk: number,
