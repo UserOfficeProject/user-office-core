@@ -59,6 +59,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     const result = database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
+      .join(
+        'users',
+        'users.user_id',
+        '=',
+        'proposal_table_view.principal_investigator'
+      )
       .whereIn('proposal_pk', proposals)
       .orderBy('proposal_pk', 'desc')
       .modify((query) => {
@@ -67,6 +73,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             this.where('title', 'ilike', `%${filter.text}%`)
               .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
               .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
+              .orWhere('users.email', 'ilike', `%${filter.text}%`)
+              .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
+              .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',

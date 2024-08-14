@@ -379,6 +379,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
+      .join(
+        'users',
+        'users.user_id',
+        '=',
+        'proposal_table_view.principal_investigator'
+      )
       .modify((query) => {
         if (filter?.callId) {
           query.where('call_id', filter?.callId);
@@ -422,6 +428,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereRaw('proposal_id ILIKE ?', `%${searchText}%`)
               .orWhereRaw('title ILIKE ?', `%${searchText}%`)
               .orWhereRaw('proposal_status_name ILIKE ?', `%${searchText}%`)
+              .orWhere('users.email', 'ilike', `%${searchText}%`)
+              .orWhere('users.firstname', 'ilike', `%${searchText}%`)
+              .orWhere('users.lastname', 'ilike', `%${searchText}%`)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
