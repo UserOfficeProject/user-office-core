@@ -5,6 +5,7 @@ import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
@@ -24,6 +25,7 @@ const XpressProposalTable = () => {
     []
   );
   const { techniques, loadingTechniques } = useTechniquesData();
+  const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useCallsData();
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -31,6 +33,7 @@ const XpressProposalTable = () => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
+    instrument: StringParam,
     technique: NumberParam,
     proposalId: StringParam,
   });
@@ -53,6 +56,13 @@ const XpressProposalTable = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: urlQueryParams.call,
+    instrumentFilter: {
+      instrumentId: urlQueryParams.instrument
+        ? +urlQueryParams.instrument
+        : null,
+      showAllProposals: !urlQueryParams.instrument,
+      showMultiInstrumentProposals: false,
+    },
     techniqueFilter: {
       techniqueId: urlQueryParams.technique ? +urlQueryParams.technique : null,
       showAllProposals: !urlQueryParams.technique,
@@ -223,6 +233,7 @@ const XpressProposalTable = () => {
         <StyledPaper data-cy="xpress-proposals-table">
           <XpressProposalFilterBar
             calls={{ data: calls, isLoading: loadingCalls }}
+            instruments={{ data: instruments, isLoading: loadingInstruments }}
             techniques={{
               data: techniques,
               isLoading: loadingTechniques,
