@@ -369,6 +369,27 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
+  async getCurrentFapProposalCount(fapId: number): Promise<number> {
+    const callFilter = {
+      isFapReviewEnded: false,
+    };
+
+    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
+      (call) => call.id
+    );
+
+    return database('fap_proposals as fp')
+      .join('proposals as p', { 'p.proposal_pk': 'fp.proposal_pk' })
+      .count('fp.fap_id')
+      .where('fp.fap_id', fapId)
+      .whereIn('fp.call_id', callIds)
+      .andWhere('p.submitted', true)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
+  }
+
   async getFapReviewerProposalCount(reviewerId: number): Promise<number> {
     return database('fap_reviews')
       .count('user_id')
@@ -379,11 +400,10 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getFapReviewerProposalCountCurrentRound(
+  async getCurrentFapReviewerProposalCount(
     reviewerId: number
   ): Promise<number> {
     const callFilter = {
-      isEnded: true,
       isFapReviewEnded: false,
     };
 

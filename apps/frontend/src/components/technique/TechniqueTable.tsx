@@ -1,4 +1,5 @@
 import { Column } from '@material-table/core';
+import { AssignmentInd } from '@mui/icons-material';
 import { Dialog, DialogContent, Typography } from '@mui/material';
 import i18n from 'i18n';
 import React, { useState } from 'react';
@@ -6,19 +7,24 @@ import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
+import SimpleTabs from 'components/common/SimpleTabs';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
+import ParticipantModal from 'components/proposal/ParticipantModal';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
+import { StyledContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
+import AssignedScientistsTable from './AssignedScientistsTable';
 import AssignInstrumentsToTechniques from './AssignInstrumentsToTechniques';
 import CreateUpdateTechnique from './CreateUpdateTechnique';
 import {
+  BasicUserDetails,
   InstrumentFragment,
   Technique,
   TechniqueFragment,
@@ -42,6 +48,8 @@ const TechniqueTable = () => {
     useState<TechniqueFragment | null>(null);
 
   const { t } = useTranslation();
+  const [assigningTechniqueScientistsId, setAssigningTechniqueScientistsId] =
+    useState<number | null>(null);
 
   const columns: Column<TechniqueFragment>[] = [
     {
@@ -76,7 +84,8 @@ const TechniqueTable = () => {
     }
   };
 
-  const AssignmentIndIcon = (): JSX.Element => <ScienceIcon />;
+  const AssignmentInstrumentIcon = (): JSX.Element => <ScienceIcon />;
+  const AssignmentScientistIcon = (): JSX.Element => <AssignmentInd />;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function setAssigningTechniqueId(technique: TechniqueFragment): void {
@@ -118,15 +127,87 @@ const TechniqueTable = () => {
       }
     }
   };
+  const assignScientistsToTechnique = async (
+    scientists: BasicUserDetails[]
+  ) => {
+    await api({
+      toastSuccessMessage: `Scientist assigned to technique successfully!`,
+    }).assignScientistsToTechnique({
+      scientistIds: scientists.map((scientist) => scientist.id),
+      techniqueId: assigningTechniqueScientistsId as number,
+    });
+
+    setTechniques((techniques) =>
+      techniques.map((technique) => {
+        if (technique.id === assigningTechniqueScientistsId) {
+          return {
+            ...technique,
+            scientists: [...technique.scientists, ...scientists],
+          };
+        } else {
+          return technique;
+        }
+      })
+    );
+
+    setAssigningTechniqueScientistsId(null);
+  };
 
   const AssignedInstruments = React.useCallback(
     ({ rowData }: { rowData: Technique }) => {
-      return <AssignedInstrumentsTable technique={rowData} />;
+      const removeScientistFromTechnique = async (
+        scientistId: number,
+        techniqueId: number
+      ): Promise<void> => {
+        await api({
+          toastSuccessMessage:
+            'Scientist removed from ' +
+            i18n.format(t('Technique'), 'lowercase') +
+            ' successfully!',
+        })
+          .removeScientistFromTechnique({
+            scientistId,
+            techniqueId,
+          })
+          .then(() => {
+            setTechniques((techniques) =>
+              techniques.map((techniqueItem) => {
+                if (techniqueItem.id === techniqueId) {
+                  return {
+                    ...techniqueItem,
+                    scientists: techniqueItem.scientists.filter(
+                      (scientist) => scientist.id !== scientistId
+                    ),
+                  };
+                }
+
+                return techniqueItem;
+              })
+            );
+          });
+      };
+
+      return (
+        <StyledContainer margin={[0]} padding={[1, 0, 0, 0]} maxWidth={false}>
+          <SimpleTabs
+            tabNames={[
+              `${i18n.format(t('instrument'), 'plural')}`,
+              `Assigned ${i18n.format(t('scientist'), 'plural')}`,
+            ]}
+          >
+            <AssignedInstrumentsTable technique={rowData} />
+            <AssignedScientistsTable
+              removeScientistFromTechnique={removeScientistFromTechnique}
+              technique={rowData}
+            />
+          </SimpleTabs>
+        </StyledContainer>
+      );
     },
-    []
+    [api, setTechniques, t]
   );
 
-  const removeIntrumentsFromTechnique = async (
+  const removeInstrumentsFromTechnique = async (
     instrumentIds: number[]
   ): Promise<void> => {
     if (selectedTechnique) {
@@ -179,6 +260,21 @@ const TechniqueTable = () => {
 
   return (
     <>
+      <ParticipantModal
+        show={!!assigningTechniqueScientistsId}
+        close={(): void => {
+          setSelectedTechnique(null);
+          setAssigningTechniqueScientistsId(null);
+        }}
+        addParticipants={assignScientistsToTechnique}
+        selectedUsers={selectedTechnique?.scientists.map(
+          (scientist) => scientist.id
+        )}
+        selection={true}
+        userRole={UserRole.INSTRUMENT_SCIENTIST}
+        title={t('instrumentSci')}
+        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
+      />
       <Dialog
         aria-labelledby="instrument-select-title"
         aria-describedby="instrument-select-description"
@@ -194,7 +290,7 @@ const TechniqueTable = () => {
             currentlyAssignedInstrumentIds={(
               selectedTechnique?.instruments || []
             ).map((instrument) => instrument.id)}
-            removeIntrumentsFromTechnique={removeIntrumentsFromTechnique}
+            removeInstrumentsFromTechnique={removeInstrumentsFromTechnique}
           />
         </DialogContent>
       </Dialog>
@@ -235,7 +331,7 @@ const TechniqueTable = () => {
             isUserOfficer
               ? [
                   {
-                    icon: AssignmentIndIcon,
+                    icon: AssignmentInstrumentIcon,
                     tooltip:
                       'Assign/remove ' +
                       i18n.format(
@@ -244,6 +340,16 @@ const TechniqueTable = () => {
                       ),
                     onClick: (_event: unknown, rowData: unknown): void =>
                       setAssigningTechniqueId(rowData as TechniqueFragment),
+                  },
+                  {
+                    icon: AssignmentScientistIcon,
+                    tooltip: 'Assign scientist',
+                    onClick: (_event: unknown, rowData: unknown): void => {
+                      setSelectedTechnique(rowData as TechniqueFragment);
+                      setAssigningTechniqueScientistsId(
+                        (rowData as TechniqueFragment).id
+                      );
+                    },
                   },
                 ]
               : []
