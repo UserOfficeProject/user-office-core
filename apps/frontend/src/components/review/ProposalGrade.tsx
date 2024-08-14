@@ -20,6 +20,7 @@ import UOLoader from 'components/common/UOLoader';
 import GradeGuidePage from 'components/pages/GradeGuidePage';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import { SettingsContext } from 'context/SettingsContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import { ReviewStatus, Review, UserRole, SettingsId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -57,7 +58,7 @@ const ProposalGrade = ({
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { settingsMap } = useContext(SettingsContext);
-
+  const { user } = useContext(UserContext);
   const gradeDecimalPoints = parseFloat(
     settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
   );
@@ -76,7 +77,8 @@ const ProposalGrade = ({
 
   const isDisabled = (isSubmitting: boolean) =>
     isSubmitting ||
-    (review.status === ReviewStatus.SUBMITTED && !hasAccessRights);
+    (review.status === ReviewStatus.SUBMITTED && !hasAccessRights) ||
+    !(review.userID === user.id);
 
   const handleSubmit = async (values: GradeFormType) => {
     const { updateReview } = await api({
