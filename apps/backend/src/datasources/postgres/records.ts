@@ -403,7 +403,7 @@ export interface FapRecord {
   readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
-  readonly files: string;
+  readonly files: string | null;
 }
 
 export interface FapSecretariesRecord {

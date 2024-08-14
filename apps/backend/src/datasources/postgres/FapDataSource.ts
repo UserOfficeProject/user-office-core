@@ -106,7 +106,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     gradeGuide: string,
     customGradeGuide: boolean,
     active: boolean,
-    files: string
+    files: string | null
   ) {
     return database
       .update(
