@@ -52,6 +52,21 @@ declare global {
       removeInstrumentsFromTechnique: (
         removeInstrumentsFromTechniqueInput: RemoveInstrumentsFromTechniqueMutationVariables
       ) => Cypress.Chainable<RemoveInstrumentsFromTechniqueMutation>;
+
+      /**
+       * Assigns available scientist/s to an technique
+       *
+       * @returns {typeof assignScientistsToTechnique}
+       * @memberof Chainable
+       * @example
+       *    cy.assignScientistsToTechnique({
+       *      scientistIds: [1],
+       *      techniqueId: 1
+       *    });
+       */
+      assignScientistsToTechnique: (
+        assignScientistsToTechniqueInput: AssignScientistsToTechniqueMutationVariables
+      ) => Cypress.Chainable<AssignScientistsToTechniqueMutation>;
     }
   }
 }

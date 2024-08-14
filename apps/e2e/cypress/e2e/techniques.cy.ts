@@ -572,7 +572,7 @@ context('Technique tests', () => {
       cy.contains(techniqueName3).should('not.exist');
     });
 
-    it.only('User able to choose multiple techniques while submitting proposal', function () {
+    it('User able to choose multiple techniques while submitting proposal', function () {
       cy.updateQuestion({
         id: techniquePickerQuestionId,
         question: techniquePickerQuestion,
@@ -635,6 +635,63 @@ context('Technique tests', () => {
 
       cy.contains(techniqueName1);
       cy.contains(techniqueName2);
+    });
+
+    it('User Officer should be able to assign scientist to techniques', () => {
+      cy.contains('Techniques').click();
+
+      cy.contains(technique1.name)
+        .parent()
+        .find('[aria-label="Assign scientist"]')
+        .click();
+
+      cy.contains(scientist1.lastName).parent().find('[type=checkbox]').click();
+
+      cy.contains('Update').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Scientist assigned to technique successfully!',
+      });
+
+      cy.contains('Assigned scientist').click();
+
+      cy.contains(scientist1.lastName).should('exist');
+    });
+
+    it('User Officer should be able to remove assigned scientist from techniques', () => {
+      cy.assignScientistsToTechnique({
+        scientistIds: [scientist2.id],
+        techniqueId: techniqueId1,
+      });
+      cy.contains('Techniques').click();
+
+      cy.finishedLoading();
+
+      cy.contains(technique1.shortCode)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
+      cy.contains('Assigned scientist').click();
+
+      cy.contains(scientist2.lastName)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
+
+      cy.get('[aria-label="Save"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Scientist removed from instrument',
+      });
+
+      cy.finishedLoading();
+
+      cy.contains('Assigned scientist').click();
+
+      cy.contains(scientist2.lastName).should('not.exist');
     });
   });
 });
