@@ -8,20 +8,28 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import {
+  useQueryParams,
+  NumberParam,
+  withDefault,
+  StringParam,
+} from 'use-query-params';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import { UserContext } from 'context/UserContextProvider';
 import {
   ReviewerFilter,
   ReviewStatus,
+  UserRole,
   UserWithReviewsQuery,
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
@@ -34,6 +42,7 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from './ProposalReviewContent';
 import ProposalReviewModal from './ProposalReviewModal';
+import ReviewerFilterComponent from './ReviewerFilter';
 import ReviewStatusFilter, {
   defaultReviewStatusQueryFilter,
 } from './ReviewStatusFilter';
@@ -46,6 +55,7 @@ type UserWithReview = {
   reviewId: number;
   comment: string | null;
   status: ReviewStatus;
+  reviewerId: number;
   callShortCode?: string;
   instrumentShortCode?: string;
 };
@@ -56,7 +66,12 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
     : selected === ReviewStatus.DRAFT
       ? ReviewStatus.DRAFT
       : undefined; // if the selected status is not a valid status assume we want to see everything
-
+const getFilterReviewer = (selected: string | ReviewerFilter) =>
+  selected === ReviewerFilter.ME
+    ? ReviewerFilter.ME
+    : selected === ReviewerFilter.ALL
+      ? ReviewerFilter.ALL
+      : undefined;
 const columns: (
   t: TFunction<'translation', undefined>
 ) => Column<UserWithReview>[] = (t) => [
@@ -84,11 +99,14 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
+  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
+  const reviewerFilter = isFapReviewer ? ReviewerFilter.ME : ReviewerFilter.ALL;
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
     instrument: NumberParam,
     reviewStatus: defaultReviewStatusQueryFilter,
+    reviewer: withDefault(StringParam, reviewerFilter),
     reviewModal: NumberParam,
     modalTab: NumberParam,
   });
@@ -109,8 +127,10 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       callId: selectedCallId,
       instrumentId: selectedInstrumentId,
       status: getFilterStatus(urlQueryParams.reviewStatus),
-      reviewer: ReviewerFilter.ME,
+      reviewer: getFilterReviewer(urlQueryParams.reviewer),
     });
+
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const getProposalsToGradeDataFromUserData = (
@@ -124,6 +144,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         reviewId: review.id,
         comment: review.comment,
         status: review.status,
+        reviewerId: review.userID,
         callShortCode: review.proposal!.call?.shortCode,
         instrumentShortCodes: review.proposal!.instruments?.map(
           (instrument) => instrument?.shortCode
@@ -174,7 +195,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       {!loading && (
         <Tooltip
           title={
-            rowData.status === ReviewStatus.DRAFT
+            rowData.status === ReviewStatus.DRAFT &&
+            rowData.reviewerId === user.id
               ? 'Grade proposal'
               : 'View proposal'
           }
@@ -184,7 +206,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
               setUrlQueryParams({
                 reviewModal: rowData.reviewId,
                 modalTab:
-                  rowData.status === ReviewStatus.DRAFT
+                  rowData.status === ReviewStatus.DRAFT &&
+                  rowData.reviewerId === user.id
                     ? reviewerProposalReviewTabs.indexOf(
                         PROPOSAL_MODAL_TAB_NAMES.GRADE
                       )
@@ -194,7 +217,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
               });
             }}
           >
-            {rowData.status === ReviewStatus.DRAFT ? (
+            {rowData.status === ReviewStatus.DRAFT &&
+            rowData.reviewerId === user.id ? (
               <RateReviewIcon data-cy="grade-proposal-icon" />
             ) : (
               <Visibility data-cy="view-proposal-details-icon" />
@@ -251,7 +275,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       status: getFilterStatus(reviewStatus),
     }));
   };
-
+  const handleReviewerFilterChange = (reviewer: ReviewerFilter) => {
+    setUserWithReviewsFilter((filter) => ({
+      ...filter,
+      reviewer: getFilterReviewer(reviewer),
+    }));
+  };
   const handleColumnSelectionChange = (selectedItems: UserWithReview[]) => {
     setUrlQueryParams((params) => ({
       ...params,
@@ -378,6 +407,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     <>
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
+          <ReviewerFilterComponent
+            reviewer={urlQueryParams.reviewer}
+            onChange={handleReviewerFilterChange}
+          />
+        </Grid>
+        <Grid item sm={3} xs={12}>
           <ReviewStatusFilter
             reviewStatus={urlQueryParams.reviewStatus}
             onChange={handleStatusFilterChange}
@@ -470,6 +505,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
             tooltip: 'Submit proposal reviews',
             onClick: handleBulkReviewsSubmitClick,
             position: 'toolbarOnSelect',
+            disabled: urlQueryParams.reviewer === ReviewerFilter.ALL,
           },
         ]}
       />
