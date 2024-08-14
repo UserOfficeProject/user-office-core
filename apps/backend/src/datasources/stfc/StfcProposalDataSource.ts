@@ -298,6 +298,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (user.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST) {
           this.where('ths.user_id', user.id);
         }
+        if (filter?.techniqueFilter?.techniqueId) {
+          this.where('tech.technique_id', filter?.techniqueFilter?.techniqueId);
+        }
       });
 
     const result = database
@@ -314,10 +317,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
         if (filter?.callId) {
           query.where('call_id', filter.callId);
-        }
-
-        if (filter?.techniqueFilter?.techniqueId) {
-          query.where('technique_id', filter?.techniqueFilter?.techniqueId);
         }
 
         if (filter?.proposalStatusId) {
