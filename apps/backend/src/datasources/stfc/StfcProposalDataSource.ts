@@ -218,10 +218,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     };
   }
 
-  async cloneProposal(
-    sourceProposal: Proposal,
-    call: Call | undefined
-  ): Promise<Proposal> {
+  async cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal> {
     const result = await database
       .select()
       .from('call')
@@ -237,6 +234,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       );
     }
 
-    return await super.cloneProposal(sourceProposal, call);
+    const proposals = await super.cloneProposal(sourceProposal, call);
+
+    return proposals;
   }
 }
