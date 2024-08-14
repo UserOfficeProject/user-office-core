@@ -1017,11 +1017,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
 
-      cy.get('[data-cy="fap-chair-reviews-info"]').should(
-        'have.attr',
-        'aria-label',
-        'Number of proposals to review: 1'
-      );
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
     });
 
     it('Fap Chair should be able to see proposal details in modal inside proposals and assignments', () => {
@@ -1166,10 +1162,8 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
 
-      cy.get('[data-cy="fap-secretary-reviews-info"]').should(
-        'have.attr',
-        'aria-label',
-        'Number of proposals to review: 1'
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '1'
       );
     });
 
