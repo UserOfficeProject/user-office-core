@@ -102,4 +102,3 @@ mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.DownloadService, StfcDownloadService);
-mapClass(Tokens.TechniqueDataSource, StfcTechniqueDataSource);
