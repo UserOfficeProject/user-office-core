@@ -4,10 +4,12 @@ import React from 'react';
 import { QueryParamConfig } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
+import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import TechniqueFilter from 'components/common/proposalFilters/TechniqueFilter';
 import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import {
   Call,
+  InstrumentFragment,
   ProposalsFilter,
   ProposalStatus,
   TechniqueFragment,
@@ -15,6 +17,7 @@ import {
 
 export type ProposalUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
+  instrument: QueryParamConfig<string | null | undefined>;
   reviewModal: QueryParamConfig<number | null | undefined>;
   modalTab: QueryParamConfig<number | null | undefined>;
   compareOperator: QueryParamConfig<string | null | undefined>;
@@ -25,6 +28,7 @@ export type ProposalUrlQueryParamsType = {
 
 type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
+  instruments?: { data: InstrumentFragment[]; isLoading: boolean };
   techniques?: { data: TechniqueFragment[]; isLoading: boolean };
   proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
@@ -33,6 +37,7 @@ type ProposalFilterBarProps = {
 
 const XpressProposalFilterBar = ({
   calls,
+  instruments,
   techniques,
   setProposalFilter,
   filter,
@@ -72,12 +77,35 @@ const XpressProposalFilterBar = ({
           }}
         />
       </Grid>
+
+      <Grid item sm={3} xs={12}>
+        <InstrumentFilter
+          instrumentId={filter.instrumentFilter?.instrumentId}
+          showMultiInstrumentProposals={
+            filter.instrumentFilter?.showMultiInstrumentProposals
+          }
+          instruments={instruments?.data}
+          isLoading={instruments?.isLoading}
+          shouldShowAll={true}
+          shouldShowMultiple={true}
+          onChange={(instrumentFilterValue) => {
+            setProposalFilter({
+              ...filter,
+              instrumentFilter: instrumentFilterValue,
+            });
+          }}
+        />
+      </Grid>
     </Grid>
   );
 };
 
 XpressProposalFilterBar.propTypes = {
   calls: PropTypes.shape({
+    data: PropTypes.array.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+  }),
+  instruments: PropTypes.shape({
     data: PropTypes.array.isRequired,
     isLoading: PropTypes.bool.isRequired,
   }),
