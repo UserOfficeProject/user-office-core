@@ -121,10 +121,15 @@ context('Technique tests', () => {
   });
 
   describe('Advanced techniques tests as user officer role', () => {
+    let createdTechniqueId: number;
     beforeEach(() => {
       cy.login('officer');
       cy.visit('/');
-      cy.createTechnique(technique);
+      cy.createTechnique(technique).then((result) => {
+        if (result.createTechnique) {
+          createdTechniqueId = result.createTechnique.id;
+        }
+      });
       cy.createInstrument(instrument1);
       cy.createInstrument(instrument2);
     });
@@ -165,6 +170,8 @@ context('Technique tests', () => {
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
 
+      cy.contains('instrument').click();
+
       cy.get('[data-cy="technique-instrument-assignments-table"]').contains(
         instrument1.shortCode
       );
@@ -201,6 +208,63 @@ context('Technique tests', () => {
       cy.get('[data-cy="technique-instrument-assignments-table"]')
         .children()
         .should('not.contain', instrument1.shortCode);
+    });
+
+    it('User Officer should be able to assign scientist to techniques', () => {
+      cy.contains('Techniques').click();
+
+      cy.contains(technique.name)
+        .parent()
+        .find('[aria-label="Assign scientist"]')
+        .click();
+
+      cy.contains(scientist1.lastName).parent().find('[type=checkbox]').click();
+
+      cy.contains('Update').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Scientist assigned to technique successfully!',
+      });
+
+      cy.contains('Assigned scientist').click();
+
+      cy.contains(scientist1.lastName).should('exist');
+    });
+
+    it('User Officer should be able to remove assigned scientist from techniques', () => {
+      cy.assignScientistsToTechnique({
+        scientistIds: [scientist2.id],
+        techniqueId: createdTechniqueId,
+      });
+      cy.contains('Techniques').click();
+
+      cy.finishedLoading();
+
+      cy.contains(technique.shortCode)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
+      cy.contains('Assigned scientist').click();
+
+      cy.contains(scientist2.lastName)
+        .parent()
+        .find('[aria-label="Delete"]')
+        .click();
+
+      cy.get('[aria-label="Save"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Scientist removed from instrument',
+      });
+
+      cy.finishedLoading();
+
+      cy.contains('Assigned scientist').click();
+
+      cy.contains(scientist2.lastName).should('not.exist');
     });
   });
 });

@@ -21,4 +21,5 @@ fragment fap on Fap {
     count
   }
   proposalCount
+  proposalCurrentCount
 }

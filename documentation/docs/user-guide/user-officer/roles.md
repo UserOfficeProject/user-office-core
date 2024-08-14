@@ -10,7 +10,7 @@ There are many roles within User Office:
 
     * Submitting Proposals
 
-??? info "User"
+??? info "User Officer"
 
     The **User Officer** is part of the Research Coordination Office and is responsible for managing the administration of the user programme. This includes coordinating proposal submission, review and selection, preparing user visits to ESS for experiments and collating experiment reports and publications. 
 
