@@ -254,7 +254,7 @@ context('Technique tests', () => {
     });
   });
 
-  describe('Advanced techniques tests as user officer role', () => {
+  describe('Advanced techniques tests', () => {
     let techniqueId1: number;
     let techniqueId2: number;
     let techniqueId3: number;
@@ -402,24 +402,6 @@ context('Technique tests', () => {
             techniqueName2,
           ]);
         });
-
-      cy.createTopic({
-        templateId: initialDBData.template.id,
-        sortOrder: 1,
-      }).then((topicResult) => {
-        if (topicResult.createTopic) {
-          topicId =
-            topicResult.createTopic.steps[
-              topicResult.createTopic.steps.length - 1
-            ].topic.id;
-          cy.createQuestion({
-            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
-            dataType: DataType.TECHNIQUE_PICKER,
-          }).then((result) => {
-            techniquePickerQuestionId = result.createQuestion.id;
-          });
-        }
-      });
     });
 
     it('Techniques options display in the questionnaire based on the instruments attached to the call', function () {
