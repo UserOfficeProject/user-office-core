@@ -89,16 +89,16 @@ export class FapResolvers {
     @Root() fap: Fap,
     @Ctx() context: ResolverContext
   ) {
-    if (!fap.fapSecretariesUserIds) {
+    if (!fap.fapChairUserIds) {
       return [];
     }
 
-    return fap.fapSecretariesUserIds.map((fapSecretariesUserId) => {
+    return fap.fapChairUserIds.map((fapChairUserId) => {
       return {
-        userId: fapSecretariesUserId,
+        userId: fapChairUserId,
         count:
           context.queries.fap.dataSource.getCurrentFapReviewerProposalCount(
-            fapSecretariesUserId
+            fapChairUserId
           ),
       };
     });
