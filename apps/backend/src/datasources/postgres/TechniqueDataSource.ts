@@ -235,6 +235,7 @@ export default class PostgresTechniqueDataSource
 
     return await database('technique_has_scientists')
       .insert(dataToInsert)
+      .returning('*')
       .then((result) => !!result.length);
   }
 
