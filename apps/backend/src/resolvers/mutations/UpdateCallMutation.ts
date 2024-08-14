@@ -80,10 +80,10 @@ export class UpdateCallInput {
   @Field({ nullable: true })
   public callEndedInternal?: boolean;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Boolean, { nullable: true })
   public callReviewEnded?: boolean;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Boolean, { nullable: true })
   public callFapReviewEnded?: boolean;
 
   @Field(() => Int, { nullable: true })
