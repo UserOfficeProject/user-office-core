@@ -235,7 +235,9 @@ jobs:
             "cypress/e2e/p[a-m]*.ts",
             "cypress/e2e/p[n-z]*.ts",
             "cypress/e2e/[r-s]*.ts",
-            "cypress/e2e/t*.ts",
+            "cypress/e2e/templatesBasic.cy.ts",
+            "cypress/e2e/templatesAdvanced.cy.ts",
+            "cypress/e2e/techniques.cy.ts",
             "cypress/e2e/[u-z]*.ts",
             "cypress/e2e/[A-Z]*.ts",
           ]
