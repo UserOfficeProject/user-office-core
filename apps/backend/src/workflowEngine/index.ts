@@ -93,7 +93,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
       return;
     }
 
-    newStatusChangingEvents.forEach((sce) => {
+    for (const sce of newStatusChangingEvents) {
       const proposalEventsKeys = Object.keys(
         proposalWithEvents.proposalEvents!
       );
@@ -109,14 +109,14 @@ const checkIfConditionsForNextStatusAreMet = async ({
       );
 
       if (sce.statusChangingEvent && nextStatusRulesFulfilled)
-        workflowEngine([
+        await workflowEngine([
           {
             currentEvent: sce.statusChangingEvent as Event,
             proposalEvents: proposalWithEvents.proposalEvents,
             proposalPk: proposalWithEvents.proposalPk,
           },
         ]);
-    });
+    }
   }
 };
 
