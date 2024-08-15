@@ -12,9 +12,7 @@ import database from '../postgres/database';
 import {
   CallRecord,
   createCallObject,
-  createProposalObject,
   createProposalViewObject,
-  ProposalRecord,
   ProposalViewRecord,
 } from '../postgres/records';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -220,10 +218,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     };
   }
 
-  async cloneProposal(
-    sourceProposal: Proposal,
-    _call: Call | undefined
-  ): Promise<Proposal> {
+  async cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal> {
     const result = await database
       .select()
       .from('call')
@@ -235,46 +230,10 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
     if (result?.templateId === 15 && result?.proposalWorkflowId === 5) {
       return Promise.reject(
-        ` ('${sourceProposal.proposalId}') because it is a legacy proposal`
+        ` ('${sourceProposal.proposalId}') because it is a legacy proposal `
       );
     }
 
-    const [newProposal]: ProposalRecord[] = (
-      await database.raw(`
-          INSERT INTO proposals
-          (title,
-           abstract,
-           status_id,
-           proposer_id,
-           created_at,
-           updated_at,
-           final_status,
-           call_id,
-           questionary_id,
-           comment_for_management,
-           comment_for_user,
-           notified,
-           submitted,
-           management_decision_submitted)
-          SELECT title,
-                 abstract,
-                 status_id,
-                 proposer_id,
-                 created_at,
-                 updated_at,
-                 final_status,
-                 ${_call?.id},
-                 questionary_id,
-                 comment_for_management,
-                 comment_for_user,
-                 notified,
-                 submitted,
-                 management_decision_submitted
-          FROM proposals
-          WHERE proposal_pk = ${sourceProposal.primaryKey} RETURNING *
-      `)
-    ).rows;
-
-    return createProposalObject(newProposal);
+    return await super.cloneProposal(sourceProposal, call);
   }
 }

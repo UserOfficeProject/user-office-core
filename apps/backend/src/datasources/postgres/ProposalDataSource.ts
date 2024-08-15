@@ -779,7 +779,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                  created_at,
                  updated_at,
                  final_status,
-                 ${call.id},
+                 call_id,
                  questionary_id,
                  comment_for_management,
                  comment_for_user,
