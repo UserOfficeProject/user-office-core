@@ -64,5 +64,5 @@ export async function createTicket(shipmentId: number, containerId: string) {
     'DEMAX'
   );
 
-  await performApiRequest(request);
+  await performApiRequest('ticket', request); // The Create Ticket API is still not yet live. Hence this 'ticket' should be replaced once the API is live.
 }
