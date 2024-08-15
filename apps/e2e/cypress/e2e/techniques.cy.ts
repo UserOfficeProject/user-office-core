@@ -658,6 +658,11 @@ context('Technique tests', () => {
         text: 'Scientist assigned to technique successfully!',
       });
 
+      cy.contains(technique1.shortCode)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
       cy.contains('Assigned scientist').click();
 
       cy.contains(scientist1.lastName).should('exist');
@@ -692,7 +697,7 @@ context('Technique tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Scientist removed from instrument',
+        text: 'Scientist removed from technique',
       });
 
       cy.finishedLoading();
