@@ -1,0 +1,9 @@
+mutation assignScientistsToTechnique(
+  $scientistIds: [Int!]!
+  $techniqueId: Int!
+) {
+  assignScientistsToTechnique(
+    scientistIds: $scientistIds
+    techniqueId: $techniqueId
+  )
+}

@@ -1,8 +1,9 @@
 # Creating a call :material-calendar-blank:
 
-![Call](../../assets/images/call.png)
+![Call](/assets/images/call.png)
 
 **What are calls?**
+
 
 **Calls** :material-calendar-blank: allow users’ **proposals** :material-folder-outline: to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates :material-text-box-multiple:**](templates/templates.md) (such as [**proposal templates**](templates/proposal_template.md) which act as the questionnaire that users must fill out when creating their proposals). Calls are assigned to [**FAPs**](fap.md) (Facility Access Panels) for proposal review and evaluation. Calls are also linked to a [**proposal workflow**](proposal_workflow.md), which dictates the lifecycle of the proposals within a call. 
 
@@ -27,11 +28,12 @@ There are several different types of templates utilised within Calls:
 
     [**Proposal templates**](templates/2proposal_template.md) act as the questionnaire that users must fill out when writing their proposal and are designed to capture all necessary information regarding the proposed research. For example, these templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields to submit their proposals for review.
 
+
     User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
 
     ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Proposal](../../assets/images/proposal_template.png){ width="450"}
+        ![Proposal](/assets/images/proposal_template.png){ width="450"}
         <figcaption>**Proposal (viewed from the user's perspective)**</figcaption>
     </figure>
 
@@ -42,7 +44,7 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Proposal ESI](../../assets/images/proposal_esi.png){ width="450"}
+        ![Proposal ESI](/assets/images/proposal_esi.png){ width="450"}
         <figcaption>**Proposal ESI (viewed from the user's perspective)**</figcaption>
     </figure>
 
@@ -53,7 +55,7 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
 
     <figure markdown="span">  
-        ![PDF Template](../../assets/images/pdf_template.png){ width="450"}
+        ![PDF Template](/assets/images/pdf_template.png){ width="450"}
         <figcaption>**PDF template**</figcaption>
     </figure>
     
@@ -64,7 +66,7 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Shipment Declaration](../../assets/images/declare_shipment.png){ width="450"}
+        ![Shipment Declaration](/assets/images/declare_shipment.png){ width="450"}
         <figcaption>**Shipment declaration (viewed from the user's perspective)**</figcaption>
     </figure>
 
@@ -74,7 +76,7 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Visit Registration templates](../../assets/images/placeholder.png){ width="450"}
+        ![Visit Registration templates](/assets/images/placeholder.png){ width="450"}
         <figcaption>**Visit reigstration (viewed from the user's perspective)**</figcaption>
     </figure>
 
@@ -84,7 +86,7 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Feedback templates](../../assets/images/placeholder.png){ width="450"}
+        ![Feedback templates](/assets/images/placeholder.png){ width="450"}
         <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
     </figure>
 
@@ -99,6 +101,7 @@ To use a pre-existing template, simply select it from the drop-down menu within 
 
     **TIP:** It is good practice to check the templates you wish to use before finalising the creation of the call. You can view the template details in the designated template edit page, found by navigating to the templates menu.
 
+
     Note: [**Shipment declaration templates**](templates/shipment_template.md), [**visit registration templates**](templates/visit_template.md) and [**feedback templates**](templates/feedback_template.md) do not appear within calls. To select which of each of these templates you would like to utilise, find their page on the main menu and use the `MARK AS ACTIVE` function to specify which should be utilised within the call. These will be visible to the user after the experiment has been scheduled in the scheduler. 
 
 **2. Edit a pre-existing template**
@@ -106,6 +109,7 @@ To use a pre-existing template, simply select it from the drop-down menu within 
 To edit pre-existing [**Proposal templates**](templates/proposal_template.md) and [**Proposal ESI templates**](templates/proposalESI_template.md) directily from the call, click on `EDIT SELECTED TEMPLATE`. For all other templates, navigate to the templates menu, click on the desired template type and `SEARCH` :material-magnify: for the name of the template you wish to make changes to. You can then make changes to the template within the template editor.
 
 Alternatively, you can also `CLONE` the template and `EDIT` :material-pencil: the new cloned version if you wish to keep the original template as it is. Note: the clone will be renamed 'Copy of (name) Template' and will be edded to the end of the list of templates
+
 
 For further information on editing templates for calls, see the specific template creation guides below for an overview of each template's features.
 
@@ -131,6 +135,7 @@ Lastly, you may also create templates to fully customise them to fit the researc
 Calls are also assigned to Facility Access Panel(s) (FAPs) for review of the submitted proposals, which must be selected within the call.
 
 ??? info "FAPs" 
+
 
     [**Facility Access Panels (FAPs)**](fap.md) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a **reviewer**, **secretary** and **chair** to oversee the review process and ensure thorough and unbiased evaluation. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
 
@@ -187,7 +192,7 @@ You can navigate between the sections by clicking on the headings or next and ba
 
     This is the section where you specify the general information about the call, including:
 
-    ![General](../../assets/images/general_1.png){ align=left width="350"}
+    ![General](/assets/images/general_1.png){ align=left width="350"}
 
     * **Short code (public):** The call short code which will be publicly displayed 
 
@@ -214,7 +219,7 @@ You can navigate between the sections by clicking on the headings or next and ba
 
     In this section you can specify the review process:
 
-    ![Reviews](../../assets/images/reviews_1.png){ align=left width="350"}
+    ![Reviews](/assets/images/reviews_1.png){ align=left width="350"}
 
     * **Sart of review:** Start date of the feasibility review
 
@@ -233,7 +238,7 @@ You can navigate between the sections by clicking on the headings or next and ba
 
     Finally, this section allows you to specify information regarding notifications and cycle:
 
-    ![Notification and cycle](../../assets/images/notification_1.png){ align=left width="350"}
+    ![Notification and cycle](/assets/images/notification_1.png){ align=left width="350"}
 
     * **Start of notification period:** The start of the period in which emails are sent to users regarding the result of their proposal
 
@@ -265,7 +270,9 @@ Finally, before creating the call please ensure you have done the following:
 
 Note: It is possible to edit call information after a call has been created, but please refer to the best practice information on [editing active calls](../../user-guide/user-officer/editing_call.md).
 
+
 Lastly, once you have filled out all of the call information, checked that it is correct and reviewed the call checklist you may now Create the call by clicking the 'Create' button on the Notification and Cycle page.
 
 <figure markdown="span">  
     ![Congratulations!](../../assets/images/congratulations.png){ width="500"}
+

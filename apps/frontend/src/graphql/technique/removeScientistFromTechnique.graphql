@@ -1,0 +1,9 @@
+mutation removeScientistFromTechnique(
+  $scientistId: Int!
+  $techniqueId: Int!
+) {
+  removeScientistFromTechnique(
+    scientistId: $scientistId
+    techniqueId: $techniqueId
+  )
+}

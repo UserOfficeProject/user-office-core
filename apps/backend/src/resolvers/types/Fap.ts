@@ -119,4 +119,12 @@ export class FapResolvers {
   async proposalCount(@Root() fap: Fap, @Ctx() context: ResolverContext) {
     return context.queries.fap.dataSource.getFapProposalCount(fap.id);
   }
+
+  @FieldResolver(() => Int)
+  async proposalCurrentCount(
+    @Root() fap: Fap,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.fap.dataSource.getCurrentFapProposalCount(fap.id);
+  }
 }
