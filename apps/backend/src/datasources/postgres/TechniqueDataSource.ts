@@ -2,12 +2,17 @@ import { injectable } from 'tsyringe';
 
 import { Instrument } from '../../models/Instrument';
 import { Technique } from '../../models/Technique';
+import { BasicUserDetails } from '../../models/User';
 import { CreateTechniqueArgs } from '../../resolvers/mutations/CreateTechniqueMutation';
 import { TechniqueDataSource } from '../TechniqueDataSource';
 import database from './database';
 import {
+  CountryRecord,
+  InstitutionRecord,
   InstrumentRecord,
   TechniqueRecord,
+  UserRecord,
+  createBasicUserObject,
   createInstrumentObject,
 } from './records';
 
@@ -108,6 +113,25 @@ export default class PostgresTechniqueDataSource
         throw new Error(`Error getting instruments by technique ID: ${error}`);
       });
   }
+  async getTechniqueScientists(
+    techniqueId: number
+  ): Promise<BasicUserDetails[]> {
+    return database
+      .select('*')
+      .from('users as u')
+      .join('technique_has_scientists as ths', {
+        'u.user_id': 'ths.user_id',
+      })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .where('ths.technique_id', techniqueId)
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          return usersRecord.map((user) => createBasicUserObject(user));
+        }
+      );
+  }
 
   async update(technique: Technique): Promise<Technique> {
     try {
@@ -197,6 +221,37 @@ export default class PostgresTechniqueDataSource
       }
     } catch (error) {
       throw new Error(`Error removing instrument(s) from technique: ${error}`);
+    }
+  }
+
+  async assignScientistsToTechnique(
+    scientistIds: number[],
+    techniqueId: number
+  ): Promise<boolean> {
+    const dataToInsert = scientistIds.map((scientistId) => ({
+      technique_id: techniqueId,
+      user_id: scientistId,
+    }));
+
+    return await database('technique_has_scientists')
+      .insert(dataToInsert)
+      .returning('*')
+      .then((result) => !!result.length);
+  }
+
+  async removeScientistFromTechnique(
+    scientistId: number,
+    techniqueId: number
+  ): Promise<boolean> {
+    const result = await database('technique_has_scientists')
+      .where('technique_id', techniqueId)
+      .andWhere('user_id', scientistId)
+      .del();
+
+    if (result) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
