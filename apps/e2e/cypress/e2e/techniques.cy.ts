@@ -638,6 +638,10 @@ context('Technique tests', () => {
     });
 
     it('User Officer should be able to assign scientist to techniques', () => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.finishedLoading();
+
       cy.contains('Techniques').click();
 
       cy.contains(technique1.name)
@@ -660,6 +664,10 @@ context('Technique tests', () => {
     });
 
     it('User Officer should be able to remove assigned scientist from techniques', () => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.finishedLoading();
+
       cy.assignScientistsToTechnique({
         scientistIds: [scientist2.id],
         techniqueId: techniqueId1,
