@@ -1,16 +1,17 @@
-# Creating a Call
+# Creating a call :material-calendar-blank:
 
 ![Call](../../assets/images/call.png)
 
 **What are calls?**
 
-Calls allow users’ proposals to be submitted within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of **templates** (notably a [**proposal template**](templates/proposal_template.md)), a [**FAP (Facility Access Panel)**](fap.md) and a [**proposal workflow**](proposal_workflow.md). 
 
-* The [**proposal template**](templates/proposal_template.md) acts as the questionnaire that users need to fill in when writing their proposal. User Officers can customise calls with specific requirements, such as the type of research users may conduct and during which period. 
+**Calls** :material-calendar-blank: allow users’ **proposals** :material-folder-outline: to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates :material-text-box-multiple:**](templates/templates.md) (such as [**proposal templates**](templates/proposal_template.md) which act as the questionnaire that users must fill out when creating their proposals). Calls are assigned to [**FAPs**](fap.md) (Facility Access Panels) for proposal review and evaluation. Calls are also linked to a [**proposal workflow**](proposal_workflow.md), which dictates the lifecycle of the proposals within a call. 
 
-* The [**FAP (Facility Access Panel)**](fap.md) is the 
+* The [**templates** :material-text-box-multiple:](templates/templates.md) allow User Officers to customise calls with specific requirements regarding the type of research users may conduct. Templates also specify and collect the information that users must provide in order to facilitate their research.
 
-* The [**proposal workflow**](proposal_workflow.md) specifies which stages the proposals assigned to the call will go through and the events that must occur in order to move to progess to the next status. 
+* The [**FAP (Facility Access Panel)**](fap.md) is the group responsible for evaluating users' research proposals which are assigned to proposals and calls.
+
+* The [**proposal workflow**](proposal_workflow.md) specifies which stages the proposals assigned to the call will go through. This is configured by defining the [**events**](proposal_workflow.md) that must occur in order for proposals to progress to the next [**status :material-folder-cog-outline:**](proposal_workflow.md). 
 
 # **Step 1. Setting up the templates, FAP and Proposal Workflow**
 
@@ -19,8 +20,7 @@ Calls allow users’ proposals to be submitted within User Office. A call is a p
 In order to set up a call, you must decide which [**templates**](templates.md) it will utilise.
 
 Templates are used to save and re-utilise predefined information across User Office.
-Calls are built using several different types of templates which can be edited and cloned. Templates carry information and serve many functions; for example, they may contain specific questions to be used within the call which users answer in their proposals. The template system is useful because it saves you having to do all the work from scratch every time. Furthermore, it allows for standardisation which is essential for data collection and analysis.
-
+Calls are built using several different types of templates which can be edited and cloned. Templates serve many different functions; for example, they may contain specific questions which users answer in their proposals. The template system is useful because it saves User Officers from having to create calls from scratch every time. Furthermore, templates allows for standardisation which is essential for data collection and analysis of users' responses.
 
 There are several different types of templates utilised within Calls:
 
@@ -133,13 +133,15 @@ To use a pre-existing template, simply select it from the drop-down menu within 
 
     **TIP:** It is good practice to check the templates you wish to use before finalising the creation of the call. You can view the template details in the designated template edit page, found by navigating to the templates menu.
 
-    Note: [**Shipment declaration templates**](templates/shipment_template.md), [**visit registration templates**](templates/visit_template.md) and [**feedback templates**](templates/feedback_template.md) do not appear within calls. To select which you of each of these templates you would like to utilise, find their page on the main menu and use the `MARK AS ACTIVE` function to specify which should be utilised within the call. These will be visible to the user after the experiment has been scheduled in the scheduler. 
+
+    Note: [**Shipment declaration templates**](templates/shipment_template.md), [**visit registration templates**](templates/visit_template.md) and [**feedback templates**](templates/feedback_template.md) do not appear within calls. To select which of each of these templates you would like to utilise, find their page on the main menu and use the `MARK AS ACTIVE` function to specify which should be utilised within the call. These will be visible to the user after the experiment has been scheduled in the scheduler. 
 
 **2. Edit a pre-existing template**
 
-To edit pre-existing [**Proposal templates**](templates/proposal_template.md) and [**Proposal ESI templates**](templates/proposalESI_template.md) directily from the call, click on `EDIT SELECTED TEMPLATE`. For all other templates, navigate to the templates menu, click on the desired template type and `SEARCH` for the name of the template you wish to make changes to. You can then make changes to the template within the template editor.
+To edit pre-existing [**Proposal templates**](templates/proposal_template.md) and [**Proposal ESI templates**](templates/proposalESI_template.md) directily from the call, click on `EDIT SELECTED TEMPLATE`. For all other templates, navigate to the templates menu, click on the desired template type and `SEARCH` :material-magnify: for the name of the template you wish to make changes to. You can then make changes to the template within the template editor.
 
-Alternatively, you can also `CLONE` the template and `EDIT` the new cloned version if you wish to keep the original template as it is. Note: the clone will be renamed 'Copy of (name) Template' and will be edded to the end of the list of templates
+Alternatively, you can also `CLONE` the template and `EDIT` :material-pencil: the new cloned version if you wish to keep the original template as it is. Note: the clone will be renamed 'Copy of (name) Template' and will be edded to the end of the list of templates
+
 
 For further information on editing templates for calls, see the specific template creation guides below for an overview of each template's features.
 
@@ -172,9 +174,10 @@ Calls are also assigned to Facility Access Panel(s) (FAPs) for review of the sub
 
 ??? info "FAPs" 
 
-    [**Facility Access Panels (FAPs)**](fap.md) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a **reviewer**, **secretary** and **chair** to oversee the review process and ensure thorough and unbiased evaluations. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
 
-    User Officers can manage the FAPs assigned to proposals and provide general information such as labeling FAPs with a code, a description, and specifying the required number of proposal ratings. FAP can be utilised across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria such as the **grade guide**. 
+    [**Facility Access Panels (FAPs)**](fap.md) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a **reviewer**, **secretary** and **chair** to oversee the review process and ensure thorough and unbiased evaluation. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
+
+    User Officers can manage the FAPs assigned to proposals and calls. FAPs can be utilised across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria such as the **grade guide**. In creating a FAP, user officers may provide general information by labeling FAPs with a code, a description, and specifying the required number of proposal ratings. 
 
 ### **How do I use FAPs within a call?** 
 
@@ -303,9 +306,11 @@ Finally, before creating the call please ensure you have done the following:
 
     - Have I checked that the user help page and FAQ pages contain all the necessary information for users?
 
-Note: It is possible to edit call information after a call has been created, but please refer to the best practice information on [editing active calls](editing_calls).
+Note: It is possible to edit call information after a call has been created, but please refer to the best practice information on [editing active calls](../../user-guide/user-officer/editing_call.md).
+
 
 Lastly, once you have filled out all of the call information, checked that it is correct and reviewed the call checklist you may now Create the call by clicking the 'Create' button on the Notification and Cycle page.
 
 <figure markdown="span">  
     ![Congratulations!](../../assets/images/congratulations.png){ width="500"}
+

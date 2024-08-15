@@ -1,12 +1,15 @@
 
 ## Templates :material-text-box-multiple:
 
+
 Templates :material-text-box-multiple: are used to save and re-utilise predefined information across User Office. Calls are built using several different types of templates which can be edited and cloned. Templates carry information and serve many functions; for example, they may contain specific questions to be used within the call which users answer in their proposals. The template system is useful because it saves you having to do all the work from scratch every time. Furthermore, it allows for standardisation which is essential for data collection and analysis.
 
 
 There are several different types of templates utilised within Calls:
 
+
 # **List of all templates**
+
 
 ??? info "Proposal templates" 
 
