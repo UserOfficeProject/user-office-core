@@ -1,6 +1,8 @@
+![UOS Logo](assets/images/uo_logo.png){ align=left, width="300" } 
+
 ## Welcome to User Office
 
-The User Office Project is an international collaboration to build flexible web software designed to efficiently run and organize user programs at various scientific facilities.
+The User Office Project is an international collaboration to build flexible web software designed to efficiently run and organize user programs at various scientific facilities. 
 
 We have built this software with flexibility in mind - allowing user officers and user program managers to configure the software to the specific needs of their facility.
 
@@ -15,9 +17,13 @@ We have built this software with flexibility in mind - allowing user officers an
 
 #### European Spallation Source
 
+![ESS Logo](assets/images/ess.png){ align=left, width="150" } 
+
 The European Spallation Source (ESS) started building this software in 2018 with the vision that it would work for any facility. The ESS has been using the software to run their Deuteration and Macromolecular Crystallisation (DEMAX) facility since 2020.
 
 #### Science and Technology Facilities Council
+
+![STFC Logo](assets/images/stfc.png){ align=left, width="200" } 
 
 The Science and Technology Facilities Council (STFC) joined the collaboration with the ESS in 2020. The software has been used to accept proposals for facilities at STFC since late 2021 and has been rolled out to the ISIS Neutron and Muon Source, and the Central Laser Facility.
 
