@@ -373,12 +373,12 @@ jobs:
           CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
           BUILD_TAG: ${{ github.sha }}
           CYPRESS_CACHE_FOLDER: .cache/Cypress
-          EAM_AUTH_URL: https://ios.esss.lu.se
-          EAM_AUTH_SECRET: dummyEAMsecret
+          EAM_API_URL: https://ios.esss.lu.se
           EAM_AUTH_USER: dummyAuthUser
-          EAM_AUTH_PASS: dummyAuthPass
-          EAM_API_URL: https://ios.esss.lu.se:7443
-          EAM_PART_CODE: 12413
+          EAM_AUTH_PASSWORD: dummyEAMsecret
+          EAM_AUTH_TENANT: dummyTenant
+          EAM_AUTH_ORGANIZATION: dummyOrg
+          EAM_EQUIPMENT_PART_CODE: 12413
           AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
           AUTH_CLIENT_ID: useroffice
           AUTH_CLIENT_SECRET: useroffice
