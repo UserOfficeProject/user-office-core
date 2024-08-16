@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  SettingsId,
   TechnicalReviewStatus,
   TemplateCategoryId,
 } from '@user-office-software-libs/shared-types';
@@ -10,6 +11,7 @@ import PdfParse from 'pdf-parse';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 context('Proposal administration tests', () => {
   const proposalName1 = faker.lorem.words(3);
@@ -819,7 +821,14 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to sort propsals by instrument and technical review fields', () => {
-      cy.addFeasibilityReviewToDefaultWorkflow();
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        cy.addFeasibilityReviewToDefaultWorkflow();
+      }
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposalPk = result.createProposal.primaryKey;
         if (proposalPk) {
