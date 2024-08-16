@@ -1,10 +1,12 @@
 import { faker } from '@faker-js/faker';
 import {
   DataType,
+  FeatureId,
   TemplateCategoryId,
   TemplateGroupId,
 } from '@user-office-software-libs/shared-types';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Technique tests', () => {
@@ -638,6 +640,12 @@ context('Technique tests', () => {
     });
 
     it('User Officer should be able to assign scientist to techniques', () => {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
+        cy.updateUserRoles({
+          id: scientist2.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
+      }
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -649,7 +657,7 @@ context('Technique tests', () => {
         .find('[aria-label="Assign scientist"]')
         .click();
 
-      cy.contains(scientist1.lastName).parent().find('[type=checkbox]').click();
+      cy.contains(scientist2.lastName).parent().find('[type=checkbox]').click();
 
       cy.contains('Update').click();
 
@@ -665,7 +673,7 @@ context('Technique tests', () => {
 
       cy.contains('Assigned scientist').click();
 
-      cy.contains(scientist1.lastName).should('exist');
+      cy.contains(scientist2.lastName).should('exist');
     });
 
     it('User Officer should be able to remove assigned scientist from techniques', () => {
@@ -680,6 +688,8 @@ context('Technique tests', () => {
       cy.contains('Techniques').click();
 
       cy.finishedLoading();
+
+      cy.get('body').click();
 
       cy.contains(technique1.shortCode)
         .parent()
