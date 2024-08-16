@@ -24,8 +24,14 @@ export function useProposalsCoreData(
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
-  const { callId, techniqueFilter, proposalStatusId, text, referenceNumbers } =
-    filter;
+  const {
+    callId,
+    instrumentFilter,
+    techniqueFilter,
+    proposalStatusId,
+    text,
+    referenceNumbers,
+  } = filter;
 
   const fetchProposalsData = useCallback(
     async (componentController?: { unmounted: boolean }) => {
@@ -35,6 +41,7 @@ export function useProposalsCoreData(
         .getTechniqueScientistProposals({
           filter: {
             callId,
+            instrumentFilter,
             techniqueFilter,
             proposalStatusId,
             text,
@@ -73,6 +80,7 @@ export function useProposalsCoreData(
     },
     [
       callId,
+      instrumentFilter,
       techniqueFilter,
       proposalStatusId,
       text,

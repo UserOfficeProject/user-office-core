@@ -68,7 +68,6 @@ const XpressProposalFilterBar = ({
           techniques={techniques?.data}
           isLoading={techniques?.isLoading}
           shouldShowAll={true}
-          shouldShowMultiple={true}
           onChange={(techniqueFilterValue) => {
             setProposalFilter({
               ...filter,
@@ -87,7 +86,6 @@ const XpressProposalFilterBar = ({
           instruments={instruments?.data}
           isLoading={instruments?.isLoading}
           shouldShowAll={true}
-          shouldShowMultiple={true}
           onChange={(instrumentFilterValue) => {
             setProposalFilter({
               ...filter,

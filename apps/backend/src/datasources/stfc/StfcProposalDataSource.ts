@@ -291,12 +291,24 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'thp.technique_id'
       )
+      .leftJoin(
+        'technique_has_instruments as thi',
+        'thi.technique_id',
+        '=',
+        'thp.technique_id'
+      )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST) {
           this.where('ths.user_id', user.id);
         }
         if (filter?.techniqueFilter?.techniqueId) {
           this.where('tech.technique_id', filter?.techniqueFilter?.techniqueId);
+        }
+        if (filter?.instrumentFilter?.instrumentId) {
+          this.where(
+            'thi.instrument_id',
+            filter?.instrumentFilter?.instrumentId
+          );
         }
       });
 
