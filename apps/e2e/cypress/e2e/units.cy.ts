@@ -160,7 +160,6 @@ context('Units tests', () => {
       cy.visit('/');
       cy.get('#call-select').click();
       cy.get('[role=listbox]').contains('call 1').click();
-      cy.get('[data-cy=question-search-toggle]').click();
       cy.get('#question-list').click();
       cy.get('[role="presentation"] [role="option"]').first().click();
       cy.get('body').click();

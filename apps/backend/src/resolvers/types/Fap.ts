@@ -49,6 +49,9 @@ export class Fap implements Partial<FapBase> {
   public fapChairUserIds: number[] | null;
 
   public fapSecretariesUserIds: number[] | null;
+
+  @Field(() => String, { nullable: true })
+  public files: string | null;
 }
 
 @Resolver(() => Fap)
