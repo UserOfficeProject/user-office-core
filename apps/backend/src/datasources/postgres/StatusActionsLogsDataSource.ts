@@ -12,6 +12,7 @@ import {
 import { StatusActionsLogsDataSource } from '../StatusActionsLogsDataSource';
 import database from './database';
 import {
+  ProposalRecord,
   StatusActionsLogHasProposalRecord,
   StatusActionsLogRecord,
 } from './records';
@@ -124,9 +125,9 @@ export default class PostgresStatusActionsLogsDataSource
     args: StatusActionsLogsFilterArgs
   ): Promise<{ totalCount: number; statusActionsLogs: StatusActionsLog[] }> {
     return database
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .select(['sal.*', 'p.*', database.raw('count(*) OVER() AS full_count')])
       .from('status_actions_logs as sal')
-      .distinct()
+      .distinct('sal.status_actions_log_id')
       .leftJoin(
         'status_actions_log_has_proposals as salhp',
         'salhp.status_actions_log_id',
@@ -193,10 +194,14 @@ export default class PostgresStatusActionsLogsDataSource
           query.offset(args.offset);
         }
       })
-      .then((results: StatusActionsLogRecord[]) => {
-        const statusActionsLogs = results.map((statusActionsLog) =>
-          this.createStatusActionsLogObject(statusActionsLog)
-        );
+      .then((results: StatusActionsLogRecord & ProposalRecord[]) => {
+        const statusActionsLogs = results
+          .filter((result) => !!result.proposal_id)
+          .map((statusActionsLog) =>
+            this.createStatusActionsLogObject(
+              statusActionsLog as unknown as StatusActionsLogRecord
+            )
+          );
 
         return {
           totalCount: results[0]?.full_count || 0,
