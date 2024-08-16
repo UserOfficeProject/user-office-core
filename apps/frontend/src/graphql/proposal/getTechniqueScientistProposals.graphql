@@ -13,6 +13,7 @@ query getTechniqueScientistProposals(
       proposalId
       title
       submitted
+      submittedDate
       finalStatus
       statusName
       allocationTimeUnit

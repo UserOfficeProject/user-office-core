@@ -134,6 +134,7 @@ export interface ProposalRecord {
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
+  readonly submitted_date: Date;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -155,6 +156,7 @@ export interface ProposalViewRecord {
   readonly proposal_workflow_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
+  readonly submitted_date: Date;
 }
 
 export interface TopicRecord {
@@ -801,7 +803,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.notified,
     proposal.submitted,
     proposal.reference_number_sequence,
-    proposal.management_decision_submitted
+    proposal.management_decision_submitted,
+    proposal.submitted_date
   );
 };
 
@@ -865,7 +868,8 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.call_short_code,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.proposal_workflow_id
+    proposal.proposal_workflow_id,
+    proposal.submitted_date
   );
 };
 
