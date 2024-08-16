@@ -2,33 +2,32 @@
 
 What are question templates?
 
-
 ??? info "What are question templates?" 
 
     Question templates are predefined questions that are designed to streamline the template creation process and ensure consistency across users' submissions. Question templates allow users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the **question drawer**. Question templates allow for standardisation across multiple templates which is essential for data collection and analysis of users' responses.
 
 Question templates can be utilised within the following templates:
 
-* [**Proposal templates**](proposal_template.md)
-* [**Proposal ESI templates**](proposalESI_template.md)
-* [**Sample ESI templates**](sampleESI_template.md)
-* [**Feedback templates**](feedback_template.md)
+* [**Proposal templates**](templates/proposal_template.md)
+* [**Proposal ESI templates**](templates/proposalESI_template.md)
+* [**Sample ESI templates**](templates/sampleESI_template.md)
+* [**Feedback templates**](templates/feedback_template.md)
 * [**Sub Templates**](sub_template.md)
-* [**Sample declaration templates**](sampledec_template.md)
-* [**Shipment declarationt templates**](shipment_template.md)
-* [**Visit registration templates**](visit_template.md)
+* [**Sample declaration templates**](templates/sampledec_template.md)
+* [**Shipment declarationt templates**](templates/shipment_template.md)
+* [**Visit registration templates**](templates/visit_template.md)
 
 # **How do I edit question templates**
 
-When editing a quesiton template you have two options
+When editing a quesiton template you have two options:
 
 * **Edit the question as it appears within the current template (i.e, only for this one instance)**
-* **Edit the question within the question drawer (across all templates)**
+* **Edit the question within the question drawer (across all templates)** 
 
 
 # **How do I create question templates?**
 
-* In the main menu, navigate to the template page you wish to create the question for ([**Proposal templates**](proposal_template.md), [**Proposal ESI templates**](proposalESI_template.md),[**Sample ESI templates**](sampleESI_template.md), [**Feedback templates**](feedback_template.md), [**Sub Templates**](sub_template.md), [**Sample declaration templates**](sampledec_template.md), [**Shipment declarationt templates**](shipment_template.md), [**Visit registration templates**](visit_template.md))
+* In the main menu, navigate to the template page you wish to create the question for ([**Proposal templates**](templates/proposal_template.md), [**Proposal ESI templates**](templates/proposalESI_template.md),[**Sample ESI templates**](templates/sampleESI_template.md), [**Feedback templates**](templates/feedback_template.md), [**Sub Templates**](sub_template.md), [**Sample declaration templates**](templates/sampledec_template.md), [**Shipment declarationt templates**](templates/shipment_template.md), [**Visit registration templates**](templates/visit_template.md))
 
 * Within the chosen template page, create or edit a pre-existing template. 
 (In this example, we wish to create questions for a Proposal template:)
@@ -61,7 +60,7 @@ Note: depending on which template you are creating questions for, certain questi
     * **Question:** Fill in your question (It should be clear a 'yes' or 'no' answer applicable to the checkbox)
 
     **Contraints:**
-    
+
     * **User must check it to continue:** enabling this constraint means that the user must check the box in order to continue filling out (and submit) their proposal. This is useful to use in questions that must be agreed to such as 'I acknowledge this is an Expression of Interest' or 'I agree to the terms and conditions'.
 
 
