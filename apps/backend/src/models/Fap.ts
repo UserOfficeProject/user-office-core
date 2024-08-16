@@ -15,7 +15,8 @@ export class Fap {
     public customGradeGuide: boolean | null,
     public active: boolean,
     public fapChairUserIds: number[] | null,
-    public fapSecretariesUserIds: number[] | null
+    public fapSecretariesUserIds: number[] | null,
+    public files: string | null
   ) {}
 }
 

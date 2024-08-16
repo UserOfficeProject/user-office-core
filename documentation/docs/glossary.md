@@ -53,8 +53,6 @@ Alphabetical list of terms and their definitions.
     * [Instruments](placeholder.md)
     * [Institutions](placeholder.md)
 
-
-
 ??? info "**J**"
 
     * 
@@ -101,7 +99,9 @@ Alphabetical list of terms and their definitions.
 
 ??? info "**R**"
 
-    * 
+
+    * [Roles](placeholder.md)
+
 
 
 ??? info "**S**"
