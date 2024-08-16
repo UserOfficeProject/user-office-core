@@ -33,7 +33,7 @@ const XpressProposalTable = () => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
-    instrument: StringParam,
+    instrument: NumberParam,
     technique: NumberParam,
     proposalId: StringParam,
   });
@@ -102,6 +102,7 @@ const XpressProposalTable = () => {
     useProposalsCoreData({
       proposalStatusId: proposalFilter.proposalStatusId,
       techniqueFilter: proposalFilter.techniqueFilter,
+      instrumentFilter: proposalFilter.instrumentFilter,
       callId: proposalFilter.callId,
       referenceNumbers: proposalFilter.referenceNumbers,
     });
