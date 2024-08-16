@@ -5,15 +5,18 @@
 
 _______________________________________________________
 
-![Call](../../assets/images/call.png){ width="400" }
+
+![Call](../../assets/images/call.png){ width="500" }
 
 * ### [How do I create a call?](creating_call.md) 
 
-![workflow](../../assets/images/workflow.png){ width="400" }
+![Workflow](../../assets/images/workflow.png){ width="500" }
 
 * ### [How do I create a proposal workflow?](proposal_workflow.md)
 
+![Templates](../../assets/images/templates.png){ width="500"}
 
+* ### [How do I create templates?](templates/templates.md)
 _______________________________________________________
 
 Video tutorials:
@@ -33,12 +36,14 @@ All how-to guides:
 ### **Calls**
 * #### [How do I create a call?](creating_call.md) 
 
+* #### [How do I edit an active call?](editing_call.md)
+
 
 ### **Managing proposals**
 
 * #### [How do I edit a users' proposal?](proposal.md)
 
-* #### [How do I impersonate users?](roles.md)
+* #### [How do I impersonate users? (see what the user sees)](roles.md)
 
 * #### [How do I revert submitted proposals back to draft status?](proposal.md)
 

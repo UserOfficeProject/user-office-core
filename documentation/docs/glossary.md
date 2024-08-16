@@ -57,7 +57,6 @@ Alphabetical list of terms and their definitions.
     * [Institutions](placeholder.md)
     * [Import](placeholder.md)
     * [Impersonate](placeholder.md)
-    * [# Instruments](placeholder.md)
 
 ??? info "**J**"
     * 

@@ -1,3 +1,4 @@
+
 # Feedback templates :material-message-alert:
 
 ??? info "Feedback templates" 
@@ -117,3 +118,17 @@ ________________________________________________________________________________
 ### **What does # feedbacks mean on feedback templates?**
 
 In the feedback templates page, the # feedbacks assigned to the templates refers to the number of feedback forms users have submitted to that feedback template. 
+=======
+
+
+??? info "Feedback templates" 
+
+    [**Feedback templates**](templates/feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire.
+    ______________________________________________________________________________________
+    
+    <figure markdown="span">  
+        ![Feedback templates](/assets/images/placeholder.png){ width="450"}
+        <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
+    </figure>
+
+

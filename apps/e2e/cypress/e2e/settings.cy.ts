@@ -1397,6 +1397,14 @@ context('Settings tests', () => {
     });
 
     it('Feasibility Reviews should only be assigned if the Workflow contains a Feasibility Review Status', function () {
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        this.skip();
+      }
       createInstrumentAndAssignItToCall();
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {

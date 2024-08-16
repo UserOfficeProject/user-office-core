@@ -39,6 +39,7 @@ Pages are highly customiseable sections of information within User Office. Pages
         <figcaption>**User homepage (dashboard)**</figcaption>
     </figure>
 
+
 ### **Reviewer**
 
 !!! note ""
