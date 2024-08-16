@@ -22,9 +22,6 @@ export class StatusActionsLog implements Partial<StatusActionsLogOrigin> {
   @Field(() => Int)
   public statusActionsLogId: number;
 
-  @Field(() => Int, { nullable: true })
-  public parentStatusActionsLogId?: number;
-
   @Field(() => EmailStatusActionRecipients)
   public statusActionsStep: EmailStatusActionRecipients;
 
@@ -87,20 +84,6 @@ export class StatusActionsLogResolver {
 
     return context.queries.proposal.dataSource.getProposalsByPks(
       statusActionsProposals.map((proposal) => proposal.proposalPk)
-    );
-  }
-
-  @FieldResolver(() => [StatusActionsLog])
-  async replays(
-    @Root() statusActionsLog: StatusActionsLogOrigin,
-    @Ctx() context: ResolverContext
-  ): Promise<StatusActionsLogOrigin[] | null> {
-    if (!statusActionsLog.statusActionsLogId) {
-      return null;
-    }
-
-    return context.queries.statusActionsLogs.dataSource.getStatusActionsLogReplays(
-      statusActionsLog.statusActionsLogId
     );
   }
 }

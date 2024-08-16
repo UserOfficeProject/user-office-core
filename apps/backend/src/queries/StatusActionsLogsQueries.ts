@@ -6,7 +6,7 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { StatusActionsLog } from '../models/StatusActionsLog';
 import { UserWithRole } from '../models/User';
-import { StatusActionsLogsFilter } from '../resolvers/queries/StatusActionsLogsQuery';
+import { StatusActionsLogsFilterArgs } from '../resolvers/queries/StatusActionsLogsQuery';
 
 @injectable()
 export default class StatusActionsLogsQueries {
@@ -18,9 +18,9 @@ export default class StatusActionsLogsQueries {
   @Authorized([Roles.USER_OFFICER])
   async getStatusActionsLogs(
     agent: UserWithRole | null,
-    filter?: StatusActionsLogsFilter
-  ): Promise<StatusActionsLog[] | null> {
-    return this.dataSource.getStatusActionsLogs(filter);
+    args: StatusActionsLogsFilterArgs
+  ): Promise<{ totalCount: number; statusActionsLogs: StatusActionsLog[] }> {
+    return await this.dataSource.getStatusActionsLogs(args);
   }
 
   @Authorized([Roles.USER_OFFICER])

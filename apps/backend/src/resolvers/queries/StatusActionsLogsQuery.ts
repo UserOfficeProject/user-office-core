@@ -3,10 +3,11 @@ import {
   Ctx,
   Resolver,
   InputType,
-  Arg,
   Field,
   Int,
   ArgsType,
+  Args,
+  ObjectType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -36,7 +37,7 @@ export class StatusActionsLogsFilter {
 @ArgsType()
 export class StatusActionsLogsArgs {
   @Field(() => Int, { nullable: true })
-  public parentStatusActionsLogId: number | null;
+  public statusActionsLogId: number | null;
 
   @Field(() => Int)
   public connectionId: number;
@@ -60,17 +61,44 @@ export class StatusActionsLogsArgs {
   public proposalPks: number[];
 }
 
+@ObjectType()
+class StatusActionsLogQueryResult {
+  @Field(() => Int)
+  public totalCount: number;
+
+  @Field(() => [StatusActionsLog])
+  public statusActionsLogs: StatusActionsLog[];
+}
+@ArgsType()
+export class StatusActionsLogsFilterArgs {
+  @Field(() => StatusActionsLogsFilter, { nullable: true })
+  public filter?: StatusActionsLogsFilter;
+
+  @Field(() => Int, { nullable: true })
+  public first?: number;
+
+  @Field(() => Int, { nullable: true })
+  public offset?: number;
+
+  @Field({ nullable: true })
+  public sortField?: string;
+
+  @Field({ nullable: true })
+  public sortDirection?: string;
+
+  @Field({ nullable: true })
+  public searchText?: string;
+}
 @Resolver()
 export class StatusActionsLogsQuery {
-  @Query(() => [StatusActionsLog], { nullable: true })
+  @Query(() => StatusActionsLogQueryResult, { nullable: true })
   statusActionsLogs(
-    @Arg('filter', () => StatusActionsLogsFilter, { nullable: true })
-    filter: StatusActionsLogsFilter | undefined,
+    @Args() args: StatusActionsLogsFilterArgs,
     @Ctx() context: ResolverContext
   ) {
     return context.queries.statusActionsLogs.getStatusActionsLogs(
       context.user,
-      filter
+      args
     );
   }
 }

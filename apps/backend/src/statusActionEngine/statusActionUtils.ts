@@ -284,14 +284,15 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
 export const publishProposalMessageToTheEventBus = async (
   proposal: WorkflowEngineProposalType,
   messageDescription: string,
-  exchange?: string
+  exchange?: string,
+  loggedInUserId?: number
 ) => {
   const eventBus = resolveApplicationEventBus();
   const event = {
     type: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
     proposal: proposal,
     key: 'proposal',
-    loggedInUserId: null,
+    loggedInUserId,
     isRejection: false,
     description: messageDescription,
     exchange: exchange,
@@ -304,14 +305,16 @@ export const publishProposalMessageToTheEventBus = async (
 export const publishMessageToTheEventBus = async (
   proposals: WorkflowEngineProposalType[],
   messageDescription: string,
-  exchange?: string
+  exchange?: string,
+  loggedInUserId?: number
 ) => {
   await Promise.all(
     proposals.map(async (proposal) =>
       publishProposalMessageToTheEventBus(
         proposal,
         messageDescription,
-        exchange
+        exchange,
+        loggedInUserId
       )
     )
   );
@@ -321,9 +324,9 @@ export const statusActionLogger = (args: {
   connectionId: number;
   actionId: number;
   statusActionsStep: EmailStatusActionRecipients;
-  statusActionsBy: number | null;
-  parentStatusActionsLogId: number | null;
   proposalPks: number[];
+  statusActionsBy?: number | null;
+  statusActionsLogId?: number | null;
 }) => {
   const statusActionsLogsDataSource =
     container.resolve<StatusActionsLogsDataSource>(
@@ -336,9 +339,16 @@ export const statusActionLogger = (args: {
   ) {
     const statusActionsLogsArgs: StatusActionsLogsArgs = {
       ...args,
+      statusActionsLogId: args?.statusActionsLogId || null,
+      statusActionsBy: args?.statusActionsBy || null,
       statusActionsSuccessful,
       statusActionsMessage,
     };
-    statusActionsLogsDataSource.create(statusActionsLogsArgs);
+
+    if (statusActionsLogsArgs.statusActionsLogId) {
+      return statusActionsLogsDataSource.update(statusActionsLogsArgs);
+    }
+
+    return statusActionsLogsDataSource.create(statusActionsLogsArgs);
   };
 };

@@ -4,14 +4,13 @@ import {
 } from '../../models/StatusActionsLog';
 import {
   StatusActionsLogsArgs,
-  StatusActionsLogsFilter,
+  StatusActionsLogsFilterArgs,
 } from '../../resolvers/queries/StatusActionsLogsQuery';
 import { EmailStatusActionRecipients } from '../../resolvers/types/ProposalStatusActionConfig';
 import { StatusActionsLogsDataSource } from '../StatusActionsLogsDataSource';
 
 export const dummyStatusActionsLog = new StatusActionsLog(
   1,
-  null,
   1,
   1,
   EmailStatusActionRecipients.OTHER,
@@ -23,7 +22,6 @@ export const dummyStatusActionsLog = new StatusActionsLog(
 
 export const dummyStatusActionsLogReplay = new StatusActionsLog(
   2,
-  1,
   1,
   1,
   EmailStatusActionRecipients.OTHER,
@@ -40,11 +38,6 @@ export const dummyConnectionHasStatusAction = new StatusActionsLogHasProposal(
 export class StatusActionsLogsDataSourceMock
   implements StatusActionsLogsDataSource
 {
-  async getStatusActionsLogReplays(
-    statusActionsLogId: number
-  ): Promise<StatusActionsLog[] | null> {
-    return [dummyStatusActionsLogReplay];
-  }
   async create(args: StatusActionsLogsArgs): Promise<StatusActionsLog> {
     return { ...args, ...dummyStatusActionsLog };
   }
@@ -54,9 +47,9 @@ export class StatusActionsLogsDataSourceMock
     return dummyStatusActionsLog;
   }
   async getStatusActionsLogs(
-    filter?: StatusActionsLogsFilter
-  ): Promise<StatusActionsLog[] | null> {
-    return [dummyStatusActionsLog];
+    args: StatusActionsLogsFilterArgs
+  ): Promise<{ totalCount: number; statusActionsLogs: StatusActionsLog[] }> {
+    return { totalCount: 1, statusActionsLogs: [dummyStatusActionsLog] };
   }
   async getStatusActionsLogHasProposals(
     statusActionsLogId: number

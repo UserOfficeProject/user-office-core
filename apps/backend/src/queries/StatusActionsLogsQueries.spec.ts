@@ -10,7 +10,10 @@ const statusActionsLogsQueries = container.resolve(StatusActionsLogsQueries);
 describe('Test Status Actions Logs Queries', () => {
   test('A userofficer can get Status actions logs', async () => {
     return expect(
-      statusActionsLogsQueries.getStatusActionsLogs(dummyUserOfficerWithRole)
+      statusActionsLogsQueries.getStatusActionsLogs(
+        dummyUserOfficerWithRole,
+        {}
+      )
     ).resolves.not.toBe(null);
   });
 

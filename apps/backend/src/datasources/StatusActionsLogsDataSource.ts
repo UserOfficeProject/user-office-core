@@ -4,7 +4,7 @@ import {
 } from '../models/StatusActionsLog';
 import {
   StatusActionsLogsArgs,
-  StatusActionsLogsFilter,
+  StatusActionsLogsFilterArgs,
 } from '../resolvers/queries/StatusActionsLogsQuery';
 
 export interface StatusActionsLogsDataSource {
@@ -13,12 +13,9 @@ export interface StatusActionsLogsDataSource {
   getStatusActionsLog(
     statusActionsLogId: number
   ): Promise<StatusActionsLog | null>;
-  getStatusActionsLogReplays(
-    statusActionsLogId: number
-  ): Promise<StatusActionsLog[] | null>;
   getStatusActionsLogs(
-    filter?: StatusActionsLogsFilter
-  ): Promise<StatusActionsLog[] | null>;
+    args: StatusActionsLogsFilterArgs
+  ): Promise<{ totalCount: number; statusActionsLogs: StatusActionsLog[] }>;
   getStatusActionsLogHasProposals(
     statusActionsLogId: number
   ): Promise<StatusActionsLogHasProposal[]>;

@@ -1333,7 +1333,6 @@ export interface TechniqueHasInstrumentsRecord {
 
 export interface StatusActionsLogRecord {
   readonly status_actions_log_id: number;
-  readonly parent_status_actions_log_id: number;
   readonly connection_id: number;
   readonly action_id: number;
   readonly status_actions_step: string;
@@ -1341,6 +1340,7 @@ export interface StatusActionsLogRecord {
   readonly status_actions_successful: boolean;
   readonly status_actions_message: string;
   readonly status_actions_tstamp: Date;
+  readonly full_count: number;
 }
 export interface StatusActionsLogHasProposalRecord {
   readonly status_actions_log_id: number;

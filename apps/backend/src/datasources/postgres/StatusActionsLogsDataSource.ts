@@ -7,7 +7,7 @@ import {
 } from '../../models/StatusActionsLog';
 import {
   StatusActionsLogsArgs,
-  StatusActionsLogsFilter,
+  StatusActionsLogsFilterArgs,
 } from '../../resolvers/queries/StatusActionsLogsQuery';
 import { StatusActionsLogsDataSource } from '../StatusActionsLogsDataSource';
 import database from './database';
@@ -16,6 +16,12 @@ import {
   StatusActionsLogRecord,
 } from './records';
 
+const fieldMap: { [key: string]: string } = {
+  statusActionsTstamp: 'status_actions_tstamp',
+  statusActionsMessage: 'status_actions_message',
+  statusActionsSuccessful: 'status_actions_successful',
+  statusActionsStep: 'status_actions_step',
+};
 export default class PostgresStatusActionsLogsDataSource
   implements StatusActionsLogsDataSource
 {
@@ -24,7 +30,6 @@ export default class PostgresStatusActionsLogsDataSource
   ) {
     return new StatusActionsLog(
       statusActionLog.status_actions_log_id,
-      statusActionLog.parent_status_actions_log_id,
       statusActionLog.connection_id,
       statusActionLog.action_id,
       statusActionLog.status_actions_step,
@@ -50,7 +55,6 @@ export default class PostgresStatusActionsLogsDataSource
         try {
           const statusActionsLog: StatusActionsLogRecord[] = await database
             .insert({
-              parent_status_actions_log_id: args.parentStatusActionsLogId,
               connection_id: args.connectionId,
               action_id: args.actionId,
               status_actions_step: args.statusActionsStep,
@@ -87,6 +91,19 @@ export default class PostgresStatusActionsLogsDataSource
 
     return this.createStatusActionsLogObject(statusActionLogRecord);
   }
+  async update(args: StatusActionsLogsArgs): Promise<StatusActionsLog> {
+    return database('status_actions_logs')
+      .update({
+        status_actions_message: args.statusActionsMessage,
+        status_actions_by: args.statusActionsBy,
+        status_actions_successful: args.statusActionsSuccessful,
+      })
+      .where({ status_actions_log_id: args.statusActionsLogId })
+      .returning('*')
+      .then((statusActionsLog) => {
+        return this.createStatusActionsLogObject(statusActionsLog[0]);
+      });
+  }
   async getStatusActionsLog(statusActionsLogId: number) {
     const statusActionsLog = await database
       .select<StatusActionsLogRecord>()
@@ -103,52 +120,88 @@ export default class PostgresStatusActionsLogsDataSource
     return this.createStatusActionsLogObject(statusActionsLog);
   }
 
-  async getStatusActionsLogReplays(statusActionsLogId: number) {
+  async getStatusActionsLogs(
+    args: StatusActionsLogsFilterArgs
+  ): Promise<{ totalCount: number; statusActionsLogs: StatusActionsLog[] }> {
     return database
-      .select('*')
-      .from('status_actions_logs')
-      .where('parent_status_actions_log_id', statusActionsLogId)
-      .orderBy('status_actions_tstamp', 'asc')
-      .then((statusActionsLogs: StatusActionsLogRecord[]) => {
-        return statusActionsLogs.map((statusActionsLog) =>
-          this.createStatusActionsLogObject(statusActionsLog)
-        );
-      });
-  }
-  async getStatusActionsLogs(filter?: StatusActionsLogsFilter) {
-    return database
-      .select('*')
-      .from('status_actions_logs')
-      .whereNull('parent_status_actions_log_id')
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('status_actions_logs as sal')
+      .distinct()
+      .leftJoin(
+        'status_actions_log_has_proposals as salhp',
+        'salhp.status_actions_log_id',
+        '=',
+        'sal.status_actions_log_id'
+      )
+      .leftJoin('proposals as p', { 'p.proposal_pk': 'salhp.proposal_pk' })
       .modify((query) => {
-        if (filter?.statusActionsLogIds) {
-          query.whereIn('status_actions_log_id', filter.statusActionsLogIds);
+        if (args.filter?.statusActionsLogIds) {
+          query.whereIn(
+            'sal.status_actions_log_id',
+            args.filter.statusActionsLogIds
+          );
         }
-        if (filter?.statusActionIds) {
-          query.whereIn('action_id', filter.statusActionIds);
+        if (args.filter?.statusActionIds) {
+          query.whereIn('sal.action_id', args.filter.statusActionIds);
         }
-        if (filter?.statusActionsMessage) {
+        if (args.filter?.statusActionsMessage) {
           query.where(
-            'status_actions_message',
+            'sal.status_actions_message',
             'like',
-            `%${filter.statusActionsMessage}%`
+            `%${args.filter.statusActionsMessage}%`
           );
         }
-        if (filter?.statusActionsSteps) {
-          query.whereIn('status_actions_step', filter.statusActionsSteps);
+        if (args.filter?.statusActionsSteps) {
+          query.whereIn(
+            'sal.status_actions_step',
+            args.filter.statusActionsSteps
+          );
         }
-        if (filter?.statusActionsSuccessful) {
+        if (args.filter?.statusActionsSuccessful) {
           query.where(
-            'status_actions_successful',
-            filter.statusActionsSuccessful
+            'sal.status_actions_successful',
+            args.filter.statusActionsSuccessful
           );
+        }
+        if (args.sortField && args.sortDirection) {
+          if (args.sortField in fieldMap) {
+            query.orderByRaw(
+              `${fieldMap[args.sortField]} ${args.sortDirection}`
+            );
+          } else {
+            throw new GraphQLError(`Bad sort field given: ${args.sortField}`);
+          }
+        }
+        if (args.searchText) {
+          query.andWhere((qb) =>
+            qb
+              .orWhereRaw(
+                'sal.status_actions_message ILIKE ?',
+                `%${args.searchText}%`
+              )
+              .orWhereRaw('p.proposal_id ILIKE ?', `%${args.searchText}%`)
+              .orWhereRaw(
+                'sal.status_actions_step ILIKE ?',
+                `%${args.searchText}%`
+              )
+          );
+        }
+        if (args.first) {
+          query.limit(args.first);
+        }
+        if (args.offset) {
+          query.offset(args.offset);
         }
       })
-      .orderBy('status_actions_tstamp', 'asc')
-      .then((statusActionsLogs: StatusActionsLogRecord[]) => {
-        return statusActionsLogs.map((statusActionsLog) =>
+      .then((results: StatusActionsLogRecord[]) => {
+        const statusActionsLogs = results.map((statusActionsLog) =>
           this.createStatusActionsLogObject(statusActionsLog)
         );
+
+        return {
+          totalCount: results[0]?.full_count || 0,
+          statusActionsLogs: statusActionsLogs,
+        };
       });
   }
   async getStatusActionsLogHasProposals(

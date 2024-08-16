@@ -1,7 +1,7 @@
 export class StatusActionsLog {
+  full_count: any;
   constructor(
     public statusActionsLogId: number,
-    public parentStatusActionsLogId: number | null,
     public connectionId: number,
     public actionId: number,
     public statusActionsStep: string,

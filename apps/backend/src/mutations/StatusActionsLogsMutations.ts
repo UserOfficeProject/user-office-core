@@ -106,8 +106,8 @@ export default class StatusActionsLogsMutations {
     }
 
     emailActionHandler(statusAction, workflowEngineProposals, {
+      statusActionsLogId: statusActionsLog.statusActionsLogId,
       statusActionsBy: agent?.id,
-      parentStatusActionsLogId: statusActionsLog.statusActionsLogId,
       statusActionRecipients:
         statusActionsLog.statusActionsStep as EmailStatusActionRecipients,
     });
