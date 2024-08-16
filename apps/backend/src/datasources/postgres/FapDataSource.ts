@@ -105,7 +105,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean,
-    active: boolean
+    active: boolean,
+    files: string | null
   ) {
     return database
       .update(
@@ -116,6 +117,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           grade_guide: gradeGuide,
           custom_grade_guide: customGradeGuide,
           active,
+          files,
         },
         ['*']
       )
