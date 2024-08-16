@@ -368,25 +368,27 @@ const PeopleTable = ({
             userRole: query.userRole,
           });
 
-          const paginatedFilteredData = data
-            ? data
-                .filter((user) =>
-                  tableQuery.search
-                    ? user.firstname
-                        .toLowerCase()
-                        .includes(tableQuery.search.toLowerCase()) ||
-                      user.lastname
-                        .toLowerCase()
-                        .includes(tableQuery.search.toLowerCase()) ||
-                      user.institution
-                        .toLowerCase()
-                        .includes(tableQuery.search.toLowerCase())
-                    : true
-                )
-                .slice(
-                  tableQuery.page * tableQuery.pageSize,
-                  tableQuery.pageSize + tableQuery.page * tableQuery.pageSize
-                )
+          const filteredData = data
+            ? data.filter((user) =>
+                tableQuery.search
+                  ? user.firstname
+                      .toLowerCase()
+                      .includes(tableQuery.search.toLowerCase()) ||
+                    user.lastname
+                      .toLowerCase()
+                      .includes(tableQuery.search.toLowerCase()) ||
+                    user.institution
+                      .toLowerCase()
+                      .includes(tableQuery.search.toLowerCase())
+                  : true
+              )
+            : undefined;
+
+          const paginatedFilteredData = filteredData
+            ? filteredData.slice(
+                tableQuery.page * tableQuery.pageSize,
+                tableQuery.pageSize + tableQuery.page * tableQuery.pageSize
+              )
             : undefined;
 
           const usersTableData = getUsersTableData(
@@ -394,7 +396,7 @@ const PeopleTable = ({
             selectedParticipants || [],
             invitedUsers,
             tableQuery,
-            paginatedFilteredData?.length || users?.totalCount || 0
+            filteredData?.length || users?.totalCount || 0
           );
 
           setCurrentPageIds(usersTableData.users.map(({ id }) => id));
