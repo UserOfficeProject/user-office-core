@@ -403,6 +403,7 @@ export interface FapRecord {
   readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
+  readonly files: string | null;
 }
 
 export interface FapSecretariesRecord {
@@ -1115,7 +1116,8 @@ export const createFapObject = (fap: FapRecord) => {
     fap.custom_grade_guide,
     fap.active,
     [],
-    []
+    [],
+    fap.files ? JSON.stringify(fap.files) : null
   );
 };
 

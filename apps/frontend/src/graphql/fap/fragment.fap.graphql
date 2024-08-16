@@ -6,6 +6,7 @@ fragment fap on Fap {
   gradeGuide
   customGradeGuide
   active
+  files
   fapChairs {
     ...basicUserDetails
   }
@@ -21,4 +22,5 @@ fragment fap on Fap {
     count
   }
   proposalCount
+  proposalCurrentCount
 }

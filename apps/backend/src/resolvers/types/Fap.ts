@@ -49,6 +49,9 @@ export class Fap implements Partial<FapBase> {
   public fapChairUserIds: number[] | null;
 
   public fapSecretariesUserIds: number[] | null;
+
+  @Field(() => String, { nullable: true })
+  public files: string | null;
 }
 
 @Resolver(() => Fap)
@@ -118,5 +121,13 @@ export class FapResolvers {
   @FieldResolver(() => Int)
   async proposalCount(@Root() fap: Fap, @Ctx() context: ResolverContext) {
     return context.queries.fap.dataSource.getFapProposalCount(fap.id);
+  }
+
+  @FieldResolver(() => Int)
+  async proposalCurrentCount(
+    @Root() fap: Fap,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.fap.dataSource.getCurrentFapProposalCount(fap.id);
   }
 }
