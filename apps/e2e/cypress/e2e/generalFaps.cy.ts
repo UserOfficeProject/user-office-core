@@ -101,7 +101,8 @@ context('General facility access panel tests', () => {
     });
 
     it('Officer should be able to delete Fap', () => {
-      cy.contains('FAPs').click();
+      cy.visit('/Faps');
+      cy.finishedLoading();
       cy.get('[aria-label="Delete"]').last().click();
 
       cy.get('[aria-label="Save"]').click();
@@ -142,7 +143,8 @@ context('General facility access panel tests', () => {
       const newCode = faker.random.words(3);
       const newDescription = faker.random.words(8);
 
-      cy.contains('FAPs').click();
+      cy.visit('/Faps');
+      cy.finishedLoading();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -215,7 +217,8 @@ context('General facility access panel tests', () => {
       let selectedSecretaryUserFirstName = '';
       let selectedSecretaryUserLastName = '';
 
-      cy.contains('FAPs').click();
+      cy.visit('/Faps');
+      cy.finishedLoading();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -370,7 +373,8 @@ context('General facility access panel tests', () => {
           roleId: UserRole.FAP_SECRETARY,
         },
       });
-      cy.contains('FAPs').click();
+      cy.visit('/Faps');
+      cy.finishedLoading();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -400,7 +404,8 @@ context('General facility access panel tests', () => {
     });
 
     it('Officer should be able to assign Fap Reviewers to existing Fap', () => {
-      cy.contains('FAPs').click();
+      cy.visit('/Faps');
+      cy.finishedLoading();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
@@ -435,7 +440,8 @@ context('General facility access panel tests', () => {
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer.id],
       });
-      cy.contains('FAPs').click();
+      cy.visit('/Faps');
+      cy.finishedLoading();
       cy.contains(fap1.code)
         .closest('tr')
         .find('button[aria-label="Edit"]')
