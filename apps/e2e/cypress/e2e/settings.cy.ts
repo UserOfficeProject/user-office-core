@@ -1130,11 +1130,9 @@ context('Settings tests', () => {
         }
       });
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/Faps');
 
       cy.finishedLoading();
-
-      cy.contains('FAPs').click();
 
       cy.get("[aria-label='Edit']").first().click();
 
