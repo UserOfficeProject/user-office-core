@@ -16,7 +16,7 @@ import XpressProposalFilterBar from './XpressProposalFilterBar';
 export interface ProposalData {
   proposalId: string;
   title: string;
-  submitted: boolean;
+  submittedDate: Date;
 }
 
 const XpressProposalTable = () => {
@@ -92,7 +92,7 @@ const XpressProposalTable = () => {
     },
     {
       title: 'Date submitted',
-      field: 'submitted',
+      field: 'submittedDate',
       ...{ width: 'auto' },
     },
   ];
@@ -180,7 +180,7 @@ const XpressProposalTable = () => {
     return {
       proposalId: proposal.proposalId,
       title: proposal.title,
-      submitted: proposal.submitted,
+      submittedDate: proposal.submittedDate,
     };
   });
 

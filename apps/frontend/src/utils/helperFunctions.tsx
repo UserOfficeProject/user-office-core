@@ -105,6 +105,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     callId: proposal.callId,
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
+    submittedDate: proposal.submittedDate,
   }) as ProposalViewData;
 
 export const capitalize = (s: string) =>

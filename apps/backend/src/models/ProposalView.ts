@@ -24,6 +24,7 @@ export class ProposalView {
     public callShortCode: string,
     public allocationTimeUnit: AllocationTimeUnits,
     public callId: number,
-    public workflowId: number
+    public workflowId: number,
+    public submittedDate: Date
   ) {}
 }
