@@ -1,6 +1,6 @@
 # Creating a call :material-calendar-blank:
 
-![Call](/assets/images/call.png)
+![Call](../../assets/images/call.png)
 
 **What are calls?**
 
@@ -24,30 +24,6 @@ Calls are built using several different types of templates which can be edited a
 
 There are several different types of templates utilised within Calls:
 
-??? info "Proposal templates" 
-
-    [**Proposal templates**](templates/2proposal_template.md) act as the questionnaire that users must fill out when writing their proposal and are designed to capture all necessary information regarding the proposed research. For example, these templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields to submit their proposals for review.
-
-
-    User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
-
-    ______________________________________________________________________________________
-    <figure markdown="span">  
-        ![Proposal](/assets/images/proposal_template.png){ width="450"}
-        <figcaption>**Proposal (viewed from the user's perspective)**</figcaption>
-    </figure>
-
-??? info "Proposal ESI templates" 
-
-    [**Proposal Experimental Safety Input (ESI)**](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise Proposal ESI templates.
-
-    ______________________________________________________________________________________
-    
-    <figure markdown="span">  
-        ![Proposal ESI](/assets/images/proposal_esi.png){ width="450"}
-        <figcaption>**Proposal ESI (viewed from the user's perspective)**</figcaption>
-    </figure>
-
 ??? info "PDF templates" 
 
     [**PDF templates**](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
@@ -55,10 +31,40 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
 
     <figure markdown="span">  
-        ![PDF Template](/assets/images/pdf_template.png){ width="450"}
+        ![PDF Template](../../assets/images/pdf_template.png){ width="450"}
         <figcaption>**PDF template**</figcaption>
     </figure>
     
+
+??? info "Proposal templates" 
+
+    [**Proposal templates**](templates/2proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
+
+    User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+
+    ______________________________________________________________________________________
+    <figure markdown="span">  
+        ![Proposal](../../assets/images/proposal_template.png){ width="450"}
+        <figcaption>**Proposal (viewed from the user's perspective)**</figcaption>
+    </figure>
+
+??? info "Sample declaration templates" 
+
+    [**Sample declaration templates**](templates/sampledec_template.md) 
+    ______________________________________________________________________________________
+    <figure markdown="span">  
+        ![Proposal](../../assets/images/placeholder.png){ width="450"}
+        <figcaption>**Sample declaration**</figcaption>
+    </figure>
+
+??? info "Sub templates" 
+
+    [**Sub templates**](templates/sub_template.md) 
+    ______________________________________________________________________________________
+    <figure markdown="span">  
+        ![Proposal](../../assets/images/create_sub_template.png){ width="450"}
+        <figcaption>**Sub template**</figcaption>
+    </figure>
 
 ??? info "Shipment declaration templates" 
 
@@ -66,19 +72,44 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Shipment Declaration](/assets/images/declare_shipment.png){ width="450"}
+        ![Shipment Declaration](../../assets/images/shipment_declaration.png){ width="450"}
         <figcaption>**Shipment declaration (viewed from the user's perspective)**</figcaption>
     </figure>
 
 ??? info "Visit registration templates" 
 
     [**Visit registration templates**](templates/visit_template.md) allow users to fill out a questionnaire to provide information about their visit registration.
+
+    Note: Visit registration templates become accessible to users to fill out after their experiment has been allocated a time within the scheduled and the status has been set to 'Accepted'
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Visit Registration templates](/assets/images/placeholder.png){ width="450"}
+        ![Visit Registration templates](../../assets/images/define_visit.png){ width="450"}
         <figcaption>**Visit reigstration (viewed from the user's perspective)**</figcaption>
     </figure>
+
+??? info "Proposal ESI templates" 
+
+    [**Proposal Experiment Safety Input (ESI)**](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise Proposal ESI templates.
+
+    Note: Proposal ESI templates become accessible to users to fill out after their experiment has been allocated a time within the scheduled and the status has been set to 'Accepted' 
+    ______________________________________________________________________________________
+    
+    <figure markdown="span">  
+        ![Proposal ESI](../../assets/images/proposal_esi.png){ width="450"}
+        <figcaption>**Proposal ESI (viewed from the user's perspective)**</figcaption>
+    </figure>
+
+??? info "Sample ESI templates" 
+
+    [**Sample Experiment Safety Input (ESI)**](templates/sampleESI_template.md) 
+    ______________________________________________________________________________________
+    
+    <figure markdown="span">  
+        ![Proposal ESI](../../assets/images/placeholder.png){ width="450"}
+        <figcaption>**Proposal ESI (viewed from the user's perspective)**</figcaption>
+    </figure>
+
 
 ??? info "Feedback templates" 
 
@@ -86,9 +117,10 @@ There are several different types of templates utilised within Calls:
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Feedback templates](/assets/images/placeholder.png){ width="450"}
+        ![Feedback templates](../../assets/images/placeholder.png){ width="450"}
         <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
     </figure>
+
 
 ### **How do I use templates within a call?**
 When it comes to utilising templates within a call there are various options:
@@ -117,15 +149,21 @@ For further information on editing templates for calls, see the specific templat
 
 Lastly, you may also create templates to fully customise them to fit the research needs: 
 
-* [**How do I create Proposal templates?**](templates/proposal_template.md)
-
-* [**How do I create Proposal ESI templates?**](templates/proposalESI_template.md)
-
 * [**How do I create PDF templates?**](templates/pdf_template.md)
 
-* [**How do I create Shipment declaration templates?**](templates/shipment_template.md)
+* [**How do I create proposal templates?**](templates/proposal_template.md)
 
-* [**How do I create Visit registration templates?**](templates/visit_template.md)
+* [**How do I create sample declaration templates?**](templates/sampledec_template.md)
+
+* [**How do I create sub templates?**](templates/sub_template.md)
+
+* [**How do I create shipment declaration templates?**](templates/shipment_template.md)
+
+* [**How do I create visit registration templates?**](templates/visit_template.md)
+
+* [**How do I create proposal ESI templates?**](templates/proposalESI_template.md)
+
+* [**How do I create sample ESI templates?**](templates/sampleESI_template.md)
 
 * [**How do I create Feedback templates?**](templates/feedback_template.md)
 
@@ -151,7 +189,7 @@ To utilise a pre-existing FAP within a call, simply select it from the 'Call FAP
 
 **2. Create FAPs**
 
-You may also create new FAPs if they have not yet been defined within the UOS system.
+You may also create new FAPs if they have not yet been defined within the User Office System.
 
 * [**How do I create FAPs?**](fap.md)
 
@@ -192,7 +230,7 @@ You can navigate between the sections by clicking on the headings or next and ba
 
     This is the section where you specify the general information about the call, including:
 
-    ![General](/assets/images/general_1.png){ align=left width="350"}
+    ![General](../../assets/images/general_1.png){ align=left width="350"}
 
     * **Short code (public):** The call short code which will be publicly displayed 
 
@@ -219,7 +257,7 @@ You can navigate between the sections by clicking on the headings or next and ba
 
     In this section you can specify the review process:
 
-    ![Reviews](/assets/images/reviews_1.png){ align=left width="350"}
+    ![Reviews](../../assets/images/reviews_1.png){ align=left width="350"}
 
     * **Sart of review:** Start date of the feasibility review
 
@@ -238,7 +276,7 @@ You can navigate between the sections by clicking on the headings or next and ba
 
     Finally, this section allows you to specify information regarding notifications and cycle:
 
-    ![Notification and cycle](/assets/images/notification_1.png){ align=left width="350"}
+    ![Notification and cycle](../../assets/images/notification_1.png){ align=left width="350"}
 
     * **Start of notification period:** The start of the period in which emails are sent to users regarding the result of their proposal
 
