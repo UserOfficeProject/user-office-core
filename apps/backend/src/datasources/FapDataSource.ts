@@ -39,7 +39,8 @@ export interface FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean | null,
-    active: boolean
+    active: boolean,
+    files: string | null
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;
