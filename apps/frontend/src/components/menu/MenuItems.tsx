@@ -1,4 +1,4 @@
-import { Science } from '@mui/icons-material';
+import { History, Science } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -277,6 +277,14 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
             <CalendarToday />
           </ListItemIcon>
           <ListItemText primary="Calls" />
+        </ListItemButton>
+      </Tooltip>
+      <Tooltip title="Status Actions Logs">
+        <ListItemButton component={NavLink} to="/StatusActionsLogs">
+          <ListItemIcon>
+            <History />
+          </ListItemIcon>
+          <ListItemText primary="Status Actions Logs" />
         </ListItemButton>
       </Tooltip>
       {isUserManagementEnabled && (

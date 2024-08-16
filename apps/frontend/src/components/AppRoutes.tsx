@@ -12,6 +12,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
+import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
 
@@ -226,6 +227,17 @@ const AppRoutes = () => {
           <Route
             path="/Calls"
             element={<TitledRoute title="Calls" element={<CallPage />} />}
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/StatusActionsLogs"
+            element={
+              <TitledRoute
+                title="StatusActionsLogs"
+                element={<StatusActionsLogsPage />}
+              />
+            }
           />
         )}
         <Route
