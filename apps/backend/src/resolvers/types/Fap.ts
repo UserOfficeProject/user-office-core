@@ -65,26 +65,6 @@ export class FapResolvers {
   }
 
   @FieldResolver(() => [FapProposalCount])
-  async fapChairsProposalCounts(
-    @Root() fap: Fap,
-    @Ctx() context: ResolverContext
-  ) {
-    if (!fap.fapChairUserIds) {
-      return [];
-    }
-
-    return fap.fapChairUserIds.map((fapChairUserId) => {
-      return {
-        userId: fapChairUserId,
-        count:
-          context.queries.fap.dataSource.getFapReviewerProposalCount(
-            fapChairUserId
-          ),
-      };
-    });
-  }
-
-  @FieldResolver(() => [FapProposalCount])
   async fapChairsCurrentProposalCounts(
     @Root() fap: Fap,
     @Ctx() context: ResolverContext
@@ -113,26 +93,6 @@ export class FapResolvers {
     return fap.fapSecretariesUserIds.map((fapSecretariesUserId) =>
       context.queries.user.getBasic(context.user, fapSecretariesUserId)
     );
-  }
-
-  @FieldResolver(() => [FapProposalCount])
-  async fapSecretariesProposalCounts(
-    @Root() fap: Fap,
-    @Ctx() context: ResolverContext
-  ) {
-    if (!fap.fapSecretariesUserIds) {
-      return [];
-    }
-
-    return fap.fapSecretariesUserIds.map((fapSecretariesUserId) => {
-      return {
-        userId: fapSecretariesUserId,
-        count:
-          context.queries.fap.dataSource.getFapReviewerProposalCount(
-            fapSecretariesUserId
-          ),
-      };
-    });
   }
 
   @FieldResolver(() => [FapProposalCount])
