@@ -3,10 +3,12 @@ import {
   ReviewerFilter,
   TechnicalReviewStatus,
   FeatureId,
+  SettingsId,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
   cy.get('[data-cy="status-filter"]').click();
@@ -44,7 +46,13 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
-    cy.addFeasibilityReviewToDefaultWorkflow();
+    if (
+      settings
+        .getEnabledSettings()
+        .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !== 'FEASIBILITY'
+    ) {
+      cy.addFeasibilityReviewToDefaultWorkflow();
+    }
   });
 
   // TODO: Maybe this should be moved to permission testing.

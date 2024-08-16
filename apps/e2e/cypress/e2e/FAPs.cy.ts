@@ -186,13 +186,20 @@ function createWorkflowAndEsiTemplate() {
     const workflow = result.createProposalWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
-      cy.addProposalWorkflowStatus({
-        droppableGroupId: 'proposalWorkflowConnections_0',
-        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-        proposalWorkflowId: createdWorkflowId,
-        sortOrder: 1,
-        prevProposalStatusId: 1,
-      });
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_0',
+          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 1,
+          prevProposalStatusId: 1,
+        });
+      }
 
       cy.createTemplate({
         name: 'default esi template',
