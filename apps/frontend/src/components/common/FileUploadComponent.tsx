@@ -301,7 +301,11 @@ export function NewFileEntry(props: {
             multiple={false}
             onChange={onFileSelected}
           />
-          <Button variant="outlined" component="span">
+          <Button
+            variant="outlined"
+            component="span"
+            data-cy="attach-file-button"
+          >
             <AddCircleOutlineIcon
               sx={{
                 marginRight: theme.spacing(1),
@@ -358,6 +362,7 @@ export function FileUploadComponent(props: {
   omitFromPdf: boolean;
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
+  deleteAllOption?: boolean;
 }) {
   const fileIds = props.value.map((fileItem) => fileItem.id);
   const { files, setFiles } = useFilesMetadata({ fileIds });
@@ -388,6 +393,11 @@ export function FileUploadComponent(props: {
         )?.caption,
       }))
     );
+  };
+
+  const onDeleteAllClicked = () => {
+    setFiles([]);
+    props.onChange([]);
   };
 
   const onImageCaptionOrFigureAdded = ({
@@ -470,7 +480,18 @@ export function FileUploadComponent(props: {
               </ListItem>
             );
           })}
-        <ListItem key="addNew">{newFileEntry}</ListItem>
+        <ListItem key="addNew">
+          {newFileEntry}
+          {props.deleteAllOption && (
+            <Button
+              sx={{ marginLeft: '10px' }}
+              data-cy="delete-all"
+              onClick={() => onDeleteAllClicked()}
+            >
+              Remove All
+            </Button>
+          )}
+        </ListItem>
       </List>
     </>
   );

@@ -717,4 +717,192 @@ context('General facility access panel tests', () => {
       cy.contains(fap2.code).should('not.exist');
     });
   });
+
+  describe.only('Fap document store tests', () => {
+    it('Officer should be able to upload documents to the document store', () => {
+      const fileName1 = 'pdf_5_pages.pdf';
+      const fileName2 = 'pdf_3_pages.pdf';
+      cy.login('officer');
+      cy.visit(`/FapPage/1?tab=5`);
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('[data-cy="attach-file-button"]').click();
+
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName1}`,
+          fileName: fileName1,
+        },
+        { force: true }
+      );
+
+      cy.contains(fileName1).should('exist');
+
+      cy.get('[data-cy="attach-file-button"]').click();
+
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName2}`,
+          fileName: fileName2,
+        },
+        { force: true }
+      );
+
+      cy.contains(fileName1).should('exist');
+      cy.contains(fileName2).should('exist');
+
+      // Files persist after reload
+      cy.visit(`/FapPage/1?tab=5`);
+
+      cy.contains(fileName1).should('exist');
+      cy.contains(fileName2).should('exist');
+
+      cy.get('[data-cy="delete-all"]').click();
+
+      cy.contains(fileName1).should('not.exist');
+      cy.contains(fileName2).should('not.exist');
+
+      // Files removed after reload
+      cy.visit(`/FapPage/1?tab=5`);
+
+      cy.contains(fileName1).should('not.exist');
+      cy.contains(fileName2).should('not.exist');
+    });
+
+    it('Fap Secretary should be able to see uploaded documents', () => {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: fapMembers.secretary.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+      }
+
+      cy.assignChairOrSecretary({
+        assignChairOrSecretaryToFapInput: {
+          fapId: 1,
+          userId: fapMembers.secretary.id,
+          roleId: UserRole.FAP_SECRETARY,
+        },
+      });
+
+      const fileName1 = 'pdf_5_pages.pdf';
+
+      cy.login('officer');
+      cy.visit(`/FapPage/1?tab=5`);
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('[data-cy="attach-file-button"]').click();
+
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName1}`,
+          fileName: fileName1,
+        },
+        { force: true }
+      );
+
+      cy.login(fapMembers.secretary);
+      cy.changeActiveRole(initialDBData.roles.fapSecretary);
+
+      cy.visit(`/FapPage/1?tab=2`);
+
+      cy.contains('Documents - Upload').should('not.exist');
+      cy.contains(fileName1).should('exist');
+    });
+
+    it('Fap Chair should be able to see uploaded documents', () => {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: fapMembers.chair.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+      }
+
+      cy.assignChairOrSecretary({
+        assignChairOrSecretaryToFapInput: {
+          fapId: 1,
+          userId: fapMembers.chair.id,
+          roleId: UserRole.FAP_CHAIR,
+        },
+      });
+
+      const fileName1 = 'pdf_5_pages.pdf';
+
+      cy.login('officer');
+      cy.visit(`/FapPage/1?tab=5`);
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('[data-cy="attach-file-button"]').click();
+
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName1}`,
+          fileName: fileName1,
+        },
+        { force: true }
+      );
+
+      cy.login(fapMembers.chair);
+      cy.changeActiveRole(initialDBData.roles.fapChair);
+
+      cy.visit(`/FapPage/1?tab=2`);
+
+      cy.contains('Documents - Upload').should('not.exist');
+      cy.contains(fileName1).should('exist');
+    });
+
+    it('Fap Reviewer should be able to see uploaded documents', () => {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: fapMembers.reviewer.id,
+          roles: [initialDBData.roles.user, initialDBData.roles.fapReviewer],
+        });
+      }
+
+      cy.assignReviewersToFap({
+        fapId: 1,
+        memberIds: [fapMembers.reviewer.id],
+      });
+
+      const fileName1 = 'pdf_5_pages.pdf';
+
+      cy.login('officer');
+      cy.visit(`/FapPage/1?tab=5`);
+
+      cy.intercept({
+        method: 'POST',
+        url: '/files/upload',
+      }).as('upload');
+
+      cy.get('[data-cy="attach-file-button"]').click();
+
+      cy.get('input[type="file"]').selectFile(
+        {
+          contents: `cypress/fixtures/${fileName1}`,
+          fileName: fileName1,
+        },
+        { force: true }
+      );
+
+      cy.login(fapMembers.reviewer);
+      cy.changeActiveRole(initialDBData.roles.fapReviewer);
+
+      cy.visit(`/FapPage/1?tab=1`);
+
+      cy.contains('Documents - Upload').should('not.exist');
+      cy.contains(fileName1).should('exist');
+    });
+  });
 });
