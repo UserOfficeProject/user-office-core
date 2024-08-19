@@ -663,7 +663,7 @@ context('Fap reviews tests', () => {
         .contains(fapMembers.reviewer2.lastName)
         .should('have.length', 1);
 
-      cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
@@ -2562,7 +2562,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('@rows').should('not.contain.text', fapMembers.reviewer.lastName);
 
-      cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
@@ -2595,7 +2595,7 @@ context('Fap meeting components tests', () => {
 
       cy.closeNotification();
 
-      cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
