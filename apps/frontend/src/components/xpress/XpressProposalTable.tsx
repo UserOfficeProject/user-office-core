@@ -36,6 +36,8 @@ const XpressProposalTable = () => {
     instrument: NumberParam,
     technique: NumberParam,
     proposalId: StringParam,
+    to: StringParam,
+    from: StringParam,
   });
 
   type QueryParameters = {
@@ -67,6 +69,10 @@ const XpressProposalTable = () => {
       techniqueId: urlQueryParams.technique ? +urlQueryParams.technique : null,
       showAllProposals: !urlQueryParams.technique,
       showMultiTechniqueProposals: false,
+    },
+    dateFilter: {
+      to: urlQueryParams.to ? +urlQueryParams.to : null,
+      from: urlQueryParams.from ? +urlQueryParams.from : null,
     },
     referenceNumbers: urlQueryParams.proposalId
       ? [urlQueryParams.proposalId]
@@ -105,6 +111,7 @@ const XpressProposalTable = () => {
       instrumentFilter: proposalFilter.instrumentFilter,
       callId: proposalFilter.callId,
       referenceNumbers: proposalFilter.referenceNumbers,
+      dateFilter: proposalFilter.dateFilter,
     });
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
