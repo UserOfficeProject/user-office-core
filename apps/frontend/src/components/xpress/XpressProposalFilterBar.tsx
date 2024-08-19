@@ -1,9 +1,11 @@
 import Grid from '@mui/material/Grid';
+import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { QueryParamConfig } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
+import DateFilter from 'components/common/proposalFilters/DateFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import TechniqueFilter from 'components/common/proposalFilters/TechniqueFilter';
 import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
@@ -93,6 +95,27 @@ const XpressProposalFilterBar = ({
             });
           }}
         />
+      </Grid>
+
+      <Grid item sm={3} xs={12}>
+        <Grid item xs={12}>
+          <DateFilter
+            from={filter.dateFilter?.from}
+            to={filter.dateFilter?.to}
+            onChange={(format: string, from?: Date, to?: Date) => {
+              setProposalFilter({
+                ...filter,
+                dateFilter: {
+                  from: from
+                    ? DateTime.fromJSDate(from).toFormat(format)
+                    : undefined,
+                  to: to ? DateTime.fromJSDate(to).toFormat(format) : undefined,
+                },
+              });
+            }}
+            data-cy="date-filter"
+          />
+        </Grid>
       </Grid>
     </Grid>
   );

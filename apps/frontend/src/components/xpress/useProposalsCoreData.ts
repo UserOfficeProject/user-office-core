@@ -31,6 +31,7 @@ export function useProposalsCoreData(
     proposalStatusId,
     text,
     referenceNumbers,
+    dateFilter,
   } = filter;
 
   const fetchProposalsData = useCallback(
@@ -46,6 +47,7 @@ export function useProposalsCoreData(
             proposalStatusId,
             text,
             referenceNumbers,
+            dateFilter,
           },
           ...queryParameters,
         })
@@ -87,6 +89,7 @@ export function useProposalsCoreData(
       referenceNumbers,
       api,
       queryParameters,
+      dateFilter,
     ]
   );
 
