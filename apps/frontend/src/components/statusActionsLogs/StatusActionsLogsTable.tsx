@@ -34,7 +34,9 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { api } = useDataApiWithFeedback();
   const theme = useTheme();
 
-  const ReplayIcon = (): JSX.Element => <Replay />;
+  const ReplayIcon = (): JSX.Element => (
+    <Replay data-cy="replay_status_action_icon" />
+  );
   const RefreshIcon = (): JSX.Element => <Refresh />;
   const [selectedStatusActionsLog, setStatusActionsLog] =
     useState<StatusActionsLog | null>(null);
