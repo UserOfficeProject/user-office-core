@@ -483,7 +483,7 @@ context('Fap reviews tests', () => {
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('4564654');
 
-      cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
