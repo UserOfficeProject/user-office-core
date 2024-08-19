@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Call } from '../../models/Call';
@@ -12,7 +13,9 @@ import database from '../postgres/database';
 import {
   CallRecord,
   createCallObject,
+  createProposalObject,
   createProposalViewObject,
+  ProposalRecord,
   ProposalViewRecord,
 } from '../postgres/records';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -365,5 +368,24 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       });
 
     return result;
+  }
+
+  async updateSubmittedDate(proposalPk: number): Promise<Proposal> {
+    return database
+      .update(
+        {
+          submitted_date: new Date(),
+        },
+        ['*']
+      )
+      .from('proposals')
+      .where('proposal_pk', proposalPk)
+      .then((records: ProposalRecord[]) => {
+        if (records === undefined || !records.length) {
+          throw new GraphQLError(`Proposal not found ${proposalPk}`);
+        }
+
+        return createProposalObject(records[0]);
+      });
   }
 }

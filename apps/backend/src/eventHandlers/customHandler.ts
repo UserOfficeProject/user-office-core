@@ -385,6 +385,13 @@ export default function createCustomHandler() {
         }
 
         break;
+      case Event.PROPOSAL_SUBMITTED:
+        if (event.proposal.primaryKey) {
+          await proposalDataSource.updateSubmittedDate(
+            event.proposal.primaryKey
+          );
+        }
+        break;
     }
   };
 }
