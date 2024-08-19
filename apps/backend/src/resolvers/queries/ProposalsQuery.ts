@@ -56,6 +56,15 @@ export class TechniqueFilterInput {
 }
 
 @InputType()
+export class DateFilterInput {
+  @Field(() => Date, { nullable: true })
+  public to: number;
+
+  @Field(() => Date, { nullable: true })
+  public from: number;
+}
+
+@InputType()
 export class ProposalsFilter {
   @Field(() => String, { nullable: true })
   public text?: string;
@@ -95,6 +104,9 @@ export class ProposalsFilter {
 
   @Field(() => TechniqueFilterInput, { nullable: true })
   public techniqueFilter?: TechniqueFilterInput;
+
+  @Field(() => DateFilterInput, { nullable: true })
+  public dateFilter?: DateFilterInput;
 }
 
 @ArgsType()
