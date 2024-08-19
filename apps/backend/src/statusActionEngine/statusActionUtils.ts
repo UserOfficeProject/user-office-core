@@ -347,6 +347,8 @@ export const statusActionLogger = (args: {
 
     if (statusActionsLogsArgs.statusActionsLogId) {
       await statusActionsLogsDataSource.update(statusActionsLogsArgs);
+
+      return;
     }
 
     await statusActionsLogsDataSource.create(statusActionsLogsArgs);

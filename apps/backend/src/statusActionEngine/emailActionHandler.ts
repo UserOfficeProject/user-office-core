@@ -88,6 +88,7 @@ export const emailStatusActionRecipients = async (
   statusActionsBy?: number | null,
   statusActionRecipients?: EmailStatusActionRecipients
 ) => {
+  const proposalPks = proposals.map((proposal) => proposal.primaryKey);
   switch (statusActionRecipients || recipientWithTemplate.recipient.name) {
     case EmailStatusActionRecipients.PI: {
       const PIs = await getPIAndFormatOutputForEmailSending(
@@ -95,7 +96,7 @@ export const emailStatusActionRecipients = async (
         recipientWithTemplate
       );
 
-      sendMail(
+      await sendMail(
         PIs,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
@@ -103,7 +104,7 @@ export const emailStatusActionRecipients = async (
           statusActionsBy,
           statusActionsLogId,
           statusActionsStep: EmailStatusActionRecipients.PI,
-          proposalPks: proposals.map((proposal) => proposal.primaryKey),
+          proposalPks,
         }),
         !!statusActionsLogId,
         statusActionsBy
@@ -117,7 +118,7 @@ export const emailStatusActionRecipients = async (
         proposals,
         recipientWithTemplate
       );
-      sendMail(
+      await sendMail(
         CPs,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
@@ -125,7 +126,7 @@ export const emailStatusActionRecipients = async (
           statusActionsBy,
           statusActionsLogId,
           statusActionsStep: EmailStatusActionRecipients.CO_PROPOSERS,
-          proposalPks: proposals.map((proposal) => proposal.primaryKey),
+          proposalPks,
         }),
         !!statusActionsLogId,
         statusActionsBy
@@ -140,7 +141,7 @@ export const emailStatusActionRecipients = async (
         recipientWithTemplate
       );
 
-      sendMail(
+      await sendMail(
         ISs,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
@@ -148,7 +149,7 @@ export const emailStatusActionRecipients = async (
           statusActionsBy,
           statusActionsLogId,
           statusActionsStep: EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
-          proposalPks: proposals.map((proposal) => proposal.primaryKey),
+          proposalPks,
         }),
         !!statusActionsLogId,
         statusActionsBy
@@ -163,7 +164,7 @@ export const emailStatusActionRecipients = async (
         recipientWithTemplate
       );
 
-      sendMail(
+      await sendMail(
         FRs,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
@@ -171,7 +172,7 @@ export const emailStatusActionRecipients = async (
           statusActionsBy,
           statusActionsLogId,
           statusActionsStep: EmailStatusActionRecipients.FAP_REVIEWERS,
-          proposalPks: proposals.map((proposal) => proposal.primaryKey),
+          proposalPks,
         }),
         !!statusActionsLogId,
         statusActionsBy
@@ -186,7 +187,7 @@ export const emailStatusActionRecipients = async (
         recipientWithTemplate
       );
 
-      sendMail(
+      await sendMail(
         FCSs,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
@@ -195,7 +196,7 @@ export const emailStatusActionRecipients = async (
           statusActionsLogId,
           statusActionsStep:
             EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
-          proposalPks: proposals.map((proposal) => proposal.primaryKey),
+          proposalPks,
         }),
         !!statusActionsLogId,
         statusActionsBy
@@ -261,7 +262,7 @@ export const emailStatusActionRecipients = async (
         uoRecipient = await Promise.all(recipientPromises);
       }
 
-      sendMail(
+      await sendMail(
         uoRecipient,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
@@ -269,7 +270,7 @@ export const emailStatusActionRecipients = async (
           statusActionsBy,
           statusActionsLogId,
           statusActionsStep: EmailStatusActionRecipients.USER_OFFICE,
-          proposalPks: proposals.map((proposal) => proposal.primaryKey),
+          proposalPks,
         }),
         !!statusActionsLogId,
         statusActionsBy
@@ -280,6 +281,10 @@ export const emailStatusActionRecipients = async (
 
     case EmailStatusActionRecipients.OTHER: {
       if (!recipientWithTemplate.otherRecipientEmails?.length) {
+        logger.logError(
+          `Could not execute status action email because no ${EmailStatusActionRecipients.OTHER} recipience set on proposals`,
+          { ...proposalPks }
+        );
         break;
       }
 
@@ -291,14 +296,14 @@ export const emailStatusActionRecipients = async (
           template: recipientWithTemplate.emailTemplate.id,
         }));
 
-      sendMail(
+      await sendMail(
         otherRecipients,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
           statusActionsStep: EmailStatusActionRecipients.OTHER,
-          proposalPks: proposals.map((proposal) => proposal.primaryKey),
+          proposalPks,
           statusActionsLogId,
         }),
         !!statusActionsLogId,
@@ -329,58 +334,65 @@ const sendMail = async (
   const failMessage = isStatusActionReplay
     ? 'Email(s) could not be sent on status action replay'
     : 'Email(s) could not be sent';
-
-  await Promise.all(
-    recipientsWithData.map((recipientWithData) => {
-      return mailService
-        .sendMail({
-          content: {
-            template_id: recipientWithData.template,
-          },
-          substitution_data: {
-            proposals: recipientWithData.proposals,
-            pi: recipientWithData.pi,
-            coProposers: recipientWithData.coProposers,
-            instruments: recipientWithData.instruments,
-            firstName: recipientWithData.firstName,
-            lastName: recipientWithData.lastName,
-            preferredName: recipientWithData.preferredName,
-          },
-          recipients: [{ address: recipientWithData.email }],
-        })
-        .then(async (res) => {
+  try {
+    const mailServiceResponse = await Promise.all(
+      recipientsWithData.map(async (recipientWithData) => {
+        try {
+          const res = await mailService.sendMail({
+            content: {
+              template_id: recipientWithData.template,
+            },
+            substitution_data: {
+              proposals: recipientWithData.proposals,
+              pi: recipientWithData.pi,
+              coProposers: recipientWithData.coProposers,
+              instruments: recipientWithData.instruments,
+              firstName: recipientWithData.firstName,
+              lastName: recipientWithData.lastName,
+              preferredName: recipientWithData.preferredName,
+            },
+            recipients: [{ address: recipientWithData.email }],
+          });
           logger.logInfo('Email sent:', {
             result: res,
           });
 
           await publishMessageToTheEventBus(
             recipientWithData.proposals,
-            `${successfulMessage} to ${recipientWithData.email}`,
+            `${successfulMessage} ${recipientWithData.id} to ${recipientWithData.email}`,
             undefined,
             statusActionsBy || undefined
           );
 
           return res;
-        })
-        .catch(async (err) => {
+        } catch (err) {
           logger.logError('Could not send email', {
             error: err,
           });
 
           await publishMessageToTheEventBus(
             recipientWithData.proposals,
-            `${failMessage} to ${recipientWithData.email}`,
+            `${failMessage} ${recipientWithData.id} to ${recipientWithData.email}`,
             undefined,
             statusActionsBy || undefined
           );
           throw err;
-        });
-    })
-  )
-    .then(async () => {
+        }
+      })
+    );
+    if (
+      !!mailServiceResponse.length &&
+      mailServiceResponse[0].results.total_rejected_recipients === 0
+    ) {
       await statusActionLogger(true, successfulMessage);
-    })
-    .catch(async () => {
-      await statusActionLogger(false, failMessage);
+
+      return;
+    }
+    await statusActionLogger(false, failMessage);
+  } catch (err) {
+    logger.logInfo('Status action email(s) not sent:', {
+      err,
     });
+    await statusActionLogger(false, failMessage);
+  }
 };
