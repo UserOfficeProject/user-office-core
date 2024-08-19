@@ -555,7 +555,7 @@ context('Status actions tests', () => {
 
     cy.finishedLoading();
 
-    cy.get('[role="tab"]').contains('Logs').click();
+    cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
 
     cy.finishedLoading();
 

@@ -92,7 +92,7 @@ context('Event log tests', () => {
 
       cy.get("[name='firstname']").should('have.value', newFirstName);
 
-      cy.contains('Logs').click();
+      cy.get('[role="dialog"] [role="tab"]').contains('Logs').click();
 
       cy.get('[data-cy="event-logs-table"]').as('eventLogsTable');
       cy.get('@eventLogsTable')
