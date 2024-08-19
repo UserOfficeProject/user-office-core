@@ -8,6 +8,8 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
+import { ProposalWorkflow } from '../models/ProposalWorkflow';
+import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { statusActionEngine } from '../statusActionEngine';
 
@@ -55,6 +57,67 @@ const shouldMoveToNextStatus = (
   );
 
   return allNextStatusRulesFulfilled;
+};
+
+const checkIfConditionsForNextStatusAreMet = async ({
+  nextWorkflowConnections,
+  proposalWorkflow,
+  proposalSettingsDataSource,
+  proposalWithEvents,
+}: {
+  nextWorkflowConnections: ProposalWorkflowConnection[];
+  proposalWorkflow: ProposalWorkflow;
+  proposalSettingsDataSource: ProposalSettingsDataSource;
+  proposalWithEvents: {
+    proposalPk: number;
+    proposalEvents?: ProposalEventsRecord;
+    currentEvent: Event;
+  };
+}) => {
+  for (const nextWorkflowConnection of nextWorkflowConnections) {
+    if (!nextWorkflowConnection.nextProposalStatusId) {
+      continue;
+    }
+
+    const nextNextWorkflowConnections =
+      await getProposalWorkflowConnectionByStatusId(
+        proposalWorkflow.id,
+        nextWorkflowConnection.nextProposalStatusId
+      );
+    const newStatusChangingEvents =
+      await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
+        nextNextWorkflowConnections.map((connection) => connection.id)
+      );
+
+    if (!proposalWithEvents.proposalEvents) {
+      return;
+    }
+
+    for (const sce of newStatusChangingEvents) {
+      const proposalEventsKeys = Object.keys(
+        proposalWithEvents.proposalEvents!
+      );
+      const allProposalCompleteEvents = proposalEventsKeys.filter(
+        (proposalEventsKey) =>
+          proposalWithEvents.proposalEvents![
+            proposalEventsKey as keyof ProposalEventsRecord
+          ]
+      );
+
+      const nextStatusRulesFulfilled = allProposalCompleteEvents.includes(
+        sce.statusChangingEvent.toLowerCase()
+      );
+
+      if (sce.statusChangingEvent && nextStatusRulesFulfilled)
+        await workflowEngine([
+          {
+            currentEvent: sce.statusChangingEvent as Event,
+            proposalEvents: proposalWithEvents.proposalEvents,
+            proposalPk: proposalWithEvents.proposalPk,
+          },
+        ]);
+    }
+  }
 };
 
 export type WorkflowEngineProposalType = Proposal & {
@@ -181,6 +244,13 @@ export const workflowEngine = async (
                 );
 
               if (updatedProposal) {
+                await checkIfConditionsForNextStatusAreMet({
+                  nextWorkflowConnections,
+                  proposalWorkflow,
+                  proposalSettingsDataSource,
+                  proposalWithEvents,
+                });
+
                 return {
                   ...updatedProposal,
                   workflowId: proposalWorkflow.id,
