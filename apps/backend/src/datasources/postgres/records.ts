@@ -1332,3 +1332,8 @@ export interface TechniqueHasInstrumentsRecord {
   readonly technique_id: number;
   readonly instrument_id: number;
 }
+
+export interface TechniqueHasProposalsRecord {
+  readonly technique_id: number;
+  readonly proposal_id: number;
+}

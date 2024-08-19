@@ -30,5 +30,3 @@ export const techniquePickerDefinition: QuestionaryComponentDefinition = {
   getYupInitialValue: ({ answer }) => answer.value || null,
   searchCriteriaComponent: TechniquePickerSearchCriteriaComponent,
 };
-
-export {};

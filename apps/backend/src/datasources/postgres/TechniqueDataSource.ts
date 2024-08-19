@@ -10,6 +10,7 @@ import {
   CountryRecord,
   InstitutionRecord,
   InstrumentRecord,
+  TechniqueHasProposalsRecord,
   TechniqueRecord,
   UserRecord,
   createBasicUserObject,
@@ -228,15 +229,19 @@ export default class PostgresTechniqueDataSource
     proposalPk: number,
     techniqueIds: number[]
   ): Promise<boolean> {
-    const dataToInsert = techniqueIds.map((techniqueId) => ({
-      technique_id: techniqueId,
-      proposal_id: proposalPk,
-    }));
+    const dataToInsert = techniqueIds
+      .filter((techId) => {
+        !this.checkIfProposalIsAssignedToTechnique(techId, proposalPk);
+      })
+      .map((techniqueId) => ({
+        technique_id: techniqueId,
+        proposal_id: proposalPk,
+      }));
 
     try {
-      const result = await database('technique_has_proposals').insert(
-        dataToInsert
-      );
+      const [result] = await database('technique_has_proposals')
+        .insert(dataToInsert)
+        .returning('*');
 
       if (result) {
         return true;
@@ -248,6 +253,19 @@ export default class PostgresTechniqueDataSource
     } catch (error) {
       throw new Error(`Error assigning proposal to technique: ${error}`);
     }
+  }
+
+  async checkIfProposalIsAssignedToTechnique(
+    techId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    return database
+      .select()
+      .from('technique_has_proposals')
+      .where('technique_id', techId)
+      .andWhere('proposal_id', proposalPk)
+      .first()
+      .then((result: TechniqueHasProposalsRecord) => (result ? true : false));
   }
 
   async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {
