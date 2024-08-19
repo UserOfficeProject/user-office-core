@@ -359,7 +359,7 @@ const sendMail = async (
 
           await publishMessageToTheEventBus(
             recipientWithData.proposals,
-            `${successfulMessage} ${recipientWithData.id} to ${recipientWithData.email}`,
+            `${successfulMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
             undefined,
             statusActionsBy || undefined
           );
@@ -372,7 +372,7 @@ const sendMail = async (
 
           await publishMessageToTheEventBus(
             recipientWithData.proposals,
-            `${failMessage} ${recipientWithData.id} to ${recipientWithData.email}`,
+            `${failMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
             undefined,
             statusActionsBy || undefined
           );
