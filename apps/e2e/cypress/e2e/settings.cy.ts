@@ -983,6 +983,85 @@ context('Settings tests', () => {
       cy.contains('FAP_REVIEW');
     });
 
+    it('Proposal status should update multiple times if conditions are met', () => {
+      addMultipleStatusesToProposalWorkflowWithChangingEvents();
+      cy.createInstrument(instrument1).then((result) => {
+        if (result.createInstrument) {
+          createdInstrumentId = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [
+              {
+                instrumentId: createdInstrumentId,
+                fapId: initialDBData.fap.id,
+              },
+            ],
+          });
+        }
+      });
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal;
+        if (proposal) {
+          cy.updateProposal({
+            proposalPk: proposal.primaryKey,
+            title: proposalTitle,
+            abstract: proposalAbstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[type="checkbox"]').first().check();
+
+      cy.get('[data-cy="assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]')
+        .contains('Loading...')
+        .should('not.exist');
+
+      cy.get('#selectedInstrumentIds-input').first().click();
+
+      cy.get('[data-cy="instrument-selection-options"] li')
+        .contains(instrument1.name)
+        .click();
+
+      cy.get('[data-cy="submit-assign-remove-instrument"]').click();
+
+      cy.get('[data-cy="proposals-instrument-assignment"]').should('not.exist');
+
+      cy.get('[data-cy="view-proposal"]').first().click();
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.get('[data-cy="timeAllocation"] input').clear().type('20');
+
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.get('[data-cy="technical-review-status-options"]')
+        .contains('Feasible')
+        .click();
+
+      cy.get('[data-cy="is-review-submitted"]').click();
+
+      cy.get('[data-cy="save-technical-review"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Technical review updated successfully',
+      });
+
+      cy.closeNotification();
+      cy.closeModal();
+
+      cy.should('not.contain', 'FAP_SELECTION');
+      cy.contains('FAP_REVIEW');
+    });
+
     it('Proposal status should update immediately after all Fap reviews submitted', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.FAP_REVIEW)) {
         this.skip();
@@ -1051,11 +1130,9 @@ context('Settings tests', () => {
         }
       });
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/Faps');
 
       cy.finishedLoading();
-
-      cy.contains('FAPs').click();
 
       cy.get("[aria-label='Edit']").first().click();
 
@@ -1397,6 +1474,14 @@ context('Settings tests', () => {
     });
 
     it('Feasibility Reviews should only be assigned if the Workflow contains a Feasibility Review Status', function () {
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        this.skip();
+      }
       createInstrumentAndAssignItToCall();
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
