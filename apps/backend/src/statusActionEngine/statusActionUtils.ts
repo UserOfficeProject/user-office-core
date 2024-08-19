@@ -333,7 +333,7 @@ export const statusActionLogger = (args: {
       Tokens.StatusActionsLogsDataSource
     );
 
-  return function (
+  return async function (
     statusActionsSuccessful: boolean,
     statusActionsMessage: string
   ) {
@@ -346,9 +346,9 @@ export const statusActionLogger = (args: {
     };
 
     if (statusActionsLogsArgs.statusActionsLogId) {
-      return statusActionsLogsDataSource.update(statusActionsLogsArgs);
+      await statusActionsLogsDataSource.update(statusActionsLogsArgs);
     }
 
-    return statusActionsLogsDataSource.create(statusActionsLogsArgs);
+    await statusActionsLogsDataSource.create(statusActionsLogsArgs);
   };
 };

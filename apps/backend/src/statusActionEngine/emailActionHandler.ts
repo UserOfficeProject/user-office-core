@@ -315,7 +315,10 @@ export const emailStatusActionRecipients = async (
 
 const sendMail = async (
   recipientsWithData: EmailReadyType[],
-  statusActionLogger: (actionSuccessful: boolean, message: string) => void,
+  statusActionLogger: (
+    actionSuccessful: boolean,
+    message: string
+  ) => Promise<void>,
   isStatusActionReplay: boolean,
   statusActionsBy?: number | null
 ) => {
@@ -327,9 +330,9 @@ const sendMail = async (
     ? 'Email(s) could not be sent on status action replay'
     : 'Email(s) could not be sent';
 
-  await Promise.allSettled(
-    recipientsWithData.map(async (recipientWithData) => {
-      return await mailService
+  await Promise.all(
+    recipientsWithData.map((recipientWithData) => {
+      return mailService
         .sendMail({
           content: {
             template_id: recipientWithData.template,
@@ -350,41 +353,34 @@ const sendMail = async (
             result: res,
           });
 
-          publishMessageToTheEventBus(
+          await publishMessageToTheEventBus(
             recipientWithData.proposals,
-            `${successfulMessage} to ${recipientWithData.id}`,
+            `${successfulMessage} to ${recipientWithData.email}`,
             undefined,
             statusActionsBy || undefined
           );
 
           return res;
         })
-        .catch((err) => {
+        .catch(async (err) => {
           logger.logError('Could not send email', {
             error: err,
           });
 
-          publishMessageToTheEventBus(
+          await publishMessageToTheEventBus(
             recipientWithData.proposals,
-            `${failMessage} to ${recipientWithData.id}`,
+            `${failMessage} to ${recipientWithData.email}`,
             undefined,
             statusActionsBy || undefined
           );
           throw err;
         });
     })
-  ).then((results) => {
-    const errors = results.filter((result) => result.status === 'rejected');
-    const fulfilled = results.filter((result) => result.status === 'fulfilled');
-
-    if (errors.length < 1 && fulfilled.length > 0) {
-      statusActionLogger(true, successfulMessage);
-
-      return results;
-    }
-
-    statusActionLogger(false, failMessage);
-
-    return results;
-  });
+  )
+    .then(async () => {
+      await statusActionLogger(true, successfulMessage);
+    })
+    .catch(async () => {
+      await statusActionLogger(false, failMessage);
+    });
 };
