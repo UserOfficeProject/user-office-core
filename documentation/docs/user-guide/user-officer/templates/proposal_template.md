@@ -16,14 +16,7 @@
 
 ??? info "What are question templates?"
 
-    **Question templates** are predefined questions that can be utilised within 
-    
-    * Proposal templates
-    * Proposal ESI templates
-    * Sample ESI templates
-    * Feedback templates
-    
-    Question templates are designed to streamline the template creation and ensure consistency across different submissions. Each question addresses a specific , allowing users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the question drawer. Question templates allow for standardisation across the different questionnaire types which is essential for data collection and analysis of users' responses.
+    **Question templates** are designed to streamline the template creation and ensure consistency across different submissions. Each question addresses a specific piece of information which users must provide in order to facilitate the research. Question templates allow users to provide detailed and structured responses regarding information about their research. User Officers can create various types of questions, which are stored in the the question drawer to be used across multiple templates. Question templates allow for standardisation across the different questionnaire types which is essential for data collection and analysis of users' responses.
 
 ??? info "What are sub templates?"
 
