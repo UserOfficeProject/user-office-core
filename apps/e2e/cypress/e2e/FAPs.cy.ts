@@ -871,7 +871,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-reviewers-table"]').contains('0');
     });
 
-    it('Should be able to see how many proposals are assigned to a chair/secretary', () => {
+    it('Should be able to see how many proposals are assigned to a chair and secretary', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
@@ -902,7 +902,7 @@ context('Fap reviews tests', () => {
         '0'
       );
 
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
