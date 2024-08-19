@@ -21,6 +21,7 @@ function IdleTimeoutPrompt(props: IdleTimeoutPromptProps): JSX.Element {
       data-cy="timeout-dialog"
       open={props.isIdle}
       title="Warning"
+      error
     >
       <DialogContent dividers>
         <DialogContentText>
