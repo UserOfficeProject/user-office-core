@@ -104,4 +104,5 @@ export interface ProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
+  updateSubmittedDate(proposalPk: number): Promise<Proposal>;
 }
