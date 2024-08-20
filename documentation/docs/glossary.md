@@ -1,10 +1,3 @@
-### Purpose
-
-Definitions of terms used in the documentation.
-
-### Contents
-
-Alphabetical list of terms and their definitions.
 
 # Glossary Links
 
@@ -13,50 +6,50 @@ Alphabetical list of terms and their definitions.
 
 
 ??? info "**A**"
-    * [Admin](placeholder.md)
-    * [API Access Tokens](placeholder.md)
-    * [App Settings](placeholder.md)
-    * [Archive](placeholder.md)
+    * [Admin](user-guide/user-officer/placeholder.md)
+    * [API Access Tokens](user-guide/user-officer/placeholder.md)
+    * [App Settings](user-guide/user-officer/placeholder.md)
+    * [Archive](user-guide/user-officer/placeholder.md)
 
 ??? info "**B**"
     * 
 
 ??? info "**C**"
-    :material-book-open-variant-outline: [**Calls**](placeholder.md) 
-    > Calls allow users’ proposals to be submitted within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates**](templates.md), [**FAPs (Facility Access Panels)**](fap.md) and a [**proposal workflow**](proposal_workflow.md). 
+    :material-book-open-variant-outline: [**Calls**](user-guide/user-officer/placeholder.md) 
+    > Calls allow users’ proposals to be submitted within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates**](user-guide/user-officer/templates/templates.md), [**FAPs (Facility Access Panels)**](user-guide/user-officer/fap.md) and a [**proposal workflow**](user-guide/user-officer/proposal_workflow.md). 
 
-    :material-book-open-variant-outline: [**Clone**](placeholder.md)
+    :material-book-open-variant-outline: [**Clone**](user-guide/user-officer/placeholder.md)
     > Clone is an action within User Office which allows you to duplicate templates. 
 
 ??? info "**D**"
-    * [Dashboard](placeholder.md)
+    * [Dashboard](user-guide/user-officer/placeholder.md)
 
 ??? info "**E**"
-    * [Events](placeholder.md)
-    * [Experiments](placeholder.md)
-    * [Export](placeholder.md)
+    * [Events](user-guide/user-officer/placeholder.md)
+    * [Experiments](user-guide/user-officer/placeholder.md)
+    * [Export](user-guide/user-officer/placeholder.md)
 
 ??? info "**F**"
-    * [FAP Chair](placeholder.md)
-    * [FAP Secretary](placeholder.md)
-    * [FAPs](placeholder.md)
-    * [Feasibility review](placeholder.md)
-    * [Features](placeholder.md)
-    * [Feedback templates](placeholder.md)
-    * [# faps](placeholder.md)
-    * [# feedbacks](placeholder.md)
+    * [FAP Chair](user-guide/user-officer/placeholder.md)
+    * [FAP Secretary](user-guide/user-officer/placeholder.md)
+    * [FAPs](user-guide/user-officer/placeholder.md)
+    * [Feasibility review](user-guide/user-officer/placeholder.md)
+    * [Features](user-guide/user-officer/placeholder.md)
+    * [Feedback templates](user-guide/user-officer/placeholder.md)
+    * [# faps](user-guide/user-officer/placeholder.md)
+    * [# feedbacks](user-guide/user-officer/placeholder.md)
 
 ??? info "**G**"
-    * [Grade guide](placeholder.md)
+    * [Grade guide](user-guide/user-officer/placeholder.md)
 
 ??? info "**H**"
     * 
 
 ??? info "**I**"
-    * [Instruments](placeholder.md)
-    * [Institutions](placeholder.md)
-    * [Import](placeholder.md)
-    * [Impersonate](placeholder.md)
+    * [Instruments](user-guide/user-officer/placeholder.md)
+    * [Institutions](user-guide/user-officer/placeholder.md)
+    * [Import](user-guide/user-officer/placeholder.md)
+    * [Impersonate](user-guide/user-officer/placeholder.md)
 
 ??? info "**J**"
     * 
@@ -65,11 +58,11 @@ Alphabetical list of terms and their definitions.
     * 
 
 ??? info "**L**"
-    * [Logs](placeholder.md)
+    * [Logs](user-guide/user-officer/placeholder.md)
 
 ??? info "**M**"
-    * [Mark as active](placeholder.md)
-    * [Mutations](placeholder.md)
+    * [Mark as active](user-guide/user-officer/placeholder.md)
+    * [Mutations](user-guide/user-officer/placeholder.md)
     
 ??? info "**N**"
     * 
@@ -78,42 +71,42 @@ Alphabetical list of terms and their definitions.
     * 
 
 ??? info "**P**"
-    * [Pages](placeholder.md) 
-    * [PDF templates](placeholder.md)
-    * [People](placeholder.md)
-    * [Proposal ESI templates](placeholder.md)
-    * [Proposal templates](placeholder.md)
-    * [Proposal workflows](placeholder.md)
-    * [# proposals](placeholder.md)
+    * [Pages](user-guide/user-officer/placeholder.md) 
+    * [PDF templates](user-guide/user-officer/placeholder.md)
+    * [People](user-guide/user-officer/placeholder.md)
+    * [Proposal ESI templates](user-guide/user-officer/placeholder.md)
+    * [Proposal templates](user-guide/user-officer/placeholder.md)
+    * [Proposal workflows](user-guide/user-officer/placeholder.md)
+    * [# proposals](user-guide/user-officer/placeholder.md)
 
 ??? info "**Q**"
-    * [Question templates](placeholder.md)
-    * [Queries](placeholder.md)
+    * [Question templates](user-guide/user-officer/placeholder.md)
+    * [Queries](user-guide/user-officer/placeholder.md)
 
 ??? info "**R**"
-    * [Reference number](placeholder.md)
-    * [Roles](placeholder.md)
-    * [Ratings](placeholder.md)
+    * [Reference number](user-guide/user-officer/placeholder.md)
+    * [Roles](user-guide/user-officer/placeholder.md)
+    * [Ratings](user-guide/user-officer/placeholder.md)
 
 ??? info "**S**"
-    * [Sample declaration templates](placeholder.md)
-    * [Sample ESI templates](placeholder.md)
-    * [Shipment declaration templates](placeholder.md)
-    * [Statuses](placeholder.md)
-    * [Sub templates](placeholder.md)
-    * [Short code](placeholder.md)
+    * [Sample declaration templates](user-guide/user-officer/placeholder.md)
+    * [Sample ESI templates](user-guide/user-officer/placeholder.md)
+    * [Shipment declaration templates](user-guide/user-officer/placeholder.md)
+    * [Statuses](user-guide/user-officer/placeholder.md)
+    * [Sub templates](user-guide/user-officer/placeholder.md)
+    * [Short code](user-guide/user-officer/placeholder.md)
 
 ??? info "**T**"
-    * [Techniques](placeholder.md)
+    * [Techniques](user-guide/user-officer/placeholder.md)
 
 ??? info "**U**"
-    * [Units](placeholder.md)
+    * [Units](user-guide/user-officer/placeholder.md)
 
 ??? info "**V**"
-    * [Visit registration templates](placeholder.md)
+    * [Visit registration templates](user-guide/user-officer/placeholder.md)
 
 ??? info "**W**"
-    * [Workflows](placeholder.md)
+    * [Workflows](user-guide/user-officer/placeholder.md)
 
 ??? info "**X**"
     * 
