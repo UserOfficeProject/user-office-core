@@ -233,7 +233,7 @@ function QuestionaryComponentGenericTemplate(
             <QuestionnairesList
               addButtonLabel={config.addEntryButtonLabel}
               copyButtonLabel={config.copyButtonLabel || undefined}
-              canCopy={true}
+              canCopy={config.canCopy}
               data={field.value?.map(genericTemplateToListRow) ?? []}
               maxEntries={config.maxEntries || undefined}
               onEditClick={(item) =>
