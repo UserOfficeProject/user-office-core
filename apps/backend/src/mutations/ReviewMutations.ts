@@ -128,7 +128,12 @@ export default class ReviewMutations {
   }
 
   @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED)
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
+  ])
   async submitTechnicalReview(
     agent: UserWithRole | null,
     args: SubmitTechnicalReviewInput
@@ -195,7 +200,12 @@ export default class ReviewMutations {
     'comment',
     'publicComment',
   ])
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
+  ])
   async setTechnicalReview(
     agent: UserWithRole | null,
     args: AddTechnicalReviewInput | SubmitTechnicalReviewInput

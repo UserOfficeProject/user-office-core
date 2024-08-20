@@ -54,6 +54,10 @@ const ProposalTechnicalReview = ({
   const { api } = useDataApiWithFeedback();
   const [shouldSubmit, setShouldSubmit] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isFapChairOrSec = useCheckAccess([
+    UserRole.FAP_CHAIR,
+    UserRole.FAP_SECRETARY,
+  ]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { user } = useContext(UserContext);
@@ -93,7 +97,7 @@ const ProposalTechnicalReview = ({
   ) => {
     const shouldSubmit =
       method === 'submitTechnicalReviews' ||
-      (isUserOfficer && values.submitted);
+      (isUserOfficer && isFapChairOrSec && values.submitted);
     const toastSuccessMessage = isUserOfficer
       ? `Technical review updated successfully!`
       : `Technical review ${
@@ -144,7 +148,8 @@ const ProposalTechnicalReview = ({
   };
 
   const shouldDisableForm = (isSubmitting: boolean) =>
-    ((isSubmitting || data.submitted) && !isUserOfficer) || isInternalReviewer;
+    ((isSubmitting || data.submitted) && !(isUserOfficer || isFapChairOrSec)) ||
+    isInternalReviewer;
 
   return (
     <>
@@ -193,6 +198,7 @@ const ProposalTechnicalReview = ({
                   label="Status"
                   data-cy="technical-review-status"
                   required
+                  disabled={isFapChairOrSec}
                   formControl={{ margin: 'normal' }}
                 />
               </Grid>
@@ -203,13 +209,13 @@ const ProposalTechnicalReview = ({
                   id="time-allocation-input"
                   type="number"
                   data-cy="timeAllocation"
-                  disabled={shouldDisableForm(isSubmitting)}
+                  disabled={isFapChairOrSec || shouldDisableForm(isSubmitting)}
                   component={TextField}
                   required
                   autoComplete="off"
                 />
               </Grid>
-              {(isUserOfficer || isInstrumentScientist) && (
+              {(isUserOfficer || isInstrumentScientist || isFapChairOrSec) && (
                 <Grid item xs={12}>
                   <InputLabel htmlFor="comment" shrink margin="dense">
                     Internal comment
@@ -251,7 +257,7 @@ const ProposalTechnicalReview = ({
                   />
                 </Grid>
               )}
-              {(isUserOfficer || isInstrumentScientist) && (
+              {(isUserOfficer || isInstrumentScientist || isFapChairOrSec) && (
                 <Grid item xs={12}>
                   <InputLabel htmlFor="comment" shrink margin="dense">
                     Internal documents
@@ -315,7 +321,7 @@ const ProposalTechnicalReview = ({
               </Grid>
               <Grid item xs={12}>
                 <StyledButtonContainer>
-                  {isUserOfficer && (
+                  {(isUserOfficer || isFapChairOrSec) && (
                     <Field
                       id="submitted"
                       name="submitted"
@@ -329,16 +335,18 @@ const ProposalTechnicalReview = ({
                   <Button
                     disabled={
                       shouldDisableForm(isSubmitting) ||
-                      (isUserOfficer && isSubmitting)
+                      ((isUserOfficer || isFapChairOrSec) && isSubmitting)
                     }
                     type="submit"
                     onClick={() => setShouldSubmit(false)}
-                    color={isUserOfficer ? 'primary' : 'secondary'}
+                    color={
+                      isUserOfficer || isFapChairOrSec ? 'primary' : 'secondary'
+                    }
                     data-cy="save-technical-review"
                   >
                     Save
                   </Button>
-                  {!isUserOfficer && (
+                  {!(isUserOfficer || isFapChairOrSec) && (
                     <Button
                       disabled={
                         isSubmitting || data.submitted || isInternalReviewer

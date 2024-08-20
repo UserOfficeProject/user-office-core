@@ -24,6 +24,7 @@ import RankInputModal from './RankInputModal';
 
 type FapAssignedReviewersTableProps = {
   fapProposal: FapProposalType;
+  fapChairAndSecs: number[];
   removeAssignedReviewer: (
     assignedReviewer: FapProposalAssignmentType,
     proposalPk: number
@@ -60,6 +61,7 @@ const assignmentColumns = [
 
 const FapAssignedReviewersTable = ({
   fapProposal,
+  fapChairAndSecs,
   removeAssignedReviewer,
   updateView,
 }: FapAssignedReviewersTableProps) => {
@@ -165,6 +167,7 @@ const FapAssignedReviewersTable = ({
         <ProposalReviewContent
           reviewId={urlQueryParams.reviewerModal}
           fapId={fapProposal.fapId}
+          fapSecAndChair={fapChairAndSecs}
           tabNames={reviewProposalTabNames}
         />
       </ProposalReviewModal>
