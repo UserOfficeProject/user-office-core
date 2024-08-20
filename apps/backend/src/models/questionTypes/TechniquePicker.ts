@@ -7,6 +7,8 @@ import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { TechniqueDataSource } from '../../datasources/TechniqueDataSource';
+import { resolveApplicationEventBus } from '../../events';
+import { Event } from '../../events/event.enum';
 import TechniqueMutations from '../../mutations/TechniqueMutations';
 import { TechniquePickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
@@ -88,8 +90,12 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     return fallBackConfig;
   },
   async onBeforeSave(questionaryId, questionTemplateRelation, answer) {
+    const eventBus = resolveApplicationEventBus();
     const proposalDataSource = container.resolve<ProposalDataSource>(
       Tokens.ProposalDataSource
+    );
+    const techniqueDataSource = container.resolve<TechniqueDataSource>(
+      Tokens.TechniqueDataSource
     );
 
     const techniqueMutations = container.resolve(TechniqueMutations);
@@ -111,9 +117,17 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
       return;
     }
 
-    await techniqueMutations.assignProposalToTechniquesInternal(null, {
-      techniqueIds,
-      proposalPk: proposal.primaryKey,
+    const result = await techniqueDataSource.assignProposalToTechniques(
+      proposal.primaryKey,
+      techniqueIds
+    );
+
+    eventBus.publish({
+      type: Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
+      boolean: result,
+      isRejection: !result,
+      key: 'technique',
+      loggedInUserId: 0,
     });
   },
 };

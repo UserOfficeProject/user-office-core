@@ -159,7 +159,7 @@ describe('Test technique Mutations', () => {
 
   test('A logged in user officer can assign techniques to a proposal', async () => {
     return expect(
-      techniqueMutations.assignProposalToTechnique(dummyUserOfficerWithRole, {
+      techniqueMutations.assignProposalToTechniques(dummyUserOfficerWithRole, {
         techniqueIds: [1, 2],
         proposalPk: 1,
       })
@@ -168,7 +168,7 @@ describe('Test technique Mutations', () => {
 
   test('A user cannot assign techniques to a proposal', async () => {
     return expect(
-      techniqueMutations.assignProposalToTechnique(dummyUserWithRole, {
+      techniqueMutations.assignProposalToTechniques(dummyUserWithRole, {
         techniqueIds: [1, 2],
         proposalPk: 1,
       })

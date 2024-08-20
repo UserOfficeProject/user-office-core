@@ -129,15 +129,7 @@ export default class TechniqueMutations {
 
   @EventBus(Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES)
   @Authorized([Roles.USER_OFFICER])
-  async assignProposalToTechnique(
-    agent: UserWithRole | null,
-    args: AssignProposalToTechniquesArgs
-  ) {
-    return this.assignProposalToTechniquesInternal(agent, args);
-  }
-
-  @EventBus(Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES)
-  async assignProposalToTechniquesInternal(
+  async assignProposalToTechniques(
     agent: UserWithRole | null,
     args: AssignProposalToTechniquesArgs
   ) {

@@ -229,14 +229,20 @@ export default class PostgresTechniqueDataSource
     proposalPk: number,
     techniqueIds: number[]
   ): Promise<boolean> {
+    const checks = await Promise.all(
+      techniqueIds.map((techId) =>
+        this.checkIfProposalIsAssignedToTechnique(techId, proposalPk)
+      )
+    );
+
     const dataToInsert = techniqueIds
-      .filter((techId) => {
-        !this.checkIfProposalIsAssignedToTechnique(techId, proposalPk);
-      })
+      .filter((_, index) => !checks[index])
       .map((techniqueId) => ({
         technique_id: techniqueId,
         proposal_id: proposalPk,
       }));
+
+    if (dataToInsert.length === 0) return false;
 
     try {
       const [result] = await database('technique_has_proposals')

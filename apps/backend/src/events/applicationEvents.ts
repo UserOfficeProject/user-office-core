@@ -350,7 +350,7 @@ interface InstrumentsRemovedFromTechniqueEvent extends GeneralEvent {
   boolean: boolean;
 }
 
-interface ProposalsAssignedToTechniqueEvent extends GeneralEvent {
+interface ProposalAssignedToTechniquesEvent extends GeneralEvent {
   type: Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES;
   boolean: boolean;
 }
@@ -421,4 +421,4 @@ export type ApplicationEvent =
   | TechniqueDeletedEvent
   | InstrumentsAssignedToTechniqueEvent
   | InstrumentsRemovedFromTechniqueEvent
-  | ProposalsAssignedToTechniqueEvent;
+  | ProposalAssignedToTechniquesEvent;
