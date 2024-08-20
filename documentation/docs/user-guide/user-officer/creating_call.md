@@ -25,7 +25,6 @@ Calls are built using several different types of templates which can be edited a
 There are several different types of templates utilised within Calls:
 
 ??? info "PDF templates" 
-
     [**PDF templates**](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
     ______________________________________________________________________________________
@@ -37,7 +36,6 @@ There are several different types of templates utilised within Calls:
     
 
 ??? info "Proposal templates" 
-
     [**Proposal templates**](templates/2proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
     User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
@@ -49,35 +47,30 @@ There are several different types of templates utilised within Calls:
     </figure>
 
 ??? info "Sample declaration templates" 
-
-    [**Sample declaration templates**](templates/sampledec_template.md) 
+    [**Sample declaration templates**](templates/sampledec_template.md) are question templates which can be added to proposal templates.
     ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Proposal](../../assets/images/placeholder.png){ width="450"}
+        ![Sample declaration](../../assets/images/sample_dec.png){ width="450"}
         <figcaption>**Sample declaration**</figcaption>
     </figure>
 
 ??? info "Sub templates" 
-
     [**Sub templates**](templates/sub_template.md) 
     ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Proposal](../../assets/images/create_sub_template.png){ width="450"}
+        ![Sub templates](../../assets/images/create_sub_template.png){ width="450"}
         <figcaption>**Sub template**</figcaption>
     </figure>
 
 ??? info "Shipment declaration templates" 
-
     [**Shipment declaration templates**](templates/shipment_template.md) allow users to fill out a questionnaire to declare shipments.
     ______________________________________________________________________________________
-    
     <figure markdown="span">  
         ![Shipment Declaration](../../assets/images/shipment_declaration.png){ width="450"}
         <figcaption>**Shipment declaration (viewed from the user's perspective)**</figcaption>
     </figure>
 
 ??? info "Visit registration templates" 
-
     [**Visit registration templates**](templates/visit_template.md) allow users to fill out a questionnaire to provide information about their visit registration.
 
     Note: Visit registration templates become accessible to users to fill out after their experiment has been allocated a time within the scheduled and the status has been set to 'Accepted'
@@ -89,10 +82,9 @@ There are several different types of templates utilised within Calls:
     </figure>
 
 ??? info "Proposal ESI templates" 
-
     [**Proposal Experiment Safety Input (ESI)**](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise Proposal ESI templates.
 
-    Note: Proposal ESI templates become accessible to users to fill out after their experiment has been allocated a time within the scheduled and the status has been set to 'Accepted' 
+    Note: Proposal ESI templates become accessible for users to fill out after their experiment has been allocated a time within the scheduled and the status has been set to 'Accepted' 
     ______________________________________________________________________________________
     
     <figure markdown="span">  
@@ -101,26 +93,22 @@ There are several different types of templates utilised within Calls:
     </figure>
 
 ??? info "Sample ESI templates" 
-
     [**Sample Experiment Safety Input (ESI)**](templates/sampleESI_template.md) 
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Proposal ESI](../../assets/images/placeholder.png){ width="450"}
-        <figcaption>**Proposal ESI (viewed from the user's perspective)**</figcaption>
+        ![Sample ESI](../../assets/images/sample_esi.png){ width="450"}
+        <figcaption>**Sample ESI template**</figcaption>
     </figure>
 
-
 ??? info "Feedback templates" 
-
     [**Feedback templates**](templates/feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire.
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Feedback templates](../../assets/images/placeholder.png){ width="450"}
+        ![Feedback templates](../../assets/images/feedback.png){ width="450"}
         <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
     </figure>
-
 
 ### **How do I use templates within a call?**
 When it comes to utilising templates within a call there are various options:
@@ -130,7 +118,6 @@ When it comes to utilising templates within a call there are various options:
 To use a pre-existing template, simply select it from the drop-down menu within the call.
 
 !!! tip ""
-
     **TIP:** It is good practice to check the templates you wish to use before finalising the creation of the call. You can view the template details in the designated template edit page, found by navigating to the templates menu.
 
 
@@ -173,11 +160,17 @@ Lastly, you may also create templates to fully customise them to fit the researc
 Calls are also assigned to Facility Access Panel(s) (FAPs) for review of the submitted proposals, which must be selected within the call.
 
 ??? info "FAPs" 
-
-
     [**Facility Access Panels (FAPs)**](fap.md) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a **reviewer**, **secretary** and **chair** to oversee the review process and ensure thorough and unbiased evaluation. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
 
     User Officers can manage the FAPs assigned to proposals and calls. FAPs can be utilised across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria such as the **grade guide**. In creating a FAP, user officers may provide general information by labeling FAPs with a code, a description, and specifying the required number of proposal ratings. 
+
+    ______________________________________________________________________________________
+    
+    <figure markdown="span">  
+        ![FAP](../../assets/images/fap.png){ width="450"}
+        <figcaption>**FAP General Information**</figcaption>
+    </figure>
+
 
 ### **How do I use FAPs within a call?** 
 
@@ -202,6 +195,13 @@ Calls utilise proposal workflow
     [**Proposal workflows**](proposal_workflow.md) outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status marks a key stage in the proposal's progression. For example, moving from 'Draft' to 'Feasibility Review' indicates the proposal's readiness for preliminary assessment. 
 
     Proposal workflows control how and when the User Office system will display information to different roles based on statuses. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customise workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
+
+    ______________________________________________________________________________________
+    
+    <figure markdown="span">  
+        ![Workflow](../../assets/images/workflow_editor.png){ width="450"}
+        <figcaption>**Proposal workflow**</figcaption>
+    </figure>
 
 There are several ways to assign a Proposal Worklow to a call:
 
