@@ -42,6 +42,7 @@ type ProposalFilterBarProps = {
   proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
+  hiddenStatuses: number[];
 };
 
 const ProposalFilterBar = ({
@@ -97,6 +98,7 @@ const ProposalFilterBar = ({
           proposalStatuses={proposalStatuses?.data}
           isLoading={proposalStatuses?.isLoading}
           shouldShowAll={true}
+          hiddenStatuses={filter.excludeProposalStatusIds as number[]}
           onChange={(proposalStatusId) => {
             setProposalFilter({
               ...filter,

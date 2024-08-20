@@ -95,9 +95,16 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             { instrumentId: filter?.instrumentFilter?.instrumentId }
           );
         }
-
         if (filter?.proposalStatusId) {
           query.where('proposal_status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.excludeProposalStatusIds) {
+          query.where(
+            'proposal_status_id',
+            'not in',
+            filter?.excludeProposalStatusIds
+          );
         }
 
         if (filter?.shortCodes) {
