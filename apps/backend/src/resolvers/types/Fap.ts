@@ -49,6 +49,9 @@ export class Fap implements Partial<FapBase> {
   public fapChairUserIds: number[] | null;
 
   public fapSecretariesUserIds: number[] | null;
+
+  @Field(() => String, { nullable: true })
+  public files: string | null;
 }
 
 @Resolver(() => Fap)
@@ -65,7 +68,7 @@ export class FapResolvers {
   }
 
   @FieldResolver(() => [FapProposalCount])
-  async fapChairsProposalCounts(
+  async fapChairsCurrentProposalCounts(
     @Root() fap: Fap,
     @Ctx() context: ResolverContext
   ) {
@@ -77,7 +80,7 @@ export class FapResolvers {
       return {
         userId: fapChairUserId,
         count:
-          context.queries.fap.dataSource.getFapReviewerProposalCount(
+          context.queries.fap.dataSource.getCurrentFapReviewerProposalCount(
             fapChairUserId
           ),
       };
@@ -96,7 +99,7 @@ export class FapResolvers {
   }
 
   @FieldResolver(() => [FapProposalCount])
-  async fapSecretariesProposalCounts(
+  async fapSecretariesCurrentProposalCounts(
     @Root() fap: Fap,
     @Ctx() context: ResolverContext
   ) {
@@ -108,7 +111,7 @@ export class FapResolvers {
       return {
         userId: fapSecretariesUserId,
         count:
-          context.queries.fap.dataSource.getFapReviewerProposalCount(
+          context.queries.fap.dataSource.getCurrentFapReviewerProposalCount(
             fapSecretariesUserId
           ),
       };

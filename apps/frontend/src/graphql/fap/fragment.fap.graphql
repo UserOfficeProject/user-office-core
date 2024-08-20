@@ -6,17 +6,18 @@ fragment fap on Fap {
   gradeGuide
   customGradeGuide
   active
+  files
   fapChairs {
     ...basicUserDetails
   }
-  fapChairsProposalCounts {
+  fapChairsCurrentProposalCounts {
     userId
     count
   }
   fapSecretaries {
     ...basicUserDetails
   }
-  fapSecretariesProposalCounts {
+  fapSecretariesCurrentProposalCounts {
     userId
     count
   }

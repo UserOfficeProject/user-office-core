@@ -8,8 +8,8 @@ import InboxIcon from '@mui/icons-material/Inbox';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
-import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
@@ -20,13 +20,25 @@ import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 
+const menuMap = {
+  PdfTemplates: '/PdfTemplates',
+  ProposalTemplates: '/ProposalTemplates',
+  SampleDeclarationTemplates: '/SampleDeclarationTemplates',
+  GenericTemplates: '/GenericTemplates',
+  ShipmentDeclarationTemplates: '/ShipmentDeclarationTemplates',
+  VisitTemplates: '/VisitTemplates',
+  FeedbackTemplates: '/FeedbackTemplates',
+  EsiTemplates: '/EsiTemplates',
+  SampleEsiTemplates: '/SampleEsiTemplates',
+};
+
 function EsiTemplatesMenuListItem() {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <>
       <Tooltip title="Experiment Safety Input (ESI)">
-        <ListItem button onClick={() => setIsExpanded(!isExpanded)}>
+        <ListItemButton onClick={() => setIsExpanded(!isExpanded)}>
           <ListItemIcon>
             <EsiIcon />
             {isExpanded ? (
@@ -36,7 +48,7 @@ function EsiTemplatesMenuListItem() {
             )}
           </ListItemIcon>
           <ListItemText primary="ESI" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
 
       <Collapse
@@ -46,20 +58,23 @@ function EsiTemplatesMenuListItem() {
         style={{ marginLeft: '10px' }}
       >
         <Tooltip title="Experiment Safety Input (Proposal)">
-          <ListItem component={NavLink} to="/EsiTemplates" button>
+          <ListItemButton component={NavLink} to={menuMap['EsiTemplates']}>
             <ListItemIcon>
               <DescriptionIcon />
             </ListItemIcon>
             <ListItemText primary="Proposal ESI" title="Proposal ESI" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
         <Tooltip title="Experiment Safety Input (Sample)">
-          <ListItem component={NavLink} to="/SampleEsiTemplates" button>
+          <ListItemButton
+            component={NavLink}
+            to={menuMap['SampleEsiTemplates']}
+          >
             <ListItemIcon>
               <InboxIcon />
             </ListItemIcon>
             <ListItemText primary="Sample ESI" title="Sample ESI" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       </Collapse>
     </>
@@ -68,10 +83,9 @@ function EsiTemplatesMenuListItem() {
 
 export function TemplateMenuListItem() {
   const location = useLocation();
-  const shouldExpand =
-    location.pathname === '/ProposalTemplates' ||
-    location.pathname === '/SampleDeclarationTemplates';
-  const [isExpanded, setIsExpanded] = useState(shouldExpand);
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const context = useContext(FeatureContext);
   const isShipmentFeatureEnabled = !!context.featuresMap.get(FeatureId.SHIPPING)
     ?.isEnabled;
@@ -81,6 +95,11 @@ export function TemplateMenuListItem() {
   const isVisitManagementEnabled = !!context.featuresMap.get(
     FeatureId.VISIT_MANAGEMENT
   )?.isEnabled;
+
+  React.useEffect(() => {
+    setIsExpanded(Object.values(menuMap).includes(location.pathname));
+  }, [location.pathname]);
+
   function toggleExpand() {
     setIsExpanded(!isExpanded);
   }
@@ -88,7 +107,7 @@ export function TemplateMenuListItem() {
   return (
     <>
       <Tooltip title="Templates">
-        <ListItem button onClick={toggleExpand}>
+        <ListItemButton onClick={toggleExpand}>
           <ListItemIcon>
             <LibraryBooksIcon />
             {isExpanded ? (
@@ -98,80 +117,82 @@ export function TemplateMenuListItem() {
             )}
           </ListItemIcon>
           <ListItemText primary="Templates" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
 
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <Tooltip title="PDF">
-          <ListItem component={NavLink} to="/PdfTemplates" button>
+          <ListItemButton component={NavLink} to={menuMap['PdfTemplates']}>
             <ListItemIcon>
               <PictureAsPdfIcon />
             </ListItemIcon>
             <ListItemText primary="PDF" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
 
         <Tooltip title="Proposal">
-          <ListItem component={NavLink} to="/ProposalTemplates" button>
+          <ListItemButton component={NavLink} to={menuMap['ProposalTemplates']}>
             <ListItemIcon>
               <DescriptionIcon />
             </ListItemIcon>
             <ListItemText primary="Proposal" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
 
         <Tooltip title="Sample declaration">
-          <ListItem component={NavLink} to="/SampleDeclarationTemplates" button>
+          <ListItemButton
+            component={NavLink}
+            to={menuMap['SampleDeclarationTemplates']}
+          >
             <ListItemIcon>
               <InboxIcon />
             </ListItemIcon>
             <ListItemText primary="Sample declaration" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
 
         <Tooltip title="Sub Template">
-          <ListItem component={NavLink} to="/GenericTemplates" button>
+          <ListItemButton component={NavLink} to={menuMap['GenericTemplates']}>
             <ListItemIcon>
               <DynamicFeedIcon />
             </ListItemIcon>
             <ListItemText primary="Sub Template" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
 
         {isShipmentFeatureEnabled && (
           <Tooltip title="Shipment declaration templates">
-            <ListItem
+            <ListItemButton
               component={NavLink}
-              to="/ShipmentDeclarationTemplates"
-              button
+              to={menuMap['ShipmentDeclarationTemplates']}
             >
               <ListItemIcon>
                 <LocalShippingIcon />
               </ListItemIcon>
               <ListItemText primary="Shipment declaration" />
-            </ListItem>
+            </ListItemButton>
           </Tooltip>
         )}
         {isVisitManagementEnabled && (
           <Tooltip title="Visit registration">
-            <ListItem component={NavLink} to="/VisitTemplates" button>
+            <ListItemButton component={NavLink} to={menuMap['VisitTemplates']}>
               <ListItemIcon>
                 <FlightTakeoffIcon />
               </ListItemIcon>
               <ListItemText primary="Visit registration" />
-            </ListItem>
+            </ListItemButton>
           </Tooltip>
         )}
 
         {isRiskAssessmentFeatureEnabled && <EsiTemplatesMenuListItem />}
 
         <Tooltip title="Feedback">
-          <ListItem component={NavLink} to="/FeedbackTemplates" button>
+          <ListItemButton component={NavLink} to={menuMap['FeedbackTemplates']}>
             <ListItemIcon>
               <FeedbackIcon />
             </ListItemIcon>
             <ListItemText primary="Feedback" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       </Collapse>
     </>
