@@ -666,7 +666,9 @@ context('Status actions tests', () => {
 
       cy.contains('Status Actions Logs').click();
 
-      cy.get('[data-cy="replay_status_action_icon"]').first().click();
+      cy.get('[data-cy="replay_status_action_icon"]')
+        .first()
+        .click({ force: true });
 
       cy.get('[data-cy="confirm-ok"]').click();
 
