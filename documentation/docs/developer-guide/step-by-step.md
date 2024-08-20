@@ -13,11 +13,11 @@ Start by adding a new column `is_locked` to the database by creating a new file 
     DO
     $$
     BEGIN
-	IF register_patch('AlterUserAddIsLocked.sql', 'your_username', 'Add is_locked to the users table', '2024-08-08') THEN
+	    IF register_patch('AlterUserAddIsLocked.sql', 'your_username', 'Add is_locked to the users table', '2024-08-08') THEN
         BEGIN
             ALTER TABLE users ADD COLUMN is_locked BOOL DEFAULT FALSE; 
         END;
-	END IF;
+	    END IF;
     END;
     $$
     LANGUAGE plpgsql;
