@@ -603,6 +603,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../user-guide/user-officer/editing_call/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Editing a call
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../user-guide/user-officer/proposal_workflow/" class="md-nav__link">
         
   
@@ -781,10 +802,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_12" >
         
           
-          <label class="md-nav__link" for="__nav_3_3_11" id="__nav_3_3_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_3_12" id="__nav_3_3_12_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -795,8 +816,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3_11">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_12">
             <span class="md-nav__icon md-icon"></span>
             Templates
           </label>
@@ -1367,6 +1388,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../rabbitmq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RabbitMQ
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../api_documentation/" class="md-nav__link">
         
   
@@ -1650,11 +1692,13 @@
 
   <h1>Configuration</h1>
 
-<p>This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. The configuration is managed through a <code>.env</code> file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your <code>.env</code> file. </p>
+<p>This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. </p>
+<p>The configuration is managed through a <code>.env</code> file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your <code>.env</code> file. </p>
 <blockquote>
 <p><strong><em>NOTE:</em></strong> The <code>DEPENDENCY_CONFIG</code> variable is crucial for the User Office application. It enables, disables, or modifies various features based on the specified configuration. You can find the different configuration files in the <code>apps/backend/src/config</code> directory.</p>
 </blockquote>
-<p>The <code>.env</code> file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. For more detailed information, refer to the <a href="https://www.npmjs.com/package/dotenv">dotenv documentation</a>.</p>
+<p>The <code>.env</code> file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. </p>
+<p>For more detailed information, refer to the <a href="https://www.npmjs.com/package/dotenv">dotenv documentation</a>.</p>
 <h2 id="environment-variables">Environment Variables</h2>
 <h3 id="eam-configuration-ess-specific">EAM Configuration (ESS-specific)</h3>
 <p>The EAM (Enterprise Asset Management) section includes variables that configure API access and authentication.</p>
@@ -1674,7 +1718,7 @@
 <li><strong>GRAYLOG_PORT</strong>: The port for the Graylog server.</li>
 </ul>
 <h3 id="orcid-configuration">ORCID Configuration</h3>
-<p>The ORCID section is used for integrating with the ORCID API for user identification and authentication.</p>
+<p>The ORCID section can be used for integrating with the ORCID API for user identification and authentication.</p>
 <ul>
 <li><strong>ORCID_TOKEN_URL</strong>: The URL for obtaining ORCID tokens.</li>
 <li><strong>ORCID_API_URL</strong>: The ORCID API URL.</li>
@@ -1704,7 +1748,6 @@ AUTH_CLIENT_SECRET=ABCDEF-0123456789
 <ul>
 <li><strong>NODE_ENV</strong>: Specifies the environment (e.g., development, production).</li>
 <li><strong>DEPENDENCY_CONFIG</strong>: Indicates which dependency configuration to use (<code>e2e</code>, <code>ess</code>, <code>stfc</code>, <code>test</code>). Defaults to the standard configuration if not provided.</li>
-<li><strong>PING_PUBLIC_CRT</strong>: Public certificate for ping operations.</li>
 <li><strong>DATABASE_URL</strong>: The URL for the database connection.</li>
 <li><strong>BASE_URL</strong>: The base URL for the application.</li>
 <li><strong>JWT_TOKEN_LIFE</strong>: The lifetime of JWT tokens.</li>
