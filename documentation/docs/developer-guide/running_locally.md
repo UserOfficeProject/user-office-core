@@ -68,4 +68,4 @@ Lints typescript code and log if there are any errors.
 
 If you want to fix all auto-fixable errors and warnings use:
 
-      npm run lint:fix
+      npm run lint:
