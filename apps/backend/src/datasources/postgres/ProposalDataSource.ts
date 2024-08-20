@@ -6,6 +6,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { Event } from '../../events/event.enum';
+import { Call } from '../../models/Call';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
@@ -757,7 +758,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
-  async cloneProposal(sourceProposal: Proposal): Promise<Proposal> {
+  async cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal> {
     const [newProposal]: ProposalRecord[] = (
       await database.raw(`
           INSERT INTO proposals
