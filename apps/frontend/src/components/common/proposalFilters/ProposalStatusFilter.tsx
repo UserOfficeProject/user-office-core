@@ -15,7 +15,21 @@ type ProposalStatusFilterProps = {
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
   proposalStatusId?: number;
+  hiddenStatuses: number[];
 };
+
+function checkToRemove(
+  hiddenStatuses: number[],
+  proposalStatus: ProposalStatus
+) {
+  if (hiddenStatuses != null) {
+    for (let i = 0; i < hiddenStatuses.length; i++) {
+      if (hiddenStatuses[i] == proposalStatus.id) return false;
+    }
+  }
+
+  return true;
+}
 
 const ProposalStatusFilter = ({
   proposalStatuses,
@@ -23,6 +37,7 @@ const ProposalStatusFilter = ({
   proposalStatusId,
   onChange,
   shouldShowAll,
+  hiddenStatuses,
 }: ProposalStatusFilterProps) => {
   const [, setQuery] = useQueryParams({
     proposalStatus: NumberParam,
@@ -61,11 +76,14 @@ const ProposalStatusFilter = ({
             data-cy="status-filter"
           >
             {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-            {proposalStatuses.map((proposalStatus) => (
-              <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
-                {proposalStatus.name}
-              </MenuItem>
-            ))}
+            {proposalStatuses.map(
+              (proposalStatus) =>
+                checkToRemove(hiddenStatuses, proposalStatus) && (
+                  <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
+                    {proposalStatus.name}
+                  </MenuItem>
+                )
+            )}
           </Select>
         )}
       </FormControl>
