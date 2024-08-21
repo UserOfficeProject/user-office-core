@@ -128,7 +128,10 @@ const closeNotification = () => {
 const closeModal = () => {
   cy.get('[role="dialog"] [data-cy="close-modal"]').click();
 
-  cy.get('[role="dialog"]').should('not.exist');
+  cy.get('body').should(
+    'not.have.descendants',
+    '[role="presentation"] [role="dialog"]'
+  );
 };
 
 const finishedLoading = () => {

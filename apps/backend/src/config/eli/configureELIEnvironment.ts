@@ -11,11 +11,11 @@ async function setELIColourTheme() {
   const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_DARK,
-    settingsValue: '#519548',
+    settingsValue: '#1A1A1A',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_MAIN,
-    settingsValue: '#519548',
+    settingsValue: '#F26722',
   });
   await db.updateSettings({
     settingsId: SettingsId.PALETTE_PRIMARY_LIGHT,
@@ -93,10 +93,10 @@ async function enableDefaultELIFeatures() {
     settingsId: SettingsId.DEFAULT_INST_SCI_STATUS_FILTER,
     settingsValue: 'FEASIBILITY_REVIEW',
   });
-  /*await db.updateSettings({
-      settingsId: SettingsId.GRADE_PRECISION,
-      settingsValue: '1',
-    });*/
+  await db.updateSettings({
+    settingsId: SettingsId.GRADE_PRECISION,
+    settingsValue: '1',
+  });
 }
 
 export async function configureELIDevelopmentEnvironment() {

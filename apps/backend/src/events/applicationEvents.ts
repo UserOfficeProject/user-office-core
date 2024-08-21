@@ -10,7 +10,6 @@ import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
-import { UserLinkResponse } from '../models/UserLinkResponse';
 import { Event } from './event.enum';
 
 interface GeneralEvent {
@@ -229,18 +228,6 @@ interface UserDeletedEvent extends GeneralEvent {
   user: User;
 }
 
-interface UserPasswordResetEvent extends GeneralEvent {
-  type: Event.USER_PASSWORD_RESET_EMAIL;
-  user: User;
-  userlinkresponse: UserLinkResponse;
-}
-
-interface UserCreatedEvent extends GeneralEvent {
-  type: Event.USER_CREATED;
-  user: User;
-  userlinkresponse: UserLinkResponse;
-}
-
 interface EmailInvite extends GeneralEvent {
   type: Event.EMAIL_INVITE;
   emailinviteresponse: {
@@ -388,8 +375,6 @@ export type ApplicationEvent =
   | FapMemberAssignedToProposalEvent
   | FapMemberRemovedFromProposalEvent
   | UserDeletedEvent
-  | UserPasswordResetEvent
-  | UserCreatedEvent
   | ProposalNotifiedEvent
   | CallCreatedEvent
   | CallEndedEvent

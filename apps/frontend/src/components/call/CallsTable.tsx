@@ -1,5 +1,6 @@
 import { Column } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
+import GridOnIcon from '@mui/icons-material/GridOn';
 import Unarchive from '@mui/icons-material/Unarchive';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -24,6 +25,7 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useDownloadXLSXCallFap } from 'hooks/fap/useDownloadXLSXCallFap';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -71,6 +73,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     ...DefaultQueryParams,
     callStatus: defaultCallStatusQueryFilter,
   });
+  const exportFapData = useDownloadXLSXCallFap();
 
   const {
     loadingCalls,
@@ -344,6 +347,12 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             icon: rowData.isActive ? Archive : Unarchive,
             tooltip: `${rowData.isActive ? 'Deactivate' : 'Activate'} call`,
             onClick: (): void => changeCallActiveStatus(rowData as Call),
+            position: 'row',
+          }),
+          (rowData) => ({
+            icon: GridOnIcon,
+            tooltip: `Export Fap Data`,
+            onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
             position: 'row',
           }),
         ]}

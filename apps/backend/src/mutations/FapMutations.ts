@@ -109,7 +109,8 @@ export default class FapMutations {
         args.numberRatingsRequired,
         args.gradeGuide,
         args.customGradeGuide,
-        args.active
+        args.active,
+        args.files
       )
       .catch((err) => {
         return rejection(

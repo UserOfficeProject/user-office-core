@@ -51,6 +51,7 @@ import {
   InstitutionRecord,
   AssignProposalsToFapsInput,
   CountryRecord,
+  FapReviewsRecord,
 } from './records';
 
 @injectable()
@@ -104,7 +105,8 @@ export default class PostgresFapDataSource implements FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean,
-    active: boolean
+    active: boolean,
+    files: string | null
   ) {
     return database
       .update(
@@ -115,6 +117,7 @@ export default class PostgresFapDataSource implements FapDataSource {
           grade_guide: gradeGuide,
           custom_grade_guide: customGradeGuide,
           active,
+          files,
         },
         ['*']
       )
@@ -368,6 +371,27 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
+  async getCurrentFapProposalCount(fapId: number): Promise<number> {
+    const callFilter = {
+      isFapReviewEnded: false,
+    };
+
+    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
+      (call) => call.id
+    );
+
+    return database('fap_proposals as fp')
+      .join('proposals as p', { 'p.proposal_pk': 'fp.proposal_pk' })
+      .count('fp.fap_id')
+      .where('fp.fap_id', fapId)
+      .whereIn('fp.call_id', callIds)
+      .andWhere('p.submitted', true)
+      .first()
+      .then((result: { count?: string | undefined } | undefined) => {
+        return parseInt(result?.count || '0');
+      });
+  }
+
   async getFapReviewerProposalCount(reviewerId: number): Promise<number> {
     return database('fap_reviews')
       .count('user_id')
@@ -378,11 +402,10 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getFapReviewerProposalCountCurrentRound(
+  async getCurrentFapReviewerProposalCount(
     reviewerId: number
   ): Promise<number> {
     const callFilter = {
-      isEnded: true,
       isFapReviewEnded: false,
     };
 
@@ -1209,6 +1232,17 @@ export default class PostgresFapDataSource implements FapDataSource {
 
         return true;
       });
+  }
+
+  async getFapReviewData(
+    callId: number,
+    fapId: number
+  ): Promise<FapReviewsRecord[]> {
+    return await database
+      .select('*')
+      .from('review_data')
+      .where('fap_id', fapId)
+      .andWhere('call_id', callId);
   }
 
   async submitFapMeetings(

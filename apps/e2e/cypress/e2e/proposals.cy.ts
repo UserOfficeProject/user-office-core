@@ -5,12 +5,14 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
   FeatureId,
+  SettingsId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 import PdfParse from 'pdf-parse';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
 context('Proposal tests', () => {
@@ -473,7 +475,14 @@ context('Proposal tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
-      cy.addFeasibilityReviewToDefaultWorkflow();
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        cy.addFeasibilityReviewToDefaultWorkflow();
+      }
 
       const allocationTime = '10';
       cy.createInstrument(instrument1).then((result) => {

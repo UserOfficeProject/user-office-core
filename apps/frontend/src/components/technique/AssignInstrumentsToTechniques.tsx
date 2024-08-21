@@ -18,14 +18,14 @@ type AssignInstrumentsToTechniquesProps = {
   assignInstrumentsToTechniques: (
     instrument: InstrumentFragment[]
   ) => Promise<void>;
-  removeIntrumentsFromTechnique: (id: number[]) => Promise<void>;
+  removeInstrumentsFromTechnique: (id: number[]) => Promise<void>;
   currentlyAssignedInstrumentIds: number[];
 };
 
 const AssignInstrumentsToTechniques = ({
   close,
   assignInstrumentsToTechniques,
-  removeIntrumentsFromTechnique,
+  removeInstrumentsFromTechnique: removeInstrumentsFromTechnique,
   currentlyAssignedInstrumentIds,
 }: AssignInstrumentsToTechniquesProps) => {
   const { instruments, loadingInstruments } = useInstruments();
@@ -72,7 +72,7 @@ const AssignInstrumentsToTechniques = ({
             }
 
             if (deletedInstruments.length != 0) {
-              await removeIntrumentsFromTechnique(deletedInstruments);
+              await removeInstrumentsFromTechnique(deletedInstruments);
             }
           } else {
             if (selectedInstruments.length != 0) {

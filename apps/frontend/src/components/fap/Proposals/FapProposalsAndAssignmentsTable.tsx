@@ -409,17 +409,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     onAssignmentsUpdate({
       ...data,
-      fapChairsProposalCounts: data.fapChairsProposalCounts.map((value) => {
-        return {
-          userId: value.userId,
-          count: assignedMembers.find(
-            (assignedMember) => assignedMember.id === value.userId
-          )
-            ? value.count + 1
-            : value.count,
-        };
-      }),
-      fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
+      fapChairsCurrentProposalCounts: data.fapChairsCurrentProposalCounts.map(
         (value) => {
           return {
             userId: value.userId,
@@ -431,6 +421,17 @@ const FapProposalsAndAssignmentsTable = ({
           };
         }
       ),
+      fapSecretariesCurrentProposalCounts:
+        data.fapSecretariesCurrentProposalCounts.map((value) => {
+          return {
+            userId: value.userId,
+            count: assignedMembers.find(
+              (assignedMember) => assignedMember.id === value.userId
+            )
+              ? value.count + 1
+              : value.count,
+          };
+        }),
     });
   };
 
@@ -644,17 +645,8 @@ const FapProposalsAndAssignmentsTable = ({
 
         onAssignmentsUpdate({
           ...data,
-          fapChairsProposalCounts: data.fapChairsProposalCounts.map((value) => {
-            return {
-              userId: value.userId,
-              count:
-                assignedReviewer.fapMemberUserId === value.userId
-                  ? value.count - 1
-                  : value.count,
-            };
-          }),
-          fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
-            (value) => {
+          fapChairsCurrentProposalCounts:
+            data.fapChairsCurrentProposalCounts.map((value) => {
               return {
                 userId: value.userId,
                 count:
@@ -662,8 +654,17 @@ const FapProposalsAndAssignmentsTable = ({
                     ? value.count - 1
                     : value.count,
               };
-            }
-          ),
+            }),
+          fapSecretariesCurrentProposalCounts:
+            data.fapSecretariesCurrentProposalCounts.map((value) => {
+              return {
+                userId: value.userId,
+                count:
+                  assignedReviewer.fapMemberUserId === value.userId
+                    ? value.count - 1
+                    : value.count,
+              };
+            }),
         });
       };
 

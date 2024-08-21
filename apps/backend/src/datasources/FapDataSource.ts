@@ -18,7 +18,10 @@ import {
 import { RemoveProposalsFromFapsArgs } from '../resolvers/mutations/AssignProposalsToFapsMutation';
 import { SaveFapMeetingDecisionInput } from '../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../resolvers/queries/FapsQuery';
-import { AssignProposalsToFapsInput } from './postgres/records';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from './postgres/records';
 
 export interface FapDataSource {
   create(
@@ -36,7 +39,8 @@ export interface FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean | null,
-    active: boolean
+    active: boolean,
+    files: string | null
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;
@@ -73,8 +77,9 @@ export interface FapDataSource {
     callId: number
   ): Promise<BasicUserDetails[]>;
   getFapProposalCount(fapId: number): Promise<number>;
+  getCurrentFapProposalCount(fapId: number): Promise<number>;
   getFapReviewerProposalCount(reviewerId: number): Promise<number>;
-  getFapReviewerProposalCountCurrentRound(reviewerId: number): Promise<number>;
+  getCurrentFapReviewerProposalCount(reviewerId: number): Promise<number>;
   getFapProposal(
     fapId: number,
     proposalPk: number,
@@ -144,6 +149,7 @@ export interface FapDataSource {
     reviewerId: number,
     rank: number
   ): Promise<boolean>;
+  getFapReviewData(callId: number, fapId: number): Promise<FapReviewsRecord[]>;
   submitFapMeetings(
     callId: number,
     fapId: number,
