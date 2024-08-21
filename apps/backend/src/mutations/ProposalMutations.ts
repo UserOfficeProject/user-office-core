@@ -666,7 +666,7 @@ export default class ProposalMutations {
       return clonedProposal;
     } catch (error) {
       return rejection(
-        'Could not clone the proposal',
+        'Could not clone the proposal' + (error === null ? '' : ' ' + error),
         { proposalToClonePk },
         error
       );
