@@ -31,35 +31,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.USER_PASSWORD_RESET_EMAIL: {
-      mailService
-        .sendMail({
-          content: {
-            template_id: 'user-office-account-reset-password',
-          },
-          substitution_data: {
-            title: 'ESS User reset account password',
-            buttonText: 'Click to reset',
-            link: event.userlinkresponse.link,
-          },
-          recipients: [{ address: event.userlinkresponse.user.email }],
-        })
-        .then((res: any) => {
-          logger.logInfo('Email send on for password reset:', {
-            result: res,
-            event,
-          });
-        })
-        .catch((err: string) => {
-          logger.logError('Could not send email for password reset', {
-            error: err,
-            event,
-          });
-        });
-
-      return;
-    }
-
     case Event.EMAIL_INVITE: {
       const user = await userDataSource.getUser(
         event.emailinviteresponse.userId
@@ -172,41 +143,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       return;
     }
 
-    case Event.USER_CREATED: {
-      if (process.env.NODE_ENV === 'development') {
-        logger.logInfo('Set user as verified without sending email', {
-          userId: event.userlinkresponse.user.id,
-          event,
-        });
-      } else {
-        mailService
-          .sendMail({
-            content: {
-              template_id: 'user-office-account-verification',
-            },
-            substitution_data: {
-              title: 'ESS User portal verify account',
-              buttonText: 'Click to verify',
-              link: event.userlinkresponse.link,
-            },
-            recipients: [{ address: event.userlinkresponse.user.email }],
-          })
-          .then((res: any) => {
-            logger.logInfo('Email sent on user creation:', {
-              result: res,
-              event,
-            });
-          })
-          .catch((err: string) => {
-            logger.logError('Could not send email on user creation:', {
-              error: err,
-              event,
-            });
-          });
-      }
-
-      return;
-    }
     case Event.PROPOSAL_NOTIFIED: {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
