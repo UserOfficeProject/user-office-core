@@ -14,19 +14,19 @@ context('Technique tests', () => {
   const abstract = faker.word.words(5);
 
   const technique1 = {
-    name: faker.word.words(1),
+    name: faker.word.words(3),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
 
   const technique2 = {
-    name: faker.word.words(1),
+    name: faker.word.words(3),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
 
   const technique3 = {
-    name: faker.word.words(1),
+    name: faker.word.words(3),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
   };
