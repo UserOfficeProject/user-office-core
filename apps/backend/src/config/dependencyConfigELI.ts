@@ -29,7 +29,6 @@ import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSour
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
-//import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { eliEmailHandler } from '../eventHandlers/email/eliEmailHandler';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
