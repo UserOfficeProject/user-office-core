@@ -55,7 +55,6 @@ const XpressProposalTable = () => {
     searchText: urlQueryParams.search ?? undefined,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: urlQueryParams.call,
     instrumentFilter: {
@@ -71,8 +70,8 @@ const XpressProposalTable = () => {
       showMultiTechniqueProposals: false,
     },
     dateFilter: {
-      to: urlQueryParams.to ? +urlQueryParams.to : null,
-      from: urlQueryParams.from ? +urlQueryParams.from : null,
+      to: urlQueryParams.to ? urlQueryParams.to : null,
+      from: urlQueryParams.from ? urlQueryParams.from : null,
     },
     referenceNumbers: urlQueryParams.proposalId
       ? [urlQueryParams.proposalId]
