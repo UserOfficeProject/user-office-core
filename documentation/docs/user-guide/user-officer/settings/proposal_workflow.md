@@ -1,10 +1,41 @@
 # Proposal workflows
 
+## **What are proposal workflows?**
+
 ??? info "Proposal Workflows" 
 
     [**Proposal workflows**](proposal_workflow.md) outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status marks a key stage in the proposal's progression. For example, moving from 'Draft' to 'Feasibility Review' indicates the proposal's readiness for preliminary assessment. 
 
     Proposal workflows control how and when the User Office system will display information to different roles based on statuses. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customise workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
+
+    ______________________________________________________________________________________
+    
+    <figure markdown="span">  
+        ![Workflow](../../assets/images/workflow_editor.png){ width="450"}
+        <figcaption>**Proposal workflow**</figcaption>
+    </figure>
+_____________________________________________________________________________________________________
+
+## **What are proposal statuses?**
+
+??? info "proposal statuses" 
+
+    **Proposal statuses** 
+_____________________________________________________________________________________________________
+
+## **What are status events?**
+
+??? info "Status events" 
+
+    **Status Events** 
+_____________________________________________________________________________________________________
+
+## **What are status actions?**
+
+??? info "Status actions" 
+
+    **Status Actions** 
+_____________________________________________________________________________________________________
 
 ## How do I create a proposal workflow?
 
@@ -33,8 +64,15 @@
 
 * Once you are satisfied with your edits, click the Update button to save and apply the changes to the PDF template
 
+_____________________________________________________________________________________________________
 
+## **How do I edit a proposal workflow?**
 
+_____________________________________________________________________________________________________
+
+## **How do I assign a proposal workflow to a call?**
+
+_____________________________________________________________________________________________________
 
 
 ## Statuses
@@ -95,44 +133,16 @@
 
     **Management decision** status that indicates that proposal sample review can be done
 
-
-
-
-
-
-
-
-
-
-
-??? info "Status events" 
-
-    **Status Events** 
-
-??? info "Status actions" 
-
-    **Status Actions** 
-
-
-
-??? info "How do I create new Statuses?" 
-
-    Creating new statuses
-
-
-# General Workflow
-
+### **General Workflow**
 
 <figure markdown="span">  
         ![General Workflow](../../assets/images/general_workflow.png){ width="300"}
         <figcaption>**General workflow structure**</figcaption>
     </figure>
 
-
-# Rapid Access Workflow 
+### **Rapid Access Workflow**
 
 <figure markdown="span">  
         ![Shipment Declaration](../../assets/images/rapid_workflow.png){ width="250"}
         <figcaption>**Rapid Access Workflow structure**</figcaption>
     </figure>
- 
