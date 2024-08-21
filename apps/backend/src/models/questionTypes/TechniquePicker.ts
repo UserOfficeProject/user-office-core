@@ -98,7 +98,6 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
       Tokens.TechniqueDataSource
     );
 
-    const techniqueMutations = container.resolve(TechniqueMutations);
 
     const proposal = await proposalDataSource.getByQuestionaryId(questionaryId);
 
