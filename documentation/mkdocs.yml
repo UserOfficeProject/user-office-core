@@ -82,6 +82,7 @@ nav:
       - Step-by-Step Guide: developer-guide/step-by-step.md
       - Architecture: developer-guide/architecture.md
       - RabbitMQ: developer-guide/rabbitmq.md
+      - Kubernetes: developer-guide/kubernetes.md
       - API Documentation: developer-guide/api_documentation.md
       - Documentation Changes: developer-guide/documentation_changes.md
   - FAQ: faq.md
