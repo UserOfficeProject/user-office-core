@@ -11,6 +11,9 @@ switch (process.env.DEPENDENCY_CONFIG) {
   case 'stfc':
     require('./dependencyConfigSTFC');
     break;
+  case 'eli':
+    require('./dependencyConfigELI');
+    break;
   case 'test':
     require('./dependencyConfigTest');
     break;
