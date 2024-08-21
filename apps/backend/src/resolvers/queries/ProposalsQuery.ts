@@ -57,11 +57,11 @@ export class TechniqueFilterInput {
 
 @InputType()
 export class DateFilterInput {
-  @Field(() => Date, { nullable: true })
-  public to: number;
+  @Field(() => String, { nullable: true })
+  public to: string;
 
-  @Field(() => Date, { nullable: true })
-  public from: number;
+  @Field(() => String, { nullable: true })
+  public from: string;
 }
 
 @InputType()
