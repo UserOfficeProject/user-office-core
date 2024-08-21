@@ -70,3 +70,20 @@ The FAP members can be configured.
 
 ### **What is the grade guide?**
 
+
+
+### **Multiple FAP reviewal of proposal**
+
+To generate a cutoff, we need the amount of instrument time available per instrument and the amount of time recommended per instrument. 
+
+In the simplest case all the proposals for an instrument are reviewed in the same panel
+cutoff = total instrument time available
+
+In the next case the proposals for an instrument are reviewed in two panels. Each panel needs a cutoff for that instrument
+
+cutoff = (total instrument time available / total instrument time recommended in both panels) x instrument time recommended in this panel
+
+Therefore in the case where instrument 1 has 10 days available to be shared in FAP 1 and FAP 2, where FAP 1 has a total of 15 days recommended by the instrument scientist and FAP 2 has a total of 10 days recommended by the instrument scientist
+
+FAP 1 has a cutoff at (10/25)*15 or 6 days
+FAP 2 has a cutoff at (10/25)*10 or 4 days

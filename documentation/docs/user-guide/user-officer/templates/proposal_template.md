@@ -4,11 +4,19 @@
 
     **Proposal templates** are designed to capture all necessary information that users need to provide when submitting their proposals. For example, these templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilise [**question templates**](question_template.md) and [**sub templates**](sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    User Officers can also utilise **question templates** and **sub-templates** to customise proposal templates to include specific questions based on the nature and requirements of the research.
+
+    _____________________________________________________________________________________
+
+    <figure markdown="span">  
+        ![Proposal](/assets/images/proposal_template.png){ width="450"}
+        <figcaption>**Proposal (viewed from the user's perspective)**</figcaption>
+    </figure>
+
 
 ??? info "What are question templates?"
 
-    **Question templates** are predefined questions that can be utilised within proposal templates, Proposal ESI templates, Sample ESI templates, Feedback templates and . These are designed to streamline the creation process of these templates and ensure consistency across different submissions. Each question addresses a specific -, allowing users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the question drawer. Question templates allow for standardisation across - proposals which is essential for data collection and analysis of users' responses.
+    **Question templates** are designed to streamline the template creation and ensure consistency across different submissions. Each question addresses a specific piece of information which users must provide in order to facilitate the research. Question templates allow users to provide detailed and structured responses regarding information about their research. User Officers can create various types of questions, which are stored in the the question drawer to be used across multiple templates. Question templates allow for standardisation across the different questionnaire types which is essential for data collection and analysis of users' responses.
 
 ??? info "What are sub templates?"
 

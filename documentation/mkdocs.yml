@@ -33,42 +33,44 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 nav:
   - Home: index.md
-  - Getting started: 
-      - Quick start: quick-start.md
+  - Getting Started: 
+      - Quick start: quick_start.md
   - User Guide:
       - Overview: user-guide/overview.md
       - Basic User: user-guide/user/user.md
       - User Officer:
-          - Introduction: user-guide/user-officer/user-officer.md
-          - Creating call: user-guide/user-officer/creating_call.md
-          - Editing call: user-guide/user-officer/editing_call.md
-          - Fap: user-guide/user-officer/fap.md
+          - Tutorials: user-guide/user-officer/user-officer.md
+          - Creating a call: user-guide/user-officer/creating_call.md
+          - Editing a call: user-guide/user-officer/editing_call.md
+          - Proposal workflow: user-guide/user-officer/proposal_workflow.md
+          - FAPs: user-guide/user-officer/fap.md
           - Feasibility review: user-guide/user-officer/feasibility_review.md
           - Features: user-guide/user-officer/features.md
-          - Page: user-guide/user-officer/page.md
-          - Proposal workflow: user-guide/user-officer/proposal_workflow.md
-          - Proposal: user-guide/user-officer/proposal.md
+          - Pages: user-guide/user-officer/page.md
+          - Proposals: user-guide/user-officer/proposal.md
           - Roles: user-guide/user-officer/roles.md
           - Videos: user-guide/user-officer/videos.md
           - Templates:
               - What are templates?: user-guide/user-officer/templates/templates.md
-              - PDF template: user-guide/user-officer/templates/pdf_template.md
-              - Feedback template: user-guide/user-officer/templates/feedback_template.md
-              - Proposal template: user-guide/user-officer/templates/proposal_template.md
-              - Proposal ESI template: user-guide/user-officer/templates/proposalESI_template.md
-              - Question template: user-guide/user-officer/templates/question_template.md
-              - Sample DEC template: user-guide/user-officer/templates/sampledec_template.md
-              - Sample ESI template: user-guide/user-officer/templates/sampleESI_template.md
-              - Shipment template: user-guide/user-officer/templates/shipment_template.md
-              - Sub template: user-guide/user-officer/templates/sub_template.md
-              - Visit template: user-guide/user-officer/templates/visit_template.md
+              - PDF templates: user-guide/user-officer/templates/pdf_template.md
+              - Proposal templates: user-guide/user-officer/templates/proposal_template.md
+              - Sample declaration templates: user-guide/user-officer/templates/sampledec_template.md
+              - Sub templates: user-guide/user-officer/templates/sub_template.md
+              - Shipment declaration templates: user-guide/user-officer/templates/shipment_template.md
+              - Visit registration templatse: user-guide/user-officer/templates/visit_template.md
+              - Proposal ESI templates: user-guide/user-officer/templates/proposalESI_template.md
+              - Sample ESI templates: user-guide/user-officer/templates/sampleESI_template.md
+              - Feedback templates: user-guide/user-officer/templates/feedback_template.md
+              - Question templates: user-guide/user-officer/templates/question_template.md
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
-      - Running locally: developer-guide/running-locally.md
+      - Running Locally: developer-guide/running_locally.md
       - Configuration: developer-guide/configuration.md
+      - Step-by-Step Guide: developer-guide/step-by-step.md
       - Architecture: developer-guide/achitecture.md
-      - Codebase structure: developer-guide/codebase-structure.md
-      - API documentation: developer-guide/api-documentation.md
+      - RabbitMQ: developer-guide/rabbitmq.md
+      - API Documentation: developer-guide/api_documentation.md
+      - Documentation Changes: developer-guide/documentation_changes.md
   - FAQ: faq.md
   - Glossary: glossary.md
   - References: references.md

@@ -9,6 +9,8 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
+import FapFiles from './Files/FapFilesUpload';
+import FapFilesView from './Files/FapFilesView';
 import FapGeneralInfo from './General/FapGeneralInfo';
 import FapMeetingComponentsView from './MeetingComponents/FapMeetingComponentsView';
 import FapMembers from './Members/FapMembers';
@@ -51,6 +53,10 @@ const FapPage = () => {
         />
       ),
     },
+    {
+      name: 'Documents',
+      element: <FapFilesView data={fap} />,
+    },
   ];
 
   if (isFapChairOrSecretary || isUserOfficer) {
@@ -74,6 +80,10 @@ const FapPage = () => {
         ),
       },
       {
+        name: 'Documents',
+        element: <FapFilesView data={fap} />,
+      },
+      {
         name: 'Proposals and Assignments',
         element: (
           <FapProposalsAndAssignmentsView
@@ -90,6 +100,15 @@ const FapPage = () => {
   }
 
   if (isUserOfficer) {
+    tabs.push({
+      name: 'Documents - Upload',
+      element: (
+        <FapFiles
+          data={fap}
+          onFapUpdate={(newFap: Fap): void => setFap(newFap)}
+        />
+      ),
+    });
     tabs.push({
       name: 'Logs',
       element: <EventLogList changedObjectId={fap.id} eventType="FAP" />,

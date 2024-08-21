@@ -106,7 +106,8 @@ export default class FapMutations {
         args.numberRatingsRequired,
         args.gradeGuide,
         args.customGradeGuide,
-        args.active
+        args.active,
+        args.files
       )
       .catch((err) => {
         return rejection(
@@ -643,9 +644,9 @@ export default class FapMutations {
     }
 
     const fapProposals = await this.dataSource.getFapProposalsByInstrument(
-      fapId,
       instrumentId,
-      proposal.callId
+      proposal.callId,
+      { fapId }
     );
 
     if (fapProposals.every((fp) => fp.fapInstrumentMeetingSubmitted)) {

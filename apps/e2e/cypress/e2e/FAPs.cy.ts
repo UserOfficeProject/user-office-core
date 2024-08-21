@@ -17,6 +17,8 @@ import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
 import { updatedCall, closedCall } from '../support/utils';
 
+faker.seed(1);
+
 const fapMembers = {
   chair: initialDBData.users.user2,
   secretary: initialDBData.users.user3,
@@ -184,13 +186,20 @@ function createWorkflowAndEsiTemplate() {
     const workflow = result.createProposalWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
-      cy.addProposalWorkflowStatus({
-        droppableGroupId: 'proposalWorkflowConnections_0',
-        proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-        proposalWorkflowId: createdWorkflowId,
-        sortOrder: 1,
-        prevProposalStatusId: 1,
-      });
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        cy.addProposalWorkflowStatus({
+          droppableGroupId: 'proposalWorkflowConnections_0',
+          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
+          proposalWorkflowId: createdWorkflowId,
+          sortOrder: 1,
+          prevProposalStatusId: 1,
+        });
+      }
 
       cy.createTemplate({
         name: 'default esi template',
@@ -227,6 +236,8 @@ function initializationBeforeTests() {
           abstract: proposal1.abstract,
           proposerId: initialDBData.users.user1.id,
         });
+
+        cy.submitProposal({ proposalPk: createdProposal.primaryKey });
 
         // Manually changing the proposal status to be shown in the Faps. -------->
         cy.changeProposalsStatus({
@@ -337,7 +348,7 @@ context('Fap reviews tests', () => {
 
     it('Officer should be able to assign proposal to existing Fap', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.get('[data-cy="fap-assignments-table"]').should(
         'not.contain.text',
@@ -365,7 +376,7 @@ context('Fap reviews tests', () => {
         variant: 'success',
       });
 
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -383,7 +394,7 @@ context('Fap reviews tests', () => {
         proposalPks: [firstCreatedProposalPk],
       });
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -411,7 +422,7 @@ context('Fap reviews tests', () => {
         proposalPks: [firstCreatedProposalPk],
       });
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -432,7 +443,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -493,7 +504,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -548,7 +559,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -609,7 +620,7 @@ context('Fap reviews tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -678,7 +689,7 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
       });
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -710,7 +721,7 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
       });
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -797,6 +808,33 @@ context('Fap reviews tests', () => {
       });
     });
 
+    it('Should be able to see how many proposals are assigned to a fap', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.login('officer');
+
+      cy.visit(`/Faps`);
+
+      cy.contains(fap1.code).parent().parent().contains('1');
+
+      cy.updateCall({
+        id: initialDBData.call.id,
+        proposalWorkflowId: createdWorkflowId,
+        esiTemplateId: createdEsiTemplateId,
+        faps: [createdFapId],
+        callFapReviewEnded: true,
+      });
+
+      cy.visit(`/Faps`);
+
+      cy.contains(fap1.code).parent().parent().contains('0');
+    });
+
     it('Should be able to see how many proposals are assigned to a reviewer', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
@@ -819,18 +857,91 @@ context('Fap reviews tests', () => {
       cy.login('officer');
 
       cy.visit(`/FapPage/${createdFapId}?tab=1`);
-      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
+      cy.get('[data-cy="fap-reviewers-table"]').contains('1');
 
       cy.updateCall({
         id: initialDBData.call.id,
-        ...closedCall,
         proposalWorkflowId: createdWorkflowId,
         esiTemplateId: createdEsiTemplateId,
         faps: [createdFapId],
+        callFapReviewEnded: true,
       });
 
       cy.visit(`/FapPage/${createdFapId}?tab=1`);
-      cy.get('[data-cy="fap-reviewers-table"]').contains('1');
+      cy.get('[data-cy="fap-reviewers-table"]').contains('0');
+    });
+
+    it('Should be able to see how many proposals are assigned to a chair and secretary', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+      cy.assignChairOrSecretary({
+        assignChairOrSecretaryToFapInput: {
+          fapId: createdFapId,
+          userId: fapMembers.chair.id,
+          roleId: UserRole.FAP_CHAIR,
+        },
+      });
+      cy.assignChairOrSecretary({
+        assignChairOrSecretaryToFapInput: {
+          fapId: createdFapId,
+          userId: fapMembers.secretary.id,
+          roleId: UserRole.FAP_SECRETARY,
+        },
+      });
+
+      cy.login('officer');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('0');
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '0'
+      );
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[type="checkbox"]').first().check();
+
+      cy.get('[data-cy="assign-fap-members"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.chair.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.secretary.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains('Update').click();
+
+      clickConfirmOk();
+
+      //The count are maintained in frontend so cannot reload the page
+      cy.contains('Members').click();
+
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '1'
+      );
+
+      //Now test with reload
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '1'
+      );
     });
   });
 
@@ -881,7 +992,7 @@ context('Fap reviews tests', () => {
           position: 'Dirrector',
         } as UpdateUserMutationVariables);
       }
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -913,15 +1024,11 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
 
-      cy.get('[data-cy="fap-chair-reviews-info"]').should(
-        'have.attr',
-        'aria-label',
-        'Number of proposals to review: 1'
-      );
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
     });
 
     it('Fap Chair should be able to see proposal details in modal inside proposals and assignments', () => {
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -948,7 +1055,7 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
       });
 
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -976,7 +1083,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="save-grade"]').should('be.disabled');
       cy.get('[data-cy="submit-grade"]').should('be.disabled');
 
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
       cy.contains('1 / 1').should('be.visible');
     });
@@ -1030,7 +1137,7 @@ context('Fap reviews tests', () => {
         } as UpdateUserMutationVariables);
       }
 
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -1062,10 +1169,8 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
 
-      cy.get('[data-cy="fap-secretary-reviews-info"]').should(
-        'have.attr',
-        'aria-label',
-        'Number of proposals to review: 1'
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '1'
       );
     });
 
@@ -1078,7 +1183,7 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
       });
 
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -1288,7 +1393,7 @@ context('Fap reviews tests', () => {
         .find('[aria-label="Edit"]')
         .click();
 
-      cy.get('[role="tablist"] [role="tab"]').should('have.length', 1);
+      cy.get('[role="tablist"] [role="tab"]').should('have.length', 2);
 
       cy.finishedLoading();
 
@@ -1433,7 +1538,7 @@ context('Fap meeting components tests', () => {
   describe('User Officer role', () => {
     it('Officer should be able to assign proposal to instrument and instrument to call to see it in meeting components', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1462,7 +1567,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should not be able to submit an instrument if all proposals are not submitted in Fap meetings', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1530,7 +1635,7 @@ context('Fap meeting components tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1587,7 +1692,7 @@ context('Fap meeting components tests', () => {
         }
       });
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1739,7 +1844,7 @@ context('Fap meeting components tests', () => {
         }
       });
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1759,7 +1864,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to see proposals that are marked red if they do not fit in availability time', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1771,7 +1876,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to update avaliblity time', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1785,7 +1890,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to edit Fap Meeting form', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1849,7 +1954,7 @@ context('Fap meeting components tests', () => {
       );
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -1951,7 +2056,7 @@ context('Fap meeting components tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2012,7 +2117,7 @@ context('Fap meeting components tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2075,7 +2180,7 @@ context('Fap meeting components tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2111,7 +2216,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to set Fap time allocation', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2163,7 +2268,7 @@ context('Fap meeting components tests', () => {
     it('should use Fap time allocation (if set) when calculating if they fit in available time', () => {
       const newFapTimeAllocation = 15;
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2312,7 +2417,7 @@ context('Fap meeting components tests', () => {
       });
 
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2345,7 +2450,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to submit an instrument if all proposals Fap meetings are submitted in existing Fap', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2461,7 +2566,7 @@ context('Fap meeting components tests', () => {
         fapId: createdFapId,
       });
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2479,7 +2584,7 @@ context('Fap meeting components tests', () => {
 
     it('Download Fap is working with dialog window showing up', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2495,7 +2600,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to remove assigned Fap member from proposal in existing Fap', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2533,7 +2638,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to remove assigned proposal from existing Fap', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2577,7 +2682,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to download Fap proposal as pdf', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2596,7 +2701,7 @@ context('Fap meeting components tests', () => {
 
     it('Officer should be able to add custom grade guide when creating Fap', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2613,7 +2718,7 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="custom-grade-guide"]').click();
       cy.get('[data-cy="submit"]').click();
 
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2661,7 +2766,7 @@ context('Fap meeting components tests', () => {
         }
       );
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2675,6 +2780,156 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="preparing-download-dialog-item"]').contains(
         proposal1.title
       );
+    });
+
+    it('Officer should be be able to download of all FAP meetings in excel', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+
+        cy.wrap(createdProposal.proposalId).as('proposal2Id');
+
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [createdInstrumentId],
+            proposalPks: [createdProposal.primaryKey],
+          });
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal.primaryKey,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 5,
+            submitted: true,
+            reviewerId: 0,
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.assignProposalsToFaps({
+            fapInstruments: [
+              { instrumentId: createdInstrumentId, fapId: createdFapId },
+            ],
+            proposalPks: [createdProposal.primaryKey],
+          });
+
+          cy.assignReviewersToFap({
+            fapId: createdFapId,
+            memberIds: [fapMembers.reviewer2.id],
+          });
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: firstCreatedProposalPk,
+            },
+            fapId: createdFapId,
+          });
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer.id,
+              proposalPk: createdProposal.primaryKey,
+            },
+            fapId: createdFapId,
+          });
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: createdProposal.primaryKey,
+            },
+            fapId: createdFapId,
+          });
+
+          // Manually changing the proposal status to be shown in the Faps. -------->
+          cy.changeProposalsStatus({
+            statusId: initialDBData.proposalStatuses.fapReview.id,
+            proposalPks: [createdProposal.primaryKey],
+          });
+
+          cy.getProposalReviews({
+            proposalPk: firstCreatedProposalPk,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make first proposal with lower standard deviation. Grades are 2 and 4
+                  grade: index ? 2 : 4,
+                  status: ReviewStatus.SUBMITTED,
+                  fapID: createdFapId,
+                });
+              });
+            }
+          });
+
+          cy.getProposalReviews({
+            proposalPk: createdProposal.primaryKey,
+          }).then(({ proposalReviews }) => {
+            if (proposalReviews) {
+              proposalReviews.forEach((review, index) => {
+                cy.updateReview({
+                  reviewID: review.id,
+                  comment: faker.random.words(5),
+                  // NOTE: Make second proposal with higher standard deviation. Grades are 1 and 5
+                  grade: index ? 1 : 5,
+                  status: ReviewStatus.SUBMITTED,
+                  fapID: createdFapId,
+                });
+              });
+            }
+          });
+
+          cy.saveFapMeetingDecision({
+            saveFapMeetingDecisionInput: {
+              commentForManagement: 'test',
+              commentForUser: 'test',
+              proposalPk: firstCreatedProposalPk,
+              submitted: true,
+              recommendation: ProposalEndStatus.ACCEPTED,
+              instrumentId: createdInstrumentId,
+              fapId: createdFapId,
+            },
+          });
+
+          cy.saveFapMeetingDecision({
+            saveFapMeetingDecisionInput: {
+              commentForManagement: 'test2',
+              commentForUser: 'test2',
+              proposalPk: createdProposal.primaryKey,
+              submitted: true,
+              recommendation: ProposalEndStatus.ACCEPTED,
+              instrumentId: createdInstrumentId,
+              fapId: createdFapId,
+            },
+          });
+        }
+      });
+
+      cy.login('officer');
+      cy.visit(`/Calls`);
+
+      cy.contains(updatedCall.shortCode)
+        .parent()
+        .find('[aria-label="Export Fap Data"]')
+        .click();
+
+      const downloadsFolder = Cypress.config('downloadsFolder');
+      const fileName = `${updatedCall.shortCode}_FAP_Results.xlsx`;
+
+      cy.readFile(`${downloadsFolder}/${fileName}`)
+        .should('exist')
+        .then(() => {
+          cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
+            (actualExport) => {
+              cy.fixture('exampleCallFapExport.json').then((expectedExport) => {
+                expect(expectedExport).to.deep.equal(actualExport);
+              });
+            }
+          );
+        });
     });
   });
 
@@ -2692,7 +2947,7 @@ context('Fap meeting components tests', () => {
       cy.changeActiveRole(initialDBData.roles.fapChair);
     });
     it('Fap Chair should be able to edit Fap Meeting form', () => {
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2720,7 +2975,7 @@ context('Fap meeting components tests', () => {
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
       });
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
       cy.get('button[aria-label="Submit instrument"]').should('not.exist');
@@ -2746,7 +3001,7 @@ context('Fap meeting components tests', () => {
     });
 
     it('Fap Chair should not be able to remove assigned proposal from existing Fap', () => {
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2755,7 +3010,7 @@ context('Fap meeting components tests', () => {
 
     it('Fap Chair should be able to update avalibabity time', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2884,7 +3139,7 @@ context('Fap meeting components tests', () => {
 
       cy.login(fapMembers.chair);
       cy.changeActiveRole(initialDBData.roles.fapChair);
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2923,7 +3178,7 @@ context('Fap meeting components tests', () => {
     });
 
     it('Fap Secretary should be able to edit Fap Meeting form', () => {
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -2951,7 +3206,7 @@ context('Fap meeting components tests', () => {
         instrumentId: createdInstrumentId,
         fapId: createdFapId,
       });
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
       cy.get('button[aria-label="Submit instrument"]').should('not.exist');
@@ -2977,7 +3232,7 @@ context('Fap meeting components tests', () => {
     });
 
     it('Fap Secretary should not be able to remove assigned proposal from existing Fap', () => {
-      cy.visit(`/FapPage/${createdFapId}?tab=2`);
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
       cy.finishedLoading();
 
@@ -2986,7 +3241,7 @@ context('Fap meeting components tests', () => {
 
     it('Fap Secretary should be able to update avalibabity time', () => {
       cy.login('officer');
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 
@@ -3115,7 +3370,7 @@ context('Fap meeting components tests', () => {
 
       cy.login(fapMembers.secretary);
       cy.changeActiveRole(initialDBData.roles.fapSecretary);
-      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.visit(`/FapPage/${createdFapId}?tab=4`);
 
       cy.finishedLoading();
 

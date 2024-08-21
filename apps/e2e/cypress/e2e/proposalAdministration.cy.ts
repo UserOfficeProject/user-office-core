@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  SettingsId,
   TechnicalReviewStatus,
   TemplateCategoryId,
 } from '@user-office-software-libs/shared-types';
@@ -10,6 +11,7 @@ import PdfParse from 'pdf-parse';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 context('Proposal administration tests', () => {
   const proposalName1 = faker.lorem.words(3);
@@ -741,6 +743,58 @@ context('Proposal administration tests', () => {
         .should('have.attr', 'aria-sort', 'ascending');
     });
 
+    it('Should not save table sort if it is not present in the url', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalFixedName,
+            abstract: proposalName2,
+          });
+        }
+      });
+      let officerProposalsTableAsTextBeforeSort = '';
+
+      cy.contains('Proposals').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
+        officerProposalsTableAsTextBeforeSort = element.text();
+      });
+
+      cy.contains('Title')
+        .parent()
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Calls').click();
+
+      cy.finishedLoading();
+
+      cy.contains(initialDBData.call.shortCode);
+
+      cy.get('[data-cy="officer-menu-items"]').contains('Proposals').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposalFixedName);
+
+      cy.get('[data-cy="officer-proposals-table"] table').then((element) => {
+        expect(element.text()).to.be.equal(
+          officerProposalsTableAsTextBeforeSort
+        );
+      });
+
+      cy.contains('Title')
+        .parent()
+        .find('[data-testid="mtableheader-sortlabel"]')
+        .should('not.have.attr', 'aria-sort', 'ascending');
+    });
+
     it('Should preserve the ordering when row is selected', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
@@ -767,7 +821,14 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to sort propsals by instrument and technical review fields', () => {
-      cy.addFeasibilityReviewToDefaultWorkflow();
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
+        'FEASIBILITY'
+      ) {
+        cy.addFeasibilityReviewToDefaultWorkflow();
+      }
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposalPk = result.createProposal.primaryKey;
         if (proposalPk) {
@@ -880,8 +941,6 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy=call-filter]').click();
 
       cy.get('[role=listbox]').contains('call 1').first().click();
-
-      cy.get('[data-cy=question-search-toggle]').click();
     });
 
     it('Should be able to search Boolean question', () => {
