@@ -37,7 +37,6 @@ export function useProposalsCoreData(
   const fetchProposalsData = useCallback(
     async (componentController?: { unmounted: boolean }) => {
       setLoading(true);
-
       api()
         .getTechniqueScientistProposals({
           filter: {
