@@ -349,6 +349,20 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.whereIn('proposal_id', filter.referenceNumbers);
         }
 
+        if (
+          filter?.dateFilter?.to !== undefined &&
+          filter?.dateFilter?.to !== null
+        ) {
+          query.where('submitted_date', '>=', new Date(filter.dateFilter.from));
+        }
+
+        if (
+          filter?.dateFilter?.from !== undefined &&
+          filter?.dateFilter?.from !== null
+        ) {
+          query.where('submitted_date', '<=', new Date(filter.dateFilter.to));
+        }
+
         if (first) {
           query.limit(first);
         }
