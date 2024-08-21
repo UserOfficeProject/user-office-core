@@ -1,6 +1,8 @@
 
 # Feedback templates :material-message-alert:
 
+## **What are feedback templates?**
+
 ??? info "Feedback templates" 
 
     [**Feedback templates**](templates/feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire. This form becomes available to users after their experiment has been allocated a time within the external scheduler. User Officers can set the Feedback template they wish to utilise with the `MARK AS ACTIVE` function on the feedback templates page. 
@@ -114,21 +116,6 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
-
 ### **What does # feedbacks mean on feedback templates?**
 
 In the feedback templates page, the # feedbacks assigned to the templates refers to the number of feedback forms users have submitted to that feedback template. 
-=======
-
-
-??? info "Feedback templates" 
-
-    [**Feedback templates**](templates/feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire.
-    ______________________________________________________________________________________
-    
-    <figure markdown="span">  
-        ![Feedback templates](/assets/images/placeholder.png){ width="450"}
-        <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
-    </figure>
-
-

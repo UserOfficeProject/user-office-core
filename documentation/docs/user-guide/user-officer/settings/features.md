@@ -1,34 +1,36 @@
 # Features
 
-* **EMAIL_SEARCH:** Search by Email functionality 
+## **What are features?**
 
-* **STFC_IDLE_TIMER:** STFC idle warning popup
+* **`EMAIL SEARCH:`** Search by Email functionality 
 
-* **USER_SEARCH_FILTER:** Flag for users list filter functionality
+* **`STFC IDLE TIMER:`** STFC idle warning popup
 
-* **USER_MANAGEMENT:** User management functionality
+* **`USER SEARCH FILTER:`** Flag for users list filter functionality
 
-* **FAP_REVIEW:** FAP (facility access panels) functionality
+* **`USER MANAGEMENT:`** User management functionality
 
-* **SHIPPING:** Shipping feature
+* **`FAP REVIEW:`** FAP (facility access panels) functionality
 
-* **SCHEDULER:** Scheduler feature
+* **`SHIPPING:`** Shipping feature
 
-* **RISK_ASSESSMENT:** Risk assessment functionality
+* **`SCHEDULER:`** Scheduler feature
 
-* **INSTRUMENT_MANAGEMENT:** Instrument management functionality
+* **`RISK ASSESSMENT:`** Risk assessment functionality
 
-* **TECHNICAL_REVIEW:** Technical review functionality 
+* **`INSTRUMENT MANAGEMENT:`** Instrument management functionality
 
-* **VISIT_MANAGEMENT:** Visit management functionality
+* **`TECHNICAL REVIEW:`** Technical review functionality 
 
-* **SAMPLE_SAFETY:** Sample safety functionality
+* **`VISIT MANAGEMENT:`** Visit management functionality
 
-* **OAUTH:** Is OAuth enabled
+* **`SAMPLE SAFETY:`** Sample safety functionality
 
-* **EMAIL_INVITE:** Email invitation functionality    
+* **`OAUTH:`** Is OAuth enabled
 
+* **`EMAIL INVITE:`** Email invitation functionality    
 
+## **How do I configure the features?**
 
 Icon functions
 
@@ -42,13 +44,13 @@ Icon functions
 * Pages - :material-cog-box:
 * Institutions - :material-bank:
 * Templates - :material-text-box-multiple:
-* PDF -
+* PDF - :material-file-pdf-box:
 * Proposal templates -
 * Sample declaration -
 * Sub template -
 * Shipment declaration - :material-truck:
 * Visit registration - :material-airplane-takeoff:
-* ESI -
+* ESI - 
 * Proposal ESI -
 * Sample ESI - :material-inbox:
 * Feedback - :material-message-alert:
