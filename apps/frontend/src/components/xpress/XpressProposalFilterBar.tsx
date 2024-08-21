@@ -1,5 +1,4 @@
 import Grid from '@mui/material/Grid';
-import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { QueryParamConfig } from 'use-query-params';
@@ -102,15 +101,10 @@ const XpressProposalFilterBar = ({
           <DateFilter
             from={filter.dateFilter?.from}
             to={filter.dateFilter?.to}
-            onChange={(format: string, from?: Date, to?: Date) => {
+            onChange={(dateFilterValue) => {
               setProposalFilter({
                 ...filter,
-                dateFilter: {
-                  from: from
-                    ? DateTime.fromJSDate(from).toFormat(format)
-                    : undefined,
-                  to: to ? DateTime.fromJSDate(to).toFormat(format) : undefined,
-                },
+                dateFilter: dateFilterValue,
               });
             }}
             data-cy="date-filter"
