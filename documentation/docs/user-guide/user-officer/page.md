@@ -135,9 +135,6 @@ Pages are highly customiseable sections of information within User Office. Pages
 
 **Step 3. Update your changes**
 
-* Once you are satisfied with the changes and ensured that the page is well-formatted with the `PREVIEW` function you can update the page by clicking on the `UPDATE` button
+* Once you are satisfied with the changes and ensured that the page is well-formatted with the `PREVIEW` function you can update the page by clicking on the `UPDATE` button.
+_________________________________________________________________________________________________________
 
-!!! tip ""
-
-    **Tip!** If you are You may wish to check the updated page by swiching roles. You can do this in `VIEW` > `PREVIEW`
-_____________________________________________________________________________________________________________

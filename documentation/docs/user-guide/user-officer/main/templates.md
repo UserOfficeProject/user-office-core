@@ -1,6 +1,8 @@
+# Templates :material-text-box-multiple:
 
-## Templates :material-text-box-multiple:
+![Templates](../../../assets/images/templates.png)
 
+## **What are templates?**
 
 Templates :material-text-box-multiple: are used to save and re-utilise predefined information across User Office. Calls are built using several different types of templates which can be edited and cloned. Templates carry information and serve many functions; for example, they may contain specific questions to be used within the call which users answer in their proposals. The template system is useful because it saves you having to do all the work from scratch every time. Furthermore, it allows for standardisation which is essential for data collection and analysis.
 
@@ -8,7 +10,7 @@ Templates :material-text-box-multiple: are used to save and re-utilise predefine
 There are several different types of templates utilised within Calls:
 
 
-# **List of all templates**
+## **List of all templates**
 
 
 ??? info "Proposal templates" 
@@ -92,17 +94,8 @@ There are several different types of templates utilised within Calls:
 
 ______________________________________________________________________________________
 
-# **How do I use templates within a call?**
+## **How do I use templates within a call?**
 
 * [How do I use templates within a call?](../creating_call.md)
 
 ______________________________________________________________________________________
-
-# **How do I edit templates?**
-
-1. To edit templates, click on the **templates** :material-text-box-multiple: dropdown within the main menu and chose the type of template you wish to edit. 
-
-
-2. 
-
-chose the type of template you wish to edit 

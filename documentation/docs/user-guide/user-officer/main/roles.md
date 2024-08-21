@@ -1,4 +1,11 @@
-# Roles
+# Roles :material-account-supervisor-circle:
+
+## **What are roles?**
+
+_________________________________________________________________________________________________________
+
+
+## **What are the different roles in User Office?** 
 
 There are many roles within User Office: 
 
@@ -57,9 +64,8 @@ There are many roles within User Office:
 
     **Main uses of User Office:**
 
+_________________________________________________________________________________________________________
 
-### How do I change roles?
+### **How do I change roles?**
 
-
-### How do I impersonate other users? 
-
+_________________________________________________________________________________________________________
