@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/achitecture/">
+        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/kubernetes/">
       
       
-        <link rel="prev" href="../step-by-step/">
+        <link rel="prev" href="../rabbitmq/">
       
       
-        <link rel="next" href="../rabbitmq/">
+        <link rel="next" href="../api_documentation/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Architecture - User Office Documentation</title>
+        <title>Kubernetes - User Office Documentation</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#components" class="md-skip">
+        <a href="#repository-and-helm-chart" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Architecture
+              Kubernetes
             
           </span>
         </div>
@@ -1531,28 +1531,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Architecture
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1561,57 +1543,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#components" class="md-nav__link">
-    <span class="md-ellipsis">
-      Components
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Components">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#integration-and-communication" class="md-nav__link">
-    <span class="md-ellipsis">
-      Integration and Communication
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#external-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      External Dependencies
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1633,6 +1564,126 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#repository-and-helm-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Repository and Helm Chart
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-the-helm-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installing the Helm Chart
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Modules
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling Dependencies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uninstalling-the-helm-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uninstalling the Helm Chart
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1792,35 +1843,65 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#components" class="md-nav__link">
+  <a href="#repository-and-helm-chart" class="md-nav__link">
     <span class="md-ellipsis">
-      Components
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Components">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#integration-and-communication" class="md-nav__link">
-    <span class="md-ellipsis">
-      Integration and Communication
+      Repository and Helm Chart
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#external-dependencies" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
-      External Dependencies
+      Prerequisites
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#installing-the-helm-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installing the Helm Chart
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Modules
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Handling Dependencies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uninstalling-the-helm-chart" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uninstalling the Helm Chart
+    </span>
+  </a>
   
 </li>
       
@@ -1839,40 +1920,53 @@
                   
 
 
-  <h1>Architecture</h1>
+  <h1>Kubernetes</h1>
 
-<p>The following picture shows the components of the User Office architecture.</p>
-<p><img alt="System overview" src="../../assets/images/system-overview.png" /></p>
-<h2 id="components">Components</h2>
-<p>The User Office application leverages a modular architecture with several interconnected components that interact through GraphQL and RabbitMQ.</p>
-<p><strong>User Office Core</strong></p>
+<p>Kubernetes is an open-source platform for automating the deployment, scaling, and operation of containerized applications. Helm is a package manager and simplifies the process of deploying and managing applications on Kubernetes by using pre-configured application packages, the Helm charts.</p>
+<h2 id="repository-and-helm-chart">Repository and Helm Chart</h2>
+<p>The Helm charts for deploying the User Office platform with Kubernetes are located in the <a href="https://github.com/UserOfficeProject/user-office-helm"><code>user-office-helm</code></a> repository, specifically within the <code>user-office-app</code> directory.</p>
+<h2 id="prerequisites">Prerequisites</h2>
 <ul>
-<li>Frontend: Manages the main user interface for proposal submissions, reviews, and visits.</li>
-<li>Backend: Handles requests from the frontend, interfaces with the database, and manages authentication services.</li>
+<li>Ensure that you have a Kubernetes cluster set up.</li>
+<li>Helm must be installed on your local machine to manage the deployment.</li>
+<li>OpenID Connect (OIDC) is required for authentication. The redirect URL for setting up your OIDC provider is <code>&lt;HOSTNAME&gt;/external-auth</code>.</li>
 </ul>
-<p><strong>User Office Factory</strong></p>
+<h2 id="installing-the-helm-chart">Installing the Helm Chart</h2>
+<p>To install the User Office platform with the release name <code>user-office-app</code>, run the following commands:</p>
+<pre><code>helm install -f values.yaml user-office-app \
+--set duo-backend.configmap.data.AUTH_CLIENT_ID=&lt;AUTH_CLIENT_ID&gt; \
+--set duo-backend.configmap.data.AUTH_CLIENT_SECRET=&lt;AUTH_CLIENT_SECRET&gt; \
+--set duo-backend.configmap.data.AUTH_DISCOVERY_URL=&lt;AUTH_DISCOVERY_URL&gt; \
+./user-office-app
+</code></pre>
+<p>This command deploys the application with default settings, making it accessible at <code>localhost</code>. Ensure that you enter your actual OIDC provider details.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The Helm chart is highly configurable, with several parameters available for customization:</p>
 <ul>
-<li>Generates PDF and Excel files for the frontend, supporting data export and reporting functionalities.</li>
+<li><code>duo-frontend.ingress.host</code>: The URL for the frontend (default is <code>localhost</code>).</li>
+<li><code>duo-backend.ingress.host</code>: The URL for the backend (default is <code>localhost</code>).</li>
+<li><code>duo-backend.configmap.data.AUTH_CLIENT_ID</code>: Your OpenID Client ID.</li>
+<li><code>duo-backend.configmap.data.AUTH_CLIENT_SECRET</code>: Your OpenID Client Secret.</li>
+<li><code>duo-backend.configmap.data.AUTH_DISCOVERY_URL</code>: The OIDC discovery URL, including the entire path.</li>
+<li><code>rabbitmq.enabled</code>: Whether to enable <a href="../rabbitmq/">RabbitMQ</a> (default is <code>false</code>).</li>
 </ul>
-<p><strong>User Office Cron</strong></p>
+<p>You can specify these parameters directly in the Helm install command using <code>--set key=value</code>, or by modifying the <code>values.yaml</code> file.</p>
+<h2 id="additional-modules">Additional Modules</h2>
+<p>If you need to install the scheduler module, replace <code>values.yaml</code> with <code>values.scheduler.yaml</code> in your install command:</p>
+<pre><code>helm install -f values.scheduler.yaml user-office-app ./user-office-app
+</code></pre>
+<p>The scheduler will communicate with the User Office core via <a href="../rabbitmq/">RabbitMQ</a>.</p>
+<h2 id="handling-dependencies">Handling Dependencies</h2>
+<p>The User Office software uses dependency injection for services like email and RabbitMQ. To configure these services, you will need to modify the backend’s <code>configmap</code> and <code>secrets</code>:</p>
 <ul>
-<li>Performs asynchronous backend tasks, such as user cleanup after periods of inactivity, ensuring smooth system operations.</li>
+<li><strong>RabbitMQ Configuration</strong>: Set <code>RABBITMQ_HOSTNAME</code>, <code>RABBITMQ_USERNAME</code>, <code>RABBITMQ_CORE_EXCHANGE_NAME</code> in the <code>configmap</code>, and <code>RABBITMQ_PASSWORD</code> in the <code>secrets</code>.</li>
+<li><strong>Email Services Configuration</strong>: The platform supports SMTP and Sparkpost. Adjust the dependency configuration as necessary for your environment.</li>
 </ul>
-<h3 id="integration-and-communication">Integration and Communication</h3>
-<p><strong>User Office Gateway</strong></p>
-<ul>
-<li>Combines APIs from the scheduler backend and core backend, providing a unified GraphQL API crucial for systems utilizing the scheduler.</li>
-</ul>
-<p><strong>User Office Scheduler</strong></p>
-<ul>
-<li>Frontend: Manages the scheduling interface for users.</li>
-<li>Backend: Serves as the primary source of scheduling information and communicates with the core backend via RabbitMQ for real-time data exchange.</li>
-</ul>
-<h3 id="external-dependencies">External Dependencies</h3>
-<p><strong>SciCat, NICOS, and Asset Management Systems</strong> </p>
-<ul>
-<li>These external systems interface with the User Office application to ensure efficient asset management and integration with external resources, enhancing the overall functionality and data management capabilities.</li>
-</ul>
+<h2 id="uninstalling-the-helm-chart">Uninstalling the Helm Chart</h2>
+<p>To remove the deployed User Office platform, use the following command:</p>
+<pre><code>helm delete user-office-app
+</code></pre>
+<p>This command will delete all Kubernetes components associated with the chart and remove the release.</p>
 
 
 
