@@ -51,6 +51,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://userofficeproject.github.io/user-office-core/develop/developer-guide/email/</loc>
+         <lastmod>2024-08-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://userofficeproject.github.io/user-office-core/develop/developer-guide/kubernetes/</loc>
          <lastmod>2024-08-22</lastmod>
          <changefreq>daily</changefreq>
