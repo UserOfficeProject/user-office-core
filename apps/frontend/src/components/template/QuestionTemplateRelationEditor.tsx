@@ -25,8 +25,9 @@ export default function QuestionTemplateRelationEditor(props: {
       onClose={props.closeMe}
       fullWidth
       maxWidth="md"
+      title="Edit question"
     >
-      <DialogContent>
+      <DialogContent dividers>
         <TemplateEditLabel pageType={'Template'} />
 
         {createQuestionTemplateRelationForm({

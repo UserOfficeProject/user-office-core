@@ -52,7 +52,7 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
       open={props.templateId !== undefined}
       onClose={props.onClose}
       fullWidth={true}
-      title="Calls using the template"
+      title="Associated Calls"
     >
       <DialogContent dividers>
         <CallsList filterTemplateId={props.templateId as number} />

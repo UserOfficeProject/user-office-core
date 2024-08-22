@@ -199,6 +199,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               if (reason && reason == 'backdropClick') return;
               setShow(false);
             }}
+            title="Create new unit"
           >
             <DialogContent>
               <CreateUnit close={onCreated} unit={null} />

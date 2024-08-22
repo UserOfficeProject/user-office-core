@@ -392,6 +392,7 @@ function QuestionaryComponentProposalEsiBasis(
               data-cy="sample-esi-modal"
               maxWidth="md"
               fullWidth
+              title="Sample ESI"
             >
               <DialogContent>
                 {selectedSampleEsi ? (

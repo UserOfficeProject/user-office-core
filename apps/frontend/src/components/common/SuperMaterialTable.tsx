@@ -189,8 +189,9 @@ export function SuperMaterialTable<Entry extends EntryID>({
           setEditObject(null);
           setShow(false);
         }}
+        title="Create"
       >
-        <DialogContent>
+        <DialogContent dividers>
           {createModal?.(onUpdated, onCreated, editObject)}
         </DialogContent>
       </StyledDialog>

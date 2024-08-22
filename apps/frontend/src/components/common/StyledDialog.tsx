@@ -31,23 +31,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import { DialogTitle, IconButton } from '@mui/material';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
 import React from 'react';
-function StyledDialog(
-  props: DialogProps & { title?: string; error?: boolean }
-) {
+function StyledDialog(props: DialogProps & { title: string; error?: boolean }) {
   return (
     <Dialog {...props}>
-      {props.title && (
-        <DialogTitle
-          id="customized-dialog-title"
-          sx={(theme) => ({
-            color: props.error
-              ? theme.palette.error.main
-              : theme.palette.primary.main,
-          })}
-        >
-          {props.title}
-        </DialogTitle>
-      )}
+      <DialogTitle
+        id="customized-dialog-title"
+        sx={(theme) => ({
+          color: props.error
+            ? theme.palette.error.main
+            : theme.palette.primary.main,
+        })}
+      >
+        {props.title}
+      </DialogTitle>
       {props.onClose && (
         <IconButton
           data-cy="close-modal-btn"

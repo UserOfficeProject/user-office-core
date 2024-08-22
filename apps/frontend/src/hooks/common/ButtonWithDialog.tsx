@@ -8,6 +8,7 @@ interface ButtonWithDialogProps extends ButtonProps {
   children: JSX.Element & { onClose?: () => void };
   label: string;
   disabled?: boolean;
+  title: string;
 }
 
 function ButtonWithDialog(props: ButtonWithDialogProps) {
@@ -22,8 +23,9 @@ function ButtonWithDialog(props: ButtonWithDialogProps) {
       <StyledDialog
         open={isDialogOpen}
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
         onClose={() => setIsDialogOpen(false)}
+        title={props.title}
       >
         <DialogContent dividers>
           {React.cloneElement(children, {

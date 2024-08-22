@@ -207,8 +207,12 @@ const TemplatesTable = ({
 
   return (
     <>
-      <StyledDialog open={show} onClose={() => setShow(false)}>
-        <DialogContent>
+      <StyledDialog
+        open={show}
+        onClose={() => setShow(false)}
+        title="Create New Template"
+      >
+        <DialogContent dividers>
           <CreateTemplate
             onComplete={(template) => {
               if (template) {

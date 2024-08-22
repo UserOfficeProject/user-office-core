@@ -24,8 +24,9 @@ export default function QuestionEditor(props: {
       fullWidth
       maxWidth="md"
       onClose={props.closeMe}
+      title="Edit question"
     >
-      <DialogContent>
+      <DialogContent dividers>
         <TemplateEditLabel pageType={'Question'} />
         {createQuestionForm({
           question: props.field,

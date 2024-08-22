@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -62,10 +61,6 @@ const CreateUnit = ({ close, unit }: CreateUnitProps) => {
     >
       {() => (
         <Form>
-          <Typography variant="h6" component="h1">
-            Create new unit
-          </Typography>
-
           <Field
             name="id"
             label="ID"
