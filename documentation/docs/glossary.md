@@ -30,11 +30,11 @@
     > The term # Answers refers to the number of responses provided to specific questions. Clicking on the # Answers will display more information about the Question and the template the answer is linked to.
 
 ??? info "**B**"
-    :material-book-open-variant-outline: [**Backend**](placeholder.md)
+    :material-book-open-variant-outline: [**Backend**](user-guide/user-officer/placeholder.md)
 
 ??? info "**C**"
     :material-book-open-variant-outline: [**Call**](user-guide/user-officer/placeholder.md) 
-    > Calls allow users’ proposals to be submitted within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates**](user-guide/user-officer/templates/templates.md), [**FAPs (Facility Access Panels)**](user-guide/user-officer/fap.md) and a [**proposal workflow**](user-guide/user-officer/proposal_workflow.md). 
+    > Calls allow users’ proposals to be submitted within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates**](user-guide/user-officer/main/templates.md), [**FAPs (Facility Access Panels)**](user-guide/user-officer/fap.md) and a [**proposal workflow**](user-guide/user-officer/settings/proposal_workflow.md). 
 
     :material-book-open-variant-outline: [**Call deadline**](user-guide/user-officer/placeholder.md) 
     >
