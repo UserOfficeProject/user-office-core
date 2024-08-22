@@ -282,7 +282,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }): Promise<Review> {
     const { userID, proposalPk, fapID, questionaryID } = args;
 
-    // @TODO: add questionary_id
     return database
       .insert({
         user_id: userID,

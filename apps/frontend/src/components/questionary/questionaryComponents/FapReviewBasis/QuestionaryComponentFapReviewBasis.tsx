@@ -9,7 +9,6 @@ import { ErrorMessage, Field } from 'formik';
 import React, { ChangeEvent, useContext, useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
-import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import Editor from 'components/common/TinyEditor';
@@ -22,9 +21,8 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { ReviewContextType } from 'components/review/ReviewQuestionary';
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { ReviewStatus, SettingsId, UserRole } from 'generated/sdk';
+import { SettingsId } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
@@ -45,7 +43,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
     state?.fapReview.comment || ''
   );
   const [numberOfChars, setNumberOfChars] = useState(0);
-  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
@@ -64,10 +61,8 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   };
 
   const gradeFieldId = `${id}.grade`;
-  const submittedFieldId = `${id}.submitted`;
   const commentFieldId = `${id}.comment`;
 
-  // @TODO: check if TextFieldNoSubmit can be applied
   return (
     <div>
       <Box sx={{ margin: theme.spacing(2, 0) }}>
@@ -157,28 +152,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
           <ButtonWithDialog label="Grading guide" data-cy="grade-guide">
             {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
           </ButtonWithDialog>
-          {hasAccessRights && (
-            <Field
-              id={submittedFieldId}
-              name={submittedFieldId}
-              component={CheckboxWithLabel}
-              onChange={(evt: ChangeEvent<HTMLInputElement>) => {
-                dispatch({
-                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: {
-                    status: evt.target.checked
-                      ? ReviewStatus.SUBMITTED
-                      : ReviewStatus.DRAFT,
-                  },
-                });
-              }}
-              type="checkbox"
-              Label={{
-                label: 'Submitted',
-              }}
-              data-cy="is-grade-submitted"
-            />
-          )}
         </NavigationFragment>
       </Box>
     </div>

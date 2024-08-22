@@ -1,5 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { Save } from '@mui/icons-material';
+import { Field, Form, Formik } from 'formik';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import { NavigButton } from 'components/common/NavigButton';
 import UOLoader from 'components/common/UOLoader';
 import NavigationFragment from 'components/questionary/NavigationFragment';
@@ -21,7 +24,7 @@ type ReviewSummaryProps = {
   confirm: WithConfirmType;
 };
 
-function ReviewReview({ confirm }: ReviewSummaryProps) {
+function ReviewSummaryReview({ confirm }: ReviewSummaryProps) {
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ReviewContextType;
@@ -70,6 +73,10 @@ function ReviewReview({ confirm }: ReviewSummaryProps) {
     return submissionDisabled;
   });
 
+  const isDisabled = (isSubmitting: boolean) =>
+    isSubmitting ||
+    (fapReview.status === ReviewStatus.SUBMITTED && !isUserOfficer);
+
   useEffect(() => {
     async function initializeSubmissionMessage() {
       if (!fapReview.proposal?.callId || submitDisabled) {
@@ -90,68 +97,138 @@ function ReviewReview({ confirm }: ReviewSummaryProps) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
   }
 
+  const initialValues = {
+    submitted: fapReview.status === ReviewStatus.SUBMITTED,
+  };
+
   return (
     <>
-      <ReviewQuestionaryReview data={fapReview} />
-      <NavigationFragment
-        //disabled={fapReview.status === ReviewStatus.DRAFT}
-        isLoading={isSubmitting}
+      <Formik
+        initialValues={initialValues}
+        onSubmit={async () => {}}
+        enableReinitialize={true}
       >
-        <NavigButton
-          onClick={() => dispatch({ type: 'BACK_CLICKED' })}
-          disabled={state.stepIndex === 0}
-          isBusy={isSubmitting}
-        >
-          Back
-        </NavigButton>
-        <NavigButton
-          onClick={() => {
-            confirm(
-              async () => {
-                setIsSubmitting(true);
-                try {
-                  const { updateReview } = await api({
-                    toastSuccessMessage:
-                      'Your review has been submitted successfully. You will receive a confirmation email soon.',
-                  }).updateReview({
-                    reviewID: state.fapReview.id,
-                    grade: state.fapReview.grade || 0,
-                    comment: state.fapReview.comment || '',
-                    status: ReviewStatus.SUBMITTED,
-                    fapID: state.fapReview.fapID,
-                    questionaryID: state.fapReview.questionaryID,
-                  });
-
+        <Form>
+          <ReviewQuestionaryReview data={fapReview} />
+          <NavigationFragment
+            //disabled={fapReview.status === ReviewStatus.DRAFT}
+            isLoading={isSubmitting}
+          >
+            {isUserOfficer && (
+              <Field
+                id="submitted"
+                name="submitted"
+                component={CheckboxWithLabel}
+                onChange={(evt: ChangeEvent<HTMLInputElement>) => {
                   dispatch({
                     type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                    itemWithQuestionary: updateReview,
+                    itemWithQuestionary: {
+                      status: evt.target.checked
+                        ? ReviewStatus.SUBMITTED
+                        : ReviewStatus.DRAFT,
+                    },
                   });
-                  dispatch({
-                    type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                    itemWithQuestionary: updateReview,
-                  });
-                } finally {
-                  setSubmitDisabled(true);
-                  setIsSubmitting(false);
-                }
-              },
-              {
-                title: 'Please confirm',
-                description: submitButtonMessage,
-              }
-            )();
-          }}
-          disabled={submitDisabled}
-          isBusy={isSubmitting}
-          data-cy="button-submit-proposal"
-        >
-          {fapReview.status === ReviewStatus.SUBMITTED
-            ? '✔ Submitted'
-            : 'Submit'}
-        </NavigButton>
-      </NavigationFragment>
+                }}
+                disabled={isSubmitting}
+                type="checkbox"
+                Label={{
+                  label: 'Submitted',
+                }}
+                data-cy="is-grade-submitted"
+              />
+            )}
+            <NavigButton
+              onClick={() => dispatch({ type: 'BACK_CLICKED' })}
+              disabled={state.stepIndex === 0}
+              isBusy={isSubmitting}
+            >
+              Back
+            </NavigButton>
+            {isUserOfficer && (
+              <NavigButton
+                data-cy="save-grade"
+                disabled={isDisabled(isSubmitting)}
+                color="secondary"
+                type="submit"
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  try {
+                    const { updateReview } = await api({
+                      toastSuccessMessage: 'Updated',
+                    }).updateReview({
+                      reviewID: state.fapReview.id,
+                      grade: state.fapReview.grade || 0,
+                      comment: state.fapReview.comment || '',
+                      status: state.fapReview.status,
+                      fapID: state.fapReview.fapID,
+                      questionaryID: state.fapReview.questionaryID,
+                    });
+
+                    dispatch({
+                      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                      itemWithQuestionary: updateReview,
+                    });
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+                startIcon={<Save />}
+              >
+                Save
+              </NavigButton>
+            )}
+            {!isUserOfficer && (
+              <NavigButton
+                onClick={() => {
+                  confirm(
+                    async () => {
+                      setIsSubmitting(true);
+                      try {
+                        const { updateReview } = await api({
+                          toastSuccessMessage:
+                            'Your review has been submitted successfully. You will receive a confirmation email soon.',
+                        }).updateReview({
+                          reviewID: state.fapReview.id,
+                          grade: state.fapReview.grade || 0,
+                          comment: state.fapReview.comment || '',
+                          status: ReviewStatus.SUBMITTED,
+                          fapID: state.fapReview.fapID,
+                          questionaryID: state.fapReview.questionaryID,
+                        });
+
+                        dispatch({
+                          type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                          itemWithQuestionary: updateReview,
+                        });
+                        dispatch({
+                          type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                          itemWithQuestionary: updateReview,
+                        });
+                      } finally {
+                        setSubmitDisabled(true);
+                        setIsSubmitting(false);
+                      }
+                    },
+                    {
+                      title: 'Please confirm',
+                      description: submitButtonMessage,
+                    }
+                  )();
+                }}
+                disabled={submitDisabled}
+                isBusy={isSubmitting}
+                data-cy="button-submit-proposal"
+              >
+                {fapReview.status === ReviewStatus.SUBMITTED
+                  ? '✔ Submitted'
+                  : 'Submit'}
+              </NavigButton>
+            )}
+          </NavigationFragment>
+        </Form>
+      </Formik>
     </>
   );
 }
 
-export default withConfirm(ReviewReview);
+export default withConfirm(ReviewSummaryReview);
