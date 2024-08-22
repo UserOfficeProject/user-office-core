@@ -1,4 +1,4 @@
-# Proposal templates
+# Proposal templates :material-note-text:
 
 ## **What are proposal templates?**
 ??? info "Proposal templates" 

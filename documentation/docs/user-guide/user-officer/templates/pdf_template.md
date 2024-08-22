@@ -1,3 +1,4 @@
+# PDF Templates :material-file-pdf-box:
 
 ## **What are PDF templates?**
 ??? info "PDF templates" 
