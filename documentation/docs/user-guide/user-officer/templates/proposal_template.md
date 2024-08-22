@@ -4,7 +4,7 @@
 ??? info "Proposal templates" 
     **Proposal templates** are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilise [**question templates**](templates/question_template.md) and [**sub-templates**](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    User Officers can also utilise [**question templates**](../questions.md) and [**sub-templates**](sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
     ______________________________________________________________________________________
     <figure markdown="span">  
         ![Proposal](../../../assets/images/proposal_template.png){ width="450"}
@@ -42,7 +42,7 @@ ________________________________________________________________________________
 
 **Step 3. Edit the Proposal Template**
 
-* In the Proposal Template editor, you can see more options to add [**question templates**](question_template.md) and topics or delete topics.
+* In the Proposal Template editor, you can see more options to add [**question templates**](../questions.md) and topics or delete topics.
 
 ??? question "Editing questions"
     
