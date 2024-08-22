@@ -6,6 +6,7 @@ import { QueryParamConfig } from 'use-query-params';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import DateFilter from 'components/common/proposalFilters/DateFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStatusFilter';
 import TechniqueFilter from 'components/common/proposalFilters/TechniqueFilter';
 import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import {
@@ -40,6 +41,7 @@ const XpressProposalFilterBar = ({
   calls,
   instruments,
   techniques,
+  proposalStatuses,
   setProposalFilter,
   filter,
 }: ProposalFilterBarProps) => {
@@ -97,6 +99,22 @@ const XpressProposalFilterBar = ({
       </Grid>
 
       <Grid item sm={3} xs={12}>
+        <ProposalStatusFilter
+          proposalStatusId={filter.proposalStatusId as number}
+          proposalStatuses={proposalStatuses?.data}
+          isLoading={proposalStatuses?.isLoading}
+          shouldShowAll={true}
+          hiddenStatuses={filter.excludeProposalStatusIds as number[]}
+          onChange={(proposalStatusId) => {
+            setProposalFilter({
+              ...filter,
+              proposalStatusId,
+            });
+          }}
+        />
+      </Grid>
+
+      <Grid item sm={5} xs={12}>
         <Grid item xs={12}>
           <DateFilter
             from={filter.dateFilter?.from}
