@@ -384,7 +384,7 @@ context('General facility access panel tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[aria-label="Remove Fap chair"]').click();
+      cy.get('[aria-label="Remove Fap Chair"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -393,7 +393,7 @@ context('General facility access panel tests', () => {
         text: 'Fap member removed successfully',
       });
 
-      cy.get('[aria-label="Remove Fap secretary"]').click();
+      cy.get('[aria-label="Remove Fap Secretary"]').click();
 
       cy.get('[data-cy="confirm-ok"]').click();
 

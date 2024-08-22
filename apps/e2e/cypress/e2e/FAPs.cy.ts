@@ -870,6 +870,79 @@ context('Fap reviews tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=1`);
       cy.get('[data-cy="fap-reviewers-table"]').contains('0');
     });
+
+    it('Should be able to see how many proposals are assigned to a chair and secretary', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+      cy.assignChairOrSecretary({
+        assignChairOrSecretaryToFapInput: {
+          fapId: createdFapId,
+          userId: fapMembers.chair.id,
+          roleId: UserRole.FAP_CHAIR,
+        },
+      });
+      cy.assignChairOrSecretary({
+        assignChairOrSecretaryToFapInput: {
+          fapId: createdFapId,
+          userId: fapMembers.secretary.id,
+          roleId: UserRole.FAP_SECRETARY,
+        },
+      });
+
+      cy.login('officer');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('0');
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '0'
+      );
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[type="checkbox"]').first().check();
+
+      cy.get('[data-cy="assign-fap-members"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.chair.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.secretary.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains('Update').click();
+
+      clickConfirmOk();
+
+      //The count are maintained in frontend so cannot reload the page
+      cy.contains('Members').click();
+
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '1'
+      );
+
+      //Now test with reload
+      cy.visit(`/FapPage/${createdFapId}?tab=1`);
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '1'
+      );
+    });
   });
 
   describe('Fap Chair role', () => {
@@ -951,11 +1024,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
 
-      cy.get('[data-cy="fap-chair-reviews-info"]').should(
-        'have.attr',
-        'aria-label',
-        'Number of proposals to review: 1'
-      );
+      cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
     });
 
     it('Fap Chair should be able to see proposal details in modal inside proposals and assignments', () => {
@@ -1100,10 +1169,8 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="tablist"] [role="tab"]').contains('Members').click();
 
-      cy.get('[data-cy="fap-secretary-reviews-info"]').should(
-        'have.attr',
-        'aria-label',
-        'Number of proposals to review: 1'
+      cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
+        '1'
       );
     });
 

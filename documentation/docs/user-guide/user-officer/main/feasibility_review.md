@@ -1,7 +1,9 @@
 # Feasibility review
 
+## **What are feasibility reviews?**
+_____________________________________________________________________________________________________
 
-### **How do I configure the system for Feasibility review?**
+## **How do I configure the system for Feasibility review?**
 
 Conditions: 
 
@@ -11,3 +13,4 @@ Conditions:
 When the call deadline closes the system will be configured for feasibility review
 
 *Alternatively, as a user officer you may manually change proposal's status to **feasibility review** 
+_____________________________________________________________________________________________________
