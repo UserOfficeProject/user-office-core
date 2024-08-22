@@ -9,7 +9,6 @@ import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { TechniqueDataSource } from '../../datasources/TechniqueDataSource';
 import { resolveApplicationEventBus } from '../../events';
 import { Event } from '../../events/event.enum';
-import TechniqueMutations from '../../mutations/TechniqueMutations';
 import { TechniquePickerConfig } from '../../resolvers/types/FieldConfig';
 import { QuestionFilterCompareOperator } from '../Questionary';
 import { DataType, QuestionTemplateRelation } from '../Template';
@@ -97,7 +96,6 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     const techniqueDataSource = container.resolve<TechniqueDataSource>(
       Tokens.TechniqueDataSource
     );
-
 
     const proposal = await proposalDataSource.getByQuestionaryId(questionaryId);
 

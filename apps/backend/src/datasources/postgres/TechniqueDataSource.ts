@@ -10,7 +10,6 @@ import {
   CountryRecord,
   InstitutionRecord,
   InstrumentRecord,
-  TechniqueHasProposalsRecord,
   TechniqueRecord,
   UserRecord,
   createBasicUserObject,
@@ -229,49 +228,32 @@ export default class PostgresTechniqueDataSource
     proposalPk: number,
     techniqueIds: number[]
   ): Promise<boolean> {
-    const checks = await Promise.all(
-      techniqueIds.map((techId) =>
-        this.checkIfProposalIsAssignedToTechnique(techId, proposalPk)
-      )
-    );
+    database.transaction(async (trx) => {
+      await database('technique_has_proposals')
+        .delete()
+        .where('proposal_id', proposalPk)
+        .transacting(trx);
 
-    const dataToInsert = techniqueIds
-      .filter((_, index) => !checks[index])
-      .map((techniqueId) => ({
-        technique_id: techniqueId,
-        proposal_id: proposalPk,
-      }));
+      await database('technique_has_proposals')
+        .insert(
+          techniqueIds.map((techniqueId) => ({
+            technique_id: techniqueId,
+            proposal_id: proposalPk,
+          }))
+        )
+        .onConflict(['proposal_id', 'technique_id'])
+        .ignore()
+        .transacting(trx)
+        .then(() => {
+          trx.commit;
+        })
+        .catch((error) => {
+          trx.rollback;
+          throw new Error(`Error assigning proposal to technique: ${error}`);
+        });
+    });
 
-    if (dataToInsert.length === 0) return false;
-
-    try {
-      const [result] = await database('technique_has_proposals')
-        .insert(dataToInsert)
-        .returning('*');
-
-      if (result) {
-        return true;
-      } else {
-        throw new Error(
-          'Error assigning proposal to technique: no technique returned from insert'
-        );
-      }
-    } catch (error) {
-      throw new Error(`Error assigning proposal to technique: ${error}`);
-    }
-  }
-
-  async checkIfProposalIsAssignedToTechnique(
-    techId: number,
-    proposalPk: number
-  ): Promise<boolean> {
-    return database
-      .select()
-      .from('technique_has_proposals')
-      .where('technique_id', techId)
-      .andWhere('proposal_id', proposalPk)
-      .first()
-      .then((result: TechniqueHasProposalsRecord) => (result ? true : false));
+    return true;
   }
 
   async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {

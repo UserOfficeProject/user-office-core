@@ -56,9 +56,11 @@ export function QuestionaryComponentTechniquePicker(
     let techniques: number[] | number = [] || {};
 
     if (Array.isArray(newValue) && newValue.length > 0) {
-      techniques = newValue.map((id) => {
-        return +id;
-      });
+      techniques = newValue
+        .filter((id) => id != '')
+        .map((id) => {
+          return +id;
+        });
     } else {
       techniques = +newValue;
     }
