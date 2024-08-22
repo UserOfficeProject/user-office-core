@@ -6,6 +6,7 @@ import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
@@ -27,9 +28,12 @@ const XpressProposalTable = () => {
   const { techniques, loadingTechniques } = useTechniquesData();
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useCallsData();
+  const { proposalStatuses, loadingProposalStatuses } =
+    useProposalStatusesData();
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const PREFETCH_SIZE = 200;
+
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
@@ -38,6 +42,7 @@ const XpressProposalTable = () => {
     proposalId: StringParam,
     to: StringParam,
     from: StringParam,
+    proposalStatus: NumberParam,
   });
 
   type QueryParameters = {
@@ -76,6 +81,7 @@ const XpressProposalTable = () => {
     referenceNumbers: urlQueryParams.proposalId
       ? [urlQueryParams.proposalId]
       : undefined,
+    proposalStatusId: urlQueryParams.proposalStatus,
   });
 
   const columns = [
@@ -244,6 +250,10 @@ const XpressProposalTable = () => {
             techniques={{
               data: techniques,
               isLoading: loadingTechniques,
+            }}
+            proposalStatuses={{
+              data: proposalStatuses,
+              isLoading: loadingProposalStatuses,
             }}
             setProposalFilter={setProposalFilter}
             filter={proposalFilter}
