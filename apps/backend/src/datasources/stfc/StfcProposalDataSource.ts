@@ -350,17 +350,30 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
 
         if (
-          filter?.dateFilter?.to !== undefined &&
-          filter?.dateFilter?.to !== null
-        ) {
-          query.where('submitted_date', '>=', new Date(filter.dateFilter.from));
-        }
-
-        if (
           filter?.dateFilter?.from !== undefined &&
           filter?.dateFilter?.from !== null
         ) {
-          query.where('submitted_date', '<=', new Date(filter.dateFilter.to));
+          const dateParts: string[] = filter.dateFilter.from.split('-');
+          const dateObject: Date = new Date(
+            +dateParts[2],
+            +dateParts[1] - 1,
+            +dateParts[0]
+          );
+
+          query.where('submitted_date', '>=', dateObject);
+        }
+
+        if (
+          filter?.dateFilter?.to !== undefined &&
+          filter?.dateFilter?.to !== null
+        ) {
+          const dateParts: string[] = filter.dateFilter.to.split('-');
+          const dateObject: Date = new Date(
+            +dateParts[2],
+            +dateParts[1] - 1,
+            +dateParts[0]
+          );
+          query.where('submitted_date', '<=', dateObject);
         }
 
         if (first) {
