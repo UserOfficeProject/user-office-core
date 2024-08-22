@@ -1,4 +1,4 @@
-import { FormControl, Grid } from '@mui/material';
+import { FormControl, Grid, InputLabel } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
@@ -31,6 +31,9 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
   return (
     <>
       <FormControl fullWidth>
+        <InputLabel id="date-select-label" shrink>
+          Submitted Date
+        </InputLabel>
         <Grid container spacing={2}>
           <LocalizationProvider dateAdapter={DateAdapter}>
             <Grid item sm={3} xs={12}>
