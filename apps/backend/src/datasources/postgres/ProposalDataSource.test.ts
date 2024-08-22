@@ -261,7 +261,7 @@ describe('Submit proposal', () => {
     const call = await createCall('211{digits:4}{other:param}text');
     const original = await createProposal(call.id);
     await proposalDataSource.submitProposal(original.primaryKey);
-    const cloned = await proposalDataSource.cloneProposal(original);
+    const cloned = await proposalDataSource.cloneProposal(original, call);
 
     const submission = proposalDataSource.submitProposal(cloned.primaryKey);
 
