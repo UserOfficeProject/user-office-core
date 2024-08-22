@@ -110,10 +110,7 @@ function ReviewSummaryReview({ confirm }: ReviewSummaryProps) {
       >
         <Form>
           <ReviewQuestionaryReview data={fapReview} />
-          <NavigationFragment
-            //disabled={fapReview.status === ReviewStatus.DRAFT}
-            isLoading={isSubmitting}
-          >
+          <NavigationFragment isLoading={isSubmitting}>
             {isUserOfficer && (
               <Field
                 id="submitted"
@@ -168,6 +165,9 @@ function ReviewSummaryReview({ confirm }: ReviewSummaryProps) {
                       type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                       itemWithQuestionary: updateReview,
                     });
+                    dispatch({
+                      type: 'CLEAN_DIRTY_STATE',
+                    });
                   } finally {
                     setIsSubmitting(false);
                   }
@@ -203,6 +203,9 @@ function ReviewSummaryReview({ confirm }: ReviewSummaryProps) {
                         dispatch({
                           type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
                           itemWithQuestionary: updateReview,
+                        });
+                        dispatch({
+                          type: 'CLEAN_DIRTY_STATE',
                         });
                       } finally {
                         setSubmitDisabled(true);
