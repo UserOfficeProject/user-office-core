@@ -1,12 +1,12 @@
-# Question templates
+# Questions :material-comment-question:
 
-What are question templates?
+## **What are questions?**
 
-??? info "What are question templates?" 
+??? info "What are questions?" 
 
-    Question templates are predefined questions that are designed to streamline the template creation process and ensure consistency across users' submissions. Question templates allow users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the **question drawer**. Question templates allow for standardisation across multiple templates which is essential for data collection and analysis of users' responses.
+    **Questions** :material-comment-question: are designed to streamline the template creation process and ensure consistency across users' submissions. Question allow users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the **question drawer**. Questions allow for standardisation across multiple templates which is essential for data collection and analysis of users' responses.
 
-Question templates can be utilised within the following templates:
+Questions can be utilised within the following templates:
 
 * [**Proposal templates**](templates/proposal_template.md)
 * [**Proposal ESI templates**](templates/proposalESI_template.md)
@@ -17,15 +17,18 @@ Question templates can be utilised within the following templates:
 * [**Shipment declarationt templates**](templates/shipment_template.md)
 * [**Visit registration templates**](templates/visit_template.md)
 
-# **How do I edit question templates**
+_____________________________________________________________________________________________________
 
-When editing a quesiton template you have two options:
+## **How do I edit questions**
+
+When editing a quesiton you have two options:
 
 * **Edit the question as it appears within the current template (i.e, only for this one instance)**
 * **Edit the question within the question drawer (across all templates)** 
 
+_____________________________________________________________________________________________________
 
-# **How do I create question templates?**
+## **How do I create questions?**
 
 * In the main menu, navigate to the template page you wish to create the question for ([**Proposal templates**](templates/proposal_template.md), [**Proposal ESI templates**](templates/proposalESI_template.md),[**Sample ESI templates**](templates/sampleESI_template.md), [**Feedback templates**](templates/feedback_template.md), [**Sub Templates**](sub_template.md), [**Sample declaration templates**](templates/sampledec_template.md), [**Shipment declarationt templates**](templates/shipment_template.md), [**Visit registration templates**](templates/visit_template.md))
 
@@ -40,8 +43,8 @@ When editing a quesiton template you have two options:
 Note: depending on which template you are creating questions for, certain questions may be limited. For example, you may not add a sample declaration question type to a visit registration template.
 
 
-
 * Once you have put the questions in the _ template, you can click on them to edit (as they appear on the current template) to edit them in the question drawer click on the edit question template.
+
 
 !!! tip ""
 
@@ -207,3 +210,9 @@ Note: depending on which template you are creating questions for, certain questi
     * ***Key:** The question key
     * **Question:**
     **Constraints:**
+
+_____________________________________________________________________________________________________
+
+## **What does #Answers and #Templates mean on question templates?**
+
+_____________________________________________________________________________________________________
