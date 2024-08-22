@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
+import { UserContext } from 'context/UserContextProvider';
 import { FileMetaData } from 'models/questionary/FileUpload';
 import { FunctionType } from 'utils/utilTypes';
 
@@ -15,6 +16,8 @@ export enum UPLOAD_STATE {
 export function useFileUpload() {
   const [progress, setProgress] = useState<number>(0);
   const [state, setState] = useState<UPLOAD_STATE>(UPLOAD_STATE.PRISTINE);
+  const { token } = useContext(UserContext);
+
   let xhr: XMLHttpRequest;
 
   const reset = () => {
@@ -78,12 +81,14 @@ export function useFileUpload() {
     xhr.addEventListener(
       'abort',
       () => {
+        console.log('ABORTED');
         setState(UPLOAD_STATE.ABORTED);
       },
       false
     );
 
     xhr.open('POST', '/files/upload');
+    xhr.setRequestHeader('authorization', `Bearer ${token}`);
     xhr.send(formData);
   };
 
