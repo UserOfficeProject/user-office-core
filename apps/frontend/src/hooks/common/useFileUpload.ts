@@ -81,7 +81,6 @@ export function useFileUpload() {
     xhr.addEventListener(
       'abort',
       () => {
-        console.log('ABORTED');
         setState(UPLOAD_STATE.ABORTED);
       },
       false
