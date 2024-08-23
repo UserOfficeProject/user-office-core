@@ -1,11 +1,11 @@
+import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import React, { useState } from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import GenericTemplateDetails from 'components/genericTemplate/GenericTemplateDetails';
 import { Answer } from 'generated/sdk';
 import { useGenericTemplatesWithQuestionaryStatus } from 'hooks/genericTemplate/useGenericTemplatesWithQuestionaryStatus';
@@ -67,17 +67,21 @@ const GenericTemplatesAnswerRenderer = ({
           setSelectedGenericTemplateId(genericTemplate.id)
         }
       />
-      <InputDialog
-        maxWidth="sm"
+      <StyledDialog
+        maxWidth="md"
+        fullWidth
         open={selectedGenericTemplateId !== null}
         onClose={() => setSelectedGenericTemplateId(null)}
+        title="GenericTemplate details"
       >
-        {selectedGenericTemplateId ? (
-          <GenericTemplateDetails
-            genericTemplateId={selectedGenericTemplateId}
-          />
-        ) : null}
-        <ActionButtonContainer>
+        <DialogContent dividers>
+          {selectedGenericTemplateId ? (
+            <GenericTemplateDetails
+              genericTemplateId={selectedGenericTemplateId}
+            />
+          ) : null}
+        </DialogContent>
+        <DialogActions>
           <Button
             type="button"
             variant="outlined"
@@ -86,8 +90,8 @@ const GenericTemplatesAnswerRenderer = ({
           >
             Close
           </Button>
-        </ActionButtonContainer>
-      </InputDialog>
+        </DialogActions>
+      </StyledDialog>
     </div>
   );
 };
