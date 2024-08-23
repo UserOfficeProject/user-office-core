@@ -1,6 +1,8 @@
 import {
   AssignInstrumentsToTechniqueMutation,
   AssignInstrumentsToTechniqueMutationVariables,
+  AssignProposalToTechniquesMutation,
+  AssignProposalToTechniquesMutationVariables,
   CreateTechniqueMutation,
   CreateTechniqueMutationVariables,
   RemoveInstrumentsFromTechniqueMutation,
@@ -40,6 +42,17 @@ const removeInstrumentsFromTechnique = (
   return cy.wrap(request);
 };
 
+const assignProposalToTechniques = (
+  assignProposalToTechniquesInput: AssignProposalToTechniquesMutationVariables
+): Cypress.Chainable<AssignProposalToTechniquesMutation> => {
+  const api = getE2EApi();
+  const request = api.assignProposalToTechniques(
+    assignProposalToTechniquesInput
+  );
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createTechnique', createTechnique);
 Cypress.Commands.add(
   'assignInstrumentsToTechnique',
@@ -49,3 +62,4 @@ Cypress.Commands.add(
   'removeInstrumentsFromTechnique',
   removeInstrumentsFromTechnique
 );
+Cypress.Commands.add('assignProposalToTechniques', assignProposalToTechniques);
