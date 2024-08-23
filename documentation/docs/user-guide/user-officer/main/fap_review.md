@@ -8,3 +8,5 @@ Conditions to be met:
 * Instrument scientists complete the feasibility review (either setting the proposal status to `feasible` or `not feasible`) 
 * The proposal is then assigned to the FAP for evaluation (in accordance with the general proposal workflow, however this may be defined otherwise).
 
+
+

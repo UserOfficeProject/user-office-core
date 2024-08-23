@@ -78,7 +78,8 @@ Tools
 * Delete - :material-delete:
 * Edit - :material-pencil:
 * Clone - :material-file-multiple:
-* Share - :material-share-variant:
+* Import - 
+* Export - :material-share-variant:
 * Select - :fontawesome-regular-square:
 * Show columns - :material-view-column:
 * Mark as active - 

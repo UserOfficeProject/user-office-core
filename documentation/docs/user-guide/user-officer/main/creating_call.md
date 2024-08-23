@@ -158,14 +158,14 @@ Lastly, you may also create templates to fully customise them to fit the researc
 
 * [**How do I create sample ESI templates?**](../templates/sampleESI_template.md)
 
-* [**How do I create Feedback templates?**](../templates/feedback_template.md)
+* [**How do I create feedback templates?**](../templates/feedback_template.md)
 
 ### **FAPs**
 
 Calls are also assigned to Facility Access Panels (FAPs) for review of the submitted proposals, which must be selected within the call.
 
 ??? info "FAPs :material-google-circles-communities:" 
-    [**FAPs** :material-google-circles-communities:](../fap.md) (Facility Access Panels) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a **reviewer**, **secretary** and **chair** to oversee the review process and ensure thorough and unbiased evaluation. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
+    [**FAPs** :material-google-circles-communities:](../fap.md) (Facility Access Panels) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a [**reviewer**](roles.md), [**secretary**](roles.md) and [**chair**](chair.md) to oversee the review process and ensure thorough and unbiased evaluation. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
 
     User Officers can manage the FAPs assigned to proposals and calls. FAPs can be utilised across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria such as the **grade guide**. In creating a FAP, user officers may provide general information by labeling FAPs with a code, a description, and specifying the required number of proposal ratings. 
 
