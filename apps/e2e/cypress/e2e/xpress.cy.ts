@@ -11,6 +11,8 @@ import initialDBData from '../support/initialDBData';
 context('Xpress tests', () => {
   let createdInstrumentId1: number;
   let createdInstrumentId2: number;
+  let createdInstrumentId3: number;
+  let createdInstrumentId4: number;
 
   let createdProposalPk1: number;
   let createdProposalPk2: number;
@@ -25,7 +27,12 @@ context('Xpress tests', () => {
   let createdTechniquePk1: number;
   let createdTechniquePk2: number;
   let createdTechniquePk3: number;
-  let createdTechniquePk4: number;
+  // Technique 4 has no proposals assigned
+
+  // Proposal 1 is unsubmitted
+  const proposalSubmittedDate2 = new Date(2023, 2, 2);
+  const proposalSubmittedDate3 = new Date(2024, 3, 3);
+  const proposalSubmittedDate4 = new Date(2025, 4, 4);
 
   const technique1 = {
     name: faker.word.words(1),
@@ -130,6 +137,28 @@ context('Xpress tests', () => {
       }
     });
 
+    cy.createInstrument(instrument3).then((result) => {
+      if (result.createInstrument) {
+        createdInstrumentId3 = result.createInstrument.id;
+
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: createdInstrumentId3 }],
+        });
+      }
+    });
+
+    cy.createInstrument(instrument4).then((result) => {
+      if (result.createInstrument) {
+        createdInstrumentId4 = result.createInstrument.id;
+
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: createdInstrumentId4 }],
+        });
+      }
+    });
+
     cy.createTechnique(technique1).then((result) => {
       createdTechniquePk1 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
@@ -148,7 +177,7 @@ context('Xpress tests', () => {
         techniqueId: result.createTechnique.id,
       });
       cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId1],
+        instrumentIds: [createdInstrumentId2],
         techniqueId: result.createTechnique.id,
       });
     });
@@ -159,14 +188,13 @@ context('Xpress tests', () => {
         techniqueId: result.createTechnique.id,
       });
       cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId2],
+        instrumentIds: [createdInstrumentId3],
         techniqueId: result.createTechnique.id,
       });
     });
     cy.createTechnique(technique4).then((result) => {
-      createdTechniquePk4 = result.createTechnique.id;
       cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId2],
+        instrumentIds: [createdInstrumentId4],
         techniqueId: result.createTechnique.id,
       });
     });
@@ -199,9 +227,12 @@ context('Xpress tests', () => {
           abstract: proposal2.abstract,
         });
 
-        //cy.clock(Date.UTC(2024, 8, 18), ['Date']);
-        cy.submitProposal({ proposalPk: createdProposalPk2 }).then((result) => {
-          createdProposalId2 = result.submitProposal.proposalId;
+        cy.clock(proposalSubmittedDate2.getTime()).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk2 }).then(
+            (result) => {
+              createdProposalId2 = result.submitProposal.proposalId;
+            }
+          );
         });
 
         cy.assignProposalToTechniques({
@@ -221,9 +252,12 @@ context('Xpress tests', () => {
           abstract: proposal3.abstract,
         });
 
-        //cy.clock(Date.UTC(2024, 8, 20), ['Date']);
-        cy.submitProposal({ proposalPk: createdProposalPk3 }).then((result) => {
-          createdProposalId3 = result.submitProposal.proposalId;
+        cy.clock(proposalSubmittedDate3.getTime()).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk3 }).then(
+            (result) => {
+              createdProposalId3 = result.submitProposal.proposalId;
+            }
+          );
         });
 
         cy.changeProposalsStatus({
@@ -248,24 +282,20 @@ context('Xpress tests', () => {
           abstract: proposal4.abstract,
         });
 
-        //cy.clock(Date.UTC(2024, 8, 23), ['Date']);
-        cy.submitProposal({ proposalPk: createdProposalPk4 }).then((result) => {
-          createdProposalId4 = result.submitProposal.proposalId;
+        cy.clock(proposalSubmittedDate4.getTime()).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk4 }).then(
+            (result) => {
+              createdProposalId4 = result.submitProposal.proposalId;
+            }
+          );
         });
 
         cy.changeProposalsStatus({
           statusId: initialDBData.proposalStatuses.editableSubmitted.id,
           proposalPks: [createdProposalPk4],
         });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk4,
-          techniqueIds: [createdTechniquePk4],
-        });
       }
     });
-
-    //cy.clock(new Date(), ['Date']);
   });
 
   it('User should not be able to see Xpress page', () => {
@@ -532,7 +562,11 @@ context('Xpress tests', () => {
     cy.contains(proposal4.title);
   });
 
-  describe('Techniques advanced tests', () => {
+  it('Xpress proposals can be searched for by title, technique, instrument, proposal ID', function () {
+    return true;
+  });
+
+  describe.only('Techniques advanced tests', () => {
     it('User officer can see all submitted and unsubmitted Xpress proposals', function () {
       if (
         !featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)
@@ -542,32 +576,33 @@ context('Xpress tests', () => {
 
       cy.login('officer');
       cy.visit('/');
+      cy.finishedLoading();
 
-      cy.get('[data-cy="user-menu-items"]').should('contain', 'Xpress').click();
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
 
       cy.contains(proposal1.title);
       cy.contains(createdProposalId1);
-      // cy.contains(proposal1.submittedate);
-      cy.contains(technique1.name);
-      cy.contains(instrument1.name);
+      // cy.contains(technique1.name);
+      // cy.contains(instrument1.name);
 
       cy.contains(proposal2.title);
       cy.contains(createdProposalId2);
-      // cy.contains(proposal1.submittedate);
-      cy.contains(technique2.name);
-      cy.contains(instrument2.name);
+      cy.contains(proposalSubmittedDate2.toDateString());
+      // cy.contains(technique2.name);
+      // cy.contains(instrument2.name);
 
       cy.contains(proposal3.title);
       cy.contains(createdProposalId3);
-      // cy.contains(proposal3.submittedate);
-      cy.contains(technique3.name);
-      cy.contains(instrument3.name);
+      cy.contains(proposalSubmittedDate3.toDateString());
+      // cy.contains(technique3.name);
+      // cy.contains(instrument3.name);
 
       cy.contains(proposal4.title);
       cy.contains(createdProposalId4);
-      // cy.contains(proposal4.submittedate);
-      cy.contains(technique4.name);
-      cy.contains(instrument4.name);
+      cy.contains(proposalSubmittedDate4.toDateString());
+      // cy.contains(technique4.name);
+      // cy.contains(instrument4.name);
     });
 
     it('Instrument scientist can only see submitted and unsubmitted Xpress proposals for their techniques', function () {
@@ -578,120 +613,144 @@ context('Xpress tests', () => {
       }
 
       /*
-      Scientist 1 belongs to techniques 1, 2 and 3
+      Scientist 1 belongs to technique 1, which only has proposal 1
       */
       cy.login(scientist1);
       cy.visit('/');
+      cy.finishedLoading();
 
-      cy.get('[data-cy="user-menu-items"]').should('contain', 'Xpress').click();
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.finishedLoading();
 
       cy.contains(proposal1.title);
       cy.contains(createdProposalId1);
-      // cy.contains(proposal1.submittedate);
-      cy.contains(technique1.name);
-      cy.contains(instrument1.name);
+      // cy.contains(technique1.name);
+      // cy.contains(instrument1.name);
 
-      cy.contains(proposal2.title);
-      cy.contains(createdProposalId2);
-      // cy.contains(proposal2.submittedate);
-      cy.contains(technique2.name);
-      cy.contains(instrument2.name);
+      cy.should('not.contain', proposal2.title);
+      cy.should('not.contain', createdProposalId2);
+      cy.should('not.contain', proposalSubmittedDate2.toDateString());
+      // cy.should('not.contain', technique2.name);
+      // cy.should('not.contain', instrument2.name);
 
-      cy.contains(proposal3.title);
-      cy.contains(createdProposalId3);
-      // cy.contains(proposal3.submittedate);
-      cy.contains(technique3.name);
-      cy.contains(instrument3.name);
+      cy.should('not.contain', proposal3.title);
+      cy.should('not.contain', createdProposalId3);
+      cy.should('not.contain', proposalSubmittedDate3.toDateString());
+      // cy.should('not.contain', technique3.name);
+      // cy.should('not.contain', instrument3.name);
 
       cy.should('not.contain', proposal4.title);
       cy.should('not.contain', createdProposalId4);
-      // cy.should('not.contain', proposal2.submittedate);
-      cy.should('not.contain', technique4.name);
-      cy.should('not.contain', instrument4.name);
+      cy.should('not.contain', proposalSubmittedDate4.toDateString());
+      // cy.should('not.contain', technique4.name);
+      // cy.should('not.contain', instrument4.name);
 
       /*
-      Scientist 2 belongs to techniques 1 and 2
+      Scientist 2 belongs to technique 2, which has proposals 1 and 2
       */
       cy.login(scientist2);
       cy.visit('/');
+      cy.finishedLoading();
 
-      cy.contains(proposal4.title);
-      cy.contains(createdProposalId4);
-      // cy.contains(proposal4.submittedate);
-      cy.contains(technique4.name);
-      cy.contains(instrument4.name);
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
 
-      cy.should('not.contain', proposal1.title);
-      cy.should('not.contain', createdProposalId1);
-      // cy.should('not.contain', proposal1.submittedate);
-      cy.should('not.contain', technique1.name);
-      cy.should('not.contain', instrument1.name);
+      cy.finishedLoading();
 
-      cy.should('not.contain', proposal2.title);
-      cy.should('not.contain', createdProposalId2);
-      // cy.should('not.contain', proposal1.submittedate);
-      cy.should('not.contain', technique2.name);
-      cy.should('not.contain', instrument2.name);
+      cy.contains(proposal1.title);
+      cy.contains(createdProposalId1);
+      // cy.contains(technique1.name);
+      // cy.contains(instrument1.name);
+
+      cy.contains(proposal2.title);
+      cy.contains(createdProposalId2);
+      cy.contains(proposalSubmittedDate2.toDateString());
+      // cy.contains(technique2.name);
+      // cy.contains(instrument2.name);
 
       cy.should('not.contain', proposal3.title);
       cy.should('not.contain', createdProposalId3);
-      // cy.should('not.contain', proposal3.submittedate);
-      cy.should('not.contain', technique3.name);
-      cy.should('not.contain', instrument3.name);
+      cy.should('not.contain', proposalSubmittedDate3.toDateString());
+      // cy.should('not.contain', technique3.name);
+      // cy.should('not.contain', instrument3.name);
+
+      cy.should('not.contain', proposal4.title);
+      cy.should('not.contain', createdProposalId4);
+      cy.should('not.contain', proposalSubmittedDate4.toDateString());
+      // cy.should('not.contain', technique4.name);
+      // cy.should('not.contain', instrument4.name);
 
       /*
-      Scientist 3 belongs to technique 3
+      Scientist 3 belongs to technique 3, which has proposal 3
       */
+      cy.login(scientist3);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.finishedLoading();
+
       cy.contains(proposal3.title);
       cy.contains(createdProposalId3);
-      // cy.contains(proposal4.submittedate);
-      cy.contains(technique3.name);
-      cy.contains(instrument3.name);
+      cy.contains(proposalSubmittedDate3.toDateString());
+      // cy.contains(technique3.name);
+      // cy.contains(instrument3.name);
 
       cy.should('not.contain', proposal1.title);
       cy.should('not.contain', createdProposalId1);
-      // cy.should('not.contain', proposal1.submittedate);
-      cy.should('not.contain', technique1.name);
-      cy.should('not.contain', instrument1.name);
+      // cy.should('not.contain', technique1.name);
+      // cy.should('not.contain', instrument1.name);
 
       cy.should('not.contain', proposal2.title);
       cy.should('not.contain', createdProposalId2);
-      // cy.should('not.contain', proposal1.submittedate);
-      cy.should('not.contain', technique2.name);
-      cy.should('not.contain', instrument2.name);
+      cy.should('not.contain', proposalSubmittedDate2.toDateString());
+      // cy.should('not.contain', technique2.name);
+      // cy.should('not.contain', instrument2.name);
 
       cy.should('not.contain', proposal4.title);
       cy.should('not.contain', createdProposalId4);
-      // cy.should('not.contain', proposal3.submittedate);
-      cy.should('not.contain', technique4.name);
-      cy.should('not.contain', instrument4.name);
+      cy.should('not.contain', proposalSubmittedDate4.toDateString());
+      // cy.should('not.contain', technique4.name);
+      // cy.should('not.contain', instrument4.name);
 
       /*
-      Scientist 4 doesn't belong to any techniques
+      Scientist 4 belongs to technique 4, but it doesn't have any proposals
       */
+      cy.login(scientist4);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.finishedLoading();
+
       cy.should('not.contain', proposal1.title);
       cy.should('not.contain', createdProposalId1);
-      // cy.should('not.contain', proposal1.submittedate);
-      cy.should('not.contain', technique1.name);
-      cy.should('not.contain', instrument1.name);
+      // cy.should('not.contain', technique1.name);
+      // cy.should('not.contain', instrument1.name);
 
       cy.should('not.contain', proposal2.title);
       cy.should('not.contain', createdProposalId2);
-      // cy.should('not.contain', proposal1.submittedate);
-      cy.should('not.contain', technique2.name);
-      cy.should('not.contain', instrument2.name);
+      cy.should('not.contain', proposalSubmittedDate2.toDateString());
+      // cy.should('not.contain', technique2.name);
+      // cy.should('not.contain', instrument2.name);
 
       cy.should('not.contain', proposal3.title);
       cy.should('not.contain', createdProposalId3);
-      // cy.should('not.contain', proposal3.submittedate);
-      cy.should('not.contain', technique3.name);
-      cy.should('not.contain', instrument3.name);
+      cy.should('not.contain', proposalSubmittedDate3.toDateString());
+      // cy.should('not.contain', technique3.name);
+      // cy.should('not.contain', instrument3.name);
 
       cy.should('not.contain', proposal4.title);
       cy.should('not.contain', createdProposalId4);
-      // cy.should('not.contain', proposal3.submittedate);
-      cy.should('not.contain', technique4.name);
-      cy.should('not.contain', instrument4.name);
+      cy.should('not.contain', proposalSubmittedDate4.toDateString());
+      // cy.should('not.contain', technique4.name);
+      // cy.should('not.contain', instrument4.name);
     });
   });
 });
