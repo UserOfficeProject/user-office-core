@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
-import featureFlags from 'cypress/support/featureFlags';
+import {
+  AllocationTimeUnits,
+  FeatureId,
+} from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
 
+import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Xpress tests', () => {
@@ -138,6 +142,7 @@ context('Xpress tests', () => {
       });
     });
     cy.createTechnique(technique3).then((result) => {
+      createdTechniquePk3 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist1.id],
         techniqueId: result.createTechnique.id,
@@ -187,7 +192,7 @@ context('Xpress tests', () => {
         });
 
         //cy.clock(Date.UTC(2024, 8, 18), ['Date']);
-        cy.submitProposal({ proposalPk: createdProposalPk4 });
+        cy.submitProposal({ proposalPk: createdProposalPk2 });
 
         cy.assignProposalToTechniques({
           proposalPk: createdProposalPk2,
@@ -267,11 +272,250 @@ context('Xpress tests', () => {
   });
 
   it('Xpress proposals can be filtered by technique', function () {
-    return true;
+    cy.login('officer');
+    cy.visit('/');
+    cy.finishedLoading();
+
+    cy.contains('Xpress Proposals').click();
+
+    cy.get('[data-cy="technique-filter"]').click();
+    cy.get('[role="listbox"]').contains(technique1.name).click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal2.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal4.title
+    );
+
+    cy.get('[data-cy="technique-filter"]').click();
+    cy.get('[role="listbox"]').contains(technique4.name).click();
+    cy.finishedLoading();
+
+    cy.contains(proposal4.title);
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal1.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal2.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+
+    cy.get('[data-cy="technique-filter"]').click();
+    cy.get('[role="listbox"]').contains('All').click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+    cy.contains(proposal3.title);
+    cy.contains(proposal4.title);
   });
 
   it('Xpress proposals can be filtered by instrument', function () {
-    return true;
+    cy.login('officer');
+    cy.visit('/');
+    cy.finishedLoading();
+
+    cy.contains('Xpress Proposals').click();
+
+    cy.get('[data-cy="instrument-filter"]').click();
+    cy.get('[role="listbox"]').contains(instrument1.name).click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal4.title
+    );
+
+    cy.get('[data-cy="instrument-filter"]').click();
+    cy.get('[role="listbox"]').contains(instrument2.name).click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal3.title);
+    cy.contains(proposal4.title);
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal2.title
+    );
+
+    cy.get('[data-cy="instrument-filter"]').click();
+    cy.get('[role="listbox"]').contains('All').click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+    cy.contains(proposal3.title);
+    cy.contains(proposal4.title);
+  });
+
+  it.skip('Xpress proposals can be filtered by call', function () {
+    const esiTemplateName = faker.lorem.words(2);
+    const currentDayStart = DateTime.now().startOf('day');
+
+    const newCall = {
+      shortCode: 'call 2',
+      startCall: DateTime.fromJSDate(faker.date.past()),
+      endCall: DateTime.fromJSDate(faker.date.future()),
+      startReview: currentDayStart,
+      endReview: currentDayStart,
+      startFapReview: currentDayStart,
+      endFapReview: currentDayStart,
+      startNotify: currentDayStart,
+      endNotify: currentDayStart,
+      startCycle: currentDayStart,
+      endCycle: currentDayStart,
+      templateName: initialDBData.template.name,
+      templateId: initialDBData.template.id,
+      allocationTimeUnit: AllocationTimeUnits.DAY,
+      cycleComment: faker.lorem.word(10),
+      surveyComment: faker.lorem.word(10),
+      esiTemplateName: esiTemplateName,
+    };
+
+    cy.createCall({
+      ...newCall,
+      proposalWorkflowId: 0,
+    });
+
+    cy.login('officer');
+    cy.visit('/');
+    cy.finishedLoading();
+
+    cy.contains('Xpress Proposals').click();
+
+    cy.get('[data-cy="call-filter"]').click();
+    cy.get('[role="listbox"]').contains('Call 1').click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+    cy.contains(proposal3.title);
+    cy.contains(proposal4.title);
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal4.title
+    );
+
+    cy.get('[data-cy="call-filter"]').click();
+    cy.get('[role="listbox"]').contains('Call 2').click();
+    cy.finishedLoading();
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal1.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal2.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal4.title
+    );
+
+    cy.get('[data-cy="call-filter"]').click();
+    cy.get('[role="listbox"]').contains('All').click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+    cy.contains(proposal3.title);
+    cy.contains(proposal4.title);
+  });
+
+  it('Xpress proposals can be filtered by status', function () {
+    cy.login('officer');
+    cy.visit('/');
+    cy.finishedLoading();
+
+    cy.contains('Xpress Proposals').click();
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="14"]').click();
+
+    cy.finishedLoading();
+
+    cy.contains(proposal3.title);
+    cy.contains(proposal4.title);
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal1.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal2.title
+    );
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"] [data-value="1"]').click();
+
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal4.title
+    );
+
+    cy.get('[data-cy="status-filter"]').click();
+    cy.get('[role="listbox"]').contains('All').click();
+    cy.finishedLoading();
+
+    cy.contains(proposal1.title);
+    cy.contains(proposal2.title);
+    cy.contains(proposal3.title);
+    cy.contains(proposal4.title);
   });
 
   describe('Techniques advanced tests', () => {
