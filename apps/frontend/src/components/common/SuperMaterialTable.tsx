@@ -1,7 +1,6 @@
 import { MaterialTableProps } from '@material-table/core';
-import CloseIcon from '@mui/icons-material/Close';
 import Edit from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { SetStateAction, useState } from 'react';
 import {
@@ -15,10 +14,11 @@ import {
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
-import InputDialog from 'components/common/InputDialog';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
+
+import StyledDialog from './StyledDialog';
 
 export type UrlQueryParamsType = {
   search: QueryParamConfig<string | null | undefined>;
@@ -177,7 +177,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
   return (
     <>
-      <InputDialog
+      <StyledDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         data-cy="create-modal"
@@ -189,25 +189,19 @@ export function SuperMaterialTable<Entry extends EntryID>({
           setEditObject(null);
           setShow(false);
         }}
+        title="Create"
       >
-        <IconButton
-          data-cy="close-modal-btn"
-          sx={(theme) => ({
-            position: 'absolute',
-            right: theme.spacing(1),
-            top: theme.spacing(1),
-          })}
-          onClick={() => {
-            setEditObject(null);
-            setShow(false);
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-        {createModal?.(onUpdated, onCreated, editObject)}
-      </InputDialog>
+        <DialogContent dividers>
+          {createModal?.(onUpdated, onCreated, editObject)}
+        </DialogContent>
+      </StyledDialog>
       <MaterialTable
         {...props}
+        title={
+          <Typography variant="h6" component="h2">
+            {props.title}
+          </Typography>
+        }
         columns={columns}
         data={data}
         icons={tableIcons}

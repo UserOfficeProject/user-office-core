@@ -1,9 +1,10 @@
-
 # Feedback templates :material-message-alert:
+
+## **What are feedback templates?**
 
 ??? info "Feedback templates" 
 
-    [**Feedback templates**](templates/feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire. This form becomes available to users after their experiment has been allocated a time within the external scheduler. User Officers can set the Feedback template they wish to utilise with the `MARK AS ACTIVE` function on the feedback templates page. 
+    [**Feedback templates**](feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire. This form becomes available to users after their experiment has been allocated a time within the external scheduler. User Officers can set the Feedback template they wish to utilise with the `MARK AS ACTIVE` function on the feedback templates page. 
     ______________________________________________________________________________________
     
     <figure markdown="span">  
@@ -26,7 +27,7 @@ How to mark a feedback template as active:
 
 #### **Step 2. Find the feedback template you wish to mark as active**
 
-* On the Feedback templates page, find the template you mark as active. You may wish to [**create a new feedback template**](templates/feedback_template.md) or [**edit a feedback template**](templates/feedback_template.md).
+* On the Feedback templates page, find the template you mark as active. You may wish to [**create a new feedback template**](feedback_template.md) or [**edit a feedback template**](feedback_template.md).
 
 #### **Step 3. Mark the feedback template as active***
 * Click the `MARK AS ACTIVE` function on your chosen feedback template. Note: The template will remain marked as active until another is feedback template is marked.  
@@ -72,7 +73,7 @@ ________________________________________________________________________________
 
 #### **Step 3. Edit the template**
 
-* Click the `EDIT` function on the template you wish to make changes to. This function will open the Feedback template editor. See the [create a feedback template](templates/feedback_template.md) guide for an overview of all the feedback template editing features.
+* Click the `EDIT` function on the template you wish to make changes to. This function will open the Feedback template editor. See the [create a feedback template](feedback_template.md) guide for an overview of all the feedback template editing features.
 
 * The Feedback template changes will be updated automatically
 
@@ -114,21 +115,6 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
-
 ### **What does # feedbacks mean on feedback templates?**
 
 In the feedback templates page, the # feedbacks assigned to the templates refers to the number of feedback forms users have submitted to that feedback template. 
-=======
-
-
-??? info "Feedback templates" 
-
-    [**Feedback templates**](templates/feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire.
-    ______________________________________________________________________________________
-    
-    <figure markdown="span">  
-        ![Feedback templates](/assets/images/placeholder.png){ width="450"}
-        <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
-    </figure>
-
-

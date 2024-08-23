@@ -1,5 +1,4 @@
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import { createTemplateValidationSchema } from '@user-office-software/duo-validation/lib/Template';
 import { Field, Form, Formik } from 'formik';
 import React from 'react';
@@ -25,9 +24,6 @@ const CreateTemplate = (props: {
 
   return (
     <>
-      <Typography variant="h6" component="h1">
-        Create new template
-      </Typography>
       <Formik
         initialValues={{
           name: '',
