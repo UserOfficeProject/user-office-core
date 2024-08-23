@@ -1,10 +1,11 @@
+import { DialogContent } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import Paper from '@mui/material/Paper';
 import { Field, FieldProps } from 'formik';
 import React, { useContext, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
-import StyledModal from 'components/common/StyledModal';
+import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
@@ -203,46 +204,53 @@ function QuestionaryComponentSampleDeclaration(
 
               <ErrorMessage name={answerId} />
 
-              <StyledModal
+              <StyledDialog
                 onClose={() => setSelectedSample(null)}
                 open={selectedSample !== null}
                 data-cy="sample-declaration-modal"
+                maxWidth="md"
+                fullWidth
+                title="Sample Declaration"
               >
-                {selectedSample ? (
-                  <SampleDeclarationContainer
-                    sample={selectedSample}
-                    sampleUpdated={(updatedSample) => {
-                      const newStateItems = field.value.map((sample) =>
-                        sample.id === updatedSample.id ? updatedSample : sample
-                      );
+                <DialogContent dividers>
+                  {selectedSample ? (
+                    <SampleDeclarationContainer
+                      sample={selectedSample}
+                      sampleUpdated={(updatedSample) => {
+                        const newStateItems = field.value.map((sample) =>
+                          sample.id === updatedSample.id
+                            ? updatedSample
+                            : sample
+                        );
 
-                      updateFieldValueAndState(newStateItems);
-                    }}
-                    sampleCreated={(newSample) => {
-                      const newStateItems = [...field.value, newSample];
+                        updateFieldValueAndState(newStateItems);
+                      }}
+                      sampleCreated={(newSample) => {
+                        const newStateItems = [...field.value, newSample];
 
-                      updateFieldValueAndState(newStateItems);
-                    }}
-                    sampleEditDone={() => {
-                      // refresh all samples
-                      api()
-                        .getSamplesWithQuestionaryStatus({
-                          filter: {
-                            questionId: answer.question.id,
-                            proposalPk: state.proposal.primaryKey,
-                          },
-                        })
-                        .then((result) => {
-                          updateFieldValueAndState(result.samples);
-                        });
+                        updateFieldValueAndState(newStateItems);
+                      }}
+                      sampleEditDone={() => {
+                        // refresh all samples
+                        api()
+                          .getSamplesWithQuestionaryStatus({
+                            filter: {
+                              questionId: answer.question.id,
+                              proposalPk: state.proposal.primaryKey,
+                            },
+                          })
+                          .then((result) => {
+                            updateFieldValueAndState(result.samples);
+                          });
 
-                      setSelectedSample(null);
-                    }}
-                  ></SampleDeclarationContainer>
-                ) : (
-                  <UOLoader />
-                )}
-              </StyledModal>
+                        setSelectedSample(null);
+                      }}
+                    ></SampleDeclarationContainer>
+                  ) : (
+                    <UOLoader />
+                  )}
+                </DialogContent>
+              </StyledDialog>
             </Paper>
           </>
         );

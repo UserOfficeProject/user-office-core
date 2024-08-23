@@ -26,7 +26,6 @@ function SampleDetails(props: SampleDetailsProps) {
       <QuestionaryDetails
         questionaryId={sample.questionaryId}
         additionalDetails={additionalDetails}
-        title="Sample information"
       />
     </>
   );

@@ -36,7 +36,7 @@ function RedeemCode(props: RedeemCodeProps) {
     >
       {() => (
         <Form>
-          <Typography variant="h5" component="h2">
+          <Typography variant="h6" component="h2">
             {props.title}
           </Typography>
           <Field

@@ -482,7 +482,7 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy="clone"]').click();
 
-      cy.contains('OK').click();
+      cy.contains('button', 'Clone').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
@@ -1268,7 +1268,7 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy="clone"]').eq(0).click();
 
-      cy.contains('OK').click();
+      cy.contains('button', 'Clone').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
@@ -1340,13 +1340,13 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy="clone"]').eq(0).click();
 
-      cy.contains('OK').click();
+      cy.contains('button', 'Clone').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
       cy.get('[data-cy="clone"]').eq(0).click();
 
-      cy.contains('OK').click();
+      cy.contains('button', 'Clone').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 3);
 
@@ -1517,7 +1517,7 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy="clone"]').eq(0).click();
 
-      cy.contains('OK').click();
+      cy.contains('button', 'Clone').click();
 
       cy.get('[data-cy="delete"]').eq(0).click();
 
@@ -1570,7 +1570,7 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy="clone"]').eq(0).click();
 
-      cy.contains('OK').click();
+      cy.contains('button', 'Clone').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
