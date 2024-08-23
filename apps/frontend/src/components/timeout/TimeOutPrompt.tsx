@@ -1,12 +1,12 @@
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from '@mui/material';
 import React from 'react';
+
+import StyledDialog from 'components/common/StyledDialog';
 
 type IdleTimeoutPromptProps = {
   isIdle: boolean;
@@ -15,16 +15,15 @@ type IdleTimeoutPromptProps = {
 
 function IdleTimeoutPrompt(props: IdleTimeoutPromptProps): JSX.Element {
   return (
-    <Dialog fullWidth data-cy="timeout-dialog" open={props.isIdle}>
-      <DialogTitle
-        sx={(theme) => ({
-          marginTop: theme.spacing(1.5),
-          color: theme.palette.error.main,
-        })}
-      >
-        {'Warning'}
-      </DialogTitle>
-      <DialogContent>
+    <StyledDialog
+      fullWidth
+      maxWidth="md"
+      data-cy="timeout-dialog"
+      open={props.isIdle}
+      title="Warning"
+      error
+    >
+      <DialogContent dividers>
         <DialogContentText>
           {
             'You are at risk of being logged out and losing any unsaved data due to inactivity. Please confirm you are still using the system'
@@ -33,10 +32,10 @@ function IdleTimeoutPrompt(props: IdleTimeoutPromptProps): JSX.Element {
       </DialogContent>
       <DialogActions>
         <Button onClick={props.onConfirm} data-cy="confirm-idle" variant="text">
-          {'Close'}
+          {'Confirm'}
         </Button>
       </DialogActions>
-    </Dialog>
+    </StyledDialog>
   );
 }
 

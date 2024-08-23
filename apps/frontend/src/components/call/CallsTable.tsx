@@ -2,6 +2,7 @@ import { Column } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import Unarchive from '@mui/icons-material/Unarchive';
+import { DialogContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
@@ -10,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -40,7 +41,6 @@ import CallStatusFilter, {
   CallStatusFilters,
 } from './CallStatusFilter';
 import CreateUpdateCall from './CreateUpdateCall';
-
 const getFilterStatus = (
   callStatus: CallStatusFilters
 ): Partial<Record<'isActive' | 'isActiveInternal', boolean>> => {
@@ -290,22 +290,25 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
         </Grid>
       </Grid>
       {assigningInstrumentsCallId && (
-        <InputDialog
+        <StyledDialog
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
           maxWidth="xl"
           fullWidth
+          title={`Assign Instruments to the selected call - ${calls.find((callItem) => callItem.id === assigningInstrumentsCallId)?.shortCode}`}
         >
-          <AssignInstrumentsToCall
-            assignedInstruments={callAssignments?.instruments}
-            callId={assigningInstrumentsCallId}
-            assignInstrumentsToCall={(instruments) =>
-              assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
-            }
-          />
-        </InputDialog>
+          <DialogContent>
+            <AssignInstrumentsToCall
+              assignedInstruments={callAssignments?.instruments}
+              callId={assigningInstrumentsCallId}
+              assignInstrumentsToCall={(instruments) =>
+                assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
+              }
+            />
+          </DialogContent>
+        </StyledDialog>
       )}
       <SuperMaterialTable
         createModal={createModal}
