@@ -12,7 +12,7 @@ _______________________________________________________
 
 ![Workflow](../../../assets/images/workflow.png){ width="500" }
 
-* ### [How do I create a proposal workflow?](proposal_workflow.md)
+* ### [How do I create a proposal workflow?](../settings/proposal_workflow.md)
 
 ![Templates](../../../assets/images/templates.png){ width="500"}
 

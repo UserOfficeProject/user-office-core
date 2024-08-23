@@ -15,11 +15,11 @@ There are several different types of templates utilised within Calls:
 
 ??? info "Proposal templates" 
 
-    [**Proposal templates**](proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. For example, these templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
+    [**Proposal templates**](../templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. For example, these templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilise [**question templates**](question_template.md) and [**sub-templates**](sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    User Officers can also utilise [**question templates**](../questions.md) and [**sub-templates**](../templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
 
-    * [**How do I create proposal templates?**](proposal_template.md)
+    * [**How do I create proposal templates?**](../templates/proposal_template.md)
 
     ______________________________________________________________________________________
     <figure markdown="span">  
@@ -31,9 +31,9 @@ There are several different types of templates utilised within Calls:
 
 ??? info "Proposal ESI templates" 
 
-    [**Proposal Experimental Safety Input (ESI)**](proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [**question templates**](question_template.md) and [**sub-templates**](sub_template.md) to customise Proposal ESI templates.
+    [**Proposal Experimental Safety Input (ESI)**](../templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [**question templates**](../questions.md) and [**sub-templates**](../templates/sub_template.md) to customise Proposal ESI templates.
 
-    * [**How do I create proposal ESI templates?**](proposalESI_template.md)
+    * [**How do I create proposal ESI templates?**](../templates/proposalESI_template.md)
     ______________________________________________________________________________________
     
     <figure markdown="span">  
@@ -44,9 +44,9 @@ There are several different types of templates utilised within Calls:
 
 ??? info "PDF templates" 
 
-    [**PDF templates**](pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+    [**PDF templates**](../templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
-    * [**How do I create PDF templates?**](pdf_template.md)
+    * [**How do I create PDF templates?**](../templates/pdf_template.md)
     ______________________________________________________________________________________
 
     <figure markdown="span">  
@@ -57,22 +57,22 @@ There are several different types of templates utilised within Calls:
 
 ??? info "Shipment declaration templates" 
 
-    [**Shipment declaration templates**](shipment_template.md) allow users to fill out a questionnaire to declare shipments.
+    [**Shipment declaration templates**](../templates/shipment_template.md) allow users to fill out a questionnaire to declare shipments.
 
-    * [**How do I create shipment declaration templates?**](shipment_template.md)
+    * [**How do I create shipment declaration templates?**](../templates/shipment_template.md)
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Shipment Declaration](../../../assets/images/declare_shipment.png){ width="450"}
+        ![Shipment Declaration](../../../assets/images/shipment_declaration.png){ width="450"}
         <figcaption>**Shipment declaration (viewed from the user's perspective)**</figcaption>
     </figure>
 
 
 ??? info "Visit registration templates" 
 
-    [**Visit registration templates**](visit_template.md) allow users to fill out a questionnaire to provide information about their visit registration.
+    [**Visit registration templates**](../templates/visit_template.md) allow users to fill out a questionnaire to provide information about their visit registration.
 
-    * [**How do I create visit registration templates?**](visit_template.md)
+    * [**How do I create visit registration templates?**](../templates/visit_template.md)
     ______________________________________________________________________________________
     
     <figure markdown="span">  
@@ -82,9 +82,9 @@ There are several different types of templates utilised within Calls:
 
 ??? info "Feedback templates" 
 
-    [**Feedback templates**](feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire.
+    [**Feedback templates**](../templates/feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire.
 
-    * [**How do I create feedback templates?**](visit_template.md)
+    * [**How do I create feedback templates?**](../templates/visit_template.md)
     ______________________________________________________________________________________
     
     <figure markdown="span">  
@@ -96,6 +96,6 @@ ________________________________________________________________________________
 
 ## **How do I use templates within a call?**
 
-* [How do I use templates within a call?](../creating_call.md)
+* [How do I use templates within a call?](creating_call.md)
 
 ______________________________________________________________________________________

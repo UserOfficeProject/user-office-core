@@ -11,7 +11,7 @@
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Workflow](../../assets/images/workflow_editor.png){ width="450"}
+        ![Workflow](../../../assets/images/workflow_editor.png){ width="450"}
         <figcaption>**Proposal workflow**</figcaption>
     </figure>
 _____________________________________________________________________________________________________
@@ -136,13 +136,13 @@ ________________________________________________________________________________
 ### **General Workflow**
 
 <figure markdown="span">  
-        ![General Workflow](../../assets/images/general_workflow.png){ width="300"}
+        ![General Workflow](../../../assets/images/general_workflow.png){ width="300"}
         <figcaption>**General workflow structure**</figcaption>
     </figure>
 
 ### **Rapid Access Workflow**
 
 <figure markdown="span">  
-        ![Shipment Declaration](../../assets/images/rapid_workflow.png){ width="250"}
+        ![Shipment Declaration](../../../assets/images/rapid_workflow.png){ width="250"}
         <figcaption>**Rapid Access Workflow structure**</figcaption>
     </figure>

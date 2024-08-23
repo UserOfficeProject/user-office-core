@@ -43,7 +43,7 @@ Pages are highly customiseable sections of information within User Office. Pages
 ### **Reviewer**
 
 !!! note ""
-    **Reviewer page:** This sets the reviewers' homepage; this is the information that reviewers will see on their dashboard (This is displayed to the following roles: [Sample Safety Reviewer](roles.md), [Internal Reviewer](roles.md), [FAP chairs](roles.md), [FAP secretaries](roles.md) and [FAP reviewers](roles.md)).
+    **Reviewer page:** This sets the reviewers' homepage; this is the information that reviewers will see on their dashboard (This is displayed to the following roles: [Sample Safety Reviewer](main/roles.md), [Internal Reviewer](main/roles.md), [FAP chairs](main/roles.md), [FAP secretaries](main/roles.md) and [FAP reviewers](main/roles.md)).
 
     The reviewer page may include the following key information: 
 
@@ -120,13 +120,13 @@ Pages are highly customiseable sections of information within User Office. Pages
 ### **Footer**
 
 !!! note ""
-    [Footer (developer tool)](developer-guide.md)
+    [Footer (developer tool)](placeholder.md)
     Note: The page must be refreshed in order to view the updated footer. 
 
 ### **Login**
 
 !!! note ""
-    [Login (developer tool)](developer-guide.md)
+    [Login (developer tool)](placeholder.md)
 
 ### **Grade guide** 
 
