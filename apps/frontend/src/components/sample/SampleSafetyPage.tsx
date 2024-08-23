@@ -1,5 +1,6 @@
 import GetAppIcon from '@mui/icons-material/GetApp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { DialogContent } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -14,8 +15,8 @@ import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import TextField from 'components/common/FormikUITextField';
-import InputDialog from 'components/common/InputDialog';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
+import StyledDialog from 'components/common/StyledDialog';
 import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
@@ -38,109 +39,119 @@ function SampleEvaluationDialog(props: {
   };
 
   return (
-    <InputDialog
+    <StyledDialog
       open={sample !== null}
       onClose={() => onClose(null)}
       fullWidth={true}
+      maxWidth="lg"
+      title="Review sample"
     >
-      <SampleDetails sampleId={sample.id} />
-      <Formik
-        initialValues={initialValues}
-        onSubmit={async (values): Promise<void> => {
-          if (!values) {
-            return;
-          }
+      <DialogContent>
+        <SampleDetails sampleId={sample.id} />
+        <Formik
+          initialValues={initialValues}
+          onSubmit={async (values): Promise<void> => {
+            if (!values) {
+              return;
+            }
 
-          const { id, safetyComment, safetyStatus } = values;
-          const { updateSample } = await api({
-            toastSuccessMessage: `Review for '${sample?.title}' submitted`,
-          }).updateSample({ sampleId: id, safetyComment, safetyStatus });
+            const { id, safetyComment, safetyStatus } = values;
+            const { updateSample } = await api({
+              toastSuccessMessage: `Review for '${sample?.title}' submitted`,
+            }).updateSample({ sampleId: id, safetyComment, safetyStatus });
 
-          onClose({ ...values, ...updateSample } || null);
-        }}
-      >
-        {({ isSubmitting, dirty }) => (
-          <Form>
-            <Field
-              type="text"
-              name="safetyStatus"
-              label="Status"
-              select
-              component={TextField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              InputProps={{ 'data-cy': 'safety-status' }}
-              fullWidth
-              required={true}
-              disabled={isSubmitting}
-            >
-              <MenuItem
-                key={SampleStatus.PENDING_EVALUATION}
-                value={SampleStatus.PENDING_EVALUATION}
+            onClose({ ...values, ...updateSample } || null);
+          }}
+        >
+          {({ isSubmitting, dirty }) => (
+            <Form>
+              <Field
+                type="text"
+                name="safetyStatus"
+                label="Status"
+                select
+                component={TextField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                InputProps={{ 'data-cy': 'safety-status' }}
+                fullWidth
+                required={true}
+                disabled={isSubmitting}
               >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Not evaluated</Typography>
-              </MenuItem>
+                <MenuItem
+                  key={SampleStatus.PENDING_EVALUATION}
+                  value={SampleStatus.PENDING_EVALUATION}
+                >
+                  <ListItemIcon>
+                    <Avatar style={{ backgroundColor: '#CCC' }}>&nbsp;</Avatar>
+                  </ListItemIcon>
+                  <Typography variant="inherit">Not evaluated</Typography>
+                </MenuItem>
 
-              <MenuItem
-                key={SampleStatus.LOW_RISK}
-                value={SampleStatus.LOW_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#88C100' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Low risk</Typography>
-              </MenuItem>
+                <MenuItem
+                  key={SampleStatus.LOW_RISK}
+                  value={SampleStatus.LOW_RISK}
+                >
+                  <ListItemIcon>
+                    <Avatar style={{ backgroundColor: '#88C100' }}>
+                      &nbsp;
+                    </Avatar>
+                  </ListItemIcon>
+                  <Typography variant="inherit">Low risk</Typography>
+                </MenuItem>
 
-              <MenuItem
-                key={SampleStatus.ELEVATED_RISK}
-                value={SampleStatus.ELEVATED_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF8A00' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">Elevated risk</Typography>
-              </MenuItem>
+                <MenuItem
+                  key={SampleStatus.ELEVATED_RISK}
+                  value={SampleStatus.ELEVATED_RISK}
+                >
+                  <ListItemIcon>
+                    <Avatar style={{ backgroundColor: '#FF8A00' }}>
+                      &nbsp;
+                    </Avatar>
+                  </ListItemIcon>
+                  <Typography variant="inherit">Elevated risk</Typography>
+                </MenuItem>
 
-              <MenuItem
-                key={SampleStatus.HIGH_RISK}
-                value={SampleStatus.HIGH_RISK}
-              >
-                <ListItemIcon>
-                  <Avatar style={{ backgroundColor: '#FF003C' }}>&nbsp;</Avatar>
-                </ListItemIcon>
-                <Typography variant="inherit">High risk</Typography>
-              </MenuItem>
-            </Field>
+                <MenuItem
+                  key={SampleStatus.HIGH_RISK}
+                  value={SampleStatus.HIGH_RISK}
+                >
+                  <ListItemIcon>
+                    <Avatar style={{ backgroundColor: '#FF003C' }}>
+                      &nbsp;
+                    </Avatar>
+                  </ListItemIcon>
+                  <Typography variant="inherit">High risk</Typography>
+                </MenuItem>
+              </Field>
 
-            <Field
-              name="safetyComment"
-              id="safetyComment"
-              label="Comment"
-              type="text"
-              component={TextField}
-              multiline
-              fullWidth
-              disabled={isSubmitting}
-              InputProps={{
-                minRows: 4,
-                maxRows: 10,
-                'data-cy': 'safety-comment',
-              }}
-            />
+              <Field
+                name="safetyComment"
+                id="safetyComment"
+                label="Comment"
+                type="text"
+                component={TextField}
+                multiline
+                fullWidth
+                disabled={isSubmitting}
+                InputProps={{
+                  minRows: 4,
+                  maxRows: 10,
+                  'data-cy': 'safety-comment',
+                }}
+              />
 
-            <ActionButtonContainer>
-              <Button type="submit" data-cy="submit" disabled={!dirty}>
-                Submit
-              </Button>
-            </ActionButtonContainer>
-          </Form>
-        )}
-      </Formik>
-    </InputDialog>
+              <ActionButtonContainer>
+                <Button type="submit" data-cy="submit" disabled={!dirty}>
+                  Submit
+                </Button>
+              </ActionButtonContainer>
+            </Form>
+          )}
+        </Formik>
+      </DialogContent>
+    </StyledDialog>
   );
 }
 

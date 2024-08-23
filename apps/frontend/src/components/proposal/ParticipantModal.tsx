@@ -67,6 +67,7 @@ const ParticipantModal = ({
     selectedUsers: selectedUsers,
     userRole: userRole || ('' as UserRole),
     emailInvite: true,
+    emailSearch: true,
     selection: !!selection,
     onUpdate: (data: BasicUserDetails[]) => addParticipants(data),
     invitationUserRole: invitationUserRole || userRole,
@@ -90,6 +91,7 @@ const ParticipantModal = ({
       open={show}
       onClose={(_, reason) => {
         if (reason && reason == 'backdropClick') return;
+        setSelectedParticipants([]);
         close();
       }}
       maxWidth="sm"
@@ -101,7 +103,13 @@ const ParticipantModal = ({
           textAlign: 'right',
         }}
       >
-        <IconButton data-cy="close-modal-btn" onClick={close}>
+        <IconButton
+          data-cy="close-modal-btn"
+          onClick={() => {
+            setSelectedParticipants([]);
+            close();
+          }}
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>

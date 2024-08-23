@@ -306,9 +306,9 @@ const ProposalTable = ({
             label="Join proposal"
             data-cy="join-proposal-btn"
             startIcon={<AddIcon />}
+            title="Join proposal"
           >
             <RedeemCode
-              title="Join proposal"
               onRedeemed={() => {
                 searchQuery().then((data) => {
                   if (data) {
