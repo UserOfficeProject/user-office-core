@@ -88,6 +88,11 @@ context('Xpress tests', () => {
     let createdProposalPk3: number;
     let createdProposalPk4: number;
 
+    let createdTechniquePk1: number;
+    let createdTechniquePk2: number;
+    let createdTechniquePk3: number;
+    let createdTechniquePk4: number;
+
     cy.createInstrument(instrument1).then((result) => {
       if (result.createInstrument) {
         createdInstrumentId1 = result.createInstrument.id;
@@ -111,6 +116,7 @@ context('Xpress tests', () => {
     });
 
     cy.createTechnique(technique1).then((result) => {
+      createdTechniquePk1 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist1.id],
         techniqueId: result.createTechnique.id,
@@ -121,6 +127,7 @@ context('Xpress tests', () => {
       });
     });
     cy.createTechnique(technique2).then((result) => {
+      createdTechniquePk2 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist1.id],
         techniqueId: result.createTechnique.id,
@@ -141,6 +148,7 @@ context('Xpress tests', () => {
       });
     });
     cy.createTechnique(technique4).then((result) => {
+      createdTechniquePk4 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist2.id],
         techniqueId: result.createTechnique.id,
@@ -160,6 +168,11 @@ context('Xpress tests', () => {
           title: proposal1.title,
           abstract: proposal1.abstract,
         });
+
+        cy.assignProposalToTechniques({
+          proposalPk: createdProposalPk1,
+          techniqueIds: [createdTechniquePk1],
+        });
       }
     });
 
@@ -171,6 +184,14 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk2,
           title: proposal2.title,
           abstract: proposal2.abstract,
+        });
+
+        //cy.clock(Date.UTC(2024, 8, 18), ['Date']);
+        cy.submitProposal({ proposalPk: createdProposalPk4 });
+
+        cy.assignProposalToTechniques({
+          proposalPk: createdProposalPk2,
+          techniqueIds: [createdTechniquePk2],
         });
       }
     });
@@ -185,7 +206,18 @@ context('Xpress tests', () => {
           abstract: proposal3.abstract,
         });
 
+        //cy.clock(Date.UTC(2024, 8, 20), ['Date']);
         cy.submitProposal({ proposalPk: createdProposalPk3 });
+
+        cy.changeProposalsStatus({
+          statusId: initialDBData.proposalStatuses.editableSubmitted.id,
+          proposalPks: [createdProposalPk3],
+        });
+
+        cy.assignProposalToTechniques({
+          proposalPk: createdProposalPk3,
+          techniqueIds: [createdTechniquePk3],
+        });
       }
     });
 
@@ -199,9 +231,22 @@ context('Xpress tests', () => {
           abstract: proposal4.abstract,
         });
 
+        //cy.clock(Date.UTC(2024, 8, 23), ['Date']);
         cy.submitProposal({ proposalPk: createdProposalPk4 });
+
+        cy.changeProposalsStatus({
+          statusId: initialDBData.proposalStatuses.editableSubmitted.id,
+          proposalPks: [createdProposalPk4],
+        });
+
+        cy.assignProposalToTechniques({
+          proposalPk: createdProposalPk4,
+          techniqueIds: [createdTechniquePk4],
+        });
       }
     });
+
+    //cy.clock(new Date(), ['Date']);
   });
 
   it('User should not be able to see Xpress page', () => {
