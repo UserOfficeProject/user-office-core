@@ -69,6 +69,7 @@ const AssignFapMemberToProposalModal = ({
           title="Select reviewers"
           selection={true}
           data={members}
+          emailSearch={false}
           isLoading={loadingMembers}
           columns={columns}
           search
