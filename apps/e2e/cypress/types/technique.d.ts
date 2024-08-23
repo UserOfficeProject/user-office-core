@@ -2,6 +2,8 @@ import {
   CreateTechniqueMutationVariables,
   AssignInstrumentsToTechniqueMutationVariables,
   RemoveInstrumentsFromTechniqueMutationVariables,
+  AssignProposalToTechniquesMutationVariables,
+  AssignScientistsToTechniqueMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
