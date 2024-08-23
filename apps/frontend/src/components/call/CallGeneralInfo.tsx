@@ -2,7 +2,6 @@ import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   FormControl,
@@ -29,6 +28,7 @@ import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
+import StyledDialog from 'components/common/StyledDialog';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
@@ -262,10 +262,11 @@ const CallGeneralInfo = ({
                 <IconButton onClick={handleClickOpen}>
                   <HelpIcon />
                 </IconButton>
-                <Dialog
+                <StyledDialog
                   onClose={handleClose}
                   aria-labelledby="customized-dialog-title"
                   open={open}
+                  title="Reference Number Format"
                 >
                   <DialogContent dividers>
                     <Typography gutterBottom color="inherit" variant="body1">
@@ -318,7 +319,7 @@ const CallGeneralInfo = ({
                       Close
                     </Button>
                   </DialogActions>
-                </Dialog>
+                </StyledDialog>
               </InputAdornment>
             ),
           }}

@@ -209,6 +209,7 @@ const ProposalGrade = ({
               label="Grading guide"
               disabled={isSubmitting}
               data-cy="grade-guide"
+              title="Grading Guide"
             >
               {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
             </ButtonWithDialog>

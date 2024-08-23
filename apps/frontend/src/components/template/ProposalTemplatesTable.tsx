@@ -1,11 +1,11 @@
 import MaterialTable, { Column } from '@material-table/core';
+import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import React, { useCallback, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import { Proposal, ProposalTemplate, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -95,14 +95,22 @@ function CallsModal(props: {
   onClose: () => void;
 }) {
   return (
-    <InputDialog open={props.open} onClose={props.onClose} fullWidth={true}>
-      <CallsList filterTemplateId={props.templateId as number} />
-      <ActionButtonContainer>
+    <StyledDialog
+      open={props.open}
+      onClose={props.onClose}
+      fullWidth={true}
+      maxWidth="lg"
+      title="Calls using the template"
+    >
+      <DialogContent dividers>
+        <CallsList filterTemplateId={props.templateId as number} />
+      </DialogContent>
+      <DialogActions>
         <Button variant="text" onClick={() => props.onClose()}>
           Close
         </Button>
-      </ActionButtonContainer>
-    </InputDialog>
+      </DialogActions>
+    </StyledDialog>
   );
 }
 
@@ -112,19 +120,23 @@ function ProposalsModal(props: {
   onClose: () => void;
 }) {
   return (
-    <InputDialog
+    <StyledDialog
       open={props.open}
       onClose={props.onClose}
       fullWidth={true}
+      maxWidth="lg"
       data-cy="proposals-modal"
+      title="Proposals using the template"
     >
-      <ProposalsList filterTemplateId={props.templateId as number} />
-      <ActionButtonContainer>
+      <DialogContent dividers>
+        <ProposalsList filterTemplateId={props.templateId as number} />
+      </DialogContent>
+      <DialogActions>
         <Button variant="text" onClick={() => props.onClose()}>
           Close
         </Button>
-      </ActionButtonContainer>
-    </InputDialog>
+      </DialogActions>
+    </StyledDialog>
   );
 }
 export type ProposalTemplateRowDataType = TemplateRowDataType & {

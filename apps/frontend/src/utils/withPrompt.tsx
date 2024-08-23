@@ -1,14 +1,15 @@
 import { DialogContent, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import React, { useCallback, useState } from 'react';
 
+import StyledDialog from 'components/common/StyledDialog';
 import withHandleEnter from 'components/common/withHandleEnter';
 
 import { FunctionType } from './utilTypes';
 
 const defaultOptions: Options = {
+  title: '',
   question: '',
   prefilledAnswer: '',
   okBtnLabel: 'OK',
@@ -57,8 +58,13 @@ const withPrompt = <T extends {}>(WrappedComponent: React.ComponentType<T>) => {
     return (
       <>
         <WrappedComponent {...(props as T)} prompt={prompt} />
-        <Dialog fullWidth open={!!onPrompt} onClose={handleCancel}>
-          <DialogContent>
+        <StyledDialog
+          fullWidth
+          open={!!onPrompt}
+          onClose={handleCancel}
+          title={options.title}
+        >
+          <DialogContent dividers>
             <TextFieldWithHandleEnter
               id="prompt-input"
               data-cy="prompt-input"
@@ -69,22 +75,23 @@ const withPrompt = <T extends {}>(WrappedComponent: React.ComponentType<T>) => {
               autoFocus
               onEnter={handleOk}
             />
-            <DialogActions>
-              <Button variant="text" onClick={handleCancel}>
-                {cancelBtnLabel}
-              </Button>
-              <Button variant="text" onClick={handleOk} data-cy="prompt-ok">
-                {okBtnLabel}
-              </Button>
-            </DialogActions>
           </DialogContent>
-        </Dialog>
+          <DialogActions>
+            <Button variant="text" onClick={handleCancel}>
+              {cancelBtnLabel}
+            </Button>
+            <Button variant="text" onClick={handleOk} data-cy="prompt-ok">
+              {okBtnLabel}
+            </Button>
+          </DialogActions>
+        </StyledDialog>
       </>
     );
   };
 };
 
 interface Options {
+  title: string;
   question: string;
   prefilledAnswer: string;
   okBtnLabel: string;
