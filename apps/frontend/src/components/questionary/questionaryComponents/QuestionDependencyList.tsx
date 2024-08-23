@@ -63,6 +63,7 @@ const QuestionDependencyList = ({
           DataType.BOOLEAN,
           DataType.SELECTION_FROM_OPTIONS,
           DataType.INSTRUMENT_PICKER,
+          DataType.TECHNIQUE_PICKER,
         ].includes(option.question.dataType) &&
         currentQuestionId !== option.question.id
     ).length;
