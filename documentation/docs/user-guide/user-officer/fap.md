@@ -1,4 +1,4 @@
-# FAPs
+# FAPs :material-google-circles-communities: 
 
 ### **What are facility access panels?**
 
