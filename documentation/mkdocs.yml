@@ -82,6 +82,7 @@ nav:
       - Architecture: developer-guide/architecture.md
       - RabbitMQ: developer-guide/rabbitmq.md
       - Kubernetes: developer-guide/kubernetes.md
+      - Depencency Injection: developer-guide/dependency_injection.md
       - Email Service: developer-guide/email.md
       - API Documentation: developer-guide/api_documentation.md
       - Documentation Changes: developer-guide/documentation_changes.md
