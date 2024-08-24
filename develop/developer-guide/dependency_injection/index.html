@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/CONTRIBUTING/">
+        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/dependency_injection/">
       
       
-        <link rel="prev" href="../../user-guide/user-officer/settings/app_settings/">
+        <link rel="prev" href="../kubernetes/">
       
       
-        <link rel="next" href="../running_locally/">
+        <link rel="next" href="../email/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Contributing - User Office Documentation</title>
+        <title>Depencency Injection - User Office Documentation</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#guidelines" class="md-skip">
+        <a href="#dependency-injection-with-tsyringe" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contributing
+              Depencency Injection
             
           </span>
         </div>
@@ -232,7 +232,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../CONTRIBUTING/" class="md-tabs__link">
           
   
   Developer Guide
@@ -1447,28 +1447,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Contributing
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1477,42 +1459,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#guidelines" class="md-nav__link">
-    <span class="md-ellipsis">
-      Guidelines
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-releases" class="md-nav__link">
-    <span class="md-ellipsis">
-      Creating releases
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1648,10 +1594,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../dependency_injection/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Depencency Injection
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1660,6 +1624,99 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-injection-with-tsyringe" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dependency Injection with TSyringe
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency Injection with TSyringe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up-di" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up DI
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#injecting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Injecting
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overwriting-database-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overwriting Database Calls
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overwriting Database Calls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-custom-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a Custom Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#registering-the-custom-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Registering the Custom Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-custom-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using the Custom Repository
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1840,20 +1897,77 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#guidelines" class="md-nav__link">
+  <a href="#dependency-injection-with-tsyringe" class="md-nav__link">
     <span class="md-ellipsis">
-      Guidelines
+      Dependency Injection with TSyringe
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency Injection with TSyringe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up-di" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up DI
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-releases" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#injecting" class="md-nav__link">
     <span class="md-ellipsis">
-      Creating releases
+      Injecting
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overwriting-database-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overwriting Database Calls
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overwriting Database Calls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-a-custom-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a Custom Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#registering-the-custom-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Registering the Custom Repository
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-custom-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using the Custom Repository
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1872,35 +1986,75 @@
                   
 
 
-  <h1>Contributing</h1>
+  <h1>Depencency Injection</h1>
 
-<p>Thank you for considering contributing to User Office Project!</p>
-<p>You can find the repo <a href="https://github.com/UserOfficeProject/user-office-core">here</a> and a detailed step-by-step guide with an example on how to create new functionality <a href="../step-by-step/">here</a>.</p>
-<p>If you're planning to contribute to this project by adding new functionality, we encourage you to discuss it first in the Discussions tab. This helps ensure that your proposed changes align with the project's goals and prevents duplicate efforts. Here's how you can initiate a discussion:</p>
-<ol>
-<li>Go to the <a href="https://github.com/UserOfficeProject/user-office-core/discussions">Discussions</a> tab.</li>
-<li>Start a new discussion thread outlining your proposed changes.</li>
-<li>Wait for feedback and consensus before proceeding with creating a pull request.</li>
-</ol>
-<h2 id="guidelines">Guidelines</h2>
-<ul>
-<li>Commits follow the <a href="https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines">Angular commit convention</a>.</li>
-<li>JavaScript is written using ES2015 features.</li>
-<li>2 spaces indentation.</li>
-<li>Features and bug fixes should be covered by test cases.</li>
-</ul>
-<h2 id="creating-releases">Creating releases</h2>
-<p>UserOfficeProject/user-office-core uses <a href="https://github.com/semantic-release/semantic-release">semantic-release</a>
-to release new versions automatically.</p>
-<ul>
-<li>Commits of type <code>fix</code> will trigger bugfix releases, think <code>0.0.1</code>.</li>
-<li>Commits of type <code>feat</code> will trigger feature releases, think <code>0.1.0</code>.</li>
-<li>Commits with <code>BREAKING CHANGE</code> in body or footer will trigger breaking releases, think <code>1.0.0</code>.</li>
-</ul>
-<p>All other commit types will trigger no new release.</p>
-<blockquote>
-<p><strong><em>NOTE:</em></strong> When merging the pull requests with <code>Squash and merge</code> option on github, the title of the pull request should follow the commit guidelines mentioned above because all the commits are squashed into one commit with title od the PR as a message of the commit. Otherwise when using normal <code>Merge pull request</code> the title of the pull request doesn't need to follow the commit guidelines but only the commit messages.</p>
-</blockquote>
+<p>Dependency Injection (DI) is a technique that allows a class to receive its dependencies from an external source rather than creating them internally. This promotes a loosely coupled architecture by enabling better modularity, ease of testing, and management of complex dependencies.</p>
+<p>This guide explains the usage of DI in the project and how to overwrite database calls for custom implementations or testing purposes.</p>
+<h2 id="dependency-injection-with-tsyringe">Dependency Injection with TSyringe</h2>
+<p>The project uses the <a href="https://github.com/microsoft/tsyringe">TSyringe library</a> for dependency injection. It is a lightweight dependency injection container for TypeScript and JavaScript.</p>
+<h3 id="setting-up-di">Setting Up DI</h3>
+<p>The first step is the registration of dependencies in the TSyringe container. This is typically done in a central file, named <code>buildContext.ts</code>. For example, a UserService and UserRepository might be registered as follows:</p>
+<pre><code>import { container } from 'tsyringe';
+import { UserService } from './services/UserService';
+import { UserRepository } from './repositories/UserRepository';
+
+container.register('UserService', { useClass: UserService });
+container.register('UserRepository', { useClass: UserRepository });
+</code></pre>
+<h3 id="injecting">Injecting</h3>
+<p>Dependencies can be injected into classes using the <code>@inject</code> decorator. Here is an example:</p>
+<pre><code>import { inject, injectable } from 'tsyringe';
+
+@injectable()
+class UserController {
+  constructor(
+    @inject('UserService') private userService: UserService
+  ) {}
+
+  async getUser(id: string) {
+    this.userService.getUserById(id);
+  }
+}
+</code></pre>
+<h2 id="overwriting-database-calls">Overwriting Database Calls</h2>
+<p>To overwrite database calls, you can create a custom repository or service and register it in the DI container.</p>
+<h3 id="creating-a-custom-repository">Creating a Custom Repository</h3>
+<p>First, create a custom repository that implements the same interface as the original repository:</p>
+<pre><code>// CustomUserRepository.ts
+import { UserRepository } from './UserRepository';
+
+class CustomUserRepository implements UserRepository {
+  async getUserById(id: string) {
+    // Custom implementation
+}
+
+  // Implement other methods as needed
+}
+</code></pre>
+<h3 id="registering-the-custom-repository">Registering the Custom Repository</h3>
+<p>Next, register the custom repository in the DI container, overwriting the original repository:</p>
+<pre><code>// buildContext.ts
+import { container } from 'tsyringe';
+import { CustomUserRepository } from './repositories/CustomUserRepository';
+
+container.register('UserRepository', { useClass: CustomUserRepository });
+</code></pre>
+<h3 id="using-the-custom-repository">Using the Custom Repository</h3>
+<p>Now, when the UserRepository is injected, the custom implementation will be used:</p>
+<pre><code>import { inject, injectable } from 'tsyringe';
+
+@injectable()
+class UserService {
+  constructor(
+    @inject('UserRepository') private userRepository: UserRepository
+  ) {}
+
+  async getUserById(id: string) {
+    return this.userRepository.getUserById(id);
+  }
+}
+</code></pre>
+<p>For more information on tsyringe, refer to the <a href="https://github.com/microsoft/tsyringe">official documentation</a>.</p>
 
 
 
