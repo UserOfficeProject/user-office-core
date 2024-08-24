@@ -181,11 +181,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://userofficeproject.github.io/user-office-core/develop/user-guide/user-officer/main/videos/</loc>
-         <lastmod>2024-08-24</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://userofficeproject.github.io/user-office-core/develop/user-guide/user-officer/settings/api_tokens/</loc>
          <lastmod>2024-08-24</lastmod>
          <changefreq>daily</changefreq>
