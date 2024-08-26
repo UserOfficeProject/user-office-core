@@ -7,9 +7,19 @@ BEGIN
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (1, 'Instrument 1', 'INSTR1', 'Test instrument 1', 0);
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (2, 'Instrument 2', 'INSTR2', 'Test instrument 2', 0);
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (3, 'Instrument 3', 'INSTR3', 'Test instrument 3', 0);
+
+  INSERT INTO techniques (technique_id, name, short_code, description) VALUES (1, 'Technique 1', 'TECH1', 'Test technique 1');
+  INSERT INTO techniques (technique_id, name, short_code, description) VALUES (2, 'Technique 2', 'TECH2', 'Test technique 2');
+  INSERT INTO techniques (technique_id, name, short_code, description) VALUES (3, 'Technique 3', 'TECH3', 'Test technique 3');
   
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 1, NULL);
   INSERT INTO call_has_instruments (call_id, instrument_id, availability_time) VALUES (1, 3, NULL);
+
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (1, 1);
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (1, 3);
+
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (2, 1);
+  INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (2, 3);
 
   INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (1, NOW(), 1);
 

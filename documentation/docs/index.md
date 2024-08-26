@@ -1,4 +1,4 @@
-![UOS Logo](assets/images/uo_logo.png){ align=left, width="300" } 
+![UOS Logo](assets/images/uo_logo_small.png){ align=left, width="300" } 
 
 ## Welcome to User Office
 

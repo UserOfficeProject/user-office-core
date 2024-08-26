@@ -40,8 +40,8 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
     return { totalCount: dummyTechniques.length, techniques: dummyTechniques };
   }
 
-  async getInstrumentsByTechniqueId(
-    techniqueId: number
+  async getInstrumentsByTechniqueIds(
+    techniqueIds: number[]
   ): Promise<Instrument[]> {
     return dummyInstruments;
   }
@@ -67,17 +67,49 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
   ): Promise<boolean> {
     return true;
   }
+
+  async assignProposalToTechniques(
+    proposalPk: number,
+    techniqueIds: number[]
+  ): Promise<boolean> {
+    if (proposalPk && techniqueIds) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {
+    if (techniqueIds) {
+      return dummyTechniques;
+    }
+
+    return [];
+  }
+
+  async getTechniquesByInstrumentIds(
+    instrumentIds: number[]
+  ): Promise<Technique[]> {
+    if (instrumentIds) {
+      return dummyTechniques;
+    }
+
+    return [];
+  }
+
   async getTechniqueScientists(
     techniqueId: number
   ): Promise<BasicUserDetails[]> {
     return [basicDummyUser];
   }
+
   async assignScientistsToTechnique(
     scientistIds: number[],
     techniqueId: number
   ): Promise<boolean> {
     return true;
   }
+
   async removeScientistFromTechnique(
     scientistId: number,
     techniqueId: number

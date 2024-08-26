@@ -151,7 +151,11 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
           />
         </Box>
         <NavigationFragment>
-          <ButtonWithDialog label="Grading guide" data-cy="grade-guide">
+          <ButtonWithDialog
+            label="Grading guide"
+            data-cy="grade-guide"
+            title="Grading guide"
+          >
             {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
           </ButtonWithDialog>
         </NavigationFragment>

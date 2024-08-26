@@ -24,6 +24,7 @@ import {
   SampleEsiBasisConfig,
   SelectionFromOptionsConfig,
   ShipmentBasisConfig,
+  TechniquePickerConfig,
   TextInputConfig,
   VisitBasisConfig,
 } from '../../resolvers/types/FieldConfig';
@@ -48,6 +49,7 @@ import { sampleDeclarationDefinition } from './SampleDeclaration';
 import { sampleEsiBasisDefinition } from './SampleEsiBasis';
 import { selectionFromOptionsDefinition } from './SelectionFromOptions';
 import { shipmentBasis } from './ShipmentBasis';
+import { techniquePickerDefinition } from './TechniquePicker';
 import { textInputDefinition } from './TextInput';
 import { visitBasisDefinition } from './VisitBasis';
 
@@ -95,7 +97,9 @@ export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
                                           ? DynamicMultipleChoiceConfig
                                           : T extends DataType.INSTRUMENT_PICKER
                                             ? InstrumentPickerConfig
-                                            : never;
+                                            : T extends DataType.TECHNIQUE_PICKER
+                                              ? TechniquePickerConfig
+                                              : never;
 
 export interface Question<T extends DataType> {
   /**
@@ -179,6 +183,7 @@ const registry = [
   visitBasisDefinition,
   fapReviewBasisDefinition,
   instrumentPickerDefinition,
+  techniquePickerDefinition,
 ];
 
 Object.freeze(registry);

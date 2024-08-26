@@ -11,6 +11,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { InstrumentOptionClass } from '../../models/questionTypes/InstrumentPicker';
+import { TechniqueOptionClass } from '../../models/questionTypes/TechniquePicker';
 import { Roles } from '../../models/Role';
 import { Unit } from './Unit';
 
@@ -295,6 +296,27 @@ export class RichTextInputConfig extends ConfigBase {
   max: number | null;
 }
 
+@ObjectType()
+export class TechniqueOption implements Partial<TechniqueOptionClass> {
+  @Field()
+  id: number;
+
+  @Field()
+  name: string;
+}
+
+@ObjectType()
+export class TechniquePickerConfig extends ConfigBase {
+  @Field(() => String)
+  variant: string;
+
+  @Field(() => [TechniqueOption])
+  techniques: TechniqueOption[];
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
+}
+
 export const FieldConfigType = createUnionType({
   name: 'FieldConfig', // the name of the GraphQL union
   types: () => [
@@ -320,5 +342,6 @@ export const FieldConfigType = createUnionType({
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
     InstrumentPickerConfig,
+    TechniquePickerConfig,
   ], // function that returns array of object types classes
 });

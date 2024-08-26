@@ -5,7 +5,7 @@ import React, { useCallback, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import { FapReviewTemplate, Review, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -94,14 +94,19 @@ function CallsModal(props: {
   onClose: () => void;
 }) {
   return (
-    <InputDialog open={props.open} onClose={props.onClose} fullWidth={true}>
+    <StyledDialog
+      open={props.open}
+      onClose={props.onClose}
+      fullWidth={true}
+      title="Calls using the template"
+    >
       <CallsList filterTemplateId={props.templateId as number} />
       <ActionButtonContainer>
         <Button variant="text" onClick={() => props.onClose()}>
           Close
         </Button>
       </ActionButtonContainer>
-    </InputDialog>
+    </StyledDialog>
   );
 }
 
@@ -111,11 +116,12 @@ function ReviewsModal(props: {
   onClose: () => void;
 }) {
   return (
-    <InputDialog
+    <StyledDialog
       open={props.open}
       onClose={props.onClose}
       fullWidth={true}
       data-cy="reviews-modal"
+      title="Reviews using the template"
     >
       <FapReviewsList filterTemplateId={props.templateId as number} />
       <ActionButtonContainer>
@@ -123,7 +129,7 @@ function ReviewsModal(props: {
           Close
         </Button>
       </ActionButtonContainer>
-    </InputDialog>
+    </StyledDialog>
   );
 }
 export type ReviewTemplateRowDataType = TemplateRowDataType & {

@@ -1,50 +1,140 @@
-# Proposal templates
+# Proposal templates :material-note-text:
 
-??? info "What are proposal templates?" 
+## **What are proposal templates?**
+??? info "Proposal templates :material-note-text:" 
+    [**Proposal templates** :material-note-text:](../templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    **Proposal templates** are designed to capture all necessary information that users need to provide when submitting their proposals. For example, these templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
-
-    User Officers can also utilise **question templates** and **sub-templates** to customise proposal templates to include specific questions based on the nature and requirements of the research.
-
-    _____________________________________________________________________________________
-
+    User Officers can also utilise [**questions** :material-comment-question:](../questions.md) and [**sub-templates** :material-collapse-all-outline:](../templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Proposal](/assets/images/proposal_template.png){ width="450"}
+        ![Proposal](../../../assets/images/proposal_template.png){ width="450"}
         <figcaption>**Proposal (viewed from the user's perspective)**</figcaption>
     </figure>
+______________________________________________________________________________________
 
+## **How do I link proposal templates to a call?**
 
-??? info "What are question templates?"
-
-    **Question templates** are designed to streamline the template creation and ensure consistency across different submissions. Each question addresses a specific piece of information which users must provide in order to facilitate the research. Question templates allow users to provide detailed and structured responses regarding information about their research. User Officers can create various types of questions, which are stored in the the question drawer to be used across multiple templates. Question templates allow for standardisation across the different questionnaire types which is essential for data collection and analysis of users' responses.
-
-??? info "What are sub templates?"
-
-    **Sub templates** 
-
+* See the [**creating a call**](../main/creating_call.md) guide.
+______________________________________________________________________________________
 
 ## **How do I create a proposal template?**
 
+**Step 1. Adding topics**
 
-## **Step 1. Navigate to the Proposal Templates page**
+* In the **main menu** :material-menu: select **Templates** :material-text-box-multiple:
+* From the dropdown menu, choose **proposal** :material-note-text:
+* From the template page, use the `Create` button. 
+* Enter a name and optional description for your new template. 
 
-* Go to the main menu and select Templates
-* From the dropdown menu, choose Proposal
+* This will bring you to the template editor. From here you may add topics which act as the different sections within the questionnaire that users fill out. 
 
-## **Step 2. Create a new Proposal Template**
-
-* From the proposal template page use the 'create' button
-* Enter a name for your new Proposal template. You may also provide an optional description
-* Click Create to proceed
-
-**Step 3. Edit the Proposal Template**
-
-* In the Proposal Template editor, you can see more options to add [**question templates**](question_template.md) and topics or delete topics.
-
-??? question "Editing questions"
+!!! TIP ""
+    **TIP:** It is good practice to utilise topics to split up the presentation of information for users. For example, in a proposal template you may wish to have a topic for addressing general information, another for support requirements and another for experiment details, etc.
     
-    **How do I create question templates?**
+* You can add questions to topics by clicking on **options** and from the dropdown select **^^`Add topic`^^**. Topics can be reordered by clicking on the **^^`Reorder topics mode`^^** option. In reorder topics mode, you may **drag and drop** the topics into the desired order.
 
+**Step 2. Adding questions**
 
-    *Tip! It is good practice to utilise pre-existing question templates when possible. This allows for the collection of users' awnser data to be standardised for analysis*
+* To add  [**questions** :material-comment-question:](../questions.md) click on **options** and from the dropdown select **^^`Add question`^^**. 
+* This will open the **question drawer** which contains all previously used questions. You can **^^`Search`^^**:material-magnify: for pre-existing questions through **question text** or by **question type**. You may preview questions in the question drawer by clicking on them. 
+
+!!! TIP ""
+    **Note:** not all question types are compatible with every template. For example, **sub-template** questions can only be added to **proposal templates**.
+
+* There are several different options when adding questions to a template:
+
+**1. Use a pre-existing question**
+
+* To add a pre-exisiting question to the template simply find it in the question drawer and **drag and drop** it into the template. 
+
+**2. Edit a pre-existing question** 
+
+* First add a pre-exisiting question to the template. You can them modify it by clicking on it within the template.
+
+!!! TIP ""
+    **Note:** the changes you make to questions will only be updated within the current template you are creating. If you wish to make changes to the question **across all templates** click on the `edit` (question key) link at the top of the question. 
+
+* Once you are satisfied with your changes, click the `Update` button to save the changes to the question within the current template.
+
+**3. Creating a question**
+
+* You may also create questions from scratch by clicking on **options** within the **question drawer** and selecting the question type you wish to create. 
+______________________________________________________________________________________
+
+## **How do I edit proposal templates?**
+
+**Step 1. Navigate to the proposal templates page**
+
+* To edit a pre-existing proposal template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
+* From the dropdown menu, choose **proposal** :material-note-text:
+
+**Step 2. Find the proposal template you wish to edit**
+
+* On the proposal templates page, find the template you wish to edit. You may wish to use the **^^`Search`^^**:material-magnify: function to search for the name or description if there are a lot of templates.
+
+**Step 3. Edit the template**
+
+* Click the **^^`Edit`^^** action on the template you wish to make changes to. In the proposal template editor you can make the desired changes to the proposal template. See the [**creating proposal templates**](proposal_template.md) guide for more information on the proposal template editor and using [**questions** :material-comment-question:](../questions.md)
+
+______________________________________________________________________________________
+
+## **How do I clone proposal templates?**
+
+**Step 1. Navigate to the proposal templates page**
+
+* To clone a pre-existing proposal template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
+* From the dropdown menu, choose **Proposal** 
+
+**Step 2. Find the proposal template you wish to edit**
+
+* On the proposal templates page, find the template you wish to clone. You may wish to use the `SEARCH` function to search for the name or description if there are a lot of templates.
+
+**Step 3. Clone the template**
+
+* Click the `CLONE` action on the template to create a clone. Note: the clone will be renamed 'Copy of (name)' and will be edded to the end of the list of proposal templates.
+
+______________________________________________________________________________________
+
+## **How do I archive and unarchive proposal templates?**
+
+The archive system allows you to save proposal templates for future reference. Archiving proposal templates will prevent them from being able to be linked to calls or searched for in the proposal templates page. 
+
+!!! tip ""
+
+    **TIP!** This feature is useful to prevent infrequently used proposal templates from crowding the User Office interface.
+
+**Step 1. Navigate to the proposal templates page**
+
+* To archive or unarchive proposal templates, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
+* From the dropdown menu, choose **proposal template** :material-note-text:
+
+**Step 2. Archive or Unarchive a proposal template**
+
+* To **archive** a proposal template, click on the `ARCHIVE` action next to the template name. This action will send the proposal template to the `ARCHIVED` tab.
+* To **unarchive** a proposal template, simply go to the `ARCHIVED` tab and click on the `UNARCHIVE` action next to the template name. This action will send the proposal template to the `CURRENT` tab.
+______________________________________________________________________________________
+
+## **How do I import and export proposal templates?**
+
+**Step 1. Navigate to the proposal templates page**
+
+* To import or export a **proposal template** :material-note-text:, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
+* From the dropdown menu, choose **proposal template** :material-note-text:
+
+**Step 2. Import or Export a proposal template**
+
+* To **Import** a proposal template, click on the **^^`IMPORT`^^** button at the bottom of the page. This will open the Import template page. From here, click on **^^`SELECT FILE`^^** to import .json proposal templates.
+
+* To **Export** a proposal template, click on the **^^`Export`^^** :material-share-variant: action on the desired template. This action will export the proposal template to a .json file which can be shared and imported in User Office. 
+______________________________________________________________________________________
+
+### **What does #proposals mean on proposal templates?**
+
+* '#proposals' refers to the number of calls the proposal template has been utilised in.
+______________________________________________________________________________________
+
+### **What does #calls mean on proposal templates?**
+
+* '#calls' refers to the number of calls the proposal template has been utilised in.
+______________________________________________________________________________________
 

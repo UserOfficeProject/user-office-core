@@ -1,4 +1,4 @@
-RabbitMQ is an open-source message broker that enables applications to communicate with each other asynchronously by sending and receiving messages. It is used within User Office to handle communication between different components of the system, particularly for routing messages related to proposal status actions. 
+RabbitMQ is a message broker that enables applications to communicate with each other asynchronously by sending and receiving messages. It is used within User Office to handle communication between different components of the system, particularly for routing messages related to proposal status actions. 
 
 This page provides an overview of how RabbitMQ is integrated into the project, including details on configuration, message handling, and frontend display.
 
