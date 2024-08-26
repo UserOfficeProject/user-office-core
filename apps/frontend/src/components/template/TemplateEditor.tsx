@@ -247,12 +247,6 @@ export default function TemplateEditor() {
     );
   }
 
-  // NOTE: For now preview works on proposal templates only. Another task is added to make it work for all of the templates.
-  if (
-    state.groupId === TemplateGroupId.PROPOSAL ||
-    state.groupId === TemplateGroupId.SAMPLE ||
-    true
-  ) {
     topControlBarElements.push(
       <Tooltip title="Preview questionary">
         <IconButton
@@ -263,7 +257,6 @@ export default function TemplateEditor() {
         </IconButton>
       </Tooltip>
     );
-  }
 
   const topControlBar = topControlBarElements.length ? (
     <FormGroup
