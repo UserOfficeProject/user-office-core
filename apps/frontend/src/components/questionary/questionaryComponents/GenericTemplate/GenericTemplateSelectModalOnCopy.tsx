@@ -1,19 +1,13 @@
-import CloseIcon from '@mui/icons-material/Close';
-import {
-  Autocomplete,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-} from '@mui/material';
-import { IconButton } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { useTheme } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { useSnackbar } from 'notistack';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
@@ -33,7 +27,7 @@ type GenericTemplateSelectModalOnCopyProps = {
   close: () => void;
   filter: GenericTemplatesFilter;
   currentProposalPk: number;
-  copyButtonLabel: Maybe<string>;
+  copyButtonLabel?: Maybe<string>;
   question: string;
   isMultipleCopySelect: boolean;
   handleGenericTemplateOnCopy: (copyAnswersInput: CopyAnswerInput[]) => void;
@@ -51,33 +45,7 @@ const GenericTemplateSelectModalOnCopy = ({
   isMultipleCopySelect = false,
   handleGenericTemplateOnCopy,
 }: GenericTemplateSelectModalOnCopyProps) => {
-  const useStyles = makeStyles((theme) => ({
-    mainContainer: {
-      margin: theme.spacing(2, 0, 0),
-      padding: theme.spacing(0, 1),
-      justifyContent: 'center',
-      flexWrap: 'wrap',
-    },
-    cardHeader: {
-      textAlign: 'center',
-      fontSize: '18px',
-    },
-    buttonContainer: {
-      display: 'flex',
-      justifyContent: 'right',
-      marginTop: theme.spacing(3),
-    },
-    selectorContainer: {
-      minWidth: '100%',
-    },
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      zIndex: '1',
-    },
-  }));
-  const classes = useStyles();
+  const theme = useTheme();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
   const [genericTemplates, setGenericTemplates] = useState<
@@ -135,117 +103,124 @@ const GenericTemplateSelectModalOnCopy = ({
   const SelectMenuItem = isMultipleCopySelect ? MultiMenuItem : MenuItem;
 
   return (
-    <Container component="main" className={classes.mainContainer}>
-      <IconButton
-        data-cy="close-modal-btn"
-        className={classes.closeButton}
-        onClick={(): void => close()}
+    <>
+      {copyButtonLabel && (
+        <Typography
+          variant="h6"
+          component="h1"
+          sx={{
+            textAlign: 'center',
+            fontSize: '18px',
+          }}
+        >
+          {copyButtonLabel || 'Copy'}
+        </Typography>
+      )}
+
+      <Box
+        sx={{
+          minWidth: '100%',
+        }}
       >
-        <CloseIcon />
-      </IconButton>
-
-      <Typography variant="h6" component="h1" className={classes.cardHeader}>
-        {copyButtonLabel || 'Copy'}
-      </Typography>
-
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <div className={classes.selectorContainer}>
-            <Autocomplete
-              id="generic-template-proposal-select"
-              aria-labelledby="generic-template-proposal-select-label"
-              fullWidth={true}
-              noOptionsText={capitalize(
-                `No proposal(s) with matching ${question || 'answers(s)'}`
-              )}
-              disableClearable
-              onChange={(_event, selectedValue) => {
-                setGenericTemplateAnswer([]);
-                setSelectedProposalPk(selectedValue.proposalPk);
-              }}
-              getOptionLabel={(option) => option.proposal.title}
-              isOptionEqualToValue={(option, value) =>
-                option.proposalPk === value.proposalPk
-              }
-              options={genericTemplates.filter(
-                (template, index) =>
-                  genericTemplates.findIndex(
-                    (value) => value.proposalPk == template.proposalPk
-                  ) === index
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  key={params.id}
-                  data-cy="genericTemplateProposalTitle"
-                  label="Proposal title"
-                  placeholder="Select proposal title"
-                />
-              )}
-              renderOption={(props, option) => {
-                return (
-                  <li {...props} key={option.proposalPk}>
-                    {option.proposal.title}
-                  </li>
-                );
-              }}
-              loading={isExecutingCall}
+        <Autocomplete
+          id="generic-template-proposal-select"
+          aria-labelledby="generic-template-proposal-select-label"
+          fullWidth={true}
+          noOptionsText={capitalize(
+            `No proposal(s) with matching ${question || 'answers(s)'}`
+          )}
+          disableClearable
+          onChange={(_event, selectedValue) => {
+            setGenericTemplateAnswer([]);
+            setSelectedProposalPk(selectedValue.proposalPk);
+          }}
+          getOptionLabel={(option) => option.proposal.title}
+          isOptionEqualToValue={(option, value) =>
+            option.proposalPk === value.proposalPk
+          }
+          options={genericTemplates.filter(
+            (template, index) =>
+              genericTemplates.findIndex(
+                (value) => value.proposalPk == template.proposalPk
+              ) === index
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              key={params.id}
+              data-cy="genericTemplateProposalTitle"
+              label="Proposal title"
+              placeholder="Select proposal title"
             />
+          )}
+          renderOption={(props, option) => {
+            return (
+              <li {...props} key={option.proposalPk}>
+                {option.proposal.title}
+              </li>
+            );
+          }}
+          loading={isExecutingCall}
+        />
 
-            <FormControl fullWidth disabled={selectedProposalPk ? false : true}>
-              <InputLabel id="generic-template-answer-label">
-                {question || 'Answer(s)'}
-              </InputLabel>
+        <FormControl fullWidth disabled={selectedProposalPk ? false : true}>
+          <InputLabel id="generic-template-answer-label">
+            {question || 'Answer(s)'}
+          </InputLabel>
 
-              <Select
-                labelId="generic-template-answer-select-label"
-                id="generic-template-answer-select"
-                data-cy="genericTemplateAnswers"
-                multiple={isMultipleCopySelect}
-                value={
-                  isMultipleCopySelect
-                    ? genericTemplateAnswer
-                    : genericTemplateAnswer.length > 0
-                      ? genericTemplateAnswer[0]
-                      : ''
-                }
-                onChange={(event: SelectChangeEvent<string | string[]>) => {
-                  if (Array.isArray(event.target.value)) {
-                    setGenericTemplateAnswer(event.target.value);
-                  } else {
-                    setGenericTemplateAnswer([event.target.value]);
-                  }
-                }}
-                renderValue={(selected) =>
-                  Array.isArray(selected)
-                    ? `${question || ''} selected(${selected.length})`
-                    : genericTemplates.find((value) => value.id === +selected)
-                        ?.title
-                }
-                MenuProps={{
-                  variant: 'menu',
-                }}
-              >
-                {genericTemplates
-                  .filter((template) =>
-                    selectedProposalPk
-                      ? template.proposalPk === selectedProposalPk
-                      : false
-                  )
-                  .map((option) => {
-                    return (
-                      <SelectMenuItem value={option.id} key={option.id}>
-                        {option.title}
-                      </SelectMenuItem>
-                    );
-                  })}
-              </Select>
-            </FormControl>
-          </div>
-        </Grid>
-      </Grid>
+          <Select
+            labelId="generic-template-answer-select-label"
+            id="generic-template-answer-select"
+            data-cy="genericTemplateAnswers"
+            multiple={isMultipleCopySelect}
+            value={
+              isMultipleCopySelect
+                ? genericTemplateAnswer
+                : genericTemplateAnswer.length > 0
+                  ? genericTemplateAnswer[0]
+                  : ''
+            }
+            onChange={(event: SelectChangeEvent<string | string[]>) => {
+              if (Array.isArray(event.target.value)) {
+                setGenericTemplateAnswer(event.target.value);
+              } else {
+                setGenericTemplateAnswer([event.target.value]);
+              }
+            }}
+            renderValue={(selected) =>
+              Array.isArray(selected)
+                ? `${question || ''} selected(${selected.length})`
+                : genericTemplates.find((value) => value.id === +selected)
+                    ?.title
+            }
+            MenuProps={{
+              variant: 'menu',
+            }}
+          >
+            {genericTemplates
+              .filter((template) =>
+                selectedProposalPk
+                  ? template.proposalPk === selectedProposalPk
+                  : false
+              )
+              .map((option) => {
+                return (
+                  <SelectMenuItem value={option.id} key={option.id}>
+                    {option.title}
+                  </SelectMenuItem>
+                );
+              })}
+          </Select>
+        </FormControl>
+      </Box>
 
-      <div className={classes.buttonContainer}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'right',
+          marginTop: theme.spacing(3),
+        }}
+      >
         {isExecutingCall && <UOLoader size="2em" />}
         <Button
           disabled={genericTemplateAnswer.length <= 0}
@@ -268,8 +243,8 @@ const GenericTemplateSelectModalOnCopy = ({
         >
           Save
         </Button>
-      </div>
-    </Container>
+      </Box>
+    </>
   );
 };
 

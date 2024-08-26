@@ -6,10 +6,9 @@ import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import AssignFapMemberToProposalModal, {
@@ -20,8 +19,17 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import { UserRole, Review, SettingsId, Fap, ReviewStatus } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import {
+  UserRole,
+  Review,
+  SettingsId,
+  Fap,
+  ReviewStatus,
+  FeatureId,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   useFapProposalsData,
   FapProposalType,
@@ -173,6 +181,11 @@ const FapProposalsAndAssignmentsTable = ({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { enqueueSnackbar } = useSnackbar();
+  const { featuresMap } = useContext(FeatureContext);
+
+  const isUseConflictOfInterestWarningEnabled = featuresMap.get(
+    FeatureId.CONFLICT_OF_INTEREST_WARNING
+  )?.isEnabled;
 
   const hasRightToAssignReviewers = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -395,17 +408,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     onAssignmentsUpdate({
       ...data,
-      fapChairsProposalCounts: data.fapChairsProposalCounts.map((value) => {
-        return {
-          userId: value.userId,
-          count: assignedMembers.find(
-            (assignedMember) => assignedMember.id === value.userId
-          )
-            ? value.count + 1
-            : value.count,
-        };
-      }),
-      fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
+      fapChairsCurrentProposalCounts: data.fapChairsCurrentProposalCounts.map(
         (value) => {
           return {
             userId: value.userId,
@@ -417,6 +420,17 @@ const FapProposalsAndAssignmentsTable = ({
           };
         }
       ),
+      fapSecretariesCurrentProposalCounts:
+        data.fapSecretariesCurrentProposalCounts.map((value) => {
+          return {
+            userId: value.userId,
+            count: assignedMembers.find(
+              (assignedMember) => assignedMember.id === value.userId
+            )
+              ? value.count + 1
+              : value.count,
+          };
+        }),
     });
   };
 
@@ -481,15 +495,13 @@ const FapProposalsAndAssignmentsTable = ({
     }
 
     const shouldShowWarning =
-      proposalPIsMap.size > 0 ||
-      proposalCoIsMap.size > 0 ||
-      pIInstitutionConflictMap.size > 0 ||
-      coIInstitutionConflictMap.size > 0;
+      isUseConflictOfInterestWarningEnabled &&
+      (proposalPIsMap.size > 0 ||
+        proposalCoIsMap.size > 0 ||
+        pIInstitutionConflictMap.size > 0 ||
+        coIInstitutionConflictMap.size > 0);
 
-    const alertText: React.DetailedHTMLProps<
-      React.HTMLAttributes<HTMLUListElement>,
-      HTMLUListElement
-    >[] = [];
+    const alertText: JSX.Element[] = [];
 
     const selectedProposalPks = selectedProposals.map(
       (selectedProposal) => selectedProposal.proposalPk
@@ -497,51 +509,49 @@ const FapProposalsAndAssignmentsTable = ({
 
     for (const selectedProposalPk of selectedProposalPks) {
       alertText.push(
-        <>
-          <ul>
-            {(!!proposalPIsMap.get(selectedProposalPk) ||
-              !!proposalCoIsMap.get(selectedProposalPk) ||
-              !!pIInstitutionConflictMap.get(selectedProposalPk) ||
-              !!coIInstitutionConflictMap.get(selectedProposalPk)) && (
-              <li>Proposal: {selectedProposalPk}</li>
-            )}
-            {!!proposalPIsMap.get(selectedProposalPk) && (
-              <li>
-                PI: {getFullUserName(proposalPIsMap.get(selectedProposalPk))}
-              </li>
-            )}
-            {!!proposalCoIsMap.get(selectedProposalPk) && (
-              <li>
-                Co-proposers:{' '}
-                {proposalCoIsMap
-                  .get(selectedProposalPk)
-                  ?.map((selectedCoProposer) =>
-                    getFullUserName(selectedCoProposer)
-                  )
-                  .join(', ')}
-              </li>
-            )}
-            {!!pIInstitutionConflictMap.get(selectedProposalPk) && (
-              <li>
-                Same institution as PI:{' '}
-                {getFullUserName(
-                  pIInstitutionConflictMap.get(selectedProposalPk)
-                )}
-              </li>
-            )}
-            {!!coIInstitutionConflictMap.get(selectedProposalPk) && (
-              <li>
-                Same institution as co-proposers:{' '}
-                {coIInstitutionConflictMap
-                  .get(selectedProposalPk)
-                  ?.map((selectedCoProposer) =>
-                    getFullUserName(selectedCoProposer)
-                  )
-                  .join(', ')}
-              </li>
-            )}
-          </ul>
-        </>
+        <ul>
+          {(!!proposalPIsMap.get(selectedProposalPk) ||
+            !!proposalCoIsMap.get(selectedProposalPk) ||
+            !!pIInstitutionConflictMap.get(selectedProposalPk) ||
+            !!coIInstitutionConflictMap.get(selectedProposalPk)) && (
+            <li>Proposal: {selectedProposalPk}</li>
+          )}
+          {!!proposalPIsMap.get(selectedProposalPk) && (
+            <li>
+              PI: {getFullUserName(proposalPIsMap.get(selectedProposalPk))}
+            </li>
+          )}
+          {!!proposalCoIsMap.get(selectedProposalPk) && (
+            <li>
+              Co-proposers:{' '}
+              {proposalCoIsMap
+                .get(selectedProposalPk)
+                ?.map((selectedCoProposer) =>
+                  getFullUserName(selectedCoProposer)
+                )
+                .join(', ')}
+            </li>
+          )}
+          {!!pIInstitutionConflictMap.get(selectedProposalPk) && (
+            <li>
+              Same institution as PI:{' '}
+              {getFullUserName(
+                pIInstitutionConflictMap.get(selectedProposalPk)
+              )}
+            </li>
+          )}
+          {!!coIInstitutionConflictMap.get(selectedProposalPk) && (
+            <li>
+              Same institution as co-proposers:{' '}
+              {coIInstitutionConflictMap
+                .get(selectedProposalPk)
+                ?.map((selectedCoProposer) =>
+                  getFullUserName(selectedCoProposer)
+                )
+                .join(', ')}
+            </li>
+          )}
+        </ul>
       );
     }
 
@@ -634,17 +644,8 @@ const FapProposalsAndAssignmentsTable = ({
 
         onAssignmentsUpdate({
           ...data,
-          fapChairsProposalCounts: data.fapChairsProposalCounts.map((value) => {
-            return {
-              userId: value.userId,
-              count:
-                assignedReviewer.fapMemberUserId === value.userId
-                  ? value.count - 1
-                  : value.count,
-            };
-          }),
-          fapSecretariesProposalCounts: data.fapSecretariesProposalCounts.map(
-            (value) => {
+          fapChairsCurrentProposalCounts:
+            data.fapChairsCurrentProposalCounts.map((value) => {
               return {
                 userId: value.userId,
                 count:
@@ -652,8 +653,17 @@ const FapProposalsAndAssignmentsTable = ({
                     ? value.count - 1
                     : value.count,
               };
-            }
-          ),
+            }),
+          fapSecretariesCurrentProposalCounts:
+            data.fapSecretariesCurrentProposalCounts.map((value) => {
+              return {
+                userId: value.userId,
+                count:
+                  assignedReviewer.fapMemberUserId === value.userId
+                    ? value.count - 1
+                    : value.count,
+              };
+            }),
         });
       };
 
@@ -707,6 +717,12 @@ const FapProposalsAndAssignmentsTable = ({
     })
   );
 
+  const maxPageLength = FapProposalsWitIdAndFormattedDate.length;
+
+  const pageSizeOptions = [5, 10, 20, maxPageLength]
+    .sort((a, b) => a - b)
+    .filter((n) => n <= maxPageLength);
+
   return (
     <>
       <ProposalReviewModal
@@ -756,10 +772,12 @@ const FapProposalsAndAssignmentsTable = ({
           options={{
             search: true,
             selection: true,
+            pageSize: Math.min(10, maxPageLength),
+            pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
               inputProps: {
                 'aria-label': 'Select all rows',
-                'data-cy': 'select-all-table-rows',
+                id: 'select-all-table-rows',
               },
             },
           }}

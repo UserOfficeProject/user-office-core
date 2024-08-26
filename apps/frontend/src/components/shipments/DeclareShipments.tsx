@@ -7,7 +7,6 @@ import {
   Divider,
   Paper,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -38,26 +37,10 @@ const shipmentToListRow = (
   };
 };
 
-const useStyles = makeStyles((theme) => ({
-  questionLabel: {
-    opacity: 0.54,
-    fontWeight: 400,
-    fontSize: '1rem',
-  },
-  container: {
-    padding: '1rem',
-    marginTop: theme.spacing(1),
-  },
-  alert: {
-    margin: `${theme.spacing(2)}px 0`,
-  },
-}));
-
 function DeclareShipments({
   scheduledEventId,
   confirm,
 }: DeclareShipmentsProps) {
-  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -131,7 +114,12 @@ function DeclareShipments({
           </Typography>
           <ShippingInstructions />
           {!hasLocalContact && (
-            <Alert severity="warning" className={classes.alert}>
+            <Alert
+              severity="warning"
+              sx={(theme) => ({
+                margin: `${theme.spacing(2)}px 0`,
+              })}
+            >
               Shipment declarations are not possible until the local contact has
               been assigned to your scheduled event
             </Alert>

@@ -1,22 +1,24 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
-import CallDataSource from '../datasources/postgres/CallDataSource';
-import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
-import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
+import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
+import { ProposalWorkflow } from '../models/ProposalWorkflow';
+import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { statusActionEngine } from '../statusActionEngine';
 
-const proposalSettingsDataSource = container.resolve(
-  ProposalSettingsDataSource
-);
-const proposalDataSource = container.resolve(ProposalDataSource);
-const callDataSource = container.resolve(CallDataSource);
-
 const getProposalWorkflowByCallId = (callId: number) => {
+  const proposalSettingsDataSource =
+    container.resolve<ProposalSettingsDataSource>(
+      Tokens.ProposalSettingsDataSource
+    );
+
   return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
 };
 
@@ -25,6 +27,11 @@ export const getProposalWorkflowConnectionByStatusId = (
   proposalStatusId: number,
   prevProposalStatusId?: number
 ) => {
+  const proposalSettingsDataSource =
+    container.resolve<ProposalSettingsDataSource>(
+      Tokens.ProposalSettingsDataSource
+    );
+
   return proposalSettingsDataSource.getProposalWorkflowConnectionsById(
     proposalWorkflowId,
     proposalStatusId,
@@ -52,10 +59,66 @@ const shouldMoveToNextStatus = (
   return allNextStatusRulesFulfilled;
 };
 
-const updateProposalStatus = (
-  proposalPk: number,
-  nextProposalStatusId: number
-) => proposalDataSource.updateProposalStatus(proposalPk, nextProposalStatusId);
+const checkIfConditionsForNextStatusAreMet = async ({
+  nextWorkflowConnections,
+  proposalWorkflow,
+  proposalSettingsDataSource,
+  proposalWithEvents,
+}: {
+  nextWorkflowConnections: ProposalWorkflowConnection[];
+  proposalWorkflow: ProposalWorkflow;
+  proposalSettingsDataSource: ProposalSettingsDataSource;
+  proposalWithEvents: {
+    proposalPk: number;
+    proposalEvents?: ProposalEventsRecord;
+    currentEvent: Event;
+  };
+}) => {
+  for (const nextWorkflowConnection of nextWorkflowConnections) {
+    if (!nextWorkflowConnection.nextProposalStatusId) {
+      continue;
+    }
+
+    const nextNextWorkflowConnections =
+      await getProposalWorkflowConnectionByStatusId(
+        proposalWorkflow.id,
+        nextWorkflowConnection.nextProposalStatusId
+      );
+    const newStatusChangingEvents =
+      await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
+        nextNextWorkflowConnections.map((connection) => connection.id)
+      );
+
+    if (!proposalWithEvents.proposalEvents) {
+      return;
+    }
+
+    for (const sce of newStatusChangingEvents) {
+      const proposalEventsKeys = Object.keys(
+        proposalWithEvents.proposalEvents!
+      );
+      const allProposalCompleteEvents = proposalEventsKeys.filter(
+        (proposalEventsKey) =>
+          proposalWithEvents.proposalEvents![
+            proposalEventsKey as keyof ProposalEventsRecord
+          ]
+      );
+
+      const nextStatusRulesFulfilled = allProposalCompleteEvents.includes(
+        sce.statusChangingEvent.toLowerCase()
+      );
+
+      if (sce.statusChangingEvent && nextStatusRulesFulfilled)
+        await workflowEngine([
+          {
+            currentEvent: sce.statusChangingEvent as Event,
+            proposalEvents: proposalWithEvents.proposalEvents,
+            proposalPk: proposalWithEvents.proposalPk,
+          },
+        ]);
+    }
+  }
+};
 
 export type WorkflowEngineProposalType = Proposal & {
   workflowId: number;
@@ -70,6 +133,9 @@ export const workflowEngine = async (
     currentEvent: Event;
   }[]
 ): Promise<Array<WorkflowEngineProposalType | void> | void> => {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
   const proposalsWithChangedStatuses = (
     await Promise.all(
       args.map(async (proposalWithEvents) => {
@@ -100,6 +166,10 @@ export const workflowEngine = async (
         if (!currentWorkflowConnections.length) {
           return;
         }
+
+        const callDataSource = container.resolve<CallDataSource>(
+          Tokens.CallDataSource
+        );
 
         const call = await callDataSource.getCall(proposal.callId);
 
@@ -136,6 +206,11 @@ export const workflowEngine = async (
               return;
             }
 
+            const proposalSettingsDataSource =
+              container.resolve<ProposalSettingsDataSource>(
+                Tokens.ProposalSettingsDataSource
+              );
+
             const statusChangingEvents =
               await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
                 nextWorkflowConnections.map((connection) => connection.id)
@@ -162,12 +237,20 @@ export const workflowEngine = async (
                 proposalWithEvents.proposalEvents
               )
             ) {
-              const updatedProposal = await updateProposalStatus(
-                proposalWithEvents.proposalPk,
-                currentWorkflowConnection.nextProposalStatusId
-              );
+              const updatedProposal =
+                await proposalDataSource.updateProposalStatus(
+                  proposalWithEvents.proposalPk,
+                  currentWorkflowConnection.nextProposalStatusId
+                );
 
               if (updatedProposal) {
+                await checkIfConditionsForNextStatusAreMet({
+                  nextWorkflowConnections,
+                  proposalWorkflow,
+                  proposalSettingsDataSource,
+                  proposalWithEvents,
+                });
+
                 return {
                   ...updatedProposal,
                   workflowId: proposalWorkflow.id,
@@ -209,6 +292,10 @@ export const markProposalsEventAsDoneAndCallWorkflowEngine = async (
 
     return;
   }
+
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
 
   const allProposalEvents = await proposalDataSource.markEventAsDoneOnProposals(
     eventType,

@@ -1,12 +1,13 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import FormControl from '@mui/material/FormControl';
 import useTheme from '@mui/material/styles/useTheme';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
-import { DatePicker, DateTimePicker } from 'formik-mui-lab';
 import { DateTime } from 'luxon';
 import React from 'react';
 
+import DatePicker from 'components/common/FormikUIDatePicker';
+import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { DateConfig, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -21,7 +22,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
   } = answer;
   const { tooltip, required, minDate, maxDate, includeTime } =
     answer.config as DateConfig;
-  const { format, mask } = useFormattedDateTime({
+  const { format } = useFormattedDateTime({
     settingsFormatToUse: includeTime
       ? SettingsId.DATE_TIME_FORMAT
       : SettingsId.DATE_FORMAT,
@@ -44,8 +45,7 @@ export function QuestionaryComponentDatePicker(props: BasicComponentProps) {
           id={`${id}-id`}
           name={id}
           label={question}
-          inputFormat={format}
-          mask={mask}
+          format={format}
           component={component}
           inputProps={{ placeholder: format }}
           ampm={false}

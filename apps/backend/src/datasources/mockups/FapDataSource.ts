@@ -19,7 +19,10 @@ import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignPro
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { FapDataSource } from '../FapDataSource';
-import { AssignProposalsToFapsInput } from '../postgres/records';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from '../postgres/records';
 import { basicDummyUser } from './UserDataSource';
 
 export const dummyFap = new Fap(
@@ -30,6 +33,7 @@ export const dummyFap = new Fap(
   '',
   true,
   true,
+  null,
   null,
   null
 );
@@ -43,6 +47,7 @@ export const anotherDummyFap = new Fap(
   true,
   false,
   null,
+  null,
   null
 );
 
@@ -54,6 +59,7 @@ export const dummyFapWithoutCode = new Fap(
   '',
   true,
   false,
+  null,
   null,
   null
 );
@@ -243,6 +249,7 @@ export class FapDataSourceMock implements FapDataSource {
       customGradeGuide,
       active,
       null,
+      null,
       null
     );
   }
@@ -264,6 +271,7 @@ export class FapDataSourceMock implements FapDataSource {
       gradeGuide,
       customGradeGuide,
       active,
+      null,
       null,
       null
     );
@@ -315,11 +323,15 @@ export class FapDataSourceMock implements FapDataSource {
     return dummyFapProposals.length;
   }
 
+  async getCurrentFapProposalCount(fapId: number) {
+    return dummyFapProposals.length;
+  }
+
   async getFapReviewerProposalCount(reviewerId: number) {
     return dummyFapProposals.length;
   }
 
-  async getFapReviewerProposalCountCurrentRound(reviewerId: number) {
+  async getCurrentFapReviewerProposalCount(reviewerId: number) {
     return dummyFapProposals.length;
   }
 
@@ -336,9 +348,9 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getFapProposalsByInstrument(
-    fapId: number,
     instrumentId: number,
-    callId: number
+    callId: number,
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ) {
     return dummyFapProposals.filter((proposal) => proposal.fapId === fapId);
   }
@@ -369,6 +381,12 @@ export class FapDataSourceMock implements FapDataSource {
         assignment.fapId === fapId &&
         assignment.proposalPk === proposalPk &&
         (reviewerId !== null ? assignment.fapMemberUserId === reviewerId : true)
+    );
+  }
+
+  async getAllFapProposalAssignments(proposalPk: number) {
+    return dummyFapAssignments.filter(
+      (assignment) => assignment.proposalPk === proposalPk
     );
   }
 
@@ -472,6 +490,12 @@ export class FapDataSourceMock implements FapDataSource {
     return [dummyFapMeetingDecision];
   }
 
+  async getAllFapMeetingDecisions(
+    fapId: number
+  ): Promise<FapMeetingDecision[]> {
+    return [dummyFapMeetingDecision];
+  }
+
   async getFapProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]> {
@@ -497,6 +521,10 @@ export class FapDataSourceMock implements FapDataSource {
     reviewer_id: number,
     rank: number
   ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  getFapReviewData(callId: number, fapId: number): Promise<FapReviewsRecord[]> {
     throw new Error('Method not implemented.');
   }
 

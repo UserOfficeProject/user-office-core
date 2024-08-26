@@ -1,8 +1,8 @@
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect, useState } from 'react';
 
 import PeopleTable from 'components/user/PeopleTable';
@@ -18,12 +18,6 @@ type AssignFapMemberToProposalModalProps = {
   assignMembersToFapProposals: (assignedMembers: FapAssignedMember[]) => void;
   assignedMembers?: Array<BasicUserDetails | null>;
 };
-
-const useStyles = makeStyles((theme) => ({
-  selectedUsersText: {
-    paddingRight: theme.spacing(1),
-  },
-}));
 
 const memberRole = (member: FapAssignedMember) => `${member.role?.title}`;
 
@@ -43,7 +37,6 @@ const AssignFapMemberToProposalModal = ({
   proposalPks,
   setProposalPks,
 }: AssignFapMemberToProposalModalProps) => {
-  const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
   >([]);
@@ -76,8 +69,10 @@ const AssignFapMemberToProposalModal = ({
           title="Select reviewers"
           selection={true}
           data={members}
+          emailSearch={false}
           isLoading={loadingMembers}
           columns={columns}
+          search
           onUpdate={(members: FapAssignedMember[]) =>
             assignMembersToFapProposals(members)
           }
@@ -86,9 +81,13 @@ const AssignFapMemberToProposalModal = ({
         />
       </DialogContent>
       <DialogActions>
-        <div className={classes.selectedUsersText}>
+        <Box
+          sx={(theme) => ({
+            paddingRight: theme.spacing(1),
+          })}
+        >
           {selectedParticipants.length} user(s) selected
-        </div>
+        </Box>
         <Button
           type="button"
           onClick={() => assignMembersToFapProposals(selectedParticipants)}

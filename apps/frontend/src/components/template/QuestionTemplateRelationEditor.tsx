@@ -1,24 +1,12 @@
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import makeStyles from '@mui/styles/makeStyles';
+import { DialogContent } from '@mui/material';
 import React from 'react';
 
-import StyledModal from 'components/common/StyledModal';
+import StyledDialog from 'components/common/StyledDialog';
 import { createQuestionTemplateRelationForm } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionTemplateRelation, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
 import TemplateEditLabel from './QuestionTemplateLabel';
-const useStyles = makeStyles((theme) => ({
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    '& > svg': {
-      color: theme.palette.grey[600],
-    },
-  },
-}));
 
 export default function QuestionTemplateRelationEditor(props: {
   field: QuestionTemplateRelation | null;
@@ -26,26 +14,22 @@ export default function QuestionTemplateRelationEditor(props: {
   closeMe: () => void;
   template: Template;
 }) {
-  const classes = useStyles();
-
   if (props.field === null) {
     return null;
   }
 
   return (
-    <StyledModal
+    <StyledDialog
       open={props.field != null}
       data-cy="question-relation-dialogue"
+      onClose={props.closeMe}
+      fullWidth
+      maxWidth="md"
+      title="Edit question"
     >
-      <>
+      <DialogContent dividers>
         <TemplateEditLabel pageType={'Template'} />
-        <IconButton
-          data-cy="close-modal-btn"
-          className={classes.closeButton}
-          onClick={props.closeMe}
-        >
-          <CloseIcon />
-        </IconButton>
+
         {createQuestionTemplateRelationForm({
           questionRel: props.field,
           onOpenQuestionClicked: (question) => {
@@ -69,7 +53,7 @@ export default function QuestionTemplateRelationEditor(props: {
           closeMe: props.closeMe,
           template: props.template,
         })}
-      </>
-    </StyledModal>
+      </DialogContent>
+    </StyledDialog>
   );
 }

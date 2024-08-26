@@ -4,6 +4,8 @@ import {
   deleteTechniqueValidationSchema,
   removeInstrumentsFromTechniqueValidationSchema,
   updateTechniqueValidationSchema,
+  assignScientistsToTechniqueValidationSchema,
+  removeScientistFromTechniqueValidationSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
@@ -12,9 +14,13 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
-import { Technique } from '../models/Technique';
+import { AssignProposalToTechniquesArgs, Technique } from '../models/Technique';
 import { UserWithRole } from '../models/User';
 import { AssignInstrumentsToTechniqueArgs } from '../resolvers/mutations/AssignInstrumentsToTechnique';
+import {
+  AssignScientistsToTechniqueArgs,
+  RemoveScientistFromTechniqueArgs,
+} from '../resolvers/mutations/AssignScientistsToTechnique';
 import { CreateTechniqueArgs } from '../resolvers/mutations/CreateTechniqueMutation';
 import { RemoveInstrumentsFromTechniqueArgs } from '../resolvers/mutations/RemoveInstrumentsFromTechnique';
 import { UpdateTechniqueArgs } from '../resolvers/mutations/UpdateTechniqueMutations';
@@ -56,7 +62,7 @@ export default class TechniqueMutations {
       .update(args)
       .catch((error) => {
         return rejection(
-          `Could not update technique '${args.id}`,
+          `Could not update technique: '${args.id}`,
           { agent, args: args },
           error
         );
@@ -76,7 +82,7 @@ export default class TechniqueMutations {
       .delete(args.id)
       .catch((error) => {
         return rejection(
-          `Could not delete technique '${args.id}'`,
+          `Could not delete technique: '${args.id}'`,
           { agent, args: args },
           error
         );
@@ -96,7 +102,7 @@ export default class TechniqueMutations {
       .assignInstrumentsToTechnique(args.instrumentIds, args.techniqueId)
       .catch((error) => {
         return rejection(
-          `Could not assign instruments to technique '${args.techniqueId}`,
+          `Could not assign instruments to technique: '${args.techniqueId}`,
           { agent, args: args },
           error
         );
@@ -114,8 +120,59 @@ export default class TechniqueMutations {
       .removeInstrumentsFromTechnique(args.instrumentIds, args.techniqueId)
       .catch((error) => {
         return rejection(
-          `Could not remove assigned instruments from technique '${args.techniqueId}`,
+          `Could not remove assigned instruments from technique: '${args.techniqueId}`,
           { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @EventBus(Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES)
+  @Authorized([Roles.USER_OFFICER])
+  async assignProposalToTechniques(
+    agent: UserWithRole | null,
+    args: AssignProposalToTechniquesArgs
+  ) {
+    return this.dataSource
+      .assignProposalToTechniques(args.proposalPk, args.techniqueIds)
+      .catch((error) => {
+        return rejection(
+          `Could not assign proposal to techniques: '${args.techniqueIds}`,
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @ValidateArgs(assignScientistsToTechniqueValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async assignScientistsToTechnique(
+    agent: UserWithRole | null,
+    args: AssignScientistsToTechniqueArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .assignScientistsToTechnique(args.scientistIds, args.techniqueId)
+      .catch((error) => {
+        return rejection(
+          'Could not assign scientist/s to technique',
+          { agent, args },
+          error
+        );
+      });
+  }
+
+  @ValidateArgs(removeScientistFromTechniqueValidationSchema)
+  @Authorized([Roles.USER_OFFICER])
+  async removeScientistFromTechnique(
+    agent: UserWithRole | null,
+    args: RemoveScientistFromTechniqueArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .removeScientistFromTechnique(args.scientistId, args.techniqueId)
+      .catch((error) => {
+        return rejection(
+          'Could not remove assigned scientist/s from technique',
+          { agent, args },
           error
         );
       });

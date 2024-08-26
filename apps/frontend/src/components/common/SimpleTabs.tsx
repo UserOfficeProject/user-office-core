@@ -1,10 +1,9 @@
 import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   NumberParam,
   StringParam,
@@ -44,31 +43,6 @@ const a11yProps = (index: number, orientation: 'horizontal' | 'vertical') => ({
   'aria-controls': `${orientation}-tabpanel-${index}`,
 });
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-    display: 'flex',
-    boxShadow: theme.shadows[1],
-  },
-  tabs: {
-    width: 'auto',
-    flexShrink: 0,
-    backgroundColor: theme.palette.grey['100'],
-    boxShadow: theme.shadows[1],
-  },
-  tabsNoItems: {
-    minWidth: '150px',
-
-    '& .MuiTabs-indicator': {
-      display: 'none',
-    },
-  },
-  tabsRightBorder: {
-    borderRight: `1px solid ${theme.palette.divider}`,
-  },
-}));
-
 type SimpleTabsProps = {
   children: React.ReactNode[];
   tabNames: string[];
@@ -89,7 +63,6 @@ const SimpleTabs = ({
 }: SimpleTabsProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery('(max-width: 500px)');
-  const classes = useStyles();
   const [query, setQuery] = useQueryParams({
     tab: withDefault(NumberParam, 0),
     modalTab: withDefault(NumberParam, 0),
@@ -97,6 +70,25 @@ const SimpleTabs = ({
     modal: StringParam,
   });
   const noItems = children.length === 0;
+
+  const styles = {
+    tabs: {
+      width: 'auto',
+      flexShrink: 0,
+      backgroundColor: theme.palette.grey['100'],
+      boxShadow: theme.shadows[1],
+    },
+    tabsRightBorder: {
+      borderRight: `1px solid ${theme.palette.divider}`,
+    },
+    tabsNoItems: {
+      minWidth: '150px',
+
+      '& .MuiTabs-indicator': {
+        display: 'none',
+      },
+    },
+  };
 
   // NOTE: If screen is mobile use horizontal orientation for space optimization
   if (isMobile) {
@@ -120,22 +112,6 @@ const SimpleTabs = ({
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (isVerticalOrientation) {
-        setQuery({ verticalTab: undefined });
-      } else if (isInsideModal) {
-        setQuery({ modalTab: undefined });
-      } else {
-        setQuery({ tab: undefined });
-      }
-    };
-  }, [setQuery, isInsideModal, isVerticalOrientation]);
-
-  const tabsClasses = `${classes.tabs} ${
-    isVerticalOrientation && classes.tabsRightBorder
-  } ${noItems && classes.tabsNoItems}`;
-
   const tabValue = isVerticalOrientation
     ? query.verticalTab
     : isInsideModal
@@ -143,7 +119,16 @@ const SimpleTabs = ({
       : query.tab;
 
   return (
-    <Box className={isVerticalOrientation ? classes.root : ''}>
+    <Box
+      sx={{
+        ...(isVerticalOrientation && {
+          flexGrow: 1,
+          backgroundColor: theme.palette.background.paper,
+          display: 'flex',
+          boxShadow: theme.shadows[1],
+        }),
+      }}
+    >
       <Tabs
         value={tabValue}
         onChange={handleChange}
@@ -153,7 +138,11 @@ const SimpleTabs = ({
         aria-label={`${orientation} tabs example`}
         indicatorColor="primary"
         orientation={orientation}
-        className={tabsClasses}
+        sx={{
+          ...styles.tabs,
+          ...(isVerticalOrientation && styles.tabsRightBorder),
+          ...(noItems && styles.tabsNoItems),
+        }}
         {...other}
       >
         {tabNames.map((tabName, i) => (

@@ -1,12 +1,7 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-} from '@mui/material';
+import { Button, DialogActions, DialogContent, TextField } from '@mui/material';
 import React, { useState } from 'react';
+
+import StyledDialog from 'components/common/StyledDialog';
 
 interface RankInputModalProps {
   open: boolean;
@@ -30,9 +25,14 @@ const RankInputModal: React.FC<RankInputModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>What Rank is this reviewer </DialogTitle>
-      <DialogContent>
+    <StyledDialog
+      open={open}
+      onClose={onClose}
+      title="What Rank is this reviewer"
+      fullWidth
+      maxWidth="xs"
+    >
+      <DialogContent dividers>
         <TextField
           autoFocus
           margin="dense"
@@ -52,7 +52,7 @@ const RankInputModal: React.FC<RankInputModalProps> = ({
           Submit
         </Button>
       </DialogActions>
-    </Dialog>
+    </StyledDialog>
   );
 };
 

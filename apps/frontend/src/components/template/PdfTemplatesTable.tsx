@@ -1,10 +1,10 @@
 import MaterialTable, { Column } from '@material-table/core';
+import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import React, { useCallback, useState } from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import { Template, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -48,18 +48,21 @@ function CallsList(props: { filterTemplateId: number }) {
 
 function CallsModal(props: { templateId?: number; onClose: () => void }) {
   return (
-    <InputDialog
+    <StyledDialog
       open={props.templateId !== undefined}
       onClose={props.onClose}
       fullWidth={true}
+      title="Associated Calls"
     >
-      <CallsList filterTemplateId={props.templateId as number} />
-      <ActionButtonContainer>
+      <DialogContent dividers>
+        <CallsList filterTemplateId={props.templateId as number} />
+      </DialogContent>
+      <DialogActions>
         <Button variant="text" onClick={() => props.onClose()}>
           Close
         </Button>
-      </ActionButtonContainer>
-    </InputDialog>
+      </DialogActions>
+    </StyledDialog>
   );
 }
 export type PdfTemplateRowDataType = TemplateRowDataType & {

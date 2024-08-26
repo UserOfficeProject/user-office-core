@@ -157,6 +157,23 @@ declare global {
       /**
        * Creates dynamic multiple choice question. You have to be in edit template view to call this method
        *
+       * @returns {typeof createTechniquePickerQuestion}
+       * @memberof Chainable
+       * @example
+       *    cy.createTechniquePickerQuestion('Is dangerous')
+       */
+      createTechniquePickerQuestion: (
+        title: string,
+        options?: {
+          type?: 'radio' | 'dropdown';
+          firstTopic?: boolean;
+          key?: string;
+        }
+      ) => void;
+
+      /**
+       * Creates dynamic multiple choice question. You have to be in edit template view to call this method
+       *
        * @returns {typeof createDynamicMultipleChoiceQuestion}
        * @memberof Chainable
        * @example

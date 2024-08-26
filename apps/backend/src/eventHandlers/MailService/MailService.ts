@@ -5,7 +5,9 @@ export abstract class MailService {
   abstract sendMail(options: EmailSettings): ResultsPromise<SendMailResults>;
   abstract getEmailTemplates(
     includeDraft?: boolean
-  ): ResultsPromise<(SparkPostTemplate | STFCEmailTemplate)[]>;
+  ): ResultsPromise<
+    (SparkPostTemplate | STFCEmailTemplate | ELIEmailTemplate)[]
+  >;
 }
 
 export type SparkPostTemplate = {
@@ -21,6 +23,11 @@ export type SparkPostTemplate = {
 };
 
 export type STFCEmailTemplate = {
+  id: string;
+  name: string;
+};
+
+export type ELIEmailTemplate = {
   id: string;
   name: string;
 };

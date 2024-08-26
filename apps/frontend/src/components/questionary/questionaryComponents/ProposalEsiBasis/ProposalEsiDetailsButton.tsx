@@ -8,7 +8,7 @@ interface ProposalEsiDetailsButtonProps {
 }
 function ProposalEsiDetailsButton(props: ProposalEsiDetailsButtonProps) {
   return (
-    <ButtonWithDialog label="View ESI">
+    <ButtonWithDialog label="View ESI" title="View ESI">
       <ProposalEsiDetails esiId={props.esiId} />
     </ButtonWithDialog>
   );

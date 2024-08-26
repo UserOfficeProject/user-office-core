@@ -13,14 +13,15 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
+import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
+import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
 import { getType } from 'mime';
 import React, { ChangeEvent, useState } from 'react';
 
@@ -45,45 +46,7 @@ export function FileEntry(props: {
   caption?: Maybe<string>;
   figure?: Maybe<string>;
 }) {
-  const classes = makeStyles((theme) => ({
-    fileListWrapper: {
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-    },
-    avatar: {
-      backgroundColor: theme.palette.primary.main,
-      color: 'white',
-    },
-    avatarWrapper: {
-      maxWidth: '50px',
-    },
-    downloadLink: {
-      display: 'inline-flex',
-      color: 'rgba(0, 0, 0, 0.54)',
-    },
-    fileText: {
-      display: 'inline-flex',
-      maxWidth: '70%',
-      '& span': {
-        width: '80%',
-        overflow: 'hidden',
-      },
-      '& p': {
-        paddingLeft: theme.spacing(1),
-        display: 'flex',
-        alignItems: 'center',
-      },
-    },
-    captionInput: {
-      marginLeft: theme.spacing(2),
-    },
-    infoIcon: {
-      fill: 'rgba(0, 0, 0, 0.54)',
-      width: '20px',
-      cursor: 'auto',
-    },
-  }))();
-
+  const theme = useTheme();
   const [showCaption, setShowCaption] = useState(false);
 
   const downloadLink = `/files/download/${props.metaData.fileId}`;
@@ -102,9 +65,14 @@ export function FileEntry(props: {
 
   return (
     <Grid container alignItems="center">
-      <Grid item xs={1} className={classes.avatarWrapper}>
+      <Grid item xs={1} sx={{ maxWidth: '50px' }}>
         <ListItemAvatar>
-          <Avatar className={classes.avatar}>
+          <Avatar
+            sx={{
+              backgroundColor: theme.palette.primary.main,
+              color: 'white',
+            }}
+          >
             <AttachFileIcon />
           </Avatar>
         </ListItemAvatar>
@@ -114,7 +82,19 @@ export function FileEntry(props: {
           <ListItemText
             primary={props.metaData.originalFileName}
             secondary={formatBytes(props.metaData.sizeInBytes)}
-            className={classes.fileText}
+            sx={{
+              display: 'inline-flex',
+              maxWidth: '70%',
+              '& span': {
+                width: '80%',
+                overflow: 'hidden',
+              },
+              '& p': {
+                paddingLeft: theme.spacing(1),
+                display: 'flex',
+                alignItems: 'center',
+              },
+            }}
           />
 
           <Box display="inline-flex">
@@ -134,13 +114,16 @@ export function FileEntry(props: {
             )}
             <Tooltip title="Download file">
               <IconButton edge="end">
-                <a
+                <Link
                   href={downloadLink}
-                  className={classes.downloadLink}
+                  sx={{
+                    display: 'inline-flex',
+                    color: 'rgba(0, 0, 0, 0.54)',
+                  }}
                   download
                 >
                   <GetAppIcon />
-                </a>
+                </Link>
               </IconButton>
             </Tooltip>
             <Tooltip title="Remove file">
@@ -165,7 +148,9 @@ export function FileEntry(props: {
                 label="Figure"
                 data-cy="image-figure"
                 defaultValue={props.figure || ''}
-                className={classes.captionInput}
+                sx={{
+                  marginLeft: theme.spacing(2),
+                }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
                     id: props.metaData.fileId,
@@ -177,7 +162,13 @@ export function FileEntry(props: {
                   startAdornment: (
                     <InputAdornment position="start">
                       <Tooltip title="Use figure to reference the image inside the rich text editor">
-                        <InfoOutlined className={classes.infoIcon} />
+                        <InfoOutlined
+                          sx={{
+                            fill: 'rgba(0, 0, 0, 0.54)',
+                            width: '20px',
+                            cursor: 'auto',
+                          }}
+                        />
                       </Tooltip>
                     </InputAdornment>
                   ),
@@ -192,7 +183,9 @@ export function FileEntry(props: {
                 label="Image caption"
                 data-cy="image-caption"
                 defaultValue={props.caption || ''}
-                className={classes.captionInput}
+                sx={{
+                  marginLeft: theme.spacing(2),
+                }}
                 onBlur={(e) =>
                   props.onImageCaptionOrFigureAdded({
                     id: props.metaData.fileId,
@@ -214,20 +207,7 @@ export function NewFileEntry(props: {
   filetype: string | undefined;
   onUploadComplete: (data: FileMetaData) => void;
 }) {
-  const classes = makeStyles((theme) => ({
-    fileListWrapper: {
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-    },
-    addIcon: {
-      marginRight: theme.spacing(1),
-    },
-    avatar: {
-      backgroundColor: theme.palette.primary.main,
-      color: 'white',
-    },
-  }))();
-
+  const theme = useTheme();
   const { uploadFile, progress, state, setState, abort } = useFileUpload();
 
   const hasValidContentHeader = (file: File): boolean => {
@@ -274,7 +254,12 @@ export function NewFileEntry(props: {
       return (
         <>
           <ListItemAvatar>
-            <Avatar className={classes.avatar}>
+            <Avatar
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: 'white',
+              }}
+            >
               <ErrorIcon />
             </Avatar>
           </ListItemAvatar>
@@ -291,7 +276,12 @@ export function NewFileEntry(props: {
       return (
         <>
           <ListItemAvatar>
-            <Avatar className={classes.avatar}>
+            <Avatar
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: 'white',
+              }}
+            >
               <ErrorIcon />
             </Avatar>
           </ListItemAvatar>
@@ -311,8 +301,17 @@ export function NewFileEntry(props: {
             multiple={false}
             onChange={onFileSelected}
           />
-          <Button variant="outlined" component="span">
-            <AddCircleOutlineIcon className={classes.addIcon} /> Attach file
+          <Button
+            variant="outlined"
+            component="span"
+            data-cy="attach-file-button"
+          >
+            <AddCircleOutlineIcon
+              sx={{
+                marginRight: theme.spacing(1),
+              }}
+            />{' '}
+            Attach file
           </Button>
         </label>
       );
@@ -320,7 +319,12 @@ export function NewFileEntry(props: {
       return (
         <>
           <ListItemAvatar>
-            <Avatar className={classes.avatar}>
+            <Avatar
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: 'white',
+              }}
+            >
               <CancelIcon />
             </Avatar>
           </ListItemAvatar>
@@ -350,16 +354,6 @@ export function NewFileEntry(props: {
   return <div>Unknown state</div>;
 }
 
-const useStyles = makeStyles(() => ({
-  questionnairesList: {
-    listStyle: 'none',
-    padding: 0,
-    marginBottom: 0,
-    '& li': {
-      paddingLeft: 0,
-    },
-  },
-}));
 export function FileUploadComponent(props: {
   maxFiles?: number; // 0 is unlimited
   id?: string;
@@ -368,11 +362,10 @@ export function FileUploadComponent(props: {
   omitFromPdf: boolean;
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
+  deleteAllOption?: boolean;
 }) {
   const fileIds = props.value.map((fileItem) => fileItem.id);
   const { files, setFiles } = useFilesMetadata({ fileIds });
-
-  const classes = useStyles();
 
   const onUploadComplete = (newFile: FileMetaData): void => {
     const newValue = files.concat(newFile);
@@ -400,6 +393,11 @@ export function FileUploadComponent(props: {
         )?.caption,
       }))
     );
+  };
+
+  const onDeleteAllClicked = () => {
+    setFiles([]);
+    props.onChange([]);
   };
 
   const onImageCaptionOrFigureAdded = ({
@@ -452,7 +450,17 @@ export function FileUploadComponent(props: {
       Accepted formats: {fileTypeInfo.join(', ')}
       {amountFilesInfo}
       {pdfPageLimitInfo}
-      <List component="ul" className={classes.questionnairesList}>
+      <List
+        component="ul"
+        sx={{
+          listStyle: 'none',
+          padding: 0,
+          marginBottom: 0,
+          '& li': {
+            paddingLeft: 0,
+          },
+        }}
+      >
         {files.map &&
           files.map((metaData: FileMetaData) => {
             const currentFileAnswerValues = props.value.find(
@@ -472,7 +480,18 @@ export function FileUploadComponent(props: {
               </ListItem>
             );
           })}
-        <ListItem key="addNew">{newFileEntry}</ListItem>
+        <ListItem key="addNew">
+          {newFileEntry}
+          {props.deleteAllOption && (
+            <Button
+              sx={{ marginLeft: '10px' }}
+              data-cy="delete-all"
+              onClick={() => onDeleteAllClicked()}
+            >
+              Remove All
+            </Button>
+          )}
+        </ListItem>
       </List>
     </>
   );

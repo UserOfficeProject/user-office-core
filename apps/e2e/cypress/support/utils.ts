@@ -61,6 +61,8 @@ export const closedCall = {
   callFapReviewEnded: false,
 };
 
+const numbersOnly = (date: string): string => date.replace(/[^0-9]/gi, '');
+
 export const getE2EApi = (token?: string | null) => {
   // NOTE: Token is used when we want to do some action as a specific logged in user.
   const authHeader = `Bearer ${token ? token : Cypress.env('SVC_ACC_TOKEN')}`;
@@ -124,7 +126,10 @@ const closeNotification = () => {
 const closeModal = () => {
   cy.get('[role="dialog"] [data-cy="close-modal"]').click();
 
-  cy.get('[role="dialog"]').should('not.exist');
+  cy.get('body').should(
+    'not.have.descendants',
+    '[role="presentation"] [role="dialog"]'
+  );
 };
 
 const finishedLoading = () => {
@@ -167,22 +172,39 @@ const dragElement = (
   return cy.get('@focusedElement');
 };
 
+const getEditorById = (win: Cypress.AUTWindow, tinyMceId: string) =>
+  win.tinyMCE.EditorManager.get().find((editor) => editor.id === tinyMceId);
+
 const setTinyMceContent = (tinyMceId: string, content: string) => {
+  cy.window().should('have.property', 'tinymce'); // wait for tinyMCE
   cy.get(`#${tinyMceId}`).should('exist');
 
+  // NOTE: // wait for editor to be ready
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(1000);
+
   cy.window().then((win) => {
-    const editor = win.tinyMCE.editors[tinyMceId];
-    editor.setContent(content);
+    const editor = getEditorById(win, tinyMceId);
+    editor?.setContent(content);
   });
 };
+
+const setDatePickerValue = (selector: string, value: string) =>
+  cy
+    .get(selector)
+    // NOTE: Clears the value from the datepicker
+    .type('{selectall}{backspace}')
+    // NOTE: Points to the first sub-field which is usually the date.
+    .type('{leftarrow}{leftarrow}{leftarrow}{leftarrow}')
+    .type(numbersOnly(value));
 
 const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
   return cy.window().then((win) => {
-    const editor = win.tinyMCE.editors[tinyMceId];
+    const editor = getEditorById(win, tinyMceId);
 
-    return editor.getContent();
+    return editor?.getContent();
   });
 };
 
@@ -248,6 +270,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('setTinyMceContent', setTinyMceContent);
+Cypress.Commands.add('setDatePickerValue', setDatePickerValue);
 Cypress.Commands.add('getTinyMceContent', getTinyMceContent);
 Cypress.Commands.add('testActionButton', testActionButton);
 Cypress.Commands.add('createApiAccessToken', createApiAccessToken);

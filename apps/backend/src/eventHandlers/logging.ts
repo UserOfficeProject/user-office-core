@@ -6,6 +6,7 @@ import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -26,6 +27,10 @@ export default function createHandler() {
 
   const techniqueDataSource = container.resolve<TechniqueDataSource>(
     Tokens.TechniqueDataSource
+  );
+
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
   );
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
@@ -170,6 +175,29 @@ export default function createHandler() {
           );
 
           break;
+        case Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED: {
+          const instrumentIds = event.instrumentshasproposals.instrumentIds;
+          const instruments =
+            await instrumentDataSource.getInstrumentsByIds(instrumentIds);
+
+          const description = `Submitted instrument${instruments.length > 1 ? 's' : ''}: ${instruments?.map((i) => i.name).join(', ')}`;
+
+          await Promise.all(
+            event.instrumentshasproposals.proposalPks.map(
+              async (proposalPk) => {
+                return eventLogsDataSource.set(
+                  event.loggedInUserId,
+                  event.type,
+                  json,
+                  proposalPk.toString(),
+                  description
+                );
+              }
+            )
+          );
+
+          break;
+        }
         case Event.PROPOSAL_FAP_MEETING_SAVED:
         case Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN:
         case Event.PROPOSAL_FAP_MEETING_REORDER:
@@ -235,6 +263,29 @@ export default function createHandler() {
                 event.type,
                 json,
                 obj[0].techniqueId,
+                description
+              );
+            }
+          }
+          break;
+        case Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES:
+          {
+            let description = '';
+            if (event.boolean && event.inputArgs) {
+              const obj = JSON.parse(event.inputArgs);
+              const techniques = await techniqueDataSource.getTechniquesByIds(
+                obj[0].techniqueIds
+              );
+
+              const proposal = await proposalDataSource.get(obj[0].proposalPk);
+
+              description = `Selected techniques: ${techniques?.map((technique) => technique.name).join(', ')} is attached to proposal: ${proposal?.proposalId}`;
+
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].proposalPk,
                 description
               );
             }
