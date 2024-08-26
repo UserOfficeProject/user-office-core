@@ -6,7 +6,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { ErrorMessage, Field } from 'formik';
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
 import Select from 'components/common/FormikUISelect';
@@ -44,6 +44,14 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   );
   const [numberOfChars, setNumberOfChars] = useState(0);
 
+  const [localGrade, setLocalGrade] = useState(
+    state?.fapReview.grade || undefined
+  );
+
+  useEffect(() => {
+    setLocalGrade(state?.fapReview.grade || undefined);
+  }, [state]);
+
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -62,8 +70,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
 
   const gradeFieldId = `${id}.grade`;
   const commentFieldId = `${id}.comment`;
-
-  // @TODO: check multi-topic initialization
 
   return (
     <div>
@@ -111,6 +117,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
           <Field
             name={gradeFieldId}
             label="Grade"
+            value={localGrade}
             component={gradeDecimalPoints === 1 ? Select : TextField}
             MenuProps={{ 'data-cy': 'grade-proposal-options' }}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
