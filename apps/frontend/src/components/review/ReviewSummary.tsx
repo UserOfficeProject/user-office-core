@@ -24,7 +24,7 @@ type ReviewSummaryProps = {
   confirm: WithConfirmType;
 };
 
-function ReviewSummaryReview({ confirm }: ReviewSummaryProps) {
+function ReviewSummary({ confirm }: ReviewSummaryProps) {
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ReviewContextType;
@@ -143,7 +143,7 @@ function ReviewSummaryReview({ confirm }: ReviewSummaryProps) {
             </NavigButton>
             {isUserOfficer && (
               <NavigButton
-                data-cy="save-grade"
+                data-cy="save-button"
                 disabled={isDisabled(isSubmitting)}
                 color="secondary"
                 type="submit"
@@ -234,4 +234,4 @@ function ReviewSummaryReview({ confirm }: ReviewSummaryProps) {
   );
 }
 
-export default withConfirm(ReviewSummaryReview);
+export default withConfirm(ReviewSummary);

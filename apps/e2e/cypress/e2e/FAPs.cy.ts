@@ -75,6 +75,7 @@ function readWriteReview(
       cy.contains('Submit').click();
       cy.contains('OK').click();
     } else {
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="is-grade-submitted"]').click();
     }
   }
@@ -756,6 +757,7 @@ context('Fap reviews tests', () => {
       cy.get('[role="presentation"] [role="tab"]').contains('Grade').click();
 
       cy.contains('New fap review').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.get('[data-cy="is-grade-submitted"]').click();
 
@@ -1366,6 +1368,9 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.closeModal();
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
         text: 'Proposals review submitted successfully',
@@ -2870,6 +2875,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 2 : 4,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -2887,6 +2893,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 1 : 5,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -3427,7 +3434,7 @@ context('Fap meeting components tests', () => {
       cy.visit('/');
       cy.finishedLoading();
       cy.get('[data-cy="grade-proposal-icon"]').click();
-      cy.get('[data-cy=save-grade]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="grade-proposal"] input:invalid').should(
         'have.length',
         1
@@ -3442,11 +3449,11 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="grade-proposal-options"] [role="option"]')
         .first()
         .click();
-      cy.get('[data-cy=save-grade]').click();
-      cy.contains('comment is a required field');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Comment is required');
       cy.setTinyMceContent('comment', faker.lorem.words(3));
-      cy.get('[data-cy=save-grade]').click();
-      cy.notification({ variant: 'success', text: 'Updated' });
+      cy.get('[data-cy=save-and-continue-button]').focus().click();
+      //cy.notification({ variant: 'success', text: 'Updated' });
     });
 
     it('Fap Reviewer should be able to give non integer review', () => {
@@ -3491,13 +3498,13 @@ context('Fap meeting components tests', () => {
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('#grade-proposal').type('0.001');
 
-      cy.get('[data-cy="save-grade"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('Lowest grade is 1');
 
       cy.get('#grade-proposal').clear().type('1.001');
 
-      cy.get('[data-cy="save-grade"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.get('[data-cy="grade-proposal"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
@@ -3507,8 +3514,8 @@ context('Fap meeting components tests', () => {
 
       cy.get('#grade-proposal').clear().type('1.01');
 
-      cy.get('[data-cy=save-grade]').click();
-      cy.notification({ variant: 'success', text: 'Updated' });
+      cy.get('[data-cy=save-and-continue-button]').click();
+      //cy.notification({ variant: 'success', text: 'Updated' });
     });
   });
 });

@@ -15,7 +15,9 @@ import { tableIcons } from 'utils/materialIcons';
 import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
-  const { calls } = useCallsData({ templateIds: [props.filterTemplateId] });
+  const { calls, loadingCalls } = useCallsData({
+    templateIds: [props.filterTemplateId],
+  });
   const { toFormattedDateTime, timezone } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -44,12 +46,13 @@ function CallsList(props: { filterTemplateId: number }) {
       title="Calls"
       columns={callListColumns}
       data={callsWithFormattedDates}
+      isLoading={loadingCalls}
     />
   );
 }
 
 function FapReviewsList(props: { filterTemplateId: number }) {
-  const { reviewsData } = useReviewsData({
+  const { reviewsData, loading } = useReviewsData({
     templateIds: [props.filterTemplateId],
   });
 
@@ -80,6 +83,7 @@ function FapReviewsList(props: { filterTemplateId: number }) {
       title="Reviews"
       columns={reviewListColumns}
       data={reviewsData}
+      isLoading={loading}
     />
   );
 }

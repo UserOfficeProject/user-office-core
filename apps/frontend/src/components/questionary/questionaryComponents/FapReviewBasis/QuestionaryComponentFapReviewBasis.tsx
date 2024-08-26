@@ -63,6 +63,8 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const gradeFieldId = `${id}.grade`;
   const commentFieldId = `${id}.comment`;
 
+  // @TODO: check multi-topic initialization
+
   return (
     <div>
       <Box sx={{ margin: theme.spacing(2, 0) }}>
