@@ -47,7 +47,7 @@ const genericTemplateToListRow = (
   };
 };
 
-function createGenericTemplateStub(
+export function createGenericTemplateStub(
   templateId: number,
   questionarySteps: QuestionaryStep[],
   proposalPk: number,

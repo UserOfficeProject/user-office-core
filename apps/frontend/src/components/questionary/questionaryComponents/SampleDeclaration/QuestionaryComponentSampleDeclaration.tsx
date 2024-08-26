@@ -48,7 +48,7 @@ const sampleToListRow = (sample: SampleCore): QuestionnairesListRow => {
   };
 };
 
-function createSampleStub(
+export function createSampleStub(
   templateId: number,
   questionarySteps: QuestionaryStep[],
   proposalPk: number,
