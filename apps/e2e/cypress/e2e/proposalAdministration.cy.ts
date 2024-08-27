@@ -26,7 +26,7 @@ context('Proposal administration tests', () => {
 
   const existingUserId = initialDBData.users.user1.id;
   const existingTopicId = 1;
-  const existingQuestionaryId = 1;
+  const existingQuestionaryId = 2;
   let createdProposalPk: number;
   let createdProposalId: string;
   let createdInstrumentId: number;

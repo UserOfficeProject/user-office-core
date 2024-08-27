@@ -54,7 +54,7 @@ export default {
     id: 1,
     name: 'default template',
     topic: {
-      id: 5,
+      id: 6,
       title: 'Topic title',
     },
   },
@@ -194,7 +194,7 @@ export default {
   proposal: {
     id: 1,
     title: 'Test proposal',
-    questionaryId: 1,
+    questionaryId: 2,
     shortCode: '999999',
   },
   instrument1: {
