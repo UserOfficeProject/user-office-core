@@ -33,19 +33,19 @@ INSERT INTO public.questionaries(
 	
 INSERT INTO public.samples(
 	title, creator_id, questionary_id, safety_status, created_at, safety_comment, proposal_pk, question_id, shipment_id)
-	VALUES ('My sample title', 2, 2, 0, '2021-07-20 13:59:08.602853+00', '', 1, 'sample_declaration_question', null);
+	VALUES ('My sample title', 2, 3, 0, '2021-07-20 13:59:08.602853+00', '', 1, 'sample_declaration_question', null);
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
-	VALUES (2, 5, true);
+	VALUES (3, 5, true);
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
-	VALUES (1, 1, true);
+	VALUES (2, 1, true);
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
-	VALUES (1, 6, true);
+	VALUES (2, 6, true);
 
 
 

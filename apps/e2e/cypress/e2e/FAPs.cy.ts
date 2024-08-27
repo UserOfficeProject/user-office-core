@@ -443,7 +443,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
-    it('only Officer should be able to assign Fap member to proposal in existing Fap', () => {
+    it('Officer should be able to assign Fap member to proposal in existing Fap', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
