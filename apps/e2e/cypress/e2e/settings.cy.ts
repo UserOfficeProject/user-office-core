@@ -1148,6 +1148,7 @@ context('Settings tests', () => {
         .click();
 
       cy.setTinyMceContent('comment', faker.lorem.words(3));
+      cy.get(`#comment_ifr`).first().focus().click();
 
       if (
         settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
@@ -1159,6 +1160,7 @@ context('Settings tests', () => {
         cy.get('[data-cy="grade-proposal"]').click().type('1');
       }
 
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="is-grade-submitted"]').click();
       cy.get('[type="submit"]').contains('Save').click();
 

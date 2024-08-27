@@ -472,14 +472,14 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'technique_picker_question', 
-    1, 5, 6, '{"variant":"dropdown","options":[1, 2]}'
+    1, 6, 6, '{"variant":"dropdown","options":[1, 2]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
 ) 
 VALUES 
   (
-    1, 'technique_picker_question', 
+    2, 'technique_picker_question', 
     '{"value": 1 }'
   );
 
