@@ -58,6 +58,15 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
               data-cy="required"
             />
             <Field
+              name="config.allowImages"
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Allow images',
+              }}
+              data-cy="allow-images"
+            />
+            <Field
               name="config.max"
               label="Max"
               type="text"
