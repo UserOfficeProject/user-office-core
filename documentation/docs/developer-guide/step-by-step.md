@@ -26,13 +26,13 @@ Start by adding a new column `is_locked` to the database by creating a new file 
 
 Now that we have DB column, let’s write a function in our datasource layer that will update the database.
 
-#### Create new database interface function
+#### 1. Create new database interface function
 
 Add a new interface function under `/src/datasources/AdminDataSource.ts`. The Interface function will accept one parameter user_id, and return a value object of type BasicUserDetails containing the user who was locked out.
 
     lockUser(user_id: number): Promise<BasicUserDetails>;
 
-#### Implement the interface in PostgreSQL
+#### 2. Implement the interface in PostgreSQL
 
 Add the function to handle the database request in the file by implementing the interface in `/src/datasources/postgres/AdminDataSource.ts`.
 
@@ -54,7 +54,7 @@ Add the function to handle the database request in the file by implementing the 
 
 > **_NOTE:_** Knex is a powerful library that simplifies writing SQL in JavaScript. For questions about syntax or functionality, visit their comprehensive documentation at http://knexjs.org/.
 
-#### Implement the interface in mockups
+#### 3. Implement the interface in mockups
 
 Also implement the interface in mockup db in `/src/datasources/mockups/AdminDataSource.ts`. Mockup DB layer is used in unit tests.
 
@@ -64,7 +64,7 @@ Also implement the interface in mockup db in `/src/datasources/mockups/AdminData
     return new BasicUserDetails(user_id, 'Carl', 'Young', 'ESS', 'Pharmacist')
     }
 
-#### Add function to logic layer for handling requests
+#### 4. Add function to logic layer for handling requests
 
 With the database layer now ready, it's time to implement a mutation. Mutations contains database error handling, authorization and other important business logic. Procees by navigating to `/src/mutations/AdminMutations.ts` and add a new function.
 
@@ -89,7 +89,7 @@ With the database layer now ready, it's time to implement a mutation. Mutations 
           });
     }
 
-#### Create a resolver that exposes mutation functionality to GraphQL
+#### 5. Create a resolver that exposes mutation functionality to GraphQL
 
 Create new file in `/src/resolvers/mutations/LockUserMutation.ts`. Note that Resolvers relies heavily on decorators (https://www.typescriptlang.org/docs/handbook/decorators.html)
 
@@ -119,7 +119,7 @@ All response wrappers contain a response field and an error field. The error fie
 
 Now that we managed to get the backend working, calling it from the frontend is surprisingly easy.
 
-### Write GraphQL mutation
+#### 1. Write GraphQL mutation
 
 Create a new file lockUserMutation and write the mutation:
 
@@ -132,13 +132,13 @@ Create a new file lockUserMutation and write the mutation:
       }
     }
 
-### Regnererate SDK
+#### 2. Regnererate SDK
 
     npm run generate:local
 
 This will regenerate sdk in the `src/generated/sdk.ts` file on client side which contains new signatures of the GraphQL layer, including our new `lockUser` method. This will also typecheck your mutation and make sure it is existing and valid.
 
-### Call the method
+#### 3. Call the method
 
 Create a hook and invoke the method
 

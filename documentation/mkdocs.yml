@@ -76,10 +76,11 @@ nav:
               - App settings: user-guide/user-officer/settings/app_settings.md
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
+      - Architecture: developer-guide/architecture.md
+      - Tech Stack: developer-guide/tech_stack.md
       - Running Locally: developer-guide/running_locally.md
       - Configuration: developer-guide/configuration.md
       - Step-by-Step Guide: developer-guide/step-by-step.md
-      - Architecture: developer-guide/architecture.md
       - RabbitMQ: developer-guide/rabbitmq.md
       - Kubernetes: developer-guide/kubernetes.md
       - Depencency Injection: developer-guide/dependency_injection.md
