@@ -102,7 +102,6 @@ const PreviewTemplateModal = ({
   if (!questionarySteps?.length || !templateId) {
     return null;
   }
-  console.log(templateId, questionarySteps, templateGroupId);
 
   return (
     <Dialog
