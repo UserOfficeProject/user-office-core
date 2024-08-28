@@ -48,7 +48,7 @@
         },
         {
           "topic": {
-            "id": 5,
+                    "id": 6,
             "title": "Topic title",
             "templateId": 1,
             "sortOrder": 1,
@@ -65,21 +65,21 @@
                 "config": {
                   "addEntryButtonLabel": "Add",
                   "templateCategory": "SAMPLE_DECLARATION",
-                  "templateId": 4,
-                  "esiTemplateId": 3,
+                  "templateId": 5,
+                  "esiTemplateId": 4,
                   "small_label": "",
                   "required": false,
                   "maxEntries": null,
                   "minEntries": null
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 0,
               "config": {
                 "addEntryButtonLabel": "Add",
                 "templateCategory": "SAMPLE_DECLARATION",
-                "templateId": 4,
-                "esiTemplateId": 3,
+                "templateId": 5,
+                "esiTemplateId": 4,
                 "small_label": "",
                 "required": false,
                 "maxEntries": null,
@@ -118,7 +118,7 @@
                   "numberValueConstraint": null
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 2,
               "config": {
                 "small_label": "",
@@ -158,7 +158,7 @@
                   "tooltip": ""
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 3,
               "config": {
                 "small_label": "",
@@ -190,7 +190,7 @@
                   ]
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 4,
               "config": {
                 "small_label": "",
@@ -223,7 +223,7 @@
                   "includeTime": false
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 5,
               "config": {
                 "small_label": "",
@@ -254,7 +254,7 @@
                   ]
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 6,
               "config": {
                 "small_label": "",
@@ -291,7 +291,7 @@
                   "isMultipleSelect": true
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 6,
               "config": {
                 "small_label": "",
@@ -326,7 +326,7 @@
                   "apiCallRequestHeaders": []
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 6,
               "config": {
                 "required": false,
@@ -362,7 +362,7 @@
                   ]
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 6,
               "config": {
                 "small_label": "",
@@ -400,7 +400,7 @@
                   "isCounterHidden": false
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 7,
               "config": {
                 "required": false,
@@ -438,7 +438,7 @@
                   "omitFromPdf": false
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 8,
               "config": {
                 "small_label": "",
@@ -470,7 +470,7 @@
                   "max": null
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 8,
               "config": {
                 "required": false,
@@ -497,7 +497,7 @@
                   "small_label": ""
                 }
               },
-              "topicId": 5,
+              "topicId": 6,
               "sortOrder": 9,
               "config": {
                 "html": "",
@@ -535,8 +535,8 @@
           "config": {
             "addEntryButtonLabel": "Add",
             "templateCategory": "SAMPLE_DECLARATION",
-            "templateId": 4,
-            "esiTemplateId": 3,
+            "templateId": 5,
+            "esiTemplateId": 4,
             "small_label": "",
             "required": false,
             "maxEntries": null,
@@ -764,7 +764,7 @@
       "subTemplates": [
         {
           "template": {
-            "templateId": 4,
+            "templateId": 5,
             "groupId": "SAMPLE",
             "name": "default sample template",
             "description": "default sample template",
@@ -773,9 +773,9 @@
           "templateSteps": [
             {
               "topic": {
-                "id": 4,
+                "id": 5,
                 "title": "New sample",
-                "templateId": 4,
+                "templateId": 5,
                 "sortOrder": 0,
                 "isEnabled": true
               },
@@ -794,7 +794,7 @@
                       "small_label": ""
                     }
                   },
-                  "topicId": 4,
+                  "topicId": 5,
                   "sortOrder": 0,
                   "config": {
                     "titlePlaceholder": "Title",
