@@ -47,7 +47,6 @@ nav:
               - Feasibility review: user-guide/user-officer/main/feasibility_review.md
               - FAP review: user-guide/user-officer/main/fap_review.md
               - Roles: user-guide/user-officer/main/roles.md
-              - Videos: user-guide/user-officer/main/videos.md
           - Proposals: user-guide/user-officer/proposal.md
           - Experiments: user-guide/user-officer/experiments.md
           - Calls: user-guide/user-officer/calls.md
@@ -83,6 +82,7 @@ nav:
       - Architecture: developer-guide/architecture.md
       - RabbitMQ: developer-guide/rabbitmq.md
       - Kubernetes: developer-guide/kubernetes.md
+      - Depencency Injection: developer-guide/dependency_injection.md
       - Email Service: developer-guide/email.md
       - API Documentation: developer-guide/api_documentation.md
       - Documentation Changes: developer-guide/documentation_changes.md

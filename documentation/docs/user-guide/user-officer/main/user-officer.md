@@ -3,23 +3,31 @@
 
 ### **Welcome to the User Office documentation!**
 
-_______________________________________________________
+__________________________________________________________________________
 
+![Call](../../../assets/images/call.png){ width="400" align=right } 
+!!! info inline end ""
+    [Create a call :material-calendar-blank:](creating_call.md){ .md-button .md-button--primary }
+    
+    Calls  allow users’ proposals  to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. 
+    _______________________________________________________
 
-![Call](../../../assets/images/call.png){ width="500" }
+![Workflow](../../../assets/images/workflow.png){ width="400" align=right } 
+!!! info inline end ""
+    [Create a workflow :material-sitemap:](../settings/proposal_workflow.md){ .md-button .md-button--primary }
 
-* ### [How do I create a call?](creating_call.md) 
+    Proposal workflows manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle.
+    _______________________________________________________
+    
+![Templates](../../../assets/images/templates.png){ width="400" align=right } 
+!!! info inline end ""
+    [Create templates :material-text-box-multiple:](templates.md){ .md-button .md-button--primary }
 
-![Workflow](../../../assets/images/workflow.png){ width="500" }
-
-* ### [How do I create a proposal workflow?](../settings/proposal_workflow.md)
-
-![Templates](../../../assets/images/templates.png){ width="500"}
-
-* ### [How do I create templates?](templates.md)
-_______________________________________________________
-
-Video tutorials:
+    Templates are used to save and re-utilise predefined information across User Office. Calls are built using several different types of templates.
+    _______________________________________________________
+    
+Video tutorials
+__________________________________________________________________________
 
 Overview and intruduction to User Office:
 
@@ -28,7 +36,5 @@ Overview and intruduction to User Office:
 * #### [Part II: How do I use workflows?](videos.md)
 
 * #### [Part III: How do I create a call?](videos.md)
-
-
 
 

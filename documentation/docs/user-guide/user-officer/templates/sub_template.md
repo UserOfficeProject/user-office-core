@@ -1,4 +1,4 @@
-# Sub templates
+# Sub templates :material-collapse-all-outline:
 
 ## **What are sub templates?**
 Sub templates
