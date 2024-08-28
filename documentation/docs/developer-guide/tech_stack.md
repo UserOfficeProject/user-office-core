@@ -2,13 +2,13 @@ This page provides an overview of the technical stack used in the development of
 
 ## Backend
 
-The backend is designed to handle business logic, database interactions, authentication, and serve API requests. Below follows a breakdown of the key technologies used:
+The backend is designed to handle business logic, database interactions, authentication, and serve API requests. Key technologies used:
 
 - **Node.js**: A JavaScript runtime built on Chrome's V8 JavaScript engine, used for creating the server-side application.
-- **Express.js**: A minimal and flexible Node.js web application framework that provides a robust set of features for web applications.
-- **TypeScript**: A superset of JavaScript that adds static types, used for writing robust and maintainable code.
+- **Express.js**: A minimal and flexible Node.js web application framework that provides a robust set of features.
+- **TypeScript**: A superset of JavaScript that adds static types.
 - **PostgreSQL**: An open-source relational database used for storing and managing data.
-- **Docker**: A platform for developing, shipping, and running applications inside lightweight containers, ensuring consistency across environments.
+- **Docker**: A platform for developing, shipping, and running User Office inside lightweight containers.
 
 ## Frontend
 
@@ -16,14 +16,14 @@ The frontend is responsible for presenting data to users and handling user inter
 
 - **React**: A JavaScript library for building user interfaces, allowing for the development of single-page applications with interactive UIs.
 - **TypeScript**: Enhances code quality and understandability with static typing.
-- **Material-UI**: A popular React UI framework that implements Google's Material Design, used for designing the user interface.
+- **Material-UI**: A React UI framework that implements Google's Material Design, used for designing the user interface.
 
 ## Documentation
 
 The documentation is managed as follows:
 
-- **MkDocs**: A static site generator that builds the documentation site from Markdown files, making it easy to write and maintain the docs.
-- **Material for MkDocs**: A Material Design theme for MkDocs, providing a visually appealing design for the documentation.
+- **MkDocs**: A static site generator that builds the documentation site from Markdown files.
+- **Material for MkDocs**: A Material Design theme for MkDocs, providing an appealing design for the documentation.
 - **mike**: A tool used alongside MkDocs to handle versioning of the documentation.
 
 ## Continuous Integration and Deployment (CI/CD)
