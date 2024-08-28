@@ -566,7 +566,7 @@ context('Xpress tests', () => {
     return true;
   });
 
-  describe.only('Techniques advanced tests', () => {
+  describe('Techniques advanced tests', () => {
     it('User officer can see all submitted and unsubmitted Xpress proposals', function () {
       if (
         !featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)
