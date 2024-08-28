@@ -32,7 +32,7 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
     <>
       <FormControl fullWidth>
         <InputLabel id="date-select-label" shrink>
-          Submitted Date
+          Date
         </InputLabel>
         <Grid container spacing={2}>
           <LocalizationProvider dateAdapter={DateAdapter}>
