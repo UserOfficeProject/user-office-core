@@ -29,6 +29,14 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    let userStfc: number[] = [];
+
+    if (filter?.text) {
+      userStfc = (await this.getSTFCUsers(filter?.text)).users.map(
+        (ids) => ids.id
+      );
+    }
+
     const proposals = database
       .select('proposal_pk')
       .from('proposal_table_view')
@@ -59,7 +67,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           );
         }
       });
-
     const result = database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
@@ -80,6 +87,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
               .orWhere('users.email', 'ilike', `%${filter.text}%`)
               .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
               .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
+              .orWhere('principal_investigator', 'in', userStfc)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
@@ -155,6 +163,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       });
 
     return result;
+  }
+
+  async getSTFCUsers(text: string) {
+    const userStfc = await stfcUserDataSource.getUsers({ filter: text });
+
+    return userStfc;
   }
 
   async getProposalsFromView(
