@@ -19,7 +19,10 @@ import { RemoveProposalsFromFapsArgs } from '../../resolvers/mutations/AssignPro
 import { SaveFapMeetingDecisionInput } from '../../resolvers/mutations/FapMeetingDecisionMutation';
 import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { FapDataSource } from '../FapDataSource';
-import { AssignProposalsToFapsInput } from '../postgres/records';
+import {
+  FapReviewsRecord,
+  AssignProposalsToFapsInput,
+} from '../postgres/records';
 import { basicDummyUser } from './UserDataSource';
 
 export const dummyFap = new Fap(
@@ -30,6 +33,7 @@ export const dummyFap = new Fap(
   '',
   true,
   true,
+  null,
   null,
   null
 );
@@ -43,6 +47,7 @@ export const anotherDummyFap = new Fap(
   true,
   false,
   null,
+  null,
   null
 );
 
@@ -55,6 +60,7 @@ export const dummyFapWithoutCode = new Fap(
   true,
   false,
   null,
+  null,
   null
 );
 
@@ -62,21 +68,6 @@ export const dummyFaps = [dummyFap, anotherDummyFap];
 
 export const dummyFapMember = new FapReviewer(1, 1);
 export const anotherDummyFapMember = new FapReviewer(2, 1);
-
-export const dummyFapMemberWithNoReviews = new FapReviewer(1, 3);
-export const anotherDummyFapMemberWithNoReviews = new FapReviewer(4, 3);
-
-export const dummyFapMemberForNoReviewsNeeded = new FapReviewer(1, 4);
-export const anotherDummyFapMemberForNoReviewsNeeded = new FapReviewer(2, 4);
-
-export const dummyFapMemberUnevenAllocation = new FapReviewer(5, 5);
-export const anotherDummyFapMemberUnevenAllocation = new FapReviewer(6, 5);
-
-export const dummyFapMemberAlreadyAssigned = new FapReviewer(7, 6);
-export const dummyFapMemberNotAlreadyAssigned = new FapReviewer(8, 6);
-
-export const dummyFapMemberForFap7 = new FapReviewer(9, 7);
-export const anotherDummyFapMemberForFap7 = new FapReviewer(10, 7);
 
 export const dummyFapAssignment = new FapAssignment(
   1,
@@ -93,28 +84,6 @@ export const anotherDummyFapAssignment = new FapAssignment(
   1,
   3,
   2,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  false,
-  null,
-  false,
-  null
-);
-
-export const andAnotherDummyFapAssignment = new FapAssignment(
-  5,
-  5,
-  5,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  false,
-  null,
-  false,
-  null
-);
-
-export const yetAnotherDummyFapAssignment = new FapAssignment(
-  2,
-  7,
-  6,
   new Date('2020-04-20 08:25:12.23043+00'),
   false,
   null,
@@ -146,105 +115,6 @@ export const anotherDummyFapProposal = new FapProposal(
   true
 );
 
-export const dummyFapProposalForMassAssignment = new FapProposal(
-  3,
-  1,
-  3,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const anotherDummyFapProposalForMassAssignment = new FapProposal(
-  4,
-  2,
-  3,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const firstDummyFapProposalForUnevenMassAssignment = new FapProposal(
-  5,
-  1,
-  5,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const secondDummyFapProposalForUnevenMassAssignment = new FapProposal(
-  6,
-  2,
-  5,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const thirdDummyFapProposalForUnevenMassAssignment = new FapProposal(
-  7,
-  3,
-  5,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const firstDummyFapProposalForAlreadyAssigned = new FapProposal(
-  8,
-  1,
-  6,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const secondDummyFapProposalForAlreadyAssigned = new FapProposal(
-  9,
-  2,
-  6,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const thirdDummyFapProposalForAlreadyAssigned = new FapProposal(
-  10,
-  3,
-  6,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
-export const dummyFapProposalForMassAssignmentNeedsTwoReviews = new FapProposal(
-  11,
-  1,
-  7,
-  new Date('2020-04-20 08:25:12.23043+00'),
-  null,
-  1,
-  1,
-  true
-);
-
 export const dummyFapMeetingDecision = new FapMeetingDecision(
   1,
   1,
@@ -260,64 +130,11 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
 export const dummyFapAssignments = [
   dummyFapAssignment,
   anotherDummyFapAssignment,
-  andAnotherDummyFapAssignment,
-  yetAnotherDummyFapAssignment,
 ];
 
 export const dummyFapProposals = [dummyFapProposal, anotherDummyFapProposal];
 
-export const dummyFapMembers = [
-  dummyFapMember,
-  anotherDummyFapMember,
-  dummyFapMemberWithNoReviews,
-  anotherDummyFapMemberWithNoReviews,
-  dummyFapMemberForNoReviewsNeeded,
-  anotherDummyFapMemberForNoReviewsNeeded,
-  dummyFapMemberUnevenAllocation,
-  anotherDummyFapMemberUnevenAllocation,
-  dummyFapMemberAlreadyAssigned,
-  dummyFapMemberNotAlreadyAssigned,
-  dummyFapMemberForFap7,
-  anotherDummyFapMemberForFap7,
-];
-
-export const dummyFapProposalToNumReviewsNeededMap = new Map<
-  FapProposal,
-  number
->([
-  [dummyFapProposalForMassAssignment, 1],
-  [anotherDummyFapProposalForMassAssignment, 1],
-]);
-
-export const dummyFapProposalToNumReviewsNeededMapUneven = new Map<
-  FapProposal,
-  number
->([
-  [firstDummyFapProposalForUnevenMassAssignment, 1],
-  [secondDummyFapProposalForUnevenMassAssignment, 1],
-  [thirdDummyFapProposalForUnevenMassAssignment, 1],
-]);
-
-export const dummyFapProposalToNumReviewsNeededMapAlreadyAssigned = new Map<
-  FapProposal,
-  number
->([
-  [firstDummyFapProposalForAlreadyAssigned, 1],
-  [secondDummyFapProposalForAlreadyAssigned, 1],
-  [thirdDummyFapProposalForAlreadyAssigned, 1],
-]);
-
-export const dummyFapProposalToNoReviewsNeededMap = new Map<
-  FapProposal,
-  number
->([
-  [dummyFapProposalForMassAssignment, 0],
-  [anotherDummyFapProposalForMassAssignment, 0],
-]);
-
-export const dummyFapProposalTwoReviewsNeeded = new Map<FapProposal, number>([
-  [dummyFapProposalForMassAssignmentNeedsTwoReviews, 2],
-]);
+export const dummyFapMembers = [dummyFapMember, anotherDummyFapMember];
 
 export class FapDataSourceMock implements FapDataSource {
   async delete(id: number): Promise<Fap> {
@@ -432,6 +249,7 @@ export class FapDataSourceMock implements FapDataSource {
       customGradeGuide,
       active,
       null,
+      null,
       null
     );
   }
@@ -453,6 +271,7 @@ export class FapDataSourceMock implements FapDataSource {
       gradeGuide,
       customGradeGuide,
       active,
+      null,
       null,
       null
     );
@@ -504,14 +323,16 @@ export class FapDataSourceMock implements FapDataSource {
     return dummyFapProposals.length;
   }
 
+  async getCurrentFapProposalCount(fapId: number) {
+    return dummyFapProposals.length;
+  }
+
   async getFapReviewerProposalCount(reviewerId: number) {
     return dummyFapProposals.length;
   }
 
-  async getFapReviewerProposalCountCurrentRound(reviewerId: number) {
-    return dummyFapAssignments.filter(
-      (assignment) => assignment.fapMemberUserId === reviewerId
-    ).length;
+  async getCurrentFapReviewerProposalCount(reviewerId: number) {
+    return dummyFapProposals.length;
   }
 
   async getFapReviewsByCallAndStatus(callIds: number[], status: ReviewStatus) {
@@ -527,9 +348,9 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async getFapProposalsByInstrument(
-    fapId: number,
     instrumentId: number,
-    callId: number
+    callId: number,
+    { fapId, proposalPk }: { fapId?: number; proposalPk?: number }
   ) {
     return dummyFapProposals.filter((proposal) => proposal.fapId === fapId);
   }
@@ -560,6 +381,12 @@ export class FapDataSourceMock implements FapDataSource {
         assignment.fapId === fapId &&
         assignment.proposalPk === proposalPk &&
         (reviewerId !== null ? assignment.fapMemberUserId === reviewerId : true)
+    );
+  }
+
+  async getAllFapProposalAssignments(proposalPk: number) {
+    return dummyFapAssignments.filter(
+      (assignment) => assignment.proposalPk === proposalPk
     );
   }
 
@@ -623,11 +450,9 @@ export class FapDataSourceMock implements FapDataSource {
     );
   }
 
-  async assignMemberToFapProposal(
-    proposalPk: number,
-    fapId: number,
-    memberIds: number[],
-    fapProposalId: number
+  async assignMembersToFapProposals(
+    assignments: { proposalPk: number; memberId: number }[],
+    fapId: number
   ) {
     const fap = dummyFaps.find((element) => element.id === fapId);
 
@@ -636,52 +461,6 @@ export class FapDataSourceMock implements FapDataSource {
     }
 
     throw new Error(`Fap not found ${fapId}`);
-  }
-
-  async assignMemberToFapProposals(
-    proposalPk: number[],
-    fapId: number,
-    memberIds: number,
-    fapProposalId: number
-  ) {
-    const fap = dummyFaps.find((element) => element.id === fapId);
-
-    if (fap) {
-      return fap;
-    }
-
-    throw new Error(`Fap not found ${fapId}`);
-  }
-
-  async getFapProposalToNumReviewsNeededMap(fapId: number) {
-    let fapProposalToNumReviewsNeededMap: Map<FapProposal, number>;
-    switch (fapId) {
-      case 4:
-        fapProposalToNumReviewsNeededMap = dummyFapProposalToNoReviewsNeededMap;
-        break;
-      case 5:
-        fapProposalToNumReviewsNeededMap = new Map(
-          dummyFapProposalToNumReviewsNeededMapUneven
-        );
-        break;
-      case 6:
-        fapProposalToNumReviewsNeededMap = new Map(
-          dummyFapProposalToNumReviewsNeededMapAlreadyAssigned
-        );
-        break;
-      case 7:
-        fapProposalToNumReviewsNeededMap = new Map(
-          dummyFapProposalTwoReviewsNeeded
-        );
-        break;
-      default:
-        fapProposalToNumReviewsNeededMap = new Map(
-          dummyFapProposalToNumReviewsNeededMap
-        );
-        break;
-    }
-
-    return fapProposalToNumReviewsNeededMap;
   }
 
   async removeMemberFromFapProposal(
@@ -711,6 +490,12 @@ export class FapDataSourceMock implements FapDataSource {
     return [dummyFapMeetingDecision];
   }
 
+  async getAllFapMeetingDecisions(
+    fapId: number
+  ): Promise<FapMeetingDecision[]> {
+    return [dummyFapMeetingDecision];
+  }
+
   async getFapProposalsWithReviewGradesAndRanking(
     proposalPks: number[]
   ): Promise<FapProposalWithReviewGradesAndRanking[]> {
@@ -736,6 +521,18 @@ export class FapDataSourceMock implements FapDataSource {
     reviewer_id: number,
     rank: number
   ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  getFapReviewData(callId: number, fapId: number): Promise<FapReviewsRecord[]> {
+    throw new Error('Method not implemented.');
+  }
+
+  submitFapMeetings(
+    callId: number,
+    fapId: number,
+    userId?: number | undefined
+  ): Promise<FapProposal[]> {
     throw new Error('Method not implemented.');
   }
 }

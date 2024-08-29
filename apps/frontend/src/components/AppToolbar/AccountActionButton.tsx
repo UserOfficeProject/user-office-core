@@ -6,34 +6,24 @@ import SwitchAccountOutlinedIcon from '@mui/icons-material/SwitchAccountOutlined
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useContext, useState } from 'react';
 
 import ImpersonateButton from 'components/common/ImpersonateButton';
+import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { getUniqueArrayBy } from 'utils/helperFunctions';
 
 import RoleSelection from './RoleSelection';
 
-const useStyles = makeStyles((theme) => ({
-  infoIcon: {
-    '& .MuiBadge-badge': {
-      top: theme.spacing(0.5),
-      right: theme.spacing(0.5),
-    },
-  },
-}));
-
 const AccountActionButton = () => {
-  const classes = useStyles();
+  // const classes = useStyles();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [show, setShow] = useState(false);
   const { roles, handleLogout, impersonatingUserId } = useContext(UserContext);
@@ -62,16 +52,16 @@ const AccountActionButton = () => {
 
   return (
     <>
-      <Dialog
+      <StyledDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         open={show}
         onClose={handleModalClose}
-        style={{ backdropFilter: 'blur(6px)' }}
-        maxWidth="xs"
+        maxWidth="md"
         fullWidth
+        title="Assigned Roles"
       >
-        <DialogContent>
+        <DialogContent dividers>
           <RoleSelection onClose={handleModalClose} />
         </DialogContent>
         <DialogActions>
@@ -79,7 +69,7 @@ const AccountActionButton = () => {
             Close
           </Button>
         </DialogActions>
-      </Dialog>
+      </StyledDialog>
       <>
         <Badge
           badgeContent={
@@ -87,7 +77,14 @@ const AccountActionButton = () => {
               <InfoOutlinedIcon fontSize="small" />
             </Tooltip>
           }
-          className={classes.infoIcon}
+          sx={(theme) => ({
+            infoIcon: {
+              '& .MuiBadge-badge': {
+                top: theme.spacing(0.5),
+                right: theme.spacing(0.5),
+              },
+            },
+          })}
           invisible={!impersonatingUserId}
         >
           <IconButton

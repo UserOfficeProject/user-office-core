@@ -1,0 +1,27 @@
+query getProposalCoreBasic(
+  $filter: ProposalsFilter
+  $searchText: String
+) {
+  proposalsView(
+    filter: $filter
+    searchText: $searchText
+  ) {
+    proposalViews {
+      primaryKey
+      statusId
+      proposalId
+      callId
+      instruments {
+        id
+        name
+        managerUserId
+        managementTimeAllocation
+      }
+      fapInstruments {
+        fapId
+        instrumentId
+      }
+    }
+    totalCount
+  }
+}

@@ -1,4 +1,9 @@
-import { Action, Column, MTableToolbar } from '@material-table/core';
+import {
+  Action,
+  Column,
+  MTableToolbar,
+  OrderByCollection,
+} from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
@@ -17,7 +22,6 @@ import {
   withDefault,
 } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
@@ -41,6 +45,7 @@ import {
   ProposalViewTechnicalReviewAssignee,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -54,7 +59,7 @@ import {
   addColumns,
   fromArrayToCommaSeparated,
   removeColumns,
-  setSortDirectionOnSortColumn,
+  setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -166,7 +171,7 @@ const technicalReviewColumns: Column<ProposalViewData>[] = [
 ];
 
 const instrumentManagementColumns = (
-  t: TFunction<'translation', undefined, 'translation'>
+  t: TFunction<'translation', undefined>
 ) => [
   {
     title: t('instrument'),
@@ -195,15 +200,15 @@ const SELECT_ALL_ACTION_TOOLTIP = 'select-all-prefetched-proposals';
  */
 const ToolbarWithSelectAllPrefetched = (props: {
   actions: Action<ProposalViewData>[];
-  selectedRows: ProposalViewData[];
-  data: ProposalViewData[];
+  selectedCount: number;
+  dataManager: { data: ProposalViewData[] };
 }) => {
   const selectAllAction = props.actions.find(
     (action) => action.hidden && action.tooltip === SELECT_ALL_ACTION_TOOLTIP
   );
-  const tableHasData = !!props.data.length;
+  const tableHasData = !!props.dataManager.data.length;
   const allItemsSelectedOnThePage =
-    props.selectedRows.length === props.data.length;
+    props.selectedCount === props.dataManager.data.length;
 
   return (
     <div data-cy="select-all-toolbar">
@@ -220,7 +225,9 @@ const ToolbarWithSelectAllPrefetched = (props: {
               All proposals are selected.
               <Button
                 variant="text"
-                onClick={() => selectAllAction.onClick(null, props.data)}
+                onClick={() =>
+                  selectAllAction.onClick(null, props.dataManager.data)
+                }
                 data-cy="clear-all-selection"
               >
                 Clear selection
@@ -228,11 +235,12 @@ const ToolbarWithSelectAllPrefetched = (props: {
             </>
           ) : (
             <>
-              All {props.selectedRows.length} proposals on this page are
-              selected.
+              All {props.selectedCount} proposals on this page are selected.
               <Button
                 variant="text"
-                onClick={() => selectAllAction.onClick(null, props.data)}
+                onClick={() =>
+                  selectAllAction.onClick(null, props.dataManager.data)
+                }
                 data-cy="select-all-prefetched-proposals"
               >
                 Select all {selectAllAction.iconProps?.defaultValue} proposals
@@ -285,7 +293,7 @@ const ProposalTableInstrumentScientist = ({
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
     ...DefaultQueryParams,
     call: NumberParam,
-    instrument: NumberParam,
+    instrument: StringParam,
     proposalStatus: withDefault(NumberParam, statusFilter),
     questionId: StringParam,
     compareOperator: StringParam,
@@ -293,16 +301,25 @@ const ProposalTableInstrumentScientist = ({
     dataType: StringParam,
     reviewModal: NumberParam,
     modalTab: NumberParam,
-    proposalid: StringParam,
+    proposalId: StringParam,
     reviewer: withDefault(StringParam, reviewerFilter),
+    page: NumberParam,
+    pageSize: NumberParam,
   });
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: urlQueryParams.call,
-    instrumentId: urlQueryParams.instrument,
+    instrumentFilter: {
+      instrumentId: urlQueryParams.instrument
+        ? +urlQueryParams.instrument
+        : null,
+      showAllProposals: !urlQueryParams.instrument,
+      showMultiInstrumentProposals: false,
+    },
     proposalStatusId: urlQueryParams.proposalStatus,
-    referenceNumbers: urlQueryParams.proposalid
-      ? [urlQueryParams.proposalid]
+    excludeProposalStatusIds: [9],
+    referenceNumbers: urlQueryParams.proposalId
+      ? [urlQueryParams.proposalId]
       : undefined,
     questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
     reviewer: getFilterReviewer(urlQueryParams.reviewer),
@@ -323,7 +340,8 @@ const ProposalTableInstrumentScientist = ({
     useProposalsCoreData(
       {
         proposalStatusId: proposalFilter.proposalStatusId,
-        instrumentId: proposalFilter.instrumentId,
+        excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
+        instrumentFilter: proposalFilter.instrumentFilter,
         callId: proposalFilter.callId,
         questionFilter: proposalFilter.questionFilter,
         reviewer: proposalFilter.reviewer,
@@ -548,13 +566,15 @@ const ProposalTableInstrumentScientist = ({
     }));
 
   const handleColumnSortOrderChange = (
-    orderedColumnId: number,
-    orderDirection: 'desc' | 'asc'
-  ) =>
-    setUrlQueryParams({
-      sortColumn: orderedColumnId >= 0 ? orderedColumnId : undefined,
-      sortDirection: orderDirection ? orderDirection : undefined,
-    });
+    orderByCollection: OrderByCollection[]
+  ) => {
+    const [orderBy] = orderByCollection;
+    setUrlQueryParams((params) => ({
+      ...params,
+      sortField: orderBy?.orderByField,
+      sortDirection: orderBy?.orderDirection,
+    }));
+  };
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -649,9 +669,9 @@ const ProposalTableInstrumentScientist = ({
     removeColumns(columns, FapReviewColumns);
   }
 
-  columns = setSortDirectionOnSortColumn(
+  columns = setSortDirectionOnSortField(
     columns,
-    urlQueryParams.sortColumn,
+    urlQueryParams.sortField,
     urlQueryParams.sortDirection
   );
 
@@ -665,7 +685,7 @@ const ProposalTableInstrumentScientist = ({
   const proposalToReview = preselectedProposalsData.find(
     (proposal) =>
       proposal.primaryKey === urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalid
+      proposal.proposalId === urlQueryParams.proposalId
   );
 
   /** NOTE:
@@ -759,13 +779,13 @@ const ProposalTableInstrumentScientist = ({
               }
             })
           );
-          if (urlQueryParams.proposalid) {
+          if (urlQueryParams.proposalId) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
             setUrlQueryParams({
-              proposalid: undefined,
+              proposalId: undefined,
             });
           }
           setUrlQueryParams({
@@ -827,6 +847,9 @@ const ProposalTableInstrumentScientist = ({
               }}
               setProposalFilter={setProposalFilter}
               filter={proposalFilter}
+              hiddenStatuses={
+                proposalFilter.excludeProposalStatusIds as number[]
+              }
             />
           </Grid>
         </Grid>
@@ -884,7 +907,7 @@ const ProposalTableInstrumentScientist = ({
         onSearchChange={handleSearchChange}
         onChangeColumnHidden={handleColumnHiddenChange}
         onSelectionChange={handleColumnSelectionChange}
-        onOrderChange={handleColumnSortOrderChange}
+        onOrderCollectionChange={handleColumnSortOrderChange}
         actions={tableActions}
       />
     </>

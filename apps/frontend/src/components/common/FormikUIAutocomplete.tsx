@@ -1,13 +1,97 @@
-import { InputAdornment } from '@mui/material';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import MuiAutocomplete, {
+  AutocompleteProps as MuiAutocompleteProps,
+} from '@mui/material/Autocomplete';
 import { InputProps } from '@mui/material/Input';
+import InputAdornment from '@mui/material/InputAdornment';
 import MuiTextField, {
   TextFieldProps as MUITextFieldProps,
 } from '@mui/material/TextField';
+import { FieldProps } from 'formik';
 import { Field } from 'formik';
-import { Autocomplete } from 'formik-mui';
 import React, { useState } from 'react';
+import invariant from 'tiny-warning';
 
 import { Option } from 'utils/utilTypes';
+
+export type { AutocompleteRenderInputParams } from '@mui/material/Autocomplete';
+
+export interface AutocompleteProps<
+  T,
+  Multiple extends boolean | undefined,
+  DisableClearable extends boolean | undefined,
+  FreeSolo extends boolean | undefined,
+> extends FieldProps,
+    Omit<
+      MuiAutocompleteProps<T, Multiple, DisableClearable, FreeSolo>,
+      'name' | 'value' | 'defaultValue'
+    > {
+  type?: string;
+}
+
+export function fieldToAutocomplete<
+  T,
+  Multiple extends boolean | undefined,
+  DisableClearable extends boolean | undefined,
+  FreeSolo extends boolean | undefined,
+>({
+  disabled,
+  field,
+  form: { isSubmitting, setFieldValue },
+  type,
+  onChange,
+  onBlur,
+  freeSolo,
+  ...props
+}: AutocompleteProps<
+  T,
+  Multiple,
+  DisableClearable,
+  FreeSolo
+>): MuiAutocompleteProps<T, Multiple, DisableClearable, FreeSolo> {
+  if (process.env.NODE_ENV !== 'production') {
+    if (props.multiple) {
+      invariant(
+        Array.isArray(field.value),
+        `value for ${field.name} is not an array, this can caused unexpected behaviour`
+      );
+    }
+  }
+
+  const {
+    onChange: _onChange,
+    onBlur: _onBlur,
+    multiple: _multiple,
+    ...fieldSubselection
+  } = field;
+
+  return {
+    freeSolo,
+    onBlur:
+      onBlur ??
+      function (event) {
+        field.onBlur(event ?? field.name);
+      },
+    onChange:
+      onChange ??
+      function (_event, value) {
+        setFieldValue(field.name, value);
+      },
+    disabled: disabled ?? isSubmitting,
+    loading: isSubmitting,
+    ...fieldSubselection,
+    ...props,
+  };
+}
+
+function Autocomplete<
+  T,
+  Multiple extends boolean | undefined,
+  DisableClearable extends boolean | undefined,
+  FreeSolo extends boolean | undefined,
+>(props: AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>) {
+  return <MuiAutocomplete {...fieldToAutocomplete(props)} />;
+}
 
 type FormikUIAutocompleteProps = {
   items: Option[];
@@ -18,15 +102,10 @@ type FormikUIAutocompleteProps = {
   required?: boolean;
   disabled?: boolean;
   TextFieldProps?: MUITextFieldProps;
-  InputProps?: Partial<InputProps> & {
-    'data-cy'?: string;
-    startAdornment?: React.ReactNode;
-    endAdornment?: React.ReactNode;
-  };
+  InputProps?: Partial<InputProps> & { 'data-cy'?: string };
   multiple?: boolean;
   'data-cy'?: string;
-  AdornmentIcon?: MUITextFieldProps;
-  isOptionEqualToValue?: () => boolean;
+  onChange?: (_: React.SyntheticEvent<Element, Event>, value: number) => void;
 };
 
 const FormikUIAutocomplete = ({
@@ -40,7 +119,6 @@ const FormikUIAutocomplete = ({
   InputProps,
   TextFieldProps,
   multiple = false,
-  AdornmentIcon,
   ...props
 }: FormikUIAutocompleteProps) => {
   const [adornmentVisible, setAdornmentVisible] = useState(false);
@@ -72,9 +150,9 @@ const FormikUIAutocomplete = ({
             ...InputProps,
             endAdornment: (
               <InputAdornment position="start">
-                {AdornmentIcon && adornmentVisible
-                  ? { ...AdornmentIcon }
-                  : null}
+                {InputProps?.endAdornment && adornmentVisible
+                  ? InputProps.endAdornment
+                  : null}{' '}
                 {params.InputProps?.endAdornment}
               </InputAdornment>
             ),
@@ -89,7 +167,7 @@ const FormikUIAutocomplete = ({
       )}
       ListboxProps={{ 'data-cy': props['data-cy'] + '-options' }}
       data-cy={props['data-cy']}
-      isOptionEqualToValue={props.isOptionEqualToValue}
+      {...(props.onChange && { onChange: props.onChange })}
     />
   );
 };

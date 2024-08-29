@@ -1,8 +1,8 @@
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect, useState } from 'react';
 
 import PeopleTable from 'components/user/PeopleTable';
@@ -12,18 +12,12 @@ import { useFapMembersData } from 'hooks/fap/useFapMembersData';
 export type FapAssignedMember = BasicUserDetails & { role?: Maybe<Role> };
 
 type AssignFapMemberToProposalModalProps = {
-  proposalPk: number | null;
-  setProposalPk: React.Dispatch<React.SetStateAction<number | null>>;
+  proposalPks: number[];
+  setProposalPks: React.Dispatch<React.SetStateAction<number[]>>;
   fapId: number;
-  assignMemberToFapProposal: (assignedMembers: FapAssignedMember[]) => void;
+  assignMembersToFapProposals: (assignedMembers: FapAssignedMember[]) => void;
   assignedMembers?: Array<BasicUserDetails | null>;
 };
-
-const useStyles = makeStyles((theme) => ({
-  selectedUsersText: {
-    paddingRight: theme.spacing(1),
-  },
-}));
 
 const memberRole = (member: FapAssignedMember) => `${member.role?.title}`;
 
@@ -38,31 +32,24 @@ const columns = [
 ];
 
 const AssignFapMemberToProposalModal = ({
-  assignMemberToFapProposal,
+  assignMembersToFapProposals,
   fapId,
-  assignedMembers,
-  proposalPk,
-  setProposalPk,
+  proposalPks,
+  setProposalPks,
 }: AssignFapMemberToProposalModalProps) => {
-  const classes = useStyles();
   const [selectedParticipants, setSelectedParticipants] = useState<
     BasicUserDetails[]
   >([]);
   const { loadingMembers, FapMembersData } = useFapMembersData(fapId, false);
 
   useEffect(() => {
-    if (!proposalPk) {
+    if (proposalPks.length === 0) {
       setSelectedParticipants([]);
     }
-  }, [proposalPk]);
+  }, [proposalPks]);
 
   const members: FapAssignedMember[] = FapMembersData
-    ? FapMembersData.filter(
-        (fapMember) =>
-          !assignedMembers?.find(
-            (assignedMember) => assignedMember?.id === fapMember.userId
-          )
-      ).map((fapMember) => ({
+    ? FapMembersData.map((fapMember) => ({
         ...fapMember.user,
         role: fapMember.role ?? null,
       }))
@@ -74,30 +61,36 @@ const AssignFapMemberToProposalModal = ({
       fullWidth
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"
-      open={!!proposalPk}
-      onClose={(): void => setProposalPk(null)}
+      open={proposalPks.length > 0}
+      onClose={(): void => setProposalPks([])}
     >
       <DialogContent>
         <PeopleTable
           title="Select reviewers"
           selection={true}
           data={members}
+          emailSearch={false}
           isLoading={loadingMembers}
           columns={columns}
+          search
           onUpdate={(members: FapAssignedMember[]) =>
-            assignMemberToFapProposal(members)
+            assignMembersToFapProposals(members)
           }
           selectedParticipants={selectedParticipants}
           setSelectedParticipants={setSelectedParticipants}
         />
       </DialogContent>
       <DialogActions>
-        <div className={classes.selectedUsersText}>
+        <Box
+          sx={(theme) => ({
+            paddingRight: theme.spacing(1),
+          })}
+        >
           {selectedParticipants.length} user(s) selected
-        </div>
+        </Box>
         <Button
           type="button"
-          onClick={() => assignMemberToFapProposal(selectedParticipants)}
+          onClick={() => assignMembersToFapProposals(selectedParticipants)}
           disabled={selectedParticipants.length === 0}
           data-cy="assign-selected-users"
         >

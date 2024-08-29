@@ -1,12 +1,14 @@
-import DateAdapter from '@mui/lab/AdapterLuxon';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import useTheme from '@mui/material/styles/useTheme';
+import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
-import { DatePicker, DateTimePicker } from 'formik-mui-lab';
 import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import DatePicker from 'components/common/FormikUIDatePicker';
+import DateTimePicker from 'components/common/FormikUIDateTimePicker';
+import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { SettingsContext } from 'context/SettingsContextProvider';
@@ -76,7 +78,6 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
 
         const component = includeTime ? DateTimePicker : DatePicker;
         const inputFormat = includeTime ? dateTimeFormat : dateFormat;
-        const mask = inputFormat?.replace(/[a-zA-Z]/g, '_');
 
         return (
           <>
@@ -134,8 +135,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   name="config.minDate"
                   id="Min-Time-Input"
                   label="Min"
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   ampm={false}
                   component={component}
                   showToolbar
@@ -151,8 +151,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   name="config.maxDate"
                   id="Max-Time-Input"
                   label="Max"
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   ampm={false}
                   component={component}
                   inputProps={{ placeholder: inputFormat }}
@@ -167,8 +166,7 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   name="config.defaultDate"
                   id="Default-Time-Input"
                   label="Default"
-                  inputFormat={inputFormat}
-                  mask={mask}
+                  format={inputFormat}
                   ampm={false}
                   component={component}
                   inputProps={{ placeholder: inputFormat }}

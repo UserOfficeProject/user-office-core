@@ -1,20 +1,13 @@
+import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useQueryParams, NumberParam } from 'use-query-params';
 
 import { ProposalStatus } from 'generated/sdk';
-
-const useStyles = makeStyles(() => ({
-  loadingText: {
-    minHeight: '32px',
-    marginTop: '16px',
-  },
-}));
 
 type ProposalStatusFilterProps = {
   proposalStatuses?: ProposalStatus[];
@@ -22,7 +15,21 @@ type ProposalStatusFilterProps = {
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
   proposalStatusId?: number;
+  hiddenStatuses: number[];
 };
+
+function checkToRemove(
+  hiddenStatuses: number[],
+  proposalStatus: ProposalStatus
+) {
+  if (hiddenStatuses != null) {
+    for (let i = 0; i < hiddenStatuses.length; i++) {
+      if (hiddenStatuses[i] == proposalStatus.id) return false;
+    }
+  }
+
+  return true;
+}
 
 const ProposalStatusFilter = ({
   proposalStatuses,
@@ -30,8 +37,8 @@ const ProposalStatusFilter = ({
   proposalStatusId,
   onChange,
   shouldShowAll,
+  hiddenStatuses,
 }: ProposalStatusFilterProps) => {
-  const classes = useStyles();
   const [, setQuery] = useQueryParams({
     proposalStatus: NumberParam,
   });
@@ -51,7 +58,7 @@ const ProposalStatusFilter = ({
           Status
         </InputLabel>
         {isLoading ? (
-          <div className={classes.loadingText}>Loading...</div>
+          <Box sx={{ minHeight: '32px', marginTop: '16px' }}>Loading...</Box>
         ) : (
           <Select
             id="proposal-status-select"
@@ -69,11 +76,14 @@ const ProposalStatusFilter = ({
             data-cy="status-filter"
           >
             {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-            {proposalStatuses.map((proposalStatus) => (
-              <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
-                {proposalStatus.name}
-              </MenuItem>
-            ))}
+            {proposalStatuses.map(
+              (proposalStatus) =>
+                checkToRemove(hiddenStatuses, proposalStatus) && (
+                  <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
+                    {proposalStatus.name}
+                  </MenuItem>
+                )
+            )}
           </Select>
         )}
       </FormControl>

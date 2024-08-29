@@ -5,6 +5,6 @@ import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 export type ExperimentUrlQueryParamsType = {
   call: QueryParamConfig<number | null | undefined>;
   instrument: QueryParamConfig<number | null | undefined>;
-  from: QueryParamConfig<Date | null | undefined>;
-  to: QueryParamConfig<Date | null | undefined>;
+  from: QueryParamConfig<string | null | undefined>;
+  to: QueryParamConfig<string | null | undefined>;
 } & UrlQueryParamsType;

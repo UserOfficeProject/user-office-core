@@ -1,32 +1,20 @@
+import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import makeStyles from '@mui/styles/makeStyles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import React, { useState } from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import SampleDetails from 'components/sample/SampleDetails';
 import { Answer } from 'generated/sdk';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { SampleCore } from 'models/questionary/sample/SampleCore';
 
-const useStyles = makeStyles((theme) => ({
-  list: {
-    padding: 0,
-    margin: 0,
-    '& li': {
-      display: 'block',
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
-
 function SampleList(props: {
   samples: SampleCore[];
   onClick?: (sample: SampleCore) => void;
 }) {
-  const classes = useStyles();
-
   const sampleLink = (sample: SampleCore) => (
     <Link href="#" onClick={() => props.onClick?.(sample)}>
       {sample.title}
@@ -34,11 +22,20 @@ function SampleList(props: {
   );
 
   return (
-    <ul className={classes.list}>
+    <List
+      sx={(theme) => ({
+        padding: 0,
+        margin: 0,
+        '& li': {
+          display: 'block',
+          marginRight: theme.spacing(1),
+        },
+      })}
+    >
       {props.samples.map((sample) => (
-        <li key={`sample-${sample.id}`}>{sampleLink(sample)}</li>
+        <ListItem key={`sample-${sample.id}`}>{sampleLink(sample)}</ListItem>
       ))}
-    </ul>
+    </List>
   );
 }
 
@@ -64,15 +61,19 @@ const SamplesAnswerRenderer = ({
         samples={samples}
         onClick={(sample) => setSelectedSampleId(sample.id)}
       />
-      <InputDialog
-        maxWidth="sm"
+      <StyledDialog
+        maxWidth="lg"
+        fullWidth
         open={selectedSampleId !== null}
         onClose={() => setSelectedSampleId(null)}
+        title="Sample details"
       >
-        {selectedSampleId ? (
-          <SampleDetails sampleId={selectedSampleId} />
-        ) : null}
-        <ActionButtonContainer>
+        <DialogContent>
+          {selectedSampleId ? (
+            <SampleDetails sampleId={selectedSampleId} />
+          ) : null}
+        </DialogContent>
+        <DialogActions>
           <Button
             type="button"
             variant="outlined"
@@ -81,8 +82,8 @@ const SamplesAnswerRenderer = ({
           >
             Close
           </Button>
-        </ActionButtonContainer>
-      </InputDialog>
+        </DialogActions>
+      </StyledDialog>
     </div>
   );
 };

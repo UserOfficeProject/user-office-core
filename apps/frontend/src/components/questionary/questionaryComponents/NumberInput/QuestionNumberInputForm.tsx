@@ -1,19 +1,20 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import CloseIcon from '@mui/icons-material/Close';
 import LaunchIcon from '@mui/icons-material/Launch';
-import Autocomplete from '@mui/lab/Autocomplete';
-import { Button, IconButton } from '@mui/material';
+import { DialogContent } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
-import MaterialTextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
+import { useTheme } from '@mui/material/styles';
+import MUITextField from '@mui/material/TextField';
 import { Field } from 'formik';
-import { CheckboxWithLabel, TextField } from 'formik-mui';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import InputDialog from 'components/common/InputDialog';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import TextField from 'components/common/FormikUITextField';
+import StyledDialog from 'components/common/StyledDialog';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
@@ -23,22 +24,6 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
-const useStyles = makeStyles((theme) => ({
-  iconVerticalAlign: {
-    verticalAlign: 'middle',
-    marginLeft: theme.spacing(0.5),
-  },
-  textRightAlign: {
-    marginLeft: 'auto',
-    marginRight: 0,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-  },
-}));
-
 export const QuestionNumberForm = (props: QuestionFormProps) => {
   const [show, setShow] = useState(false);
   const field = props.question;
@@ -46,7 +31,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
   const { units, setUnitsWithLoading } = useUnitsData();
   const { api } = useDataApiWithFeedback();
-  const classes = useStyles();
+  const theme = useTheme();
   const [selectedUnits, setSelectedUnits] = useState(numberConfig.units);
 
   const onCreated = (unitAdded: Unit | null): void => {
@@ -150,11 +135,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
                 }
                 renderInput={(params) => {
                   return (
-                    <MaterialTextField
-                      {...params}
-                      label="Units"
-                      margin="none"
-                    />
+                    <MUITextField {...params} label="Units" margin="none" />
                   );
                 }}
                 onChange={(_event, newValue) => {
@@ -168,12 +149,15 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               <Link
                 href="/Units/"
                 target="_blank"
-                className={classes.textRightAlign}
+                sx={{ marginLeft: 'auto', marginRight: 0 }}
               >
                 View/Edit all units
                 <LaunchIcon
                   fontSize="small"
-                  className={classes.iconVerticalAlign}
+                  sx={{
+                    verticalAlign: 'middle',
+                    marginLeft: theme.spacing(0.5),
+                  }}
                 />
               </Link>
             </FormControl>
@@ -205,7 +189,7 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               ]}
             />
           </TitledContainer>
-          <InputDialog
+          <StyledDialog
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
             data-cy="unit-modal"
@@ -215,18 +199,12 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               if (reason && reason == 'backdropClick') return;
               setShow(false);
             }}
+            title="Create new unit"
           >
-            <IconButton
-              className={classes.closeButton}
-              data-cy="close-modal-btn"
-              onClick={() => {
-                setShow(false);
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-            <CreateUnit close={onCreated} unit={null} />
-          </InputDialog>
+            <DialogContent>
+              <CreateUnit close={onCreated} unit={null} />
+            </DialogContent>
+          </StyledDialog>
         </>
       )}
     </QuestionFormShell>

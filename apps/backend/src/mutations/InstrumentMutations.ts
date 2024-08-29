@@ -32,7 +32,7 @@ import { CreateInstrumentArgs } from '../resolvers/mutations/CreateInstrumentMut
 import {
   UpdateInstrumentArgs,
   InstrumentAvailabilityTimeArgs,
-  InstrumentSubmitArgs,
+  InstrumentSubmitInFapArgs,
 } from '../resolvers/mutations/UpdateInstrumentMutation';
 import { sortByRankOrAverageScore } from '../utils/mathFunctions';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
@@ -182,7 +182,10 @@ export default class InstrumentMutations {
           (i) => !args.instrumentIds.includes(i.id)
         );
 
-        if (proposalInstrumentsToRemove.length) {
+        if (
+          proposalInstrumentsToRemove.length &&
+          proposalInstruments.length !== proposalInstrumentsToRemove.length
+        ) {
           await Promise.all(
             proposalInstrumentsToRemove.map((i) => {
               return this.dataSource.removeProposalsFromInstrument(
@@ -205,38 +208,43 @@ export default class InstrumentMutations {
         );
         instrumentHasProposalIds.push(instrumentHasProposalId);
 
-        const technicalReview =
-          await this.reviewDataSource.getProposalInstrumentTechnicalReview(
-            proposalPk,
-            instrumentId
-          );
+        const needTechReview =
+          await this.proposalDataSource.doesProposalNeedTechReview(proposalPk);
 
-        if (technicalReview) {
-          await this.proposalDataSource.updateProposalTechnicalReviewer({
-            userId: instrument.managerUserId,
-            proposalPks: [proposalPk],
-            instrumentId: instrument.id,
-          });
-        } else {
-          await this.reviewDataSource.setTechnicalReview(
-            {
-              proposalPk: proposalPk,
-              comment: null,
-              publicComment: null,
-              reviewerId: instrument.managerUserId,
-              timeAllocation: null,
-              status: null,
-              files: null,
-              submitted: false,
+        if (needTechReview) {
+          const technicalReview =
+            await this.reviewDataSource.getProposalInstrumentTechnicalReview(
+              proposalPk,
+              instrumentId
+            );
+
+          if (technicalReview) {
+            await this.proposalDataSource.updateProposalTechnicalReviewer({
+              userId: instrument.managerUserId,
+              proposalPks: [proposalPk],
               instrumentId: instrument.id,
-            },
-            false
-          );
-          await this.proposalDataSource.updateProposalTechnicalReviewer({
-            userId: instrument.managerUserId,
-            proposalPks: [proposalPk],
-            instrumentId: instrument.id,
-          });
+            });
+          } else {
+            await this.reviewDataSource.setTechnicalReview(
+              {
+                proposalPk: proposalPk,
+                comment: null,
+                publicComment: null,
+                reviewerId: instrument.managerUserId,
+                timeAllocation: null,
+                status: null,
+                files: null,
+                submitted: false,
+                instrumentId: instrument.id,
+              },
+              false
+            );
+            await this.proposalDataSource.updateProposalTechnicalReviewer({
+              userId: instrument.managerUserId,
+              proposalPks: [proposalPk],
+              instrumentId: instrument.id,
+            });
+          }
         }
       }
     }
@@ -324,16 +332,13 @@ export default class InstrumentMutations {
 
   @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED)
   @ValidateArgs(submitInstrumentValidationSchema)
-  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
-  async submitInstrument(
+  @Authorized([Roles.USER_OFFICER])
+  async submitInstrumentInFap(
     agent: UserWithRole | null,
-    args: InstrumentSubmitArgs
+    args: InstrumentSubmitInFapArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
-    ) {
-      return rejection('Submitting instrument is not permitted', {
+    if (!this.userAuth.isUserOfficer(agent)) {
+      return rejection('Submitting FAP instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
         args,
@@ -342,18 +347,18 @@ export default class InstrumentMutations {
 
     const allInstrumentProposals =
       await this.fapDataSource.getFapProposalsByInstrument(
-        args.fapId,
         args.instrumentId,
-        args.callId
+        args.callId,
+        { fapId: args.fapId }
       );
 
-    const submittedInstrumentProposalPks = allInstrumentProposals.map(
+    const submittedFapInstrumentProposalPks = allInstrumentProposals.map(
       (fapInstrumentProposal) => fapInstrumentProposal.proposalPk
     );
 
     const fapProposalsWithReviewsAndRanking =
       await this.fapDataSource.getFapProposalsWithReviewGradesAndRanking(
-        submittedInstrumentProposalPks
+        submittedFapInstrumentProposalPks
       );
 
     const allFapMeetingsHasRankings = fapProposalsWithReviewsAndRanking.every(
@@ -389,9 +394,55 @@ export default class InstrumentMutations {
     }
 
     return this.dataSource
-      .submitInstrument(submittedInstrumentProposalPks, args.instrumentId)
+      .submitInstrumentInFap(
+        submittedFapInstrumentProposalPks,
+        args.instrumentId
+      )
       .catch((error) => {
-        return rejection('Could not submit instrument', { agent, args }, error);
+        return rejection(
+          'Could not submit instrument in FAP',
+          { agent, args },
+          error
+        );
+      });
+  }
+
+  @EventBus(Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED)
+  @Authorized([Roles.USER_OFFICER])
+  async unsubmitInstrumentInFap(
+    agent: UserWithRole | null,
+    args: InstrumentSubmitInFapArgs
+  ): Promise<InstrumentsHasProposals | Rejection> {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
+    ) {
+      return rejection('Unsubmitting instrument in FAP is not permitted', {
+        code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
+        agent,
+        args,
+      });
+    }
+
+    const allInstrumentProposals =
+      await this.fapDataSource.getFapProposalsByInstrument(
+        args.instrumentId,
+        args.callId,
+        { fapId: args.fapId }
+      );
+
+    const proposalPksToUnsubmit = allInstrumentProposals.map(
+      (fapInstrumentProposal) => fapInstrumentProposal.proposalPk
+    );
+
+    return this.dataSource
+      .unsubmitInstrumentInFap(proposalPksToUnsubmit, args.instrumentId)
+      .catch((error) => {
+        return rejection(
+          'Could not unsubmit instrument in FAP',
+          { agent, args },
+          error
+        );
       });
   }
 }

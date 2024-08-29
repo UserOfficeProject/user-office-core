@@ -7,7 +7,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import makeStyles from '@mui/styles/makeStyles';
 import { getIn } from 'formik';
 import React, { useEffect, useState } from 'react';
 
@@ -18,20 +17,9 @@ import { DynamicMultipleChoiceConfig } from 'generated/sdk';
 import { useGetDynamicMultipleChoiceOptions } from 'hooks/template/useGetDynamicMultipleChoiceOptions';
 import { toArray } from 'utils/helperFunctions';
 
-const useStyles = makeStyles(() => ({
-  horizontalLayout: {
-    flexDirection: 'row',
-  },
-  verticalLayout: {
-    flexDirection: 'column',
-  },
-}));
-
 export function QuestionaryComponentDynamicMultipleChoice(
   props: BasicComponentProps
 ) {
-  const classes = useStyles();
-
   const {
     answer,
     onComplete,
@@ -144,11 +132,9 @@ export function QuestionaryComponentDynamicMultipleChoice(
             name={id}
             value={stateValue[0] || ''}
             onChange={handleOnChange}
-            className={
-              options.length < 3
-                ? classes.horizontalLayout
-                : classes.verticalLayout
-            }
+            sx={{
+              flexDirection: options.length < 3 ? 'row' : 'column',
+            }}
           >
             {options.map((option) => {
               return (

@@ -29,6 +29,11 @@ export interface InstrumentDataSource {
     instrumentId: number,
     proposalPks: number[]
   ): Promise<InstrumentsHasProposals>;
+  getInstrumentsHasProposal(
+    instrumentIds: number[],
+    proposalPk: number,
+    callId: number
+  ): Promise<InstrumentsHasProposals>;
   update(instrument: Instrument): Promise<Instrument>;
   delete(instrumentId: number): Promise<Instrument>;
   assignProposalToInstrument(
@@ -72,7 +77,11 @@ export interface InstrumentDataSource {
     instrumentId: number,
     availabilityTime: number
   ): Promise<boolean>;
-  submitInstrument(
+  submitInstrumentInFap(
+    proposalPks: number[],
+    instrumentId: number
+  ): Promise<InstrumentsHasProposals>;
+  unsubmitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals>;

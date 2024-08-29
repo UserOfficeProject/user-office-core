@@ -1,8 +1,8 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
+import TextField from 'components/common/FormikUITextField';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { InstrumentPickerConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';

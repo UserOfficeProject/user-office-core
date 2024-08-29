@@ -65,7 +65,7 @@ export function QuestionaryComponentFileUpload(
         }}
         value={stateValue}
       />
-      {isError && <FormHelperText>{errors[id]}</FormHelperText>}
+      {isError && <FormHelperText>{errors[id]?.toString()}</FormHelperText>}
     </FormControl>
   );
 }

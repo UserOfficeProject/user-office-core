@@ -1,5 +1,7 @@
 import { injectable } from 'tsyringe';
 
+import { Call } from '../../models/Call';
+import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
@@ -8,6 +10,8 @@ import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView'
 import { removeDuplicates } from '../../utils/helperFunctions';
 import database from '../postgres/database';
 import {
+  CallRecord,
+  createCallObject,
   createProposalViewObject,
   ProposalViewRecord,
 } from '../postgres/records';
@@ -84,16 +88,23 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (filter?.callId) {
           query.where('call_id', filter.callId);
         }
-        if (filter?.instrumentId) {
+        if (filter?.instrumentFilter?.instrumentId) {
           // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
-            { instrumentId: filter?.instrumentId }
+            { instrumentId: filter?.instrumentFilter?.instrumentId }
           );
         }
-
         if (filter?.proposalStatusId) {
           query.where('proposal_status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.excludeProposalStatusIds) {
+          query.where(
+            'proposal_status_id',
+            'not in',
+            filter?.excludeProposalStatusIds
+          );
         }
 
         if (filter?.shortCodes) {
@@ -212,5 +223,24 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       proposalViews: propsWithTechReviewerDetails,
       totalCount: proposals.totalCount,
     };
+  }
+
+  async cloneProposal(sourceProposal: Proposal, call: Call): Promise<Proposal> {
+    const result = await database
+      .select()
+      .from('call')
+      .where('call_id', sourceProposal.callId)
+      .first()
+      .then((call: CallRecord | null) =>
+        call ? createCallObject(call) : null
+      );
+
+    if (result?.templateId === 15 && result?.proposalWorkflowId === 5) {
+      return Promise.reject(
+        ` ('${sourceProposal.proposalId}') because it is a legacy proposal `
+      );
+    }
+
+    return await super.cloneProposal(sourceProposal, call);
   }
 }

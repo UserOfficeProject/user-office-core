@@ -159,7 +159,20 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     isMultipleSelect
+    requestTime
     instruments {
+      id
+      name
+    }
+  }
+
+  ... on TechniquePickerConfig {
+    variant
+    small_label
+    required
+    tooltip
+    isMultipleSelect
+    techniques {
       id
       name
     }

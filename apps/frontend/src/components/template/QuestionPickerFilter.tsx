@@ -1,12 +1,9 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  TextField,
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import { getQuestionaryComponentDefinitions } from 'components/questionary/QuestionaryComponentRegistry';
@@ -18,18 +15,6 @@ interface QuestionPickerProps {
   onChange?: (filter: QuestionFilter) => void;
 }
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    width: '100%',
-    padding: theme.spacing(2),
-    paddingBottom: 0,
-    marginBottom: theme.spacing(2),
-  },
-  formItem: {
-    marginBottom: theme.spacing(2),
-  },
-}));
-
 function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
   const [filter, setFilter] = useState<QuestionFilter>({
     dataType: 'all',
@@ -38,7 +23,6 @@ function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
   const [debounceTimeout, setDebounceTimeout] = useState<ReturnType<
     typeof setTimeout
   > | null>(null); // timeout for searching only when keystrokes stop
-  const classes = useStyles();
   const questionDefs = getQuestionaryComponentDefinitions();
 
   useEffect(() => {
@@ -50,9 +34,17 @@ function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
     <Paper
       data-cy="question-picker-filter"
       elevation={1}
-      className={classes.container}
+      sx={(theme) => ({
+        width: '100%',
+        padding: theme.spacing(2),
+        paddingBottom: 0,
+        marginBottom: theme.spacing(2),
+      })}
     >
-      <FormControl fullWidth className={classes.formItem}>
+      <FormControl
+        fullWidth
+        sx={(theme) => ({ marginBottom: theme.spacing(2) })}
+      >
         <TextField
           label="Question text"
           data-cy="search-text"
@@ -78,7 +70,10 @@ function QuestionPickerFilter({ onChange }: QuestionPickerProps) {
           autoFocus
         />
       </FormControl>
-      <FormControl fullWidth className={classes.formItem}>
+      <FormControl
+        fullWidth
+        sx={(theme) => ({ marginBottom: theme.spacing(2) })}
+      >
         <InputLabel shrink>Question type</InputLabel>
         <Select
           label="DataType"

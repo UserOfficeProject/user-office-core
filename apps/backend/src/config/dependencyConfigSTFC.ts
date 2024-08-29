@@ -28,6 +28,7 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import StfcFapDataSource from '../datasources/stfc/StfcFapDataSource';
 import StfcInstrumentDataSource from '../datasources/stfc/StfcInstrumentDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
+import StfcTechniqueDataSource from '../datasources/stfc/StfcTechniqueDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
@@ -36,8 +37,10 @@ import {
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
+import { StfcDownloadService } from '../factory/StfcDownloadService';
 import { StfcFapDataColumns } from '../factory/xlsx/stfc/StfcFapDataColumns';
 import {
+  callFapStfcPopulateRow,
   getStfcDataRow,
   populateStfcRow,
 } from '../factory/xlsx/stfc/StfcFapDataRow';
@@ -72,6 +75,7 @@ mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, StfcUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
+mapClass(Tokens.TechniqueDataSource, StfcTechniqueDataSource);
 mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource
@@ -86,6 +90,7 @@ mapClass(Tokens.MailService, SMTPMailService);
 mapValue(Tokens.FapDataColumns, StfcFapDataColumns);
 mapValue(Tokens.FapDataRow, getStfcDataRow);
 mapValue(Tokens.PopulateRow, populateStfcRow);
+mapValue(Tokens.PopulateCallRow, callFapStfcPopulateRow);
 
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 
@@ -95,3 +100,5 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+
+mapClass(Tokens.DownloadService, StfcDownloadService);

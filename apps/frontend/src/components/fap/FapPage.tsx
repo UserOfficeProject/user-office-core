@@ -1,22 +1,24 @@
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
 import { Fap, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
+import FapFiles from './Files/FapFilesUpload';
+import FapFilesView from './Files/FapFilesView';
 import FapGeneralInfo from './General/FapGeneralInfo';
 import FapMeetingComponentsView from './MeetingComponents/FapMeetingComponentsView';
 import FapMembers from './Members/FapMembers';
 import FapProposalsAndAssignmentsView from './Proposals/FapProposalsAndAssignmentsView';
 
 const FapPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const { loading, fap, setFap } = useFapData(parseInt(id));
+  const { id } = useParams();
+  const { loading, fap, setFap } = useFapData(id);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isFapChairOrSecretary = useCheckAccess([
     UserRole.FAP_CHAIR,
@@ -25,7 +27,7 @@ const FapPage = () => {
 
   if (loading) {
     return (
-      <StyledContainer>
+      <StyledContainer maxWidth={false}>
         <StyledPaper>
           <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
         </StyledPaper>
@@ -35,7 +37,7 @@ const FapPage = () => {
 
   if (!fap) {
     return (
-      <StyledContainer>
+      <StyledContainer maxWidth={false}>
         <StyledPaper>Fap not found</StyledPaper>
       </StyledContainer>
     );
@@ -50,6 +52,10 @@ const FapPage = () => {
           onFapUpdate={(newFap: Fap): void => setFap(newFap)}
         />
       ),
+    },
+    {
+      name: 'Documents',
+      element: <FapFilesView data={fap} />,
     },
   ];
 
@@ -74,6 +80,10 @@ const FapPage = () => {
         ),
       },
       {
+        name: 'Documents',
+        element: <FapFilesView data={fap} />,
+      },
+      {
         name: 'Proposals and Assignments',
         element: (
           <FapProposalsAndAssignmentsView
@@ -91,13 +101,22 @@ const FapPage = () => {
 
   if (isUserOfficer) {
     tabs.push({
+      name: 'Documents - Upload',
+      element: (
+        <FapFiles
+          data={fap}
+          onFapUpdate={(newFap: Fap): void => setFap(newFap)}
+        />
+      ),
+    });
+    tabs.push({
       name: 'Logs',
       element: <EventLogList changedObjectId={fap.id} eventType="FAP" />,
     });
   }
 
   return (
-    <StyledContainer maxWidth="xl">
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <SimpleTabs tabNames={tabs.map((tab) => tab.name)}>
           {tabs.map((tab, index) => (

@@ -1,30 +1,21 @@
-import { Stack } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
+import Stack from '@mui/material/Stack';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Field, Form, Formik, FormikHelpers, FormikProps } from 'formik';
-import { TextField } from 'formik-mui';
 import React, { useContext, useEffect, useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
+import TextField from 'components/common/FormikUITextField';
 import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, InternalReview, UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
-
-const useStyles = makeStyles((theme) => ({
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  comment: {
-    marginTop: theme.spacing(2),
-  },
-}));
 
 type CreateUpdateInternalReviewProps = {
   close: (internalReviewAdded: InternalReview | null) => void;
@@ -39,7 +30,7 @@ const CreateUpdateInternalReview = ({
   technicalReviewId,
   technicalReviewSubmitted,
 }: CreateUpdateInternalReviewProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { user } = useContext(UserContext);
@@ -210,7 +201,9 @@ const CreateUpdateInternalReview = ({
               <InputLabel
                 htmlFor="internal_review_title"
                 shrink
-                className={classes.comment}
+                sx={{
+                  marginTop: theme.spacing(2),
+                }}
               >
                 Title
               </InputLabel>
@@ -240,7 +233,9 @@ const CreateUpdateInternalReview = ({
                 <InputLabel
                   htmlFor="internal_review_comment"
                   shrink
-                  className={classes.comment}
+                  sx={{
+                    marginTop: theme.spacing(2),
+                  }}
                 >
                   Reviewer
                 </InputLabel>
@@ -255,7 +250,9 @@ const CreateUpdateInternalReview = ({
           <InputLabel
             htmlFor="internal_review_comment"
             shrink
-            className={classes.comment}
+            sx={{
+              marginTop: theme.spacing(2),
+            }}
           >
             Internal review comment
           </InputLabel>
@@ -286,7 +283,9 @@ const CreateUpdateInternalReview = ({
             <Button
               type="submit"
               fullWidth
-              className={classes.submit}
+              sx={{
+                margin: theme.spacing(3, 0, 2),
+              }}
               data-cy="submit"
               disabled={
                 formikProps.isSubmitting || isExecutingCall || formDisabled

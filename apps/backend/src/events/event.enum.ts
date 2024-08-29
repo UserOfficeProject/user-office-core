@@ -21,9 +21,13 @@ export enum Event {
   PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED = 'PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED',
   PROPOSAL_FAP_MEETING_SAVED = 'PROPOSAL_FAP_MEETING_SAVED',
   PROPOSAL_FAP_MEETING_SUBMITTED = 'PROPOSAL_FAP_MEETING_SUBMITTED',
+  PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED = 'PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED',
+  PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS = 'PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS',
   PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN = 'PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN',
   PROPOSAL_FAP_MEETING_REORDER = 'PROPOSAL_FAP_MEETING_REORDER',
   PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED = 'PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED',
+  PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED = 'PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED',
+  PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED = 'PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED',
   PROPOSAL_MANAGEMENT_DECISION_UPDATED = 'PROPOSAL_MANAGEMENT_DECISION_UPDATED',
   PROPOSAL_MANAGEMENT_DECISION_SUBMITTED = 'PROPOSAL_MANAGEMENT_DECISION_SUBMITTED',
   PROPOSAL_ACCEPTED = 'PROPOSAL_ACCEPTED',
@@ -46,6 +50,7 @@ export enum Event {
   FAP_MEMBER_ASSIGNED_TO_PROPOSAL = 'FAP_MEMBER_ASSIGNED_TO_PROPOSAL',
   FAP_MEMBER_REMOVED_FROM_PROPOSAL = 'FAP_MEMBER_REMOVED_FROM_PROPOSAL',
   FAP_REVIEWER_NOTIFIED = 'FAP_REVIEWER_NOTIFIED',
+  FAP_ALL_MEETINGS_SUBMITTED = 'FAP_ALL_MEETINGS_SUBMITTED',
   PROPOSAL_NOTIFIED = 'PROPOSAL_NOTIFIED',
   PROPOSAL_CLONED = 'PROPOSAL_CLONED',
   PROPOSAL_STATUS_ACTION_EXECUTED = 'PROPOSAL_STATUS_ACTION_EXECUTED',
@@ -68,6 +73,12 @@ export enum Event {
   INTERNAL_REVIEW_CREATED = 'INTERNAL_REVIEW_CREATED',
   INTERNAL_REVIEW_UPDATED = 'INTERNAL_REVIEW_UPDATED',
   INTERNAL_REVIEW_DELETED = 'INTERNAL_REVIEW_DELETED',
+  TECHNIQUE_CREATED = 'TECHNIQUE_CREATED',
+  TECHNIQUE_UPDATED = 'TECHNIQUE_UPDATED',
+  TECHNIQUE_DELETED = 'TECHNIQUE_DELETED',
+  INSTRUMENTS_ASSIGNED_TO_TECHNIQUE = 'INSTRUMENTS_ASSIGNED_TO_TECHNIQUE',
+  INSTRUMENTS_REMOVED_FROM_TECHNIQUE = 'INSTRUMENTS_REMOVED_FROM_TECHNIQUE',
+  PROPOSAL_ASSIGNED_TO_TECHNIQUES = 'PROPOSAL_ASSIGNED_TO_TECHNIQUES',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -133,7 +144,7 @@ export const EventLabel = new Map<Event, string>([
   ],
   [
     Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED,
-    'Event occurs when all FAP reviews on a proposal are submitted',
+    'Event occurs when all FAP reviews on a proposal are submitted for the current FAP',
   ],
   [
     Event.PROPOSAL_FAP_MEETING_SAVED,
@@ -142,6 +153,14 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_FAP_MEETING_SUBMITTED,
     'Event occurs when FAP meeting is submitted on a proposal',
+  ],
+  [
+    Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED,
+    'Event occurs when all the FAP meetings are submitted for a specific proposal',
+  ],
+  [
+    Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS,
+    'Event occurs when all proposal FAP reviews are submitted throughout all the FAPs',
   ],
   [
     Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN,
@@ -154,6 +173,14 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED,
     'Event occurs when instrument is submitted after FAP meeting is finalized',
+  ],
+  [
+    Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED,
+    'Event occurs when instrument is submitted after FAP meeting is finalized for all the FAPs proposal is part of',
+  ],
+  [
+    Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED,
+    'Event occurs when instrument is unsubmitted in the FAP meeting',
   ],
   [
     Event.PROPOSAL_ACCEPTED,
@@ -212,6 +239,10 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL,
     'Event occurs when FAP member is removed from proposal for review',
+  ],
+  [
+    Event.FAP_ALL_MEETINGS_SUBMITTED,
+    'Event occurs when all the FAP meetings are submitted for all of the proposals',
   ],
   [Event.PROPOSAL_NOTIFIED, 'Event occurs when proposal is notified'],
   [Event.PROPOSAL_CLONED, 'Event occurs when proposal is cloned'],
@@ -279,5 +310,20 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.INTERNAL_REVIEW_DELETED,
     'Event occurs when internal (technical) review is removed',
+  ],
+  [Event.TECHNIQUE_CREATED, 'Event occurs when the technique is created'],
+  [Event.TECHNIQUE_UPDATED, 'Event occurs when the technique is updated'],
+  [Event.TECHNIQUE_DELETED, 'Event occurs when the technique is removed'],
+  [
+    Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE,
+    'Event occurs when instruments are assigned to a technique',
+  ],
+  [
+    Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE,
+    'Event occurs when instruments are removed from a technique',
+  ],
+  [
+    Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
+    'Event occurs when a proposal is assigned to techniques',
   ],
 ]);

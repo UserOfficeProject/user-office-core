@@ -27,6 +27,7 @@ const columns = [
     render: (rowData: QuestionWithUsage) => (
       <ButtonWithDialog
         label={rowData.answers.length.toString()}
+        title="Answers to the Question"
         data-cy="open-answer-details-btn"
       >
         <AnswerCountDetails question={rowData} />
@@ -41,6 +42,7 @@ const columns = [
     render: (rowData: QuestionWithUsage) => (
       <ButtonWithDialog
         label={rowData.templates.length.toString()}
+        title="Templates using the question"
         data-cy="open-template-details-btn"
       >
         <TemplateCountDetails question={rowData} />
@@ -87,7 +89,7 @@ function QuestionsPage() {
   };
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <QuestionsTableFilter
           onChange={(filter) => {

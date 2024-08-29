@@ -1,8 +1,9 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import { FeatureId, SettingsId } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 const scientist1 = initialDBData.users.user1;
 const scientist2 = initialDBData.users.user2;
@@ -24,6 +25,13 @@ let numberOfScientistsAndManagerAssignedToCreatedInstrument: number;
 context('Internal Review tests', () => {
   beforeEach(function () {
     cy.resetDB();
+    if (
+      settings
+        .getEnabledSettings()
+        .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !== 'FEASIBILITY'
+    ) {
+      cy.addFeasibilityReviewToDefaultWorkflow();
+    }
     cy.getAndStoreFeaturesEnabled().then(() => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();

@@ -119,6 +119,9 @@ const dummyProposalEvents = {
   proposal_all_fap_reviewers_selected: false,
   proposal_fap_review_submitted: false,
   proposal_fap_meeting_submitted: false,
+  proposal_all_fap_meetings_submitted: false,
+  proposal_all_reviews_submitted_for_all_faps: false,
+  proposal_all_fap_meeting_instrument_submitted: false,
   proposal_instrument_submitted: false,
   proposal_accepted: false,
   proposal_reserved: false,
@@ -416,5 +419,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async getProposalById(proposalId: string): Promise<Proposal | null> {
     return dummyProposal.proposalId === proposalId ? dummyProposal : null;
+  }
+
+  async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
+    return true;
   }
 }

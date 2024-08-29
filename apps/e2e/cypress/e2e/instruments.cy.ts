@@ -3,10 +3,12 @@ import {
   ReviewerFilter,
   TechnicalReviewStatus,
   FeatureId,
+  SettingsId,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
+import settings from '../support/settings';
 
 const selectAllProposalsFilterStatus = () => {
   cy.get('[data-cy="status-filter"]').click();
@@ -44,6 +46,13 @@ context('Instrument tests', () => {
   beforeEach(() => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+    if (
+      settings
+        .getEnabledSettings()
+        .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !== 'FEASIBILITY'
+    ) {
+      cy.addFeasibilityReviewToDefaultWorkflow();
+    }
   });
 
   // TODO: Maybe this should be moved to permission testing.
@@ -345,6 +354,45 @@ context('Instrument tests', () => {
       );
     });
 
+    it('Proposal should have technical review even if workflow status name changes but the shortCode contains FEASIBILITY', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
+        this.skip();
+      }
+
+      const newStatusName = faker.lorem.words(2);
+
+      cy.login('officer', initialDBData.roles.userOfficer);
+      cy.visit('/ProposalStatuses');
+
+      cy.contains('FEASIBILITY_REVIEW')
+        .closest('tr')
+        .find('[aria-label="Edit"]')
+        .click();
+
+      cy.get('[data-cy="name"] input').clear().type(newStatusName);
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.get('[data-cy="officer-menu-items"]')
+        .find('[aria-label="Proposals"]')
+        .click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.get('[data-cy="timeAllocation"]').should('exist');
+    });
+
     it('User Officer should be able to re-open submitted technical review', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
@@ -545,10 +593,89 @@ context('Instrument tests', () => {
 
       cy.contains('Instrument updated successfully!');
     });
+
+    it('User officer should be able to filter proposals assigned to multiple instruments', () => {
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.createInstrument(instrument2).then(({ createInstrument }) => {
+        if (createInstrument) {
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createInstrument.id }],
+          });
+
+          cy.assignScientistsToInstrument({
+            instrumentId: createInstrument.id,
+            scientistIds: [scientist2.id],
+          });
+
+          cy.createProposal({ callId: initialDBData.call.id }).then(
+            ({ createProposal }) => {
+              if (createProposal) {
+                cy.updateProposal({
+                  proposalPk: createProposal.primaryKey,
+                  title: proposal2.title,
+                  abstract: proposal2.abstract,
+                });
+
+                cy.assignProposalsToInstruments({
+                  proposalPks: [createProposal.primaryKey],
+                  instrumentIds: [createdInstrumentId, createInstrument.id],
+                });
+
+                cy.updateTechnicalReviewAssignee({
+                  proposalPks: [createProposal.primaryKey],
+                  userId: scientist2.id,
+                  instrumentId: createInstrument.id,
+                });
+              }
+            }
+          );
+        }
+      });
+
+      cy.visit('/Proposals');
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[data-value="multi"]').click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
+      cy.contains(instrument1.name);
+      cy.contains(instrument2.name);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
+    });
   });
 
   describe('Instruments tests as instrument scientist role', () => {
     let createdInstrumentId: number;
+    let createdInstrument2Id: number;
     let createdProposalPk: number;
     let createdProposalId: string;
 
@@ -578,7 +705,7 @@ context('Instrument tests', () => {
       });
       cy.createInstrument(instrument2).then((result) => {
         if (result.createInstrument) {
-          const createdInstrument2Id = result.createInstrument.id;
+          createdInstrument2Id = result.createInstrument.id;
 
           cy.assignInstrumentToCall({
             callId: initialDBData.call.id,
@@ -639,6 +766,64 @@ context('Instrument tests', () => {
       cy.contains(proposal1.title);
     });
 
+    it('Instrument scientist should be able to filter proposals assigned to multiple instruments where assigned as instrument scientist', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then(
+        ({ createProposal }) => {
+          if (createProposal) {
+            cy.updateProposal({
+              proposalPk: createProposal.primaryKey,
+              title: proposal2.title,
+              abstract: proposal2.abstract,
+            });
+
+            cy.assignProposalsToInstruments({
+              proposalPks: [createProposal.primaryKey],
+              instrumentIds: [createdInstrumentId, createdInstrument2Id],
+            });
+
+            cy.updateTechnicalReviewAssignee({
+              proposalPks: [createProposal.primaryKey],
+              userId: scientist2.id,
+              instrumentId: createdInstrument2Id,
+            });
+          }
+        }
+      );
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[data-value="multi"]').click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal2.title);
+
+      cy.get('[data-cy="instrument-filter"]').click();
+      cy.get('[role="listbox"]').contains(instrument2.name).click();
+      cy.finishedLoading();
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
+      cy.contains(proposal2.title);
+    });
+
     it('Instrument scientist should have a call and instrument filter', () => {
       cy.contains('Proposals');
 
@@ -665,7 +850,7 @@ context('Instrument tests', () => {
       cy.get('[role="listbox"]').contains('All').click();
       cy.finishedLoading();
 
-      cy.get('[data-cy=question-search-toggle]').should('exist');
+      cy.contains(proposal1.title);
 
       // TODO: This could be tested in the questions or templates where we test other question filters.
       // cy.get('[data-cy=question-list]').click();

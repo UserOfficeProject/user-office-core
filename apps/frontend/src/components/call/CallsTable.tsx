@@ -1,5 +1,8 @@
+import { Column } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
+import GridOnIcon from '@mui/icons-material/GridOn';
 import Unarchive from '@mui/icons-material/Unarchive';
+import { DialogContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
@@ -7,9 +10,8 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import ScienceIcon from 'components/common/icons/ScienceIcon';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
@@ -19,9 +21,12 @@ import {
   InstrumentWithAvailabilityTime,
   UserRole,
   UpdateCallInput,
+  AssignInstrumentsToCallMutation,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useDownloadXLSXCallFap } from 'hooks/fap/useDownloadXLSXCallFap';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -36,7 +41,6 @@ import CallStatusFilter, {
   CallStatusFilters,
 } from './CallStatusFilter';
 import CreateUpdateCall from './CreateUpdateCall';
-
 const getFilterStatus = (
   callStatus: CallStatusFilters
 ): Partial<Record<'isActive' | 'isActiveInternal', boolean>> => {
@@ -69,6 +73,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     ...DefaultQueryParams,
     callStatus: defaultCallStatusQueryFilter,
   });
+  const exportFapData = useDownloadXLSXCallFap();
 
   const {
     loadingCalls,
@@ -87,17 +92,17 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   };
 
   // NOTE: Here we keep the columns inside the component just because of the timezone shown in the title
-  const columns = [
+  const columns: Column<Call>[] = [
     { title: 'Short Code', field: 'shortCode' },
     {
       title: `Start Date (${timezone})`,
-      field: 'formattedStartCall',
+      render: (rowdata) => toFormattedDateTime(rowdata.startCall),
       customSort: (a: Call, b: Call) =>
         new Date(a.startCall).getTime() - new Date(b.startCall).getTime(),
     },
     {
       title: `End Date (${timezone})`,
-      field: 'formattedEndCall',
+      render: (rowdata) => toFormattedDateTime(rowdata.endCall),
       customSort: (a: Call, b: Call) =>
         new Date(a.endCall).getTime() - new Date(b.endCall).getTime(),
     },
@@ -118,8 +123,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     },
     {
       title: '#' + i18n.format(t('instrument'), 'plural'),
-      field: 'instruments.length',
-      emptyValue: '-',
+      render: (data) => data.instruments.length,
     },
     {
       title: '#proposals',
@@ -127,13 +131,15 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     },
     {
       title: '#faps',
-      field: 'faps.length',
-      emptyValue: '-',
+      render: (data) => data.faps?.length,
     },
   ];
 
   const assignInstrumentsToCall = useCallback(
-    (callId: number, instruments: InstrumentWithAvailabilityTime[]) => {
+    (
+      callId: number,
+      instruments: AssignInstrumentsToCallMutation['assignInstrumentsToCall']['instruments']
+    ) => {
       if (calls) {
         const callsWithInstruments = calls.map((callItem) => {
           if (callItem.id === callId) {
@@ -145,7 +151,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             return callItem;
           }
         });
-        setCalls(callsWithInstruments);
+        setCalls(callsWithInstruments as Call[]);
         setAssigningInstrumentsCallId(null);
       }
     },
@@ -273,12 +279,6 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     />
   );
 
-  const callsWithFormattedData = calls.map((call) => ({
-    ...call,
-    formattedStartCall: toFormattedDateTime(call.startCall),
-    formattedEndCall: toFormattedDateTime(call.endCall),
-  }));
-
   return (
     <div data-cy="calls-table">
       <Grid container spacing={2}>
@@ -290,26 +290,25 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
         </Grid>
       </Grid>
       {assigningInstrumentsCallId && (
-        <InputDialog
+        <StyledDialog
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
           maxWidth="xl"
           fullWidth
+          title={`Assign Instruments to the selected call - ${calls.find((callItem) => callItem.id === assigningInstrumentsCallId)?.shortCode}`}
         >
-          <AssignInstrumentsToCall
-            assignedInstruments={
-              callAssignments?.instruments as InstrumentWithAvailabilityTime[]
-            }
-            callId={assigningInstrumentsCallId}
-            assignInstrumentsToCall={(
-              instruments: InstrumentWithAvailabilityTime[]
-            ) =>
-              assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
-            }
-          />
-        </InputDialog>
+          <DialogContent>
+            <AssignInstrumentsToCall
+              assignedInstruments={callAssignments?.instruments}
+              callId={assigningInstrumentsCallId}
+              assignInstrumentsToCall={(instruments) =>
+                assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
+              }
+            />
+          </DialogContent>
+        </StyledDialog>
       )}
       <SuperMaterialTable
         createModal={createModal}
@@ -328,7 +327,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           </Typography>
         }
         columns={columns}
-        data={callsWithFormattedData}
+        data={calls}
         isLoading={loadingCalls}
         detailPanel={[
           {
@@ -351,6 +350,12 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             icon: rowData.isActive ? Archive : Unarchive,
             tooltip: `${rowData.isActive ? 'Deactivate' : 'Activate'} call`,
             onClick: (): void => changeCallActiveStatus(rowData as Call),
+            position: 'row',
+          }),
+          (rowData) => ({
+            icon: GridOnIcon,
+            tooltip: `Export Fap Data`,
+            onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
             position: 'row',
           }),
         ]}

@@ -35,6 +35,14 @@ export default {
 
     return { dateFormat, dateTimeFormat, statusFilter, reviewerFilter };
   },
+  getCorrectFormatCase: (string: string) => {
+    return string
+      .split(' ')
+      .map((part, index) =>
+        index === 0 ? part.toUpperCase() : part.toLowerCase()
+      )
+      .join(' ');
+  },
   call: {
     id: 1,
     shortCode: 'call 1',
@@ -111,6 +119,11 @@ export default {
       text: 'Add samples',
       type: DataType.SAMPLE_DECLARATION,
     },
+    techniquePicker: {
+      id: 'technique_picker_question',
+      text: 'Technique Picker question from seeds',
+      type: DataType.TECHNIQUE_PICKER,
+    },
   },
   answers: {
     proposal: {
@@ -163,10 +176,11 @@ export default {
       dynamicMultipleChoice: {
         value: ['One'],
       },
-      instrumentPicker: { value: 1 },
+      instrumentPicker: { value: { instrumentId: '1', timeRequested: '0' } },
       textInput: {
         value: 'Text input answer from seeds',
       },
+      techniquePicker: { value: 1 },
     },
   },
   proposal: {
@@ -185,6 +199,18 @@ export default {
   instrument3: {
     id: 3,
     name: 'Instrument 3',
+  },
+  technique1: {
+    id: 1,
+    name: 'Technique 1',
+  },
+  technique2: {
+    id: 2,
+    name: 'Technique 2',
+  },
+  technique3: {
+    id: 3,
+    name: 'Technique 3',
   },
   fap: {
     id: 1,
@@ -257,6 +283,7 @@ export default {
     fapSelection: { id: 4 },
     fapReview: {
       id: 5,
+      name: 'FAP_REVIEW',
     },
     fapMeeting: {
       id: 12,

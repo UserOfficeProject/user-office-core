@@ -33,11 +33,11 @@ code {
   color: #b40000;
 }
 
-.MuiList-root .MuiListItem-root.active {
+.MuiList-root .MuiListItemButton-root.active {
   background-color: rgba(0, 0, 0, 0.04);
 }
 
-.MuiList-root .MuiCollapse-wrapper .MuiListItem-root {
+.MuiList-root .MuiCollapse-wrapper .MuiListItemButton-root  {
   padding-left: 26px;
 }
 
@@ -257,3 +257,7 @@ div.MuiToolbar-root[class*='MTableToolbar-highlight'] {
 }
 
 /*------ Mobile view improvements ------*/
+
+.MuiBox-root .MuiIconButton-root:not(.Mui-disabled) {
+  color: inherit;
+}
