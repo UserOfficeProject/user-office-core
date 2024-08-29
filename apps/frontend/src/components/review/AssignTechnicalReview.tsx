@@ -1,9 +1,11 @@
-import { Button, TextField, Autocomplete, Grid } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import Autocomplete from '@mui/material/Autocomplete';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import { UserRole } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   ProposalDataInstrument,
   ProposalDataTechnicalReview,
@@ -21,18 +23,12 @@ type AssignTechnicalReviewProps = {
   confirm: WithConfirmType;
 };
 
-const useStyles = makeStyles((theme) => ({
-  submitButton: {
-    marginLeft: theme.spacing(2),
-  },
-}));
 function AssignTechnicalReview({
   technicalReview,
   instrument,
   onTechnicalReviewUpdated,
   confirm,
 }: AssignTechnicalReviewProps) {
-  const classes = useStyles();
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
@@ -41,7 +37,7 @@ function AssignTechnicalReview({
     technicalReview?.technicalReviewAssigneeId
   );
 
-  const usersData = instrument?.scientists || [];
+  const usersData = instrument?.scientists ? [...instrument.scientists] : [];
   const instrumentContactAlreadyExists = instrument?.scientists.find(
     (scientist) => scientist.id === instrument?.instrumentContact?.id
   );
@@ -115,7 +111,7 @@ function AssignTechnicalReview({
           type="button"
           variant="contained"
           color="primary"
-          className={classes.submitButton}
+          sx={(theme) => ({ marginLeft: theme.spacing(2) })}
           disabled={
             (!isUserOfficer && technicalReview?.submitted) || isInternalReviewer
           }

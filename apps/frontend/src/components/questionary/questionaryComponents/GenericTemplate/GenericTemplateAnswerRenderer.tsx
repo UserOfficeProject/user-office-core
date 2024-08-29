@@ -1,32 +1,20 @@
+import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import makeStyles from '@mui/styles/makeStyles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import React, { useState } from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import GenericTemplateDetails from 'components/genericTemplate/GenericTemplateDetails';
 import { Answer } from 'generated/sdk';
 import { useGenericTemplatesWithQuestionaryStatus } from 'hooks/genericTemplate/useGenericTemplatesWithQuestionaryStatus';
 import { GenericTemplateCore } from 'models/questionary/genericTemplate/GenericTemplateCore';
 
-const useStyles = makeStyles((theme) => ({
-  list: {
-    padding: 0,
-    margin: 0,
-    '& li': {
-      display: 'block',
-      marginRight: theme.spacing(1),
-    },
-  },
-}));
-
 function GenericTemplateList(props: {
   genericTemplates: GenericTemplateCore[];
   onClick?: (genericTemplate: GenericTemplateCore) => void;
 }) {
-  const classes = useStyles();
-
   const genericTemplateLink = (genericTemplate: GenericTemplateCore) => (
     <Link href="#" onClick={() => props.onClick?.(genericTemplate)}>
       {genericTemplate.title}
@@ -34,13 +22,22 @@ function GenericTemplateList(props: {
   );
 
   return (
-    <ul className={classes.list}>
+    <List
+      sx={(theme) => ({
+        padding: 0,
+        margin: 0,
+        '& li': {
+          display: 'block',
+          marginRight: theme.spacing(1),
+        },
+      })}
+    >
       {props.genericTemplates.map((genericTemplate) => (
-        <li key={`genericTemplate-${genericTemplate.id}`}>
+        <ListItem key={`genericTemplate-${genericTemplate.id}`}>
           {genericTemplateLink(genericTemplate)}
-        </li>
+        </ListItem>
       ))}
-    </ul>
+    </List>
   );
 }
 
@@ -70,17 +67,21 @@ const GenericTemplatesAnswerRenderer = ({
           setSelectedGenericTemplateId(genericTemplate.id)
         }
       />
-      <InputDialog
-        maxWidth="sm"
+      <StyledDialog
+        maxWidth="md"
+        fullWidth
         open={selectedGenericTemplateId !== null}
         onClose={() => setSelectedGenericTemplateId(null)}
+        title="GenericTemplate details"
       >
-        {selectedGenericTemplateId ? (
-          <GenericTemplateDetails
-            genericTemplateId={selectedGenericTemplateId}
-          />
-        ) : null}
-        <ActionButtonContainer>
+        <DialogContent dividers>
+          {selectedGenericTemplateId ? (
+            <GenericTemplateDetails
+              genericTemplateId={selectedGenericTemplateId}
+            />
+          ) : null}
+        </DialogContent>
+        <DialogActions>
           <Button
             type="button"
             variant="outlined"
@@ -89,8 +90,8 @@ const GenericTemplatesAnswerRenderer = ({
           >
             Close
           </Button>
-        </ActionButtonContainer>
-      </InputDialog>
+        </DialogActions>
+      </StyledDialog>
     </div>
   );
 };

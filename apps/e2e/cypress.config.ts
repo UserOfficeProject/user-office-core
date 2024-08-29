@@ -4,7 +4,12 @@ import { createServer, Server } from 'http';
 import webpackPreprocessor from '@cypress/webpack-preprocessor';
 import { defineConfig } from 'cypress';
 
-import { downloadFile, readPdf, unzip } from './cypress/support/fileUtilTasks';
+import {
+  convertXlsxToJson,
+  downloadFile,
+  readPdf,
+  unzip,
+} from './cypress/support/fileUtilTasks';
 
 function replaceLastOccurrenceInString(
   string: string,
@@ -42,7 +47,7 @@ module.exports = defineConfig({
   viewportHeight: 1080,
   retries: 1,
   scrollBehavior: 'center',
-  defaultCommandTimeout: 15000,
+  defaultCommandTimeout: 30000,
   chromeWebSecurity: false,
   env: {
     SVC_ACC_TOKEN:
@@ -106,6 +111,8 @@ module.exports = defineConfig({
       });
 
       on('task', { unzip });
+
+      on('task', { convertXlsxToJson });
     },
   },
 });

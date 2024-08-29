@@ -71,7 +71,7 @@ describe('Test Instrument Mutations', () => {
     ).resolves.toBe(dummyInstrument);
   });
 
-  test('A logged in user officer can assign proposal/s to instrument', () => {
+  test('A logged in user officer can assign proposal/s to instrument', async () => {
     return expect(
       instrumentMutations.assignProposalsToInstruments(
         dummyUserOfficerWithRole,
@@ -81,13 +81,14 @@ describe('Test Instrument Mutations', () => {
         }
       )
     ).resolves.toEqual({
+      instrumentHasProposalIds: [1, 2],
       proposalPks: [1, 2],
       instrumentIds: [1],
       submitted: false,
     });
   });
 
-  test('A logged in user officer can assign proposal/s to multiple instruments', () => {
+  test('A logged in user officer can assign proposal/s to multiple instruments', async () => {
     return expect(
       instrumentMutations.assignProposalsToInstruments(
         dummyUserOfficerWithRole,
@@ -97,6 +98,7 @@ describe('Test Instrument Mutations', () => {
         }
       )
     ).resolves.toEqual({
+      instrumentHasProposalIds: [1, 2, 3, 4],
       proposalPks: [1, 2],
       instrumentIds: [1, 2],
       submitted: false,
@@ -166,7 +168,7 @@ describe('Test Instrument Mutations', () => {
 
   test('A logged in user officer can submit instrument attached to a call from a Fap', () => {
     return expect(
-      instrumentMutations.submitInstrument(dummyUserOfficerWithRole, {
+      instrumentMutations.submitInstrumentInFap(dummyUserOfficerWithRole, {
         instrumentId: 1,
         callId: 1,
         fapId: 1,

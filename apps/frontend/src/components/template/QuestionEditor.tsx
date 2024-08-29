@@ -1,23 +1,12 @@
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import makeStyles from '@mui/styles/makeStyles';
+import { DialogContent } from '@mui/material';
 import React from 'react';
 
-import StyledModal from 'components/common/StyledModal';
+import StyledDialog from 'components/common/StyledDialog';
 import { createQuestionForm } from 'components/questionary/QuestionaryComponentRegistry';
 import { Question, Template } from 'generated/sdk';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
-const useStyles = makeStyles((theme) => ({
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    '& > svg': {
-      color: theme.palette.grey[600],
-    },
-  },
-}));
+import TemplateEditLabel from './QuestionTemplateLabel';
 
 export default function QuestionEditor(props: {
   field: Question | null;
@@ -25,22 +14,20 @@ export default function QuestionEditor(props: {
   closeMe: () => void;
   template: Template;
 }) {
-  const classes = useStyles();
-
   if (props.field === null) {
     return null;
   }
 
   return (
-    <StyledModal open={props.field != null}>
-      <>
-        <IconButton
-          data-cy="close-modal-btn"
-          className={classes.closeButton}
-          onClick={props.closeMe}
-        >
-          <CloseIcon />
-        </IconButton>
+    <StyledDialog
+      open={props.field != null}
+      fullWidth
+      maxWidth="md"
+      onClose={props.closeMe}
+      title="Edit question"
+    >
+      <DialogContent dividers>
+        <TemplateEditLabel pageType={'Question'} />
         {createQuestionForm({
           question: props.field,
           onUpdated: (question) => {
@@ -57,7 +44,7 @@ export default function QuestionEditor(props: {
           },
           closeMe: props.closeMe,
         })}
-      </>
-    </StyledModal>
+      </DialogContent>
+    </StyledDialog>
   );
 }

@@ -2,9 +2,7 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
 import { Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
 import React from 'react';
 import * as yup from 'yup';
 
@@ -15,16 +13,6 @@ import { useCallsData } from 'hooks/call/useCallsData';
 const callSelectModalOnProposalsCloneValidationSchema = yup.object().shape({
   selectedCallId: yup.number().required('You must select active call'),
 });
-
-const useStyles = makeStyles((theme) => ({
-  cardHeader: {
-    fontSize: '18px',
-    padding: '22px 0 0',
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
 
 type CallSelectModalOnProposalsCloneProps = {
   close: () => void;
@@ -37,9 +25,10 @@ const CallSelectModalOnProposalsClone = ({
   cloneProposalsToCall,
   templateId,
 }: CallSelectModalOnProposalsCloneProps) => {
-  const classes = useStyles();
   const { calls, loadingCalls } = useCallsData({
     isActive: true,
+    isActiveInternal: true,
+    isEnded: false,
     templateIds: templateId ? [templateId] : undefined,
   });
 
@@ -47,7 +36,7 @@ const CallSelectModalOnProposalsClone = ({
     <Container component="main" maxWidth="xs">
       <Formik
         initialValues={{
-          selectedCallId: undefined,
+          selectedCallId: null,
         }}
         onSubmit={async (values, actions): Promise<void> => {
           const selectedCall = calls.find(
@@ -70,7 +59,10 @@ const CallSelectModalOnProposalsClone = ({
             <Typography
               variant="h6"
               component="h1"
-              className={classes.cardHeader}
+              sx={{
+                fontSize: '18px',
+                padding: '22px 0 0',
+              }}
             >
               Clone proposal/s to call. You will need to review the proposal
               before it is submitted.
@@ -94,7 +86,9 @@ const CallSelectModalOnProposalsClone = ({
             <Button
               type="submit"
               fullWidth
-              className={classes.submit}
+              sx={(theme) => ({
+                margin: theme.spacing(3, 0, 2),
+              })}
               disabled={isSubmitting}
               data-cy="submit"
             >
@@ -105,11 +99,6 @@ const CallSelectModalOnProposalsClone = ({
       </Formik>
     </Container>
   );
-};
-
-CallSelectModalOnProposalsClone.propTypes = {
-  close: PropTypes.func.isRequired,
-  cloneProposalsToCall: PropTypes.func.isRequired,
 };
 
 export default CallSelectModalOnProposalsClone;

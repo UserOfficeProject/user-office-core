@@ -8,8 +8,7 @@ export interface ReviewDataSource {
   removeUserForReview(id: number): Promise<Review>;
   getReview(id: number): Promise<Review | null>;
   updateReview(args: UpdateReviewArgs): Promise<Review>;
-
-  getProposalReviews(id: number): Promise<Review[]>;
+  getProposalReviews(proposalPk: number, fapId?: number): Promise<Review[]>;
   getUserReviews(
     fapIds: number[],
     userId?: number,

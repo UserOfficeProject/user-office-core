@@ -491,15 +491,17 @@ context('Template tests', () => {
 
       // Updating dependencies
       cy.get('[data-cy="add-dependency-button"]').click();
-      cy.get('#dependency-id').click();
+      cy.get('[data-cy="dependencyField"]').click();
       cy.get('[data-cy=question-relation-dialogue]')
         .get('#menu- > .MuiPaper-root > .MuiList-root > [tabindex="0"]')
         .click(); // get boolean question
 
-      cy.get('#dependencyValue').click();
+      cy.get('[data-cy="dependencyValue"]').click();
       cy.get('[data-cy=question-relation-dialogue]')
         .get("#menu- > .MuiPaper-root > .MuiList-root > [tabindex='0']")
         .click(); // get true from dropdown
+
+      cy.get('[data-cy="submit"]').focus();
 
       cy.contains('Update').click();
 
@@ -509,8 +511,8 @@ context('Template tests', () => {
         .dragElement([{ direction: 'up', length: 1 }]); // Move item to top, in case it isn't
 
       cy.contains(initialDBData.template.topic.title)
-        .closest('[data-rbd-draggable-context-id]') // new topic column
-        .find('[data-rbd-drag-handle-draggable-id]') // all questions
+        .closest('[data-rfd-draggable-context-id]') // new topic column
+        .find('[data-rfd-drag-handle-draggable-id]') // all questions
         .first() // first question
         .contains(textQuestion.title);
 
@@ -519,8 +521,8 @@ context('Template tests', () => {
         .dragElement([{ direction: 'down', length: 1 }]);
 
       cy.contains(initialDBData.template.topic.title)
-        .closest('[data-rbd-draggable-context-id]') // new topic column
-        .find('[data-rbd-drag-handle-draggable-id]') // all questions
+        .closest('[data-rfd-draggable-context-id]') // new topic column
+        .find('[data-rfd-drag-handle-draggable-id]') // all questions
         .first() // first question
         .should('not.contain', textQuestion);
 
@@ -564,7 +566,6 @@ context('Template tests', () => {
       cy.contains(multipleChoiceQuestion.answers[0])
         .parent()
         .find('[aria-label=Up]')
-        .find('[type=button]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[0])
@@ -580,7 +581,6 @@ context('Template tests', () => {
       cy.contains(multipleChoiceQuestion.answers[2])
         .parent()
         .find('[aria-label=Down]')
-        .find('[type=button]')
         .should('be.disabled');
 
       cy.contains(multipleChoiceQuestion.answers[2])
@@ -732,9 +732,7 @@ context('Template tests', () => {
 
     it('User officer can clone template', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -750,9 +748,7 @@ context('Template tests', () => {
     it('User officer can delete template', () => {
       cy.cloneTemplate({ templateId: initialDBData.template.id });
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(`Copy of ${initialDBData.template.name}`)
         .parent()
@@ -767,9 +763,7 @@ context('Template tests', () => {
 
     it('User officer archive and unarchive template', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -798,9 +792,7 @@ context('Template tests', () => {
 
     it('User officer can view proposals on template', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -842,15 +834,9 @@ context('Template tests', () => {
         .toFormat(initialDBData.getFormats().dateFormat);
 
       cy.login('officer');
-      cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.get('[data-cy=show-more-button]').first().click();
 
@@ -906,19 +892,19 @@ context('Template tests', () => {
 
       cy.contains(dateQuestion.title);
       cy.get('body').then(() => {
-        cy.get(`[data-cy="${dateFieldId}.value"] input`).as('dateField');
+        const dateFieldSelector = `[data-cy="${dateFieldId}.value"] input`;
 
-        cy.get('@dateField').should('have.value', defaultDate);
+        cy.get(dateFieldSelector).should('have.value', defaultDate);
 
-        cy.get('@dateField').clear().type(earlierThanMinDate);
+        cy.setDatePickerValue(dateFieldSelector, earlierThanMinDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no earlier than');
 
-        cy.get('@dateField').clear().type(laterThanMaxDate);
+        cy.setDatePickerValue(dateFieldSelector, laterThanMaxDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no latter than');
 
-        cy.get('@dateField').clear().type(tomorrowDate);
+        cy.setDatePickerValue(dateFieldSelector, tomorrowDate);
         cy.contains('Save and continue').click();
         cy.contains('Date must be no').should('not.exist');
       });
@@ -926,14 +912,8 @@ context('Template tests', () => {
 
     it('should be able to create new unit from the Unit field', () => {
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.get('[data-cy=show-more-button]').first().click();
 
@@ -1006,15 +986,8 @@ context('Template tests', () => {
       ];
 
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       /* Create questions */
       for (const question of questions) {
@@ -1045,7 +1018,8 @@ context('Template tests', () => {
           question.badInput
         );
       }
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
       for (const question of questions) {
         cy.contains(question.failureMessage);
       }
@@ -1056,7 +1030,8 @@ context('Template tests', () => {
           .clear()
           .type(question.goodInput);
       }
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
       for (const question of questions) {
         cy.contains(question.failureMessage).should('not.exist');
       }
@@ -1076,15 +1051,8 @@ context('Template tests', () => {
       });
 
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.createMultipleChoiceQuestion(
         templateDependencies.questions.selectQuestion.title,
@@ -1102,13 +1070,13 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').click();
+      cy.get('[data-cy="dependencyField"]').click();
 
       cy.get('[role="presentation"]')
         .contains(templateDependencies.questions.selectQuestion.title)
         .click();
 
-      cy.get('[id="dependencyValue"]').click();
+      cy.get('[data-cy="dependencyValue"]').click();
 
       cy.contains(
         templateDependencies.questions.selectQuestion.answer1
@@ -1176,15 +1144,8 @@ context('Template tests', () => {
       });
 
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
-
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find("[aria-label='Edit']")
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.createBooleanQuestion(
         templateDependencies.questions.booleanQuestion.title
@@ -1194,19 +1155,22 @@ context('Template tests', () => {
 
       cy.get('[data-cy="add-dependency-button"]').click();
 
-      cy.get('[id="dependency-id"]').click();
+      cy.get('[data-cy="dependencyField"]').click();
 
       cy.get('[role="presentation"]')
         .contains(initialDBData.questions.instrumentPicker.text)
         .click();
 
-      cy.get('[id="dependencyValue"]').click();
+      cy.get('[data-cy="dependencyValue"]').click();
+
+      cy.finishedLoading();
 
       cy.contains(initialDBData.instrument1.name).click();
 
-      cy.get('[data-cy="question-relation-dialogue"]')
-        .contains(templateDependencies.questions.booleanQuestion.title)
-        .click();
+      cy.get('[data-cy="dependencyValue"] input').should(
+        'have.value',
+        initialDBData.instrument1.id
+      );
 
       cy.get('[data-cy="submit"]').click();
 
@@ -1254,10 +1218,19 @@ context('Template tests', () => {
       );
     });
 
-    it('Should not let you create circular dependency chain', () => {
-      const field1 = 'boolean_1_' + Date.now();
-      const field2 = 'boolean_2_' + Date.now();
-      const field3 = 'boolean_3_' + Date.now();
+    it('User officer can add technique picker question as a dependency', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal.title,
+            abstract: proposal.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+        }
+      });
+
       cy.login('officer');
       cy.visit('/');
 
@@ -1268,6 +1241,85 @@ context('Template tests', () => {
         .find("[aria-label='Edit']")
         .first()
         .click();
+
+      cy.createBooleanQuestion(
+        templateDependencies.questions.booleanQuestion.title
+      );
+
+      cy.contains(templateDependencies.questions.booleanQuestion.title).click();
+
+      cy.get('[data-cy="add-dependency-button"]').click();
+
+      cy.get('[id="dependency-id"]').click();
+
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.questions.techniquePicker.text)
+        .click();
+
+      cy.get('[id="dependencyValue"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(initialDBData.technique1.name).click();
+
+      cy.get('[data-cy="dependencyValue"] input').should(
+        'have.value',
+        initialDBData.technique1.id
+      );
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.get('[data-cy="question-relation-dialogue"]').should('not.exist');
+
+      cy.logout();
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains(proposal.title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .click();
+
+      cy.contains('save and continue', { matchCase: false }).click();
+      cy.finishedLoading();
+
+      // Dependee is NOT visible
+      cy.get('main form').should(
+        'not.contain.text',
+        templateDependencies.questions.booleanQuestion.title
+      );
+
+      cy.contains(initialDBData.questions.techniquePicker.text)
+        .parent()
+        .click();
+      cy.contains(initialDBData.technique1.name).click();
+
+      // Dependee is visible
+      cy.get('main form').should(
+        'contain.text',
+        templateDependencies.questions.booleanQuestion.title
+      );
+
+      cy.contains(initialDBData.questions.techniquePicker.text)
+        .parent()
+        .click();
+      cy.contains(initialDBData.technique2.name).click();
+
+      // Dependee is NOT visible again
+      cy.get('main form').should(
+        'not.contain.text',
+        templateDependencies.questions.booleanQuestion.title
+      );
+    });
+
+    it('Should not let you create circular dependency chain', () => {
+      const field1 = 'boolean_1_' + Date.now();
+      const field2 = 'boolean_2_' + Date.now();
+      const field3 = 'boolean_3_' + Date.now();
+      cy.login('officer');
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
 
       cy.createBooleanQuestion(field1);
       cy.createBooleanQuestion(field2);
@@ -1280,20 +1332,20 @@ context('Template tests', () => {
       ) {
         cy.contains(fieldName).click();
         cy.get('[data-cy="add-dependency-button"]').click();
-        cy.get('[id="dependency-id"]').click();
+        cy.get('[data-cy="dependencyField"]').click();
 
         contains.forEach((field) => {
           cy.get('[role="listbox"]').contains(field);
         });
 
         if (contains.length === 0) {
-          cy.get('[role="listbox"]').children().should('have.length', 3);
+          cy.get('[role="listbox"]').children().should('have.length', 4);
         }
 
         if (select) {
           cy.get('[role="listbox"]').contains(select).click();
 
-          cy.get('[id="dependencyValue"]').click();
+          cy.get('[data-cy="dependencyValue"]').click();
           cy.get('[role="listbox"]').contains('true').click();
 
           cy.contains('Update').click();
@@ -1310,9 +1362,8 @@ context('Template tests', () => {
     it('User officer should be able to search questions', function () {
       createTopicWithQuestionsAndRelations();
       cy.login('officer');
-      cy.visit('/');
-
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.visit('/ProposalTemplates');
+      cy.finishedLoading();
 
       // Create an empty template so we can search all question from the question picker
 
@@ -1398,9 +1449,9 @@ context('Template tests', () => {
       const resolvedQuestionTitle = 'General information';
 
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/ProposalTemplates');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.finishedLoading();
 
       cy.get('[data-cy=import-template-button]').click();
 
@@ -1443,9 +1494,9 @@ context('Template tests', () => {
 
     it('should export template in compatible format', () => {
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/ProposalTemplates');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.finishedLoading();
 
       cy.contains(initialDBData.template.name)
         .closest('TR')
@@ -1513,13 +1564,8 @@ context('Template tests', () => {
 
     beforeEach(() => {
       cy.login('officer');
-      cy.visit('/');
-      cy.navigateToTemplatesSubmenu('Proposal');
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find('[aria-label=Edit]')
-        .first()
-        .click();
+      cy.visit(`/QuestionaryEditor/${initialDBData.template.id}`);
+      cy.finishedLoading();
     });
 
     it('Should render empty list if JSONPATH syntax is invalid', () => {
@@ -1616,9 +1662,10 @@ context('Template tests', () => {
   describe('File upload tests', () => {
     beforeEach(() => {
       cy.login('officer');
-      cy.visit('/');
+      cy.visit('/ProposalTemplates');
 
-      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.get('table.MuiTable-root').should('exist');
+      cy.finishedLoading();
 
       cy.contains(initialDBData.template.name)
         .parent()
@@ -1631,7 +1678,9 @@ context('Template tests', () => {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
-      cy.contains('New Proposal').click();
+      cy.get('[data-cy="user-menu-items"] [aria-label="New Proposal"]')
+        .should('not.have.class', 'Mui-disabled')
+        .click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type('title');
@@ -1710,7 +1759,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1744,7 +1794,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1778,7 +1829,8 @@ context('Template tests', () => {
 
       cy.contains(validFile);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({ variant: 'success', text: 'Saved' });
 
@@ -1810,7 +1862,8 @@ context('Template tests', () => {
 
       cy.contains(invalidFile);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1844,7 +1897,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'error',
@@ -1878,7 +1932,8 @@ context('Template tests', () => {
 
       cy.contains(fileName);
 
-      cy.contains('Save and continue').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({ variant: 'success', text: 'Saved' });
     });

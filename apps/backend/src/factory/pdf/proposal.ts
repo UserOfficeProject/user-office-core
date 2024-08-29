@@ -6,6 +6,7 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
@@ -13,10 +14,12 @@ import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { DownloadOptions } from '../../middlewares/factory/factoryServices';
+import { Call } from '../../models/Call';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Instrument } from '../../models/Instrument';
 import { Proposal } from '../../models/Proposal';
 import { getTopicActiveAnswers } from '../../models/ProposalModelFunctions';
-import { QuestionaryStep } from '../../models/Questionary';
+import { Answer, QuestionaryStep } from '../../models/Questionary';
 import { isRejection } from '../../models/Rejection';
 import { Review } from '../../models/Review';
 import { Sample } from '../../models/Sample';
@@ -26,6 +29,7 @@ import {
 } from '../../models/TechnicalReview';
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
+import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
 import { PdfTemplate } from '../../resolvers/types/PdfTemplate';
 import { getFileAttachments, Attachment } from '../util';
 import {
@@ -99,7 +103,44 @@ const getQuestionary = async (questionaryId: number) => {
   return questionary;
 };
 
-const addTopicInformation = (
+const instrumentPickerAnswer = (
+  answer: Answer,
+  instruments: Instrument[],
+  call: Call
+): string => {
+  const instrumentPickerConfig = answer.config as InstrumentPickerConfig;
+  if (instrumentPickerConfig.requestTime) {
+    const instrumentWithTime = instruments?.map((i) => {
+      const filtered = Array.isArray(answer.value)
+        ? answer.value.find(
+            (v: {
+              instrumentId: string;
+              instrumentName: string;
+              timeRequested: number;
+            }) => Number(v.instrumentId) == i.id
+          )
+        : answer.value;
+
+      return (
+        i.name +
+        ' (' +
+        filtered.timeRequested +
+        ' ' +
+        call.allocationTimeUnit +
+        ') '
+      );
+    });
+
+    return instrumentWithTime?.join(', ');
+  } else {
+    const instrumentWithTime = instruments?.length
+      ? instruments.map((instrument) => instrument.name).join(', ')
+      : '';
+
+    return instrumentWithTime;
+  }
+};
+const addTopicInformation = async (
   proposalPDFData: ProposalPDFData,
   questionarySteps: QuestionaryStep[],
   samples: Sample[],
@@ -145,6 +186,24 @@ const addTopicInformation = (
               genericTemplate.questionId === answer.question.id
           )
           .map((genericTemplate) => genericTemplate);
+      } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
+        const ids = Array.isArray(answer.value)
+          ? answer.value.map((v: { instrumentId: string }) =>
+              Number(v.instrumentId)
+            )
+          : [Number(answer.value?.instrumentId || '0')];
+        const instrumentDataSource = container.resolve<InstrumentDataSource>(
+          Tokens.InstrumentDataSource
+        );
+        const callDataSource = container.resolve<CallDataSource>(
+          Tokens.CallDataSource
+        );
+        const instruments = await instrumentDataSource.getInstrumentsByIds(ids);
+
+        const call = await callDataSource.getCallByQuestionId(
+          answer.question.id
+        );
+        answer.value = instrumentPickerAnswer(answer, instruments, call);
       }
     }
 
@@ -320,16 +379,29 @@ export const collectProposalPDFData = async (
           )
           .map((genericTemplate) => genericTemplate);
       } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
-        const instrumentIds = Array.isArray(answer.value)
+        const ids = Array.isArray(answer.value)
+          ? answer.value.map((v: { instrumentId: string }) =>
+              Number(v.instrumentId)
+            )
+          : [Number(answer.value?.instrumentId || '0')];
+        const instruments =
+          await baseContext.queries.instrument.getInstrumentsByIds(user, ids);
+        const call = await baseContext.queries.call.getCallByQuestionId(
+          user,
+          answer.question.id
+        );
+        answer.value = instrumentPickerAnswer(answer, instruments, call);
+      } else if (answer.question.dataType === DataType.TECHNIQUE_PICKER) {
+        const techniqueIds = Array.isArray(answer.value)
           ? answer.value
           : [answer.value];
-        const instruments =
-          await baseContext.queries.instrument.getInstrumentsByIds(
+        const techniques =
+          await baseContext.queries.technique.getTechniquesByIds(
             user,
-            instrumentIds
+            techniqueIds
           );
-        answer.value = instruments?.length
-          ? instruments.map((instrument) => instrument.name).join(', ')
+        answer.value = techniques?.length
+          ? techniques.map((technique) => technique.name).join(', ')
           : '';
       }
     }
@@ -366,10 +438,9 @@ export const collectProposalPDFData = async (
   }
 
   // Get Reviews
-  const reviews = await baseContext.queries.review.reviewsForProposal(
-    user,
-    proposal.primaryKey
-  );
+  const reviews = await baseContext.queries.review.reviewsForProposal(user, {
+    proposalPk: proposal.primaryKey,
+  });
 
   if (reviews) out.fapReviews = reviews;
 
@@ -523,7 +594,7 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   // Add information from each topic in proposal
-  const proposalPDFData: ProposalPDFData = addTopicInformation(
+  const proposalPDFData: ProposalPDFData = await addTopicInformation(
     {
       proposal,
       principalInvestigator,
@@ -550,11 +621,12 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   if (technicalReviews?.length) {
-    const instruments =
-      await baseContext.queries.instrument.getInstrumentsByIds(
-        user,
-        technicalReviews.map((technicalReview) => technicalReview.instrumentId)
-      );
+    const instrumentDataSource = container.resolve<InstrumentDataSource>(
+      Tokens.InstrumentDataSource
+    );
+    const instruments = await instrumentDataSource.getInstrumentsByIds(
+      technicalReviews.map((technicalReview) => technicalReview.instrumentId)
+    );
     proposalPDFData.technicalReviews = technicalReviews.map(
       (technicalReview) => ({
         ...technicalReview,

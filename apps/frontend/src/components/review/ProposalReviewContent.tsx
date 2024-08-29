@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
 import EventLogList from 'components/eventLog/EventLogList';
@@ -21,6 +20,7 @@ import {
   TechnicalReview,
   UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
   ProposalDataTechnicalReview,
   useProposalData,
@@ -36,7 +36,7 @@ import InternalReviews from '../internalReview/InternalReviews';
 export enum PROPOSAL_MODAL_TAB_NAMES {
   PROPOSAL_INFORMATION = 'Proposal information',
   TECHNICAL_REVIEW = 'Technical reviews',
-  REVIEWS = 'Reviews',
+  REVIEWS = 'FAP reviews',
   ADMIN = 'Admin',
   GRADE = 'Grade',
   LOGS = 'Logs',
@@ -194,10 +194,14 @@ const ProposalReviewContent = ({
 
   const AllProposalReviewsTab = isUserOfficer && (
     <>
-      <ExternalReviews reviews={proposalData.reviews as Review[]} />
+      <ExternalReviews
+        reviews={proposalData.reviews as Review[]}
+        faps={proposalData.faps}
+      />
       <FapMeetingDecision
-        fapMeetingDecision={proposalData.fapMeetingDecision}
-        fap={proposalData.fap}
+        fapMeetingDecisions={proposalData.fapMeetingDecisions}
+        faps={proposalData.faps}
+        instruments={proposalData.instruments}
       />
     </>
   );

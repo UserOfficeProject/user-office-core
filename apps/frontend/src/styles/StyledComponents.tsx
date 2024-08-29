@@ -29,7 +29,7 @@ export const StyledPaper = styled(Paper, {
     margin: marginValue || theme.spacing(2, 0),
     padding: paddingValue || theme.spacing(2),
     [theme.breakpoints.up(600)]: {
-      margin: marginValue || theme.spacing(4, 0),
+      margin: marginValue || theme.spacing(0, 0),
       padding: paddingValue || theme.spacing(3),
     },
   };
@@ -63,7 +63,7 @@ export const StyledContainer = styled(Container, {
   };
 });
 
-export const StyledButtonContainer = styled('div')({
+export const StyledButtonContainer = styled(Box)({
   display: 'flex',
   justifyContent: 'flex-end',
 });

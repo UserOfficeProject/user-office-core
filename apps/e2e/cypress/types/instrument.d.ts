@@ -14,8 +14,10 @@ import {
   AddTechnicalReviewMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
-  SubmitInstrumentMutationVariables,
-  SubmitInstrumentMutation,
+  SubmitInstrumentInFapMutationVariables,
+  SubmitInstrumentInFapMutation,
+  RemoveProposalsFromInstrumentMutationVariables,
+  RemoveProposalsFromInstrumentMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -67,6 +69,20 @@ declare global {
       assignProposalsToInstruments: (
         assignProposalsToInstrumentsInput: AssignProposalsToInstrumentsMutationVariables
       ) => Cypress.Chainable<AssignProposalsToInstrumentsMutation>;
+
+      /**
+       * Removes selected proposal/s from all instrument/s
+       *
+       * @returns {typeof removeProposalsFromInstrument}
+       * @memberof Chainable
+       * @example
+       *    cy.removeProposalsFromInstrument({
+       *      proposalPks: [1]
+       *    });
+       */
+      removeProposalsFromInstrument: (
+        removeProposalsFromInstrumentInput: RemoveProposalsFromInstrumentMutationVariables
+      ) => Cypress.Chainable<RemoveProposalsFromInstrumentMutation>;
 
       /**
        * Assigns an instrument/s to a selected call
@@ -124,14 +140,14 @@ declare global {
       /**
        * Submit instrument in Fap meeting components
        *
-       * @returns {typeof submitInstrument}
+       * @returns {typeof submitInstrumentInFap}
        * @memberof Chainable
        * @example
-       *    cy.submitInstrument(submitInstrumentInput: SubmitInstrumentMutationVariables);
+       *    cy.submitInstrumentInFap(submitInstrumentInFapInput: SubmitInstrumentInFapMutationVariables);
        */
-      submitInstrument: (
-        submitInstrumentInput: SubmitInstrumentMutationVariables
-      ) => Cypress.Chainable<SubmitInstrumentMutation>;
+      submitInstrumentInFap: (
+        submitInstrumentInFapInput: SubmitInstrumentInFapMutationVariables
+      ) => Cypress.Chainable<SubmitInstrumentInFapMutation>;
     }
   }
 }

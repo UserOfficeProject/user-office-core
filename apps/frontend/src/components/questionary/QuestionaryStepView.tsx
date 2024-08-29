@@ -1,11 +1,11 @@
-import makeStyles from '@mui/styles/makeStyles';
-import { Formik, useFormikContext } from 'formik';
+import Box from '@mui/material/Box';
+import { Formik } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
-import { Prompt } from 'react-router';
 import * as Yup from 'yup';
 
 import { ErrorFocus } from 'components/common/ErrorFocus';
 import { NavigButton } from 'components/common/NavigButton';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import UOLoader from 'components/common/UOLoader';
 import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
@@ -27,16 +27,6 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from './QuestionaryContext';
-
-const useStyles = makeStyles((theme) => ({
-  componentWrapper: {
-    margin: theme.spacing(2, 0, 0, 0),
-  },
-  disabled: {
-    pointerEvents: 'none',
-    opacity: 0.7,
-  },
-}));
 
 export const createFormikConfigObjects = (
   answers: Answer[],
@@ -69,24 +59,12 @@ export const createFormikConfigObjects = (
   };
 };
 
-const PromptIfDirty = ({ isDirty }: { isDirty: boolean }) => {
-  const formik = useFormikContext();
-
-  return (
-    <Prompt
-      when={isDirty && formik.submitCount === 0}
-      message="Changes you recently made in this step will not be saved! Are you sure?"
-    />
-  );
-};
-
 export default function QuestionaryStepView(props: {
   topicId: number;
   readonly: boolean;
   onStepComplete?: (topicId: number) => void;
 }) {
   const { topicId } = props;
-  const classes = useStyles();
 
   const preSubmitActions = usePreSubmitActions();
   const { api } = useDataApiWithFeedback();
@@ -122,6 +100,7 @@ export default function QuestionaryStepView(props: {
   );
 
   const [lastSavedFormValues, setLastSavedFormValues] = useState(initialValues);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setLastSavedFormValues(initialValues);
@@ -176,19 +155,30 @@ export default function QuestionaryStepView(props: {
   };
 
   const performSave = async (isPartialSave: boolean): Promise<boolean> => {
+    setIsSaving(true);
+
     actionsTemplateChanges();
 
-    const questionaryId =
-      (
-        await Promise.all(
-          preSubmitActions(activeFields).map(
-            async (f) => await f({ state, dispatch, api: api() })
+    let questionaryId;
+    try {
+      questionaryId =
+        (
+          await Promise.all(
+            preSubmitActions(activeFields).map(
+              async (f) => await f({ state, dispatch, api: api() })
+            )
           )
-        )
-      ).pop() || state.questionary.questionaryId; // TODO obtain newly created questionary ID some other way
+        ).pop() || state.questionary.questionaryId; // TODO obtain newly created questionary ID some other way
 
-    if (!questionaryId) {
-      return false;
+      if (!questionaryId) {
+        setIsSaving(false);
+
+        return false;
+      }
+    } catch (error) {
+      setIsSaving(false);
+
+      throw error;
     }
 
     try {
@@ -211,6 +201,8 @@ export default function QuestionaryStepView(props: {
       setLastSavedFormValues(initialValues);
     } catch (error) {
       return false;
+    } finally {
+      setIsSaving(false);
     }
 
     return true;
@@ -270,12 +262,16 @@ export default function QuestionaryStepView(props: {
         const { submitForm, setFieldValue, isSubmitting } = formikProps;
 
         return (
-          <form className={props.readonly ? classes.disabled : undefined}>
+          <form
+            style={{
+              ...(props.readonly && { pointerEvents: 'none', opacity: 0.7 }),
+            }}
+          >
             <PromptIfDirty isDirty={state.isDirty} />
             {activeFields.map((field) => {
               return (
-                <div
-                  className={classes.componentWrapper}
+                <Box
+                  sx={(theme) => ({ margin: theme.spacing(2, 0, 0, 0) })}
                   key={field.question.id}
                 >
                   {createQuestionaryComponent({
@@ -292,7 +288,7 @@ export default function QuestionaryStepView(props: {
                       }
                     },
                   })}
-                </div>
+                </Box>
               );
             })}
             <NavigationFragment
@@ -311,8 +307,8 @@ export default function QuestionaryStepView(props: {
               {!questionaryStep.isCompleted && (
                 <NavigButton
                   onClick={saveHandler}
-                  disabled={!state.isDirty}
-                  isBusy={isSubmitting}
+                  disabled={!state.isDirty || isSaving}
+                  isBusy={isSaving}
                   data-cy="save-button"
                 >
                   Save

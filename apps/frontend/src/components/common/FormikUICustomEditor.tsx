@@ -1,18 +1,9 @@
-import makeStyles from '@mui/styles/makeStyles';
+import InputLabel from '@mui/material/InputLabel';
 import { FormikHelpers, FormikValues } from 'formik';
 import React, { useState } from 'react';
 
 import Editor from 'components/common/TinyEditor';
 import { FunctionType } from 'utils/utilTypes';
-
-const useStyles = makeStyles((theme) => ({
-  label: {
-    marginTop: '17px',
-    fontSize: '1.1875em',
-    display: 'block',
-    color: theme.palette.grey[800],
-  },
-}));
 
 /* NOTE: We prefer using Editor component directly into the forms (example: ProposalTechnicalReview component) instead of FormikUICustomEditor with Formik Field component.
   This is because FormikUICustomEditor is not updated properly when we set form field onEditorChange
@@ -35,12 +26,22 @@ const FormikUICustomEditor = ({
   'data-cy'?: string;
   label?: string;
 }) => {
-  const classes = useStyles();
   const [fieldValue, setFieldValue] = useState(field.value);
 
   return (
     <div data-cy={props['data-cy']}>
-      {props.label && <label className={classes.label}>{props.label}</label>}
+      {props.label && (
+        <InputLabel
+          sx={(theme) => ({
+            marginTop: '17px',
+            fontSize: '1.1875em',
+            display: 'block',
+            color: theme.palette.grey[800],
+          })}
+        >
+          {props.label}
+        </InputLabel>
+      )}
       <Editor
         initialValue={field.value}
         {...props}

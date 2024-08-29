@@ -12,8 +12,8 @@ import { CallsFilter } from './../resolvers/queries/CallsQuery';
 export interface CallDataSource {
   getCall(id: number): Promise<Call | null>;
   getCalls(filter?: CallsFilter): Promise<Call[]>;
-  getCallHasInstrumentsByInstrumentId(
-    instrumentId: number
+  getCallHasInstrumentsByInstrumentIds(
+    instrumentIds: number[]
   ): Promise<CallHasInstrument[]>;
   create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
@@ -28,4 +28,5 @@ export interface CallDataSource {
   getCallsByInstrumentScientist(scientistId: number): Promise<Call[]>;
   isCallEnded(callId: number, checkIfInternalEnded: boolean): Promise<boolean>;
   isCallEnded(callId: number): Promise<boolean>;
+  getCallByQuestionId(questionId: string): Promise<Call>;
 }

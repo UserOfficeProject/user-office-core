@@ -1,8 +1,8 @@
 import { Field } from 'formik';
-import { TextField } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
+import TextField from 'components/common/FormikUITextField';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -17,7 +17,9 @@ export const QuestionProposalBasisForm = (props: QuestionFormProps) => {
       {...props}
       validationSchema={Yup.object().shape({
         naturalKey: naturalKeySchema,
-        question: Yup.string().required('Question is required'),
+        question: Yup.string()
+          .required('Question is required')
+          .max(256, 'There is a 256 max character limit'),
       })}
     >
       {() => (

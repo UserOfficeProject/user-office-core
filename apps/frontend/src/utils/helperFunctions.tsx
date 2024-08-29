@@ -16,11 +16,6 @@ import {
 } from 'generated/sdk';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 
-import {
-  average,
-  getGradesFromReviews,
-  standardDeviation,
-} from './mathFunctions';
 import { FunctionType } from './utilTypes';
 
 export const getUniqueArrayBy = (roles: any[], uniqueBy: string): any[] => {
@@ -41,13 +36,18 @@ export const getUniqueArray = <T,>(array: (T | null)[]) =>
     return value !== null && self.indexOf(value) === index;
   });
 
-export const setSortDirectionOnSortColumn = (
+export const setSortDirectionOnSortField = (
   columns: Column<any>[],
-  sortColumn: number | null | undefined,
+  sortField: string | null | undefined,
   sortDirection: string | null | undefined
 ) => {
-  if (sortColumn !== undefined && sortColumn !== null && sortDirection) {
-    columns[sortColumn].defaultSort = sortDirection as SortDirectionType;
+  if (sortField !== undefined && sortField !== null && sortDirection) {
+    const fieldIndex = columns.findIndex(
+      (column) => column.field === sortField
+    );
+    columns[fieldIndex].defaultSort = sortDirection as SortDirectionType;
+  } else {
+    columns.forEach((column) => (column.defaultSort = undefined));
   }
 
   return columns;
@@ -71,6 +71,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
   ({
     primaryKey: proposal.primaryKey,
     principalInvestigator: proposal.proposer || null,
+    principalInvestigatorId: proposal.proposer?.id,
     title: proposal.title,
     status: proposal.status?.name || '',
     statusId: proposal.status?.id || 1,
@@ -78,37 +79,27 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     statusDescription: proposal.status?.description || '',
     submitted: proposal.submitted,
     proposalId: proposal.proposalId,
-    rankOrder: proposal.fapMeetingDecision?.rankOrder,
     finalStatus: getTranslation(proposal.finalStatus as ResourceId),
-    technicalTimeAllocations:
-      proposal.technicalReviews?.map(
-        (technicalReview) => technicalReview?.timeAllocation
-      ) || null,
-    technicalReviewAssigneeIds:
-      proposal.technicalReviews?.map(
-        (technicalReview) => technicalReview.technicalReviewAssigneeId
-      ) || null,
-    technicalReviewAssigneeNames: proposal.technicalReviews?.map(
-      (technicalReview) =>
-        `${technicalReview.technicalReviewAssignee?.firstname} ${technicalReview.technicalReviewAssignee?.lastname}`
-    ),
-    managementTimeAllocations:
-      proposal.instruments?.map(
-        (instrument) => instrument?.managementTimeAllocation
-      ) || [],
-    technicalStatuses: proposal.technicalReviews?.map((technicalReview) =>
-      getTranslation(technicalReview?.status as ResourceId)
-    ),
-    instrumentNames:
-      proposal.instruments?.map((instrument) => instrument?.name) || null,
-    instrumentIds:
-      proposal.instruments?.map((instrument) => instrument?.id) || null,
-    reviewAverage:
-      average(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    reviewDeviation:
-      standardDeviation(getGradesFromReviews(proposal.reviews ?? [])) || null,
-    fapId: proposal.fap?.id,
-    fapCode: proposal.fap?.code,
+    instruments: proposal.instruments?.map((instrument) => ({
+      id: instrument?.id,
+      name: instrument?.name,
+      managerUserId: instrument?.managerUserId,
+      managementTimeAllocation: instrument?.managementTimeAllocation,
+    })),
+    technicalReviews:
+      proposal.technicalReviews.map((tr) => ({
+        id: tr.id,
+        status: getTranslation(tr.status as ResourceId),
+        submitted: tr.submitted,
+        timeAllocation: tr.timeAllocation,
+        technicalReviewAssignee: {
+          id: tr.technicalReviewAssignee?.id,
+          firstname: tr.technicalReviewAssignee?.firstname,
+          lastname: tr.technicalReviewAssignee?.lastname,
+        },
+      })) || null,
+    faps: proposal.faps,
+    fapInstruments: [],
     callShortCode: proposal.call?.shortCode || null,
     notified: proposal.notified,
     callId: proposal.callId,
@@ -170,7 +161,13 @@ export const urlValidationSchema = () => {
 };
 
 export const getValueFromKey = (object: any, key: string | undefined) => {
-  return key?.split('.').reduce((o, i) => o[i], object);
+  return key?.split('.').reduce((o, i) => {
+    if (Array.isArray(o)) {
+      return o.map((item) => item?.[i]).join(', ');
+    }
+
+    return o?.[i];
+  }, object);
 };
 
 export const denseTableColumn = <T extends object>(
@@ -194,7 +191,7 @@ export const denseTableColumn = <T extends object>(
       if (typeof columnData === 'string' && columnData.length > 45) {
         return (
           <span title={columnData}>
-            {column.render ? column.render(rowData, 'row') : columnData}
+            {column.render ? column.render(rowData) : columnData}
           </span>
         );
       } else {
@@ -202,9 +199,7 @@ export const denseTableColumn = <T extends object>(
           return column.lookup[columnData as keyof object];
         }
 
-        return (
-          <>{column.render ? column.render(rowData, 'row') : columnData}</>
-        );
+        return <>{column.render ? column.render(rowData) : columnData}</>;
       }
     },
     cellStyle: {
@@ -237,8 +232,11 @@ export function toArray<T>(input: T | T[]): T[] {
 export function fromArrayToCommaSeparated(
   itemsArray?: (string | number | null | undefined)[] | null
 ) {
-  return (
-    itemsArray?.map((technicalStatus) => technicalStatus ?? '-').join(', ') ||
-    '-'
-  );
+  return itemsArray?.map((item) => item ?? '-').join(', ') || '-';
 }
+
+export const getMax32BitInteger = () => Math.pow(2, 31);
+
+export const BOLD_TEXT_STYLE = {
+  fontWeight: 'bold',
+};

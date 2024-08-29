@@ -1,3 +1,4 @@
+import { Column } from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import { Typography } from '@mui/material';
 import i18n from 'i18n';
@@ -5,11 +6,11 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import SuperMaterialTable, {
   DefaultQueryParams,
   UrlQueryParamsType,
 } from 'components/common/SuperMaterialTable';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -23,7 +24,7 @@ import {
 } from '../../generated/sdk';
 import ParticipantModal from '../proposal/ParticipantModal';
 
-const columns = [
+const columns: Column<InstrumentFragment>[] = [
   {
     title: 'Name',
     field: 'name',
@@ -38,17 +39,13 @@ const columns = [
   },
   {
     title: 'Scientists',
-    field: 'scientists.length',
-    emptyValue: '-',
+    render: (data) => data.scientists.length,
   },
 ];
 
 const InstrumentTable = () => {
-  const {
-    loadingInstruments,
-    instruments,
-    setInstrumentsWithLoading: setInstruments,
-  } = useInstrumentsData();
+  const { loadingInstruments, instruments, setInstruments } =
+    useInstrumentsData();
 
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
@@ -105,7 +102,7 @@ const InstrumentTable = () => {
   const AssignmentIndIcon = (): JSX.Element => <AssignmentInd />;
 
   const AssignedScientists = React.useCallback(
-    ({ rowData }) => {
+    ({ rowData }: { rowData: InstrumentFragment }) => {
       const removeAssignedScientistFromInstrument = (
         scientistToRemoveId: number,
         instrumentToRemoveFromId: number

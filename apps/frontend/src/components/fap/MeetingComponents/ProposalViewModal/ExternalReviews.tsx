@@ -4,77 +4,62 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
-import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Review } from 'generated/sdk';
+import { Fap, Review } from 'generated/sdk';
 import { StyledPaper } from 'styles/StyledComponents';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { getFullUserName } from 'utils/user';
-
-const useStyles = makeStyles((theme) => ({
-  heading: {
-    marginTop: theme.spacing(2),
-  },
-  textBold: {
-    fontWeight: 'bold',
-  },
-  table: {
-    minWidth: 500,
-  },
-}));
 
 type ExternalReviewsProps = {
   reviews: Review[] | null;
+  faps?: Pick<Fap, 'id' | 'code'>[] | null;
 };
 
-const ExternalReviews = ({ reviews }: ExternalReviewsProps) => {
-  const classes = useStyles();
-
-  return (
-    <div data-cy="Fap-meeting-components-external-reviews">
-      <StyledPaper margin={[0]}>
-        <Typography
-          variant="h6"
-          component="h2"
-          className={classes.heading}
-          gutterBottom
-        >
-          External reviews
-        </Typography>
-        <TableContainer>
-          <Table className={classes.table}>
-            <TableBody>
-              <TableRow key="externalReviewsHeading">
-                <TableCell width="50%" className={classes.textBold}>
-                  Name
+const ExternalReviews = ({ reviews, faps }: ExternalReviewsProps) => (
+  <div data-cy="Fap-meeting-components-external-reviews">
+    <StyledPaper margin={[0]}>
+      <Typography
+        variant="h6"
+        component="h2"
+        sx={(theme) => ({
+          marginTop: theme.spacing(2),
+        })}
+        gutterBottom
+      >
+        External reviews
+      </Typography>
+      <TableContainer>
+        <Table sx={{ minWidth: 500 }}>
+          <TableBody>
+            <TableRow key="externalReviewsHeading">
+              <TableCell width="50%" sx={BOLD_TEXT_STYLE}>
+                Name
+              </TableCell>
+              <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
+                Score
+              </TableCell>
+              <TableCell sx={BOLD_TEXT_STYLE}>Comment</TableCell>
+            </TableRow>
+            {reviews?.map((review) => (
+              <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
+                <TableCell>{getFullUserName(review.reviewer)}</TableCell>
+                <TableCell>{review.grade || '-'}</TableCell>
+                <TableCell
+                  dangerouslySetInnerHTML={{
+                    __html: review?.comment || '-',
+                  }}
+                />
+                <TableCell>
+                  {faps?.find((f) => f.id === review.fapID)?.code || '-'}
                 </TableCell>
-                <TableCell width="25%" className={classes.textBold}>
-                  Score
-                </TableCell>
-                <TableCell className={classes.textBold}>Comment</TableCell>
               </TableRow>
-              {reviews?.map((review) => (
-                <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
-                  <TableCell>{getFullUserName(review.reviewer)}</TableCell>
-                  <TableCell>{review.grade || '-'}</TableCell>
-                  <TableCell
-                    dangerouslySetInnerHTML={{
-                      __html: review?.comment || '-',
-                    }}
-                  />
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </StyledPaper>
-    </div>
-  );
-};
-
-ExternalReviews.propTypes = {
-  reviews: PropTypes.array,
-};
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </StyledPaper>
+  </div>
+);
 
 export default ExternalReviews;

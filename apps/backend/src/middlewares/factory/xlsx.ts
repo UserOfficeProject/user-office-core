@@ -3,13 +3,18 @@ import { container } from 'tsyringe';
 
 import { UserAuthorization } from '../../auth/UserAuthorization';
 import { Tokens } from '../../config/Tokens';
-import callFactoryService, {
-  DownloadType,
+import {
   XLSXType,
   XLSXMetaBase,
-} from '../../factory/service';
+  DownloadType,
+  DownloadService,
+} from '../../factory/DownloadService';
 import { getCurrentTimestamp } from '../../factory/util';
-import { collectFaplXLSXData } from '../../factory/xlsx/fap';
+import {
+  CallExtraFapDataColumns,
+  collectCallFapXLSXData,
+} from '../../factory/xlsx/callFaps';
+import { collectFapXLSXData } from '../../factory/xlsx/fap';
 import {
   collectProposalXLSXData,
   defaultProposalDataColumns,
@@ -18,6 +23,10 @@ import {
 const fapDataColumns = container.resolve<string[]>(Tokens.FapDataColumns);
 
 const router = express.Router();
+
+const downloadService = container.resolve<DownloadService>(
+  Tokens.DownloadService
+);
 
 router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
@@ -61,7 +70,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    callFactoryService(
+    downloadService.callFactoryService(
       DownloadType.XLSX,
       XLSXType.PROPOSAL,
       { data, meta, userRole },
@@ -74,7 +83,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   }
 });
 
-router.get(`/${XLSXType.Fap}/:fap_id/call/:call_id`, async (req, res, next) => {
+router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
   try {
     if (!req.user) {
       throw new Error('Not authorized');
@@ -94,7 +103,7 @@ router.get(`/${XLSXType.Fap}/:fap_id/call/:call_id`, async (req, res, next) => {
       );
     }
 
-    const { data, filename } = await collectFaplXLSXData(
+    const { data, filename } = await collectFapXLSXData(
       fapId,
       callId,
       userWithRole
@@ -107,9 +116,51 @@ router.get(`/${XLSXType.Fap}/:fap_id/call/:call_id`, async (req, res, next) => {
     };
 
     const userRole = req.user.currentRole;
-    callFactoryService(
+    downloadService.callFactoryService(
       DownloadType.XLSX,
-      XLSXType.Fap,
+      XLSXType.FAP,
+      { data, meta, userRole },
+      req,
+      res,
+      next
+    );
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new Error('Not authorized');
+    }
+
+    const userWithRole = {
+      ...req.user.user,
+      currentRole: req.user.currentRole,
+    };
+
+    const callId = parseInt(req.params.call_id);
+
+    if (isNaN(+callId)) {
+      throw new Error(`Invalid call ID:  Call ${req.params.call_id}`);
+    }
+
+    const { data, filename } = await collectCallFapXLSXData(
+      callId,
+      userWithRole
+    );
+
+    const meta: XLSXMetaBase = {
+      singleFilename: filename,
+      collectionFilename: filename,
+      columns: fapDataColumns.concat(CallExtraFapDataColumns),
+    };
+
+    const userRole = req.user.currentRole;
+    downloadService.callFactoryService(
+      DownloadType.XLSX,
+      XLSXType.CALL_FAP,
       { data, meta, userRole },
       req,
       res,

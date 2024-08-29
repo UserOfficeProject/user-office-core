@@ -1,5 +1,5 @@
 import { Call } from '../models/Call';
-import { Fap } from '../models/Fap';
+import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
@@ -8,6 +8,7 @@ import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
+import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
 import { Event } from './event.enum';
 
@@ -137,8 +138,8 @@ interface ProposalInstrumentSelectedEvent extends GeneralEvent {
   instrumentshasproposals: InstrumentsHasProposals;
 }
 
-interface ProposalFapSelectedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_FAP_SELECTED;
+interface ProposalFapsSelectedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAPS_SELECTED;
   proposalpks: ProposalPks;
 }
 
@@ -147,8 +148,33 @@ interface ProposalInstrumentSubmittedEvent extends GeneralEvent {
   instrumentshasproposals: InstrumentsHasProposals;
 }
 
+interface ProposalAllFapInstrumentSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED;
+  instrumentshasproposals: InstrumentsHasProposals;
+}
+
+interface ProposalInstrumentUnsubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED;
+  instrumentshasproposals: InstrumentsHasProposals;
+}
+
 interface ProposalFapMeetingSubmittedEvent extends GeneralEvent {
   type: Event.PROPOSAL_FAP_MEETING_SUBMITTED;
+  proposal: Proposal;
+}
+
+interface FapAllMeetingsSubmittedEvent extends GeneralEvent {
+  type: Event.FAP_ALL_MEETINGS_SUBMITTED;
+  fap: Fap;
+}
+
+interface ProposalAllFapReviewsSubmittedForAllPanelsEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_REVIEWS_SUBMITTED_FOR_ALL_FAPS;
+  proposal: Proposal;
+}
+
+interface ProposalAllFapMeetingsSubmittedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ALL_FAP_MEETINGS_SUBMITTED;
   proposal: Proposal;
 }
 
@@ -237,8 +263,8 @@ interface FapMemberRemovedFromProposalEvent extends GeneralEvent {
 }
 
 interface FapProposalRemovedEvent extends GeneralEvent {
-  type: Event.FAP_PROPOSAL_REMOVED;
-  fap: Fap;
+  type: Event.PROPOSAL_FAPS_REMOVED;
+  array: FapProposal[];
 }
 
 interface FapMemberRemovedEvent extends GeneralEvent {
@@ -299,6 +325,36 @@ interface FapReviewerNotified extends GeneralEvent {
   fapReview: Review;
 }
 
+interface TechniqueCreatedEvent extends GeneralEvent {
+  type: Event.TECHNIQUE_CREATED;
+  technique: Technique;
+}
+
+interface TechniqueUpdatedEvent extends GeneralEvent {
+  type: Event.TECHNIQUE_UPDATED;
+  technique: Technique;
+}
+
+interface TechniqueDeletedEvent extends GeneralEvent {
+  type: Event.TECHNIQUE_DELETED;
+  technique: Technique;
+}
+
+interface InstrumentsAssignedToTechniqueEvent extends GeneralEvent {
+  type: Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE;
+  boolean: boolean;
+}
+
+interface InstrumentsRemovedFromTechniqueEvent extends GeneralEvent {
+  type: Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE;
+  boolean: boolean;
+}
+
+interface ProposalAssignedToTechniquesEvent extends GeneralEvent {
+  type: Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES;
+  boolean: boolean;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -339,8 +395,9 @@ export type ApplicationEvent =
   | ProposalAllFapReviewsSubmittedEvent
   | ProposalSampleReviewSubmittedEvent
   | ProposalInstrumentSelectedEvent
-  | ProposalFapSelectedEvent
+  | ProposalFapsSelectedEvent
   | ProposalInstrumentSubmittedEvent
+  | ProposalInstrumentUnsubmittedEvent
   | ProposalFapMeetingSubmittedEvent
   | ProposalStatusChangedByWorkflowEvent
   | ProposalStatusChangedByUserEvent
@@ -350,8 +407,18 @@ export type ApplicationEvent =
   | ProposalTopicAnsweredEvent
   | ProposalBookingTimeSlotAddedEvent
   | ProposalBookingTimeSlotsRemovedEvent
+  | FapAllMeetingsSubmittedEvent
+  | ProposalAllFapReviewsSubmittedForAllPanelsEvent
+  | ProposalAllFapMeetingsSubmittedEvent
+  | ProposalAllFapInstrumentSubmittedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
   | FapReviewerNotified
-  | ProposalStatusActionExecutedEvent;
+  | ProposalStatusActionExecutedEvent
+  | TechniqueCreatedEvent
+  | TechniqueUpdatedEvent
+  | TechniqueDeletedEvent
+  | InstrumentsAssignedToTechniqueEvent
+  | InstrumentsRemovedFromTechniqueEvent
+  | ProposalAssignedToTechniquesEvent;

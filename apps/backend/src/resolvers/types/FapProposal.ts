@@ -27,11 +27,11 @@ export class FapProposal {
   public fapTimeAllocation?: number | null;
 
   @Field(() => Int)
-  public instrumentId: number;
+  public instrumentId: number | null;
 }
 
 @Resolver(() => FapProposal)
-export class FapUserResolver {
+export class FapProposalResolver {
   @FieldResolver(() => Proposal)
   async proposal(
     @Root() fapProposal: FapProposal,

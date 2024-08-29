@@ -67,6 +67,7 @@ export default class FapQueries {
     { fapId, callId }: { fapId: number; callId: number | null }
   ) {
     if (
+      agent?.isApiAccessToken ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
@@ -114,11 +115,9 @@ export default class FapQueries {
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
-      return this.dataSource.getFapProposalsByInstrument(
+      return this.dataSource.getFapProposalsByInstrument(instrumentId, callId, {
         fapId,
-        instrumentId,
-        callId
-      );
+      });
     } else {
       return null;
     }
@@ -163,25 +162,28 @@ export default class FapQueries {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
-  async getProposalFapMeetingDecision(
+  async getProposalFapMeetingDecisions(
     agent: UserWithRole | null,
-    proposalPk: number
+    { proposalPk, fapId }: { proposalPk: number; fapId?: number }
   ) {
-    const [fapMeetingDecision] =
-      await this.dataSource.getProposalsFapMeetingDecisions([proposalPk]);
+    const fapMeetingDecisions =
+      await this.dataSource.getProposalsFapMeetingDecisions(
+        [proposalPk],
+        fapId
+      );
     const fap = await this.dataSource.getFapByProposalPk(proposalPk);
 
-    if (!fapMeetingDecision || !fap) {
-      return null;
+    if (!fapMeetingDecisions.length || !fap) {
+      return [];
     }
 
     if (
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fap.id))
     ) {
-      return fapMeetingDecision;
+      return fapMeetingDecisions;
     } else {
-      return null;
+      return [];
     }
   }
 

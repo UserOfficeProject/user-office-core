@@ -1,24 +1,23 @@
 import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { Formik, Form, Field, useFormikContext, FieldArray } from 'formik';
-import { CheckboxWithLabel, Select, TextField } from 'formik-mui';
+import { Formik, Form, Field, FieldArray } from 'formik';
 import React, { ChangeEvent } from 'react';
-import { Prompt } from 'react-router';
 
-import { useCheckAccess } from 'components/common/Can';
+import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
+import Select from 'components/common/FormikUISelect';
+import TextField from 'components/common/FormikUITextField';
 import FormikUIPredefinedMessagesTextField, {
   PredefinedMessageKey,
 } from 'components/common/predefinedMessages/FormikUIPredefinedMessagesTextField';
+import PromptIfDirty from 'components/common/PromptIfDirty';
 import {
   InstrumentWithManagementTime,
   ProposalEndStatus,
   UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { ProposalData } from 'hooks/proposal/useProposalData';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -67,17 +66,6 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
     { text: 'Rejected', value: ProposalEndStatus.REJECTED },
   ];
 
-  const PromptIfDirty = () => {
-    const formik = useFormikContext();
-
-    return (
-      <Prompt
-        when={formik.dirty && formik.submitCount === 0}
-        message="Changes you recently made in this tab will be lost! Are you sure?"
-      />
-    );
-  };
-
   const handleProposalAdministration = async (
     administrationValues: AdministrationFormData
   ) => {
@@ -87,6 +75,14 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
 
     setAdministration(administrationValues);
   };
+
+  if (!data.instruments?.length) {
+    return (
+      <div data-cy="no-instrument-message">
+        Proposal has to be assigned to an instrument for administration
+      </div>
+    );
+  }
 
   return (
     <>
@@ -120,29 +116,17 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
             <PromptIfDirty />
             <Grid container spacing={2} alignItems="center">
               <Grid item sm={6} xs={12}>
-                <FormControl fullWidth margin="normal">
-                  <InputLabel
-                    htmlFor="finalStatus"
-                    shrink={!!values.finalStatus}
-                    required
-                  >
-                    Status
-                  </InputLabel>
-                  <Field
-                    name="finalStatus"
-                    component={Select}
-                    data-cy="proposal-final-status"
-                    disabled={!isUserOfficer || isSubmitting}
-                    MenuProps={{ 'data-cy': 'proposal-final-status-options' }}
-                    required
-                  >
-                    {statusOptions.map(({ value, text }) => (
-                      <MenuItem value={value} key={value}>
-                        {text}
-                      </MenuItem>
-                    ))}
-                  </Field>
-                </FormControl>
+                <Field
+                  name="finalStatus"
+                  options={statusOptions}
+                  component={Select}
+                  inputLabel={{ htmlFor: 'status', required: true }}
+                  label="Status"
+                  data-cy="proposal-final-status"
+                  required
+                  formControl={{ margin: 'normal' }}
+                  disabled={!isUserOfficer || isSubmitting}
+                />
               </Grid>
               <Grid item sm={6} xs={12}>
                 <FieldArray
@@ -188,7 +172,6 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   name="commentForUser"
                   label="Comment for user"
                   type="text"
-                  component={TextField}
                   margin="normal"
                   fullWidth
                   autoComplete="off"
@@ -204,7 +187,6 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                   name="commentForManagement"
                   label="Comment for management"
                   type="text"
-                  component={TextField}
                   margin="normal"
                   fullWidth
                   autoComplete="off"
@@ -222,10 +204,8 @@ const ProposalAdmin = ({ data, setAdministration }: ProposalAdminProps) => {
                     name="managementDecisionSubmitted"
                     component={CheckboxWithLabel}
                     type="checkbox"
-                    Label={{
-                      label: 'Submitted',
-                    }}
                     data-cy="is-management-decision-submitted"
+                    Label={{ label: 'Submitted' }}
                     disabled={!isUserOfficer || isSubmitting}
                   />
 

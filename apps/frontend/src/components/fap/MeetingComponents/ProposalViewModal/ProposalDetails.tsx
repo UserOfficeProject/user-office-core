@@ -5,101 +5,98 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Proposal } from 'generated/sdk';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { StyledPaper } from 'styles/StyledComponents';
+import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { average, getGradesFromReviews } from 'utils/mathFunctions';
 import { getFullUserName } from 'utils/user';
 
 type ProposalDetailsProps = {
   proposal: Proposal;
+  instrumentId: number;
 };
 
-const useStyles = makeStyles((theme) => ({
-  heading: {
-    marginTop: theme.spacing(2),
-  },
-  textBold: {
-    fontWeight: 'bold',
-  },
-  table: {
-    minWidth: 500,
-  },
-}));
-
-const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
+const ProposalDetails = ({ proposal, instrumentId }: ProposalDetailsProps) => {
   const downloadPDFProposal = useDownloadPDFProposal();
-  const classes = useStyles();
 
   return (
     <div data-cy="Fap-meeting-components-proposal-details">
       <StyledPaper>
-        <Typography variant="h6" className={classes.heading} gutterBottom>
+        <Typography
+          variant="h6"
+          sx={(theme) => ({
+            marginTop: theme.spacing(2),
+          })}
+          gutterBottom
+        >
           Proposal details
         </Typography>
         <TableContainer>
-          <Table className={classes.table}>
+          <Table sx={{ minWidth: 500 }}>
             <TableBody>
               <TableRow key="titleAndShortCode">
-                <TableCell width="25%" className={classes.textBold}>
+                <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                   ID
                 </TableCell>
                 <TableCell width="25%">{proposal.proposalId}</TableCell>
-                <TableCell width="25%" className={classes.textBold}>
+                <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                   Title
                 </TableCell>
                 <TableCell>{proposal.title}</TableCell>
               </TableRow>
               <TableRow key="abstractAndScore">
-                <TableCell className={classes.textBold}>Abstract</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Abstract</TableCell>
                 <TableCell>{proposal.abstract}</TableCell>
-                <TableCell className={classes.textBold}>
-                  Average score
-                </TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Average score</TableCell>
                 <TableCell>
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
               </TableRow>
               <TableRow key="principalInvestigatorAndStatus">
-                <TableCell className={classes.textBold}>
+                <TableCell sx={BOLD_TEXT_STYLE}>
                   Principal Investigator
                 </TableCell>
                 <TableCell>{getFullUserName(proposal.proposer)}</TableCell>
-                <TableCell className={classes.textBold}>Status</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Status</TableCell>
                 <TableCell>{proposal.status?.name}</TableCell>
               </TableRow>
               <TableRow key="coProposersAndCall">
-                <TableCell className={classes.textBold}>Co-Proposers</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Co-Proposers</TableCell>
                 <TableCell>
                   {proposal.users
                     .map((user) => getFullUserName(user))
                     .join(', ')}
                 </TableCell>
-                <TableCell className={classes.textBold}>Call</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Call</TableCell>
                 <TableCell>{proposal.call?.shortCode}</TableCell>
               </TableRow>
               <TableRow key="ranking">
-                <TableCell className={classes.textBold}>
+                <TableCell sx={BOLD_TEXT_STYLE}>
                   Initial Rank (by average score)
                 </TableCell>
                 <TableCell>
                   {average(getGradesFromReviews(proposal.reviews ?? [])) || '-'}
                 </TableCell>
-                <TableCell className={classes.textBold}>Current Rank</TableCell>
-                <TableCell>{proposal.fapMeetingDecision?.rankOrder}</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Current Rank</TableCell>
+                <TableCell>
+                  {
+                    proposal.fapMeetingDecisions?.find(
+                      (fmd) => fmd.instrumentId === instrumentId
+                    )?.rankOrder
+                  }
+                </TableCell>
               </TableRow>
               <TableRow key="instrumentAndPdf">
-                <TableCell className={classes.textBold}>Instrument</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>Instrument</TableCell>
                 <TableCell>
                   {proposal.instruments
                     ?.map((instrument) => instrument?.name)
                     .join(', ')}
                 </TableCell>
-                <TableCell className={classes.textBold}>PDF</TableCell>
+                <TableCell sx={BOLD_TEXT_STYLE}>PDF</TableCell>
                 <TableCell>
                   <Button
                     onClick={() =>
@@ -117,10 +114,6 @@ const ProposalDetails = ({ proposal }: ProposalDetailsProps) => {
       </StyledPaper>
     </div>
   );
-};
-
-ProposalDetails.propTypes = {
-  proposal: PropTypes.any.isRequired,
 };
 
 export default ProposalDetails;

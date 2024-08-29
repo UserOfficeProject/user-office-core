@@ -58,6 +58,12 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from '../../resolvers/types/ProposalBooking';
+import {
+  FapInstrument,
+  ProposalViewFap,
+  ProposalViewInstrument,
+  ProposalViewTechnicalReview,
+} from '../../resolvers/types/ProposalView';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
 
@@ -77,6 +83,8 @@ declare module 'knex/types/tables' {
 
   interface Tables {
     pdf_templates: PdfTemplateRecord;
+    techniques: TechniqueRecord;
+    technique_has_instruments: TechniqueHasInstrumentsRecord;
   }
 }
 
@@ -135,25 +143,14 @@ export interface ProposalViewRecord {
   readonly proposal_status_name: string;
   readonly proposal_status_description: string;
   readonly proposal_id: string;
-  readonly rank_order: number;
   readonly final_status: number;
-  readonly management_time_allocations: number[];
   readonly notified: boolean;
   readonly submitted: boolean;
-  readonly technical_review_ids: number[];
-  readonly technical_time_allocations: number[];
-  readonly technical_review_statuses: number[];
-  readonly technical_reviews_submitted: boolean[];
-  readonly technical_review_assignee_ids: number[];
-  readonly technical_review_assignee_names: string[];
-  readonly instrument_ids: number[];
-  readonly fap_instrument_id: number;
-  readonly instrument_names: string[];
+  readonly instruments: ProposalViewInstrument[];
+  readonly technical_reviews: ProposalViewTechnicalReview[];
+  readonly faps: ProposalViewFap[];
+  readonly fap_instruments: FapInstrument[];
   readonly call_short_code: string;
-  readonly fap_id: number;
-  readonly fap_code: string;
-  readonly average: number;
-  readonly deviation: number;
   readonly call_id: number;
   readonly proposal_workflow_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
@@ -406,6 +403,7 @@ export interface FapRecord {
   readonly custom_grade_guide: boolean | null;
   readonly active: boolean;
   readonly full_count: number;
+  readonly files: string | null;
 }
 
 export interface FapSecretariesRecord {
@@ -419,13 +417,20 @@ export interface FapChairsRecord {
 }
 
 export interface FapProposalRecord {
+  readonly fap_proposal_id: number;
   readonly proposal_pk: number;
   readonly fap_id: number;
   readonly date_assigned: Date;
   readonly fap_time_allocation: number | null;
-  readonly instrument_id: number;
+  readonly instrument_id: number | null;
+  readonly call_id: number;
   readonly fap_meeting_instrument_submitted: boolean;
 }
+
+export type AssignProposalsToFapsInput = Pick<
+  FapProposalRecord,
+  'call_id' | 'fap_id' | 'instrument_id' | 'proposal_pk'
+> & { instrument_has_proposals_id: number };
 
 export interface FapAssignmentRecord {
   readonly proposal_pk: number;
@@ -436,6 +441,23 @@ export interface FapAssignmentRecord {
   readonly date_reassigned: Date;
   readonly email_sent: boolean;
   readonly rank: number | null;
+}
+
+export interface FapReviewsRecord {
+  readonly proposal_pk: number;
+  readonly proposal_id: number;
+  readonly title: string;
+  readonly instrument_name: string;
+  readonly availability_time: number;
+  readonly time_allocation: number;
+  readonly fap_id: number;
+  readonly rank_order: number;
+  readonly call_id: number;
+  readonly proposer_id: number;
+  readonly instrument_id: number;
+  readonly fap_time_allocation: number;
+  readonly average_grade: number;
+  readonly questionary_id: number;
 }
 
 export interface FapReviewerRecord {
@@ -478,11 +500,13 @@ export interface InstrumentWithAvailabilityTimeRecord {
   readonly short_code: string;
   readonly description: string;
   readonly manager_user_id: number;
-  readonly availability_time: number;
+  readonly availability_time: number | null;
   readonly submitted: boolean;
   readonly proposal_count: number;
   readonly full_count: number;
   readonly fap_id: number;
+  readonly all_faps_instrument_time_allocation: number;
+  readonly fap_instrument_time_allocation: number;
 }
 
 export interface InstrumentWithManagementTimeRecord {
@@ -567,6 +591,8 @@ export interface FapMeetingDecisionRecord {
   readonly recommendation: ProposalEndStatus;
   readonly submitted: boolean;
   readonly submitted_by: number | null;
+  readonly instrument_id: number;
+  readonly fap_id: number;
 }
 
 export interface FapProposalWithReviewGradesAndRankingRecord {
@@ -584,7 +610,7 @@ export interface ProposalEventsRecord {
   readonly call_ended: boolean;
   readonly call_ended_internal: boolean;
   readonly call_review_ended: boolean;
-  readonly proposal_fap_selected: boolean;
+  readonly proposal_faps_selected: boolean;
   readonly proposal_instruments_selected: boolean;
   readonly proposal_feasibility_review_submitted: boolean;
   readonly proposal_sample_review_submitted: boolean;
@@ -597,6 +623,9 @@ export interface ProposalEventsRecord {
   readonly proposal_sample_safe: boolean;
   readonly proposal_fap_review_submitted: boolean;
   readonly proposal_fap_meeting_submitted: boolean;
+  readonly proposal_all_fap_meetings_submitted: boolean;
+  readonly proposal_all_reviews_submitted_for_all_faps: boolean;
+  readonly proposal_all_fap_meeting_instrument_submitted: boolean;
   readonly proposal_instrument_submitted: boolean;
   readonly proposal_accepted: boolean;
   readonly proposal_reserved: boolean;
@@ -821,25 +850,14 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.proposal_status_name,
     proposal.proposal_status_description,
     proposal.proposal_id,
-    proposal.rank_order,
     proposal.final_status,
     proposal.notified,
     proposal.submitted,
-    proposal.management_time_allocations,
-    proposal.technical_review_ids,
-    proposal.technical_review_assignee_ids,
-    proposal.technical_time_allocations,
-    proposal.technical_review_assignee_names,
-    proposal.technical_review_statuses,
-    proposal.technical_reviews_submitted,
-    proposal.instrument_names,
-    proposal.instrument_ids,
-    proposal.fap_instrument_id,
+    proposal.instruments,
+    proposal.technical_reviews,
+    proposal.faps,
+    proposal.fap_instruments,
     proposal.call_short_code,
-    proposal.fap_code,
-    proposal.fap_id,
-    proposal.average,
-    proposal.deviation,
     proposal.allocation_time_unit,
     proposal.call_id,
     proposal.proposal_workflow_id
@@ -1098,7 +1116,8 @@ export const createFapObject = (fap: FapRecord) => {
     fap.custom_grade_guide,
     fap.active,
     [],
-    []
+    [],
+    fap.files ? JSON.stringify(fap.files) : null
   );
 };
 
@@ -1112,17 +1131,21 @@ export const createFapMeetingDecisionObject = (
     fapMeetingDecisionRecord.comment_for_user,
     fapMeetingDecisionRecord.comment_for_management,
     fapMeetingDecisionRecord.submitted,
-    fapMeetingDecisionRecord.submitted_by
+    fapMeetingDecisionRecord.submitted_by,
+    fapMeetingDecisionRecord.instrument_id,
+    fapMeetingDecisionRecord.fap_id
   );
 };
 
 export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
   return new FapProposal(
+    fapProposal.fap_proposal_id,
     fapProposal.proposal_pk,
     fapProposal.fap_id,
     fapProposal.date_assigned,
     fapProposal.fap_time_allocation,
     fapProposal.instrument_id,
+    fapProposal.call_id,
     fapProposal.fap_meeting_instrument_submitted
   );
 };
@@ -1296,3 +1319,16 @@ export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
     invite.claimed_by,
     invite.claimed_at
   );
+
+export interface TechniqueRecord {
+  readonly technique_id: number;
+  readonly name: string;
+  readonly short_code: string;
+  readonly description: string;
+  readonly full_count: number;
+}
+
+export interface TechniqueHasInstrumentsRecord {
+  readonly technique_id: number;
+  readonly instrument_id: number;
+}

@@ -6,7 +6,7 @@ import ApiAccessTokensTable from './ApiAccessTokensTable';
 
 const ApiAccessTokensPage = () => {
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper>
         <ApiAccessTokensTable />
       </StyledPaper>

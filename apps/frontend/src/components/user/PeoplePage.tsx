@@ -1,6 +1,6 @@
 import Edit from '@mui/icons-material/Edit';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { BasicUserDetails } from 'generated/sdk';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -11,16 +11,16 @@ import PeopleTable from './PeopleTable';
 export default function PeoplePage() {
   const [userData, setUserData] = useState<BasicUserDetails | null>(null);
   const { api } = useDataApiWithFeedback();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   if (userData) {
     setTimeout(() => {
-      history.push(`/People/${userData.id}`);
+      navigate(`/People/${userData.id}`);
     });
   }
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <StyledPaper data-cy="people-table">
         <PeopleTable
           title="Users"
@@ -31,6 +31,7 @@ export default function PeoplePage() {
           }}
           selection={false}
           showInvitationButtons
+          search
           onRemove={(user: { id: number }) =>
             api({
               toastSuccessMessage: 'User removed successfully!',

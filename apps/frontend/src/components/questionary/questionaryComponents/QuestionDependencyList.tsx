@@ -63,6 +63,7 @@ const QuestionDependencyList = ({
           DataType.BOOLEAN,
           DataType.SELECTION_FROM_OPTIONS,
           DataType.INSTRUMENT_PICKER,
+          DataType.TECHNIQUE_PICKER,
         ].includes(option.question.dataType) &&
         currentQuestionId !== option.question.id
     ).length;
@@ -75,25 +76,23 @@ const QuestionDependencyList = ({
             <Grid container direction="row-reverse">
               <Grid item xs={1}>
                 <Tooltip title="Add dependency">
-                  <>
-                    <IconButton
-                      onClick={() =>
-                        push({
-                          dependencyId: '',
-                          questionId: currentQuestionId,
-                          dependencyNaturalKey: '',
-                          condition: {
-                            condition: EvaluatorOperator.EQ,
-                            params: '',
-                          },
-                        })
-                      }
-                      data-cy="add-dependency-button"
-                      disabled={allAvailableDependenciesAdded}
-                    >
-                      <AddCircleOutlineIcon />
-                    </IconButton>
-                  </>
+                  <IconButton
+                    onClick={() =>
+                      push({
+                        dependencyId: '',
+                        questionId: currentQuestionId,
+                        dependencyNaturalKey: '',
+                        condition: {
+                          condition: EvaluatorOperator.EQ,
+                          params: '',
+                        },
+                      })
+                    }
+                    data-cy="add-dependency-button"
+                    disabled={allAvailableDependenciesAdded}
+                  >
+                    <AddCircleOutlineIcon />
+                  </IconButton>
                 </Tooltip>
               </Grid>
               {field.dependencies.length > 1 && (

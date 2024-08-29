@@ -8,32 +8,17 @@ import Slide from '@mui/material/Slide';
 import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions/transition';
 import Typography from '@mui/material/Typography';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
-import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import { Review, UserRole, FapMeetingDecision, Proposal } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapProposalData } from 'hooks/fap/useFapProposalData';
 
 import ExternalReviews from './ExternalReviews';
 import FinalRankingForm from './FinalRankingForm';
 import ProposalDetails from './ProposalDetails';
 import TechnicalReviewInfo from './TechnicalReviewInfo';
-
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    appBar: {
-      position: 'relative',
-    },
-    title: {
-      marginLeft: theme.spacing(2),
-      flex: 1,
-      color: 'white',
-    },
-  })
-);
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -61,7 +46,6 @@ const FapMeetingProposalViewModal = ({
   setProposalViewModalOpen,
   instrumentId,
 }: FapMeetingProposalViewModalProps) => {
-  const classes = useStyles();
   const hasWriteAccess = useCheckAccess([
     UserRole.USER_OFFICER,
     UserRole.FAP_CHAIR,
@@ -69,27 +53,29 @@ const FapMeetingProposalViewModal = ({
   ]);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const { FapProposalData, loading, setFapProposalData } = useFapProposalData(
+  const { fapProposalData, loading, setFapProposalData } = useFapProposalData(
     fapId,
     proposalPk
   );
 
-  const finalHasWriteAccess = FapProposalData?.instrumentSubmitted
+  const finalHasWriteAccess = fapProposalData?.instrumentSubmitted
     ? isUserOfficer
     : hasWriteAccess;
 
-  const proposalData = (FapProposalData?.proposal ?? null) as Proposal;
+  const proposalData = (fapProposalData?.proposal ?? null) as Proposal;
 
   const handleClose = () => {
     setProposalViewModalOpen(false);
   };
 
-  const fapTimeAllocation = FapProposalData?.fapTimeAllocation ?? null;
+  const fapTimeAllocation = fapProposalData?.fapTimeAllocation ?? null;
 
   const getInstrumentTechnicalReview = () =>
     proposalData.technicalReviews?.find(
       (technicalReview) => technicalReview.instrumentId === instrumentId
     );
+  const getInstrumentDetails = () =>
+    proposalData.instruments?.find((i) => i?.id === instrumentId);
 
   return (
     <>
@@ -100,7 +86,11 @@ const FapMeetingProposalViewModal = ({
         TransitionComponent={Transition}
         data-cy="Fap-meeting-modal"
       >
-        <AppBar className={classes.appBar}>
+        <AppBar
+          sx={{
+            position: 'relative',
+          }}
+        >
           <Toolbar>
             <IconButton
               edge="start"
@@ -111,7 +101,14 @@ const FapMeetingProposalViewModal = ({
             >
               <CloseIcon />
             </IconButton>
-            <Typography variant="h6" className={classes.title}>
+            <Typography
+              variant="h6"
+              sx={(theme) => ({
+                marginLeft: theme.spacing(2),
+                flex: 1,
+                color: 'white',
+              })}
+            >
               Fap Meeting Components - Proposal View: {proposalData?.title} (
               {proposalData?.proposalId})
             </Typography>
@@ -121,7 +118,7 @@ const FapMeetingProposalViewModal = ({
           <Grid container>
             <Grid item xs={12}>
               <div data-cy="Fap-meeting-components-proposal-view">
-                {loading || !FapProposalData || !proposalData ? (
+                {loading || !fapProposalData || !proposalData ? (
                   <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />
                 ) : (
                   <>
@@ -131,17 +128,27 @@ const FapMeetingProposalViewModal = ({
                       proposalData={proposalData}
                       meetingSubmitted={(data) => {
                         setFapProposalData({
-                          ...FapProposalData,
+                          ...fapProposalData,
                           proposal: {
                             ...proposalData,
-                            fapMeetingDecision: data,
+                            fapMeetingDecisions:
+                              proposalData.fapMeetingDecisions?.map((fmd) => {
+                                if (fmd.instrumentId === data.instrumentId) {
+                                  return data;
+                                }
+
+                                return fmd;
+                              }) || [],
                           },
                         });
                         meetingSubmitted(data);
                       }}
+                      instrumentId={instrumentId}
+                      fapId={fapId}
                     />
                     <ExternalReviews
                       reviews={proposalData.reviews as Review[]}
+                      faps={proposalData.faps}
                     />
                     <TechnicalReviewInfo
                       hasWriteAccess={finalHasWriteAccess}
@@ -149,15 +156,19 @@ const FapMeetingProposalViewModal = ({
                       fapTimeAllocation={fapTimeAllocation}
                       onFapTimeAllocationEdit={(fapTimeAllocation) =>
                         setFapProposalData({
-                          ...FapProposalData,
+                          ...fapProposalData,
                           fapTimeAllocation,
                         })
                       }
                       proposal={proposalData}
                       fapId={fapId}
+                      instrument={getInstrumentDetails()}
                     />
 
-                    <ProposalDetails proposal={proposalData} />
+                    <ProposalDetails
+                      proposal={proposalData}
+                      instrumentId={instrumentId}
+                    />
                   </>
                 )}
               </div>

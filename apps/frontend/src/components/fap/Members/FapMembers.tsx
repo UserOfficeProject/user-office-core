@@ -1,9 +1,18 @@
 import MaterialTable from '@material-table/core';
 import Clear from '@mui/icons-material/Clear';
-import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import Person from '@mui/icons-material/Person';
 import PersonAdd from '@mui/icons-material/PersonAdd';
-import { Button, Stack } from '@mui/material';
+import {
+  Button,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
@@ -12,11 +21,11 @@ import Typography from '@mui/material/Typography';
 import React, { useState, useContext } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import { useCheckAccess } from 'components/common/Can';
 import UOLoader from 'components/common/UOLoader';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, UserRole, Fap } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useRenewToken } from 'hooks/common/useRenewToken';
 import { useFapReviewersData } from 'hooks/fap/useFapReviewersData';
 import { tableIcons } from 'utils/materialIcons';
@@ -43,7 +52,7 @@ const columns = [
     field: 'user.institution',
   },
   {
-    title: '# proposals currently assigned',
+    title: '# Proposals Currently Assigned',
     field: 'proposalsCountByCall',
   },
 ];
@@ -92,12 +101,13 @@ const FapMembers = ({
     onFapUpdate({
       ...fapData,
       fapChairs: fapData.fapChairs?.concat([fapChair]) ?? fapData.fapChairs,
-      fapChairsProposalCounts: fapData.fapChairsProposalCounts.concat([
-        {
-          userId: fapChair.id,
-          count: 0,
-        },
-      ]),
+      fapChairsCurrentProposalCounts:
+        fapData.fapChairsCurrentProposalCounts.concat([
+          {
+            userId: fapChair.id,
+            count: 0,
+          },
+        ]),
     });
 
     if (
@@ -131,14 +141,13 @@ const FapMembers = ({
       fapSecretaries:
         fapData.fapSecretaries?.concat([fapSecretary]) ??
         fapData.fapSecretaries,
-      fapSecretariesProposalCounts: fapData.fapSecretariesProposalCounts.concat(
-        [
+      fapSecretariesCurrentProposalCounts:
+        fapData.fapSecretariesCurrentProposalCounts.concat([
           {
             userId: fapSecretary.id,
             count: 0,
           },
-        ]
-      ),
+        ]),
     });
 
     if (
@@ -232,6 +241,89 @@ const FapMembers = ({
     Object.assign(fapReviewer, { id: fapReviewer.userId })
   );
 
+  const fapChairSecTable = (
+    data: BasicUserDetails[],
+    isChair: boolean
+  ): JSX.Element => {
+    const chairOrSec = isChair ? 'Chair' : 'Secretary';
+
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>{isChair ? 'Chairs' : 'Secretaries'}</TableCell>
+              <TableCell align="left"># Proposals Currently Assigned</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((user, index) => (
+              <TableRow
+                key={user.lastname}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell align="left">
+                  <TextField
+                    key={user.id}
+                    name={`Fap${chairOrSec}`}
+                    id={`Fap${chairOrSec}-` + user.id}
+                    label={`Fap ${chairOrSec}`}
+                    type="text"
+                    value={getFullUserName(user)}
+                    margin="normal"
+                    fullWidth
+                    data-cy={`Fap${chairOrSec}`}
+                    required
+                    InputProps={{
+                      readOnly: true,
+                      endAdornment: isUserOfficer && (
+                        <>
+                          <Tooltip title={`Remove Fap ${chairOrSec}`}>
+                            <IconButton
+                              aria-label={`Remove Fap ${chairOrSec}`}
+                              onClick={() =>
+                                removeChairOrSecretary(
+                                  user,
+                                  isChair
+                                    ? UserRole.FAP_CHAIR
+                                    : UserRole.FAP_SECRETARY
+                                )
+                              }
+                            >
+                              <Clear />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={`Set Fap ${chairOrSec}`}>
+                            <IconButton
+                              edge="start"
+                              onClick={() =>
+                                isChair
+                                  ? setFapChairModalOpen(true)
+                                  : setFapSecretaryModalOpen(true)
+                              }
+                            >
+                              <Person />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      ),
+                    }}
+                  />
+                </TableCell>
+                <TableCell align="left" data-cy={`proposal-count-${user.id}`}>
+                  {isChair
+                    ? fapData.fapChairsCurrentProposalCounts[index].count || 0
+                    : fapData.fapSecretariesCurrentProposalCounts[index]
+                        .count || 0}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
+
   return (
     <>
       <ParticipantModal
@@ -267,118 +359,20 @@ const FapMembers = ({
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>
-          {fapData.fapChairs.map((chair, index) => (
-            <TextField
-              key={chair.id}
-              name="FapChair"
-              id={'FapChair-' + chair.id}
-              label="Fap Chair"
-              type="text"
-              value={getFullUserName(chair)}
-              margin="normal"
-              fullWidth
-              data-cy="FapChair"
-              required
-              InputProps={{
-                readOnly: true,
-                endAdornment: isUserOfficer && (
-                  <>
-                    {
-                      <Tooltip title="Remove Fap Chair">
-                        <IconButton
-                          aria-label="Remove Fap chair"
-                          onClick={() =>
-                            removeChairOrSecretary(chair, UserRole.FAP_CHAIR)
-                          }
-                        >
-                          <Clear />
-                        </IconButton>
-                      </Tooltip>
-                    }
-                    <Tooltip title="Set Fap Chair">
-                      <IconButton
-                        edge="start"
-                        onClick={() => setFapChairModalOpen(true)}
-                      >
-                        <Person />
-                      </IconButton>
-                    </Tooltip>
-                  </>
-                ),
-                startAdornment: fapData.fapChairs && (
-                  <Tooltip
-                    title={`Number of proposals to review: ${
-                      fapData.fapChairsProposalCounts[index].count || 0
-                    }`}
-                    sx={{ padding: '2px', marginRight: '4px' }}
-                  >
-                    <InfoOutlined
-                      fontSize="small"
-                      data-cy="fap-chair-reviews-info"
-                    />
-                  </Tooltip>
-                ),
-              }}
-            />
-          ))}
+          {fapChairSecTable(fapData.fapChairs, true)}
         </Grid>
         <Grid item sm={6} xs={12}>
-          {fapData.fapSecretaries.map((sec, index) => (
-            <TextField
-              key={sec.id}
-              name="FapSecretary"
-              id={'FapSecretary-' + sec.id}
-              label="Fap Secretary"
-              type="text"
-              value={getFullUserName(sec)}
-              margin="normal"
-              fullWidth
-              data-cy="FapSecretary"
-              required
-              InputProps={{
-                readOnly: true,
-                endAdornment: isUserOfficer && (
-                  <>
-                    <Tooltip title="Remove Fap Secretary">
-                      <IconButton
-                        aria-label="Remove Fap secretary"
-                        onClick={() =>
-                          removeChairOrSecretary(sec, UserRole.FAP_SECRETARY)
-                        }
-                      >
-                        <Clear />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Set Fap Secretary">
-                      <IconButton
-                        edge="start"
-                        onClick={() => setFapSecretaryModalOpen(true)}
-                      >
-                        <Person />
-                      </IconButton>
-                    </Tooltip>
-                  </>
-                ),
-                startAdornment: fapData.fapSecretaries && (
-                  <Tooltip
-                    title={`Number of proposals to review: ${
-                      fapData.fapSecretariesProposalCounts[index].count || 0
-                    }`}
-                    sx={{ padding: '2px', marginRight: '4px' }}
-                  >
-                    <InfoOutlined
-                      fontSize="small"
-                      data-cy="fap-secretary-reviews-info"
-                    />
-                  </Tooltip>
-                ),
-              }}
-            />
-          ))}
+          {fapChairSecTable(fapData.fapSecretaries, false)}
         </Grid>
       </Grid>
       {isUserOfficer && (
-        <Stack direction="row" display="flex" justifyContent="space-between">
+        <Stack
+          direction="row"
+          display="flex"
+          justifyContent="space-between"
+          marginTop={'10px'}
+          marginBottom={'10px'}
+        >
           <Button
             onClick={() => setFapChairModalOpen(true)}
             aria-label="Add New FAP Chair Button"

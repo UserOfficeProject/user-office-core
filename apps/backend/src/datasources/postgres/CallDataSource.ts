@@ -44,6 +44,11 @@ export default class PostgresCallDataSource implements CallDataSource {
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
     const query = database('call').select(['*']);
+
+    if (filter?.shortCode) {
+      query.where('call_short_code', 'like', `%${filter.shortCode}%`);
+    }
+
     if (filter?.templateIds) {
       query.whereIn('template_id', filter.templateIds);
     }
@@ -132,13 +137,13 @@ export default class PostgresCallDataSource implements CallDataSource {
     );
   }
 
-  async getCallHasInstrumentsByInstrumentId(
-    instrumentId: number
+  async getCallHasInstrumentsByInstrumentIds(
+    instrumentIds: number[]
   ): Promise<CallHasInstrument[]> {
     return database
       .select()
       .from('call_has_instruments')
-      .where('instrument_id', instrumentId)
+      .whereIn('instrument_id', instrumentIds)
       .then((callHasInstrument: CallHasInstrumentRecord[]) =>
         callHasInstrument.map((callHasInstrument) =>
           createCallHasInstrumentObject(callHasInstrument)
@@ -477,5 +482,21 @@ export default class PostgresCallDataSource implements CallDataSource {
       .andWhere('call_id', '=', callId)
       .first()
       .then((call: CallRecord) => (call ? false : true));
+  }
+  public async getCallByQuestionId(questionId: string): Promise<Call> {
+    const records: CallRecord[] = await database('call')
+      .leftJoin(
+        'templates_has_questions',
+        'templates_has_questions.template_id',
+        'call.template_id'
+      )
+      .leftJoin(
+        'answers',
+        'answers.question_id',
+        'templates_has_questions.question_id'
+      )
+      .where('answers.question_id', questionId);
+
+    return createCallObject(records[0]);
   }
 }

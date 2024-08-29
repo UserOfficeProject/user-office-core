@@ -5,16 +5,14 @@ import MaterialTable, {
 import DragHandle from '@mui/icons-material/DragHandle';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Visibility from '@mui/icons-material/Visibility';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
+import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
-import useTheme from '@mui/styles/useTheme';
-import clsx from 'clsx';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
-import { useCheckAccess } from 'components/common/Can';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FapProposal,
@@ -24,7 +22,9 @@ import {
   Call,
   Proposal,
   TechnicalReview,
+  ProposalPkWithRankOrder,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import {
@@ -45,60 +45,49 @@ type FapProposalWithAverageScoreAndAvailabilityZone = FapProposal & {
 };
 
 // NOTE: Some custom styles for row expand table.
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& table': {
-      backgroundColor: '#ddd',
-    },
-    '& .lastRowInAvailabilityZone:not(.draggingRow)': {
-      position: 'relative',
-      borderBottom: '23px solid white',
+const rootStyles = {
+  '& table': {
+    backgroundColor: '#ddd',
+  },
+  '& .lastRowInAvailabilityZone:not(.draggingRow)': {
+    position: 'relative',
+    borderBottom: '23px solid white',
 
-      '&::after': {
-        content: 'attr(unallocated-time-information)',
-        position: 'absolute',
-        bottom: -34,
-        left: 0,
-        zIndex: 2,
-        background: 'rgba(0,0,0, .2)',
-        width: '100%',
-        padding: '2px 12px',
-        fontSize: 'small',
-      },
-    },
-    '& tr': {
-      transition: 'all 200ms ease-out',
-      backgroundColor: '#fafafa',
-    },
-    '& tr td': {
-      whiteSpace: 'nowrap',
-    },
-    '& tr:last-child td': {
-      border: 'none',
-    },
-    '& .MuiPaper-root': {
-      backgroundColor: '#fafafa',
-    },
-    '& .draggingRow': {
-      visibility: 'hidden',
-    },
-    '& .shiftUp': {
-      transform: 'translateY(-50px)',
-    },
-    '& .shiftDown': {
-      transform: 'translateY(50px)',
+    '&::after': {
+      content: 'attr(unallocated-time-information)',
+      position: 'absolute',
+      bottom: -34,
+      left: 0,
+      zIndex: 2,
+      background: 'rgba(0,0,0, .2)',
+      width: '100%',
+      padding: '2px 12px',
+      fontSize: 'small',
     },
   },
-  disabled: {
-    color: theme.palette.text.disabled,
+  '& tr': {
+    transition: 'all 200ms ease-out',
+    backgroundColor: '#fafafa',
   },
-  proposalTitle: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+  '& tr td': {
     whiteSpace: 'nowrap',
-    maxWidth: '200px',
   },
-}));
+  '& tr:last-child td': {
+    border: 'none',
+  },
+  '& .MuiPaper-root': {
+    backgroundColor: '#fafafa',
+  },
+  '& .draggingRow': {
+    visibility: 'hidden',
+  },
+  '& .shiftUp': {
+    transform: 'translateY(-50px)',
+  },
+  '& .shiftDown': {
+    transform: 'translateY(50px)',
+  },
+};
 
 type FapInstrumentProposalsTableProps = {
   fapInstrument: InstrumentWithAvailabilityTime;
@@ -121,7 +110,6 @@ const FapInstrumentProposalsTable = ({
     refreshInstrumentProposalsData,
   } = useFapProposalsByInstrument(fapInstrument.id, fapId, selectedCall?.id);
 
-  const classes = useStyles();
   const theme = useTheme();
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { user } = useContext(UserContext);
@@ -151,6 +139,16 @@ const FapInstrumentProposalsTable = ({
       field: 'proposal.proposalId',
     },
     {
+      title: 'Fap meeting submitted',
+      render: (rowData: FapProposal) => {
+        const submitted = rowData.proposal.fapMeetingDecisions?.find(
+          (fmd) => fmd.instrumentId === fapInstrument.id
+        )?.submitted;
+
+        return submitted ? 'Yes' : 'No';
+      },
+    },
+    {
       title: 'Principal Investigator',
       render: (rowData: FapProposal) => {
         return getFullUserName(rowData.proposal.proposer);
@@ -176,8 +174,13 @@ const FapInstrumentProposalsTable = ({
     },
     {
       title: 'Current rank',
-      field: 'proposal.fapMeetingDecision.rankOrder',
-      emptyValue: '-',
+      render: (rowData: FapProposal) => {
+        const rankOrder = rowData.proposal.fapMeetingDecisions?.find(
+          (fmd) => fmd.instrumentId === fapInstrument.id
+        )?.rankOrder;
+
+        return rankOrder || '-';
+      },
     },
     {
       title: 'Time allocation',
@@ -205,14 +208,14 @@ const FapInstrumentProposalsTable = ({
       },
     },
     {
-      title: 'Fap meeting submitted',
-      field: 'proposal.fapMeetingDecision.submitted',
-      lookup: { true: 'Yes', false: 'No', undefined: 'No' },
-    },
-    {
       title: 'Recommendation',
-      field: 'proposal.fapMeetingDecision.recommendation',
-      emptyValue: 'Unset',
+      render: (rowData: FapProposal) => {
+        const recommendation = rowData.proposal.fapMeetingDecisions?.find(
+          (fmd) => fmd.instrumentId === fapInstrument.id
+        )?.recommendation;
+
+        return recommendation || 'Unset';
+      },
     },
   ];
 
@@ -239,20 +242,24 @@ const FapInstrumentProposalsTable = ({
   }, [fapInstrument.submitted]);
 
   const sortByRankOrder = (a: FapProposal, b: FapProposal) => {
+    const fapMeetingDecisionA = a.proposal.fapMeetingDecisions?.find(
+      (fmd) => fmd.instrumentId === fapInstrument.id
+    );
+    const fapMeetingDecisionB = b.proposal.fapMeetingDecisions?.find(
+      (fmd) => fmd.instrumentId === fapInstrument.id
+    );
     if (
-      a.proposal.fapMeetingDecision?.rankOrder ===
-        b.proposal.fapMeetingDecision?.rankOrder ||
-      (!a.proposal.fapMeetingDecision?.rankOrder &&
-        !b.proposal.fapMeetingDecision?.rankOrder)
+      fapMeetingDecisionA?.rankOrder === fapMeetingDecisionB?.rankOrder ||
+      (!fapMeetingDecisionA?.rankOrder && !fapMeetingDecisionB?.rankOrder)
     ) {
       return -1;
-    } else if (!a.proposal.fapMeetingDecision?.rankOrder) {
+    } else if (!fapMeetingDecisionA?.rankOrder) {
       return 1;
-    } else if (!b.proposal.fapMeetingDecision?.rankOrder) {
+    } else if (!fapMeetingDecisionB?.rankOrder) {
       return -1;
     } else {
-      return (a.proposal.fapMeetingDecision?.rankOrder as number) >
-        (b.proposal.fapMeetingDecision?.rankOrder as number)
+      return (fapMeetingDecisionA?.rankOrder as number) >
+        (fapMeetingDecisionB?.rankOrder as number)
         ? 1
         : -1;
     }
@@ -353,13 +360,16 @@ const FapInstrumentProposalsTable = ({
 
     return (
       <>
-        <span
-          className={clsx({
-            [classes.disabled]: fapTimeAllocation !== null,
-          })}
+        <Box
+          component="span"
+          sx={{
+            ...(fapTimeAllocation !== null && {
+              color: theme.palette.text.disabled,
+            }),
+          }}
         >
           {timeAllocation}
-        </span>
+        </Box>
         {fapTimeAllocation && (
           <>
             <br />
@@ -379,15 +389,17 @@ const FapInstrumentProposalsTable = ({
 
     return (
       <>
-        <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
-          <IconButton
-            style={{ cursor: 'grab' }}
-            color="inherit"
-            data-cy="drag-icon"
-          >
-            <DragHandle />
-          </IconButton>
-        </Tooltip>
+        {!fapInstrument.submitted && (
+          <Tooltip title="Drag proposals to reorder" enterDelay={2000}>
+            <IconButton
+              style={{ cursor: 'grab' }}
+              color="inherit"
+              data-cy="drag-icon"
+            >
+              <DragHandle />
+            </IconButton>
+          </Tooltip>
+        )}
         {showViewIcon && (
           <Tooltip title="View proposal details">
             <IconButton
@@ -437,24 +449,35 @@ const FapInstrumentProposalsTable = ({
       : { backgroundColor: theme.palette.error.light };
 
   const updateAllProposalRankings = (proposals: FapProposal[]) => {
-    const proposalsWithUpdatedRanking = proposals.map((item, index) => ({
-      ...item,
-      proposal: {
-        ...item.proposal,
-        fapMeetingDecision: {
+    const proposalsWithUpdatedRanking = proposals.map((item, index) => {
+      const fapMeetingDecision = item.proposal.fapMeetingDecisions?.find(
+        (fmd) => fmd.instrumentId === fapInstrument.id
+      );
+
+      // NOTE: Per instrument there is only one `fapMeetingDecision`. And when we load the proposals for this table we pass the `instrumentId` as input parameter to filter `fapMeetingDecisions` by instrument only.
+      const fapMeetingDecisions = [
+        {
           proposalPk: item.proposal.primaryKey,
           rankOrder: index + 1,
           commentForManagement:
-            item.proposal.fapMeetingDecision?.commentForManagement || null,
-          commentForUser:
-            item.proposal.fapMeetingDecision?.commentForUser || null,
-          recommendation:
-            item.proposal.fapMeetingDecision?.recommendation || null,
-          submitted: item.proposal.fapMeetingDecision?.submitted || false,
-          submittedBy: item.proposal.fapMeetingDecision?.submittedBy || null,
+            fapMeetingDecision?.commentForManagement || null,
+          commentForUser: fapMeetingDecision?.commentForUser || null,
+          recommendation: fapMeetingDecision?.recommendation || null,
+          submitted: fapMeetingDecision?.submitted || false,
+          submittedBy: fapMeetingDecision?.submittedBy || null,
+          instrumentId: fapMeetingDecision?.instrumentId || fapInstrument.id,
+          fapId: fapId,
         },
-      },
-    }));
+      ];
+
+      return {
+        ...item,
+        proposal: {
+          ...item.proposal,
+          fapMeetingDecisions: fapMeetingDecisions,
+        },
+      };
+    });
 
     return proposalsWithUpdatedRanking;
   };
@@ -491,11 +514,18 @@ const FapInstrumentProposalsTable = ({
     const tableDataWithRankingsUpdated =
       updateAllProposalRankings(newTableData);
 
-    const reorderFapMeetingDecisionProposalsInput =
-      tableDataWithRankingsUpdated.map((item) => ({
+    const reorderFapMeetingDecisionProposalsInput = tableDataWithRankingsUpdated
+      .map((item) => ({
         proposalPk: item.proposal.primaryKey,
-        rankOrder: item.proposal.fapMeetingDecision?.rankOrder,
-      }));
+        rankOrder: item.proposal.fapMeetingDecisions.find(
+          (fmd) => fmd.instrumentId === fapInstrument.id
+        )?.rankOrder,
+        instrumentId: fapInstrument.id,
+        fapId: fapId,
+      }))
+      .filter(
+        (fmd): fmd is ProposalPkWithRankOrder => fmd.rankOrder !== undefined
+      );
 
     setInstrumentProposalsData(tableDataWithRankingsUpdated);
     const toastErrorMessageAction = (
@@ -596,7 +626,12 @@ const FapInstrumentProposalsTable = ({
       timeAllocation: ProposalTimeAllocationColumn(proposal),
       proposalTitle: (
         <Tooltip
-          className={classes.proposalTitle}
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            maxWidth: '200px',
+          }}
           title={proposal.proposal.title}
           enterDelay={1000}
           enterNextDelay={1000}
@@ -664,7 +699,7 @@ const FapInstrumentProposalsTable = ({
         {...props}
         unallocated-time-information={unallocatedTimeInformation}
         className={isLastAvailabilityZoneRow ? 'lastRowInAvailabilityZone' : ''}
-        draggable
+        draggable={!fapInstrument.submitted}
         onDragStart={(e: DragEvent<HTMLTableRowElement>) =>
           handleOnRowDragStart(e, rowData.tableData?.id)
         }
@@ -677,7 +712,7 @@ const FapInstrumentProposalsTable = ({
   };
 
   return (
-    <div className={classes.root} data-cy="fap-instrument-proposals-table">
+    <Box sx={rootStyles} data-cy="fap-instrument-proposals-table">
       <FapMeetingProposalViewModal
         proposalViewModalOpen={
           !!urlQueryParams.fapMeetingModal &&
@@ -713,7 +748,7 @@ const FapInstrumentProposalsTable = ({
             ),
         }}
       />
-    </div>
+    </Box>
   );
 };
 

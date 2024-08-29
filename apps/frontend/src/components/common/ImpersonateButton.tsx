@@ -1,6 +1,6 @@
 import Button, { ButtonProps } from '@mui/material/Button';
 import React, { useContext } from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -16,13 +16,13 @@ const ImpersonateButton = ({
 }: ImpersonateButtonProps) => {
   const { api } = useDataApiWithFeedback();
   const { handleLogin } = useContext(UserContext);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleButtonClick = async () => {
     const { getTokenForUser } = await api().getTokenForUser({ userId });
 
     handleLogin(getTokenForUser);
-    history.push('/');
+    navigate('/');
   };
 
   return (

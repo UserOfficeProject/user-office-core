@@ -9,10 +9,12 @@ import {
   AssignScientistsToInstrumentMutationVariables,
   CreateInstrumentMutation,
   CreateInstrumentMutationVariables,
+  RemoveProposalsFromInstrumentMutation,
+  RemoveProposalsFromInstrumentMutationVariables,
   SetInstrumentAvailabilityTimeMutation,
   SetInstrumentAvailabilityTimeMutationVariables,
-  SubmitInstrumentMutation,
-  SubmitInstrumentMutationVariables,
+  SubmitInstrumentInFapMutation,
+  SubmitInstrumentInFapMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -59,6 +61,17 @@ const assignProposalsToInstruments = (
   return cy.wrap(request);
 };
 
+const removeProposalsFromInstrument = (
+  removeProposalsFromInstrumentInput: RemoveProposalsFromInstrumentMutationVariables
+): Cypress.Chainable<RemoveProposalsFromInstrumentMutation> => {
+  const api = getE2EApi();
+  const request = api.removeProposalsFromInstrument(
+    removeProposalsFromInstrumentInput
+  );
+
+  return cy.wrap(request);
+};
+
 const updateTechnicalReviewAssignee = (
   updateTechnicalReviewAssigneeInput: UpdateTechnicalReviewAssigneeMutationVariables
 ): Cypress.Chainable<UpdateTechnicalReviewAssigneeMutation> => {
@@ -92,11 +105,11 @@ const setInstrumentAvailabilityTime = (
   return cy.wrap(request);
 };
 
-const submitInstrument = (
-  submitInstrumentInput: SubmitInstrumentMutationVariables
-): Cypress.Chainable<SubmitInstrumentMutation> => {
+const submitInstrumentInFap = (
+  submitInstrumentInFapInput: SubmitInstrumentInFapMutationVariables
+): Cypress.Chainable<SubmitInstrumentInFapMutation> => {
   const api = getE2EApi();
-  const request = api.submitInstrument(submitInstrumentInput);
+  const request = api.submitInstrumentInFap(submitInstrumentInFapInput);
 
   return cy.wrap(request);
 };
@@ -110,6 +123,10 @@ Cypress.Commands.add(
   'assignProposalsToInstruments',
   assignProposalsToInstruments
 );
+Cypress.Commands.add(
+  'removeProposalsFromInstrument',
+  removeProposalsFromInstrument
+);
 
 Cypress.Commands.add('assignInstrumentToCall', assignInstrumentToCall);
 
@@ -122,4 +139,4 @@ Cypress.Commands.add(
   'setInstrumentAvailabilityTime',
   setInstrumentAvailabilityTime
 );
-Cypress.Commands.add('submitInstrument', submitInstrument);
+Cypress.Commands.add('submitInstrumentInFap', submitInstrumentInFap);

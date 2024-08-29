@@ -1,0 +1,92 @@
+site_name: User Office Documentation
+site_url: 'https://userofficeproject.github.io/user-office-core/'
+theme:
+  name: material
+  features:
+    - navigation.top
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - content.tooltips
+  palette:
+    primary: indigo
+    accent: light blue
+extra:
+  generator: false
+  version:
+    provider: mike
+    default: latest
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - abbr
+  - attr_list
+  - md_in_html
+  - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+nav:
+  - Home: index.md
+  - Getting Started: 
+      - Quick start: quick_start.md
+  - User Guide:
+      - Overview: user-guide/overview.md
+      - User: user-guide/user/user.md
+      - User Officer:
+          - Fundamental tutorials:
+              - User Officer Homepage: user-guide/user-officer/main/user-officer.md
+              - Creating a call: user-guide/user-officer/main/creating_call.md
+              - Creating a workflow: user-guide/user-officer/main/creating_workflow.md
+              - Creating templates: user-guide/user-officer/main/templates.md
+              - Feasibility review: user-guide/user-officer/main/feasibility_review.md
+              - FAP review: user-guide/user-officer/main/fap_review.md
+              - Roles: user-guide/user-officer/main/roles.md
+          - Proposals: user-guide/user-officer/proposal.md
+          - Experiments: user-guide/user-officer/experiments.md
+          - Calls: user-guide/user-officer/calls.md
+          - People: user-guide/user-officer/people.md
+          - Instruments: user-guide/user-officer/instruments.md
+          - FAPs: user-guide/user-officer/fap.md
+          - Pages: user-guide/user-officer/page.md
+          - Institutions: user-guide/user-officer/institutions.md
+          - Templates:
+              - PDF templates: user-guide/user-officer/templates/pdf_template.md
+              - Proposal templates: user-guide/user-officer/templates/proposal_template.md
+              - Sample declaration templates: user-guide/user-officer/templates/sampledec_template.md
+              - Sub templates: user-guide/user-officer/templates/sub_template.md
+              - Shipment declaration templates: user-guide/user-officer/templates/shipment_template.md
+              - Visit registration templatse: user-guide/user-officer/templates/visit_template.md
+              - Proposal ESI templates: user-guide/user-officer/templates/proposalESI_template.md
+              - Sample ESI templates: user-guide/user-officer/templates/sampleESI_template.md
+              - Feedback templates: user-guide/user-officer/templates/feedback_template.md
+          - Questions: user-guide/user-officer/questions.md
+          - Sample safety: user-guide/user-officer/sample_safety.md
+          - Settings:
+              - Units: user-guide/user-officer/settings/units.md
+              - Proposal statuses: user-guide/user-officer/settings/proposal_statuses.md
+              - Proposal workflows: user-guide/user-officer/settings/proposal_workflow.md
+              - API access tokens: user-guide/user-officer/settings/api_tokens.md
+              - Features: user-guide/user-officer/settings/features.md
+              - App settings: user-guide/user-officer/settings/app_settings.md
+  - Developer Guide:
+      - Contributing: developer-guide/CONTRIBUTING.md
+      - Running Locally: developer-guide/running_locally.md
+      - Configuration: developer-guide/configuration.md
+      - Step-by-Step Guide: developer-guide/step-by-step.md
+      - Architecture: developer-guide/architecture.md
+      - RabbitMQ: developer-guide/rabbitmq.md
+      - Kubernetes: developer-guide/kubernetes.md
+      - Depencency Injection: developer-guide/dependency_injection.md
+      - Email Service: developer-guide/email.md
+      - API Documentation: developer-guide/api_documentation.md
+      - Documentation Changes: developer-guide/documentation_changes.md
+  - FAQ: faq.md
+  - Glossary: glossary.md
+  - References: references.md
+  - Placeholder: user-guide/user-officer/placeholder.md

@@ -41,7 +41,7 @@ export const dummyInstrumentWithAvailabilityTime =
 
 export const dummyInstrumentWithManagementTime =
   new InstrumentWithManagementTime(
-    1,
+    3,
     'Dummy instrument 1',
     'instrument_1',
     'This is test instrument.',
@@ -49,13 +49,39 @@ export const dummyInstrumentWithManagementTime =
     10
   );
 
-const dummyInstruments = [dummyInstrument, dummyInstrument2];
+export const dummyInstruments = [dummyInstrument, dummyInstrument2];
 
 export const dummyInstrumentHasProposals = new InstrumentsHasProposals(
   [1],
   [1],
+  [1],
   true
 );
+export const dummyInstrumentHasProposals2 = new InstrumentsHasProposals(
+  [2],
+  [1],
+  [2],
+  true
+);
+export const dummyInstrumentHasProposals3 = new InstrumentsHasProposals(
+  [3],
+  [2],
+  [1],
+  true
+);
+export const dummyInstrumentHasProposals4 = new InstrumentsHasProposals(
+  [4],
+  [2],
+  [2],
+  true
+);
+
+const allDummyInstrumentHasProposals = [
+  dummyInstrumentHasProposals,
+  dummyInstrumentHasProposals2,
+  dummyInstrumentHasProposals3,
+  dummyInstrumentHasProposals4,
+];
 
 export class InstrumentDataSourceMock implements InstrumentDataSource {
   async assignScientistToInstruments(
@@ -127,11 +153,33 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return [{ callId: 1, instrumentId: 1 }];
   }
 
+  async getInstrumentHasProposals(instrumentId: number, proposalPks: number[]) {
+    return dummyInstrumentHasProposals;
+  }
+
+  async getInstrumentsHasProposal(
+    instrumentIds: number[],
+    proposalPk: number,
+    callId: number
+  ) {
+    return dummyInstrumentHasProposals;
+  }
+
   async assignProposalToInstrument(
     proposalPk: number,
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
-    return new InstrumentsHasProposals([instrumentId], [proposalPk], false);
+    const found = allDummyInstrumentHasProposals.find(
+      (ihp) =>
+        ihp.instrumentIds.includes(instrumentId) &&
+        ihp.proposalPks.includes(proposalPk)
+    );
+
+    if (!found) {
+      throw new Error('Not found');
+    }
+
+    return found;
   }
 
   async removeProposalsFromInstrument(
@@ -193,11 +241,23 @@ export class InstrumentDataSourceMock implements InstrumentDataSource {
     return true;
   }
 
-  async submitInstrument(
+  async submitInstrumentInFap(
     proposalPks: number[],
     instrumentId: number
   ): Promise<InstrumentsHasProposals> {
     return dummyInstrumentHasProposals;
+  }
+
+  async unsubmitInstrumentInFap(
+    proposalPks: number[],
+    instrumentId: number
+  ): Promise<InstrumentsHasProposals> {
+    const dummyInstrumentHasProposalsUnsbmitted = {
+      ...dummyInstrumentHasProposals,
+      submitted: false,
+    };
+
+    return dummyInstrumentHasProposalsUnsbmitted;
   }
 
   hasInstrumentScientistInstrument(

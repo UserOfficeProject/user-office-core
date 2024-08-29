@@ -1,42 +1,37 @@
+import { Science } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import EventIcon from '@mui/icons-material/Event';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
 import FolderOpen from '@mui/icons-material/FolderOpen';
-import FunctionsIcon from '@mui/icons-material/Functions';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import Help from '@mui/icons-material/Help';
 import NoteAdd from '@mui/icons-material/NoteAdd';
 import People from '@mui/icons-material/People';
-import Settings from '@mui/icons-material/Settings';
 import SettingsApplications from '@mui/icons-material/SettingsApplications';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import VpnKey from '@mui/icons-material/VpnKey';
-import Collapse from '@mui/material/Collapse';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import i18n from 'i18n';
-import React, { useContext, useState } from 'react';
+import { DateTime } from 'luxon';
+import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
-import { encodeDate } from 'use-query-params';
 
 import Tooltip from 'components/common/MenuTooltip';
-import { getRelativeDatesFromToday } from 'components/experiment/DateFilter';
+import {
+  DEFAULT_DATE_FORMAT,
+  getRelativeDatesFromToday,
+} from 'components/experiment/DateFilter';
 import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { Call, FeatureId, UserRole } from 'generated/sdk';
+import { Call, FeatureId, SettingsId, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
+import SettingsMenuListItem from './SettingsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
 import BoxIcon from '../common/icons/BoxIcon';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
-import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
-import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
@@ -44,112 +39,15 @@ type MenuItemsProps = {
   callsData: Call[];
 };
 
-const SettingsMenuListItem = () => {
-  const history = useHistory();
-  const shouldExpand =
-    history.location.pathname === '/ProposalStatuses' ||
-    history.location.pathname === '/ProposalWorkflows' ||
-    history.location.pathname.includes('ProposalWorkflowEditor');
-  const [isExpanded, setIsExpanded] = useState(shouldExpand);
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <>
-      <Tooltip title="Settings">
-        <ListItem button onClick={toggleExpand}>
-          <ListItemIcon>
-            {isExpanded ? (
-              <>
-                <Settings />
-                <ExpandLess fontSize="small" />
-              </>
-            ) : (
-              <>
-                <Settings />
-                <ExpandMore fontSize="small" />
-              </>
-            )}
-          </ListItemIcon>
-          <ListItemText primary="Settings" />
-        </ListItem>
-      </Tooltip>
-
-      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <Tooltip title="Units">
-          <ListItem component={NavLink} to="/Units" button>
-            <ListItemIcon>
-              <FunctionsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Units" />
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip title="Proposal statuses">
-          <ListItem component={NavLink} to="/ProposalStatuses" button>
-            <ListItemIcon>
-              <ProposalSettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Proposal statuses" />
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip title="Proposal workflows">
-          <ListItem
-            component={NavLink}
-            isActive={() =>
-              history.location.pathname.includes('/ProposalWorkflows') ||
-              history.location.pathname.includes('ProposalWorkflowEditor')
-            }
-            to="/ProposalWorkflows"
-            button
-          >
-            <ListItemIcon>
-              <ProposalWorkflowIcon />
-            </ListItemIcon>
-            <ListItemText primary="Proposal workflows" />
-          </ListItem>
-        </Tooltip>
-
-        <Tooltip title="API access tokens">
-          <ListItem component={NavLink} to="/ApiAccessTokens" button>
-            <ListItemIcon>
-              <VpnKey />
-            </ListItemIcon>
-            <ListItemText primary="API access tokens" />
-          </ListItem>
-        </Tooltip>
-        <Tooltip title="Features">
-          <ListItem component={NavLink} to="/Features" button>
-            <ListItemIcon>
-              <ViewModuleIcon />
-            </ListItemIcon>
-            <ListItemText primary="Features" />
-          </ListItem>
-        </Tooltip>
-        <Tooltip title="App settings">
-          <ListItem component={NavLink} to="/Settings" button>
-            <ListItemIcon>
-              <DisplaySettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="App settings" />
-          </ListItem>
-        </Tooltip>
-      </Collapse>
-    </>
-  );
-};
-
 const SamplesMenuListItem = () => {
   return (
     <Tooltip title="Sample safety">
-      <ListItem component={NavLink} to="/SampleSafety" button>
+      <ListItemButton component={NavLink} to="/SampleSafety">
         <ListItemIcon>
           <BoxIcon />
         </ListItemIcon>
         <ListItemText primary="Sample safety" />
-      </ListItem>
+      </ListItemButton>
     </Tooltip>
   );
 };
@@ -157,12 +55,12 @@ const SamplesMenuListItem = () => {
 const ProposalsMenuListItem = () => {
   return (
     <Tooltip title="Review Proposals">
-      <ListItem component={NavLink} to="/" exact button>
+      <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
-      </ListItem>
+      </ListItemButton>
     </Tooltip>
   );
 };
@@ -171,6 +69,9 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const proposalDisabled = callsData.length === 0;
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
+  const { format } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const isSchedulerEnabled = context.featuresMap.get(
     FeatureId.SCHEDULER
@@ -188,47 +89,51 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
+  const formattedDate = (value?: Date) =>
+    value
+      ? DateTime.fromJSDate(value).toFormat(format || DEFAULT_DATE_FORMAT)
+      : undefined;
+
   const user = (
     <div data-cy="user-menu-items">
       <Tooltip title="Dashboard">
-        <ListItem component={NavLink} to="/" exact button>
+        <ListItemButton component={NavLink} to="/">
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
       <Tooltip title="New Proposal">
-        <ListItem
+        <ListItemButton
           component={NavLink}
           to="/ProposalSelectType"
-          button
           disabled={proposalDisabled}
         >
           <ListItemIcon>
             <NoteAdd />
           </ListItemIcon>
           <ListItemText primary="New Proposal" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
       {isSchedulerEnabled && (
         <Tooltip title="Experiment Times">
-          <ListItem component={NavLink} to="/ExperimentTimes" button>
+          <ListItemButton component={NavLink} to="/ExperimentTimes">
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>
             <ListItemText primary="Experiment Times" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       )}
 
       <Tooltip title="Help">
-        <ListItem component={NavLink} to="/HelpPage" button>
+        <ListItemButton component={NavLink} to="/HelpPage">
           <ListItemIcon>
             <Help />
           </ListItemIcon>
           <ListItemText primary="Help" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
     </div>
   );
@@ -236,91 +141,98 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const userOfficer = (
     <div data-cy="officer-menu-items">
       <Tooltip title="Proposals">
-        <ListItem component={NavLink} to="/Proposals" button>
+        <ListItemButton component={NavLink} to="/Proposals">
           <ListItemIcon>
             <FolderOpen />
           </ListItemIcon>
           <ListItemText primary="Proposals" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
-          <ListItem
+          <ListItemButton
             component={NavLink}
-            to={`/ExperimentPage?from=${encodeDate(from)}&to=${encodeDate(to)}`}
-            button
+            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
           >
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>
             <ListItemText primary="Experiments" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       )}
       <Tooltip title="Calls">
-        <ListItem component={NavLink} to="/Calls" button>
+        <ListItemButton component={NavLink} to="/Calls">
           <ListItemIcon>
             <CalendarToday />
           </ListItemIcon>
           <ListItemText primary="Calls" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
       {isUserManagementEnabled && (
         <Tooltip title="People">
-          <ListItem component={NavLink} to="/People" button>
+          <ListItemButton component={NavLink} to="/People">
             <ListItemIcon>
               <People />
             </ListItemIcon>
             <ListItemText primary="People" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       )}
       {isInstrumentManagementEnabled && (
         <Tooltip title="Instruments">
-          <ListItem component={NavLink} to="/Instruments" button>
+          <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
               <ScienceIcon />
             </ListItemIcon>
             <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       )}
+      <Tooltip title="Techniques">
+        <ListItemButton component={NavLink} to="/Techniques">
+          <ListItemIcon>
+            <Science />
+          </ListItemIcon>
+          <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
+        </ListItemButton>
+      </Tooltip>
       {isFapEnabled && (
         <Tooltip title="Facility access panels">
-          <ListItem component={NavLink} to="/Faps" button>
+          <ListItemButton component={NavLink} to="/Faps">
             <ListItemIcon>
               <GroupWorkIcon />
             </ListItemIcon>
             <ListItemText primary="FAPs" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       )}
       <Tooltip title="Pages">
-        <ListItem component={NavLink} to="/PageEditor" button>
+        <ListItemButton component={NavLink} to="/PageEditor">
           <ListItemIcon>
             <SettingsApplications />
           </ListItemIcon>
           <ListItemText primary="Pages" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
       {isUserManagementEnabled && (
         <Tooltip title="Institutions">
-          <ListItem component={NavLink} to="/Institutions" button>
+          <ListItemButton component={NavLink} to="/Institutions">
             <ListItemIcon>
               <AccountBalanceIcon />
             </ListItemIcon>
             <ListItemText primary="Institutions" />
-          </ListItem>
+          </ListItemButton>
         </Tooltip>
       )}
       <TemplateMenuListItem />
       <Tooltip title="Questions">
-        <ListItem component={NavLink} to="/Questions" button>
+        <ListItemButton component={NavLink} to="/Questions">
           <ListItemIcon>
             <CommentQuestionIcon />
           </ListItemIcon>
           <ListItemText primary="Questions" />
-        </ListItem>
+        </ListItemButton>
       </Tooltip>
       {isSampleSafetyEnabled && <SamplesMenuListItem />}
       <SettingsMenuListItem />
@@ -329,46 +241,46 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
 
   const FapRoles = (
     <div data-cy="FapRoles-menu-items">
-      <ListItem component={NavLink} to="/" exact button>
+      <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Review Proposals" />
-      </ListItem>
-      <ListItem component={NavLink} to="/Faps" button>
+      </ListItemButton>
+      <ListItemButton component={NavLink} to="/Faps">
         <ListItemIcon>
           <GroupWorkIcon />
         </ListItemIcon>
         <Tooltip title="Facility access panels">
           <ListItemText primary="FAPs" />
         </Tooltip>
-      </ListItem>
+      </ListItemButton>
     </div>
   );
 
   const instrumentScientist = (
     <div data-cy="instrument-scientist-menu-items">
-      <ListItem component={NavLink} to="/" exact button>
+      <ListItemButton component={NavLink} to="/">
         <ListItemIcon>
           <FolderOpen />
         </ListItemIcon>
         <ListItemText primary="Proposals" />
-      </ListItem>
+      </ListItemButton>
       {isInstrumentManagementEnabled && (
-        <ListItem component={NavLink} to="/Instruments" button>
+        <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>
             <GroupWorkIcon />
           </ListItemIcon>
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
-        </ListItem>
+        </ListItemButton>
       )}
       {isSchedulerEnabled && (
-        <ListItem component={NavLink} to="/UpcomingExperimentTimes" button>
+        <ListItemButton component={NavLink} to="/UpcomingExperimentTimes">
           <ListItemIcon>
             <EventIcon />
           </ListItemIcon>
           <ListItemText primary="Upcoming experiments" />
-        </ListItem>
+        </ListItemButton>
       )}
     </div>
   );

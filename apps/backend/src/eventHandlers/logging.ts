@@ -6,7 +6,9 @@ import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
@@ -22,6 +24,14 @@ export default function createHandler() {
     Tokens.InstrumentDataSource
   );
   const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
+
+  const techniqueDataSource = container.resolve<TechniqueDataSource>(
+    Tokens.TechniqueDataSource
+  );
+
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
@@ -76,12 +86,14 @@ export default function createHandler() {
           );
           break;
         }
-        case Event.PROPOSAL_FAP_SELECTED:
+        case Event.PROPOSAL_FAPS_SELECTED: {
           await Promise.all(
             event.proposalpks.proposalPks.map(async (proposalPk) => {
-              const fap = await fapDataSource.getFapByProposalPk(proposalPk);
+              const faps = await fapDataSource.getFapsByProposalPk(proposalPk);
 
-              const description = `Selected Fap: ${fap?.code}`;
+              const description = `Selected FAPs: ${faps
+                ?.map((fap) => fap.code)
+                .join(', ')}`;
 
               return eventLogsDataSource.set(
                 event.loggedInUserId,
@@ -93,6 +105,28 @@ export default function createHandler() {
             })
           );
           break;
+        }
+        case Event.PROPOSAL_FAPS_REMOVED: {
+          const key = 'proposalPk';
+          const uniqueFapProposals = [
+            ...new Map(event.array.map((item) => [item[key], item])).values(),
+          ];
+
+          await Promise.all(
+            uniqueFapProposals.map(async (fapProposal) => {
+              const description = 'All proposal FAPs removed';
+
+              return eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                fapProposal.proposalPk.toString(),
+                description
+              );
+            })
+          );
+          break;
+        }
         case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
           await Promise.all(
             event.proposals.proposals.map(async (proposal) => {
@@ -114,11 +148,17 @@ export default function createHandler() {
           );
           break;
         case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_SUBMITTED:
+        case Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED:
           const [instrumentId] = event.instrumentshasproposals.instrumentIds;
           const instrument =
             await instrumentDataSource.getInstrument(instrumentId);
 
-          const description = `Submitted instrument: ${instrument?.name}`;
+          let description = `Submitted instrument: ${instrument?.name}`;
+          if (
+            event.type === Event.PROPOSAL_FAP_MEETING_INSTRUMENT_UNSUBMITTED
+          ) {
+            description = `Unsubmitted instrument: ${instrument?.name}`;
+          }
 
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(
@@ -135,6 +175,29 @@ export default function createHandler() {
           );
 
           break;
+        case Event.PROPOSAL_ALL_FAP_MEETING_INSTRUMENT_SUBMITTED: {
+          const instrumentIds = event.instrumentshasproposals.instrumentIds;
+          const instruments =
+            await instrumentDataSource.getInstrumentsByIds(instrumentIds);
+
+          const description = `Submitted instrument${instruments.length > 1 ? 's' : ''}: ${instruments?.map((i) => i.name).join(', ')}`;
+
+          await Promise.all(
+            event.instrumentshasproposals.proposalPks.map(
+              async (proposalPk) => {
+                return eventLogsDataSource.set(
+                  event.loggedInUserId,
+                  event.type,
+                  json,
+                  proposalPk.toString(),
+                  description
+                );
+              }
+            )
+          );
+
+          break;
+        }
         case Event.PROPOSAL_FAP_MEETING_SAVED:
         case Event.PROPOSAL_FAP_MEETING_RANKING_OVERWRITTEN:
         case Event.PROPOSAL_FAP_MEETING_REORDER:
@@ -152,6 +215,81 @@ export default function createHandler() {
             json,
             event.questionarystep.questionaryId.toString()
           );
+          break;
+        case Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE:
+          {
+            let description = '';
+            if (event.boolean && event.inputArgs) {
+              const obj = JSON.parse(event.inputArgs);
+              const instruments =
+                await instrumentDataSource.getInstrumentsByIds(
+                  obj[0].instrumentIds
+                );
+
+              const technique = await techniqueDataSource.getTechnique(
+                obj[0].techniqueId
+              );
+
+              description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is removed from technique: ${technique?.name}`;
+
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].techniqueId,
+                description
+              );
+            }
+          }
+          break;
+        case Event.INSTRUMENTS_ASSIGNED_TO_TECHNIQUE:
+          {
+            let description = '';
+            if (event.boolean && event.inputArgs) {
+              const obj = JSON.parse(event.inputArgs);
+              const instruments =
+                await instrumentDataSource.getInstrumentsByIds(
+                  obj[0].instrumentIds
+                );
+
+              const technique = await techniqueDataSource.getTechnique(
+                obj[0].techniqueId
+              );
+
+              description = `Selected instruments: ${instruments?.map((instrument) => instrument.name).join(', ')} is attached to technique: ${technique?.name}`;
+
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].techniqueId,
+                description
+              );
+            }
+          }
+          break;
+        case Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES:
+          {
+            let description = '';
+            if (event.boolean && event.inputArgs) {
+              const obj = JSON.parse(event.inputArgs);
+              const techniques = await techniqueDataSource.getTechniquesByIds(
+                obj[0].techniqueIds
+              );
+
+              const proposal = await proposalDataSource.get(obj[0].proposalPk);
+
+              description = `Selected techniques: ${techniques?.map((technique) => technique.name).join(', ')} is attached to proposal: ${proposal?.proposalId}`;
+
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                obj[0].proposalPk,
+                description
+              );
+            }
+          }
           break;
         default: {
           let changedObjectId: number;

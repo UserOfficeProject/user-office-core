@@ -3,9 +3,9 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import {
-  FapDataSourceMock,
   anotherDummyFap,
   dummyFap,
+  dummyFapProposal,
   dummyFapWithoutCode,
 } from '../datasources/mockups/FapDataSource';
 import {
@@ -20,9 +20,6 @@ import FapMutations from './FapMutations';
 const FapMutationsInstance = container.resolve(FapMutations);
 
 describe('Test FapMutations', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
   test('A user cannot create Fap', async () => {
     const result = (await FapMutationsInstance.create(
       dummyUserWithRole,
@@ -199,20 +196,19 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can assign proposal to Fap', () => {
     return expect(
-      FapMutationsInstance.assignProposalsToFap(dummyUserOfficerWithRole, {
-        proposals: [{ primaryKey: 1, callId: 1 }],
-        fapId: 1,
-        fapInstrumentId: 1,
+      FapMutationsInstance.assignProposalsToFaps(dummyUserOfficerWithRole, {
+        proposalPks: [1],
+        fapInstruments: [{ fapId: 1, instrumentId: 3 }],
       })
     ).resolves.toStrictEqual(new ProposalPks([1]));
   });
 
   test('A user can not remove proposal from Fap', async () => {
-    const result = (await FapMutationsInstance.removeProposalsFromFap(
+    const result = (await FapMutationsInstance.removeProposalsFromFaps(
       dummyUserWithRole,
       {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       }
     )) as Rejection;
 
@@ -221,136 +217,34 @@ describe('Test FapMutations', () => {
 
   test('A userofficer can remove proposal from Fap', () => {
     return expect(
-      FapMutationsInstance.removeProposalsFromFap(dummyUserOfficerWithRole, {
+      FapMutationsInstance.removeProposalsFromFaps(dummyUserOfficerWithRole, {
         proposalPks: [1],
-        fapId: 1,
+        fapIds: [1],
       })
-    ).resolves.toStrictEqual(dummyFap);
+    ).resolves.toStrictEqual([dummyFapProposal]);
   });
 
-  test('A user can not assign Fap member to proposal', async () => {
-    const result = (await FapMutationsInstance.assignFapReviewersToProposal(
+  test('A user can not assign Fap members to proposals', async () => {
+    const result = (await FapMutationsInstance.assignFapReviewersToProposals(
       dummyUserWithRole,
       {
-        proposalPk: 1,
+        assignments: [{ proposalPk: 1, memberId: 1 }],
         fapId: 1,
-        memberIds: [1],
       }
     )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
   });
 
-  test('A userofficer can assign Fap member to proposal', () => {
+  test('A user officer can assign Fap members to proposals', () => {
     return expect(
-      FapMutationsInstance.assignFapReviewersToProposal(
+      FapMutationsInstance.assignFapReviewersToProposals(
         dummyUserOfficerWithRole,
         {
-          proposalPk: 1,
+          assignments: [{ proposalPk: 1, memberId: 1 }],
           fapId: 1,
-          memberIds: [1],
         }
       )
     ).resolves.toStrictEqual(dummyFap);
-  });
-
-  test('A user can not mass assign proposals to Fap members', async () => {
-    const result = (await FapMutationsInstance.massAssignFapReviews(
-      dummyUserWithRole,
-      {
-        fapId: 1,
-      }
-    )) as Rejection;
-
-    return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
-  });
-
-  test('A userofficer can mass assign proposals to Fap members', () => {
-    return expect(
-      FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
-        fapId: 1,
-      })
-    ).resolves.toStrictEqual(dummyFap);
-  });
-
-  test('Proposals are evenly assigned to Fap members', async () => {
-    const mockAssignMemberToFapProposals = jest.spyOn(
-      FapDataSourceMock.prototype,
-      'assignMemberToFapProposals'
-    );
-
-    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
-      fapId: 3,
-    });
-    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
-
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 3, 1]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[2], 3, 4]);
-  });
-
-  test('No proposals are assigned to Fap members when there are none to assign', async () => {
-    const mockAssignMemberToFapProposals = jest.spyOn(
-      FapDataSourceMock.prototype,
-      'assignMemberToFapProposals'
-    );
-
-    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
-      fapId: 4,
-    });
-
-    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(0);
-  });
-
-  test('Proposal needing multiple reviews is assigned', async () => {
-    const mockAssignMemberToFapProposals = jest.spyOn(
-      FapDataSourceMock.prototype,
-      'assignMemberToFapProposals'
-    );
-
-    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
-      fapId: 7,
-    });
-    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
-
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([[1], 7, 9]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[1], 7, 10]);
-  });
-
-  test('Proposals are evenly assigned to Fap members who aready have assignments', async () => {
-    const mockAssignMemberToFapProposals = jest.spyOn(
-      FapDataSourceMock.prototype,
-      'assignMemberToFapProposals'
-    );
-
-    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
-      fapId: 5,
-    });
-
-    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([
-      [1, 3],
-      5,
-      6,
-    ]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[2], 5, 5]);
-  });
-
-  test('Proposals are not assigned to Fap members they are already assigned to', async () => {
-    const mockAssignMemberToFapProposals = jest.spyOn(
-      FapDataSourceMock.prototype,
-      'assignMemberToFapProposals'
-    );
-
-    await FapMutationsInstance.massAssignFapReviews(dummyUserOfficerWithRole, {
-      fapId: 6,
-    });
-
-    expect(mockAssignMemberToFapProposals.mock.calls.length).toBe(2);
-    expect(mockAssignMemberToFapProposals.mock.calls[0]).toEqual([
-      [1, 2],
-      6,
-      8,
-    ]);
-    expect(mockAssignMemberToFapProposals.mock.calls[1]).toEqual([[3], 6, 7]);
   });
 });

@@ -8,7 +8,13 @@ import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, ProposalView, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-import { QueryParameters } from '../../components/proposal/ProposalTableOfficer';
+type QueryParameters = {
+  first?: number;
+  offset?: number;
+  sortField?: string | undefined;
+  sortDirection?: string | undefined;
+  searchText?: string | undefined;
+};
 
 export function useProposalsCoreData(
   filter: ProposalsFilter,
@@ -23,8 +29,9 @@ export function useProposalsCoreData(
   const {
     reviewer,
     callId,
-    instrumentId,
+    instrumentFilter,
     proposalStatusId,
+    excludeProposalStatusIds,
     questionaryIds,
     text,
     questionFilter,
@@ -45,8 +52,9 @@ export function useProposalsCoreData(
             filter: {
               reviewer,
               callId,
-              instrumentId,
+              instrumentFilter,
               proposalStatusId,
+              excludeProposalStatusIds,
               questionaryIds,
               referenceNumbers,
               questionFilter: questionFilter && {
@@ -68,9 +76,13 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatuses: proposal.technicalStatuses?.map(
-                      (technicalStatus) =>
-                        getTranslation(technicalStatus as ResourceId)
+                    technicalReviews: proposal.technicalReviews?.map(
+                      (technicalReview) => ({
+                        ...technicalReview,
+                        status: getTranslation(
+                          technicalReview.status as ResourceId
+                        ),
+                      })
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId
@@ -87,8 +99,9 @@ export function useProposalsCoreData(
           .getProposalsCore({
             filter: {
               callId,
-              instrumentId,
+              instrumentFilter,
               proposalStatusId,
+              excludeProposalStatusIds,
               questionaryIds,
               referenceNumbers,
               questionFilter: questionFilter && {
@@ -110,9 +123,13 @@ export function useProposalsCoreData(
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalStatuses: proposal.technicalStatuses?.map(
-                      (technicalStatus) =>
-                        getTranslation(technicalStatus as ResourceId)
+                    technicalReviews: proposal.technicalReviews?.map(
+                      (technicalReview) => ({
+                        ...technicalReview,
+                        status: getTranslation(
+                          technicalReview.status as ResourceId
+                        ),
+                      })
                     ),
                     finalStatus: getTranslation(
                       proposal.finalStatus as ResourceId
@@ -129,8 +146,9 @@ export function useProposalsCoreData(
     [
       reviewer,
       callId,
-      instrumentId,
+      instrumentFilter,
       proposalStatusId,
+      excludeProposalStatusIds,
       questionaryIds,
       text,
       questionFilter,
@@ -159,8 +177,6 @@ export function useProposalsCoreData(
   };
 }
 
-export interface ProposalViewData
-  extends Omit<ProposalView, 'technicalStatuses'> {
+export interface ProposalViewData extends ProposalView {
   status: string;
-  technicalStatuses: string[] | null;
 }

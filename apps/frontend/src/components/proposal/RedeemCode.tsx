@@ -1,10 +1,10 @@
 import { Button, Typography } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
-import { TextField } from 'formik-mui';
 import React from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
+import TextField from 'components/common/FormikUITextField';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 interface RedeemCodeProps {
@@ -36,7 +36,7 @@ function RedeemCode(props: RedeemCodeProps) {
     >
       {() => (
         <Form>
-          <Typography variant="h5" component="h2">
+          <Typography variant="h6" component="h2">
             {props.title}
           </Typography>
           <Field
