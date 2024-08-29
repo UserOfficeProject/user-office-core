@@ -7,14 +7,14 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 import PublishIcon from '@mui/icons-material/Publish';
 import ShareIcon from '@mui/icons-material/Share';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
-import { Typography } from '@mui/material';
+import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import { GetTemplatesQuery, Template, TemplateGroupId } from 'generated/sdk';
 import { downloadBlob } from 'utils/downloadBlob';
 import { tableIcons } from 'utils/materialIcons';
@@ -207,24 +207,30 @@ const TemplatesTable = ({
 
   return (
     <>
-      <InputDialog open={show} onClose={() => setShow(false)}>
-        <CreateTemplate
-          onComplete={(template) => {
-            if (template) {
-              setTemplates([
-                ...templates,
-                { ...template, questionaryCount: 0 },
-              ]);
+      <StyledDialog
+        open={show}
+        onClose={() => setShow(false)}
+        title="Create New Template"
+      >
+        <DialogContent dividers>
+          <CreateTemplate
+            onComplete={(template) => {
+              if (template) {
+                setTemplates([
+                  ...templates,
+                  { ...template, questionaryCount: 0 },
+                ]);
 
-              setTimeout(() => {
-                editTemplate(template.templateId);
-              });
-            }
-            setShow(false);
-          }}
-          groupId={templateGroup}
-        />
-      </InputDialog>
+                setTimeout(() => {
+                  editTemplate(template.templateId);
+                });
+              }
+              setShow(false);
+            }}
+            groupId={templateGroup}
+          />
+        </DialogContent>
+      </StyledDialog>
       <MaterialTable
         icons={tableIcons}
         title={

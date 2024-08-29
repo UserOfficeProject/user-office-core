@@ -1,11 +1,11 @@
+import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import React, { useState } from 'react';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import InputDialog from 'components/common/InputDialog';
+import StyledDialog from 'components/common/StyledDialog';
 import SampleDetails from 'components/sample/SampleDetails';
 import { Answer } from 'generated/sdk';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
@@ -61,15 +61,19 @@ const SamplesAnswerRenderer = ({
         samples={samples}
         onClick={(sample) => setSelectedSampleId(sample.id)}
       />
-      <InputDialog
-        maxWidth="sm"
+      <StyledDialog
+        maxWidth="lg"
+        fullWidth
         open={selectedSampleId !== null}
         onClose={() => setSelectedSampleId(null)}
+        title="Sample details"
       >
-        {selectedSampleId ? (
-          <SampleDetails sampleId={selectedSampleId} />
-        ) : null}
-        <ActionButtonContainer>
+        <DialogContent>
+          {selectedSampleId ? (
+            <SampleDetails sampleId={selectedSampleId} />
+          ) : null}
+        </DialogContent>
+        <DialogActions>
           <Button
             type="button"
             variant="outlined"
@@ -78,8 +82,8 @@ const SamplesAnswerRenderer = ({
           >
             Close
           </Button>
-        </ActionButtonContainer>
-      </InputDialog>
+        </DialogActions>
+      </StyledDialog>
     </div>
   );
 };

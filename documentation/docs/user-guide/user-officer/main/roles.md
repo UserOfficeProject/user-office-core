@@ -1,4 +1,4 @@
-# Roles
+# Roles :material-account-supervisor-circle:
 
 There are many roles within User Office: 
 
@@ -12,7 +12,7 @@ There are many roles within User Office:
 
 ??? info "User Officer"
 
-    The **User Officer** is part of the Research Coordination Office and is responsible for managing the administration of the user programme. This includes coordinating proposal submission, review and selection, preparing user visits to ESS for experiments and collating experiment reports and publications. 
+    The **User Officer** is part of the Research Coordination Office and is responsible for managing the administration of the user program. This includes coordinating proposal submission, review and selection, preparing user visits to ESS for experiments and collating experiment reports and publications. 
 
     **Main uses of User Office:**
 
@@ -57,9 +57,8 @@ There are many roles within User Office:
 
     **Main uses of User Office:**
 
+_________________________________________________________________________________________________________
 
 ### How do I change roles?
 
-
-### How do I impersonate other users? 
-
+_________________________________________________________________________________________________________

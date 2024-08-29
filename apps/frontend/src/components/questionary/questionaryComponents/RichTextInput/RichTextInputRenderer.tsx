@@ -1,11 +1,10 @@
 import { Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import React, { useState } from 'react';
 
+import StyledDialog from 'components/common/StyledDialog';
 import {
   AnswerRenderer,
   QuestionRenderer,
@@ -39,10 +38,14 @@ export const RichTextInputRendererComponent = ({
         {`${truncateString(stripHtml(valueToRender), 100)}`}
       </Typography>
 
-      <Dialog fullWidth maxWidth="lg" open={open} onClose={handleClose}>
-        <DialogTitle>{title}</DialogTitle>
-
-        <DialogContent>
+      <StyledDialog
+        fullWidth
+        maxWidth="lg"
+        open={open}
+        onClose={handleClose}
+        title={title}
+      >
+        <DialogContent dividers>
           <div
             dangerouslySetInnerHTML={{
               __html: valueToRender,
@@ -55,7 +58,7 @@ export const RichTextInputRendererComponent = ({
             Close
           </Button>
         </DialogActions>
-      </Dialog>
+      </StyledDialog>
     </span>
   );
 };
