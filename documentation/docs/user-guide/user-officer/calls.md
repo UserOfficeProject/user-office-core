@@ -3,9 +3,9 @@
 ## **What are calls?**
 
 ??? info "Calls" 
-    **Calls** :material-calendar-blank: allow users’ **proposals** :material-folder-outline: to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates :material-text-box-multiple:**](main/templates.md) (such as [**proposal templates**](templates/proposal_template.md) which act as the questionnaire that users must fill out when creating their proposals). Calls are assigned to [**FAPs**](fap.md) (Facility Access Panels) for proposal review and evaluation. Calls are also linked to a [**proposal workflow**](settings/proposal_workflow.md), which dictates the lifecycle of the proposals within a call. 
+    **Calls** :material-calendar-blank: allow users’ **proposals** :material-folder-outline: to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [**templates :material-text-box-multiple:**](main/creating_templates.md) (such as [**proposal templates**](templates/proposal_template.md) which act as the questionnaire that users must fill out when creating their proposals). Calls are assigned to [**FAPs**](fap.md) (Facility Access Panels) for proposal review and evaluation. Calls are also linked to a [**proposal workflow**](settings/proposal_workflow.md), which dictates the lifecycle of the proposals within a call. 
 
-    * The [**templates** :material-text-box-multiple:](main/templates.md) allow User Officers to customise calls with specific requirements regarding the type of research users may conduct. Templates also specify and collect the information that users must provide in order to facilitate their research.
+    * The [**templates** :material-text-box-multiple:](main/creating_templates.md) allow User Officers to customise calls with specific requirements regarding the type of research users may conduct. Templates also specify and collect the information that users must provide in order to facilitate their research.
 
     * The [**FAP (Facility Access Panel)**](fap.md) is the group responsible for evaluating users' research proposals which are assigned to proposals and calls.
 

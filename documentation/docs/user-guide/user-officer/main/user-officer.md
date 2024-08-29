@@ -1,8 +1,3 @@
-# **User Officer Homepage**
-
-
-### **Welcome to the User Office documentation!**
-
 __________________________________________________________________________
 
 ![Call](../../../assets/images/call.png){ width="400" align=right } 
@@ -21,20 +16,20 @@ __________________________________________________________________________
     
 ![Templates](../../../assets/images/templates.png){ width="400" align=right } 
 !!! info inline end ""
-    [Create templates :material-text-box-multiple:](templates.md){ .md-button .md-button--primary }
+    [Create templates :material-text-box-multiple:](creating_templates.md){ .md-button .md-button--primary }
 
     Templates are used to save and re-utilise predefined information across User Office. Calls are built using several different types of templates.
     _______________________________________________________
     
-Video tutorials
+## Quick start
 __________________________________________________________________________
 
 Overview and intruduction to User Office:
 
-* #### [Part I: How do I create templates?](videos.md)
+- [Part I: How do I create templates?](creating_templates.md)
 
-* #### [Part II: How do I use workflows?](videos.md)
+- [Part II: How do I use workflows?](../settings/proposal_workflow.md)
 
-* #### [Part III: How do I create a call?](videos.md)
+- [Part III: How do I create a call?](creating_call.md)
 
 
