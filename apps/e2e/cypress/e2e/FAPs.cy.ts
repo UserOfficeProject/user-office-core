@@ -1464,6 +1464,7 @@ context('Fap meeting components tests', () => {
       updateUsersRoles();
     });
     initializationBeforeTests();
+    cy.getAndStoreAppSettings();
     cy.then(() => {
       cy.assignProposalsToFaps({
         fapInstruments: [
@@ -2722,6 +2723,26 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
       cy.get('[data-cy="grade-proposal-icon"]').click();
+
+      cy.get('[role="dialog"]').as('dialog');
+      const commentContent = faker.lorem.words(3);
+      cy.setTinyMceContent('comment', commentContent);
+
+      if (
+        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
+      ) {
+        cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
+
+        cy.get('[role="listbox"] > [role="option"]').first().click();
+
+        cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
+      } else {
+        cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
+      }
+
+      cy.get(`#comment_ifr`).first().focus().click();
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="grade-guide"]').click();
 
       cy.contains(fap1.gradeGuide).should('not.exist');
@@ -2739,6 +2760,8 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
       cy.get('[data-cy="grade-proposal-icon"]').click();
+
+      cy.get('[data-cy=back-button]').focus().click();
       cy.get('[data-cy="grade-guide"]').click();
 
       cy.contains(fap1.gradeGuide);

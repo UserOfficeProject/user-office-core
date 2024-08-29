@@ -135,6 +135,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
               />
             )}
             <NavigButton
+              data-cy="back-button"
               onClick={() => dispatch({ type: 'BACK_CLICKED' })}
               disabled={state.stepIndex === 0}
               isBusy={isSubmitting}
