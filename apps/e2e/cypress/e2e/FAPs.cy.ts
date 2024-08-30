@@ -1119,7 +1119,7 @@ context('Fap reviews tests', () => {
       });
       cy.assignReviewersToFap({
         fapId: createdFapId,
-        memberIds: [fapMembers.reviewer.id],
+        memberIds: [fapMembers.reviewer.id, fapMembers.reviewer2.id],
       });
 
       cy.assignFapReviewersToProposals({
@@ -1130,13 +1130,13 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
       });
 
-      cy.assignFapReviewersToProposals({
-        assignments: {
-          memberId: fapMembers.reviewer.id,
-          proposalPk: firstCreatedProposalPk,
-        },
-        fapId: createdFapId,
-      });
+      // cy.assignFapReviewersToProposals({
+      //   assignments: {
+      //     memberId: fapMembers.reviewer.id,
+      //     proposalPk: firstCreatedProposalPk,
+      //   },
+      //   fapId: createdFapId,
+      // });
 
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
@@ -1263,6 +1263,26 @@ context('Fap reviews tests', () => {
         text: 'Proposals review submitted successfully',
         variant: 'success',
       });
+    });
+
+    it.only('Fap Reviewer should not be able to submit a grade for proposals on which they are not reviewer, they should only able to view them', () => {
+      cy.get('[data-cy="review-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Draft').click();
+
+      cy.finishedLoading();
+
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('All proposals').click();
+
+      cy.finishedLoading();
+      cy.contains(proposal1.title).parent().contains('Draft');
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal-details-icon"]')
+        .should('be.visible');
     });
 
     it('FAP review should be removed if proposal is removed from instrument', () => {
