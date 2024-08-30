@@ -2765,6 +2765,9 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="grade-guide"]').click();
 
       cy.contains(fap1.gradeGuide);
+
+      cy.get('[data-cy="close-modal-btn"]').click();
+      cy.closeModal();
     });
 
     it('Officer should be able to bulk download Fap proposals as pdf', () => {
