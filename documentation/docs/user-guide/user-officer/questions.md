@@ -2,24 +2,22 @@
 
 ## **What are questions?**
 
-??? info "What are questions?" 
-
-    **Questions** :material-comment-question: are designed to streamline the template creation process and ensure consistency across users' submissions. Question allow users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the **question drawer**. Questions allow for standardisation across multiple templates which is essential for data collection and analysis of users' responses.
+**Questions** :material-comment-question: are designed to streamline the template creation process and ensure consistency across users' submissions. Question allow users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the **question drawer**. Questions allow for standardisation across multiple templates which is essential for data collection and analysis of users' responses.
 
 Questions can be utilised within the following templates:
 
-* [**Proposal templates**](templates/proposal_template.md)
-* [**Proposal ESI templates**](templates/proposalESI_template.md)
-* [**Sample ESI templates**](templates/sampleESI_template.md)
-* [**Feedback templates**](templates/feedback_template.md)
-* [**Sub Templates**](templates/sub_template.md)
-* [**Sample declaration templates**](templates/sampledec_template.md)
-* [**Shipment declarationt templates**](templates/shipment_template.md)
-* [**Visit registration templates**](templates/visit_template.md)
+* [**Proposal templates** :material-note-text:](templates/proposal_template.md)
+* [**Proposal ESI templates** :material-note-text:](templates/proposalESI_template.md)
+* [**Sample ESI templates** :material-inbox:](templates/sampleESI_template.md)
+* [**Feedback templates** :material-message-alert:](templates/feedback_template.md)
+* [**Sub Templates** :material-collapse-all-outline:](templates/sub_template.md)
+* [**Sample declaration templates** :material-inbox:](templates/sampledec_template.md)
+* [**Shipment declarationt templates** :material-truck:](templates/shipment_template.md)
+* [**Visit registration templates** :material-airplane-takeoff:](templates/visit_template.md)
 
 _____________________________________________________________________________________________________
 
-## **How do I edit questions**
+## **How do I edit questions?**
 
 When editing a quesiton you have two options:
 
@@ -30,7 +28,8 @@ ________________________________________________________________________________
 
 ## **How do I create questions?**
 
-* In the main menu, navigate to the template page you wish to create the question for ([**Proposal templates**](templates/proposal_template.md), [**Proposal ESI templates**](templates/proposalESI_template.md),[**Sample ESI templates**](templates/sampleESI_template.md), [**Feedback templates**](templates/feedback_template.md), [**Sub Templates**](templates/sub_template.md), [**Sample declaration templates**](templates/sampledec_template.md), [**Shipment declarationt templates**](templates/shipment_template.md), [**Visit registration templates**](templates/visit_template.md))
+* In the main menu, navigate to the template page you wish to create the question within
+([**Proposal templates** :material-note-text:](templates/proposal_template.md), [**Proposal ESI templates** :material-note-text:](templates/proposalESI_template.md), [**Sample ESI templates** :material-inbox:](templates/sampleESI_template.md), [**Feedback templates** :material-message-alert:](templates/feedback_template.md), [**Sub Templates** :material-collapse-all-outline:](templates/sub_template.md), [**Sample declaration templates** :material-inbox:](templates/sampledec_template.md), [**Shipment declarationt templates** :material-truck:](templates/shipment_template.md), [**Visit registration templates** :material-airplane-takeoff:](templates/visit_template.md))
 
 * Within the chosen template page, create or edit a pre-existing template. 
 (In this example, we wish to create questions for a Proposal template:)
@@ -50,9 +49,9 @@ Note: depending on which template you are creating questions for, certain questi
 
     **TIP:** It is good practice to utilise pre-existing question templates when possible. This allows for the collection of users' answer data to be standardised for analysis
 
-# **List of all question types:**
+## **What are the different question types?**
 
-??? info "Boolean"
+??? info "Boolean :material-square-outline:"
 
     ![Boolean](../../assets/images/boolean.png){ align=left width="350"}
 
@@ -67,7 +66,7 @@ Note: depending on which template you are creating questions for, certain questi
     * **User must check it to continue:** enabling this constraint means that the user must check the box in order to continue filling out (and submit) their proposal. This is useful to use in questions that must be agreed to such as 'I acknowledge this is an Expression of Interest' or 'I agree to the terms and conditions'.
 
 
-??? info "Date"
+??? info "Date :material-calendar-today:"
     **Date:**
 
     ![Date](../../assets/images/date.png){ align=left width="350"}
@@ -87,7 +86,7 @@ Note: depending on which template you are creating questions for, certain questi
     * **Is required:** enabling this constraint allows you to define a valid date range. Min refers to the earliest date and Max refers to the latest date which can be chosen. Default is the date the calendar will be set to by default when the user goes to select the date. *Note: leaving these fields empty allows the user to chose any date*
 
 
-??? info "Embellishment"
+??? info "Embellishment :material-format-size:"
     **Embellishment:**
 
     ![Embellishment](../../assets/images/embellishment.png){ align=left width="350"}
@@ -99,7 +98,7 @@ Note: depending on which template you are creating questions for, certain questi
     **Constraints:** 
 
 
-??? info "File Upload"
+??? info "File Upload :material-paperclip:"
     **File Upload**
 
     ![File Upload](../../assets/images/file_upload.png){ align=left width="350"}
@@ -110,7 +109,7 @@ Note: depending on which template you are creating questions for, certain questi
 
     **Constraints:** 
 
-??? info "Sub Template"
+??? info "Sub Template :material-list-box-outline:"
     **Sub Template**
 
     ![Sub Template](../../assets/images/sub_template.png){ align=left width="350"}
@@ -121,7 +120,7 @@ Note: depending on which template you are creating questions for, certain questi
 
     **Constraints:**
 
-??? info "Interval"
+??? info "Interval :material-chevron-right:"
     **Interval**
 
     ![Interval](../../assets/images/interval.png){ align=left width="350"}
@@ -132,7 +131,7 @@ Note: depending on which template you are creating questions for, certain questi
 
     **Constraints:** 
 
-??? info "Multiple choice"
+??? info "Multiple choice :material-record-circle:"
     **Multiple choice**
 
     ![Multiple choice](../../assets/images/multiple_choice.png){ align=left width="350"}
@@ -143,7 +142,7 @@ Note: depending on which template you are creating questions for, certain questi
 
     **Constraints:** 
 
-??? info "Dynamic multiple choice"
+??? info "Dynamic multiple choice :material-web:"
     **Dynamic Multiple Choice**
 
     ![Dynamic Multiple Choice](../../assets/images/dynamic_choice.png){ align=left width="350"}
@@ -154,7 +153,7 @@ Note: depending on which template you are creating questions for, certain questi
 
     **Constraints:**
 
-??? info "Number"
+??? info "Number :material-numeric-1-box-outline:"
     **Number**
 
     ![Number](../../assets/images/number.png){ align=left width="350"}
@@ -164,7 +163,7 @@ Note: depending on which template you are creating questions for, certain questi
     **Constraints:**
 
 
-??? info "Rich text input"
+??? info "Rich text input :material-format-text-variant:"
     **Rich Text Input**
 
     ![Rich Text Input](../../assets/images/rich_text.png){ align=left width="350"}
@@ -176,7 +175,7 @@ Note: depending on which template you are creating questions for, certain questi
     **Constraints:**
 
 
-??? info "Sample declaration"
+??? info "Sample declaration :material-clipboard-text:"
     **Sample Declaration**
 
     ![Sample Declaration](../../assets/images/sample_declaration.png){ align=left width="350"}
@@ -191,7 +190,7 @@ Note: depending on which template you are creating questions for, certain questi
 
     **Constraints:** 
 
-??? info "Text input"
+??? info "Text input :material-text-short:"
     **Text input**
 
     ![Text Input](../../assets/images/text_input.png){ align=left width="350"}
@@ -202,7 +201,7 @@ Note: depending on which template you are creating questions for, certain questi
 
     **Constraints:**
 
-??? info "Instrument Picker"
+??? info "Instrument Picker :material-microscope:"
     **Instrument Picker**
 
     ![Instrument Picker](../../assets/images/instrument_picker.png){ align=left width="350"}
