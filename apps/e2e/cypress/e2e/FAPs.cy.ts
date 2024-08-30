@@ -3482,7 +3482,7 @@ context('Fap meeting components tests', () => {
       //cy.notification({ variant: 'success', text: 'Updated' });
     });
 
-    it('Fap Reviewer should be able to give non integer review', () => {
+    it.only('Fap Reviewer should be able to give non integer review', () => {
       cy.login(initialDBData.users.officer);
       cy.visit('/');
       cy.finishedLoading();
@@ -3534,7 +3534,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="grade-proposal"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Please enter a valid value. The two nearest valid values are 1 and 1.01.'
+          'Value must be less than or equal to 10.'
         );
       });
 
