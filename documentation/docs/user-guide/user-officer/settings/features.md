@@ -40,18 +40,18 @@ Icon functions
 * People - :fontawesome-solid-user-group:
 * Instruments - :material-microscope:
 * Techniques -
-* FAPs - 
+* FAPs - :material-google-circles-communities: 
 * Pages - :material-cog-box:
 * Institutions - :material-bank:
 * Templates - :material-text-box-multiple:
 * PDF - :material-file-pdf-box:
-* Proposal templates -
-* Sample declaration -
-* Sub template -
+* Proposal templates - :material-note-text:
+* Sample declaration - :material-inbox:
+* Sub template - :material-collapse-all-outline:
 * Shipment declaration - :material-truck:
 * Visit registration - :material-airplane-takeoff:
 * ESI - 
-* Proposal ESI -
+* Proposal ESI - :material-note-text:
 * Sample ESI - :material-inbox:
 * Feedback - :material-message-alert:
 * Questions - :material-comment-question:
@@ -59,10 +59,12 @@ Icon functions
 * Settings - :material-cog:
 * Units - :material-sigma:
 * Proposal statuses - :material-folder-cog-outline:
-* Proposal workflows - 
+* Proposal workflows - :material-sitemap: 
 * API access tokens - :material-key:
 * Features - 
 * App settings - 
+
+* check :material-check-all:
 
 Profile
 
@@ -75,8 +77,9 @@ Tools
 * Search - :material-magnify:
 * Delete - :material-delete:
 * Edit - :material-pencil:
-* Clone -
-* Share - :material-share-variant:
+* Clone - :material-file-multiple:
+* Import - 
+* Export - :material-share-variant:
 * Select - :fontawesome-regular-square:
 * Show columns - :material-view-column:
 * Mark as active - 

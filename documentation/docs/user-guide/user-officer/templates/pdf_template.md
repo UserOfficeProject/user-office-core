@@ -1,8 +1,9 @@
+# PDF Templates :material-file-pdf-box:
 
 ## **What are PDF templates?**
 ??? info "PDF templates" 
 
-    **PDF templates** enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+    **PDF templates** :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
     ______________________________________________________________________________________
 
@@ -17,8 +18,8 @@ ________________________________________________________________________________
 
 **Step 1. Navigate to the PDF templates page**
 
-* In the main menu select **Templates** :material-text-box-multiple:
-* From the dropdown menu, choose **PDF** 
+* In the **main menu** :material-menu: select **Templates** :material-text-box-multiple:
+* From the dropdown menu, choose **PDF** :material-file-pdf-box:
 
 **Step 2. Create a new PDF template**
 
@@ -40,8 +41,8 @@ ________________________________________________________________________________
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
-* From the dropdown menu, choose **PDF** 
+* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
+* From the dropdown menu, choose **PDF** :material-file-pdf-box:
 
 **Step 2. Find the PDF template you wish to edit**
 
@@ -61,7 +62,7 @@ ________________________________________________________________________________
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
+* To clone a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
 * From the dropdown menu, choose **PDF** 
 
 **Step 2. Find the PDF template you wish to edit**
@@ -84,10 +85,11 @@ The archive system allows you to save PDF templates for future reference. Archiv
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
+* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
 * From the dropdown menu, choose **PDF** 
 
 **Step 2. Archive or Unarchive the PDF template**
+
 * To **archive** a PDF template, click on the `ARCHIVE` action next to the template name. This action will send the PDF template to the `ARCHIVED` tab.
 * To **unarchive** a PDF template, simply go to the `ARCHIVED` tab and click on the `UNARCHIVE` action next to the template name. This action will send the PDF template to the `CURRENT` tab.
 
@@ -97,7 +99,7 @@ ________________________________________________________________________________
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
+* To edit a import or export a PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
 * From the dropdown menu, choose **PDF** 
 
 **Step 2. Export or Import the PDF template**
@@ -108,5 +110,6 @@ ________________________________________________________________________________
 
 ______________________________________________________________________________________
 
-## **What does #calls mean on PDF templates?**
+### **What does #calls mean on PDF templates?**
 
+* '#Calls' refers to the number of calls the PDF template has been utilised in.

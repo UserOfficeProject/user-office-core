@@ -42,8 +42,8 @@
 
 ??? info "**Templates**"
     ### **Templates**
-    * [**What are templates?**](user-guide/user-officer/main/templates.md)
-    * [**How do I use templates within a call?**](user-guide/user-officer/main/templates.md)
+    * [**What are templates?**](user-guide/user-officer/main/creating_templates.md)
+    * [**How do I use templates within a call?**](user-guide/user-officer/main/creating_templates.md)
 
 ??? info "**PDF Templates**"
     ### **PDF templates**
