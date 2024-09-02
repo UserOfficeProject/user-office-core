@@ -83,7 +83,7 @@ export default class PostgresStatusActionsLogsDataSource
           return await trx.commit(statusActionsLog);
         } catch (error) {
           logger.logException(
-            `Could not status actions log with args: '${JSON.stringify(args)}'`,
+            `Could not create status actions log with args: '${JSON.stringify(args)}'`,
             error
           );
           throw new GraphQLError('Could not status actions log');
