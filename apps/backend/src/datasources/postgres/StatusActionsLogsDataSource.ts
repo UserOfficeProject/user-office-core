@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
@@ -144,7 +145,10 @@ export default class PostgresStatusActionsLogsDataSource
             args.filter.emailStatusActionRecipient
           );
         }
-        if (args.filter?.statusActionsSuccessful) {
+        if (
+          args.filter?.statusActionsSuccessful !== undefined &&
+          args.filter?.statusActionsSuccessful !== null
+        ) {
           query.where(
             'sal.status_actions_successful',
             args.filter.statusActionsSuccessful

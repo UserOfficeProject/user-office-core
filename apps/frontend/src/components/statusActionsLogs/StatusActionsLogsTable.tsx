@@ -5,7 +5,7 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import { Replay, Refresh } from '@mui/icons-material';
-import { Typography, useTheme } from '@mui/material';
+import { Grid, Typography, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { NumberParam, QueryParamConfig, StringParam } from 'use-query-params';
@@ -19,6 +19,12 @@ import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+
+import StatusActionsStatusFilter, {
+  defaultStatusActionsLogStatusQueryFilter,
+  StatusActionsLogStatus,
+  StatusActionsLogQueryFilter,
+} from './StatusActionsStatusFilter';
 
 export type StatusActionsLogsQueryParams = {
   sortDirection: QueryParamConfig<string | null | undefined>;
@@ -40,14 +46,16 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const RefreshIcon = (): JSX.Element => <Refresh />;
   const [selectedStatusActionsLog, setStatusActionsLog] =
     useState<StatusActionsLog | null>(null);
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<StatusActionsLogsQueryParams>({
-      sortDirection: StringParam,
-      search: StringParam,
-      sortField: StringParam,
-      page: NumberParam,
-      pageSize: NumberParam,
-    });
+  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
+    StatusActionsLogsQueryParams & StatusActionsLogQueryFilter
+  >({
+    statusActionsLogStatus: defaultStatusActionsLogStatusQueryFilter,
+    sortDirection: StringParam,
+    search: StringParam,
+    sortField: StringParam,
+    page: NumberParam,
+    pageSize: NumberParam,
+  });
   let columns: Column<StatusActionsLog>[] = [
     {
       title: 'Email Status Action Recipient',
@@ -106,12 +114,32 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
       )?.hidden,
     }));
   }
+  const handleStatusActionsLogStatusFilterChange = (
+    statusActionsLogStatus: StatusActionsLogStatus
+  ) => {
+    setUrlQueryParams((params) => ({
+      ...params,
+      statusActionsLogStatus,
+    }));
+    tableRef.current && tableRef.current.onQueryChange({});
+  };
   const fetchStatusActionsLogsData = (tableQuery: Query<StatusActionsLog>) =>
     new Promise<QueryResult<StatusActionsLog>>(async (resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
+        let filter = {};
+        if (
+          urlQueryParams.statusActionsLogStatus &&
+          urlQueryParams.statusActionsLogStatus !== StatusActionsLogStatus.ALL
+        ) {
+          filter = {
+            ...filter,
+            statusActionsSuccessful:
+              urlQueryParams.statusActionsLogStatus === 'true' ? true : false,
+          };
+        }
         const results = await api().getStatusActionsLogs({
-          filter: {},
+          filter,
           searchText: tableQuery.search,
           sortField: orderBy?.orderByField,
           sortDirection: orderBy?.orderDirection,
@@ -140,7 +168,15 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     });
 
   return (
-    <>
+    <div data-cy="status-actions-logs-table">
+      <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <StatusActionsStatusFilter
+            statusActionsLogStatus={urlQueryParams.statusActionsLogStatus}
+            onChange={handleStatusActionsLogStatusFilterChange}
+          />
+        </Grid>
+      </Grid>
       <MaterialTable
         tableRef={tableRef}
         icons={tableIcons}
@@ -237,16 +273,18 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           setLocalStorageValue(proposalColumns);
         }}
         onPageChange={(page, pageSize) => {
-          setUrlQueryParams({
+          setUrlQueryParams((params) => ({
+            ...params,
             page: +page.toString(),
             pageSize: +pageSize.toString(),
-          });
+          }));
         }}
         onSearchChange={(searchText) => {
-          setUrlQueryParams({
+          setUrlQueryParams((params) => ({
+            ...params,
             search: searchText ? searchText : '',
             page: searchText ? 0 : urlQueryParams.pageSize || 0,
-          });
+          }));
         }}
         onOrderCollectionChange={(orderByCollection: OrderByCollection[]) => {
           const [orderBy] = orderByCollection;
@@ -257,7 +295,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           }));
         }}
       />
-    </>
+    </div>
   );
 };
 export default withConfirm(StatusActionsLogsTable);
