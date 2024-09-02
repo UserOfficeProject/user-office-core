@@ -52,7 +52,7 @@ export const emailActionHandler = async (
 
     if (!recipientWithTemplate) {
       throw new Error(
-        `Provide status action recipient does not match any available email recipients 
+        `Provided status action recipient does not match any available email recipients 
         ${statusActionRecipients}`
       );
     }
