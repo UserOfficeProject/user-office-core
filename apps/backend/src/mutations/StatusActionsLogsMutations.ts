@@ -109,7 +109,7 @@ export default class StatusActionsLogsMutations {
       statusActionsLogId: statusActionsLog.statusActionsLogId,
       statusActionsBy: agent?.id,
       statusActionRecipients:
-        statusActionsLog.statusActionsStep as EmailStatusActionRecipients,
+        statusActionsLog.emailStatusActionRecipient as EmailStatusActionRecipients,
     });
 
     return !!statusActionsLog;

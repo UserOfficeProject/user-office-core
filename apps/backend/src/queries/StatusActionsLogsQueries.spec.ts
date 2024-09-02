@@ -14,7 +14,12 @@ describe('Test Status Actions Logs Queries', () => {
         dummyUserOfficerWithRole,
         {}
       )
-    ).resolves.not.toBe(null);
+    ).resolves.toEqual(
+      expect.objectContaining({
+        totalCount: 1,
+        statusActionsLogs: [dummyStatusActionsLog],
+      })
+    );
   });
 
   test('A userofficer can get Status actions log by id', () => {

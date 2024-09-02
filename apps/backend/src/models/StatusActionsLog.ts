@@ -4,7 +4,7 @@ export class StatusActionsLog {
     public statusActionsLogId: number,
     public connectionId: number,
     public actionId: number,
-    public statusActionsStep: string,
+    public emailStatusActionRecipient: string,
     public statusActionsBy: number | null,
     public statusActionsSuccessful: boolean,
     public statusActionsMessage: string,

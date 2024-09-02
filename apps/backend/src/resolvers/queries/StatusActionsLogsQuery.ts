@@ -32,7 +32,7 @@ export class StatusActionsLogsFilter {
   public connectionIds?: number[];
 
   @Field(() => [EmailStatusActionRecipients], { nullable: true })
-  public statusActionsSteps?: EmailStatusActionRecipients[];
+  public emailStatusActionRecipient?: EmailStatusActionRecipients[];
 }
 @ArgsType()
 export class StatusActionsLogsArgs {
@@ -46,7 +46,7 @@ export class StatusActionsLogsArgs {
   public actionId: number;
 
   @Field(() => EmailStatusActionRecipients)
-  public statusActionsStep: EmailStatusActionRecipients;
+  public emailStatusActionRecipient: EmailStatusActionRecipients;
 
   @Field(() => Int, { nullable: true })
   public statusActionsBy?: number | null;

@@ -103,7 +103,7 @@ export const emailStatusActionRecipients = async (
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
           statusActionsLogId,
-          statusActionsStep: EmailStatusActionRecipients.PI,
+          emailStatusActionRecipient: EmailStatusActionRecipients.PI,
           proposalPks,
         }),
         !!statusActionsLogId,
@@ -125,7 +125,7 @@ export const emailStatusActionRecipients = async (
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
           statusActionsLogId,
-          statusActionsStep: EmailStatusActionRecipients.CO_PROPOSERS,
+          emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
           proposalPks,
         }),
         !!statusActionsLogId,
@@ -148,7 +148,8 @@ export const emailStatusActionRecipients = async (
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
           statusActionsLogId,
-          statusActionsStep: EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
+          emailStatusActionRecipient:
+            EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
           proposalPks,
         }),
         !!statusActionsLogId,
@@ -171,7 +172,7 @@ export const emailStatusActionRecipients = async (
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
           statusActionsLogId,
-          statusActionsStep: EmailStatusActionRecipients.FAP_REVIEWERS,
+          emailStatusActionRecipient: EmailStatusActionRecipients.FAP_REVIEWERS,
           proposalPks,
         }),
         !!statusActionsLogId,
@@ -194,7 +195,7 @@ export const emailStatusActionRecipients = async (
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
           statusActionsLogId,
-          statusActionsStep:
+          emailStatusActionRecipient:
             EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
           proposalPks,
         }),
@@ -269,7 +270,7 @@ export const emailStatusActionRecipients = async (
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
           statusActionsLogId,
-          statusActionsStep: EmailStatusActionRecipients.USER_OFFICE,
+          emailStatusActionRecipient: EmailStatusActionRecipients.USER_OFFICE,
           proposalPks,
         }),
         !!statusActionsLogId,
@@ -302,7 +303,7 @@ export const emailStatusActionRecipients = async (
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
           statusActionsBy,
-          statusActionsStep: EmailStatusActionRecipients.OTHER,
+          emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
           proposalPks,
           statusActionsLogId,
         }),
@@ -334,6 +335,14 @@ const sendMail = async (
   const failMessage = isStatusActionReplay
     ? 'Email(s) could not be sent on status action replay'
     : 'Email(s) could not be sent';
+
+  if (!recipientsWithData.length) {
+    logger.logInfo('Could not send email(s) because there are no recipients.', {
+      recipientsWithData,
+    });
+
+    return;
+  }
   try {
     const mailServiceResponse = await Promise.all(
       recipientsWithData.map(async (recipientWithData) => {

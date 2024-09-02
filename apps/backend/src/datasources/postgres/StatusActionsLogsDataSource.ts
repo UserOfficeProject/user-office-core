@@ -12,6 +12,7 @@ import {
 import { StatusActionsLogsDataSource } from '../StatusActionsLogsDataSource';
 import database from './database';
 import {
+  createStatusActionsLogObject,
   ProposalRecord,
   StatusActionsLogHasProposalRecord,
   StatusActionsLogRecord,
@@ -21,26 +22,11 @@ const fieldMap: { [key: string]: string } = {
   statusActionsTstamp: 'status_actions_tstamp',
   statusActionsMessage: 'status_actions_message',
   statusActionsSuccessful: 'status_actions_successful',
-  statusActionsStep: 'status_actions_step',
+  emailStatusActionRecipient: 'email_status_action_recipient',
 };
 export default class PostgresStatusActionsLogsDataSource
   implements StatusActionsLogsDataSource
 {
-  private createStatusActionsLogObject(
-    statusActionLog: StatusActionsLogRecord
-  ) {
-    return new StatusActionsLog(
-      statusActionLog.status_actions_log_id,
-      statusActionLog.connection_id,
-      statusActionLog.action_id,
-      statusActionLog.status_actions_step,
-      statusActionLog.status_actions_by,
-      statusActionLog.status_actions_successful,
-      statusActionLog.status_actions_message,
-      statusActionLog.status_actions_tstamp
-    );
-  }
-
   private createStatusActionsLogHasProposalsObject(
     statusActionLogHasProposal: StatusActionsLogHasProposalRecord
   ) {
@@ -58,7 +44,7 @@ export default class PostgresStatusActionsLogsDataSource
             .insert({
               connection_id: args.connectionId,
               action_id: args.actionId,
-              status_actions_step: args.statusActionsStep,
+              email_status_action_recipient: args.emailStatusActionRecipient,
               status_actions_by: args.statusActionsBy,
               status_actions_successful: args.statusActionsSuccessful,
               status_actions_message: args.statusActionsMessage,
@@ -90,7 +76,7 @@ export default class PostgresStatusActionsLogsDataSource
         }
       });
 
-    return this.createStatusActionsLogObject(statusActionLogRecord);
+    return createStatusActionsLogObject(statusActionLogRecord);
   }
   async update(args: StatusActionsLogsArgs): Promise<StatusActionsLog> {
     return database('status_actions_logs')
@@ -102,7 +88,7 @@ export default class PostgresStatusActionsLogsDataSource
       .where({ status_actions_log_id: args.statusActionsLogId })
       .returning('*')
       .then((statusActionsLog) => {
-        return this.createStatusActionsLogObject(statusActionsLog[0]);
+        return createStatusActionsLogObject(statusActionsLog[0]);
       });
   }
   async getStatusActionsLog(statusActionsLogId: number) {
@@ -118,7 +104,7 @@ export default class PostgresStatusActionsLogsDataSource
       );
     }
 
-    return this.createStatusActionsLogObject(statusActionsLog);
+    return createStatusActionsLogObject(statusActionsLog);
   }
 
   async getStatusActionsLogs(
@@ -152,10 +138,10 @@ export default class PostgresStatusActionsLogsDataSource
             `%${args.filter.statusActionsMessage}%`
           );
         }
-        if (args.filter?.statusActionsSteps) {
+        if (args.filter?.emailStatusActionRecipient) {
           query.whereIn(
-            'sal.status_actions_step',
-            args.filter.statusActionsSteps
+            'sal.email_status_action_recipient',
+            args.filter.emailStatusActionRecipient
           );
         }
         if (args.filter?.statusActionsSuccessful) {
@@ -182,7 +168,7 @@ export default class PostgresStatusActionsLogsDataSource
               )
               .orWhereRaw('p.proposal_id ILIKE ?', `%${args.searchText}%`)
               .orWhereRaw(
-                'sal.status_actions_step ILIKE ?',
+                'sal.email_status_action_recipient ILIKE ?',
                 `%${args.searchText}%`
               )
           );
@@ -198,7 +184,7 @@ export default class PostgresStatusActionsLogsDataSource
         const statusActionsLogs = results
           .filter((result) => !!result.proposal_id)
           .map((statusActionsLog) =>
-            this.createStatusActionsLogObject(
+            createStatusActionsLogObject(
               statusActionsLog as unknown as StatusActionsLogRecord
             )
           );

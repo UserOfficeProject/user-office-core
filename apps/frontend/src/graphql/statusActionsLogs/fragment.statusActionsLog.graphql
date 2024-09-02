@@ -1,7 +1,7 @@
 fragment statusActionsLog on StatusActionsLog {
     statusActionsLogId
     statusActionsMessage
-    statusActionsStep
+    emailStatusActionRecipient
     statusActionsSuccessful
     statusActionsTstamp
     proposals {

@@ -323,7 +323,7 @@ export const publishMessageToTheEventBus = async (
 export const statusActionLogger = (args: {
   connectionId: number;
   actionId: number;
-  statusActionsStep: EmailStatusActionRecipients;
+  emailStatusActionRecipient: EmailStatusActionRecipients;
   proposalPks: number[];
   statusActionsBy?: number | null;
   statusActionsLogId?: number | null;
@@ -345,7 +345,7 @@ export const statusActionLogger = (args: {
       statusActionsMessage,
     };
 
-    if (statusActionsLogsArgs.statusActionsLogId) {
+    if (!!statusActionsLogsArgs.statusActionsLogId) {
       await statusActionsLogsDataSource.update(statusActionsLogsArgs);
 
       return;

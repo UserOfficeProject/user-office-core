@@ -23,7 +23,7 @@ export class StatusActionsLog implements Partial<StatusActionsLogOrigin> {
   public statusActionsLogId: number;
 
   @Field(() => EmailStatusActionRecipients)
-  public statusActionsStep: EmailStatusActionRecipients;
+  public emailStatusActionRecipient: EmailStatusActionRecipients;
 
   @Field(() => Boolean)
   public statusActionsSuccessful: boolean;

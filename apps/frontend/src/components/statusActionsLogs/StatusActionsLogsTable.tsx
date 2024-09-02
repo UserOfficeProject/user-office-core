@@ -50,13 +50,8 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     });
   let columns: Column<StatusActionsLog>[] = [
     {
-      title: 'Status Action',
-      field: 'statusActionsStep',
-      render: (rowData: StatusActionsLog): string =>
-        rowData.connectionStatusAction?.action.type
-          ? `${rowData.connectionStatusAction?.action.type} ${rowData.statusActionsStep}  `
-          : 'Not set',
-      cellStyle: { minWidth: 300 },
+      title: 'Email Status Action Recipient',
+      field: 'emailStatusActionRecipient',
     },
     {
       title: 'Proposal IDs',
