@@ -1,12 +1,14 @@
 # FAP Review :material-google-circles-communities: 
 
-## **What are FAP reviews?**
+## What are FAP reviews?
 
-## **How do I configure the system for FAP Review?**
+A FAP (Facility Access Panel) review is a process where a panel of experts evaluates proposals for access to a facility. 
+
+This review involves assessing the scientific merit, feasibility, and resource requirements of the proposals to determine their suitability for the facility.
+
+## How do I configure the system for FAP Review?
 
 Conditions to be met:
+
 * Instrument scientists complete the feasibility review (either setting the proposal status to `feasible` or `not feasible`) 
 * The proposal is then assigned to the FAP for evaluation (in accordance with the general proposal workflow, however this may be defined otherwise).
-
-
-
