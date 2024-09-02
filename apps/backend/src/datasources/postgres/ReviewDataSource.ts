@@ -293,7 +293,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     status?: ReviewStatus
   ): Promise<Review[]> {
     const fapReviewsFiltered = database
-      .select()
+      .select('fap_reviews.*')
       .from('fap_reviews')
       .modify((qb) => {
         // sometimes the ID 0 is sent as a equivalent of all
