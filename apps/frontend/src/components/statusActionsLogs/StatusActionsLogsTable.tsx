@@ -168,7 +168,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     });
 
   return (
-    <div data-cy="status-actions-logs-table">
+    <>
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <StatusActionsStatusFilter
@@ -177,125 +177,128 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           />
         </Grid>
       </Grid>
-      <MaterialTable
-        tableRef={tableRef}
-        icons={tableIcons}
-        title={
-          <Typography variant="h6" component="h2">
-            Status Actions Logs
-          </Typography>
-        }
-        onRowClick={() => {
-          setStatusActionsLog(null);
-        }}
-        columns={columns}
-        data={fetchStatusActionsLogsData}
-        options={{
-          search: true,
-          selection: false,
-          searchText: urlQueryParams.search || undefined,
-          debounceInterval: 600,
-          columnsButton: true,
-          pageSize: urlQueryParams.pageSize || 20,
-          initialPage: urlQueryParams.page || 0,
-          idSynonym: 'statusActionsLogId',
-          rowStyle: (rowdata: StatusActionsLog): React.CSSProperties => {
-            const style = rowdata.statusActionsSuccessful
-              ? { color: theme.palette.success.main }
-              : { color: theme.palette.error.main };
+      <div data-cy="status-actions-logs-table">
+        <MaterialTable
+          tableRef={tableRef}
+          icons={tableIcons}
+          title={
+            <Typography variant="h6" component="h2">
+              Status Actions Logs
+            </Typography>
+          }
+          onRowClick={() => {
+            setStatusActionsLog(null);
+          }}
+          columns={columns}
+          data={fetchStatusActionsLogsData}
+          options={{
+            search: true,
+            selection: false,
+            searchText: urlQueryParams.search || undefined,
+            debounceInterval: 600,
+            columnsButton: true,
+            pageSize: urlQueryParams.pageSize || 20,
+            initialPage: urlQueryParams.page || 0,
+            idSynonym: 'statusActionsLogId',
+            rowStyle: (rowdata: StatusActionsLog): React.CSSProperties => {
+              const style = rowdata.statusActionsSuccessful
+                ? { color: theme.palette.success.main }
+                : { color: theme.palette.error.main };
 
-            if (
-              selectedStatusActionsLog &&
-              rowdata.statusActionsLogId ===
-                selectedStatusActionsLog.statusActionsLogId
-            ) {
-              return {
-                ...style,
-                backgroundColor: theme.palette.grey[100],
-              };
-            }
-
-            return style;
-          },
-        }}
-        actions={[
-          {
-            icon: ReplayIcon,
-            tooltip: 'Replay status action',
-            onClick: (_event: unknown, rowData: unknown): void => {
-              const statusActionsLog = rowData as StatusActionsLog;
-              if (statusActionsLog.statusActionsLogId) {
-                confirm(
-                  () =>
-                    api({
-                      toastSuccessMessage:
-                        'Status action replay successfully send',
-                    })
-                      .replayStatusActionsLog({
-                        statusActionsLogId: statusActionsLog.statusActionsLogId,
-                      })
-                      .then((result) => {
-                        if (result.replayStatusActionsLog) {
-                          setStatusActionsLog(statusActionsLog);
-                        }
-                      }),
-                  {
-                    title: 'Are you sure?',
-                    description: `You are about to send a status action replay request`,
-                    alertText: statusActionsLog.statusActionsSuccessful
-                      ? 'This status action is already successful resending a request will lead to duplicate notifications being send'
-                      : '',
-                    shouldEnableOKWithAlert: true,
-                  }
-                )();
+              if (
+                selectedStatusActionsLog &&
+                rowdata.statusActionsLogId ===
+                  selectedStatusActionsLog.statusActionsLogId
+              ) {
+                return {
+                  ...style,
+                  backgroundColor: theme.palette.grey[100],
+                };
               }
-            },
-          },
-          {
-            icon: RefreshIcon,
-            tooltip: 'Refresh status actions log data',
-            isFreeAction: true,
-            onClick: () =>
-              tableRef.current && tableRef.current.onQueryChange({}),
-          },
-        ]}
-        onChangeColumnHidden={(columnChange) => {
-          const proposalColumns = columns.map(
-            (statusActionLogsColumn: Column<StatusActionsLog>) => ({
-              hidden:
-                statusActionLogsColumn.title === columnChange.title
-                  ? columnChange.hidden
-                  : statusActionLogsColumn.hidden,
-              title: statusActionLogsColumn.title,
-            })
-          );
 
-          setLocalStorageValue(proposalColumns);
-        }}
-        onPageChange={(page, pageSize) => {
-          setUrlQueryParams((params) => ({
-            ...params,
-            page: +page.toString(),
-            pageSize: +pageSize.toString(),
-          }));
-        }}
-        onSearchChange={(searchText) => {
-          setUrlQueryParams((params) => ({
-            ...params,
-            search: searchText ? searchText : '',
-            page: searchText ? 0 : urlQueryParams.pageSize || 0,
-          }));
-        }}
-        onOrderCollectionChange={(orderByCollection: OrderByCollection[]) => {
-          const [orderBy] = orderByCollection;
-          setUrlQueryParams((params) => ({
-            ...params,
-            sortField: orderBy?.orderByField,
-            sortDirection: orderBy?.orderDirection,
-          }));
-        }}
-      />
-    </div>
+              return style;
+            },
+          }}
+          actions={[
+            {
+              icon: ReplayIcon,
+              tooltip: 'Replay status action',
+              onClick: (_event: unknown, rowData: unknown): void => {
+                const statusActionsLog = rowData as StatusActionsLog;
+                if (statusActionsLog.statusActionsLogId) {
+                  confirm(
+                    () =>
+                      api({
+                        toastSuccessMessage:
+                          'Status action replay successfully send',
+                      })
+                        .replayStatusActionsLog({
+                          statusActionsLogId:
+                            statusActionsLog.statusActionsLogId,
+                        })
+                        .then((result) => {
+                          if (result.replayStatusActionsLog) {
+                            setStatusActionsLog(statusActionsLog);
+                          }
+                        }),
+                    {
+                      title: 'Are you sure?',
+                      description: `You are about to send a status action replay request`,
+                      alertText: statusActionsLog.statusActionsSuccessful
+                        ? 'This status action is already successful resending a request will lead to duplicate notifications being send'
+                        : '',
+                      shouldEnableOKWithAlert: true,
+                    }
+                  )();
+                }
+              },
+            },
+            {
+              icon: RefreshIcon,
+              tooltip: 'Refresh status actions log data',
+              isFreeAction: true,
+              onClick: () =>
+                tableRef.current && tableRef.current.onQueryChange({}),
+            },
+          ]}
+          onChangeColumnHidden={(columnChange) => {
+            const proposalColumns = columns.map(
+              (statusActionLogsColumn: Column<StatusActionsLog>) => ({
+                hidden:
+                  statusActionLogsColumn.title === columnChange.title
+                    ? columnChange.hidden
+                    : statusActionLogsColumn.hidden,
+                title: statusActionLogsColumn.title,
+              })
+            );
+
+            setLocalStorageValue(proposalColumns);
+          }}
+          onPageChange={(page, pageSize) => {
+            setUrlQueryParams((params) => ({
+              ...params,
+              page: +page.toString(),
+              pageSize: +pageSize.toString(),
+            }));
+          }}
+          onSearchChange={(searchText) => {
+            setUrlQueryParams((params) => ({
+              ...params,
+              search: searchText ? searchText : '',
+              page: searchText ? 0 : urlQueryParams.pageSize || 0,
+            }));
+          }}
+          onOrderCollectionChange={(orderByCollection: OrderByCollection[]) => {
+            const [orderBy] = orderByCollection;
+            setUrlQueryParams((params) => ({
+              ...params,
+              sortField: orderBy?.orderByField,
+              sortDirection: orderBy?.orderDirection,
+            }));
+          }}
+        />
+      </div>
+    </>
   );
 };
 export default withConfirm(StatusActionsLogsTable);

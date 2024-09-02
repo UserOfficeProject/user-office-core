@@ -677,5 +677,40 @@ context('Status actions tests', () => {
         text: 'Status action replay successfully send',
       });
     });
+    it('User Officer should be able to view and filter status actions', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal;
+        if (proposal) {
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.contains('Status Actions Logs').click();
+
+      cy.get('[data-cy="status-actions-log-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Successful').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]').should('have.length', 2);
+      cy.contains('FAILED').should('not.exist');
+
+      cy.get('[data-cy="status-actions-log-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Failed').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]').should('have.length', 0);
+      cy.contains('SUCCESSFUL').should('not.exist');
+
+      cy.get('[data-cy="status-actions-log-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]').should('have.length', 2);
+    });
   });
 });
