@@ -86,7 +86,7 @@ export default class PostgresStatusActionsLogsDataSource
             `Could not create status actions log with args: '${JSON.stringify(args)}'`,
             error
           );
-          throw new GraphQLError('Could not status actions log');
+          throw new GraphQLError('Could not create status actions log');
         }
       });
 
