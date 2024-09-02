@@ -284,4 +284,50 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         return reviews.map((review) => createReviewObject(review));
       });
   }
+
+  async getAllUsersReviews(
+    fapIds: number[],
+    userId?: number,
+    callId?: number,
+    instrumentId?: number,
+    status?: ReviewStatus
+  ): Promise<Review[]> {
+    const fapReviewsFiltered = database
+      .select()
+      .from('fap_reviews')
+      .modify((qb) => {
+        // sometimes the ID 0 is sent as a equivalent of all
+        if (callId) {
+          qb.join('proposals', {
+            'proposals.proposal_pk': 'fap_reviews.proposal_pk',
+          });
+          qb.where('proposals.call_id', callId);
+        }
+
+        // sometimes the ID 0 is sent as a equivalent of all
+        if (instrumentId) {
+          qb.join('instrument_has_proposals', {
+            'instrument_has_proposals.proposal_pk': 'fap_reviews.proposal_pk',
+          });
+          qb.where('instrument_has_proposals.instrument_id', instrumentId);
+        }
+
+        if (status !== undefined && status !== null) {
+          qb.where('fap_reviews.status', status);
+        }
+      })
+      .whereIn('fap_id', fapIds);
+
+    const query = `SELECT DISTINCT ON (proposal_pk) *  
+                   FROM (${fapReviewsFiltered}) fapReviewsTemp
+                   WHERE (user_id=${userId}
+                   OR (proposal_pk NOT IN 
+                   (SELECT DISTINCT proposal_pk 
+                   FROM fap_reviews 
+                   WHERE user_id = ${userId})));`;
+
+    const response = (await database.raw(query)).rows;
+
+    return response.map((review: ReviewRecord) => createReviewObject(review));
+  }
 }
