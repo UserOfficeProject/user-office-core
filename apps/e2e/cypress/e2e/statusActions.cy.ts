@@ -604,6 +604,13 @@ context('Status actions tests', () => {
         recipientsWithEmailTemplate: [
           {
             recipient: {
+              name: EmailStatusActionRecipients.PI,
+              description: '',
+            },
+            emailTemplate: { id: 'pi-template', name: 'PI template' },
+          },
+          {
+            recipient: {
               name: EmailStatusActionRecipients.OTHER,
               description:
                 'Other email recipients manually added by their email',
