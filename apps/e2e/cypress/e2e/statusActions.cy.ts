@@ -702,7 +702,7 @@ context('Status actions tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="status-actions-logs-table"]')
-        .find('tbody td')
+        .find('[data-cy="replay_status_action_icon"]')
         .should('have.length', 2);
 
       cy.get('[data-cy="status-actions-log-status-filter"]').click();
