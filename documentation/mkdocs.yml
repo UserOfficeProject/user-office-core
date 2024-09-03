@@ -40,14 +40,13 @@ nav:
       - User: user-guide/user/user.md
       - User Officer:
           - Fundamental tutorials:
-              - User Officer Homepage: user-guide/user-officer/main/user-officer.md
+              - Home: user-guide/user-officer/main/user-officer.md
               - Creating a call: user-guide/user-officer/main/creating_call.md
               - Creating a workflow: user-guide/user-officer/main/creating_workflow.md
-              - Creating templates: user-guide/user-officer/main/templates.md
+              - Creating templates: user-guide/user-officer/main/creating_templates.md
               - Feasibility review: user-guide/user-officer/main/feasibility_review.md
               - FAP review: user-guide/user-officer/main/fap_review.md
               - Roles: user-guide/user-officer/main/roles.md
-              - Videos: user-guide/user-officer/main/videos.md
           - Proposals: user-guide/user-officer/proposal.md
           - Experiments: user-guide/user-officer/experiments.md
           - Calls: user-guide/user-officer/calls.md
@@ -77,14 +76,15 @@ nav:
               - App settings: user-guide/user-officer/settings/app_settings.md
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
+      - Architecture: developer-guide/architecture.md
+      - Tech Stack: developer-guide/tech_stack.md
       - Running Locally: developer-guide/running_locally.md
       - Configuration: developer-guide/configuration.md
       - Step-by-Step Guide: developer-guide/step-by-step.md
-      - Architecture: developer-guide/architecture.md
       - RabbitMQ: developer-guide/rabbitmq.md
       - Kubernetes: developer-guide/kubernetes.md
+      - Depencency Injection: developer-guide/dependency_injection.md
       - Email Service: developer-guide/email.md
-      - API Documentation: developer-guide/api_documentation.md
       - Documentation Changes: developer-guide/documentation_changes.md
   - FAQ: faq.md
   - Glossary: glossary.md
