@@ -186,11 +186,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                   proposal_id: ref,
                   reference_number_sequence: call.proposal_sequence ?? 0,
                   submitted: true,
+                  submitted_date: new Date(),
                 });
               } else {
                 query.update({
                   reference_number_sequence: call.proposal_sequence ?? 0,
                   submitted: true,
+                  submitted_date: new Date(),
                 });
               }
             })
@@ -1157,14 +1159,14 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return { totalCount: 0, proposals: [] };
   }
 
-  async updateSubmittedDate(proposalPk: number): Promise<Proposal> {
-    const proposal = await this.get(proposalPk);
+  // async updateSubmittedDate(proposalPk: number): Promise<Proposal> {
+  //   const proposal = await this.get(proposalPk);
 
-    if (!proposal) {
-      throw new Error('Proposal does not exist');
-    }
-    proposal.submittedDate = new Date();
+  //   if (!proposal) {
+  //     throw new Error('Proposal does not exist');
+  //   }
+  //   proposal.submittedDate = new Date();
 
-    return proposal;
-  }
+  //   return proposal;
+  // }
 }
