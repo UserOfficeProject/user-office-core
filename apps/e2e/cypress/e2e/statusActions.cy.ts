@@ -703,7 +703,7 @@ context('Status actions tests', () => {
 
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
-        .contains('SUCCESSFUL')
+        .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
 
       cy.get('[data-cy="status-actions-log-status-filter"]').click();
@@ -724,7 +724,7 @@ context('Status actions tests', () => {
 
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
-        .contains('SUCCESSFUL')
+        .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
     });
   });
