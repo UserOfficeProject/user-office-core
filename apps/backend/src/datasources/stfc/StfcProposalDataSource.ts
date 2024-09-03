@@ -319,13 +319,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             filter?.instrumentFilter?.instrumentId
           );
         }
-        if (filter?.text) {
-          this.where('tech.name', 'ilike', `%${filter.text}%`).orWhere(
-            'ins.name',
-            'ilike',
-            `%${filter.text}%`
-          );
-        }
       });
 
     const result = database
