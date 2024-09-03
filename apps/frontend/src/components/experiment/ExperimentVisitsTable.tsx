@@ -41,11 +41,17 @@ function ExperimentVisitsTable({
     {
       title: 'Visitor name',
       render: (rowData: RowType) => getFullUserName(rowData.user),
+      customSort: (a: RowType, b: RowType) => {
+        return getFullUserName(a.user).localeCompare(getFullUserName(b.user));
+      },
     },
     {
       title: 'Teamleader',
       render: (rowData: RowType) =>
         rowData.userId === scheduledEvent.visit?.teamLead.id ? 'Yes' : 'No',
+      customSort: (a: RowType) => {
+        return a.userId === scheduledEvent.visit?.teamLead.id ? -1 : 1;
+      },
     },
     {
       title: 'Starts at',
@@ -54,6 +60,20 @@ function ExperimentVisitsTable({
         rowData.isRegistrationSubmitted
           ? toFormattedDateTime(rowData.startsAt)
           : 'Unfinished',
+      customSort: (a: RowType, b: RowType) => {
+        const aIsUnfinished = !a.isRegistrationSubmitted;
+        const bIsUnfinished = !b.isRegistrationSubmitted;
+
+        if (aIsUnfinished === bIsUnfinished) {
+          if (!aIsUnfinished) {
+            return a.startsAt.localeCompare(b.startsAt);
+          } else {
+            return 0;
+          }
+        }
+
+        return aIsUnfinished ? (bIsUnfinished ? 0 : 1) : bIsUnfinished ? -1 : 0;
+      },
     },
     {
       title: 'Ends at',
@@ -62,11 +82,28 @@ function ExperimentVisitsTable({
         rowData.isRegistrationSubmitted
           ? toFormattedDateTime(rowData.endsAt)
           : 'Unfinished',
+      customSort: (a: RowType, b: RowType) => {
+        const aIsUnfinished = !a.isRegistrationSubmitted;
+        const bIsUnfinished = !b.isRegistrationSubmitted;
+
+        if (aIsUnfinished === bIsUnfinished) {
+          if (!aIsUnfinished) {
+            return a.endsAt.localeCompare(b.endsAt);
+          } else {
+            return 0;
+          }
+        }
+
+        return aIsUnfinished ? (bIsUnfinished ? 0 : 1) : bIsUnfinished ? -1 : 0;
+      },
     },
     {
       title: 'Training',
       field: 'rowData.trainingStatus',
       render: (rowData: RowType) => getHumanReadableStatus(rowData),
+      customSort: (a: RowType, b: RowType) => {
+        return a.trainingExpiryDate?.localeCompare(b.trainingExpiryDate) || 0;
+      },
     },
   ];
 
