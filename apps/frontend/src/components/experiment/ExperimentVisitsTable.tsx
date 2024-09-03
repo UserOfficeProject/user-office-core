@@ -50,7 +50,7 @@ function ExperimentVisitsTable({
       render: (rowData: RowType) =>
         rowData.userId === scheduledEvent.visit?.teamLead.id ? 'Yes' : 'No',
       customSort: (a: RowType) => {
-        return a.userId === scheduledEvent.visit?.teamLead.id ? -1 : 1;
+        return a.userId === scheduledEvent.visit?.teamLead.id ? 1 : -1;
       },
     },
     {
@@ -126,6 +126,7 @@ function ExperimentVisitsTable({
           backgroundColor: '#fafafa',
         },
       }}
+      data-cy="visit-registrations-table"
     >
       <MaterialTable
         title=""
@@ -140,7 +141,6 @@ function ExperimentVisitsTable({
           pageSize: 20,
           padding: 'dense',
         }}
-        data-cy="visit-registrations-table"
       />
     </Box>
   );
