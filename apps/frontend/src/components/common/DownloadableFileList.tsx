@@ -1,4 +1,3 @@
-import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import React from 'react';
@@ -6,14 +5,19 @@ import React from 'react';
 import { useFilesMetadata } from 'hooks/file/useFilesMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
 
+import { FileLink } from './FileLink';
+
 export function DownloadableFileList(props: { fileIds: string[] }) {
   const { fileIds } = props;
   const { files } = useFilesMetadata({ fileIds });
 
   const downloadLink = (file: FileMetaData) => (
-    <Link href={`/files/download/${file.fileId}`} download>
+    <FileLink
+      link={`/files/download/${file.fileId}`}
+      filename={file.originalFileName}
+    >
       {file.originalFileName}
-    </Link>
+    </FileLink>
   );
 
   return (
