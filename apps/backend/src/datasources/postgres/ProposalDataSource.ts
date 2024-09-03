@@ -513,6 +513,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.callId) {
           query.where('proposals.call_id', filter.callId);
         }
+
+        if (filter?.instrumentId) {
+          query
+            .leftJoin(
+              'instrument_has_proposals',
+              'instrument_has_proposals.proposal_pk',
+              'proposals.proposal_pk'
+            )
+            .where(
+              'instrument_has_proposals.instrument_id',
+              filter.instrumentId
+            );
+        }
+
         if (filter?.instrumentFilter?.instrumentId) {
           query
             .leftJoin(
