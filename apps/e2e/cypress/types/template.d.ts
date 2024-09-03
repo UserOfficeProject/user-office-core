@@ -276,11 +276,11 @@ declare global {
        * @returns {typeof createRichTextInput}
        * @memberof Chainable
        * @example
-       *    cy.createRichTextInput('Question', {maxChars:500})
+       *    cy.createRichTextInput('Question', {maxChars:500, allowImages:false})
        */
       createRichTextInput: (
         question: string,
-        options?: { maxChars?: number }
+        options?: { maxChars?: number; allowImages?: boolean }
       ) => void;
 
       /**
