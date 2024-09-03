@@ -303,6 +303,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'thp.technique_id'
       )
+      .leftJoin(
+        'instruments as ins',
+        'thi.instrument_id',
+        '=',
+        'ins.instrument_id'
+      )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST) {
           this.where('ths.user_id', user.id);
@@ -314,6 +320,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           this.where(
             'thi.instrument_id',
             filter?.instrumentFilter?.instrumentId
+          );
+        }
+        if (filter?.text) {
+          this.where('tech.name', 'ilike', `%${filter.text}%`).orWhere(
+            'ins.name',
+            'ilike',
+            `%${filter.text}%`
           );
         }
       });
