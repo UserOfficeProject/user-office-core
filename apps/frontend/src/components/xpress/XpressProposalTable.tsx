@@ -82,6 +82,7 @@ const XpressProposalTable = () => {
       ? [urlQueryParams.proposalId]
       : undefined,
     proposalStatusId: urlQueryParams.proposalStatus,
+    text: urlQueryParams.search,
   });
 
   const columns = [
@@ -117,6 +118,7 @@ const XpressProposalTable = () => {
       callId: proposalFilter.callId,
       referenceNumbers: proposalFilter.referenceNumbers,
       dateFilter: proposalFilter.dateFilter,
+      text: queryParameters.searchText,
     });
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
