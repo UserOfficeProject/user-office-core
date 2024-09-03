@@ -116,25 +116,25 @@ context('Xpress tests', () => {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
 
-    cy.updateUserRoles({
-      id: scientist1.id,
-      roles: [initialDBData.roles.instrumentScientist],
-    });
+    // cy.updateUserRoles({
+    //   id: scientist1.id,
+    //   roles: [initialDBData.roles.instrumentScientist],
+    // });
 
-    cy.updateUserRoles({
-      id: scientist2.id,
-      roles: [initialDBData.roles.instrumentScientist],
-    });
+    // cy.updateUserRoles({
+    //   id: scientist2.id,
+    //   roles: [initialDBData.roles.instrumentScientist],
+    // });
 
-    cy.updateUserRoles({
-      id: scientist3.id,
-      roles: [initialDBData.roles.instrumentScientist],
-    });
+    // cy.updateUserRoles({
+    //   id: scientist3.id,
+    //   roles: [initialDBData.roles.instrumentScientist],
+    // });
 
-    cy.updateUserRoles({
-      id: scientist4.id,
-      roles: [initialDBData.roles.instrumentScientist],
-    });
+    // cy.updateUserRoles({
+    //   id: scientist4.id,
+    //   roles: [initialDBData.roles.instrumentScientist],
+    // });
 
     cy.createInstrument(instrument1).then((result) => {
       if (result.createInstrument) {
@@ -248,8 +248,20 @@ context('Xpress tests', () => {
           abstract: proposal2.abstract,
         });
 
-        cy.submitProposal({ proposalPk: createdProposalPk2 }).then((result) => {
-          createdProposalId2 = result.submitProposal.proposalId;
+        cy.clock(proposalSubmittedDate2.getTime()).then(() => {
+          cy.task('log', 'before submit');
+          cy.task('log', proposalSubmittedDate2.getTime());
+          cy.task('log', new Date());
+          cy.submitProposal({ proposalPk: createdProposalPk2 }).then(
+            (result) => {
+              createdProposalId2 = result.submitProposal.proposalId;
+
+              cy.clock().then((clock) => clock.restore());
+              cy.task('log', 'after submit');
+              cy.task('log', proposalSubmittedDate2.getTime());
+              cy.task('log', new Date());
+            }
+          );
         });
 
         cy.assignProposalToTechniques({
@@ -269,8 +281,14 @@ context('Xpress tests', () => {
           abstract: proposal3.abstract,
         });
 
-        cy.submitProposal({ proposalPk: createdProposalPk3 }).then((result) => {
-          createdProposalId3 = result.submitProposal.proposalId;
+        cy.clock(proposalSubmittedDate3.getTime()).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk3 }).then(
+            (result) => {
+              createdProposalId3 = result.submitProposal.proposalId;
+
+              cy.clock().then((clock) => clock.restore());
+            }
+          );
         });
 
         cy.changeProposalsStatus({
@@ -295,8 +313,14 @@ context('Xpress tests', () => {
           abstract: proposal4.abstract,
         });
 
-        cy.submitProposal({ proposalPk: createdProposalPk4 }).then((result) => {
-          createdProposalId4 = result.submitProposal.proposalId;
+        cy.clock(proposalSubmittedDate4.getTime()).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk4 }).then(
+            (result) => {
+              createdProposalId4 = result.submitProposal.proposalId;
+
+              cy.clock().then((clock) => clock.restore());
+            }
+          );
         });
 
         cy.changeProposalsStatus({
@@ -681,7 +705,7 @@ context('Xpress tests', () => {
     cy.get('input[aria-label="Search"]').focus().clear();
   });
 
-  describe('Techniques advanced tests', () => {
+  describe.only('Techniques advanced tests', () => {
     it('User officer can see all submitted and unsubmitted Xpress proposals', function () {
       if (
         !featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)

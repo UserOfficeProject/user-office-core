@@ -436,14 +436,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return { totalCount: 1, proposals: [dummyProposalView] };
   }
 
-  async updateSubmittedDate(proposalPk: number): Promise<Proposal> {
-    const proposal = await this.get(proposalPk);
+  // async updateSubmittedDate(proposalPk: number): Promise<Proposal> {
+  //   const proposal = await this.get(proposalPk);
 
-    if (!proposal) {
-      throw new Error('Proposal does not exist');
-    }
-    proposal.submittedDate = new Date();
+  //   if (!proposal) {
+  //     throw new Error('Proposal does not exist');
+  //   }
+  //   proposal.submittedDate = new Date();
 
-    return proposal;
-  }
+  //   return proposal;
+  // }
 }
