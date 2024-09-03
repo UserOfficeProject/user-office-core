@@ -65,6 +65,14 @@ async function setELIColourTheme() {
     settingsId: SettingsId.HEADER_LOGO_FILENAME,
     settingsValue: 'eli-white.svg',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.EXTERNAL_AUTH_LOGIN_URL,
+    settingsValue: process.env.EXTERNAL_AUTH_LOGIN_URL,
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.EXTERNAL_AUTH_LOGOUT_URL,
+    settingsValue: process.env.EXTERNAL_AUTH_LOGOUT_URL,
+  });
 }
 
 async function enableDefaultELIFeatures() {
