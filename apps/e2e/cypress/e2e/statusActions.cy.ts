@@ -702,7 +702,8 @@ context('Status actions tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="status-actions-logs-table"]')
-        .find('[data-cy="replay_status_action_icon"]')
+        .find('tbody td')
+        .contains('SUCCESSFUL')
         .should('have.length', 2);
 
       cy.get('[data-cy="status-actions-log-status-filter"]').click();
@@ -723,6 +724,7 @@ context('Status actions tests', () => {
 
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
+        .contains('SUCCESSFUL')
         .should('have.length', 2);
     });
   });
