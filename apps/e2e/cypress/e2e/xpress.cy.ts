@@ -653,12 +653,32 @@ context('Xpress tests', () => {
     cy.finishedLoading();
 
     cy.contains('Xpress Proposals').click();
-    //cy.contains('Search').type(proposal1.title);
-    //cy.get('#search').type(proposal1.title);
 
-    //cy.get('.search').find('input').invoke(proposal1.title);
+    // Test with proposal title
+    cy.get('input[aria-label="Search"]').focus().type(proposal1.title);
+    cy.contains(proposal1.title);
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal2.title
+    );
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+    cy.get('input[aria-label="Search"]').focus().clear();
 
-    cy.screenshot('test');
+    // Test with proposal id
+    cy.get('input[aria-label="Search"]').focus().type(createdProposalId2);
+    cy.contains(proposal2.title);
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal1.title
+    );
+    cy.get('table.MuiTable-root tbody tr').should(
+      'not.contain',
+      proposal3.title
+    );
+    cy.get('input[aria-label="Search"]').focus().clear();
   });
 
   describe('Techniques advanced tests', () => {
