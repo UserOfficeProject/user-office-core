@@ -39,7 +39,8 @@ export interface FapDataSource {
     numberRatingsRequired: number,
     gradeGuide: string,
     customGradeGuide: boolean | null,
-    active: boolean
+    active: boolean,
+    files: string | null
   ): Promise<Fap>;
   delete(id: number): Promise<Fap>;
   getFap(id: number): Promise<Fap | null>;
@@ -76,8 +77,9 @@ export interface FapDataSource {
     callId: number
   ): Promise<BasicUserDetails[]>;
   getFapProposalCount(fapId: number): Promise<number>;
+  getCurrentFapProposalCount(fapId: number): Promise<number>;
   getFapReviewerProposalCount(reviewerId: number): Promise<number>;
-  getFapReviewerProposalCountCurrentRound(reviewerId: number): Promise<number>;
+  getCurrentFapReviewerProposalCount(reviewerId: number): Promise<number>;
   getFapProposal(
     fapId: number,
     proposalPk: number,

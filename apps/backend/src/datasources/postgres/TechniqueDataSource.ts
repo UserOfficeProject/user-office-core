@@ -2,12 +2,17 @@ import { injectable } from 'tsyringe';
 
 import { Instrument } from '../../models/Instrument';
 import { Technique } from '../../models/Technique';
+import { BasicUserDetails } from '../../models/User';
 import { CreateTechniqueArgs } from '../../resolvers/mutations/CreateTechniqueMutation';
 import { TechniqueDataSource } from '../TechniqueDataSource';
 import database from './database';
 import {
+  CountryRecord,
+  InstitutionRecord,
   InstrumentRecord,
   TechniqueRecord,
+  UserRecord,
+  createBasicUserObject,
   createInstrumentObject,
 } from './records';
 
@@ -91,8 +96,8 @@ export default class PostgresTechniqueDataSource
       });
   }
 
-  async getInstrumentsByTechniqueId(
-    techniqueId: number
+  async getInstrumentsByTechniqueIds(
+    techniqueIds: number[]
   ): Promise<Instrument[]> {
     return database
       .select()
@@ -100,13 +105,32 @@ export default class PostgresTechniqueDataSource
       .join('technique_has_instruments as tech_instr', {
         'instr.instrument_id': 'tech_instr.instrument_id',
       })
-      .where('technique_id', techniqueId)
+      .whereIn('technique_id', techniqueIds)
       .then((results: InstrumentRecord[]) =>
         results.map(createInstrumentObject)
       )
       .catch((error) => {
         throw new Error(`Error getting instruments by technique ID: ${error}`);
       });
+  }
+  async getTechniqueScientists(
+    techniqueId: number
+  ): Promise<BasicUserDetails[]> {
+    return database
+      .select('*')
+      .from('users as u')
+      .join('technique_has_scientists as ths', {
+        'u.user_id': 'ths.user_id',
+      })
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .where('ths.technique_id', techniqueId)
+      .then(
+        (
+          usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>
+        ) => {
+          return usersRecord.map((user) => createBasicUserObject(user));
+        }
+      );
   }
 
   async update(technique: Technique): Promise<Technique> {
@@ -197,6 +221,104 @@ export default class PostgresTechniqueDataSource
       }
     } catch (error) {
       throw new Error(`Error removing instrument(s) from technique: ${error}`);
+    }
+  }
+
+  async assignProposalToTechniques(
+    proposalPk: number,
+    techniqueIds: number[]
+  ): Promise<boolean> {
+    database.transaction(async (trx) => {
+      await database('technique_has_proposals')
+        .delete()
+        .where('proposal_id', proposalPk)
+        .transacting(trx);
+
+      await database('technique_has_proposals')
+        .insert(
+          techniqueIds.map((techniqueId) => ({
+            technique_id: techniqueId,
+            proposal_id: proposalPk,
+          }))
+        )
+        .onConflict(['proposal_id', 'technique_id'])
+        .ignore()
+        .transacting(trx)
+        .then(() => {
+          trx.commit;
+        })
+        .catch((error) => {
+          trx.rollback;
+          throw new Error(`Error assigning proposal to technique: ${error}`);
+        });
+    });
+
+    return true;
+  }
+
+  async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {
+    return database
+      .select()
+      .from('techniques')
+      .whereIn('technique_id', techniqueIds)
+      .then((results: TechniqueRecord[]) =>
+        results.map(this.createTechniqueObject)
+      )
+      .catch((error) => {
+        throw new Error(`Error getting techniques: ${error}`);
+      });
+  }
+
+  async getTechniquesByInstrumentIds(
+    instrumentIds: number[]
+  ): Promise<Technique[]> {
+    try {
+      const uniqueTechniques: TechniqueRecord[] = await database(
+        'techniques as t'
+      )
+        .select('t.*')
+        .join('technique_has_instruments as thi', {
+          'thi.technique_id': 't.technique_id',
+        })
+        .whereIn('thi.instrument_id', instrumentIds)
+        .distinct();
+
+      return uniqueTechniques
+        ? uniqueTechniques.map((tech) => this.createTechniqueObject(tech))
+        : [];
+    } catch (error) {
+      throw new Error(`Error getting techniques by instrument IDs: ${error}`);
+    }
+  }
+
+  async assignScientistsToTechnique(
+    scientistIds: number[],
+    techniqueId: number
+  ): Promise<boolean> {
+    const dataToInsert = scientistIds.map((scientistId) => ({
+      technique_id: techniqueId,
+      user_id: scientistId,
+    }));
+
+    return await database('technique_has_scientists')
+      .insert(dataToInsert)
+      .returning('*')
+      .then((result) => !!result.length);
+  }
+
+  async removeScientistFromTechnique(
+    scientistId: number,
+    techniqueId: number
+  ): Promise<boolean> {
+    const result = await database('technique_has_scientists')
+      .where('technique_id', techniqueId)
+      .andWhere('user_id', scientistId)
+      .del();
+
+    if (result) {
+      return true;
+    } else {
+      return false;
     }
   }
 }

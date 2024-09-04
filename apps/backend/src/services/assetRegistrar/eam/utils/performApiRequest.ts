@@ -1,25 +1,25 @@
-import { getToken } from '../api/getToken';
 import { createAndLogError } from './createAndLogError';
 import { getEnvOrThrow } from './getEnvOrThrow';
 
-export async function performApiRequest(requestData: string) {
+export async function performApiRequest(uri: string, requestData: object) {
   try {
-    const accessToken = await getToken();
-
-    const response = await fetch(getEnvOrThrow('EAM_API_URL'), {
+    const response = await fetch(getEnvOrThrow('EAM_API_URL') + uri, {
       method: 'POST',
-      body: requestData,
+      body: JSON.stringify(requestData),
       headers: {
-        'Content-Type': 'text/xml',
-        Authorization: `Bearer ${accessToken.token.access_token}`,
+        'Content-Type': 'application/json',
+        INFOR_USER: getEnvOrThrow('EAM_AUTH_USER'),
+        INFOR_PASSWORD: getEnvOrThrow('EAM_AUTH_PASSWORD'),
+        INFOR_TENANT: getEnvOrThrow('EAM_AUTH_TENANT'),
+        INFOR_ORGANIZATION: getEnvOrThrow('EAM_AUTH_ORGANIZATION'),
       },
     });
-
-    const data = await response.text();
-
+    const data = await response.json();
     if (!response.ok) {
       throw createAndLogError('Failed to execute registerAssetInEAM', {
         data,
+        url: getEnvOrThrow('EAM_API_URL') + uri,
+        requestData,
       });
     }
 
@@ -27,6 +27,7 @@ export async function performApiRequest(requestData: string) {
   } catch (error) {
     throw createAndLogError('Error while calling EAM API', {
       error,
+      url: getEnvOrThrow('EAM_API_URL') + uri,
       requestData,
     });
   }

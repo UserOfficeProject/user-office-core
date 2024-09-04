@@ -34,6 +34,7 @@ export const dummyFap = new Fap(
   true,
   true,
   null,
+  null,
   null
 );
 
@@ -46,6 +47,7 @@ export const anotherDummyFap = new Fap(
   true,
   false,
   null,
+  null,
   null
 );
 
@@ -57,6 +59,7 @@ export const dummyFapWithoutCode = new Fap(
   '',
   true,
   false,
+  null,
   null,
   null
 );
@@ -246,6 +249,7 @@ export class FapDataSourceMock implements FapDataSource {
       customGradeGuide,
       active,
       null,
+      null,
       null
     );
   }
@@ -267,6 +271,7 @@ export class FapDataSourceMock implements FapDataSource {
       gradeGuide,
       customGradeGuide,
       active,
+      null,
       null,
       null
     );
@@ -318,11 +323,15 @@ export class FapDataSourceMock implements FapDataSource {
     return dummyFapProposals.length;
   }
 
+  async getCurrentFapProposalCount(fapId: number) {
+    return dummyFapProposals.length;
+  }
+
   async getFapReviewerProposalCount(reviewerId: number) {
     return dummyFapProposals.length;
   }
 
-  async getFapReviewerProposalCountCurrentRound(reviewerId: number) {
+  async getCurrentFapReviewerProposalCount(reviewerId: number) {
     return dummyFapProposals.length;
   }
 

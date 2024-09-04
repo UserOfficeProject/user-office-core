@@ -6,6 +6,7 @@ mutation updateFap(
   $gradeGuide: String
   $customGradeGuide: Boolean
   $active: Boolean!
+  $files: String
 ) {
   updateFap(
     id: $id
@@ -15,6 +16,7 @@ mutation updateFap(
     gradeGuide: $gradeGuide
     customGradeGuide: $customGradeGuide
     active: $active
+    files: $files
   ) {
     id
   }

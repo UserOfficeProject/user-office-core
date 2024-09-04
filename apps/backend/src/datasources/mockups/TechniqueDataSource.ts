@@ -1,8 +1,10 @@
 import { Instrument } from '../../models/Instrument';
 import { Technique } from '../../models/Technique';
+import { BasicUserDetails } from '../../models/User';
 import { CreateTechniqueArgs } from '../../resolvers/mutations/CreateTechniqueMutation';
 import { TechniqueDataSource } from '../TechniqueDataSource';
 import { dummyInstruments } from './InstrumentDataSource';
+import { basicDummyUser } from './UserDataSource';
 
 export const dummyTechnique1 = new Technique(
   1,
@@ -38,8 +40,8 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
     return { totalCount: dummyTechniques.length, techniques: dummyTechniques };
   }
 
-  async getInstrumentsByTechniqueId(
-    techniqueId: number
+  async getInstrumentsByTechniqueIds(
+    techniqueIds: number[]
   ): Promise<Instrument[]> {
     return dummyInstruments;
   }
@@ -61,6 +63,55 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
 
   async removeInstrumentsFromTechnique(
     instrumentIds: number[],
+    techniqueId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async assignProposalToTechniques(
+    proposalPk: number,
+    techniqueIds: number[]
+  ): Promise<boolean> {
+    if (proposalPk && techniqueIds) {
+      return true;
+    }
+
+    return false;
+  }
+
+  async getTechniquesByIds(techniqueIds: number[]): Promise<Technique[]> {
+    if (techniqueIds) {
+      return dummyTechniques;
+    }
+
+    return [];
+  }
+
+  async getTechniquesByInstrumentIds(
+    instrumentIds: number[]
+  ): Promise<Technique[]> {
+    if (instrumentIds) {
+      return dummyTechniques;
+    }
+
+    return [];
+  }
+
+  async getTechniqueScientists(
+    techniqueId: number
+  ): Promise<BasicUserDetails[]> {
+    return [basicDummyUser];
+  }
+
+  async assignScientistsToTechnique(
+    scientistIds: number[],
+    techniqueId: number
+  ): Promise<boolean> {
+    return true;
+  }
+
+  async removeScientistFromTechnique(
+    scientistId: number,
     techniqueId: number
   ): Promise<boolean> {
     return true;

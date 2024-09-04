@@ -13,7 +13,6 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
-import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
@@ -31,6 +30,7 @@ import { useFilesMetadata } from 'hooks/file/useFilesMetadata';
 import { FileMetaData } from 'models/questionary/FileUpload';
 import { FunctionType } from 'utils/utilTypes';
 
+import { FileLink } from './FileLink';
 import UOLoader from './UOLoader';
 
 export type FileIdWithCaptionAndFigure = {
@@ -50,6 +50,7 @@ export function FileEntry(props: {
   const [showCaption, setShowCaption] = useState(false);
 
   const downloadLink = `/files/download/${props.metaData.fileId}`;
+  const filename = props.metaData.originalFileName;
 
   const formatBytes = (bytes: number, decimals = 2): string => {
     if (bytes === 0) return '0 Bytes';
@@ -114,16 +115,16 @@ export function FileEntry(props: {
             )}
             <Tooltip title="Download file">
               <IconButton edge="end">
-                <Link
-                  href={downloadLink}
+                <FileLink
+                  link={downloadLink}
+                  filename={filename}
                   sx={{
                     display: 'inline-flex',
                     color: 'rgba(0, 0, 0, 0.54)',
                   }}
-                  download
                 >
                   <GetAppIcon />
-                </Link>
+                </FileLink>
               </IconButton>
             </Tooltip>
             <Tooltip title="Remove file">
@@ -301,7 +302,11 @@ export function NewFileEntry(props: {
             multiple={false}
             onChange={onFileSelected}
           />
-          <Button variant="outlined" component="span">
+          <Button
+            variant="outlined"
+            component="span"
+            data-cy="attach-file-button"
+          >
             <AddCircleOutlineIcon
               sx={{
                 marginRight: theme.spacing(1),
@@ -358,6 +363,7 @@ export function FileUploadComponent(props: {
   omitFromPdf: boolean;
   value: FileIdWithCaptionAndFigure[];
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
+  deleteAllOption?: boolean;
 }) {
   const fileIds = props.value.map((fileItem) => fileItem.id);
   const { files, setFiles } = useFilesMetadata({ fileIds });
@@ -388,6 +394,11 @@ export function FileUploadComponent(props: {
         )?.caption,
       }))
     );
+  };
+
+  const onDeleteAllClicked = () => {
+    setFiles([]);
+    props.onChange([]);
   };
 
   const onImageCaptionOrFigureAdded = ({
@@ -470,7 +481,18 @@ export function FileUploadComponent(props: {
               </ListItem>
             );
           })}
-        <ListItem key="addNew">{newFileEntry}</ListItem>
+        <ListItem key="addNew">
+          {newFileEntry}
+          {props.deleteAllOption && (
+            <Button
+              sx={{ marginLeft: '10px' }}
+              data-cy="delete-all"
+              onClick={() => onDeleteAllClicked()}
+            >
+              Remove All
+            </Button>
+          )}
+        </ListItem>
       </List>
     </>
   );

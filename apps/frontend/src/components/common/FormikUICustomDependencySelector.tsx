@@ -115,6 +115,27 @@ const FormikUICustomDependencySelector = ({
 
             setIsLoading(false);
           });
+      } else if (depField.question.dataType === DataType.TECHNIQUE_PICKER) {
+        if (form.submitCount) {
+          setIsLoading(false);
+
+          return;
+        }
+
+        api()
+          .getTechniques()
+          .then((data) => {
+            if (data.techniques) {
+              setAvailableValues(
+                data.techniques.techniques.map((technique) => ({
+                  label: technique.name,
+                  value: technique.id,
+                }))
+              );
+            }
+
+            setIsLoading(false);
+          });
       }
     }
   }, [dependencyId, template, api, form.submitCount]);
@@ -162,6 +183,7 @@ const FormikUICustomDependencySelector = ({
             DataType.BOOLEAN,
             DataType.SELECTION_FROM_OPTIONS,
             DataType.INSTRUMENT_PICKER,
+            DataType.TECHNIQUE_PICKER,
           ].includes(option.question.dataType) &&
           currentQuestionId !== option.question.id
       )
