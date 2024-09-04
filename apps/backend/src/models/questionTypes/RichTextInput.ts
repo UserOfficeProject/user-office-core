@@ -31,7 +31,6 @@ export const sanitizerConfig: IOptions = {
     'li',
     'div',
     'br',
-    'img',
   ],
   disallowedTagsMode: 'discard',
   allowedAttributes: {
@@ -48,6 +47,28 @@ export const sanitizerConfig: IOptions = {
 
 export const sanitizerConfigWithImages: IOptions = {
   ...sanitizerConfig,
+  allowedTags: [
+    'a',
+    'p',
+    'span',
+    'strong',
+    'em',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'sub',
+    'sup',
+    'pre',
+    'ul',
+    'ol',
+    'li',
+    'div',
+    'br',
+    'img',
+  ],
   allowedAttributes: {
     a: ['href', 'title'],
     span: ['style', 'class'],
@@ -68,14 +89,11 @@ export const richTextInputDefinition: Question<DataType.RICH_TEXT_INPUT> = {
   },
   transform: (field: QuestionTemplateRelation, value: any) => {
     const config = field.config as RichTextInputConfig;
-    const s = config.allowImages ? sanitizerConfigWithImages : sanitizerConfig;
 
-    const r = sanitizeHtml(
+    return sanitizeHtml(
       value,
       config.allowImages ? sanitizerConfigWithImages : sanitizerConfig
     );
-
-    return r;
   },
   createBlankConfig: (): ConfigBase => {
     const config = new RichTextInputConfig();
