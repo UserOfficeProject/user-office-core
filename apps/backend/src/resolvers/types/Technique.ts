@@ -12,6 +12,7 @@ import {
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
 import { Technique as TechniqueOrigin } from '../../models/Technique';
+import { BasicUserDetails } from './BasicUserDetails';
 import { Instrument } from './Instrument';
 
 @ObjectType()
@@ -38,10 +39,21 @@ export class TechniqueResolver {
     @Ctx() context: ResolverContext
   ): Promise<Instrument[] | null> {
     const instruments =
-      context.queries.technique.dataSource.getInstrumentsByTechniqueId(
-        technique.id
-      );
+      context.queries.technique.dataSource.getInstrumentsByTechniqueIds([
+        technique.id,
+      ]);
 
     return isRejection(instruments) ? null : instruments;
+  }
+
+  @FieldResolver(() => [BasicUserDetails])
+  async scientists(
+    @Root() technique: Technique,
+    @Ctx() context: ResolverContext
+  ): Promise<BasicUserDetails[] | null> {
+    const scientists =
+      context.queries.technique.dataSource.getTechniqueScientists(technique.id);
+
+    return isRejection(scientists) ? [] : scientists;
   }
 }

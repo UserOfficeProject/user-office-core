@@ -1,15 +1,45 @@
 import { existsSync, unlink } from 'fs';
 
 import { logger } from '@user-office-software/duo-logger';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import multer from 'multer';
+import { container } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import baseContext from '../buildContext';
+import { Tokens } from '../config/Tokens';
 import { isRejection } from '../models/Rejection';
 
 const files = () => {
   const router = express.Router();
   const upload = multer({ dest: 'uploads/' });
+
+  const userAuthorization = container.resolve<UserAuthorization>(
+    Tokens.UserAuthorization
+  );
+
+  const validation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    if (!req.user) {
+      res.status(401).send('Unauthorized');
+
+      return;
+    } else {
+      const isExternalTokenValid = await userAuthorization.isExternalTokenValid(
+        req.user.externalToken ? req.user.externalToken : ''
+      );
+      if (!isExternalTokenValid) {
+        res.status(401).send('External Token is Invalid');
+
+        return;
+      }
+    }
+    next();
+  };
+
   const fileDownloadHandler = async (req: Request, res: Response) => {
     try {
       const fileId = req.params.file_id;
@@ -55,6 +85,8 @@ const files = () => {
       res.status(500).send(e);
     }
   };
+
+  router.use('/files/', validation);
 
   router.get('/files/download/:file_id', fileDownloadHandler);
 

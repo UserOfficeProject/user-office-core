@@ -112,7 +112,7 @@ function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
       }}
     >
       <Typography
-        variant="h4"
+        variant="h6"
         component="h2"
         sx={{ textAlign: 'center' }}
         ref={titleRef}

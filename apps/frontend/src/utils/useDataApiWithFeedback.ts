@@ -22,18 +22,19 @@ function useDataApiWithFeedback() {
         get(target, prop) {
           return async (args: never) => {
             setIsExecutingCall(true);
+            try {
+              const serverResponse = await target[prop as KeyOfSdk](args);
+              props?.toastSuccessMessage &&
+                enqueueSnackbar(props.toastSuccessMessage, {
+                  variant: props.toastSuccessMessageVariant ?? 'success',
+                  className: 'snackbar-success',
+                  autoHideDuration: 10000,
+                });
 
-            const serverResponse = await target[prop as KeyOfSdk](args);
-
-            props?.toastSuccessMessage &&
-              enqueueSnackbar(props.toastSuccessMessage, {
-                variant: props.toastSuccessMessageVariant ?? 'success',
-                className: 'snackbar-success',
-                autoHideDuration: 10000,
-              });
-            setIsExecutingCall(false);
-
-            return serverResponse;
+              return serverResponse;
+            } finally {
+              setIsExecutingCall(false);
+            }
           };
         },
       }),

@@ -165,4 +165,16 @@ fragment fieldConfig on FieldConfig {
       name
     }
   }
+
+  ... on TechniquePickerConfig {
+    variant
+    small_label
+    required
+    tooltip
+    isMultipleSelect
+    techniques {
+      id
+      name
+    }
+  }
 }

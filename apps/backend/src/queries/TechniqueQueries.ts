@@ -35,7 +35,7 @@ export default class TechniqueQueries {
     techniqueId: number
   ) {
     return await this.dataSource
-      .getInstrumentsByTechniqueId(techniqueId)
+      .getInstrumentsByTechniqueIds([techniqueId])
       .catch((error) => {
         return rejection(
           'Could not get instruments by technique ID',
@@ -50,5 +50,10 @@ export default class TechniqueQueries {
     return await this.dataSource.getTechniques().catch((error) => {
       return rejection('Could not get all techniques', { agent }, error);
     });
+  }
+
+  @Authorized()
+  async getTechniquesByIds(agent: UserWithRole | null, techniqueIds: number[]) {
+    return await this.dataSource.getTechniquesByIds(techniqueIds);
   }
 }

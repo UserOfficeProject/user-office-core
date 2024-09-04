@@ -1,3 +1,7 @@
+# Running Locally
+
+_________________________________________________________________________________________________________
+
 To successfully run both the backend and frontend of the project locally, follow these steps:
 
 ## Prerequisites
@@ -8,23 +12,27 @@ Ensure you have the following installed on your machine:
 - npm
 - Docker (if using Docker Compose)
 
+_________________________________________________________________________________________________________
+
 ## Installation
 
 **1. Install Dependencies**
 
    Navigate to the root directory of your project and install all necessary dependencies:
 
-   `npm install`
+      npm install
 
 **2. Start the Application**
 
    Start the application in development mode:
 
-   `npm run dev`
+      npm run dev
 
    Alternatively, you can use:
 
-   `npm run start`
+      npm run start
+
+_________________________________________________________________________________________________________
 
 ## Configuration
 
@@ -32,10 +40,12 @@ Ensure you have the following installed on your machine:
 
 The application requires environment variables to be set. If a .env file is not present at startup, it will be generated using the example.development.env template.
 
-    Backend: apps/backend/.env
-    Frontend: apps/frontend/.env
+- Backend: `apps/backend/.env`
+- Frontend: `apps/frontend/.env`
 
-Ensure these files are correctly configured before starting the application. For more information about configuration, visit the [Configuration tab](./configuration.md)
+Ensure these files are correctly configured before starting the application. For more information about configuration, visit the [Configuration page](./configuration.md)
+
+_________________________________________________________________________________________________________
 
 ## Running with Docker Compose
 
@@ -45,14 +55,16 @@ For testing purposes, you can use Docker Compose to quickly set up the project. 
 
    Navigate to the root directory of your project and run:
 
-   `docker compose up`
+      docker compose up
 
 **2. Access the Application**
 
 - Open your browser and visit [http://localhost:33000](http://localhost:33000).
 - Use the following default credentials to log in:
-    - User Officer: 'Aaron_Harris49@gmail.com' with password 'Test1234!'
-    - User: 'Javon4@hotmail.com' with password 'Test1234!'
+    - User Officer: `Aaron_Harris49@gmail.com` with password `Test1234!`
+    - User: `Javon4@hotmail.com` with password `Test1234!`
+
+_________________________________________________________________________________________________________
 
 ## GraphQL Playground and Schema
 
@@ -60,10 +72,16 @@ The GraphQL Playground is an interactive, in-browser tool for writing, validatin
 
 - Open your browser and navigate to [http://localhost:4000](http://localhost:4000). This URL will direct you to the GraphQL Playground interface.
 
+_________________________________________________________________________________________________________
+
 ## Available Scripts
 
-### `npm run lint`
+      npm run lint
 
 Lints typescript code and log if there are any errors.
 
-`npm run lint:fix` should be used if you want to fix all auto-fixable errors and warnings.
+If you want to fix all auto-fixable errors and warnings use:
+
+      npm run lint:
+
+_________________________________________________________________________________________________________
