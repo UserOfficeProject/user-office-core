@@ -1,30 +1,32 @@
 # Pages :material-cog-box:
 
-## **What are pages?**
+_________________________________________________________________________________________________________
+
+## What are pages?
 
 Pages are highly customiseable sections of information within User Office. Pages can be utilised to display key dates, advice and links to users and reviewers. 
 
-## **How do I edit pages?**
+_________________________________________________________________________________________________________
 
-**Step 1. Navigate to the Page editor**
+## How do I edit pages?
+
+### Step 1: Navigate to the Page editor
 
 * To edit a page, select `PAGES` :material-cog-box: from the main menu
 * From the Page Editor, choose the page you wish to edit
 
-**Step 2. Edit the page**
+### Step 2: Edit the page
 
 * To create a new page click on `FILE` > `NEW DOCUMENT`, or edit the pre-existing message.
 * The editor contains many useful features to aid in creating the page such as `EDITING` and `FORMATTING` tools.
 * The `INSERT` button can also be used to insert images and links into the page.
 
-!!! tip ""
+> **_NOTE:_** It is good practice to carefully check the preview before updating the page to ensure that it is well formatted. You can do this in `VIEW` > `PREVIEW`
 
-    **Tip!** It is good practice to carefully check the preview before updating the page to ensure that it is well formatted. You can do this in `VIEW` > `PREVIEW`
-
-### **User**
+#### User page
 
 !!! note ""
-    **User page:** This sets the users' homepage; this is the information that users will see on their dashboard.   
+    This sets the users' homepage; this is the information that users will see on their dashboard.   
     This may include the following key information: 
     
     * A welcome message to users
@@ -36,14 +38,14 @@ Pages are highly customiseable sections of information within User Office. Pages
 
     <figure markdown="span">  
         ![User](../../assets/images/user_homepage.png)
-        <figcaption>**User homepage (dashboard)**</figcaption>
+        <figcaption>User homepage (dashboard)</figcaption>
     </figure>
 
 
-### **Reviewer**
+#### Reviewer page
 
 !!! note ""
-    **Reviewer page:** This sets the reviewers' homepage; this is the information that reviewers will see on their dashboard (This is displayed to the following roles: [Sample Safety Reviewer](main/roles.md), [Internal Reviewer](main/roles.md), [FAP chairs](main/roles.md), [FAP secretaries](main/roles.md) and [FAP reviewers](main/roles.md)).
+    This sets the reviewers' homepage; this is the information that reviewers will see on their dashboard (This is displayed to the following roles: [Sample Safety Reviewer](roles.md), [Internal Reviewer](roles.md), [FAP chairs](roles.md), [FAP secretaries](roles.md) and [FAP reviewers](roles.md)).
 
     The reviewer page may include the following key information: 
 
@@ -59,10 +61,10 @@ Pages are highly customiseable sections of information within User Office. Pages
         <figcaption>**Reviewer homepage (dashboard)**</figcaption>
     </figure>
 
-### **Help**
+#### Help page
 
 !!! note ""
-    **Help page:** This sets the help page; this is the information that is displayed to users on the 'help' page, and at the FAQ button at the bottom of the page for all users. See the 'FAQs for help page section for an list of example questions that may be useful to include in the help page.
+    This sets the help page; this is the information that is displayed to users on the 'help' page, and at the FAQ button at the bottom of the page for all users. See the 'FAQs for help page section for an list of example questions that may be useful to include in the help page.
     
     ??? info "FAQs for help page"
         Frequently asked questions: 
@@ -107,34 +109,32 @@ Pages are highly customiseable sections of information within User Office. Pages
         <figcaption>**Help notice (FAQ)**</figcaption>
     </figure>
 
-### **Privacy**
+#### Privacy Agreement page
 
 !!! note ""
-    **Privacy Agreement page:** This sets the privacy agreement page; this is the information that is displayed when clicking on the `PRIVACY STATEMENT` button at the bottom of all pages.
+    This sets the privacy agreement page; this is the information that is displayed when clicking on the `PRIVACY STATEMENT` button at the bottom of all pages.
 
     <figure markdown="span">  
         ![Privacy page](../../assets/images/privacy_page.png)
         <figcaption>**Privacy Agreement Page**</figcaption>
     </figure>
 
-### **Footer**
+#### Footer
 
 !!! note ""
-    [Footer (developer tool)](placeholder.md)
-    Note: The page must be refreshed in order to view the updated footer. 
+    This sets the footer. The page must be refreshed in order to view the updated footer. 
 
-### **Login**
-
-!!! note ""
-    [Login (developer tool)](placeholder.md)
-
-### **Grade guide** 
+#### Login
 
 !!! note ""
-    **Grade guide:** This sets the grade guide. Note: this is different from the grade guide in the FAP page
+    This sets login.
 
-**Step 3. Update your changes**
+#### Grade guide
+
+!!! note ""
+    This sets the grade guide. Note: this is different from the grade guide in the FAP page
+
+### Step 3: Update your changes
 
 * Once you are satisfied with the changes and ensured that the page is well-formatted with the `PREVIEW` function you can update the page by clicking on the `UPDATE` button.
 _________________________________________________________________________________________________________
-

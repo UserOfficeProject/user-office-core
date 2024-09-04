@@ -1,3 +1,7 @@
+# RabbitMQ
+
+_________________________________________________________________________________________________________
+
 RabbitMQ is a message broker that enables applications to communicate with each other asynchronously by sending and receiving messages. It is used within User Office to handle communication between different components of the system, particularly for routing messages related to proposal status actions. 
 
 This page provides an overview of how RabbitMQ is integrated into the project, including details on configuration, message handling, and frontend display.
@@ -7,6 +11,8 @@ This page provides an overview of how RabbitMQ is integrated into the project, i
 When the status of a proposal changes, a message is sent to specific RabbitMQ exchanges, which then route the message to the appropriate services or components for further processing.
 
 Enable it in the [configuration](configuration.md).
+
+_________________________________________________________________________________________________________
 
 ## Configuration of RabbitMQ Exchanges
 
@@ -19,6 +25,8 @@ The RabbitMQ exchanges are configured using the `RabbitMQActionConfig` class. Th
     }
 
 **Exchanges:** The exchanges property is an array of strings, each representing the name of a RabbitMQ exchange. These exchanges are where messages related to proposal status changes are sent.
+
+_________________________________________________________________________________________________________
 
 ## Backend Message Handling
 
@@ -47,6 +55,8 @@ The `rabbitMQActionHandler` function in the backend is responsible for sending m
 
 If no exchanges are configured, the function exits early without performing any actions.
 
+_________________________________________________________________________________________________________
+
 ## Frontend Display of RabbitMQ Exchanges
 
 On the frontend, the `RabbitMQActionConfig` component is responsible for displaying the RabbitMQ exchanges where messages are sent. This provides users with information of how and where proposal data is routed.
@@ -74,6 +84,8 @@ On the frontend, the `RabbitMQActionConfig` component is responsible for display
 
 The component renders a list of RabbitMQ exchanges, showing which exchanges are being used to route messages related to proposal data.
 
+_________________________________________________________________________________________________________
+
 ## GraphQL Integration
 
 The `RabbitMQActionConfig` class is integrated into the project’s GraphQL API, allowing for dynamic configuration and querying of RabbitMQ settings.
@@ -85,3 +97,5 @@ You can retrieve the RabbitMQ configuration using a GraphQL query:
         exchanges
       }
     }
+
+_________________________________________________________________________________________________________
