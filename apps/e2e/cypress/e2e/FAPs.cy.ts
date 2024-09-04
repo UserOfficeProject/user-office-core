@@ -2743,6 +2743,8 @@ context('Fap meeting components tests', () => {
       cy.get(`#comment_ifr`).first().focus().click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.get('[data-cy="back-button"]').focus().click();
+
       cy.get('[data-cy="grade-guide"]').click();
 
       cy.contains(fap1.gradeGuide).should('not.exist');
