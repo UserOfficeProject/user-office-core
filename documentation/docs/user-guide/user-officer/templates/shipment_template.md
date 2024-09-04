@@ -1,6 +1,8 @@
 # Shipment declaration templates :material-truck:
 
-## **What are shipment declaration templates?**
+_____________________________________________________________________________________________________
+
+## What are shipment declaration templates?
 
 ??? info "Shipment declaration templates :material-truck:" 
     [**Shipment declaration templates :material-truck:**](shipment_template.md) are standardised forms used to collect and organise information about parcels being sent to a facility. These templates can be customised to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
@@ -13,33 +15,4 @@
         <figcaption>**Shipment declaration (viewed from the user's perspective)**</figcaption>
     </figure>
 
-
-## **How do I mark a shipment declaration template as active?**
-
 _____________________________________________________________________________________________________
-
-## **How do I create shipment declaration templates?**
-
-_____________________________________________________________________________________________________
-
-
-## **How do I edit shipment declaration templates?**
-
-_____________________________________________________________________________________________________
-
-## **How do I import and export shipment declaration templates?**
-
-_____________________________________________________________________________________________________
-
-## **How do I clone shipment declaration templates?**
-
-_____________________________________________________________________________________________________
-
-## **How do I clone shipment declaration templates?**
-
-_____________________________________________________________________________________________________
-
-## **What does # shipments mean on shipment declaration templates?**
-
-_____________________________________________________________________________________________________
-
