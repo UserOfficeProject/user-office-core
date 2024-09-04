@@ -11,14 +11,14 @@
         <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/developer-guide/CONTRIBUTING/">
       
       
-        <link rel="prev" href="../../user-guide/user-officer/settings/app_settings/">
+        <link rel="prev" href="../../user-guide/user-officer/settings/features/">
       
       
         <link rel="next" href="../architecture/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.33">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
     
     
       
@@ -26,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.3cba04c6.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -48,7 +48,7 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#guidelines" class="md-skip">
+        <a href="#contributing" class="md-skip">
           Skip to content
         </a>
       
@@ -95,12 +95,12 @@
     <a href="../.." title="User Office Documentation" class="md-header__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
       
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -126,7 +126,7 @@
     
       <label class="md-header__button md-icon" for="__search">
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
       </label>
       <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
@@ -135,15 +135,15 @@
       <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
       <nav class="md-search__options" aria-label="Search">
         
         <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
       </nav>
       
@@ -277,40 +277,6 @@
   
 
       
-        
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../references/" class="md-tabs__link">
-        
-  
-    
-  
-  References
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-    <li class="md-tabs__item">
-      <a href="../../user-guide/user-officer/placeholder/" class="md-tabs__link">
-        
-  
-    
-  
-  Placeholder
-
-      </a>
-    </li>
-  
-
-      
     </ul>
   </div>
 </nav>
@@ -342,7 +308,7 @@
     <a href="../.." title="User Office Documentation" class="md-nav__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
       
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     User Office Documentation
@@ -501,27 +467,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../user-guide/user/user/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    User
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     
     
     
@@ -533,10 +478,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -547,8 +492,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             User Officer
           </label>
@@ -560,46 +505,8 @@
   
   
   
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_3_1" id="__nav_3_3_1_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Fundamental tutorials
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3_1">
-            <span class="md-nav__icon md-icon"></span>
-            Fundamental tutorials
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/main/user-officer/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/user-officer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -620,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/main/creating_call/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/creating_call/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -641,7 +548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/main/creating_workflow/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/creating_workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -662,7 +569,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/main/creating_templates/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/creating_templates/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -683,7 +590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/main/feasibility_review/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/feasibility_review/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -704,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/main/fap_review/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/fap_review/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -725,7 +632,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/main/roles/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/roles/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -734,14 +641,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -759,90 +658,6 @@
   
   <span class="md-ellipsis">
     Proposals
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/experiments/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Experiments
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/calls/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Calls
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/people/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    People
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/instruments/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Instruments
   </span>
   
 
@@ -901,11 +716,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/institutions/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/questions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Institutions
+    Questions
   </span>
   
 
@@ -932,10 +747,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_12" >
         
           
-          <label class="md-nav__link" for="__nav_3_3_10" id="__nav_3_3_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_2_12" id="__nav_3_2_12_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -946,8 +761,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3_10">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2_12">
             <span class="md-nav__icon md-icon"></span>
             Templates
           </label>
@@ -1156,48 +971,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/questions/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Questions
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/sample_safety/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Sample safety
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     
     
     
@@ -1209,10 +982,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_13" >
         
           
-          <label class="md-nav__link" for="__nav_3_3_13" id="__nav_3_3_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_2_13" id="__nav_3_2_13_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1223,8 +996,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3_13">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2_13">
             <span class="md-nav__icon md-icon"></span>
             Settings
           </label>
@@ -1300,53 +1073,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/settings/api_tokens/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    API access tokens
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../user-guide/user-officer/settings/features/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Features
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/settings/app_settings/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    App settings
   </span>
   
 
@@ -1435,6 +1166,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -1462,6 +1195,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -1754,46 +1489,6 @@
   
 
     
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../references/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    References
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/placeholder/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Placeholder
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
   </ul>
 </nav>
                   </div>
@@ -1810,6 +1505,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -1851,8 +1548,8 @@
                   
 
 
-  <h1>Contributing</h1>
-
+<h1 id="contributing">Contributing</h1>
+<hr />
 <p>Thank you for considering contributing to User Office Project!</p>
 <p>You can find the repo <a href="https://github.com/UserOfficeProject/user-office-core">here</a> and a detailed step-by-step guide with an example on how to create new functionality <a href="../step-by-step/">here</a>.</p>
 <p>If you're planning to contribute to this project by adding new functionality, we encourage you to discuss it first in the Discussions tab. This helps ensure that your proposed changes align with the project's goals and prevents duplicate efforts. Here's how you can initiate a discussion:</p>
@@ -1861,6 +1558,7 @@
 <li>Start a new discussion thread outlining your proposed changes.</li>
 <li>Wait for feedback and consensus before proceeding with creating a pull request.</li>
 </ol>
+<hr />
 <h2 id="guidelines">Guidelines</h2>
 <ul>
 <li>Commits follow the <a href="https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines">Angular commit convention</a>.</li>
@@ -1868,6 +1566,7 @@
 <li>2 spaces indentation.</li>
 <li>Features and bug fixes should be covered by test cases.</li>
 </ul>
+<hr />
 <h2 id="creating-releases">Creating releases</h2>
 <p>UserOfficeProject/user-office-core uses <a href="https://github.com/semantic-release/semantic-release">semantic-release</a>
 to release new versions automatically.</p>
@@ -1880,6 +1579,7 @@ to release new versions automatically.</p>
 <blockquote>
 <p><strong><em>NOTE:</em></strong> When merging the pull requests with <code>Squash and merge</code> option on github, the title of the pull request should follow the commit guidelines mentioned above because all the commits are squashed into one commit with title od the PR as a message of the commit. Otherwise when using normal <code>Merge pull request</code> the title of the pull request doesn't need to follow the commit guidelines but only the commit messages.</p>
 </blockquote>
+<hr />
 
 
 
@@ -1902,7 +1602,7 @@ to release new versions automatically.</p>
         
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
   Back to top
 </button>
         
@@ -1927,10 +1627,10 @@ to release new versions automatically.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.top", "navigation.tabs", "navigation.tabs.sticky", "content.tooltips"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.top", "navigation.tabs", "navigation.tabs.sticky", "content.tooltips"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.af256bd8.min.js"></script>
+      <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>
       
     
   </body>
