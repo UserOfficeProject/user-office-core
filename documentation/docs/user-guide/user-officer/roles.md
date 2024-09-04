@@ -1,5 +1,7 @@
 # Roles :material-account-supervisor-circle:
 
+_________________________________________________________________________________________________________
+
 There are many roles within User Office: 
 
 ??? info "User"
@@ -56,9 +58,5 @@ There are many roles within User Office:
     **FAP Reviewer** are part of the Facility Access Panel (FAP)
 
     **Main uses of User Office:**
-
-_________________________________________________________________________________________________________
-
-### How do I change roles?
 
 _________________________________________________________________________________________________________

@@ -1,6 +1,8 @@
 # Features
 
-## **What are features?**
+_________________________________________________________________________________________________________
+
+## What are features?
 
 * **`EMAIL SEARCH:`** Search by Email functionality 
 
@@ -30,7 +32,9 @@
 
 * **`EMAIL INVITE:`** Email invitation functionality    
 
-## **How do I configure the features?**
+_________________________________________________________________________________________________________
+
+## How do I configure the features?
 
 Icon functions
 
@@ -85,3 +89,4 @@ Tools
 * Mark as active - 
 * Rename - :material-rename-box:
 
+_________________________________________________________________________________________________________
