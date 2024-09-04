@@ -1,3 +1,7 @@
+# Documentation Changes
+
+_________________________________________________________________________________________________________
+
 This documentation helps our users understand how to use User Office and troubleshoot common issues on their own. 
 
 ## Engine
@@ -37,3 +41,5 @@ If you add a new page, make sure to update the mkdocs.yml file:
 1. Open `mkdocs.yml`.
 2. Locate the `nav` section.
 3. Add your new page under the appropriate section to ensure it appears in the site navigation.
+
+_________________________________________________________________________________________________________
