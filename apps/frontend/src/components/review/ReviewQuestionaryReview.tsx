@@ -5,6 +5,8 @@ import UOLoader from 'components/common/UOLoader';
 import { TableRowData } from 'components/questionary/QuestionaryDetails';
 import { ReviewStatus } from 'generated/sdk';
 import { FapReviewWithQuestionary } from 'models/questionary/fapReview/FapReviewWithQuestionary';
+import stripHtml from 'utils/stripHtml';
+import { truncateString } from 'utils/truncateString';
 
 import ReviewQuestionaryDetails from './ReviewQuestionaryDetails';
 
@@ -27,7 +29,10 @@ export default function ReviewQuestionaryReview(
           ? data.id + ' (Pre-submission)'
           : data.id.toString(),
     },
-    { label: 'Comment', value: data.comment },
+    {
+      label: 'Comment',
+      value: truncateString(stripHtml(data.comment || ''), 100),
+    },
     { label: 'Grade', value: data.grade ? data.grade.toString() : '' },
   ];
 

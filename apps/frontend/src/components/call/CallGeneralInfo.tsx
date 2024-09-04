@@ -428,6 +428,7 @@ const CallGeneralInfo = ({
           'data-cy': 'call-fap-review-template',
           endAdornment: <RefreshListIcon onClick={reloadFapReviewTemplates} />,
         }}
+        required
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"
