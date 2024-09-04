@@ -8,12 +8,19 @@ import { Replay, Refresh } from '@mui/icons-material';
 import { Grid, Typography, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
-import { NumberParam, QueryParamConfig, StringParam } from 'use-query-params';
+import {
+  NumberParam,
+  QueryParamConfig,
+  StringParam,
+  withDefault,
+} from 'use-query-params';
 import useQueryParams from 'use-query-params/dist/useQueryParams';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
+import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { StatusActionsLog } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCallsData } from 'hooks/call/useCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
@@ -27,6 +34,7 @@ import StatusActionsStatusFilter, {
 } from './StatusActionsStatusFilter';
 
 export type StatusActionsLogsQueryParams = {
+  call: QueryParamConfig<number | null>;
   sortDirection: QueryParamConfig<string | null | undefined>;
   search: QueryParamConfig<string | null | undefined>;
   sortField: QueryParamConfig<string | null | undefined>;
@@ -39,7 +47,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>();
   const { api } = useDataApiWithFeedback();
   const theme = useTheme();
-
+  const { calls, loadingCalls } = useCallsData();
   const ReplayIcon = (): JSX.Element => (
     <Replay data-cy="replay_status_action_icon" />
   );
@@ -49,6 +57,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const [urlQueryParams, setUrlQueryParams] = useQueryParams<
     StatusActionsLogsQueryParams & StatusActionsLogQueryFilter
   >({
+    call: withDefault(NumberParam, null),
     statusActionsLogStatus: defaultStatusActionsLogStatusQueryFilter,
     sortDirection: StringParam,
     search: StringParam,
@@ -138,6 +147,12 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
               urlQueryParams.statusActionsLogStatus === 'true' ? true : false,
           };
         }
+        if (!!urlQueryParams.call) {
+          filter = {
+            ...filter,
+            callIds: [urlQueryParams?.call],
+          };
+        }
         const results = await api().getStatusActionsLogs({
           filter,
           searchText: tableQuery.search,
@@ -164,12 +179,33 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
         });
       } catch (error) {
         reject(error);
+      } finally {
+        if (
+          urlQueryParams.statusActionsLogStatus &&
+          urlQueryParams.statusActionsLogStatus === StatusActionsLogStatus.ALL
+        ) {
+          setUrlQueryParams((params) => ({
+            ...params,
+            statusActionsLogStatus: undefined,
+          }));
+        }
       }
     });
 
   return (
     <>
       <Grid container spacing={2}>
+        <Grid item sm={3} xs={12}>
+          <CallFilter
+            callId={urlQueryParams.call}
+            calls={calls}
+            isLoading={loadingCalls}
+            shouldShowAll={true}
+            onChange={() => {
+              tableRef.current && tableRef.current.onQueryChange({});
+            }}
+          />
+        </Grid>
         <Grid item sm={3} xs={12}>
           <StatusActionsStatusFilter
             statusActionsLogStatus={urlQueryParams.statusActionsLogStatus}
