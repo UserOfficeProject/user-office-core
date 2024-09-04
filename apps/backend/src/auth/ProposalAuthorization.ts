@@ -118,6 +118,24 @@ export class ProposalAuthorization {
       });
   }
 
+  async isMemberOfFapProposal(agent: UserWithRole | null, proposalPk: number) {
+    if (agent == null || !agent.id || !agent.currentRole) {
+      return false;
+    }
+
+    const fapsUserIsMemberOf =
+      await this.fapDataSource.getUserFapsByRoleAndFapId(
+        agent.id,
+        agent.currentRole
+      );
+
+    const fapIdsUserIsMemberOf = fapsUserIsMemberOf.map((fap) => fap.id);
+    const faps = await this.fapDataSource.getFapsByProposalPk(proposalPk);
+    const fapIds = faps.map((fap) => fap.id);
+
+    return fapIds.some((id) => fapIdsUserIsMemberOf.includes(id));
+  }
+
   async isScientistToProposal(agent: UserJWT | null, proposalPk: number) {
     if (agent == null || !agent.id) {
       return false;
@@ -212,6 +230,7 @@ export class ProposalAuthorization {
       this.userAuth.hasGetAccessByToken(agent) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
+      (await this.isMemberOfFapProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
       (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
       isInternalReviewerOnSomeTechnicalReview ||
