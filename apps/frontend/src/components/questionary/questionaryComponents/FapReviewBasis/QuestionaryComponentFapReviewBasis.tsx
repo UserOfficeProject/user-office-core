@@ -12,9 +12,7 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import Editor from 'components/common/TinyEditor';
-import GradeGuidePage from 'components/pages/GradeGuidePage';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import NavigationFragment from 'components/questionary/NavigationFragment';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -22,8 +20,6 @@ import {
 import { ReviewContextType } from 'components/review/ReviewQuestionary';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { SettingsId } from 'generated/sdk';
-import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { useFapData } from 'hooks/fap/useFapData';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 
@@ -57,7 +53,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   }
 
   const { settingsMap } = useContext(SettingsContext);
-  const { fap } = useFapData(state?.fapReview?.fapID);
 
   const gradeDecimalPoints = parseFloat(
     settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
@@ -157,15 +152,6 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             }
           />
         </Box>
-        <NavigationFragment>
-          <ButtonWithDialog
-            label="Grading guide"
-            data-cy="grade-guide"
-            title="Grading guide"
-          >
-            {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
-          </ButtonWithDialog>
-        </NavigationFragment>
       </Box>
     </div>
   );
