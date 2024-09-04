@@ -10,6 +10,8 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 import Editor from 'components/common/TinyEditor';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { RichTextInputConfig } from 'generated/sdk';
+//import { useFileUpload } from 'hooks/common/useFileUpload';
+//import { FileMetaData } from 'models/questionary/FileUpload';
 
 export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   const {
@@ -33,6 +35,17 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
     setNumberOfChars(wordCount.body.getCharacterCount());
   };
 
+  /*const { uploadFile } = useFileUpload();
+
+  const imageUploadHandler = (blobInfo, progress) =>
+    new Promise<string>((resolve, reject) => {
+      const onUploadComplete = (data: FileMetaData) => {
+        resolve(`/files/download/${data.fileId}`);
+      };
+
+      uploadFile(blobInfo.blob(), onUploadComplete);
+    });*/
+
   return (
     <FormControl
       required={config.required}
@@ -52,15 +65,30 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
            *        on the BE is in sync, otherwise the result will be filtered
            */
           plugins: config.allowImages
-            ? ['preview', 'advlist', 'lists', 'charmap', 'wordcount', 'image']
+            ? [
+                'preview',
+                'advlist',
+                'lists',
+                'charmap',
+                'wordcount',
+                'image',
+                'code',
+              ]
             : ['preview', 'advlist', 'lists', 'charmap', 'wordcount'],
-          toolbar:
-            'undo redo | bold italic underline strikethrough superscript subscript | ' +
-            'fontsizeselect formatselect forecolor | ' +
-            'alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist | outdent indent | charmap removeformat preview',
+          toolbar: config.allowImages
+            ? 'undo redo | bold italic underline strikethrough superscript subscript | ' +
+              'fontsizeselect formatselect forecolor | ' +
+              'alignleft aligncenter alignright alignjustify link image | code | ' +
+              'bullist numlist | outdent indent | charmap removeformat preview'
+            : 'undo redo | bold italic underline strikethrough superscript subscript | ' +
+              'fontsizeselect formatselect forecolor | ' +
+              'alignleft aligncenter alignright alignjustify | ' +
+              'bullist numlist | outdent indent | charmap removeformat preview',
           branding: false,
           menubar: false,
+          /*images_upload_handler: config.allowImages
+            ? imageUploadHandler
+            : undefined,*/
         }}
         onEditorChange={(content, editor) => {
           handleCharacterCount(editor);
