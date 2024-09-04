@@ -1,3 +1,7 @@
+# Email Service
+
+_________________________________________________________________________________________________________
+
 This guide will help you set up email services in your project using either SMTP or SparkPost. 
 
 ## Overview
@@ -5,6 +9,8 @@ Email services are essential for sending notifications, alerts, and other commun
 
 - **SMTPMailService**: Uses SMTP protocol.
 - **SparkPostMailService**: Uses SparkPost API.
+
+_________________________________________________________________________________________________________
 
 ## Setting Up SMTP
 
@@ -26,6 +32,8 @@ Ensure the following environment variables are set:
 - `EMAIL_AUTH_USERNAME`
 - `EMAIL_AUTH_PASSWORD`
 
+_________________________________________________________________________________________________________
+
 ## Setting Up SparkPost
 
 If using SparkPost, please refer to the `SparkPostMailService.ts` class here:
@@ -45,6 +53,8 @@ Ensure the following environment variables are set:
 
 - `SPARKPOST_TOKEN`
 - `SINK_EMAIL` (optional, for non-production environments)
+
+_________________________________________________________________________________________________________
 
 ## SMTP vs SparkPost
 
@@ -71,3 +81,5 @@ Ensure the following environment variables are set:
   - Requires API token and configuration.
 
 Now you should be able to set up and configure email services effectively. Choose the service that best fits your needs and environment.
+
+_________________________________________________________________________________________________________

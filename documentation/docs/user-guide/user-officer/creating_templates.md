@@ -1,6 +1,8 @@
 # Creating templates :material-text-box-multiple:
 
-![Templates](../../../assets/images/templates.png)
+_________________________________________________________________________________________________________
+
+![Templates](../../assets/images/templates.png)
 
 ## What are templates?
 
@@ -8,102 +10,104 @@ Templates :material-text-box-multiple: are used to save and re-utilise predefine
 
 There are several different types of templates utilised within Calls:
 
-## Types of templates
+### Types of templates
 
 ??? info "PDF templates :material-file-pdf-box:" 
-    [PDF templates :material-file-pdf-box:](../templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+    [PDF templates :material-file-pdf-box:](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
     ______________________________________________________________________________________
 
     <figure markdown="span">  
-        ![PDF Template](../../../assets/images/pdf_template.png){ width="450"}
+        ![PDF Template](../../assets/images/pdf_template.png){ width="450"}
         <figcaption>PDF template</figcaption>
     </figure>
 
 ??? info "Proposal templates :material-note-text:" 
-    [Proposal templates :material-note-text:](../templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
+    [Proposal templates :material-note-text:](templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilise [questions :material-comment-question:](../questions.md) and [sub-templates :material-collapse-all-outline:](../templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    User Officers can also utilise [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
     ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Proposal](../../../assets/images/proposal_template.png){ width="450"}
+        ![Proposal](../../assets/images/proposal_template.png){ width="450"}
         <figcaption>Proposal (viewed from the user's perspective)</figcaption>
     </figure>
 
 ??? info "Sample declaration templates :material-inbox:" 
-    [Sample declaration templates :material-inbox:](../templates/sampledec_template.md) are designed to collect detailed information about the samples that researchers intend to use in their experiments. The purpose of these templates is to standardise the way sample-related data is gathered, ensuring that all necessary details are captured uniformly across different proposals. These templates are linked to [proposal templates :material-note-text:](../templates/proposal_template.md) through sample declaration [questions :material-comment-question:](../questions.md).
+    [Sample declaration templates :material-inbox:](templates/sampledec_template.md) are designed to collect detailed information about the samples that researchers intend to use in their experiments. The purpose of these templates is to standardise the way sample-related data is gathered, ensuring that all necessary details are captured uniformly across different proposals. These templates are linked to [proposal templates :material-note-text:](templates/proposal_template.md) through sample declaration [questions :material-comment-question:](questions.md).
 
     ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Sample declaration](../../../assets/images/sample_dec.png){ width="450"}
+        ![Sample declaration](../../assets/images/sample_dec.png){ width="450"}
         <figcaption>Sample declaration question linking to a Sample Delaration Template and Sample Experiment Safety Input (ESI) template</figcaption>
     </figure>
 
 ??? info "Sub templates :material-collapse-all-outline:" 
-    [Sub templates :material-collapse-all-outline:](../templates/sub_template.md) are used to streamline and organise the creation of complex [proposal templates.](../templates/proposal_template.md). They serve as reusable building blocks containing [questions](../questions.md), enabling User Officers to efficiently manage and deploy recurring sets of questions across multiple proposals.
+    [Sub templates :material-collapse-all-outline:](templates/sub_template.md) are used to streamline and organise the creation of complex [proposal templates.](templates/proposal_template.md). They serve as reusable building blocks containing [questions](questions.md), enabling User Officers to efficiently manage and deploy recurring sets of questions across multiple proposals.
 
     Sub templates are created by grouping related question templates into a cohesive unit and saving them as a standalone entity. When constructing or modifying a proposal template, User Officers can easily select and insert these sub templates into the appropriate sections, ensuring consistency and reducing the time required to build detailed proposal forms.
     ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Sub templates](../../../assets/images/create_sub_template.png){ width="450"}
+        ![Sub templates](../../assets/images/create_sub_template.png){ width="450"}
         <figcaption>Sub template</figcaption>
     </figure>
 
 ??? info "Shipment declaration templates :material-truck:" 
-    [Shipment declaration templates :material-truck:](../templates/shipment_template.md) are standardised forms used to collect and organise information about parcels being sent to a facility. These templates can be customised to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
+    [Shipment declaration templates :material-truck:](templates/shipment_template.md) are standardised forms used to collect and organise information about parcels being sent to a facility. These templates can be customised to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
 
     > **_NOTE:_** The shipment declaration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
     <figure markdown="span">  
-        ![Shipment Declaration](../../../assets/images/shipment_declaration.png){ width="450"}
+        ![Shipment Declaration](../../assets/images/shipment_declaration.png){ width="450"}
         <figcaption>Shipment declaration (viewed from the user's perspective)</figcaption>
     </figure>
 
 ??? info "Visit registration templates :material-airplane-takeoff:" 
-    [Visit registration templates :material-airplane-takeoff:](../templates/visit_template.md) are predefined forms used to gather and organise information from visitors planning to access a research facility. These templates collect essential details regarding visitor accomodation needs, arrival and departure dates, and on-site access, ensuring that the visit is properly coordinated and compliant with facility protocols.
+    [Visit registration templates :material-airplane-takeoff:](templates/visit_template.md) are predefined forms used to gather and organise information from visitors planning to access a research facility. These templates collect essential details regarding visitor accomodation needs, arrival and departure dates, and on-site access, ensuring that the visit is properly coordinated and compliant with facility protocols.
 
     > **_NOTE:_** The visit registration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Visit Registration templates](../../../assets/images/define_visit.png){ width="450"}
+        ![Visit Registration templates](../../assets/images/define_visit.png){ width="450"}
         <figcaption>Visit reigstration (viewed from the user's perspective)</figcaption>
     </figure>
 
 ??? info "Proposal ESI templates :material-note-text:" 
-    [Proposal Experiment Safety Input (ESI) :material-note-text:](../templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [questions](../questions.md) and [sub-templates](../templates/sub_template.md) to customise Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
+    [Proposal Experiment Safety Input (ESI) :material-note-text:](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [questions](questions.md) and [sub-templates](templates/sub_template.md) to customise Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
 
     > **_NOTE:_**The Proposal ESI form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Proposal ESI](../../../assets/images/proposal_esi.png){ width="450"}
+        ![Proposal ESI](../../assets/images/proposal_esi.png){ width="450"}
         <figcaption>Proposal ESI (viewed from the user's perspective)</figcaption>
     </figure>
 
 ??? info "Sample ESI templates :material-inbox:" 
-    [Sample Experiment Safety Input (ESI) templates :material-inbox:](../templates/sampleESI_template.md) are predefined forms used to collect safety-related information about the samples involved in an experiment. These templates are added to [proposal templates](../templates/proposal_template.md) through [sample declaration question templates](../questions.md), ensuring that all safety considerations, such as potential hazards or special handling requirements, are thoroughly documented and assessed as part of the proposal submission process. 
+    [Sample Experiment Safety Input (ESI) templates :material-inbox:](templates/sampleESI_template.md) are predefined forms used to collect safety-related information about the samples involved in an experiment. These templates are added to [proposal templates](templates/proposal_template.md) through [sample declaration question templates](questions.md), ensuring that all safety considerations, such as potential hazards or special handling requirements, are thoroughly documented and assessed as part of the proposal submission process. 
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Sample ESI](../../../assets/images/sample_esi.png){ width="450"}
+        ![Sample ESI](../../assets/images/sample_esi.png){ width="450"}
         <figcaption>Sample ESI template</figcaption>
     </figure>
 
 ??? info "Feedback templates :material-message-alert:" 
-    [Feedback templates :material-message-alert:](../templates/feedback_template.md) are structured questionnaires used to collect feedback from users about their experiments and overall experience at the facility. These templates allow users to provide insights and evaluations, which help the facility improve its services and address any issues.
+    [Feedback templates :material-message-alert:](templates/feedback_template.md) are structured questionnaires used to collect feedback from users about their experiments and overall experience at the facility. These templates allow users to provide insights and evaluations, which help the facility improve its services and address any issues.
 
     > **_NOTE:_** The feedback form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
     
     <figure markdown="span">  
-        ![Feedback templates](../../../assets/images/feedback.png){ width="450"}
+        ![Feedback templates](../../assets/images/feedback.png){ width="450"}
         <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
     </figure>
 
-The template creation process is similar for all types of templates except for [PDF templates :material-file-pdf-box:](../templates/pdf_template.md) which are built with customiseable code. All other templates are built with [questions. :material-comment-question:](../questions.md) 
+The template creation process is similar for all types of templates except for [PDF templates :material-file-pdf-box:](templates/pdf_template.md) which are built with customiseable code. All other templates are built with [questions. :material-comment-question:](questions.md) 
 
-## Step 1. Adding topics
+_________________________________________________________________________________________________________
+
+## Step 1: Adding topics
 
 * In the **main menu** :material-menu: select **Templates** :material-text-box-multiple:
 * From the dropdown menu, choose the type of template you wish to create
@@ -116,14 +120,14 @@ It is good practice to utilise topics to split up the presentation of informatio
     
 * You can add questions to topics by clicking on **options** and from the dropdown select ^^`Add topic`^^. Topics can be reordered by clicking on the ^^`Reorder topics mode`^^ option. In reorder topics mode, you may **drag and drop** the topics into the desired order.
 
-## Step 2. Adding questions
+## Step 2: Adding questions
 
-* To add  [questions :material-comment-question:](../questions.md) click on **options** and from the dropdown select ^^`Add question`^^. 
+* To add  [questions :material-comment-question:](questions.md) click on **options** and from the dropdown select ^^`Add question`^^. 
 * This will open the **question drawer** which contains all previously used questions. You can ^^`Search`^^:material-magnify: for pre-existing questions through **question text** or by **question type**. You may preview questions in the question drawer by clicking on them. 
 
  > **_NOTE:_** Not all question types are compatible with every template. For example, **sub-template** questions can only be added to **proposal templates**.
 
-### Options when adding questions to a template:
+### Options when adding questions to a template
 
 **1. Use a pre-existing question**
 
@@ -142,7 +146,7 @@ Once you are satisfied with your changes, click the `Update` button to save the 
 You may also create questions from scratch by clicking on **options** within the **question drawer** and selecting the question type you wish to create. The following is information for creating each of the question types:
 
 ??? info "Boolean :material-square-outline:"
-    ![Boolean](../../../assets/images/boolean.png){ align=left width="350"}
+    ![Boolean](../../assets/images/boolean.png){ align=left width="350"}
 
     **Boolean:** A checkbox question type which can have one of the two possible values; true or false ('Yes' or 'No')
 
@@ -156,7 +160,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 
 ??? info "Date :material-calendar-today:"
-    ![Date](../../../assets/images/date.png){ align=left width="350"}
+    ![Date](../../assets/images/date.png){ align=left width="350"}
 
     **Date:** Allows users to specify a date which can be selected from a calendar tool 
 
@@ -181,7 +185,7 @@ You may also create questions from scratch by clicking on **options** within the
     * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Embellishment :material-format-size:"
-    ![Embellishment](../../../assets/images/embellishment.png){ align=left width="350"}
+    ![Embellishment](../../assets/images/embellishment.png){ align=left width="350"}
     
     **Embellishment:** A the text file which can be customised to modify elements such as font size, colour and formatting options facilitating the display of more detailed information for users. Note: this is not a question that users can provide responses to.
 
@@ -196,7 +200,7 @@ You may also create questions from scratch by clicking on **options** within the
     * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "File Upload :material-paperclip:"
-    ![File Upload](../../../assets/images/file_upload.png){ align=left width="350"}
+    ![File Upload](../../assets/images/file_upload.png){ align=left width="350"}
 
     **File Upload** A question which allows users to upload attachments 
 
@@ -224,7 +228,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 
 ??? info "Sub Template :material-list-box-outline:"
-    ![Sub Template](../../../assets/images/sub_template.png){ align=left width="350"}
+    ![Sub Template](../../assets/images/sub_template.png){ align=left width="350"}
 
     **Sub Template** Sub templates are allow for related questions to be grouped into a cohesive unit and saved them as a standalone entity. 
 
@@ -250,7 +254,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 
 ??? info "Interval :material-chevron-right:"
-    ![Interval](../../../assets/images/interval.png){ align=left width="350"}
+    ![Interval](../../assets/images/interval.png){ align=left width="350"}
 
     **Interval**
 
@@ -272,7 +276,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 
 ??? info "Multiple choice :material-record-circle:"
-    ![Multiple choice](../../../assets/images/multiple_choice.png){ align=left width="350"}
+    ![Multiple choice](../../assets/images/multiple_choice.png){ align=left width="350"}
 
     **Multiple choice** a multiple choice selection question.
 
@@ -298,7 +302,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 
 ??? info "Dynamic multiple choice :material-web:"
-    ![Dynamic Multiple Choice](../../../assets/images/dynamic_choice.png){ align=left width="350"}
+    ![Dynamic Multiple Choice](../../assets/images/dynamic_choice.png){ align=left width="350"}
 
     **Dynamic Multiple Choice:** 
 
@@ -329,7 +333,7 @@ You may also create questions from scratch by clicking on **options** within the
     * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Number :material-numeric-1-box-outline:"
-    ![Number](../../../assets/images/number.png){ align=left width="350"}
+    ![Number](../../assets/images/number.png){ align=left width="350"}
 
     **Number:**
 
@@ -346,7 +350,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 
 ??? info "Rich text input :material-format-text-variant:"
-    ![Rich Text Input](../../../assets/images/rich_text.png){ align=left width="350"}
+    ![Rich Text Input](../../assets/images/rich_text.png){ align=left width="350"}
 
     **Rich Text Input**
 
@@ -362,7 +366,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 
 ??? info "Sample declaration :material-clipboard-text:"
-    ![Sample Declaration](../../../assets/images/sample_declaration.png){ align=left width="350"}
+    ![Sample Declaration](../../assets/images/sample_declaration.png){ align=left width="350"}
 
     **Sample Declaration**
 
@@ -383,7 +387,7 @@ You may also create questions from scratch by clicking on **options** within the
     * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Text input :material-text-short:"
-    ![Text Input](../../../assets/images/text_input.png){ align=left width="350"}
+    ![Text Input](../../assets/images/text_input.png){ align=left width="350"}
 
     **Text input**
 
@@ -398,7 +402,7 @@ You may also create questions from scratch by clicking on **options** within the
     * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Instrument Picker :material-microscope:"
-    ![Instrument Picker](../../../assets/images/instrument_picker.png){ align=left width="350"}
+    ![Instrument Picker](../../assets/images/instrument_picker.png){ align=left width="350"}
 
     **Instrument Picker**
 
@@ -413,15 +417,16 @@ You may also create questions from scratch by clicking on **options** within the
 
 > **_NOTE:_** The basis question type is unique to each template type. It is mandatory and cannot be removed since it contains important information which needs to be addressed within each template. For example, in proposal templates it includes the section to add a Principle Investigator and co-proposers to the proposal. Having other questions prior to the basis question may create problems for users filling out the questionnaire.
 
-## Step 3. Configuring questions
+## Step 3: Configuring questions
 
 ### Dependencies
 
 * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
-______________________________________________________________________________________
+
+_________________________________________________________________________________________________________
 
 ## How do I use templates within a call?
 
 * See the [creating a call](creating_call.md) guide.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
