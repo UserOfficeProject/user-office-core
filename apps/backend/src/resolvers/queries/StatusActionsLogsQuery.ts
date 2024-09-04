@@ -33,6 +33,9 @@ export class StatusActionsLogsFilter {
 
   @Field(() => [EmailStatusActionRecipients], { nullable: true })
   public emailStatusActionRecipient?: EmailStatusActionRecipients[];
+
+  @Field(() => [Int], { nullable: true })
+  public callIds: number[];
 }
 @ArgsType()
 export class StatusActionsLogsArgs {

@@ -163,6 +163,9 @@ export default class PostgresStatusActionsLogsDataSource
             throw new GraphQLError(`Bad sort field given: ${args.sortField}`);
           }
         }
+        if (args.filter?.callIds) {
+          query.whereIn('p.call_id', args.filter.callIds);
+        }
         if (args.searchText) {
           query.andWhere((qb) =>
             qb
