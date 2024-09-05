@@ -1158,15 +1158,4 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return { totalCount: 0, proposals: [] };
   }
-
-  // async updateSubmittedDate(proposalPk: number): Promise<Proposal> {
-  //   const proposal = await this.get(proposalPk);
-
-  //   if (!proposal) {
-  //     throw new Error('Proposal does not exist');
-  //   }
-  //   proposal.submittedDate = new Date();
-
-  //   return proposal;
-  // }
 }
