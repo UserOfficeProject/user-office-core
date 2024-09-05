@@ -24,6 +24,25 @@ const currentDayStart = DateTime.now().startOf('day');
 
 const closedCallStartDate = faker.date.past();
 
+export const newCall = {
+  shortCode: faker.string.alphanumeric(15),
+  startCall: DateTime.fromJSDate(faker.date.past()),
+  endCall: DateTime.fromJSDate(faker.date.future()),
+  startReview: currentDayStart,
+  endReview: currentDayStart,
+  startFapReview: currentDayStart,
+  endFapReview: currentDayStart,
+  startNotify: currentDayStart,
+  endNotify: currentDayStart,
+  startCycle: currentDayStart,
+  endCycle: currentDayStart,
+  templateName: initialDBData.template.name,
+  templateId: initialDBData.template.id,
+  allocationTimeUnit: AllocationTimeUnits.DAY,
+  cycleComment: faker.lorem.word(10),
+  surveyComment: faker.lorem.word(10),
+  esiTemplateName: faker.lorem.words(2),
+};
 export const updatedCall = {
   shortCode: faker.random.alphaNumeric(15),
   startCall: faker.date.past().toISOString().slice(0, 10),

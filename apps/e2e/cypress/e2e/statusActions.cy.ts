@@ -4,6 +4,7 @@ import {
   EmailStatusActionRecipients,
   ProposalStatusActionType,
 } from '@user-office-software-libs/shared-types';
+import { newCall } from 'cypress/support/utils';
 
 import initialDBData from '../support/initialDBData';
 
@@ -684,13 +685,27 @@ context('Status actions tests', () => {
         text: 'Status action replay successfully send',
       });
     });
-    it('User Officer should be able to view and filter status actions', () => {
+    it('User Officer should be able to view and filter status actions logs', () => {
+      cy.createProposalWorkflow({
+        name: faker.lorem.words(2),
+        description: faker.lorem.words(5),
+      }).then((result) => {
+        if (result.createProposalWorkflow) {
+          cy.createCall({
+            ...newCall,
+            proposalWorkflowId: result.createProposalWorkflow.id,
+          });
+        } else {
+          throw new Error('Workflow creation failed');
+        }
+      });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
           cy.submitProposal({ proposalPk: proposal.primaryKey });
         }
       });
+
       cy.login('officer');
       cy.visit('/');
 
@@ -726,6 +741,40 @@ context('Status actions tests', () => {
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length', 2);
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(newCall.shortCode).click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .first()
+        .then((element) => {
+          expect(element.text()).to.be.equal('No records to display');
+        });
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .first()
+        .then((element) => {
+          expect(element.text()).to.be.equal('No records to display');
+        });
     });
   });
 });
