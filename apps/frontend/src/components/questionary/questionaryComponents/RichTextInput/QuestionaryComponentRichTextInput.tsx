@@ -10,8 +10,6 @@ import { Editor as TinyMCEEditor } from 'tinymce';
 import Editor from 'components/common/TinyEditor';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { RichTextInputConfig } from 'generated/sdk';
-//import { useFileUpload } from 'hooks/common/useFileUpload';
-//import { FileMetaData } from 'models/questionary/FileUpload';
 
 export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   const {
