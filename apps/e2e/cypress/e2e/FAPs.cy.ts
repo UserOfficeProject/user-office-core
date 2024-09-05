@@ -1547,7 +1547,7 @@ context('Fap meeting components tests', () => {
     });
   });
 
-  describe('User Officer role', () => {
+  describe.only('User Officer role', () => {
     it('Officer should be able to assign proposal to instrument and instrument to call to see it in meeting components', () => {
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=4`);
@@ -2743,21 +2743,22 @@ context('Fap meeting components tests', () => {
       cy.get(`#comment_ifr`).first().focus().click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.closeNotification();
       cy.get('[data-cy="back-button"]').focus().click();
-
       cy.get('[data-cy="grade-guide"]').click();
 
       cy.contains(fap1.gradeGuide).should('not.exist');
 
-      cy.visit(`/FapPage/${createdFapId}?`);
+      cy.get('[data-cy="close-modal-btn"]').focus().click();
+      cy.closeModal();
 
+      cy.visit(`/FapPage/${createdFapId}?`);
       cy.finishedLoading();
 
       cy.get('[data-cy="custom-grade-guide"]').click();
       cy.get('[data-cy="submit"]').click();
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
-
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
@@ -2768,11 +2769,9 @@ context('Fap meeting components tests', () => {
 
       cy.contains(fap1.gradeGuide);
 
-      cy.get('[data-cy="close-modal-btn"]').click();
+      cy.get('[data-cy="close-modal-btn"]').focus().click();
       cy.closeModal();
-
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
-
       cy.finishedLoading();
     });
 
