@@ -2770,6 +2770,10 @@ context('Fap meeting components tests', () => {
 
       cy.get('[data-cy="close-modal-btn"]').click();
       cy.closeModal();
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
     });
 
     it('Officer should be able to bulk download Fap proposals as pdf', () => {
