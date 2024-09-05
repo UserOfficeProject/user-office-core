@@ -1,3 +1,7 @@
+# Step-by-Step Guide
+
+_________________________________________________________________________________________________________
+
 ![System overview](../assets/images/sbs_overview.png)
 
 Use this page to understand how different parts of the User Office code base is interconnected.
@@ -115,6 +119,8 @@ All response wrappers contain a response field and an error field. The error fie
 
 **And that's it!** Test if things are working properly by navigating to [http://localhost:4000/graphql](http://localhost:4000/graphql) where you should see a new endpoint mutation. You can check the backend output terminal for any potential errors.
 
+_________________________________________________________________________________________________________
+
 ## Frontend
 
 Now that we managed to get the backend working, calling it from the frontend is surprisingly easy.
@@ -151,3 +157,5 @@ Create a hook and invoke the method
     ...
  
     api().lockUser({userId:1})
+
+_________________________________________________________________________________________________________
