@@ -43,6 +43,10 @@ query getTechniqueScientistProposals(
         institutionId
         email
       }
+      techniques {
+        id
+        name
+      }
     }
     totalCount
   }
