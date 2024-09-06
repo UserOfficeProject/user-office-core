@@ -1547,7 +1547,7 @@ context('Fap meeting components tests', () => {
     });
   });
 
-  describe.only('User Officer role', () => {
+  describe('User Officer role', () => {
     it('Officer should be able to assign proposal to instrument and instrument to call to see it in meeting components', () => {
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=4`);
