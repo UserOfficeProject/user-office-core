@@ -227,6 +227,10 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async isMemberOfFap(agent: User | null, fapId: number) {
+    if (agent?.id === 3) {
+      return false;
+    }
+
     return true;
   }
 
