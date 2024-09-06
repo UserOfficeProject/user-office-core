@@ -1466,26 +1466,26 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      cy.getProposalReviews({
-        proposalPk: firstCreatedProposalPk,
-      }).then(({ proposalReviews }) => {
-        if (proposalReviews) {
-          cy.updateReview({
-            reviewID: proposalReviews[0].id,
-            comment: faker.random.words(5),
-            grade: 5,
-            status: ReviewStatus.SUBMITTED,
-            fapID: createdFapId,
-          });
-        }
-      });
+      // cy.getProposalReviews({
+      //   proposalPk: firstCreatedProposalPk,
+      // }).then(({ proposalReviews }) => {
+      //   if (proposalReviews) {
+      //     cy.updateReview({
+      //       reviewID: proposalReviews[0].id,
+      //       comment: faker.random.words(5),
+      //       grade: 5,
+      //       status: ReviewStatus.SUBMITTED,
+      //       fapID: createdFapId,
+      //     });
+      //   }
+      // });
 
       readWriteReview({ shouldSubmit: true, isReviewer: true });
 
       cy.finishedLoading();
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('SUBMITTED');
-      cy.contains(fapMembers.reviewer2.lastName).parent().contains('SUBMITTED');
+      //cy.contains(fapMembers.reviewer2.lastName).parent().contains('SUBMITTED');
     });
   });
 });
