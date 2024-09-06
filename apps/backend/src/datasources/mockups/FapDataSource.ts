@@ -150,7 +150,7 @@ export class FapDataSourceMock implements FapDataSource {
     fapId?: number
   ): Promise<Fap[]> {
     if (userId && role) {
-      return dummyFaps;
+      return userId === 3 ? [] : dummyFaps;
     }
 
     return [];
@@ -227,10 +227,6 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async isMemberOfFap(agent: User | null, fapId: number) {
-    if (agent?.id === 3) {
-      return false;
-    }
-
     return true;
   }
 
