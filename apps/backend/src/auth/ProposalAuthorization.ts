@@ -234,8 +234,8 @@ export class ProposalAuthorization {
       (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
       isInternalReviewerOnSomeTechnicalReview ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isMemberOfFapProposal(agent, proposal.primaryKey))
+      (await this.isVisitorOfProposal(agent, proposal.primaryKey))
+      //(await this.isMemberOfFapProposal(agent, proposal.primaryKey))
     );
   }
 
