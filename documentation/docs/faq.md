@@ -1,24 +1,23 @@
-### User Officer FAQs
+# Frequently Asked Questions
 
+_________________________________________________________________________________________________________
 
 ??? info "**Calls**"
     ### **Calls**
-    * [**What are calls?**](user-guide/user-officer/main/creating_call.md) 
-    * [**How do I create a call?**](user-guide/user-officer/main/creating_call.md) 
-    * [**How do I edit active calls?**](user-guide/user-officer/calls.md)
-    * [**How do I manage calls?**](user-guide/user-officer/calls.md)
-        * [**How do I assign instruments to a call?**](user-guide/user-officer/calls.md)
-        * [**How do I deactivate calls?**](user-guide/user-officer/calls.md)
-        * [**How do I delete calls?**](user-guide/user-officer/calls.md)
-        * [**How do I export FAP data from a call?**](user-guide/user-officer/calls.md)
-        * [**What do #Instruments #proposals and #faps mean on calls?**](user-guide/user-officer/calls.md)
+    * [**What are calls?**](user-guide/user-officer/creating_call.md) 
+    * [**How do I create a call?**](user-guide/user-officer/creating_call.md) 
+    * [**How do I edit active calls?**](user-guide/user-officer/creating_call.md)
+    * [**How do I manage calls?**](user-guide/user-officer/creating_call.md)
+        * [**How do I assign instruments to a call?**](user-guide/user-officer/creating_call.md)
+        * [**How do I deactivate calls?**](user-guide/user-officer/creating_call.md)
+        * [**How do I delete calls?**](user-guide/user-officer/creating_call.md)
+        * [**How do I export FAP data from a call?**](user-guide/user-officer/creating_call.md)
+        * [**What do #Instruments #proposals and #faps mean on calls?**](user-guide/user-officer/creating_call.md)
 
 ??? info "**People and Roles**"
-    * [**What are roles?**](user-guide/user-officer/main/roles.md)
-    * [**What are the different roles in User Office?**](user-guide/user-officer/main/roles.md)
-    * [**How do I change roles?**](user-guide/user-officer/main/roles.md)
-    * [**How do I find users?**](user-guide/user-officer/people.md)
-    * [**How do I impersonate users?**](user-guide/user-officer/people.md)
+    * [**What are roles?**](user-guide/user-officer/roles.md)
+    * [**What are the different roles in User Office?**](user-guide/user-officer/roles.md)
+    * [**How do I change roles?**](user-guide/user-officer/roles.md)
 
 ??? info "**Proposal Management**"
     ### **Proposal Management**
@@ -42,8 +41,8 @@
 
 ??? info "**Templates**"
     ### **Templates**
-    * [**What are templates?**](user-guide/user-officer/main/templates.md)
-    * [**How do I use templates within a call?**](user-guide/user-officer/main/templates.md)
+    * [**What are templates?**](user-guide/user-officer/creating_templates.md)
+    * [**How do I use templates within a call?**](user-guide/user-officer/creating_templates.md)
 
 ??? info "**PDF Templates**"
     ### **PDF templates**
@@ -150,8 +149,8 @@
 
 ??? info "**Feasibility review**"
     ### **Feasibility review**
-    * [**What are feasibility reviews?**](user-guide/user-officer/main/feasibility_review.md)
-    * [**How do I configure the system for feasibility review?**](user-guide/user-officer/main/feasibility_review.md)
+    * [**What are feasibility reviews?**](user-guide/user-officer/feasibility_review.md)
+    * [**How do I configure the system for feasibility review?**](user-guide/user-officer/feasibility_review.md)
 
 ??? info "**Proposal workflows**"
     ### **Proposal workflows**
@@ -183,7 +182,7 @@
     * [**How do I create units?**](user-guide/user-officer/settings/units.md)
     * [**How do I import and export units?**](user-guide/user-officer/settings/units.md)
     * [**How do I delete units?**](user-guide/user-officer/settings/units.md)
-    * [**How do I change the look of the UI?**](user-guide/user-officer/settings/app_settings.md)
     * [**What are features?**](user-guide/user-officer/settings/features.md)
     * [**How do I configure the features?**](user-guide/user-officer/settings/features.md)
 
+_________________________________________________________________________________________________________

@@ -1,26 +1,10 @@
 # Sample ESI templates
 
-## **What are sample ESI templates?**
-
 ______________________________________________________________________________________
 
-## **How do I link sample ESI templates to calls?**
-______________________________________________________________________________________
+## What are sample ESI templates?
 
-## **How do I link sample ESI templates to sample declaration questions?**
-______________________________________________________________________________________
+??? info "Sample ESI templates" 
+    **Sample Experiment Safety Input (ESI) templates** are predefined forms used to collect safety-related information about the samples involved in an experiment. These templates ensure that all safety considerations are thoroughly documented and assessed as part of the proposal submission process.
 
-## **How do I create sample ESI templates?**
-______________________________________________________________________________________
-
-## **How do I edit sample ESI templates?**
-______________________________________________________________________________________
-   
-## **How do I import and export sample ESI templates?**
-______________________________________________________________________________________
-
-## **How do I clone sample ESI templates?**
-______________________________________________________________________________________
-
-## **What does # Sample ESIs mean on Sample ESI templates?**
 ______________________________________________________________________________________
