@@ -36,4 +36,5 @@ export interface TechniqueDataSource {
     scientistId: number,
     techniqueId: number
   ): Promise<boolean>;
+  getTechniquesByProposalPk(proposalPk: number): Promise<Technique[]>;
 }

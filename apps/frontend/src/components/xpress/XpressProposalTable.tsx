@@ -1,14 +1,20 @@
 import MaterialTable, { OrderByCollection } from '@material-table/core';
+import { t, TFunction } from 'i18next';
 import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
-import { ProposalsFilter } from 'generated/sdk';
+import {
+  ProposalsFilter,
+  ProposalViewInstrument,
+  ProposalViewTechnique,
+} from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
+import { addColumns, fromArrayToCommaSeparated } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 
 import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
@@ -18,6 +24,8 @@ export interface ProposalData {
   proposalId: string;
   title: string;
   submittedDate: Date;
+  instruments: ProposalViewInstrument[] | null;
+  techniques: ProposalViewTechnique[] | null;
 }
 
 const XpressProposalTable = () => {
@@ -109,6 +117,35 @@ const XpressProposalTable = () => {
     },
   ];
 
+  const instrumentManagementColumns = (
+    t: TFunction<'translation', undefined>
+  ) => [
+    {
+      title: t('instrument'),
+      field: 'instruments.name',
+      render: (rowData: ProposalViewData) =>
+        fromArrayToCommaSeparated(
+          rowData.instruments?.map((instrument) => instrument.name)
+        ),
+      customFilterAndSearch: () => true,
+    },
+  ];
+
+  const techniquesColumns = (t: TFunction<'translation', undefined>) => [
+    {
+      title: t('technique'),
+      field: 'technique.name',
+      render: (rowData: ProposalViewData) =>
+        fromArrayToCommaSeparated(
+          rowData.techniques?.map((technique) => technique.name)
+        ),
+      customFilterAndSearch: () => true,
+    },
+  ];
+
+  addColumns(columns, instrumentManagementColumns(t));
+  addColumns(columns, techniquesColumns(t));
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading, proposalsData, totalCount, setProposalsData } =
     useProposalsCoreData({
@@ -195,6 +232,8 @@ const XpressProposalTable = () => {
       proposalId: proposal.proposalId,
       title: proposal.title,
       submittedDate: proposal.submittedDate,
+      instruments: proposal.instruments,
+      techniques: proposal.techniques,
     };
   });
 

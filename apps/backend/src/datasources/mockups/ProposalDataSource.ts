@@ -214,7 +214,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       AllocationTimeUnits.Day,
       1,
       1,
-      new Date()
+      new Date(),
+      []
     );
 
     allProposals = [
