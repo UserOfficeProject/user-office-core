@@ -57,6 +57,7 @@ const ProposalGrade = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
+  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { settingsMap } = useContext(SettingsContext);
   const { user } = useContext(UserContext);
   const gradeDecimalPoints = parseFloat(
@@ -74,11 +75,12 @@ const ProposalGrade = ({
     saveOnly: true,
     gradeGuide: fap?.gradeGuide,
   };
+  const hasNoGradingRights = isFapReviewer ? review.userID !== user.id : false;
 
   const isDisabled = (isSubmitting: boolean) =>
     isSubmitting ||
     (review.status === ReviewStatus.SUBMITTED && !hasAccessRights) ||
-    !(review.userID === user.id);
+    hasNoGradingRights;
 
   const handleSubmit = async (values: GradeFormType) => {
     const { updateReview } = await api({
