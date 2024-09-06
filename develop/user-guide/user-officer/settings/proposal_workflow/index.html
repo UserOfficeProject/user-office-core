@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/develop/user-guide/user-officer/settings/proposal_workflow/">
       
       
-        <link rel="prev" href="../proposal_statuses/">
+        <link rel="prev" href="../../templates/feedback_template/">
       
       
         <link rel="next" href="../features/">
@@ -1016,48 +1016,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../units/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Units
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../proposal_statuses/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Proposal statuses
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -1146,24 +1104,6 @@
   <a href="#how-do-i-create-a-proposal-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       How do I create a proposal workflow?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-edit-a-proposal-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      How do I edit a proposal workflow?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-assign-a-proposal-workflow-to-a-call" class="md-nav__link">
-    <span class="md-ellipsis">
-      How do I assign a proposal workflow to a call?
     </span>
   </a>
   
@@ -1643,24 +1583,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-do-i-edit-a-proposal-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      How do I edit a proposal workflow?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-do-i-assign-a-proposal-workflow-to-a-call" class="md-nav__link">
-    <span class="md-ellipsis">
-      How do I assign a proposal workflow to a call?
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#statuses" class="md-nav__link">
     <span class="md-ellipsis">
       Statuses
@@ -1713,7 +1635,7 @@
 <h2 id="what-are-proposal-workflows">What are proposal workflows?</h2>
 <details class="info">
 <summary>Proposal Workflows</summary>
-<p><a href="./"><strong>Proposal workflows</strong></a> outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '<strong>Draft</strong>', '<strong>Feasibility Review</strong>', '<strong>Allocated</strong>', '<strong>Not Allocated</strong>', '<strong>Reserved</strong>', and '<strong>Rejected</strong>'. Each status marks a key stage in the proposal's progression. For example, moving from 'Draft' to 'Feasibility Review' indicates the proposal's readiness for preliminary assessment. </p>
+<p><strong>Proposal workflows</strong> outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '<strong>Draft</strong>', '<strong>Feasibility Review</strong>', '<strong>Allocated</strong>', '<strong>Not Allocated</strong>', '<strong>Reserved</strong>', and '<strong>Rejected</strong>'. Each status marks a key stage in the proposal's progression. For example, moving from 'Draft' to 'Feasibility Review' indicates the proposal's readiness for preliminary assessment. </p>
 <p>Proposal workflows control how and when the User Office system will display information to different roles based on statuses. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customise workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.</p>
 <hr />
 <p><figure markdown="span"><br />
@@ -1725,19 +1647,22 @@
 <h2 id="what-are-proposal-statuses">What are proposal statuses?</h2>
 <details class="info">
 <summary>proposal statuses</summary>
-<p><strong>Proposal statuses</strong> </p>
+<p><strong>Proposal statuses</strong> represent the various stages a proposal goes through during its lifecycle, such as '<strong>Draft</strong>', '<strong>Feasibility Review</strong>', '<strong>Allocated</strong>', '<strong>Not Allocated</strong>', '<strong>Reserved</strong>', and '<strong>Rejected</strong>'. Each status signifies a specific point in the proposal's progression and helps track its current state.</p>
+<p>Proposal statuses are used to manage and monitor the flow of proposals within the User Office system. They provide an indication of where a proposal is in the review and decision-making process. User Officers can customize these statuses to ensure that each proposal is processed correctly. Statuses can trigger events, notifications, and actions, helping to automate the proposal management process. For example, moving a proposal to 'Feasibility Review' might trigger a notification to the relevant reviewers, while a status of 'Allocated' could initiate resource allocation for the approved proposal.</p>
 </details>
 <hr />
 <h2 id="what-are-status-events">What are status events?</h2>
 <details class="info">
 <summary>Status events</summary>
-<p><strong>Status Events</strong> </p>
+<p><strong>Status events</strong> are specific triggers that cause a proposal to transition from one status to another within the proposal workflow. Examples of status events include '<strong>Proposal Submitted</strong>' and '<strong>Review Completed</strong>'. Each event is associated with a particular action or milestone in the proposal's lifecycle.</p>
+<p>Status events are used to automate the movement of proposals through the workflow based on predefined criteria. User Officers can customize these events to fit the needs of their workflow, ensuring that proposals progress efficiently. Events can trigger status changes, notifications, and other actions. For example, the event '<strong>Proposal Submitted</strong>' might trigger a transition from 'Draft' to 'Feasibility Review'.</p>
 </details>
 <hr />
 <h2 id="what-are-status-actions">What are status actions?</h2>
 <details class="info">
 <summary>Status actions</summary>
-<p><strong>Status Actions</strong> </p>
+<p><strong>Status actions</strong> are predefined operations that are automatically executed when a proposal transitions to a specific status. Examples of status actions include sending email notifications, updating records, or triggering external systems via RabbitMQ messages.</p>
+<p>Status actions are used to automate tasks and ensure consistency in the proposal management process. User Officers can customize these actions to trigger necessary tasks when a proposal reaches a certain status. For example, a status action might send an email notification to reviewers when a proposal transitions to 'Feasibility Review'.</p>
 </details>
 <hr />
 <h2 id="how-do-i-create-a-proposal-workflow">How do I create a proposal workflow?</h2>
@@ -1768,10 +1693,6 @@
 <ul>
 <li>Once you are satisfied with your edits, click the Update button to save and apply the changes to the PDF template</li>
 </ul>
-<hr />
-<h2 id="how-do-i-edit-a-proposal-workflow">How do I edit a proposal workflow?</h2>
-<hr />
-<h2 id="how-do-i-assign-a-proposal-workflow-to-a-call">How do I assign a proposal workflow to a call?</h2>
 <hr />
 <h2 id="statuses">Statuses</h2>
 <details class="info">
