@@ -44,6 +44,15 @@ export class ProposalViewInstrument {
 }
 
 @ObjectType()
+export class ProposalViewTechnique {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  name: string;
+}
+
+@ObjectType()
 export class ProposalViewFap {
   @Field(() => Int)
   id: number;
@@ -140,6 +149,9 @@ export class ProposalView implements Partial<ProposalOrigin> {
 
   @Field(() => Date, { nullable: true })
   public submittedDate: Date;
+
+  @Field(() => [ProposalViewTechnique], { nullable: true })
+  public techniques: ProposalViewTechnique[] | null;
 }
 
 @Resolver(() => ProposalView)

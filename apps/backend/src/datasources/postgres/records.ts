@@ -63,6 +63,7 @@ import {
   ProposalViewFap,
   ProposalViewInstrument,
   ProposalViewTechnicalReview,
+  ProposalViewTechnique,
 } from '../../resolvers/types/ProposalView';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
@@ -157,6 +158,7 @@ export interface ProposalViewRecord {
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
   readonly submitted_date: Date;
+  readonly techniques: ProposalViewTechnique[];
 }
 
 export interface TopicRecord {
@@ -869,7 +871,8 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.allocation_time_unit,
     proposal.call_id,
     proposal.proposal_workflow_id,
-    proposal.submitted_date
+    proposal.submitted_date,
+    proposal.techniques
   );
 };
 

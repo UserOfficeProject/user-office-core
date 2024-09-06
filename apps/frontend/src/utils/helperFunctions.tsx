@@ -106,6 +106,10 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     workflowId: proposal.call?.proposalWorkflowId,
     allocationTimeUnit: proposal.call?.allocationTimeUnit,
     submittedDate: proposal.submittedDate,
+    techniques: proposal.techniques?.map((technique) => ({
+      id: technique?.id,
+      name: technique?.name,
+    })),
   }) as ProposalViewData;
 
 export const capitalize = (s: string) =>
