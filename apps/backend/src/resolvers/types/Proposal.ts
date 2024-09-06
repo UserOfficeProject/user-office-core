@@ -30,6 +30,7 @@ import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { Sample } from './Sample';
 import { TechnicalReview } from './TechnicalReview';
+import { Technique } from './Technique';
 import { Visit } from './Visit';
 
 const statusMap = new Map<ProposalEndStatus, ProposalPublicStatus>();
@@ -169,6 +170,19 @@ export class ProposalResolver {
     @Ctx() context: ResolverContext
   ): Promise<InstrumentWithManagementTime[]> {
     return await context.queries.instrument.getInstrumentsByProposalPk(
+      context.user,
+      proposal.primaryKey
+    );
+  }
+
+  @FieldResolver(() => [Technique], {
+    nullable: 'itemsAndList',
+  })
+  async techniques(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Technique[]> {
+    return await context.queries.technique.getTechniquesByProposalPk(
       context.user,
       proposal.primaryKey
     );
