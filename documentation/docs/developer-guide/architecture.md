@@ -1,6 +1,12 @@
+# Architecture
+
+_________________________________________________________________________________________________________
+
 The following picture shows the components of the User Office architecture.
 
 ![System overview](../assets/images/system-overview.png)
+
+_________________________________________________________________________________________________________
 
 ## Components
 
@@ -35,3 +41,5 @@ The User Office application leverages a modular architecture with several interc
 **SciCat, NICOS, and Asset Management Systems** 
 
 - These external systems interface with the User Office application to ensure efficient asset management and integration with external resources, enhancing the overall functionality and data management capabilities.
+
+_________________________________________________________________________________________________________
