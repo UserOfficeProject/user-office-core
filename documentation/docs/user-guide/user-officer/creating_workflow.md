@@ -83,8 +83,7 @@ ________________________________________________________________________________
 
 * The Proposal Workflow Editor will open. From this page, you can set up the Proposal Workflow.
 
-> **_NOTE:_** You can **drag and drop** [proposal Statuses :material-folder-cog-outline:](settings/proposal_statuses.md) into the Proposal Workflow, reordering them as desired. The order of the statuses represent the workflow that the proposal will progress through. 
-
+> **_NOTE:_** You can drag and drop Proposal Statuses :material-folder-cog-outline: into the Proposal Workflow, reordering them as desired. The order of the statuses represent the workflow that the proposal will progress through. 
 
  Delete statuses to remove them from the workflow. The 'Draft' Status is a mandatory starting status for all proposals and cannot be deleted or have other statuses precede it.
 
