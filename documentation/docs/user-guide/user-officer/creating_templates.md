@@ -100,10 +100,10 @@ There are several different types of templates utilised within Calls:
     
     <figure markdown="span">  
         ![Feedback templates](../../assets/images/feedback.png){ width="450"}
-        <figcaption>**Feedback form (viewed from the user's perspective)**</figcaption>
+        <figcaption>Feedback form (viewed from the user's perspective)</figcaption>
     </figure>
 
-The template creation process is similar for all types of templates except for [PDF templates :material-file-pdf-box:](templates/pdf_template.md) which are built with customiseable code. All other templates are built with [questions. :material-comment-question:](questions.md) 
+The template creation process is similar for all types of templates except for [PDF templates :material-file-pdf-box:](templates/pdf_template.md) which are built with customizable code. All other templates are built with [questions. :material-comment-question:](questions.md) 
 
 _________________________________________________________________________________________________________
 
