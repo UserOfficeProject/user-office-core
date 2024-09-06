@@ -230,12 +230,12 @@ export class ProposalAuthorization {
       this.userAuth.hasGetAccessByToken(agent) ||
       (await this.isMemberOfProposal(agent, proposal)) ||
       (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isMemberOfFapProposal(agent, proposal.primaryKey)) ||
       (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
       (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
       isInternalReviewerOnSomeTechnicalReview ||
       (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isVisitorOfProposal(agent, proposal.primaryKey))
+      (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
+      (await this.isMemberOfFapProposal(agent, proposal.primaryKey))
     );
   }
 
