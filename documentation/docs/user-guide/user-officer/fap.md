@@ -56,13 +56,7 @@ The FAP members can be configured.
 
 * FAP Chairs can be added with the `ADD CHAIR` button
 * FAP Secretaries can be added with the `ADD SECRETARY` button.
-* Reviewers can be added with the `ADD REVEWERS` button.
-
-**Proposal and assignments**
-
-**Meeting components**
-
-**Logs**
+* Reviewers can be added with the `ADD REVIEWERS` button.
 
 _________________________________________________________________________________________________________
 

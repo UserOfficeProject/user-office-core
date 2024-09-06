@@ -60,8 +60,6 @@ nav:
             - Sample ESI templates: user-guide/user-officer/templates/sampleESI_template.md
             - Feedback templates: user-guide/user-officer/templates/feedback_template.md
           - Settings:
-              - Units: user-guide/user-officer/settings/units.md
-              - Proposal statuses: user-guide/user-officer/settings/proposal_statuses.md
               - Proposal workflows: user-guide/user-officer/settings/proposal_workflow.md
               - Features: user-guide/user-officer/settings/features.md
   - Developer Guide:
