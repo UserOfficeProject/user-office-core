@@ -257,7 +257,7 @@ const ProposalTableInstrumentScientist = ({
 }: {
   confirm: WithConfirmType;
 }) => {
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalViewData[]
@@ -362,13 +362,11 @@ const ProposalTableInstrumentScientist = ({
 
   useEffect(() => {
     let isMounted = true;
-    let endSlice = rowsPerPage * (currentPage + 1);
-    endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
     if (isMounted) {
       setTableData(
         preselectedProposalsData.slice(
           (currentPage * rowsPerPage) % PREFETCH_SIZE,
-          endSlice
+          totalCount
         )
       );
     }
@@ -376,7 +374,13 @@ const ProposalTableInstrumentScientist = ({
     return () => {
       isMounted = false;
     };
-  }, [currentPage, rowsPerPage, preselectedProposalsData, queryParameters]);
+  }, [
+    currentPage,
+    rowsPerPage,
+    preselectedProposalsData,
+    queryParameters,
+    totalCount,
+  ]);
 
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
@@ -875,7 +879,6 @@ const ProposalTableInstrumentScientist = ({
               },
             });
           }
-          setCurrentPage(page);
         }}
         columns={columns}
         data={proposalDataWithIdAndRowActions}
