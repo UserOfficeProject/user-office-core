@@ -58,7 +58,7 @@ ________________________________________________________________________________
 
     <figure markdown="span">  
         ![Reviewer Homepage](../../assets/images/reviewer_page.png)
-        <figcaption>**Reviewer homepage (dashboard)**</figcaption>
+        <figcaption>Reviewer homepage (dashboard)</figcaption>
     </figure>
 
 #### Help page
@@ -101,12 +101,12 @@ ________________________________________________________________________________
 
     <figure markdown="span">  
         ![Help page](../../assets/images/faq_page.png)
-        <figcaption>**User help page (FAQ)**</figcaption>
+        <figcaption>User help page (FAQ)</figcaption>
     </figure>
 
     <figure markdown="span">  
         ![Help notice](../../assets/images/faq_notice.png)
-        <figcaption>**Help notice (FAQ)**</figcaption>
+        <figcaption>Help notice (FAQ)</figcaption>
     </figure>
 
 #### Privacy Agreement page
@@ -116,7 +116,7 @@ ________________________________________________________________________________
 
     <figure markdown="span">  
         ![Privacy page](../../assets/images/privacy_page.png)
-        <figcaption>**Privacy Agreement Page**</figcaption>
+        <figcaption>Privacy Agreement Page</figcaption>
     </figure>
 
 #### Footer
