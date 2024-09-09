@@ -228,7 +228,6 @@ export function QuestionaryComponentInstrumentPicker(
             data-natural-key={naturalKey}
             data-cy="dropdown-ul"
           >
-            {!config.isMultipleSelect && <MenuItem value={0}>None</MenuItem>}
             {config.instruments.map((instrument) => {
               return (
                 <SelectMenuItem
