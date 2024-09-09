@@ -1,14 +1,18 @@
 # FAPs :material-google-circles-communities: 
 
-### **What are facility access panels?**
+_________________________________________________________________________________________________________
 
-* FAPs (Facility Access Panels) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a [**chair**](main/roles.md), [**reviewer**](main/roles.md) and [**secretary**](main/roles.md) to oversee the review process and ensure thorough and unbiased evaluations. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments
+## What are facility access panels (FAPs)?
 
-* [**User Officers**](main/roles.md) can manage the FAPs assigned to proposals and provide general information such as labeling FAPs with a code, a description, and specifying the required number of proposal ratings. FAPs can be automatically assigned to all proposals within a call, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria such as the **grade guide**. 
+FAPs are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a [chair](roles.md), [reviewer](roles.md) and [secretary](roles.md) to oversee the review process and ensure thorough and unbiased evaluations. 
 
-_____________________________________________________________________________________________________
+FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments
 
-####  **How do I edit FAPs?**
+[User Officers](roles.md) can manage the FAPs assigned to proposals and provide general information such as labeling FAPs with a code, a description, and specifying the required number of proposal ratings. FAPs can be automatically assigned to all proposals within a call, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria such as the grade guide. 
+
+_________________________________________________________________________________________________________
+
+## How do I edit FAPs?
 
 * In the main menu, head to the FAPs page.
 
@@ -16,9 +20,9 @@ ________________________________________________________________________________
 
 * You can update changes to the General tab with the `UPDATE FAP` button. Changes made within other tabs such as editing the FAP members will be updated automatically.
 
-_____________________________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-####  **How do I create FAPs?**
+##  How do I create FAPs?
 
 * In the main menu, head to the FAPs page.
 
@@ -52,29 +56,13 @@ The FAP members can be configured.
 
 * FAP Chairs can be added with the `ADD CHAIR` button
 * FAP Secretaries can be added with the `ADD SECRETARY` button.
-* Reviewers can be added with the `ADD REVEWERS` button.
+* Reviewers can be added with the `ADD REVIEWERS` button.
 
-**Proposal and assignments**
+_________________________________________________________________________________________________________
 
-**Meeting components**
+## How are FAPs with multiple instruments configured?
 
-**Logs**
-
-_____________________________________________________________________________________________________
-
-
-### **How do I configure the system for FAP review?**
-
-___________________________________________________________________________________________________
-
-### **What is the grade guide?**
-
-_____________________________________________________________________________________________________
-
-
-### **How are FAPs with multiple instruments configured?**
-
-* Proposals with multiple instruments have a different distribution of time allocation.
+Proposals with multiple instruments have a different distribution of time allocation.
 
 To generate a cutoff, we need the amount of instrument time available per instrument and the amount of time recommended per instrument. 
 
@@ -85,12 +73,9 @@ In the next case the proposals for an instrument are reviewed in two panels. Eac
 
 cutoff = (total instrument time available / total instrument time recommended in both panels) x instrument time recommended in this panel
 
-Therefore in the case where instrument 1 has 10 days available to be shared in FAP 1 and FAP 2, where FAP 1 has a total of 15 days recommended by the instrument scientist and FAP 2 has a total of 10 days recommended by the instrument scientist
+Therefore in the case where instrument 1 has 10 days available to be shared in FAP 1 and FAP 2, where FAP 1 has a total of 15 days recommended by the instrument scientist and FAP 2 has a total of 10 days recommended by the instrument scientist.
 
-FAP 1 has a cutoff at (10/25)*15 or 6 days
-FAP 2 has a cutoff at (10/25)*10 or 4 days
+* FAP 1 has a cutoff at (10/25)*15 or 6 days.
+* FAP 2 has a cutoff at (10/25)*10 or 4 days.
 
-
-
-
-
+_________________________________________________________________________________________________________
