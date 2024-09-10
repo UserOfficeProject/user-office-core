@@ -54,14 +54,14 @@ export default function ProposalPage() {
   const dataType = searchParams.get('dataType');
 
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
-    callId: callId != null ? +callId : null,
+    callId: callId ? +callId : undefined,
     instrumentFilter: {
       instrumentId: instrumentId != null ? +instrumentId : null,
       showAllProposals: !instrumentId,
       showMultiInstrumentProposals: false,
     },
-    proposalStatusId: proposalStatusId != null ? +proposalStatusId : null,
-    referenceNumbers: proposalId ? [proposalId] : [],
+    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    referenceNumbers: proposalId ? [proposalId] : undefined,
     questionFilter: questionaryFilterFromUrlQuery({
       compareOperator,
       dataType,
