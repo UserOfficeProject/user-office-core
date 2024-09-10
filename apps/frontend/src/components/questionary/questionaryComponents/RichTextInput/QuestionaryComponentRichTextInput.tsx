@@ -25,9 +25,9 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
   const config = answer.config as RichTextInputConfig;
+
   const theme = useTheme();
   const [numberOfChars, setNumberOfChars] = useState(0);
-
   const handleCharacterCount = (editor: TinyMCEEditor) => {
     const wordCount = editor.plugins.wordcount;
     setNumberOfChars(wordCount.body.getCharacterCount());
@@ -51,12 +51,26 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
            * Note:  if you add new styling options please make sure the HTML sanitizer rules
            *        on the BE is in sync, otherwise the result will be filtered
            */
-          plugins: ['preview', 'advlist', 'lists', 'charmap', 'wordcount'],
-          toolbar:
-            'undo redo | bold italic underline strikethrough superscript subscript | ' +
-            'fontsizeselect formatselect forecolor | ' +
-            'alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist | outdent indent | charmap removeformat preview',
+          plugins: config.allowImages
+            ? [
+                'preview',
+                'advlist',
+                'lists',
+                'charmap',
+                'wordcount',
+                'image',
+                'code',
+              ]
+            : ['preview', 'advlist', 'lists', 'charmap', 'wordcount'],
+          toolbar: config.allowImages
+            ? 'undo redo | bold italic underline strikethrough superscript subscript | ' +
+              'fontsizeselect formatselect forecolor | ' +
+              'alignleft aligncenter alignright alignjustify link image | code | ' +
+              'bullist numlist | outdent indent | charmap removeformat preview'
+            : 'undo redo | bold italic underline strikethrough superscript subscript | ' +
+              'fontsizeselect formatselect forecolor | ' +
+              'alignleft aligncenter alignright alignjustify | ' +
+              'bullist numlist | outdent indent | charmap removeformat preview',
           branding: false,
           menubar: false,
         }}
