@@ -53,6 +53,7 @@ interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
   delete?: (id: number | string) => Promise<boolean>;
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
   extraActionButtons?: React.ReactNode;
+  persistUrlQueryParams?: boolean;
 }
 
 interface EntryID {
@@ -66,6 +67,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
     update: true,
   },
   extraActionButtons,
+
   ...props
 }: MaterialTableProps<Entry> & SuperProps<Entry>) {
   const [show, setShow] = useState(false);
@@ -73,7 +75,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
   let { data, columns } = props;
   const { setData, options, actions, createModal } = props;
-
+  const { persistUrlQueryParams = false } = props;
   const [searchParam, setSearchParam] = useSearchParams();
   const selection = searchParam.getAll('selection');
   const search = searchParam.get('search');
@@ -224,39 +226,42 @@ export function SuperMaterialTable<Entry extends EntryID>({
             : [...localActions]
         }
         onSearchChange={(searchText) => {
-          setSearchParam((searchParam) => {
-            searchParam.delete('search');
-            if (searchText) searchParam.set('search', searchText);
+          persistUrlQueryParams &&
+            setSearchParam((searchParam) => {
+              searchParam.delete('search');
+              if (searchText) searchParam.set('search', searchText);
 
-            return searchParam;
-          });
+              return searchParam;
+            });
         }}
         onSelectionChange={(selectedItems) => {
-          setSearchParam((searchParam) => {
-            searchParam.delete('selection');
-            selectedItems.map((selectedItem) =>
-              searchParam.append('selection', selectedItem.id.toString())
-            );
+          persistUrlQueryParams &&
+            setSearchParam((searchParam) => {
+              searchParam.delete('selection');
+              selectedItems.map((selectedItem) =>
+                searchParam.append('selection', selectedItem.id.toString())
+              );
 
-            return searchParam;
-          });
+              return searchParam;
+            });
         }}
         onOrderCollectionChange={(orderByCollection) => {
           const [orderBy] = orderByCollection;
-          setSearchParam((searchParam) => {
-            searchParam.delete('sortField');
-            searchParam.delete('sortDirection');
+          persistUrlQueryParams &&
+            setSearchParam((searchParam) => {
+              searchParam.delete('sortField');
+              searchParam.delete('sortDirection');
 
-            if (
-              orderBy?.orderByField != null &&
-              orderBy?.orderDirection != null
-            ) {
-              searchParam.set('sortField', orderBy?.orderByField);
-              searchParam.set('sortDirection', orderBy?.orderDirection);
-            }
+              if (
+                orderBy?.orderByField != null &&
+                orderBy?.orderDirection != null
+              ) {
+                searchParam.set('sortField', orderBy?.orderByField);
+                searchParam.set('sortDirection', orderBy?.orderDirection);
+              }
 
-            return searchParam;
-          });
+              return searchParam;
+            });
         }}
       />
       {hasAccess.create && createModal && (

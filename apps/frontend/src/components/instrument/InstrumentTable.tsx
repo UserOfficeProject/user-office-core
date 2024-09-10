@@ -204,6 +204,7 @@ const InstrumentTable = () => {
                 ]
               : []
           }
+          persistUrlQueryParams={true}
         />
       </div>
     </>
