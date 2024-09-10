@@ -15,15 +15,9 @@ import { proposalTechnicalReviewValidationSchema } from '@user-office-software/d
 import { TFunction } from 'i18next';
 import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  NumberParam,
-  StringParam,
-  useQueryParams,
-  withDefault,
-} from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
-import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
@@ -292,46 +286,48 @@ const ProposalTableInstrumentScientist = ({
       ? ReviewerFilter.ME
       : ReviewerFilter.ALL;
   }
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    ...DefaultQueryParams,
-    call: NumberParam,
-    instrument: StringParam,
-    proposalStatus: withDefault(NumberParam, statusFilter),
-    questionId: StringParam,
-    compareOperator: StringParam,
-    value: StringParam,
-    dataType: StringParam,
-    reviewModal: NumberParam,
-    modalTab: NumberParam,
-    proposalId: StringParam,
-    reviewer: withDefault(StringParam, reviewerFilter),
-    page: NumberParam,
-    pageSize: NumberParam,
-  });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const callId = searchParams.get('call');
+  const instrumentId = searchParams.get('instrument');
+  const proposalStatusId = searchParams.get('proposalStatus');
+  const questionId = searchParams.get('questionId');
+  const proposalId = searchParams.get('proposalId');
+  const compareOperator = searchParams.get('compareOperator');
+  const value = searchParams.get('value');
+  const dataType = searchParams.get('dataType');
+  const reviewer = searchParams.get('reviewer');
+  const search = searchParams.get('search');
+  const selection = searchParams.get('selection');
+  const sortField = searchParams.get('sortField');
+  const sortDirection = searchParams.get('sortDirection');
+  const reviewModal = searchParams.get('reviewModal');
+
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
-    callId: urlQueryParams.call,
+    callId: callId ? +callId : undefined,
     instrumentFilter: {
-      instrumentId: urlQueryParams.instrument
-        ? +urlQueryParams.instrument
-        : null,
-      showAllProposals: !urlQueryParams.instrument,
+      instrumentId: instrumentId != null ? +instrumentId : null,
+      showAllProposals: !instrumentId,
       showMultiInstrumentProposals: false,
     },
-    proposalStatusId: urlQueryParams.proposalStatus,
+    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    referenceNumbers: proposalId ? [proposalId] : undefined,
     excludeProposalStatusIds: [9],
-    referenceNumbers: urlQueryParams.proposalId
-      ? [urlQueryParams.proposalId]
-      : undefined,
-    questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
-    reviewer: getFilterReviewer(urlQueryParams.reviewer),
+    questionFilter: questionaryFilterFromUrlQuery({
+      compareOperator,
+      dataType,
+      questionId,
+      value,
+    }),
+    reviewer: getFilterReviewer(reviewer ?? ReviewerFilter.ALL),
   });
   const [queryParameters, setQueryParameters] = useState<QueryParameters>({
     query: {
       first: PREFETCH_SIZE,
       offset: 0,
     },
-    searchText: urlQueryParams.search ?? undefined,
+    searchText: search ?? undefined,
   });
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
@@ -379,19 +375,19 @@ const ProposalTableInstrumentScientist = ({
   }, [rowsPerPage, preselectedProposalsData, queryParameters, totalCount]);
 
   useEffect(() => {
-    if (urlQueryParams.selection.length > 0) {
-      const selection = new Set(urlQueryParams.selection);
+    if (selection && selection.length > 0) {
+      const selectionSet = new Set(selection);
       const selected: ProposalViewData[] = [];
       setPreselectedProposalsData(
         proposalsData.map((proposal) => {
-          if (selection.has(proposal.primaryKey.toString())) {
+          if (selectionSet.has(proposal.primaryKey.toString())) {
             selected.push(proposal);
           }
 
           return {
             ...proposal,
             tableData: {
-              checked: selection.has(proposal.primaryKey.toString()),
+              checked: selectionSet.has(proposal.primaryKey.toString()),
             },
           };
         })
@@ -406,7 +402,7 @@ const ProposalTableInstrumentScientist = ({
       );
       setSelectedProposals([]);
     }
-  }, [proposalsData, urlQueryParams.selection]);
+  }, [proposalsData, selection]);
 
   const downloadPDFProposal = useDownloadPDFProposal();
   const downloadProposalAttachment = useDownloadProposalAttachment();
@@ -463,15 +459,20 @@ const ProposalTableInstrumentScientist = ({
         >
           <IconButton
             onClick={() => {
-              setUrlQueryParams({
-                reviewModal: rowData.primaryKey,
-                modalTab: showView
-                  ? instrumentScientistProposalReviewTabs.indexOf(
-                      PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION
-                    )
-                  : instrumentScientistProposalReviewTabs.indexOf(
-                      PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW
-                    ),
+              setSearchParams((searchParam) => {
+                searchParam.set('reviewModal', rowData.primaryKey.toString());
+                searchParam.set(
+                  'modalTab',
+                  showView
+                    ? instrumentScientistProposalReviewTabs
+                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
+                        .toString()
+                    : instrumentScientistProposalReviewTabs
+                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW)
+                        .toString()
+                );
+
+                return searchParam;
               });
             }}
             style={iconButtonStyle}
@@ -537,7 +538,14 @@ const ProposalTableInstrumentScientist = ({
       ...queryParameters,
       searchText: searchText ? searchText : undefined,
     });
-    setUrlQueryParams({ search: searchText ? searchText : undefined });
+
+    setSearchParams((searchParam) => {
+      searchParam.delete('search');
+
+      if (searchText) searchParam.set('search', searchText);
+
+      return searchParam;
+    });
   };
 
   const handleColumnHiddenChange = (columnChange: Column<ProposalViewData>) => {
@@ -554,26 +562,32 @@ const ProposalTableInstrumentScientist = ({
     setLocalStorageValue(proposalColumns);
   };
 
-  const handleColumnSelectionChange = (selectedItems: ProposalViewData[]) =>
-    setUrlQueryParams((params) => ({
-      ...params,
-      selection:
-        selectedItems.length > 0
-          ? selectedItems.map((selectedItem) =>
-              selectedItem.primaryKey.toString()
-            )
-          : undefined,
-    }));
+  const handleColumnSelectionChange = (selectedItems: ProposalViewData[]) => {
+    setSearchParams((searchParam) => {
+      searchParam.delete('selection');
+      selectedItems.map((selectedItem) =>
+        searchParam.append('selection', selectedItem.primaryKey.toString())
+      );
+
+      return searchParam;
+    });
+  };
 
   const handleColumnSortOrderChange = (
     orderByCollection: OrderByCollection[]
   ) => {
     const [orderBy] = orderByCollection;
-    setUrlQueryParams((params) => ({
-      ...params,
-      sortField: orderBy?.orderByField,
-      sortDirection: orderBy?.orderDirection,
-    }));
+    setSearchParams((searchParam) => {
+      searchParam.delete('sortField');
+      searchParam.delete('sortDirection');
+
+      if (orderBy?.orderByField != null && orderBy?.orderDirection != null) {
+        searchParam.set('sortField', orderBy?.orderByField);
+        searchParam.set('sortDirection', orderBy?.orderDirection);
+      }
+
+      return searchParam;
+    });
   };
 
   const handleDownloadActionClick = (
@@ -668,12 +682,7 @@ const ProposalTableInstrumentScientist = ({
   } else {
     removeColumns(columns, FapReviewColumns);
   }
-
-  columns = setSortDirectionOnSortField(
-    columns,
-    urlQueryParams.sortField,
-    urlQueryParams.sortDirection
-  );
+  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
   const GetAppIconComponent = (): JSX.Element => (
     <GetAppIcon data-cy="download-proposals" />
@@ -684,8 +693,8 @@ const ProposalTableInstrumentScientist = ({
 
   const proposalToReview = preselectedProposalsData.find(
     (proposal) =>
-      proposal.primaryKey === urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalId
+      (reviewModal && proposal.primaryKey === +reviewModal) ||
+      proposal.proposalId === proposalId
   );
 
   /** NOTE:
@@ -703,7 +712,7 @@ const ProposalTableInstrumentScientist = ({
     totalCount >= PREFETCH_SIZE ? SELECT_ALL_ACTION_TOOLTIP : undefined;
 
   const allPrefetchedProposalsSelected =
-    preselectedProposalsData.length === urlQueryParams.selection.length;
+    preselectedProposalsData.length === (selection ? selection.length : 0);
 
   const tableActions: Action<ProposalViewData>[] = [
     {
@@ -722,17 +731,20 @@ const ProposalTableInstrumentScientist = ({
       },
       onClick: () => {
         if (allPrefetchedProposalsSelected) {
-          setUrlQueryParams((params) => ({
-            ...params,
-            selection: undefined,
-          }));
+          setSearchParams((searchParam) => {
+            searchParam.delete('selection');
+
+            return searchParam;
+          });
         } else {
-          setUrlQueryParams((params) => ({
-            ...params,
-            selection: preselectedProposalsData.map((proposal) =>
-              proposal.primaryKey.toString()
-            ),
-          }));
+          setSearchParams((searchParam) => {
+            searchParam.delete('selection');
+            preselectedProposalsData.map((proposal) =>
+              searchParam.append('selection', proposal.primaryKey.toString())
+            );
+
+            return searchParam;
+          });
         }
       },
       position: 'toolbarOnSelect',
@@ -779,18 +791,24 @@ const ProposalTableInstrumentScientist = ({
               }
             })
           );
-          if (urlQueryParams.proposalId) {
+          if (proposalId) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
-            setUrlQueryParams({
-              proposalId: undefined,
+
+            setSearchParams((searchParam) => {
+              searchParam.delete('proposalId');
+
+              return searchParam;
             });
           }
-          setUrlQueryParams({
-            reviewModal: undefined,
-            modalTab: undefined,
+
+          setSearchParams((searchParam) => {
+            searchParam.delete('reviewModal');
+            searchParam.delete('modalTab');
+
+            return searchParam;
           });
         }}
         reviewItemId={proposalToReview?.primaryKey}
@@ -831,7 +849,7 @@ const ProposalTableInstrumentScientist = ({
         <Grid container spacing={2}>
           <Grid item sm={2} xs={12}>
             <ReviewerFilterComponent
-              reviewer={urlQueryParams.reviewer}
+              reviewer={reviewer ?? ReviewerFilter.ALL}
               onChange={(reviewer) =>
                 setProposalFilter({ ...proposalFilter, reviewer })
               }
@@ -882,14 +900,14 @@ const ProposalTableInstrumentScientist = ({
         page={currentPage}
         localization={{
           toolbar: {
-            nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
+            nRowsSelected: `${selection ? selection.length : 0} row(s) selected`,
           },
         }}
         onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
         isLoading={loading}
         options={{
           search: true,
-          searchText: urlQueryParams.search || undefined,
+          searchText: search || undefined,
           selection: true,
           headerSelectionProps: {
             inputProps: { 'aria-label': 'Select All Rows' },

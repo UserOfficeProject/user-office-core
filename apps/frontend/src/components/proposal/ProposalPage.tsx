@@ -1,5 +1,5 @@
 import React from 'react';
-import { SetURLSearchParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { QueryParamConfig } from 'use-query-params';
 
 import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
@@ -41,8 +41,7 @@ export interface ProposalUrlQueryParams extends URLSearchParams {
 }
 
 export default function ProposalPage() {
-  const [searchParams]: [ProposalUrlQueryParams, SetURLSearchParams] =
-    useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const callId = searchParams.get('call');
   const instrumentId = searchParams.get('instrument');

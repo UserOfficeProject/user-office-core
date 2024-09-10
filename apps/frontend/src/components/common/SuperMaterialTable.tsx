@@ -226,7 +226,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
         onSearchChange={(searchText) => {
           setSearchParam((searchParam) => {
             searchParam.delete('search');
-            searchParam.set('search', searchText);
+            if (searchText) searchParam.set('search', searchText);
 
             return searchParam;
           });

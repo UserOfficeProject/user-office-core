@@ -5,6 +5,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
+import { Visibility } from '@mui/icons-material';
 import Delete from '@mui/icons-material/Delete';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import Email from '@mui/icons-material/Email';
@@ -12,13 +13,11 @@ import FileCopy from '@mui/icons-material/FileCopy';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
-import Visibility from '@mui/icons-material/Visibility';
+import { IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import {
   ResourceId,
@@ -29,7 +28,7 @@ import { TFunction } from 'i18next';
 import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
-import { SetURLSearchParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -302,6 +301,31 @@ const ToolbarWithSelectAllPrefetched = (props: {
   );
 };
 
+/**
+ * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
+ * and selection flag is true they are not working properly.
+ */
+const RowActionButtons = (rowData: ProposalViewData) => {
+  const [, setSearchParams] = useSearchParams();
+
+  return (
+    <Tooltip title="View proposal">
+      <IconButton
+        data-cy="view-proposal"
+        onClick={() => {
+          setSearchParams((searchParams) => {
+            searchParams.set('reviewModal', rowData.primaryKey.toString());
+
+            return searchParams;
+          });
+        }}
+      >
+        <Visibility />
+      </IconButton>
+    </Tooltip>
+  );
+};
+
 const ProposalTableOfficer = ({
   proposalFilter,
   setProposalFilter,
@@ -330,10 +354,7 @@ const ProposalTableOfficer = ({
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
   const featureContext = useContext(FeatureContext);
-  const [searchParams, setSearchParams]: [
-    ProposalTableSearchParams,
-    SetURLSearchParams,
-  ] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -380,27 +401,6 @@ const ProposalTableOfficer = ({
   const isFapEnabled = featureContext.featuresMap.get(
     FeatureId.FAP_REVIEW
   )?.isEnabled;
-
-  /**
-   * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
-   * and selection flag is true they are not working properly.
-   */
-  const RowActionButtons = (rowData: ProposalViewData) => (
-    <Tooltip title="View proposal">
-      <IconButton
-        data-cy="view-proposal"
-        onClick={() => {
-          setSearchParams((searchParams) => {
-            searchParams.set('reviewModal', rowData.primaryKey.toString());
-
-            return searchParams;
-          });
-        }}
-      >
-        <Visibility />
-      </IconButton>
-    </Tooltip>
-  );
 
   if (!columns.find((column) => column.field === 'rowActionButtons')) {
     columns = [
