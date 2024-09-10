@@ -82,6 +82,9 @@ type QueryParameters = {
   };
   searchText?: string | undefined;
 };
+
+const currentPage = 0;
+
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
 
@@ -257,7 +260,6 @@ const ProposalTableInstrumentScientist = ({
 }: {
   confirm: WithConfirmType;
 }) => {
-  const currentPage = 0;
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalViewData[]
@@ -374,13 +376,7 @@ const ProposalTableInstrumentScientist = ({
     return () => {
       isMounted = false;
     };
-  }, [
-    currentPage,
-    rowsPerPage,
-    preselectedProposalsData,
-    queryParameters,
-    totalCount,
-  ]);
+  }, [rowsPerPage, preselectedProposalsData, queryParameters, totalCount]);
 
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
