@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React, { Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, StringParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { InstrumentFilterInput, InstrumentFragment } from 'generated/sdk';
 
@@ -35,9 +35,7 @@ const InstrumentFilter = ({
   shouldShowMultiple,
   showMultiInstrumentProposals,
 }: InstrumentFilterProps) => {
-  const [, setQuery] = useQueryParams({
-    instrument: StringParam,
-  });
+  const [, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
 
   if (instruments === undefined) {
@@ -66,10 +64,14 @@ const InstrumentFilter = ({
                 showMultiInstrumentProposals: false,
                 showAllProposals: false,
               };
-              setQuery({
-                instrument: e.target.value
-                  ? e.target.value.toString()
-                  : undefined,
+
+              setSearchParams((searchParams) => {
+                searchParams.delete('instrument');
+                if (e.target.value) {
+                  searchParams.set('instrument', e.target.value.toString());
+                }
+
+                return searchParams;
               });
               if (
                 e.target.value === InstrumentFilterEnum.ALL ||

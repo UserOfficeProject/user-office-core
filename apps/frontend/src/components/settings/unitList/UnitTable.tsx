@@ -4,12 +4,8 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryParams } from 'use-query-params';
 
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, Unit, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -35,8 +31,6 @@ const UnitTable = () => {
   const navigate = useNavigate();
   const { loadingUnits, units, setUnitsWithLoading: setUnits } = useUnitsData();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const createModal = (
     onUpdate: FunctionType<void, [Unit | null]>,
@@ -81,8 +75,6 @@ const UnitTable = () => {
           search: true,
           debounceInterval: 400,
         }}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
         delete={deleteUnit}
         extraActionButtons={
           <>
@@ -119,6 +111,7 @@ const UnitTable = () => {
             </Button>
           </>
         }
+        persistUrlQueryParams={true}
       />
     </div>
   );
