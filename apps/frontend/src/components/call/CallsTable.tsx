@@ -8,14 +8,11 @@ import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import StyledDialog from 'components/common/StyledDialog';
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import {
   Call,
   InstrumentWithAvailabilityTime,
@@ -35,8 +32,6 @@ import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CallStatusFilter, {
-  CallStatusQueryFilter,
-  defaultCallStatusQueryFilter,
   CallStatus,
   CallStatusFilters,
 } from './CallStatusFilter';
@@ -67,13 +62,12 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType & CallStatusQueryFilter
-  >({
-    ...DefaultQueryParams,
-    callStatus: defaultCallStatusQueryFilter,
-  });
+
+  const [searchParam, setSearchParam] = useSearchParams();
+
   const exportFapData = useDownloadXLSXCallFap();
+
+  const callStatus = searchParam.get('callStatus');
 
   const {
     loadingCalls,
@@ -81,11 +75,16 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     setCallsWithLoading: setCalls,
     setCallsFilter,
   } = useCallsData({
-    ...getFilterStatus(urlQueryParams.callStatus as CallStatusFilters),
+    ...getFilterStatus((callStatus as CallStatusFilters) ?? CallStatus.ACTIVE),
   });
 
   const handleStatusFilterChange = (callStatus: CallStatus) => {
-    setUrlQueryParams((queries) => ({ ...queries, callStatus }));
+    setSearchParam((searchParam) => {
+      searchParam.set('callStatus', callStatus);
+
+      return searchParam;
+    });
+
     setCallsFilter(() => ({
       ...getFilterStatus(callStatus as CallStatusFilters),
     }));
@@ -97,12 +96,14 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     {
       title: `Start Date (${timezone})`,
       render: (rowdata) => toFormattedDateTime(rowdata.startCall),
+      field: 'startCall',
       customSort: (a: Call, b: Call) =>
         new Date(a.startCall).getTime() - new Date(b.startCall).getTime(),
     },
     {
       title: `End Date (${timezone})`,
       render: (rowdata) => toFormattedDateTime(rowdata.endCall),
+      field: 'endCall',
       customSort: (a: Call, b: Call) =>
         new Date(a.endCall).getTime() - new Date(b.endCall).getTime(),
     },
@@ -284,7 +285,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <CallStatusFilter
-            callStatus={urlQueryParams.callStatus}
+            callStatus={callStatus ?? CallStatus.ACTIVE}
             onChange={handleStatusFilterChange}
           />
         </Grid>
@@ -315,8 +316,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
         setData={setCalls}
         delete={deleteCall}
         hasAccess={{
-          create:
-            isUserOfficer && urlQueryParams.callStatus !== CallStatus.INACTIVE,
+          create: isUserOfficer && callStatus !== CallStatus.INACTIVE,
           update: isUserOfficer,
           remove: isUserOfficer,
         }}
@@ -359,8 +359,6 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             position: 'row',
           }),
         ]}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

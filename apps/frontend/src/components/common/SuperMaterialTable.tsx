@@ -3,11 +3,10 @@ import Edit from '@mui/icons-material/Edit';
 import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { SetStateAction, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-  DecodedValueMap,
   DelimitedArrayParam,
   QueryParamConfig,
-  SetQuery,
   StringParam,
   withDefault,
 } from 'use-query-params';
@@ -53,8 +52,6 @@ interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
   createModalSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
   delete?: (id: number | string) => Promise<boolean>;
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
-  urlQueryParams?: DecodedValueMap<UrlQueryParamsType>;
-  setUrlQueryParams?: SetQuery<UrlQueryParamsType>;
   extraActionButtons?: React.ReactNode;
 }
 
@@ -75,24 +72,22 @@ export function SuperMaterialTable<Entry extends EntryID>({
   const [editObject, setEditObject] = useState<Entry | null>(null);
 
   let { data, columns } = props;
-  const {
-    setData,
-    options,
-    urlQueryParams,
-    actions,
-    createModal,
-    setUrlQueryParams,
-  } = props;
+  const { setData, options, actions, createModal } = props;
+
+  const [searchParam, setSearchParam] = useSearchParams();
+  const selection = searchParam.getAll('selection');
+  const search = searchParam.get('search');
+  const sortField = searchParam.get('sortField');
+  const sortDirection = searchParam.get('sortDirection');
 
   // NOTE: If selection is on than read the selected items from the url.
-  if (options?.selection && urlQueryParams) {
+  if (options?.selection) {
     data = data.map((objectItem) => {
       return {
         ...objectItem,
         tableData: {
-          checked: urlQueryParams?.selection?.some(
-            (selectedItem: number | string | null) =>
-              selectedItem === objectItem.id
+          checked: selection.some(
+            (selectedItem) => selectedItem === objectItem.id
           ),
         },
       };
@@ -105,15 +100,11 @@ export function SuperMaterialTable<Entry extends EntryID>({
     };
   }
 
-  if (options?.search && urlQueryParams) {
-    options.searchText = urlQueryParams.search || undefined;
+  if (options?.search) {
+    options.searchText = search || undefined;
   }
 
-  columns = setSortDirectionOnSortField(
-    columns,
-    urlQueryParams?.sortField,
-    urlQueryParams?.sortDirection
-  );
+  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
   const onCreated = (
     objectAdded: Entry | null,
@@ -233,30 +224,39 @@ export function SuperMaterialTable<Entry extends EntryID>({
             : [...localActions]
         }
         onSearchChange={(searchText) => {
-          setUrlQueryParams &&
-            setUrlQueryParams({
-              search: searchText ? searchText : undefined,
-            });
+          setSearchParam((searchParam) => {
+            searchParam.delete('search');
+            searchParam.set('search', searchText);
+
+            return searchParam;
+          });
         }}
         onSelectionChange={(selectedItems) => {
-          setUrlQueryParams &&
-            setUrlQueryParams({
-              selection:
-                selectedItems.length > 0
-                  ? selectedItems.map((selectedItem) =>
-                      selectedItem.id.toString()
-                    )
-                  : undefined,
-            });
+          setSearchParam((searchParam) => {
+            searchParam.delete('selection');
+            selectedItems.map((selectedItem) =>
+              searchParam.append('selection', selectedItem.id.toString())
+            );
+
+            return searchParam;
+          });
         }}
         onOrderCollectionChange={(orderByCollection) => {
           const [orderBy] = orderByCollection;
-          setUrlQueryParams &&
-            setUrlQueryParams((params) => ({
-              ...params,
-              sortField: orderBy?.orderByField,
-              sortDirection: orderBy?.orderDirection,
-            }));
+          setSearchParam((searchParam) => {
+            searchParam.delete('sortField');
+            searchParam.delete('sortDirection');
+
+            if (
+              orderBy?.orderByField != null &&
+              orderBy?.orderDirection != null
+            ) {
+              searchParam.set('sortField', orderBy?.orderByField);
+              searchParam.set('sortDirection', orderBy?.orderDirection);
+            }
+
+            return searchParam;
+          });
         }}
       />
       {hasAccess.create && createModal && (

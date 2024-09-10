@@ -30,7 +30,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
 import { SetURLSearchParams, useSearchParams } from 'react-router-dom';
-import { DecodedValueMap, SetQuery } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -74,7 +73,6 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
-import { ProposalUrlQueryParamsType } from './ProposalPage';
 import TableActionsDropdownMenu, {
   DownloadMenuOption,
   PdfDownloadMenuOption,
@@ -83,8 +81,6 @@ import TableActionsDropdownMenu, {
 type ProposalTableOfficerProps = {
   proposalFilter: ProposalsFilter;
   setProposalFilter: (filter: ProposalsFilter) => void;
-  urlQueryParams: DecodedValueMap<ProposalUrlQueryParamsType>;
-  setUrlQueryParams: SetQuery<ProposalUrlQueryParamsType>;
   confirm: WithConfirmType;
 };
 
@@ -104,6 +100,7 @@ interface ProposalTableSearchParams extends URLSearchParams {
   sortField?: string;
   page?: string;
   pageSize?: string;
+  selection?: string[];
 }
 
 let columns: Column<ProposalViewData>[] = [
@@ -308,8 +305,6 @@ const ToolbarWithSelectAllPrefetched = (props: {
 const ProposalTableOfficer = ({
   proposalFilter,
   setProposalFilter,
-  urlQueryParams,
-  setUrlQueryParams,
   confirm,
 }: ProposalTableOfficerProps) => {
   const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
@@ -395,7 +390,11 @@ const ProposalTableOfficer = ({
       <IconButton
         data-cy="view-proposal"
         onClick={() => {
-          setUrlQueryParams({ reviewModal: rowData.primaryKey });
+          setSearchParams((searchParams) => {
+            searchParams.set('reviewModal', rowData.primaryKey.toString());
+
+            return searchParams;
+          });
         }}
       >
         <Visibility />
@@ -452,15 +451,14 @@ const ProposalTableOfficer = ({
   }
 
   const getSelectedProposalPks = () =>
-    urlQueryParams.selection.length
-      ? urlQueryParams.selection
-          .filter((proposalPk): proposalPk is string => proposalPk !== null)
-          .map((proposalPk) => +proposalPk)
-      : [];
+    searchParams
+      .getAll('selection')
+      .filter((proposalPk): proposalPk is string => proposalPk !== null)
+      .map((proposalPk) => +proposalPk);
 
   const getSelectedProposalsData = () =>
     tableData.filter((item) =>
-      urlQueryParams.selection.includes(item.primaryKey.toString())
+      searchParams.getAll('selection').includes(item.primaryKey.toString())
     );
 
   const handleClose = (selectedOption: string) => {
@@ -603,10 +601,13 @@ const ProposalTableOfficer = ({
     searchParams.get('sortDirection')
   );
 
+  const reviewModal = searchParams.get('reviewModal');
+  const proposalId = searchParams.get('proposalId');
+
   const proposalToReview = tableData.find(
     (proposal) =>
-      proposal.primaryKey === urlQueryParams.reviewModal ||
-      proposal.proposalId === urlQueryParams.proposalId
+      (reviewModal != null && proposal.primaryKey === +reviewModal) ||
+      (proposalId != null && proposal.proposalId === proposalId)
   );
 
   const userOfficerProposalReviewTabs = [
@@ -656,8 +657,7 @@ const ProposalTableOfficer = ({
 
         const tableData =
           proposalsView?.proposalViews.map((proposal) => {
-            const selection = new Set(urlQueryParams.selection);
-
+            const selection = new Set(searchParams.getAll('selection'));
             const proposalData = {
               ...proposal,
               status: proposal.submitted ? 'Submitted' : 'Open',
@@ -670,7 +670,7 @@ const ProposalTableOfficer = ({
               finalStatus: getTranslation(proposal.finalStatus as ResourceId),
             } as ProposalViewData;
 
-            if (urlQueryParams.selection.length > 0) {
+            if (searchParams.getAll('selection').length > 0) {
               return {
                 ...proposalData,
                 tableData: {
@@ -719,7 +719,7 @@ const ProposalTableOfficer = ({
         }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
         text: text,
       },
-      searchText: urlQueryParams.search,
+      searchText: searchParams.get('search'),
     });
 
     return proposalsView?.proposalViews;
@@ -735,7 +735,7 @@ const ProposalTableOfficer = ({
       ? SELECT_ALL_ACTION_TOOLTIP
       : undefined;
   const allPrefetchedProposalsSelected =
-    totalCount === urlQueryParams.selection.length;
+    totalCount === searchParams.getAll('selection').length;
 
   const proposalFapInstruments = selectedProposalsData
     .filter((item) => !!item.instruments)
@@ -855,16 +855,19 @@ const ProposalTableOfficer = ({
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!proposalToReview}
         setProposalReviewModalOpen={() => {
-          if (urlQueryParams.proposalId) {
+          if (searchParams.get('proposalId')) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
           }
-          setUrlQueryParams({
-            reviewModal: undefined,
-            proposalId: undefined,
-            modalTab: undefined,
+
+          setSearchParams((searchParams) => {
+            searchParams.delete('reviewModal');
+            searchParams.delete('proposalId');
+            searchParams.delete('modalTab');
+
+            return searchParams;
           });
 
           refreshTableData();
@@ -887,7 +890,7 @@ const ProposalTableOfficer = ({
         data={fetchRemoteProposalsData}
         localization={{
           toolbar: {
-            nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
+            nRowsSelected: `${searchParams.getAll('selection').length} row(s) selected`,
           },
         }}
         components={{
@@ -906,14 +909,20 @@ const ProposalTableOfficer = ({
           });
         }}
         onSelectionChange={(selectedItems) => {
-          setUrlQueryParams({
-            selection:
-              selectedItems.length > 0
-                ? selectedItems.map((selectedItem) =>
-                    selectedItem.primaryKey.toString()
-                  )
-                : undefined,
-          });
+          if (selectedItems.length) {
+            setSearchParams({
+              ...searchParams,
+              selection: selectedItems.map((selectedItem) =>
+                selectedItem.primaryKey.toString()
+              ),
+            });
+          } else {
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+
+              return searchParams;
+            });
+          }
         }}
         options={{
           search: true,
@@ -954,7 +963,8 @@ const ProposalTableOfficer = ({
             tooltip: 'Export proposals in Excel',
             onClick: (): void => {
               downloadXLSXProposal(
-                urlQueryParams.selection
+                searchParams
+                  .getAll('selection')
                   .filter((item): item is string => !!item)
                   .map((item) => +item),
                 selectedProposalsData?.[0].title
@@ -1026,7 +1036,7 @@ const ProposalTableOfficer = ({
           {
             tooltip: shouldShowSelectAllAction,
             icon: DoneAllIcon,
-            hidden: true,
+            hidden: false,
             iconProps: {
               hidden: allPrefetchedProposalsSelected,
               defaultValue: totalCount,
@@ -1035,8 +1045,10 @@ const ProposalTableOfficer = ({
             onClick: async () => {
               setAllProposalSelectionLoading(true);
               if (allPrefetchedProposalsSelected) {
-                setUrlQueryParams({
-                  selection: undefined,
+                setSearchParams((searchParams) => {
+                  searchParams.delete('selection');
+
+                  return searchParams;
                 });
                 refreshTableData();
               } else {
@@ -1061,11 +1073,19 @@ const ProposalTableOfficer = ({
                 });
 
                 setTableData(newTableData);
-                setUrlQueryParams({
-                  selection: selectedProposalsData?.map((item) =>
-                    item.primaryKey.toString()
-                  ),
+
+                setSearchParams((searchParams) => {
+                  searchParams.delete('selection');
+                  selectedProposalsData.forEach((proposal) => {
+                    searchParams.append(
+                      'selection',
+                      proposal.primaryKey.toString()
+                    );
+                  });
+
+                  return searchParams;
                 });
+                refreshTableData();
               }
 
               setAllProposalSelectionLoading(false);

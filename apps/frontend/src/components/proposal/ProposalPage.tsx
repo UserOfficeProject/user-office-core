@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-  NumberParam,
-  QueryParamConfig,
-  StringParam,
-  useQueryParams,
-} from 'use-query-params';
+import { SetURLSearchParams, useSearchParams } from 'react-router-dom';
+import { QueryParamConfig } from 'use-query-params';
 
-import {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -34,35 +27,47 @@ export type ProposalUrlQueryParamsType = {
   dataType: QueryParamConfig<string | null | undefined>;
 } & UrlQueryParamsType;
 
+export interface ProposalUrlQueryParams extends URLSearchParams {
+  call?: string;
+  instrument?: string;
+  proposalStatus?: string;
+  reviewModal?: string;
+  modalTab?: string;
+  questionId?: string;
+  proposalId?: string;
+  compareOperator?: string;
+  value?: string;
+  dataType?: string;
+}
+
 export default function ProposalPage() {
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<ProposalUrlQueryParamsType>({
-      ...DefaultQueryParams,
-      call: NumberParam,
-      instrument: StringParam,
-      proposalStatus: NumberParam,
-      reviewModal: NumberParam,
-      modalTab: NumberParam,
-      questionId: StringParam,
-      proposalId: StringParam,
-      compareOperator: StringParam,
-      value: StringParam,
-      dataType: StringParam,
-    });
+  const [searchParams]: [ProposalUrlQueryParams, SetURLSearchParams] =
+    useSearchParams();
+
+  const callId = searchParams.get('call');
+  const instrumentId = searchParams.get('instrument');
+  const proposalStatusId = searchParams.get('proposalStatus');
+  const questionId = searchParams.get('questionId');
+  const proposalId = searchParams.get('proposalId');
+  const compareOperator = searchParams.get('compareOperator');
+  const value = searchParams.get('value');
+  const dataType = searchParams.get('dataType');
+
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
-    callId: urlQueryParams.call,
+    callId: callId != null ? +callId : null,
     instrumentFilter: {
-      instrumentId: urlQueryParams.instrument
-        ? +urlQueryParams.instrument
-        : null,
-      showAllProposals: !urlQueryParams.instrument,
+      instrumentId: instrumentId != null ? +instrumentId : null,
+      showAllProposals: !instrumentId,
       showMultiInstrumentProposals: false,
     },
-    proposalStatusId: urlQueryParams.proposalStatus,
-    referenceNumbers: urlQueryParams.proposalId
-      ? [urlQueryParams.proposalId]
-      : undefined,
-    questionFilter: questionaryFilterFromUrlQuery(urlQueryParams),
+    proposalStatusId: proposalStatusId != null ? +proposalStatusId : null,
+    referenceNumbers: proposalId ? [proposalId] : [],
+    questionFilter: questionaryFilterFromUrlQuery({
+      compareOperator,
+      dataType,
+      questionId,
+      value,
+    }),
   });
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsData();
@@ -89,8 +94,6 @@ export default function ProposalPage() {
         <ProposalTableOfficer
           proposalFilter={proposalFilter}
           setProposalFilter={setProposalFilter}
-          urlQueryParams={urlQueryParams}
-          setUrlQueryParams={setUrlQueryParams}
         />
       </StyledPaper>
     </StyledContainer>

@@ -1,35 +1,42 @@
 import Grid from '@mui/material/Grid';
 import { DateTime } from 'luxon';
 import React from 'react';
-import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
-import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 
 import DateFilter from './DateFilter';
-import { ExperimentUrlQueryParamsType } from './ExperimentUrlQueryParamsType';
 
 function ExperimentFilterBar() {
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<ExperimentUrlQueryParamsType>({
-      ...DefaultQueryParams,
-      call: NumberParam,
-      instrument: NumberParam,
-      from: StringParam,
-      to: StringParam,
-    });
+  const [searchParams, setSearchParam] = useSearchParams();
+  const call = searchParams.get('call');
+  const instrument = searchParams.get('instrument');
+  const experimentFromDate = searchParams.get('from');
+  const experimentToDate = searchParams.get('to');
 
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useCallsData();
 
   const handleOnChange = (format: string, from?: Date, to?: Date) => {
-    setUrlQueryParams({
-      ...urlQueryParams,
-      from: from ? DateTime.fromJSDate(from).toFormat(format) : undefined,
-      to: to ? DateTime.fromJSDate(to).toFormat(format) : undefined,
+    console.log('---------');
+    setSearchParam((searchParam) => {
+      searchParam.delete('from');
+      searchParam.delete('to');
+
+      if (from) {
+        console.log('-------from--------');
+        searchParam.set('from', DateTime.fromJSDate(from).toFormat(format));
+      }
+
+      if (to) {
+        console.log('-------to--------');
+        searchParam.set('to', DateTime.fromJSDate(to).toFormat(format));
+      }
+
+      return searchParam;
     });
   };
 
@@ -37,7 +44,7 @@ function ExperimentFilterBar() {
     <Grid container spacing={2}>
       <Grid item sm={3} xs={12}>
         <CallFilter
-          callId={urlQueryParams.call ?? null}
+          callId={call ? +call : null}
           calls={calls}
           isLoading={loadingCalls}
           shouldShowAll={true}
@@ -46,7 +53,7 @@ function ExperimentFilterBar() {
       </Grid>
       <Grid item sm={3} xs={12}>
         <InstrumentFilter
-          instrumentId={urlQueryParams.instrument ?? undefined}
+          instrumentId={instrument ? +instrument : null}
           instruments={instruments}
           isLoading={loadingInstruments}
           shouldShowAll={true}
@@ -55,8 +62,8 @@ function ExperimentFilterBar() {
       </Grid>
       <Grid item xs={12}>
         <DateFilter
-          from={urlQueryParams.from ?? undefined}
-          to={urlQueryParams.to ?? undefined}
+          from={experimentFromDate ?? undefined}
+          to={experimentToDate ?? undefined}
           onChange={handleOnChange}
           data-cy="date-filter"
         />
