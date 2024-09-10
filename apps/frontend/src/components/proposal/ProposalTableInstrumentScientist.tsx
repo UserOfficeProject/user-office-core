@@ -257,7 +257,7 @@ const ProposalTableInstrumentScientist = ({
 }: {
   confirm: WithConfirmType;
 }) => {
-  const [currentPage] = useState(0);
+  const currentPage = 0;
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalViewData[]
