@@ -3,19 +3,11 @@ import Edit from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useQueryParams } from 'use-query-params';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
-import FapStatusFilter, {
-  FapStatusQueryFilter,
-  defaultFapStatusQueryFilter,
-  FapStatus,
-} from 'components/fap/FapStatusFilter';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import FapStatusFilter, { FapStatus } from 'components/fap/FapStatusFilter';
 import AddFap from 'components/fap/General/AddFap';
 import { UserContext } from 'context/UserContextProvider';
 import { Fap, UserRole } from 'generated/sdk';
@@ -69,16 +61,17 @@ const FapsTable = () => {
   });
   const [editFapID, setEditFapID] = useState(0);
 
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType & FapStatusQueryFilter
-  >({
-    ...DefaultQueryParams,
-    fapStatus: defaultFapStatusQueryFilter,
-  });
+  const [searchParam, setSearchParam] = useSearchParams();
+  const fapStatus = searchParam.get('fapStatus');
+
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const handleStatusFilterChange = (fapStatus: FapStatus) => {
-    setUrlQueryParams((queries) => ({ ...queries, fapStatus }));
+    setSearchParam((searchParam) => {
+      searchParam.set('fapStatus', fapStatus);
+
+      return searchParam;
+    });
     if (fapStatus === FapStatus.ALL) {
       setIsActiveFilter(undefined);
     } else {
@@ -136,7 +129,7 @@ const FapsTable = () => {
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <FapStatusFilter
-            fapStatus={urlQueryParams.fapStatus}
+            fapStatus={fapStatus || FapStatus.ACTIVE}
             onChange={handleStatusFilterChange}
           />
         </Grid>
@@ -172,8 +165,6 @@ const FapsTable = () => {
             position: 'row',
           },
         ]}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

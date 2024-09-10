@@ -1,11 +1,7 @@
 import { Typography } from '@mui/material';
 import React from 'react';
-import { useQueryParams } from 'use-query-params';
 
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, PermissionsWithAccessToken } from 'generated/sdk';
 import { useApiAccessTokensData } from 'hooks/admin/useApiAccessTokensData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -24,8 +20,6 @@ const ApiAccessTokensTable = () => {
     apiAccessTokens,
     setApiAccessTokensWithLoading: setApiAccessTokens,
   } = useApiAccessTokensData();
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const createModal = (
@@ -85,8 +79,6 @@ const ApiAccessTokensTable = () => {
           search: true,
           debounceInterval: 400,
         }}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

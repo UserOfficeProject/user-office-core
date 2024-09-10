@@ -4,12 +4,8 @@ import { Typography } from '@mui/material';
 import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams } from 'use-query-params';
 
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -53,8 +49,6 @@ const InstrumentTable = () => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const onInstrumentDelete = async (instrumentDeletedId: number | string) => {
     try {
@@ -210,8 +204,6 @@ const InstrumentTable = () => {
                 ]
               : []
           }
-          urlQueryParams={urlQueryParams}
-          setUrlQueryParams={setUrlQueryParams}
         />
       </div>
     </>
