@@ -111,6 +111,7 @@ const UnitTable = () => {
             </Button>
           </>
         }
+        persistUrlQueryParams={true}
       />
     </div>
   );

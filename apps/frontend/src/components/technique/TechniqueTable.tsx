@@ -349,6 +349,7 @@ const TechniqueTable = () => {
               : []
           }
           createModal={createModal}
+          persistUrlQueryParams={true}
         />
       </div>
     </>

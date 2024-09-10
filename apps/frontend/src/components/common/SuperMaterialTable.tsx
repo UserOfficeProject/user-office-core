@@ -77,10 +77,14 @@ export function SuperMaterialTable<Entry extends EntryID>({
   const { setData, options, actions, createModal } = props;
   const { persistUrlQueryParams = false } = props;
   const [searchParam, setSearchParam] = useSearchParams();
-  const selection = searchParam.getAll('selection');
-  const search = searchParam.get('search');
-  const sortField = searchParam.get('sortField');
-  const sortDirection = searchParam.get('sortDirection');
+  const selection = persistUrlQueryParams
+    ? searchParam.getAll('selection')
+    : [];
+  const search = persistUrlQueryParams ? searchParam.get('search') : '';
+  const sortField = persistUrlQueryParams ? searchParam.get('sortField') : '';
+  const sortDirection = persistUrlQueryParams
+    ? searchParam.get('sortDirection')
+    : '';
 
   // NOTE: If selection is on than read the selected items from the url.
   if (options?.selection) {

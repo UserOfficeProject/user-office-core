@@ -165,6 +165,7 @@ const FapsTable = () => {
             position: 'row',
           },
         ]}
+        persistUrlQueryParams={true}
       />
     </div>
   );

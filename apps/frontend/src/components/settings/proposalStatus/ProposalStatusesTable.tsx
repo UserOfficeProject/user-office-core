@@ -101,6 +101,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
             };
           },
         ]}
+        persistUrlQueryParams={true}
       />
     </div>
   );

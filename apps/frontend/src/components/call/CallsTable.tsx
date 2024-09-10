@@ -359,6 +359,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
             position: 'row',
           }),
         ]}
+        persistUrlQueryParams={true}
       />
     </div>
   );

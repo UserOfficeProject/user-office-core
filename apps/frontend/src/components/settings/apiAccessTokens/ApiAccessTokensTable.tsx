@@ -79,6 +79,7 @@ const ApiAccessTokensTable = () => {
           search: true,
           debounceInterval: 400,
         }}
+        persistUrlQueryParams={true}
       />
     </div>
   );

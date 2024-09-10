@@ -94,6 +94,7 @@ const ProposalWorkflowsTable = () => {
             position: 'row',
           },
         ]}
+        persistUrlQueryParams={true}
       />
     </div>
   );
