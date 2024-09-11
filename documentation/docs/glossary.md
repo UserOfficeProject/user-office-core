@@ -252,7 +252,7 @@ ________________________________________________________________________________
     > Sample ESI templates are predefined forms used to collect safety-related information about the samples involved in an experiment.
 
     :material-book-open-variant-outline: **Shipment declaration templates**
-    > Shipment declaration templates are standardised forms used to collect and organise information about parcels being sent to a facility.
+    > Shipment declaration templates are standardized forms used to collect and organize information about parcels being sent to a facility.
 
     :material-book-open-variant-outline: **Short code**
     > A Short code is a brief identifier used to reference specific items or configurations within the User Office system.
@@ -261,7 +261,7 @@ ________________________________________________________________________________
     > Statuses are labels that indicate the current state or progress of a proposal, request, or other item.
 
     :material-book-open-variant-outline: **Sub templates**
-    > Sub templates are reusable building blocks containing questions, used to streamline and organise the creation of complex templates.
+    > Sub templates are reusable building blocks containing questions, used to streamline and organize the creation of complex templates.
 
 
 ??? info "**T**"
