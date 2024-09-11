@@ -8,7 +8,7 @@ ________________________________________________________________________________
 
 [Proposal workflows :material-sitemap:](settings/proposal_workflow.md) outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status marks a key stage in the proposal's progression. For example, moving from '**Draft**' to '**Feasibility Review**' indicates the proposal's readiness for preliminary assessment. 
 
-Proposal workflows control how and when the User Office system will display information to different roles based on statuses. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customise workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
+Proposal workflows control how and when the User Office system will display information to different roles based on statuses. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customize workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
     
 <figure markdown="span">  
         ![Workflow](../../assets/images/workflow_editor.png){ width="600"}
@@ -83,8 +83,7 @@ ________________________________________________________________________________
 
 * The Proposal Workflow Editor will open. From this page, you can set up the Proposal Workflow.
 
-> **_NOTE:_** You can **drag and drop** [proposal Statuses :material-folder-cog-outline:](settings/proposal_statuses.md) into the Proposal Workflow, reordering them as desired. The order of the statuses represent the workflow that the proposal will progress through. 
-
+> **_NOTE:_** You can drag and drop Proposal Statuses :material-folder-cog-outline: into the Proposal Workflow, reordering them as desired. The order of the statuses represent the workflow that the proposal will progress through. 
 
  Delete statuses to remove them from the workflow. The 'Draft' Status is a mandatory starting status for all proposals and cannot be deleted or have other statuses precede it.
 
@@ -95,3 +94,4 @@ ________________________________________________________________________________
 
 * Once you are satisfied with your edits, click the Update button to save and apply the changes to the PDF template
 
+_________________________________________________________________________________________________________

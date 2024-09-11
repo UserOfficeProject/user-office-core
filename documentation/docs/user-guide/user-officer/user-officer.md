@@ -1,4 +1,5 @@
 # Welcome to the User Officer guide!
+
 _________________________________________________________________________________________________________
 
 There are three fundamental tutorials in this guide:
@@ -7,7 +8,7 @@ There are three fundamental tutorials in this guide:
 !!! info inline end ""
     [Create a call :material-calendar-blank:](creating_call.md){ .md-button .md-button--primary }
     
-    Calls  allow users’ proposals  to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. 
+    Calls allow users’ proposals to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. 
 
 ![Workflow](../../assets/images/workflow.png){ width="400" align=right } 
 !!! info inline end ""
@@ -19,4 +20,4 @@ There are three fundamental tutorials in this guide:
 !!! info inline end ""
     [Create templates :material-text-box-multiple:](creating_templates.md){ .md-button .md-button--primary }
 
-    Templates are used to save and re-utilise predefined information across User Office. Calls are built using several different types of templates.
+    Templates are used to save and reuse predefined information across User Office. Calls are built using several different types of templates.

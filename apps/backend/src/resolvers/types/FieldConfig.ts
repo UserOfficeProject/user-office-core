@@ -291,6 +291,9 @@ export class SampleEsiBasisConfig {
 export class RichTextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   max: number | null;
+
+  @Field(() => Boolean)
+  allowImages: boolean;
 }
 
 @ObjectType()
