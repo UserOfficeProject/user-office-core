@@ -1,8 +1,11 @@
+# PDF Templates :material-file-pdf-box:
 
-## **What are PDF templates?**
+_________________________________________________________________________________________________________
+
+## What are PDF templates?
 ??? info "PDF templates" 
 
-    **PDF templates** enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+    **PDF templates** :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
     ______________________________________________________________________________________
 
@@ -11,14 +14,14 @@
         <figcaption>**PDF template**</figcaption>
     </figure>
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I create PDF templates?**
+## How do I create PDF templates?
 
 **Step 1. Navigate to the PDF templates page**
 
-* In the main menu select **Templates** :material-text-box-multiple:
-* From the dropdown menu, choose **PDF** 
+* In the **main menu** :material-menu: select **Templates** :material-text-box-multiple:
+* From the dropdown menu, choose **PDF** :material-file-pdf-box:
 
 **Step 2. Create a new PDF template**
 
@@ -32,16 +35,16 @@ ________________________________________________________________________________
 
 **Step 4. Update your changes**
 
-* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template
+* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I edit PDF templates?**
+## How do I edit PDF templates?
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
-* From the dropdown menu, choose **PDF** 
+* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
+* From the dropdown menu, choose **PDF** :material-file-pdf-box:
 
 **Step 2. Find the PDF template you wish to edit**
 
@@ -53,15 +56,15 @@ ________________________________________________________________________________
 
 **Step 4. Update your changes**
 
-* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template
+* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I clone PDF templates?**
+## How do I clone PDF templates?
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
+* To clone a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
 * From the dropdown menu, choose **PDF** 
 
 **Step 2. Find the PDF template you wish to edit**
@@ -72,32 +75,31 @@ ________________________________________________________________________________
 
 * Click the `CLONE` function on the template to create a clone. Note: the clone will be renamed 'Copy of (name)' and will be edded to the end of the list of PDF templates.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I archive and unarchive PDF templates?**
+## How do I archive and unarchive PDF templates?
 
 The archive system allows you to save PDF templates for future reference. Archiving PDF templates will prevent them from being able to be linked to calls or searched for in the PDF templates page. 
 
-!!! tip ""
-
-    **TIP!** This feature is useful to prevent infrequently used PDF templates from crowding the User Office interface.
+ > **_NOTE:_** This feature is useful to prevent infrequently used PDF templates from crowding the User Office interface.
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
+* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
 * From the dropdown menu, choose **PDF** 
 
 **Step 2. Archive or Unarchive the PDF template**
+
 * To **archive** a PDF template, click on the `ARCHIVE` action next to the template name. This action will send the PDF template to the `ARCHIVED` tab.
 * To **unarchive** a PDF template, simply go to the `ARCHIVED` tab and click on the `UNARCHIVE` action next to the template name. This action will send the PDF template to the `CURRENT` tab.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I export and import PDF templates?** 
+## How do I export and import PDF templates?*
 
 **Step 1. Navigate to the PDF templates page**
 
-* To edit a pre-existing PDF template, select **Templates** :material-text-box-multiple: from the main menu
+* To edit a import or export a PDF template, select **Templates** :material-text-box-multiple: from the **main menu** :material-menu:
 * From the dropdown menu, choose **PDF** 
 
 **Step 2. Export or Import the PDF template**
@@ -106,7 +108,10 @@ ________________________________________________________________________________
 
 * To **Import** a PDF template, click on the `IMPORT` button at the bottom of the page. This will open the Import template page. From here, click on `SELECT FILE` to import .json PDF templates.
 
+_________________________________________________________________________________________________________
+
+### What does #calls mean on PDF templates?
+
+* '#Calls' refers to the number of calls the PDF template has been utilised in.
+
 ______________________________________________________________________________________
-
-## **What does #calls mean on PDF templates?**
-
