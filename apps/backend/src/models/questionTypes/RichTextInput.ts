@@ -45,6 +45,39 @@ export const sanitizerConfig: IOptions = {
   allowedSchemesAppliedToAttributes: [],
 };
 
+export const sanitizerConfigWithImages: IOptions = {
+  ...sanitizerConfig,
+  allowedTags: [
+    'a',
+    'p',
+    'span',
+    'strong',
+    'em',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'sub',
+    'sup',
+    'pre',
+    'ul',
+    'ol',
+    'li',
+    'div',
+    'br',
+    'img',
+  ],
+  allowedAttributes: {
+    a: ['href', 'title'],
+    span: ['style', 'class'],
+    p: ['style'],
+    div: ['style'],
+    img: ['src', 'alt', 'data-mce-src'],
+  },
+};
+
 export const richTextInputDefinition: Question<DataType.RICH_TEXT_INPUT> = {
   dataType: DataType.RICH_TEXT_INPUT,
   validate: (field: QuestionTemplateRelation, value: any) => {
@@ -54,14 +87,21 @@ export const richTextInputDefinition: Question<DataType.RICH_TEXT_INPUT> = {
 
     return richTextInputQuestionValidationSchema(field).isValid(value);
   },
-  transform: (field: QuestionTemplateRelation, value: any) =>
-    sanitizeHtml(value, sanitizerConfig),
+  transform: (field: QuestionTemplateRelation, value: any) => {
+    const config = field.config as RichTextInputConfig;
+
+    return sanitizeHtml(
+      value,
+      config.allowImages ? sanitizerConfigWithImages : sanitizerConfig
+    );
+  },
   createBlankConfig: (): ConfigBase => {
     const config = new RichTextInputConfig();
     config.required = false;
     config.small_label = '';
     config.tooltip = '';
     config.max = null;
+    config.allowImages = false;
 
     return config;
   },

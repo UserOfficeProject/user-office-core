@@ -4,7 +4,7 @@ ________________________________________________________________________________
 
 ![System overview](../assets/images/sbs_overview.png)
 
-Use this page to understand how different parts of the User Office code base is interconnected.
+Use this page to understand how different parts of the User Office code base are interconnected.
 
 As an example, we will implement an imaginary feature that enables product owners to give user officers the ability to **lock out a user**.
 
@@ -28,11 +28,11 @@ Start by adding a new column `is_locked` to the database by creating a new file 
     
 ### Code changes
 
-Now that we have DB column, let’s write a function in our datasource layer that will update the database.
+Now that we have a DB column, let’s write a function in our datasource layer that will update the database.
 
 #### 1. Create new database interface function
 
-Add a new interface function under `/src/datasources/AdminDataSource.ts`. The Interface function will accept one parameter user_id, and return a value object of type BasicUserDetails containing the user who was locked out.
+Add a new interface function under `/src/datasources/AdminDataSource.ts`. The interface function will accept one parameter user_id, and return a value object of type BasicUserDetails containing the user who was locked out.
 
     lockUser(user_id: number): Promise<BasicUserDetails>;
 
@@ -60,7 +60,7 @@ Add the function to handle the database request in the file by implementing the 
 
 #### 3. Implement the interface in mockups
 
-Also implement the interface in mockup db in `/src/datasources/mockups/AdminDataSource.ts`. Mockup DB layer is used in unit tests.
+Also implement the interface in mockup DB in `/src/datasources/mockups/AdminDataSource.ts`. Mockup DB layer is used in unit tests.
 
     async lockUser(
     user_id: number
@@ -70,7 +70,7 @@ Also implement the interface in mockup db in `/src/datasources/mockups/AdminData
 
 #### 4. Add function to logic layer for handling requests
 
-With the database layer now ready, it's time to implement a mutation. Mutations contains database error handling, authorization and other important business logic. Procees by navigating to `/src/mutations/AdminMutations.ts` and add a new function.
+With the database layer now ready, it's time to implement a mutation. Mutations contain database error handling, authorization and other important business logic. Proceed by navigating to `/src/mutations/AdminMutations.ts` and add a new function.
 
     async lockUser(
        agent: User | null, // This is a reference to the currently logged-in user, which will be passed in from resolver in next step.
