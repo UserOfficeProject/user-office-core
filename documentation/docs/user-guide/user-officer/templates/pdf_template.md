@@ -92,7 +92,7 @@ The archive system allows you to save PDF templates for future reference. Archiv
 
 _________________________________________________________________________________________________________
 
-## How do I export and import PDF templates?*
+## How do I export and import PDF templates?
 
 **Step 1. Navigate to the PDF templates page**
 

@@ -103,7 +103,7 @@ ________________________________________________________________________________
 
 **Step 3: Clone the template**
 
-* Click the `CLONE` function on the template to create a clone. Note: the clone will be renamed 'Copy of (name)' and will be edded to the end of the list of feedback templates. 
+* Click the `CLONE` function on the template to create a clone. Note: the clone will be renamed 'Copy of (name)' and will be added to the end of the list of feedback templates. 
 
 > **_NOTE:_** The cloning feature is useful if you wish to make changes to a feedback template and keep a copy of the original version for reference. It is good practice to make copies of templates in case the previous version needs to be utilized in the future.
 

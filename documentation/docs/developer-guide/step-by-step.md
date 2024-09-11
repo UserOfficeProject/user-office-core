@@ -138,7 +138,7 @@ Create a new file lockUserMutation and write the mutation:
       }
     }
 
-#### 2. Regnererate SDK
+#### 2. Regenerate SDK
 
     npm run generate:local
 
