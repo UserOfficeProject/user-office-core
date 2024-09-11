@@ -24,7 +24,7 @@ The RabbitMQ exchanges are configured using the `RabbitMQActionConfig` class. Th
     exchanges?: string[] | null;
     }
 
-**Exchanges:** The exchanges property is an array of strings, each representing the name of a RabbitMQ exchange. These exchanges are where messages related to proposal status changes are sent.
+**Exchanges:** The exchanges' property is an array of strings, each representing the name of a RabbitMQ exchange. These exchanges are where messages related to proposal status changes are sent.
 
 _________________________________________________________________________________________________________
 
@@ -57,7 +57,7 @@ If no exchanges are configured, the function exits early without performing any 
 
 _________________________________________________________________________________________________________
 
-## Frontend Display of RabbitMQ Exchanges
+## Frontend display of RabbitMQ Exchanges
 
 On the frontend, the `RabbitMQActionConfig` component is responsible for displaying the RabbitMQ exchanges where messages are sent. This provides users with information of how and where proposal data is routed.
 

@@ -32,7 +32,7 @@ ________________________________________________________________________________
     * [**How do I clone PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-clone-pdf-templates)
     * [**How do I archive and unarchive PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-archive-and-unarchive-pdf-templates)
     * [**How do I import and export PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-export-and-import-pdf-templates)
-    * [**What does #calls mean on PDF templates?**](user-guide/user-officer/templates/pdf_template.md#what-does-calls-mean-on-pdf-templates)
+    * [**What do #calls mean on PDF templates?**](user-guide/user-officer/templates/pdf_template.md#what-does-calls-mean-on-pdf-templates)
 
 ??? info "**Proposal Templates**"
     ### **Proposal templates**
