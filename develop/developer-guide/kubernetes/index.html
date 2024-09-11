@@ -590,11 +590,32 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/feasibility_review/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/proposal/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Feasibility review
+    Proposals
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../user-guide/user-officer/fap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAPs
   </span>
   
 
@@ -632,53 +653,32 @@
   
   
     <li class="md-nav__item">
+      <a href="../../user-guide/user-officer/feasibility_review/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Feasibility review
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../user-guide/user-officer/roles/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Roles
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/proposal/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Proposals
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/fap/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    FAPs
   </span>
   
 
@@ -775,6 +775,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../user-guide/user-officer/templates/proposal_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Proposal templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../user-guide/user-officer/templates/pdf_template/" class="md-nav__link">
         
   
@@ -796,11 +817,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/templates/proposal_template/" class="md-nav__link">
+      <a href="../../user-guide/user-officer/templates/feedback_template/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Proposal templates
+    Feedback templates
   </span>
   
 
@@ -927,27 +948,6 @@
   
   <span class="md-ellipsis">
     Sample ESI templates
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../user-guide/user-officer/templates/feedback_template/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Feedback templates
   </span>
   
 
@@ -1160,11 +1160,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../tech_stack/" class="md-nav__link">
+      <a href="../step-by-step/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Tech Stack
+    Step-by-Step Guide
   </span>
   
 
@@ -1202,11 +1202,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../tech_stack/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Configuration
+    Tech Stack
   </span>
   
 
@@ -1223,11 +1223,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../step-by-step/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Step-by-Step Guide
+    Configuration
   </span>
   
 
@@ -1638,7 +1638,7 @@
 <p>The scheduler will communicate with the User Office core via <a href="../rabbitmq/">RabbitMQ</a>.</p>
 <hr />
 <h2 id="handling-dependencies">Handling Dependencies</h2>
-<p>The User Office software uses dependency injection for services like email and RabbitMQ. To configure these services, you will need to modify the backend’s <code>configmap</code> and <code>secrets</code>:</p>
+<p>The User Office software uses <a href="../dependency_injection/">dependency injection</a> for services like email and RabbitMQ. To configure these services, you will need to modify the backend’s <code>configmap</code> and <code>secrets</code>:</p>
 <ul>
 <li><strong>RabbitMQ Configuration</strong>: Set <code>RABBITMQ_HOSTNAME</code>, <code>RABBITMQ_USERNAME</code>, <code>RABBITMQ_CORE_EXCHANGE_NAME</code> in the <code>configmap</code>, and <code>RABBITMQ_PASSWORD</code> in the <code>secrets</code>.</li>
 <li><strong>Email Services Configuration</strong>: The platform supports SMTP and Sparkpost. Adjust the dependency configuration as necessary for your environment.</li>
