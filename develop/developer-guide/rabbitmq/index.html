@@ -1319,7 +1319,7 @@
         <li class="md-nav__item">
   <a href="#frontend-display-of-rabbitmq-exchanges" class="md-nav__link">
     <span class="md-ellipsis">
-      Frontend Display of RabbitMQ Exchanges
+      Frontend display of RabbitMQ Exchanges
     </span>
   </a>
   
@@ -1530,7 +1530,7 @@
         <li class="md-nav__item">
   <a href="#frontend-display-of-rabbitmq-exchanges" class="md-nav__link">
     <span class="md-ellipsis">
-      Frontend Display of RabbitMQ Exchanges
+      Frontend display of RabbitMQ Exchanges
     </span>
   </a>
   
@@ -1576,7 +1576,7 @@ export class RabbitMQActionConfig extends ProposalStatusActionConfigBase {
 exchanges?: string[] | null;
 }
 </code></pre>
-<p><strong>Exchanges:</strong> The exchanges property is an array of strings, each representing the name of a RabbitMQ exchange. These exchanges are where messages related to proposal status changes are sent.</p>
+<p><strong>Exchanges:</strong> The exchanges' property is an array of strings, each representing the name of a RabbitMQ exchange. These exchanges are where messages related to proposal status changes are sent.</p>
 <hr />
 <h2 id="backend-message-handling">Backend Message Handling</h2>
 <p>The <code>rabbitMQActionHandler</code> function in the backend is responsible for sending messages to RabbitMQ exchanges based on the configuration defined in <code>RabbitMQActionConfig</code>.</p>
@@ -1602,7 +1602,7 @@ exchanges?: string[] | null;
 <p><strong>Message Publishing:</strong> This function takes in a <code>proposalStatusAction</code> and an array of proposals. It then publishes messages to each configured exchange by calling <code>publishMessageToTheEventBus</code>.</p>
 <p>If no exchanges are configured, the function exits early without performing any actions.</p>
 <hr />
-<h2 id="frontend-display-of-rabbitmq-exchanges">Frontend Display of RabbitMQ Exchanges</h2>
+<h2 id="frontend-display-of-rabbitmq-exchanges">Frontend display of RabbitMQ Exchanges</h2>
 <p>On the frontend, the <code>RabbitMQActionConfig</code> component is responsible for displaying the RabbitMQ exchanges where messages are sent. This provides users with information of how and where proposal data is routed.</p>
 <pre><code>type RabbitMQActionConfigProps = {
   exchanges: RabbitMqActionConfigType['exchanges'];
