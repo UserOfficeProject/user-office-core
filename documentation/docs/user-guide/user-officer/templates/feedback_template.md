@@ -4,14 +4,11 @@ ________________________________________________________________________________
 
 ## What are feedback templates?
 
-??? info "Feedback templates" 
-
-    [**Feedback templates**](feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire. This form becomes available to users after their experiment has been allocated a time within the external scheduler. User Officers can set the Feedback template they wish to utilize with the `MARK AS ACTIVE` function on the feedback templates page. 
-    ______________________________________________________________________________________
+Feedback templates allow users to provide feedback about their experiment and experience at the facility through a questionnaire. This form becomes available to users after their experiment has been allocated a time within the external scheduler. User Officers can set the Feedback template they wish to utilize with the `MARK AS ACTIVE` function on the feedback templates page. 
     
-    <figure markdown="span">  
+<figure markdown="span">  
         ![Feedback templates](../../../assets/images/feedback.png){ width="450"}
-        <figcaption>**Feedback template**</figcaption>
+        <figcaption>Feedback template</figcaption>
     </figure>
 
 _____________________________________________________________________________________________________
@@ -27,7 +24,7 @@ Unlike some other templates, feedback templates cannot be linked calls or indivi
 
 **Step 2: Find the feedback template you wish to mark as active**
 
-* On the Feedback templates page, find the template you mark as active. You may wish to [**create a new feedback template**](feedback_template.md) or [**edit a feedback template**](feedback_template.md).
+* On the Feedback templates page, find the template you mark as active. You may wish to create a new feedback template or edit a feedback template.
 
 **Step 3: Mark the feedback template as active***
 
@@ -72,7 +69,7 @@ ________________________________________________________________________________
 
 **Step 3: Edit the template**
 
-* Click the `EDIT` function on the template you wish to make changes to. This function will open the Feedback template editor. See the [create a feedback template](feedback_template.md) guide for an overview of all the feedback template editing features.
+* Click the `EDIT` function on the template you wish to make changes to. This function will open the Feedback template editor.
 
 * The Feedback template changes will be updated automatically
 
