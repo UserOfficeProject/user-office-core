@@ -20,8 +20,6 @@ ________________________________________________________________________________
 
 Unlike some other templates, feedback templates cannot be linked calls or individually assigned to proposals. Instead, User Officers must mark a feedback template as active. This will assign it to all users to be filled out after their experiment has been allocated a time within the external scheduler. The template marked as active will remain active until another is feedback template is marked.  
 
-How to mark a feedback template as active: 
-
 **Step 1: Navigate to the feedback templates page**
 
 * In the main menu select `TEMPLATES` :material-text-box-multiple:
@@ -37,7 +35,7 @@ How to mark a feedback template as active:
 
 _____________________________________________________________________________________________________
 
-### **How do I create feedback templates?**
+### How do I create feedback templates?
 
 **Step 1: Navigate to the feedback templates page**
 
@@ -58,7 +56,7 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
-### **How do I edit feedback templates?**
+### How do I edit feedback templates?
 
 **Step 1: Navigate to the feedback templates page**
 
@@ -80,7 +78,7 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
-### **How do I import and export feedback templates?**
+### How do I import and export feedback templates?
 
 **Step 1: Navigate to the feedback templates page**
 
@@ -95,7 +93,7 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
-### **How do I clone feedback templates?**
+### How do I clone feedback templates?
 
 **Step 1: Navigate to the feedback templates page**
 
