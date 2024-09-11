@@ -2,7 +2,7 @@
 
 _________________________________________________________________________________________________________
 
-Kubernetes is a platform for automating the deployment, scaling, and operation of containerized applications. Helm is a package manager and simplifies the process of deploying and managing applications on Kubernetes by using pre-configured application packages called Helm charts.
+Kubernetes is a platform for automating the deployment, scaling, and operation of containerized applications. Helm is a package manager that simplifies the process of deploying and managing applications on Kubernetes by using pre-configured application packages called Helm charts.
 
 ## Repository and Helm Chart
 

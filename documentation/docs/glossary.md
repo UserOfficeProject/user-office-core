@@ -4,7 +4,7 @@ ________________________________________________________________________________
 
 ??? info "**A**"
     :material-book-open-variant-outline: **Actions**
-    > Actions refer to specific operations that User Officers can perform on proposals, documents, or other system components. Examples of actions include viewing proposals, editing, cloning, exporting, deleting, archiving, assigning a scientist etc.
+    > Actions refer to specific operations that User Officers can perform on proposals, documents, or other system components. Examples of actions include viewing proposals, editing, cloning, exporting, deleting, archiving, assigning a scientist, etc.
 
     :material-book-open-variant-outline: **Access token**
     > An access token is a security credential used to authenticate and authorize users or applications to access specific resources within the User Office system. It is issued upon successful login or authentication and is used to verify the identity of the requester and their permissions for accessing various functionalities or data.
@@ -16,7 +16,7 @@ ________________________________________________________________________________
     > API Access Tokens are unique identifiers used to authenticate and authorize API requests to the User Office system. They enable secure interaction between external applications and the User Office by allowing programmatic access to its features and data, ensuring that only authorized applications can perform actions or retrieve information.
 
     :material-book-open-variant-outline: **App Settings**
-    > App Settings refer to the configuration options that allow User Officers to customize the behaviour and appearance of User Office. These settings include timezone, date format and pallette colour settings to customuse the User Interface.
+    > App Settings refer to the configuration options that allow User Officers to customize the behavior and appearance of User Office. These settings include time zone, date format and palette colour settings to customize the User Interface.
 
     :material-book-open-variant-outline: **Archive**
     > Archive is an action which allows User Officers to store templates that are no longer actively used but need to be kept for reference. Archiving helps in managing system performance and data organization by separating current, active information from older records.

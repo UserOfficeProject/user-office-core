@@ -50,6 +50,10 @@ Runs the app in the development mode.<br>
 Lints typescript code and log if there are any errors.<br>
 `npm run lint:fix` should be used if you want to fix all auto-fixable errors and warnings.
 
+## Documentation
+
+You can find the full documentation for the User Office project [here](https://userofficeproject.github.io/user-office-core/develop/).
+
 ## Contribution and release versioning
 
 Please refer to the [Contribution guide](CONTRIBUTING.md) to get information about contributing and versioning.

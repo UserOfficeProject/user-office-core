@@ -6,7 +6,7 @@ ________________________________________________________________________________
 
 ??? info "Feedback templates" 
 
-    [**Feedback templates**](feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire. This form becomes available to users after their experiment has been allocated a time within the external scheduler. User Officers can set the Feedback template they wish to utilise with the `MARK AS ACTIVE` function on the feedback templates page. 
+    [**Feedback templates**](feedback_template.md) allow users to provide feedback about their experiment and experience at the facility through a questionnaire. This form becomes available to users after their experiment has been allocated a time within the external scheduler. User Officers can set the Feedback template they wish to utilize with the `MARK AS ACTIVE` function on the feedback templates page. 
     ______________________________________________________________________________________
     
     <figure markdown="span">  
@@ -16,9 +16,9 @@ ________________________________________________________________________________
 
 _____________________________________________________________________________________________________
 
-### How do mark a feedback template as active?
+### How to mark a feedback template as active?
 
-Unlike some other templates, feedback templates cannot be linked calls or individually assigned to proposals. Instead, User Officers must mark a feedback template as active. This will assign it to all users to be filled out after their experiment has been allocated a time within the external scheduler. The template marked as active will remain active until another is feedback template is marked.  
+Unlike some other templates, feedback templates cannot be linked calls or individually assigned to proposals. Instead, User Officers must mark a feedback template as active. This will assign it to all users to be filled out after their experiment has been allocated a time within the external scheduler. The template marked as active will remain active until another feedback template is marked.  
 
 **Step 1: Navigate to the feedback templates page**
 
@@ -52,7 +52,7 @@ ________________________________________________________________________________
 
 * In the Feedback template editor you can set -----
 
-* The changed made to the feedback template will be updated automatically
+* The changes made to the feedback template will be updated automatically
 
 _____________________________________________________________________________________________________
 
@@ -66,9 +66,9 @@ ________________________________________________________________________________
 **Step 2: Find the feedback template you wish to edit**
 
 * On the Feedback templates page, find the template you wish to edit. You may wish to use the `SEARCH` function to search for the name or description if there are a lot of templates.
-* You may wish to make a copy of the feedback template you want to edit. To do this, click the `CLONE` function on the template you wish to make a copy of.  Note: the clone will be renamed 'Copy of (name)' and will be edded to the end of the list of feedback templates. 
+* You may wish to make a copy of the feedback template you want to edit. To do this, click the `CLONE` function on the template you wish to make a copy of.  Note: the clone will be renamed 'Copy of (name)' and will be added to the end of the list of feedback templates. 
 
-> **_NOTE:_** The cloning feature is useful if you wish to make changes to a feedback template and keep a copy of the original version for reference. It is good practice to make copies of templates in case the previous version needs to be utilised in the future.
+> **_NOTE:_** The cloning feature is useful if you wish to make changes to a feedback template and keep a copy of the original version for reference. It is good practice to make copies of templates in case the previous version needs to be utilized in the future.
 
 **Step 3: Edit the template**
 
@@ -108,7 +108,7 @@ ________________________________________________________________________________
 
 * Click the `CLONE` function on the template to create a clone. Note: the clone will be renamed 'Copy of (name)' and will be edded to the end of the list of feedback templates. 
 
-> **_NOTE:_** The cloning feature is useful if you wish to make changes to a feedback template and keep a copy of the original version for reference. It is good practice to make copies of templates in case the previous version needs to be utilised in the future.
+> **_NOTE:_** The cloning feature is useful if you wish to make changes to a feedback template and keep a copy of the original version for reference. It is good practice to make copies of templates in case the previous version needs to be utilized in the future.
 
 _____________________________________________________________________________________________________
 
