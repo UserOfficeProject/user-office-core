@@ -13,7 +13,7 @@ There are several different types of templates utilised within Calls:
 ### Types of templates
 
 ??? info "PDF templates :material-file-pdf-box:" 
-    [PDF templates :material-file-pdf-box:](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+    [PDF templates :material-file-pdf-box:](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
     ______________________________________________________________________________________
 
@@ -25,7 +25,7 @@ There are several different types of templates utilised within Calls:
 ??? info "Proposal templates :material-note-text:" 
     [Proposal templates :material-note-text:](templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilise [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    User Officers can also utilise [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customize proposal templates to include specific questions based on the nature and requirements of the research.
     ______________________________________________________________________________________
     <figure markdown="span">  
         ![Proposal](../../assets/images/proposal_template.png){ width="450"}
@@ -52,7 +52,7 @@ There are several different types of templates utilised within Calls:
     </figure>
 
 ??? info "Shipment declaration templates :material-truck:" 
-    [Shipment declaration templates :material-truck:](templates/shipment_template.md) are standardised forms used to collect and organise information about parcels being sent to a facility. These templates can be customised to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
+    [Shipment declaration templates :material-truck:](templates/shipment_template.md) are standardised forms used to collect and organise information about parcels being sent to a facility. These templates can be customized to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
 
     > **_NOTE:_** The shipment declaration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
@@ -73,7 +73,7 @@ There are several different types of templates utilised within Calls:
     </figure>
 
 ??? info "Proposal ESI templates :material-note-text:" 
-    [Proposal Experiment Safety Input (ESI) :material-note-text:](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [questions](questions.md) and [sub-templates](templates/sub_template.md) to customise Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
+    [Proposal Experiment Safety Input (ESI) :material-note-text:](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [questions](questions.md) and [sub-templates](templates/sub_template.md) to customize Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
 
     > **_NOTE:_**The Proposal ESI form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
@@ -182,12 +182,12 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Embellishment :material-format-size:"
     ![Embellishment](../../assets/images/embellishment.png){ align=left width="350"}
     
-    **Embellishment:** A the text file which can be customised to modify elements such as font size, colour and formatting options facilitating the display of more detailed information for users. Note: this is not a question that users can provide responses to.
+    **Embellishment:** A the text file which can be customized to modify elements such as font size, colour and formatting options facilitating the display of more detailed information for users. Note: this is not a question that users can provide responses to.
 
     * **Key:** The question key
 
@@ -197,7 +197,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "File Upload :material-paperclip:"
     ![File Upload](../../assets/images/file_upload.png){ align=left width="350"}
@@ -224,7 +224,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 
 ??? info "Sub Template :material-list-box-outline:"
@@ -240,7 +240,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     * **Template name:**
 
-    * **Add button label:** Customise the text on the add button
+    * **Add button label:** Customize the text on the add button
 
     * **Can copy:** 
 
@@ -250,7 +250,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:**
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 
 ??? info "Interval :material-chevron-right:"
@@ -272,7 +272,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 
 ??? info "Multiple choice :material-record-circle:"
@@ -294,11 +294,11 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Items**
 
-    * This section allows you to customise the answer choices. The order can be changed with the Up and Down arrows.
+    * This section allows you to customize the answer choices. The order can be changed with the Up and Down arrows.
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 
 ??? info "Dynamic multiple choice :material-web:"
@@ -330,7 +330,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Number :material-numeric-1-box-outline:"
     ![Number](../../assets/images/number.png){ align=left width="350"}
@@ -346,7 +346,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 
 ??? info "Rich text input :material-format-text-variant:"
@@ -362,7 +362,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 
 ??? info "Sample declaration :material-clipboard-text:"
@@ -384,7 +384,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Text input :material-text-short:"
     ![Text Input](../../assets/images/text_input.png){ align=left width="350"}
@@ -399,7 +399,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 ??? info "Instrument Picker :material-microscope:"
     ![Instrument Picker](../../assets/images/instrument_picker.png){ align=left width="350"}
@@ -412,7 +412,7 @@ You may also create questions from scratch by clicking on **options** within the
 
     **Dependencies:** 
     
-    * This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+    * This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 
 > **_NOTE:_** The basis question type is unique to each template type. It is mandatory and cannot be removed since it contains important information which needs to be addressed within each template. For example, in proposal templates it includes the section to add a Principle Investigator and co-proposers to the proposal. Having other questions prior to the basis question may create problems for users filling out the questionnaire.
@@ -421,7 +421,7 @@ You may also create questions from scratch by clicking on **options** within the
 
 ### Dependencies
 
-* This allows you to add depencies to configure the conditions which need to be met for this question is displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
+* This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.
 
 _________________________________________________________________________________________________________
 
