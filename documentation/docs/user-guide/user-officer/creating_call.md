@@ -20,11 +20,11 @@ ________________________________________________________________________________
 
 ### Templates
 
-In order to set up a call, you must decide which [templates :material-text-box-multiple:](creating_templates.md) it will utilise.
+In order to set up a call, you must decide which [templates :material-text-box-multiple:](creating_templates.md) it will utilize.
 
-[Templates :material-text-box-multiple:](creating_templates.md) are used to save and re-utilise predefined information across User Office. Calls :material-calendar-blank: are built using several different types of templates which can be ^^`edited`^^:material-pencil: and ^^`cloned`^^:material-file-multiple:. Templates serve many different functions; for example, they may contain specific [questions :material-comment-question:](questions.md) which users answer in their proposals. The template system is useful because it saves User Officers from having to create calls from scratch every time. Furthermore, templates allows for standardisation which is essential for data collection and analysis of users' responses.
+[Templates :material-text-box-multiple:](creating_templates.md) are used to save and re-utilize predefined information across User Office. Calls :material-calendar-blank: are built using several different types of templates which can be ^^`edited`^^:material-pencil: and ^^`cloned`^^:material-file-multiple:. Templates serve many different functions; for example, they may contain specific [questions :material-comment-question:](questions.md) which users answer in their proposals. The template system is useful because it saves User Officers from having to create calls from scratch every time. Furthermore, templates allows for standardisation which is essential for data collection and analysis of users' responses.
 
-There are several different types of templates utilised within Calls:
+There are several different types of templates utilized within Calls:
 
 ??? info "PDF templates :material-file-pdf-box:" 
     [PDF templates :material-file-pdf-box:](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
@@ -39,7 +39,7 @@ There are several different types of templates utilised within Calls:
 ??? info "Proposal templates :material-note-text:" 
     [Proposal templates :material-note-text:](templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilise [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
     ______________________________________________________________________________________
     <figure markdown="span">  
         ![Proposal](../../assets/images/proposal_template.png){ width="450"}
@@ -87,7 +87,7 @@ There are several different types of templates utilised within Calls:
     </figure>
 
 ??? info "Proposal ESI templates :material-note-text:" 
-    [Proposal Experiment Safety Input (ESI) :material-note-text:](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilise [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
+    [Proposal Experiment Safety Input (ESI) :material-note-text:](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
 
     > **_NOTE:_** The Proposal ESI form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
@@ -125,7 +125,7 @@ When it comes to utilising templates within a call there are various options:
 
 To use a pre-existing template, simply select it from the drop-down menu within the call. 
 
-> **_NOTE:_** [Shipment declaration templates :material-truck:](templates/shipment_template.md), [visit registration templates :material-airplane-takeoff:](templates/visit_template.md) and [feedback templates :material-message-alert:](templates/feedback_template.md) do not appear within the call creation page. To select which of each of these templates you would like to utilise, find their page on the main menu and use the ^^`Mark as active`^^:material-check: function to specify which should be currently utilised. 
+> **_NOTE:_** [Shipment declaration templates :material-truck:](templates/shipment_template.md), [visit registration templates :material-airplane-takeoff:](templates/visit_template.md) and [feedback templates :material-message-alert:](templates/feedback_template.md) do not appear within the call creation page. To select which of each of these templates you would like to utilize, find their page on the main menu and use the ^^`Mark as active`^^:material-check: function to specify which should be currently utilized. 
 
 It is good practice to check the templates you wish to use before finalising the creation of the call. You can view the template details in the designated template edit page, found by navigating to the templates menu.
 
@@ -168,7 +168,7 @@ Calls are also assigned to Facility Access Panels (FAPs) for review of the submi
 ??? info "FAPs :material-google-circles-communities:" 
     [FAPs :material-google-circles-communities:](fap.md) (Facility Access Panels) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a [reviewer](roles.md), [secretary](roles.md) and [chair](roles.md) to oversee the review process and ensure thorough and unbiased evaluation. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
 
-    User Officers can manage the FAPs assigned to proposals and calls. FAPs can be utilised across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria. In creating a FAP, user officers may provide general information by labeling FAPs with a code, a description, and specifying the required number of proposal ratings. 
+    User Officers can manage the FAPs assigned to proposals and calls. FAPs can be utilized across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria. In creating a FAP, user officers may provide general information by labeling FAPs with a code, a description, and specifying the required number of proposal ratings. 
 
     ______________________________________________________________________________________
     
@@ -184,7 +184,7 @@ There are several ways to assign a FAP to a call:
 
 **1. Use pre-existing FAPs**
 
-To utilise a pre-existing FAP within a call, simply select it from the 'Call FAPs' drop-down menu in the 'Reviews' section of the call. Note: multiple FAPs can be selected within a single call. 
+To utilize a pre-existing FAP within a call, simply select it from the 'Call FAPs' drop-down menu in the 'Reviews' section of the call. Note: multiple FAPs can be selected within a single call. 
 
 **2. Create FAPs**
 
@@ -196,7 +196,7 @@ ________________________________________________________________________________
 
 ### Proposal Workflows
 
-Calls utilise proposal workflow 
+Calls utilize proposal workflow 
 
 ??? info "Proposal Workflows :material-sitemap:" 
     [Proposal workflows](settings/proposal_workflow.md) outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status marks a key stage in the proposal's progression. For example, moving from '**Draft**' to '**Feasibility Review**' indicates the proposal's readiness for preliminary assessment. 
@@ -216,7 +216,7 @@ There are several ways to assign a Proposal Worklow to a call:
 
 **1. Use pre-existing Proposal Workflows**
 
-To utilise a pre-existing Proposal workflow within a call, simply select it from the 'Proposal Workflow' drop-down menu in the 'General' section of the call. 
+To utilize a pre-existing Proposal workflow within a call, simply select it from the 'Proposal Workflow' drop-down menu in the 'General' section of the call. 
 
 **2. Create Proposal Workflows**
 
@@ -248,9 +248,9 @@ You can navigate between the sections by clicking on the headings or `NEXT` and 
      
     * **Reference number format:** The reference number format that determines how reference numbers are generated.
 
-    * **Call template:** The proposal template that the call will utilise.
+    * **Call template:** The proposal template that the call will utilize.
 
-    * **ESI template:** The Experimental Safety Input (ESI) template the call will utilise.
+    * **ESI template:** The Experimental Safety Input (ESI) template the call will utilize.
 
     * **Proposal workflow:** The workflow that the Proposal will follow.
 
@@ -267,7 +267,7 @@ You can navigate between the sections by clicking on the headings or `NEXT` and 
 
     ![Reviews](../../assets/images/reviews_1.png){ align=left width="350"}
 
-    * **Sart of review:** Start date of the feasibility review
+    * **Start of review:** Start date of the feasibility review
 
     * **End of review:** End date of the feasibility review
 
@@ -315,9 +315,9 @@ ________________________________________________________________________________
 
 ## How do I edit an active call?
 
-Once a call has been created it becomes `ACTIVE` meaning that it is open for users to submit their proposals. Therefore, if changes are made to active calls proposals submitted after the update may be different. This may cause disavdantage to users, therefore User Officers must take care to ensure that 
+Once a call has been created it becomes `ACTIVE` meaning that it is open for users to submit their proposals. Therefore, if changes are made to active calls proposals submitted after the update may be different. This may cause disadvantage to users, therefore User Officers must take care to ensure that 
 
-All active calls can be seen by filtering by 'Active' Status within the the Calls page. Active calls can be edited by clicking on the `EDIT` :material-pencil: action. This opens the update call pop-up. Once you have made the desired changes, click on `UPDATE` to update the call. 
+All active calls can be seen by filtering by 'Active' Status within the Calls page. Active calls can be edited by clicking on the `EDIT` :material-pencil: action. This opens the update call pop-up. Once you have made the desired changes, click on `UPDATE` to update the call. 
 
 Lastly, once you have filled out all of the call information, checked that it is correct and reviewed the call checklist you may now create the call by clicking the `CREATE` button on the **Notification and Cycle** page.
 

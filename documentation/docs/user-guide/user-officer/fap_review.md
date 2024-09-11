@@ -12,9 +12,9 @@ ________________________________________________________________________________
 
 ## How do I configure the system for FAP Review?
 
-Conditions to be met:
+Conditions to be met include:
 
-* Instrument scientists complete the feasibility review (either setting the proposal status to `feasible` or `not feasible`) 
-* The proposal is then assigned to the FAP for evaluation (in accordance with the general proposal workflow, however this may be defined otherwise).
+* Instrument scientists complete the feasibility review (either setting the proposal status to `fDeasible` or `Not Feasible`) 
+* The proposal is then assigned to the FAP for evaluation (in accordance with the general proposal workflow; however, this may be defined otherwise).
 
 _________________________________________________________________________________________________________

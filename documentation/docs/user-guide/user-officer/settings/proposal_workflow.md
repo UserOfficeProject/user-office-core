@@ -125,7 +125,7 @@ ________________________________________________________________________________
 
 ??? info "Feasibility and sample review" 
 
-    **Feasibility and sample review** indicates that the proposal feasibity and sample review can be done simultaneously
+    **Feasibility and sample review** indicates that the proposal feasibility and sample review can be done simultaneously
 
 ??? info "Sample review" 
 
