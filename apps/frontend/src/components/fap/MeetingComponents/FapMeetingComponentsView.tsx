@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
-import { NumberParam, useQueryParams, withDefault } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { useCallsData } from 'hooks/call/useCallsData';
@@ -18,17 +18,22 @@ const FapMeetingComponentsView = ({
   code,
 }: FapMeetingComponentsViewProps) => {
   const { loadingCalls, calls } = useCallsData({ fapIds: [fapId] });
-  const [query, setQuery] = useQueryParams({
-    call: withDefault(NumberParam, null),
-  });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const call = searchParams.get('call');
 
   useEffect(() => {
-    if (calls.length && !query.call) {
-      setQuery({ call: calls[0].id });
-    }
-  }, [calls, query.call, setQuery]);
+    if (calls.length && !call) {
+      setSearchParams((searchParams) => {
+        searchParams.set('call', calls[0].id.toString());
 
-  const selectedCall = calls.find((call) => call.id === query.call);
+        return searchParams;
+      });
+    }
+  }, [call, calls, setSearchParams]);
+
+  const selectedCall = calls.find((call) => call && call.id === +call);
 
   return (
     <>
@@ -37,7 +42,7 @@ const FapMeetingComponentsView = ({
           <CallFilter
             calls={calls}
             isLoading={loadingCalls}
-            callId={query.call}
+            callId={call ? +call : null}
           />
         </Grid>
       </Grid>

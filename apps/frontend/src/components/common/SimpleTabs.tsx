@@ -4,12 +4,7 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import React from 'react';
-import {
-  NumberParam,
-  StringParam,
-  useQueryParams,
-  withDefault,
-} from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -63,12 +58,12 @@ const SimpleTabs = ({
 }: SimpleTabsProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery('(max-width: 500px)');
-  const [query, setQuery] = useQueryParams({
-    tab: withDefault(NumberParam, 0),
-    modalTab: withDefault(NumberParam, 0),
-    verticalTab: withDefault(NumberParam, 0),
-    modal: StringParam,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const tab = searchParams.get('tab') ?? '0';
+  const modalTab = searchParams.get('modalTab') ?? '0';
+  const verticalTab = searchParams.get('verticalTab') ?? '0';
+
   const noItems = children.length === 0;
 
   const styles = {
@@ -104,19 +99,34 @@ const SimpleTabs = ({
     const tabValue = newValue > 0 ? newValue : undefined;
 
     if (isVerticalOrientation) {
-      setQuery({ verticalTab: tabValue });
+      setSearchParams((searchParam) => {
+        searchParams.delete('verticalTab');
+        if (tabValue) searchParam.set('verticalTab', String(tabValue));
+
+        return searchParam;
+      });
     } else if (isInsideModal) {
-      setQuery({ modalTab: tabValue });
+      setSearchParams((searchParam) => {
+        searchParams.delete('modalTab');
+        if (tabValue) searchParam.set('modalTab', String(tabValue));
+
+        return searchParam;
+      });
     } else {
-      setQuery({ tab: tabValue });
+      setSearchParams((searchParam) => {
+        searchParams.delete('tab');
+        if (tabValue) searchParam.set('tab', String(tabValue));
+
+        return searchParam;
+      });
     }
   };
 
   const tabValue = isVerticalOrientation
-    ? query.verticalTab
+    ? +verticalTab
     : isInsideModal
-      ? query.modalTab
-      : query.tab;
+      ? +modalTab
+      : +tab;
 
   return (
     <Box

@@ -4,12 +4,6 @@ import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { SetStateAction, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  DelimitedArrayParam,
-  QueryParamConfig,
-  StringParam,
-  withDefault,
-} from 'use-query-params';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -18,20 +12,6 @@ import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 import StyledDialog from './StyledDialog';
-
-export type UrlQueryParamsType = {
-  search: QueryParamConfig<string | null | undefined>;
-  selection: QueryParamConfig<(string | null | never)[]>;
-  sortDirection: QueryParamConfig<string | null | undefined>;
-  sortField?: QueryParamConfig<string | null | undefined>;
-};
-
-export const DefaultQueryParams = {
-  sortDirection: StringParam,
-  search: StringParam,
-  selection: withDefault(DelimitedArrayParam, []),
-  sortField: StringParam,
-};
 
 export type SortDirectionType = 'asc' | 'desc' | undefined;
 

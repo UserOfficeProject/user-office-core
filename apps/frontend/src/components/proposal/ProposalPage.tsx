@@ -1,8 +1,6 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { QueryParamConfig } from 'use-query-params';
 
-import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -13,19 +11,6 @@ import ProposalFilterBar, {
   questionaryFilterFromUrlQuery,
 } from './ProposalFilterBar';
 import ProposalTableOfficer from './ProposalTableOfficer';
-
-export type ProposalUrlQueryParamsType = {
-  call: QueryParamConfig<number | null | undefined>;
-  instrument: QueryParamConfig<string | null | undefined>;
-  proposalStatus: QueryParamConfig<number | null | undefined>;
-  reviewModal: QueryParamConfig<number | null | undefined>;
-  modalTab: QueryParamConfig<number | null | undefined>;
-  compareOperator: QueryParamConfig<string | null | undefined>;
-  questionId: QueryParamConfig<string | null | undefined>;
-  proposalId: QueryParamConfig<string | null | undefined>;
-  value: QueryParamConfig<string | null | undefined>;
-  dataType: QueryParamConfig<string | null | undefined>;
-} & UrlQueryParamsType;
 
 export interface ProposalUrlQueryParams extends URLSearchParams {
   call?: string;
