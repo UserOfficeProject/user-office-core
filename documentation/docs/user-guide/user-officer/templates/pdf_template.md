@@ -3,15 +3,12 @@
 _________________________________________________________________________________________________________
 
 ## What are PDF templates?
-??? info "PDF templates" 
 
-    **PDF templates** :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+PDF templates :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardized PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
-    ______________________________________________________________________________________
-
-    <figure markdown="span">  
+<figure markdown="span">  
         ![PDF Template](../../../assets/images/pdf_template.png){ width="450"}
-        <figcaption>**PDF template**</figcaption>
+        <figcaption>PDF template</figcaption>
     </figure>
 
 _________________________________________________________________________________________________________
@@ -112,6 +109,6 @@ ________________________________________________________________________________
 
 ### What does #calls mean on PDF templates?
 
-* '#Calls' refers to the number of calls the PDF template has been utilised in.
+* '#Calls' refers to the number of calls the PDF template has been utilized in.
 
 ______________________________________________________________________________________

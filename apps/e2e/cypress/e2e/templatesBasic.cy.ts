@@ -37,6 +37,7 @@ context('Template tests', () => {
   const richTextInputQuestion = {
     title: faker.lorem.words(3),
     maxChars: 200,
+    allowImages: false,
     answer: faker.lorem.words(3),
   };
   const multipleChoiceQuestion = {
@@ -335,7 +336,29 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: richTextInputQuestion.title,
-          config: `{"max":"${richTextInputQuestion.maxChars}"}`,
+          config: `{"max":"${richTextInputQuestion.maxChars}", "allowImages":true }`,
+        });
+
+        if (shouldAddQuestionsToTemplate) {
+          cy.createQuestionTemplateRelation({
+            questionId: createdQuestion.id,
+            templateId: initialDBData.template.id,
+            sortOrder: 7,
+            topicId: initialDBData.template.topic.id,
+          });
+        }
+      }
+    });
+    cy.createQuestion({
+      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      dataType: DataType.RICH_TEXT_INPUT,
+    }).then((questionResult) => {
+      const createdQuestion = questionResult.createQuestion;
+      if (createdQuestion) {
+        cy.updateQuestion({
+          id: createdQuestion.id,
+          question: richTextInputQuestion.title,
+          config: `{"max":"${richTextInputQuestion.maxChars}", "allowImages":false }`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -668,6 +691,7 @@ context('Template tests', () => {
 
       cy.createRichTextInput(richTextInputQuestion.title, {
         maxChars: richTextInputQuestion.maxChars,
+        allowImages: richTextInputQuestion.allowImages,
       });
 
       cy.contains(richTextInputQuestion.title);

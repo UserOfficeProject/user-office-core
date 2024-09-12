@@ -4,47 +4,41 @@ ________________________________________________________________________________
 
 ## What are proposal workflows?
 
-??? info "Proposal Workflows" 
+Proposal workflows outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status marks a key stage in the proposal's progression. For example, moving from 'Draft' to 'Feasibility Review' indicates the proposal's readiness for preliminary assessment. 
 
-    **Proposal workflows** outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status marks a key stage in the proposal's progression. For example, moving from 'Draft' to 'Feasibility Review' indicates the proposal's readiness for preliminary assessment. 
+Proposal workflows control how and when the User Office system will display information to different roles based on statuses. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. 
 
-    Proposal workflows control how and when the User Office system will display information to different roles based on statuses. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customise workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
-
-    ______________________________________________________________________________________
+User Officers can customize workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
     
-    <figure markdown="span">  
+<figure markdown="span">  
         ![Workflow](../../../assets/images/workflow_editor.png){ width="450"}
-        <figcaption>**Proposal workflow**</figcaption>
+        <figcaption>Proposal workflow</figcaption>
     </figure>
 _________________________________________________________________________________________________________
 
 ## What are proposal statuses?
 
-??? info "proposal statuses" 
+Proposal statuses represent the various stages a proposal goes through during its lifecycle, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status signifies a specific point in the proposal's progression and helps track its current state.
 
-    **Proposal statuses** represent the various stages a proposal goes through during its lifecycle, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status signifies a specific point in the proposal's progression and helps track its current state.
+Proposal statuses are used to manage and monitor the flow of proposals within the User Office system. They provide an indication of where a proposal is in the review and decision-making process. User Officers can customize these statuses to ensure that each proposal is processed correctly. 
 
-    Proposal statuses are used to manage and monitor the flow of proposals within the User Office system. They provide an indication of where a proposal is in the review and decision-making process. User Officers can customize these statuses to ensure that each proposal is processed correctly. Statuses can trigger events, notifications, and actions, helping to automate the proposal management process. For example, moving a proposal to 'Feasibility Review' might trigger a notification to the relevant reviewers, while a status of 'Allocated' could initiate resource allocation for the approved proposal.
+Statuses can trigger events, notifications, and actions, helping to automate the proposal management process. For example, moving a proposal to 'Feasibility Review' might trigger a notification to the relevant reviewers, while a status of 'Allocated' could initiate resource allocation for the approved proposal.
 
 _________________________________________________________________________________________________________
 
 ## What are status events?
 
-??? info "Status events"
+Status events are specific triggers that cause a proposal to transition from one status to another within the proposal workflow. Examples of status events include '**Proposal Submitted**' and '**Review Completed**'. Each event is associated with a particular action or milestone in the proposal's lifecycle.
 
-    **Status events** are specific triggers that cause a proposal to transition from one status to another within the proposal workflow. Examples of status events include '**Proposal Submitted**' and '**Review Completed**'. Each event is associated with a particular action or milestone in the proposal's lifecycle.
-
-    Status events are used to automate the movement of proposals through the workflow based on predefined criteria. User Officers can customize these events to fit the needs of their workflow, ensuring that proposals progress efficiently. Events can trigger status changes, notifications, and other actions. For example, the event '**Proposal Submitted**' might trigger a transition from 'Draft' to 'Feasibility Review'.
+Status events are used to automate the movement of proposals through the workflow based on predefined criteria. User Officers can customize these events to fit the needs of their workflow, ensuring that proposals progress efficiently. Events can trigger status changes, notifications, and other actions. For example, the event '**Proposal Submitted**' might trigger a transition from 'Draft' to 'Feasibility Review'.
 
 _________________________________________________________________________________________________________
 
 ## What are status actions?
 
-??? info "Status actions"
+Status actions are predefined operations that are automatically executed when a proposal transitions to a specific status. Examples of status actions include sending email notifications, updating records, or triggering external systems via RabbitMQ messages.
 
-    **Status actions** are predefined operations that are automatically executed when a proposal transitions to a specific status. Examples of status actions include sending email notifications, updating records, or triggering external systems via RabbitMQ messages.
-
-    Status actions are used to automate tasks and ensure consistency in the proposal management process. User Officers can customize these actions to trigger necessary tasks when a proposal reaches a certain status. For example, a status action might send an email notification to reviewers when a proposal transitions to 'Feasibility Review'.
+Status actions are used to automate tasks and ensure consistency in the proposal management process. User Officers can customize these actions to trigger necessary tasks when a proposal reaches a certain status. For example, a status action might send an email notification to reviewers when a proposal transitions to 'Feasibility Review'.
 
 _____________________________________________________________________________________________________
 
@@ -125,7 +119,7 @@ ________________________________________________________________________________
 
 ??? info "Feasibility and sample review" 
 
-    **Feasibility and sample review** indicates that the proposal feasibity and sample review can be done simultaneously
+    **Feasibility and sample review** indicates that the proposal feasibility and sample review can be done simultaneously
 
 ??? info "Sample review" 
 
@@ -141,7 +135,7 @@ ________________________________________________________________________________
 
 <figure markdown="span">  
         ![General Workflow](../../../assets/images/general_workflow.png){ width="300"}
-        <figcaption>**General workflow structure**</figcaption>
+        <figcaption>General workflow structure</figcaption>
     </figure>
 
 _________________________________________________________________________________________________________
@@ -150,7 +144,7 @@ ________________________________________________________________________________
 
 <figure markdown="span">  
         ![Shipment Declaration](../../../assets/images/rapid_workflow.png){ width="250"}
-        <figcaption>**Rapid Access Workflow structure**</figcaption>
+        <figcaption>Rapid Access Workflow structure</figcaption>
     </figure>
 
 _________________________________________________________________________________________________________
