@@ -5,6 +5,7 @@ import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
+import { Technique } from '../../models/Technique';
 import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
@@ -13,7 +14,9 @@ import {
   CallRecord,
   createCallObject,
   createProposalViewObject,
+  createProposalViewObjectWithTechniques,
   ProposalViewRecord,
+  TechniqueRecord,
 } from '../postgres/records';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
@@ -163,6 +166,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       });
 
     return result;
+  }
+
+  createTechniqueObject(technique: TechniqueRecord): Technique {
+    return new Technique(
+      technique.technique_id,
+      technique.name,
+      technique.short_code,
+      technique.description
+    );
   }
 
   async getProposalsFromView(
@@ -318,6 +330,39 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
       });
 
+    type techniqueForProposal = {
+      proposalId: number;
+      technique: Technique[];
+    };
+    type proposalId = {
+      proposal_pk: number;
+    };
+
+    let techniqueList: techniqueForProposal[];
+    const proposalIds: proposalId[] = await proposals;
+
+    proposalIds.forEach(async (proposalId) => {
+      const techniques = await database('techniques as t')
+        .select('t.*')
+        .join('technique_has_proposals as thp', {
+          'thp.technique_id': 't.technique_id',
+        })
+        .where('thp.proposal_id', proposalId.proposal_pk)
+        .distinct()
+        .then((results: TechniqueRecord[]) =>
+          results.map(this.createTechniqueObject)
+        );
+      const techniqueForPk = {
+        proposalId: proposalId.proposal_pk,
+        technique: techniques,
+      };
+      if (techniqueList === undefined) {
+        techniqueList = [techniqueForPk];
+      } else {
+        techniqueList.push(techniqueForPk);
+      }
+    });
+
     const result = database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
@@ -387,9 +432,20 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
       })
       .then((proposals: ProposalViewRecord[]) => {
-        const props = proposals.map((proposal) =>
-          createProposalViewObject(proposal)
-        );
+        const props = proposals.map((proposal) => {
+          const techs = techniqueList
+            .filter((prop) => prop.proposalId === proposal.proposal_pk)
+            .map((item) => {
+              return item.technique;
+            })
+            .at(0);
+
+          if (techs?.length != undefined && techs?.length > 0) {
+            return createProposalViewObjectWithTechniques(proposal, techs);
+          }
+
+          return createProposalViewObject(proposal);
+        });
 
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,

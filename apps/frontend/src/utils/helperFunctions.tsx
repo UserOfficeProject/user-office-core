@@ -109,6 +109,8 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
     techniques: proposal.techniques?.map((technique) => ({
       id: technique?.id,
       name: technique?.name,
+      shortCode: technique?.shortCode,
+      description: technique?.description,
     })),
   }) as ProposalViewData;
 
