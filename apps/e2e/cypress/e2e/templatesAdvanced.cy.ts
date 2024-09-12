@@ -18,6 +18,7 @@ context('Template tests', () => {
   let intervalId: string;
   let numberId: string;
   let richTextInputId: string;
+  let richTextInputAllowImagesId: string;
 
   const proposal = {
     title: faker.lorem.words(3),
@@ -42,6 +43,13 @@ context('Template tests', () => {
   const richTextInputQuestion = {
     title: faker.lorem.words(3),
     maxChars: 200,
+    allowImages: false,
+    answer: faker.lorem.words(3),
+  };
+  const richTextInputQuestionAllowImages = {
+    title: faker.lorem.words(3),
+    maxChars: 200,
+    allowImages: true,
     answer: faker.lorem.words(3),
   };
   const multipleChoiceQuestion = {
@@ -320,7 +328,31 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: richTextInputQuestion.title,
-          config: `{"max":"${richTextInputQuestion.maxChars}"}`,
+          config: `{"max":"${richTextInputQuestion.maxChars}", "allowImages": ${richTextInputQuestion.allowImages}}`,
+        });
+
+        if (shouldAddQuestionsToTemplate) {
+          cy.createQuestionTemplateRelation({
+            questionId: createdQuestion.id,
+            templateId: initialDBData.template.id,
+            sortOrder: 7,
+            topicId: initialDBData.template.topic.id,
+          });
+        }
+      }
+    });
+    cy.createQuestion({
+      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      dataType: DataType.RICH_TEXT_INPUT,
+    }).then((questionResult) => {
+      const createdQuestion = questionResult.createQuestion;
+      if (createdQuestion) {
+        richTextInputAllowImagesId = createdQuestion.id;
+
+        cy.updateQuestion({
+          id: createdQuestion.id,
+          question: richTextInputQuestionAllowImages.title,
+          config: `{"max":"${richTextInputQuestionAllowImages.maxChars}", "allowImages": ${richTextInputQuestionAllowImages.allowImages}}`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -406,6 +438,15 @@ context('Template tests', () => {
             `Characters: ${richTextInputQuestion.answer.length} / ${richTextInputQuestion.maxChars}`
           );
         });
+
+      cy.setTinyMceContent(
+        richTextInputAllowImagesId,
+        richTextInputQuestionAllowImages.answer
+      );
+
+      cy.getTinyMceContent(richTextInputAllowImagesId).then((content) =>
+        expect(content).to.have.string(richTextInputQuestionAllowImages.answer)
+      );
 
       cy.contains('Save and continue').click();
 

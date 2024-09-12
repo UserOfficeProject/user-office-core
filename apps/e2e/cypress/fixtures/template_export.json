@@ -467,7 +467,8 @@
                   "required": false,
                   "small_label": "",
                   "tooltip": "",
-                  "max": null
+                  "max": null,
+                  "allowImages": false
                 }
               },
               "topicId": 6,
@@ -476,7 +477,8 @@
                 "required": false,
                 "small_label": "",
                 "tooltip": "",
-                "max": null
+                "max": null,
+                "allowImages": false
               },
               "dependencies": [],
               "dependenciesOperator": "AND"
@@ -742,7 +744,8 @@
             "required": false,
             "small_label": "",
             "tooltip": "",
-            "max": null
+            "max": null,
+            "allowImages": false
           }
         },
         {
