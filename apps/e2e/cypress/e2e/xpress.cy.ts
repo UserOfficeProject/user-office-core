@@ -661,18 +661,15 @@ context('Xpress tests', () => {
 
       cy.contains(proposal1.title);
       cy.contains(createdProposalId1);
-      // cy.contains(technique1.name);
-      // cy.contains(instrument1.name);
+      cy.contains(technique1.name);
 
       cy.contains(proposal2.title);
       cy.contains(createdProposalId2);
-      // cy.contains(technique2.name);
-      // cy.contains(instrument2.name);
+      cy.contains(technique2.name);
 
       cy.contains(proposal3.title);
       cy.contains(createdProposalId3);
-      // cy.contains(technique3.name);
-      // cy.contains(instrument3.name);
+      cy.contains(technique3.name);
     });
 
     it('Instrument scientist can only see submitted and unsubmitted Xpress proposals for their techniques', function () {
@@ -689,23 +686,19 @@ context('Xpress tests', () => {
 
       cy.contains(proposal1.title);
       cy.contains(createdProposalId1);
-      // cy.contains(technique1.name);
-      // cy.contains(instrument1.name);
+      cy.contains(technique1.name);
 
       cy.should('not.contain', proposal2.title);
       cy.should('not.contain', createdProposalId2);
-      // cy.should('not.contain', technique2.name);
-      // cy.should('not.contain', instrument2.name);
+      cy.should('not.contain', technique2.name);
 
       cy.should('not.contain', proposal3.title);
       cy.should('not.contain', createdProposalId3);
-      // cy.should('not.contain', technique3.name);
-      // cy.should('not.contain', instrument3.name);
+      cy.should('not.contain', technique3.name);
 
       cy.should('not.contain', proposal4.title);
       cy.should('not.contain', createdProposalId4);
-      // cy.should('not.contain', technique4.name);
-      // cy.should('not.contain', instrument4.name);
+      cy.should('not.contain', technique4.name);
 
       /*
       Scientist 2 belongs to technique 2, which has proposals 1 and 2
@@ -720,87 +713,19 @@ context('Xpress tests', () => {
 
       cy.contains(proposal1.title);
       cy.contains(createdProposalId1);
-      // cy.contains(technique1.name);
-      // cy.contains(instrument1.name);
+      cy.contains(technique1.name);
 
       cy.contains(proposal2.title);
       cy.contains(createdProposalId2);
-      // cy.contains(technique2.name);
-      // cy.contains(instrument2.name);
+      cy.contains(technique2.name);
 
       cy.should('not.contain', proposal3.title);
       cy.should('not.contain', createdProposalId3);
-      // cy.should('not.contain', technique3.name);
-      // cy.should('not.contain', instrument3.name);
+      cy.should('not.contain', technique3.name);
 
       cy.should('not.contain', proposal4.title);
       cy.should('not.contain', createdProposalId4);
-      // cy.should('not.contain', technique4.name);
-      // cy.should('not.contain', instrument4.name);
-
-      /*
-      Commenting out: scientist 3 and 4 is not getting logged in.
-      Scientist 3 belongs to technique 3, which has proposal 3
-      
-      cy.login(scientist3, initialDBData.roles.instrumentScientist);
-      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
-      cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Xpress').click();
-      cy.finishedLoading();
-
-      cy.contains(proposal3.title);
-      cy.contains(createdProposalId3);
-      // cy.contains(technique3.name);
-      // cy.contains(instrument3.name);
-
-      cy.should('not.contain', proposal1.title);
-      cy.should('not.contain', createdProposalId1);
-      // cy.should('not.contain', technique1.name);
-      // cy.should('not.contain', instrument1.name);
-
-      cy.should('not.contain', proposal2.title);
-      cy.should('not.contain', createdProposalId2);
-      // cy.should('not.contain', technique2.name);
-      // cy.should('not.contain', instrument2.name);
-
-      cy.should('not.contain', proposal4.title);
-      cy.should('not.contain', createdProposalId4);
-      // cy.should('not.contain', technique4.name);
-      // cy.should('not.contain', instrument4.name);
-
-      
-      Scientist 4 belongs to technique 4, but it doesn't have any proposals
-      
-      cy.login(scientist4);
-      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
-      cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Xpress').click();
-      cy.finishedLoading();
-
-      cy.should('not.contain', proposal1.title);
-      cy.should('not.contain', createdProposalId1);
-      // cy.should('not.contain', technique1.name);
-      // cy.should('not.contain', instrument1.name);
-
-      cy.should('not.contain', proposal2.title);
-      cy.should('not.contain', createdProposalId2);
-      // cy.should('not.contain', technique2.name);
-      // cy.should('not.contain', instrument2.name);
-
-      cy.should('not.contain', proposal3.title);
-      cy.should('not.contain', createdProposalId3);
-      // cy.should('not.contain', technique3.name);
-      // cy.should('not.contain', instrument3.name);
-
-      cy.should('not.contain', proposal4.title);
-      cy.should('not.contain', createdProposalId4);
-      // cy.should('not.contain', technique4.name);
-      // cy.should('not.contain', instrument4.name);
-      */
+      cy.should('not.contain', technique4.name);
     });
   });
 });
