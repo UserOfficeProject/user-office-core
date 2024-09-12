@@ -50,6 +50,12 @@ export class ProposalViewTechnique {
 
   @Field(() => String)
   name: string;
+
+  @Field(() => String)
+  shortCode: string;
+
+  @Field(() => String)
+  description: string;
 }
 
 @ObjectType()
