@@ -38,6 +38,7 @@ import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { TechnicalReview } from '../../models/TechnicalReview';
+import { Technique } from '../../models/Technique';
 import {
   DataType,
   FieldCondition,
@@ -1345,3 +1346,31 @@ export interface TechniqueHasInstrumentsRecord {
   readonly technique_id: number;
   readonly instrument_id: number;
 }
+
+export const createProposalViewObjectWithTechniques = (
+  proposal: ProposalViewRecord,
+  techniques: Technique[]
+) => {
+  return new ProposalView(
+    proposal.proposal_pk,
+    proposal.title || '',
+    proposal.principal_investigator,
+    proposal.proposal_status_id,
+    proposal.proposal_status_name,
+    proposal.proposal_status_description,
+    proposal.proposal_id,
+    proposal.final_status,
+    proposal.notified,
+    proposal.submitted,
+    proposal.instruments,
+    proposal.technical_reviews,
+    proposal.faps,
+    proposal.fap_instruments,
+    proposal.call_short_code,
+    proposal.allocation_time_unit,
+    proposal.call_id,
+    proposal.proposal_workflow_id,
+    proposal.submitted_date,
+    techniques
+  );
+};

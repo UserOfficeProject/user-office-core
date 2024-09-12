@@ -77,11 +77,5 @@ query getProposal($primaryKey: Int!) {
         isCompleted
       }
     }
-    techniques {
-      id
-      name
-      shortCode
-      description
-    }
   }
 }
