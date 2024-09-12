@@ -82,6 +82,9 @@ type QueryParameters = {
   };
   searchText?: string | undefined;
 };
+
+const currentPage = 0;
+
 const getFilterReviewer = (selected: string | ReviewerFilter) =>
   selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
 
@@ -183,7 +186,7 @@ const instrumentManagementColumns = (
 
 const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
-  { title: 'Fap', field: 'fapCode', emptyValue: '-', hidden: true },
+  { title: 'FAP', field: 'fapCode', emptyValue: '-', hidden: true },
 ];
 
 const proposalStatusFilter: Record<string, number> = {
@@ -257,7 +260,6 @@ const ProposalTableInstrumentScientist = ({
 }: {
   confirm: WithConfirmType;
 }) => {
-  const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalViewData[]
@@ -362,13 +364,11 @@ const ProposalTableInstrumentScientist = ({
 
   useEffect(() => {
     let isMounted = true;
-    let endSlice = rowsPerPage * (currentPage + 1);
-    endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
     if (isMounted) {
       setTableData(
         preselectedProposalsData.slice(
           (currentPage * rowsPerPage) % PREFETCH_SIZE,
-          endSlice
+          totalCount
         )
       );
     }
@@ -376,7 +376,7 @@ const ProposalTableInstrumentScientist = ({
     return () => {
       isMounted = false;
     };
-  }, [currentPage, rowsPerPage, preselectedProposalsData, queryParameters]);
+  }, [rowsPerPage, preselectedProposalsData, queryParameters, totalCount]);
 
   useEffect(() => {
     if (urlQueryParams.selection.length > 0) {
@@ -875,7 +875,6 @@ const ProposalTableInstrumentScientist = ({
               },
             });
           }
-          setCurrentPage(page);
         }}
         columns={columns}
         data={proposalDataWithIdAndRowActions}

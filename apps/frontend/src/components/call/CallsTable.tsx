@@ -117,20 +117,20 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       emptyValue: '-',
     },
     {
-      title: 'Call template',
+      title: 'Proposal template',
       field: 'template.name',
       emptyValue: '-',
     },
     {
-      title: '#' + i18n.format(t('instrument'), 'plural'),
+      title: '#' + i18n.format(t('Instrument'), 'plural'),
       render: (data) => data.instruments.length,
     },
     {
-      title: '#proposals',
+      title: '#Proposals',
       field: 'proposalCount',
     },
     {
-      title: '#faps',
+      title: '#FAPs',
       render: (data) => data.faps?.length,
     },
   ];

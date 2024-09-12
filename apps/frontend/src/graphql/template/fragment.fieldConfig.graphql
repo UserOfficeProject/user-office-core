@@ -120,6 +120,7 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     max
+    allowImages
   }
 
   ... on DynamicMultipleChoiceConfig {
