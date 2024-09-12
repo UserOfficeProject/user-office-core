@@ -6,6 +6,10 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/UserOfficeProject/user-office-core/master/badge.svg?targetFile=package.json)](https://snyk.io/test/github/UserOfficeProject/user-office-core/master?targetFile=package.json)
 
 ---
+## Documentation
+
+You can find the full documentation for the User Office project [here](https://userofficeproject.github.io/user-office-core/develop/).
+
 ## Contributing
 
 If you're planning to contribute to this project by adding new functionality, we encourage you to discuss it first in the Discussions tab. This helps ensure that your proposed changes align with the project's goals and prevents duplicate efforts. Here's how you can initiate a discussion:

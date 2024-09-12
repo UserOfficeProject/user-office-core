@@ -6,7 +6,7 @@ ________________________________________________________________________________
 
 ## Welcome to User Office
 
-The User Office Project is an international collaboration to build flexible web software designed to efficiently run and organize user programs at various scientific facilities. 
+The User Office project is an international collaboration to build flexible web software designed to efficiently run and organize user programs at various scientific facilities. 
 
 We have built this software with flexibility in mind - allowing user officers and user program managers to configure the software to the specific needs of their facility.
 

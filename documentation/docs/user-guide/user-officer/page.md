@@ -4,7 +4,7 @@ ________________________________________________________________________________
 
 ## What are pages?
 
-Pages are highly customiseable sections of information within User Office. Pages can be utilised to display key dates, advice and links to users and reviewers. 
+Pages are highly customizable sections of information within User Office. Pages can be utilized to display key dates, advice and links to users and reviewers. 
 
 _________________________________________________________________________________________________________
 
@@ -17,7 +17,7 @@ ________________________________________________________________________________
 
 ### Step 2: Edit the page
 
-* To create a new page click on `FILE` > `NEW DOCUMENT`, or edit the pre-existing message.
+* To create a new page click on `FILE` > `NEW DOCUMENT`, or edit the preexisting message.
 * The editor contains many useful features to aid in creating the page such as `EDITING` and `FORMATTING` tools.
 * The `INSERT` button can also be used to insert images and links into the page.
 
@@ -58,20 +58,20 @@ ________________________________________________________________________________
 
     <figure markdown="span">  
         ![Reviewer Homepage](../../assets/images/reviewer_page.png)
-        <figcaption>**Reviewer homepage (dashboard)**</figcaption>
+        <figcaption>Reviewer homepage (dashboard)</figcaption>
     </figure>
 
 #### Help page
 
 !!! note ""
-    This sets the help page; this is the information that is displayed to users on the 'help' page, and at the FAQ button at the bottom of the page for all users. See the 'FAQs for help page section for an list of example questions that may be useful to include in the help page.
+    This sets the help page; this is the information that is displayed to users on the 'help' page, and at the FAQ button at the bottom of the page for all users. See the 'FAQs for help page section for a list of example questions that may be useful to include in the help page.
     
     ??? info "FAQs for help page"
         Frequently asked questions: 
 
         * **Can I view all the questions before I start completing my proposal?**
 
-        You can navigate though the proposal, once you have completed the first page - the title, abstract and co-proposers. However, the proposal is dynamic - some questions are dependent on the answer to other questions. You can download a pdf containing all the questions here (link).
+        You can navigate through the proposal, once you have completed the first page - the title, abstract and co-proposers. However, the proposal is dynamic - some questions are dependent on the answer to other questions. You can download a pdf containing all the questions here (link).
 
         * **When I click 'Save and Continue' nothing seems to happen?**
 
@@ -101,12 +101,12 @@ ________________________________________________________________________________
 
     <figure markdown="span">  
         ![Help page](../../assets/images/faq_page.png)
-        <figcaption>**User help page (FAQ)**</figcaption>
+        <figcaption>User help page (FAQ)</figcaption>
     </figure>
 
     <figure markdown="span">  
         ![Help notice](../../assets/images/faq_notice.png)
-        <figcaption>**Help notice (FAQ)**</figcaption>
+        <figcaption>Help notice (FAQ)</figcaption>
     </figure>
 
 #### Privacy Agreement page
@@ -116,7 +116,7 @@ ________________________________________________________________________________
 
     <figure markdown="span">  
         ![Privacy page](../../assets/images/privacy_page.png)
-        <figcaption>**Privacy Agreement Page**</figcaption>
+        <figcaption>Privacy Agreement Page</figcaption>
     </figure>
 
 #### Footer
@@ -127,7 +127,7 @@ ________________________________________________________________________________
 #### Login
 
 !!! note ""
-    This sets login.
+    This sets the login.
 
 #### Grade guide
 
@@ -137,4 +137,5 @@ ________________________________________________________________________________
 ### Step 3: Update your changes
 
 * Once you are satisfied with the changes and ensured that the page is well-formatted with the `PREVIEW` function you can update the page by clicking on the `UPDATE` button.
+
 _________________________________________________________________________________________________________
