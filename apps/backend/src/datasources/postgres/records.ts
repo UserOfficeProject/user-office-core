@@ -458,6 +458,7 @@ export interface FapReviewsRecord {
   readonly fap_time_allocation: number;
   readonly average_grade: number;
   readonly questionary_id: number;
+  readonly comment: string;
 }
 
 export interface FapReviewerRecord {

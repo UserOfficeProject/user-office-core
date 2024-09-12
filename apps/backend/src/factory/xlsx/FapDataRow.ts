@@ -1,5 +1,3 @@
-import { stripHtml } from 'string-strip-html';
-
 import { CallRowObj } from './callFaps';
 import { RowObj } from './fap';
 
@@ -13,6 +11,7 @@ export function getDataRow(
   proposalTitle: string,
   proposalId: number | null,
   techReviewTimeAllocation: number | null,
+  technicalReviewComment: string | null,
   propFapRankOrder: number | null
 ): RowObj {
   return {
@@ -23,6 +22,7 @@ export function getDataRow(
     instrName: instrumentName,
     instrAvailTime: instrumentAvailabilityTime,
     techReviewTimeAllocation: techReviewTimeAllocation,
+    techReviewComment: technicalReviewComment,
     fapTimeAllocation: fapTimeAllocation ?? null,
     propReviewAvgScore: proposalAverageScore ?? 0,
     propFapRankOrder: propFapRankOrder ?? null,
@@ -46,11 +46,6 @@ export function populateRow(row: RowObj) {
 }
 
 export function callFapPopulateRow(row: CallRowObj): (string | number)[] {
-  const individualReviews = row.reviews?.flatMap((rev) => [
-    rev.grade,
-    rev.comment && stripHtml(rev.comment).result,
-  ]);
-
   return [
     row.propShortCode ?? '<missing>',
     row.propTitle ?? '<missing>',
@@ -58,6 +53,7 @@ export function callFapPopulateRow(row: CallRowObj): (string | number)[] {
     row.instrName ?? '<missing>',
     row.instrAvailTime ?? '<missing>',
     row.techReviewTimeAllocation ?? '<missing>',
+    row.techReviewComment ?? '<missing>',
     row.fapTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
     row.propFapRankOrder ?? '<missing>',
@@ -66,5 +62,5 @@ export function callFapPopulateRow(row: CallRowObj): (string | number)[] {
     row.fapMeetingDecision ?? '<missing>',
     row.fapMeetingInComment ?? '<missing>',
     row.fapMeetingExComment ?? '<missing>',
-  ].concat(individualReviews ? individualReviews : []);
+  ].concat(row.reviews ? row.reviews?.flatMap((a) => a) : []);
 }
