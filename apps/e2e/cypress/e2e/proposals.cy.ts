@@ -347,7 +347,7 @@ context('Proposal tests', () => {
         .find('input')
         .uncheck();
       cy.get('.MuiPopover-paper')
-        .contains('Fap')
+        .contains('FAP')
         .parent()
         .find('input')
         .uncheck();
@@ -366,7 +366,7 @@ context('Proposal tests', () => {
       );
       cy.get('[data-cy="officer-proposals-table"] table').should(
         'not.contain',
-        'Fap'
+        'FAP'
       );
 
       cy.get("[aria-label='Show Columns']").first().click();
@@ -376,7 +376,7 @@ context('Proposal tests', () => {
         .find('input')
         .check();
       cy.get('.MuiPopover-paper')
-        .contains('Fap')
+        .contains('FAP')
         .parent()
         .find('input')
         .check();
@@ -389,7 +389,7 @@ context('Proposal tests', () => {
       );
       cy.get('[data-cy="officer-proposals-table"] table').should(
         'contain',
-        'Fap'
+        'FAP'
       );
     });
 
