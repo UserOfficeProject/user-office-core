@@ -366,7 +366,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       logger.logInfo('Creating dummy users', { usersIds: missedUsers });
 
       const newUsers = await database
-        .insert(userIds.map(this.createDummyUserRecord))
+        .insert(missedUsers.map(this.createDummyUserRecord))
         .returning(['*'])
         .into('users');
 
