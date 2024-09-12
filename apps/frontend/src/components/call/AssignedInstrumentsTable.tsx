@@ -120,7 +120,7 @@ const AssignedInstrumentsTable = ({
       editable: 'never',
     },
     {
-      title: 'Fap',
+      title: 'FAP',
       field: 'fapId',
       editable: 'onUpdate',
       emptyValue: '-',

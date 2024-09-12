@@ -94,7 +94,7 @@ const OverwriteTimeAllocationDialog = ({
                 id="fapTimeAllocation"
                 type="number"
                 name="fapTimeAllocation"
-                label={`Time Allocation(${fapProposalArgs.proposal.call?.allocationTimeUnit}s)`}
+                label={`Time Allocation (${fapProposalArgs.proposal.call?.allocationTimeUnit}s)`}
                 value={values.fapTimeAllocation ?? ''}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFieldValue(
