@@ -13,6 +13,8 @@ The documentation is built using **MkDocs**, a static site generator specificall
 - [MkDocs Official Documentation](https://www.mkdocs.org/)
 - [MkDocs Material Theme](https://squidfunk.github.io/mkdocs-material/)
 
+_________________________________________________________________________________________________________
+
 ## General Guidelines
 
 When contributing to the documentation, keep the following guidelines in mind:
@@ -22,6 +24,8 @@ When contributing to the documentation, keep the following guidelines in mind:
 - Ensure that all code snippets are correctly formatted and easy to read. 
 - Provide comments in code examples where necessary.
 - Check for spelling and grammatical errors; tools like [Grammarly](https://www.grammarly.com/) can be helpful. 
+
+_________________________________________________________________________________________________________
 
 ## Running the Documentation Locally
 
@@ -33,6 +37,8 @@ To preview your changes locally, follow these steps:
         mkdocs serve
 
 This will start a local server where you can view the documentation in your browser.
+
+_________________________________________________________________________________________________________
 
 ## Adding New Pages
 

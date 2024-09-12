@@ -8,7 +8,7 @@ FAPs are groups of external reviewers responsible for evaluating research propos
 
 FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments
 
-[User Officers](roles.md) can manage the FAPs assigned to proposals and provide general information such as labeling FAPs with a code, a description, and specifying the required number of proposal ratings. FAPs can be automatically assigned to all proposals within a call, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria such as the grade guide. 
+[User Officers](roles.md) can manage the FAPs assigned to proposals and provide general information such as labeling FAPs with a code, a description, and specifying the required number of proposal ratings. FAPs can be automatically assigned to all proposals within a call, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardized criteria such as the grade guide. 
 
 _________________________________________________________________________________________________________
 
@@ -56,13 +56,7 @@ The FAP members can be configured.
 
 * FAP Chairs can be added with the `ADD CHAIR` button
 * FAP Secretaries can be added with the `ADD SECRETARY` button.
-* Reviewers can be added with the `ADD REVEWERS` button.
-
-**Proposal and assignments**
-
-**Meeting components**
-
-**Logs**
+* Reviewers can be added with the `ADD REVIEWERS` button.
 
 _________________________________________________________________________________________________________
 
