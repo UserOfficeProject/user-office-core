@@ -362,7 +362,7 @@ context('Fap reviews tests', () => {
 
       cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
 
-      cy.get("[aria-label='Assign proposals to Fap']").first().click();
+      cy.get("[aria-label='Assign proposals to FAP']").first().click();
 
       cy.get('[data-cy="fap-selection"] input').should(
         'not.have.class',
