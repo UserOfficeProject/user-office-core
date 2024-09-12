@@ -1,5 +1,4 @@
 [
-  { "Proposal Reference Number": "local lumen" },
   {
     "Proposal Reference Number": "567122",
     "Proposal Title": "lumen proofread hertz",
@@ -10,11 +9,7 @@
     "Fap allocated time": 25,
     "Average Score": 3,
     "Current rank": "<missing>",
-    "Is in availability zone": "no",
-    "Fap Time allocation": "<missing>",
-    "Fap Meeting Decision": "Accepted",
-    "Fap Meeting Comment for User": "test",
-    "Fap Meeting Internal Comment": "test"
+    "Is in availability zone": "no"
   },
   {
     "Proposal Reference Number": "701367",
@@ -26,10 +21,6 @@
     "Fap allocated time": 5,
     "Average Score": 3,
     "Current rank": "<missing>",
-    "Is in availability zone": "no",
-    "Fap Time allocation": "<missing>",
-    "Fap Meeting Decision": "Accepted",
-    "Fap Meeting Comment for User": "test2",
-    "Fap Meeting Internal Comment": "test2"
+    "Is in availability zone": "no"
   }
 ]
