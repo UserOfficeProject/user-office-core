@@ -232,7 +232,7 @@ const FapReviewColumns = [
     hidden: true,
   },
   {
-    title: 'Fap',
+    title: 'FAP',
     field: 'faps.code',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
@@ -981,7 +981,7 @@ const ProposalTableOfficer = ({
           },
           {
             icon: GroupWorkIcon,
-            tooltip: 'Assign proposals to Fap',
+            tooltip: 'Assign proposals to FAP',
             onClick: () => {
               setOpenAssignment(true);
             },
