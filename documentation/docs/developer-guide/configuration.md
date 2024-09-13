@@ -12,6 +12,8 @@ The `.env` file format is supported by the dotenv library, which loads these var
 
 For more detailed information, refer to the [dotenv documentation](https://www.npmjs.com/package/dotenv).
 
+_________________________________________________________________________________________________________
+
 ## Environment Variables
 
 ### EAM Configuration (ESS-specific)

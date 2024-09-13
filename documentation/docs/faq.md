@@ -32,7 +32,7 @@ ________________________________________________________________________________
     * [**How do I clone PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-clone-pdf-templates)
     * [**How do I archive and unarchive PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-archive-and-unarchive-pdf-templates)
     * [**How do I import and export PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-export-and-import-pdf-templates)
-    * [**What does #calls mean on PDF templates?**](user-guide/user-officer/templates/pdf_template.md#what-does-calls-mean-on-pdf-templates)
+    * [**What do #calls mean on PDF templates?**](user-guide/user-officer/templates/pdf_template.md#what-does-calls-mean-on-pdf-templates)
 
 ??? info "**Proposal Templates**"
     ### **Proposal templates**
@@ -72,7 +72,7 @@ ________________________________________________________________________________
 ??? info "**Feedback templates**"
     ### **Feedback templates**
     * [**What are feedback templates**](user-guide/user-officer/templates/feedback_template.md#what-are-feedback-templates)
-    * [**How do I mark a feedback template as active?**](user-guide/user-officer/templates/feedback_template.md#how-do-mark-a-feedback-template-as-active)
+    * [**How do I mark a feedback template as active?**](user-guide/user-officer/templates/feedback_template.md#how-to-mark-a-feedback-template-as-active)
     * [**How do I create feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-create-feedback-templates)
     * [**How do I edit feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-edit-feedback-templates)
     * [**How do I import and export feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-import-and-export-feedback-templates)
@@ -93,7 +93,7 @@ ________________________________________________________________________________
     ### **Proposal workflows**
     * [**What are proposal workflows?**](user-guide/user-officer/settings/proposal_workflow.md#what-are-proposal-workflows)
     * [**How do I create a proposal workflow?**](user-guide/user-officer/settings/proposal_workflow.md#how-do-i-create-a-proposal-workflow)
-    * [**How do I edit a proposal workflow?**](user-guide/user-officer/settings/proposal_workflow.md#how-do-i-edit-a-proposal-workflow)
+    * [**How do I edit a proposal workflow?**](user-guide/user-officer/settings/proposal_workflow.md#how-do-i-create-a-proposal-workflow)
 
 ??? info "**FAPs**"
     ### **FAPs**
@@ -110,6 +110,5 @@ ________________________________________________________________________________
 ??? info "**Settings**"
     ### **Settings**
     * [**What are features?**](user-guide/user-officer/settings/features.md#what-are-features)
-    * [**How do I configure the features?**](user-guide/user-officer/settings/features.md#how-do-i-configure-the-features)
 
 _________________________________________________________________________________________________________

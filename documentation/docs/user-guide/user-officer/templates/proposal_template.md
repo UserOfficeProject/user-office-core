@@ -3,15 +3,15 @@
 ______________________________________________________________________________________
 
 ## What are proposal templates?
-??? info "Proposal templates :material-note-text:" 
-    [**Proposal templates** :material-note-text:](../templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilise [**questions** :material-comment-question:](../questions.md) and [**sub-templates** :material-collapse-all-outline:](../templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
-    ______________________________________________________________________________________
-    <figure markdown="span">  
-        ![Proposal](../../../assets/images/proposal_template.png){ width="450"}
-        <figcaption>**Proposal (viewed from the user's perspective)**</figcaption>
-    </figure>
+Proposal templates :material-note-text: are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
+
+User Officers can also utilize [questions :material-comment-question:](../questions.md) and [sub-templates :material-collapse-all-outline:](../templates/sub_template.md) to customize proposal templates to include specific questions based on the nature and requirements of the research.
+
+<figure markdown="span">  
+    ![Proposal](../../../assets/images/proposal_template.png){ width="450"}
+    <figcaption>Proposal (viewed from the user's perspective)</figcaption>
+</figure>
 
 _________________________________________________________________________________________________________
 
@@ -32,7 +32,7 @@ ________________________________________________________________________________
 
 * This will bring you to the template editor. From here you may add topics which act as the different sections within the questionnaire that users fill out. 
 
-> **_NOTE:_** It is good practice to utilise topics to split up the presentation of information for users. For example, in a proposal template you may wish to have a topic for addressing general information, another for support requirements and another for experiment details, etc.
+> **_NOTE:_** It is good practice to utilize topics to split up the presentation of information for users. For example, in a proposal template you may wish to have a topic for addressing general information, another for support requirements and another for experiment details, etc.
     
 You can add questions to topics by clicking on **options** and from the dropdown select **^^`Add topic`^^**. Topics can be reordered by clicking on the **^^`Reorder topics mode`^^** option. In reorder topics mode, you may drag and drop the topics into the desired order.
 
@@ -76,7 +76,7 @@ ________________________________________________________________________________
 
 **Step 3: Edit the template**
 
-* Click the **^^`Edit`^^** action on the template you wish to make changes to. In the proposal template editor you can make the desired changes to the proposal template. See the [**creating proposal templates**](proposal_template.md) guide for more information on the proposal template editor and using [**questions** :material-comment-question:](../questions.md)
+* Click the **^^`Edit`^^** action on the template you wish to make changes to. In the proposal template editor you can make the desired changes to the proposal template. See the [creating proposal templates](proposal_template.md) guide for more information on the proposal template editor and using [questions :material-comment-question:](../questions.md)
 
 _________________________________________________________________________________________________________
 
@@ -132,12 +132,12 @@ ________________________________________________________________________________
 
 ## What does #proposals mean on proposal templates?
 
-* '#proposals' refers to the number of calls the proposal template has been utilised in.
+* '#proposals' refers to the number of calls the proposal template has been utilized in.
 
 _________________________________________________________________________________________________________
 
 ## What does #calls mean on proposal templates?
 
-* '#calls' refers to the number of calls the proposal template has been utilised in.
+* '#calls' refers to the number of calls the proposal template has been utilized in.
 
 ______________________________________________________________________________________
