@@ -53,7 +53,6 @@ export function callFapPopulateRow(row: CallRowObj): (string | number)[] {
     row.instrName ?? '<missing>',
     row.instrAvailTime ?? '<missing>',
     row.techReviewTimeAllocation ?? '<missing>',
-    row.techReviewComment ?? '<missing>',
     row.fapTimeAllocation ?? row.techReviewTimeAllocation ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
     row.propFapRankOrder ?? '<missing>',
