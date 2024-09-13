@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
@@ -22,8 +23,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
+
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
-    Tokens.UserDataSource
+    Tokens.RedeemCodesDataSource
   );
 
   if (event.isRejection) {
@@ -82,6 +87,49 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         })
         .catch((err: string) => {
           logger.logException('Failed email transmission', err);
+        });
+
+      return;
+    }
+
+    case Event.PROPOSAL_CREATED: {
+      const principalInvestigator = await userDataSource.getUser(
+        event.proposal.proposerId
+      );
+
+      const call = await callDataSource.getCall(event.proposal.callId);
+
+      if (!principalInvestigator || !call) {
+        return;
+      }
+
+      const options: EmailSettings = {
+        content: {
+          template_id: 'proposal-created',
+        },
+        substitution_data: {
+          piPreferredname: principalInvestigator.preferredname,
+          piLastname: principalInvestigator.lastname,
+          proposalNumber: event.proposal.proposalId,
+          proposalTitle: event.proposal.title,
+          callShortCode: call.shortCode,
+        },
+        recipients: [{ address: principalInvestigator.email }],
+      };
+
+      mailService
+        .sendMail(options)
+        .then((res: any) => {
+          logger.logInfo('Emails sent on proposal submission:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email(s) on proposal submission:', {
+            error: err,
+            event,
+          });
         });
 
       return;
@@ -195,10 +243,10 @@ export async function eliEmailHandler(event: ApplicationEvent) {
     }
     case Event.FAP_REVIEWER_NOTIFIED: {
       const { id: reviewId, userID, proposalPk } = event.fapReview;
-      const sepReviewer = await userDataSource.getUser(userID);
+      const fapReviewer = await userDataSource.getUser(userID);
       const proposal = await proposalDataSource.get(proposalPk);
 
-      if (!sepReviewer || !proposal) {
+      if (!fapReviewer || !proposal) {
         return;
       }
 
@@ -208,21 +256,13 @@ export async function eliEmailHandler(event: ApplicationEvent) {
             template_id: 'review-reminder',
           },
           substitution_data: {
-            sepReviewerPreferredName: sepReviewer.preferredname,
-            sepReviewerLastName: sepReviewer.lastname,
+            fapReviewerPreferredName: fapReviewer.preferredname,
+            fapReviewerLastName: fapReviewer.lastname,
             proposalNumber: proposal.proposalId,
             proposalTitle: proposal.title,
             commentForUser: proposal.commentForUser,
           },
-          recipients: [
-            { address: sepReviewer.email },
-            {
-              address: {
-                email: 'useroffice@esss.se',
-                header_to: sepReviewer.email,
-              },
-            },
-          ],
+          recipients: [{ address: fapReviewer.email }],
         })
         .then(async (res: any) => {
           await fapDataSource.setFapReviewNotificationEmailSent(
@@ -230,13 +270,13 @@ export async function eliEmailHandler(event: ApplicationEvent) {
             userID,
             proposalPk
           );
-          logger.logInfo('Email sent on SEP reviewer notify:', {
+          logger.logInfo('Email sent on FAP reviewer notify:', {
             result: res,
             event,
           });
         })
         .catch((err: string) => {
-          logger.logError('Could not send email on SEP reviewer notify:', {
+          logger.logError('Could not send email on FAP reviewer notify:', {
             error: err,
             event,
           });

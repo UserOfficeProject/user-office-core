@@ -186,7 +186,7 @@ const instrumentManagementColumns = (
 
 const FapReviewColumns = [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
-  { title: 'Fap', field: 'fapCode', emptyValue: '-', hidden: true },
+  { title: 'FAP', field: 'fapCode', emptyValue: '-', hidden: true },
 ];
 
 const proposalStatusFilter: Record<string, number> = {
