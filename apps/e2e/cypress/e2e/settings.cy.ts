@@ -959,7 +959,7 @@ context('Settings tests', () => {
 
       cy.get('[type="checkbox"]').first().check();
 
-      cy.get("[aria-label='Assign proposals to Fap']").first().click();
+      cy.get("[aria-label='Assign proposals to FAP']").first().click();
 
       cy.get('[data-cy="fap-selection"] input').should(
         'not.have.class',

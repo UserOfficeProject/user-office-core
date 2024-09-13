@@ -340,7 +340,7 @@ const CallGeneralInfo = ({
       <FormControl fullWidth>
         <FormikUIAutocomplete
           name="templateId"
-          label="Call template"
+          label="Proposal template"
           loading={loadingTemplates}
           noOptionsText="No templates"
           items={templateOptions}
@@ -374,7 +374,7 @@ const CallGeneralInfo = ({
         <FormControl fullWidth>
           <FormikUIAutocomplete
             name="esiTemplateId"
-            label="ESI template"
+            label="Proposal ESI template"
             loading={loadingTemplates}
             noOptionsText="No templates"
             items={esiTemplateOptions}
