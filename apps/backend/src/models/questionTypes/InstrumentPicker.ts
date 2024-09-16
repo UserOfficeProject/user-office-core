@@ -108,6 +108,15 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
         return;
       }
 
+      const instrumentDataSource = container.resolve<InstrumentDataSource>(
+        Tokens.InstrumentDataSource
+      );
+
+      // Remove previously assigned instruments
+      await instrumentDataSource.removeProposalsFromInstrument([
+        proposal.primaryKey,
+      ]);
+
       // Assign the Proposals to Instruments
       await instrumentMutations.assignProposalsToInstrumentsInternal(null, {
         instrumentIds,
