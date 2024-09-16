@@ -10,6 +10,7 @@ import { Review } from '../models/Review';
 import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
+import { ReviewsFilter } from '../resolvers/queries/ReviewsQuery';
 
 @injectable()
 export default class ReviewQueries {
@@ -36,6 +37,16 @@ export default class ReviewQueries {
     } else {
       return null;
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
+  async getAll(
+    agent: UserWithRole | null,
+    filter?: ReviewsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return this.dataSource.getReviews(filter, first, offset);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])
