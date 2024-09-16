@@ -107,7 +107,7 @@ const CallReviewAndNotification = () => {
       </LocalizationProvider>
       <FormikUIAutocomplete
         name="faps"
-        label="Call Faps"
+        label="Call FAPs"
         multiple
         loading={loadingFaps}
         noOptionsText="No Faps"

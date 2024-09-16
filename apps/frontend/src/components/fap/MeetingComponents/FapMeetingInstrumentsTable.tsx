@@ -208,7 +208,7 @@ const FapMeetingInstrumentsTable = ({
             },
             {
               title: 'Submit ' + i18n.format(t('instrument'), 'lowercase'),
-              description: `No further changes to Fap meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
+              description: `No further changes to FAP meeting decisions and rankings are possible after submission. Are you sure you want to submit the ${(rowData as InstrumentWithAvailabilityTime).name} ${t(
                 'instrument'
               )}?`,
             }

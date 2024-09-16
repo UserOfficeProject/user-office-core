@@ -34,7 +34,7 @@ ________________________________________________________________________________
 
 _________________________________________________________________________________________________________
 
-## What are the icons for the different the features?
+## What are the icons for the different features?
 
 Icon functions
 
