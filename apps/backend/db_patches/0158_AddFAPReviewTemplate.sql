@@ -42,7 +42,7 @@ BEGIN
       FROM templates 
       WHERE name='default fap review template';
 
-    INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (fap_review_template_id_var, NOW(), 1);
+    INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (fap_review_template_id_var, NOW(), 0);
 
     INSERT INTO topics(topic_title, is_enabled, sort_order, template_id) VALUES('New fap review', TRUE, 0, fap_review_template_id_var);
 
