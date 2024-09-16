@@ -25,7 +25,8 @@ function DefaultTemplatesTable(props: DefaultTemplatesTableProps) {
   const { isArchived, templateGroup } = props;
   const { api } = useDataApiWithFeedback();
 
-  const defaultIsRowRemovable = () => true;
+  const defaultIsRowRemovable = (rowData: TemplateRowDataType) =>
+    rowData.questionaryCount === 0;
 
   // NOTE: Here we keep the columns inside the component just because of the itemCountLabel shown in the title
   const defaultColumns: Column<TemplateRowDataType>[] = [
