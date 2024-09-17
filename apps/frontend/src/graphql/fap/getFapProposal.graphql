@@ -28,6 +28,7 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
         status
         userID
         fapID
+        questionaryID
         reviewer {
           firstname
           lastname
@@ -68,6 +69,7 @@ query getFapProposal($fapId: Int!, $proposalPk: Int!) {
         comment
         grade
         fapID
+        questionaryID
       }
     }
   }

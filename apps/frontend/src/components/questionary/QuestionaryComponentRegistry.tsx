@@ -20,6 +20,7 @@ import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefini
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { dynamicMultipleChoiceDefinition } from './questionaryComponents/DynamicMultipleChoice/DynamicMultipleChoiceDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
+import { fapReviewBasisDefinition } from './questionaryComponents/FapReviewBasis/FapReviewBasisDefinition';
 import { feedbackBasisDefinition } from './questionaryComponents/FeedbackBasis/FeedbackBasisDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
 import { genericTemplateDefinition } from './questionaryComponents/GenericTemplate/GenericTemplateDefinition';
@@ -176,6 +177,7 @@ const registry = [
   shipmentBasisDefinition,
   textInputDefinition,
   visitBasisDefinition,
+  fapReviewBasisDefinition,
   instrumentPickerDefinition,
   techniquePickerDefinition,
 ];
