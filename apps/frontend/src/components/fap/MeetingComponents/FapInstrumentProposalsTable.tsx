@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import { UserContext } from 'context/UserContextProvider';
@@ -115,6 +116,7 @@ const FapInstrumentProposalsTable = ({
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
+  const { t } = useTranslation();
 
   const getInstrumentTechnicalReview = (
     technicalReviews: TechnicalReview[] | null
@@ -139,7 +141,7 @@ const FapInstrumentProposalsTable = ({
       field: 'proposal.proposalId',
     },
     {
-      title: 'Fap meeting submitted',
+      title: t('Fap') + ' meeting submitted',
       render: (rowData: FapProposal) => {
         const submitted = rowData.proposal.fapMeetingDecisions?.find(
           (fmd) => fmd.instrumentId === fapInstrument.id

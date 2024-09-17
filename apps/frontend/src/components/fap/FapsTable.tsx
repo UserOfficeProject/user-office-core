@@ -3,6 +3,7 @@ import Edit from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useQueryParams } from 'use-query-params';
 
@@ -76,6 +77,7 @@ const FapsTable = () => {
     fapStatus: defaultFapStatusQueryFilter,
   });
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const { t } = useTranslation();
 
   const handleStatusFilterChange = (fapStatus: FapStatus) => {
     setUrlQueryParams((queries) => ({ ...queries, fapStatus }));
@@ -95,7 +97,7 @@ const FapsTable = () => {
   const deleteFap = async (id: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Fap deleted successfully',
+        toastSuccessMessage: `${t('Fap')} deleted successfully`,
       }).deleteFap({
         id: id as number,
       });
@@ -152,7 +154,7 @@ const FapsTable = () => {
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            Facility access panels
+            {t('Facility access panel')}s
           </Typography>
         }
         columns={columns}

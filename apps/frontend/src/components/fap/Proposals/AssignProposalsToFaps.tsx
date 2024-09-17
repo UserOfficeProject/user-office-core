@@ -6,6 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { Form, Formik } from 'formik';
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { UserContext } from 'context/UserContextProvider';
@@ -40,6 +41,7 @@ const AssignProposalsToFaps = ({
     active: true,
     role: currentRole as UserRole,
   });
+  const { t } = useTranslation();
 
   const proposalsUniqueInstruments: ProposalViewInstrument[] = getUniqueArrayBy(
     proposalInstrumentsCopy.flat(),
@@ -87,7 +89,7 @@ const AssignProposalsToFaps = ({
         {({ isSubmitting, values }): JSX.Element => (
           <Form>
             <Typography variant="h6" component="h1">
-              Assign proposal/s to FAP
+              {`Assign proposal/s to ${t('FAP')}`}
             </Typography>
 
             <Grid container spacing={3}>
@@ -96,7 +98,7 @@ const AssignProposalsToFaps = ({
                   <FormikUIAutocomplete
                     key={instrument.id}
                     name={`selectedFapIds_${instrument.id}`}
-                    label="Select FAP"
+                    label={`Select ${t('FAP')}`}
                     loading={loadingFaps}
                     items={faps.map((fap) => ({
                       value: fap.id,
@@ -110,7 +112,7 @@ const AssignProposalsToFaps = ({
                       ),
                     }}
                     disabled={isSubmitting}
-                    noOptionsText="No FAPs"
+                    noOptionsText={`No ${t('FAP', 'plural')}`}
                     data-cy="fap-selection"
                   />
                 ))}
@@ -119,26 +121,26 @@ const AssignProposalsToFaps = ({
 
             {!proposalsUniqueInstruments?.length && (
               <Alert severity="warning" data-cy="different-instruments">
-                Selected proposal/s do NOT have any instruments assigned. Please
-                assign instruments first and then you can select FAPs
-                accordingly.
+                {`Selected proposal/s do NOT have any instruments assigned. Please
+                assign instruments first and then you can select ${t('FAP', 'plural')}
+                accordingly.`}
               </Alert>
             )}
 
             {proposalFapInstruments?.[0] && !hasEmptyValue(values) && (
               <Alert severity="warning" data-cy="remove-fap-alert">
-                Be aware that leaving FAP selection empty will remove assigned
-                FAP from proposal/s and delete all FAP reviews on that
-                assignment.
+                {`Be aware that leaving ${t('FAP')} selection empty will remove assigned
+                ${t('FAP')} from proposal/s and delete all ${t('FAP')} reviews on that
+                assignment.`}
               </Alert>
             )}
 
             {!allSelectedProposalsHaveSameInstruments && (
               <Alert severity="warning" data-cy="different-instruments">
-                It is NOT recommended to do group assignment of FAPs to
+                {`It is NOT recommended to do group assignment of ${t('FAP', 'plural')} to
                 proposals that differ in their instruments. If you want to
-                continue be aware that proposals will get FAPs assigned ONLY to
-                their own instruments accordingly and not to all instruments.
+                continue be aware that proposals will get ${t('FAP', 'plural')} assigned ONLY to
+                their own instruments accordingly and not to all instruments.`}
               </Alert>
             )}
             <Button

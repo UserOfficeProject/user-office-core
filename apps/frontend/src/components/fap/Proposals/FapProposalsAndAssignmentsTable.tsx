@@ -7,6 +7,7 @@ import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NumberParam, useQueryParams } from 'use-query-params';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
@@ -196,6 +197,7 @@ const FapProposalsAndAssignmentsTable = ({
   const hasRightToRemoveAssignedProposal = useCheckAccess([
     UserRole.USER_OFFICER,
   ]);
+  const { t } = useTranslation();
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -274,9 +276,8 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
     confirm(() => removeProposalsFromFap(proposalsToRemove), {
-      title: 'Remove Fap assignment/s',
-      description:
-        'Are you sure you want to remove the selected proposal/s from this Fap?',
+      title: `Remove ${t('Fap')} assignment/s`,
+      description: `Are you sure you want to remove the selected proposal/s from this ${t('Fap')}?`,
     })();
   };
 
@@ -310,8 +311,8 @@ const FapProposalsAndAssignmentsTable = ({
 
     const fapMemberPluralMsg =
       assignedMembers.length === 1
-        ? 'The FAP member is'
-        : 'All FAP members are';
+        ? `The ${t('FAP')} member is`
+        : `All ${t('FAP')} members are`;
     const proposalPluralMsg = proposalPks.length === 1 ? '' : 's';
 
     if (proposalAssignments.length === 0) {
@@ -558,7 +559,7 @@ const FapProposalsAndAssignmentsTable = ({
 
     if (shouldShowWarning) {
       confirm(() => assignMembersToFapProposals(memberUsers), {
-        title: 'Fap reviewers assignment',
+        title: `${t('Fap')} reviewers assignment`,
         description: ' ',
         shouldEnableOKWithAlert: true,
         alertText: (
@@ -566,7 +567,7 @@ const FapProposalsAndAssignmentsTable = ({
             Some of the selected reviewers are already part of the proposal(s)
             as a PI/Co-proposer or belong to the same institution{' '}
             <strong>{alertText}</strong>
-            {`Are you sure you want to assign all selected users to the Fap proposal(s)?`}
+            {`Are you sure you want to assign all selected users to the ${t('Fap')} proposal(s)?`}
           </>
         ),
       })();
@@ -580,7 +581,7 @@ const FapProposalsAndAssignmentsTable = ({
   hasRightToAssignReviewers &&
     tableActions.push({
       icon: () => <AssignmentInd data-cy="assign-fap-members" />,
-      tooltip: 'Assign Fap members',
+      tooltip: `Assign ${t('Fap')} members`,
       onClick: handleAssignMembersToFapProposals,
       position: 'toolbarOnSelect',
     });
@@ -727,7 +728,7 @@ const FapProposalsAndAssignmentsTable = ({
   return (
     <>
       <ProposalReviewModal
-        title="Fap - Proposal View"
+        title={`${t('Fap')} - Proposal View`}
         proposalReviewModalOpen={!!urlQueryParams.reviewModal}
         setProposalReviewModalOpen={() => {
           setUrlQueryParams({ reviewModal: undefined });
@@ -753,7 +754,7 @@ const FapProposalsAndAssignmentsTable = ({
           columns={FapProposalColumns}
           title={
             <Typography variant="h6" component="h2">
-              {`${data.code} - Fap Proposals`}
+              {`${data.code} - ${t('Fap')} Proposals`}
             </Typography>
           }
           data={FapProposalsWitIdAndFormattedDate}

@@ -220,7 +220,7 @@ const instrumentManagementColumns = (
   },
 ];
 
-const FapReviewColumns = [
+const fapReviewColumns = (t: TFunction<'translation', undefined>) => [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
   {
     title: 'Final time allocation',
@@ -232,7 +232,7 @@ const FapReviewColumns = [
     hidden: true,
   },
   {
-    title: 'FAP',
+    title: t('FAP'),
     field: 'faps.code',
     render: (rowData: ProposalViewData) =>
       fromArrayToCommaSeparated(rowData.faps?.map((fap) => fap.code)),
@@ -430,9 +430,9 @@ const ProposalTableOfficer = ({
   }
 
   if (isFapEnabled) {
-    addColumns(columns, FapReviewColumns);
+    addColumns(columns, fapReviewColumns(t));
   } else {
-    removeColumns(columns, FapReviewColumns);
+    removeColumns(columns, fapReviewColumns(t));
   }
 
   columns = columns.map((v: Column<ProposalViewData>) => {
@@ -513,8 +513,7 @@ const ProposalTableOfficer = ({
       }
 
       await api({
-        toastSuccessMessage:
-          'Proposal/s assigned to the selected Fap successfully!',
+        toastSuccessMessage: `Proposal/s assigned to the selected ${t('Fap')} successfully!`,
       }).assignProposalsToFaps({
         proposalPks: getSelectedProposalPks(),
         fapInstruments: fapInstsruments,
