@@ -1,5 +1,7 @@
 DO
 $DO$
+DECLARE  
+  questionary_id_var int;
 BEGIN
 
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (1, 'Instrument 1', 'INSTR1', 'Test instrument 1', 0);
@@ -20,6 +22,11 @@ BEGIN
   INSERT INTO technique_has_instruments (technique_id, instrument_id) VALUES (2, 3);
 
   INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (1, NOW(), 1);
+
+  SELECT questionaries.questionary_id
+  INTO questionary_id_var
+  FROM questionaries
+  WHERE template_id = 1;
 
   INSERT INTO proposals 
     (
@@ -49,7 +56,7 @@ BEGIN
      , '999999'           -- proposal_id
      , 1                  -- final_status
      , 1                  -- call_id
-     , 1                  -- questionary_id
+     , questionary_id_var -- questionary_id
      , NULL               -- comment_for_management
      , NULL               -- comment_for_user
      , true               -- notified

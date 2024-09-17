@@ -15,6 +15,9 @@ export class CallsFilter {
   public pdfTemplateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
+  public fapReviewTemplateIds?: number[];
+
+  @Field(() => [Int], { nullable: true })
   public fapIds?: number[];
 
   @Field(() => [Int], { nullable: true })

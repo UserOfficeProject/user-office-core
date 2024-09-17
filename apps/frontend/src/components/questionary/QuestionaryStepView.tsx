@@ -7,8 +7,12 @@ import { ErrorFocus } from 'components/common/ErrorFocus';
 import { NavigButton } from 'components/common/NavigButton';
 import PromptIfDirty from 'components/common/PromptIfDirty';
 import UOLoader from 'components/common/UOLoader';
+import GradeGuidePage from 'components/pages/GradeGuidePage';
 import { Answer, QuestionaryStep, Sdk } from 'generated/sdk';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
+import { useFapData } from 'hooks/fap/useFapData';
 import { usePreSubmitActions } from 'hooks/questionary/useSubmitActions';
+import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 import {
   areDependenciesSatisfied,
@@ -74,6 +78,12 @@ export default function QuestionaryStepView(props: {
   const [isProposalSubmitted] = useState(
     () => (state as ProposalSubmissionState)?.proposal?.submitted ?? false
   );
+
+  const [fapId] = useState(
+    () => (state as FapReviewSubmissionState)?.fapReview?.fapID ?? 0
+  );
+
+  const { fap } = useFapData(fapId);
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
@@ -295,6 +305,16 @@ export default function QuestionaryStepView(props: {
               disabled={props.readonly}
               isLoading={isSubmitting}
             >
+              {state.stepIndex == 0 && fapId != 0 && (
+                <ButtonWithDialog
+                  label="Grading guide"
+                  disabled={isSubmitting}
+                  data-cy="grade-guide"
+                  title="Grading Guide"
+                >
+                  {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
+                </ButtonWithDialog>
+              )}
               <NavigButton
                 onClick={backHandler}
                 disabled={state.stepIndex === 0}
