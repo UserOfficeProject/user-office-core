@@ -90,6 +90,7 @@ BEGIN
                FROM answers,
                     jsonb_array_elements(answer->'value') WITH ordinality arr(item, pos)
               WHERE jsonb_typeof(answer->'value') = 'array'
+                AND answer->'value'->((pos - 1)::int)->>'timeRequested' IS NULL
                 AND question_id IN (
                       SELECT question_id 
                         FROM questions 
