@@ -1476,7 +1476,6 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-
       readWriteReview({ shouldSubmit: true, isReviewer: true });
 
       cy.finishedLoading();
