@@ -3,8 +3,5 @@ query getTechniquesByIds($techniqueIds: [Int!]!) {
     id
     name
     shortCode
-    instruments {
-      ...instrument
-    }
   }
 }
