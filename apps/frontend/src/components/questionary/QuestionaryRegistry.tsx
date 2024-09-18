@@ -4,6 +4,7 @@ import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionSta
 
 import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
 import { esiQuestionaryDefinition } from './questionaries/esi/EsiQuestionaryDefinition';
+import { fapReviewQuestionaryDefinition } from './questionaries/fapReview/FapReviewQuestionaryDefinition';
 import { feedbackQuestionaryDefinition } from './questionaries/feedback/FeedbackQuestionaryDefinition';
 import { genericTemplateQuestionaryDefinition } from './questionaries/genericTemplate/GenericTemplateQuestionaryDefinition';
 import { proposalQuestionaryDefinition } from './questionaries/proposal/ProposalQuestionaryDefinition';
@@ -44,6 +45,7 @@ const registry = [
   feedbackQuestionaryDefinition,
   genericTemplateQuestionaryDefinition,
   proposalQuestionaryDefinition,
+  fapReviewQuestionaryDefinition,
   sampleEsiQuestionaryDefinition,
   sampleQuestionaryDefinition,
   shipmentQuestionaryDefinition,

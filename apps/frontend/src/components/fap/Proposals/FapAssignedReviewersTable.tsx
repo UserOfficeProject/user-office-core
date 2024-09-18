@@ -163,6 +163,7 @@ const FapAssignedReviewersTable = ({
         setProposalReviewModalOpen={onProposalReviewModalClose}
       >
         <ProposalReviewContent
+          proposalPk={fapProposal.proposalPk}
           reviewId={urlQueryParams.reviewerModal}
           fapId={fapProposal.fapId}
           tabNames={reviewProposalTabNames}

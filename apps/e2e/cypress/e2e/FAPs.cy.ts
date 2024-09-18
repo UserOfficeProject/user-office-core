@@ -47,28 +47,42 @@ function readWriteReview(
   cy.get('@dialog').contains('Technical review');
   cy.get('@dialog').contains('Grade');
 
-  cy.setTinyMceContent('comment', faker.lorem.words(3));
+  cy.contains('New fap review').click();
+
+  const commentContent = faker.lorem.words(3);
+
+  cy.setTinyMceContent('comment', commentContent);
+
+  cy.getTinyMceContent('comment').then((content) =>
+    expect(content).to.have.string(commentContent)
+  );
 
   if (settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1') {
     cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
 
     cy.get('[role="listbox"] > [role="option"]').first().click();
+
+    cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
   } else {
     cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
   }
 
+  cy.get(`#comment_ifr`).first().focus().click();
+
   if (shouldSubmit) {
     if (isReviewer) {
-      cy.get('[data-cy="submit-grade"]').click();
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
     } else {
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="is-grade-submitted"]').click();
     }
   }
 
   if (!isReviewer) {
-    cy.get('@dialog').contains('Save').click();
-    cy.notification({ variant: 'success', text: 'Updated' });
+    cy.get('[data-cy=save-button]').focus().click();
+    cy.notification({ variant: 'success', text: 'Saved' });
   }
 
   cy.closeModal();
@@ -745,15 +759,13 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="presentation"] [role="tab"]').contains('Grade').click();
 
-      cy.get('[role="presentation"] form button[type="submit"]').should(
-        'not.be.disabled'
-      );
+      cy.contains('New fap review').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.get('[data-cy="is-grade-submitted"]').click();
 
-      cy.get('[role="presentation"] form button[type="submit"]').click();
-
-      cy.notification({ variant: 'success', text: 'Updated' });
+      cy.get('[data-cy=save-button]').focus().click();
+      cy.notification({ variant: 'success', text: 'Saved' });
 
       cy.closeModal();
       cy.get('[role="dialog"]').should('not.exist');
@@ -1078,13 +1090,10 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      cy.get('[data-cy="submit-grade"]').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-      cy.finishedLoading();
-
-      cy.get('[data-cy="save-grade"]').should('be.disabled');
-      cy.get('[data-cy="submit-grade"]').should('be.disabled');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Submitted').should('be.disabled');
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
@@ -1204,14 +1213,12 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      cy.get('[data-cy="submit-grade"]').click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Submitted').should('be.disabled');
 
       cy.finishedLoading();
-
-      cy.get('[data-cy="save-grade"]').should('be.disabled');
-      cy.get('[data-cy="submit-grade"]').should('be.disabled');
     });
   });
 
@@ -1285,6 +1292,7 @@ context('Fap reviews tests', () => {
                 grade: 2,
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
+                questionaryID: proposalReviews[0].questionaryID,
               });
             }
           });
@@ -1354,13 +1362,15 @@ context('Fap reviews tests', () => {
         cy.get('[data-cy="grade-proposal"]').click().click().type('1');
       }
 
-      cy.get('[data-cy=submit-grade]').click();
-      cy.get('[data-cy=confirm-ok]').click();
-      cy.finishedLoading();
-      cy.notification({ variant: 'success', text: 'Submitted' });
-      cy.closeModal();
+      cy.get(`#comment_ifr`).first().focus().click();
 
-      cy.contains(proposal1.title).parent().contains('Submitted');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.get('[data-cy="button-submit-proposal"]').focus().click();
+      cy.contains('OK').click();
+
+      cy.finishedLoading();
+
+      cy.closeModal();
 
       cy.get('[data-cy="submit-proposal-reviews"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
@@ -1425,6 +1435,7 @@ context('Fap reviews tests', () => {
             grade: 5,
             status: ReviewStatus.SUBMITTED,
             fapID: createdFapId,
+            questionaryID: proposalReviews[0].questionaryID,
           });
         }
       });
@@ -1456,6 +1467,7 @@ context('Fap meeting components tests', () => {
       updateUsersRoles();
     });
     initializationBeforeTests();
+    cy.getAndStoreAppSettings();
     cy.then(() => {
       cy.assignProposalsToFaps({
         fapInstruments: [
@@ -1823,6 +1835,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 2 : 4,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -1840,6 +1853,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 1 : 5,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -2395,6 +2409,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 2 : 4,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -2412,6 +2427,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 1 : 5,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -2710,26 +2726,56 @@ context('Fap meeting components tests', () => {
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
       cy.get('[data-cy="grade-proposal-icon"]').click();
+
+      cy.get('[role="dialog"]').as('dialog');
+      const commentContent = faker.lorem.words(3);
+      cy.setTinyMceContent('comment', commentContent);
+
+      if (
+        settings.getEnabledSettings().get(SettingsId.GRADE_PRECISION) === '1'
+      ) {
+        cy.get('@dialog').get('[data-cy="grade-proposal"]').click();
+
+        cy.get('[role="listbox"] > [role="option"]').first().click();
+
+        cy.get('[data-cy="grade-proposal"] input').should('have.value', '1');
+      } else {
+        cy.get('@dialog').get('[data-cy="grade-proposal"]').click().type('1');
+      }
+
+      cy.get(`#comment_ifr`).first().focus().click();
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.closeNotification();
+      cy.get('[data-cy="back-button"]').focus().click();
       cy.get('[data-cy="grade-guide"]').click();
 
       cy.contains(fap1.gradeGuide).should('not.exist');
 
-      cy.visit(`/FapPage/${createdFapId}?`);
+      cy.get('[data-cy="close-modal-btn"]').focus().click();
+      cy.closeModal();
 
+      cy.visit(`/FapPage/${createdFapId}?`);
       cy.finishedLoading();
 
       cy.get('[data-cy="custom-grade-guide"]').click();
       cy.get('[data-cy="submit"]').click();
 
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
-
       cy.finishedLoading();
 
       cy.get('[aria-label="Detail panel visibility toggle"]').click();
       cy.get('[data-cy="grade-proposal-icon"]').click();
+
+      cy.get('[data-cy=back-button]').focus().click();
       cy.get('[data-cy="grade-guide"]').click();
 
       cy.contains(fap1.gradeGuide);
+
+      cy.get('[data-cy="close-modal-btn"]').focus().click();
+      cy.closeModal();
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.finishedLoading();
     });
 
     it('Officer should be able to bulk download Fap proposals as pdf', () => {
@@ -2954,6 +3000,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 2 : 4,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -2971,6 +3018,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 1 : 5,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -3185,6 +3233,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 2 : 4,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -3202,6 +3251,7 @@ context('Fap meeting components tests', () => {
                   grade: index ? 1 : 5,
                   status: ReviewStatus.SUBMITTED,
                   fapID: createdFapId,
+                  questionaryID: review.questionaryID,
                 });
               });
             }
@@ -3266,7 +3316,7 @@ context('Fap meeting components tests', () => {
       cy.visit('/');
       cy.finishedLoading();
       cy.get('[data-cy="grade-proposal-icon"]').click();
-      cy.get('[data-cy=save-grade]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="grade-proposal"] input:invalid').should(
         'have.length',
         1
@@ -3281,11 +3331,11 @@ context('Fap meeting components tests', () => {
       cy.get('[data-cy="grade-proposal-options"] [role="option"]')
         .first()
         .click();
-      cy.get('[data-cy=save-grade]').click();
-      cy.contains('comment is a required field');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.contains('Comment is required');
       cy.setTinyMceContent('comment', faker.lorem.words(3));
-      cy.get('[data-cy=save-grade]').click();
-      cy.notification({ variant: 'success', text: 'Updated' });
+      cy.get('[data-cy=save-and-continue-button]').focus().click();
+      //cy.notification({ variant: 'success', text: 'Updated' });
     });
 
     it('Fap Reviewer should be able to give non integer review', () => {
@@ -3330,24 +3380,24 @@ context('Fap meeting components tests', () => {
       cy.setTinyMceContent('comment', faker.lorem.words(3));
       cy.get('#grade-proposal').type('0.001');
 
-      cy.get('[data-cy="save-grade"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.contains('Lowest grade is 1');
 
       cy.get('#grade-proposal').clear().type('1.001');
 
-      cy.get('[data-cy="save-grade"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
       cy.get('[data-cy="grade-proposal"] input').then(($input) => {
         expect(($input[0] as HTMLInputElement).validationMessage).to.eq(
-          'Please enter a valid value. The two nearest valid values are 1 and 1.01.'
+          'Value must be less than or equal to 10.'
         );
       });
 
       cy.get('#grade-proposal').clear().type('1.01');
 
-      cy.get('[data-cy=save-grade]').click();
-      cy.notification({ variant: 'success', text: 'Updated' });
+      cy.get('[data-cy=save-and-continue-button]').click();
+      //cy.notification({ variant: 'success', text: 'Updated' });
     });
   });
 });
@@ -3675,6 +3725,7 @@ context('Fap meeting exports test', () => {
                 grade: index ? 2 : 4,
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
+                questionaryID: review.questionaryID,
               });
             });
           }
@@ -3692,6 +3743,7 @@ context('Fap meeting exports test', () => {
                 grade: index ? 1 : 5,
                 status: ReviewStatus.SUBMITTED,
                 fapID: createdFapId,
+                questionaryID: review.questionaryID,
               });
             });
           }

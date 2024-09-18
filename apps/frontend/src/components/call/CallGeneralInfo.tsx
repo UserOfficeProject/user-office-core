@@ -65,19 +65,23 @@ const CallGeneralInfo = ({
   templates,
   esiTemplates,
   pdfTemplates,
+  fapReviewTemplates,
   loadingTemplates,
   reloadTemplates,
   reloadEsi,
   reloadPdfTemplates,
+  reloadFapReviewTemplates,
   reloadProposalWorkflows,
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
   reloadPdfTemplates: () => void;
+  reloadFapReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
+  fapReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
@@ -105,6 +109,12 @@ const CallGeneralInfo = ({
 
   const pdfTemplateOptions =
     pdfTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const fapReviewTemplateOptions =
+    fapReviewTemplates?.map((template) => ({
       text: template.name,
       value: template.templateId,
     })) || [];
@@ -407,6 +417,18 @@ const CallGeneralInfo = ({
           'data-cy': 'call-pdf-template',
           endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
         }}
+      />
+      <FormikUIAutocomplete
+        name="fapReviewTemplateId"
+        label="FAP Review template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={fapReviewTemplateOptions}
+        InputProps={{
+          'data-cy': 'call-fap-review-template',
+          endAdornment: <RefreshListIcon onClick={reloadFapReviewTemplates} />,
+        }}
+        required
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"

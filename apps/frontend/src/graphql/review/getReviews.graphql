@@ -1,0 +1,8 @@
+query getReviews($filter: ReviewsFilter) {
+    reviews(filter: $filter) {
+        reviews {
+            ...coreReview
+        }
+        totalCount
+    }
+}

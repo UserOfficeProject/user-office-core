@@ -52,6 +52,7 @@ query getProposals($filter: ProposalsFilter) {
         status
         userID
         fapID
+        questionaryID
         reviewer {
           firstname
           lastname
