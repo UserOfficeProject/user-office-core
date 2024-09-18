@@ -1,13 +1,18 @@
 import MaterialTable, { OrderByCollection } from '@material-table/core';
+import { Dialog, DialogContent } from '@mui/material';
+import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
 import React, { useEffect, useState } from 'react';
 import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
 
+import ScienceIcon from 'components/common/icons/ScienceIcon';
 import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
 import {
+  InstrumentFragment,
   ProposalsFilter,
   ProposalViewInstrument,
   ProposalViewTechnique,
+  User,
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -16,16 +21,21 @@ import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { addColumns, fromArrayToCommaSeparated } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import AssignProposalsToInstruments from './AssignProposalsToInstruments';
 import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
 export interface ProposalData {
+  callId: number;
   proposalId: string;
   title: string;
   submittedDate: Date;
   instruments: ProposalViewInstrument[] | null;
   techniques: ProposalViewTechnique[] | null;
+  principalInvestigator: User | null;
+  status: string;
 }
 
 const XpressProposalTable = () => {
@@ -111,9 +121,42 @@ const XpressProposalTable = () => {
       ...{ width: 'auto' },
     },
     {
+      title: 'Status',
+      field: 'status',
+    },
+    {
       title: 'Date submitted',
       field: 'submittedDate',
       ...{ width: 'auto' },
+    },
+  ];
+
+  const piColumn = () => [
+    {
+      title: 'Principal Investigator',
+      field: 'principalInvestigator',
+      render: (proposalView: ProposalData) => {
+        if (
+          proposalView.principalInvestigator?.lastname &&
+          proposalView.principalInvestigator?.preferredname
+        ) {
+          return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
+        } else if (
+          proposalView.principalInvestigator?.lastname &&
+          proposalView.principalInvestigator?.firstname
+        ) {
+          return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
+        }
+
+        return '';
+      },
+      customFilterAndSearch: () => true,
+    },
+    {
+      title: 'PI Email',
+      field: 'principalInvestigator.email',
+      sorting: false,
+      emptyValue: '-',
     },
   ];
 
@@ -131,9 +174,9 @@ const XpressProposalTable = () => {
     },
   ];
 
-  const techniquesColumns = (t: TFunction<'translation', undefined>) => [
+  const techniquesColumns = () => [
     {
-      title: t('technique'),
+      title: 'Technique',
       field: 'technique.name',
       render: (rowData: ProposalViewData) =>
         fromArrayToCommaSeparated(
@@ -143,8 +186,9 @@ const XpressProposalTable = () => {
     },
   ];
 
+  addColumns(columns, piColumn());
   addColumns(columns, instrumentManagementColumns(t));
-  addColumns(columns, techniquesColumns(t));
+  addColumns(columns, techniquesColumns());
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading, proposalsData, totalCount, setProposalsData } =
@@ -165,41 +209,7 @@ const XpressProposalTable = () => {
 
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);
-  }, [proposalsData]);
-
-  useEffect(() => {
-    if (urlQueryParams.selection.length > 0) {
-      const selection = new Set(urlQueryParams.selection);
-      const selected: ProposalViewData[] = [];
-      setPreselectedProposalsData(
-        proposalsData.map((proposal) => {
-          if (selection.has(proposal.primaryKey.toString())) {
-            selected.push(proposal);
-          }
-
-          return {
-            ...proposal,
-            tableData: {
-              checked: selection.has(proposal.primaryKey.toString()),
-            },
-          };
-        })
-      );
-      setSelectedProposals(selected);
-    } else {
-      setPreselectedProposalsData(
-        proposalsData.map((proposal) => ({
-          ...proposal,
-          tableData: { checked: false },
-        }))
-      );
-      setSelectedProposals([]);
-    }
-  }, [proposalsData, urlQueryParams.selection]);
-
-  useEffect(() => {
-    setPreselectedProposalsData(proposalsData);
-  }, [proposalsData]);
+  }, [proposalsData, queryParameters]);
 
   useEffect(() => {
     let isMounted = true;
@@ -229,11 +239,14 @@ const XpressProposalTable = () => {
 
   const proposalDataWithIdAndRowActions = tableData.map((proposal) => {
     return {
+      callId: proposal.callId,
       proposalId: proposal.proposalId,
       title: proposal.title,
       submittedDate: proposal.submittedDate,
       instruments: proposal.instruments,
       techniques: proposal.techniques,
+      principalInvestigator: proposal.principalInvestigator,
+      status: proposal.status,
     };
   });
 
@@ -243,14 +256,14 @@ const XpressProposalTable = () => {
       const selected: ProposalViewData[] = [];
       setPreselectedProposalsData(
         proposalsData.map((proposal) => {
-          if (selection.has(proposal.primaryKey.toString())) {
+          if (selection.has(proposal.proposalId.toString())) {
             selected.push(proposal);
           }
 
           return {
             ...proposal,
             tableData: {
-              checked: selection.has(proposal.primaryKey.toString()),
+              checked: selection.has(proposal.proposalId.toString()),
             },
           };
         })
@@ -258,19 +271,15 @@ const XpressProposalTable = () => {
 
       setSelectedProposals(selected);
     } else {
+      setPreselectedProposalsData(
+        proposalsData.map((proposal) => ({
+          ...proposal,
+          tableData: { checked: false },
+        }))
+      );
       setSelectedProposals([]);
     }
   }, [proposalsData, urlQueryParams.selection]);
-
-  const handleSelectionChange = (rows: ProposalData[]) => {
-    setUrlQueryParams((params) => ({
-      ...params,
-      selection:
-        rows.length > 0
-          ? rows.map((row) => row.proposalId.toString())
-          : undefined,
-    }));
-  };
 
   const handleSortOrderChange = (orderByCollection: OrderByCollection[]) => {
     const [orderBy] = orderByCollection;
@@ -281,9 +290,90 @@ const XpressProposalTable = () => {
     }));
   };
 
+  const ScienceIconComponent = (): JSX.Element => (
+    <ScienceIcon data-cy="assign-remove-instrument" />
+  );
+
+  const [openInstrumentAssignment, setOpenInstrumentAssignment] =
+    useState(false);
+
+  const tableRef = React.useRef<MaterialTable<ProposalViewData>>();
+
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
+  };
+
+  const { api } = useDataApiWithFeedback();
+
+  const getSelectedProposalPks = () =>
+    urlQueryParams.selection.length
+      ? urlQueryParams.selection
+          .filter((proposalPk): proposalPk is string => proposalPk !== null)
+          .map((proposalPk) => {
+            if (proposalPk !== null) {
+              return +proposalPk;
+            }
+          })
+          .filter((proposalPk) => proposalPk !== undefined)
+      : [];
+
+  const assignProposalsToInstruments = async (
+    instruments: InstrumentFragment[] | null
+  ): Promise<void> => {
+    if (instruments?.length) {
+      await api({
+        toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
+      }).assignProposalsToInstruments({
+        proposalPks: getSelectedProposalPks(),
+        instrumentIds: instruments.map((instrument) => instrument.id),
+      });
+    } else {
+      await api({
+        toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
+      }).removeProposalsFromInstrument({
+        proposalPks: getSelectedProposalPks(),
+      });
+    }
+
+    refreshTableData();
+  };
+
   return (
     <>
       <StyledContainer maxWidth={false}>
+        <Dialog
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+          open={openInstrumentAssignment}
+          onClose={(): void => setOpenInstrumentAssignment(false)}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogContent>
+            <AssignProposalsToInstruments
+              assignProposalsToInstruments={assignProposalsToInstruments}
+              close={(): void => setOpenInstrumentAssignment(false)}
+              techniques={selectedProposals
+                .filter(
+                  (selectedProposal) => selectedProposal.techniques != null
+                )
+                .flatMap((selectedProposal) => selectedProposal.techniques)}
+              instrumentIds={selectedProposals
+                .map((selectedProposal) =>
+                  (selectedProposal.instruments || []).map(
+                    (instrument) => instrument.id
+                  )
+                )
+                .flat()}
+            />
+          </DialogContent>
+        </Dialog>
         <StyledPaper data-cy="xpress-proposals-table">
           <XpressProposalFilterBar
             calls={{ data: calls, isLoading: loadingCalls }}
@@ -316,8 +406,22 @@ const XpressProposalTable = () => {
               debounceInterval: 600,
               columnsButton: true,
               pageSize: 20,
+              selectionProps: (rowdata: ProposalData) => ({
+                inputProps: {
+                  'aria-label': `${rowdata.title}-select`,
+                },
+              }),
             }}
-            onSelectionChange={handleSelectionChange}
+            onSelectionChange={(selectedItems) => {
+              setUrlQueryParams({
+                selection:
+                  selectedItems.length > 0
+                    ? selectedItems.map((selectedItem) =>
+                        selectedItem.proposalId.toString()
+                      )
+                    : undefined,
+              });
+            }}
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
             onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
@@ -338,6 +442,18 @@ const XpressProposalTable = () => {
               }
               setCurrentPage(page);
             }}
+            actions={[
+              {
+                icon: ScienceIconComponent,
+                tooltip: `Assign/Remove ${i18n.format(
+                  t('instrument'),
+                  'lowercase'
+                )}`,
+                onClick: () => {
+                  setOpenInstrumentAssignment(true);
+                },
+              },
+            ]}
             localization={{
               toolbar: {
                 nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,

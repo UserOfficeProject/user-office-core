@@ -1,4 +1,4 @@
-import { Science } from '@mui/icons-material';
+import { Science, Topic } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -158,7 +158,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         <Tooltip title="Xpress Proposals">
           <ListItemButton component={NavLink} to="/XpressProposals">
             <ListItemIcon>
-              <FolderOpen />
+              <Topic />
             </ListItemIcon>
             <ListItemText primary="Xpress Proposals" />
           </ListItemButton>
