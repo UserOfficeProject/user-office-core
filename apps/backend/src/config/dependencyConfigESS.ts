@@ -46,7 +46,7 @@ import {
   populateRow,
 } from '../factory/xlsx/FapDataRow';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
-import { isProduction } from '../utils/helperFunctions';
+import { isDevelopment } from '../utils/helperFunctions';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
 import { Tokens } from './Tokens';
@@ -104,7 +104,7 @@ mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
 mapValue(
   Tokens.ConfigureEnvironment,
-  isProduction ? () => {} : configureESSDevelopmentEnvironment
+  isDevelopment ? configureESSDevelopmentEnvironment : () => {}
 );
 mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 

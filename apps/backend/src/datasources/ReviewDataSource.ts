@@ -1,12 +1,19 @@
 import { Review } from '../models/Review';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalReviewMutation';
-import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
 import { UpdateReviewArgs } from '../resolvers/mutations/UpdateReviewMutation';
+import { ReviewsFilter } from '../resolvers/queries/ReviewsQuery';
 
 export interface ReviewDataSource {
   removeUserForReview(id: number): Promise<Review>;
   getReview(id: number): Promise<Review | null>;
+
+  getReviews(
+    filter?: ReviewsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; reviews: Review[] }>;
+
   updateReview(args: UpdateReviewArgs): Promise<Review>;
   getProposalReviews(proposalPk: number, fapId?: number): Promise<Review[]>;
   getUserReviews(
@@ -34,5 +41,10 @@ export interface ReviewDataSource {
   getTechnicalReviewById(
     technicalReviewId: number
   ): Promise<TechnicalReview | null>;
-  addUserForReview(args: AddUserForReviewArgs): Promise<Review>;
+  addUserForReview(args: {
+    userID: number;
+    proposalPk: number;
+    fapID: number;
+    questionaryID: number;
+  }): Promise<Review>;
 }

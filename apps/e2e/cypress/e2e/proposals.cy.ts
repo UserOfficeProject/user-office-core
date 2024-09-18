@@ -67,6 +67,7 @@ context('Proposal tests', () => {
     endCycle: currentDayStart,
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
+    fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -347,7 +348,7 @@ context('Proposal tests', () => {
         .find('input')
         .uncheck();
       cy.get('.MuiPopover-paper')
-        .contains('Fap')
+        .contains('FAP')
         .parent()
         .find('input')
         .uncheck();
@@ -366,7 +367,7 @@ context('Proposal tests', () => {
       );
       cy.get('[data-cy="officer-proposals-table"] table').should(
         'not.contain',
-        'Fap'
+        'FAP'
       );
 
       cy.get("[aria-label='Show Columns']").first().click();
@@ -376,7 +377,7 @@ context('Proposal tests', () => {
         .find('input')
         .check();
       cy.get('.MuiPopover-paper')
-        .contains('Fap')
+        .contains('FAP')
         .parent()
         .find('input')
         .check();
@@ -389,7 +390,7 @@ context('Proposal tests', () => {
       );
       cy.get('[data-cy="officer-proposals-table"] table').should(
         'contain',
-        'Fap'
+        'FAP'
       );
     });
 
@@ -620,7 +621,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
-      cy.get('@dialog').contains('Change proposal/s status');
+      cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
         .find('#selectedStatusId-input')
@@ -644,7 +645,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
-      cy.get('@dialog').contains('Change proposal/s status');
+      cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
         .find('#selectedStatusId-input')

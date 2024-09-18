@@ -73,6 +73,7 @@ mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
 mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
 mapClass(Tokens.ShipmentDataSource, PostgresShipmentDataSource);
 mapClass(Tokens.SystemDataSource, PostgresSystemDataSource);
+
 mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
