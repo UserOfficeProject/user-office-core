@@ -444,6 +444,47 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           return createProposalViewObject(proposal);
         });
 
+        if (filter?.text) {
+          const proposalsList = props.filter((proposal) => {
+            let techniqueNames: string[] = [];
+            if (proposal.techniques) {
+              techniqueNames = proposal.techniques.map((tech) => {
+                return tech.name;
+              });
+            }
+            if (filter.text) {
+              if (
+                proposal.title != null &&
+                proposal.title.includes(filter.text)
+              ) {
+                return true;
+              } else if (
+                proposal.proposalId &&
+                proposal.proposalId.includes(filter.text)
+              ) {
+                return true;
+              } else if (
+                proposal.statusName != null &&
+                proposal.statusName.includes(filter.text)
+              ) {
+                return true;
+              } else if (
+                techniqueNames.length > 0 &&
+                techniqueNames.filter(
+                  (techName) => filter.text && techName.includes(filter.text)
+                ).length > 0
+              ) {
+                return true;
+              }
+            }
+          });
+
+          return {
+            totalCount: proposalsList ? proposalsList.length : 0,
+            proposals: proposalsList,
+          };
+        }
+
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
           proposals: props,
