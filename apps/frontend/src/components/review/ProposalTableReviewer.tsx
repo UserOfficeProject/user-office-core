@@ -95,6 +95,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
+  const { user } = useContext(UserContext);
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const reviewerFilter = isFapReviewer ? ReviewerFilter.ME : ReviewerFilter.ALL;
   const [urlQueryParams, setUrlQueryParams] = useQueryParams({
@@ -125,8 +126,6 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       status: getFilterStatus(urlQueryParams.reviewStatus),
       reviewer: getFilterReviewer(urlQueryParams.reviewer),
     });
-
-  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const getProposalsToGradeDataFromUserData = (
