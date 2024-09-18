@@ -8,7 +8,7 @@ ________________________________________________________________________________
 
 Calls :material-calendar-blank: allow users’ [proposals :material-folder-outline:](proposal.md) to be submitted and managed within User Office. A call is a period of time during which users can submit proposals to a facility. Calls have a start and an end date and are linked to several different kinds of [templates :material-text-box-multiple:](creating_templates.md) (e.g, [proposal templates :material-note-text:](templates/proposal_template.md) which act as the questionnaire that users must fill out when creating their proposals). Calls are assigned to [FAPs :material-google-circles-communities:](fap.md) (Facility Access Panels) for proposal review and evaluation. Calls are also linked to a [proposal workflow :material-sitemap:](settings/proposal_workflow.md) which dictates the lifecycle of the proposals within a call. 
 
-* The [templates :material-text-box-multiple:](creating_templates.md) allow User Officers to customise calls with specific requirements regarding the type of research users may conduct. Templates also specify and collect the information that users must provide in order to facilitate their research.
+* The [templates :material-text-box-multiple:](creating_templates.md) allow User Officers to customize calls with specific requirements regarding the type of research users may conduct. Templates also specify and collect the information that users must provide in order to facilitate their research.
 
 * The [FAP :material-google-circles-communities:](fap.md) (Facility Access Panel) is the group responsible for evaluating users' research proposals which are assigned to proposals and calls.
 
@@ -22,12 +22,12 @@ ________________________________________________________________________________
 
 In order to set up a call, you must decide which [templates :material-text-box-multiple:](creating_templates.md) it will utilize.
 
-[Templates :material-text-box-multiple:](creating_templates.md) are used to save and re-utilize predefined information across User Office. Calls :material-calendar-blank: are built using several different types of templates which can be ^^`edited`^^:material-pencil: and ^^`cloned`^^:material-file-multiple:. Templates serve many different functions; for example, they may contain specific [questions :material-comment-question:](questions.md) which users answer in their proposals. The template system is useful because it saves User Officers from having to create calls from scratch every time. Furthermore, templates allows for standardisation which is essential for data collection and analysis of users' responses.
+[Templates :material-text-box-multiple:](creating_templates.md) are used to save and re-utilize predefined information across User Office. Calls :material-calendar-blank: are built using several different types of templates which can be ^^`edited`^^:material-pencil: and ^^`cloned`^^:material-file-multiple:. Templates serve many different functions; for example, they may contain specific [questions :material-comment-question:](questions.md) which users answer in their proposals. The template system is useful because it saves User Officers from having to create calls from scratch every time. Furthermore, templates allows for standardization which is essential for data collection and analysis of users' responses.
 
 There are several different types of templates utilized within Calls:
 
 ??? info "PDF templates :material-file-pdf-box:" 
-    [PDF templates :material-file-pdf-box:](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+    [PDF templates :material-file-pdf-box:](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardized PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
     ______________________________________________________________________________________
 
@@ -39,7 +39,7 @@ There are several different types of templates utilized within Calls:
 ??? info "Proposal templates :material-note-text:" 
     [Proposal templates :material-note-text:](templates/proposal_template.md) are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.
 
-    User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise proposal templates to include specific questions based on the nature and requirements of the research.
+    User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customize proposal templates to include specific questions based on the nature and requirements of the research.
     ______________________________________________________________________________________
     <figure markdown="span">  
         ![Proposal](../../assets/images/proposal_template.png){ width="450"}
@@ -47,7 +47,7 @@ There are several different types of templates utilized within Calls:
     </figure>
 
 ??? info "Sample declaration templates :material-inbox:" 
-    [Sample declaration templates :material-inbox:](templates/sampledec_template.md) are designed to collect detailed information about the samples that researchers intend to use in their experiments. The purpose of these templates is to standardise the way sample-related data is gathered, ensuring that all necessary details are captured uniformly across different proposals. These templates are linked to [proposal templates :material-note-text:](templates/proposal_template.md) through sample declaration [questions :material-comment-question:](questions.md).
+    [Sample declaration templates :material-inbox:](templates/sampledec_template.md) are designed to collect detailed information about the samples that researchers intend to use in their experiments. The purpose of these templates is to standardize the way sample-related data is gathered, ensuring that all necessary details are captured uniformly across different proposals. These templates are linked to [proposal templates :material-note-text:](templates/proposal_template.md) through sample declaration [questions :material-comment-question:](questions.md).
 
     ______________________________________________________________________________________
     <figure markdown="span">  
@@ -56,7 +56,7 @@ There are several different types of templates utilized within Calls:
     </figure>
 
 ??? info "Sub templates :material-collapse-all-outline:" 
-    [Sub templates :material-collapse-all-outline:](templates/sub_template.md) are used to streamline and organise the creation of complex [proposal templates :material-note-text:.](templates/proposal_template.md). They serve as reusable building blocks containing [questions :material-comment-question:](questions.md), enabling User Officers to efficiently manage and deploy recurring sets of questions across multiple proposals.
+    [Sub templates :material-collapse-all-outline:](templates/sub_template.md) are used to streamline and organize the creation of complex [proposal templates :material-note-text:.](templates/proposal_template.md). They serve as reusable building blocks containing [questions :material-comment-question:](questions.md), enabling User Officers to efficiently manage and deploy recurring sets of questions across multiple proposals.
 
     Sub templates are created by grouping related question templates into a cohesive unit and saving them as a standalone entity. When constructing or modifying a proposal template, User Officers can easily select and insert these sub templates into the appropriate sections, ensuring consistency and reducing the time required to build detailed proposal forms.
     ______________________________________________________________________________________
@@ -66,7 +66,7 @@ There are several different types of templates utilized within Calls:
     </figure>
 
 ??? info "Shipment declaration templates :material-truck:" 
-    [Shipment declaration templates :material-truck:](templates/shipment_template.md) are standardised forms used to collect and organise information about parcels being sent to a facility. These templates can be customised to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
+    [Shipment declaration templates :material-truck:](templates/shipment_template.md) are standardized forms used to collect and organize information about parcels being sent to a facility. These templates can be customized to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
 
     > **_NOTE:_** The shipment declaration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
@@ -76,7 +76,7 @@ There are several different types of templates utilized within Calls:
     </figure>
 
 ??? info "Visit registration templates :material-airplane-takeoff:" 
-    [**Visit registration templates :material-airplane-takeoff:**](templates/visit_template.md) are predefined forms used to gather and organise information from visitors planning to access a research facility. These templates collect essential details regarding visitor accomodation needs, arrival and departure dates, and on-site access, ensuring that the visit is properly coordinated and compliant with facility protocols.
+    [**Visit registration templates :material-airplane-takeoff:**](templates/visit_template.md) are predefined forms used to gather and organize information from visitors planning to access a research facility. These templates collect essential details regarding visitor accomodation needs, arrival and departure dates, and on-site access, ensuring that the visit is properly coordinated and compliant with facility protocols.
 
     > **_NOTE:_** The visit registration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
@@ -87,7 +87,7 @@ There are several different types of templates utilized within Calls:
     </figure>
 
 ??? info "Proposal ESI templates :material-note-text:" 
-    [Proposal Experiment Safety Input (ESI) :material-note-text:](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customise Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
+    [Proposal Experiment Safety Input (ESI) :material-note-text:](templates/proposalESI_template.md) are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customize Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.
 
     > **_NOTE:_** The Proposal ESI form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.
     ______________________________________________________________________________________
@@ -119,7 +119,7 @@ There are several different types of templates utilized within Calls:
 
 #### How do I use templates within a call?
 
-When it comes to utilising templates within a call there are various options:
+When it comes to utilizing templates within a call there are various options:
 
 **1. Use a pre-existing template**
 
@@ -139,7 +139,7 @@ For further information on editing templates for calls, see the specific templat
 
 **3. Create a template**
 
-Lastly, you may also create templates to fully customise them to fit the research needs: 
+Lastly, you may also create templates to fully customize them to fit the research needs: 
 
 * [How do I create PDF templates?](templates/pdf_template.md)
 
@@ -168,7 +168,7 @@ Calls are also assigned to Facility Access Panels (FAPs) for review of the submi
 ??? info "FAPs :material-google-circles-communities:" 
     [FAPs :material-google-circles-communities:](fap.md) (Facility Access Panels) are groups of external reviewers responsible for evaluating research proposals. These panels consist of experts who assess the feasibility, significance, and resource requirements of the proposals. Each FAP typically includes a [reviewer](roles.md), [secretary](roles.md) and [chair](roles.md) to oversee the review process and ensure thorough and unbiased evaluation. FAPs play a crucial role in maintaining the integrity and quality of the proposal review process by providing independent and specialised assessments.
 
-    User Officers can manage the FAPs assigned to proposals and calls. FAPs can be utilized across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardised criteria. In creating a FAP, user officers may provide general information by labeling FAPs with a code, a description, and specifying the required number of proposal ratings. 
+    User Officers can manage the FAPs assigned to proposals and calls. FAPs can be utilized across multiple proposals, helping streamline the organisation and operation of the review process. This ensures that proposals are evaluated efficiently and according to standardized criteria. In creating a FAP, user officers may provide general information by labeling FAPs with a code, a description, and specifying the required number of proposal ratings. 
 
     ______________________________________________________________________________________
     
@@ -196,12 +196,12 @@ ________________________________________________________________________________
 
 ### Proposal Workflows
 
-Calls utilize proposal workflow 
+Calls utilize proposal workflows.
 
 ??? info "Proposal Workflows :material-sitemap:" 
     [Proposal workflows](settings/proposal_workflow.md) outline the sequential steps a proposal follows from draft to final decision represented by statuses, such as '**Draft**', '**Feasibility Review**', '**Allocated**', '**Not Allocated**', '**Reserved**', and '**Rejected**'. Each status marks a key stage in the proposal's progression. For example, moving from '**Draft**' to '**Feasibility Review**' indicates the proposal's readiness for preliminary assessment. 
 
-    Proposal workflows control how and when the User Office system will display information to different [roles :material-account-supervisor-circle:](roles.md) based on proposal statuses :material-folder-cog-outline:. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customise workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
+    Proposal workflows control how and when the User Office system will display information to different [roles :material-account-supervisor-circle:](roles.md) based on proposal statuses :material-folder-cog-outline:. The workflow manages how proposals are processed, with User Officers defining the statuses and events that guide proposals through their lifecycle. Events triggering status transitions include user submissions, call deadlines, feasibility reviews, and User Officers' decisions. User Officers can customize workflow templates by adding, removing or modifying statuses to fit specific needs, such as including 'Technical Review' or 'FAP Review' stages. Proposal workflows ensure systematic processing of proposals, allowing User Officers to track statuses and set up automatic notifications for users' proposals at different stages of review.
 
     ______________________________________________________________________________________
     

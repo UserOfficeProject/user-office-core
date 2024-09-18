@@ -90,6 +90,7 @@ const ProposalGrade = ({
           ? ReviewStatus.SUBMITTED
           : ReviewStatus.DRAFT,
       fapID: review.fapID,
+      questionaryID: review.questionaryID,
     });
 
     setReview({

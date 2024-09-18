@@ -18,6 +18,7 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { AssignProposalsToFapsInput } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -63,7 +64,9 @@ export default class FapMutations {
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.QuestionaryDataSource)
+    public questionaryDataSource: QuestionaryDataSource
   ) {}
 
   @ValidateArgs(createFapValidationSchema)
@@ -435,17 +438,41 @@ export default class FapMutations {
       );
     }
 
-    const fapReviewAssignments = args.assignments.map(async (assignment) => {
-      return {
+    const fapReviewAssignments = [];
+
+    for (const assignment of args.assignments) {
+      const fapProposal = await this.dataSource.getFapProposal(
+        args.fapId,
+        assignment.proposalPk
+      );
+
+      if (!fapProposal) {
+        return rejection(
+          'Can not assign member to review because of an error',
+          { agent, args }
+        );
+      }
+
+      const fapCall = await this.callDataSource.getCall(fapProposal.callId);
+
+      if (!fapCall) {
+        return rejection(
+          'Can not assign member to review because of an error',
+          { agent, args }
+        );
+      }
+
+      const fapReviewQuestionary = await this.questionaryDataSource.create(
+        assignment.memberId,
+        fapCall.fapReviewTemplateId
+      );
+
+      fapReviewAssignments.push({
         ...assignment,
-        fapProposalId: (
-          await this.dataSource.getFapProposal(
-            args.fapId,
-            assignment.proposalPk
-          )
-        )?.fapProposalId,
-      };
-    });
+        fapProposalId: fapProposal.fapProposalId,
+        questionaryId: fapReviewQuestionary.questionaryId,
+      });
+    }
 
     return Promise.all(fapReviewAssignments).then(
       (resolvedFapReviewAssignments) =>

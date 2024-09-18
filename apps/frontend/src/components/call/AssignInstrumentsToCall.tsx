@@ -89,7 +89,7 @@ const AssignInstrumentsToCall = ({
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
     {
-      title: 'Fap',
+      title: 'FAP',
       field: 'fap',
       render: (rowData: Instrument) => (
         <FapSelectionComponent {...rowData} onChange={onChange} />

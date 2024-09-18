@@ -54,6 +54,7 @@ type ProposalReview = {
   status: ReviewStatus;
   fapID: number;
   proposalPk?: number;
+  questionaryID: number;
 };
 
 type FapProposalsAndAssignmentsTableProps = {

@@ -74,7 +74,7 @@ const ChangeProposalStatus = ({
                 padding: '22px 0 0',
               }}
             >
-              Change proposal/s status
+              Change proposal(s) status
             </Typography>
 
             <Grid container spacing={3}>
