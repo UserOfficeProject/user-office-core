@@ -26,6 +26,16 @@ In order to set up a call, you must decide which [templates :material-text-box-m
 
 There are several different types of templates utilized within Calls:
 
+??? info "FAP review templates :material-file-pdf-box:" 
+    [FAP review templates :material-note-text:](templates/fap_review_template.md) are designed to capture all necessary information that reviewers need to provide when submitting their FAP reviews. These templates generally include questions regarding scientific evaluation of the associated proposal. Users fill in their answers to these questions in the predefined fields and submit their reviews.
+
+    User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customize review templates to include specific questions based on the nature and requirements of the research.
+    ______________________________________________________________________________________
+    <figure markdown="span">  
+        ![Proposal](../../assets/images/fap_review_template.png){ width="450"}
+        <figcaption>FAP Review (viewed from the user's perspective)</figcaption>
+    </figure>
+
 ??? info "PDF templates :material-file-pdf-box:" 
     [PDF templates :material-file-pdf-box:](templates/pdf_template.md) enable users and User Officers to download proposals in a well-formatted and standardized PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
