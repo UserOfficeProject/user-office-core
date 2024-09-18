@@ -42,7 +42,6 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
                 label="From"
                 value={from ? DateTime.fromFormat(from, inputDateFormat) : null}
                 onChange={(startsAt) => {
-                  alert(startsAt);
                   setQuery({
                     from: startsAt
                       ? DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
@@ -77,7 +76,6 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
                 label="To"
                 value={to ? DateTime.fromFormat(to, inputDateFormat) : null}
                 onChange={(endsAt) => {
-                  alert(endsAt);
                   setQuery({
                     to: endsAt
                       ? DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
