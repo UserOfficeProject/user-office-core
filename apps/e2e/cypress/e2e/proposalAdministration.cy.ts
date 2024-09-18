@@ -26,7 +26,7 @@ context('Proposal administration tests', () => {
 
   const existingUserId = initialDBData.users.user1.id;
   const existingTopicId = 1;
-  const existingQuestionaryId = 1;
+  const existingQuestionaryId = 2;
   let createdProposalPk: number;
   let createdProposalId: string;
   let createdInstrumentId: number;
@@ -241,7 +241,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
-      cy.get('@dialog').contains('Change proposal/s status');
+      cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
         .find('#selectedStatusId-input')
@@ -271,7 +271,7 @@ context('Proposal administration tests', () => {
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
-      cy.get('@dialog').contains('Change proposal/s status');
+      cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
         .find('#selectedStatusId-input')

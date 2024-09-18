@@ -8,9 +8,21 @@ query getReview($reviewId: Int!) {
       proposer {
         id
       }
+      call {
+        isActive
+        isActiveInternal
+        referenceNumberFormat
+        startCall
+        endCall
+        endCallInternal
+      }
     }
     reviewer {
       ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+      isCompleted
     }
   }
 }

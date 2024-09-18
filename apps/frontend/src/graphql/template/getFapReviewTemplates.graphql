@@ -1,0 +1,10 @@
+query getFapReviewTemplates($filter: FapReviewTemplatesFilter) {
+  fapReviewTemplates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+    questionaryCount
+    callCount
+  }
+}

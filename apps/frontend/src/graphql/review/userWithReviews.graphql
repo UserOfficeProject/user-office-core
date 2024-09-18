@@ -21,6 +21,8 @@ query userWithReviews(
       status
       fapID
       userID
+      questionaryID
+
       proposal {
         primaryKey
         title
