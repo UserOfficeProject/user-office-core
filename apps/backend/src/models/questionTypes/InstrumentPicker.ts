@@ -98,10 +98,10 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       }
 
       const { value } = JSON.parse(answer.value);
-      const instrumentIds = value
+      const instrumentIds: number[] | null = value
         ? Array.isArray(value)
-          ? value.map((i) => i.instrumentId)
-          : [value.instrumentId]
+          ? value.map((i) => parseInt(i.instrumentId))
+          : [parseInt(value.instrumentId)]
         : null;
 
       if (!instrumentIds?.length) {
