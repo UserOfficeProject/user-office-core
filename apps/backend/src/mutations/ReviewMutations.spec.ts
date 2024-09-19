@@ -24,6 +24,7 @@ test('A reviewer can submit a review on a proposal he is on', () => {
       grade: 9,
       status: ReviewStatus.DRAFT,
       fapID: 1,
+      questionaryID: 1,
     })
   ).resolves.toEqual(dummyReview);
 });
@@ -36,6 +37,7 @@ test('A user can not submit a review on a proposal', () => {
       grade: 9,
       status: ReviewStatus.DRAFT,
       fapID: 1,
+      questionaryID: 1,
     })
   ).resolves.toHaveProperty(
     'reason',
@@ -51,6 +53,7 @@ test('A Fap chair can not modify Fap review if it is submitted', () => {
       grade: 9,
       status: ReviewStatus.SUBMITTED,
       fapID: 1,
+      questionaryID: 1,
     })
   ).resolves.toHaveProperty(
     'reason',
@@ -66,6 +69,7 @@ test('A Fap secretary can not modify Fap review if it is submitted', () => {
       grade: 9,
       status: ReviewStatus.SUBMITTED,
       fapID: 1,
+      questionaryID: 1,
     })
   ).resolves.toHaveProperty(
     'reason',

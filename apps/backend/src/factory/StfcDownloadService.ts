@@ -1,5 +1,6 @@
 import querystring from 'querystring';
 
+import { logger } from '@user-office-software/duo-logger';
 import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
@@ -51,33 +52,92 @@ export class StfcDownloadService implements DownloadService {
           const fileDataSource = container.resolve<FileDataSource>(
             Tokens.FileDataSource
           );
-          proposalPdfData = await fileDataSource.getBlobdata(
-            `${facility}-${data.proposal.proposalId}.pdf`
-          );
+
+          fileName = `${facility}-${data.proposal.proposalId}.pdf`;
+
+          const loggingContext = {
+            message: `Failed to download proposal PDF ${data.proposal.proposalId} from Postgres storage`,
+            proposalId: data.proposal.proposalId,
+            callId: call?.id,
+            callShortCode: call?.shortCode,
+            facilityIdentifiedAs: facility,
+            storedFileName: fileName,
+          };
+
+          try {
+            proposalPdfData = await fileDataSource.getBlobdata(fileName);
+          } catch (error) {
+            next({
+              error: error,
+              ...loggingContext,
+            });
+          }
 
           if (proposalPdfData) {
-            isPdfAvailable = true;
             fileName = `${data.proposal.proposalId}_${
               data.principalInvestigator.lastname
             }_${data.proposal.created.getUTCFullYear()}.pdf`;
+
+            proposalPdfData.on('error', (streamError) => {
+              next({
+                error: streamError,
+                ...loggingContext,
+                formattedFilename: fileName,
+              });
+            });
+
+            isPdfAvailable = true;
+          } else {
+            // This is a reasonable case, so don't log an error
+            logger.logInfo(
+              `Proposal PDF for ${data.proposal.proposalId} not found in Postgres storage, generating via Factory instead`,
+              {
+                ...loggingContext,
+              }
+            );
           }
         }
       }
     }
 
     if (isPdfAvailable && proposalPdfData && fileName != '') {
+      const proposal = (properties?.data[0] as ProposalPDFData)?.proposal;
+
       try {
         res.setHeader('Content-Disposition', contentDisposition(fileName));
         res.setHeader('x-download-filename', querystring.escape(fileName));
         res.setHeader('content-type', 'application/pdf');
 
+        res.on('finish', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            logger.logInfo(
+              `Succesfully sent proposal PDF ${proposal.proposalId} from Postgres storage`,
+              {
+                proposalId: proposal.proposalId,
+                call: proposal.callId,
+                storedFileName: fileName,
+                statusCode: res.statusCode,
+              }
+            );
+          } else {
+            next({
+              message: `Failed to send proposal PDF ${proposal.proposalId} from Postgres storage`,
+              proposalId: proposal.proposalId,
+              call: proposal.callId,
+              storedFileName: fileName,
+              statusCode: res.statusCode,
+            });
+          }
+        });
+
         proposalPdfData.pipe(res);
-        await new Promise((f) => setTimeout(f, 1000));
-        proposalPdfData.emit('end');
       } catch (error) {
         next({
           error,
-          message: 'Could not generate proposal pdf',
+          message: `Failed to send proposal PDF ${proposal.proposalId} from Postgres storage`,
+          proposalId: proposal.proposalId,
+          call: proposal.callId,
+          storedFileName: fileName,
         });
       }
 
@@ -87,6 +147,7 @@ export class StfcDownloadService implements DownloadService {
     fetchDataAndStreamResponse(downloadType, type, properties, req, res, next);
   }
 }
+
 function getFacilityName(shortCode: string | undefined) {
   let facility = null;
   if (!shortCode) {

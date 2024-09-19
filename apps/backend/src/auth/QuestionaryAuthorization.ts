@@ -6,6 +6,7 @@ import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { TemplateGroupId } from '../models/Template';
 import { UserJWT } from '../models/User';
+import { FapReviewQuestionaryAuthorizer } from './questionary/FapReviewQuestionaryAuthorizer';
 import { FeedbackQuestionaryAuthorizer } from './questionary/FeedbackQuestionaryAuthorizer';
 import { GenericTemplateQuestionaryAuthorizer } from './questionary/GenericTemplateQuestionaryAuthorizer';
 import { ProposalEsiQuestionaryAuthorizer } from './questionary/ProposalEsiQuestionaryAuthorizer';
@@ -37,6 +38,10 @@ export class QuestionaryAuthorization {
     this.authorizers.set(
       TemplateGroupId.PROPOSAL,
       container.resolve(ProposalQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.FAP_REVIEW,
+      container.resolve(FapReviewQuestionaryAuthorizer)
     );
     this.authorizers.set(
       TemplateGroupId.SAMPLE,

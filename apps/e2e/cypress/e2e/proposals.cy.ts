@@ -67,6 +67,7 @@ context('Proposal tests', () => {
     endCycle: currentDayStart,
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
+    fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),

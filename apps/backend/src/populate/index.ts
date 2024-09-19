@@ -31,6 +31,7 @@ import { execute } from './executor';
 
 const MAX_USERS = 1000;
 const MAX_TEMPLATES = 15;
+const MAX_REVIEW_TEMPLATES = 15;
 const MAX_CALLS = 11;
 const MAX_INSTRUMENTS = 16;
 const MAX_PROPOSALS = 500;
@@ -149,6 +150,7 @@ const createCalls = async () => {
       submissionMessage: faker.random.words(5),
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
+      fapReviewTemplateId: dummy.positiveNumber(MAX_REVIEW_TEMPLATES),
       allocationTimeUnit: AllocationTimeUnits.Day,
       title: faker.random.words(8),
       description: faker.random.words(10),
@@ -186,6 +188,63 @@ const createTemplates = async () => {
 
         return templateDataSource.createQuestion(
           TemplateCategoryId.PROPOSAL_QUESTIONARY,
+          questionId,
+          questionId,
+          DataType.TEXT_INPUT,
+          `${faker.random.words(5)}?`,
+          JSON.stringify(
+            getQuestionDefinition(DataType.TEXT_INPUT).createBlankConfig()
+          )
+        );
+      }, 10);
+
+      for (const question of questions) {
+        await templateDataSource.upsertQuestionTemplateRelations([
+          {
+            questionId: question.id,
+            sortOrder: faker.datatype.number({
+              min: 0,
+              max: 100,
+            }),
+            templateId: template.templateId,
+            topicId: step.topic.id,
+          } as TemplatesHasQuestions,
+        ]);
+      }
+    }
+  }
+};
+
+const createReviewTemplates = async () => {
+  const templates = await execute(() => {
+    return templateDataSource.createTemplate({
+      groupId: TemplateGroupId.FAP_REVIEW,
+      name: faker.random.word(),
+      description: faker.random.words(3),
+    });
+  }, MAX_REVIEW_TEMPLATES);
+
+  for (const template of templates) {
+    await execute(() => {
+      return templateDataSource.createTopic({
+        sortOrder: faker.datatype.number({
+          min: 0,
+          max: 100,
+        }),
+        templateId: template.templateId,
+      });
+    }, dummy.positiveNumber(5));
+
+    const steps = await templateDataSource.getTemplateSteps(
+      template.templateId
+    );
+
+    for (const step of steps) {
+      const questions = await execute(() => {
+        const questionId = `text_input_${new Date().getTime()}`;
+
+        return templateDataSource.createQuestion(
+          TemplateCategoryId.FAP_REVIEW,
           questionId,
           questionId,
           DataType.TEXT_INPUT,
@@ -345,14 +404,28 @@ const createFaps = async () => {
             instrumentHasProposals.instrumentHasProposalIds[0],
         },
       ]);
+
+      const fapReviewQuestionary = await questionaryDataSource.create(
+        tmpUserId,
+        1
+      );
+
       await fapDataSource.assignMembersToFapProposals(
-        [{ proposalPk, memberId: tmpUserId, fapProposalId: 1 }],
+        [
+          {
+            proposalPk,
+            memberId: tmpUserId,
+            fapProposalId: 1,
+            questionaryId: fapReviewQuestionary.questionaryId,
+          },
+        ],
         fap.id
       );
       await reviewDataSource.addUserForReview({
         proposalPk: proposalPk,
         fapID: fap.id,
         userID: tmpUserId,
+        questionaryID: fapReviewQuestionary.questionaryId,
       });
     }
   }, MAX_FAPS);

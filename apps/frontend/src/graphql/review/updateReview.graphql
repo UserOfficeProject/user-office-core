@@ -4,13 +4,15 @@ mutation updateReview(
   $comment: String!
   $status: ReviewStatus!
   $fapID: Int!
+  $questionaryID: Int!
 ) {
   updateReview(
     reviewID: $reviewID
     grade: $grade
     comment: $comment
     status: $status
-    fapID: $fapID
+    fapID: $fapID,
+    questionaryID: $questionaryID
   ) {
     id
     userID
@@ -18,5 +20,6 @@ mutation updateReview(
     comment
     grade
     fapID
+    questionaryID
   }
 }
