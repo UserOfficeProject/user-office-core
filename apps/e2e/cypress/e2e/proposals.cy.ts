@@ -1542,6 +1542,7 @@ context('Proposal tests', () => {
       cy.contains('Proposals').click();
       cy.contains(title).parent().contains(instrument2.name);
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument1.name).should('not.exist');
       cy.contains('td', instrument2.name).should('exist');
     });
 
