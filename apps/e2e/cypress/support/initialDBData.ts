@@ -293,6 +293,10 @@ export default {
       id: 5,
       name: 'FAP_REVIEW',
     },
+    expired: {
+      id: 9,
+      name: 'EXPIRED',
+    },
     fapMeeting: {
       id: 12,
       name: 'FAP Meeting',
