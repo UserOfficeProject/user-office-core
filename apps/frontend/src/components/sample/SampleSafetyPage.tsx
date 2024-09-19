@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import TextField from 'components/common/FormikUITextField';
@@ -174,13 +174,11 @@ const columns = [
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { calls, loadingCalls } = useCallsData({ isActive: true });
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    call: NumberParam,
-    search: StringParam,
-  });
+  const [searchParam] = useSearchParams();
+  const call = searchParam.get('call');
 
   const [selectedCallId, setSelectedCallId] = useState<number>(
-    urlQueryParams.call ? urlQueryParams.call : 0
+    call ? +call : 0
   );
   const [samples, setSamples] = useState<SampleWithProposalData[]>([]);
   const [selectedSample, setSelectedSample] =
@@ -265,8 +263,6 @@ function SampleSafetyPage() {
           <SamplesTable
             data={samplesWithRowActions}
             isLoading={isExecutingCall}
-            urlQueryParams={urlQueryParams}
-            setUrlQueryParams={setUrlQueryParams}
             columns={columns}
             options={{
               selection: true,
