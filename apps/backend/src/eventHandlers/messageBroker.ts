@@ -267,6 +267,16 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.PROPOSAL_FAPS_SELECTED: {
+        const jsonMessage = JSON.stringify(event.proposalpks);
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
       case Event.USER_UPDATED:
       case Event.USER_DELETED: {
         const jsonMessage = JSON.stringify(event.user);
