@@ -285,7 +285,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
       {isXpressRouteEnabled && (
         <ListItemButton component={NavLink} to="/XpressProposals">
           <ListItemIcon>
-            <FolderOpen />
+            <Topic />
           </ListItemIcon>
           <ListItemText primary="Xpress Proposals" />
         </ListItemButton>
