@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid';
 import React from 'react';
-import { NumberParam, useQueryParams, withDefault } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { Fap } from 'generated/sdk';
@@ -20,9 +20,9 @@ const FapProposalsAndAssignments = ({
 }: FapProposalsAndAssignmentsProps) => {
   const { loadingCalls, calls } = useCallsData({ fapIds: [fapData.id] });
   // NOTE: Default null means load all calls if nothing is selected
-  const [query] = useQueryParams({
-    call: withDefault(NumberParam, null),
-  });
+
+  const [searchParams] = useSearchParams();
+  const call = searchParams.get('call');
 
   return (
     <>
@@ -32,14 +32,14 @@ const FapProposalsAndAssignments = ({
             calls={calls}
             isLoading={loadingCalls}
             shouldShowAll={true}
-            callId={query.call}
+            callId={call ? +call : null}
           />
         </Grid>
       </Grid>
       <FapProposalsAndAssignmentsTable
         data={fapData}
         onAssignmentsUpdate={onFapUpdate}
-        selectedCallId={query.call}
+        selectedCallId={call ? +call : null}
       />
     </>
   );

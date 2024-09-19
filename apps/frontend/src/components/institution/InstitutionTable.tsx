@@ -1,12 +1,8 @@
 import { Typography } from '@mui/material';
 import { Link } from '@mui/material';
 import React from 'react';
-import { useQueryParams } from 'use-query-params';
 
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { Institution } from 'generated/sdk';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { tableIcons } from 'utils/materialIcons';
@@ -43,9 +39,6 @@ const InstitutionPage = () => {
   } = useInstitutionsData({
     country: true,
   });
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
-
   const deleteInstitution = async (id: number | string) => {
     try {
       await api({
@@ -91,8 +84,6 @@ const InstitutionPage = () => {
           search: true,
           debounceInterval: 400,
         }}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
       />
     </div>
   );

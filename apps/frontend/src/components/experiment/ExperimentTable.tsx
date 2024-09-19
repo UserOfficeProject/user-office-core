@@ -3,11 +3,9 @@ import { TFunction } from 'i18next';
 import { DateTime } from 'luxon';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, NumberParam, StringParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
-import SuperMaterialTable, {
-  DefaultQueryParams,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import ProposalEsiDetailsButton from 'components/questionary/questionaryComponents/ProposalEsiBasis/ProposalEsiDetailsButton';
 import { GetScheduledEventsCoreQuery, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -16,21 +14,16 @@ import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
 import { DEFAULT_DATE_FORMAT } from './DateFilter';
-import { ExperimentUrlQueryParamsType } from './ExperimentUrlQueryParamsType';
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
 type RowType = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
 
 function ExperimentTable() {
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<ExperimentUrlQueryParamsType>({
-      ...DefaultQueryParams,
-      call: NumberParam,
-      instrument: NumberParam,
-      from: StringParam,
-      to: StringParam,
-    });
-
+  const [searchParams] = useSearchParams();
+  const call = searchParams.get('call');
+  const instrument = searchParams.get('instrument');
+  const experimentFromDate = searchParams.get('from');
+  const experimentToDate = searchParams.get('to');
   const { scheduledEvents, setScheduledEvents, loadingEvents, setArgs } =
     useScheduledEvents({});
 
@@ -82,32 +75,25 @@ function ExperimentTable() {
   useEffect(() => {
     setArgs({
       filter: {
-        callId: urlQueryParams.call,
-        instrumentId: urlQueryParams.instrument,
+        callId: call ? +call : undefined,
+        instrumentId: instrument ? +instrument : undefined,
         overlaps: {
-          from: urlQueryParams.from
+          from: experimentFromDate
             ? DateTime.fromFormat(
-                urlQueryParams.from,
+                experimentFromDate,
                 format || DEFAULT_DATE_FORMAT
               )
             : undefined,
-          to: urlQueryParams.to
+          to: experimentToDate
             ? DateTime.fromFormat(
-                urlQueryParams.to,
+                experimentToDate,
                 format || DEFAULT_DATE_FORMAT
               )
             : undefined,
         },
       },
     });
-  }, [
-    setArgs,
-    urlQueryParams.call,
-    urlQueryParams.instrument,
-    urlQueryParams.from,
-    urlQueryParams.to,
-    format,
-  ]);
+  }, [setArgs, format, call, instrument, experimentFromDate, experimentToDate]);
 
   const ScheduledEventDetails = React.useCallback(
     ({ rowData }: Record<'rowData', RowType>) => {
@@ -131,8 +117,6 @@ function ExperimentTable() {
       options={{
         search: false,
       }}
-      urlQueryParams={urlQueryParams}
-      setUrlQueryParams={setUrlQueryParams}
       detailPanel={[
         {
           tooltip: 'Show details',

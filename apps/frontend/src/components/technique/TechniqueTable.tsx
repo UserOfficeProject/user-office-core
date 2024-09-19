@@ -4,14 +4,10 @@ import { Dialog, DialogContent, Typography } from '@mui/material';
 import i18n from 'i18n';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams } from 'use-query-params';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SimpleTabs from 'components/common/SimpleTabs';
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import ParticipantModal from 'components/proposal/ParticipantModal';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
@@ -40,8 +36,6 @@ const TechniqueTable = () => {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const [openTechniqueAssignment, setOpenTechniqueAssignment] = useState(false);
   const [selectedTechnique, setSelectedTechnique] =
@@ -354,9 +348,8 @@ const TechniqueTable = () => {
                 ]
               : []
           }
-          urlQueryParams={urlQueryParams}
-          setUrlQueryParams={setUrlQueryParams}
           createModal={createModal}
+          persistUrlQueryParams={true}
         />
       </div>
     </>

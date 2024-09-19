@@ -4,7 +4,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import React, { Dispatch } from 'react';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { Call } from 'generated/sdk';
 
@@ -23,9 +23,7 @@ const CallFilter = ({
   onChange,
   shouldShowAll,
 }: CallFilterProps) => {
-  const [, setQuery] = useQueryParams({
-    call: NumberParam,
-  });
+  const [, setSearchParams] = useSearchParams();
 
   if (calls === undefined) {
     return null;
@@ -68,8 +66,11 @@ const CallFilter = ({
              */
             disableClearable
             onChange={(_, call) => {
-              setQuery({
-                call: call?.id ? (call?.id as number) : undefined,
+              setSearchParams((searchParams) => {
+                searchParams.delete('call');
+                if (call?.id) searchParams.set('call', String(call.id));
+
+                return searchParams;
               });
               onChange?.(call?.id as number);
             }}
