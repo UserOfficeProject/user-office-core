@@ -19,11 +19,9 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   ReviewerFilter,
   ReviewStatus,
-  UserRole,
   UserWithReviewsQuery,
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
@@ -88,14 +86,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
   const { user } = useContext(UserContext);
-  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
-  const reviewerFilter = isFapReviewer ? ReviewerFilter.ME : ReviewerFilter.ALL;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const call = searchParams.get('call');
   const instrument = searchParams.get('instrument');
   const reviewStatus = searchParams.get('reviewStatus') ?? ReviewStatus.DRAFT;
-  const reviewer = searchParams.get('reviewerFilter') ?? ReviewerFilter.ME;
+  const reviewer = searchParams.get('reviewer') ?? ReviewerFilter.ME;
   const reviewModal = searchParams.get('reviewModal');
   const selection = searchParams.getAll('selection');
   const sortField = searchParams.get('sortField');
@@ -272,6 +268,11 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     }));
   };
   const handleReviewerFilterChange = (reviewer: ReviewerFilter) => {
+    setSearchParams((searchParams) => {
+      searchParams.set('reviewer', reviewer);
+
+      return searchParams;
+    });
     setUserWithReviewsFilter((filter) => ({
       ...filter,
       reviewer: getFilterReviewer(reviewer),
