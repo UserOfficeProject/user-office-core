@@ -3,19 +3,12 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React from 'react';
-import { StringParam, withDefault, QueryParamConfig } from 'use-query-params';
 
 export enum FapStatus {
   ALL = 'all',
   ACTIVE = 'active',
   INACTIVE = 'inactive',
 }
-
-export type FapStatusQueryFilter = { fapStatus: QueryParamConfig<string> };
-export const defaultFapStatusQueryFilter = withDefault(
-  StringParam,
-  FapStatus.ACTIVE
-);
 
 type FapStatusFilterProps = {
   fapStatus: string;
