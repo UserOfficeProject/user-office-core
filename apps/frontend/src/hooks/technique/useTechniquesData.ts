@@ -33,7 +33,12 @@ export function useTechniquesData(callIds?: number[]): {
     let unmounted = false;
 
     setLoadingTechniques(true);
-    if (currentRole && [UserRole.USER_OFFICER].includes(currentRole)) {
+    if (
+      currentRole &&
+      [UserRole.USER_OFFICER, UserRole.INSTRUMENT_SCIENTIST].includes(
+        currentRole
+      )
+    ) {
       api()
         .getTechniques()
         .then((data) => {
