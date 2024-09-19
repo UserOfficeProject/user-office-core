@@ -175,17 +175,16 @@ export default class InstrumentMutations {
       }
 
       for await (const proposalPk of args.proposalPks) {
+        // all instruments currently on a proposal
         const proposalInstruments =
           await this.dataSource.getInstrumentsByProposalPk(proposalPk);
 
+        // Instruments on the proposal to remove
         const proposalInstrumentsToRemove = proposalInstruments.filter(
           (i) => !args.instrumentIds.includes(i.id)
         );
 
-        if (
-          proposalInstrumentsToRemove.length &&
-          proposalInstruments.length !== proposalInstrumentsToRemove.length
-        ) {
+        if (proposalInstrumentsToRemove.length) {
           await Promise.all(
             proposalInstrumentsToRemove.map((i) => {
               return this.dataSource.removeProposalsFromInstrument(

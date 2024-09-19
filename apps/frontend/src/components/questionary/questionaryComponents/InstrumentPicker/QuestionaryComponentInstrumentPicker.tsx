@@ -216,7 +216,9 @@ export function QuestionaryComponentInstrumentPicker(
             value={
               Array.isArray(stateValue)
                 ? stateValue?.filter((i) => i).map((i) => i.instrumentId) || []
-                : stateValue?.instrumentId || '0'
+                : stateValue?.instrumentId
+                  ? [stateValue.instrumentId]
+                  : []
             }
             onChange={handleOnChange}
             multiple={config.isMultipleSelect}
