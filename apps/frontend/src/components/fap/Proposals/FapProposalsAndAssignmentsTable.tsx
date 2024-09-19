@@ -7,7 +7,7 @@ import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
 import React, { useContext, useState } from 'react';
-import { NumberParam, useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -170,9 +170,9 @@ const FapProposalsAndAssignmentsTable = ({
   selectedCallId,
   confirm,
 }: FapProposalsAndAssignmentsTableProps) => {
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    reviewModal: NumberParam,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const reviewModal = searchParams.get('reviewModal');
+
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
     useFapProposalsData(data.id, selectedCallId);
   const { api } = useDataApiWithFeedback();
@@ -207,7 +207,11 @@ const FapProposalsAndAssignmentsTable = ({
         <IconButton
           data-cy="view-proposal"
           onClick={() => {
-            setUrlQueryParams({ reviewModal: rowData.proposalPk });
+            setSearchParams((searchParams) => {
+              searchParams.set('reviewModal', rowData.proposalPk.toString());
+
+              return searchParams;
+            });
           }}
         >
           <Visibility />
@@ -728,13 +732,17 @@ const FapProposalsAndAssignmentsTable = ({
     <>
       <ProposalReviewModal
         title="Fap - Proposal View"
-        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        proposalReviewModalOpen={!!reviewModal}
         setProposalReviewModalOpen={() => {
-          setUrlQueryParams({ reviewModal: undefined });
+          setSearchParams((searchParams) => {
+            searchParams.delete('reviewModal');
+
+            return searchParams;
+          });
         }}
       >
         <ProposalReviewContent
-          proposalPk={urlQueryParams.reviewModal}
+          proposalPk={reviewModal ? +reviewModal : undefined}
           tabNames={[
             PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
             PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
