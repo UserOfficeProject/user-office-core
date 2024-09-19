@@ -14,20 +14,24 @@ context('Xpress tests', () => {
   let createdInstrumentId2: number;
   let createdInstrumentId3: number;
   let createdInstrumentId4: number;
+  let createdInstrumentId5: number;
 
   let createdProposalPk1: number;
   let createdProposalPk2: number;
   let createdProposalPk3: number;
   let createdProposalPk4: number;
+  let createdProposalPk5: number;
 
   let createdProposalId1: string;
   let createdProposalId2: string;
   let createdProposalId3: string;
   let createdProposalId4: string;
+  let createdProposalId5: string;
 
   let createdTechniquePk1: number;
   let createdTechniquePk2: number;
   let createdTechniquePk3: number;
+  let createdTechniquePk5: number;
   // Technique 4 has no proposals assigned
   // Proposal 1 is unsubmitted
 
@@ -50,6 +54,12 @@ context('Xpress tests', () => {
   };
 
   const technique4 = {
+    name: faker.word.words(1),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.word.words(5),
+  };
+
+  const technique5 = {
     name: faker.word.words(1),
     shortCode: faker.string.alphanumeric(15),
     description: faker.word.words(5),
@@ -88,6 +98,13 @@ context('Xpress tests', () => {
     managerUserId: scientist4.id,
   };
 
+  const instrument5 = {
+    name: faker.word.words(1),
+    shortCode: faker.string.alphanumeric(15),
+    description: faker.word.words(5),
+    managerUserId: scientist2.id,
+  };
+
   const proposal1 = {
     title: faker.word.words(4),
     abstract: faker.word.words(5),
@@ -104,6 +121,11 @@ context('Xpress tests', () => {
   };
 
   const proposal4 = {
+    title: faker.word.words(4),
+    abstract: faker.word.words(5),
+  };
+
+  const proposal5 = {
     title: faker.word.words(4),
     abstract: faker.word.words(5),
   };
@@ -161,6 +183,17 @@ context('Xpress tests', () => {
       }
     });
 
+    cy.createInstrument(instrument5).then((result) => {
+      if (result.createInstrument) {
+        createdInstrumentId5 = result.createInstrument.id;
+
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [{ instrumentId: createdInstrumentId5 }],
+        });
+      }
+    });
+
     cy.createTechnique(technique1).then((result) => {
       createdTechniquePk1 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
@@ -197,6 +230,17 @@ context('Xpress tests', () => {
     cy.createTechnique(technique4).then((result) => {
       cy.assignInstrumentsToTechnique({
         instrumentIds: [createdInstrumentId4],
+        techniqueId: result.createTechnique.id,
+      });
+    });
+    cy.createTechnique(technique5).then((result) => {
+      createdTechniquePk5 = result.createTechnique.id;
+      cy.assignScientistsToTechnique({
+        scientistIds: [scientist2.id],
+        techniqueId: result.createTechnique.id,
+      });
+      cy.assignInstrumentsToTechnique({
+        instrumentIds: [createdInstrumentId5],
         techniqueId: result.createTechnique.id,
       });
     });
@@ -283,6 +327,29 @@ context('Xpress tests', () => {
         cy.changeProposalsStatus({
           statusId: initialDBData.proposalStatuses.editableSubmitted.id,
           proposalPks: [createdProposalPk4],
+        });
+      }
+    });
+
+    cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+      if (result.createProposal) {
+        createdProposalPk5 = result.createProposal.primaryKey;
+        createdProposalId5 = result.createProposal.proposalId;
+
+        cy.updateProposal({
+          proposalPk: createdProposalPk5,
+          title: proposal5.title,
+          abstract: proposal5.abstract,
+        });
+
+        cy.changeProposalsStatus({
+          statusId: initialDBData.proposalStatuses.expired.id,
+          proposalPks: [createdProposalPk5],
+        });
+
+        cy.assignProposalToTechniques({
+          proposalPk: createdProposalPk5,
+          techniqueIds: [createdTechniquePk5],
         });
       }
     });
@@ -646,6 +713,19 @@ context('Xpress tests', () => {
         proposal3.title
       );
       cy.get('input[aria-label="Search"]').focus().clear();
+
+      // Test with technique name
+      cy.get('input[aria-label="Search"]').focus().type(technique1.name);
+      cy.contains(proposal1.title);
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal2.title
+      );
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal3.title
+      );
+      cy.get('input[aria-label="Search"]').focus().clear();
     });
   });
 
@@ -670,6 +750,10 @@ context('Xpress tests', () => {
       cy.contains(proposal3.title);
       cy.contains(createdProposalId3);
       cy.contains(technique3.name);
+
+      cy.contains(proposal5.title);
+      cy.contains(createdProposalId5);
+      cy.contains(technique5.name);
     });
 
     it('Instrument scientist can only see submitted and unsubmitted Xpress proposals for their techniques', function () {
@@ -700,6 +784,9 @@ context('Xpress tests', () => {
       cy.should('not.contain', createdProposalId4);
       cy.should('not.contain', technique4.name);
 
+      cy.should('not.contain', proposal5.title);
+      cy.should('not.contain', createdProposalId5);
+
       /*
       Scientist 2 belongs to technique 2, which has proposals 1 and 2
       */
@@ -726,6 +813,10 @@ context('Xpress tests', () => {
       cy.should('not.contain', proposal4.title);
       cy.should('not.contain', createdProposalId4);
       cy.should('not.contain', technique4.name);
+
+      cy.should('not.contain', proposal5.title);
+      cy.should('not.contain', createdProposalId5);
+      cy.should('not.contain', technique5.name);
     });
   });
 });

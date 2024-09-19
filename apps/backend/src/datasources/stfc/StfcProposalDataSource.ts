@@ -289,12 +289,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     const proposals = database
       .select('proposal_pk')
-      .from('proposal_table_view')
+      .from('proposals')
       .join(
         'technique_has_proposals as thp',
         'thp.proposal_id',
         '=',
-        'proposal_table_view.proposal_pk'
+        'proposals.proposal_pk'
       )
       .join('techniques as tech', 'tech.technique_id', '=', 'thp.technique_id')
       .leftJoin(
@@ -327,6 +327,32 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             'thi.instrument_id',
             filter?.instrumentFilter?.instrumentId
           );
+        }
+        if (
+          filter?.dateFilter?.from !== undefined &&
+          filter?.dateFilter?.from !== null
+        ) {
+          const dateParts: string[] = filter.dateFilter.from.split('-');
+          const dateObject: Date = new Date(
+            +dateParts[2],
+            +dateParts[1] - 1,
+            +dateParts[0]
+          );
+
+          this.where('created_at', '>=', dateObject);
+        }
+
+        if (
+          filter?.dateFilter?.to !== undefined &&
+          filter?.dateFilter?.to !== null
+        ) {
+          const dateParts: string[] = filter.dateFilter.to.split('-');
+          const dateObject: Date = new Date(
+            +dateParts[2],
+            +dateParts[1] - 1,
+            +dateParts[0]
+          );
+          this.where('created_at', '<=', dateObject);
         }
       });
 
@@ -390,31 +416,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.whereIn('proposal_id', filter.referenceNumbers);
         }
 
-        if (
-          filter?.dateFilter?.from !== undefined &&
-          filter?.dateFilter?.from !== null
-        ) {
-          const dateParts: string[] = filter.dateFilter.from.split('-');
-          const dateObject: Date = new Date(
-            +dateParts[2],
-            +dateParts[1] - 1,
-            +dateParts[0]
+        if (filter?.excludeProposalStatusIds) {
+          query.where(
+            'proposal_status_id',
+            'not in',
+            filter?.excludeProposalStatusIds
           );
-
-          query.where('submitted_date', '>=', dateObject);
-        }
-
-        if (
-          filter?.dateFilter?.to !== undefined &&
-          filter?.dateFilter?.to !== null
-        ) {
-          const dateParts: string[] = filter.dateFilter.to.split('-');
-          const dateObject: Date = new Date(
-            +dateParts[2],
-            +dateParts[1] - 1,
-            +dateParts[0]
-          );
-          query.where('submitted_date', '<=', dateObject);
         }
 
         if (first) {
