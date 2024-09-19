@@ -3,7 +3,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React, { useContext } from 'react';
-import { StringParam, useQueryParams, withDefault } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { ReviewerFilter, SettingsId } from 'generated/sdk';
@@ -30,8 +30,8 @@ const ReviewerFilterComponent = ({
   if (!reviewerFilter) {
     reviewerFilter = ReviewerFilter.ME;
   }
-  const [, setQuery] = useQueryParams({
-    reviewer: withDefault(StringParam, reviewerFilter),
+  const [, setSearchParams] = useSearchParams({
+    reviewer: reviewerFilter,
   });
 
   return (
@@ -40,8 +40,10 @@ const ReviewerFilterComponent = ({
       <Select
         id="reviewer-selection"
         onChange={(e) => {
-          setQuery({
-            reviewer: e.target.value ? e.target.value : undefined,
+          setSearchParams((searchParam) => {
+            searchParam.set('reviewer', e.target.value as string);
+
+            return searchParam;
           });
           onChange?.(e.target.value as ReviewerFilter);
         }}
