@@ -29,7 +29,7 @@ export interface ProposalData {
   instruments: ProposalViewInstrument[] | null;
   techniques: ProposalViewTechnique[] | null;
   principalInvestigator: User | null;
-  status: string;
+  statusName: string;
 }
 
 const XpressProposalTable = () => {
@@ -95,6 +95,7 @@ const XpressProposalTable = () => {
       : undefined,
     proposalStatusId: urlQueryParams.proposalStatus,
     text: urlQueryParams.search,
+    excludeProposalStatusIds: [9],
   });
 
   const columns = [
@@ -116,7 +117,7 @@ const XpressProposalTable = () => {
     },
     {
       title: 'Status',
-      field: 'status',
+      field: 'statusName',
     },
     {
       title: 'Date submitted',
@@ -194,6 +195,7 @@ const XpressProposalTable = () => {
       referenceNumbers: proposalFilter.referenceNumbers,
       dateFilter: proposalFilter.dateFilter,
       text: queryParameters.searchText,
+      excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
     });
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
@@ -240,7 +242,7 @@ const XpressProposalTable = () => {
       instruments: proposal.instruments,
       techniques: proposal.techniques,
       principalInvestigator: proposal.principalInvestigator,
-      status: proposal.status,
+      statusName: proposal.statusName,
     };
   });
 
