@@ -1,20 +1,30 @@
-import { StringParam, useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { QuestionFilterInput } from 'generated/sdk';
 
 export const useQuestionFilterQueryParams = () => {
-  const [query, setQuery] = useQueryParams({
-    questionId: StringParam,
-    compareOperator: StringParam,
-    value: StringParam,
-    dataType: StringParam,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const questionId = searchParams.get('questionId');
+  const compareOperator = searchParams.get('compareOperator');
+  const value = searchParams.get('value');
+  const dataType = searchParams.get('dataType');
+
+  const query = {
+    questionId: questionId || undefined,
+    compareOperator: compareOperator || undefined,
+    value: value || undefined,
+    dataType: dataType || undefined,
+  };
+
   const setQuestionFilterQuery = (filter?: QuestionFilterInput) => {
-    setQuery({
-      questionId: filter?.questionId,
-      compareOperator: filter?.compareOperator,
-      value: filter?.value,
-      dataType: filter?.dataType,
+    setSearchParams((searchParams) => {
+      if (filter?.questionId) searchParams.set('questionId', filter.questionId);
+      if (filter?.compareOperator)
+        searchParams.set('compareOperator', filter.compareOperator);
+      if (filter?.value) searchParams.set('value', filter.value);
+      if (filter?.dataType) searchParams.set('dataType', filter.dataType);
+
+      return searchParams;
     });
   };
 
