@@ -1479,7 +1479,6 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('SUBMITTED');
-      //cy.contains(fapMembers.reviewer2.lastName).parent().contains('SUBMITTED');
     });
   });
 });
