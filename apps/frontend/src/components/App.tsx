@@ -4,8 +4,6 @@ import { StyledEngineProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
 import React, { ErrorInfo, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import { DownloadContextProvider } from 'context/DownloadContextProvider';
 import { FeatureContextProvider } from 'context/FeatureContextProvider';
@@ -59,9 +57,7 @@ function Root() {
                 <UserContextProvider>
                   <DownloadContextProvider>
                     <IdleContextPicker>
-                      <QueryParamProvider adapter={ReactRouter6Adapter}>
-                        <AppRoutes />
-                      </QueryParamProvider>
+                      <AppRoutes />
                     </IdleContextPicker>
                   </DownloadContextProvider>
                 </UserContextProvider>
