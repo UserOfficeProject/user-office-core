@@ -4,6 +4,7 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import React, { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   Maybe,
@@ -25,6 +26,7 @@ const FapMeetingDecision = ({
   faps,
   instruments,
 }: FapMeetingDecisionProps) => {
+  const { t } = useTranslation();
   if (!fapMeetingDecisions?.length) {
     return null;
   }
@@ -46,8 +48,8 @@ const FapMeetingDecision = ({
               })}
               gutterBottom
             >
-              {getFapCodeById(fmd.fapId)} - Fap Meeting decision (Instrument:{' '}
-              {getInstrumentNameById(fmd.instrumentId)})
+              {getFapCodeById(fmd.fapId)} - {t('Fap')} Meeting decision
+              (Instrument: {getInstrumentNameById(fmd.instrumentId)})
             </Typography>
             <Table>
               <TableBody>
@@ -57,7 +59,7 @@ const FapMeetingDecision = ({
                   </TableCell>
                   <TableCell width="25%">{fmd.rankOrder || '-'}</TableCell>
                   <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
-                    Fap meeting recommendation
+                    {t('Fap')} meeting recommendation
                   </TableCell>
                   <TableCell width="25%">{fmd.recommendation || '-'}</TableCell>
                 </TableRow>

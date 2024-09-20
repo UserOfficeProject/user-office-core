@@ -133,7 +133,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       field: 'proposalCount',
     },
     {
-      title: '#FAPs',
+      title: '#' + i18n.format(t('FAP'), 'plural'),
       render: (data) => data.faps?.length,
     },
   ];
@@ -356,7 +356,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           }),
           (rowData) => ({
             icon: GridOnIcon,
-            tooltip: `Export Fap Data`,
+            tooltip: `Export ${t('Fap')} Data`,
             onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
             position: 'row',
           }),
