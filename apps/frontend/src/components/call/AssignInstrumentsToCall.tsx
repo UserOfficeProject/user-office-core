@@ -30,6 +30,7 @@ const FapSelectionComponent = ({
     active: true,
     role: currentRole as UserRole,
   });
+  const { t } = useTranslation();
 
   const fapOptions =
     allActiveFaps?.map((fap) => ({
@@ -44,7 +45,7 @@ const FapSelectionComponent = ({
       options={fapOptions}
       isOptionEqualToValue={(option, value) => option.value === value.value}
       renderInput={(params) => (
-        <TextField {...params} label="Fap" margin="none" />
+        <TextField {...params} label={t('Fap')} margin="none" />
       )}
       onChange={(_event, newValue) => {
         onChange(id, newValue?.value || null);
@@ -89,7 +90,7 @@ const AssignInstrumentsToCall = ({
     { title: 'Short code', field: 'shortCode' },
     { title: 'Description', field: 'description' },
     {
-      title: 'FAP',
+      title: t('FAP'),
       field: 'fap',
       render: (rowData: Instrument) => (
         <FapSelectionComponent {...rowData} onChange={onChange} />

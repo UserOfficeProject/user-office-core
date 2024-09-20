@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import { saveFapMeetingDecisionValidationSchema } from '@user-office-software/duo-validation';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
@@ -48,6 +49,7 @@ const FinalRankingForm = ({
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const [shouldSubmit, setShouldSubmit] = useState(false);
+  const { t } = useTranslation();
 
   const fapMeetingDecision = proposalData.fapMeetingDecisions?.find(
     (fmd) => fmd.instrumentId === instrumentId
@@ -85,7 +87,7 @@ const FinalRankingForm = ({
     };
 
     await api({
-      toastSuccessMessage: `Fap meeting decision ${
+      toastSuccessMessage: `${t('Fap')} meeting decision ${
         shouldSubmitMeetingDecision ? 'submitted' : 'saved'
       } successfully!`,
     }).saveFapMeetingDecision({ saveFapMeetingDecisionInput });
@@ -127,8 +129,7 @@ const FinalRankingForm = ({
                   },
                   {
                     title: 'Please confirm',
-                    description:
-                      'I am aware that no further changes to the Fap meeting are possible after submission.',
+                    description: `I am aware that no further changes to the ${t('Fap')} meeting are possible after submission.`,
                   }
                 )();
               } else {
@@ -147,7 +148,7 @@ const FinalRankingForm = ({
             <Form>
               <PromptIfDirty />
               <Typography variant="h6" gutterBottom>
-                Fap Meeting form
+                {`${t('Fap')} Meeting form`}
               </Typography>
               <Grid container spacing={3}>
                 <Grid item sm={6} xs={12}>
