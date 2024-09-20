@@ -1,42 +1,29 @@
-import MaterialTable, { OrderByCollection } from '@material-table/core';
+import MaterialTable, { Column, OrderByCollection } from '@material-table/core';
 import { t, TFunction } from 'i18next';
 import React, { useEffect, useState } from 'react';
-import { NumberParam, StringParam, useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
-import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
-import {
-  ProposalsFilter,
-  ProposalViewInstrument,
-  ProposalViewTechnique,
-  User,
-} from 'generated/sdk';
+import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
-import { addColumns, fromArrayToCommaSeparated } from 'utils/helperFunctions';
+import {
+  addColumns,
+  fromArrayToCommaSeparated,
+  setSortDirectionOnSortField,
+} from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 
 import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
-export interface ProposalData {
-  callId: number;
-  proposalId: string;
-  title: string;
-  submittedDate: Date;
-  instruments: ProposalViewInstrument[] | null;
-  techniques: ProposalViewTechnique[] | null;
-  principalInvestigator: User | null;
-  statusName: string;
-}
-
 const XpressProposalTable = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedProposals, setSelectedProposals] = useState<ProposalData[]>(
-    []
-  );
+  const [selectedProposals, setSelectedProposals] = useState<
+    ProposalViewData[]
+  >([]);
   const { techniques, loadingTechniques } = useTechniquesData();
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useCallsData();
@@ -46,16 +33,19 @@ const XpressProposalTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const PREFETCH_SIZE = 200;
 
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    ...DefaultQueryParams,
-    call: NumberParam,
-    instrument: NumberParam,
-    technique: NumberParam,
-    proposalId: StringParam,
-    to: StringParam,
-    from: StringParam,
-    proposalStatus: NumberParam,
-  });
+  const [searchParams, setSearchParams] = useSearchParams({});
+
+  const callId = searchParams.get('callId');
+  const instrument = searchParams.get('instrument');
+  const technique = searchParams.get('technique');
+  const proposalId = searchParams.get('proposalId');
+  const to = searchParams.get('to');
+  const from = searchParams.get('from');
+  const proposalStatusId = searchParams.get('proposalStatusId');
+  const search = searchParams.get('search');
+  const selection = searchParams.getAll('selection');
+  const sortField = searchParams.get('sortField');
+  const sortDirection = searchParams.get('sortDirection');
 
   type QueryParameters = {
     query: {
@@ -69,36 +59,32 @@ const XpressProposalTable = () => {
       first: PREFETCH_SIZE,
       offset: 0,
     },
-    searchText: urlQueryParams.search ?? undefined,
+    searchText: search ?? undefined,
   });
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
-    callId: urlQueryParams.call,
+    callId: callId ? +callId : undefined,
     instrumentFilter: {
-      instrumentId: urlQueryParams.instrument
-        ? +urlQueryParams.instrument
-        : null,
-      showAllProposals: !urlQueryParams.instrument,
+      instrumentId: instrument ? +instrument : null,
+      showAllProposals: !instrument,
       showMultiInstrumentProposals: false,
     },
     techniqueFilter: {
-      techniqueId: urlQueryParams.technique ? +urlQueryParams.technique : null,
-      showAllProposals: !urlQueryParams.technique,
+      techniqueId: technique ? +technique : null,
+      showAllProposals: !technique,
       showMultiTechniqueProposals: false,
     },
     dateFilter: {
-      to: urlQueryParams.to ? urlQueryParams.to : null,
-      from: urlQueryParams.from ? urlQueryParams.from : null,
+      to: to ? to : null,
+      from: from ? from : null,
     },
-    referenceNumbers: urlQueryParams.proposalId
-      ? [urlQueryParams.proposalId]
-      : undefined,
-    proposalStatusId: urlQueryParams.proposalStatus,
-    text: urlQueryParams.search,
+    referenceNumbers: proposalId ? [proposalId] : undefined,
+    proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
+    text: search,
     excludeProposalStatusIds: [9],
   });
 
-  const columns = [
+  let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
       cellStyle: { padding: 0, minWidth: 120 },
@@ -116,21 +102,9 @@ const XpressProposalTable = () => {
       ...{ width: 'auto' },
     },
     {
-      title: 'Status',
-      field: 'statusName',
-    },
-    {
-      title: 'Date submitted',
-      field: 'submittedDate',
-      ...{ width: 'auto' },
-    },
-  ];
-
-  const piColumn = () => [
-    {
       title: 'Principal Investigator',
       field: 'principalInvestigator',
-      render: (proposalView: ProposalData) => {
+      render: (proposalView: ProposalViewData) => {
         if (
           proposalView.principalInvestigator?.lastname &&
           proposalView.principalInvestigator?.preferredname
@@ -152,6 +126,15 @@ const XpressProposalTable = () => {
       field: 'principalInvestigator.email',
       sorting: false,
       emptyValue: '-',
+    },
+    {
+      title: 'Status',
+      field: 'statusName',
+    },
+    {
+      title: 'Date submitted',
+      field: 'submittedDate',
+      ...{ width: 'auto' },
     },
   ];
 
@@ -181,9 +164,10 @@ const XpressProposalTable = () => {
     },
   ];
 
-  addColumns(columns, piColumn());
   addColumns(columns, instrumentManagementColumns(t));
   addColumns(columns, techniquesColumns());
+
+  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading, proposalsData, totalCount, setProposalsData } =
@@ -230,36 +214,30 @@ const XpressProposalTable = () => {
       ...queryParameters,
       searchText: searchText ? searchText : undefined,
     });
-    setUrlQueryParams({ search: searchText ? searchText : undefined });
+
+    setSearchParams((searchParam) => {
+      searchParam.delete('search');
+
+      if (searchText) searchParam.set('search', searchText);
+
+      return searchParam;
+    });
   };
 
-  const proposalDataWithIdAndRowActions = tableData.map((proposal) => {
-    return {
-      callId: proposal.callId,
-      proposalId: proposal.proposalId,
-      title: proposal.title,
-      submittedDate: proposal.submittedDate,
-      instruments: proposal.instruments,
-      techniques: proposal.techniques,
-      principalInvestigator: proposal.principalInvestigator,
-      statusName: proposal.statusName,
-    };
-  });
-
   useEffect(() => {
-    if (urlQueryParams.selection.length > 0) {
-      const selection = new Set(urlQueryParams.selection);
+    if (selection && selection.length > 0) {
+      const selectionSet = new Set(selection);
       const selected: ProposalViewData[] = [];
       setPreselectedProposalsData(
         proposalsData.map((proposal) => {
-          if (selection.has(proposal.proposalId.toString())) {
+          if (selectionSet.has(proposal.primaryKey.toString())) {
             selected.push(proposal);
           }
 
           return {
             ...proposal,
             tableData: {
-              checked: selection.has(proposal.proposalId.toString()),
+              checked: selectionSet.has(proposal.primaryKey.toString()),
             },
           };
         })
@@ -275,15 +253,20 @@ const XpressProposalTable = () => {
       );
       setSelectedProposals([]);
     }
-  }, [proposalsData, urlQueryParams.selection]);
+  }, [proposalsData, JSON.stringify(selection)]);
 
   const handleSortOrderChange = (orderByCollection: OrderByCollection[]) => {
     const [orderBy] = orderByCollection;
-    setUrlQueryParams((params) => ({
-      ...params,
-      sortField: orderBy?.orderByField,
-      sortDirection: orderBy?.orderDirection,
-    }));
+    setSearchParams((searchParam) => {
+      searchParam.delete('sortField');
+      searchParam.delete('sortDirection');
+      if (orderBy?.orderByField != null && orderBy?.orderDirection != null) {
+        searchParam.set('sortField', orderBy?.orderByField);
+        searchParam.set('sortDirection', orderBy?.orderDirection);
+      }
+
+      return searchParam;
+    });
   };
 
   return (
@@ -304,16 +287,16 @@ const XpressProposalTable = () => {
             setProposalFilter={setProposalFilter}
             filter={proposalFilter}
           />
-          <MaterialTable<ProposalData>
+          <MaterialTable<ProposalViewData>
             icons={tableIcons}
             title={'Xpress Proposals'}
             columns={columns}
-            data={proposalDataWithIdAndRowActions}
+            data={tableData}
             totalCount={20}
             isLoading={loading}
             options={{
               search: true,
-              searchText: urlQueryParams.search || undefined,
+              searchText: search || undefined,
               selection: true,
               headerSelectionProps: {
                 inputProps: { 'aria-label': 'Select All Rows' },
@@ -321,20 +304,23 @@ const XpressProposalTable = () => {
               debounceInterval: 600,
               columnsButton: true,
               pageSize: 20,
-              selectionProps: (rowdata: ProposalData) => ({
+              selectionProps: (rowdata: ProposalViewData) => ({
                 inputProps: {
                   'aria-label': `${rowdata.title}-select`,
                 },
               }),
             }}
             onSelectionChange={(selectedItems) => {
-              setUrlQueryParams({
-                selection:
-                  selectedItems.length > 0
-                    ? selectedItems.map((selectedItem) =>
-                        selectedItem.proposalId.toString()
-                      )
-                    : undefined,
+              setSearchParams((searchParam) => {
+                searchParam.delete('selection');
+                selectedItems.map((selectedItem) =>
+                  searchParam.append(
+                    'selection',
+                    selectedItem.primaryKey.toString()
+                  )
+                );
+
+                return searchParam;
               });
             }}
             onOrderCollectionChange={handleSortOrderChange}
@@ -359,7 +345,7 @@ const XpressProposalTable = () => {
             }}
             localization={{
               toolbar: {
-                nRowsSelected: `${urlQueryParams.selection.length} row(s) selected`,
+                nRowsSelected: `${selection.length} row(s) selected`,
               },
             }}
           />
