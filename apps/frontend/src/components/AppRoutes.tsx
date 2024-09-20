@@ -80,6 +80,9 @@ const PdfTemplatesPage = lazy(() => import('./template/PdfTemplatesPage'));
 const ProposalTemplatesPage = lazy(
   () => import('./template/ProposalTemplatesPage')
 );
+const FapReviewTemplatesPage = lazy(
+  () => import('./template/FapReviewTemplatesPage')
+);
 const QuestionsPage = lazy(() => import('./template/QuestionsPage'));
 const SampleEsiPage = lazy(() => import('./template/SampleEsiPage'));
 const SampleTemplatesPage = lazy(
@@ -304,6 +307,15 @@ const AppRoutes = () => {
           path="/PdfTemplates"
           element={
             <TitledRoute title="PDF Templates" element={<PdfTemplatesPage />} />
+          }
+        />
+        <Route
+          path="/FapReviewTemplates"
+          element={
+            <TitledRoute
+              title="FAP Review Templates"
+              element={<FapReviewTemplatesPage />}
+            />
           }
         />
         <Route

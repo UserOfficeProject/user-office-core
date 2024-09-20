@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
@@ -9,15 +9,14 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import ExperimentsTable from './ExperimentTimesTable';
 
 export default function InstrSciUpcomingExperimentTimesTable() {
-  const [urlQueryParams] = useQueryParams({
-    instrument: NumberParam,
-  });
+  const [searchParams] = useSearchParams();
+  const instrumentId = searchParams.get('instrument');
 
   const { instruments, loadingInstruments } = useInstrumentsData();
 
   const [selectedInstrumentId, setSelectedInstrumentId] = useState<
     number | null | undefined
-  >(urlQueryParams.instrument ? urlQueryParams.instrument : null);
+  >(instrumentId ? +instrumentId : null);
 
   const { loading, proposalScheduledEvents } =
     useProposalBookingsScheduledEvents({

@@ -4,7 +4,7 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
 import Box from '@mui/material/Box';
 import React, { useCallback, useEffect, useState } from 'react';
-import { NumberParam, useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -64,10 +64,10 @@ const FapAssignedReviewersTable = ({
   updateView,
 }: FapAssignedReviewersTableProps) => {
   const { api } = useDataApiWithFeedback();
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    reviewerModal: NumberParam,
-    modalTab: NumberParam,
-  });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const reviewerModal = searchParams.get('reviewerModal');
+
   const [openProposalPk, setOpenProposalPk] = useState<number | null>(null);
   const hasAccessRights = useCheckAccess([
     UserRole.USER_OFFICER,
@@ -126,10 +126,15 @@ const FapAssignedReviewersTable = ({
   }, [getFapAssignments]);
 
   const proposalReviewModalShouldOpen =
-    !!urlQueryParams.reviewerModal && openProposalPk === fapProposal.proposalPk;
+    !!reviewerModal && openProposalPk === fapProposal.proposalPk;
 
   const onProposalReviewModalClose = () => {
-    setUrlQueryParams({ reviewerModal: undefined, modalTab: undefined });
+    setSearchParams((searchParams) => {
+      searchParams.delete('reviewerModal');
+      searchParams.delete('modalTab');
+
+      return searchParams;
+    });
     openProposalPk && updateView(openProposalPk);
     setOpenProposalPk(null);
   };
@@ -163,7 +168,8 @@ const FapAssignedReviewersTable = ({
         setProposalReviewModalOpen={onProposalReviewModalClose}
       >
         <ProposalReviewContent
-          reviewId={urlQueryParams.reviewerModal}
+          proposalPk={fapProposal.proposalPk}
+          reviewId={reviewerModal ? +reviewerModal : undefined}
           fapId={fapProposal.fapId}
           tabNames={reviewProposalTabNames}
         />
@@ -209,15 +215,24 @@ const FapAssignedReviewersTable = ({
                 return;
               }
 
-              setUrlQueryParams({
-                modalTab: isDraftStatus(rowData?.review?.status)
-                  ? reviewProposalTabNames.indexOf(
-                      PROPOSAL_MODAL_TAB_NAMES.GRADE
-                    )
-                  : reviewProposalTabNames.indexOf(
-                      PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION
-                    ),
-                reviewerModal: rowData.review.id,
+              setSearchParams((searchParams) => {
+                if (rowData.review)
+                  searchParams.set(
+                    'reviewerModal',
+                    rowData.review.id.toString()
+                  );
+                searchParams.set(
+                  'modalTab',
+                  isDraftStatus(rowData?.review?.status)
+                    ? reviewProposalTabNames
+                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
+                        .toString()
+                    : reviewProposalTabNames
+                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
+                        .toString()
+                );
+
+                return searchParams;
               });
               setOpenProposalPk(fapProposal.proposalPk);
             },

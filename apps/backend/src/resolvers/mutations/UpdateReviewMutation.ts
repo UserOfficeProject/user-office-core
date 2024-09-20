@@ -29,6 +29,9 @@ export class UpdateReviewArgs {
 
   @Field(() => Int)
   public fapID: number;
+
+  @Field(() => Int)
+  public questionaryID: number;
 }
 
 @Resolver()
