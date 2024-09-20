@@ -4,6 +4,7 @@ import { createFapValidationSchema } from '@user-office-software/duo-validation/
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
@@ -17,6 +18,7 @@ type AddFapProps = {
 
 const AddFap = ({ close }: AddFapProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { t } = useTranslation();
 
   return (
     <Formik
@@ -29,7 +31,7 @@ const AddFap = ({ close }: AddFapProps) => {
       onSubmit={async (values): Promise<void> => {
         try {
           const { createFap } = await api({
-            toastSuccessMessage: 'Fap created successfully!',
+            toastSuccessMessage: `${t('Fap')} created successfully!`,
           }).createFap(values);
 
           close(createFap);
@@ -42,7 +44,7 @@ const AddFap = ({ close }: AddFapProps) => {
       {(): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h1">
-            Create new Fap
+            Create new {t('Fap')}
           </Typography>
 
           <Field

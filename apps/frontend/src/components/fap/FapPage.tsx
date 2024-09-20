@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
@@ -24,6 +25,7 @@ const FapPage = () => {
     UserRole.FAP_CHAIR,
     UserRole.FAP_SECRETARY,
   ]);
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -38,7 +40,7 @@ const FapPage = () => {
   if (!fap) {
     return (
       <StyledContainer maxWidth={false}>
-        <StyledPaper>Fap not found</StyledPaper>
+        <StyledPaper>{t('Fap')} not found</StyledPaper>
       </StyledContainer>
     );
   }
