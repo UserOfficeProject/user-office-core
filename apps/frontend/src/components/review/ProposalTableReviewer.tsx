@@ -19,9 +19,11 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   ReviewerFilter,
   ReviewStatus,
+  UserRole,
   UserWithReviewsQuery,
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
@@ -85,6 +87,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
+  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { user } = useContext(UserContext);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -406,12 +409,14 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item sm={3} xs={12}>
-          <ReviewerFilterComponent
-            reviewer={reviewer}
-            onChange={handleReviewerFilterChange}
-          />
-        </Grid>
+        {isFapReviewer && (
+          <Grid item sm={3} xs={12}>
+            <ReviewerFilterComponent
+              reviewer={reviewer}
+              onChange={handleReviewerFilterChange}
+            />
+          </Grid>
+        )}
         <Grid item sm={3} xs={12}>
           <ReviewStatusFilter
             reviewStatus={reviewStatus}
