@@ -33,6 +33,13 @@ export class StfcDownloadService implements DownloadService {
     let proposalPdfData = null;
     let fileName = '';
 
+    const requesterContext = {
+      requestedBy: req.user?.accessTokenId
+        ? 'API key'
+        : req.user?.currentRole.title,
+      accessTokenOrUserId: req.user?.accessTokenId || req.user?.user.id,
+    };
+
     if (
       properties?.data?.length === 1 &&
       type === PDFType.PROPOSAL &&
@@ -62,6 +69,7 @@ export class StfcDownloadService implements DownloadService {
             callShortCode: call?.shortCode,
             facilityIdentifiedAs: facility,
             storedFileName: fileName,
+            ...requesterContext,
           };
 
           try {
@@ -70,6 +78,7 @@ export class StfcDownloadService implements DownloadService {
             next({
               error: error,
               ...loggingContext,
+              ...requesterContext,
             });
           }
 
@@ -83,6 +92,7 @@ export class StfcDownloadService implements DownloadService {
                 error: streamError,
                 ...loggingContext,
                 formattedFilename: fileName,
+                ...requesterContext,
               });
             });
 
@@ -93,6 +103,7 @@ export class StfcDownloadService implements DownloadService {
               `Proposal PDF for ${data.proposal.proposalId} not found in Postgres storage, generating via Factory instead`,
               {
                 ...loggingContext,
+                ...requesterContext,
               }
             );
           }
@@ -117,6 +128,7 @@ export class StfcDownloadService implements DownloadService {
                 call: proposal.callId,
                 storedFileName: fileName,
                 statusCode: res.statusCode,
+                ...requesterContext,
               }
             );
           } else {
@@ -126,6 +138,7 @@ export class StfcDownloadService implements DownloadService {
               call: proposal.callId,
               storedFileName: fileName,
               statusCode: res.statusCode,
+              ...requesterContext,
             });
           }
         });
@@ -138,6 +151,7 @@ export class StfcDownloadService implements DownloadService {
           proposalId: proposal.proposalId,
           call: proposal.callId,
           storedFileName: fileName,
+          ...requesterContext,
         });
       }
 
