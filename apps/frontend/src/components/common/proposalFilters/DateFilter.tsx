@@ -16,7 +16,7 @@ type DateFilterProps = {
   onChange?: Dispatch<DateFilterInput>;
 };
 
-const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
+const DateFilter = ({ onChange }: DateFilterProps) => {
   const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -25,19 +25,23 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const fromDate = searchParams.get('startsAt');
+  const toDate = searchParams.get('endsAt');
+
   return (
     <>
       <FormControl fullWidth>
-        <InputLabel id="date-select-label" shrink>
-          Date
-        </InputLabel>
         <Grid container spacing={2}>
           <LocalizationProvider dateAdapter={DateAdapter}>
             <Grid item sm={3} xs={12}>
               <DatePicker
                 format={inputDateFormat}
-                label="From"
-                value={from ? DateTime.fromFormat(from, inputDateFormat) : null}
+                label="From date"
+                value={
+                  fromDate
+                    ? DateTime.fromFormat(fromDate, inputDateFormat)
+                    : null
+                }
                 onChange={(startsAt) => {
                   setSearchParams((searchParams) => {
                     searchParams.delete('startsAt');
@@ -76,8 +80,10 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
             <Grid item sm={3} xs={12}>
               <DatePicker
                 format={inputDateFormat}
-                label="To"
-                value={to ? DateTime.fromFormat(to, inputDateFormat) : null}
+                label="To date"
+                value={
+                  toDate ? DateTime.fromFormat(toDate, inputDateFormat) : null
+                }
                 onChange={(endsAt) => {
                   setSearchParams((searchParams) => {
                     searchParams.delete('endsAt');
