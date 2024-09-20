@@ -1,14 +1,12 @@
 import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { QueryParamConfig } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import DateFilter from 'components/common/proposalFilters/DateFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStatusFilter';
 import TechniqueFilter from 'components/common/proposalFilters/TechniqueFilter';
-import { UrlQueryParamsType } from 'components/common/SuperMaterialTable';
 import {
   Call,
   InstrumentFragment,
@@ -16,17 +14,6 @@ import {
   ProposalStatus,
   TechniqueFragment,
 } from 'generated/sdk';
-
-export type ProposalUrlQueryParamsType = {
-  call: QueryParamConfig<number | null | undefined>;
-  instrument: QueryParamConfig<string | null | undefined>;
-  reviewModal: QueryParamConfig<number | null | undefined>;
-  modalTab: QueryParamConfig<number | null | undefined>;
-  compareOperator: QueryParamConfig<string | null | undefined>;
-  proposalId: QueryParamConfig<string | null | undefined>;
-  value: QueryParamConfig<string | null | undefined>;
-  dataType: QueryParamConfig<string | null | undefined>;
-} & UrlQueryParamsType;
 
 type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
