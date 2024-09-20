@@ -1426,10 +1426,8 @@ context('Fap reviews tests', () => {
         .find('[data-cy="view-proposal-details-icon"]')
         .click();
       cy.get('[role="presentation"] [role="tab"]').contains('Grade').click();
-
-      cy.get('[role="presentation"] form button[type="submit"]').should(
-        'be.disabled'
-      );
+      cy.contains('button', 'Review').click();
+      cy.get('[data-cy="button-submit-proposal"]').should('be.disabled');
     });
 
     it('FAP review should be removed if proposal is removed from instrument', () => {
