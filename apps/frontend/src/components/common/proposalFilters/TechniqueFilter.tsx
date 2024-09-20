@@ -50,7 +50,7 @@ const TechniqueFilter = ({
     <>
       <FormControl fullWidth>
         <InputLabel id="technique-select-label" shrink>
-          {t('technique')}
+          {t('Technique')}
         </InputLabel>
         {isLoading ? (
           <Box sx={{ minHeight: '32px', marginTop: '16px' }}>Loading...</Box>
@@ -65,9 +65,9 @@ const TechniqueFilter = ({
                 showAllProposals: false,
               };
               setSearchParams((searchParams) => {
-                searchParams.delete('instrument');
+                searchParams.delete('technique');
                 if (e.target.value) {
-                  searchParams.set('instrument', e.target.value.toString());
+                  searchParams.set('technique', e.target.value.toString());
                 }
 
                 return searchParams;
