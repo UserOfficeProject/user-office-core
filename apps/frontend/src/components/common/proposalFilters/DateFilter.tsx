@@ -3,7 +3,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
 import React, { Dispatch } from 'react';
-import { useQueryParams, StringParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { DateFilterInput, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -23,10 +23,7 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
 
   const inputDateFormat = format ?? DEFAULT_DATE_FORMAT;
 
-  const [query, setQuery] = useQueryParams({
-    to: StringParam,
-    from: StringParam,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <>
@@ -42,15 +39,21 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
                 label="From"
                 value={from ? DateTime.fromFormat(from, inputDateFormat) : null}
                 onChange={(startsAt) => {
-                  setQuery({
-                    from: startsAt
-                      ? DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
+                  setSearchParams((searchParams) => {
+                    searchParams.delete('startsAt');
+                    if (startsAt) {
+                      searchParams.set(
+                        'startsAt',
+                        DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
                           inputDateFormat
                         )
-                      : undefined,
+                      );
+                    }
+
+                    return searchParams;
                   });
                   const newValue: DateFilterInput = {
-                    to: query.to,
+                    to: searchParams.get('to'),
                     from: startsAt
                       ? DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
                           inputDateFormat
@@ -76,12 +79,18 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
                 label="To"
                 value={to ? DateTime.fromFormat(to, inputDateFormat) : null}
                 onChange={(endsAt) => {
-                  setQuery({
-                    to: endsAt
-                      ? DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
+                  setSearchParams((searchParams) => {
+                    searchParams.delete('endsAt');
+                    if (endsAt) {
+                      searchParams.set(
+                        'endsAt',
+                        DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
                           inputDateFormat
                         )
-                      : undefined,
+                      );
+                    }
+
+                    return searchParams;
                   });
                   const newValue: DateFilterInput = {
                     to: endsAt
@@ -89,7 +98,7 @@ const DateFilter = ({ from, to, onChange }: DateFilterProps) => {
                           inputDateFormat
                         )
                       : undefined,
-                    from: query.from,
+                    from: searchParams.get('from'),
                   };
                   onChange?.(newValue);
                 }}

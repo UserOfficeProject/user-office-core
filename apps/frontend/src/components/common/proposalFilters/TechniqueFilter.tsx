@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React, { Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, StringParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { TechniqueFilterInput, TechniqueFragment } from 'generated/sdk';
 
@@ -35,9 +35,7 @@ const TechniqueFilter = ({
   shouldShowMultiple,
   showMultiTechniqueProposals,
 }: TechniqueFilterProps) => {
-  const [, setQuery] = useQueryParams({
-    technique: StringParam,
-  });
+  const [, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
 
   if (techniques === undefined) {
@@ -66,10 +64,13 @@ const TechniqueFilter = ({
                 showMultiTechniqueProposals: false,
                 showAllProposals: false,
               };
-              setQuery({
-                technique: e.target.value
-                  ? e.target.value.toString()
-                  : undefined,
+              setSearchParams((searchParams) => {
+                searchParams.delete('instrument');
+                if (e.target.value) {
+                  searchParams.set('instrument', e.target.value.toString());
+                }
+
+                return searchParams;
               });
               if (
                 e.target.value === TechniqueFilterEnum.ALL ||
