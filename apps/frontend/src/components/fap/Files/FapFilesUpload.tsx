@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   FileIdWithCaptionAndFigure,
@@ -19,10 +20,11 @@ type FapFilesProps = {
 const FapFiles = ({ data, onFapUpdate }: FapFilesProps) => {
   const fap = { ...data };
   const { api } = useDataApiWithFeedback();
+  const { t } = useTranslation();
 
   const sendFapUpdate = async (values: Fap): Promise<void> => {
     await api({
-      toastSuccessMessage: 'Fap updated successfully!',
+      toastSuccessMessage: `${t('Fap')} updated successfully!`,
     }).updateFap(values);
     onFapUpdate(values);
   };
@@ -34,7 +36,7 @@ const FapFiles = ({ data, onFapUpdate }: FapFilesProps) => {
   return (
     <>
       <Typography variant="h6" component="h2" gutterBottom>
-        {`${fap.code} Facility access panel - File Store`}
+        {`${fap.code} ${t('Facility access panel')} - File Store`}
       </Typography>
       <FileUploadComponent
         fileType={'pdf'}
