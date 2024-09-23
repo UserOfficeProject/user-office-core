@@ -66,7 +66,11 @@ const TechniqueFilter = ({
               };
               setSearchParams((searchParams) => {
                 searchParams.delete('technique');
-                if (e.target.value) {
+
+                if (
+                  e.target.value &&
+                  e.target.value != TechniqueFilterEnum.ALL
+                ) {
                   searchParams.set('technique', e.target.value.toString());
                 }
 
