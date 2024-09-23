@@ -46,7 +46,7 @@ export default class TechniqueQueries {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getAll(agent: UserWithRole | null) {
     return await this.dataSource.getTechniques().catch((error) => {
       return rejection('Could not get all techniques', { agent }, error);
