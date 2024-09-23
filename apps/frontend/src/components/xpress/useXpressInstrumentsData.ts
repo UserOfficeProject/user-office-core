@@ -7,12 +7,15 @@ import {
 } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { InstrumentFragment, UserRole } from 'generated/sdk';
+import { InstrumentFragment, TechniqueFragment, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import { ProposalViewData } from './useProposalsCoreData';
 
-export function useXpressInstrumentsData(proposals?: ProposalViewData[]): {
+export function useXpressInstrumentsData(
+  proposals?: ProposalViewData[],
+  techniques?: TechniqueFragment[]
+): {
   loadingInstruments: boolean;
   instruments: InstrumentFragment[];
   setInstruments: Dispatch<SetStateAction<InstrumentFragment[]>>;
@@ -44,6 +47,17 @@ export function useXpressInstrumentsData(proposals?: ProposalViewData[]): {
             )
           : [];
 
+      const instrumentIdList = techniques
+        ? techniques
+            .filter(
+              (technique) =>
+                technique.instruments != null ||
+                technique.instruments != undefined
+            )
+            .flatMap((technique) => technique.instruments)
+            .map((instrument) => instrument.id)
+        : [];
+
       api()
         .getInstruments({ callIds })
         .then((data) => {
@@ -52,7 +66,10 @@ export function useXpressInstrumentsData(proposals?: ProposalViewData[]): {
           }
 
           if (data.instruments) {
-            setInstruments(data.instruments.instruments);
+            const instruments = data.instruments.instruments.filter(
+              (instrument) => instrumentIdList.includes(instrument.id)
+            );
+            setInstruments(instruments);
           }
           setLoadingInstruments(false);
         });
