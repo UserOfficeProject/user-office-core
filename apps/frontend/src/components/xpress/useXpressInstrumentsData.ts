@@ -35,13 +35,13 @@ export function useXpressInstrumentsData(proposals?: ProposalViewData[]): {
     ) {
       const callIds =
         proposals != null && proposals != undefined
-          ? proposals
-              .filter((proposal) => {
-                proposal.callId != null;
-              })
-              .map((proposal) => {
-                return proposal.callId;
-              })
+          ? Array.from(
+              new Set(
+                proposals
+                  .filter((proposal) => proposal.callId != null)
+                  .map((proposal) => proposal.callId)
+              )
+            )
           : [];
 
       api()
