@@ -9,6 +9,7 @@ import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions/transition';
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import UOLoader from 'components/common/UOLoader';
 import { Review, UserRole, FapMeetingDecision, Proposal } from 'generated/sdk';
@@ -57,6 +58,7 @@ const FapMeetingProposalViewModal = ({
     fapId,
     proposalPk
   );
+  const { t } = useTranslation();
 
   const finalHasWriteAccess = fapProposalData?.instrumentSubmitted
     ? isUserOfficer
@@ -109,8 +111,8 @@ const FapMeetingProposalViewModal = ({
                 color: 'white',
               })}
             >
-              Fap Meeting Components - Proposal View: {proposalData?.title} (
-              {proposalData?.proposalId})
+              {t('Fap')} Meeting Components - Proposal View:{' '}
+              {proposalData?.title} ({proposalData?.proposalId})
             </Typography>
           </Toolbar>
         </AppBar>

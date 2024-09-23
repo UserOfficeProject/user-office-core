@@ -178,9 +178,9 @@ const instrumentManagementColumns = (
   },
 ];
 
-const FapReviewColumns = [
+const fapReviewColumns = (t: TFunction<'translation', undefined>) => [
   { title: 'Final status', field: 'finalStatus', emptyValue: '-' },
-  { title: 'FAP', field: 'fapCode', emptyValue: '-', hidden: true },
+  { title: t('FAP'), field: 'fapCode', emptyValue: '-', hidden: true },
 ];
 
 const proposalStatusFilter: Record<string, number> = {
@@ -681,9 +681,9 @@ const ProposalTableInstrumentScientist = ({
   }
 
   if (isFapEnabled) {
-    addColumns(columns, FapReviewColumns);
+    addColumns(columns, fapReviewColumns(t));
   } else {
-    removeColumns(columns, FapReviewColumns);
+    removeColumns(columns, fapReviewColumns(t));
   }
   columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 

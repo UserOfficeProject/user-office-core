@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import { updateFapValidationSchema } from '@user-office-software/duo-validation/lib/fap';
 import { Formik, Form, Field } from 'formik';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
@@ -25,6 +26,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
   const fap = { ...data };
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
+  const { t } = useTranslation();
 
   const [customGradeGuideChecked, setCustomGradeGuideChecked] = useState(
     fap.customGradeGuide
@@ -37,7 +39,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
 
   const sendFapUpdate = async (values: Fap): Promise<void> => {
     await api({
-      toastSuccessMessage: 'Fap updated successfully!',
+      toastSuccessMessage: `${t('Fap')} updated successfully!`,
     }).updateFap(values);
     onFapUpdate(values);
   };
@@ -66,7 +68,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
       }): JSX.Element => (
         <Form>
           <Typography variant="h6" component="h2" gutterBottom>
-            {`${fap.code} Facility access panel`}
+            {`${fap.code} ${t('Facility access panel')}`}
           </Typography>
           <Grid container spacing={3}>
             <Grid item sm={6} xs={12}>
