@@ -17,6 +17,7 @@ query getTechniqueScientistProposals(
       finalStatus
       statusName
       allocationTimeUnit
+      callId
       callShortCode
       instruments {
         id

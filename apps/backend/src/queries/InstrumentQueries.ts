@@ -45,6 +45,7 @@ export default class InstrumentQueries {
     Roles.FAP_REVIEWER,
     Roles.FAP_CHAIR,
     Roles.FAP_SECRETARY,
+    Roles.INSTRUMENT_SCIENTIST,
   ])
   async getAll(agent: UserWithRole | null, callIds: number[]) {
     if (!callIds || callIds.length === 0) {
