@@ -3,21 +3,12 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React from 'react';
-import { StringParam, withDefault, QueryParamConfig } from 'use-query-params';
 
 export enum StatusActionsLogStatus {
   ALL = 'all',
   SUCCESSFUL = 'true',
   FAILED = 'false',
 }
-
-export type StatusActionsLogQueryFilter = {
-  statusActionsLogStatus: QueryParamConfig<string>;
-};
-export const defaultStatusActionsLogStatusQueryFilter = withDefault(
-  StringParam,
-  StatusActionsLogStatus.ALL
-);
 
 type StatusActionsStatusFilterProps = {
   statusActionsLogStatus: string;

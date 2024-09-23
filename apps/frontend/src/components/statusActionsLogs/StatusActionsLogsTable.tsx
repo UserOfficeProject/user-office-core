@@ -1,20 +1,12 @@
 import MaterialTableCore, {
   Column,
-  OrderByCollection,
   Query,
   QueryResult,
 } from '@material-table/core';
 import { Replay, Refresh } from '@mui/icons-material';
 import { Grid, Typography, useTheme } from '@mui/material';
 import React, { useState } from 'react';
-import { Link as ReactRouterLink } from 'react-router-dom';
-import {
-  NumberParam,
-  QueryParamConfig,
-  StringParam,
-  withDefault,
-} from 'use-query-params';
-import useQueryParams from 'use-query-params/dist/useQueryParams';
+import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
@@ -28,19 +20,8 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import StatusActionsStatusFilter, {
-  defaultStatusActionsLogStatusQueryFilter,
   StatusActionsLogStatus,
-  StatusActionsLogQueryFilter,
 } from './StatusActionsStatusFilter';
-
-export type StatusActionsLogsQueryParams = {
-  call: QueryParamConfig<number | null>;
-  sortDirection: QueryParamConfig<string | null | undefined>;
-  search: QueryParamConfig<string | null | undefined>;
-  sortField: QueryParamConfig<string | null | undefined>;
-  page: QueryParamConfig<number | null | undefined>;
-  pageSize: QueryParamConfig<number | null | undefined>;
-};
 
 const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { toFormattedDateTime } = useFormattedDateTime();
@@ -54,17 +35,16 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const RefreshIcon = (): JSX.Element => <Refresh />;
   const [selectedStatusActionsLog, setStatusActionsLog] =
     useState<StatusActionsLog | null>(null);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    StatusActionsLogsQueryParams & StatusActionsLogQueryFilter
-  >({
-    call: withDefault(NumberParam, null),
-    statusActionsLogStatus: defaultStatusActionsLogStatusQueryFilter,
-    sortDirection: StringParam,
-    search: StringParam,
-    sortField: StringParam,
-    page: NumberParam,
-    pageSize: NumberParam,
+  const [searchParams, setSearchParams] = useSearchParams({
+    statusActionsLogStatus: StatusActionsLogStatus.ALL,
   });
+  const sortField = searchParams.get('sortField');
+  const sortDirection = searchParams.get('sortDirection');
+  const statusActionsLogStatus = searchParams.get('statusActionsLogStatus');
+  const call = searchParams.get('call');
+  const search = searchParams.get('search');
+  const page = searchParams.get('page');
+  const pageSize = searchParams.get('pageSize');
   let columns: Column<StatusActionsLog>[] = [
     {
       title: 'Email Status Action Recipient',
@@ -79,7 +59,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           <ReactRouterLink
             key={proposal.primaryKey}
             to={`/Proposals?reviewModal=${proposal.primaryKey}`}
-            onClick={() => setUrlQueryParams({})}
+            onClick={() => setSearchParams({})}
           >
             {proposal.proposalId}
           </ReactRouterLink>
@@ -108,12 +88,8 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
     return v;
   });
-  if (urlQueryParams.sortField && urlQueryParams.sortDirection) {
-    columns = setSortDirectionOnSortField(
-      columns,
-      urlQueryParams.sortField,
-      urlQueryParams.sortDirection
-    );
+  if (sortField && sortDirection) {
+    columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
   }
   if (localStorageValue) {
     columns = columns.map((column) => ({
@@ -126,10 +102,11 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const handleStatusActionsLogStatusFilterChange = (
     statusActionsLogStatus: StatusActionsLogStatus
   ) => {
-    setUrlQueryParams((params) => ({
-      ...params,
-      statusActionsLogStatus,
-    }));
+    setSearchParams((searchParams) => {
+      searchParams.set('statusActionsLogStatus', statusActionsLogStatus);
+
+      return searchParams;
+    });
     tableRef.current && tableRef.current.onQueryChange({});
   };
   const fetchStatusActionsLogsData = (tableQuery: Query<StatusActionsLog>) =>
@@ -138,19 +115,19 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
         const [orderBy] = tableQuery.orderByCollection;
         let filter = {};
         if (
-          urlQueryParams.statusActionsLogStatus &&
-          urlQueryParams.statusActionsLogStatus !== StatusActionsLogStatus.ALL
+          statusActionsLogStatus &&
+          statusActionsLogStatus !== StatusActionsLogStatus.ALL
         ) {
           filter = {
             ...filter,
             statusActionsSuccessful:
-              urlQueryParams.statusActionsLogStatus === 'true' ? true : false,
+              statusActionsLogStatus === 'true' ? true : false,
           };
         }
-        if (!!urlQueryParams.call) {
+        if (!!call) {
           filter = {
             ...filter,
-            callIds: [urlQueryParams?.call],
+            callIds: [+call],
           };
         }
         const results = await api().getStatusActionsLogs({
@@ -181,13 +158,14 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
         reject(error);
       } finally {
         if (
-          urlQueryParams.statusActionsLogStatus &&
-          urlQueryParams.statusActionsLogStatus === StatusActionsLogStatus.ALL
+          statusActionsLogStatus &&
+          statusActionsLogStatus === StatusActionsLogStatus.ALL
         ) {
-          setUrlQueryParams((params) => ({
-            ...params,
-            statusActionsLogStatus: undefined,
-          }));
+          setSearchParams((searchParams) => {
+            searchParams.delete('statusActionsLogStatus');
+
+            return searchParams;
+          });
         }
       }
     });
@@ -197,7 +175,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <CallFilter
-            callId={urlQueryParams.call}
+            callId={call ? +call : null}
             calls={calls}
             isLoading={loadingCalls}
             shouldShowAll={true}
@@ -208,7 +186,11 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
         </Grid>
         <Grid item sm={3} xs={12}>
           <StatusActionsStatusFilter
-            statusActionsLogStatus={urlQueryParams.statusActionsLogStatus}
+            statusActionsLogStatus={
+              statusActionsLogStatus
+                ? statusActionsLogStatus
+                : StatusActionsLogStatus.ALL
+            }
             onChange={handleStatusActionsLogStatusFilterChange}
           />
         </Grid>
@@ -230,11 +212,11 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           options={{
             search: true,
             selection: false,
-            searchText: urlQueryParams.search || undefined,
+            searchText: search || undefined,
             debounceInterval: 600,
             columnsButton: true,
-            pageSize: urlQueryParams.pageSize || 20,
-            initialPage: urlQueryParams.page || 0,
+            pageSize: pageSize ? +pageSize : 20,
+            initialPage: page ? +page : 0,
             idSynonym: 'statusActionsLogId',
             rowStyle: (rowdata: StatusActionsLog): React.CSSProperties => {
               const style = rowdata.statusActionsSuccessful
@@ -311,26 +293,48 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
             setLocalStorageValue(proposalColumns);
           }}
           onPageChange={(page, pageSize) => {
-            setUrlQueryParams((params) => ({
-              ...params,
-              page: +page.toString(),
-              pageSize: +pageSize.toString(),
-            }));
+            setSearchParams({
+              page: page.toString(),
+              pageSize: pageSize.toString(),
+            });
           }}
           onSearchChange={(searchText) => {
-            setUrlQueryParams((params) => ({
-              ...params,
+            setSearchParams({
               search: searchText ? searchText : '',
-              page: searchText ? 0 : urlQueryParams.pageSize || 0,
-            }));
+              page: searchText ? '0' : page || '',
+            });
+            if (!searchText) {
+              setSearchParams((searchParams) => {
+                searchParams.delete('searchText');
+
+                return searchParams;
+              });
+            } else {
+              setSearchParams((searchParams) => {
+                searchParams.set('searchText', searchText);
+
+                return searchParams;
+              });
+            }
           }}
-          onOrderCollectionChange={(orderByCollection: OrderByCollection[]) => {
+          onOrderCollectionChange={(orderByCollection) => {
             const [orderBy] = orderByCollection;
-            setUrlQueryParams((params) => ({
-              ...params,
-              sortField: orderBy?.orderByField,
-              sortDirection: orderBy?.orderDirection,
-            }));
+
+            if (!orderBy) {
+              setSearchParams((searchParams) => {
+                searchParams.delete('sortField');
+                searchParams.delete('sortDirection');
+
+                return searchParams;
+              });
+            } else {
+              setSearchParams((searchParams) => {
+                searchParams.set('sortField', orderBy?.orderByField);
+                searchParams.set('sortDirection', orderBy?.orderDirection);
+
+                return searchParams;
+              });
+            }
           }}
         />
       </div>
