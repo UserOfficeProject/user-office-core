@@ -46,6 +46,9 @@ export class GenericTemplateBasisConfig {
 export class VisitBasisConfig extends ConfigBase {}
 
 @ObjectType()
+export class FapReviewBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
@@ -291,6 +294,9 @@ export class SampleEsiBasisConfig {
 export class RichTextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   max: number | null;
+
+  @Field(() => Boolean)
+  allowImages: boolean;
 }
 
 @ObjectType()
@@ -335,6 +341,7 @@ export const FieldConfigType = createUnionType({
     ShipmentBasisConfig,
     RichTextInputConfig,
     VisitBasisConfig,
+    FapReviewBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
     InstrumentPickerConfig,

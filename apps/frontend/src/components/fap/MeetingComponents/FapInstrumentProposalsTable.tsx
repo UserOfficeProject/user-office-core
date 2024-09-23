@@ -11,7 +11,8 @@ import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useContext, DragEvent, useState, useEffect } from 'react';
-import { NumberParam, useQueryParams } from 'use-query-params';
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -100,9 +101,10 @@ const FapInstrumentProposalsTable = ({
   fapId,
   selectedCall,
 }: FapInstrumentProposalsTableProps) => {
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    fapMeetingModal: NumberParam,
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const fapMeetingModal = searchParams.get('fapMeetingModal');
+
   const {
     instrumentProposalsData,
     loadingInstrumentProposals,
@@ -115,6 +117,7 @@ const FapInstrumentProposalsTable = ({
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [openProposal, setOpenProposal] = useState<Proposal | null>(null);
+  const { t } = useTranslation();
 
   const getInstrumentTechnicalReview = (
     technicalReviews: TechnicalReview[] | null
@@ -139,7 +142,7 @@ const FapInstrumentProposalsTable = ({
       field: 'proposal.proposalId',
     },
     {
-      title: 'Fap meeting submitted',
+      title: t('Fap') + ' meeting submitted',
       render: (rowData: FapProposal) => {
         const submitted = rowData.proposal.fapMeetingDecisions?.find(
           (fmd) => fmd.instrumentId === fapInstrument.id
@@ -405,8 +408,13 @@ const FapInstrumentProposalsTable = ({
             <IconButton
               color="inherit"
               onClick={() => {
-                setUrlQueryParams({
-                  fapMeetingModal: rowData.proposal.primaryKey,
+                setSearchParams((searchParams) => {
+                  searchParams.set(
+                    'fapMeetingModal',
+                    String(rowData.proposal.primaryKey)
+                  );
+
+                  return searchParams;
                 });
                 setOpenProposal(rowData.proposal);
               }}
@@ -715,15 +723,18 @@ const FapInstrumentProposalsTable = ({
     <Box sx={rootStyles} data-cy="fap-instrument-proposals-table">
       <FapMeetingProposalViewModal
         proposalViewModalOpen={
-          !!urlQueryParams.fapMeetingModal &&
-          urlQueryParams.fapMeetingModal === openProposal?.primaryKey
+          !!fapMeetingModal && +fapMeetingModal === openProposal?.primaryKey
         }
         setProposalViewModalOpen={() => {
-          setUrlQueryParams({ fapMeetingModal: undefined });
+          setSearchParams((searchParams) => {
+            searchParams.delete('fapMeetingModal');
+
+            return searchParams;
+          });
           setOpenProposal(null);
           refreshInstrumentProposalsData();
         }}
-        proposalPk={urlQueryParams.fapMeetingModal}
+        proposalPk={fapMeetingModal ? +fapMeetingModal : undefined}
         meetingSubmitted={onMeetingSubmitted}
         fapId={fapId}
         instrumentId={fapInstrument.id}

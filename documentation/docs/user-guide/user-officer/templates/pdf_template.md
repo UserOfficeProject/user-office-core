@@ -1,20 +1,19 @@
 # PDF Templates :material-file-pdf-box:
 
-## **What are PDF templates?**
-??? info "PDF templates" 
+_________________________________________________________________________________________________________
 
-    **PDF templates** :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardised PDF document for summary and sharing. User Officers can customise PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+## What are PDF templates?
 
-    ______________________________________________________________________________________
+PDF templates :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardized PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
-    <figure markdown="span">  
+<figure markdown="span">  
         ![PDF Template](../../../assets/images/pdf_template.png){ width="450"}
-        <figcaption>**PDF template**</figcaption>
+        <figcaption>PDF template</figcaption>
     </figure>
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I create PDF templates?**
+## How do I create PDF templates?
 
 **Step 1. Navigate to the PDF templates page**
 
@@ -33,11 +32,11 @@ ________________________________________________________________________________
 
 **Step 4. Update your changes**
 
-* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template
+* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I edit PDF templates?**
+## How do I edit PDF templates?
 
 **Step 1. Navigate to the PDF templates page**
 
@@ -54,11 +53,11 @@ ________________________________________________________________________________
 
 **Step 4. Update your changes**
 
-* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template
+* Once you are satisfied with your edits, click the `UPDATE` button to save and apply the changes to the PDF template.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I clone PDF templates?**
+## How do I clone PDF templates?
 
 **Step 1. Navigate to the PDF templates page**
 
@@ -73,15 +72,13 @@ ________________________________________________________________________________
 
 * Click the `CLONE` function on the template to create a clone. Note: the clone will be renamed 'Copy of (name)' and will be edded to the end of the list of PDF templates.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I archive and unarchive PDF templates?**
+## How do I archive and unarchive PDF templates?
 
 The archive system allows you to save PDF templates for future reference. Archiving PDF templates will prevent them from being able to be linked to calls or searched for in the PDF templates page. 
 
-!!! tip ""
-
-    **TIP!** This feature is useful to prevent infrequently used PDF templates from crowding the User Office interface.
+ > **_NOTE:_** This feature is useful to prevent infrequently used PDF templates from crowding the User Office interface.
 
 **Step 1. Navigate to the PDF templates page**
 
@@ -93,9 +90,9 @@ The archive system allows you to save PDF templates for future reference. Archiv
 * To **archive** a PDF template, click on the `ARCHIVE` action next to the template name. This action will send the PDF template to the `ARCHIVED` tab.
 * To **unarchive** a PDF template, simply go to the `ARCHIVED` tab and click on the `UNARCHIVE` action next to the template name. This action will send the PDF template to the `CURRENT` tab.
 
-______________________________________________________________________________________
+_________________________________________________________________________________________________________
 
-## **How do I export and import PDF templates?** 
+## How do I export and import PDF templates?*
 
 **Step 1. Navigate to the PDF templates page**
 
@@ -108,8 +105,10 @@ ________________________________________________________________________________
 
 * To **Import** a PDF template, click on the `IMPORT` button at the bottom of the page. This will open the Import template page. From here, click on `SELECT FILE` to import .json PDF templates.
 
+_________________________________________________________________________________________________________
+
+### What does #calls mean on PDF templates?
+
+* '#Calls' refers to the number of calls the PDF template has been utilized in.
+
 ______________________________________________________________________________________
-
-### **What does #calls mean on PDF templates?**
-
-* '#Calls' refers to the number of calls the PDF template has been utilised in.

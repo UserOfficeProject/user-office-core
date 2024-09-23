@@ -1,10 +1,16 @@
+# HOME
+
+_________________________________________________________________________________________________________
+
 ![UOS Logo](assets/images/uo_logo_small.png){ align=left, width="300" } 
 
 ## Welcome to User Office
 
-The User Office Project is an international collaboration to build flexible web software designed to efficiently run and organize user programs at various scientific facilities. 
+The User Office project is an international collaboration to build flexible web software designed to efficiently run and organize user programs at various scientific facilities. 
 
 We have built this software with flexibility in mind - allowing user officers and user program managers to configure the software to the specific needs of their facility.
+
+_________________________________________________________________________________________________________
 
 ## Key Features
 
@@ -13,6 +19,8 @@ We have built this software with flexibility in mind - allowing user officers an
 - **Technical Reviews:** Facility science staff can submit technical reviews on each proposal.
 - **Scheduler:** User officers can utilize the scheduler for efficient resource allocation, instrument management, and experiment scheduling.
 - **Science Evaluation Panels:** Science evaluation panels can be set up to review proposals.
+
+_________________________________________________________________________________________________________
 
 ## Used at
 
@@ -34,6 +42,9 @@ The Science and Technology Facilities Council (STFC) joined the collaboration wi
 
 The Extreme Light Infrastructure (ELI) is the world's largest and most advanced high-power laser infrastructure. They are a global technology and innovation leader in high-power, high-intensity, and short-pulsed laser systems. 
 
+_________________________________________________________________________________________________________
 
 ## Quickstart
 - [Get started here](quick_start.md)
+
+_________________________________________________________________________________________________________

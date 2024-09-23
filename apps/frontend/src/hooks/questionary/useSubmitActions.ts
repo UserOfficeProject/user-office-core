@@ -1,3 +1,4 @@
+import { fapReviewBasisPreSubmit } from 'components/questionary/questionaryComponents/FapReviewBasis/QuestionaryComponentFapReviewBasis';
 import { feedbackBasisPreSubmit } from 'components/questionary/questionaryComponents/FeedbackBasis/QuestionaryComponentFeedbackBasis';
 import { genericTemplateBasisPreSubmit } from 'components/questionary/questionaryComponents/GenericTemplateBasis/QuestionaryComponentGenericTemplateBasis';
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
@@ -35,6 +36,8 @@ export function usePreSubmitActions() {
           return genericTemplateBasisPreSubmit();
         case DataType.FEEDBACK_BASIS:
           return feedbackBasisPreSubmit();
+        case DataType.FAP_REVIEW_BASIS:
+          return fapReviewBasisPreSubmit();
       }
 
       return [];

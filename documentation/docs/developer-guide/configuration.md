@@ -1,3 +1,7 @@
+# Configuration
+
+_________________________________________________________________________________________________________
+
 This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. 
 
 The configuration is managed through a `.env` file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your `.env` file. 
@@ -7,6 +11,8 @@ The configuration is managed through a `.env` file, which contains environment v
 The `.env` file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. 
 
 For more detailed information, refer to the [dotenv documentation](https://www.npmjs.com/package/dotenv).
+
+_________________________________________________________________________________________________________
 
 ## Environment Variables
 
@@ -94,3 +100,5 @@ The scheduler endpoint is used for managing scheduled tasks:
 The email configuration includes a sink email address for testing purposes:
 
 - **SINK_EMAIL**: The email address to receive sink emails.
+
+_________________________________________________________________________________________________________

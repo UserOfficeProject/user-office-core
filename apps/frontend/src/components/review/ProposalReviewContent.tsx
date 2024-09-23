@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
@@ -25,9 +26,8 @@ import {
   ProposalDataTechnicalReview,
   useProposalData,
 } from 'hooks/proposal/useProposalData';
-import { useReviewData } from 'hooks/review/useReviewData';
 
-import ProposalGrade from './ProposalGrade';
+import ProposalReviewContainer from './ProposalReviewContainer';
 import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
@@ -61,10 +61,10 @@ const ProposalReviewContent = ({
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const { reviewData, setReviewData } = useReviewData(reviewId, fapId);
-  const { proposalData, setProposalData, loading } = useProposalData(
-    proposalPk || reviewData?.proposal?.primaryKey
-  );
+
+  const { proposalData, setProposalData, loading } =
+    useProposalData(proposalPk);
+  const { t } = useTranslation();
 
   if (loading) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
@@ -184,12 +184,7 @@ const ProposalReviewContent = ({
   );
 
   const GradeTab = (
-    <ProposalGrade
-      onChange={() => {}}
-      review={reviewData}
-      setReview={setReviewData}
-      fapId={fapId as number} //grade is only used within Fap
-    />
+    <ProposalReviewContainer fapId={fapId} reviewId={reviewId} />
   );
 
   const AllProposalReviewsTab = isUserOfficer && (
@@ -255,7 +250,10 @@ const ProposalReviewContent = ({
   return (
     <>
       {tabNames.length > 1 ? (
-        <SimpleTabs tabNames={tabNames} isInsideModal={isInsideModal}>
+        <SimpleTabs
+          tabNames={tabNames.map((name) => t(name))}
+          isInsideModal={isInsideModal}
+        >
           {tabsContent}
         </SimpleTabs>
       ) : (

@@ -1,28 +1,9 @@
 # Sub templates :material-collapse-all-outline:
 
-## **What are sub templates?**
-Sub templates
-
 _____________________________________________________________________________________________________
 
+## What are sub templates?
 
-## **How do I link sub templates to other templates?**
-_____________________________________________________________________________________________________
+Sub templates are reusable building blocks used to streamline and organize the creation of complex proposal templates within the User Office system. They contain predefined sets of questions and can be inserted into larger templates, ensuring consistency and reducing the time required to build detailed proposal forms.
 
-## **How do I create sub templates?**
-_____________________________________________________________________________________________________
-
-## **How do I edit sub templates?**
-_____________________________________________________________________________________________________
-
-## **How do I clone sub templates?**
-_____________________________________________________________________________________________________
-
-## **How do I archive and unarchive sub templates?**
-_____________________________________________________________________________________________________
-
-## **How do I import and export sub templates?**
-_____________________________________________________________________________________________________
-
-## **What does #templates mean on sub templates?**
 _____________________________________________________________________________________________________

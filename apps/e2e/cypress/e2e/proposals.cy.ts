@@ -67,6 +67,7 @@ context('Proposal tests', () => {
     endCycle: currentDayStart,
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
+    fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -347,7 +348,7 @@ context('Proposal tests', () => {
         .find('input')
         .uncheck();
       cy.get('.MuiPopover-paper')
-        .contains('Fap')
+        .contains('FAP')
         .parent()
         .find('input')
         .uncheck();
@@ -366,7 +367,7 @@ context('Proposal tests', () => {
       );
       cy.get('[data-cy="officer-proposals-table"] table').should(
         'not.contain',
-        'Fap'
+        'FAP'
       );
 
       cy.get("[aria-label='Show Columns']").first().click();
@@ -376,7 +377,7 @@ context('Proposal tests', () => {
         .find('input')
         .check();
       cy.get('.MuiPopover-paper')
-        .contains('Fap')
+        .contains('FAP')
         .parent()
         .find('input')
         .check();
@@ -389,7 +390,7 @@ context('Proposal tests', () => {
       );
       cy.get('[data-cy="officer-proposals-table"] table').should(
         'contain',
-        'Fap'
+        'FAP'
       );
     });
 
@@ -620,7 +621,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
-      cy.get('@dialog').contains('Change proposal/s status');
+      cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
         .find('#selectedStatusId-input')
@@ -644,7 +645,7 @@ context('Proposal tests', () => {
       cy.get('[data-cy="change-proposal-status"]').click();
 
       cy.get('[role="presentation"] .MuiDialogContent-root').as('dialog');
-      cy.get('@dialog').contains('Change proposal/s status');
+      cy.get('@dialog').contains('Change proposal(s) status');
 
       cy.get('@dialog')
         .find('#selectedStatusId-input')
@@ -1488,6 +1489,62 @@ context('Proposal tests', () => {
       cy.contains(title).parent().contains(instrument.name);
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('td', instrument.name).should('exist');
+    });
+
+    it('Instrument should be automatically un assigned to the proposal when a new instrument is selected', () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('Dashboard').click();
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Back').click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 2').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument2.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('not.exist');
+      cy.contains('td', instrument2.name).should('exist');
     });
 
     it('Multiple instruments should be automatically assigned to the proposal', () => {

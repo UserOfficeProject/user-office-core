@@ -1,6 +1,5 @@
 import Grid from '@mui/material/Grid';
 import React from 'react';
-import { DecodedValueMap } from 'use-query-params';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
@@ -16,11 +15,12 @@ import {
   QuestionFilterInput,
 } from 'generated/sdk';
 
-import { ProposalUrlQueryParamsType } from './ProposalPage';
-
-export const questionaryFilterFromUrlQuery = (
-  urlQuery: DecodedValueMap<ProposalUrlQueryParamsType>
-): QuestionFilterInput | undefined => {
+export const questionaryFilterFromUrlQuery = (urlQuery: {
+  questionId: string | null;
+  compareOperator: string | null;
+  value: string | null;
+  dataType: string | null;
+}): QuestionFilterInput | undefined => {
   if (
     urlQuery.questionId &&
     urlQuery.compareOperator &&

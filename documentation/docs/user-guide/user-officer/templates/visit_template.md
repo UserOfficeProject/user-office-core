@@ -1,24 +1,9 @@
 # Visit Registration Templates :material-airplane-takeoff:
 
-## **What are visit registration templates?**
-
 _____________________________________________________________________________________________________
 
+## What are visit registration templates?
 
-## **How do I mark a visit registration template as active?**
-_____________________________________________________________________________________________________
+Visit registration templates are standardized forms used to collect and organize information about parcels being sent to a facility. These templates can be customized to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.
 
-## **How do I create a visit registration template?**
-_____________________________________________________________________________________________________
-
-## **How do I edit a visit registration template?**
-_____________________________________________________________________________________________________
-
-## **How do I import and export visit registration templates?**
-_____________________________________________________________________________________________________
-
-## **How do I clone visit registration template?**
-_____________________________________________________________________________________________________
-
-## **What does # visits mean on visit registration templates?**
 _____________________________________________________________________________________________________
