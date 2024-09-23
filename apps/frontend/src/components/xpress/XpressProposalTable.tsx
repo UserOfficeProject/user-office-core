@@ -186,9 +186,8 @@ const XpressProposalTable = () => {
     ProposalViewData[]
   >([]);
 
-  const { instruments, loadingInstruments } = useXpressInstrumentsData(
-    loading ? [] : proposalsData
-  );
+  const { instruments, loadingInstruments } =
+    useXpressInstrumentsData(proposalsData);
 
   useEffect(() => {
     let isMounted = true;
