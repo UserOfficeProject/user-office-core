@@ -186,6 +186,10 @@ const XpressProposalTable = () => {
     ProposalViewData[]
   >([]);
 
+  const { instruments, loadingInstruments } = useXpressInstrumentsData(
+    loading ? [] : proposalsData
+  );
+
   useEffect(() => {
     let isMounted = true;
     let endSlice = rowsPerPage * (currentPage + 1);
@@ -267,10 +271,6 @@ const XpressProposalTable = () => {
   useEffect(() => {
     setPreselectedProposalsData(proposalsData);
   }, [proposalsData, queryParameters]);
-
-  const { instruments, loadingInstruments } = useXpressInstrumentsData(
-    preselectedProposalsData
-  );
 
   return (
     <>
