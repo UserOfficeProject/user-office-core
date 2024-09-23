@@ -347,11 +347,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           filter?.dateFilter?.to !== null
         ) {
           const dateParts: string[] = filter.dateFilter.to.split('-');
-          const dateObject: Date = new Date(
-            +dateParts[2],
-            +dateParts[1] - 1,
-            +dateParts[0]
-          );
+          const year = +dateParts[2];
+          const month = +dateParts[1] - 1;
+          const day = +dateParts[0];
+
+          const dateObject: Date = new Date(year, month, day);
+
           this.where('created_at', '<=', dateObject);
         }
       });
