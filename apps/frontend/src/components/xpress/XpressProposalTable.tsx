@@ -5,7 +5,6 @@ import { useSearchParams } from 'react-router-dom';
 
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -17,6 +16,7 @@ import {
 import { tableIcons } from 'utils/materialIcons';
 
 import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
+import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
 const XpressProposalTable = () => {
@@ -25,7 +25,6 @@ const XpressProposalTable = () => {
     ProposalViewData[]
   >([]);
   const { techniques, loadingTechniques } = useTechniquesData();
-  const { instruments, loadingInstruments } = useInstrumentsData();
   const { calls, loadingCalls } = useCallsData();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
@@ -188,10 +187,6 @@ const XpressProposalTable = () => {
   >([]);
 
   useEffect(() => {
-    setPreselectedProposalsData(proposalsData);
-  }, [proposalsData, queryParameters]);
-
-  useEffect(() => {
     let isMounted = true;
     let endSlice = rowsPerPage * (currentPage + 1);
     endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
@@ -268,6 +263,14 @@ const XpressProposalTable = () => {
       return searchParam;
     });
   };
+
+  useEffect(() => {
+    setPreselectedProposalsData(proposalsData);
+  }, [proposalsData, queryParameters]);
+
+  const { instruments, loadingInstruments } = useXpressInstrumentsData(
+    preselectedProposalsData
+  );
 
   return (
     <>
