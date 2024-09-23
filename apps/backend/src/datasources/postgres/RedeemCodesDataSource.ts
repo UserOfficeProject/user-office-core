@@ -38,14 +38,16 @@ export default class PostgresRedeemCodesDataSource
   async updateRedeemCode(
     redeemCode: Partial<RedeemCode> & Pick<RedeemCode, 'code'>
   ): Promise<RedeemCode> {
-    await database('redeem_codes').update({
-      code: redeemCode.code,
-      placeholderUserId: redeemCode.placeholderUserId,
-      createdBy: redeemCode.createdBy,
-      createdAt: redeemCode.createdAt,
-      claimed_at: redeemCode.claimedAt,
-      claimed_by: redeemCode.claimedBy,
-    });
+    await database('redeem_codes')
+      .update({
+        code: redeemCode.code,
+        placeholderUserId: redeemCode.placeholderUserId,
+        createdBy: redeemCode.createdBy,
+        createdAt: redeemCode.createdAt,
+        claimed_at: redeemCode.claimedAt,
+        claimed_by: redeemCode.claimedBy,
+      })
+      .where('code', redeemCode.code);
 
     return this.getRedeemCode(redeemCode.code);
   }
