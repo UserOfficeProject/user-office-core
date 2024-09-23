@@ -113,14 +113,6 @@ module.exports = defineConfig({
       on('task', { unzip });
 
       on('task', { convertXlsxToJson });
-
-      on('task', {
-        log(message) {
-          console.log(message);
-
-          return null;
-        },
-      });
     },
   },
 });
