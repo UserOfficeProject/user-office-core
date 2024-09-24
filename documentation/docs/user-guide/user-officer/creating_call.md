@@ -31,7 +31,7 @@ There are several different types of templates utilized within Calls:
 
     User Officers can also utilize [questions :material-comment-question:](questions.md) and [sub-templates :material-collapse-all-outline:](templates/sub_template.md) to customize review templates to include specific questions based on the nature and requirements of the research.
     ______________________________________________________________________________________
-    <figure markdown="span">  
+    <figure markdown="span">
         ![Proposal](../../assets/images/fap_review_template.png){ width="450"}
         <figcaption>FAP Review (viewed from the user's perspective)</figcaption>
     </figure>
@@ -163,7 +163,7 @@ Lastly, you may also create templates to fully customize them to fit the researc
 
 * [How do I create visit registration templates?](templates/visit_template.md)
 
-* [How do I create proposal ESI templates?](templates/proposalESI_template.md)
+- [How do I create proposal ESI templates?](templates/proposalESI_template.md)
 
 * [How do I create sample ESI templates?](templates/sampleESI_template.md)
 
@@ -244,6 +244,7 @@ Once you have the necessary templates, FAPs and a Proposal Workflow defined for 
 You can navigate between the sections by clicking on the headings or `NEXT` and `BACK` buttons.
 
 #### 1. General
+
 !!! note ""
 
     This is the section where you specify the general information about the call, including:
@@ -258,15 +259,19 @@ You can navigate between the sections by clicking on the headings or `NEXT` and 
      
     * **Reference number format:** The reference number format that determines how reference numbers are generated.
 
-    * **Call template:** The proposal template that the call will utilize.
+    * **Proposal template:** The proposal template that the call will utilize.
 
     * **ESI template:** The Experimental Safety Input (ESI) template the call will utilize.
+
+    * **PDF template:** The PDF template the call will utilize to export proposals to PDF.
+
+    * **FAP Review template:** The FAP review template the call will utilize.
 
     * **Proposal workflow:** The workflow that the Proposal will follow.
 
     * **Allocation time unit:** The unit of time the allocation will be in (Hours, Days or Weeks) 
 
-    * **Title (public):** The name of the Call which will be publicly displayed 
+    * **Title (public):** The name of the Call which will be publicly displayed
 
     * **Description (public):** The description of the Call which will be publicly displayed
 
