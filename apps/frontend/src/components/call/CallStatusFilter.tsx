@@ -3,7 +3,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React, { useContext } from 'react';
-import { StringParam, withDefault, QueryParamConfig } from 'use-query-params';
 
 import { UserContext } from 'context/UserContextProvider';
 
@@ -19,11 +18,6 @@ export type CallStatusFilters =
   | 'active'
   | 'activeinternal'
   | 'inactive';
-export type CallStatusQueryFilter = { callStatus: QueryParamConfig<string> };
-export const defaultCallStatusQueryFilter = withDefault(
-  StringParam,
-  CallStatus.ACTIVE
-);
 
 type CallStatusFilterProps = {
   callStatus: string;

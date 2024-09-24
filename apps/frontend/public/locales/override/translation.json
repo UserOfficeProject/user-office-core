@@ -1,4 +1,8 @@
 {
   "instrument": "Instrument",
-  "instrumentSci": "Instrument Scientist"
+  "instrumentSci": "Instrument Scientist",
+  "Fap": "Fap",
+  "FAP": "FAP",
+  "Facility access panel": "Facility access panel",
+  "FAP reviews": "FAP reviews"
 }
