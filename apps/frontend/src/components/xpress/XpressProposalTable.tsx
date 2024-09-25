@@ -25,7 +25,6 @@ const XpressProposalTable = () => {
     ProposalViewData[]
   >([]);
   const { techniques, loadingTechniques } = useTechniquesData();
-  const { calls, loadingCalls } = useCallsData();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
   const [currentPage, setCurrentPage] = useState(0);
@@ -190,6 +189,8 @@ const XpressProposalTable = () => {
     proposalsData,
     techniques
   );
+
+  const { calls, loadingCalls } = useCallsData();
 
   useEffect(() => {
     let isMounted = true;

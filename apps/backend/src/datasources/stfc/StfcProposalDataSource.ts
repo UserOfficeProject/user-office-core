@@ -337,6 +337,14 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           const month = +dateParts[1] - 1;
           const day = +dateParts[0];
 
+          if (
+            typeof year !== 'number' ||
+            typeof month !== 'number' ||
+            typeof day !== 'number'
+          ) {
+            return;
+          }
+
           const dateObject: Date = new Date(year, month, day);
 
           this.where('created_at', '>=', dateObject);
@@ -350,6 +358,14 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           const year = +dateParts[2];
           const month = +dateParts[1] - 1;
           const day = +dateParts[0];
+
+          if (
+            typeof year !== 'number' ||
+            typeof month !== 'number' ||
+            typeof day !== 'number'
+          ) {
+            return;
+          }
 
           const dateObject: Date = new Date(year, month, day);
 
