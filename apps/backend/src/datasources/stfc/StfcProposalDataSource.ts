@@ -334,20 +334,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         }
         if (
           filter?.dateFilter?.from !== undefined &&
-          filter?.dateFilter?.from !== null
+          filter?.dateFilter?.from !== null &&
+          filter?.dateFilter?.from !== 'invalid datetime'
         ) {
           const dateParts: string[] = filter.dateFilter.from.split('-');
           const year = +dateParts[2];
           const month = +dateParts[1] - 1;
           const day = +dateParts[0];
-
-          if (
-            typeof year !== 'number' ||
-            typeof month !== 'number' ||
-            typeof day !== 'number'
-          ) {
-            return;
-          }
 
           const dateObject: Date = new Date(year, month, day);
 
@@ -356,20 +349,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
         if (
           filter?.dateFilter?.to !== undefined &&
-          filter?.dateFilter?.to !== null
+          filter?.dateFilter?.to !== null &&
+          filter?.dateFilter?.to !== 'Invalid DateTime'
         ) {
           const dateParts: string[] = filter.dateFilter.to.split('-');
           const year = +dateParts[2];
           const month = +dateParts[1] - 1;
           const day = +dateParts[0];
-
-          if (
-            typeof year !== 'number' ||
-            typeof month !== 'number' ||
-            typeof day !== 'number'
-          ) {
-            return;
-          }
 
           const dateObject: Date = new Date(year, month, day);
 
