@@ -306,7 +306,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (
           filter?.dateFilter?.from !== undefined &&
           filter?.dateFilter?.from !== null &&
-          filter?.dateFilter?.from !== 'invalid datetime'
+          filter?.dateFilter?.from !== 'Invalid DateTime'
         ) {
           const dateParts: string[] = filter.dateFilter.from.split('-');
           const year = +dateParts[2];
