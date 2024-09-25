@@ -40,10 +40,6 @@ export default class PostgresRedeemCodesDataSource
   ): Promise<RedeemCode> {
     await database('redeem_codes')
       .update({
-        code: redeemCode.code,
-        placeholderUserId: redeemCode.placeholderUserId,
-        createdBy: redeemCode.createdBy,
-        createdAt: redeemCode.createdAt,
         claimed_at: redeemCode.claimedAt,
         claimed_by: redeemCode.claimedBy,
       })
