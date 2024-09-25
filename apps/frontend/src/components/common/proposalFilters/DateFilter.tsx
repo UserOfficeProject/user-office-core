@@ -28,10 +28,6 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
   const fromDate = searchParams.get('startsAt');
   const toDate = searchParams.get('endsAt');
 
-  const isValidDate = (date: DateTime): boolean => {
-    return DateTime.fromJSDate(date.toJSDate()).isValid;
-  };
-
   return (
     <>
       <FormControl fullWidth>
@@ -47,29 +43,29 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
                     : null
                 }
                 onChange={(startsAt) => {
-                  if (startsAt && isValidDate(startsAt)) {
-                    setSearchParams((searchParams) => {
-                      searchParams.delete('startsAt');
+                  setSearchParams((searchParams) => {
+                    searchParams.delete('startsAt');
+                    if (startsAt) {
                       searchParams.set(
                         'startsAt',
                         DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
                           inputDateFormat
                         )
                       );
+                    }
 
-                      return searchParams;
-                    });
+                    return searchParams;
+                  });
 
-                    const newValue: DateFilterInput = {
-                      to: searchParams.get('to'),
-                      from: startsAt
-                        ? DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
-                            inputDateFormat
-                          )
-                        : undefined,
-                    };
-                    onChange?.(newValue);
-                  }
+                  const newValue: DateFilterInput = {
+                    to: searchParams.get('endsAt'),
+                    from: startsAt
+                      ? DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
+                          inputDateFormat
+                        )
+                      : undefined,
+                  };
+                  onChange?.(newValue);
                 }}
                 sx={(theme) => ({ marginRight: theme.spacing(1) })}
                 slotProps={{
@@ -90,29 +86,29 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
                   toDate ? DateTime.fromFormat(toDate, inputDateFormat) : null
                 }
                 onChange={(endsAt) => {
-                  if (endsAt && isValidDate(endsAt)) {
-                    setSearchParams((searchParams) => {
-                      searchParams.delete('endsAt');
+                  setSearchParams((searchParams) => {
+                    searchParams.delete('endsAt');
+                    if (endsAt) {
                       searchParams.set(
                         'endsAt',
                         DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
                           inputDateFormat
                         )
                       );
+                    }
 
-                      return searchParams;
-                    });
+                    return searchParams;
+                  });
 
-                    const newValue: DateFilterInput = {
-                      to: endsAt
-                        ? DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
-                            inputDateFormat
-                          )
-                        : undefined,
-                      from: searchParams.get('from'),
-                    };
-                    onChange?.(newValue);
-                  }
+                  const newValue: DateFilterInput = {
+                    to: endsAt
+                      ? DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
+                          inputDateFormat
+                        )
+                      : undefined,
+                    from: searchParams.get('startsAt'),
+                  };
+                  onChange?.(newValue);
                 }}
                 slotProps={{
                   textField: {
