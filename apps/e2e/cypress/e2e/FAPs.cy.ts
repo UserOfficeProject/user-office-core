@@ -3556,6 +3556,7 @@ context('Automatic Fap assignment to Proposal', () => {
 
 context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
+  let pk: number;
 
   beforeEach(function () {
     cy.resetDB();
@@ -3652,6 +3653,8 @@ context('Fap meeting exports test', () => {
       const createdProposal = result.createProposal;
 
       cy.wrap(createdProposal.proposalId).as('proposal2Id');
+      // cy.wrap(createdProposal.primaryKey).as('proposal2pk');
+      pk = createdProposal.primaryKey;
 
       if (createdProposal) {
         cy.updateProposal({
@@ -3886,6 +3889,41 @@ context('Fap meeting exports test', () => {
         cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
           (actualExport) => {
             cy.fixture('exampleCallFapExportSTFC.json').then(
+              (expectedExport) => {
+                expect(expectedExport).to.deep.equal(actualExport);
+              }
+            );
+          }
+        );
+      });
+  });
+
+  it.only('Expired proposals should not appear in exports', function () {
+    cy.getAndStoreFeaturesEnabled().then(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
+
+    cy.changeProposalsStatus({
+      proposalPks: [pk],
+      statusId: 9,
+    });
+
+    cy.login('officer');
+    cy.visit('/FapPage/2?tab=4&call=1');
+
+    cy.get('button[aria-label="Export in Excel"]').click();
+
+    const downloadsFolder = Cypress.config('downloadsFolder');
+    const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+
+    cy.readFile(`${downloadsFolder}/${fileName}`)
+      .should('exist')
+      .then(() => {
+        cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
+          (actualExport) => {
+            cy.fixture('exampleFapExportExpired.json').then(
               (expectedExport) => {
                 expect(expectedExport).to.deep.equal(actualExport);
               }
