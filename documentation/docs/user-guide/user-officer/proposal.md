@@ -1,17 +1,24 @@
-# Proposal
+# Proposals :material-folder-outline:
 
-## Edit a proposal 
+_________________________________________________________________________________________________________
 
-# How do I edit a proposal?
+## What are proposals?
 
-**1. Find the proposal you wish to edit**
+Proposals are formal requests submitted by researchers or users to gain access to facilities to conduct experiments. These proposals undergo various stages of review and approval, including feasibility reviews, technical assessments, and final decisions by review panels.
 
-* Navigate to 'Proposals' on the main menu
-* Identify the proposal you wish to edit click on the eye {view proposal}.
+_________________________________________________________________________________________________________
 
-**2. Edit Proposal** 
+## How do I edit a user's proposal?
+
+### 1. Find the proposal you wish to edit
+
+* Navigate to 'Proposals' on the main menu.
+* Identify the proposal you wish to edit and click on the eye {view proposal}.
+
+## 2. Edit Proposal 
 
 * Click on edit proposal {edit proposal} to toggle edit mode.
-* This will open the editor where you can make changes to the proposal
+* This will open the editor where you can make changes to the proposal.
+* Click the submit button to save your changes.
 
-*Add information about the submitted button?
+_________________________________________________________________________________________________________

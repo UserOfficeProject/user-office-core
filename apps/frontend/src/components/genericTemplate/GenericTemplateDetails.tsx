@@ -26,7 +26,6 @@ function GenericTemplateDetails(props: GenericTemplateDetailsProps) {
       <QuestionaryDetails
         questionaryId={genericTemplate.questionaryId}
         additionalDetails={additionalDetails}
-        title="GenericTemplate information"
       />
     </>
   );

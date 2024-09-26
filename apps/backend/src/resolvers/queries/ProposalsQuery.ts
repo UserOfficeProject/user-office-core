@@ -57,11 +57,17 @@ export class ProposalsFilter {
   @Field(() => Int, { nullable: true })
   public callId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public instrumentId?: number;
+
   @Field(() => InstrumentFilterInput, { nullable: true })
   public instrumentFilter?: InstrumentFilterInput;
 
   @Field(() => Int, { nullable: true })
   public proposalStatusId?: number;
+
+  @Field(() => [Int], { nullable: true })
+  public excludeProposalStatusIds?: number[];
 
   @Field(() => [String], { nullable: true })
   public shortCodes?: string[];

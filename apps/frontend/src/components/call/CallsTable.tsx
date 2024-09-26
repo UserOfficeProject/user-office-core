@@ -2,19 +2,17 @@ import { Column } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import Unarchive from '@mui/icons-material/Unarchive';
+import { DialogContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
-import InputDialog from 'components/common/InputDialog';
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import StyledDialog from 'components/common/StyledDialog';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import {
   Call,
   InstrumentWithAvailabilityTime,
@@ -34,13 +32,10 @@ import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
 import CallStatusFilter, {
-  CallStatusQueryFilter,
-  defaultCallStatusQueryFilter,
   CallStatus,
   CallStatusFilters,
 } from './CallStatusFilter';
 import CreateUpdateCall from './CreateUpdateCall';
-
 const getFilterStatus = (
   callStatus: CallStatusFilters
 ): Partial<Record<'isActive' | 'isActiveInternal', boolean>> => {
@@ -67,13 +62,14 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     number | null
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams<
-    UrlQueryParamsType & CallStatusQueryFilter
-  >({
-    ...DefaultQueryParams,
-    callStatus: defaultCallStatusQueryFilter,
+
+  const [searchParam, setSearchParam] = useSearchParams({
+    callStatus: CallStatus.ACTIVE,
   });
+
   const exportFapData = useDownloadXLSXCallFap();
+
+  const callStatus = searchParam.get('callStatus');
 
   const {
     loadingCalls,
@@ -81,11 +77,16 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     setCallsWithLoading: setCalls,
     setCallsFilter,
   } = useCallsData({
-    ...getFilterStatus(urlQueryParams.callStatus as CallStatusFilters),
+    ...getFilterStatus((callStatus as CallStatusFilters) ?? CallStatus.ACTIVE),
   });
 
   const handleStatusFilterChange = (callStatus: CallStatus) => {
-    setUrlQueryParams((queries) => ({ ...queries, callStatus }));
+    setSearchParam((searchParam) => {
+      searchParam.set('callStatus', callStatus);
+
+      return searchParam;
+    });
+
     setCallsFilter(() => ({
       ...getFilterStatus(callStatus as CallStatusFilters),
     }));
@@ -97,12 +98,14 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     {
       title: `Start Date (${timezone})`,
       render: (rowdata) => toFormattedDateTime(rowdata.startCall),
+      field: 'startCall',
       customSort: (a: Call, b: Call) =>
         new Date(a.startCall).getTime() - new Date(b.startCall).getTime(),
     },
     {
       title: `End Date (${timezone})`,
       render: (rowdata) => toFormattedDateTime(rowdata.endCall),
+      field: 'endCall',
       customSort: (a: Call, b: Call) =>
         new Date(a.endCall).getTime() - new Date(b.endCall).getTime(),
     },
@@ -117,20 +120,20 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       emptyValue: '-',
     },
     {
-      title: 'Call template',
+      title: 'Proposal template',
       field: 'template.name',
       emptyValue: '-',
     },
     {
-      title: '#' + i18n.format(t('instrument'), 'plural'),
+      title: '#' + i18n.format(t('Instrument'), 'plural'),
       render: (data) => data.instruments.length,
     },
     {
-      title: '#proposals',
+      title: '#Proposals',
       field: 'proposalCount',
     },
     {
-      title: '#faps',
+      title: '#' + i18n.format(t('FAP'), 'plural'),
       render: (data) => data.faps?.length,
     },
   ];
@@ -284,36 +287,38 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <CallStatusFilter
-            callStatus={urlQueryParams.callStatus}
+            callStatus={callStatus ?? CallStatus.ACTIVE}
             onChange={handleStatusFilterChange}
           />
         </Grid>
       </Grid>
       {assigningInstrumentsCallId && (
-        <InputDialog
+        <StyledDialog
           aria-labelledby="simple-modal-title"
           aria-describedby="simple-modal-description"
           open={!!assigningInstrumentsCallId}
           onClose={(): void => setAssigningInstrumentsCallId(null)}
           maxWidth="xl"
           fullWidth
+          title={`Assign Instruments to the selected call - ${calls.find((callItem) => callItem.id === assigningInstrumentsCallId)?.shortCode}`}
         >
-          <AssignInstrumentsToCall
-            assignedInstruments={callAssignments?.instruments}
-            callId={assigningInstrumentsCallId}
-            assignInstrumentsToCall={(instruments) =>
-              assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
-            }
-          />
-        </InputDialog>
+          <DialogContent>
+            <AssignInstrumentsToCall
+              assignedInstruments={callAssignments?.instruments}
+              callId={assigningInstrumentsCallId}
+              assignInstrumentsToCall={(instruments) =>
+                assignInstrumentsToCall(assigningInstrumentsCallId, instruments)
+              }
+            />
+          </DialogContent>
+        </StyledDialog>
       )}
       <SuperMaterialTable
         createModal={createModal}
         setData={setCalls}
         delete={deleteCall}
         hasAccess={{
-          create:
-            isUserOfficer && urlQueryParams.callStatus !== CallStatus.INACTIVE,
+          create: isUserOfficer && callStatus !== CallStatus.INACTIVE,
           update: isUserOfficer,
           remove: isUserOfficer,
         }}
@@ -351,13 +356,12 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           }),
           (rowData) => ({
             icon: GridOnIcon,
-            tooltip: `Export Fap Data`,
+            tooltip: `Export ${t('Fap')} Data`,
             onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
             position: 'row',
           }),
         ]}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
+        persistUrlQueryParams={true}
       />
     </div>
   );

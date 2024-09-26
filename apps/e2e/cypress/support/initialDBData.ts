@@ -54,7 +54,15 @@ export default {
     id: 1,
     name: 'default template',
     topic: {
-      id: 5,
+      id: 6,
+      title: 'Topic title',
+    },
+  },
+  fapReviewTemplate: {
+    id: 2,
+    name: 'default fap review template',
+    topic: {
+      id: 6,
       title: 'Topic title',
     },
   },
@@ -119,6 +127,11 @@ export default {
       text: 'Add samples',
       type: DataType.SAMPLE_DECLARATION,
     },
+    techniquePicker: {
+      id: 'technique_picker_question',
+      text: 'Technique Picker question from seeds',
+      type: DataType.TECHNIQUE_PICKER,
+    },
   },
   answers: {
     proposal: {
@@ -175,12 +188,13 @@ export default {
       textInput: {
         value: 'Text input answer from seeds',
       },
+      techniquePicker: { value: 1 },
     },
   },
   proposal: {
     id: 1,
     title: 'Test proposal',
-    questionaryId: 1,
+    questionaryId: 2,
     shortCode: '999999',
   },
   instrument1: {
@@ -193,6 +207,18 @@ export default {
   instrument3: {
     id: 3,
     name: 'Instrument 3',
+  },
+  technique1: {
+    id: 1,
+    name: 'Technique 1',
+  },
+  technique2: {
+    id: 2,
+    name: 'Technique 2',
+  },
+  technique3: {
+    id: 3,
+    name: 'Technique 3',
   },
   fap: {
     id: 1,

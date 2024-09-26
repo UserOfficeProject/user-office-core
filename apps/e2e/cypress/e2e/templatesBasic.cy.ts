@@ -37,6 +37,7 @@ context('Template tests', () => {
   const richTextInputQuestion = {
     title: faker.lorem.words(3),
     maxChars: 200,
+    allowImages: false,
     answer: faker.lorem.words(3),
   };
   const multipleChoiceQuestion = {
@@ -335,7 +336,29 @@ context('Template tests', () => {
         cy.updateQuestion({
           id: createdQuestion.id,
           question: richTextInputQuestion.title,
-          config: `{"max":"${richTextInputQuestion.maxChars}"}`,
+          config: `{"max":"${richTextInputQuestion.maxChars}", "allowImages":true }`,
+        });
+
+        if (shouldAddQuestionsToTemplate) {
+          cy.createQuestionTemplateRelation({
+            questionId: createdQuestion.id,
+            templateId: initialDBData.template.id,
+            sortOrder: 7,
+            topicId: initialDBData.template.topic.id,
+          });
+        }
+      }
+    });
+    cy.createQuestion({
+      categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+      dataType: DataType.RICH_TEXT_INPUT,
+    }).then((questionResult) => {
+      const createdQuestion = questionResult.createQuestion;
+      if (createdQuestion) {
+        cy.updateQuestion({
+          id: createdQuestion.id,
+          question: richTextInputQuestion.title,
+          config: `{"max":"${richTextInputQuestion.maxChars}", "allowImages":false }`,
         });
 
         if (shouldAddQuestionsToTemplate) {
@@ -668,6 +691,7 @@ context('Template tests', () => {
 
       cy.createRichTextInput(richTextInputQuestion.title, {
         maxChars: richTextInputQuestion.maxChars,
+        allowImages: richTextInputQuestion.allowImages,
       });
 
       cy.contains(richTextInputQuestion.title);
@@ -1218,6 +1242,101 @@ context('Template tests', () => {
       );
     });
 
+    it('User officer can add technique picker question as a dependency', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+        if (createdProposal) {
+          cy.updateProposal({
+            proposalPk: createdProposal.primaryKey,
+            title: proposal.title,
+            abstract: proposal.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+        }
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToTemplatesSubmenu('Proposal');
+
+      cy.contains(initialDBData.template.name)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+
+      cy.createBooleanQuestion(
+        templateDependencies.questions.booleanQuestion.title
+      );
+
+      cy.contains(templateDependencies.questions.booleanQuestion.title).click();
+
+      cy.get('[data-cy="add-dependency-button"]').click();
+
+      cy.get('[id="dependency-id"]').click();
+
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.questions.techniquePicker.text)
+        .click();
+
+      cy.get('[id="dependencyValue"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(initialDBData.technique1.name).click();
+
+      cy.get('[data-cy="dependencyValue"] input').should(
+        'have.value',
+        initialDBData.technique1.id
+      );
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.get('[data-cy="question-relation-dialogue"]').should('not.exist');
+
+      cy.logout();
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains(proposal.title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .click();
+
+      cy.contains('save and continue', { matchCase: false }).click();
+      cy.finishedLoading();
+
+      // Dependee is NOT visible
+      cy.get('main form').should(
+        'not.contain.text',
+        templateDependencies.questions.booleanQuestion.title
+      );
+
+      cy.contains(initialDBData.questions.techniquePicker.text)
+        .parent()
+        .click();
+      cy.contains(initialDBData.technique1.name).click();
+
+      // Dependee is visible
+      cy.get('main form').should(
+        'contain.text',
+        templateDependencies.questions.booleanQuestion.title
+      );
+
+      cy.contains(initialDBData.questions.techniquePicker.text)
+        .parent()
+        .click();
+      cy.contains(initialDBData.technique2.name).click();
+
+      // Dependee is NOT visible again
+      cy.get('main form').should(
+        'not.contain.text',
+        templateDependencies.questions.booleanQuestion.title
+      );
+    });
+
     it('Should not let you create circular dependency chain', () => {
       const field1 = 'boolean_1_' + Date.now();
       const field2 = 'boolean_2_' + Date.now();
@@ -1244,7 +1363,7 @@ context('Template tests', () => {
         });
 
         if (contains.length === 0) {
-          cy.get('[role="listbox"]').children().should('have.length', 3);
+          cy.get('[role="listbox"]').children().should('have.length', 4);
         }
 
         if (select) {

@@ -1,7 +1,11 @@
-## Purpose
+# Overview
 
-General overview for users.
+_________________________________________________________________________________________________________
 
-## Contents
+The User Office documentation is designed to help users understand and effectively use the system. 
 
-Description of what the user can do within the system, main features.
+The documentation will be organized into several sections, each targeting different types of users and their specific needs. Currently, you can find the documentation for **User Officers** in the menu on the left.
+
+For any questions or further assistance, please refer to the [FAQ](../faq.md) or contact support.
+
+_________________________________________________________________________________________________________

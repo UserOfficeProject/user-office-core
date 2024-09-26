@@ -1,15 +1,25 @@
 import MaterialTable from '@material-table/core';
 import Clear from '@mui/icons-material/Clear';
-import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import Person from '@mui/icons-material/Person';
 import PersonAdd from '@mui/icons-material/PersonAdd';
-import { Button, Stack } from '@mui/material';
+import {
+  Button,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import React, { useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import UOLoader from 'components/common/UOLoader';
@@ -43,7 +53,7 @@ const columns = [
     field: 'user.institution',
   },
   {
-    title: '# proposals currently assigned',
+    title: '# Proposals Currently Assigned',
     field: 'proposalsCountByCall',
   },
 ];
@@ -70,6 +80,7 @@ const FapMembers = ({
     UserRole.FAP_SECRETARY,
   ]);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const { t } = useTranslation();
 
   const sendFapChairUpdate = async (
     value: BasicUserDetails[]
@@ -77,7 +88,7 @@ const FapMembers = ({
     const [fapChair] = value;
 
     await api({
-      toastSuccessMessage: 'Fap chair assigned successfully!',
+      toastSuccessMessage: `${t('Fap')} chair assigned successfully!`,
     }).assignChairOrSecretary({
       assignChairOrSecretaryToFapInput: {
         fapId: fapData.id,
@@ -92,12 +103,13 @@ const FapMembers = ({
     onFapUpdate({
       ...fapData,
       fapChairs: fapData.fapChairs?.concat([fapChair]) ?? fapData.fapChairs,
-      fapChairsProposalCounts: fapData.fapChairsProposalCounts.concat([
-        {
-          userId: fapChair.id,
-          count: 0,
-        },
-      ]),
+      fapChairsCurrentProposalCounts:
+        fapData.fapChairsCurrentProposalCounts.concat([
+          {
+            userId: fapChair.id,
+            count: 0,
+          },
+        ]),
     });
 
     if (
@@ -114,7 +126,7 @@ const FapMembers = ({
     const [fapSecretary] = value;
 
     await api({
-      toastSuccessMessage: 'Fap secretary assigned successfully!',
+      toastSuccessMessage: `${t('Fap')} secretary assigned successfully!`,
     }).assignChairOrSecretary({
       assignChairOrSecretaryToFapInput: {
         fapId: fapData.id,
@@ -131,14 +143,13 @@ const FapMembers = ({
       fapSecretaries:
         fapData.fapSecretaries?.concat([fapSecretary]) ??
         fapData.fapSecretaries,
-      fapSecretariesProposalCounts: fapData.fapSecretariesProposalCounts.concat(
-        [
+      fapSecretariesCurrentProposalCounts:
+        fapData.fapSecretariesCurrentProposalCounts.concat([
           {
             userId: fapSecretary.id,
             count: 0,
           },
-        ]
-      ),
+        ]),
     });
 
     if (
@@ -151,7 +162,7 @@ const FapMembers = ({
 
   const addMember = async (users: BasicUserDetails[]): Promise<void> => {
     await api({
-      toastSuccessMessage: 'Fap member assigned successfully!',
+      toastSuccessMessage: `${t('Fap')} member assigned successfully!`,
     }).assignReviewersToFap({
       memberIds: users.map((user) => user.id),
       fapId: fapData.id,
@@ -169,7 +180,7 @@ const FapMembers = ({
     user: BasicUserDetailsWithRole
   ): Promise<void> => {
     await api({
-      toastSuccessMessage: 'Fap member removed successfully!',
+      toastSuccessMessage: `${t('Fap')} member removed successfully!`,
     }).removeMemberFromFap({
       memberId: user.id,
       fapId: fapData.id,
@@ -210,10 +221,10 @@ const FapMembers = ({
         });
       },
       {
-        title: 'Remove Fap member',
+        title: `Remove ${t('Fap')} member`,
         description: `Are you sure you want to remove ${getFullUserName(
           memberToRemove
-        )} from this Fap?`,
+        )} from this ${t('Fap')}?`,
       }
     )();
   };
@@ -232,6 +243,89 @@ const FapMembers = ({
     Object.assign(fapReviewer, { id: fapReviewer.userId })
   );
 
+  const fapChairSecTable = (
+    data: BasicUserDetails[],
+    isChair: boolean
+  ): JSX.Element => {
+    const chairOrSec = isChair ? 'Chair' : 'Secretary';
+
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>{isChair ? 'Chairs' : 'Secretaries'}</TableCell>
+              <TableCell align="left"># Proposals Currently Assigned</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((user, index) => (
+              <TableRow
+                key={user.lastname}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell align="left">
+                  <TextField
+                    key={user.id}
+                    name={`${t('Fap')}${chairOrSec}`}
+                    id={`Fap${chairOrSec}-` + user.id}
+                    label={`${t('Fap')} ${chairOrSec}`}
+                    type="text"
+                    value={getFullUserName(user)}
+                    margin="normal"
+                    fullWidth
+                    data-cy={`${t('Fap')}${chairOrSec}`}
+                    required
+                    InputProps={{
+                      readOnly: true,
+                      endAdornment: isUserOfficer && (
+                        <>
+                          <Tooltip title={`Remove ${t('Fap')} ${chairOrSec}`}>
+                            <IconButton
+                              aria-label={`Remove ${t('Fap')} ${chairOrSec}`}
+                              onClick={() =>
+                                removeChairOrSecretary(
+                                  user,
+                                  isChair
+                                    ? UserRole.FAP_CHAIR
+                                    : UserRole.FAP_SECRETARY
+                                )
+                              }
+                            >
+                              <Clear />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={`Set ${t('Fap')} ${chairOrSec}`}>
+                            <IconButton
+                              edge="start"
+                              onClick={() =>
+                                isChair
+                                  ? setFapChairModalOpen(true)
+                                  : setFapSecretaryModalOpen(true)
+                              }
+                            >
+                              <Person />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      ),
+                    }}
+                  />
+                </TableCell>
+                <TableCell align="left" data-cy={`proposal-count-${user.id}`}>
+                  {isChair
+                    ? fapData.fapChairsCurrentProposalCounts[index].count || 0
+                    : fapData.fapSecretariesCurrentProposalCounts[index]
+                        .count || 0}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
+
   return (
     <>
       <ParticipantModal
@@ -249,7 +343,7 @@ const FapMembers = ({
         close={(): void => setFapChairModalOpen(false)}
         addParticipants={sendFapChairUpdate}
         selectedUsers={alreadySelectedMembers}
-        title="Fap Chair"
+        title={`${t('Fap')} Chair`}
         invitationUserRole={UserRole.FAP_CHAIR}
         userRole={UserRole.FAP_REVIEWER}
       />
@@ -258,137 +352,39 @@ const FapMembers = ({
         close={(): void => setFapSecretaryModalOpen(false)}
         addParticipants={sendFapSecretaryUpdate}
         selectedUsers={alreadySelectedMembers}
-        title="Fap Secretary"
+        title={`${t('Fap')} Secretary`}
         invitationUserRole={UserRole.FAP_SECRETARY}
         userRole={UserRole.FAP_REVIEWER}
       />
       <Typography variant="h6" component="h2" gutterBottom>
-        {`${fapData.code} - Fap Members`}
+        {`${fapData.code} - ${t('Fap')} Members`}
       </Typography>
       <Grid container spacing={3} alignItems="center">
         <Grid item sm={6} xs={12}>
-          {fapData.fapChairs.map((chair, index) => (
-            <TextField
-              key={chair.id}
-              name="FapChair"
-              id={'FapChair-' + chair.id}
-              label="Fap Chair"
-              type="text"
-              value={getFullUserName(chair)}
-              margin="normal"
-              fullWidth
-              data-cy="FapChair"
-              required
-              InputProps={{
-                readOnly: true,
-                endAdornment: isUserOfficer && (
-                  <>
-                    {
-                      <Tooltip title="Remove Fap Chair">
-                        <IconButton
-                          aria-label="Remove Fap chair"
-                          onClick={() =>
-                            removeChairOrSecretary(chair, UserRole.FAP_CHAIR)
-                          }
-                        >
-                          <Clear />
-                        </IconButton>
-                      </Tooltip>
-                    }
-                    <Tooltip title="Set Fap Chair">
-                      <IconButton
-                        edge="start"
-                        onClick={() => setFapChairModalOpen(true)}
-                      >
-                        <Person />
-                      </IconButton>
-                    </Tooltip>
-                  </>
-                ),
-                startAdornment: fapData.fapChairs && (
-                  <Tooltip
-                    title={`Number of proposals to review: ${
-                      fapData.fapChairsProposalCounts[index].count || 0
-                    }`}
-                    sx={{ padding: '2px', marginRight: '4px' }}
-                  >
-                    <InfoOutlined
-                      fontSize="small"
-                      data-cy="fap-chair-reviews-info"
-                    />
-                  </Tooltip>
-                ),
-              }}
-            />
-          ))}
+          {fapChairSecTable(fapData.fapChairs, true)}
         </Grid>
         <Grid item sm={6} xs={12}>
-          {fapData.fapSecretaries.map((sec, index) => (
-            <TextField
-              key={sec.id}
-              name="FapSecretary"
-              id={'FapSecretary-' + sec.id}
-              label="Fap Secretary"
-              type="text"
-              value={getFullUserName(sec)}
-              margin="normal"
-              fullWidth
-              data-cy="FapSecretary"
-              required
-              InputProps={{
-                readOnly: true,
-                endAdornment: isUserOfficer && (
-                  <>
-                    <Tooltip title="Remove Fap Secretary">
-                      <IconButton
-                        aria-label="Remove Fap secretary"
-                        onClick={() =>
-                          removeChairOrSecretary(sec, UserRole.FAP_SECRETARY)
-                        }
-                      >
-                        <Clear />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Set Fap Secretary">
-                      <IconButton
-                        edge="start"
-                        onClick={() => setFapSecretaryModalOpen(true)}
-                      >
-                        <Person />
-                      </IconButton>
-                    </Tooltip>
-                  </>
-                ),
-                startAdornment: fapData.fapSecretaries && (
-                  <Tooltip
-                    title={`Number of proposals to review: ${
-                      fapData.fapSecretariesProposalCounts[index].count || 0
-                    }`}
-                    sx={{ padding: '2px', marginRight: '4px' }}
-                  >
-                    <InfoOutlined
-                      fontSize="small"
-                      data-cy="fap-secretary-reviews-info"
-                    />
-                  </Tooltip>
-                ),
-              }}
-            />
-          ))}
+          {fapChairSecTable(fapData.fapSecretaries, false)}
         </Grid>
       </Grid>
       {isUserOfficer && (
-        <Stack direction="row" display="flex" justifyContent="space-between">
+        <Stack
+          direction="row"
+          display="flex"
+          justifyContent="space-between"
+          marginTop={'10px'}
+          marginBottom={'10px'}
+        >
           <Button
             onClick={() => setFapChairModalOpen(true)}
-            aria-label="Add New FAP Chair Button"
+            aria-label={`Add New ${t('Fap')} Chair Button`}
             data-cy="add-chair-button"
           >
             Add Chair
           </Button>
           <Button
             onClick={() => setFapSecretaryModalOpen(true)}
-            aria-label="Add New FAP Secretary Button"
+            aria-label={`Add New ${t('Fap')} Secretary Button`}
             data-cy="add-secretary-button"
           >
             Add Secretary

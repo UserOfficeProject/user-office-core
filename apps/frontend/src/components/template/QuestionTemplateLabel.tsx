@@ -7,7 +7,6 @@ export default function TemplateEditLabel(props: { pageType: string }) {
       <InputLabel
         sx={(theme) => ({
           color: theme.palette.primary.main,
-          backgroundColor: theme.palette.grey[300],
           fontSize: 'medium',
           marginRight: 20,
         })}
@@ -21,7 +20,6 @@ export default function TemplateEditLabel(props: { pageType: string }) {
     <InputLabel
       sx={(theme) => ({
         color: theme.palette.primary.main,
-        backgroundColor: theme.palette.grey[300],
         fontSize: 'medium',
         marginRight: 53,
       })}

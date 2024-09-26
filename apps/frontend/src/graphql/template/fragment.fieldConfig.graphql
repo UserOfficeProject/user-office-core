@@ -120,6 +120,7 @@ fragment fieldConfig on FieldConfig {
     required
     tooltip
     max
+    allowImages
   }
 
   ... on DynamicMultipleChoiceConfig {
@@ -137,6 +138,12 @@ fragment fieldConfig on FieldConfig {
   }
 
   ... on VisitBasisConfig {
+    small_label
+    required
+    tooltip
+  }
+
+  ... on FapReviewBasisConfig {
     small_label
     required
     tooltip
@@ -161,6 +168,18 @@ fragment fieldConfig on FieldConfig {
     isMultipleSelect
     requestTime
     instruments {
+      id
+      name
+    }
+  }
+
+  ... on TechniquePickerConfig {
+    variant
+    small_label
+    required
+    tooltip
+    isMultipleSelect
+    techniques {
       id
       name
     }

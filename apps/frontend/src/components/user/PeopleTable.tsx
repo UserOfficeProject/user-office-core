@@ -66,6 +66,7 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   onRemove?: FunctionType<void, T>;
   onUpdate?: FunctionType<void, [T[]]>;
   emailInvite?: boolean;
+  emailSearch?: boolean;
   showInvitationButtons?: boolean;
   selectedUsers?: number[];
   mtOptions?: Options<T>;
@@ -96,9 +97,9 @@ const getTitle = ({
     case UserRole.USER_OFFICER:
       return 'Invite User';
     case UserRole.FAP_CHAIR:
-      return 'Invite Fap Chair';
+      return 'Invite ' + t('Fap') + ' Chair';
     case UserRole.FAP_SECRETARY:
-      return 'Invite Fap Secretary';
+      return 'Invite ' + t('Fap') + ' Secretary';
     case UserRole.INSTRUMENT_SCIENTIST:
       return 'Invite ' + t('instrumentSci');
     default:
@@ -160,10 +161,10 @@ const PeopleTable = ({
   setSelectedParticipants,
   selectedUsers,
   userRole,
-  // isLoading,
   data,
   action,
   emailInvite,
+  emailSearch,
   invitationUserRole,
   isFreeAction,
   showInvitationButtons,
@@ -367,12 +368,35 @@ const PeopleTable = ({
             userRole: query.userRole,
           });
 
+          const filteredData = data
+            ? data.filter((user) =>
+                tableQuery.search
+                  ? user.firstname
+                      .toLowerCase()
+                      .includes(tableQuery.search.toLowerCase()) ||
+                    user.lastname
+                      .toLowerCase()
+                      .includes(tableQuery.search.toLowerCase()) ||
+                    user.institution
+                      .toLowerCase()
+                      .includes(tableQuery.search.toLowerCase())
+                  : true
+              )
+            : undefined;
+
+          const paginatedFilteredData = filteredData
+            ? filteredData.slice(
+                tableQuery.page * tableQuery.pageSize,
+                tableQuery.pageSize + tableQuery.page * tableQuery.pageSize
+              )
+            : undefined;
+
           const usersTableData = getUsersTableData(
-            data || users?.users || [],
+            paginatedFilteredData || users?.users || [],
             selectedParticipants || [],
             invitedUsers,
             tableQuery,
-            data?.length || users?.totalCount || 0
+            filteredData?.length || users?.totalCount || 0
           );
 
           setCurrentPageIds(usersTableData.users.map(({ id }) => id));
@@ -417,10 +441,11 @@ const PeopleTable = ({
             setFieldValue('email', '');
 
             //If we are selecting multiple users add the user as pre selected.
-            if (selection)
+            if (selection) {
               setSelectedParticipants?.(
                 selectedParticipants?.concat([userDetails]) || []
               );
+            }
 
             setQuery({
               ...query,
@@ -428,6 +453,7 @@ const PeopleTable = ({
                 userDetails.id
               ),
             });
+            tableRef.current && tableRef.current.onQueryChange({});
           } else {
             setFieldError('email', 'Could not add user to Proposal');
           }
@@ -530,7 +556,10 @@ const PeopleTable = ({
             },
           }}
           components={{
-            Toolbar: isEmailSearchEnabled ? EmailSearchBar : MTableToolbar,
+            Toolbar:
+              isEmailSearchEnabled && emailSearch
+                ? EmailSearchBar
+                : MTableToolbar,
           }}
         />
         {showInvitationButtons && (

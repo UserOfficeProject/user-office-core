@@ -105,7 +105,7 @@ export async function stfcEmailHandler(event: ApplicationEvent) {
 
         if (answer) {
           instrumentRequested = (
-            await instruments.getInstrument(answer?.answer.value)
+            await instruments.getInstrument(answer?.answer.value.instrumentId)
           )?.name;
         }
 

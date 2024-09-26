@@ -1,8 +1,18 @@
-This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. The configuration is managed through a `.env` file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your `.env` file. 
+# Configuration
+
+_________________________________________________________________________________________________________
+
+This page provides detailed instructions for configuring your environment. Proper configuration is essential for ensuring the project functions correctly. 
+
+The configuration is managed through a `.env` file, which contains environment variables for various services and settings required by the application. The default configuration values are provided, but you can override these by setting the appropriate environment variables in your `.env` file. 
 
 > **_NOTE:_** The `DEPENDENCY_CONFIG` variable is crucial for the User Office application. It enables, disables, or modifies various features based on the specified configuration. You can find the different configuration files in the `apps/backend/src/config` directory.
 
-The `.env` file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. For more detailed information, refer to the [dotenv documentation](https://www.npmjs.com/package/dotenv).
+The `.env` file format is supported by the dotenv library, which loads these variables into the environment when the application starts. If a specific dependency configuration is not provided, the default configuration will be used. 
+
+For more detailed information, refer to the [dotenv documentation](https://www.npmjs.com/package/dotenv).
+
+_________________________________________________________________________________________________________
 
 ## Environment Variables
 
@@ -24,7 +34,7 @@ To enable local logging via Graylog, uncomment and configure the following varia
 - **GRAYLOG_PORT**: The port for the Graylog server.
 
 ### ORCID Configuration
-The ORCID section is used for integrating with the ORCID API for user identification and authentication.
+The ORCID section can be used for integrating with the ORCID API for user identification and authentication.
 
 - **ORCID_TOKEN_URL**: The URL for obtaining ORCID tokens.
 - **ORCID_API_URL**: The ORCID API URL.
@@ -57,7 +67,6 @@ These settings cover the general configuration of the application environment.
 
 - **NODE_ENV**: Specifies the environment (e.g., development, production).
 - **DEPENDENCY_CONFIG**: Indicates which dependency configuration to use (`e2e`, `ess`, `stfc`, `test`). Defaults to the standard configuration if not provided.
-- **PING_PUBLIC_CRT**: Public certificate for ping operations.
 - **DATABASE_URL**: The URL for the database connection.
 - **BASE_URL**: The base URL for the application.
 - **JWT_TOKEN_LIFE**: The lifetime of JWT tokens.
@@ -91,3 +100,5 @@ The scheduler endpoint is used for managing scheduled tasks:
 The email configuration includes a sink email address for testing purposes:
 
 - **SINK_EMAIL**: The email address to receive sink emails.
+
+_________________________________________________________________________________________________________

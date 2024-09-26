@@ -1,105 +1,114 @@
-### Purpose
+# Frequently Asked Questions
 
-Answers to frequently asked questions
+_________________________________________________________________________________________________________
 
-### Contents
+??? info "**Calls**"
+    ### **Calls**
+    * [**What are calls?**](user-guide/user-officer/creating_call.md#what-are-calls) 
+    * [**How do I create a call?**](user-guide/user-officer/creating_call.md#step-1-setting-up-the-templates-fap-and-proposal-workflow) 
+    * [**How do I edit active calls?**](user-guide/user-officer/creating_call.md#how-do-i-edit-an-active-call)
+    * [**How do I manage calls?**](user-guide/user-officer/creating_call.md)
+    * [**How do I export FAP data from a call?**](user-guide/user-officer/creating_call.md#faps)
 
-List of questions and their answers.
+??? info "**People and Roles**"
+    * [**What are the different roles in User Office?**](user-guide/user-officer/roles.md)
 
+??? info "**Proposal Management**"
+    ### **Proposal Management**
+    * [**What are proposals?**](user-guide/user-officer/proposal.md)
+    * [**How do I manage proposals?**](user-guide/user-officer/proposal.md)
+    * [**How do I edit a users' proposal?**](user-guide/user-officer/proposal.md)
 
-### User Officer FAQs
+??? info "**Templates**"
+    ### **Templates**
+    * [**What are templates?**](user-guide/user-officer/creating_templates.md#what-are-templates)
+    * [**How do I use templates within a call?**](user-guide/user-officer/creating_call.md#how-do-i-use-templates-within-a-call)
 
+??? info "**PDF Templates**"
+    ### **PDF templates**
+    * [**What are PDF templates?**](user-guide/user-officer/templates/pdf_template.md#what-are-pdf-templates)
+    * [**How do I create PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-create-pdf-templates)
+    * [**How do I edit PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-edit-pdf-templates)
+    * [**How do I clone PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-clone-pdf-templates)
+    * [**How do I archive and unarchive PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-archive-and-unarchive-pdf-templates)
+    * [**How do I import and export PDF templates?**](user-guide/user-officer/templates/pdf_template.md#how-do-i-export-and-import-pdf-templates)
+    * [**What do #calls mean on PDF templates?**](user-guide/user-officer/templates/pdf_template.md#what-does-calls-mean-on-pdf-templates)
 
-#### **Calls**
-* #### [How do I create a call?](creating_call.md) 
+??? info "**Proposal Templates**"
+    ### **Proposal templates**
+    * [**What are proposal templates?**](user-guide/user-officer/templates/proposal_template.md#what-are-proposal-templates)
+    * [**How do I link proposal templates to a call?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-link-proposal-templates-to-a-call)
+    * [**How do I create proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-create-a-proposal-template)
+    * [**How do I edit proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-edit-proposal-templates)
+    * [**How do I clone proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-clone-proposal-templates)
+    * [**How do I archive and unarchive proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-archive-and-unarchive-proposal-templates)
+    * [**How do I import and export proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-import-and-export-proposal-templates)
+    * [**What does #proposals and #calls mean on proposal templates?**](user-guide/user-officer/templates/proposal_template.md#what-does-calls-mean-on-proposal-templates)
 
-#### **Managing proposals**
+??? info "**Sample declaration templates**"
+    ### **Sample declaration templates**
+    * [**What are sample declaration templates?**](user-guide/user-officer/templates/sampledec_template.md#what-are-sample-declaration-templates)
 
-* #### [How do I edit a users' proposal?](proposal.md)
+??? info "**Sub templates**"
+    ### **Sub templates**
+    * [**What are sub templates?**](user-guide/user-officer/templates/sub_template.md#what-are-sub-templates)
 
-* #### [How do I impersonate users?](roles.md)
+??? info "**Shipment declaration templates**"
+    ### **Shipment declaration templates**
+    * [**What are shipment declaration templates?**](user-guide/user-officer/templates/shipment_template.md#what-are-shipment-declaration-templates)
 
-* #### [How do I revert submitted proposals back to draft status?](proposal.md)
+??? info "**Visit registration templates**"
+    ### **Visit registration templates**
+    * [**What are visit registration templates?**](user-guide/user-officer/templates/visit_template.md#what-are-visit-registration-templates)
 
+??? info "**Proposal Experiment Safety Input (ESI) templates**"
+    ### **Proposal ESI templates**
+    * [**What are proposal ESI templates**](user-guide/user-officer/templates/proposalESI_template.md#what-are-proposal-esi-templates)
 
-#### **Creating templates**
+??? info "**Sample Experiment Safety Input (ESI) templates**"
+    ### **Sample ESI templates**
+    * [**What are sample ESI templates?**](user-guide/user-officer/templates/sampleESI_template.md#what-are-sample-esi-templates)
 
-* #### [How do I create a proposal template?](templates/proposal_template.md)
+??? info "**Feedback templates**"
+    ### **Feedback templates**
+    * [**What are feedback templates**](user-guide/user-officer/templates/feedback_template.md#what-are-feedback-templates)
+    * [**How do I mark a feedback template as active?**](user-guide/user-officer/templates/feedback_template.md#how-to-mark-a-feedback-template-as-active)
+    * [**How do I create feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-create-feedback-templates)
+    * [**How do I edit feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-edit-feedback-templates)
+    * [**How do I import and export feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-import-and-export-feedback-templates)
+    * [**How do I clone feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-clone-feedback-templates)
 
-* #### [How do I create a feedback template?](templates/feedback_template.md)
+??? info "**Questions**"
+    ### **Questions**
+    * [**What are questions?**](user-guide/user-officer/questions.md#what-are-questions)
+    * [**How do I create questions?**](user-guide/user-officer/questions.md#how-do-i-create-questions)
+    * [**How do I edit questions?**](user-guide/user-officer/questions.md#how-do-i-edit-questions)
 
-* #### [How do I create a PDF template?](templates/pdf_template.md)
+??? info "**Feasibility review**"
+    ### **Feasibility review**
+    * [**What are feasibility reviews?**](user-guide/user-officer/feasibility_review.md#what-are-feasibility-reviews)
+    * [**How do I configure the system for feasibility review?**](user-guide/user-officer/feasibility_review.md#how-do-i-configure-the-system-for-feasibility-review)
 
-* #### [How do I create a proposal ESI template?](templates/proposalESI_template.md)
+??? info "**Proposal workflows**"
+    ### **Proposal workflows**
+    * [**What are proposal workflows?**](user-guide/user-officer/settings/proposal_workflow.md#what-are-proposal-workflows)
+    * [**How do I create a proposal workflow?**](user-guide/user-officer/settings/proposal_workflow.md#how-do-i-create-a-proposal-workflow)
+    * [**How do I edit a proposal workflow?**](user-guide/user-officer/settings/proposal_workflow.md#how-do-i-create-a-proposal-workflow)
 
-* #### [How do I create a question template?](templates/question_template.md)
+??? info "**FAPs**"
+    ### **FAPs**
+    * [**What are FAPs?**](user-guide/user-officer/fap.md#what-are-facility-access-panels-faps)
+    * [**How do I edit a FAP?**](user-guide/user-officer/fap.md#how-do-i-edit-faps)
+    * [**How do I create a FAP?**](user-guide/user-officer/fap.md#how-do-i-create-faps)
+    * [**How are FAPs with multiple instruments configured?**](user-guide/user-officer/fap.md#how-are-faps-with-multiple-instruments-configured)
 
-* #### [How do I create a sample declaration template?](templates/sampledec_template.md)
+??? info "**Pages**"
+    ### **Pages**
+    * [**What are pages?**](user-guide/user-officer/page.md#what-are-pages)
+    * [**How do I edit pages?**](user-guide/user-officer/page.md#how-do-i-edit-pages)
 
-* #### [How do I create a sample ESI template?](templates/sampleESI_template.md)
+??? info "**Settings**"
+    ### **Settings**
+    * [**What are features?**](user-guide/user-officer/settings/features.md#what-are-features)
 
-* #### [How do I create a shipment declaration template?](templates/shipment_template.md)
-
-* #### [How do I create a sub template?](templates/sub_template.md)
-
-* #### [How do I create a visit registration template?](templates/visit_template.md)
-
-* #### [How do I create a proposal workflow?](proposal_workflow.md)
-
-
-#### **Feasibility review**
-
-* #### [How do I configure the system for feasibility review?](feasibility_review.md)
-
-
-#### **FAP**
-
-* #### [How do I edit a FAP?](fap.md)
-
-* #### [How do I create a FAP?](fap.md)
-
-* #### [How do I configure the system for FAP review?](fap.md)
- 
-
-#### **Editing templates**
-
-* #### [How do I edit a proposal template?](templates/proposal_template.md)
-
-* #### [How do I edit a feedback template?](templates/feedback_template.md)
-
-* #### [How do I edit a PDF template?](templates/pdf_template.md)
-
-* #### [How do I edit a proposal ESI template?](templates/proposalESI_template.md)
-
-* #### [How do I edit a question template?](templates/question_template.md)
-
-* #### [How do I edit a sample declaration template?](templates/sampledec_template.md)
-
-* #### [How do I edit a sample ESI template?](templates/sampleESI_template.md)
-
-* #### [How do I edit a shipment declaration template?](templates/shipment_template.md)
-
-* #### [How do I edit a sub template?](templates/sub_template.md)
-
-* #### [How do I edit a visit registration template?](templates/visit_template.md)
-
-* #### [How do I edit a proposal workflow?](proposal_workflow.md)
-
-
-#### **Configure the system**
-
-* #### [How do I change the look of the UI?](placeholder.md)
-
-
-#### **Developer FAQs**
-
-* #### [How do I use API access tokens?](placeholder.md)
-
-* #### [How do I use features?](features.md)
-
-* #### [How do I use App settings?](placeholder.md)
-
-* #### [How do I edit a PDF](placeholder.md)
- 
-
-
+_________________________________________________________________________________________________________

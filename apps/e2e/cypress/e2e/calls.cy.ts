@@ -34,6 +34,8 @@ context('Calls tests', () => {
     endCycle: currentDayStart,
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
+    fapReviewTemplateName: initialDBData.fapReviewTemplate.name,
+    fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -53,6 +55,7 @@ context('Calls tests', () => {
     startCycle: currentDayStart,
     endCycle: currentDayStart,
     templateId: initialDBData.template.id,
+    fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -207,6 +210,11 @@ context('Calls tests', () => {
         .contains(initialDBData.template.name)
         .click();
 
+      cy.get('[data-cy="call-fap-review-template"]').click();
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.fapReviewTemplate.name)
+        .click();
+
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
         cy.get('[role="presentation"]').contains(esiTemplateName).click();
@@ -332,8 +340,14 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to create a call', () => {
-      const { shortCode, startCall, endCall, templateName, esiTemplateName } =
-        newCall;
+      const {
+        shortCode,
+        startCall,
+        endCall,
+        templateName,
+        fapReviewTemplateName,
+        esiTemplateName,
+      } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
       const callStartDate = startCall.toFormat(
         initialDBData.getFormats().dateTimeFormat
@@ -364,6 +378,9 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
+
+      cy.get('[data-cy="call-fap-review-template"]').click();
+      cy.get('[role="presentation"]').contains(fapReviewTemplateName).click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
@@ -401,8 +418,14 @@ context('Calls tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      const { shortCode, startCall, endCall, templateName, esiTemplateName } =
-        newCall;
+      const {
+        shortCode,
+        startCall,
+        endCall,
+        templateName,
+        fapReviewTemplateName,
+        esiTemplateName,
+      } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
       const callStartDate = startCall.toFormat(
         initialDBData.getFormats().dateTimeFormat
@@ -438,6 +461,9 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
+
+      cy.get('[data-cy="call-fap-review-template"]').click();
+      cy.get('[role="presentation"]').contains(fapReviewTemplateName).click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
@@ -497,6 +523,12 @@ context('Calls tests', () => {
         'have.value',
         initialDBData.template.name
       );
+
+      cy.get('[data-cy="call-fap-review-template"] input').should(
+        'have.value',
+        initialDBData.fapReviewTemplate.name
+      );
+
       cy.get('.MuiStep-root').contains('Reviews').click();
 
       cy.get('[data-cy="call-faps"]').click();
@@ -715,7 +747,7 @@ context('Calls tests', () => {
         .find('[type="checkbox"]')
         .check();
 
-      cy.contains('Assign Instrument').click();
+      cy.get('[data-cy="assign-instrument-to-call"]').click();
 
       cy.notification({ variant: 'success', text: 'successfully' });
 

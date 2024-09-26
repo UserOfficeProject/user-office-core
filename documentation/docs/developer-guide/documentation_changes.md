@@ -1,3 +1,7 @@
+# Documentation Changes
+
+_________________________________________________________________________________________________________
+
 This documentation helps our users understand how to use User Office and troubleshoot common issues on their own. 
 
 ## Engine
@@ -9,6 +13,8 @@ The documentation is built using **MkDocs**, a static site generator specificall
 - [MkDocs Official Documentation](https://www.mkdocs.org/)
 - [MkDocs Material Theme](https://squidfunk.github.io/mkdocs-material/)
 
+_________________________________________________________________________________________________________
+
 ## General Guidelines
 
 When contributing to the documentation, keep the following guidelines in mind:
@@ -18,6 +24,8 @@ When contributing to the documentation, keep the following guidelines in mind:
 - Ensure that all code snippets are correctly formatted and easy to read. 
 - Provide comments in code examples where necessary.
 - Check for spelling and grammatical errors; tools like [Grammarly](https://www.grammarly.com/) can be helpful. 
+
+_________________________________________________________________________________________________________
 
 ## Running the Documentation Locally
 
@@ -30,6 +38,8 @@ To preview your changes locally, follow these steps:
 
 This will start a local server where you can view the documentation in your browser.
 
+_________________________________________________________________________________________________________
+
 ## Adding New Pages
 
 If you add a new page, make sure to update the mkdocs.yml file:
@@ -37,3 +47,5 @@ If you add a new page, make sure to update the mkdocs.yml file:
 1. Open `mkdocs.yml`.
 2. Locate the `nav` section.
 3. Add your new page under the appropriate section to ensure it appears in the site navigation.
+
+_________________________________________________________________________________________________________

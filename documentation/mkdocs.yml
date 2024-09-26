@@ -8,8 +8,8 @@ theme:
     - navigation.tabs.sticky
     - content.tooltips
   palette:
-    primary: green
-    accent: green
+    primary: indigo
+    accent: light blue
 extra:
   generator: false
   version:
@@ -37,40 +37,43 @@ nav:
       - Quick start: quick_start.md
   - User Guide:
       - Overview: user-guide/overview.md
-      - Basic User: user-guide/user/user.md
       - User Officer:
-          - Tutorials: user-guide/user-officer/user-officer.md
+          - Home: user-guide/user-officer/user-officer.md
           - Creating a call: user-guide/user-officer/creating_call.md
-          - Proposal workflow: user-guide/user-officer/proposal_workflow.md
-          - FAPs: user-guide/user-officer/fap.md
-          - Feasibility review: user-guide/user-officer/feasibility_review.md
-          - Features: user-guide/user-officer/features.md
-          - Pages: user-guide/user-officer/page.md
+          - Creating a workflow: user-guide/user-officer/creating_workflow.md
+          - Creating templates: user-guide/user-officer/creating_templates.md
           - Proposals: user-guide/user-officer/proposal.md
+          - FAPs: user-guide/user-officer/fap.md
+          - FAP review: user-guide/user-officer/fap_review.md
+          - Feasibility review: user-guide/user-officer/feasibility_review.md
           - Roles: user-guide/user-officer/roles.md
-          - Videos: user-guide/user-officer/videos.md
+          - Pages: user-guide/user-officer/page.md
+          - Questions: user-guide/user-officer/questions.md
           - Templates:
-              - What are templates?: user-guide/user-officer/templates/templates.md
-              - PDF templates: user-guide/user-officer/templates/pdf_template.md
-              - Proposal templates: user-guide/user-officer/templates/proposal_template.md
-              - Sample declaration templates: user-guide/user-officer/templates/sampledec_template.md
-              - Sub templates: user-guide/user-officer/templates/sub_template.md
-              - Shipment declaration templates: user-guide/user-officer/templates/shipment_template.md
-              - Visit registration templatse: user-guide/user-officer/templates/visit_template.md
-              - Proposal ESI templates: user-guide/user-officer/templates/proposalESI_template.md
-              - Sample ESI templates: user-guide/user-officer/templates/sampleESI_template.md
-              - Feedback templates: user-guide/user-officer/templates/feedback_template.md
-              - Question templates: user-guide/user-officer/templates/question_template.md
+            - Proposal templates: user-guide/user-officer/templates/proposal_template.md
+            - PDF templates: user-guide/user-officer/templates/pdf_template.md
+            - Feedback templates: user-guide/user-officer/templates/feedback_template.md
+            - Sample declaration templates: user-guide/user-officer/templates/sampledec_template.md
+            - Sub templates: user-guide/user-officer/templates/sub_template.md
+            - Shipment declaration templates: user-guide/user-officer/templates/shipment_template.md
+            - Visit registration templatse: user-guide/user-officer/templates/visit_template.md
+            - Proposal ESI templates: user-guide/user-officer/templates/proposalESI_template.md
+            - Sample ESI templates: user-guide/user-officer/templates/sampleESI_template.md
+          - Settings:
+              - Proposal workflows: user-guide/user-officer/settings/proposal_workflow.md
+              - Features: user-guide/user-officer/settings/features.md
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
-      - Running Locally: developer-guide/running_locally.md
-      - Configuration: developer-guide/configuration.md
+      - Architecture: developer-guide/architecture.md
       - Step-by-Step Guide: developer-guide/step-by-step.md
-      - Architecture: developer-guide/achitecture.md
-      - API Documentation: developer-guide/api_documentation.md
+      - Running Locally: developer-guide/running_locally.md
+      - Tech Stack: developer-guide/tech_stack.md
+      - Configuration: developer-guide/configuration.md
+      - RabbitMQ: developer-guide/rabbitmq.md
+      - Kubernetes: developer-guide/kubernetes.md
+      - Depencency Injection: developer-guide/dependency_injection.md
+      - Email Service: developer-guide/email.md
       - Documentation Changes: developer-guide/documentation_changes.md
   - FAQ: faq.md
   - Glossary: glossary.md
-  - References: references.md
-  - Placeholder: user-guide/user-officer/placeholder.md
   

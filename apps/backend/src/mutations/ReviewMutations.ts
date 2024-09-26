@@ -10,7 +10,10 @@ import { ReviewAuthorization } from '../auth/ReviewAuthorization';
 import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
+import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -35,6 +38,12 @@ export default class ReviewMutations {
     @inject(Tokens.ReviewDataSource) private dataSource: ReviewDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.FapDataSource)
+    private fapDataSource: FapDataSource,
+    @inject(Tokens.CallDataSource)
+    private callDataSource: CallDataSource,
+    @inject(Tokens.QuestionaryDataSource)
+    private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -331,8 +340,39 @@ export default class ReviewMutations {
       );
     }
 
+    const fapProposal = await this.fapDataSource.getFapProposal(
+      args.fapID,
+      args.proposalPk
+    );
+
+    if (!fapProposal) {
+      return rejection('Can not assign member to review because of an error', {
+        agent,
+        args,
+      });
+    }
+
+    const fapCall = await this.callDataSource.getCall(fapProposal.callId);
+
+    if (!fapCall) {
+      return rejection('Can not assign member to review because of an error', {
+        agent,
+        args,
+      });
+    }
+
+    const fapReviewQuestionary = await this.questionaryDataSource.create(
+      args.userID,
+      fapCall.fapReviewTemplateId
+    );
+
     return this.dataSource
-      .addUserForReview(args)
+      .addUserForReview({
+        userID: args.userID,
+        proposalPk: args.proposalPk,
+        fapID: args.fapID,
+        questionaryID: fapReviewQuestionary.questionaryId,
+      })
       .then((review) => review)
       .catch((err) => {
         return rejection(

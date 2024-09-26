@@ -1,38 +1,17 @@
 import { MaterialTableProps } from '@material-table/core';
-import CloseIcon from '@mui/icons-material/Close';
 import Edit from '@mui/icons-material/Edit';
-import { IconButton } from '@mui/material';
+import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import React, { SetStateAction, useState } from 'react';
-import {
-  DecodedValueMap,
-  DelimitedArrayParam,
-  QueryParamConfig,
-  SetQuery,
-  StringParam,
-  withDefault,
-} from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
-import InputDialog from 'components/common/InputDialog';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
-export type UrlQueryParamsType = {
-  search: QueryParamConfig<string | null | undefined>;
-  selection: QueryParamConfig<(string | null | never)[]>;
-  sortDirection: QueryParamConfig<string | null | undefined>;
-  sortField?: QueryParamConfig<string | null | undefined>;
-};
-
-export const DefaultQueryParams = {
-  sortDirection: StringParam,
-  search: StringParam,
-  selection: withDefault(DelimitedArrayParam, []),
-  sortField: StringParam,
-};
+import StyledDialog from './StyledDialog';
 
 export type SortDirectionType = 'asc' | 'desc' | undefined;
 
@@ -53,9 +32,8 @@ interface SuperProps<RowData extends Record<keyof RowData, unknown>> {
   createModalSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
   delete?: (id: number | string) => Promise<boolean>;
   hasAccess?: { create?: boolean; update?: boolean; remove?: boolean };
-  urlQueryParams?: DecodedValueMap<UrlQueryParamsType>;
-  setUrlQueryParams?: SetQuery<UrlQueryParamsType>;
   extraActionButtons?: React.ReactNode;
+  persistUrlQueryParams?: boolean;
 }
 
 interface EntryID {
@@ -69,30 +47,33 @@ export function SuperMaterialTable<Entry extends EntryID>({
     update: true,
   },
   extraActionButtons,
+
   ...props
 }: MaterialTableProps<Entry> & SuperProps<Entry>) {
   const [show, setShow] = useState(false);
   const [editObject, setEditObject] = useState<Entry | null>(null);
 
   let { data, columns } = props;
-  const {
-    setData,
-    options,
-    urlQueryParams,
-    actions,
-    createModal,
-    setUrlQueryParams,
-  } = props;
+  const { setData, options, actions, createModal } = props;
+  const { persistUrlQueryParams = false } = props;
+  const [searchParam, setSearchParam] = useSearchParams();
+  const selection = persistUrlQueryParams
+    ? searchParam.getAll('selection')
+    : [];
+  const search = persistUrlQueryParams ? searchParam.get('search') : '';
+  const sortField = persistUrlQueryParams ? searchParam.get('sortField') : '';
+  const sortDirection = persistUrlQueryParams
+    ? searchParam.get('sortDirection')
+    : '';
 
   // NOTE: If selection is on than read the selected items from the url.
-  if (options?.selection && urlQueryParams) {
+  if (options?.selection) {
     data = data.map((objectItem) => {
       return {
         ...objectItem,
         tableData: {
-          checked: urlQueryParams?.selection?.some(
-            (selectedItem: number | string | null) =>
-              selectedItem === objectItem.id
+          checked: selection.some(
+            (selectedItem) => selectedItem === objectItem.id
           ),
         },
       };
@@ -105,15 +86,11 @@ export function SuperMaterialTable<Entry extends EntryID>({
     };
   }
 
-  if (options?.search && urlQueryParams) {
-    options.searchText = urlQueryParams.search || undefined;
+  if (options?.search) {
+    options.searchText = search || undefined;
   }
 
-  columns = setSortDirectionOnSortField(
-    columns,
-    urlQueryParams?.sortField,
-    urlQueryParams?.sortDirection
-  );
+  columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
   const onCreated = (
     objectAdded: Entry | null,
@@ -177,7 +154,7 @@ export function SuperMaterialTable<Entry extends EntryID>({
 
   return (
     <>
-      <InputDialog
+      <StyledDialog
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
         data-cy="create-modal"
@@ -189,25 +166,19 @@ export function SuperMaterialTable<Entry extends EntryID>({
           setEditObject(null);
           setShow(false);
         }}
+        title="Create"
       >
-        <IconButton
-          data-cy="close-modal-btn"
-          sx={(theme) => ({
-            position: 'absolute',
-            right: theme.spacing(1),
-            top: theme.spacing(1),
-          })}
-          onClick={() => {
-            setEditObject(null);
-            setShow(false);
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-        {createModal?.(onUpdated, onCreated, editObject)}
-      </InputDialog>
+        <DialogContent dividers>
+          {createModal?.(onUpdated, onCreated, editObject)}
+        </DialogContent>
+      </StyledDialog>
       <MaterialTable
         {...props}
+        title={
+          <Typography variant="h6" component="h2">
+            {props.title}
+          </Typography>
+        }
         columns={columns}
         data={data}
         icons={tableIcons}
@@ -239,30 +210,42 @@ export function SuperMaterialTable<Entry extends EntryID>({
             : [...localActions]
         }
         onSearchChange={(searchText) => {
-          setUrlQueryParams &&
-            setUrlQueryParams({
-              search: searchText ? searchText : undefined,
+          persistUrlQueryParams &&
+            setSearchParam((searchParam) => {
+              searchParam.delete('search');
+              if (searchText) searchParam.set('search', searchText);
+
+              return searchParam;
             });
         }}
         onSelectionChange={(selectedItems) => {
-          setUrlQueryParams &&
-            setUrlQueryParams({
-              selection:
-                selectedItems.length > 0
-                  ? selectedItems.map((selectedItem) =>
-                      selectedItem.id.toString()
-                    )
-                  : undefined,
+          persistUrlQueryParams &&
+            setSearchParam((searchParam) => {
+              searchParam.delete('selection');
+              selectedItems.map((selectedItem) =>
+                searchParam.append('selection', selectedItem.id.toString())
+              );
+
+              return searchParam;
             });
         }}
         onOrderCollectionChange={(orderByCollection) => {
           const [orderBy] = orderByCollection;
-          setUrlQueryParams &&
-            setUrlQueryParams((params) => ({
-              ...params,
-              sortField: orderBy?.orderByField,
-              sortDirection: orderBy?.orderDirection,
-            }));
+          persistUrlQueryParams &&
+            setSearchParam((searchParam) => {
+              searchParam.delete('sortField');
+              searchParam.delete('sortDirection');
+
+              if (
+                orderBy?.orderByField != null &&
+                orderBy?.orderDirection != null
+              ) {
+                searchParam.set('sortField', orderBy?.orderByField);
+                searchParam.set('sortDirection', orderBy?.orderDirection);
+              }
+
+              return searchParam;
+            });
         }}
       />
       {hasAccess.create && createModal && (

@@ -90,6 +90,7 @@ const ProposalGrade = ({
           ? ReviewStatus.SUBMITTED
           : ReviewStatus.DRAFT,
       fapID: review.fapID,
+      questionaryID: review.questionaryID,
     });
 
     setReview({
@@ -209,6 +210,7 @@ const ProposalGrade = ({
               label="Grading guide"
               disabled={isSubmitting}
               data-cy="grade-guide"
+              title="Grading Guide"
             >
               {fap ? <GradeGuidePage fap={fap} /> : <GradeGuidePage />}
             </ButtonWithDialog>

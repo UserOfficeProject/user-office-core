@@ -19,6 +19,7 @@ fragment call on Call {
   templateId
   esiTemplateId
   pdfTemplateId
+  fapReviewTemplateId
   allocationTimeUnit
   instruments {
     id

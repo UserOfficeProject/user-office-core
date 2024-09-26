@@ -2,7 +2,6 @@ import HelpIcon from '@mui/icons-material/Help';
 import LaunchIcon from '@mui/icons-material/Launch';
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   FormControl,
@@ -29,6 +28,7 @@ import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
+import StyledDialog from 'components/common/StyledDialog';
 import { ProposalStatusDefaultShortCodes } from 'components/proposal/ProposalsSharedConstants';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
@@ -65,19 +65,23 @@ const CallGeneralInfo = ({
   templates,
   esiTemplates,
   pdfTemplates,
+  fapReviewTemplates,
   loadingTemplates,
   reloadTemplates,
   reloadEsi,
   reloadPdfTemplates,
+  reloadFapReviewTemplates,
   reloadProposalWorkflows,
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
   reloadPdfTemplates: () => void;
+  reloadFapReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
+  fapReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
@@ -105,6 +109,12 @@ const CallGeneralInfo = ({
 
   const pdfTemplateOptions =
     pdfTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const fapReviewTemplateOptions =
+    fapReviewTemplates?.map((template) => ({
       text: template.name,
       value: template.templateId,
     })) || [];
@@ -262,10 +272,11 @@ const CallGeneralInfo = ({
                 <IconButton onClick={handleClickOpen}>
                   <HelpIcon />
                 </IconButton>
-                <Dialog
+                <StyledDialog
                   onClose={handleClose}
                   aria-labelledby="customized-dialog-title"
                   open={open}
+                  title="Reference Number Format"
                 >
                   <DialogContent dividers>
                     <Typography gutterBottom color="inherit" variant="body1">
@@ -318,7 +329,7 @@ const CallGeneralInfo = ({
                       Close
                     </Button>
                   </DialogActions>
-                </Dialog>
+                </StyledDialog>
               </InputAdornment>
             ),
           }}
@@ -329,7 +340,7 @@ const CallGeneralInfo = ({
       <FormControl fullWidth>
         <FormikUIAutocomplete
           name="templateId"
-          label="Call template"
+          label="Proposal template"
           loading={loadingTemplates}
           noOptionsText="No templates"
           items={templateOptions}
@@ -363,7 +374,7 @@ const CallGeneralInfo = ({
         <FormControl fullWidth>
           <FormikUIAutocomplete
             name="esiTemplateId"
-            label="ESI template"
+            label="Proposal ESI template"
             loading={loadingTemplates}
             noOptionsText="No templates"
             items={esiTemplateOptions}
@@ -406,6 +417,18 @@ const CallGeneralInfo = ({
           'data-cy': 'call-pdf-template',
           endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
         }}
+      />
+      <FormikUIAutocomplete
+        name="fapReviewTemplateId"
+        label="FAP Review template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={fapReviewTemplateOptions}
+        InputProps={{
+          'data-cy': 'call-fap-review-template',
+          endAdornment: <RefreshListIcon onClick={reloadFapReviewTemplates} />,
+        }}
+        required
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"

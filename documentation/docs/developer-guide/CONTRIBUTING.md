@@ -1,3 +1,7 @@
+# Contributing
+
+_________________________________________________________________________________________________________
+
 Thank you for considering contributing to User Office Project!
 
 You can find the repo [here](https://github.com/UserOfficeProject/user-office-core) and a detailed step-by-step guide with an example on how to create new functionality [here](step-by-step.md).
@@ -8,12 +12,16 @@ If you're planning to contribute to this project by adding new functionality, we
 2. Start a new discussion thread outlining your proposed changes.
 3. Wait for feedback and consensus before proceeding with creating a pull request.
 
+_________________________________________________________________________________________________________
+
 ## Guidelines
 
 - Commits follow the [Angular commit convention](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines).
 - JavaScript is written using ES2015 features.
 - 2 spaces indentation.
 - Features and bug fixes should be covered by test cases.
+
+_________________________________________________________________________________________________________
 
 ## Creating releases
 
@@ -26,4 +34,6 @@ to release new versions automatically.
 
 All other commit types will trigger no new release.
 
-> **_NOTE:_** When merging the pull requests with `Squash and merge` option on github, the title of the pull request should follow the commit guidelines mentioned above because all the commits are squashed into one commit with title od the PR as a message of the commit. Otherwise when using normal `Merge pull request` the title of the pull request doesn't need to follow the commit guidelines but only the commit messages.
+> **_NOTE:_** When merging the pull requests with `Squash and merge` option on GitHub, the title of the pull request should follow the commit guidelines mentioned above because all the commits are squashed into one commit with title of the PR as a message of the commit. Otherwise when using normal `Merge pull request` the title of the pull request doesn't need to follow the commit guidelines but only the commit messages.
+
+_________________________________________________________________________________________________________

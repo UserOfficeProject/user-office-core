@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { ProposalStatus } from 'generated/sdk';
 
@@ -15,7 +15,21 @@ type ProposalStatusFilterProps = {
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
   proposalStatusId?: number;
+  hiddenStatuses: number[];
 };
+
+function checkToRemove(
+  hiddenStatuses: number[],
+  proposalStatus: ProposalStatus
+) {
+  if (hiddenStatuses != null) {
+    for (let i = 0; i < hiddenStatuses.length; i++) {
+      if (hiddenStatuses[i] == proposalStatus.id) return false;
+    }
+  }
+
+  return true;
+}
 
 const ProposalStatusFilter = ({
   proposalStatuses,
@@ -23,11 +37,9 @@ const ProposalStatusFilter = ({
   proposalStatusId,
   onChange,
   shouldShowAll,
+  hiddenStatuses,
 }: ProposalStatusFilterProps) => {
-  const [, setQuery] = useQueryParams({
-    proposalStatus: NumberParam,
-  });
-
+  const [, setSearchParams] = useSearchParams();
   if (proposalStatuses === undefined) {
     return null;
   }
@@ -49,10 +61,16 @@ const ProposalStatusFilter = ({
             id="proposal-status-select"
             aria-labelledby="proposal-status-select-label"
             onChange={(proposalStatus) => {
-              setQuery({
-                proposalStatus: proposalStatus.target.value
-                  ? (proposalStatus.target.value as number)
-                  : undefined,
+              setSearchParams((searchParams) => {
+                searchParams.delete('proposalStatus');
+                if (proposalStatus.target.value) {
+                  searchParams.set(
+                    'proposalStatus',
+                    proposalStatus.target.value.toString()
+                  );
+                }
+
+                return searchParams;
               });
               onChange?.(proposalStatus.target.value as number);
             }}
@@ -61,11 +79,14 @@ const ProposalStatusFilter = ({
             data-cy="status-filter"
           >
             {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
-            {proposalStatuses.map((proposalStatus) => (
-              <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
-                {proposalStatus.name}
-              </MenuItem>
-            ))}
+            {proposalStatuses.map(
+              (proposalStatus) =>
+                checkToRemove(hiddenStatuses, proposalStatus) && (
+                  <MenuItem key={proposalStatus.id} value={proposalStatus.id}>
+                    {proposalStatus.name}
+                  </MenuItem>
+                )
+            )}
           </Select>
         )}
       </FormControl>

@@ -11,6 +11,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { InstrumentOptionClass } from '../../models/questionTypes/InstrumentPicker';
+import { TechniqueOptionClass } from '../../models/questionTypes/TechniquePicker';
 import { Roles } from '../../models/Role';
 import { Unit } from './Unit';
 
@@ -43,6 +44,9 @@ export class GenericTemplateBasisConfig {
 
 @ObjectType()
 export class VisitBasisConfig extends ConfigBase {}
+
+@ObjectType()
+export class FapReviewBasisConfig extends ConfigBase {}
 
 @ObjectType()
 export class BooleanConfig extends ConfigBase {}
@@ -290,6 +294,30 @@ export class SampleEsiBasisConfig {
 export class RichTextInputConfig extends ConfigBase {
   @Field(() => Int, { nullable: true })
   max: number | null;
+
+  @Field(() => Boolean)
+  allowImages: boolean;
+}
+
+@ObjectType()
+export class TechniqueOption implements Partial<TechniqueOptionClass> {
+  @Field()
+  id: number;
+
+  @Field()
+  name: string;
+}
+
+@ObjectType()
+export class TechniquePickerConfig extends ConfigBase {
+  @Field(() => String)
+  variant: string;
+
+  @Field(() => [TechniqueOption])
+  techniques: TechniqueOption[];
+
+  @Field(() => Boolean)
+  isMultipleSelect: boolean;
 }
 
 export const FieldConfigType = createUnionType({
@@ -313,8 +341,10 @@ export const FieldConfigType = createUnionType({
     ShipmentBasisConfig,
     RichTextInputConfig,
     VisitBasisConfig,
+    FapReviewBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
     InstrumentPickerConfig,
+    TechniquePickerConfig,
   ], // function that returns array of object types classes
 });
