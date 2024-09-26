@@ -541,7 +541,7 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
-      cy.contains('Instruments').click();
+      cy.contains('Instruments').click().type('{esc}');
 
       cy.contains(instrument1.name)
         .parent()
