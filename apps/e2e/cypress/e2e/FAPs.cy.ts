@@ -3835,7 +3835,7 @@ context('Fap meeting exports test', () => {
       });
   });
 
-  it('Officer should be be able to a summary of the FAP meeting stfc', function () {
+  it('Officer should be able to download a summary of the FAP meeting stfc', function () {
     cy.getAndStoreFeaturesEnabled().then(function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
