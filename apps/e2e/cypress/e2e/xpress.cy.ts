@@ -131,13 +131,14 @@ context('Xpress tests', () => {
   };
 
   beforeEach(function () {
-    if (
-      featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)
-    ) {
-      this.skip();
-    }
     cy.resetDB();
-    cy.getAndStoreFeaturesEnabled();
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (
+        !featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)
+      ) {
+        this.skip();
+      }
+    });
 
     cy.createInstrument(instrument1).then((result) => {
       if (result.createInstrument) {
