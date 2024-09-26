@@ -337,6 +337,13 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
+  /*Brief explanation of the query used in getAllUsersReviews
+    This query gets executed when a reviewer wishes to see all the proposals
+    (proposals where they are assigned as a reviewer and where they are not) 
+    in a FAP. Logged in reviewer's id will be returned as the reviewer against 
+    a proposal if the proposal is being reviewed by him and others. Reviewers
+    other than him will be ignored for that proposal.
+  */
   async getAllUsersReviews(
     fapIds: number[],
     userId?: number,
@@ -344,42 +351,49 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     instrumentId?: number,
     status?: ReviewStatus
   ): Promise<Review[]> {
-    const fapReviewsFiltered = database
-      .select('fap_reviews.*')
-      .from('fap_reviews')
-      .modify((qb) => {
-        // sometimes the ID 0 is sent as a equivalent of all
-        if (callId) {
-          qb.join('proposals', {
-            'proposals.proposal_pk': 'fap_reviews.proposal_pk',
-          });
-          qb.where('proposals.call_id', callId);
-        }
+    return database
+      .select('fapReviewsTemp.*')
+      .from(
+        database
+          .select('fap_reviews.*')
+          .from('fap_reviews')
+          .modify((qb) => {
+            if (callId) {
+              qb.join('proposals', {
+                'proposals.proposal_pk': 'fap_reviews.proposal_pk',
+              });
+              qb.where('proposals.call_id', callId);
+            }
+            if (instrumentId) {
+              qb.join('instrument_has_proposals', {
+                'instrument_has_proposals.proposal_pk':
+                  'fap_reviews.proposal_pk',
+              });
+              qb.where('instrument_has_proposals.instrument_id', instrumentId);
+            }
 
-        // sometimes the ID 0 is sent as a equivalent of all
-        if (instrumentId) {
-          qb.join('instrument_has_proposals', {
-            'instrument_has_proposals.proposal_pk': 'fap_reviews.proposal_pk',
-          });
-          qb.where('instrument_has_proposals.instrument_id', instrumentId);
-        }
-
-        if (status !== undefined && status !== null) {
-          qb.where('fap_reviews.status', status);
-        }
-      })
-      .whereIn('fap_id', fapIds);
-
-    const query = `SELECT DISTINCT ON (proposal_pk) *  
-                   FROM (${fapReviewsFiltered}) fapReviewsTemp
-                   WHERE (user_id=${userId}
-                   OR (proposal_pk NOT IN 
-                   (SELECT DISTINCT proposal_pk 
-                   FROM fap_reviews 
-                   WHERE user_id = ${userId})));`;
-
-    const response = (await database.raw(query)).rows;
-
-    return response.map((review: ReviewRecord) => createReviewObject(review));
+            if (status) {
+              qb.where('fap_reviews.status', status);
+            }
+          })
+          .whereIn('fap_id', fapIds)
+          .as('fapReviewsTemp')
+      )
+      .modify((query) =>
+        query
+          .where('user_id', userId)
+          .orWhereNotIn(
+            'proposal_pk',
+            database
+              .select('proposal_pk')
+              .from('fap_reviews')
+              .where('user_id', userId)
+              .distinctOn('proposal_pk')
+          )
+          .distinctOn('proposal_pk')
+      )
+      .then((reviews: ReviewRecord[]) => {
+        return reviews.map((review) => createReviewObject(review));
+      });
   }
 }
