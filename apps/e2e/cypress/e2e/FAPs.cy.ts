@@ -1407,7 +1407,24 @@ context('Fap reviews tests', () => {
         variant: 'success',
       });
     });
+    it('Fap Reviewer should only see their proposals and all proposals when selecting My Proposals and All proposals respectively from reviewer dropdown', () => {
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title);
+      cy.contains(proposal3.title).should('not.exist');
 
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('All proposals').click();
+      cy.contains(proposal1.title);
+      cy.contains(proposal3.title);
+    });
     it('Fap Reviewer should not be able to submit a grade for proposals on which they are not reviewer, they should only able to view them', () => {
       cy.get('#reviewer-selection', { timeout: 5000 })
         .parent()
