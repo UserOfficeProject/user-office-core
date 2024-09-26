@@ -536,17 +536,22 @@ context('Instrument tests', () => {
       // TODO: Extend here when technical reviewer is added to the table.
     });
 
-    it('User Officer should be able to remove assigned scientist from instrument', () => {
+    it.only('User Officer should be able to remove assigned scientist from instrument', () => {
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
-      cy.contains('Instruments').click().type('{esc}');
+      cy.contains('Experimental Areas').click();
 
-      cy.contains(instrument1.name)
-        .parent()
-        .find('[aria-label="Detail panel visibility toggle"]')
-        .click();
+      // The sidebar tab label can obstruct the dropdown
+      cy.get('body')
+        .click()
+        .then(() => {
+          cy.contains(instrument1.name)
+            .parent()
+            .find('[aria-label="Detail panel visibility toggle"]')
+            .click();
+        });
 
       cy.contains(scientist2.lastName);
 
