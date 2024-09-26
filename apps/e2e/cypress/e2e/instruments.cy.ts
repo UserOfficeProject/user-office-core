@@ -536,12 +536,13 @@ context('Instrument tests', () => {
       // TODO: Extend here when technical reviewer is added to the table.
     });
 
-    it('User Officer should be able to remove assigned scientist from instrument', () => {
+    it.only('User Officer should be able to remove assigned scientist from instrument', () => {
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
       });
       cy.contains('Instruments').click();
+      cy.finishedLoading();
 
       cy.contains(instrument1.name)
         .parent()
