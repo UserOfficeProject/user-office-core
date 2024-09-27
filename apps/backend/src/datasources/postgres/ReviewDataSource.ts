@@ -372,7 +372,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
               qb.where('instrument_has_proposals.instrument_id', instrumentId);
             }
 
-            if (status) {
+            if (status !== null) {
               qb.where('fap_reviews.status', status);
             }
           })
