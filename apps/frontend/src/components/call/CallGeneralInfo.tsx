@@ -23,6 +23,7 @@ import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
@@ -94,6 +95,7 @@ const CallGeneralInfo = ({
   });
 
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const templateOptions =
     templates?.map((template) => ({
@@ -420,7 +422,7 @@ const CallGeneralInfo = ({
       />
       <FormikUIAutocomplete
         name="fapReviewTemplateId"
-        label="FAP Review template"
+        label={t('FAP Review template')}
         loading={loadingTemplates}
         noOptionsText="No templates"
         items={fapReviewTemplateOptions}

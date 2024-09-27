@@ -132,7 +132,7 @@ ________________________________________________________________________________
 
 ## What does #proposals mean on proposal templates?
 
-* '#proposals' refers to the number of calls the proposal template has been utilized in.
+* '#proposals' refers to the number of proposals the proposal template has been utilized in.
 
 _________________________________________________________________________________________________________
 

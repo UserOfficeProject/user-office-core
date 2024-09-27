@@ -51,6 +51,7 @@ nav:
           - Questions: user-guide/user-officer/questions.md
           - Templates:
             - Proposal templates: user-guide/user-officer/templates/proposal_template.md
+            - FAP review templates: user-guide/user-officer/templates/fap_review_template.md
             - PDF templates: user-guide/user-officer/templates/pdf_template.md
             - Feedback templates: user-guide/user-officer/templates/feedback_template.md
             - Sample declaration templates: user-guide/user-officer/templates/sampledec_template.md

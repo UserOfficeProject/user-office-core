@@ -3,6 +3,7 @@ import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DatePicker from 'components/common/FormikUIDatePicker';
@@ -19,6 +20,7 @@ import { useFapsData } from 'hooks/fap/useFapsData';
 
 const CallReviewAndNotification = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { currentRole } = useContext(UserContext);
   const { faps: allActiveFaps, loadingFaps } = useFapsData({
     filter: '',
@@ -77,7 +79,7 @@ const CallReviewAndNotification = () => {
         />
         <Field
           name="startFapReview"
-          label="Start of Fap review"
+          label={t('Start of Fap review')}
           id="start-fap-review-input"
           format={dateFormat}
           ampm={false}
@@ -91,7 +93,7 @@ const CallReviewAndNotification = () => {
         />
         <Field
           name="endFapReview"
-          label="End of Fap review"
+          label={t('End of Fap review')}
           id="end-fap-review-input"
           format={dateFormat}
           ampm={false}
