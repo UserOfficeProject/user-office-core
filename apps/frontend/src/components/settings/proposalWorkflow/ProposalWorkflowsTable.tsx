@@ -2,12 +2,8 @@ import Edit from '@mui/icons-material/Edit';
 import { Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryParams } from 'use-query-params';
 
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, ProposalWorkflow } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
@@ -29,8 +25,6 @@ const ProposalWorkflowsTable = () => {
     proposalWorkflows,
     setProposalWorkflowsWithLoading: setProposalWorkflows,
   } = useProposalWorkflowsData();
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const navigate = useNavigate();
 
@@ -100,8 +94,7 @@ const ProposalWorkflowsTable = () => {
             position: 'row',
           },
         ]}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
+        persistUrlQueryParams={true}
       />
     </div>
   );

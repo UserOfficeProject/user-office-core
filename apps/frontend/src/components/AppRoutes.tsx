@@ -242,13 +242,18 @@ const AppRoutes = () => {
         {isFapEnabled && (
           <Route
             path="/FapPage/:id"
-            element={<TitledRoute title="Fap" element={<FapPage />} />}
+            element={<TitledRoute title={t('Fap')} element={<FapPage />} />}
           />
         )}
         {isFapEnabled && (
           <Route
             path="/Faps"
-            element={<TitledRoute title="Faps" element={<FapsPage />} />}
+            element={
+              <TitledRoute
+                title={i18n.format(t('Fap'), 'plural')}
+                element={<FapsPage />}
+              />
+            }
           />
         )}
         {isInstrumentManagementEnabled && (
@@ -313,7 +318,7 @@ const AppRoutes = () => {
           path="/FapReviewTemplates"
           element={
             <TitledRoute
-              title="FAP Review Templates"
+              title={i18n.format(t('FAP Review Template'), 'plural')}
               element={<FapReviewTemplatesPage />}
             />
           }

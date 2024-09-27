@@ -1,4 +1,13 @@
 {
   "instrument": "Instrument",
-  "instrumentSci": "Instrument Scientist"
+  "instrumentSci": "Instrument Scientist",
+  "Fap": "Fap",
+  "FAP": "FAP",
+  "Facility access panel": "Facility access panel",
+  "FAP reviews": "FAP reviews",
+  "FAP Review": "FAP Review",
+  "FAP Review Template": "FAP Review Template",
+  "FAP Review template": "FAP Review template",
+  "Start of Fap review": "Start of Fap review",
+  "End of Fap review": "End of Fap review"
 }
