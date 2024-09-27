@@ -75,6 +75,13 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
     return submissionDisabled;
   });
 
+  const [
+    proposalSubmissionSuccessMessage,
+    setProposalSubmissionSuccessMessage,
+  ] = useState<string>(
+    'Your proposal has been submitted successfully. You will receive a confirmation email soon.'
+  );
+
   // Show a different submit confirmation if
   // EDITABLE_SUBMITTED is an upcoming status
   useEffect(() => {
@@ -115,19 +122,20 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
           if (proposal.status != null && hasUpcomingEditableStatus) {
             setSubmitButtonMessage(
-              'Submit proposal? The proposal can be edited after submission.'.concat(
-                call?.submissionMessage ? '\n' + call.submissionMessage : ''
-              )
+              'Submit proposal? The proposal can be edited after submission.'
             );
           } else {
             setSubmitButtonMessage(
-              'I am aware that no further edits can be made after proposal submission.'.concat(
-                call?.submissionMessage ? '\n' + call.submissionMessage : ''
-              )
+              'I am aware that no further edits can be made after proposal submission.'
             );
           }
         }
       }
+
+      if (call?.submissionMessage) {
+        setProposalSubmissionSuccessMessage(call.submissionMessage);
+      }
+
       setLoadingSubmitMessage(false);
     }
     initializeSubmissionMessage();
@@ -158,8 +166,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
                 setIsSubmitting(true);
                 try {
                   const { submitProposal } = await api({
-                    toastSuccessMessage:
-                      'Your proposal has been submitted successfully. You will receive a confirmation email soon.',
+                    toastSuccessMessage: proposalSubmissionSuccessMessage,
                   }).submitProposal({
                     proposalPk: state.proposal.primaryKey,
                   });
