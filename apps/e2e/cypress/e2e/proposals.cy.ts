@@ -907,6 +907,37 @@ context('Proposal tests', () => {
 
       cy.get('[aria-label="View proposal"]').should('exist');
     });
+
+    it('During Proposal creation, User should be receive the successfull submission message as set in the call', () => {
+      const customSubmissionMessage = faker.lorem.words(20);
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: createdWorkflowId,
+        submissionMessage: customSubmissionMessage,
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]')
+        .should('contain', newCall.shortCode)
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title]').type(title);
+      cy.get('[data-cy=abstract]').type(abstract);
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains(customSubmissionMessage);
+    });
   });
 
   describe('Proposal advanced tests', () => {
