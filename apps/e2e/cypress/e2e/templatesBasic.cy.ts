@@ -402,8 +402,6 @@ context('Template tests', () => {
       cy.visit('/');
       cy.navigateToTemplatesSubmenu('Shipment declaration templates');
 
-      cy.get('[data-cy=mark-as-active]').click();
-
       cy.get('[data-cy=delete-template]').click();
 
       cy.get('[data-cy=confirm-ok]').click();
@@ -1960,6 +1958,128 @@ context('Template tests', () => {
       cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({ variant: 'success', text: 'Saved' });
+    });
+  });
+
+  describe('Activate/Deactivate template tests', () => {
+    it('Activate a Shipment Declaration template', () => {
+      cy.login('officer');
+      cy.visit('/ShipmentDeclarationTemplates');
+      cy.finishedLoading();
+
+      //Create a new template
+
+      cy.get('[data-cy=create-new-button]').click();
+
+      cy.get('[data-cy="name"]').type('Shipment Declaration Template');
+
+      cy.get('[data-cy="description"]').type('Shipment Declaration Template');
+
+      cy.get('[data-cy="submit"]').click();
+
+      // Create another template
+      cy.finishedLoading();
+      cy.visit('/ShipmentDeclarationTemplates');
+      cy.get('[data-cy=create-new-button]').click();
+
+      cy.get('[data-cy="name"]').type('Shipment Declaration Template 2');
+
+      cy.get('[data-cy="description"]').type('Shipment Declaration Template 2');
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.finishedLoading();
+      cy.visit('/ShipmentDeclarationTemplates');
+
+      // Shipment declaration template should contain data-cy=mark-as-inactive
+      cy.contains('Shipment Declaration Template')
+        .parent()
+        .find('[data-cy=mark-as-inactive]')
+        .should('exist');
+
+      // Shipment declaration template 2 should contain data-cy=mark-as-active
+      cy.contains('Shipment Declaration Template 2')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .should('exist');
+
+      // Activate the secont template
+      cy.contains('Shipment Declaration Template 2')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .click();
+
+      // Shipment declaration template should contain data-cy=mark-as-inactive
+      cy.contains('Shipment Declaration Template')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .should('exist');
+
+      // Shipment declaration template 2 should contain data-cy=mark-as-active
+      cy.contains('Shipment Declaration Template 2')
+        .parent()
+        .find('[data-cy=mark-as-inactive]')
+        .should('exist');
+    });
+
+    it('Activate a Visit Registration template', () => {
+      cy.login('officer');
+      cy.visit('/VisitTemplates');
+      cy.finishedLoading();
+
+      //Create a new template
+
+      cy.get('[data-cy=create-new-button]').click();
+
+      cy.get('[data-cy="name"]').type('Visit Registration Template');
+
+      cy.get('[data-cy="description"]').type('Visit Registration Template');
+
+      cy.get('[data-cy="submit"]').click();
+
+      // Create another template
+      cy.finishedLoading();
+      cy.visit('/VisitTemplates');
+      cy.get('[data-cy=create-new-button]').click();
+
+      cy.get('[data-cy="name"]').type('Visit Registration Template 2');
+
+      cy.get('[data-cy="description"]').type('Visit Registration Template 2');
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.finishedLoading();
+      cy.visit('/VisitTemplates');
+
+      // Visit Registration template should contain data-cy=mark-as-inactive
+      cy.contains('Visit Registration Template')
+        .parent()
+        .find('[data-cy=mark-as-inactive]')
+        .should('exist');
+
+      // Visit Registration template 2 should contain data-cy=mark-as-active
+      cy.contains('Visit Registration Template 2')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .should('exist');
+
+      // Activate the secont template
+      cy.contains('Visit Registration Template 2')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .click();
+
+      // Visit Registration template should contain data-cy=mark-as-inactive
+      cy.contains('Visit Registration Template')
+        .parent()
+        .find('[data-cy=mark-as-active]')
+        .should('exist');
+
+      // Visit Registration template 2 should contain data-cy=mark-as-active
+      cy.contains('Visit Registration Template 2')
+        .parent()
+        .find('[data-cy=mark-as-inactive]')
+        .should('exist');
     });
   });
 });
