@@ -174,85 +174,101 @@ const AddStatusActionsToConnection = ({
             Status actions that will be executed when proposals change to{' '}
             <span className="statusName">{statusName}</span> status
           </Typography>
-
-          {loadingStatusActions ? (
-            <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
-          ) : (
-            <FieldArray
-              name="selectedStatusActions"
-              render={(arrayHelpers) => (
-                <>
-                  {statusActions.map((statusAction, index) => (
-                    <Accordion
-                      sx={accordionSX}
-                      disableGutters
-                      key={index}
-                      expanded={
-                        !!values.selectedStatusActions.find(
-                          (item) => item.id === statusAction.id
-                        )
-                      }
-                      onChange={(event) => {
-                        event.preventDefault();
-                        const idx = values.selectedStatusActions.findIndex(
-                          (item) => item.id === statusAction.id
-                        );
-                        if (idx === -1) {
-                          arrayHelpers.push(statusAction);
-                        } else {
-                          arrayHelpers.remove(idx);
+          <Grid
+            spacing={1}
+            sx={{
+              minHeight: 'auto',
+              maxHeight: 'calc(100vh - 315px)',
+              [theme.breakpoints.only('sm')]: {
+                maxHeight: 'calc(100vh - 345px)',
+              },
+              [theme.breakpoints.only('xs')]: {
+                maxHeight: 'calc(100vh - 475px)',
+              },
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              marginTop: '10px',
+            }}
+          >
+            {loadingStatusActions ? (
+              <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
+            ) : (
+              <FieldArray
+                name="selectedStatusActions"
+                render={(arrayHelpers) => (
+                  <>
+                    {statusActions.map((statusAction, index) => (
+                      <Accordion
+                        sx={accordionSX}
+                        disableGutters
+                        key={index}
+                        expanded={
+                          !!values.selectedStatusActions.find(
+                            (item) => item.id === statusAction.id
+                          )
                         }
-                      }}
-                      data-cy={`accordion-${statusAction.type}`}
-                    >
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls={`panel${index}- header`}
-                        id={`panel${index}-header`}
+                        onChange={(event) => {
+                          event.preventDefault();
+                          const idx = values.selectedStatusActions.findIndex(
+                            (item) => item.id === statusAction.id
+                          );
+                          if (idx === -1) {
+                            arrayHelpers.push(statusAction);
+                          } else {
+                            arrayHelpers.remove(idx);
+                          }
+                        }}
+                        data-cy={`accordion-${statusAction.type}`}
                       >
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              id={statusAction.name}
-                              name="selectedStatusActions"
-                              value={statusAction.id}
-                              checked={
-                                !!values.selectedStatusActions.find(
-                                  (item) => item.id === statusAction.id
-                                )
-                              }
-                              data-cy={`${statusAction.type}-status-action`}
-                              inputProps={{
-                                'aria-label': 'primary checkbox',
-                              }}
-                            />
-                          }
-                          label={
-                            <>
-                              <p>{statusAction.name}</p>
-                              <Box
-                                component="p"
-                                sx={{
-                                  margin: '-5px 0',
-                                  fontSize: 'small',
-                                  color: theme.palette.grey[400],
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls={`panel${index}- header`}
+                          id={`panel${index}-header`}
+                        >
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                id={statusAction.name}
+                                name="selectedStatusActions"
+                                value={statusAction.id}
+                                checked={
+                                  !!values.selectedStatusActions.find(
+                                    (item) => item.id === statusAction.id
+                                  )
+                                }
+                                data-cy={`${statusAction.type}-status-action`}
+                                inputProps={{
+                                  'aria-label': 'primary checkbox',
                                 }}
-                              >
-                                {statusAction.description}
-                              </Box>
-                            </>
-                          }
-                        />
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {renderActionsConfig(statusAction, values)}
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-                </>
-              )}
-            />
-          )}
+                              />
+                            }
+                            label={
+                              <>
+                                <p>{statusAction.name}</p>
+                                <Box
+                                  component="p"
+                                  sx={{
+                                    margin: '-5px 0',
+                                    fontSize: 'small',
+                                    color: theme.palette.grey[400],
+                                  }}
+                                >
+                                  {statusAction.description}
+                                </Box>
+                              </>
+                            }
+                          />
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          {renderActionsConfig(statusAction, values)}
+                        </AccordionDetails>
+                      </Accordion>
+                    ))}
+                  </>
+                )}
+              />
+            )}
+          </Grid>
           <Grid container justifyContent="flex-end" spacing={1} paddingTop={1}>
             <Grid item marginTop={1}>
               <ErrorMessage name="selectedStatusActions" />
