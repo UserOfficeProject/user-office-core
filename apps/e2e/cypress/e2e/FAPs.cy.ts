@@ -3862,7 +3862,7 @@ context('Fap meeting exports test', () => {
       });
   });
 
-  it('Officer should be able to download of all FAP meetings in excel stfc', function () {
+  it('Officer should be able to download all FAP meetings in excel stfc', function () {
     cy.getAndStoreFeaturesEnabled().then(function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
