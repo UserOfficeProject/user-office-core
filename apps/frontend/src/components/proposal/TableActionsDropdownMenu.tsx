@@ -7,6 +7,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import React, { useEffect } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 type TableActionsDropdownMenuProps = {
   event: null | HTMLElement;
@@ -33,16 +34,21 @@ type MenuData = {
   handleClose: (option: string) => void;
 };
 
-const menuItems = [
-  {
-    key: DownloadMenuOption.PROPOSAL,
-    subMenu: [
-      { key: PdfDownloadMenuOption.PDF },
-      { key: PdfDownloadMenuOption.ZIP },
-    ],
-  },
-  { key: DownloadMenuOption.ATTACHMENT, subMenu: [] },
-];
+const getMenuItems = (allowMultipleFileDownload = true) => {
+  const initialItems = [
+    {
+      key: DownloadMenuOption.PROPOSAL,
+      subMenu: [{ key: PdfDownloadMenuOption.PDF }],
+    },
+    { key: DownloadMenuOption.ATTACHMENT, subMenu: [] },
+  ];
+
+  if (allowMultipleFileDownload) {
+    initialItems[0].subMenu.push({ key: PdfDownloadMenuOption.ZIP });
+  }
+
+  return initialItems;
+};
 
 const MenuItemWithSubMenuAccordion = ({ data, handleClose }: MenuData) => {
   const { key, subMenu } = data || {};
@@ -112,6 +118,18 @@ const TableActionsDropdownMenu = ({
     null
   );
   const [open, setOpen] = React.useState<boolean>(false);
+  const [menuItems, setMenuItems] = React.useState(getMenuItems());
+  const [searchParams] = useSearchParams();
+  const { search } = useLocation();
+
+  useEffect(() => {
+    if (searchParams.getAll('selection').length <= 1) {
+      setMenuItems(getMenuItems(false));
+    } else {
+      setMenuItems(getMenuItems());
+    }
+  }, [search, searchParams]);
+
   useEffect(() => {
     if (event) {
       setAnchorElement(event);
