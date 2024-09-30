@@ -110,3 +110,21 @@ jobs:
         if: ${{ steps.extract_branch.outputs.branch == 'develop' }} # Only trigger Jenkins for develop branch
         run: |
           curl -k -l -u ${{ secrets.STFC_CI_TRIGGER_USERNAME }}:${{ secrets.STFC_CI_TRIGGER_TOKEN }} "${{ secrets.STFC_CI_TRIGGER_BASE_URL }}/Dev_Deploy_ProposalBackend.LatestImage/build?token=${{ secrets.STFC_CI_TRIGGER_URL_TOKEN }}"
+
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.AUTOPRFLOW_APP_ID }}
+          private-key: ${{ secrets.AUTOPRFLOW_APP_PRIVATE_KEY }}
+          repositories: user-office-scheduler
+
+      - name: Trigger user-office-scheduler's generate-sdk workflow
+        if: ${{ steps.extract_branch.outputs.branch == 'develop' }}
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: token ${{ env.APP_TOKEN }}" \
+            -d '{"event_type": "generate-sdk"}' \
+            https://api.github.com/repos/UserOfficeProject/user-office-scheduler/dispatches
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
