@@ -170,6 +170,7 @@ export default class PostgresInstrumentDataSource
         'i.instrument_id': 'chi.instrument_id',
       })
       .whereIn('chi.call_id', callIds)
+      .orderBy('name')
       .distinct('i.instrument_id')
       .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
         const result = instruments.map((instrument) =>
