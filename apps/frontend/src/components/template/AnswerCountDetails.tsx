@@ -4,10 +4,12 @@ import React, { useMemo } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import { ProposalFragment, TemplateCategoryId } from 'generated/sdk';
+import { useGenericTemplatesData } from 'hooks/genericTemplate/useGenericTemplatesData';
 import { useProposalsData } from 'hooks/proposal/useProposalsData';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { useShipments } from 'hooks/shipment/useShipments';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
+import { GenericTemplateCoreWithProposalData } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { tableIcons } from 'utils/materialIcons';
 
 const proposalListColumns = [
@@ -20,7 +22,7 @@ const proposalListColumns = [
     ),
   },
   {
-    title: 'Proposal title',
+    title: 'Generic Template title',
     render: (rowData: ProposalFragment) => (
       <Link
         title={rowData.title}
@@ -50,6 +52,42 @@ function ProposalList({ question }: { question: QuestionWithUsage }) {
       columns={proposalListColumns}
       data={proposalsDataWithId}
       title="Proposals"
+      options={{ paging: false }}
+    />
+  );
+}
+
+const genericListColumns = [
+  { title: 'Generic Template title', field: 'title' },
+  { title: 'Created', field: 'created' },
+  { title: 'Proposal title', field: 'proposal.title' },
+  {
+    title: 'Proposal ID',
+    render: (rowData: GenericTemplateCoreWithProposalData) => (
+      <Link
+        title={rowData.proposal.proposalId}
+        href={`Proposals?reviewModal=${rowData.proposal.primaryKey}`}
+      >
+        {rowData.title}
+      </Link>
+    ),
+  },
+];
+
+function GenericTemplateList({ question }: { question: QuestionWithUsage }) {
+  const questionaryIds = useMemo(
+    () => question.answers.map((answer) => answer.questionaryId),
+    [question]
+  );
+  const { genericTemplates } = useGenericTemplatesData({ questionaryIds });
+
+  return (
+    <MaterialTable
+      style={{ width: '100%' }}
+      icons={tableIcons}
+      columns={genericListColumns}
+      data={genericTemplates}
+      title="Generic Templates"
       options={{ paging: false }}
     />
   );
@@ -112,6 +150,8 @@ function AnswerCountDetails(props: { question: QuestionWithUsage | null }) {
   switch (question?.categoryId) {
     case TemplateCategoryId.PROPOSAL_QUESTIONARY:
       return <ProposalList question={question} />;
+    case TemplateCategoryId.GENERIC_TEMPLATE:
+      return <GenericTemplateList question={question} />;
     case TemplateCategoryId.SAMPLE_DECLARATION:
       return <SampleList question={question} />;
     case TemplateCategoryId.SHIPMENT_DECLARATION:
