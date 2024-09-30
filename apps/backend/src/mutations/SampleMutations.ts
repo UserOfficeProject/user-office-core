@@ -9,7 +9,6 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection } from '../models/Rejection';
-import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateSampleInput } from '../resolvers/mutations/CreateSampleMutation';
@@ -103,7 +102,7 @@ export default class SampleMutations {
   }
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
-  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
+  @Authorized()
   async updateSample(agent: UserWithRole | null, args: UpdateSampleArgs) {
     const sample = await this.sampleDataSource.getSample(args.sampleId);
     if (sample === null) {
@@ -117,17 +116,6 @@ export default class SampleMutations {
         'Can not update sample because of insufficient permissions',
         { agent, args }
       );
-    }
-
-    // This makes sure administrative fields can be only updated by user with the right role
-    if (args.safetyComment || args.safetyStatus) {
-      const canAdministrerSample =
-        this.userAuth.isUserOfficer(agent) ||
-        (await this.sampleAuth.isSampleSafetyReviewer(agent));
-      if (canAdministrerSample === false) {
-        delete args.safetyComment;
-        delete args.safetyStatus;
-      }
     }
 
     return this.sampleDataSource
