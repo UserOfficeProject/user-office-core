@@ -3,17 +3,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React from 'react';
-import { StringParam, withDefault, QueryParamConfig } from 'use-query-params';
 
 import { ReviewStatus } from 'generated/sdk';
-
-export type ReviewStatusQueryFilter = {
-  reviewStatus: QueryParamConfig<string>;
-};
-export const defaultReviewStatusQueryFilter = withDefault(
-  StringParam,
-  ReviewStatus.DRAFT
-);
 
 type ReviewStatusFilterProps = {
   reviewStatus: string;

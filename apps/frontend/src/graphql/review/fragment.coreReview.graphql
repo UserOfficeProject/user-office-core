@@ -5,4 +5,5 @@ fragment coreReview on Review {
   comment
   grade
   fapID
+  questionaryID
 }

@@ -3,9 +3,9 @@ import { GraphQLError } from 'graphql';
 import { Review, ReviewStatus } from '../../models/Review';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
-import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { SubmitTechnicalReviewInput } from '../../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
+import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
 import { ReviewDataSource } from '../ReviewDataSource';
 import database from './database';
 import {
@@ -148,6 +148,51 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((review: ReviewRecord) => createReviewObject(review));
   }
 
+  getReviews(
+    filter?: ReviewsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; reviews: Review[] }> {
+    return database
+      .select(['fap_reviews.*', database.raw('count(*) OVER() AS full_count')])
+      .from('fap_reviews')
+      .orderBy('fap_reviews.review_id', 'desc')
+      .modify((query) => {
+        if (filter?.text) {
+          query.where('comment', 'ilike', `%${filter.text}%`);
+        }
+
+        if (filter?.questionaryIds) {
+          query.whereIn('fap_reviews.questionary_id', filter.questionaryIds);
+        }
+
+        if (filter?.templateIds) {
+          query
+            .leftJoin(
+              'questionary',
+              'questionary.questionary_id',
+              'fap_reviews.questionary_id'
+            )
+            .whereIn('questionary.template_id', filter.templateIds);
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then((reviews: ReviewRecord[]) => {
+        const revs = reviews.map((review) => createReviewObject(review));
+
+        return {
+          totalCount: reviews[0] ? reviews[0].full_count : 0,
+          reviews: revs,
+        };
+      });
+  }
+
   async getAssignmentReview(fapId: number, proposalPk: number, userId: number) {
     return database
       .select()
@@ -172,7 +217,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }
 
   async updateReview(args: UpdateReviewArgs): Promise<Review> {
-    const { reviewID, comment, grade, status, fapID } = args;
+    const { reviewID, comment, grade, status, fapID, questionaryID } = args;
 
     return database
       .update(
@@ -193,7 +238,8 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           comment,
           grade,
           status,
-          fapID
+          fapID,
+          questionaryID
         );
       });
   }
@@ -228,8 +274,13 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
-  async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
-    const { userID, proposalPk, fapID } = args;
+  async addUserForReview(args: {
+    userID: number;
+    proposalPk: number;
+    fapID: number;
+    questionaryID: number;
+  }): Promise<Review> {
+    const { userID, proposalPk, fapID, questionaryID } = args;
 
     return database
       .insert({
@@ -237,6 +288,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         proposal_pk: proposalPk,
         status: ReviewStatus.DRAFT,
         fap_id: fapID,
+        questionary_id: questionaryID,
       })
       .returning('*')
       .into('fap_reviews')

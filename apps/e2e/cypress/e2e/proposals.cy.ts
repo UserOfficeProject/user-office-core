@@ -67,6 +67,7 @@ context('Proposal tests', () => {
     endCycle: currentDayStart,
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
+    fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -906,6 +907,37 @@ context('Proposal tests', () => {
 
       cy.get('[aria-label="View proposal"]').should('exist');
     });
+
+    it('During Proposal creation, User should be receive the successfull submission message as set in the call', () => {
+      const customSubmissionMessage = faker.lorem.words(20);
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: createdWorkflowId,
+        submissionMessage: customSubmissionMessage,
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]')
+        .should('contain', newCall.shortCode)
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=title]').type(title);
+      cy.get('[data-cy=abstract]').type(abstract);
+
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+
+      cy.contains('Submit').click();
+
+      cy.contains('OK').click();
+
+      cy.contains(customSubmissionMessage);
+    });
   });
 
   describe('Proposal advanced tests', () => {
@@ -1488,6 +1520,62 @@ context('Proposal tests', () => {
       cy.contains(title).parent().contains(instrument.name);
       cy.contains(title).parent().find('[aria-label="View proposal"]').click();
       cy.contains('td', instrument.name).should('exist');
+    });
+
+    it('Instrument should be automatically un assigned to the proposal when a new instrument is selected', () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('Dashboard').click();
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Back').click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 2').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument2.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('not.exist');
+      cy.contains('td', instrument2.name).should('exist');
     });
 
     it('Multiple instruments should be automatically assigned to the proposal', () => {

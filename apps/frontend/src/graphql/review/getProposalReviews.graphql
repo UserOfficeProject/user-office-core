@@ -6,5 +6,6 @@ query getProposalReviews($proposalPk: Int!, $fapId: Int) {
     grade
     status
     fapID
+    questionaryID
   }
 }

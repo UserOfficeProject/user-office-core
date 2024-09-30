@@ -6,7 +6,8 @@ export class Review {
     public comment: string,
     public grade: number,
     public status: number,
-    public fapID: number
+    public fapID: number,
+    public questionaryID: number
   ) {}
 }
 
