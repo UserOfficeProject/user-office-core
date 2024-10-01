@@ -17,7 +17,6 @@ import {
   QuestionaryStep,
   QuestionTemplateRelation,
   Template,
-  TemplateGroupId,
 } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel, {
@@ -247,19 +246,16 @@ export default function TemplateEditor() {
     );
   }
 
-  // NOTE: For now preview works on proposal templates only. Another task is added to make it work for all of the templates.
-  if (state.groupId === TemplateGroupId.PROPOSAL) {
-    topControlBarElements.push(
-      <Tooltip title="Preview questionary">
-        <IconButton
-          onClick={() => setOpenedPreviewTemplateId(state.templateId)}
-          data-cy="preview-questionary-template"
-        >
-          <Preview />
-        </IconButton>
-      </Tooltip>
-    );
-  }
+  topControlBarElements.push(
+    <Tooltip title="Preview questionary">
+      <IconButton
+        onClick={() => setOpenedPreviewTemplateId(state.templateId)}
+        data-cy="preview-questionary-template"
+      >
+        <Preview />
+      </IconButton>
+    </Tooltip>
+  );
 
   const topControlBar = topControlBarElements.length ? (
     <FormGroup
@@ -277,6 +273,7 @@ export default function TemplateEditor() {
       {openedPreviewTemplateId !== null && (
         <PreviewTemplateModal
           templateId={openedPreviewTemplateId}
+          templateGroupId={state.groupId}
           setTemplateId={setOpenedPreviewTemplateId}
         />
       )}
