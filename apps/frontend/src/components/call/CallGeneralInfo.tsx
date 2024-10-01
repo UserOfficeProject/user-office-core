@@ -23,6 +23,7 @@ import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Field, useFormikContext } from 'formik';
 import React, { useContext, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
@@ -65,19 +66,23 @@ const CallGeneralInfo = ({
   templates,
   esiTemplates,
   pdfTemplates,
+  fapReviewTemplates,
   loadingTemplates,
   reloadTemplates,
   reloadEsi,
   reloadPdfTemplates,
+  reloadFapReviewTemplates,
   reloadProposalWorkflows,
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
   reloadPdfTemplates: () => void;
+  reloadFapReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
+  fapReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: ProposalWorkflow[];
   loadingProposalWorkflows: boolean;
@@ -90,6 +95,7 @@ const CallGeneralInfo = ({
   });
 
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const templateOptions =
     templates?.map((template) => ({
@@ -105,6 +111,12 @@ const CallGeneralInfo = ({
 
   const pdfTemplateOptions =
     pdfTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const fapReviewTemplateOptions =
+    fapReviewTemplates?.map((template) => ({
       text: template.name,
       value: template.templateId,
     })) || [];
@@ -330,7 +342,7 @@ const CallGeneralInfo = ({
       <FormControl fullWidth>
         <FormikUIAutocomplete
           name="templateId"
-          label="Call template"
+          label="Proposal template"
           loading={loadingTemplates}
           noOptionsText="No templates"
           items={templateOptions}
@@ -364,7 +376,7 @@ const CallGeneralInfo = ({
         <FormControl fullWidth>
           <FormikUIAutocomplete
             name="esiTemplateId"
-            label="ESI template"
+            label="Proposal ESI template"
             loading={loadingTemplates}
             noOptionsText="No templates"
             items={esiTemplateOptions}
@@ -407,6 +419,18 @@ const CallGeneralInfo = ({
           'data-cy': 'call-pdf-template',
           endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
         }}
+      />
+      <FormikUIAutocomplete
+        name="fapReviewTemplateId"
+        label={t('FAP Review template')}
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={fapReviewTemplateOptions}
+        InputProps={{
+          'data-cy': 'call-fap-review-template',
+          endAdornment: <RefreshListIcon onClick={reloadFapReviewTemplates} />,
+        }}
+        required
       />
       <FormikUIAutocomplete
         name="proposalWorkflowId"

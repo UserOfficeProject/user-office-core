@@ -20,6 +20,7 @@ query userWithReviews(
       comment
       status
       fapID
+      questionaryID
       proposal {
         primaryKey
         title

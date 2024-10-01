@@ -136,6 +136,7 @@ describe('Test Call Mutations', () => {
       title: 'Title',
       description: 'Description',
       pdfTemplateId: 1,
+      fapReviewTemplateId: 1,
     };
 
     return expect(

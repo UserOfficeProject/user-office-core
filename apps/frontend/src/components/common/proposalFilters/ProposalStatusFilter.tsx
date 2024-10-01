@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import { ProposalStatus } from 'generated/sdk';
 
@@ -39,10 +39,7 @@ const ProposalStatusFilter = ({
   shouldShowAll,
   hiddenStatuses,
 }: ProposalStatusFilterProps) => {
-  const [, setQuery] = useQueryParams({
-    proposalStatus: NumberParam,
-  });
-
+  const [, setSearchParams] = useSearchParams();
   if (proposalStatuses === undefined) {
     return null;
   }
@@ -64,10 +61,16 @@ const ProposalStatusFilter = ({
             id="proposal-status-select"
             aria-labelledby="proposal-status-select-label"
             onChange={(proposalStatus) => {
-              setQuery({
-                proposalStatus: proposalStatus.target.value
-                  ? (proposalStatus.target.value as number)
-                  : undefined,
+              setSearchParams((searchParams) => {
+                searchParams.delete('proposalStatus');
+                if (proposalStatus.target.value) {
+                  searchParams.set(
+                    'proposalStatus',
+                    proposalStatus.target.value.toString()
+                  );
+                }
+
+                return searchParams;
               });
               onChange?.(proposalStatus.target.value as number);
             }}

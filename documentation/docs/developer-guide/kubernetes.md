@@ -2,7 +2,7 @@
 
 _________________________________________________________________________________________________________
 
-Kubernetes is a platform for automating the deployment, scaling, and operation of containerized applications. Helm is a package manager and simplifies the process of deploying and managing applications on Kubernetes by using pre-configured application packages called Helm charts.
+Kubernetes is a platform for automating the deployment, scaling, and operation of containerized applications. Helm is a package manager that simplifies the process of deploying and managing applications on Kubernetes by using pre-configured application packages called Helm charts.
 
 ## Repository and Helm Chart
 
@@ -59,7 +59,7 @@ ________________________________________________________________________________
 
 ## Handling Dependencies
 
-The User Office software uses dependency injection for services like email and RabbitMQ. To configure these services, you will need to modify the backend’s `configmap` and `secrets`:
+The User Office software uses [dependency injection](dependency_injection.md) for services like email and RabbitMQ. To configure these services, you will need to modify the backend’s `configmap` and `secrets`:
 
 - **RabbitMQ Configuration**: Set `RABBITMQ_HOSTNAME`, `RABBITMQ_USERNAME`, `RABBITMQ_CORE_EXCHANGE_NAME` in the `configmap`, and `RABBITMQ_PASSWORD` in the `secrets`.
 - **Email Services Configuration**: The platform supports SMTP and Sparkpost. Adjust the dependency configuration as necessary for your environment.

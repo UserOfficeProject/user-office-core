@@ -74,7 +74,7 @@ export const sanitizerConfigWithImages: IOptions = {
     span: ['style', 'class'],
     p: ['style'],
     div: ['style'],
-    img: ['src', 'alt', 'data-mce-src'],
+    img: ['src', 'alt', 'data-mce-src', 'width', 'height'],
   },
 };
 

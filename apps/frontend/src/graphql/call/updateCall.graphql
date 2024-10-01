@@ -21,6 +21,7 @@ mutation updateCall(
   $templateId: Int
   $esiTemplateId: Int
   $pdfTemplateId: Int
+  $fapReviewTemplateId: Int
   $title: String
   $description: String
   $faps: [Int!]
@@ -51,6 +52,7 @@ mutation updateCall(
       templateId: $templateId
       esiTemplateId: $esiTemplateId
       pdfTemplateId: $pdfTemplateId
+      fapReviewTemplateId: $fapReviewTemplateId
       title: $title
       description: $description
       faps: $faps

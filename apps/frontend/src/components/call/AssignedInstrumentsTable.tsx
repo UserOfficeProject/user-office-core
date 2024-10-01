@@ -47,6 +47,7 @@ const FapSelectionEditComponent = (
     active: true,
     role: currentRole as UserRole,
   });
+  const { t } = useTranslation();
 
   const fapOptions =
     allActiveFaps?.map((fap) => ({
@@ -62,7 +63,7 @@ const FapSelectionEditComponent = (
       id="fapSelection"
       options={fapOptions}
       renderInput={(params) => (
-        <TextField {...params} placeholder="Fap" margin="none" />
+        <TextField {...params} placeholder={t('Fap')} margin="none" />
       )}
       onChange={(_event, newValue) => {
         props.onChange(newValue?.value ?? null);
@@ -120,7 +121,7 @@ const AssignedInstrumentsTable = ({
       editable: 'never',
     },
     {
-      title: 'Fap',
+      title: t('FAP'),
       field: 'fapId',
       editable: 'onUpdate',
       emptyValue: '-',

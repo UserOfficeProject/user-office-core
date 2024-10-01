@@ -2,7 +2,7 @@
 
 ________________________________________________________________________________________________________
 
-For a demo or a temporary account, please contact [Fredrik Bolmsten](mailto:fredrik.bolmsten@ess.eu).
+For a demo or temporary account, please contact [Fredrik Bolmsten](mailto:fredrik.bolmsten@ess.eu).
 
 Alternatively, you can run it locally by following [this guide](developer-guide/running_locally.md).
 

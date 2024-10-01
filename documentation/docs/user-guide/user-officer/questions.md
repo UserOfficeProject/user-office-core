@@ -4,17 +4,18 @@ ________________________________________________________________________________
 
 ## What are questions?
 
-Questions :material-comment-question: are designed to streamline the template creation process and ensure consistency across users' submissions. Question allow users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the **question drawer**. Questions allow for standardisation across multiple templates which is essential for data collection and analysis of users' responses.
+Questions :material-comment-question: are designed to streamline the template creation process and ensure consistency across users' submissions. Question allow users to provide detailed and structured responses. User Officers can create various types of questions, which are stored in the the **question drawer**. Questions allow for standardization across multiple templates which is essential for data collection and analysis of users' responses.
 
-Questions can be utilised within the following templates:
+Questions can be utilized within the following templates:
 
 * [Proposal templates :material-note-text:](templates/proposal_template.md)
+* [FAP Review templates :material-note-text:](templates/fap_review_template.md)
 * [Proposal ESI templates :material-note-text:](templates/proposalESI_template.md)
 * [Sample ESI templates :material-inbox:](templates/sampleESI_template.md)
 * [Feedback templates :material-message-alert:](templates/feedback_template.md)
 * [Sub Templates :material-collapse-all-outline:](templates/sub_template.md)
 * [Sample declaration templates :material-inbox:](templates/sampledec_template.md)
-* [Shipment declarationt templates :material-truck:](templates/shipment_template.md)
+* [Shipment declaration templates :material-truck:](templates/shipment_template.md)
 * [Visit registration templates :material-airplane-takeoff:](templates/visit_template.md)
 
 _________________________________________________________________________________________________________
@@ -31,24 +32,24 @@ ________________________________________________________________________________
 ## How do I create questions?
 
 * In the main menu, navigate to the template page you wish to create the question within
-([Proposal templates :material-note-text:](templates/proposal_template.md), [Proposal ESI templates :material-note-text:](templates/proposalESI_template.md), [Sample ESI templates :material-inbox:](templates/sampleESI_template.md), [Feedback templates :material-message-alert:](templates/feedback_template.md), [Sub Templates :material-collapse-all-outline:](templates/sub_template.md), [Sample declaration templates :material-inbox:](templates/sampledec_template.md), [Shipment declarationt templates :material-truck:](templates/shipment_template.md), [Visit registration templates :material-airplane-takeoff:](templates/visit_template.md))
+([Proposal templates :material-note-text:](templates/proposal_template.md), [FAP Review templates :material-note-text:](templates/fap_review_template.md), [Proposal ESI templates :material-note-text:](templates/proposalESI_template.md), [Sample ESI templates :material-inbox:](templates/sampleESI_template.md), [Feedback templates :material-message-alert:](templates/feedback_template.md), [Sub Templates :material-collapse-all-outline:](templates/sub_template.md), [Sample declaration templates :material-inbox:](templates/sampledec_template.md), [Shipment declarationt templates :material-truck:](templates/shipment_template.md), [Visit registration templates :material-airplane-takeoff:](templates/visit_template.md))
 
 * Within the chosen template page, create or edit a pre-existing template. 
 (In this example, we wish to create questions for a Proposal template:)
 
-> **_NOTE:_**  The basis question which appears at the beginning of each template type, for example proposal basis within proposal questionnaire templates contains essential questions for that template type)
+> **_NOTE:_**  The basic question which appears at the beginning of each template type, for example proposal basic within proposal questionnaire templates contain essential questions for that template type)
 
 * This will open the template editor. From here, you can create a question by clicking on the three dots {options} button and selecting **add question** to the topic. Topics are the sections of the template. You can create more topics by selecting **add topics**.
 
-* Selecting **add question** will open the **question drawer**. The question drawer  Click on the three dots {options} within the question drawer; this will open a menu listing the different types of questions you can create. 
+* Selecting **add question** will open the **question drawer**. Click on the three dots {options} within the question drawer; this will open a menu listing the different types of questions you can create. 
 
 Note: depending on which template you are creating questions for, certain questions may be limited. For example, you may not add a sample declaration question type to a visit registration template.
 
 
-* Once you have put the questions in the template, you can click on them to edit (as they appear on the current template) to edit them in the question drawer click on the edit question template.
+* Once you have put the questions in the template, you can click on them to edit (as they appear on the current template) to edit them in the question drawer.
 
 
-It is good practice to utilise pre-existing question templates when possible. This allows for the collection of users' answer data to be standardised for analysis.
+It is good practice to utilize pre-existing question templates when possible. This allows for the collection of users' answer data to be standardized for analysis.
 
 _________________________________________________________________________________________________________
 
