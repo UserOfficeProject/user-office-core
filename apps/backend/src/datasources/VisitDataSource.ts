@@ -1,9 +1,9 @@
 import { ExperimentSafetyInput } from '../models/ExperimentSafetyInput';
 import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
-import { GetRegistrationsFilter } from '../queries/VisitQueries';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistrationMutation';
+import { VisitRegistrationsArgs } from '../resolvers/queries/UserVisitQuery';
 import { CreateVisitArgs } from './../resolvers/mutations/CreateVisitMutation';
 import { VisitsFilter } from './../resolvers/queries/VisitsQuery';
 
@@ -16,7 +16,7 @@ export interface VisitDataSource {
     visitId: number
   ): Promise<VisitRegistration | null>;
   getRegistrations(
-    filter: GetRegistrationsFilter
+    filter: VisitRegistrationsArgs
   ): Promise<VisitRegistration[]>;
   getVisitByScheduledEventId(eventId: number): Promise<Visit | null>;
   getEsiByVisitId(visitId: any): Promise<ExperimentSafetyInput | null>;

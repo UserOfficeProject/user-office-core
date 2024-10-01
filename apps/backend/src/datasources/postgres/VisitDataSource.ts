@@ -3,10 +3,10 @@ import { GraphQLError } from 'graphql';
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
-import { GetRegistrationsFilter } from '../../queries/VisitQueries';
 import { CreateVisitArgs } from '../../resolvers/mutations/CreateVisitMutation';
 import { UpdateVisitArgs } from '../../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistrationMutation';
+import { VisitRegistrationsArgs } from '../../resolvers/queries/UserVisitQuery';
 import { VisitDataSource } from '../VisitDataSource';
 import { VisitsFilter } from './../../resolvers/queries/VisitsQuery';
 import database from './database';
@@ -53,15 +53,18 @@ class PostgresVisitDataSource implements VisitDataSource {
       .then((registration) => createVisitRegistrationObject(registration));
   }
 
-  getRegistrations(
-    filter: GetRegistrationsFilter
-  ): Promise<VisitRegistration[]> {
+  getRegistrations(args: VisitRegistrationsArgs): Promise<VisitRegistration[]> {
+    const filter = args.filter;
+
     return database('visits_has_users')
       .modify((query) => {
-        if (filter.questionaryIds) {
-          query.whereIn('registration_questionary_id', filter.questionaryIds);
+        if (filter?.registrationQuestionaryIds) {
+          query.whereIn(
+            'registration_questionary_id',
+            filter.registrationQuestionaryIds
+          );
         }
-        if (filter.visitId) {
+        if (filter?.visitId) {
           query.where({ visit_id: filter.visitId });
         }
       })

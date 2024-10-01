@@ -9,6 +9,7 @@ import { useProposalsData } from 'hooks/proposal/useProposalsData';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { useShipments } from 'hooks/shipment/useShipments';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
+import { useVisitRegistrationsWithVisitAndUsers } from 'hooks/visit/useVisitRegistrationsWithVisitAndUsers';
 import { GenericTemplateCoreWithProposalData } from 'models/questionary/genericTemplate/GenericTemplateCore';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -145,6 +146,34 @@ function ShipmentList({ question }: { question: QuestionWithUsage }) {
   );
 }
 
+const visitRegistrationListColumns = [
+  { title: 'Sample title', field: 'userId' },
+  { title: 'Created', field: 'visitId' },
+];
+
+function VisitRegistrationList({ question }: { question: QuestionWithUsage }) {
+  const questionaryIds = useMemo(
+    () => question.answers.map((answer) => answer.questionaryId),
+    [question]
+  );
+
+  const visitRegistrationsWithQuestionaryAndUsers =
+    useVisitRegistrationsWithVisitAndUsers({
+      registrationQuestionaryIds: questionaryIds,
+    });
+
+  return (
+    <MaterialTable
+      style={{ width: '100%' }}
+      icons={tableIcons}
+      columns={visitRegistrationListColumns}
+      data={visitRegistrationsWithQuestionaryAndUsers.visitRegistrations}
+      title="Visit registrations"
+      options={{ paging: false }}
+    />
+  );
+}
+
 function AnswerCountDetails(props: { question: QuestionWithUsage | null }) {
   const question = props.question;
   switch (question?.categoryId) {
@@ -156,6 +185,8 @@ function AnswerCountDetails(props: { question: QuestionWithUsage | null }) {
       return <SampleList question={question} />;
     case TemplateCategoryId.SHIPMENT_DECLARATION:
       return <ShipmentList question={question} />;
+    case TemplateCategoryId.VISIT_REGISTRATION:
+      return <VisitRegistrationList question={question} />;
 
     default:
       return <span></span>;

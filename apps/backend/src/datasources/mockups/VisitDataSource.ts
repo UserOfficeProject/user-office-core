@@ -1,9 +1,9 @@
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
-import { GetRegistrationsFilter } from '../../queries/VisitQueries';
 import { UpdateVisitArgs } from '../../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistrationMutation';
+import { VisitRegistrationsArgs } from '../../resolvers/queries/UserVisitQuery';
 import { VisitsFilter } from '../../resolvers/queries/VisitsQuery';
 import { VisitDataSource } from '../VisitDataSource';
 import { CreateVisitArgs } from './../../resolvers/mutations/CreateVisitMutation';
@@ -101,7 +101,7 @@ export class VisitDataSourceMock implements VisitDataSource {
     );
   }
   getRegistrations(
-    filter: GetRegistrationsFilter
+    filter: VisitRegistrationsArgs
   ): Promise<VisitRegistration[]> {
     throw new Error('Method not implemented');
   }

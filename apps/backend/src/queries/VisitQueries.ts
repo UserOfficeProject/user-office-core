@@ -9,11 +9,8 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { TrainingStatus, VisitRegistration } from '../models/VisitRegistration';
+import { VisitRegistrationsArgs } from '../resolvers/queries/UserVisitQuery';
 import { VisitsFilter } from '../resolvers/queries/VisitsQuery';
-export interface GetRegistrationsFilter {
-  questionaryIds?: number[];
-  visitId?: number;
-}
 
 @injectable()
 export default class VisitQueries {
@@ -55,7 +52,7 @@ export default class VisitQueries {
 
   async getRegistrations(
     user: UserWithRole | null,
-    filter: GetRegistrationsFilter
+    filter: VisitRegistrationsArgs
   ): Promise<VisitRegistration[]> {
     return this.dataSource.getRegistrations(filter);
   }
