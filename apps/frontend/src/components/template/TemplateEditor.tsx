@@ -17,7 +17,6 @@ import {
   QuestionaryStep,
   QuestionTemplateRelation,
   Template,
-  TemplateGroupId,
 } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel, {
@@ -247,16 +246,16 @@ export default function TemplateEditor() {
     );
   }
 
-    topControlBarElements.push(
-      <Tooltip title="Preview questionary">
-        <IconButton
-          onClick={() => setOpenedPreviewTemplateId(state.templateId)}
-          data-cy="preview-questionary-template"
-        >
-          <Preview />
-        </IconButton>
-      </Tooltip>
-    );
+  topControlBarElements.push(
+    <Tooltip title="Preview questionary">
+      <IconButton
+        onClick={() => setOpenedPreviewTemplateId(state.templateId)}
+        data-cy="preview-questionary-template"
+      >
+        <Preview />
+      </IconButton>
+    </Tooltip>
+  );
 
   const topControlBar = topControlBarElements.length ? (
     <FormGroup
