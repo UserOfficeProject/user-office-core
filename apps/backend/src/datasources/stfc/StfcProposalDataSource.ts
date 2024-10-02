@@ -179,13 +179,22 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
+    let principleInvestigator: number[] = [];
+
+    if (searchText) {
+      principleInvestigator = (await this.getSTFCUsers(searchText)).users.map(
+        (ids) => ids.id
+      );
+    }
+
     const proposals = await super.getProposalsFromView(
       filter,
       first,
       offset,
       sortField,
       sortDirection,
-      searchText
+      searchText,
+      principleInvestigator
     );
 
     const technicalReviewers = removeDuplicates(

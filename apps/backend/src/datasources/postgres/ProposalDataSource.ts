@@ -27,7 +27,6 @@ import { removeDuplicates } from '../../utils/helperFunctions';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
-import { StfcUserDataSource } from '../stfc/StfcUserDataSource';
 import {
   ProposalsFilter,
   QuestionFilterInput,
@@ -66,7 +65,6 @@ const fieldMap: { [key: string]: string } = {
   submitted: 'submitted',
   notified: 'notified',
 };
-const stfcUserDataSource = new StfcUserDataSource();
 
 export async function calculateReferenceNumber(
   format: string,
@@ -381,15 +379,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number,
     sortField?: string,
     sortDirection?: string,
-    searchText?: string
+    searchText?: string,
+    principleInvestigator?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
-    let userStfc: number[] = [];
-
-    if (searchText) {
-      userStfc = (await this.getSTFCUsers(searchText)).users.map(
-        (ids) => ids.id
-      );
-    }
+    const principalInvestigator = principleInvestigator
+      ? principleInvestigator
+      : [];
 
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
@@ -446,7 +441,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhere('users.email', 'ilike', `%${searchText}%`)
               .orWhere('users.firstname', 'ilike', `%${searchText}%`)
               .orWhere('users.lastname', 'ilike', `%${searchText}%`)
-              .orWhere('principal_investigator', 'in', userStfc)
+              .orWhere('principal_investigator', 'in', principalInvestigator)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
@@ -483,12 +478,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           proposalViews: props,
         };
       });
-  }
-
-  async getSTFCUsers(text?: string) {
-    const userStfc = await stfcUserDataSource.getUsers({ filter: text });
-
-    return userStfc;
   }
 
   async getProposals(
