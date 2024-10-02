@@ -156,6 +156,10 @@ const proposal2 = {
   title: faker.random.words(3),
   abstract: faker.random.words(5),
 };
+const proposal3 = {
+  title: faker.random.words(3),
+  abstract: faker.random.words(5),
+};
 
 const scientist = initialDBData.users.user1;
 
@@ -185,6 +189,7 @@ let createdCallId: number;
 let firstCreatedProposalPk: number;
 let firstCreatedProposalId: string;
 let secondCreatedProposalPk: number;
+let thirdCreatedProposalPk: number;
 let createdWorkflowId: number;
 let createdEsiTemplateId: number;
 let newlyCreatedInstrumentId: number;
@@ -1229,15 +1234,7 @@ context('Fap reviews tests', () => {
       });
       cy.assignReviewersToFap({
         fapId: createdFapId,
-        memberIds: [fapMembers.reviewer.id],
-      });
-
-      cy.assignFapReviewersToProposals({
-        assignments: {
-          memberId: fapMembers.reviewer2.id,
-          proposalPk: firstCreatedProposalPk,
-        },
-        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id, fapMembers.reviewer2.id],
       });
 
       cy.assignFapReviewersToProposals({
@@ -1292,6 +1289,39 @@ context('Fap reviews tests', () => {
                 questionaryID: proposalReviews[0].questionaryID,
               });
             }
+          });
+        }
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const createdProposal = result.createProposal;
+        if (createdProposal) {
+          thirdCreatedProposalPk = createdProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: thirdCreatedProposalPk,
+            title: proposal3.title,
+            abstract: proposal3.abstract,
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.assignProposalsToInstruments({
+            instrumentIds: [newlyCreatedInstrumentId],
+            proposalPks: [thirdCreatedProposalPk],
+          });
+          cy.assignProposalsToFaps({
+            fapInstruments: [
+              { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+            ],
+            proposalPks: [thirdCreatedProposalPk],
+          });
+
+          cy.assignFapReviewersToProposals({
+            assignments: {
+              memberId: fapMembers.reviewer2.id,
+              proposalPk: thirdCreatedProposalPk,
+            },
+            fapId: createdFapId,
           });
         }
       });
@@ -1377,6 +1407,45 @@ context('Fap reviews tests', () => {
         variant: 'success',
       });
     });
+    it('Fap Reviewer should only see their proposals and all proposals when selecting My Proposals and All proposals respectively from reviewer dropdown', () => {
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('My proposals').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title);
+      cy.contains(proposal3.title).should('not.exist');
+
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('All proposals').click();
+      cy.contains(proposal1.title);
+      cy.contains(proposal3.title);
+    });
+    it('Fap Reviewer should not be able to submit a grade for proposals on which they are not reviewer, they should only able to view them', () => {
+      cy.get('#reviewer-selection', { timeout: 5000 })
+        .parent()
+        .should('be.visible')
+        .click();
+      cy.get('[role="presentation"]').contains('All proposals').click();
+
+      cy.finishedLoading();
+      cy.contains(proposal3.title).parent().contains('Draft');
+      cy.contains(proposal3.title)
+        .parent()
+        .find('[data-cy="view-proposal-details-icon"]')
+        .should('be.visible');
+      cy.contains(proposal3.title)
+        .parent()
+        .find('[data-cy="view-proposal-details-icon"]')
+        .click();
+      cy.get('[role="presentation"] [role="tab"]').contains('Grade').click();
+      cy.contains('button', 'Review').click();
+      cy.get('[data-cy="button-submit-proposal"]').should('be.disabled');
+    });
 
     it('FAP review should be removed if proposal is removed from instrument', () => {
       cy.contains(proposal1.title);
@@ -1422,27 +1491,11 @@ context('Fap reviews tests', () => {
         .find('[data-cy="grade-proposal-icon"]')
         .click();
 
-      cy.getProposalReviews({
-        proposalPk: firstCreatedProposalPk,
-      }).then(({ proposalReviews }) => {
-        if (proposalReviews) {
-          cy.updateReview({
-            reviewID: proposalReviews[0].id,
-            comment: faker.random.words(5),
-            grade: 5,
-            status: ReviewStatus.SUBMITTED,
-            fapID: createdFapId,
-            questionaryID: proposalReviews[0].questionaryID,
-          });
-        }
-      });
-
       readWriteReview({ shouldSubmit: true, isReviewer: true });
 
       cy.finishedLoading();
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('SUBMITTED');
-      cy.contains(fapMembers.reviewer2.lastName).parent().contains('SUBMITTED');
     });
   });
 });
