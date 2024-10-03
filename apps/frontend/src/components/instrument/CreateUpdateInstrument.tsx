@@ -72,7 +72,7 @@ const CreateUpdateInstrument = ({
 
     try {
       await api()
-        .getUsers({ filter: value })
+        .getUsers({ filter: value, userRole: UserRole.INSTRUMENT_SCIENTIST })
         .then((data) => {
           if (data.users?.totalCount == 0) {
             setFieldError('surname', 'No users found with that surname');
