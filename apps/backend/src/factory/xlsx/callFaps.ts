@@ -49,17 +49,21 @@ const collectFAPRowData = async (
 
             return {
               ...proposal,
-              fapMeetingDecision: fapMeetingDecision[0]
-                ? ProposalEndStatusStringValue[
-                    fapMeetingDecision[0].recommendation
-                  ]
-                : null,
-              fapMeetingExComment: fapMeetingDecision[0]
-                ? stripHtml(fapMeetingDecision[0].commentForUser).result
-                : null,
-              fapMeetingInComment: fapMeetingDecision[0]
-                ? stripHtml(fapMeetingDecision[0].commentForManagement).result
-                : null,
+              fapMeetingDecision:
+                fapMeetingDecision[0] && fapMeetingDecision[0].recommendation
+                  ? ProposalEndStatusStringValue[
+                      fapMeetingDecision[0].recommendation
+                    ]
+                  : null,
+              fapMeetingExComment:
+                fapMeetingDecision[0] && fapMeetingDecision[0].commentForUser
+                  ? stripHtml(fapMeetingDecision[0].commentForUser).result
+                  : null,
+              fapMeetingInComment:
+                fapMeetingDecision[0] &&
+                fapMeetingDecision[0].commentForManagement
+                  ? stripHtml(fapMeetingDecision[0].commentForManagement).result
+                  : null,
             };
           })
         ),
@@ -95,7 +99,7 @@ export const collectCallFapXLSXData = async (
   const baseData = await Promise.all(
     faps.map(async (fap) => {
       return {
-        sheetName: fap.code,
+        sheetName: fap.code.substring(0, 30),
         rows: await collectFAPRowData(fap.id, callId, user),
       };
     })
