@@ -167,9 +167,8 @@ const XpressProposalTable = () => {
 
   columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { loading, proposalsData, totalCount, setProposalsData } =
-    useProposalsCoreData({
+  const { loading, proposalsData, totalCount } = useProposalsCoreData(
+    {
       proposalStatusId: proposalFilter.proposalStatusId,
       techniqueFilter: proposalFilter.techniqueFilter,
       instrumentFilter: proposalFilter.instrumentFilter,
@@ -178,7 +177,9 @@ const XpressProposalTable = () => {
       dateFilter: proposalFilter.dateFilter,
       text: queryParameters.searchText,
       excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
-    });
+    },
+    queryParameters.query
+  );
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
@@ -194,13 +195,11 @@ const XpressProposalTable = () => {
 
   useEffect(() => {
     let isMounted = true;
-    let endSlice = rowsPerPage * (currentPage + 1);
-    endSlice = endSlice == 0 ? PREFETCH_SIZE + 1 : endSlice; // Final page of a loaded section would produce the slice (x, 0) without this
     if (isMounted) {
       setTableData(
         preselectedProposalsData.slice(
           (currentPage * rowsPerPage) % PREFETCH_SIZE,
-          endSlice
+          totalCount
         )
       );
     }
@@ -208,7 +207,13 @@ const XpressProposalTable = () => {
     return () => {
       isMounted = false;
     };
-  }, [currentPage, rowsPerPage, preselectedProposalsData]);
+  }, [
+    rowsPerPage,
+    preselectedProposalsData,
+    queryParameters,
+    totalCount,
+    currentPage,
+  ]);
 
   const handleSearchChange = (searchText: string) => {
     setQueryParameters({
@@ -297,8 +302,9 @@ const XpressProposalTable = () => {
             title={'Xpress Proposals'}
             columns={columns}
             data={tableData}
-            totalCount={20}
             isLoading={loading}
+            totalCount={totalCount}
+            page={currentPage}
             options={{
               search: true,
               searchText: search || undefined,
