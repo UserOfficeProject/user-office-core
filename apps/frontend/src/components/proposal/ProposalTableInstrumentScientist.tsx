@@ -104,12 +104,16 @@ let columns: Column<ProposalViewData>[] = [
     field: 'principalInvestigator',
     emptyValue: '-',
     render: (proposalView) => {
-      if (proposalView.principalInvestigator?.lastname) {
-        if (proposalView.principalInvestigator?.preferredname) {
-          return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
-        } else if (proposalView.principalInvestigator?.firstname) {
-          return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
-        }
+      if (
+        proposalView.principalInvestigator?.lastname &&
+        proposalView.principalInvestigator?.preferredname
+      ) {
+        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.preferredname}`;
+      } else if (
+        proposalView.principalInvestigator?.lastname &&
+        proposalView.principalInvestigator?.firstname
+      ) {
+        return `${proposalView.principalInvestigator.lastname}, ${proposalView.principalInvestigator.firstname}`;
       }
 
       return '';
