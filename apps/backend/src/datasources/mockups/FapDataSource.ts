@@ -159,7 +159,7 @@ export class FapDataSourceMock implements FapDataSource {
     fapId?: number
   ): Promise<Fap[]> {
     if (userId && role) {
-      return dummyFaps;
+      return userId === 3 ? [] : dummyFaps;
     }
 
     return [];
