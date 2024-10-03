@@ -1,9 +1,16 @@
-import MaterialTable, { Column, OrderByCollection } from '@material-table/core';
+import MaterialTableCore, {
+  Column,
+  OrderByCollection,
+} from '@material-table/core';
+import { Dialog, DialogContent } from '@mui/material';
+import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { ProposalsFilter } from 'generated/sdk';
+import MaterialTable from 'components/common/DenseMaterialTable';
+import ScienceIcon from 'components/common/icons/ScienceIcon';
+import { InstrumentFragment, ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
@@ -14,7 +21,10 @@ import {
   setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import AssignProposalsToXpressInstruments from './AssignProposalsToXpressInstruments';
+import InstrumentSelection from './InstrumentSelection';
 import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
@@ -83,13 +93,6 @@ const XpressProposalTable = () => {
   });
 
   let columns: Column<ProposalViewData>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      removable: false,
-      field: 'rowActionButtons',
-    },
     {
       title: 'Proposal ID',
       field: 'proposalId',
@@ -275,8 +278,97 @@ const XpressProposalTable = () => {
     setPreselectedProposalsData(proposalsData);
   }, [proposalsData, queryParameters]);
 
+  const ScienceIconComponent = (): JSX.Element => (
+    <ScienceIcon data-cy="assign-remove-instrument" />
+  );
+
+  const [openInstrumentAssignment, setOpenInstrumentAssignment] =
+    useState(false);
+
+  const { api } = useDataApiWithFeedback();
+
+  const getSelectedProposalPks = () =>
+    searchParams
+      .getAll('selection')
+      .filter((proposalPk): proposalPk is string => proposalPk !== null)
+      .map((proposalPk) => +proposalPk);
+
+  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
+  };
+
+  const assignProposalsToInstruments = async (
+    instruments: InstrumentFragment[] | null
+  ): Promise<void> => {
+    if (instruments?.length) {
+      await api({
+        toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
+      }).assignProposalsToInstruments({
+        proposalPks: getSelectedProposalPks(),
+        instrumentIds: instruments.map((instrument) => instrument.id),
+      });
+    } else {
+      await api({
+        toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
+      }).removeProposalsFromInstrument({
+        proposalPks: getSelectedProposalPks(),
+      });
+    }
+
+    refreshTableData();
+  };
+
+  const RowActionButtons = (rowData: ProposalViewData) => {
+    return <InstrumentSelection techniqueInRow={rowData.techniques} />;
+  };
+
+  if (!columns.find((column) => column.field === 'rowActionButtons')) {
+    columns = [
+      {
+        title: 'Action',
+        cellStyle: { padding: 0 },
+        sorting: false,
+        removable: false,
+        field: 'rowActionButtons',
+        render: RowActionButtons,
+      },
+      ...columns,
+    ];
+  }
+
   return (
     <>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openInstrumentAssignment}
+        onClose={(): void => setOpenInstrumentAssignment(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogContent>
+          <AssignProposalsToXpressInstruments
+            assignProposalsToInstruments={assignProposalsToInstruments}
+            close={(): void => setOpenInstrumentAssignment(false)}
+            proposals={selectedProposals}
+            instrumentIds={selectedProposals
+              .map((selectedProposal) =>
+                (selectedProposal.instruments || []).map(
+                  (instrument) => instrument.id
+                )
+              )
+              .flat()}
+            techniques={techniques}
+          />
+        </DialogContent>
+      </Dialog>
       <StyledContainer maxWidth={false}>
         <StyledPaper data-cy="xpress-proposals-table">
           <XpressProposalFilterBar
@@ -317,6 +409,19 @@ const XpressProposalTable = () => {
                 },
               }),
             }}
+            actions={[
+              {
+                icon: ScienceIconComponent,
+                tooltip: `Assign/Remove ${i18n.format(
+                  t('instrument'),
+                  'lowercase'
+                )}`,
+                onClick: () => {
+                  setOpenInstrumentAssignment(true);
+                },
+                position: 'toolbarOnSelect',
+              },
+            ]}
             onSelectionChange={(selectedItems) => {
               setSearchParams((searchParam) => {
                 searchParam.delete('selection');
