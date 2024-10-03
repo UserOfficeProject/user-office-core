@@ -325,7 +325,6 @@ export const statusActionLogger = (args: {
   actionId: number;
   emailStatusActionRecipient: EmailStatusActionRecipients;
   proposalPks: number[];
-  statusActionsBy?: number | null;
   statusActionsLogId?: number | null;
 }) => {
   const statusActionsLogsDataSource =
@@ -340,7 +339,6 @@ export const statusActionLogger = (args: {
     const statusActionsLogsArgs: StatusActionsLogsArgs = {
       ...args,
       statusActionsLogId: args?.statusActionsLogId || null,
-      statusActionsBy: args?.statusActionsBy || null,
       statusActionsSuccessful,
       statusActionsMessage,
     };

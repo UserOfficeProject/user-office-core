@@ -30,12 +30,12 @@ export const emailActionHandler = async (
   proposals: WorkflowEngineProposalType[],
   options?: {
     statusActionsLogId?: number;
-    statusActionsBy?: number;
+    loggedInUserId?: number;
     statusActionRecipients?: EmailStatusActionRecipients;
   }
 ) => {
-  const { statusActionsBy, statusActionsLogId, statusActionRecipients } = {
-    statusActionsBy: null,
+  const { loggedInUserId, statusActionsLogId, statusActionRecipients } = {
+    loggedInUserId: null,
     statusActionsLogId: null,
     statusActionRecipients: null,
     ...options,
@@ -61,7 +61,7 @@ export const emailActionHandler = async (
       proposalStatusAction,
       proposals,
       statusActionsLogId,
-      statusActionsBy,
+      loggedInUserId,
       recipientWithTemplate.recipient.name
     );
 
@@ -74,7 +74,7 @@ export const emailActionHandler = async (
         proposalStatusAction,
         proposals,
         statusActionsLogId,
-        statusActionsBy
+        loggedInUserId
       )
     )
   );
@@ -85,7 +85,7 @@ export const emailStatusActionRecipients = async (
   proposalStatusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[],
   statusActionsLogId?: number | null,
-  statusActionsBy?: number | null,
+  loggedInUserId?: number | null,
   statusActionRecipients?: EmailStatusActionRecipients
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
@@ -101,13 +101,12 @@ export const emailStatusActionRecipients = async (
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
-          statusActionsBy,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.PI,
           proposalPks,
         }),
-        !!statusActionsLogId,
-        statusActionsBy
+        statusActionsLogId,
+        loggedInUserId
       );
 
       break;
@@ -123,13 +122,12 @@ export const emailStatusActionRecipients = async (
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
-          statusActionsBy,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
           proposalPks,
         }),
-        !!statusActionsLogId,
-        statusActionsBy
+        statusActionsLogId,
+        loggedInUserId
       );
 
       break;
@@ -146,14 +144,13 @@ export const emailStatusActionRecipients = async (
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
-          statusActionsBy,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
           proposalPks,
         }),
-        !!statusActionsLogId,
-        statusActionsBy
+        statusActionsLogId,
+        loggedInUserId
       );
 
       break;
@@ -170,13 +167,12 @@ export const emailStatusActionRecipients = async (
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
-          statusActionsBy,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.FAP_REVIEWERS,
           proposalPks,
         }),
-        !!statusActionsLogId,
-        statusActionsBy
+        statusActionsLogId,
+        loggedInUserId
       );
 
       break;
@@ -193,14 +189,13 @@ export const emailStatusActionRecipients = async (
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
-          statusActionsBy,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
           proposalPks,
         }),
-        !!statusActionsLogId,
-        statusActionsBy
+        statusActionsLogId,
+        loggedInUserId
       );
 
       break;
@@ -268,13 +263,12 @@ export const emailStatusActionRecipients = async (
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
-          statusActionsBy,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.USER_OFFICE,
           proposalPks,
         }),
-        !!statusActionsLogId,
-        statusActionsBy
+        statusActionsLogId,
+        loggedInUserId
       );
 
       break;
@@ -302,13 +296,12 @@ export const emailStatusActionRecipients = async (
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
-          statusActionsBy,
           emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
           proposalPks,
           statusActionsLogId,
         }),
-        !!statusActionsLogId,
-        statusActionsBy
+        statusActionsLogId,
+        loggedInUserId
       );
 
       break;
@@ -325,14 +318,14 @@ const sendMail = async (
     actionSuccessful: boolean,
     message: string
   ) => Promise<void>,
-  isStatusActionReplay: boolean,
-  statusActionsBy?: number | null
+  statusActionsLogId?: number | null,
+  loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
-  const successfulMessage = isStatusActionReplay
+  const successfulMessage = !!statusActionsLogId
     ? 'Email successfully sent on status action replay'
     : 'Email successfully sent';
-  const failMessage = isStatusActionReplay
+  const failMessage = !!statusActionsLogId
     ? 'Email(s) could not be sent on status action replay'
     : 'Email(s) could not be sent';
 
@@ -370,7 +363,7 @@ const sendMail = async (
             recipientWithData.proposals,
             `${successfulMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
             undefined,
-            statusActionsBy || undefined
+            loggedInUserId || undefined
           );
 
           return res;
@@ -383,7 +376,7 @@ const sendMail = async (
             recipientWithData.proposals,
             `${failMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
             undefined,
-            statusActionsBy || undefined
+            loggedInUserId || undefined
           );
           throw err;
         }

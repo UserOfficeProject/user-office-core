@@ -46,7 +46,6 @@ export default class PostgresStatusActionsLogsDataSource
               connection_id: args.connectionId,
               action_id: args.actionId,
               email_status_action_recipient: args.emailStatusActionRecipient,
-              status_actions_by: args.statusActionsBy,
               status_actions_successful: args.statusActionsSuccessful,
               status_actions_message: args.statusActionsMessage,
             })
@@ -83,7 +82,6 @@ export default class PostgresStatusActionsLogsDataSource
     return database('status_actions_logs')
       .update({
         status_actions_message: args.statusActionsMessage,
-        status_actions_by: args.statusActionsBy,
         status_actions_successful: args.statusActionsSuccessful,
       })
       .where({ status_actions_log_id: args.statusActionsLogId })

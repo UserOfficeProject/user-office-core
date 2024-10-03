@@ -37,20 +37,6 @@ export class StatusActionsLog implements Partial<StatusActionsLogOrigin> {
 @Resolver(() => StatusActionsLog)
 export class StatusActionsLogResolver {
   @FieldResolver(() => User, { nullable: true })
-  async statusActionsBy(
-    @Root() statusActionsLog: StatusActionsLogOrigin,
-    @Ctx() context: ResolverContext
-  ): Promise<User | null> {
-    if (!statusActionsLog.statusActionsBy) {
-      return null;
-    }
-
-    return await context.queries.user.getUser(
-      context.user,
-      statusActionsLog.statusActionsBy
-    );
-  }
-
   @FieldResolver(() => ConnectionStatusAction, { nullable: true })
   async connectionStatusAction(
     @Root() statusActionsLog: StatusActionsLogOrigin,

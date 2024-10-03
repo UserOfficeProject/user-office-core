@@ -5,7 +5,6 @@ export class StatusActionsLog {
     public connectionId: number,
     public actionId: number,
     public emailStatusActionRecipient: string,
-    public statusActionsBy: number | null,
     public statusActionsSuccessful: boolean,
     public statusActionsMessage: string,
     public statusActionsTstamp: Date

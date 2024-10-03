@@ -1333,7 +1333,6 @@ export const createStatusActionsLogObject = (
     statusActionLog.connection_id,
     statusActionLog.action_id,
     statusActionLog.email_status_action_recipient,
-    statusActionLog.status_actions_by,
     statusActionLog.status_actions_successful,
     statusActionLog.status_actions_message,
     statusActionLog.status_actions_tstamp
@@ -1357,7 +1356,6 @@ export interface StatusActionsLogRecord {
   readonly connection_id: number;
   readonly action_id: number;
   readonly email_status_action_recipient: string;
-  readonly status_actions_by: null;
   readonly status_actions_successful: boolean;
   readonly status_actions_message: string;
   readonly status_actions_tstamp: Date;

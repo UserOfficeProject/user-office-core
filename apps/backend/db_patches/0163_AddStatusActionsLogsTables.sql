@@ -1,14 +1,13 @@
 DO
 $$
 BEGIN
-  IF register_patch('0162_AddStatusActionsLogsTables.sql', 'Farai Mutambara', 'Add Status Actions Logs', '2024-09-02') THEN
+  IF register_patch('0163_AddStatusActionsLogsTables.sql', 'Farai Mutambara', 'Add Status Actions Logs', '2024-10-03') THEN
     BEGIN
        CREATE TABLE IF NOT EXISTS status_actions_logs(
             status_actions_log_id serial PRIMARY KEY,
             connection_id int NOT NULL,
             action_id int NOT NULL,
             email_status_action_recipient text DEFAULT NULL,
-            status_actions_by int REFERENCES users (user_id) ON UPDATE CASCADE,
             status_actions_successful boolean DEFAULT FALSE,
             status_actions_message text DEFAULT NULL,
             status_actions_tstamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
