@@ -3,8 +3,8 @@ import { container } from 'tsyringe';
 
 import { dummyReview } from '../datasources/mockups/ReviewDataSource';
 import {
+  dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
-  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import ReviewQueries from './ReviewQueries';
 
@@ -18,7 +18,7 @@ test('A userofficer can get a review', () => {
 
 test('A user can not get a review', () => {
   return expect(
-    reviewQueries.get(dummyUserWithRole, { reviewId: 1 })
+    reviewQueries.get(dummyUserNotOnProposalWithRole, { reviewId: 1 })
   ).resolves.toBe(null);
 });
 
@@ -32,6 +32,8 @@ test('A userofficer can get reviews for a proposal', () => {
 
 test('A user can not get reviews for a proposal', () => {
   return expect(
-    reviewQueries.reviewsForProposal(dummyUserWithRole, { proposalPk: 10 })
+    reviewQueries.reviewsForProposal(dummyUserNotOnProposalWithRole, {
+      proposalPk: 10,
+    })
   ).resolves.toStrictEqual(null);
 });
