@@ -14,7 +14,6 @@ export const dummyStatusActionsLog = new StatusActionsLog(
   1,
   1,
   EmailStatusActionRecipients.OTHER,
-  null,
   true,
   'Email(s) successfully sent',
   new Date()
@@ -25,7 +24,6 @@ export const dummyStatusActionsLogReplay = new StatusActionsLog(
   1,
   1,
   EmailStatusActionRecipients.OTHER,
-  null,
   true,
   'Email(s) successfully sent',
   new Date()
