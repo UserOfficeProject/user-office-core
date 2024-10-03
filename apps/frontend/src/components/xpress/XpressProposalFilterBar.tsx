@@ -1,5 +1,4 @@
 import Grid from '@mui/material/Grid';
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
@@ -118,23 +117,6 @@ const XpressProposalFilterBar = ({
       </Grid>
     </Grid>
   );
-};
-
-XpressProposalFilterBar.propTypes = {
-  calls: PropTypes.shape({
-    data: PropTypes.array.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-  }),
-  instruments: PropTypes.shape({
-    data: PropTypes.array.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-  }),
-  techniques: PropTypes.shape({
-    data: PropTypes.array.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-  }),
-  setProposalFilter: PropTypes.func.isRequired,
-  filter: PropTypes.object.isRequired,
 };
 
 export default XpressProposalFilterBar;

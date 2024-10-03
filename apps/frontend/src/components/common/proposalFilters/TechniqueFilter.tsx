@@ -42,10 +42,6 @@ const TechniqueFilter = ({
     return null;
   }
 
-  /**
-   * NOTE: We might use https://material-ui.com/components/autocomplete/.
-   * If we have lot of dropdown options to be able to search.
-   */
   return (
     <>
       <FormControl fullWidth>
@@ -106,9 +102,11 @@ const TechniqueFilter = ({
             {shouldShowMultiple && (
               <MenuItem value={TechniqueFilterEnum.MULTI}>Multiple</MenuItem>
             )}
-            <ListSubheader sx={{ lineHeight: 1 }}>
-              <Divider>Techniques</Divider>
-            </ListSubheader>
+            {techniques && (
+              <ListSubheader sx={{ lineHeight: 1 }}>
+                <Divider>Techniques</Divider>
+              </ListSubheader>
+            )}
             {techniques.map((technique) => (
               <MenuItem key={technique.id} value={technique.id}>
                 {technique.name}
