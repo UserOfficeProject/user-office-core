@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DownloadableFileList } from 'components/common/DownloadableFileList';
 import UOLoader from 'components/common/UOLoader';
@@ -12,6 +13,7 @@ type FapFilesProps = {
 
 const FapFilesView = ({ data }: FapFilesProps) => {
   const fap = { ...data };
+  const { t } = useTranslation();
   const fileId: { id: string }[] = fap.files ? JSON.parse(fap.files) : [];
 
   if (!fap) {
@@ -21,7 +23,7 @@ const FapFilesView = ({ data }: FapFilesProps) => {
   return (
     <>
       <Typography variant="h6" component="h2" gutterBottom>
-        {`${fap.code} Facility access panel - File Store`}
+        {`${fap.code} ${t('Facility access panel')} - File Store`}
       </Typography>
       <DownloadableFileList fileIds={fileId.map((file) => file.id)} />
     </>

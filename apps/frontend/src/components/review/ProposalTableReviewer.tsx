@@ -8,20 +8,22 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryParams, NumberParam } from 'use-query-params';
+import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
-import { DefaultQueryParams } from 'components/common/SuperMaterialTable';
+import { UserContext } from 'context/UserContextProvider';
 import {
   ReviewerFilter,
   ReviewStatus,
+  UserRole,
   UserWithReviewsQuery,
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
@@ -34,9 +36,8 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from './ProposalReviewContent';
 import ProposalReviewModal from './ProposalReviewModal';
-import ReviewStatusFilter, {
-  defaultReviewStatusQueryFilter,
-} from './ReviewStatusFilter';
+import ReviewerFilterComponent from './ReviewerFilter';
+import ReviewStatusFilter from './ReviewStatusFilter';
 
 type UserWithReview = {
   proposalId: string;
@@ -46,6 +47,7 @@ type UserWithReview = {
   reviewId: number;
   comment: string | null;
   status: ReviewStatus;
+  reviewerId: number;
   callShortCode?: string;
   instrumentShortCode?: string;
 };
@@ -56,7 +58,8 @@ const getFilterStatus = (selected: string | ReviewStatus) =>
     : selected === ReviewStatus.DRAFT
       ? ReviewStatus.DRAFT
       : undefined; // if the selected status is not a valid status assume we want to see everything
-
+const getFilterReviewer = (selected: string | ReviewerFilter) =>
+  selected === ReviewerFilter.ME ? ReviewerFilter.ME : ReviewerFilter.ALL;
 const columns: (
   t: TFunction<'translation', undefined>
 ) => Column<UserWithReview>[] = (t) => [
@@ -84,32 +87,36 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const { instruments, loadingInstruments } = useInstrumentsData();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
-  const [urlQueryParams, setUrlQueryParams] = useQueryParams({
-    ...DefaultQueryParams,
-    call: NumberParam,
-    instrument: NumberParam,
-    reviewStatus: defaultReviewStatusQueryFilter,
-    reviewModal: NumberParam,
-    modalTab: NumberParam,
-  });
+  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
+  const { user } = useContext(UserContext);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const call = searchParams.get('call');
+  const instrument = searchParams.get('instrument');
+  const reviewStatus = searchParams.get('reviewStatus') ?? ReviewStatus.DRAFT;
+  const reviewer = searchParams.get('reviewer') ?? ReviewerFilter.ME;
+  const reviewModal = searchParams.get('reviewModal');
+  const selection = searchParams.getAll('selection');
+  const sortField = searchParams.get('sortField');
+  const sortDirection = searchParams.get('sortDirection');
 
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     UserWithReview[]
   >([]);
 
   const [selectedCallId, setSelectedCallId] = useState<number>(
-    urlQueryParams.call || 0
+    call ? +call : 0
   );
   const [selectedInstrumentId, setSelectedInstrumentId] = useState<
     number | null | undefined
-  >(urlQueryParams.instrument || null);
+  >(instrument ? +instrument : null);
 
   const { loading, userData, setUserData, setUserWithReviewsFilter } =
     useUserWithReviewsData({
       callId: selectedCallId,
       instrumentId: selectedInstrumentId,
-      status: getFilterStatus(urlQueryParams.reviewStatus),
-      reviewer: ReviewerFilter.ME,
+      status: getFilterStatus(reviewStatus),
+      reviewer: getFilterReviewer(reviewer),
     });
 
   useEffect(() => {
@@ -124,6 +131,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         reviewId: review.id,
         comment: review.comment,
         status: review.status,
+        reviewerId: review.userID,
         callShortCode: review.proposal!.call?.shortCode,
         instrumentShortCodes: review.proposal!.instruments?.map(
           (instrument) => instrument?.shortCode
@@ -135,15 +143,15 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         },
       })) || [];
 
-    if (urlQueryParams.selection.length > 0) {
-      const selection = new Set(urlQueryParams.selection);
+    if (selection.length > 0) {
+      const selectionSet = new Set(selection);
       setPreselectedProposalsData(
-        getProposalsToGradeDataFromUserData(selection)
+        getProposalsToGradeDataFromUserData(selectionSet)
       );
     } else {
       setPreselectedProposalsData(getProposalsToGradeDataFromUserData());
     }
-  }, [userData, urlQueryParams.selection]);
+  }, [userData, selection]);
 
   const reviewerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
@@ -161,8 +169,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const sortedColumns = setSortDirectionOnSortField(
     columns(t),
-    urlQueryParams.sortField,
-    urlQueryParams.sortDirection
+    sortField,
+    sortDirection
   );
 
   /**
@@ -174,27 +182,34 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       {!loading && (
         <Tooltip
           title={
-            rowData.status === ReviewStatus.DRAFT
+            rowData.status === ReviewStatus.DRAFT &&
+            rowData.reviewerId === user.id
               ? 'Grade proposal'
               : 'View proposal'
           }
         >
           <IconButton
             onClick={() => {
-              setUrlQueryParams({
-                reviewModal: rowData.reviewId,
-                modalTab:
-                  rowData.status === ReviewStatus.DRAFT
-                    ? reviewerProposalReviewTabs.indexOf(
-                        PROPOSAL_MODAL_TAB_NAMES.GRADE
-                      )
-                    : reviewerProposalReviewTabs.indexOf(
-                        PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION
-                      ),
+              setSearchParams((searchParams) => {
+                searchParams.set('reviewModal', rowData.reviewId.toString());
+                searchParams.set(
+                  'modalTab',
+                  rowData.status === ReviewStatus.DRAFT &&
+                    rowData.reviewerId === user.id
+                    ? reviewerProposalReviewTabs
+                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
+                        .toString()
+                    : reviewerProposalReviewTabs
+                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
+                        .toString()
+                );
+
+                return searchParams;
               });
             }}
           >
-            {rowData.status === ReviewStatus.DRAFT ? (
+            {rowData.status === ReviewStatus.DRAFT &&
+            rowData.reviewerId === user.id ? (
               <RateReviewIcon data-cy="grade-proposal-icon" />
             ) : (
               <Visibility data-cy="view-proposal-details-icon" />
@@ -245,34 +260,51 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleStatusFilterChange = (reviewStatus: ReviewStatus) => {
-    setUrlQueryParams((queries) => ({ ...queries, reviewStatus }));
+    setSearchParams((searchParams) => {
+      searchParams.set('reviewStatus', reviewStatus);
+
+      return searchParams;
+    });
     setUserWithReviewsFilter((filter) => ({
       ...filter,
       status: getFilterStatus(reviewStatus),
     }));
   };
+  const handleReviewerFilterChange = (reviewer: ReviewerFilter) => {
+    setSearchParams((searchParams) => {
+      searchParams.set('reviewer', reviewer);
 
-  const handleColumnSelectionChange = (selectedItems: UserWithReview[]) => {
-    setUrlQueryParams((params) => ({
-      ...params,
-      selection:
-        selectedItems.length > 0
-          ? selectedItems.map((selectedItem) =>
-              selectedItem.proposalPk.toString()
-            )
-          : undefined,
+      return searchParams;
+    });
+    setUserWithReviewsFilter((filter) => ({
+      ...filter,
+      reviewer: getFilterReviewer(reviewer),
     }));
+  };
+  const handleColumnSelectionChange = (selectedItems: UserWithReview[]) => {
+    setSearchParams((searchParams) => {
+      searchParams.delete('selection');
+      if (selectedItems.length > 0) {
+        selectedItems.forEach((selectedItem) => {
+          searchParams.append('selection', selectedItem.proposalPk.toString());
+        });
+      }
+
+      return searchParams;
+    });
   };
 
   const handleColumnSortOrderChange = (
     orderByCollection: OrderByCollection[]
   ) => {
     const [orderBy] = orderByCollection;
-    setUrlQueryParams((params) => ({
-      ...params,
-      sortField: orderBy?.orderByField,
-      sortDirection: orderBy?.orderDirection,
-    }));
+
+    setSearchParams((searchParams) => {
+      searchParams.set('sortField', orderBy?.orderByField);
+      searchParams.set('sortDirection', orderBy?.orderDirection);
+
+      return searchParams;
+    });
   };
 
   const handleBulkDownLoadClick = (
@@ -364,7 +396,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const proposalToReview = preselectedProposalsData.find(
-    (review) => review.reviewId === urlQueryParams.reviewModal
+    (review) => reviewModal && review.reviewId === +reviewModal
   );
 
   const preselectedProposalsDataWithIdAndRowActions =
@@ -377,9 +409,17 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   return (
     <>
       <Grid container spacing={2}>
+        {isFapReviewer && (
+          <Grid item sm={3} xs={12}>
+            <ReviewerFilterComponent
+              reviewer={reviewer}
+              onChange={handleReviewerFilterChange}
+            />
+          </Grid>
+        )}
         <Grid item sm={3} xs={12}>
           <ReviewStatusFilter
-            reviewStatus={urlQueryParams.reviewStatus}
+            reviewStatus={reviewStatus}
             onChange={handleStatusFilterChange}
           />
         </Grid>
@@ -413,15 +453,21 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       </Grid>
       <ProposalReviewModal
         title={`Proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
-        proposalReviewModalOpen={!!urlQueryParams.reviewModal}
+        proposalReviewModalOpen={!!reviewModal}
         setProposalReviewModalOpen={() => {
-          updateView(urlQueryParams.reviewModal);
-          setUrlQueryParams({ reviewModal: undefined, modalTab: undefined });
+          updateView(reviewModal ? +reviewModal : undefined);
+
+          setSearchParams((searchParams) => {
+            searchParams.delete('reviewModal');
+            searchParams.delete('modalTab');
+
+            return searchParams;
+          });
         }}
       >
         <ProposalReviewContent
           proposalPk={proposalToReview?.proposalPk}
-          reviewId={urlQueryParams.reviewModal}
+          reviewId={reviewModal ? +reviewModal : undefined}
           tabNames={reviewerProposalReviewTabs}
           fapId={
             userData?.reviews.find((review) => {
@@ -471,6 +517,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
             tooltip: 'Submit proposal reviews',
             onClick: handleBulkReviewsSubmitClick,
             position: 'toolbarOnSelect',
+            disabled: reviewer === ReviewerFilter.ALL,
           },
         ]}
       />
