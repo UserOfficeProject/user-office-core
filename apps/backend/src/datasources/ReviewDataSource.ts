@@ -23,6 +23,13 @@ export interface ReviewDataSource {
     instrumentId?: number,
     submitted?: number
   ): Promise<Review[]>;
+  getAllUsersReviews(
+    fapIds: number[],
+    userId?: number,
+    callId?: number,
+    instrumentId?: number,
+    submitted?: number
+  ): Promise<Review[]>;
   getAssignmentReview(
     fapId: number,
     proposalPk: number,

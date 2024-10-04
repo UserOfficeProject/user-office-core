@@ -35,7 +35,9 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
 
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+  const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { isInternalUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const callHasEnded = isCallEnded(
     state.fapReview.proposal?.call?.startCall,
     state.fapReview.proposal?.call?.endCall
@@ -55,7 +57,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
     fapReview.questionary.steps.every((step) => step.isCompleted);
 
   const [submitDisabled, setSubmitDisabled] = useState(() => {
-    const submissionDisabled =
+    let submissionDisabled =
       (!isUserOfficer && callHasEnded) || // disallow submit for non user officers if the call ended
       !allStepsComplete ||
       fapReview.status === ReviewStatus.SUBMITTED;
@@ -67,7 +69,11 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
       isCallActiveInternal &&
       allStepsComplete
     ) {
-      return false; // allow submit for intenal users if the call ended
+      submissionDisabled = false; // allow submit for intenal users if the call ended
+    }
+    if (isFapReviewer) {
+      //reviewers should not be able to submit a grade for proposals on which they are not a reviewer
+      submissionDisabled = fapReview.reviewer?.id !== user.id ? true : false;
     }
 
     return submissionDisabled;

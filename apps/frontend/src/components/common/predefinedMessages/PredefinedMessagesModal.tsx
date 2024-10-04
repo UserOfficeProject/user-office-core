@@ -111,13 +111,7 @@ const PredefinedMessagesModal = ({
     setFieldValue('predefinedMessageId', selectedItem);
   };
 
-  const handlePredefinedMessageDelete = async (
-    setFieldValue: (
-      field: string,
-      value: number | string,
-      shouldValidate?: boolean | undefined
-    ) => void
-  ) => {
+  const handlePredefinedMessageDelete = async () => {
     confirm(
       async () => {
         if (!initialValues.predefinedMessageId) {
@@ -134,9 +128,8 @@ const PredefinedMessagesModal = ({
           (predefinedMessage) =>
             predefinedMessage.id !== initialValues.predefinedMessageId
         );
+
         setPredefinedMessages(newPredefinedMessagesArray);
-        setFieldValue('message', '');
-        setFieldValue('title', '');
       },
       {
         title: 'Please confirm',
@@ -195,7 +188,7 @@ const PredefinedMessagesModal = ({
             }
           }}
         >
-          {({ isSubmitting, setFieldValue, dirty }) => (
+          {({ isSubmitting, setFieldValue, dirty, resetForm }) => (
             <Form
               onChange={() => {
                 if (dirty) {
@@ -259,7 +252,17 @@ const PredefinedMessagesModal = ({
                   color="error"
                   disabled={isSubmitting || !initialValues.predefinedMessageId}
                   startIcon={<DeleteIcon />}
-                  onClick={() => handlePredefinedMessageDelete(setFieldValue)}
+                  onClick={() => {
+                    handlePredefinedMessageDelete();
+
+                    resetForm({
+                      values: {
+                        predefinedMessageId: null,
+                        title: '',
+                        message: '',
+                      },
+                    });
+                  }}
                   data-cy="delete-message"
                 >
                   Delete

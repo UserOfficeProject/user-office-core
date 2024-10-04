@@ -85,7 +85,12 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   async getProposalReviews(id: number): Promise<Review[]> {
     return [dummyReview];
   }
-  async getUserReviews(fapIds: number[]): Promise<Review[]> {
+  async getUserReviews(fapIds: number[], userId?: number): Promise<Review[]> {
+    if (userId === 3) return [];
+
+    return [dummyReview];
+  }
+  async getAllUsersReviews(fapIds: number[]): Promise<Review[]> {
     return [dummyReview];
   }
 }

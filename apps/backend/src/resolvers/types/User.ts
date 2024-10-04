@@ -136,13 +136,23 @@ export class UserResolver {
 
     const shouldGetOnlyUserReviews = !reviewer;
 
-    return context.queries.review.dataSource.getUserReviews(
-      fapsUserIsMemberOf.map((faps) => faps.id),
-      shouldGetOnlyUserReviews ? user.id : undefined,
-      callId,
-      instrumentId,
-      status
-    );
+    if (shouldGetOnlyUserReviews) {
+      return context.queries.review.dataSource.getUserReviews(
+        fapsUserIsMemberOf.map((faps) => faps.id),
+        user.id,
+        callId,
+        instrumentId,
+        status
+      );
+    } else {
+      return context.queries.review.dataSource.getAllUsersReviews(
+        fapsUserIsMemberOf.map((faps) => faps.id),
+        user.id,
+        callId,
+        instrumentId,
+        status
+      );
+    }
   }
 
   @FieldResolver(() => [Proposal])

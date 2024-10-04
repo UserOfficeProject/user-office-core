@@ -57,7 +57,6 @@ const ProposalGrade = ({
   const [numberOfChars, setNumberOfChars] = useState(0);
   const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
   const { settingsMap } = useContext(SettingsContext);
-
   const gradeDecimalPoints = parseFloat(
     settingsMap.get(SettingsId.GRADE_PRECISION)?.settingsValue?.valueOf() ?? '1'
   );

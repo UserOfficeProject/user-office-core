@@ -22,6 +22,7 @@ export default function ShipmentContainer(props: {
   shipment: ShipmentWithQuestionary;
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
   onShipmentCreated?: (shipment: ShipmentCore) => void;
+  previewMode?: boolean;
 }) {
   const [initialState] = useState(new ShipmentSubmissionState(props.shipment));
   const eventHandlers = useEventHandlers(TemplateGroupId.SHIPMENT);
@@ -47,6 +48,7 @@ export default function ShipmentContainer(props: {
       <Questionary
         title={state.shipment.title || 'New Shipment'}
         info={state.shipment.status}
+        previewMode={props.previewMode}
       />
     </QuestionaryContext.Provider>
   );
