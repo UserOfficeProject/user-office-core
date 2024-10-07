@@ -21,7 +21,7 @@ interface QuestionaryProps {
   title: string;
   info?: JSX.Element | string;
   previewMode?: boolean;
-  confirm?: WithConfirmProps;
+  confirm: WithConfirmProps;
 }
 
 function Questionary({
@@ -79,7 +79,7 @@ function Questionary({
                   dispatch({
                     type: 'GO_TO_STEP_CLICKED',
                     stepIndex: index,
-                    confirm: confirm?.confirm,
+                    confirm: confirm.confirm,
                   });
                 }}
                 readonly={stepMetadata.isReadonly && !isUserOfficer}
