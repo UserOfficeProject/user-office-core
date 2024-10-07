@@ -8,6 +8,7 @@ import React, { useContext, useRef, useEffect } from 'react';
 
 import { UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 import {
   createMissingContextErrorMessage,
@@ -20,9 +21,15 @@ interface QuestionaryProps {
   title: string;
   info?: JSX.Element | string;
   previewMode?: boolean;
+  confirm?: WithConfirmProps;
 }
 
-function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
+function Questionary({
+  title,
+  info,
+  previewMode = false,
+  confirm,
+}: QuestionaryProps) {
   const isMobile = useMediaQuery('(max-width: 500px)');
 
   const theme = useTheme();
@@ -72,6 +79,7 @@ function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
                   dispatch({
                     type: 'GO_TO_STEP_CLICKED',
                     stepIndex: index,
+                    confirm: confirm?.confirm,
                   });
                 }}
                 readonly={stepMetadata.isReadonly && !isUserOfficer}
@@ -134,4 +142,4 @@ function Questionary({ title, info, previewMode = false }: QuestionaryProps) {
   );
 }
 
-export default Questionary;
+export default withConfirm(Questionary);
