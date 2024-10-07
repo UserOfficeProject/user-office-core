@@ -1226,7 +1226,14 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
     });
 
-    it.only('Fap Secretary should be able to edit only comments of technical reviews', () => {
+    it('Fap Secretary should be able to edit only comments of technical reviews', function () {
+      if (
+        settings.getEnabledSettings().get(SettingsId.SECS_EDIT_TECH_REVIEWS) !==
+        'true'
+      ) {
+        this.skip();
+      }
+
       const internalComment = faker.word.words(2);
       const publicComment = faker.word.words(2);
 

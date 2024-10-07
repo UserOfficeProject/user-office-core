@@ -119,6 +119,10 @@ async function enableDefaultStfcFeatures() {
     settingsId: SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS,
     settingsValue: 'FEASIBILITY',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.SECS_EDIT_TECH_REVIEWS,
+    settingsValue: 'true',
+  });
 }
 
 async function setSTFCRoleNames() {
