@@ -9,6 +9,7 @@ Questions :material-comment-question: are designed to streamline the template cr
 Questions can be utilized within the following templates:
 
 * [Proposal templates :material-note-text:](templates/proposal_template.md)
+* [FAP Review templates :material-note-text:](templates/fap_review_template.md)
 * [Proposal ESI templates :material-note-text:](templates/proposalESI_template.md)
 * [Sample ESI templates :material-inbox:](templates/sampleESI_template.md)
 * [Feedback templates :material-message-alert:](templates/feedback_template.md)
@@ -31,7 +32,7 @@ ________________________________________________________________________________
 ## How do I create questions?
 
 * In the main menu, navigate to the template page you wish to create the question within
-([Proposal templates :material-note-text:](templates/proposal_template.md), [Proposal ESI templates :material-note-text:](templates/proposalESI_template.md), [Sample ESI templates :material-inbox:](templates/sampleESI_template.md), [Feedback templates :material-message-alert:](templates/feedback_template.md), [Sub Templates :material-collapse-all-outline:](templates/sub_template.md), [Sample declaration templates :material-inbox:](templates/sampledec_template.md), [Shipment declarationt templates :material-truck:](templates/shipment_template.md), [Visit registration templates :material-airplane-takeoff:](templates/visit_template.md))
+([Proposal templates :material-note-text:](templates/proposal_template.md), [FAP Review templates :material-note-text:](templates/fap_review_template.md), [Proposal ESI templates :material-note-text:](templates/proposalESI_template.md), [Sample ESI templates :material-inbox:](templates/sampleESI_template.md), [Feedback templates :material-message-alert:](templates/feedback_template.md), [Sub Templates :material-collapse-all-outline:](templates/sub_template.md), [Sample declaration templates :material-inbox:](templates/sampledec_template.md), [Shipment declarationt templates :material-truck:](templates/shipment_template.md), [Visit registration templates :material-airplane-takeoff:](templates/visit_template.md))
 
 * Within the chosen template page, create or edit a pre-existing template. 
 (In this example, we wish to create questions for a Proposal template:)
