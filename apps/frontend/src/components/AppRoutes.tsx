@@ -318,7 +318,7 @@ const AppRoutes = () => {
           path="/FapReviewTemplates"
           element={
             <TitledRoute
-              title="FAP Review Templates"
+              title={i18n.format(t('FAP Review Template'), 'plural')}
               element={<FapReviewTemplatesPage />}
             />
           }

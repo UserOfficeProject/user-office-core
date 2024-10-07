@@ -4,7 +4,6 @@ import { container } from 'tsyringe';
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { FapDataSource } from '../../datasources/FapDataSource';
-import { Review } from '../../models/Review';
 import { UserWithRole } from '../../models/User';
 import { collectCallFapXLSXData } from './callFaps';
 import { getDataRow } from './FapDataRow';
@@ -23,13 +22,14 @@ export type RowObj = {
   instrName?: string;
   instrAvailTime: number | null;
   techReviewTimeAllocation?: number | null;
+  techReviewComment: string | null;
   fapTimeAllocation: number | null;
   propReviewAvgScore?: number;
   propFapRankOrder: number | null;
   inAvailZone?: string | null;
   feedback?: string;
   daysRequested?: number;
-  reviews?: Review[] | null;
+  reviews?: (string | number)[][] | null;
   piCountry?: string | null;
 };
 
@@ -125,6 +125,7 @@ export const collectFapXLSXRowData = async (
           proposal.title,
           proposal.proposal_id,
           proposal.time_allocation,
+          proposal.comment,
           proposal.rank_order,
           proposal.proposer_id,
           proposalAnswers,
