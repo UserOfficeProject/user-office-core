@@ -244,7 +244,7 @@ function QuestionaryStepView(props: {
     });
 
   const resetHandler = () => {
-    confirm?.confirm?.(
+    confirm.confirm?.(
       () => {
         revertTemplateChanges();
       },
