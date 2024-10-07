@@ -21,7 +21,7 @@ import {
 } from 'models/questionary/QuestionaryFunctions';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import NavigationFragment from './NavigationFragment';
 import {
@@ -68,7 +68,7 @@ function QuestionaryStepView(props: {
   topicId: number;
   readonly: boolean;
   onStepComplete?: (topicId: number) => void;
-  confirm: WithConfirmProps;
+  confirm: WithConfirmType;
 }) {
   const { topicId, confirm } = props;
 
@@ -240,11 +240,11 @@ function QuestionaryStepView(props: {
   const backHandler = () =>
     dispatch({
       type: 'BACK_CLICKED',
-      confirm: confirm.confirm,
+      confirm,
     });
 
   const resetHandler = () => {
-    confirm.confirm?.(
+    confirm?.(
       () => {
         revertTemplateChanges();
       },
