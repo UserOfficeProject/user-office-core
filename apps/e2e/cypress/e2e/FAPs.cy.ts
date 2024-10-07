@@ -1278,7 +1278,7 @@ context('Fap reviews tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Technical review submitted successfully',
       });
     });
   });
