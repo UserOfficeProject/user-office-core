@@ -8,7 +8,7 @@ import React, { useContext, useRef, useEffect } from 'react';
 
 import { UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import {
   createMissingContextErrorMessage,
@@ -21,7 +21,7 @@ interface QuestionaryProps {
   title: string;
   info?: JSX.Element | string;
   previewMode?: boolean;
-  confirm: WithConfirmProps;
+  confirm: WithConfirmType;
 }
 
 function Questionary({
@@ -79,7 +79,7 @@ function Questionary({
                   dispatch({
                     type: 'GO_TO_STEP_CLICKED',
                     stepIndex: index,
-                    confirm: confirm.confirm,
+                    confirm,
                   });
                 }}
                 readonly={stepMetadata.isReadonly && !isUserOfficer}
