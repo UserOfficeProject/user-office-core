@@ -3950,7 +3950,7 @@ context('Fap meeting exports test', () => {
       });
   });
 
-  it.only('Expired proposals should not appear in exports', function () {
+  it('Expired proposals should not appear in exports', function () {
     cy.getAndStoreFeaturesEnabled().then(function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
