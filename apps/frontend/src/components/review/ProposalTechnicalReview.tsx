@@ -74,7 +74,7 @@ const ProposalTechnicalReview = ({
 
   const fapSecOrChairCanEdit =
     isFapChairOrSec &&
-    settingsMap.get(SettingsId.SECS_EDIT_TECH_REVIEWS)?.settingsValue ===
+    settingsMap.get(SettingsId.FAP_SECS_EDIT_TECH_REVIEWS)?.settingsValue ===
       'true';
 
   const initialValues: TechnicalReviewFormType = {

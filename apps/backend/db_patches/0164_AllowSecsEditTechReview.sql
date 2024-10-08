@@ -5,7 +5,7 @@ BEGIN
     BEGIN
 
       INSERT INTO settings(settings_id, description) 
-        VALUES ('SECS_EDIT_TECH_REVIEWS', 
+        VALUES ('FAP_SECS_EDIT_TECH_REVIEWS', 
                 'Allows Fap secretaries to edit technical reviews'
                 );
 

@@ -120,7 +120,7 @@ async function enableDefaultStfcFeatures() {
     settingsValue: 'FEASIBILITY',
   });
   await db.updateSettings({
-    settingsId: SettingsId.SECS_EDIT_TECH_REVIEWS,
+    settingsId: SettingsId.FAP_SECS_EDIT_TECH_REVIEWS,
     settingsValue: 'true',
   });
 }
