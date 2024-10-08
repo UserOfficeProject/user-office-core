@@ -1,4 +1,4 @@
-import MaterialTable, {
+import MaterialTableCore, {
   Column,
   OrderByCollection,
   Query,
@@ -9,7 +9,7 @@ import {
   ResourceId,
 } from '@user-office-software/duo-localisation';
 import { t, TFunction } from 'i18next';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
@@ -31,6 +31,10 @@ import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
 const XpressProposalTable = () => {
+  const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
+  };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalViewData[]
@@ -79,6 +83,19 @@ const XpressProposalTable = () => {
     text: search,
     excludeProposalStatusIds: [9],
   });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (isMounted) {
+      refreshTableData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(proposalFilter)]);
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
@@ -169,11 +186,11 @@ const XpressProposalTable = () => {
         const {
           callId,
           instrumentFilter,
+          techniqueFilter,
           proposalStatusId,
-          questionaryIds,
           text,
-          questionFilter,
           referenceNumbers,
+          dateFilter,
           excludeProposalStatusIds,
         } = proposalFilter;
 
@@ -191,16 +208,11 @@ const XpressProposalTable = () => {
               filter: {
                 callId: callId,
                 instrumentFilter: instrumentFilter,
+                techniqueFilter: techniqueFilter,
                 proposalStatusId: proposalStatusId,
-                questionaryIds: questionaryIds,
-                referenceNumbers: referenceNumbers,
-                questionFilter: questionFilter && {
-                  ...questionFilter,
-                  value:
-                    JSON.stringify({ value: questionFilter?.value }) ??
-                    undefined,
-                },
                 text: text,
+                referenceNumbers: referenceNumbers,
+                dateFilter: dateFilter,
                 excludeProposalStatusIds: excludeProposalStatusIds,
               },
               first: tableQuery.pageSize,
@@ -236,16 +248,11 @@ const XpressProposalTable = () => {
               filter: {
                 callId: callId,
                 instrumentFilter: instrumentFilter,
+                techniqueFilter: techniqueFilter,
                 proposalStatusId: proposalStatusId,
-                questionaryIds: questionaryIds,
-                referenceNumbers: referenceNumbers,
-                questionFilter: questionFilter && {
-                  ...questionFilter,
-                  value:
-                    JSON.stringify({ value: questionFilter?.value }) ??
-                    undefined,
-                },
                 text: text,
+                referenceNumbers: referenceNumbers,
+                dateFilter: dateFilter,
               },
               first: tableQuery.pageSize,
               offset: tableQuery.page * tableQuery.pageSize,
@@ -364,7 +371,8 @@ const XpressProposalTable = () => {
             setProposalFilter={setProposalFilter}
             filter={proposalFilter}
           />
-          <MaterialTable<ProposalViewData>
+          <MaterialTableCore<ProposalViewData>
+            tableRef={tableRef}
             icons={tableIcons}
             title={'Xpress Proposals'}
             columns={columns}
