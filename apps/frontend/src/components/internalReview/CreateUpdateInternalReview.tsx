@@ -85,7 +85,10 @@ const CreateUpdateInternalReview = ({
         .getUsers({ filter: value, userRole: UserRole.INTERNAL_REVIEWER })
         .then((data) => {
           if (data.users?.totalCount == 0) {
-            setFieldError('surname', 'No users found with that surname');
+            setFieldError(
+              'surname',
+              'No Internal Reviewers found with that surname'
+            );
           } else {
             setUsersData(data.users?.users || []);
           }

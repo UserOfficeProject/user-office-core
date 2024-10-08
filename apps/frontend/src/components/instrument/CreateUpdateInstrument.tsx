@@ -75,7 +75,12 @@ const CreateUpdateInstrument = ({
         .getUsers({ filter: value, userRole: UserRole.INSTRUMENT_SCIENTIST })
         .then((data) => {
           if (data.users?.totalCount == 0) {
-            setFieldError('surname', 'No users found with that surname');
+            setFieldError(
+              'surname',
+              'No ' +
+                i18n.format(t('instrumentSci'), 'plural') +
+                ' found with that surname'
+            );
           } else {
             setUsersData(data.users?.users || []);
           }
