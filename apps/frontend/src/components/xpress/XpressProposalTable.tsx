@@ -1,10 +1,21 @@
-import MaterialTable, { Column, OrderByCollection } from '@material-table/core';
+import MaterialTable, {
+  Column,
+  OrderByCollection,
+  Query,
+  QueryResult,
+} from '@material-table/core';
+import {
+  getTranslation,
+  ResourceId,
+} from '@user-office-software/duo-localisation';
 import { t, TFunction } from 'i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { ProposalsFilter } from 'generated/sdk';
+import { UserContext } from 'context/UserContextProvider';
+import { ProposalsFilter, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useDataApi } from 'hooks/common/useDataApi';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -15,7 +26,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 
-import { ProposalViewData, useProposalsCoreData } from './useProposalsCoreData';
+import { ProposalViewData } from './useProposalsCoreData';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
@@ -27,9 +38,6 @@ const XpressProposalTable = () => {
   const { techniques, loadingTechniques } = useTechniquesData();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
-  const PREFETCH_SIZE = 200;
 
   const [searchParams, setSearchParams] = useSearchParams({});
 
@@ -44,21 +52,12 @@ const XpressProposalTable = () => {
   const selection = searchParams.getAll('selection');
   const sortField = searchParams.get('sortField');
   const sortDirection = searchParams.get('sortDirection');
+  const page = searchParams.get('page');
+  const pageSize = searchParams.get('pageSize');
 
-  type QueryParameters = {
-    query: {
-      first?: number;
-      offset?: number;
-    };
-    searchText?: string | undefined;
-  };
-  const [queryParameters, setQueryParameters] = useState<QueryParameters>({
-    query: {
-      first: PREFETCH_SIZE,
-      offset: 0,
-    },
-    searchText: search ?? undefined,
-  });
+  const api = useDataApi();
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const { currentRole } = useContext(UserContext);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,
@@ -81,6 +80,8 @@ const XpressProposalTable = () => {
     text: search,
     excludeProposalStatusIds: [9],
   });
+
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
   let columns: Column<ProposalViewData>[] = [
     {
@@ -163,99 +164,158 @@ const XpressProposalTable = () => {
 
   columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
-  const { loading, proposalsData, totalCount } = useProposalsCoreData(
-    {
-      proposalStatusId: proposalFilter.proposalStatusId,
-      techniqueFilter: proposalFilter.techniqueFilter,
-      instrumentFilter: proposalFilter.instrumentFilter,
-      callId: proposalFilter.callId,
-      referenceNumbers: proposalFilter.referenceNumbers,
-      dateFilter: proposalFilter.dateFilter,
-      text: queryParameters.searchText,
-      excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
-    },
-    queryParameters.query
-  );
+  const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
+    new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+      try {
+        const {
+          callId,
+          instrumentFilter,
+          proposalStatusId,
+          questionaryIds,
+          text,
+          questionFilter,
+          referenceNumbers,
+          excludeProposalStatusIds,
+        } = proposalFilter;
 
-  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-  const [preselectedProposalsData, setPreselectedProposalsData] = useState<
-    ProposalViewData[]
-  >([]);
+        let proposalsViews: ProposalViewData[] | undefined;
 
-  const { instruments, loadingInstruments } = useXpressInstrumentsData(
-    proposalsData,
-    techniques
-  );
+        if (
+          currentRole === UserRole.INSTRUMENT_SCIENTIST ||
+          currentRole === UserRole.INTERNAL_REVIEWER
+        ) {
+          proposalsViews = await api()
+            .getTechniqueScientistProposals({
+              filter: {
+                callId: callId,
+                instrumentFilter: instrumentFilter,
+                proposalStatusId: proposalStatusId,
+                questionaryIds: questionaryIds,
+                referenceNumbers: referenceNumbers,
+                questionFilter: questionFilter && {
+                  ...questionFilter,
+                  value:
+                    JSON.stringify({ value: questionFilter?.value }) ??
+                    undefined,
+                },
+                text: text,
+                excludeProposalStatusIds: excludeProposalStatusIds,
+              },
+              first: tableQuery.pageSize,
+              offset: tableQuery.page * tableQuery.pageSize,
+            })
+            .then((data) => {
+              setTotalCount(data.techniqueScientistProposals?.totalCount || 0);
 
-  const { calls, loadingCalls } = useCallsData();
+              return data.techniqueScientistProposals?.proposals.map(
+                (proposal) => {
+                  return {
+                    ...proposal,
+                    status: proposal.submitted ? 'Submitted' : 'Open',
+                    technicalReviews: proposal.technicalReviews?.map(
+                      (technicalReview) => ({
+                        ...technicalReview,
+                        status: getTranslation(
+                          technicalReview.status as ResourceId
+                        ),
+                      })
+                    ),
+                    finalStatus: getTranslation(
+                      proposal.finalStatus as ResourceId
+                    ),
+                  } as ProposalViewData;
+                }
+              );
+            });
+        } else {
+          proposalsViews = await api()
+            .getTechniqueScientistProposals({
+              filter: {
+                callId: callId,
+                instrumentFilter: instrumentFilter,
+                proposalStatusId: proposalStatusId,
+                questionaryIds: questionaryIds,
+                referenceNumbers: referenceNumbers,
+                questionFilter: questionFilter && {
+                  ...questionFilter,
+                  value:
+                    JSON.stringify({ value: questionFilter?.value }) ??
+                    undefined,
+                },
+                text: text,
+              },
+              first: tableQuery.pageSize,
+              offset: tableQuery.page * tableQuery.pageSize,
+            })
+            .then((data) => {
+              setTotalCount(data.techniqueScientistProposals?.totalCount || 0);
 
-  useEffect(() => {
-    let isMounted = true;
-    if (isMounted) {
-      setTableData(
-        preselectedProposalsData.slice(
-          (currentPage * rowsPerPage) % PREFETCH_SIZE,
-          totalCount
-        )
-      );
-    }
+              return data.techniqueScientistProposals?.proposals.map(
+                (proposal) => {
+                  return {
+                    ...proposal,
+                    status: proposal.submitted ? 'Submitted' : 'Open',
+                    technicalReviews: proposal.technicalReviews?.map(
+                      (technicalReview) => ({
+                        ...technicalReview,
+                        status: getTranslation(
+                          technicalReview.status as ResourceId
+                        ),
+                      })
+                    ),
+                    finalStatus: getTranslation(
+                      proposal.finalStatus as ResourceId
+                    ),
+                  } as ProposalViewData;
+                }
+              );
+            });
+        }
 
-    return () => {
-      isMounted = false;
-    };
-  }, [
-    rowsPerPage,
-    preselectedProposalsData,
-    queryParameters,
-    totalCount,
-    currentPage,
-  ]);
+        if (proposalsViews === undefined) {
+          return;
+        }
+        const tableData =
+          proposalsViews.map((proposal) => {
+            const selection = new Set(searchParams.getAll('selection'));
+            const proposalData = {
+              ...proposal,
+              status: proposal.submitted ? 'Submitted' : 'Open',
+              technicalReviews: proposal.technicalReviews?.map(
+                (technicalReview) => ({
+                  ...technicalReview,
+                  status: getTranslation(technicalReview.status as ResourceId),
+                })
+              ),
+              finalStatus: getTranslation(proposal.finalStatus as ResourceId),
+            } as ProposalViewData;
 
-  const handleSearchChange = (searchText: string) => {
-    setQueryParameters({
-      ...queryParameters,
-      searchText: searchText ? searchText : undefined,
+            if (searchParams.getAll('selection').length > 0) {
+              return {
+                ...proposalData,
+                tableData: {
+                  checked: selection.has(proposal.primaryKey.toString()),
+                },
+              };
+            } else {
+              return proposalData;
+            }
+          }) || [];
+
+        setTableData(tableData);
+        setTotalCount(tableData.length);
+
+        alert(tableQuery.page);
+
+        resolve({
+          data: tableData,
+          page: tableQuery.page,
+          totalCount: totalCount || 0,
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
-
-    setSearchParams((searchParam) => {
-      searchParam.delete('search');
-
-      if (searchText) searchParam.set('search', searchText);
-
-      return searchParam;
-    });
-  };
-
-  useEffect(() => {
-    if (selection && selection.length > 0) {
-      const selectionSet = new Set(selection);
-      const selected: ProposalViewData[] = [];
-      setPreselectedProposalsData(
-        proposalsData.map((proposal) => {
-          if (selectionSet.has(proposal.primaryKey.toString())) {
-            selected.push(proposal);
-          }
-
-          return {
-            ...proposal,
-            tableData: {
-              checked: selectionSet.has(proposal.primaryKey.toString()),
-            },
-          };
-        })
-      );
-
-      setSelectedProposals(selected);
-    } else {
-      setPreselectedProposalsData(
-        proposalsData.map((proposal) => ({
-          ...proposal,
-          tableData: { checked: false },
-        }))
-      );
-      setSelectedProposals([]);
-    }
-  }, [proposalsData, JSON.stringify(selection)]);
 
   const handleSortOrderChange = (orderByCollection: OrderByCollection[]) => {
     const [orderBy] = orderByCollection;
@@ -271,9 +331,19 @@ const XpressProposalTable = () => {
     });
   };
 
-  useEffect(() => {
-    setPreselectedProposalsData(proposalsData);
-  }, [proposalsData, queryParameters]);
+  const { instruments, loadingInstruments } = useXpressInstrumentsData(
+    tableData,
+    techniques
+  );
+
+  const { calls, loadingCalls } = useCallsData();
+
+  const handleSearchChange = (searchText: string) => {
+    setSearchParams({
+      search: searchText ? searchText : '',
+      page: searchText ? '0' : page || '',
+    });
+  };
 
   return (
     <>
@@ -297,10 +367,7 @@ const XpressProposalTable = () => {
             icons={tableIcons}
             title={'Xpress Proposals'}
             columns={columns}
-            data={tableData}
-            isLoading={loading}
-            totalCount={totalCount}
-            page={currentPage}
+            data={fetchRemoteProposalsData}
             options={{
               search: true,
               searchText: search || undefined,
@@ -310,12 +377,13 @@ const XpressProposalTable = () => {
               },
               debounceInterval: 600,
               columnsButton: true,
-              pageSize: 20,
               selectionProps: (rowdata: ProposalViewData) => ({
                 inputProps: {
                   'aria-label': `${rowdata.title}-select`,
                 },
               }),
+              pageSize: pageSize ? +pageSize : 5,
+              initialPage: page ? +page : 0,
             }}
             onSelectionChange={(selectedItems) => {
               setSearchParams((searchParam) => {
@@ -332,23 +400,11 @@ const XpressProposalTable = () => {
             }}
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
-            onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
             onPageChange={(page, pageSize) => {
-              const newOffset =
-                Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
-              if (
-                page !== currentPage &&
-                newOffset != queryParameters.query.offset
-              ) {
-                setQueryParameters({
-                  searchText: queryParameters.searchText,
-                  query: {
-                    ...queryParameters.query,
-                    offset: newOffset,
-                  },
-                });
-              }
-              setCurrentPage(page);
+              setSearchParams({
+                page: page.toString(),
+                pageSize: pageSize.toString(),
+              });
             }}
             localization={{
               toolbar: {
