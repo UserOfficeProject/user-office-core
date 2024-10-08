@@ -56,7 +56,6 @@ const XpressProposalTable = () => {
   const pageSize = searchParams.get('pageSize');
 
   const api = useDataApi();
-  const [totalCount, setTotalCount] = useState<number>(0);
   const { currentRole } = useContext(UserContext);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -178,13 +177,16 @@ const XpressProposalTable = () => {
           excludeProposalStatusIds,
         } = proposalFilter;
 
-        let proposalsViews: ProposalViewData[] | undefined;
+        const result: {
+          proposals: ProposalViewData[] | undefined;
+          totalCount: number;
+        } = { proposals: undefined, totalCount: 0 };
 
         if (
           currentRole === UserRole.INSTRUMENT_SCIENTIST ||
           currentRole === UserRole.INTERNAL_REVIEWER
         ) {
-          proposalsViews = await api()
+          result.proposals = await api()
             .getTechniqueScientistProposals({
               filter: {
                 callId: callId,
@@ -205,7 +207,8 @@ const XpressProposalTable = () => {
               offset: tableQuery.page * tableQuery.pageSize,
             })
             .then((data) => {
-              setTotalCount(data.techniqueScientistProposals?.totalCount || 0);
+              result.totalCount =
+                data.techniqueScientistProposals?.totalCount || 0;
 
               return data.techniqueScientistProposals?.proposals.map(
                 (proposal) => {
@@ -228,7 +231,7 @@ const XpressProposalTable = () => {
               );
             });
         } else {
-          proposalsViews = await api()
+          result.proposals = await api()
             .getTechniqueScientistProposals({
               filter: {
                 callId: callId,
@@ -248,7 +251,8 @@ const XpressProposalTable = () => {
               offset: tableQuery.page * tableQuery.pageSize,
             })
             .then((data) => {
-              setTotalCount(data.techniqueScientistProposals?.totalCount || 0);
+              result.totalCount =
+                data.techniqueScientistProposals?.totalCount || 0;
 
               return data.techniqueScientistProposals?.proposals.map(
                 (proposal) => {
@@ -272,11 +276,11 @@ const XpressProposalTable = () => {
             });
         }
 
-        if (proposalsViews === undefined) {
+        if (result.proposals === undefined) {
           return;
         }
         const tableData =
-          proposalsViews.map((proposal) => {
+          result.proposals.map((proposal) => {
             const selection = new Set(searchParams.getAll('selection'));
             const proposalData = {
               ...proposal,
@@ -303,14 +307,11 @@ const XpressProposalTable = () => {
           }) || [];
 
         setTableData(tableData);
-        setTotalCount(tableData.length);
-
-        alert(tableQuery.page);
 
         resolve({
           data: tableData,
           page: tableQuery.page,
-          totalCount: totalCount || 0,
+          totalCount: result.totalCount,
         });
       } catch (error) {
         reject(error);
