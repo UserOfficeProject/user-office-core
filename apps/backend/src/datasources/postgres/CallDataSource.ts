@@ -136,6 +136,23 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_ended', false);
     }
 
+    if (filter?.proposalStatusShortCode?.length) {
+      query
+        .select('call.description as description')
+        .join(
+          'proposal_workflow_connections as w',
+          'call.proposal_workflow_id',
+          'w.proposal_workflow_id'
+        )
+        .join(
+          'proposal_statuses as s',
+          'w.proposal_status_id',
+          's.proposal_status_id'
+        )
+        .where('s.short_code', filter.proposalStatusShortCode)
+        .distinctOn('call.call_id');
+    }
+
     return query.then((callDB: CallRecord[]) =>
       callDB.map((call) => createCallObject(call))
     );
