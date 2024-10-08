@@ -400,6 +400,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
       .whereIn('proposal_pk', proposals)
+      .orderBy('proposal_pk', 'desc')
       .modify((query) => {
         if (filter?.callId) {
           query.where('call_id', filter.callId);
