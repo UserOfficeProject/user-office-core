@@ -432,7 +432,10 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     scientist: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
   ) {
     return { totalCount: 1, proposals: [dummyProposalView] };
   }

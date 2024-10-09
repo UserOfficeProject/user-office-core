@@ -19,7 +19,7 @@ type ProposalFilterBarProps = {
   instruments?: { data: InstrumentFragment[]; isLoading: boolean };
   techniques?: { data: TechniqueFragment[]; isLoading: boolean };
   proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
-  setProposalFilter: (filter: ProposalsFilter) => void;
+  handleFilterChange: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
 };
 
@@ -28,7 +28,7 @@ const XpressProposalFilterBar = ({
   instruments,
   techniques,
   proposalStatuses,
-  setProposalFilter,
+  handleFilterChange,
   filter,
 }: ProposalFilterBarProps) => {
   return (
@@ -40,7 +40,7 @@ const XpressProposalFilterBar = ({
           isLoading={calls?.isLoading}
           shouldShowAll={true}
           onChange={(callId) => {
-            setProposalFilter({
+            handleFilterChange({
               ...filter,
               callId,
             });
@@ -58,7 +58,7 @@ const XpressProposalFilterBar = ({
           isLoading={techniques?.isLoading}
           shouldShowAll={true}
           onChange={(techniqueFilterValue) => {
-            setProposalFilter({
+            handleFilterChange({
               ...filter,
               techniqueFilter: techniqueFilterValue,
             });
@@ -76,7 +76,7 @@ const XpressProposalFilterBar = ({
           isLoading={instruments?.isLoading}
           shouldShowAll={true}
           onChange={(instrumentFilterValue) => {
-            setProposalFilter({
+            handleFilterChange({
               ...filter,
               instrumentFilter: instrumentFilterValue,
             });
@@ -92,7 +92,7 @@ const XpressProposalFilterBar = ({
           shouldShowAll={true}
           hiddenStatuses={filter.excludeProposalStatusIds as number[]}
           onChange={(proposalStatusId) => {
-            setProposalFilter({
+            handleFilterChange({
               ...filter,
               proposalStatusId,
             });
@@ -106,7 +106,7 @@ const XpressProposalFilterBar = ({
             from={filter.dateFilter?.from}
             to={filter.dateFilter?.to}
             onChange={(dateFilterValue) => {
-              setProposalFilter({
+              handleFilterChange({
                 ...filter,
                 dateFilter: dateFilterValue,
               });
