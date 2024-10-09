@@ -1,14 +1,10 @@
 mutation updateSample(
   $sampleId: Int!
   $title: String
-  $safetyComment: String
-  $safetyStatus: SampleStatus
 ) {
   updateSample(
     sampleId: $sampleId
     title: $title
-    safetyComment: $safetyComment
-    safetyStatus: $safetyStatus
   ) {
     ...sample
   }

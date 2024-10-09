@@ -1,4 +1,5 @@
 import { Sample, SampleStatus } from '../../models/Sample';
+import { SubmitSampleReviewArg } from '../../resolvers/mutations/SubmitSampleReviewMutation';
 import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { SampleDataSource } from '../SampleDataSource';
@@ -72,6 +73,15 @@ export class SampleDataSourceMock implements SampleDataSource {
       throw new Error('Sample not found');
     }
     sample.title = args.title || sample.title;
+
+    return sample;
+  }
+
+  async submitReview(args: SubmitSampleReviewArg): Promise<Sample> {
+    const sample = await this.getSample(args.sampleId);
+    if (!sample) {
+      throw new Error('Sample not found');
+    }
     sample.safetyComment = args.safetyComment || sample.safetyComment;
     sample.safetyStatus = args.safetyStatus || sample.safetyStatus;
 
