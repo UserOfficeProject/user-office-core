@@ -106,6 +106,7 @@ const XpressProposalTable = () => {
     {
       title: 'Principal Investigator',
       field: 'principalInvestigator',
+      sorting: false,
       render: (proposalView: ProposalViewData) => {
         if (proposalView.principalInvestigator?.lastname) {
           if (proposalView.principalInvestigator?.preferredname) {
