@@ -102,6 +102,9 @@ export interface ProposalDataSource {
     scientistId: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
 }

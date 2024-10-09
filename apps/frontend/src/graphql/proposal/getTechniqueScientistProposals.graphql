@@ -1,12 +1,18 @@
 query getTechniqueScientistProposals(
   $filter: ProposalsFilter
-  $offset: Int
   $first: Int
+  $offset: Int
+  $sortField: String
+  $sortDirection: String
+  $searchText: String
 ) {
   techniqueScientistProposals(
     filter: $filter
-    offset: $offset
     first: $first
+    offset: $offset
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
   ) {
     proposals {
       primaryKey

@@ -87,17 +87,17 @@ export class ProposalsViewQuery {
 
   @Query(() => ProposalsViewResult, { nullable: true })
   async techniqueScientistProposals(
-    @Ctx() context: ResolverContext,
-    @Arg('filter', () => ProposalsFilter, { nullable: true })
-    filter?: ProposalsFilter,
-    @Arg('first', () => Int, { nullable: true }) first?: number,
-    @Arg('offset', () => Int, { nullable: true }) offset?: number
+    @Args() args: ProposalsViewArgs,
+    @Ctx() context: ResolverContext
   ): Promise<ProposalsViewResult | null> {
     return context.queries.proposal.getTechniqueScientistProposals(
       context.user,
-      filter,
-      first,
-      offset
+      args.filter,
+      args.first,
+      args.offset,
+      args.sortField,
+      args.sortDirection,
+      args.searchText
     );
   }
 }

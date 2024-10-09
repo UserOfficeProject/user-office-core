@@ -9,13 +9,14 @@ import {
   ResourceId,
 } from '@user-office-software/duo-localisation';
 import { t, TFunction } from 'i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -26,7 +27,6 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 
-import { ProposalViewData } from './useProposalsCoreData';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
@@ -83,19 +83,6 @@ const XpressProposalTable = () => {
     text: search,
     excludeProposalStatusIds: [9],
   });
-
-  useEffect(() => {
-    let isMounted = true;
-
-    if (isMounted) {
-      refreshTableData();
-    }
-
-    return () => {
-      isMounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(proposalFilter)]);
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
@@ -182,6 +169,7 @@ const XpressProposalTable = () => {
 
   const fetchRemoteProposalsData = (tableQuery: Query<ProposalViewData>) =>
     new Promise<QueryResult<ProposalViewData>>(async (resolve, reject) => {
+      const [orderBy] = tableQuery.orderByCollection;
       try {
         const {
           callId,
@@ -199,89 +187,51 @@ const XpressProposalTable = () => {
           totalCount: number;
         } = { proposals: undefined, totalCount: 0 };
 
-        if (
-          currentRole === UserRole.INSTRUMENT_SCIENTIST ||
-          currentRole === UserRole.INTERNAL_REVIEWER
-        ) {
-          result.proposals = await api()
-            .getTechniqueScientistProposals({
-              filter: {
-                callId: callId,
-                instrumentFilter: instrumentFilter,
-                techniqueFilter: techniqueFilter,
-                proposalStatusId: proposalStatusId,
-                text: text,
-                referenceNumbers: referenceNumbers,
-                dateFilter: dateFilter,
-                excludeProposalStatusIds: excludeProposalStatusIds,
-              },
-              first: tableQuery.pageSize,
-              offset: tableQuery.page * tableQuery.pageSize,
-            })
-            .then((data) => {
-              result.totalCount =
-                data.techniqueScientistProposals?.totalCount || 0;
+        result.proposals = await api()
+          .getTechniqueScientistProposals({
+            filter: {
+              callId: callId,
+              instrumentFilter: instrumentFilter,
+              techniqueFilter: techniqueFilter,
+              proposalStatusId: proposalStatusId,
+              text: text,
+              referenceNumbers: referenceNumbers,
+              dateFilter: dateFilter,
+              ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
+              currentRole === UserRole.INTERNAL_REVIEWER
+                ? { excludeProposalStatusIds: excludeProposalStatusIds }
+                : {}),
+            },
+            sortField: orderBy?.orderByField,
+            sortDirection: orderBy?.orderDirection,
+            first: tableQuery.pageSize,
+            offset: tableQuery.page * tableQuery.pageSize,
+            searchText: tableQuery.search,
+          })
+          .then((data) => {
+            result.totalCount =
+              data.techniqueScientistProposals?.totalCount || 0;
 
-              return data.techniqueScientistProposals?.proposals.map(
-                (proposal) => {
-                  return {
-                    ...proposal,
-                    status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalReviews: proposal.technicalReviews?.map(
-                      (technicalReview) => ({
-                        ...technicalReview,
-                        status: getTranslation(
-                          technicalReview.status as ResourceId
-                        ),
-                      })
-                    ),
-                    finalStatus: getTranslation(
-                      proposal.finalStatus as ResourceId
-                    ),
-                  } as ProposalViewData;
-                }
-              );
-            });
-        } else {
-          result.proposals = await api()
-            .getTechniqueScientistProposals({
-              filter: {
-                callId: callId,
-                instrumentFilter: instrumentFilter,
-                techniqueFilter: techniqueFilter,
-                proposalStatusId: proposalStatusId,
-                text: text,
-                referenceNumbers: referenceNumbers,
-                dateFilter: dateFilter,
-              },
-              first: tableQuery.pageSize,
-              offset: tableQuery.page * tableQuery.pageSize,
-            })
-            .then((data) => {
-              result.totalCount =
-                data.techniqueScientistProposals?.totalCount || 0;
-
-              return data.techniqueScientistProposals?.proposals.map(
-                (proposal) => {
-                  return {
-                    ...proposal,
-                    status: proposal.submitted ? 'Submitted' : 'Open',
-                    technicalReviews: proposal.technicalReviews?.map(
-                      (technicalReview) => ({
-                        ...technicalReview,
-                        status: getTranslation(
-                          technicalReview.status as ResourceId
-                        ),
-                      })
-                    ),
-                    finalStatus: getTranslation(
-                      proposal.finalStatus as ResourceId
-                    ),
-                  } as ProposalViewData;
-                }
-              );
-            });
-        }
+            return data.techniqueScientistProposals?.proposals.map(
+              (proposal) => {
+                return {
+                  ...proposal,
+                  status: proposal.submitted ? 'Submitted' : 'Open',
+                  technicalReviews: proposal.technicalReviews?.map(
+                    (technicalReview) => ({
+                      ...technicalReview,
+                      status: getTranslation(
+                        technicalReview.status as ResourceId
+                      ),
+                    })
+                  ),
+                  finalStatus: getTranslation(
+                    proposal.finalStatus as ResourceId
+                  ),
+                } as ProposalViewData;
+              }
+            );
+          });
 
         if (result.proposals === undefined) {
           return;
@@ -339,12 +289,18 @@ const XpressProposalTable = () => {
     });
   };
 
-  const { instruments, loadingInstruments } = useXpressInstrumentsData(
-    tableData,
-    techniques
-  );
+  const handleFilterChange = (filter: ProposalsFilter) => {
+    setProposalFilter(filter);
+    refreshTableData();
+  };
 
   const { calls, loadingCalls } = useCallsData();
+
+  const { instruments, loadingInstruments } = useXpressInstrumentsData(
+    tableData,
+    techniques,
+    calls
+  );
 
   const handleSearchChange = (searchText: string) => {
     setSearchParams({
@@ -368,7 +324,7 @@ const XpressProposalTable = () => {
               data: proposalStatuses,
               isLoading: loadingProposalStatuses,
             }}
-            setProposalFilter={setProposalFilter}
+            handleFilterChange={handleFilterChange}
             filter={proposalFilter}
           />
           <MaterialTableCore<ProposalViewData>
