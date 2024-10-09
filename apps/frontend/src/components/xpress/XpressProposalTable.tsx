@@ -35,10 +35,6 @@ const XpressProposalTable = () => {
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedProposals, setSelectedProposals] = useState<
-    ProposalViewData[]
-  >([]);
   const { techniques, loadingTechniques } = useTechniquesData();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
