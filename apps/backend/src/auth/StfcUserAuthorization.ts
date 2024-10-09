@@ -33,7 +33,7 @@ const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
 @injectable()
 export class StfcUserAuthorization extends UserAuthorization {
   private static readonly tokenCacheMaxElements = 1000;
-  private static readonly tokenCacheSecondsToLive = 300; // 5 minutes
+  private static readonly tokenCacheSecondsToLive = 600; // 10 minutes
 
   private uowsTokenCache = new Cache<boolean>(
     StfcUserAuthorization.tokenCacheMaxElements,

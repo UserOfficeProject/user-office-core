@@ -107,7 +107,7 @@ export class StfcUserDataSource implements UserDataSource {
   private static readonly userDetailsCacheMaxElements = 1000;
   private static readonly userDetailsCacheSecondsToLive = 600; // 10 minutes
   private static readonly rolesCacheMaxElements = 1000;
-  private static readonly rolesCacheSecondsToLive = 300; //5 minutes
+  private static readonly rolesCacheSecondsToLive = 600; //10 minutes
 
   private uowsBasicUserDetailsCache = new Cache<StfcBasicPersonDetails>(
     StfcUserDataSource.userDetailsCacheMaxElements,
