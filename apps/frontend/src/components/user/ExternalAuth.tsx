@@ -2,8 +2,7 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import Lock from '@mui/icons-material/Lock';
 import { Button } from '@mui/material';
 import React, { useContext, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { StringParam, useQueryParams } from 'use-query-params';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import AnimatedEllipsis from 'components/AnimatedEllipsis';
 import CenteredAlert from 'components/common/CenteredAlert';
@@ -13,20 +12,15 @@ import { SettingsId } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
 import clearSession from 'utils/clearSession';
 
-const ExternalAuthQueryParams = {
-  sessionid: StringParam,
-  token: StringParam,
-  code: StringParam,
-  error_description: StringParam,
-};
-
 export const getCurrentUrlValues = () => {
   const { protocol, host, pathname: pathName, search } = window.location;
   const currentUrlWithoutParams = [protocol, '//', host, pathName].join('');
   const queryParams = new URLSearchParams(search);
-  Object.keys(ExternalAuthQueryParams).map((value) => {
-    queryParams.delete(value);
-  });
+
+  queryParams.delete('sessionid');
+  queryParams.delete('code');
+  queryParams.delete('token');
+  queryParams.delete('error_description');
 
   return {
     currentUrlWithoutParams,
@@ -36,7 +30,11 @@ export const getCurrentUrlValues = () => {
 };
 
 function ExternalAuth() {
-  const [urlQueryParams] = useQueryParams(ExternalAuthQueryParams);
+  const [searchParams] = useSearchParams();
+  const sessionid = searchParams.get('sessionid');
+  const code = searchParams.get('code');
+  const token = searchParams.get('token');
+  const errorDescription = searchParams.get('error_description');
 
   const unauthorizedApi = useUnauthorizedApi();
   const navigate = useNavigate();
@@ -161,9 +159,7 @@ function ExternalAuth() {
 
     setView(<LoadingMessage />);
 
-    const errorDescription = urlQueryParams.error_description;
-    const authorizationCode =
-      urlQueryParams.sessionid ?? urlQueryParams.code ?? urlQueryParams.token;
+    const authorizationCode = sessionid ?? code ?? token;
 
     if (errorDescription) {
       handleError(errorDescription);
@@ -173,14 +169,14 @@ function ExternalAuth() {
       handleNoAuthorizationCode();
     }
   }, [
+    code,
+    errorDescription,
     handleLogin,
-    history,
+    navigate,
+    sessionid,
     settingsMap,
+    token,
     unauthorizedApi,
-    urlQueryParams.code,
-    urlQueryParams.error_description,
-    urlQueryParams.sessionid,
-    urlQueryParams.token,
   ]);
 
   return View;

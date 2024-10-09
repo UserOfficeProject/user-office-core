@@ -1,12 +1,8 @@
 import Delete from '@mui/icons-material/DeleteOutline';
 import { Typography } from '@mui/material';
 import React from 'react';
-import { useQueryParams } from 'use-query-params';
 
-import SuperMaterialTable, {
-  DefaultQueryParams,
-  UrlQueryParamsType,
-} from 'components/common/SuperMaterialTable';
+import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, ProposalStatus } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
@@ -31,8 +27,6 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
     setProposalStatusesWithLoading: setProposalStatuses,
   } = useProposalStatusesData();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const [urlQueryParams, setUrlQueryParams] =
-    useQueryParams<UrlQueryParamsType>(DefaultQueryParams);
 
   const createModal = (
     onUpdate: FunctionType<void, [ProposalStatus | null]>,
@@ -87,8 +81,6 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
           search: true,
           debounceInterval: 400,
         }}
-        urlQueryParams={urlQueryParams}
-        setUrlQueryParams={setUrlQueryParams}
         actions={[
           (rowActionData) => {
             return {
@@ -109,6 +101,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
             };
           },
         ]}
+        persistUrlQueryParams={true}
       />
     </div>
   );

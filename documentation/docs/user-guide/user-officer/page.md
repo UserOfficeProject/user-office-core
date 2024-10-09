@@ -127,7 +127,7 @@ ________________________________________________________________________________
 #### Login
 
 !!! note ""
-    This sets login.
+    This sets the login.
 
 #### Grade guide
 
@@ -137,4 +137,5 @@ ________________________________________________________________________________
 ### Step 3: Update your changes
 
 * Once you are satisfied with the changes and ensured that the page is well-formatted with the `PREVIEW` function you can update the page by clicking on the `UPDATE` button.
+
 _________________________________________________________________________________________________________

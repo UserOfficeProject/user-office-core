@@ -29,6 +29,7 @@ export class Call {
     public title: string,
     public description: string,
     public pdfTemplateId: number | undefined,
+    public fapReviewTemplateId: number,
     public isActive: boolean
   ) {}
 }

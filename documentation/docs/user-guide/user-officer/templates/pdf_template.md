@@ -3,15 +3,12 @@
 _________________________________________________________________________________________________________
 
 ## What are PDF templates?
-??? info "PDF templates" 
 
-    **PDF templates** :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardized PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
+PDF templates :material-file-pdf-box: enable users and User Officers to download proposals in a well-formatted and standardized PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.
 
-    ______________________________________________________________________________________
-
-    <figure markdown="span">  
+<figure markdown="span">  
         ![PDF Template](../../../assets/images/pdf_template.png){ width="450"}
-        <figcaption>**PDF template**</figcaption>
+        <figcaption>PDF template</figcaption>
     </figure>
 
 _________________________________________________________________________________________________________

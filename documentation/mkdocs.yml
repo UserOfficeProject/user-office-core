@@ -42,33 +42,34 @@ nav:
           - Creating a call: user-guide/user-officer/creating_call.md
           - Creating a workflow: user-guide/user-officer/creating_workflow.md
           - Creating templates: user-guide/user-officer/creating_templates.md
-          - Feasibility review: user-guide/user-officer/feasibility_review.md
-          - FAP review: user-guide/user-officer/fap_review.md
-          - Roles: user-guide/user-officer/roles.md
           - Proposals: user-guide/user-officer/proposal.md
           - FAPs: user-guide/user-officer/fap.md
+          - FAP review: user-guide/user-officer/fap_review.md
+          - Feasibility review: user-guide/user-officer/feasibility_review.md
+          - Roles: user-guide/user-officer/roles.md
           - Pages: user-guide/user-officer/page.md
           - Questions: user-guide/user-officer/questions.md
           - Templates:
-            - PDF templates: user-guide/user-officer/templates/pdf_template.md
             - Proposal templates: user-guide/user-officer/templates/proposal_template.md
+            - FAP review templates: user-guide/user-officer/templates/fap_review_template.md
+            - PDF templates: user-guide/user-officer/templates/pdf_template.md
+            - Feedback templates: user-guide/user-officer/templates/feedback_template.md
             - Sample declaration templates: user-guide/user-officer/templates/sampledec_template.md
             - Sub templates: user-guide/user-officer/templates/sub_template.md
             - Shipment declaration templates: user-guide/user-officer/templates/shipment_template.md
             - Visit registration templatse: user-guide/user-officer/templates/visit_template.md
             - Proposal ESI templates: user-guide/user-officer/templates/proposalESI_template.md
             - Sample ESI templates: user-guide/user-officer/templates/sampleESI_template.md
-            - Feedback templates: user-guide/user-officer/templates/feedback_template.md
           - Settings:
               - Proposal workflows: user-guide/user-officer/settings/proposal_workflow.md
               - Features: user-guide/user-officer/settings/features.md
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
       - Architecture: developer-guide/architecture.md
-      - Tech Stack: developer-guide/tech_stack.md
-      - Running Locally: developer-guide/running_locally.md
-      - Configuration: developer-guide/configuration.md
       - Step-by-Step Guide: developer-guide/step-by-step.md
+      - Running Locally: developer-guide/running_locally.md
+      - Tech Stack: developer-guide/tech_stack.md
+      - Configuration: developer-guide/configuration.md
       - RabbitMQ: developer-guide/rabbitmq.md
       - Kubernetes: developer-guide/kubernetes.md
       - Depencency Injection: developer-guide/dependency_injection.md

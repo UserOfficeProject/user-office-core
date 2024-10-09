@@ -13,6 +13,7 @@ import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import EsiIcon from 'components/common/icons/EsiIcon';
@@ -23,6 +24,7 @@ import { FeatureId } from 'generated/sdk';
 const menuMap = {
   PdfTemplates: '/PdfTemplates',
   ProposalTemplates: '/ProposalTemplates',
+  FapReviewTemplates: '/FapReviewTemplates',
   SampleDeclarationTemplates: '/SampleDeclarationTemplates',
   GenericTemplates: '/GenericTemplates',
   ShipmentDeclarationTemplates: '/ShipmentDeclarationTemplates',
@@ -83,6 +85,7 @@ function EsiTemplatesMenuListItem() {
 
 export function TemplateMenuListItem() {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -136,6 +139,18 @@ export function TemplateMenuListItem() {
               <DescriptionIcon />
             </ListItemIcon>
             <ListItemText primary="Proposal" />
+          </ListItemButton>
+        </Tooltip>
+
+        <Tooltip title={t('FAP Review')}>
+          <ListItemButton
+            component={NavLink}
+            to={menuMap['FapReviewTemplates']}
+          >
+            <ListItemIcon>
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary={t('FAP Review')} />
           </ListItemButton>
         </Tooltip>
 

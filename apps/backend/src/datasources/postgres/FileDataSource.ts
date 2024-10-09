@@ -200,25 +200,54 @@ export default class PostgresFileDataSource implements FileDataSource {
   }
 
   private async retrieveBlobData(oid: number): Promise<ReadStream | null> {
-    const [connectionError, connection] = await to(
-      database.client.acquireConnection() as Promise<Client | undefined>
-    );
-    if (connectionError || !connection) {
-      return null;
-    }
+    return new Promise(async (resolve, reject) => {
+      const [connectionError, connection] = await to(
+        database.client.acquireConnection() as Promise<Client | undefined>
+      );
+      if (connectionError || !connection) {
+        return reject(
+          `Error ocurred while establishing connection with database \n ${connectionError} ${connection}`
+        );
+      }
 
-    const [transactionError] = await to(connection.query('BEGIN')); // start the transaction
-    if (transactionError) {
-      database.client.releaseConnection(connection);
+      const [transactionError] = await to(connection.query('BEGIN'));
+      if (transactionError) {
+        database.client.releaseConnection(connection);
 
-      return null;
-    }
-    const blobManager = new LargeObjectManager({ pg: connection });
+        return reject(`Could not begin transaction \n${transactionError}`);
+      }
 
-    const response = await blobManager.openAndReadableStreamAsync(oid);
+      const blobManager = new LargeObjectManager({ pg: connection });
+      const [streamErr, response] = await to(
+        blobManager.openAndReadableStreamAsync(oid)
+      );
 
-    const [, stream] = response;
+      if (streamErr || !response) {
+        await connection.query('ROLLBACK');
+        database.client.releaseConnection(connection);
 
-    return stream;
+        return reject(
+          `Could not create readable stream \n${streamErr} ${response}`
+        );
+      }
+
+      const [, stream] = response;
+
+      stream.on('error', async (streamError) => {
+        await connection.query('ROLLBACK');
+        database.client.releaseConnection(connection);
+
+        reject(`Stream error: ${streamError}`);
+      });
+
+      stream.on('end', async function () {
+        await connection.query('COMMIT');
+        database.client.releaseConnection(connection);
+
+        resolve(stream);
+      });
+
+      resolve(stream);
+    });
   }
 }

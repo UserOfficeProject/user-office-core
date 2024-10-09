@@ -20,6 +20,6 @@ Conditions:
 
 When the call deadline closes the system will be configured for feasibility review.
 
-Alternatively, as a user officer you may manually change proposal's status to **feasibility review**.
+Alternatively, as a user officer you may manually change proposals status to **feasibility review**.
 
 _____________________________________________________________________________________________________
