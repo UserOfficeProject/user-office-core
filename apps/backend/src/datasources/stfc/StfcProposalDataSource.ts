@@ -24,6 +24,20 @@ import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
+const stfcUserDataSource = new StfcUserDataSource();
+
+const fieldMap: { [key: string]: string } = {
+  finalStatus: 'final_status',
+  callShortCode: 'call_short_code',
+  //'instruments.name': "instruments->0->'name'",
+  statusName: 'proposal_status_id',
+  proposalId: 'proposal_id',
+  title: 'title',
+  submitted: 'submitted',
+  notified: 'notified',
+  submittedDate: 'submitted_date',
+};
+
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
   protected stfcUserDataSource: StfcUserDataSource = container.resolve(
