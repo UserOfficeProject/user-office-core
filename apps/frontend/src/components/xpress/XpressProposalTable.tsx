@@ -142,6 +142,7 @@ const XpressProposalTable = () => {
     {
       title: t('instrument'),
       field: 'instruments.name',
+      sorting: false,
       render: (rowData: ProposalViewData) =>
         fromArrayToCommaSeparated(
           rowData.instruments?.map((instrument) => instrument.name)
@@ -154,6 +155,7 @@ const XpressProposalTable = () => {
     {
       title: 'Technique',
       field: 'technique.name',
+      sorting: false,
       render: (rowData: ProposalViewData) =>
         fromArrayToCommaSeparated(
           rowData.techniques?.map((technique) => technique.name)
