@@ -289,7 +289,10 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     user: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     const proposals = database
       .select('proposal_pk')
@@ -432,6 +435,14 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           );
         }
 
+        if (sortField && sortDirection) {
+          if (!fieldMap.hasOwnProperty(sortField)) {
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
+          }
+          sortField = fieldMap[sortField];
+          query.orderByRaw(`${sortField} ${sortDirection}`);
+        }
+
         if (first) {
           query.limit(first);
         }
@@ -455,7 +466,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           return createProposalViewObject(proposal);
         });
 
-        if (filter?.text) {
+        if (searchText) {
           const proposalsList = props.filter((proposal) => {
             let techniqueNames: string[] = [];
             if (proposal.techniques) {
@@ -463,26 +474,26 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
                 return tech.name;
               });
             }
-            if (filter.text) {
+            if (searchText) {
               if (
                 proposal.title != null &&
-                proposal.title.includes(filter.text)
+                proposal.title.includes(searchText)
               ) {
                 return true;
               } else if (
                 proposal.proposalId &&
-                proposal.proposalId.includes(filter.text)
+                proposal.proposalId.includes(searchText)
               ) {
                 return true;
               } else if (
                 proposal.statusName != null &&
-                proposal.statusName.includes(filter.text)
+                proposal.statusName.includes(searchText)
               ) {
                 return true;
               } else if (
                 techniqueNames.length > 0 &&
                 techniqueNames.filter(
-                  (techName) => filter.text && techName.includes(filter.text)
+                  (techName) => searchText && techName.includes(searchText)
                 ).length > 0
               ) {
                 return true;
