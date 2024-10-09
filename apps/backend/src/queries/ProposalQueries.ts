@@ -130,13 +130,19 @@ export default class ProposalQueries {
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
   ) {
     return this.dataSource.getTechniqueScientistProposals(
       agent!,
       filter,
       first,
-      offset
+      offset,
+      sortField,
+      sortDirection,
+      searchText
     );
   }
 

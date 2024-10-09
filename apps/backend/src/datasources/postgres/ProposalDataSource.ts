@@ -1154,7 +1154,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     user: UserWithRole,
     filter?: ProposalsFilter,
     first?: number,
-    offset?: number
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return { totalCount: 0, proposals: [] };
   }
