@@ -6,7 +6,9 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 
+import ReviewQuestionaryReview from 'components/review/ReviewQuestionaryReview';
 import { Fap, Review } from 'generated/sdk';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { StyledPaper } from 'styles/StyledComponents';
 import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 import { getFullUserName } from 'utils/user';
@@ -39,12 +41,20 @@ const ExternalReviews = ({ reviews, faps }: ExternalReviewsProps) => (
               <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
                 Score
               </TableCell>
+              <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
+                Review Summary
+              </TableCell>
               <TableCell sx={BOLD_TEXT_STYLE}>Comment</TableCell>
             </TableRow>
             {reviews?.map((review) => (
               <TableRow key={`externalReviews_${review.id}_${review.userID}`}>
                 <TableCell>{getFullUserName(review.reviewer)}</TableCell>
                 <TableCell>{review.grade || '-'}</TableCell>
+                <TableCell>
+                  <ButtonWithDialog label="Show" title="Show">
+                    <ReviewQuestionaryReview data={review} />
+                  </ButtonWithDialog>
+                </TableCell>
                 <TableCell
                   dangerouslySetInnerHTML={{
                     __html: review?.comment || '-',

@@ -2,6 +2,7 @@ import { container } from 'tsyringe';
 
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
+import { Roles } from '../../models/Role';
 import { SettingsId } from '../../models/Settings';
 import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
@@ -99,10 +100,32 @@ async function enableDefaultELIFeatures() {
   });
 }
 
+async function setELIRoleNames() {
+  const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  await db.waitForDBUpgrade();
+
+  await db.updateRoleTitle({
+    shortCode: Roles.FAP_CHAIR,
+    title: 'PRP Chair',
+  });
+
+  await db.updateRoleTitle({
+    shortCode: Roles.FAP_REVIEWER,
+    title: 'PRP Reviewer',
+  });
+
+  await db.updateRoleTitle({
+    shortCode: Roles.FAP_SECRETARY,
+    title: 'PRP Secretary',
+  });
+}
+
 export async function configureELIDevelopmentEnvironment() {
   await setELIColourTheme();
   await enableDefaultELIFeatures();
   await setTimezone();
   await setDateTimeFormats();
   await updateOIDCSettings();
+  await setELIRoleNames();
 }

@@ -853,6 +853,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       proposalPk: number;
       memberId: number;
       fapProposalId: number;
+      questionaryId: number;
     }[],
     fapId: number
   ) {
@@ -867,7 +868,6 @@ export default class PostgresFapDataSource implements FapDataSource {
           }))
         )
         .returning<FapAssignmentRecord[]>(['*']);
-
       await trx<ReviewRecord>('fap_reviews')
         .insert(
           assignments.map((assignment) => ({
@@ -876,6 +876,7 @@ export default class PostgresFapDataSource implements FapDataSource {
             status: ReviewStatus.DRAFT,
             fap_id: fapId,
             fap_proposal_id: assignment.fapProposalId,
+            questionary_id: assignment.questionaryId,
           }))
         )
         .returning<ReviewRecord[]>(['*']);

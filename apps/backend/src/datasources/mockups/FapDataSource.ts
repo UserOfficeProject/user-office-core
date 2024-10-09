@@ -91,7 +91,16 @@ export const anotherDummyFapAssignment = new FapAssignment(
   null
 );
 
-export const dummyFapReview = new Review(1, 1, 1, 'Dummy Fap review', 7, 0, 1);
+export const dummyFapReview = new Review(
+  1,
+  1,
+  1,
+  'Dummy Fap review',
+  7,
+  0,
+  1,
+  1
+);
 
 export const dummyFapProposal = new FapProposal(
   1,
@@ -150,7 +159,7 @@ export class FapDataSourceMock implements FapDataSource {
     fapId?: number
   ): Promise<Fap[]> {
     if (userId && role) {
-      return dummyFaps;
+      return userId === 3 ? [] : dummyFaps;
     }
 
     return [];

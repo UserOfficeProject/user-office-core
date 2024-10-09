@@ -88,6 +88,9 @@ export class CreateCallInput {
 
   @Field(() => Int, { nullable: true })
   public pdfTemplateId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public fapReviewTemplateId?: number;
 }
 
 @Resolver()

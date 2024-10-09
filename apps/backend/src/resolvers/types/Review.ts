@@ -11,8 +11,10 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Review as ReviewOrigin, ReviewStatus } from '../../models/Review';
+import { TemplateCategoryId } from '../../models/Template';
 import { Proposal } from '../types/Proposal';
 import { BasicUserDetails } from './BasicUserDetails';
+import { Questionary } from './Questionary';
 
 @ObjectType()
 export class Review implements Partial<ReviewOrigin> {
@@ -35,6 +37,9 @@ export class Review implements Partial<ReviewOrigin> {
 
   @Field(() => Int)
   public fapID: number;
+
+  @Field(() => Int)
+  public questionaryID: number;
 }
 
 @Resolver(() => Review)
@@ -53,5 +58,17 @@ export class ReviewResolver {
     @Ctx() context: ResolverContext
   ): Promise<Proposal | null> {
     return context.queries.proposal.get(context.user, review.proposalPk);
+  }
+
+  @FieldResolver(() => Questionary)
+  async questionary(
+    @Root() review: Review,
+    @Ctx() context: ResolverContext
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
+      context.user,
+      review.questionaryID,
+      TemplateCategoryId.FAP_REVIEW
+    );
   }
 }
