@@ -34,6 +34,7 @@ const fieldMap: { [key: string]: string } = {
   title: 'title',
   submitted: 'submitted',
   notified: 'notified',
+  submittedDate: 'submitted_date',
 };
 
 @injectable()
