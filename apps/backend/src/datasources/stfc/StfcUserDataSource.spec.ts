@@ -1,7 +1,7 @@
-import { StfcUserDataSource } from './StfcUserDataSource';
-import UOWSSoapClient from './UOWSSoapInterface';
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
+import { StfcUserDataSource } from './StfcUserDataSource';
+import UOWSSoapClient from './UOWSSoapInterface';
 
 jest.mock('./UOWSSoapInterface');
 jest.mock('../postgres/UserDataSource.ts');

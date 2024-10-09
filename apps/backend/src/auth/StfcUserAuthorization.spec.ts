@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
-import { StfcUserAuthorization } from './StfcUserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { dummyUser } from '../datasources/mockups/UserDataSource';
 import { Instrument } from '../models/Instrument';
+import { StfcUserAuthorization } from './StfcUserAuthorization';
 
 jest.mock('../datasources/stfc/UOWSSoapInterface.ts');
 jest.mock('../utils/Cache');
