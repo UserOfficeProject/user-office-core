@@ -1,11 +1,11 @@
-import { Role, Roles } from '../../models/Role';
-import { dummyUser } from '../mockups/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
+import { Role, Roles } from '../../models/Role';
+import { dummyUser } from '../mockups/UserDataSource';
 
 jest.mock('./UOWSSoapInterface');
 jest.mock('../postgres/UserDataSource.ts');
-jest.mock('../../utils/LRUCache');
+jest.mock('../../utils/Cache');
 
 describe('Role tests', () => {
   const dummyUserNumber = 12345;
