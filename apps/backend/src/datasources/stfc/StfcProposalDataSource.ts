@@ -180,8 +180,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           ).users.map((ids) => ids.id),
         ]
       : [];
-    // eslint-disable-next-line no-console
-    console.log('here');
     const proposals = await super.getProposalsFromView(
       filter,
       first,
