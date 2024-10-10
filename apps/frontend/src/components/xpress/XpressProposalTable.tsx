@@ -5,6 +5,14 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import {
+  Divider,
+  FormControl,
+  InputLabel,
+  ListSubheader,
+  MenuItem,
+  Select,
+} from '@mui/material';
+import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
@@ -140,10 +148,33 @@ const XpressProposalTable = () => {
       title: t('instrument'),
       field: 'instruments.name',
       sorting: false,
-      render: (rowData: ProposalViewData) =>
-        fromArrayToCommaSeparated(
-          rowData.instruments?.map((instrument) => instrument.name)
-        ),
+      render: () => (
+        <>
+          <FormControl fullWidth>
+            <InputLabel id="technique-select-label" shrink>
+              {t('instrument')}
+            </InputLabel>
+            <Select
+              id="technique-select"
+              aria-labelledby="technique-select-label"
+              onChange={() => {}}
+              value={[]}
+              data-cy="instrument-dropdown"
+            >
+              {techniques && (
+                <ListSubheader sx={{ lineHeight: 1 }}>
+                  <Divider>{t('instrument')}</Divider>
+                </ListSubheader>
+              )}
+              {techniques.map((technique) => (
+                <MenuItem key={technique.id} value={technique.id}>
+                  {technique.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </>
+      ),
       customFilterAndSearch: () => true,
     },
   ];
