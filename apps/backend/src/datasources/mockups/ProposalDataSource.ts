@@ -55,7 +55,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.notified || false,
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
-    values?.managementDecisionSubmitted || false
+    values?.managementDecisionSubmitted || false,
+    values?.submittedDate || new Date()
   );
 };
 
@@ -212,7 +213,9 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       'call short code',
       AllocationTimeUnits.Day,
       1,
-      1
+      1,
+      new Date(),
+      []
     );
 
     allProposals = [
@@ -423,5 +426,17 @@ export class ProposalDataSourceMock implements ProposalDataSource {
 
   async doesProposalNeedTechReview(proposalPk: number): Promise<boolean> {
     return true;
+  }
+
+  async getTechniqueScientistProposals(
+    scientist: UserWithRole,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ) {
+    return { totalCount: 1, proposals: [dummyProposalView] };
   }
 }

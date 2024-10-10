@@ -38,6 +38,7 @@ import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { TechnicalReview } from '../../models/TechnicalReview';
+import { Technique } from '../../models/Technique';
 import {
   DataType,
   FieldCondition,
@@ -63,6 +64,7 @@ import {
   ProposalViewFap,
   ProposalViewInstrument,
   ProposalViewTechnicalReview,
+  ProposalViewTechnique,
 } from '../../resolvers/types/ProposalView';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
@@ -134,6 +136,7 @@ export interface ProposalRecord {
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
+  readonly submitted_date: Date;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -155,6 +158,8 @@ export interface ProposalViewRecord {
   readonly proposal_workflow_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
+  readonly submitted_date: Date;
+  readonly techniques: ProposalViewTechnique[];
 }
 
 export interface TopicRecord {
@@ -801,7 +806,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.notified,
     proposal.submitted,
     proposal.reference_number_sequence,
-    proposal.management_decision_submitted
+    proposal.management_decision_submitted,
+    proposal.submitted_date
   );
 };
 
@@ -865,7 +871,9 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.call_short_code,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.proposal_workflow_id
+    proposal.proposal_workflow_id,
+    proposal.submitted_date,
+    proposal.techniques
   );
 };
 
@@ -1338,3 +1346,31 @@ export interface TechniqueHasInstrumentsRecord {
   readonly technique_id: number;
   readonly instrument_id: number;
 }
+
+export const createProposalViewObjectWithTechniques = (
+  proposal: ProposalViewRecord,
+  techniques: Technique[]
+) => {
+  return new ProposalView(
+    proposal.proposal_pk,
+    proposal.title || '',
+    proposal.principal_investigator,
+    proposal.proposal_status_id,
+    proposal.proposal_status_name,
+    proposal.proposal_status_description,
+    proposal.proposal_id,
+    proposal.final_status,
+    proposal.notified,
+    proposal.submitted,
+    proposal.instruments,
+    proposal.technical_reviews,
+    proposal.faps,
+    proposal.fap_instruments,
+    proposal.call_short_code,
+    proposal.allocation_time_unit,
+    proposal.call_id,
+    proposal.proposal_workflow_id,
+    proposal.submitted_date,
+    techniques
+  );
+};

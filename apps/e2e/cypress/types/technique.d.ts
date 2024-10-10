@@ -2,6 +2,8 @@ import {
   CreateTechniqueMutationVariables,
   AssignInstrumentsToTechniqueMutationVariables,
   RemoveInstrumentsFromTechniqueMutationVariables,
+  AssignProposalToTechniquesMutationVariables,
+  AssignScientistsToTechniqueMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -67,6 +69,21 @@ declare global {
       assignScientistsToTechnique: (
         assignScientistsToTechniqueInput: AssignScientistsToTechniqueMutationVariables
       ) => Cypress.Chainable<AssignScientistsToTechniqueMutation>;
+
+      /**
+       * Assigns a proposal to techniques
+       *
+       * @returns {typeof assignProposalToTechniques}
+       * @memberof Chainable
+       * @example
+       *    cy.assignProposalToTechniques({
+       *      proposalPk: 1,
+       *      techniqueIds: [1,2]
+       *    });
+       */
+      assignProposalToTechniques: (
+        assignProposalToTechniquesInput: AssignProposalToTechniquesMutationVariables
+      ) => Cypress.Chainable<AssignProposalToTechniquesMutation>;
     }
   }
 }

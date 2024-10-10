@@ -84,4 +84,20 @@ export class ProposalsViewQuery {
       offset
     );
   }
+
+  @Query(() => ProposalsViewResult, { nullable: true })
+  async techniqueScientistProposals(
+    @Args() args: ProposalsViewArgs,
+    @Ctx() context: ResolverContext
+  ): Promise<ProposalsViewResult | null> {
+    return context.queries.proposal.getTechniqueScientistProposals(
+      context.user,
+      args.filter,
+      args.first,
+      args.offset,
+      args.sortField,
+      args.sortDirection,
+      args.searchText
+    );
+  }
 }
