@@ -6,7 +6,7 @@ import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
-import { LRUCache } from '../../utils/LRUCache';
+import { Cache } from '../../utils/Cache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
 import UOWSSoapClient from './UOWSSoapInterface';
@@ -104,23 +104,23 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
 }
 
 export class StfcUserDataSource implements UserDataSource {
-  private static readonly userDetailsCacheMaxElements = 200;
+  private static readonly userDetailsCacheMaxElements = 1000;
   private static readonly userDetailsCacheSecondsToLive = 600; // 10 minutes
-  private static readonly rolesCacheMaxElements = 200;
-  private static readonly rolesCacheSecondsToLive = 300; //5 minutes
+  private static readonly rolesCacheMaxElements = 1000;
+  private static readonly rolesCacheSecondsToLive = 600; //10 minutes
 
-  private uowsBasicUserDetailsCache = new LRUCache<StfcBasicPersonDetails>(
+  private uowsBasicUserDetailsCache = new Cache<StfcBasicPersonDetails>(
     StfcUserDataSource.userDetailsCacheMaxElements,
     StfcUserDataSource.userDetailsCacheSecondsToLive
   ).enableStatsLogging('uowsBasicUserDetailsCache');
 
   private uowsSearchableBasicUserDetailsCache =
-    new LRUCache<StfcBasicPersonDetails>(
+    new Cache<StfcBasicPersonDetails>(
       StfcUserDataSource.userDetailsCacheMaxElements,
       StfcUserDataSource.userDetailsCacheSecondsToLive
     ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
 
-  private uowsRolesCache = new LRUCache<Role[]>(
+  private uowsRolesCache = new Cache<Role[]>(
     StfcUserDataSource.rolesCacheMaxElements,
     StfcUserDataSource.rolesCacheSecondsToLive
   ).enableStatsLogging('uowsRolesCache');

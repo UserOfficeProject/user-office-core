@@ -13,7 +13,7 @@ import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserWithRole } from '../models/User';
-import { LRUCache } from '../utils/LRUCache';
+import { Cache } from '../utils/Cache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -32,10 +32,10 @@ const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
 
 @injectable()
 export class StfcUserAuthorization extends UserAuthorization {
-  private static readonly tokenCacheMaxElements = 200;
-  private static readonly tokenCacheSecondsToLive = 300; // 5 minutes
+  private static readonly tokenCacheMaxElements = 1000;
+  private static readonly tokenCacheSecondsToLive = 600; // 10 minutes
 
-  private uowsTokenCache = new LRUCache<boolean>(
+  private uowsTokenCache = new Cache<boolean>(
     StfcUserAuthorization.tokenCacheMaxElements,
     StfcUserAuthorization.tokenCacheSecondsToLive
   ).enableStatsLogging('uowsTokenCache');
