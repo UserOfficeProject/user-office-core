@@ -34,6 +34,12 @@ export const anotherDummyStatusAction = new ProposalStatusAction(
 export const dummyStatusActions = [dummyStatusAction, anotherDummyStatusAction];
 
 export class StatusActionsDataSourceMock implements StatusActionsDataSource {
+  async getConnectionStatusAction(
+    proposalWorkflowConnectionId: number,
+    proposalStatusActionId: number
+  ): Promise<ConnectionHasStatusAction> {
+    return dummyConnectionHasStatusAction;
+  }
   async getConnectionStatusActions(
     proposalWorkflowConnectionId: number,
     proposalWorkflowId: number

@@ -4,12 +4,14 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { InstrumentWithManagementTime } from '../models/Instrument';
 import { BasicUserDetails, User } from '../models/User';
+import { StatusActionsLogsArgs } from '../resolvers/queries/StatusActionsLogsQuery';
 import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
@@ -279,30 +281,74 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
   return ISs;
 };
 
+export const publishProposalMessageToTheEventBus = async (
+  proposal: WorkflowEngineProposalType,
+  messageDescription: string,
+  exchange?: string,
+  loggedInUserId?: number
+) => {
+  const eventBus = resolveApplicationEventBus();
+  const event = {
+    type: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
+    proposal: proposal,
+    key: 'proposal',
+    loggedInUserId,
+    isRejection: false,
+    description: messageDescription,
+    exchange: exchange,
+  } as ApplicationEvent;
+
+  return eventBus
+    .publish(event)
+    .catch((e) => logger.logError(`EventBus publish failed ${event.type}`, e));
+};
 export const publishMessageToTheEventBus = async (
   proposals: WorkflowEngineProposalType[],
   messageDescription: string,
-  exchange?: string
+  exchange?: string,
+  loggedInUserId?: number
 ) => {
-  const eventBus = resolveApplicationEventBus();
-
   await Promise.all(
-    proposals.map(async (proposal) => {
-      const event = {
-        type: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
-        proposal: proposal,
-        key: 'proposal',
-        loggedInUserId: null,
-        isRejection: false,
-        description: messageDescription,
-        exchange: exchange,
-      } as ApplicationEvent;
-
-      return eventBus
-        .publish(event)
-        .catch((e) =>
-          logger.logError(`EventBus publish failed ${event.type}`, e)
-        );
-    })
+    proposals.map(async (proposal) =>
+      publishProposalMessageToTheEventBus(
+        proposal,
+        messageDescription,
+        exchange,
+        loggedInUserId
+      )
+    )
   );
+};
+
+export const statusActionLogger = (args: {
+  connectionId: number;
+  actionId: number;
+  emailStatusActionRecipient: EmailStatusActionRecipients;
+  proposalPks: number[];
+  statusActionsLogId?: number | null;
+}) => {
+  const statusActionsLogsDataSource =
+    container.resolve<StatusActionsLogsDataSource>(
+      Tokens.StatusActionsLogsDataSource
+    );
+
+  return async function (
+    statusActionsSuccessful: boolean,
+    statusActionsMessage: string
+  ) {
+    const statusActionsLogsArgs: StatusActionsLogsArgs = {
+      ...args,
+      statusActionsLogId: args?.statusActionsLogId || null,
+      statusActionsSuccessful,
+      statusActionsMessage,
+    };
+
+    if (!!statusActionsLogsArgs.statusActionsLogId) {
+      await statusActionsLogsDataSource.update(statusActionsLogsArgs);
+
+      return;
+    }
+
+    await statusActionsLogsDataSource.create(statusActionsLogsArgs);
+  };
 };

@@ -37,6 +37,7 @@ import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafety
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
+import { StatusActionsLog } from '../../models/StatusActionsLog';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import {
   DataType,
@@ -1325,7 +1326,19 @@ export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
     invite.claimed_by,
     invite.claimed_at
   );
-
+export const createStatusActionsLogObject = (
+  statusActionLog: StatusActionsLogRecord
+) => {
+  return new StatusActionsLog(
+    statusActionLog.status_actions_log_id,
+    statusActionLog.connection_id,
+    statusActionLog.action_id,
+    statusActionLog.email_status_action_recipient,
+    statusActionLog.status_actions_successful,
+    statusActionLog.status_actions_message,
+    statusActionLog.status_actions_tstamp
+  );
+};
 export interface TechniqueRecord {
   readonly technique_id: number;
   readonly name: string;
@@ -1337,4 +1350,19 @@ export interface TechniqueRecord {
 export interface TechniqueHasInstrumentsRecord {
   readonly technique_id: number;
   readonly instrument_id: number;
+}
+
+export interface StatusActionsLogRecord {
+  readonly status_actions_log_id: number;
+  readonly connection_id: number;
+  readonly action_id: number;
+  readonly email_status_action_recipient: string;
+  readonly status_actions_successful: boolean;
+  readonly status_actions_message: string;
+  readonly status_actions_tstamp: Date;
+  readonly full_count: number;
+}
+export interface StatusActionsLogHasProposalRecord {
+  readonly status_actions_log_id: number;
+  readonly proposal_pk: number;
 }

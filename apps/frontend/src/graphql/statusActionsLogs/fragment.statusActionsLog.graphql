@@ -1,0 +1,16 @@
+fragment statusActionsLog on StatusActionsLog {
+    statusActionsLogId
+    statusActionsMessage
+    emailStatusActionRecipient
+    statusActionsSuccessful
+    statusActionsTstamp
+    proposals {
+      ...proposal  
+    }
+    connectionStatusAction {
+      action {
+        name
+        type
+      }
+    }
+}

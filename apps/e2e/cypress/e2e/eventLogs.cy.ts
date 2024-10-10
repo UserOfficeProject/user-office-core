@@ -29,19 +29,19 @@ context('Event log tests', () => {
       cy.visit('/');
 
       cy.get("[data-cy='view-proposal']").first().click();
-      cy.contains('Logs').click({ force: true });
+      cy.get('button[role="tab"]').contains('Logs').click({ force: true });
       cy.contains('PROPOSAL_CREATED');
 
       cy.closeModal();
 
       cy.updateProposal({
-        title: faker.random.words(2),
-        abstract: faker.random.words(5),
+        title: faker.lorem.word(2),
+        abstract: faker.lorem.word(5),
         proposalPk: createdProposalPk,
       });
 
       cy.get("[data-cy='view-proposal']").first().click();
-      cy.contains('Logs').click({ force: true });
+      cy.get('button[role="tab"]').contains('Logs').click({ force: true });
       cy.contains('PROPOSAL_UPDATED');
     });
   });
@@ -92,7 +92,7 @@ context('Event log tests', () => {
 
       cy.get("[name='firstname']").should('have.value', newFirstName);
 
-      cy.contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.get('[data-cy="event-logs-table"]').as('eventLogsTable');
       cy.get('@eventLogsTable')
