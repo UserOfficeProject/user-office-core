@@ -29,13 +29,13 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    let userStfc: number[] = [];
-
-    if (filter?.text) {
-      userStfc = (await this.getSTFCUsers(filter?.text)).users.map(
-        (ids) => ids.id
-      );
-    }
+    const stfcUserIds: number[] = filter?.text
+      ? [
+          ...(
+            await stfcUserDataSource.getUsers({ filter: filter.text })
+          ).users.map((user) => user.id),
+        ]
+      : [];
 
     const proposals = database
       .select('proposal_pk')
@@ -87,7 +87,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
               .orWhere('users.email', 'ilike', `%${filter.text}%`)
               .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
               .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
-              .orWhere('principal_investigator', 'in', userStfc)
+              .orWhere('principal_investigator', 'in', stfcUserIds)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
@@ -165,12 +165,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     return result;
   }
 
-  async getSTFCUsers(text: string) {
-    const userStfc = await stfcUserDataSource.getUsers({ filter: text });
-
-    return userStfc;
-  }
-
   async getProposalsFromView(
     filter?: ProposalsFilter,
     first?: number,
@@ -179,14 +173,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
-    let principleInvestigator: number[] = [];
-
-    if (searchText) {
-      principleInvestigator = (await this.getSTFCUsers(searchText)).users.map(
-        (ids) => ids.id
-      );
-    }
-
+    const stfcUserIds: number[] = searchText
+      ? [
+          ...(
+            await stfcUserDataSource.getUsers({ filter: searchText })
+          ).users.map((ids) => ids.id),
+        ]
+      : [];
+    // eslint-disable-next-line no-console
+    console.log('here');
     const proposals = await super.getProposalsFromView(
       filter,
       first,
@@ -194,7 +189,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       sortField,
       sortDirection,
       searchText,
-      principleInvestigator
+      stfcUserIds
     );
 
     const technicalReviewers = removeDuplicates(
