@@ -284,5 +284,64 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
       return;
     }
+
+    case Event.INTERNAL_REVIEW_CREATED:
+    case Event.INTERNAL_REVIEW_UPDATED:
+    case Event.INTERNAL_REVIEW_DELETED: {
+      const assignedBy = await userDataSource.getUser(
+        event.internalreview.assignedBy
+      );
+
+      const reviewer = await userDataSource.getUser(
+        event.internalreview.reviewerId
+      );
+
+      const technicalReviewer = await userDataSource.getUser(
+        event.internalreview.technicalReviewId
+      );
+
+      if (!assignedBy || !reviewer || !technicalReviewer) {
+        logger.logError('Failed email invite', { event });
+
+        return;
+      }
+
+      let templateId = 'internal-review-created';
+
+      if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
+        templateId = 'internal-review-updated';
+      } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
+        templateId = 'internal-review-deleted';
+      }
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+          },
+          substitution_data: {
+            assignedByPreferredName: assignedBy.preferredname,
+            assignedByLastname: assignedBy.lastname,
+            reviewerPreferredName: reviewer.preferredname,
+            reviewerLastname: reviewer.lastname,
+            technicalReviewerPreferredName: technicalReviewer.preferredname,
+            technicalReviewerLastname: technicalReviewer.lastname,
+            reviewTitle: event.internalreview.title,
+          },
+          recipients: [{ address: reviewer.email }],
+        })
+        .then((res: any) => {
+          logger.logInfo('Email sent on internal review change:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on internal review change:', {
+            error: err,
+            event,
+          });
+        });
+    }
   }
 }
