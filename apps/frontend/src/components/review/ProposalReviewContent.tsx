@@ -47,6 +47,7 @@ type ProposalReviewContentProps = {
   proposalPk?: number | null;
   reviewId?: number | null;
   fapId?: number | null;
+  fapSecAndChair?: number[] | null;
   isInsideModal?: boolean;
 };
 
@@ -55,13 +56,17 @@ const ProposalReviewContent = ({
   tabNames,
   reviewId,
   fapId,
+  fapSecAndChair: fapChairAndSecs,
   isInsideModal,
 }: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-
+  const isFapChairOrSec = useCheckAccess([
+    UserRole.FAP_CHAIR,
+    UserRole.FAP_SECRETARY,
+  ]);
   const { proposalData, setProposalData, loading } =
     useProposalData(proposalPk);
   const { t } = useTranslation();
@@ -99,15 +104,24 @@ const ProposalReviewContent = ({
       (instrument) => instrument?.id === instrumentId
     );
 
+  const canEditAsFapChairOrSec =
+    isFapChairOrSec &&
+    fapChairAndSecs &&
+    fapChairAndSecs.find((userId) => userId === user.id);
+
   const technicalReviewsContent = proposalData.technicalReviews.map(
     (technicalReview) => {
       const technicalReviewInstrument = getTechnicalReviewInstrument(
         technicalReview.instrumentId
       );
 
+      const canEditAsInstrumentSci =
+        isInstrumentScientist &&
+        technicalReview?.technicalReviewAssigneeId === user.id;
+
       return isUserOfficer ||
-        (isInstrumentScientist &&
-          technicalReview?.technicalReviewAssigneeId === user.id) ||
+        canEditAsFapChairOrSec ||
+        canEditAsInstrumentSci ||
         isInternalReviewer ? (
         <Fragment key={technicalReview.id}>
           {!!technicalReview && (
@@ -116,7 +130,7 @@ const ProposalReviewContent = ({
               technicalReviewSubmitted={technicalReview.submitted}
             />
           )}
-          {!!technicalReviewInstrument && (
+          {!!technicalReviewInstrument && !canEditAsFapChairOrSec && (
             <ProposalTechnicalReviewerAssignment
               technicalReview={technicalReview}
               instrument={technicalReviewInstrument}

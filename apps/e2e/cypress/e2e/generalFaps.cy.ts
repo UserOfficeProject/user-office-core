@@ -724,7 +724,7 @@ context('General facility access panel tests', () => {
     });
   });
 
-  describe.only('Fap document store tests', () => {
+  describe('Fap document store tests', () => {
     it('Officer should be able to upload documents to the document store', () => {
       const fileName1 = 'pdf_5_pages.pdf';
       const fileName2 = 'pdf_3_pages.pdf';
