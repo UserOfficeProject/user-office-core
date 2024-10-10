@@ -7,7 +7,9 @@ import { GenericTemplate } from '../../models/GenericTemplate';
 import { UpdateGenericTemplateArgs } from '../../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplatesArgs } from '../../resolvers/queries/GenericTemplatesQuery';
 import { SubTemplateConfig } from '../../resolvers/types/FieldConfig';
+import { CallDataSource } from '../CallDataSource';
 import { GenericTemplateDataSource } from '../GenericTemplateDataSource';
+import { ProposalDataSource } from '../ProposalDataSource';
 import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import { createGenericTemplateObject, GenericTemplateRecord } from './records';
@@ -18,7 +20,11 @@ export default class PostgresGenericTemplateDataSource
 {
   constructor(
     @inject(Tokens.QuestionaryDataSource)
-    private questionaryDataSource: QuestionaryDataSource
+    private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.CallDataSource)
+    private callDataSource: CallDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   async cloneGenericTemplate(
@@ -137,10 +143,25 @@ export default class PostgresGenericTemplateDataSource
       questionaryId,
       questionId
     );
+
+    const proposalCallId = (await this.proposalDataSource.get(proposalPk))
+      ?.callId;
+
+    if (proposalCallId === undefined) {
+      throw new GraphQLError(
+        `Couldn't get the proposal owning the generic template: ${templateId}`
+      );
+    }
+
+    const proposalTemplateId = (
+      await this.callDataSource.getCall(proposalCallId)
+    )?.templateId;
+
     const subTemplate = await database('templates_has_questions')
       .select('*')
       .first()
-      .where({ question_id: newGenericTemplate.questionId })
+      .where('question_id', newGenericTemplate.questionId)
+      .andWhere('template_id', proposalTemplateId)
       .then((result) => {
         if (!result) {
           throw new GraphQLError(
@@ -156,7 +177,7 @@ export default class PostgresGenericTemplateDataSource
 
     if (subTemplate.config.canCopy === false) {
       throw new GraphQLError(
-        `Coping generic template questionary is not allowed ID: ${questionaryId}`
+        `The proposal template does not allow copying generic template ID: ${questionaryId}`
       );
     }
 
