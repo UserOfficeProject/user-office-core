@@ -23,15 +23,9 @@ export class Cache<T> implements ICache<T> {
   private removals = 0;
 
   public constructor(maxEntries: number, secondsToLive?: number) {
-    this.maxEntries =
-      Number(process.env.CACHE_MAX_ENTRIES) > maxEntries
-        ? Number(process.env.CACHE_MAX_ENTRIES)
-        : maxEntries;
-    this.millisecondsToLive = secondsToLive
-      ? Number(process.env.CACHE_TTL) > secondsToLive
-        ? Number(process.env.CACHE_TTL) * 1000
-        : secondsToLive * 1000
-      : 10000;
+    this.maxEntries = Number(process.env.CACHE_MAX_ENTRIES) ?? maxEntries;
+    this.millisecondsToLive =
+      Number(process.env.CACHE_SECONDS_TO_LIVE ?? secondsToLive ?? 10) * 1000;
     this.ttlCache = new TTLCache({
       max: this.maxEntries,
       ttl: this.millisecondsToLive,
