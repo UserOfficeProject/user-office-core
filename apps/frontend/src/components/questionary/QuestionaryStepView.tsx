@@ -21,6 +21,7 @@ import {
 } from 'models/questionary/QuestionaryFunctions';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import NavigationFragment from './NavigationFragment';
 import {
@@ -63,12 +64,13 @@ export const createFormikConfigObjects = (
   };
 };
 
-export default function QuestionaryStepView(props: {
+function QuestionaryStepView(props: {
   topicId: number;
   readonly: boolean;
   onStepComplete?: (topicId: number) => void;
+  confirm: WithConfirmType;
 }) {
-  const { topicId } = props;
+  const { topicId, confirm } = props;
 
   const preSubmitActions = usePreSubmitActions();
   const { api } = useDataApiWithFeedback();
@@ -235,17 +237,23 @@ export default function QuestionaryStepView(props: {
     });
   };
 
-  const backHandler = () => dispatch({ type: 'BACK_CLICKED' });
-
-  const confirmNavigation = () =>
-    window.confirm(
-      'You have made changes in this step, which will be discarded. Are you sure?'
-    );
+  const backHandler = () =>
+    dispatch({
+      type: 'BACK_CLICKED',
+      confirm,
+    });
 
   const resetHandler = () => {
-    if (confirmNavigation()) {
-      revertTemplateChanges();
-    }
+    confirm?.(
+      () => {
+        revertTemplateChanges();
+      },
+      {
+        title: 'Confirmation',
+        description:
+          'You have made changes in this step, which will be discarded. Are you sure?',
+      }
+    )();
   };
 
   const saveHandler = () => performSave(true);
@@ -349,3 +357,5 @@ export default function QuestionaryStepView(props: {
     </Formik>
   );
 }
+
+export default withConfirm(QuestionaryStepView);

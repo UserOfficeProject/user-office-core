@@ -12,6 +12,7 @@ import {
   ReducerMiddleware,
   useReducerWithMiddleWares,
 } from 'utils/useReducerWithMiddleWares';
+import { WithConfirmType } from 'utils/withConfirm';
 
 import { SampleFragment } from './../../generated/sdk';
 import { getFieldById } from './QuestionaryFunctions';
@@ -24,9 +25,13 @@ export enum GENERIC_TEMPLATE_EVENT {
 }
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
-  | { type: 'BACK_CLICKED' }
-  | { type: 'RESET_CLICKED' }
-  | { type: 'GO_TO_STEP_CLICKED'; stepIndex: number }
+  | { type: 'BACK_CLICKED'; confirm?: WithConfirmType }
+  | { type: 'RESET_CLICKED'; confirm?: WithConfirmType }
+  | {
+      type: 'GO_TO_STEP_CLICKED';
+      stepIndex: number;
+      confirm?: WithConfirmType;
+    }
   | { type: 'GO_STEP_BACK' }
   | { type: 'GO_STEP_FORWARD' }
   | { type: 'CLEAN_DIRTY_STATE' }
