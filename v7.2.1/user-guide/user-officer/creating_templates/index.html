@@ -1,0 +1,2226 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://userofficeproject.github.io/user-office-core/v7.2.1/user-guide/user-officer/creating_templates/">
+      
+      
+        <link rel="prev" href="../creating_workflow/">
+      
+      
+        <link rel="next" href="../proposal/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.40">
+    
+    
+      
+        <title>Creating templates - User Office Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.8c3ca2c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#creating-templates" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="User Office Documentation" class="md-header__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            User Office Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Creating templates
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../quick_start/" class="md-tabs__link">
+          
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../overview/" class="md-tabs__link">
+          
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../developer-guide/CONTRIBUTING/" class="md-tabs__link">
+          
+  
+  Developer Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../faq/" class="md-tabs__link">
+        
+  
+    
+  
+  FAQ
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../glossary/" class="md-tabs__link">
+        
+  
+    
+  
+  Glossary
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="User Office Documentation" class="md-nav__button md-logo" aria-label="User Office Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    User Office Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../quick_start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quick start
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    User Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User Officer
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            User Officer
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-officer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creating_call/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Creating a call
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creating_workflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Creating a workflow
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Creating templates
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Creating templates
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      What are templates?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What are templates?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#types-of-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Types of templates
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-adding-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Adding topics
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-adding-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Adding questions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2: Adding questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options-when-adding-questions-to-a-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      Options when adding questions to a template
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-configuring-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Configuring questions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Configuring questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dependencies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-do-i-use-templates-within-a-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      How do I use templates within a call?
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../proposal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Proposals
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAPs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fap_review/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAP review
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feasibility_review/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Feasibility review
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Roles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../page/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pages
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../questions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Questions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2_12" id="__nav_3_2_12_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Templates
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            Templates
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/proposal_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Proposal templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/fap_review_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAP review templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/pdf_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PDF templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/feedback_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Feedback templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/sampledec_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sample declaration templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/sub_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sub templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/shipment_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Shipment declaration templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/visit_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Visit registration templatse
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/proposalESI_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Proposal ESI templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templates/sampleESI_template/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sample ESI templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2_13" id="__nav_3_2_13_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Settings
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            Settings
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../settings/proposal_workflow/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Proposal workflows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../settings/features/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Features
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developer Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Developer Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/CONTRIBUTING/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/step-by-step/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step-by-Step Guide
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/running_locally/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Running Locally
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/tech_stack/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tech Stack
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/rabbitmq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RabbitMQ
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/dependency_injection/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Depencency Injection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/email/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Email Service
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../developer-guide/documentation_changes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Documentation Changes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../faq/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAQ
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../glossary/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Glossary
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-are-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      What are templates?
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What are templates?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#types-of-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      Types of templates
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-adding-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Adding topics
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-adding-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Adding questions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2: Adding questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options-when-adding-questions-to-a-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      Options when adding questions to a template
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-configuring-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Configuring questions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Configuring questions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dependencies
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-do-i-use-templates-within-a-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      How do I use templates within a call?
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="creating-templates">Creating templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 15H9v-2h7m3-2H9V9h10m0-2H9V5h10m2-4H7c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V3a2 2 0 0 0-2-2M3 5v16h16v2H3a2 2 0 0 1-2-2V5z"/></svg></span></h1>
+<hr />
+<p><img alt="Templates" src="../../../assets/images/templates.png" /></p>
+<h2 id="what-are-templates">What are templates?</h2>
+<p>Templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 15H9v-2h7m3-2H9V9h10m0-2H9V5h10m2-4H7c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V3a2 2 0 0 0-2-2M3 5v16h16v2H3a2 2 0 0 1-2-2V5z"/></svg></span> are used to save and re-utilize predefined information across User Office. Calls are built using several different types of templates which can be edited and cloned. Templates carry information and serve many functions; for example, they may contain specific questions to be used within the call which users answer in their proposals. The template system is useful because it saves you having to do all the work from scratch every time. Furthermore, it allows for standardization which is essential for data collection and analysis.</p>
+<p>There are several different types of templates utilized within Calls:</p>
+<h3 id="types-of-templates">Types of templates</h3>
+<details class="info">
+<summary>FAP review templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-9.5 8.5c0 .8-.7 1.5-1.5 1.5H7v2H5.5V9H8c.8 0 1.5.7 1.5 1.5zm5 2c0 .8-.7 1.5-1.5 1.5h-2.5V9H13c.8 0 1.5.7 1.5 1.5zm4-3H17v1h1.5V13H17v2h-1.5V9h3zm-6.5 0h1v3h-1zm-5 0h1v1H7z"/></svg></span></summary>
+<p><a href="../templates/fap_review_template/">FAP review templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 10h5.5L14 4.5zM5 3h10l6 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2m0 9v2h14v-2zm0 4v2h9v-2z"/></svg></span></a> are designed to capture all necessary information that reviewers need to provide when submitting their FAP reviews. These templates generally include questions regarding scientific evaluation of the associated proposal. Users fill in their answers to these questions in the predefined fields and submit their reviews.</p>
+<p>User Officers can also utilize <a href="../questions/">questions <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6.1l-3.7 3.71c-.2.19-.45.29-.7.29H9a1 1 0 0 1-1-1v-3H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m8.19 3.5c-.89 0-1.6.18-2.14.54-.55.36-.83.96-.78 1.65h1.97c0-.28.1-.49.26-.63.2-.14.42-.21.69-.21.31 0 .58.08.76.26.18.17.27.39.27.69 0 .28-.08.53-.22.74-.17.22-.38.4-.64.54-.52.32-.86.6-1.07.84-.19.24-.29.58-.29 1.08h2c0-.28.05-.5.14-.68.09-.17.26-.32.52-.47.46-.21.84-.49 1.13-.85.29-.37.44-.76.44-1.2q0-1.05-.81-1.68c-.54-.41-1.29-.62-2.23-.62M11 12v2h2v-2z"/></svg></span></a> and <a href="../templates/sub_template/">sub-templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2a2 2 0 0 0-2 2v10h2V4h10V2zm4 4a2 2 0 0 0-2 2v10h2V8h10V6zm12 6v8h-8v-8zm0-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2m-1 7h-6v-2h6z"/></svg></span></a> to customize review templates to include specific questions based on the nature and requirements of the research.</p>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Proposal" src="../../../assets/images/fap_review_template.png" width="450" />
+    <figcaption>FAP Review (viewed from the user's perspective)</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>PDF templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-9.5 8.5c0 .8-.7 1.5-1.5 1.5H7v2H5.5V9H8c.8 0 1.5.7 1.5 1.5zm5 2c0 .8-.7 1.5-1.5 1.5h-2.5V9H13c.8 0 1.5.7 1.5 1.5zm4-3H17v1h1.5V13H17v2h-1.5V9h3zm-6.5 0h1v3h-1zm-5 0h1v1H7z"/></svg></span></summary>
+<p><a href="../templates/pdf_template/">PDF templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-9.5 8.5c0 .8-.7 1.5-1.5 1.5H7v2H5.5V9H8c.8 0 1.5.7 1.5 1.5zm5 2c0 .8-.7 1.5-1.5 1.5h-2.5V9H13c.8 0 1.5.7 1.5 1.5zm4-3H17v1h1.5V13H17v2h-1.5V9h3zm-6.5 0h1v3h-1zm-5 0h1v1H7z"/></svg></span></a> enable users and User Officers to download proposals in a well-formatted and standardized PDF document for summary and sharing. User Officers can customize PDF templates by adjusting code to modify elements such as font size, colour and other formatting options.</p>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="PDF Template" src="../../../assets/images/pdf_template.png" width="450" />
+    <figcaption>PDF template</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Proposal templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 10h5.5L14 4.5zM5 3h10l6 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2m0 9v2h14v-2zm0 4v2h9v-2z"/></svg></span></summary>
+<p><a href="../templates/proposal_template/">Proposal templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 10h5.5L14 4.5zM5 3h10l6 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2m0 9v2h14v-2zm0 4v2h9v-2z"/></svg></span></a> are designed to capture all necessary information that users need to provide when submitting their proposals. These templates generally include questions regarding experiment details, objectives, safety considerations and required resources. Users fill in their answers to these questions in the predefined fields and submit their proposals for review.</p>
+<p>User Officers can also utilize <a href="../questions/">questions <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6.1l-3.7 3.71c-.2.19-.45.29-.7.29H9a1 1 0 0 1-1-1v-3H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m8.19 3.5c-.89 0-1.6.18-2.14.54-.55.36-.83.96-.78 1.65h1.97c0-.28.1-.49.26-.63.2-.14.42-.21.69-.21.31 0 .58.08.76.26.18.17.27.39.27.69 0 .28-.08.53-.22.74-.17.22-.38.4-.64.54-.52.32-.86.6-1.07.84-.19.24-.29.58-.29 1.08h2c0-.28.05-.5.14-.68.09-.17.26-.32.52-.47.46-.21.84-.49 1.13-.85.29-.37.44-.76.44-1.2q0-1.05-.81-1.68c-.54-.41-1.29-.62-2.23-.62M11 12v2h2v-2z"/></svg></span></a> and <a href="../templates/sub_template/">sub-templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2a2 2 0 0 0-2 2v10h2V4h10V2zm4 4a2 2 0 0 0-2 2v10h2V8h10V6zm12 6v8h-8v-8zm0-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2m-1 7h-6v-2h6z"/></svg></span></a> to customize proposal templates to include specific questions based on the nature and requirements of the research.</p>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Proposal" src="../../../assets/images/proposal_template.png" width="450" />
+    <figcaption>Proposal (viewed from the user's perspective)</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Sample declaration templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 15h-4a3 3 0 0 1-3 3 3 3 0 0 1-3-3H5V5h14m0-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span></summary>
+<p><a href="../templates/sampledec_template/">Sample declaration templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 15h-4a3 3 0 0 1-3 3 3 3 0 0 1-3-3H5V5h14m0-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span></a> are designed to collect detailed information about the samples that researchers intend to use in their experiments. The purpose of these templates is to standardize the way sample-related data is gathered, ensuring that all necessary details are captured uniformly across different proposals. These templates are linked to <a href="../templates/proposal_template/">proposal templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 10h5.5L14 4.5zM5 3h10l6 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2m0 9v2h14v-2zm0 4v2h9v-2z"/></svg></span></a> through sample declaration <a href="../questions/">questions <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6.1l-3.7 3.71c-.2.19-.45.29-.7.29H9a1 1 0 0 1-1-1v-3H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m8.19 3.5c-.89 0-1.6.18-2.14.54-.55.36-.83.96-.78 1.65h1.97c0-.28.1-.49.26-.63.2-.14.42-.21.69-.21.31 0 .58.08.76.26.18.17.27.39.27.69 0 .28-.08.53-.22.74-.17.22-.38.4-.64.54-.52.32-.86.6-1.07.84-.19.24-.29.58-.29 1.08h2c0-.28.05-.5.14-.68.09-.17.26-.32.52-.47.46-.21.84-.49 1.13-.85.29-.37.44-.76.44-1.2q0-1.05-.81-1.68c-.54-.41-1.29-.62-2.23-.62M11 12v2h2v-2z"/></svg></span></a>.</p>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Sample declaration" src="../../../assets/images/sample_dec.png" width="450" />
+    <figcaption>Sample declaration question linking to a Sample Delaration Template and Sample Experiment Safety Input (ESI) template</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Sub templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2a2 2 0 0 0-2 2v10h2V4h10V2zm4 4a2 2 0 0 0-2 2v10h2V8h10V6zm12 6v8h-8v-8zm0-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2m-1 7h-6v-2h6z"/></svg></span></summary>
+<p><a href="../templates/sub_template/">Sub templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2a2 2 0 0 0-2 2v10h2V4h10V2zm4 4a2 2 0 0 0-2 2v10h2V8h10V6zm12 6v8h-8v-8zm0-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2m-1 7h-6v-2h6z"/></svg></span></a> are used to streamline and organize the creation of complex <a href="../templates/proposal_template/">proposal templates.</a>. They serve as reusable building blocks containing <a href="../questions/">questions</a>, enabling User Officers to efficiently manage and deploy recurring sets of questions across multiple proposals.</p>
+<p>Sub templates are created by grouping related question templates into a cohesive unit and saving them as a standalone entity. When constructing or modifying a proposal template, User Officers can easily select and insert these sub templates into the appropriate sections, ensuring consistency and reducing the time required to build detailed proposal forms.</p>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Sub templates" src="../../../assets/images/create_sub_template.png" width="450" />
+    <figcaption>Sub template</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Shipment declaration templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 18.5a1.5 1.5 0 0 1-1.5-1.5 1.5 1.5 0 0 1 1.5-1.5 1.5 1.5 0 0 1 1.5 1.5 1.5 1.5 0 0 1-1.5 1.5m1.5-9 1.96 2.5H17V9.5m-11 9A1.5 1.5 0 0 1 4.5 17 1.5 1.5 0 0 1 6 15.5 1.5 1.5 0 0 1 7.5 17 1.5 1.5 0 0 1 6 18.5M20 8h-3V4H3c-1.11 0-2 .89-2 2v11h2a3 3 0 0 0 3 3 3 3 0 0 0 3-3h6a3 3 0 0 0 3 3 3 3 0 0 0 3-3h2v-5z"/></svg></span></summary>
+<p><a href="../templates/shipment_template/">Shipment declaration templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 18.5a1.5 1.5 0 0 1-1.5-1.5 1.5 1.5 0 0 1 1.5-1.5 1.5 1.5 0 0 1 1.5 1.5 1.5 1.5 0 0 1-1.5 1.5m1.5-9 1.96 2.5H17V9.5m-11 9A1.5 1.5 0 0 1 4.5 17 1.5 1.5 0 0 1 6 15.5 1.5 1.5 0 0 1 7.5 17 1.5 1.5 0 0 1 6 18.5M20 8h-3V4H3c-1.11 0-2 .89-2 2v11h2a3 3 0 0 0 3 3 3 3 0 0 0 3-3h6a3 3 0 0 0 3 3 3 3 0 0 0 3-3h2v-5z"/></svg></span></a> are standardized forms used to collect and organize information about parcels being sent to a facility. These templates can be customized to guide users through the process of declaring each shipment, generating labels for package identification, and ensuring compliance with shipping protocols. Each parcel's details, including tracking information and handling instructions, are documented to facilitate smooth and traceable delivery to the facility.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The shipment declaration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.</p>
+</blockquote>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Shipment Declaration" src="../../../assets/images/shipment_declaration.png" width="450" />
+    <figcaption>Shipment declaration (viewed from the user's perspective)</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Visit registration templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2.5 19h19v2h-19zm19.57-9.36c-.21-.8-1.04-1.28-1.84-1.06L14.92 10 8 3.57l-1.91.51 4.14 7.17-4.97 1.33-1.97-1.54-1.45.39 1.82 3.16.77 1.33 1.6-.42 5.31-1.43 4.35-1.16L21 11.5c.81-.24 1.28-1.06 1.07-1.86"/></svg></span></summary>
+<p><a href="../templates/visit_template/">Visit registration templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2.5 19h19v2h-19zm19.57-9.36c-.21-.8-1.04-1.28-1.84-1.06L14.92 10 8 3.57l-1.91.51 4.14 7.17-4.97 1.33-1.97-1.54-1.45.39 1.82 3.16.77 1.33 1.6-.42 5.31-1.43 4.35-1.16L21 11.5c.81-.24 1.28-1.06 1.07-1.86"/></svg></span></a> are predefined forms used to gather and organize information from visitors planning to access a research facility. These templates collect essential details regarding visitor accomodation needs, arrival and departure dates, and on-site access, ensuring that the visit is properly coordinated and compliant with facility protocols.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The visit registration form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.</p>
+</blockquote>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Visit Registration templates" src="../../../assets/images/define_visit.png" width="450" />
+    <figcaption>Visit reigstration (viewed from the user's perspective)</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Proposal ESI templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 10h5.5L14 4.5zM5 3h10l6 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2m0 9v2h14v-2zm0 4v2h9v-2z"/></svg></span></summary>
+<p><a href="../templates/proposalESI_template/">Proposal Experiment Safety Input (ESI) <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 10h5.5L14 4.5zM5 3h10l6 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.11.89-2 2-2m0 9v2h14v-2zm0 4v2h9v-2z"/></svg></span></a> are designed to collect and document safety-related information for research proposals, ensuring that all necessary safety considerations are addressed before the experiment begins. User Officers can use ESI templates to gather details about potential hazards, risk assessments, safety measures, and compliance with regulatory standards. This structured approach helps in maintaining a safe research environment and ensures that all safety protocols are thoroughly evaluated and documented. User Officers can also utilize <a href="../questions/">questions</a> and <a href="../templates/sub_template/">sub-templates</a> to customize Proposal ESI templates. This form is available after the users experiment has been accepted and scheduled so that users may review and confirm the safety information in case of any changes made to the experiment.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong>The Proposal ESI form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.</p>
+</blockquote>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Proposal ESI" src="../../../assets/images/proposal_esi.png" width="450" />
+    <figcaption>Proposal ESI (viewed from the user's perspective)</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Sample ESI templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 15h-4a3 3 0 0 1-3 3 3 3 0 0 1-3-3H5V5h14m0-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span></summary>
+<p><a href="../templates/sampleESI_template/">Sample Experiment Safety Input (ESI) templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 15h-4a3 3 0 0 1-3 3 3 3 0 0 1-3-3H5V5h14m0-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span></a> are predefined forms used to collect safety-related information about the samples involved in an experiment. These templates are added to <a href="../templates/proposal_template/">proposal templates</a> through <a href="../questions/">sample declaration question templates</a>, ensuring that all safety considerations, such as potential hazards or special handling requirements, are thoroughly documented and assessed as part of the proposal submission process. </p>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Sample ESI" src="../../../assets/images/sample_esi.png" width="450" />
+    <figcaption>Sample ESI template</figcaption>
+</figure></p>
+</details>
+<details class="info">
+<summary>Feedback templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 11h-2V5h2m0 10h-2v-2h2m7-11H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2"/></svg></span></summary>
+<p><a href="../templates/feedback_template/">Feedback templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 11h-2V5h2m0 10h-2v-2h2m7-11H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2"/></svg></span></a> are structured questionnaires used to collect feedback from users about their experiments and overall experience at the facility. These templates allow users to provide insights and evaluations, which help the facility improve its services and address any issues.</p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The feedback form will only become accessible for users to fill out after their proposal status had been set to 'accepted' and the experiment has been allocated a time within the scheduler.</p>
+</blockquote>
+<hr />
+<p><figure markdown="span"><br />
+<img alt="Feedback templates" src="../../../assets/images/feedback.png" width="450" />
+    <figcaption>Feedback form (viewed from the user's perspective)</figcaption>
+</figure></p>
+</details>
+<p>The template creation process is similar for all types of templates except for <a href="../templates/pdf_template/">PDF templates <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-9.5 8.5c0 .8-.7 1.5-1.5 1.5H7v2H5.5V9H8c.8 0 1.5.7 1.5 1.5zm5 2c0 .8-.7 1.5-1.5 1.5h-2.5V9H13c.8 0 1.5.7 1.5 1.5zm4-3H17v1h1.5V13H17v2h-1.5V9h3zm-6.5 0h1v3h-1zm-5 0h1v1H7z"/></svg></span></a> which are built with customizable code. All other templates are built with <a href="../questions/">questions. <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6.1l-3.7 3.71c-.2.19-.45.29-.7.29H9a1 1 0 0 1-1-1v-3H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m8.19 3.5c-.89 0-1.6.18-2.14.54-.55.36-.83.96-.78 1.65h1.97c0-.28.1-.49.26-.63.2-.14.42-.21.69-.21.31 0 .58.08.76.26.18.17.27.39.27.69 0 .28-.08.53-.22.74-.17.22-.38.4-.64.54-.52.32-.86.6-1.07.84-.19.24-.29.58-.29 1.08h2c0-.28.05-.5.14-.68.09-.17.26-.32.52-.47.46-.21.84-.49 1.13-.85.29-.37.44-.76.44-1.2q0-1.05-.81-1.68c-.54-.41-1.29-.62-2.23-.62M11 12v2h2v-2z"/></svg></span></a> </p>
+<hr />
+<h2 id="step-1-adding-topics">Step 1: Adding topics</h2>
+<ul>
+<li>In the <strong>main menu</strong> <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg></span> select <strong>Templates</strong> <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 15H9v-2h7m3-2H9V9h10m0-2H9V5h10m2-4H7c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14c1.11 0 2-.89 2-2V3a2 2 0 0 0-2-2M3 5v16h16v2H3a2 2 0 0 1-2-2V5z"/></svg></span></li>
+<li>From the dropdown menu, choose the type of template you wish to create</li>
+<li>From the template page, use the <code>Create</code> button. </li>
+<li>
+<p>Enter a name and optional description for your new template. </p>
+</li>
+<li>
+<p>This will bring you to the template editor. From here you may add topics which act as the different sections within the questionnaire that users fill out. </p>
+</li>
+</ul>
+<p>It is good practice to utilize topics to split up the presentation of information for users. For example, in a proposal template you may wish to have a topic for addressing general information, another for support requirements and another for experiment details, etc.</p>
+<ul>
+<li>You can add questions to topics by clicking on <strong>options</strong> and from the dropdown select <ins><code>Add topic</code></ins>. Topics can be reordered by clicking on the <ins><code>Reorder topics mode</code></ins> option. In reorder topics mode, you may <strong>drag and drop</strong> the topics into the desired order.</li>
+</ul>
+<h2 id="step-2-adding-questions">Step 2: Adding questions</h2>
+<ul>
+<li>To add  <a href="../questions/">questions <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6.1l-3.7 3.71c-.2.19-.45.29-.7.29H9a1 1 0 0 1-1-1v-3H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2m8.19 3.5c-.89 0-1.6.18-2.14.54-.55.36-.83.96-.78 1.65h1.97c0-.28.1-.49.26-.63.2-.14.42-.21.69-.21.31 0 .58.08.76.26.18.17.27.39.27.69 0 .28-.08.53-.22.74-.17.22-.38.4-.64.54-.52.32-.86.6-1.07.84-.19.24-.29.58-.29 1.08h2c0-.28.05-.5.14-.68.09-.17.26-.32.52-.47.46-.21.84-.49 1.13-.85.29-.37.44-.76.44-1.2q0-1.05-.81-1.68c-.54-.41-1.29-.62-2.23-.62M11 12v2h2v-2z"/></svg></span></a> click on <strong>options</strong> and from the dropdown select <ins><code>Add question</code></ins>. </li>
+<li>This will open the <strong>question drawer</strong> which contains all previously used questions. You can <ins><code>Search</code></ins><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg></span> for pre-existing questions through <strong>question text</strong> or by <strong>question type</strong>. You may preview questions in the question drawer by clicking on them. </li>
+</ul>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> Not all question types are compatible with every template. For example, <strong>sub-template</strong> questions can only be added to <strong>proposal templates</strong>.</p>
+</blockquote>
+<h3 id="options-when-adding-questions-to-a-template">Options when adding questions to a template</h3>
+<p><strong>1. Use a pre-existing question</strong></p>
+<ul>
+<li>To add a pre-exisiting question to the template simply find it in the question drawer and <strong>drag and drop</strong> it into the template. </li>
+</ul>
+<p><strong>2. Edit a pre-existing question</strong> </p>
+<ul>
+<li>First add a pre-exisiting question to the template. You can them modify it by clicking on it within the template.</li>
+</ul>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The changes you make to questions will only be updated within the current template you are creating. If you wish to make changes to the question <strong>across all templates</strong> click on the <code>edit</code> (question key) link at the top of the question. </p>
+</blockquote>
+<p>Once you are satisfied with your changes, click the <code>Update</code> button to save the changes to the question within the current template.</p>
+<p><strong>3. Creating a question</strong></p>
+<p>You may also create questions from scratch by clicking on <strong>options</strong> within the <strong>question drawer</strong> and selecting the question type you wish to create. The following is information for creating each of the question types:</p>
+<details class="info">
+<summary>Boolean <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 3h18v18H3zm2 2v14h14V5z"/></svg></span></summary>
+<p><img align="left" alt="Boolean" src="../../../assets/images/boolean.png" width="350" /></p>
+<p><strong>Boolean:</strong> A checkbox question type which can have one of the two possible values; true or false ('Yes' or 'No')</p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong> Fill in your question (It should be clear a 'yes' or 'no' answer applicable to the checkbox)</p>
+</li>
+</ul>
+<p><strong>Contraints:</strong></p>
+<ul>
+<li><strong>User must check it to continue:</strong> enabling this constraint means that the user must check the box in order to continue filling out (and submit) their proposal. This is useful to use in questions that must be agreed to such as 'I acknowledge this is an Expression of Interest' or 'I agree to the terms and conditions'.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Date <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10h5v5H7m12 4H5V8h14m0-5h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span></summary>
+<p><img align="left" alt="Date" src="../../../assets/images/date.png" width="350" /></p>
+<p><strong>Date:</strong> Allows users to specify a date which can be selected from a calendar tool </p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong> Fill in your question (it should relate to a date; e.g., please specify a delivery date) </p>
+</li>
+<li>
+<p><strong>Include time:</strong> This refers to including a specific time (in hours, minutes) for the date</p>
+</li>
+<li>
+<p><strong>Tooltip:</strong> This is text that appears to help the user. In this case it appears below the field where users specify the date.</p>
+</li>
+</ul>
+<p><strong>Constraints:</strong></p>
+<ul>
+<li>
+<p><strong>Is required:</strong> enabling this constraint means that the user must select a date range in order to continue filling out (and submit) their proposal.</p>
+</li>
+<li>
+<p><strong>Min/Max:</strong> This allows you to define a valid date range. Min refers to the earliest date and max refers to the latest date which can be chosen. <em>Note: leaving these field empty allows the user to chose any date</em></p>
+</li>
+<li>
+<p><strong>Default:</strong> Default is the date the calendar will be set to by default when the user goes to select the date. </p>
+</li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Embellishment <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 4v3h5v12h3V7h5V4zm19 5h-9v3h3v7h3v-7h3z"/></svg></span></summary>
+<p><img align="left" alt="Embellishment" src="../../../assets/images/embellishment.png" width="350" /></p>
+<p><strong>Embellishment:</strong> A the text file which can be customized to modify elements such as font size, colour and formatting options facilitating the display of more detailed information for users. Note: this is not a question that users can provide responses to.</p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Plain description:</strong> A plain description of the information being requested to be used for reference</p>
+</li>
+<li>
+<p><strong>Omit from PDF:</strong> Selecting this option will omit this section from the downloadable proposal pdf </p>
+</li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>File Upload <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-4 4 4 4 0 0 1-4-4V5A2.5 2.5 0 0 1 11 2.5 2.5 2.5 0 0 1 13.5 5v10.5a1 1 0 0 1-1 1 1 1 0 0 1-1-1V6H10v9.5a2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5V5a4 4 0 0 0-4-4 4 4 0 0 0-4 4v12.5a5.5 5.5 0 0 0 5.5 5.5 5.5 5.5 0 0 0 5.5-5.5V6z"/></svg></span></summary>
+<p><img align="left" alt="File Upload" src="../../../assets/images/file_upload.png" width="350" /></p>
+<p><strong>File Upload</strong> A question which allows users to upload attachments </p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong> Fill in your question (it should relate to attachmets; e.g., please upload figures for reference) </p>
+</li>
+</ul>
+<p><strong>Options</strong> </p>
+<ul>
+<li><strong>Helper text:</strong> Allows you to add more information for users which may be helpful with regard to the file upload (e.g., only PDF accepted)</li>
+</ul>
+<p><strong>Constraints:</strong></p>
+<ul>
+<li>
+<p><strong>Is required</strong> enabling this constraint means that the user must upload files to continue filling out (and submit) their proposal.</p>
+</li>
+<li>
+<p><strong>Omit from PDF:</strong> Selecting this option will omit this section from the downloadable proposal pdf </p>
+</li>
+<li>
+<p><strong>Accepted file types</strong> Select the accepted file types for users to upload</p>
+</li>
+<li>
+<p><strong>Max number of files</strong> Select the maximum number of files permitted for users to upload</p>
+</li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Sub Template <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 15h6v2h-6zM9 7H7v2h2zm2 6h6v-2h-6zm0-4h6V7h-6zm-2 2H7v2h2zm12-6v14c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2m-2 0H5v14h14zM9 15H7v2h2z"/></svg></span></summary>
+<p><img align="left" alt="Sub Template" src="../../../assets/images/sub_template.png" width="350" /></p>
+<p><strong>Sub Template</strong> Sub templates are allow for related questions to be grouped into a cohesive unit and saved them as a standalone entity. </p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong> Add a question or title text</p>
+</li>
+</ul>
+<p><strong>Options:</strong></p>
+<ul>
+<li>
+<p><strong>Template name:</strong></p>
+</li>
+<li>
+<p><strong>Add button label:</strong> Customize the text on the add button</p>
+</li>
+<li>
+<p><strong>Can copy:</strong> </p>
+</li>
+</ul>
+<p><strong>Constraints:</strong></p>
+<ul>
+<li><strong>Min/max entries</strong></li>
+</ul>
+<p><strong>Dependencies:</strong></p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Interval <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58 13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></span></summary>
+<p><img align="left" alt="Interval" src="../../../assets/images/interval.png" width="350" /></p>
+<p><strong>Interval</strong></p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong> Fill in a question or title text (e.g., temperature)</p>
+</li>
+<li>
+<p><strong>Small label:</strong> Add a small subheading under the question text (e.g., enter the temperature)</p>
+</li>
+</ul>
+<p><strong>Constraints:</strong> </p>
+<ul>
+<li>
+<p><strong>Is required:</strong> enabling this constraint means that the user must provide an interval in order to continue filling out (and submit) their proposal.</p>
+</li>
+<li>
+<p><strong>Units:</strong> specifies the interval units</p>
+</li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Multiple choice <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 7a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3"/></svg></span></summary>
+<p><img align="left" alt="Multiple choice" src="../../../assets/images/multiple_choice.png" width="350" /></p>
+<p><strong>Multiple choice</strong> a multiple choice selection question.</p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong> Fill in your question (e.g., which is the main sub discipline of engineering?)</p>
+</li>
+</ul>
+<p><strong>Constraints</strong> </p>
+<ul>
+<li><strong>Is required:</strong> enabling this constraint means that the user must select an option in order to continue filling out (and submit) their proposal.</li>
+</ul>
+<p><strong>Options</strong></p>
+<ul>
+<li><strong>Variant:</strong> allows you to specify the multiple choice format. The <strong>radio</strong> option provides the choices in a list in which only one can be chosen. The <strong>dropdown</strong> option provides a dropdown menu of the choices where multiple options can be chosen if the <strong>is multiple select</strong> box is enabled.</li>
+</ul>
+<p><strong>Items</strong></p>
+<ul>
+<li>This section allows you to customize the answer choices. The order can be changed with the Up and Down arrows.</li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Dynamic multiple choice <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2m-5.15 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56M14.34 14H9.66c-.1-.66-.16-1.32-.16-2s.06-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2M12 19.96c-.83-1.2-1.5-2.53-1.91-3.96h3.82c-.41 1.43-1.08 2.76-1.91 3.96M8 8H5.08A7.92 7.92 0 0 1 9.4 4.44C8.8 5.55 8.35 6.75 8 8m-2.92 8H8c.35 1.25.8 2.45 1.4 3.56A8 8 0 0 1 5.08 16m-.82-2C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2M12 4.03c.83 1.2 1.5 2.54 1.91 3.97h-3.82c.41-1.43 1.08-2.77 1.91-3.97M18.92 8h-2.95a15.7 15.7 0 0 0-1.38-3.56c1.84.63 3.37 1.9 4.33 3.56M12 2C6.47 2 2 6.5 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2"/></svg></span></summary>
+<p><img align="left" alt="Dynamic Multiple Choice" src="../../../assets/images/dynamic_choice.png" width="350" /></p>
+<p><strong>Dynamic Multiple Choice:</strong> </p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong> Fill in your question</p>
+</li>
+</ul>
+<p><strong>Constraints:</strong></p>
+<ul>
+<li><strong>Is required:</strong> enabling this constraint means that the user must select an option in order to continue filling out (and submit) their proposal.</li>
+</ul>
+<p><strong>Options</strong></p>
+<ul>
+<li><strong>Variant:</strong> allows you to specify the multiple choice format. The <strong>radio</strong> option provides the choices in a list in which only one can be chosen. The <strong>dropdown</strong> option provides a dropdown menu of the choices where multiple options can be chosen if the <strong>is multiple select</strong> box is enabled.</li>
+</ul>
+<p><strong>Dynamic URL</strong></p>
+<ul>
+<li>
+<p><strong>Link:</strong> Provide the URL</p>
+</li>
+<li>
+<p><strong>JsonPath:</strong> Provide the JsonPath</p>
+</li>
+</ul>
+<p><strong>API request headers</strong></p>
+<ul>
+<li>Add API request headers</li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Number <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V5h14m0-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-7 14h2V7h-4v2h2"/></svg></span></summary>
+<p><img align="left" alt="Number" src="../../../assets/images/number.png" width="350" /></p>
+<p><strong>Number:</strong></p>
+<ul>
+<li><strong>Key:</strong> The question key</li>
+<li><strong>Question:</strong></li>
+</ul>
+<p><strong>Constraints:</strong></p>
+<ul>
+<li><strong>Is required:</strong> enabling this constraint means that answer the question in order to continue filling out (and submit) their proposal.</li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Rich text input <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.6 14 12 7.7l2.4 6.3M11 5 5.5 19h2.2l1.1-3H15l1.1 3h2.2L13 5z"/></svg></span></summary>
+<p><img align="left" alt="Rich Text Input" src="../../../assets/images/rich_text.png" width="350" /></p>
+<p><strong>Rich Text Input</strong></p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong></p>
+</li>
+</ul>
+<p><strong>Constraints:</strong></p>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Sample declaration <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 9H7V7h10m0 6H7v-2h10m-3 6H7v-2h7M12 3a1 1 0 0 1 1 1 1 1 0 0 1-1 1 1 1 0 0 1-1-1 1 1 0 0 1 1-1m7 0h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2"/></svg></span></summary>
+<p><img align="left" alt="Sample Declaration" src="../../../assets/images/sample_declaration.png" width="350" /></p>
+<p><strong>Sample Declaration</strong></p>
+<p>Note: Sample declarations will not function correctly if linked within the first topic.</p>
+<ul>
+<li>
+<p><strong>Sample declaration template</strong></p>
+</li>
+<li>
+<p><strong>Sample ESI template</strong></p>
+</li>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong></p>
+</li>
+</ul>
+<p><strong>Constraints:</strong> </p>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Text input <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 9h16v2H4zm0 4h10v2H4z"/></svg></span></summary>
+<p><img align="left" alt="Text Input" src="../../../assets/images/text_input.png" width="350" /></p>
+<p><strong>Text input</strong></p>
+<ul>
+<li>
+<p><strong>Key:</strong> The question key</p>
+</li>
+<li>
+<p><strong>Question:</strong></p>
+</li>
+</ul>
+<p><strong>Constraints:</strong></p>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<details class="info">
+<summary>Instrument Picker <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.46 6.28 11.05 9c-2.58.26-4.55 2.41-4.55 5a5 5 0 0 0 5 5c2.05 0 3.81-1.23 4.58-3H13.5v-2h8v2h-2.25a8.05 8.05 0 0 1-2.46 4h2.71v2h-16v-2h2.71a8 8 0 0 1-2.71-6c0-3.63 2.46-6.8 5.96-7.72m3.28-4.21.76 1.3.86-.5 3.5 6.06-3.47 2-3.5-6.06.87-.5-.76-1.3z"/></svg></span></summary>
+<p><img align="left" alt="Instrument Picker" src="../../../assets/images/instrument_picker.png" width="350" /></p>
+<p><strong>Instrument Picker</strong></p>
+<ul>
+<li><strong>Key:</strong> The question key</li>
+<li><strong>Question:</strong>
+<strong>Constraints:</strong></li>
+</ul>
+<p><strong>Dependencies:</strong> </p>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+</details>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> The basis question type is unique to each template type. It is mandatory and cannot be removed since it contains important information which needs to be addressed within each template. For example, in proposal templates it includes the section to add a Principle Investigator and co-proposers to the proposal. Having other questions prior to the basis question may create problems for users filling out the questionnaire.</p>
+</blockquote>
+<h2 id="step-3-configuring-questions">Step 3: Configuring questions</h2>
+<h3 id="dependencies">Dependencies</h3>
+<ul>
+<li>This allows you to add dependencies to configure the conditions which need to be met for this question to be displayed to users. Leaving the dependencies empty will display the question to users irrespective of their responses.</li>
+</ul>
+<hr />
+<h2 id="how-do-i-use-templates-within-a-call">How do I use templates within a call?</h2>
+<ul>
+<li>See the <a href="../creating_call/">creating a call guide</a>.</li>
+</ul>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.top", "navigation.tabs", "navigation.tabs.sticky", "content.tooltips"], "search": "../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.525ec568.min.js"></script>
+      
+    
+  </body>
+</html>
