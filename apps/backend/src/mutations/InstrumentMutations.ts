@@ -444,4 +444,12 @@ export default class InstrumentMutations {
         );
       });
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async assignXpressProposalsToInstruments(
+    agent: UserWithRole | null,
+    args: AssignProposalsToInstrumentsArgs
+  ): Promise<InstrumentsHasProposals | Rejection> {
+    return this.assignProposalsToInstrumentsInternal(agent, args);
+  }
 }
