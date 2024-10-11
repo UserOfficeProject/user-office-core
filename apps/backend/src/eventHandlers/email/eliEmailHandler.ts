@@ -6,6 +6,7 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
+import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -29,6 +30,10 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
     Tokens.RedeemCodesDataSource
+  );
+
+  const technicalReviewDataSource = container.resolve<ReviewDataSource>(
+    Tokens.ReviewDataSource
   );
 
   if (event.isRejection) {
@@ -296,14 +301,37 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         event.internalreview.reviewerId
       );
 
-      const technicalReviewer = await userDataSource.getUser(
-        event.internalreview.technicalReviewId
-      );
+      const technicalReview =
+        await technicalReviewDataSource.getTechnicalReviewById(
+          event.internalreview.technicalReviewId
+        );
 
-      if (!assignedBy || !reviewer || !technicalReviewer) {
+      if (!assignedBy || !reviewer || !technicalReview) {
         logger.logError('Failed email invite', { event });
 
         return;
+      }
+
+      const proposal = await proposalDataSource.get(technicalReview.proposalPk);
+
+      if (!proposal) {
+        logger.logError('Failed email invite', { event });
+
+        return;
+      }
+
+      let technicalReviewerPreferredName = undefined;
+      let technicalReviewerLastname = '<N/A>';
+
+      if (technicalReview.technicalReviewAssigneeId) {
+        const technicalReviewer = await userDataSource.getUser(
+          technicalReview.technicalReviewAssigneeId
+        );
+
+        if (technicalReviewer) {
+          technicalReviewerPreferredName = technicalReviewer.preferredname;
+          technicalReviewerLastname = technicalReviewer.lastname;
+        }
       }
 
       let templateId = 'internal-review-created';
@@ -324,8 +352,10 @@ export async function eliEmailHandler(event: ApplicationEvent) {
             assignedByLastname: assignedBy.lastname,
             reviewerPreferredName: reviewer.preferredname,
             reviewerLastname: reviewer.lastname,
-            technicalReviewerPreferredName: technicalReviewer.preferredname,
-            technicalReviewerLastname: technicalReviewer.lastname,
+            technicalReviewerPreferredName: technicalReviewerPreferredName,
+            technicalReviewerLastname: technicalReviewerLastname,
+            proposalTitle: proposal.title,
+            proposalNumber: proposal.proposalId,
             reviewTitle: event.internalreview.title,
           },
           recipients: [{ address: reviewer.email }],
