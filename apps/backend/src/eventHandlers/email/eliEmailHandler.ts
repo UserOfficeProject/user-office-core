@@ -6,6 +6,7 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
+import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -29,6 +30,10 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
     Tokens.RedeemCodesDataSource
+  );
+
+  const technicalReviewDataSource = container.resolve<ReviewDataSource>(
+    Tokens.ReviewDataSource
   );
 
   if (event.isRejection) {
@@ -283,6 +288,90 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         });
 
       return;
+    }
+
+    case Event.INTERNAL_REVIEW_CREATED:
+    case Event.INTERNAL_REVIEW_UPDATED:
+    case Event.INTERNAL_REVIEW_DELETED: {
+      const assignedBy = await userDataSource.getUser(
+        event.internalreview.assignedBy
+      );
+
+      const reviewer = await userDataSource.getUser(
+        event.internalreview.reviewerId
+      );
+
+      const technicalReview =
+        await technicalReviewDataSource.getTechnicalReviewById(
+          event.internalreview.technicalReviewId
+        );
+
+      if (!assignedBy || !reviewer || !technicalReview) {
+        logger.logError('Failed email invite', { event });
+
+        return;
+      }
+
+      const proposal = await proposalDataSource.get(technicalReview.proposalPk);
+
+      if (!proposal) {
+        logger.logError('Failed email invite', { event });
+
+        return;
+      }
+
+      let technicalReviewerPreferredName = undefined;
+      let technicalReviewerLastname = '<N/A>';
+
+      if (technicalReview.technicalReviewAssigneeId) {
+        const technicalReviewer = await userDataSource.getUser(
+          technicalReview.technicalReviewAssigneeId
+        );
+
+        if (technicalReviewer) {
+          technicalReviewerPreferredName = technicalReviewer.preferredname;
+          technicalReviewerLastname = technicalReviewer.lastname;
+        }
+      }
+
+      let templateId = 'internal-review-created';
+
+      if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
+        templateId = 'internal-review-updated';
+      } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
+        templateId = 'internal-review-deleted';
+      }
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+          },
+          substitution_data: {
+            assignedByPreferredName: assignedBy.preferredname,
+            assignedByLastname: assignedBy.lastname,
+            reviewerPreferredName: reviewer.preferredname,
+            reviewerLastname: reviewer.lastname,
+            technicalReviewerPreferredName: technicalReviewerPreferredName,
+            technicalReviewerLastname: technicalReviewerLastname,
+            proposalTitle: proposal.title,
+            proposalNumber: proposal.proposalId,
+            reviewTitle: event.internalreview.title,
+          },
+          recipients: [{ address: reviewer.email }],
+        })
+        .then((res: any) => {
+          logger.logInfo('Email sent on internal review change:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on internal review change:', {
+            error: err,
+            event,
+          });
+        });
     }
   }
 }
