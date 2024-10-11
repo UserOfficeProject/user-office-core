@@ -322,6 +322,20 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
+      let technicalReviewerPreferredName = undefined;
+      let technicalReviewerLastname = '<N/A>';
+
+      if (technicalReview.technicalReviewAssigneeId) {
+        const technicalReviewer = await userDataSource.getUser(
+          technicalReview.technicalReviewAssigneeId
+        );
+
+        if (technicalReviewer) {
+          technicalReviewerPreferredName = technicalReviewer.preferredname;
+          technicalReviewerLastname = technicalReviewer.lastname;
+        }
+      }
+
       let templateId = 'internal-review-created';
 
       if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
@@ -340,6 +354,8 @@ export async function eliEmailHandler(event: ApplicationEvent) {
             assignedByLastname: assignedBy.lastname,
             reviewerPreferredName: reviewer.preferredname,
             reviewerLastname: reviewer.lastname,
+            technicalReviewerPreferredName: technicalReviewerPreferredName,
+            technicalReviewerLastname: technicalReviewerLastname,
             proposalTitle: proposal.title,
             proposalNumber: proposal.proposalId,
             reviewTitle: event.internalreview.title,
