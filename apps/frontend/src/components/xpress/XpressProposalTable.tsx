@@ -136,7 +136,7 @@ const XpressProposalTable = () => {
   ];
 
   const assignProposalsToInstruments = async (
-    instrument: number,
+    instrument: number | null,
     proposalPk: number
   ): Promise<void> => {
     if (instrument) {
@@ -145,7 +145,7 @@ const XpressProposalTable = () => {
           t('instrument'),
           'lowercase'
         )} successfully!`,
-      }).assignProposalsToInstruments({
+      }).assignXpressProposalsToInstruments({
         proposalPks: [proposalPk],
         instrumentIds: [instrument],
       });
@@ -155,13 +155,17 @@ const XpressProposalTable = () => {
           t('instrument'),
           'lowercase'
         )} successfully!`,
-      }).removeProposalsFromInstrument({
+      }).removeXpressProposalsFromInstrument({
         proposalPks: [proposalPk],
       });
     }
 
     refreshTableData();
   };
+
+  enum InstrumentColumnEnum {
+    NONE = 'none',
+  }
 
   const instrumentManagementColumns = (
     t: TFunction<'translation', undefined>
@@ -186,14 +190,21 @@ const XpressProposalTable = () => {
                 id="instrument-selection"
                 aria-labelledby="instrument-select-label"
                 onChange={(e) => {
-                  assignProposalsToInstruments(
-                    +e.target.value,
-                    rowData.primaryKey
-                  );
+                  if (e.target.value) {
+                    let instrument = null;
+                    if (e.target.value !== InstrumentColumnEnum.NONE) {
+                      instrument = +e.target.value;
+                    }
+                    assignProposalsToInstruments(
+                      instrument,
+                      rowData.primaryKey
+                    );
+                  }
                 }}
                 value={fieldValue}
                 data-cy="instrument-dropdown"
               >
+                <MenuItem value={InstrumentColumnEnum.NONE}>NONE</MenuItem>
                 {instrumentList &&
                   instrumentList.map((instrument) => (
                     <MenuItem key={instrument.id} value={instrument.id}>
