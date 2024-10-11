@@ -2,6 +2,7 @@ import { Call } from '../models/Call';
 import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
+import { InternalReview } from '../models/InternalReview';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { QuestionaryStep } from '../models/Questionary';
 import { Review } from '../models/Review';
@@ -355,6 +356,21 @@ interface ProposalAssignedToTechniquesEvent extends GeneralEvent {
   boolean: boolean;
 }
 
+interface InternalReviewCreated extends GeneralEvent {
+  type: Event.INTERNAL_REVIEW_CREATED;
+  internalreview: InternalReview;
+}
+
+interface InternalReviewUpdated extends GeneralEvent {
+  type: Event.INTERNAL_REVIEW_UPDATED;
+  internalreview: InternalReview;
+}
+
+interface InternalReviewDeleted extends GeneralEvent {
+  type: Event.INTERNAL_REVIEW_DELETED;
+  internalreview: InternalReview;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -421,4 +437,7 @@ export type ApplicationEvent =
   | TechniqueDeletedEvent
   | InstrumentsAssignedToTechniqueEvent
   | InstrumentsRemovedFromTechniqueEvent
-  | ProposalAssignedToTechniquesEvent;
+  | ProposalAssignedToTechniquesEvent
+  | InternalReviewCreated
+  | InternalReviewUpdated
+  | InternalReviewDeleted;
