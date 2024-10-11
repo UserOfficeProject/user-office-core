@@ -4,18 +4,12 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import {
-  Divider,
-  FormControl,
-  InputLabel,
-  ListSubheader,
-  MenuItem,
-  Select,
-} from '@mui/material';
+import { FormControl, MenuItem, Select } from '@mui/material';
 import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
+import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -23,7 +17,6 @@ import { useSearchParams } from 'react-router-dom';
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
@@ -34,6 +27,7 @@ import {
   setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
@@ -63,7 +57,7 @@ const XpressProposalTable = () => {
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
 
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const { currentRole } = useContext(UserContext);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -141,6 +135,34 @@ const XpressProposalTable = () => {
     },
   ];
 
+  const assignProposalsToInstruments = async (
+    instrument: number,
+    proposalPk: number
+  ): Promise<void> => {
+    if (instrument) {
+      await api({
+        toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
+      }).assignProposalsToInstruments({
+        proposalPks: [proposalPk],
+        instrumentIds: [instrument],
+      });
+    } else {
+      await api({
+        toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
+      }).removeProposalsFromInstrument({
+        proposalPks: [proposalPk],
+      });
+    }
+
+    refreshTableData();
+  };
+
   const instrumentManagementColumns = (
     t: TFunction<'translation', undefined>
   ) => [
@@ -148,33 +170,41 @@ const XpressProposalTable = () => {
       title: t('instrument'),
       field: 'instruments.name',
       sorting: false,
-      render: () => (
-        <>
-          <FormControl fullWidth>
-            <InputLabel id="technique-select-label" shrink>
-              {t('instrument')}
-            </InputLabel>
-            <Select
-              id="technique-select"
-              aria-labelledby="technique-select-label"
-              onChange={() => {}}
-              value={[]}
-              data-cy="instrument-dropdown"
-            >
-              {techniques && (
-                <ListSubheader sx={{ lineHeight: 1 }}>
-                  <Divider>{t('instrument')}</Divider>
-                </ListSubheader>
-              )}
-              {techniques.map((technique) => (
-                <MenuItem key={technique.id} value={technique.id}>
-                  {technique.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </>
-      ),
+      render: (rowData: ProposalViewData) => {
+        const techIds = rowData.techniques?.map((technique) => technique.id);
+        const instrumentList = techniques
+          .filter((technique) => techIds?.includes(technique.id))
+          .flatMap((technique) => technique.instruments);
+        const fieldValue = rowData.instruments?.map(
+          (instrument) => instrument.id
+        )[0];
+
+        return (
+          <>
+            <FormControl fullWidth>
+              <Select
+                id="instrument-selection"
+                aria-labelledby="instrument-select-label"
+                onChange={(e) => {
+                  assignProposalsToInstruments(
+                    +e.target.value,
+                    rowData.primaryKey
+                  );
+                }}
+                value={fieldValue}
+                data-cy="instrument-dropdown"
+              >
+                {instrumentList &&
+                  instrumentList.map((instrument) => (
+                    <MenuItem key={instrument.id} value={instrument.id}>
+                      {instrument.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </>
+        );
+      },
       customFilterAndSearch: () => true,
     },
   ];
