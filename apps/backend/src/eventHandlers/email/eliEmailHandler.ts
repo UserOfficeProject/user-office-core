@@ -312,9 +312,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const proposalPks: number[] = [technicalReview.proposalPk];
-      const proposals = await proposalDataSource.getProposalsByPks(proposalPks);
-      const proposal = proposals.length === 1 ? proposals[0] : undefined;
+      const proposal = await proposalDataSource.get(technicalReview.proposalPk);
 
       if (!proposal) {
         logger.logError('Failed email invite', { event });
