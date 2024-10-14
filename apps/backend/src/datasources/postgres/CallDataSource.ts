@@ -136,7 +136,7 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_ended', false);
     }
 
-    if (filter?.proposalStatusShortCode?.length) {
+    if (filter?.proposalStatusShortCode) {
       query
         .select('call.description as description')
         .join(
@@ -144,7 +144,7 @@ export default class PostgresCallDataSource implements CallDataSource {
           'call.proposal_workflow_id',
           'w.proposal_workflow_id'
         )
-        .join(
+        .leftJoin(
           'proposal_statuses as s',
           'w.proposal_status_id',
           's.proposal_status_id'
