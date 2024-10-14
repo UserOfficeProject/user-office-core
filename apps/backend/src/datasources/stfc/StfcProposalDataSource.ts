@@ -1,5 +1,6 @@
-import { injectable } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
@@ -19,10 +20,12 @@ import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
-const stfcUserDataSource = new StfcUserDataSource();
-
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
+  protected stfcUserDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
+
   async getInstrumentScientistProposals(
     user: UserWithRole,
     filter?: ProposalsFilter,
@@ -178,7 +181,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     );
 
     const technicalReviewersDetails =
-      await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
+      await this.stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
         technicalReviewers,
         false
       );
