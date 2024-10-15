@@ -90,7 +90,7 @@ export class Proposal implements Partial<ProposalOrigin> {
   public proposerId: number;
 
   @Field(() => Date, { nullable: true })
-  public submittedDate?: Date;
+  public submittedDate?: Date | null;
 }
 
 @Resolver(() => Proposal)
