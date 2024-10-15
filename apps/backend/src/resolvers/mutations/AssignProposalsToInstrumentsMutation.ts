@@ -73,6 +73,15 @@ export class AssignProposalsToInstrumentsMutation {
     @Args() args: AssignProposalsToInstrumentsArgs,
     @Ctx() context: ResolverContext
   ) {
+    const isXpressProposals =
+      await context.mutations.technique.checkProposalsHasTechniques(
+        args.proposalPks
+      );
+
+    if (!isXpressProposals) {
+      return false;
+    }
+
     const res =
       await context.mutations.instrument.assignXpressProposalsToInstruments(
         context.user,

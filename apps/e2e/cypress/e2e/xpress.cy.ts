@@ -819,5 +819,30 @@ context('Xpress tests', () => {
       cy.should('not.contain', createdProposalId5);
       cy.should('not.contain', technique5.name);
     });
+
+    it.only('User officer able to select an instrument and assign to a proposal', function () {
+      cy.login('officer');
+      cy.changeActiveRole(initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(createdProposalId1);
+      cy.contains(technique1.name);
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
+
+      cy.get('[data-cy="technique-filter"]').click();
+      cy.get('[role="listbox"]').contains(technique1.name).click();
+      cy.finishedLoading();
+
+      cy.screenshot('screen');
+    });
   });
 });

@@ -178,4 +178,34 @@ export default class TechniqueMutations {
         );
       });
   }
+
+  @Authorized([Roles.USER_OFFICER])
+  async checkProposalHasTechniques(
+    agent: UserWithRole | null,
+    args: RemoveScientistFromTechniqueArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .removeScientistFromTechnique(args.scientistId, args.techniqueId)
+      .catch((error) => {
+        return rejection(
+          'Could not remove assigned scientist/s from technique',
+          { agent, args },
+          error
+        );
+      });
+  }
+
+  async checkProposalsHasTechniques(
+    proposalPks: number[]
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .checkProposalsHasTechniques(proposalPks)
+      .catch((error) => {
+        return rejection(
+          'Could not get the proposal details',
+          { proposalPks },
+          error
+        );
+      });
+  }
 }
