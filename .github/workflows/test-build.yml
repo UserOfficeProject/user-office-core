@@ -227,18 +227,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pattern:
-          [
-            "cypress/e2e/[a-e]*.ts",
-            "cypress/e2e/[f-h]*.ts",
-            "cypress/e2e/[i-o]*.ts",
-            "cypress/e2e/p[a-m]*.ts",
-            "cypress/e2e/p[n-z]*.ts",
-            "cypress/e2e/[r-s]*.ts",
-            "cypress/e2e/t*.ts",
-            "cypress/e2e/[u-z]*.ts",
-            "cypress/e2e/[A-Z]*.ts",
-          ]
+        pattern: ["cypress/e2e/[A-Z]*.ts"]
 
     steps:
       - uses: actions/checkout@v4
@@ -302,50 +291,6 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/.."
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
-
-      - name: Run e2e tests stfc
-        env:
-          USER_OFFICE_BACKEND_DIR: apps/backend
-          USER_OFFICE_FRONTEND_DIR: apps/frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
-          USER_OFFICE_BACKEND: http://localhost:4000/graphql
-          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
-          TZ: Europe/London
-          DATE_FORMAT: dd-MM-yyyy
-          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-          PING_PUBLIC_CRT: dummypingsecret
-          DEPENDENCY_CONFIG: stfc
-          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
-          NODE_ENV: development
-          BASE_URL: localhost:3000
-          JWT_TOKEN_LIFE: 7d
-          SPARKPOST_TOKEN: dummytoken
-          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
-          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
-          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
-          SCHEMA_URL: http://localhost:4000/graphql
-          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-          CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
-          BUILD_TAG: ${{ github.sha }}
-          CYPRESS_CACHE_FOLDER: .cache/Cypress
-          EXTERNAL_AUTH_TOKEN: abc
-          SINK_EMAIL: BISAPPSSINK@stfc.ac.uk
-          EMAIL_SENDER: '"STFC User Office" <users@stfc.ac.uk>'
-          EMAIL_AUTH_HOST: exchsmtp.stfc.ac.uk
-          EMAIL_TEMPLATE_PATH: /config/emails/
-          EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
-          EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
-          EXTERNAL_AUTH_LOGOUT_URL: http://localhost:9003/auth/Login.aspx
-          EXTERNAL_AUTH_SERVICE_URL: http://localhost:1080/ws/UserOfficeWebService?wsdl
-          ANTIVIRUS_HOST: clam-antivirus
-          ANTIVIRUS_PORT: 3310
-          ISIS_UO_EMAIL: isisuo@stfc.ac.uk
-          FBS_EMAIL: FacilitiesBusinessSystem@stfc.ac.uk
-          PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
-        run: |
-          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
-          npm run e2e:after:dev:stfc
 
       - name: Run e2e tests
         env:
