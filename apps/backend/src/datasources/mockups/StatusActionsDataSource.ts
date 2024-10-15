@@ -70,7 +70,7 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
   }
 
   async addConnectionStatusActions(
-    input: AddConnectionStatusActionsInput
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }

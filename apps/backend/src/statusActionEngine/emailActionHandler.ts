@@ -56,20 +56,19 @@ export const emailActionHandler = async (
         ${statusActionRecipients}`
       );
     }
-    emailStatusActionRecipients(
+    emailStatusActionRecipient(
       recipientWithTemplate,
       proposalStatusAction,
       proposals,
       statusActionsLogId,
-      loggedInUserId,
-      recipientWithTemplate.recipient.name
+      loggedInUserId
     );
 
     return;
   }
   await Promise.all(
     config.recipientsWithEmailTemplate.map(async (recipientWithTemplate) =>
-      emailStatusActionRecipients(
+      emailStatusActionRecipient(
         recipientWithTemplate,
         proposalStatusAction,
         proposals,
@@ -80,16 +79,21 @@ export const emailActionHandler = async (
   );
 };
 
-export const emailStatusActionRecipients = async (
+export const emailStatusActionRecipient = async (
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate,
   proposalStatusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[],
   statusActionsLogId?: number | null,
-  loggedInUserId?: number | null,
-  statusActionRecipients?: EmailStatusActionRecipients
+  loggedInUserId?: number | null
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
-  switch (statusActionRecipients || recipientWithTemplate.recipient.name) {
+  const successfulMessage = !!statusActionsLogId
+    ? 'Email successfully sent on status action replay'
+    : 'Email successfully sent';
+  const failMessage = !!statusActionsLogId
+    ? 'Email(s) could not be sent on status action replay'
+    : 'Email(s) could not be sent';
+  switch (recipientWithTemplate.recipient.name) {
     case EmailStatusActionRecipients.PI: {
       const PIs = await getPIAndFormatOutputForEmailSending(
         proposals,
@@ -105,7 +109,8 @@ export const emailStatusActionRecipients = async (
           emailStatusActionRecipient: EmailStatusActionRecipients.PI,
           proposalPks,
         }),
-        statusActionsLogId,
+        successfulMessage,
+        failMessage,
         loggedInUserId
       );
 
@@ -126,7 +131,8 @@ export const emailStatusActionRecipients = async (
           emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
           proposalPks,
         }),
-        statusActionsLogId,
+        successfulMessage,
+        failMessage,
         loggedInUserId
       );
 
@@ -149,7 +155,8 @@ export const emailStatusActionRecipients = async (
             EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
           proposalPks,
         }),
-        statusActionsLogId,
+        successfulMessage,
+        failMessage,
         loggedInUserId
       );
 
@@ -171,7 +178,8 @@ export const emailStatusActionRecipients = async (
           emailStatusActionRecipient: EmailStatusActionRecipients.FAP_REVIEWERS,
           proposalPks,
         }),
-        statusActionsLogId,
+        successfulMessage,
+        failMessage,
         loggedInUserId
       );
 
@@ -194,7 +202,8 @@ export const emailStatusActionRecipients = async (
             EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
           proposalPks,
         }),
-        statusActionsLogId,
+        successfulMessage,
+        failMessage,
         loggedInUserId
       );
 
@@ -267,7 +276,8 @@ export const emailStatusActionRecipients = async (
           emailStatusActionRecipient: EmailStatusActionRecipients.USER_OFFICE,
           proposalPks,
         }),
-        statusActionsLogId,
+        successfulMessage,
+        failMessage,
         loggedInUserId
       );
 
@@ -300,7 +310,8 @@ export const emailStatusActionRecipients = async (
           proposalPks,
           statusActionsLogId,
         }),
-        statusActionsLogId,
+        successfulMessage,
+        failMessage,
         loggedInUserId
       );
 
@@ -318,17 +329,11 @@ const sendMail = async (
     actionSuccessful: boolean,
     message: string
   ) => Promise<void>,
-  statusActionsLogId?: number | null,
+  successfulMessage: string,
+  failMessage: string,
   loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
-  const successfulMessage = !!statusActionsLogId
-    ? 'Email successfully sent on status action replay'
-    : 'Email successfully sent';
-  const failMessage = !!statusActionsLogId
-    ? 'Email(s) could not be sent on status action replay'
-    : 'Email(s) could not be sent';
-
   if (!recipientsWithData.length) {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
@@ -384,7 +389,9 @@ const sendMail = async (
     );
     if (
       !!mailServiceResponse.length &&
-      mailServiceResponse[0].results.total_rejected_recipients === 0
+      !mailServiceResponse.some(
+        (result) => result.results.total_rejected_recipients !== 0
+      )
     ) {
       await statusActionLogger(true, successfulMessage);
 

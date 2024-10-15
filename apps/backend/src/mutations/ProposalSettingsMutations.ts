@@ -660,8 +660,10 @@ export default class ProposalSettingsMutations {
   @Authorized([Roles.USER_OFFICER])
   async addConnectionStatusActions(
     agent: UserWithRole | null,
-    input: AddConnectionStatusActionsInput
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null> {
-    return this.statusActionsDataSource.addConnectionStatusActions(input);
+    return this.statusActionsDataSource.addConnectionStatusActions(
+      connectionStatusActionsInput
+    );
   }
 }

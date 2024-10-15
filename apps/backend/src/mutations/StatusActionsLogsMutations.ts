@@ -112,7 +112,7 @@ export default class StatusActionsLogsMutations {
         statusActionsLog.emailStatusActionRecipient as EmailStatusActionRecipients,
     });
 
-    return !!statusActionsLog;
+    return true;
   }
 
   @Authorized([Roles.USER_OFFICER])

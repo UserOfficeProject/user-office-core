@@ -1,5 +1,5 @@
 export class StatusActionsLog {
-  full_count: any;
+  full_count: number;
   constructor(
     public statusActionsLogId: number,
     public connectionId: number,
