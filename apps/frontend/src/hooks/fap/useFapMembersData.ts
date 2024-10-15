@@ -3,9 +3,13 @@ import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import { FapReviewer, Role, BasicUserDetails } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export type FapMember = Pick<FapReviewer, 'userId' | 'fapId'> & {
+export type FapMember = Pick<
+  FapReviewer,
+  'userId' | 'fapId' | 'proposalsCountByCall'
+> & {
   role?: Pick<Role, 'id' | 'shortCode' | 'title'> | null;
-} & { user: BasicUserDetails };
+  user: BasicUserDetails;
+};
 
 export function useFapMembersData(
   fapId: number,
