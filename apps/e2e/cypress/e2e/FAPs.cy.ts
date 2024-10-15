@@ -1225,6 +1225,63 @@ context('Fap reviews tests', () => {
 
       cy.finishedLoading();
     });
+
+    it('Fap Secretary should be able to edit only comments of technical reviews', function () {
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.FAP_SECS_EDIT_TECH_REVIEWS) !== 'true'
+      ) {
+        this.skip();
+      }
+
+      const internalComment = faker.word.words(2);
+      const publicComment = faker.word.words(2);
+
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 6,
+        instrumentId: newlyCreatedInstrumentId,
+      });
+
+      cy.assignFapReviewersToProposals({
+        assignments: {
+          memberId: fapMembers.reviewer.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+        fapId: createdFapId,
+      });
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="view-proposal"]').click();
+
+      cy.contains('Technical reviews').click();
+
+      // The children are the components that are disabled
+      cy.get('[data-cy="technical-review-status"]')
+        .children()
+        .should('be.disabled');
+      cy.get('[data-cy="timeAllocation"]')
+        .children()
+        .children()
+        .should('be.disabled');
+
+      cy.setTinyMceContent('comment', internalComment);
+      cy.setTinyMceContent('publicComment', publicComment);
+
+      cy.get('[data-cy="save-technical-review"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Technical review submitted successfully',
+      });
+    });
   });
 
   describe('Fap Reviewer role', () => {
@@ -3609,6 +3666,7 @@ context('Automatic Fap assignment to Proposal', () => {
 
 context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
+  let proposalPK: number;
 
   beforeEach(function () {
     cy.resetDB();
@@ -3705,6 +3763,7 @@ context('Fap meeting exports test', () => {
       const createdProposal = result.createProposal;
 
       cy.wrap(createdProposal.proposalId).as('proposal2Id');
+      proposalPK = createdProposal.primaryKey;
 
       if (createdProposal) {
         cy.updateProposal({
@@ -3939,6 +3998,41 @@ context('Fap meeting exports test', () => {
         cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
           (actualExport) => {
             cy.fixture('exampleCallFapExportSTFC.json').then(
+              (expectedExport) => {
+                expect(expectedExport).to.deep.equal(actualExport);
+              }
+            );
+          }
+        );
+      });
+  });
+
+  it('Expired proposals should not appear in exports', function () {
+    cy.getAndStoreFeaturesEnabled().then(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
+
+    cy.changeProposalsStatus({
+      proposalPks: [proposalPK],
+      statusId: 9,
+    });
+
+    cy.login('officer');
+    cy.visit('/FapPage/2?tab=4&call=1');
+
+    cy.get('button[aria-label="Export in Excel"]').click();
+
+    const downloadsFolder = Cypress.config('downloadsFolder');
+    const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+
+    cy.readFile(`${downloadsFolder}/${fileName}`)
+      .should('exist')
+      .then(() => {
+        cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
+          (actualExport) => {
+            cy.fixture('exampleFapExportExpired.json').then(
               (expectedExport) => {
                 expect(expectedExport).to.deep.equal(actualExport);
               }
