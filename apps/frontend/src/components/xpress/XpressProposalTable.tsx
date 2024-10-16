@@ -163,10 +163,6 @@ const XpressProposalTable = () => {
     refreshTableData();
   };
 
-  enum InstrumentColumnEnum {
-    NONE = 'none',
-  }
-
   const instrumentManagementColumns = (
     t: TFunction<'translation', undefined>
   ) => [
@@ -191,12 +187,8 @@ const XpressProposalTable = () => {
                 aria-labelledby="instrument-select-label"
                 onChange={(e) => {
                   if (e.target.value) {
-                    let instrument = null;
-                    if (e.target.value !== InstrumentColumnEnum.NONE) {
-                      instrument = +e.target.value;
-                    }
                     assignProposalsToInstruments(
-                      instrument,
+                      +e.target.value,
                       rowData.primaryKey
                     );
                   }
@@ -204,7 +196,6 @@ const XpressProposalTable = () => {
                 value={fieldValue}
                 data-cy="instrument-dropdown"
               >
-                <MenuItem value={InstrumentColumnEnum.NONE}>NONE</MenuItem>
                 {instrumentList &&
                   instrumentList.map((instrument) => (
                     <MenuItem key={instrument.id} value={instrument.id}>
