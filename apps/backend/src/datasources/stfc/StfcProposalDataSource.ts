@@ -32,6 +32,14 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     first?: number,
     offset?: number
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    const stfcUserIds: number[] = filter?.text
+      ? [
+          ...(
+            await stfcUserDataSource.getUsers({ filter: filter.text })
+          ).users.map((user) => user.id),
+        ]
+      : [];
+
     const proposals = database
       .select('proposal_pk')
       .from('proposal_table_view')
@@ -62,10 +70,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           );
         }
       });
-
     const result = database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
+      .join(
+        'users',
+        'users.user_id',
+        '=',
+        'proposal_table_view.principal_investigator'
+      )
       .whereIn('proposal_pk', proposals)
       .orderBy('proposal_pk', 'desc')
       .modify((query) => {
@@ -74,6 +87,10 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
             this.where('title', 'ilike', `%${filter.text}%`)
               .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
               .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
+              .orWhere('users.email', 'ilike', `%${filter.text}%`)
+              .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
+              .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
+              .orWhere('principal_investigator', 'in', stfcUserIds)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
@@ -159,13 +176,21 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
+    const stfcUserIds: number[] = searchText
+      ? [
+          ...(
+            await stfcUserDataSource.getUsers({ filter: searchText })
+          ).users.map((ids) => ids.id),
+        ]
+      : [];
     const proposals = await super.getProposalsFromView(
       filter,
       first,
       offset,
       sortField,
       sortDirection,
-      searchText
+      searchText,
+      stfcUserIds
     );
 
     const technicalReviewers = removeDuplicates(
