@@ -5,8 +5,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { CallsFilter, FeatureId, UserRole } from 'generated/sdk';
-import { useCallsData } from 'hooks/call/useCallsData';
+import { FeatureId, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 
 import ChangeRole from './common/ChangeRole';
@@ -148,20 +147,7 @@ const AppRoutes = () => {
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
 
-  const { currentRole, isInternalUser } = useContext(UserContext);
-  function getDashBoardCallFilter(): CallsFilter {
-    return isInternalUser
-      ? {
-          isActive: true,
-          isEnded: false,
-          isActiveInternal: true,
-        }
-      : {
-          isActive: true,
-          isEnded: false,
-        };
-  }
-  const { calls } = useCallsData(getDashBoardCallFilter());
+  const { currentRole } = useContext(UserContext);
 
   return (
     <Routes>
@@ -181,7 +167,7 @@ const AppRoutes = () => {
           element={
             <TitledRoute
               title="Select Proposal Type"
-              element={<ProposalChooseCall callsData={calls} />}
+              element={<ProposalChooseCall />}
             />
           }
         />

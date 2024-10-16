@@ -1,0 +1,12 @@
+query getCallsMinimal($filter: CallsFilter) {
+  calls(filter: $filter) {
+    id
+    shortCode
+    endCall
+    endCallInternal
+    title
+    templateId
+    description
+    cycleComment
+  }
+}
