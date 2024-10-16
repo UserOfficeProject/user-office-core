@@ -35,7 +35,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     const stfcUserIds: number[] = filter?.text
       ? [
           ...(
-            await stfcUserDataSource.getUsers({ filter: filter.text })
+            await this.stfcUserDataSource.getUsers({ filter: filter.text })
           ).users.map((user) => user.id),
         ]
       : [];
@@ -179,7 +179,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     const stfcUserIds: number[] = searchText
       ? [
           ...(
-            await stfcUserDataSource.getUsers({ filter: searchText })
+            await this.stfcUserDataSource.getUsers({ filter: searchText })
           ).users.map((ids) => ids.id),
         ]
       : [];
