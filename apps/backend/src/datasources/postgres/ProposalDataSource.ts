@@ -379,11 +379,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     offset?: number,
     sortField?: string,
     sortDirection?: string,
-    searchText?: string
+    searchText?: string,
+    principleInvestigator?: number[]
   ): Promise<{ totalCount: number; proposalViews: ProposalView[] }> {
+    const principalInvestigator = principleInvestigator
+      ? principleInvestigator
+      : [];
+
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
+      .join(
+        'users',
+        'users.user_id',
+        '=',
+        'proposal_table_view.principal_investigator'
+      )
       .modify((query) => {
         if (filter?.callId) {
           query.where('call_id', filter?.callId);
@@ -427,6 +438,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereRaw('proposal_id ILIKE ?', `%${searchText}%`)
               .orWhereRaw('title ILIKE ?', `%${searchText}%`)
               .orWhereRaw('proposal_status_name ILIKE ?', `%${searchText}%`)
+              .orWhere('users.email', 'ilike', `%${searchText}%`)
+              .orWhere('users.firstname', 'ilike', `%${searchText}%`)
+              .orWhere('users.lastname', 'ilike', `%${searchText}%`)
+              .orWhere('principal_investigator', 'in', principalInvestigator)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
@@ -569,6 +584,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
+      .join(
+        'users',
+        'users.user_id',
+        '=',
+        'proposal_table_view.principal_investigator'
+      )
       .where(function () {
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains internalReviewers array of objects with id equal to user.id
@@ -595,6 +616,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
               .orWhereRaw('title ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('proposal_id ILIKE ?', `%${filter.text}%`)
               .orWhereRaw('proposal_status_name ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('users.email ILIKE', `%${filter.text}%`)
+              .orWhereRaw('users.firstname ILIKE', `%${filter.text}%`)
+              .orWhereRaw('users.lastname ILIKE', `%${filter.text}%`)
               // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
               .orWhereRaw(
                 'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
