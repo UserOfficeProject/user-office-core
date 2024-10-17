@@ -67,7 +67,10 @@ const InstrumentFilter = ({
 
               setSearchParams((searchParams) => {
                 searchParams.delete('instrument');
-                if (e.target.value) {
+                if (
+                  e.target.value &&
+                  e.target.value != InstrumentFilterEnum.ALL
+                ) {
                   searchParams.set('instrument', e.target.value.toString());
                 }
 
