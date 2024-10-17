@@ -5,6 +5,7 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized } from '../decorators';
 import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
+import { Technique } from '../models/Technique';
 import { UserWithRole } from '../models/User';
 
 @injectable()
@@ -45,7 +46,7 @@ export default class TechniqueQueries {
       });
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getAll(agent: UserWithRole | null) {
     return await this.dataSource.getTechniques().catch((error) => {
       return rejection('Could not get all techniques', { agent }, error);
@@ -55,5 +56,16 @@ export default class TechniqueQueries {
   @Authorized()
   async getTechniquesByIds(agent: UserWithRole | null, techniqueIds: number[]) {
     return await this.dataSource.getTechniquesByIds(techniqueIds);
+  }
+
+  @Authorized()
+  async getTechniquesByProposalPk(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ): Promise<Technique[]> {
+    const techniques =
+      await this.dataSource.getTechniquesByProposalPk(proposalPk);
+
+    return techniques;
   }
 }
