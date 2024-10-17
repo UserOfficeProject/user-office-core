@@ -10,7 +10,7 @@ export enum CallsDataQuantity {
 
 export function useCallsData(
   filter?: CallsFilter,
-  dataQuantity: CallsDataQuantity = CallsDataQuantity.EXTENDED
+  dataQuantity: CallsDataQuantity = CallsDataQuantity.MINIMAL
 ) {
   const [callsFilter, setCallsFilter] = useState(filter);
   const [calls, setCalls] = useState<Call[]>([]);

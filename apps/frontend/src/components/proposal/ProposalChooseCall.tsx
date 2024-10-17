@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from 'context/UserContextProvider';
 import { CallsFilter } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
+import { useCallsData } from 'hooks/call/useCallsData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { timeRemaining } from 'utils/Time';
 
@@ -36,10 +36,7 @@ const ProposalChooseCall = () => {
           isEnded: false,
         };
   }
-  const { calls } = useCallsData(
-    getDashBoardCallFilter(),
-    CallsDataQuantity.MINIMAL
-  );
+  const { calls } = useCallsData(getDashBoardCallFilter());
 
   return (
     <StyledContainer>

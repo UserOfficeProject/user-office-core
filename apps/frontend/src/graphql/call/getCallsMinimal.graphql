@@ -2,6 +2,7 @@ query getCallsMinimal($filter: CallsFilter) {
   calls(filter: $filter) {
     id
     shortCode
+    startCall
     endCall
     endCallInternal
     title
