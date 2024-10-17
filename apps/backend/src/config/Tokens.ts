@@ -42,4 +42,5 @@ export const Tokens = {
   PopulateRow: Symbol('PopulateRow'),
   PopulateCallRow: Symbol('PopulateCallRow'),
   DownloadService: Symbol('DownloadService'),
+  StatusActionsLogsDataSource: Symbol('StatusActionsLogsDataSource'),
 };

@@ -23,6 +23,7 @@ import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
+import { StatusActionsLogsDataSourceMock } from '../datasources/mockups/StatusActionsLogsDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
@@ -74,6 +75,7 @@ mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource
 );
+mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 

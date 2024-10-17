@@ -21,6 +21,7 @@ import ReviewMutations from '../mutations/ReviewMutations';
 import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
+import StatusActionsLogsMutations from '../mutations/StatusActionsLogsMutations';
 import TechniqueMutations from '../mutations/TechniqueMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
 import UnitMutations from '../mutations/UnitMutations';
@@ -46,6 +47,7 @@ import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
 import ScheduledEventQueries from '../queries/ScheduledEventQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
+import StatusActionsLogsQueries from '../queries/StatusActionsLogsQueries';
 import SystemQueries from '../queries/SystemQueries';
 import TechniqueQueries from '../queries/TechniqueQueries';
 import TemplateQueries from '../queries/TemplateQueries';
@@ -80,6 +82,7 @@ interface ResolverContextQueries {
   visit: VisitQueries;
   predefinedMessage: PredefinedMessageQueries;
   internalReview: InternalReviewQueries;
+  statusActionsLogs: StatusActionsLogsQueries;
 }
 
 interface ResolverContextMutations {
@@ -107,6 +110,7 @@ interface ResolverContextMutations {
   predefinedMessage: PredefinedMessageMutations;
   internalReview: InternalReviewMutations;
   technique: TechniqueMutations;
+  statusActionsLogs: StatusActionsLogsMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;
