@@ -1,5 +1,6 @@
-import { injectable } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { BasicUserDetails } from '../../models/User';
 import database from '../postgres/database';
 import PostgresInstrumentDataSource from '../postgres/InstrumentDataSource';
@@ -14,10 +15,12 @@ import {
   toEssBasicUserDetails,
 } from './StfcUserDataSource';
 
-const stfcUserDataSource = new StfcUserDataSource();
-
 @injectable()
 export default class StfcInstrumentDataSource extends PostgresInstrumentDataSource {
+  protected stfcUserDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
+
   async getInstrumentScientists(
     instrumentId: number
   ): Promise<BasicUserDetails[]> {
@@ -41,7 +44,9 @@ export default class StfcInstrumentDataSource extends PostgresInstrumentDataSour
 
     const userNumbers = users.map((user) => user.id.toString());
     const stfcUsers =
-      await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(userNumbers);
+      await this.stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
+        userNumbers
+      );
 
     const usersDetails = stfcUsers
       ? stfcUsers.map((person) => toEssBasicUserDetails(person))
