@@ -3,6 +3,7 @@ import {
   ProposalViewFap,
   ProposalViewInstrument,
   ProposalViewTechnicalReview,
+  ProposalViewTechnique,
 } from '../resolvers/types/ProposalView';
 import { AllocationTimeUnits } from './Call';
 export class ProposalView {
@@ -24,6 +25,8 @@ export class ProposalView {
     public callShortCode: string,
     public allocationTimeUnit: AllocationTimeUnits,
     public callId: number,
-    public workflowId: number
+    public workflowId: number,
+    public submittedDate: Date,
+    public techniques: ProposalViewTechnique[] | null
   ) {}
 }
