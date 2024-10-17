@@ -83,6 +83,16 @@ export class TemplateResolver {
       .then((result) => result?.length || 0);
   }
 
+  @FieldResolver(() => Int, { nullable: true })
+  async proposalESICallCount(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<number> {
+    return context.queries.call
+      .getAll(context.user, { esiTemplateIds: [template.templateId] })
+      .then((result) => result?.length || 0);
+  }
+
   @FieldResolver(() => TemplateGroup)
   async group(@Root() template: Template): Promise<TemplateGroup> {
     const templateDataSource = container.resolve(TemplateDataSource);

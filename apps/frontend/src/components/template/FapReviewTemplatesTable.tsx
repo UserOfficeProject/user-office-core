@@ -16,7 +16,7 @@ import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
   const { calls, loadingCalls } = useCallsData({
-    templateIds: [props.filterTemplateId],
+    fapReviewTemplateIds: [props.filterTemplateId],
   });
   const { toFormattedDateTime, timezone } = useFormattedDateTime({
     shouldUseTimeZone: true,
@@ -157,6 +157,21 @@ function FapReviewTemplatesTable(props: ReviewTemplatesTableProps) {
   const [showTemplateReviews, setShowTemplateReviews] =
     useState<boolean>(false);
 
+  const NumberOfCalls = useCallback(
+    (rowData: ReviewTemplateRowDataType) => (
+      <Link
+        onClick={() => {
+          setSelectedTemplateId(rowData.templateId);
+          setShowTemplateCalls(true);
+        }}
+        style={{ cursor: 'pointer' }}
+      >
+        {rowData.callCount || 0}
+      </Link>
+    ),
+    []
+  );
+
   const NumberOfReviews = useCallback(
     (rowData: ReviewTemplateRowDataType) => (
       <Link
@@ -182,6 +197,12 @@ function FapReviewTemplatesTable(props: ReviewTemplatesTableProps) {
       field: 'questionaryCount',
       editable: 'never',
       render: NumberOfReviews,
+    },
+    {
+      title: '# calls',
+      field: 'callCount',
+      editable: 'never',
+      render: NumberOfCalls,
     },
   ];
 

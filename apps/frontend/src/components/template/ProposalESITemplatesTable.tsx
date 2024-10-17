@@ -13,7 +13,7 @@ import { tableIcons } from 'utils/materialIcons';
 import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
-  const { calls } = useCallsData({ pdfTemplateIds: [props.filterTemplateId] });
+  const { calls } = useCallsData({ esiTemplateIds: [props.filterTemplateId] });
   const { toFormattedDateTime, timezone } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -65,11 +65,11 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
     </StyledDialog>
   );
 }
-export type PdfTemplateRowDataType = TemplateRowDataType & {
-  pdfCallCount?: number;
+export type ProposalEsiTemplateRowDataType = TemplateRowDataType & {
+  proposalESICallCount?: number;
 };
 
-type PdfTemplatesTableProps = {
+type ProposalEsiTemplatesTableProps = {
   dataProvider: () => Promise<
     Pick<
       Template,
@@ -78,38 +78,42 @@ type PdfTemplatesTableProps = {
       | 'description'
       | 'isArchived'
       | 'questionaryCount'
-      | 'pdfCallCount'
+      | 'proposalESICallCount'
     >[]
   >;
 };
 
-function PdfTemplatesTable(props: PdfTemplatesTableProps) {
+function ProposalEsiTemplatesTable(props: ProposalEsiTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
   // NOTE: Wrapping NumberOfCalls with useCallback to avoid the console warning(https://github.com/material-table-core/core/issues/286)
   const NumberOfCalls = useCallback(
-    (rowData: PdfTemplateRowDataType) => (
+    (rowData: ProposalEsiTemplateRowDataType) => (
       <Link
         onClick={() => {
           setSelectedTemplateId(rowData.templateId);
         }}
         style={{ cursor: 'pointer' }}
       >
-        {rowData.pdfCallCount || 0}
+        {rowData.proposalESICallCount || 0}
       </Link>
     ),
     []
   );
 
   // NOTE: Keeping the columns inside the component just because it needs NumberOfCalls which is wrapped with callback and uses setSelectedTemplateId.
-  const columns: Column<PdfTemplateRowDataType>[] = [
+  const columns: Column<ProposalEsiTemplateRowDataType>[] = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
     {
       title: '# calls',
-      field: 'callCount',
+      field: 'proposalESICallCount',
       editable: 'never',
       render: NumberOfCalls,
+    },
+    {
+      title: '# Proposal Safety Reviews',
+      field: 'questionaryCount',
     },
   ];
 
@@ -117,11 +121,12 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
     <>
       <TemplatesTable
         columns={columns}
-        templateGroup={TemplateGroupId.PDF_TEMPLATE}
+        templateGroup={TemplateGroupId.PROPOSAL_ESI}
         isRowRemovable={(rowData) => {
-          const pdfTemplateRowData = rowData as PdfTemplateRowDataType;
+          const proposalESITemplateRowData =
+            rowData as ProposalEsiTemplateRowDataType;
 
-          return pdfTemplateRowData.pdfCallCount === 0;
+          return proposalESITemplateRowData.proposalESICallCount === 0;
         }}
         dataProvider={props.dataProvider}
       />
@@ -133,4 +138,4 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
   );
 }
 
-export default PdfTemplatesTable;
+export default ProposalEsiTemplatesTable;

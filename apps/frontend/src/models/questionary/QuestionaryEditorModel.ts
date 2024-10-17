@@ -64,6 +64,7 @@ export default function QuestionaryEditorModel(
     complementaryQuestions: [],
     description: '',
     questionaryCount: 0,
+    proposalESICallCount: 0,
     groupId: TemplateGroupId.PROPOSAL,
     group: {
       categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
