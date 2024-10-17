@@ -1,5 +1,6 @@
-import { injectable } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
@@ -19,10 +20,12 @@ import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
-const stfcUserDataSource = new StfcUserDataSource();
-
 @injectable()
 export default class StfcProposalDataSource extends PostgresProposalDataSource {
+  protected stfcUserDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
+
   async getInstrumentScientistProposals(
     user: UserWithRole,
     filter?: ProposalsFilter,
@@ -32,7 +35,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     const stfcUserIds: number[] = filter?.text
       ? [
           ...(
-            await stfcUserDataSource.getUsers({ filter: filter.text })
+            await this.stfcUserDataSource.getUsers({ filter: filter.text })
           ).users.map((user) => user.id),
         ]
       : [];
@@ -176,7 +179,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     const stfcUserIds: number[] = searchText
       ? [
           ...(
-            await stfcUserDataSource.getUsers({ filter: searchText })
+            await this.stfcUserDataSource.getUsers({ filter: searchText })
           ).users.map((ids) => ids.id),
         ]
       : [];
@@ -203,7 +206,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     );
 
     const technicalReviewersDetails =
-      await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
+      await this.stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
         technicalReviewers,
         false
       );
