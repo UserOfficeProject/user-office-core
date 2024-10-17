@@ -1105,6 +1105,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains('Reset').click();
 
+      cy.contains('OK').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
       cy.contains('Save and continue').click();
@@ -1202,6 +1204,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains('Reset').click();
 
+      cy.contains('OK').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
       cy.contains('Save and continue').click();
@@ -1273,6 +1277,8 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 2);
 
       cy.contains('Reset').click();
+
+      cy.contains('OK').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
@@ -1352,6 +1358,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains('Reset').click();
 
+      cy.contains('OK').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
       cy.contains('Save and continue').click();
@@ -1407,6 +1415,8 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
       cy.contains('Reset').click();
+
+      cy.contains('OK').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
     });
@@ -1474,6 +1484,8 @@ context('GenericTemplates tests', () => {
 
       cy.contains('Reset').click();
 
+      cy.contains('OK').click();
+
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
     });
 
@@ -1526,6 +1538,8 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 
       cy.contains('Reset').click();
+
+      cy.contains('OK').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
     });
@@ -1591,6 +1605,8 @@ context('GenericTemplates tests', () => {
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 0);
 
       cy.contains('Reset').click();
+
+      cy.contains('OK').click();
 
       cy.get('[data-cy="questionnaires-list-item"]').should('have.length', 1);
 

@@ -821,6 +821,8 @@ context('Template tests', () => {
 
       cy.contains('Save and continue').click();
 
+      cy.closeNotification();
+
       cy.contains(fileQuestion);
 
       cy.intercept({
@@ -853,6 +855,8 @@ context('Template tests', () => {
       cy.get('[data-cy="save-button"]').click();
 
       cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.closeNotification();
 
       cy.finishedLoading();
 
