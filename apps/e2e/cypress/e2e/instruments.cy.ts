@@ -543,11 +543,15 @@ context('Instrument tests', () => {
       });
       cy.contains('Instruments').click();
 
-      cy.get('[data-cy="instruments-table"]')
-        .contains(instrument1.name)
-        .parent()
-        .find('[aria-label="Detail panel visibility toggle"]')
-        .click({ force: true });
+      // The sidebar tab label can obstruct the dropdown
+      cy.get('body')
+        .click()
+        .then(() => {
+          cy.contains(instrument1.name)
+            .parent()
+            .find('[aria-label="Detail panel visibility toggle"]')
+            .click();
+        });
 
       cy.contains(scientist2.lastName);
 

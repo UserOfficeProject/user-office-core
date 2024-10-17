@@ -8,6 +8,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { CallsFilter, FeatureId, UserRole } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
@@ -15,6 +16,7 @@ import ProposalPage from './proposal/ProposalPage';
 import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
+import XpressProposalTable from './xpress/XpressProposalTable';
 
 const CallPage = lazy(() => import('./call/CallPage'));
 const ExperimentPage = lazy(() => import('./experiment/ExperimentPage'));
@@ -128,6 +130,7 @@ const AppRoutes = () => {
   const isSampleSafetyReviewer = useCheckAccess([
     UserRole.SAMPLE_SAFETY_REVIEWER,
   ]);
+  const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
 
   const featureContext = useContext(FeatureContext);
   const isSchedulerEnabled = featureContext.featuresMap.get(
@@ -148,6 +151,10 @@ const AppRoutes = () => {
   const isSampleSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
+  const isXpressRouteEnabled = useXpressAccess([
+    UserRole.USER_OFFICER,
+    UserRole.INSTRUMENT_SCIENTIST,
+  ]);
 
   const { currentRole, isInternalUser } = useContext(UserContext);
   function getDashBoardCallFilter(): CallsFilter {
@@ -214,6 +221,17 @@ const AppRoutes = () => {
           path="/Proposals"
           element={<TitledRoute title="Proposals" element={<ProposalPage />} />}
         />
+        {isXpressRouteEnabled && (isInstrumentScientist || isUserOfficer) && (
+          <Route
+            path="/XpressProposals"
+            element={
+              <TitledRoute
+                title="Xpress Proposals"
+                element={<XpressProposalTable />}
+              />
+            }
+          />
+        )}
         {isUserOfficer && (
           <Route
             path="/ExperimentPage"
