@@ -13,6 +13,9 @@ import { GenericTemplateContainer } from 'components/questionary/questionaryComp
 import { createGenericTemplateStub } from 'components/questionary/questionaryComponents/GenericTemplate/QuestionaryComponentGenericTemplate';
 import { createSampleStub } from 'components/questionary/questionaryComponents/SampleDeclaration/QuestionaryComponentSampleDeclaration';
 import { SampleDeclarationContainer } from 'components/questionary/questionaryComponents/SampleDeclaration/SampleDeclarationContainer';
+import ReviewQuestionary, {
+  createFapReviewStub,
+} from 'components/review/ReviewQuestionary';
 import ShipmentContainer from 'components/shipments/ShipmentContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails } from 'generated/sdk';
@@ -92,6 +95,17 @@ const PreviewTemplateModal = ({
               templateId,
               0,
               0
+            )}
+            previewMode={true}
+          />
+        );
+      case TemplateGroupId.FAP_REVIEW:
+        return (
+          <ReviewQuestionary
+            review={createFapReviewStub(
+              templateId,
+              questionarySteps,
+              user as unknown as BasicUserDetails
             )}
             previewMode={true}
           />
