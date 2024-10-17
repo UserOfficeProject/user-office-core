@@ -125,6 +125,27 @@ export default class ProposalQueries {
     );
   }
 
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async getTechniqueScientistProposals(
+    agent: UserWithRole | null,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ) {
+    return this.dataSource.getTechniqueScientistProposals(
+      agent!,
+      filter,
+      first,
+      offset,
+      sortField,
+      sortDirection,
+      searchText
+    );
+  }
+
   @Authorized()
   async getProposalBookingsByProposalPk(
     agent: UserWithRole | null,

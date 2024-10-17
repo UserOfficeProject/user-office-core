@@ -186,11 +186,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                   proposal_id: ref,
                   reference_number_sequence: call.proposal_sequence ?? 0,
                   submitted: true,
+                  submitted_date: new Date(),
                 });
               } else {
                 query.update({
                   reference_number_sequence: call.proposal_sequence ?? 0,
                   submitted: true,
+                  submitted_date: new Date(),
                 });
               }
             })
@@ -1146,5 +1148,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return !!proposalStatus.find((status) =>
       status.proposalStatus.shortCode.match(workflowStatus)
     );
+  }
+
+  async getTechniqueScientistProposals(
+    user: UserWithRole,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    return { totalCount: 0, proposals: [] };
   }
 }
