@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
 import { Sample } from '../../models/Sample';
+import { SubmitSampleReviewArg } from '../../resolvers/mutations/SubmitSampleReviewMutation';
 import { UpdateSampleArgs } from '../../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../../resolvers/queries/SamplesQuery';
 import { SampleDataSource } from '../SampleDataSource';
@@ -30,8 +31,6 @@ export default class PostgresSampleDataSource implements SampleDataSource {
       .update(
         {
           title: args.title,
-          safety_comment: args.safetyComment,
-          safety_status: args.safetyStatus,
           proposal_pk: args.proposalPk,
           questionary_id: args.questionaryId,
           shipment_id: args.shipmentId,
@@ -44,6 +43,26 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         if (records.length !== 1) {
           logger.logError('Could not update sample', { args });
           throw new GraphQLError('Could not update sample');
+        }
+
+        return createSampleObject(records[0]);
+      });
+  }
+
+  submitReview(args: SubmitSampleReviewArg): Promise<Sample> {
+    return database('samples')
+      .update(
+        {
+          safety_comment: args.safetyComment,
+          safety_status: args.safetyStatus,
+        },
+        '*'
+      )
+      .where({ sample_id: args.sampleId })
+      .then((records: SampleRecord[]) => {
+        if (records.length !== 1) {
+          logger.logError('Could not set review', { args });
+          throw new GraphQLError('Could not set review');
         }
 
         return createSampleObject(records[0]);

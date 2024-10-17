@@ -1,10 +1,12 @@
 import { Sample } from '../models/Sample';
+import { SubmitSampleReviewArg } from '../resolvers/mutations/SubmitSampleReviewMutation';
 import { UpdateSampleArgs } from '../resolvers/mutations/UpdateSampleMutation';
 import { SamplesArgs } from '../resolvers/queries/SamplesQuery';
 
 export interface SampleDataSource {
   delete(sampleId: number): Promise<Sample>;
   updateSample(args: UpdateSampleArgs): Promise<Sample>;
+  submitReview(args: SubmitSampleReviewArg): Promise<Sample>;
   create(
     title: string,
     creatorId: number,
