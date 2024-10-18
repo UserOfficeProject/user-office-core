@@ -1,6 +1,6 @@
 import { MaterialTableProps } from '@material-table/core';
 import DoneIcon from '@mui/icons-material/Done';
-import React from 'react';
+import React, { useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { Template, TemplateGroupId } from 'generated/sdk';
@@ -27,6 +27,7 @@ function withMarkTemplateAsActiveAction<T>(
     const { activeTemplateId, setActiveTemplateId } = useActiveTemplateId(
       props.templateGroup
     );
+    const [seed, setSeed] = useState(Math.random());
 
     if (activeTemplateId === undefined) {
       return <UOLoader />;
@@ -34,12 +35,13 @@ function withMarkTemplateAsActiveAction<T>(
 
     return (
       <Component
+        key={seed}
         {...props}
         actions={[
           (rowData) => ({
             icon: function DoneIconComponent() {
               return rowData.templateId === activeTemplateId ? (
-                <DoneIcon data-cy="mark-as-active" />
+                <DoneIcon data-cy="mark-as-inactive" />
               ) : (
                 <DoneIcon
                   sx={(theme) => ({ color: theme.palette.grey.A100 })}
@@ -47,14 +49,22 @@ function withMarkTemplateAsActiveAction<T>(
                 />
               );
             },
-            tooltip: 'Mark as active',
+            tooltip:
+              rowData.templateId === activeTemplateId
+                ? 'Mark as Inactive'
+                : 'Mark as active',
             onClick: async (_event, data) => {
               const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
                 .templateId;
-              await api().setActiveTemplate({
-                templateGroupId: props.templateGroup,
-                templateId: newActiveTemplateId,
-              });
+              await api()
+                .setActiveTemplate({
+                  templateGroupId: props.templateGroup,
+                  templateId: newActiveTemplateId,
+                })
+                .then(() => {
+                  setActiveTemplateId(newActiveTemplateId);
+                  setSeed(Math.random());
+                });
               setActiveTemplateId(newActiveTemplateId);
             },
           }),
