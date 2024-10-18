@@ -655,6 +655,8 @@ context('Xpress tests', () => {
       cy.contains(proposal2.title);
       cy.contains(proposal3.title);
 
+      cy.get('[data-cy="instrument-filter"]').click();
+
       // Wait for instruments to load
       cy.get('ul[role="listbox"]')
         .should('be.visible')
@@ -664,7 +666,6 @@ context('Xpress tests', () => {
             .should('have.length.greaterThan', 0);
         });
 
-      cy.get('[data-cy="instrument-filter"]').click();
       cy.get('[role="listbox"]').contains(instrument2.name).click();
       cy.finishedLoading();
 
