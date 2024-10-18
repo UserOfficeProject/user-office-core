@@ -494,22 +494,94 @@ context('Fap reviews tests', () => {
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
       cy.contains(fapMembers.reviewer.lastName);
 
-      cy.contains(fapMembers.reviewer.lastName)
-        .parent()
-        .find('[data-cy="rank-reviewer"]')
-        .click();
-
-      cy.get('[data-cy="rank-input"]').type('4564654');
-
-      cy.get('[data-cy="rank-submit"]').click();
-
-      cy.contains(fapMembers.reviewer.lastName).parent().contains('4564654');
-
       cy.contains('Logs').click();
 
       cy.finishedLoading();
 
       cy.contains(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL);
+    });
+
+    it('Officer should be able to assign ranks to reviewers', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk, secondCreatedProposalPk],
+      });
+
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+      });
+
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer2.id],
+      });
+
+      cy.assignFapReviewersToProposals({
+        assignments: {
+          memberId: fapMembers.reviewer.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+        fapId: createdFapId,
+      });
+
+      cy.assignFapReviewersToProposals({
+        assignments: {
+          memberId: fapMembers.reviewer2.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+        fapId: createdFapId,
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.get('[role="dialog"]').should('not.exist');
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+      cy.contains(fapMembers.reviewer.lastName);
+
+      cy.contains(fapMembers.reviewer.lastName)
+        .parent()
+        .find('[data-cy="rank-reviewer"]')
+        .click();
+
+      cy.get('[data-cy="rank-input"]').type('-1');
+
+      cy.contains('The rank -1 is invalid, please chose another.');
+
+      // For some reason we need to clear twice
+      cy.get('[data-cy="rank-input"]').clear().clear().type('3');
+
+      cy.contains('The rank 3 is invalid, please chose another.');
+
+      cy.get('[data-cy="rank-input"]').clear().clear().type('1');
+
+      cy.get('[data-cy="rank-submit"]').click();
+
+      cy.get('[index="1"]').children().contains(fapMembers.reviewer.lastName);
+
+      cy.contains(fapMembers.reviewer2.lastName)
+        .parent()
+        .find('[data-cy="rank-reviewer"]')
+        .click();
+
+      cy.get('[data-cy="rank-input"]').type('1');
+
+      cy.contains(
+        'Warning! The rank 1 is already taken please chose another or update other ranks.'
+      );
+
+      cy.get('[data-cy="rank-input"]').clear().clear().type('2');
+
+      cy.get('[data-cy="rank-submit"]').click();
+
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('1');
+
+      cy.get('[index="1"]').children().contains(fapMembers.reviewer2.lastName);
+      cy.get('[index="0"]').children().contains(fapMembers.reviewer.lastName);
     });
 
     it('Should be able to assign Fap members to proposals in existing Fap', () => {
