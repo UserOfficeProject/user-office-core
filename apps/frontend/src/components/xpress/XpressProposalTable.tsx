@@ -60,6 +60,22 @@ const XpressProposalTable = () => {
   const { api } = useDataApiWithFeedback();
   const { currentRole } = useContext(UserContext);
 
+  const xpressStatusCodes = [
+    'SUBMITTED_LOCKED',
+    'UNDER_REVIEW',
+    'UNSUCCESSFUL',
+    'APPROVED',
+    'FINISHED',
+  ];
+
+  const xpressStatuses = proposalStatuses.filter((ps) =>
+    xpressStatusCodes.includes(ps.shortCode)
+  );
+
+  const excludedStatusIds = proposalStatuses
+    .filter((status) => !xpressStatusCodes.includes(status.shortCode))
+    .map((status) => status.id);
+
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,
     instrumentFilter: {
@@ -79,7 +95,7 @@ const XpressProposalTable = () => {
     referenceNumbers: proposalId ? [proposalId] : undefined,
     proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
     text: search,
-    excludeProposalStatusIds: [9],
+    excludeProposalStatusIds: excludedStatusIds,
   });
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
@@ -377,7 +393,7 @@ const XpressProposalTable = () => {
               isLoading: loadingTechniques,
             }}
             proposalStatuses={{
-              data: proposalStatuses,
+              data: xpressStatuses,
               isLoading: loadingProposalStatuses,
             }}
             handleFilterChange={handleFilterChange}
