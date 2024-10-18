@@ -9,5 +9,6 @@ query getCallsMinimal($filter: CallsFilter) {
     templateId
     description
     cycleComment
+    allocationTimeUnit
   }
 }
