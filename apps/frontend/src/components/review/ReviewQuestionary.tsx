@@ -93,6 +93,8 @@ export function createFapReviewStub(
       statusId: 0,
       visits: [],
       updated: new Date(),
+      submittedDate: new Date(),
+      techniques: [],
     },
   };
 }
