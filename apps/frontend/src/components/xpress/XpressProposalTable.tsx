@@ -14,7 +14,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, UserRole } from 'generated/sdk';
-import { useCallsData } from 'hooks/call/useCallsData';
+import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
@@ -293,7 +293,10 @@ const XpressProposalTable = () => {
     refreshTableData();
   };
 
-  const { calls, loadingCalls } = useCallsData();
+  const { calls, loadingCalls } = useCallsData(
+    undefined,
+    CallsDataQuantity.EXTENDED
+  );
 
   const { instruments, loadingInstruments } = useXpressInstrumentsData(
     tableData,
