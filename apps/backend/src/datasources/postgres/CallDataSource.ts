@@ -43,8 +43,10 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
-    const query = database('call').select(['*']);
-
+    const query = database('call').select([
+      '*',
+      'call.description as description',
+    ]);
     if (filter?.shortCode) {
       query.where('call_short_code', 'like', `%${filter.shortCode}%`);
     }
@@ -138,7 +140,6 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     if (filter?.proposalStatusShortCode) {
       query
-        .select('call.description as description')
         .join(
           'proposal_workflow_connections as w',
           'call.proposal_workflow_id',
