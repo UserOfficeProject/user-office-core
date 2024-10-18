@@ -90,24 +90,4 @@ export class AssignProposalsToInstrumentsMutation {
 
     return isRejection(res) ? res : true;
   }
-
-  @Mutation(() => Boolean)
-  async removeXpressProposalsFromInstrument(
-    @Args() args: RemoveProposalsFromInstrumentArgs,
-    @Ctx() context: ResolverContext
-  ) {
-    const isXpressProposals =
-      await context.mutations.technique.checkProposalsHasTechniques(
-        args.proposalPks
-      );
-
-    if (!isXpressProposals) {
-      return false;
-    }
-
-    return context.mutations.instrument.removeXpressProposalsFromInstrument(
-      context.user,
-      args
-    );
-  }
 }

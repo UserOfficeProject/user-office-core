@@ -1,3 +1,0 @@
-mutation removeXpressProposalsFromInstrument($proposalPks: [Int!]!) {
-  removeXpressProposalsFromInstrument(proposalPks: $proposalPks)
-}
