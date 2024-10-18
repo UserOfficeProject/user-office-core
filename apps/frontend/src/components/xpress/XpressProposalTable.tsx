@@ -4,10 +4,12 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
+import { FormControl, MenuItem, Select } from '@mui/material';
 import {
   getTranslation,
   ResourceId,
 } from '@user-office-software/duo-localisation';
+import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -15,7 +17,6 @@ import { useSearchParams } from 'react-router-dom';
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
-import { useDataApi } from 'hooks/common/useDataApi';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
@@ -26,6 +27,7 @@ import {
   setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
@@ -55,7 +57,7 @@ const XpressProposalTable = () => {
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
 
-  const api = useDataApi();
+  const { api } = useDataApiWithFeedback();
   const { currentRole } = useContext(UserContext);
 
   const xpressStatusCodes = [
@@ -149,6 +151,25 @@ const XpressProposalTable = () => {
     },
   ];
 
+  const assignProposalsToInstruments = async (
+    instrument: number | null,
+    proposalPk: number
+  ): Promise<void> => {
+    if (instrument) {
+      await api({
+        toastSuccessMessage: `Proposal/s assigned to the selected ${i18n.format(
+          t('instrument'),
+          'lowercase'
+        )} successfully!`,
+      }).assignXpressProposalsToInstruments({
+        proposalPks: [proposalPk],
+        instrumentIds: [instrument],
+      });
+    }
+
+    refreshTableData();
+  };
+
   const instrumentManagementColumns = (
     t: TFunction<'translation', undefined>
   ) => [
@@ -156,10 +177,43 @@ const XpressProposalTable = () => {
       title: t('instrument'),
       field: 'instruments.name',
       sorting: false,
-      render: (rowData: ProposalViewData) =>
-        fromArrayToCommaSeparated(
-          rowData.instruments?.map((instrument) => instrument.name)
-        ),
+      render: (rowData: ProposalViewData) => {
+        const techIds = rowData.techniques?.map((technique) => technique.id);
+        const instrumentList = techniques
+          .filter((technique) => techIds?.includes(technique.id))
+          .flatMap((technique) => technique.instruments);
+        const fieldValue = rowData.instruments?.map(
+          (instrument) => instrument.id
+        )[0];
+
+        return (
+          <>
+            <FormControl fullWidth>
+              <Select
+                id="instrument-selection"
+                aria-labelledby="instrument-select-label"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    assignProposalsToInstruments(
+                      +e.target.value,
+                      rowData.primaryKey
+                    );
+                  }
+                }}
+                value={fieldValue}
+                data-cy="instrument-dropdown"
+              >
+                {instrumentList &&
+                  instrumentList.map((instrument) => (
+                    <MenuItem key={instrument.id} value={instrument.id}>
+                      {instrument.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </>
+        );
+      },
       customFilterAndSearch: () => true,
     },
   ];
