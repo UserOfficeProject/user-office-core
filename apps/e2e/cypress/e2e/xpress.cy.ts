@@ -459,8 +459,8 @@ context('Xpress tests', () => {
         .should('be.visible')
         .then(() => {
           cy.get('ul[role="listbox"] li')
-          .filter('[data-value]:not([data-value="all"])')
-          .should('have.length.greaterThan', 0);
+            .filter('[data-value]:not([data-value="all"])')
+            .should('have.length.greaterThan', 0);
         });
 
       cy.get('[role="listbox"]').contains(instrument2.name).click();
@@ -660,8 +660,8 @@ context('Xpress tests', () => {
         .should('be.visible')
         .then(() => {
           cy.get('ul[role="listbox"] li')
-          .filter('[data-value]:not([data-value="all"])')
-          .should('have.length.greaterThan', 0);
+            .filter('[data-value]:not([data-value="all"])')
+            .should('have.length.greaterThan', 0);
         });
 
       cy.get('[data-cy="instrument-filter"]').click();
