@@ -22,6 +22,7 @@ import ReviewMutations from './mutations/ReviewMutations';
 import SampleEsiMutations from './mutations/SampleEsiMutations';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
+import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
 import TechniqueMutations from './mutations/TechniqueMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UnitMutations from './mutations/UnitMutations';
@@ -47,6 +48,7 @@ import SampleEsiQueries from './queries/SampleEsiQueries';
 import SampleQueries from './queries/SampleQueries';
 import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
+import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
 import SystemQueries from './queries/SystemQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
@@ -82,6 +84,7 @@ const context: BasicResolverContext = {
     predefinedMessage: container.resolve(PredefinedMessageQueries),
     internalReview: container.resolve(InternalReviewQueries),
     technique: container.resolve(TechniqueQueries),
+    statusActionsLogs: container.resolve(StatusActionsLogsQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -108,6 +111,7 @@ const context: BasicResolverContext = {
     predefinedMessage: container.resolve(PredefinedMessageMutations),
     internalReview: container.resolve(InternalReviewMutations),
     technique: container.resolve(TechniqueMutations),
+    statusActionsLogs: container.resolve(StatusActionsLogsMutations),
   },
   clients: {
     scheduler: async () => {
