@@ -90,7 +90,7 @@ const TemplatesTable = ({
             title: 'Are you sure?',
             description: `Are you sure you want to unarchive ${
               (data as TemplateRowDataType).name
-            }`,
+            }. This action can be undone by archiving the template.`,
             confirmationText: 'Yes',
             cancellationText: 'Cancel',
           }
@@ -131,7 +131,7 @@ const TemplatesTable = ({
             title: 'Are you sure?',
             description: `Are you sure you want to archive ${
               (data as TemplateRowDataType).name
-            }`,
+            }. This action can be undone by unarchiving the template.`,
             confirmationText: 'Yes',
             cancellationText: 'Cancel',
           }
@@ -141,9 +141,10 @@ const TemplatesTable = ({
   };
 
   const DeleteIconComponent = () => <Delete data-cy="delete-template" />;
-  const getDeleteButton = () => {
+  const getDeleteButton = (rowData: TemplateRowDataType) => {
     return {
       icon: DeleteIconComponent,
+      hidden: !isRowRemovable(rowData),
       tooltip: 'Delete',
       onClick: (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -171,7 +172,7 @@ const TemplatesTable = ({
             title: 'Are you sure?',
             description: `Are you sure you want to delete ${
               (data as TemplateRowDataType).name
-            }`,
+            }. This action cannot be undone.`,
             confirmationText: 'Yes',
             cancellationText: 'Cancel',
           }
@@ -180,17 +181,12 @@ const TemplatesTable = ({
     };
   };
 
-  const getMaintenanceButton = (rowData: TemplateRowDataType) => {
+  const getArchivedOrUnarchivedButton = (rowData: TemplateRowDataType) => {
     if (rowData.isArchived) {
       return getUnarchiveButton();
-    } else {
-      const isRemovable = isRowRemovable(rowData);
-      if (isRemovable) {
-        return getDeleteButton();
-      } else {
-        return getArchiveButton();
-      }
     }
+
+    return getArchiveButton();
   };
 
   const editTemplate = (templateId: number) =>
@@ -304,7 +300,8 @@ const TemplatesTable = ({
                 });
             },
           },
-          (rowData) => getMaintenanceButton(rowData),
+          (rowData) => getDeleteButton(rowData),
+          (rowData) => getArchivedOrUnarchivedButton(rowData),
         ]}
       />
       <ActionButtonContainer>

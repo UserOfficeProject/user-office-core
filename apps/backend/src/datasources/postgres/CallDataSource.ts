@@ -61,6 +61,10 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('fap_review_template_id', filter.fapReviewTemplateIds);
     }
 
+    if (filter?.esiTemplateIds) {
+      query.whereIn('esi_template_id', filter.esiTemplateIds);
+    }
+
     // if filter is explicitly set to true or false
     if (filter?.isActive === true) {
       query.where('is_active', true);
