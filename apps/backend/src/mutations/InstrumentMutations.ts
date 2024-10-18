@@ -444,4 +444,28 @@ export default class InstrumentMutations {
         );
       });
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async assignXpressProposalsToInstruments(
+    agent: UserWithRole | null,
+    args: AssignProposalsToInstrumentsArgs
+  ): Promise<InstrumentsHasProposals | Rejection> {
+    return this.assignProposalsToInstrumentsInternal(agent, args);
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async removeXpressProposalsFromInstrument(
+    agent: UserWithRole | null,
+    args: RemoveProposalsFromInstrumentArgs
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .removeProposalsFromInstrument(args.proposalPks)
+      .catch((error) => {
+        return rejection(
+          'Could not remove assigned proposal/s from instrument',
+          { agent, args },
+          error
+        );
+      });
+  }
 }
