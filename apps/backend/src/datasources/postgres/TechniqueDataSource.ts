@@ -331,4 +331,13 @@ export default class PostgresTechniqueDataSource
       .where('thp.proposal_id', proposalPk)
       .distinct();
   }
+
+  async checkProposalsHasTechniques(proposalPks: number[]): Promise<boolean> {
+    const result = await database('technique_has_proposals')
+      .select('*')
+      .whereIn('proposal_id', proposalPks)
+      .distinct();
+
+    return result && result.length > 0 ? true : false;
+  }
 }
