@@ -21,7 +21,7 @@ import {
   AssignInstrumentsToCallMutation,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { useCallsData } from 'hooks/call/useCallsData';
+import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXCallFap } from 'hooks/fap/useDownloadXLSXCallFap';
 import { tableIcons } from 'utils/materialIcons';
@@ -76,9 +76,14 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     calls,
     setCallsWithLoading: setCalls,
     setCallsFilter,
-  } = useCallsData({
-    ...getFilterStatus((callStatus as CallStatusFilters) ?? CallStatus.ACTIVE),
-  });
+  } = useCallsData(
+    {
+      ...getFilterStatus(
+        (callStatus as CallStatusFilters) ?? CallStatus.ACTIVE
+      ),
+    },
+    CallsDataQuantity.EXTENDED
+  );
 
   const handleStatusFilterChange = (callStatus: CallStatus) => {
     setSearchParam((searchParam) => {
