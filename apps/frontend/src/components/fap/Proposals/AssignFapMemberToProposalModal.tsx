@@ -24,6 +24,7 @@ const memberRole = (member: FapAssignedMember) => `${member.role?.title}`;
 const columns = [
   { title: 'Name', field: 'firstname' },
   { title: 'Surname', field: 'lastname' },
+  { title: 'Proposal Count', field: 'proposalsCountByCall' },
   {
     title: 'Role',
     render: (rowData: FapAssignedMember) => memberRole(rowData),
@@ -52,12 +53,13 @@ const AssignFapMemberToProposalModal = ({
     ? FapMembersData.map((fapMember) => ({
         ...fapMember.user,
         role: fapMember.role ?? null,
+        proposalsCountByCall: fapMember.proposalsCountByCall,
       }))
     : [];
 
   return (
     <Dialog
-      maxWidth="sm"
+      maxWidth="md"
       fullWidth
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description"

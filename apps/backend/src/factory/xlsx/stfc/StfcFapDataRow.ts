@@ -1,13 +1,13 @@
 import { stripHtml } from 'string-strip-html';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../../../config/Tokens';
 import { StfcUserDataSource } from '../../../datasources/stfc/StfcUserDataSource';
 import { QuestionaryStep } from '../../../models/Questionary';
 import { Review } from '../../../models/Review';
 import { CallRowObj } from '../callFaps';
 import { RowObj } from '../fap';
 import { getDataRow } from '../FapDataRow';
-
-const stfcUserDataSource = new StfcUserDataSource();
 
 export async function getStfcDataRow(
   proposalPk: number,
@@ -25,6 +25,10 @@ export async function getStfcDataRow(
   proposalAnswers: QuestionaryStep[] | null,
   reviews: Review[] | null
 ) {
+  const stfcUserDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
+
   const individualReviews = reviews
     ? await Promise.all(
         reviews.map(async (rev) => {
