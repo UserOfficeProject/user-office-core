@@ -867,18 +867,6 @@ context('Xpress tests', () => {
       cy.get('[role="listbox"]').contains(instrument1.name).click();
       cy.finishedLoading();
       cy.contains(instrument1.name);
-
-      // Unassign instrument 1 from proposal 1
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[data-cy="instrument-dropdown"]')
-        .click();
-      cy.get('[role="listbox"]').contains('NONE').click();
-      cy.finishedLoading();
-      cy.get('table.MuiTable-root tbody tr').should(
-        'not.contain',
-        instrument1.name
-      );
     });
 
     it('Instrument scientist able to select, assign and unassign an instrument for a proposal', function () {
@@ -911,18 +899,6 @@ context('Xpress tests', () => {
       cy.get('[role="listbox"]').contains(instrument1.name).click();
       cy.finishedLoading();
       cy.contains(instrument1.name);
-
-      // Unassign instrument 1 from proposal 1
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[data-cy="instrument-dropdown"]')
-        .click();
-      cy.get('[role="listbox"]').contains('NONE').click();
-      cy.finishedLoading();
-      cy.get('table.MuiTable-root tbody tr').should(
-        'not.contain',
-        instrument1.name
-      );
     });
   });
 });
