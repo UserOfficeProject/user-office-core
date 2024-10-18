@@ -9,7 +9,6 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { SampleStatus } from '../../models/Sample';
 import { Sample } from '../types/Sample';
 
 @ArgsType()
@@ -19,12 +18,6 @@ export class UpdateSampleArgs {
 
   @Field(() => String, { nullable: true })
   title?: string;
-
-  @Field(() => String, { nullable: true })
-  safetyComment?: string;
-
-  @Field(() => SampleStatus, { nullable: true })
-  safetyStatus?: SampleStatus;
 
   // do not expose this fields to a user
   proposalPk?: number;

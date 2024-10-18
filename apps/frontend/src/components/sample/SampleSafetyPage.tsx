@@ -56,11 +56,14 @@ function SampleEvaluationDialog(props: {
             }
 
             const { id, safetyComment, safetyStatus } = values;
-            const { updateSample } = await api({
+            const { submitSampleReview: updatedSample } = await api({
               toastSuccessMessage: `Review for '${sample?.title}' submitted`,
-            }).updateSample({ sampleId: id, safetyComment, safetyStatus });
-
-            onClose({ ...values, ...updateSample } || null);
+            }).submitSampleReview({
+              sampleId: id,
+              safetyComment,
+              safetyStatus,
+            });
+            onClose({ ...values, ...updatedSample } || null);
           }}
         >
           {({ isSubmitting, dirty }) => (
