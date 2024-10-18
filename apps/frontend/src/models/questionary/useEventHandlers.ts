@@ -12,11 +12,6 @@ import {
 const isNotCreated = (state: QuestionarySubmissionState) =>
   state.getItemId() === 0;
 
-const confirmNavigation = () =>
-  window.confirm(
-    'You have made changes in this step, which will be discarded. Are you sure?'
-  );
-
 export default function useEventHandlers(templateGroupId: TemplateGroupId) {
   const api = useDataApi();
 
@@ -61,13 +56,18 @@ export default function useEventHandlers(templateGroupId: TemplateGroupId) {
       switch (action.type) {
         case 'BACK_CLICKED':
           if (state.isDirty) {
-            if (confirmNavigation()) {
-              await handleReset();
-              dispatch({ type: 'CLEAR_DELETE_LIST' });
-              dispatch({ type: 'GO_STEP_BACK' });
-            } else {
-              // do nothing
-            }
+            action.confirm?.(
+              async () => {
+                await handleReset();
+                dispatch({ type: 'CLEAR_DELETE_LIST' });
+                dispatch({ type: 'GO_STEP_BACK' });
+              },
+              {
+                title: 'Confirmation',
+                description:
+                  'You have made changes in this step, which will be discarded. Are you sure?',
+              }
+            )();
           } else {
             dispatch({ type: 'GO_STEP_BACK' });
           }
@@ -85,17 +85,20 @@ export default function useEventHandlers(templateGroupId: TemplateGroupId) {
               stepIndex: action.stepIndex,
             });
           } else {
-            if (
-              window.confirm(
-                'Changes you recently made in this step will not be saved! Are you sure?'
-              )
-            ) {
-              await handleReset();
-              dispatch({
-                type: 'GO_TO_STEP',
-                stepIndex: action.stepIndex,
-              });
-            }
+            action.confirm?.(
+              async () => {
+                await handleReset();
+                dispatch({
+                  type: 'GO_TO_STEP',
+                  stepIndex: action.stepIndex,
+                });
+              },
+              {
+                title: 'Confirmation',
+                description:
+                  'Changes you recently made in this step will not be saved! Are you sure?',
+              }
+            )();
           }
           break;
       }

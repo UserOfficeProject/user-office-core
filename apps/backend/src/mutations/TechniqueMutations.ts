@@ -14,9 +14,10 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
-import { AssignProposalToTechniquesArgs, Technique } from '../models/Technique';
+import { Technique } from '../models/Technique';
 import { UserWithRole } from '../models/User';
 import { AssignInstrumentsToTechniqueArgs } from '../resolvers/mutations/AssignInstrumentsToTechnique';
+import { AssignProposalToTechniquesArgs } from '../resolvers/mutations/AssignProposalToTechniquesMutation';
 import {
   AssignScientistsToTechniqueArgs,
   RemoveScientistFromTechniqueArgs,

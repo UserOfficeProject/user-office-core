@@ -1,5 +1,6 @@
-import { injectable } from 'tsyringe';
+import { container, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { BasicUserDetails } from '../../models/User';
 import database from '../postgres/database';
 import {
@@ -13,9 +14,12 @@ import {
   StfcUserDataSource,
   toEssBasicUserDetails,
 } from './StfcUserDataSource';
-const stfcUserDataSource = new StfcUserDataSource();
+
 @injectable()
 export default class StfcTechniqueDataSource extends PostgresTechniqueDataSource {
+  protected stfcUserDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
   async getTechniqueScientists(
     techniqueId: number
   ): Promise<BasicUserDetails[]> {
@@ -37,7 +41,9 @@ export default class StfcTechniqueDataSource extends PostgresTechniqueDataSource
 
     const userNumbers = users.map((user) => user.id.toString());
     const stfcUsers =
-      await stfcUserDataSource.getStfcBasicPeopleByUserNumbers(userNumbers);
+      await this.stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
+        userNumbers
+      );
 
     const usersDetails = stfcUsers
       ? stfcUsers.map((person) => toEssBasicUserDetails(person))
