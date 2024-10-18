@@ -1,7 +1,7 @@
-import { ILRUCache } from '../LRUCache';
+import { ICache } from '../Cache';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export class LRUCache<T> implements ILRUCache<T> {
+export class Cache<T> implements ICache<T> {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   public constructor(maxEntries: number, secondsToLive?: number) {}
 
@@ -40,7 +40,7 @@ export class LRUCache<T> implements ILRUCache<T> {
   public enableStatsLogging(
     cacheName: string,
     intervalSeconds?: number
-  ): LRUCache<T> {
+  ): Cache<T> {
     return this;
   }
 }

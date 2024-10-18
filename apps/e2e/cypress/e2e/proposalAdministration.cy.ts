@@ -1360,4 +1360,54 @@ context('Proposal administration tests', () => {
         });
     });
   });
+
+  describe('Proposal administration download pdf tests', () => {
+    beforeEach(() => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalName1,
+            abstract: proposalName1,
+          });
+        }
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            proposerId: existingUserId,
+            title: proposalName2,
+            abstract: proposalName2,
+          });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+    });
+
+    it('Should be able to download multiple proposals as a zip, when more than one proposal is being selected', () => {
+      cy.get('[type="checkbox"]').eq(1).click();
+      cy.get('[type="checkbox"]').eq(2).click();
+
+      cy.get('[data-cy="download-proposals"]').click();
+
+      cy.contains('Proposal(s)').click();
+      cy.contains('Download as single file').should('exist');
+      cy.contains('Download as multiple files').click();
+    });
+
+    it('Should not be able to download multiple proposals as a zip, when only one proposal is selected', () => {
+      cy.get('[type="checkbox"]').eq(1).click();
+
+      cy.get('[data-cy="download-proposals"]').click();
+
+      cy.contains('Proposal(s)').click();
+
+      cy.contains('Download as single file').should('exist');
+      cy.contains('Download as multiple files').should('not.exist');
+    });
+  });
 });
