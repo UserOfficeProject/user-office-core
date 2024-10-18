@@ -149,15 +149,6 @@ const XpressProposalTable = () => {
         proposalPks: [proposalPk],
         instrumentIds: [instrument],
       });
-    } else {
-      await api({
-        toastSuccessMessage: `Proposal/s removed from the ${i18n.format(
-          t('instrument'),
-          'lowercase'
-        )} successfully!`,
-      }).removeXpressProposalsFromInstrument({
-        proposalPks: [proposalPk],
-      });
     }
 
     refreshTableData();
