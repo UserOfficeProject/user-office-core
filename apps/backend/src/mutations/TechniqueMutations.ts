@@ -178,4 +178,18 @@ export default class TechniqueMutations {
         );
       });
   }
+
+  async checkProposalsHasTechniques(
+    proposalPks: number[]
+  ): Promise<boolean | Rejection> {
+    return this.dataSource
+      .checkProposalsHasTechniques(proposalPks)
+      .catch((error) => {
+        return rejection(
+          'Could not get the proposal details',
+          { proposalPks },
+          error
+        );
+      });
+  }
 }

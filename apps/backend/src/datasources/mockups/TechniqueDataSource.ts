@@ -124,4 +124,12 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
 
     return [];
   }
+
+  async checkProposalsHasTechniques(proposalPks: number[]): Promise<boolean> {
+    if (proposalPks) {
+      return true;
+    }
+
+    return true;
+  }
 }
