@@ -12,6 +12,7 @@ import { useXpressAccess } from 'hooks/common/useXpressAccess';
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
+import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
 import XpressProposalTable from './xpress/XpressProposalTable';
@@ -233,6 +234,17 @@ const AppRoutes = () => {
           <Route
             path="/Calls"
             element={<TitledRoute title="Calls" element={<CallPage />} />}
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/StatusActionsLogs"
+            element={
+              <TitledRoute
+                title="StatusActionsLogs"
+                element={<StatusActionsLogsPage />}
+              />
+            }
           />
         )}
         <Route
