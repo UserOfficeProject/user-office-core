@@ -8,6 +8,9 @@ export class CallsFilter {
   @Field(() => String, { nullable: true })
   public shortCode?: string;
 
+  @Field(() => String, { nullable: true })
+  public proposalStatusShortCode?: string;
+
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
 
