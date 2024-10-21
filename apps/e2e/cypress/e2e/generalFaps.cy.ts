@@ -296,7 +296,7 @@ context('General facility access panel tests', () => {
         text: 'Fap secretary assigned successfully',
       });
 
-      cy.contains('Logs').click();
+      cy.get('button[role="tab"]').contains('Logs').click();
 
       cy.contains(Event.FAP_MEMBERS_ASSIGNED);
 
@@ -430,7 +430,7 @@ context('General facility access panel tests', () => {
 
       cy.contains(fapMembers.reviewer.lastName);
 
-      cy.contains('Logs').click();
+      cy.get('button[role="tab"]').contains('Logs').click();
 
       cy.contains(Event.FAP_MEMBERS_ASSIGNED);
     });
@@ -458,7 +458,7 @@ context('General facility access panel tests', () => {
         text: 'Fap member removed successfully',
       });
 
-      cy.contains('Logs').click();
+      cy.get('button[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
