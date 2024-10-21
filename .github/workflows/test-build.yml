@@ -228,17 +228,24 @@ jobs:
       fail-fast: false
       matrix:
         pattern:
-          [
-            "cypress/e2e/[a-e]*.ts",
-            "cypress/e2e/[f-h]*.ts",
-            "cypress/e2e/[i-o]*.ts",
-            "cypress/e2e/p[a-m]*.ts",
-            "cypress/e2e/p[n-z]*.ts",
-            "cypress/e2e/[r-s]*.ts",
-            "cypress/e2e/t*.ts",
-            "cypress/e2e/[u-z]*.ts",
-            "cypress/e2e/[A-Z]*.ts",
-          ]
+          - id: ae
+            files: cypress/e2e/[a-e]*.ts
+          - id: fh
+            files: cypress/e2e/[f-h]*.ts
+          - id: io
+            files: cypress/e2e/[i-o]*.ts
+          - id: p-am
+            files: cypress/e2e/p[a-m]*.ts
+          - id: p-nz
+            files: cypress/e2e/p[n-z]*.ts
+          - id: rs
+            files: cypress/e2e/[r-s]*.ts
+          - id: t
+            files: cypress/e2e/t*.ts
+          - id: uz
+            files: cypress/e2e/[u-z]*.ts
+          - id: AZ
+            files: cypress/e2e/[A-Z]*.ts
 
     steps:
       - uses: actions/checkout@v4
@@ -325,7 +332,7 @@ jobs:
           USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           SCHEMA_URL: http://localhost:4000/graphql
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-          CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
+          CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
           BUILD_TAG: ${{ github.sha }}
           CYPRESS_CACHE_FOLDER: .cache/Cypress
           EXTERNAL_AUTH_TOKEN: abc
@@ -369,7 +376,7 @@ jobs:
           USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
           SCHEMA_URL: http://localhost:4000/graphql
           SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-          CYPRES_SPEC_PATTERN: ${{ matrix.pattern }}
+          CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
           BUILD_TAG: ${{ github.sha }}
           CYPRESS_CACHE_FOLDER: .cache/Cypress
           EAM_API_URL: https://ios.esss.lu.se
@@ -390,5 +397,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-${{ matrix.pattern.id }}
           path: apps/e2e/cypress/screenshots
