@@ -453,6 +453,16 @@ context('Xpress tests', () => {
       );
 
       cy.get('[data-cy="instrument-filter"]').click();
+
+      // Wait for instruments to load
+      cy.get('ul[role="listbox"]')
+        .should('be.visible')
+        .then(() => {
+          cy.get('ul[role="listbox"] li')
+            .filter('[data-value]:not([data-value="all"])')
+            .should('have.length.greaterThan', 0);
+        });
+
       cy.get('[role="listbox"]').contains(instrument2.name).click();
       cy.finishedLoading();
 
@@ -646,6 +656,16 @@ context('Xpress tests', () => {
       cy.contains(proposal3.title);
 
       cy.get('[data-cy="instrument-filter"]').click();
+
+      // Wait for instruments to load
+      cy.get('ul[role="listbox"]')
+        .should('be.visible')
+        .then(() => {
+          cy.get('ul[role="listbox"] li')
+            .filter('[data-value]:not([data-value="all"])')
+            .should('have.length.greaterThan', 0);
+        });
+
       cy.get('[role="listbox"]').contains(instrument2.name).click();
       cy.finishedLoading();
 
