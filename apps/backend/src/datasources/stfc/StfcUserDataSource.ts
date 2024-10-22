@@ -204,7 +204,7 @@ export class StfcUserDataSource implements UserDataSource {
   private async getStfcBasicPersonByEmail(
     email: string,
     searchableOnly?: boolean
-  ): Promise<StfcBasicPersonDetails | null> {
+  ): Promise<StfcBasicPersonDetails | undefined> {
     const cache = searchableOnly
       ? this.uowsSearchableBasicUserDetailsCache
       : this.uowsBasicUserDetailsCache;
@@ -214,19 +214,25 @@ export class StfcUserDataSource implements UserDataSource {
       return cachedUser;
     }
 
-    const uowsRequest = searchableOnly
-      ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
-      : client.getBasicPersonDetailsFromEmail(token, email);
-    const stfcUser: StfcBasicPersonDetails | null = (await uowsRequest)?.return;
+    const uowsRequest = (
+      searchableOnly
+        ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
+        : client.getBasicPersonDetailsFromEmail(token, email)
+    )
+      .then((response) => response?.return)
+      .then((stfcUser: StfcBasicPersonDetails | null) => {
+        if (!stfcUser) {
+          return undefined;
+        }
 
-    if (!stfcUser) {
-      return null;
-    }
+        return this.ensureDummyUserExists(parseInt(stfcUser.userNumber)).then(
+          () => stfcUser
+        );
+      });
 
-    await this.ensureDummyUserExists(parseInt(stfcUser.userNumber));
-    cache.put(email, Promise.resolve(stfcUser));
+    cache.put(email, uowsRequest);
 
-    return stfcUser;
+    return uowsRequest;
   }
 
   async delete(id: number): Promise<User | null> {
