@@ -840,7 +840,7 @@ context('Xpress tests', () => {
       cy.should('not.contain', technique5.name);
     });
 
-    it('User officer able to select, assign and unassign an instrument for a proposal', function () {
+    it('User officer able to select and assign an instrument for a proposal', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
       cy.visit('/');
@@ -869,7 +869,7 @@ context('Xpress tests', () => {
       cy.contains(instrument1.name);
     });
 
-    it('Instrument scientist able to select, assign and unassign an instrument for a proposal', function () {
+    it('Instrument scientist able to select and assign an instrument for a proposal', function () {
       /*
       Scientist 1 belongs to technique 1, which only has proposal 1
       */
