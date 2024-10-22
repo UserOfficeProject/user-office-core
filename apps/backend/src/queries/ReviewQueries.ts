@@ -11,6 +11,7 @@ import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 import { ReviewsFilter } from '../resolvers/queries/ReviewsQuery';
+import { TechnicalReviewsFilter } from '../resolvers/queries/TechnicalReviewsQuery';
 
 @injectable()
 export default class ReviewQueries {
@@ -47,6 +48,16 @@ export default class ReviewQueries {
     offset?: number
   ) {
     return this.dataSource.getReviews(filter, first, offset);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async getAllTechnicalReviews(
+    agent: UserWithRole | null,
+    filter?: TechnicalReviewsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return this.dataSource.getTechnicalReviewsByFilter(filter, first, offset);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.FAP_CHAIR, Roles.FAP_SECRETARY])

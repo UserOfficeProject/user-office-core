@@ -31,6 +31,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       submitted = false,
       files,
       instrumentId,
+      questionaryId,
     } = args;
 
     if (shouldUpdateReview) {
@@ -44,6 +45,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           submitted,
           reviewer_id: reviewerId,
           files,
+          questionary_id: questionaryId,
         })
         .from('technical_review')
         .where('proposal_pk', proposalPk)
@@ -80,6 +82,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
         instrument_id: instrumentId,
         instrument_has_proposals_id:
           instrumentHasProposalRecord.instrument_has_proposals_id,
+        questionary_id: questionaryId,
       })
       .returning('*')
       .into('technical_review')
@@ -96,6 +99,59 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .orderBy('technical_review_id')
       .then((reviews: TechnicalReviewRecord[]) => {
         return reviews.map((review) => createTechnicalReviewObject(review));
+      });
+  }
+
+  async getTechnicalReviewsByFilter(
+    filter?: ReviewsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; technicalReviews: TechnicalReview[] }> {
+    return database
+      .select([
+        'technical_review.*',
+        database.raw('count(*) OVER() AS full_count'),
+      ])
+      .from('technical_review')
+      .orderBy('technical_review.technical_review_id', 'desc')
+      .modify((query) => {
+        if (filter?.text) {
+          query.where('comment', 'ilike', `%${filter.text}%`);
+        }
+
+        if (filter?.questionaryIds) {
+          query.whereIn(
+            'technical_review.questionary_id',
+            filter.questionaryIds
+          );
+        }
+
+        if (filter?.templateIds) {
+          query
+            .leftJoin(
+              'questionary',
+              'questionary.questionary_id',
+              'technical_review.questionary_id'
+            )
+            .whereIn('questionary.template_id', filter.templateIds);
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then((technicalReviews: TechnicalReviewRecord[]) => {
+        const revs = technicalReviews.map((technicalReview) =>
+          createTechnicalReviewObject(technicalReview)
+        );
+
+        return {
+          totalCount: technicalReviews[0] ? technicalReviews[0].full_count : 0,
+          technicalReviews: revs,
+        };
       });
   }
 

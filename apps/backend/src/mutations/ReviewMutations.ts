@@ -219,6 +219,13 @@ export default class ReviewMutations {
     agent: UserWithRole | null,
     args: AddTechnicalReviewInput | SubmitTechnicalReviewInput
   ): Promise<TechnicalReview | Rejection> {
+    if (!agent) {
+      return rejection(
+        'Can not set technical review because of unknown creator',
+        { agent, args }
+      );
+    }
+
     const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
       agent,
       args.proposalPk,
@@ -243,6 +250,34 @@ export default class ReviewMutations {
         args,
         agent,
       });
+    }
+
+    if (shouldUpdateReview) {
+      const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+      if (!proposal) {
+        return rejection(
+          'Cannot find the proposal for the technical review to be created',
+          { agent, args }
+        );
+      }
+
+      const call = await this.callDataSource.getCall(proposal.callId);
+
+      if (!call) {
+        return rejection(
+          'Cannot find the call for proposal of the technical review to be created',
+          { agent, args }
+        );
+      }
+
+      const technicalReviewQuestionary =
+        await this.questionaryDataSource.create(
+          agent.id,
+          call.technicalReviewTemplateId
+        );
+
+      args.questionaryId = technicalReviewQuestionary.questionaryId;
     }
 
     return this.dataSource

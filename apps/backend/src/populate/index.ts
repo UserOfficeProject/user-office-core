@@ -32,6 +32,7 @@ import { execute } from './executor';
 const MAX_USERS = 1000;
 const MAX_TEMPLATES = 15;
 const MAX_REVIEW_TEMPLATES = 15;
+const MAX_TECHNICAL_REVIEW_TEMPLATES = 15;
 const MAX_CALLS = 11;
 const MAX_INSTRUMENTS = 16;
 const MAX_PROPOSALS = 500;
@@ -151,6 +152,9 @@ const createCalls = async () => {
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
       fapReviewTemplateId: dummy.positiveNumber(MAX_REVIEW_TEMPLATES),
+      technicalReviewTemplateId: dummy.positiveNumber(
+        MAX_TECHNICAL_REVIEW_TEMPLATES
+      ),
       allocationTimeUnit: AllocationTimeUnits.Day,
       title: faker.random.words(8),
       description: faker.random.words(10),
@@ -356,6 +360,7 @@ const createReviews = async () => {
         reviewerId: 1,
         instrumentId: 1,
         files: '[]',
+        questionaryId: 0,
       },
       false
     );

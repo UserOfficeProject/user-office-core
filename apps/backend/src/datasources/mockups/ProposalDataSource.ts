@@ -94,6 +94,7 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   1,
   '',
   1,
+  1,
   1
 );
 
