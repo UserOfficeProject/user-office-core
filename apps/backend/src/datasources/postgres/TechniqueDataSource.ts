@@ -332,10 +332,17 @@ export default class PostgresTechniqueDataSource
       .distinct();
   }
 
-  async checkProposalsHasTechniques(proposalPks: number[]): Promise<boolean> {
-    const result = await database('technique_has_proposals')
+  async isXpressInstrumentAndProposal(
+    proposalPk: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    const result = await database('technique_has_proposals as thp')
       .select('*')
-      .whereIn('proposal_id', proposalPks)
+      .join('technique_has_instruments as thi', {
+        'thp.technique_id': 'thi.technique_id',
+      })
+      .where('thp.proposal_id', proposalPk)
+      .andWhere('thi.instrument_id', instrumentId)
       .distinct();
 
     return result && result.length > 0 ? true : false;

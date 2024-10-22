@@ -179,15 +179,16 @@ export default class TechniqueMutations {
       });
   }
 
-  async checkProposalsHasTechniques(
-    proposalPks: number[]
+  async isXpressInstrumentAndProposal(
+    proposalPk: number,
+    instrumentId: number
   ): Promise<boolean | Rejection> {
     return this.dataSource
-      .checkProposalsHasTechniques(proposalPks)
+      .isXpressInstrumentAndProposal(proposalPk, instrumentId)
       .catch((error) => {
         return rejection(
           'Could not get the proposal details',
-          { proposalPks },
+          { proposalPk, instrumentId },
           error
         );
       });
