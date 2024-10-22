@@ -4,6 +4,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
+import GridOnIcon from '@mui/icons-material/GridOn';
 import { FormControl, MenuItem, Select } from '@mui/material';
 import {
   getTranslation,
@@ -17,6 +18,7 @@ import { useSearchParams } from 'react-router-dom';
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
+import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
@@ -365,6 +367,9 @@ const XpressProposalTable = () => {
     });
   };
 
+  const ExportIcon = (): JSX.Element => <GridOnIcon />;
+  const downloadXLSXProposal = useDownloadXLSXProposal();
+
   return (
     <>
       <StyledContainer maxWidth={false}>
@@ -406,6 +411,22 @@ const XpressProposalTable = () => {
               pageSize: pageSize ? +pageSize : 5,
               initialPage: page ? +page : 0,
             }}
+            actions={[
+              {
+                icon: ExportIcon,
+                tooltip: 'Export proposals in Excel',
+                onClick: (): void => {
+                  downloadXLSXProposal(
+                    searchParams
+                      .getAll('selection')
+                      .filter((item): item is string => !!item)
+                      .map((item) => +item),
+                    'title'
+                  );
+                },
+                position: 'toolbarOnSelect',
+              },
+            ]}
             onSelectionChange={(selectedItems) => {
               setSearchParams((searchParam) => {
                 searchParam.delete('selection');
