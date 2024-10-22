@@ -292,7 +292,7 @@ export class StfcUserAuthorization extends UserAuthorization {
 
     const tokenRequest: Promise<boolean> = client
       .isTokenValid(token)
-      .then((response) => response.return);
+      .then((response) => response?.return);
 
     this.uowsTokenCache.put(token, tokenRequest);
 
