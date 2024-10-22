@@ -1,3 +1,5 @@
+import { logger } from '@user-office-software/duo-logger';
+
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
@@ -109,16 +111,19 @@ export class StfcUserDataSource implements UserDataSource {
   private static readonly rolesCacheMaxElements = 1000;
   private static readonly rolesCacheSecondsToLive = 600; //10 minutes
 
-  private uowsBasicUserDetailsCache = new Cache<StfcBasicPersonDetails>(
+  private uowsBasicUserDetailsCache = new Cache<
+    Promise<StfcBasicPersonDetails | undefined>
+  >(
     StfcUserDataSource.userDetailsCacheMaxElements,
     StfcUserDataSource.userDetailsCacheSecondsToLive
-  ).enableStatsLogging('uowsBasicUserDetailsCache');
+  ).enableStatsLogging('uowsBasicUserDetailsCache', 30);
 
-  private uowsSearchableBasicUserDetailsCache =
-    new Cache<StfcBasicPersonDetails>(
-      StfcUserDataSource.userDetailsCacheMaxElements,
-      StfcUserDataSource.userDetailsCacheSecondsToLive
-    ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
+  private uowsSearchableBasicUserDetailsCache = new Cache<
+    Promise<StfcBasicPersonDetails | undefined>
+  >(
+    StfcUserDataSource.userDetailsCacheMaxElements,
+    StfcUserDataSource.userDetailsCacheSecondsToLive
+  ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
 
   private uowsRolesCache = new Cache<Role[]>(
     StfcUserDataSource.rolesCacheMaxElements,
@@ -143,25 +148,37 @@ export class StfcUserDataSource implements UserDataSource {
       ? this.uowsSearchableBasicUserDetailsCache
       : this.uowsBasicUserDetailsCache;
 
-    const stfcUsers: StfcBasicPersonDetails[] = [];
+    const stfcUserRequests: Promise<StfcBasicPersonDetails | undefined>[] = [];
     const cacheMisses: string[] = [];
 
     for (const userNumber of userNumbers) {
       const cachedUser = cache.get(userNumber);
       if (cachedUser) {
-        stfcUsers.push(cachedUser);
+        stfcUserRequests.push(cachedUser);
       } else {
         cacheMisses.push(userNumber);
       }
     }
 
     if (cacheMisses.length > 0) {
+      logger.logInfo('Making users request', { users: cacheMisses.length });
       const uowsRequest = searchableOnly
         ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
             token,
             cacheMisses
           )
         : client.getBasicPeopleDetailsFromUserNumbers(token, cacheMisses);
+
+      for (const userNumber of cacheMisses) {
+        const userRequest = uowsRequest
+          .then((result) => result?.return)
+          .then((users: StfcBasicPersonDetails[]) =>
+            users?.find((user) => user.userNumber == userNumber)
+          );
+        cache.put(userNumber, userRequest);
+        stfcUserRequests.push(userRequest);
+      }
+
       const usersFromUows: StfcBasicPersonDetails[] | null = (await uowsRequest)
         ?.return;
 
@@ -169,10 +186,20 @@ export class StfcUserDataSource implements UserDataSource {
         await this.ensureDummyUsersExist(
           usersFromUows.map((stfcUser) => parseInt(stfcUser.userNumber))
         );
-        usersFromUows.map((user) => cache.put(user.userNumber, user));
-        stfcUsers.push(...usersFromUows);
       }
     }
+
+    const stfcUsers: StfcBasicPersonDetails[] = await Promise.all(
+      stfcUserRequests
+    ).then((users) =>
+      users.filter((user): user is StfcBasicPersonDetails => user !== undefined)
+    );
+    // Uncache any failed lookups
+    userNumbers
+      .filter(
+        (un) => stfcUsers.find((user) => user.userNumber === un) === undefined
+      )
+      .forEach((un) => cache.remove(un));
 
     return stfcUsers;
   }
@@ -185,7 +212,7 @@ export class StfcUserDataSource implements UserDataSource {
       ? this.uowsSearchableBasicUserDetailsCache
       : this.uowsBasicUserDetailsCache;
 
-    const cachedUser = cache.get(email);
+    const cachedUser = await cache.get(email);
     if (cachedUser) {
       return cachedUser;
     }
@@ -200,7 +227,7 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     await this.ensureDummyUserExists(parseInt(stfcUser.userNumber));
-    cache.put(email, stfcUser);
+    cache.put(email, Promise.resolve(stfcUser));
 
     return stfcUser;
   }
