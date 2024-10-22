@@ -35,7 +35,7 @@ export class StfcUserAuthorization extends UserAuthorization {
   private static readonly tokenCacheMaxElements = 1000;
   private static readonly tokenCacheSecondsToLive = 600; // 10 minutes
 
-  private uowsTokenCache = new Cache<boolean>(
+  private uowsTokenCache = new Cache<Promise<boolean>>(
     StfcUserAuthorization.tokenCacheMaxElements,
     StfcUserAuthorization.tokenCacheSecondsToLive
   ).enableStatsLogging('uowsTokenCache');
@@ -281,15 +281,25 @@ export class StfcUserAuthorization extends UserAuthorization {
   }
 
   async isExternalTokenValid(token: string): Promise<boolean> {
-    const cachedValidity = this.uowsTokenCache.get(token);
-    if (cachedValidity) {
+    const cachedValidity = await this.uowsTokenCache.get(token);
+    if (cachedValidity !== undefined) {
+      if (!cachedValidity) {
+        this.uowsTokenCache.remove(token);
+      }
+
       return cachedValidity;
     }
 
-    const isValid: boolean = (await client.isTokenValid(token))?.return;
-    // Only cache valid tokens to avoid locking out users for a long time
-    if (isValid) {
-      this.uowsTokenCache.put(token, true);
+    const tokenRequest: Promise<boolean> = client
+      .isTokenValid(token)
+      .then((response) => response.return);
+
+    this.uowsTokenCache.put(token, tokenRequest);
+
+    const isValid: boolean = await tokenRequest;
+    // Only keep valid tokens cached to avoid locking out users for a long time
+    if (!isValid) {
+      this.uowsTokenCache.remove(token);
     }
 
     return isValid;
