@@ -159,25 +159,24 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     if (cacheMisses.length > 0) {
-      const uowsRequest = searchableOnly
-        ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
-            token,
-            cacheMisses
-          )
-        : client.getBasicPeopleDetailsFromUserNumbers(token, cacheMisses);
+      const uowsRequest: Promise<StfcBasicPersonDetails[] | null> = (
+        searchableOnly
+          ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
+              token,
+              cacheMisses
+            )
+          : client.getBasicPeopleDetailsFromUserNumbers(token, cacheMisses)
+      ).then((result) => result?.return);
 
       for (const userNumber of cacheMisses) {
-        const userRequest = uowsRequest
-          .then((result) => result?.return)
-          .then((users: StfcBasicPersonDetails[]) =>
-            users?.find((user) => user.userNumber == userNumber)
-          );
+        const userRequest = uowsRequest.then((users) =>
+          users?.find((user) => user.userNumber == userNumber)
+        );
         cache.put(userNumber, userRequest);
         stfcUserRequests.push(userRequest);
       }
 
-      const usersFromUows: StfcBasicPersonDetails[] | null = (await uowsRequest)
-        ?.return;
+      const usersFromUows = await uowsRequest;
 
       if (usersFromUows) {
         await this.ensureDummyUsersExist(
