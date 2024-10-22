@@ -84,6 +84,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.TECHNICAL_REVIEW,
       FeatureId.FAP_REVIEW,
       FeatureId.USER_SEARCH_FILTER,
+      FeatureId.STFC_XPRESS_MANAGEMENT,
     ],
     true
   );
@@ -118,6 +119,10 @@ async function enableDefaultStfcFeatures() {
   await db.updateSettings({
     settingsId: SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS,
     settingsValue: 'FEASIBILITY',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.FAP_SECS_EDIT_TECH_REVIEWS,
+    settingsValue: 'true',
   });
 }
 

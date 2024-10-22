@@ -98,4 +98,13 @@ export interface ProposalDataSource {
   getRelatedUsersOnProposals(id: number): Promise<number[]>;
   getProposalById(proposalId: string): Promise<Proposal | null>;
   doesProposalNeedTechReview(proposalPk: number): Promise<boolean>;
+  getTechniqueScientistProposals(
+    scientistId: UserWithRole,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
 }

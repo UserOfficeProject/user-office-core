@@ -494,22 +494,94 @@ context('Fap reviews tests', () => {
       cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
       cy.contains(fapMembers.reviewer.lastName);
 
+      cy.get('button[role="tab"]').contains('Logs').click();
+
+      cy.finishedLoading();
+
+      cy.contains(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL);
+    });
+
+    it('Officer should be able to assign ranks to reviewers', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk, secondCreatedProposalPk],
+      });
+
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+      });
+
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer2.id],
+      });
+
+      cy.assignFapReviewersToProposals({
+        assignments: {
+          memberId: fapMembers.reviewer.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+        fapId: createdFapId,
+      });
+
+      cy.assignFapReviewersToProposals({
+        assignments: {
+          memberId: fapMembers.reviewer2.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+        fapId: createdFapId,
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.get('[role="dialog"]').should('not.exist');
+      cy.get('[aria-label="Detail panel visibility toggle"]').first().click();
+      cy.contains(fapMembers.reviewer.lastName);
+
       cy.contains(fapMembers.reviewer.lastName)
         .parent()
         .find('[data-cy="rank-reviewer"]')
         .click();
 
-      cy.get('[data-cy="rank-input"]').type('4564654');
+      cy.get('[data-cy="rank-input"]').type('-1');
+
+      cy.contains('The rank -1 is invalid, please chose another.');
+
+      // For some reason we need to clear twice
+      cy.get('[data-cy="rank-input"]').clear().clear().type('3');
+
+      cy.contains('The rank 3 is invalid, please chose another.');
+
+      cy.get('[data-cy="rank-input"]').clear().clear().type('1');
 
       cy.get('[data-cy="rank-submit"]').click();
 
-      cy.contains(fapMembers.reviewer.lastName).parent().contains('4564654');
+      cy.get('[index="1"]').children().contains(fapMembers.reviewer.lastName);
 
-      cy.contains('Logs').click();
+      cy.contains(fapMembers.reviewer2.lastName)
+        .parent()
+        .find('[data-cy="rank-reviewer"]')
+        .click();
 
-      cy.finishedLoading();
+      cy.get('[data-cy="rank-input"]').type('1');
 
-      cy.contains(Event.FAP_MEMBER_ASSIGNED_TO_PROPOSAL);
+      cy.contains(
+        'Warning! The rank 1 is already taken please chose another or update other ranks.'
+      );
+
+      cy.get('[data-cy="rank-input"]').clear().clear().type('2');
+
+      cy.get('[data-cy="rank-submit"]').click();
+
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
+      cy.contains(fapMembers.reviewer2.lastName).parent().contains('1');
+
+      cy.get('[index="1"]').children().contains(fapMembers.reviewer2.lastName);
+      cy.get('[index="0"]').children().contains(fapMembers.reviewer.lastName);
     });
 
     it('Should be able to assign Fap members to proposals in existing Fap', () => {
@@ -552,7 +624,7 @@ context('Fap reviews tests', () => {
       cy.contains(fapMembers.reviewer.lastName);
       cy.contains(fapMembers.reviewer2.lastName);
 
-      cy.contains('Logs').click();
+      cy.get('button[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
@@ -685,7 +757,7 @@ context('Fap reviews tests', () => {
         .contains(fapMembers.reviewer2.lastName)
         .should('have.length', 1);
 
-      cy.contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
@@ -1224,6 +1296,63 @@ context('Fap reviews tests', () => {
       cy.contains('Submitted').should('be.disabled');
 
       cy.finishedLoading();
+    });
+
+    it('Fap Secretary should be able to edit only comments of technical reviews', function () {
+      if (
+        settings
+          .getEnabledSettings()
+          .get(SettingsId.FAP_SECS_EDIT_TECH_REVIEWS) !== 'true'
+      ) {
+        this.skip();
+      }
+
+      const internalComment = faker.word.words(2);
+      const publicComment = faker.word.words(2);
+
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 6,
+        instrumentId: newlyCreatedInstrumentId,
+      });
+
+      cy.assignFapReviewersToProposals({
+        assignments: {
+          memberId: fapMembers.reviewer.id,
+          proposalPk: firstCreatedProposalPk,
+        },
+        fapId: createdFapId,
+      });
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="view-proposal"]').click();
+
+      cy.contains('Technical reviews').click();
+
+      // The children are the components that are disabled
+      cy.get('[data-cy="technical-review-status"]')
+        .children()
+        .should('be.disabled');
+      cy.get('[data-cy="timeAllocation"]')
+        .children()
+        .children()
+        .should('be.disabled');
+
+      cy.setTinyMceContent('comment', internalComment);
+      cy.setTinyMceContent('publicComment', publicComment);
+
+      cy.get('[data-cy="save-technical-review"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Technical review submitted successfully',
+      });
     });
   });
 
@@ -2701,7 +2830,7 @@ context('Fap meeting components tests', () => {
 
       cy.get('@rows').should('not.contain.text', fapMembers.reviewer.lastName);
 
-      cy.contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
@@ -2734,7 +2863,7 @@ context('Fap meeting components tests', () => {
 
       cy.closeNotification();
 
-      cy.contains('Logs').click();
+      cy.get('[role="tab"]').contains('Logs').click();
 
       cy.finishedLoading();
 
@@ -3609,6 +3738,7 @@ context('Automatic Fap assignment to Proposal', () => {
 
 context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
+  let proposalPK: number;
 
   beforeEach(function () {
     cy.resetDB();
@@ -3705,6 +3835,7 @@ context('Fap meeting exports test', () => {
       const createdProposal = result.createProposal;
 
       cy.wrap(createdProposal.proposalId).as('proposal2Id');
+      proposalPK = createdProposal.primaryKey;
 
       if (createdProposal) {
         cy.updateProposal({
@@ -3939,6 +4070,41 @@ context('Fap meeting exports test', () => {
         cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
           (actualExport) => {
             cy.fixture('exampleCallFapExportSTFC.json').then(
+              (expectedExport) => {
+                expect(expectedExport).to.deep.equal(actualExport);
+              }
+            );
+          }
+        );
+      });
+  });
+
+  it('Expired proposals should not appear in exports', function () {
+    cy.getAndStoreFeaturesEnabled().then(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        this.skip();
+      }
+    });
+
+    cy.changeProposalsStatus({
+      proposalPks: [proposalPK],
+      statusId: 9,
+    });
+
+    cy.login('officer');
+    cy.visit('/FapPage/2?tab=4&call=1');
+
+    cy.get('button[aria-label="Export in Excel"]').click();
+
+    const downloadsFolder = Cypress.config('downloadsFolder');
+    const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+
+    cy.readFile(`${downloadsFolder}/${fileName}`)
+      .should('exist')
+      .then(() => {
+        cy.task('convertXlsxToJson', `${downloadsFolder}/${fileName}`).then(
+          (actualExport) => {
+            cy.fixture('exampleFapExportExpired.json').then(
               (expectedExport) => {
                 expect(expectedExport).to.deep.equal(actualExport);
               }

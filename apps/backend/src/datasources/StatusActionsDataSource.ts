@@ -9,12 +9,16 @@ export interface StatusActionsDataSource {
     proposalWorkflowConnectionId: number,
     proposalWorkflowId: number
   ): Promise<ConnectionHasStatusAction[]>;
+  getConnectionStatusAction(
+    proposalWorkflowConnectionId: number,
+    proposalStatusActionId: number
+  ): Promise<ConnectionHasStatusAction>;
   updateConnectionStatusAction(
     data: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction>;
   getStatusAction(actionId: number): Promise<ProposalStatusAction>;
   getStatusActions(): Promise<ProposalStatusAction[]>;
   addConnectionStatusActions(
-    input: AddConnectionStatusActionsInput
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null>;
 }
