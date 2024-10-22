@@ -1,5 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
-
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
@@ -116,7 +114,7 @@ export class StfcUserDataSource implements UserDataSource {
   >(
     StfcUserDataSource.userDetailsCacheMaxElements,
     StfcUserDataSource.userDetailsCacheSecondsToLive
-  ).enableStatsLogging('uowsBasicUserDetailsCache', 30);
+  ).enableStatsLogging('uowsBasicUserDetailsCache');
 
   private uowsSearchableBasicUserDetailsCache = new Cache<
     Promise<StfcBasicPersonDetails | undefined>
@@ -161,7 +159,6 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     if (cacheMisses.length > 0) {
-      logger.logInfo('Making users request', { users: cacheMisses.length });
       const uowsRequest = searchableOnly
         ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
             token,
