@@ -421,7 +421,8 @@ const XpressProposalTable = () => {
                       .getAll('selection')
                       .filter((item): item is string => !!item)
                       .map((item) => +item),
-                    'title'
+                    'title',
+                    true
                   );
                 },
                 position: 'toolbarOnSelect',
