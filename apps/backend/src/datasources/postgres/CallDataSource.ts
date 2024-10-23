@@ -43,8 +43,10 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async getCalls(filter?: CallsFilter): Promise<Call[]> {
-    const query = database('call').select(['*']);
-
+    const query = database('call').select([
+      '*',
+      'call.description as description',
+    ]);
     if (filter?.shortCode) {
       query.where('call_short_code', 'like', `%${filter.shortCode}%`);
     }
@@ -134,6 +136,22 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.where('call_ended', true);
     } else if (filter?.isCallEndedByEvent === false) {
       query.where('call_ended', false);
+    }
+
+    if (filter?.proposalStatusShortCode) {
+      query
+        .join(
+          'proposal_workflow_connections as w',
+          'call.proposal_workflow_id',
+          'w.proposal_workflow_id'
+        )
+        .leftJoin(
+          'proposal_statuses as s',
+          'w.proposal_status_id',
+          's.proposal_status_id'
+        )
+        .where('s.short_code', filter.proposalStatusShortCode)
+        .distinctOn('call.call_id');
     }
 
     return query.then((callDB: CallRecord[]) =>
