@@ -2022,7 +2022,11 @@ context('Template tests', () => {
         .should('exist');
     });
 
-    it('Activate a Visit Registration template', () => {
+    it('Activate a Visit Registration template', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT)) {
+        this.skip();
+      }
+
       cy.login('officer');
       cy.visit('/VisitTemplates');
       cy.finishedLoading();
