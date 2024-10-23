@@ -18,6 +18,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -60,6 +61,8 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
+    @inject(Tokens.TechniqueDataSource)
+    private techniqueDataSource: TechniqueDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -686,6 +689,9 @@ export default class ProposalMutations {
       referenceNumber,
       users: coiIds,
       created,
+      submittedDate,
+      techniqueId,
+      instrumentId,
     } = args;
 
     const submitter = await this.userDataSource.getUser(submitterId);
@@ -744,6 +750,8 @@ export default class ProposalMutations {
       return rejection('Proposal creation rejected', {});
     }
 
+    proposal.submittedDate = submittedDate;
+
     const updatedProposal = await this.updateProposal(agent, {
       proposal: proposal as Proposal,
       args: {
@@ -763,6 +771,26 @@ export default class ProposalMutations {
       updatedProposal,
       referenceNumber
     );
+
+    if (submitted instanceof Rejection) {
+      return rejection('Unable to update proposal', {
+        reason: updatedProposal,
+      });
+    }
+
+    if (techniqueId) {
+      this.techniqueDataSource.assignProposalToTechniques(
+        submitted.primaryKey,
+        [techniqueId]
+      );
+    }
+
+    if (instrumentId) {
+      this.instrumentDataSource.assignProposalToInstrument(
+        submitted.primaryKey,
+        instrumentId
+      );
+    }
 
     return submitted;
   }

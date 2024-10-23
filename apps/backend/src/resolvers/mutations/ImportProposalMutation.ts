@@ -36,6 +36,15 @@ export class ImportProposalArgs {
 
   @Field(() => Date, { nullable: true })
   public created?: Date;
+
+  @Field(() => Date)
+  public submittedDate: Date;
+
+  @Field(() => Int, { nullable: true })
+  public techniqueId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public instrumentId?: number;
 }
 
 @Resolver()
