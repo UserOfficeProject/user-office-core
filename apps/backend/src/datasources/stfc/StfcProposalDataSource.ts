@@ -24,8 +24,6 @@ import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
-const stfcUserDataSource = new StfcUserDataSource();
-
 const fieldMap: { [key: string]: string } = {
   finalStatus: 'final_status',
   callShortCode: 'call_short_code',
