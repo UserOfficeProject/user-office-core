@@ -37,8 +37,4 @@ export interface TechniqueDataSource {
     techniqueId: number
   ): Promise<boolean>;
   getTechniquesByProposalPk(proposalPk: number): Promise<Technique[]>;
-  isXpressInstrumentAndProposal(
-    proposalPk: number,
-    instrumentId: number
-  ): Promise<boolean>;
 }

@@ -113,6 +113,7 @@ export default class PostgresTechniqueDataSource
         throw new Error(`Error getting instruments by technique ID: ${error}`);
       });
   }
+
   async getTechniqueScientists(
     techniqueId: number
   ): Promise<BasicUserDetails[]> {
@@ -330,21 +331,5 @@ export default class PostgresTechniqueDataSource
       })
       .where('thp.proposal_id', proposalPk)
       .distinct();
-  }
-
-  async isXpressInstrumentAndProposal(
-    proposalPk: number,
-    instrumentId: number
-  ): Promise<boolean> {
-    const result = await database('technique_has_proposals as thp')
-      .select('*')
-      .join('technique_has_instruments as thi', {
-        'thp.technique_id': 'thi.technique_id',
-      })
-      .where('thp.proposal_id', proposalPk)
-      .andWhere('thi.instrument_id', instrumentId)
-      .distinct();
-
-    return result && result.length > 0 ? true : false;
   }
 }
