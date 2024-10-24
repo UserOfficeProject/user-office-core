@@ -132,15 +132,4 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
 
     return true;
   }
-
-  async isXpressInstrumentAndProposal(
-    proposalPk: number,
-    instrumentId: number
-  ): Promise<boolean> {
-    if (proposalPk && instrumentId) {
-      return true;
-    }
-
-    return true;
-  }
 }

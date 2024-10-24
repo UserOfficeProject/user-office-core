@@ -178,19 +178,4 @@ export default class TechniqueMutations {
         );
       });
   }
-
-  async isXpressInstrumentAndProposal(
-    proposalPk: number,
-    instrumentId: number
-  ): Promise<boolean | Rejection> {
-    return this.dataSource
-      .isXpressInstrumentAndProposal(proposalPk, instrumentId)
-      .catch((error) => {
-        return rejection(
-          'Could not get the proposal details',
-          { proposalPk, instrumentId },
-          error
-        );
-      });
-  }
 }

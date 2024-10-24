@@ -73,13 +73,36 @@ export class AssignProposalsToInstrumentsMutation {
     @Args() args: AssignProposalsToInstrumentsArgs,
     @Ctx() context: ResolverContext
   ) {
-    const isXpressProposals =
-      await context.mutations.technique.isXpressInstrumentAndProposal(
-        args.proposalPks[0],
-        args.instrumentIds[0]
+    const techniquesWithProposal =
+      await context.queries.technique.getTechniquesByProposalPk(
+        context.user,
+        args.proposalPks[0]
       );
 
-    if (!isXpressProposals) {
+    if (!techniquesWithProposal || techniquesWithProposal.length < 1) {
+      return false;
+    }
+
+    const instrumentWithTechnique =
+      await context.queries.technique.getInstrumentsByTechniqueId(
+        context.user,
+        techniquesWithProposal[0].id
+      );
+
+    if (
+      isRejection(instrumentWithTechnique) ||
+      !instrumentWithTechnique ||
+      instrumentWithTechnique.length < 1
+    ) {
+      return false;
+    }
+
+    const isXpress =
+      instrumentWithTechnique.filter(
+        (instruments) => instruments.id === args.instrumentIds[0]
+      ).length > 0;
+
+    if (!isXpress) {
       return false;
     }
 
