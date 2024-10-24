@@ -16,8 +16,6 @@ type SampleOverrides = Partial<
     | 'proposalPk'
     | 'questionId'
     | 'questionaryId'
-    | 'safetyComment'
-    | 'safetyStatus'
     | 'title'
     | 'shipmentId'
   >
@@ -56,16 +54,10 @@ export class CloneUtils {
       overrides?.questionId || sourceSample.questionId
     );
 
-    if (
-      overrides?.isPostProposalSubmission !== undefined ||
-      overrides?.safetyComment !== undefined ||
-      overrides?.safetyStatus !== undefined
-    ) {
+    if (overrides?.isPostProposalSubmission !== undefined) {
       newSample = await this.sampleDataSource.updateSample({
         sampleId: newSample.id,
         isPostProposalSubmission: overrides.isPostProposalSubmission,
-        safetyComment: overrides.safetyComment,
-        safetyStatus: overrides.safetyStatus,
       });
     }
 

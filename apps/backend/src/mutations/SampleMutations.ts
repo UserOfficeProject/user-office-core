@@ -118,17 +118,6 @@ export default class SampleMutations {
       );
     }
 
-    // This makes sure administrative fields can be only updated by user with the right role
-    if (args.safetyComment || args.safetyStatus) {
-      const canAdministrerSample =
-        this.userAuth.isUserOfficer(agent) ||
-        (await this.sampleAuth.isSampleSafetyReviewer(agent));
-      if (canAdministrerSample === false) {
-        delete args.safetyComment;
-        delete args.safetyStatus;
-      }
-    }
-
     return this.sampleDataSource
       .updateSample(args)
       .then((sample) => sample)

@@ -36,6 +36,10 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
   }
 
+  isSampleSafetyReviewer(agent: UserWithRole | null) {
+    return agent?.currentRole?.shortCode === Roles.SAMPLE_SAFETY_REVIEWER;
+  }
+
   async isInternalUser(
     userId: number,
     currentRole: Role | null
