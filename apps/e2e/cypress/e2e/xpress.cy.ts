@@ -839,5 +839,66 @@ context('Xpress tests', () => {
       cy.should('not.contain', createdProposalId5);
       cy.should('not.contain', technique5.name);
     });
+
+    it('User officer able to select and assign an instrument for a proposal', function () {
+      cy.login('officer');
+      cy.changeActiveRole(initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      // Check if only instrument 1 and 2 is available to be selected for proposal 1
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+      // Assign instrument 1 to proposal 1
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        instrument1.name
+      );
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.finishedLoading();
+      cy.contains(instrument1.name);
+    });
+
+    it('Instrument scientist able to select and assign an instrument for a proposal', function () {
+      /*
+      Scientist 1 belongs to technique 1, which only has proposal 1
+      */
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      // Check if only instrument 1 and 2 is available to be selected for proposal 1
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+      // Assign instrument 1 to proposal 1
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        instrument1.name
+      );
+      cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.finishedLoading();
+      cy.contains(instrument1.name);
+    });
   });
 });

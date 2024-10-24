@@ -113,6 +113,7 @@ export default class PostgresTechniqueDataSource
         throw new Error(`Error getting instruments by technique ID: ${error}`);
       });
   }
+
   async getTechniqueScientists(
     techniqueId: number
   ): Promise<BasicUserDetails[]> {
