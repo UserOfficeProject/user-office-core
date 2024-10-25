@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { isRejection } from '../../models/Rejection';
+import { isRejection, rejection } from '../../models/Rejection';
 
 @ArgsType()
 export class AssignProposalsToInstrumentsArgs {
@@ -80,7 +80,9 @@ export class AssignProposalsToInstrumentsMutation {
       );
 
     if (!techniquesWithProposal || techniquesWithProposal.length < 1) {
-      return false;
+      return rejection(
+        'Failed to retrieve techniques attached to the proposal'
+      );
     }
 
     const instrumentWithTechnique =
@@ -89,21 +91,20 @@ export class AssignProposalsToInstrumentsMutation {
         techniquesWithProposal[0].id
       );
 
-    if (
-      isRejection(instrumentWithTechnique) ||
-      !instrumentWithTechnique ||
-      instrumentWithTechnique.length < 1
-    ) {
-      return false;
+    let isXpress = false;
+
+    if (!isRejection(instrumentWithTechnique)) {
+      isXpress =
+        instrumentWithTechnique.length > 0 &&
+        instrumentWithTechnique.filter(
+          (instruments) => instruments.id === args.instrumentIds[0]
+        ).length > 0;
+    } else {
+      return instrumentWithTechnique;
     }
 
-    const isXpress =
-      instrumentWithTechnique.filter(
-        (instruments) => instruments.id === args.instrumentIds[0]
-      ).length > 0;
-
     if (!isXpress) {
-      return false;
+      return rejection('No permission to assign instrument for this proposal');
     }
 
     const res =
