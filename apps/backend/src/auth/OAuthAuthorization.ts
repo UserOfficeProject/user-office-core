@@ -167,7 +167,7 @@ export class OAuthAuthorization extends UserAuthorization {
         undefined,
         userInfo.family_name,
         userInfo.email,
-        userInfo.preferred_username,
+        userInfo.preferred_username ?? '',
         userInfo.sub,
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
