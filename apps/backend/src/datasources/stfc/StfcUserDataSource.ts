@@ -109,18 +109,21 @@ export class StfcUserDataSource implements UserDataSource {
   private static readonly rolesCacheMaxElements = 1000;
   private static readonly rolesCacheSecondsToLive = 600; //10 minutes
 
-  private uowsBasicUserDetailsCache = new Cache<StfcBasicPersonDetails>(
+  private uowsBasicUserDetailsCache = new Cache<
+    Promise<StfcBasicPersonDetails | undefined>
+  >(
     StfcUserDataSource.userDetailsCacheMaxElements,
     StfcUserDataSource.userDetailsCacheSecondsToLive
   ).enableStatsLogging('uowsBasicUserDetailsCache');
 
-  private uowsSearchableBasicUserDetailsCache =
-    new Cache<StfcBasicPersonDetails>(
-      StfcUserDataSource.userDetailsCacheMaxElements,
-      StfcUserDataSource.userDetailsCacheSecondsToLive
-    ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
+  private uowsSearchableBasicUserDetailsCache = new Cache<
+    Promise<StfcBasicPersonDetails | undefined>
+  >(
+    StfcUserDataSource.userDetailsCacheMaxElements,
+    StfcUserDataSource.userDetailsCacheSecondsToLive
+  ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
 
-  private uowsRolesCache = new Cache<Role[]>(
+  private uowsRolesCache = new Cache<Promise<Role[]>>(
     StfcUserDataSource.rolesCacheMaxElements,
     StfcUserDataSource.rolesCacheSecondsToLive
   ).enableStatsLogging('uowsRolesCache');
@@ -143,36 +146,56 @@ export class StfcUserDataSource implements UserDataSource {
       ? this.uowsSearchableBasicUserDetailsCache
       : this.uowsBasicUserDetailsCache;
 
-    const stfcUsers: StfcBasicPersonDetails[] = [];
+    const stfcUserRequests: Promise<StfcBasicPersonDetails | undefined>[] = [];
     const cacheMisses: string[] = [];
 
     for (const userNumber of userNumbers) {
       const cachedUser = cache.get(userNumber);
       if (cachedUser) {
-        stfcUsers.push(cachedUser);
+        stfcUserRequests.push(cachedUser);
       } else {
         cacheMisses.push(userNumber);
       }
     }
 
     if (cacheMisses.length > 0) {
-      const uowsRequest = searchableOnly
-        ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
-            token,
-            cacheMisses
-          )
-        : client.getBasicPeopleDetailsFromUserNumbers(token, cacheMisses);
-      const usersFromUows: StfcBasicPersonDetails[] | null = (await uowsRequest)
-        ?.return;
+      const uowsRequest: Promise<StfcBasicPersonDetails[] | null> = (
+        searchableOnly
+          ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
+              token,
+              cacheMisses
+            )
+          : client.getBasicPeopleDetailsFromUserNumbers(token, cacheMisses)
+      ).then((result) => result?.return);
+
+      for (const userNumber of cacheMisses) {
+        const userRequest = uowsRequest.then((users) =>
+          users?.find((user) => user.userNumber == userNumber)
+        );
+        cache.put(userNumber, userRequest);
+        stfcUserRequests.push(userRequest);
+      }
+
+      const usersFromUows = await uowsRequest;
 
       if (usersFromUows) {
         await this.ensureDummyUsersExist(
           usersFromUows.map((stfcUser) => parseInt(stfcUser.userNumber))
         );
-        usersFromUows.map((user) => cache.put(user.userNumber, user));
-        stfcUsers.push(...usersFromUows);
       }
     }
+
+    const stfcUsers: StfcBasicPersonDetails[] = await Promise.all(
+      stfcUserRequests
+    ).then((users) =>
+      users.filter((user): user is StfcBasicPersonDetails => user !== undefined)
+    );
+    // Uncache any failed lookups
+    userNumbers
+      .filter(
+        (un) => stfcUsers.find((user) => user.userNumber === un) === undefined
+      )
+      .forEach((un) => cache.remove(un));
 
     return stfcUsers;
   }
@@ -180,29 +203,35 @@ export class StfcUserDataSource implements UserDataSource {
   private async getStfcBasicPersonByEmail(
     email: string,
     searchableOnly?: boolean
-  ): Promise<StfcBasicPersonDetails | null> {
+  ): Promise<StfcBasicPersonDetails | undefined> {
     const cache = searchableOnly
       ? this.uowsSearchableBasicUserDetailsCache
       : this.uowsBasicUserDetailsCache;
 
-    const cachedUser = cache.get(email);
+    const cachedUser = await cache.get(email);
     if (cachedUser) {
       return cachedUser;
     }
 
-    const uowsRequest = searchableOnly
-      ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
-      : client.getBasicPersonDetailsFromEmail(token, email);
-    const stfcUser: StfcBasicPersonDetails | null = (await uowsRequest)?.return;
+    const uowsRequest = (
+      searchableOnly
+        ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
+        : client.getBasicPersonDetailsFromEmail(token, email)
+    )
+      .then((response) => response?.return)
+      .then((stfcUser: StfcBasicPersonDetails | null) => {
+        if (!stfcUser) {
+          return undefined;
+        }
 
-    if (!stfcUser) {
-      return null;
-    }
+        return this.ensureDummyUserExists(parseInt(stfcUser.userNumber)).then(
+          () => stfcUser
+        );
+      });
 
-    await this.ensureDummyUserExists(parseInt(stfcUser.userNumber));
-    cache.put(email, stfcUser);
+    cache.put(email, uowsRequest);
 
-    return stfcUser;
+    return uowsRequest;
   }
 
   async delete(id: number): Promise<User | null> {
@@ -281,53 +310,57 @@ export class StfcUserDataSource implements UserDataSource {
       return cachedRoles;
     }
 
-    const stfcRoles: stfcRole[] | null = (
-      await client.getRolesForUser(token, id)
-    )?.return;
+    const stfcRolesRequest = client
+      .getRolesForUser(token, id)
+      .then((response): stfcRole[] | null => response?.return)
+      .then((stfcRoles) =>
+        this.getRoles().then((roleDefinitions) => {
+          const userRole: Role | undefined = roleDefinitions.find(
+            (role) => role.shortCode == Roles.USER
+          );
+          if (!userRole) {
+            return [];
+          }
 
-    const roleDefinitions: Role[] = await this.getRoles();
-    const userRole: Role | undefined = roleDefinitions.find(
-      (role) => role.shortCode == Roles.USER
-    );
-    if (!userRole) {
-      return Promise.resolve([]);
-    }
+          if (!stfcRoles || stfcRoles.length == 0) {
+            return [userRole];
+          }
 
-    if (!stfcRoles || stfcRoles.length == 0) {
-      return [userRole];
-    }
+          /*
+           * Convert the STFC roles to the Roles enums which refers to roles
+           * by short code. We will use the short code to filter relevant
+           * roles.
+           */
+          const userRolesAsEnum: Roles[] = stfcRoles
+            .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name])
+            .filter((r) => r !== undefined) as Roles[];
 
-    /*
-     * Convert the STFC roles to the Roles enums which refers to roles
-     * by short code. We will use the short code to filter relevant
-     * roles.
-     */
-    const userRolesAsEnum: Roles[] = stfcRoles
-      .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name])
-      .filter((r) => r !== undefined) as Roles[];
+          /*
+           * Filter relevant roles by short code.
+           */
+          const userRolesAsRole: Role[] = userRolesAsEnum
+            .map((r) => roleDefinitions.find((d) => d.shortCode === r))
+            .filter((r) => r !== undefined) as Role[];
 
-    /*
-     * Filter relevant roles by short code.
-     */
-    const userRolesAsRole: Role[] = userRolesAsEnum
-      .map((r) => roleDefinitions.find((d) => d.shortCode === r))
-      .filter((r) => r !== undefined) as Role[];
+          /*
+           * We can't return non-unique roles.
+           */
+          const uniqueRoles: Role[] = [...new Set(userRolesAsRole)];
 
-    /*
-     * We can't return non-unique roles.
-     */
-    const uniqueRoles: Role[] = [...new Set(userRolesAsRole)];
+          uniqueRoles.sort((a, b) => a.id - b.id);
 
-    uniqueRoles.sort((a, b) => a.id - b.id);
+          /*
+           * Prepend the user role as it must be first.
+           */
+          const userRoles = [userRole, ...uniqueRoles];
 
-    /*
-     * Prepend the user role as it must be first.
-     */
-    const userRoles = [userRole, ...uniqueRoles];
+          return userRoles;
+        })
+      );
 
-    this.uowsRolesCache.put(String(id), userRoles);
+    this.uowsRolesCache.put(String(id), stfcRolesRequest);
 
-    return userRoles;
+    return stfcRolesRequest;
   }
 
   async getRoles(): Promise<Role[]> {

@@ -3089,7 +3089,7 @@ context('Template Delete, Archive, Unarchive', () => {
     });
   });
 
-  describe('Visit template Delete, Archive, Unarchive', () => {
+  describe.only('Visit template Delete, Archive, Unarchive', () => {
     const coProposer = initialDBData.users.user2;
     const visitor = initialDBData.users.user3;
     const PI = initialDBData.users.user1;
@@ -3160,6 +3160,11 @@ context('Template Delete, Archive, Unarchive', () => {
 
       cy.testActionButton(cyTagRegisterVisit, 'completed');
     };
+
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.VISIT_MANAGEMENT))
+        this.skip();
+    });
 
     it('Generic Template can be deleted if it is not associated with any Questionary', () => {
       cy.createTemplate({
