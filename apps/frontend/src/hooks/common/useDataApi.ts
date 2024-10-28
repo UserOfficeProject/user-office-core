@@ -15,6 +15,12 @@ import { RequestQuery } from 'utils/utilTypes';
 
 const endpoint = '/graphql';
 
+const clientNameHeader = 'apollographql-client-name';
+const anonymousClientName = 'UOP frontend - anonymous';
+function getClientName(userId: number) {
+  return `UOP frontend - user ${userId}`;
+}
+
 const notifyAndLog = async (
   enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
   userMessage: string,
@@ -44,6 +50,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     private skipErrorReport?: boolean
   ) {
     super(endpoint);
+    this.setHeader(clientNameHeader, anonymousClientName);
   }
 
   async request<T = unknown, V extends Variables = Variables>(
@@ -92,6 +99,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
     private token: string,
+    private userId: number,
     private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
     private onSessionExpired: () => void,
     private handleUserActive: () => void,
@@ -101,6 +109,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     private externalAuthLoginUrl?: string
   ) {
     super(endpoint);
+    this.setHeader(clientNameHeader, getClientName(userId));
     token && this.setHeader('authorization', `Bearer ${token}`);
     this.renewalDate = this.getRenewalDate(token);
     this.externalToken = this.getExternalToken(token);
@@ -113,7 +122,12 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
       try {
-        const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
+        const data = await getSdk(
+          new GraphQLClient(this.endpoint).setHeader(
+            clientNameHeader,
+            getClientName(this.userId)
+          )
+        ).getToken({
           token: this.token,
         });
 
@@ -208,7 +222,7 @@ export function useDataApi() {
     FeatureId.STFC_IDLE_TIMER
   )?.isEnabled;
 
-  const { token, handleNewToken, handleSessionExpired } =
+  const { token, handleNewToken, handleSessionExpired, user } =
     useContext(UserContext);
   const { handleUserActive, isIdle } = useContext(IdleContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -220,6 +234,7 @@ export function useDataApi() {
           ? new AuthorizedGraphQLClient(
               endpoint,
               token,
+              user.id,
               enqueueSnackbar,
               () => {
                 handleSessionExpired();
@@ -230,10 +245,14 @@ export function useDataApi() {
               handleNewToken,
               externalAuthLoginUrl ? externalAuthLoginUrl : undefined
             )
-          : new GraphQLClient(endpoint)
+          : new GraphQLClient(endpoint).setHeader(
+              clientNameHeader,
+              anonymousClientName
+            )
       ),
     [
       token,
+      user.id,
       enqueueSnackbar,
       handleUserActive,
       isIdle,
@@ -255,5 +274,7 @@ export function useUnauthorizedApi() {
 }
 
 export function getUnauthorizedApi() {
-  return getSdk(new GraphQLClient(endpoint));
+  return getSdk(
+    new GraphQLClient(endpoint).setHeader(clientNameHeader, anonymousClientName)
+  );
 }
