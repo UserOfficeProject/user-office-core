@@ -203,7 +203,10 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
       Tokens.UserAuthorization
     );
 
-    if (!userAuthorization.isUserOfficer(userWithRole)) {
+    if (
+      !userAuthorization.isUserOfficer(userWithRole) &&
+      !userAuthorization.isInstrumentScientist(userWithRole)
+    ) {
       throw new Error('User has insufficient rights');
     }
     const meta: XLSXMetaBase = {

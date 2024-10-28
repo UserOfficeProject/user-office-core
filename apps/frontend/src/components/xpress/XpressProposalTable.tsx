@@ -4,6 +4,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import { FormControl, MenuItem, Select } from '@mui/material';
 import {
@@ -60,6 +61,12 @@ const XpressProposalTable = () => {
   const pageSize = searchParams.get('pageSize');
 
   const { api } = useDataApiWithFeedback();
+  const [totalCount, setTotalCount] = useState(0);
+  const allPrefetchedProposalsSelected =
+    totalCount === searchParams.getAll('selection').length;
+  const [allProposalSelectionLoading, setAllProposalSelectionLoading] =
+    useState(false);
+
   const { currentRole } = useContext(UserContext);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -319,6 +326,7 @@ const XpressProposalTable = () => {
           }) || [];
 
         setTableData(tableData);
+        setTotalCount(result?.totalCount || 0);
 
         resolve({
           data: tableData,
@@ -369,6 +377,54 @@ const XpressProposalTable = () => {
 
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
   const downloadXLSXProposal = useDownloadXLSXProposal();
+
+  const fetchProposalCoreBasicData = async () => {
+    const {
+      callId,
+      instrumentFilter,
+      proposalStatusId,
+      questionaryIds,
+      text,
+      questionFilter,
+      referenceNumbers,
+    } = proposalFilter;
+
+    const result: {
+      proposals: ProposalViewData[] | undefined;
+      totalCount: number;
+    } = { proposals: undefined, totalCount: 0 };
+
+    result.proposals = await api()
+      .getTechniqueScientistProposalsBasic({
+        filter: {
+          callId: callId,
+          instrumentFilter: instrumentFilter,
+          proposalStatusId: proposalStatusId,
+          questionaryIds: questionaryIds,
+          referenceNumbers: referenceNumbers,
+          questionFilter: questionFilter && {
+            ...questionFilter,
+            value:
+              JSON.stringify({ value: questionFilter?.value }) ?? undefined,
+          }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
+          text: text,
+        },
+        searchText: searchParams.get('search'),
+      })
+      .then((data) => {
+        result.totalCount = data.techniqueScientistProposals?.totalCount || 0;
+
+        return data.techniqueScientistProposals?.proposals.map((proposal) => {
+          return {
+            ...proposal,
+            status: proposal.submitted ? 'Submitted' : 'Open',
+            finalStatus: getTranslation(proposal.finalStatus as ResourceId),
+          } as ProposalViewData;
+        });
+      });
+
+    return result;
+  };
 
   return (
     <>
@@ -424,6 +480,69 @@ const XpressProposalTable = () => {
                     'title',
                     true
                   );
+                },
+                position: 'toolbarOnSelect',
+              },
+              {
+                tooltip: 'Select all proposals',
+                icon: DoneAllIcon,
+                hidden: false,
+                iconProps: {
+                  hidden: allPrefetchedProposalsSelected,
+                  defaultValue: totalCount,
+                  className: allProposalSelectionLoading ? 'loading' : '',
+                },
+                onClick: async () => {
+                  setAllProposalSelectionLoading(true);
+                  if (allPrefetchedProposalsSelected) {
+                    setSearchParams((searchParams) => {
+                      searchParams.delete('selection');
+
+                      return searchParams;
+                    });
+                    refreshTableData();
+                  } else {
+                    const selectedProposalsData =
+                      await fetchProposalCoreBasicData();
+
+                    if (!selectedProposalsData) {
+                      return;
+                    }
+
+                    // NOTE: Adding the missing data in the tableData state variable because some proposal group actions use additional data than primaryKey.
+                    const newTableData = selectedProposalsData.proposals?.map(
+                      (sp) => {
+                        const foundProposalData = tableData.find(
+                          (td) => td.primaryKey === sp.primaryKey
+                        );
+
+                        if (foundProposalData) {
+                          return foundProposalData;
+                        } else {
+                          return sp as ProposalViewData;
+                        }
+                      }
+                    );
+
+                    if (newTableData) {
+                      setTableData(newTableData);
+                    }
+
+                    setSearchParams((searchParams) => {
+                      searchParams.delete('selection');
+                      selectedProposalsData.proposals?.forEach((proposal) => {
+                        searchParams.append(
+                          'selection',
+                          proposal.primaryKey.toString()
+                        );
+                      });
+
+                      return searchParams;
+                    });
+                    refreshTableData();
+                  }
+
+                  setAllProposalSelectionLoading(false);
                 },
                 position: 'toolbarOnSelect',
               },
