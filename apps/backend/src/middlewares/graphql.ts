@@ -31,6 +31,7 @@ import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 import { isProduction } from '../utils/helperFunctions';
 import initGraphQLClient from './graphqlClient';
+import { apolloServerMetricsPlugin } from './metrics/apolloServerMetricsPlugin';
 
 export const context: ContextFunction<
   [ExpressContextFunctionArgument],
@@ -146,6 +147,7 @@ const apolloServer = async (app: Express) => {
   };
 
   const plugins = [
+    apolloServerMetricsPlugin(),
     ApolloServerPluginInlineTraceDisabled(),
     // Explicitly disable playground in prod
     isProduction
