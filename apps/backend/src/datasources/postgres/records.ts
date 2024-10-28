@@ -187,6 +187,7 @@ export interface QuestionRecord {
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly natural_key: string;
+  readonly full_count: number;
 }
 
 export interface AnswerRecord {
