@@ -16,8 +16,8 @@ import {
 } from '../../factory/xlsx/callFaps';
 import { collectFapXLSXData } from '../../factory/xlsx/fap';
 import {
-  collectEnhancedProposalXLSXData,
   collectProposalXLSXData,
+  collectTechniqueProposalXLSXData,
   defaultProposalDataColumns,
 } from '../../factory/xlsx/proposal';
 
@@ -172,71 +172,71 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
   }
 });
 
-router.get(
-  `/${XLSXType.XPRESS_PROPOSAL}/:proposal_pks`,
-  async (req, res, next) => {
-    const xpressProposalDataColumns = [
-      'Title',
-      'Proposal ID',
-      'Principal Investigator',
-      'Instrument',
-      'Status',
-    ];
+router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
+  const techniqueProposalDataColumns = [
+    'Proposal ID',
+    'Title',
+    'Principal Investigator',
+    'PI Email',
+    'Date Submitted',
+    'Technique',
+    'Instrument',
+    'Status',
+  ];
 
-    try {
-      if (!req.user) {
-        throw new Error('Not authorized');
-      }
-
-      const userWithRole = {
-        ...req.user.user,
-        currentRole: req.user.currentRole,
-      };
-
-      const proposalPks: number[] = req.params.proposal_pks
-        .split(',')
-        .map((n: string) => parseInt(n))
-        .filter((id: number) => !isNaN(id));
-
-      const userAuthorization = container.resolve<UserAuthorization>(
-        Tokens.UserAuthorization
-      );
-
-      if (!userAuthorization.isUserOfficer(userWithRole)) {
-        throw new Error('User has insufficient rights');
-      }
-      const meta: XLSXMetaBase = {
-        singleFilename: '',
-        collectionFilename: `proposals_${getCurrentTimestamp()}.xlsx`,
-        columns: xpressProposalDataColumns,
-      };
-
-      const data = await Promise.all(
-        proposalPks.map((proposalPk, indx) =>
-          collectEnhancedProposalXLSXData(
-            proposalPk,
-            userWithRole,
-            indx === 0
-              ? (filename: string) => (meta.singleFilename = filename)
-              : undefined
-          )
-        )
-      );
-
-      const userRole = req.user.currentRole;
-      downloadService.callFactoryService(
-        DownloadType.XLSX,
-        XLSXType.PROPOSAL,
-        { data, meta, userRole },
-        req,
-        res,
-        next
-      );
-    } catch (e) {
-      next(e);
+  try {
+    if (!req.user) {
+      throw new Error('Not authorized');
     }
+
+    const userWithRole = {
+      ...req.user.user,
+      currentRole: req.user.currentRole,
+    };
+
+    const proposalPks: number[] = req.params.proposal_pks
+      .split(',')
+      .map((n: string) => parseInt(n))
+      .filter((id: number) => !isNaN(id));
+
+    const userAuthorization = container.resolve<UserAuthorization>(
+      Tokens.UserAuthorization
+    );
+
+    if (!userAuthorization.isUserOfficer(userWithRole)) {
+      throw new Error('User has insufficient rights');
+    }
+    const meta: XLSXMetaBase = {
+      singleFilename: '',
+      collectionFilename: `proposals_${getCurrentTimestamp()}.xlsx`,
+      columns: techniqueProposalDataColumns,
+    };
+
+    const data = await Promise.all(
+      proposalPks.map((proposalPk, indx) =>
+        collectTechniqueProposalXLSXData(
+          proposalPk,
+          userWithRole,
+          indx === 0
+            ? (filename: string) => (meta.singleFilename = filename)
+            : undefined
+        )
+      )
+    );
+
+    const userRole = req.user.currentRole;
+    downloadService.callFactoryService(
+      DownloadType.XLSX,
+      XLSXType.PROPOSAL,
+      { data, meta, userRole },
+      req,
+      res,
+      next
+    );
+  } catch (e) {
+    next(e);
   }
-);
+});
 
 export default function xlsxDownload() {
   return router;

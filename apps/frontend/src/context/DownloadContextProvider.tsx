@@ -115,7 +115,7 @@ export enum PREPARE_DOWNLOAD_TYPE {
   XLSX_PROPOSAL,
   XLSX_FAP,
   XLSX_CALL_FAP,
-  XLSX_XPRESS_PROPOSAL,
+  XLSX_PROPOSAL_TECHNIQUE,
 }
 
 export type DownloadOptions = {
@@ -154,8 +154,8 @@ function generateLink(
       return '/download/pdf/generic-template/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_PROPOSAL:
       return '/download/xlsx/proposal/' + ids;
-    case PREPARE_DOWNLOAD_TYPE.XLSX_XPRESS_PROPOSAL:
-      return '/download/xlsx/xpressProposal/' + ids;
+    case PREPARE_DOWNLOAD_TYPE.XLSX_PROPOSAL_TECHNIQUE:
+      return '/download/xlsx/technique/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_CALL_FAP:
       return '/download/xlsx/call_fap/' + ids;
     case PREPARE_DOWNLOAD_TYPE.XLSX_FAP:

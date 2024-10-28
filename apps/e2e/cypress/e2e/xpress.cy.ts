@@ -748,6 +748,49 @@ context('Xpress tests', () => {
       );
       cy.get('input[aria-label="Search"]').focus().clear();
     });
+
+    it('Officer should be able to export the proposals into excel', function () {
+      cy.login('officer');
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress Proposals').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get("[aria-label='Export proposals in Excel']").first().click();
+
+      const downloadsFolder = Cypress.config('downloadsFolder');
+      const currentYear = new Date().getFullYear();
+      const downloadedFileName = `proposal_${currentYear}_${createdProposalId1}.xlsx`;
+
+      cy.readFile(`${downloadsFolder}/${downloadedFileName}`).should('exist');
+    });
+
+    it('Scientist should be able to export the proposals into excel', function () {
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress Proposals').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .check();
+
+      cy.get("[aria-label='Export proposals in Excel']").first().click();
+
+      const downloadsFolder = Cypress.config('downloadsFolder');
+      const currentYear = new Date().getFullYear();
+      const downloadedFileName = `proposal_${currentYear}_${createdProposalId1}.xlsx`;
+
+      cy.readFile(`${downloadsFolder}/${downloadedFileName}`).should('exist');
+    });
   });
 
   describe('Techniques advanced tests', () => {
