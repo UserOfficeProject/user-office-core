@@ -212,6 +212,12 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   }
 }
 
+export function getUnauthorizedApi() {
+  return getSdk(
+    new GraphQLClient(endpoint).setHeader(clientNameHeader, anonymousClientName)
+  );
+}
+
 export function useDataApi() {
   const settingsContext = useContext(SettingsContext);
   const featureContext = useContext(FeatureContext);
@@ -229,9 +235,9 @@ export function useDataApi() {
 
   return useCallback(
     () =>
-      getSdk(
-        token
-          ? new AuthorizedGraphQLClient(
+      token
+        ? getSdk(
+            new AuthorizedGraphQLClient(
               endpoint,
               token,
               user.id,
@@ -245,11 +251,8 @@ export function useDataApi() {
               handleNewToken,
               externalAuthLoginUrl ? externalAuthLoginUrl : undefined
             )
-          : new GraphQLClient(endpoint).setHeader(
-              clientNameHeader,
-              anonymousClientName
-            )
-      ),
+          )
+        : getUnauthorizedApi(),
     [
       token,
       user.id,
@@ -270,11 +273,5 @@ export function useUnauthorizedApi() {
   return useCallback(
     () => getSdk(new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar)),
     [enqueueSnackbar]
-  );
-}
-
-export function getUnauthorizedApi() {
-  return getSdk(
-    new GraphQLClient(endpoint).setHeader(clientNameHeader, anonymousClientName)
   );
 }
