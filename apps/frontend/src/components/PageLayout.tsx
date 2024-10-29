@@ -13,9 +13,8 @@ import parse from 'html-react-parser';
 import React, { Suspense, useContext, useEffect } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import { CallsFilter, PageName } from 'generated/sdk';
+import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
-import { useCallsData } from 'hooks/call/useCallsData';
 
 import AppToolbar from './AppToolbar/AppToolbar';
 import MenuItems from './menu/MenuItems';
@@ -58,20 +57,7 @@ const PageLayout = ({
       : !isTabletOrMobile
   );
 
-  const { currentRole, isInternalUser } = useContext(UserContext);
-  function getDashBoardCallFilter(): CallsFilter {
-    return isInternalUser
-      ? {
-          isActive: true,
-          isEnded: false,
-          isActiveInternal: true,
-        }
-      : {
-          isActive: true,
-          isEnded: false,
-        };
-  }
-  const { calls } = useCallsData(getDashBoardCallFilter());
+  const { currentRole } = useContext(UserContext);
 
   const drawer = {
     width: drawerWidth,
@@ -174,7 +160,7 @@ const PageLayout = ({
           </Box>
           <Divider />
           <List disablePadding>
-            <MenuItems callsData={calls} currentRole={currentRole} />
+            <MenuItems currentRole={currentRole} />
           </List>
           <Divider />
         </Drawer>
