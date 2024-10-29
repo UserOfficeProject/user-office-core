@@ -18,7 +18,7 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
-import { isRejection, rejection, Rejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
@@ -475,14 +475,12 @@ export default class InstrumentMutations {
 
     let isXpress = false;
 
-    if (!isRejection(instrumentWithTechnique)) {
-      isXpress =
-        instrumentWithTechnique.length > 0 &&
-        instrumentWithTechnique.filter(
-          (instruments) => instruments.id === args.instrumentIds[0]
-        ).length > 0;
-    } else {
-      return instrumentWithTechnique;
+    if (instrumentWithTechnique && instrumentWithTechnique.length > 0) {
+      isXpress = instrumentWithTechnique.find(
+        (instruments) => instruments.id === args.instrumentIds[0]
+      )
+        ? true
+        : false;
     }
 
     if (!isXpress) {
