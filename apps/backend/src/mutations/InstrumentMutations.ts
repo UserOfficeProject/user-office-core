@@ -473,15 +473,11 @@ export default class InstrumentMutations {
         techniquesWithProposal.map((technique) => technique.id)
       );
 
-    let isXpress = false;
-
-    if (instrumentWithTechnique && instrumentWithTechnique.length > 0) {
-      isXpress = instrumentWithTechnique.find(
-        (instruments) => instruments.id === args.instrumentIds[0]
-      )
-        ? true
-        : false;
-    }
+    const isXpress = instrumentWithTechnique.find(
+      (instruments) => instruments.id === args.instrumentIds[0]
+    )
+      ? true
+      : false;
 
     if (!isXpress) {
       return rejection('No permission to assign instrument for this proposal', {
