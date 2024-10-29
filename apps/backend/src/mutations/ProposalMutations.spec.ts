@@ -19,9 +19,9 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
+import { ProposalStatus } from '../models/ProposalStatus';
 import { isRejection, Rejection } from '../models/Rejection';
 import ProposalMutations from './ProposalMutations';
-import { ProposalStatus } from '../models/ProposalStatus';
 
 const proposalMutations = container.resolve(ProposalMutations);
 
@@ -565,6 +565,32 @@ describe('Test Xpress change status', () => {
     );
   });
 
+  test('A scientist cannot change status back to submitted', async () => {
+    jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+      {
+        ...dummyProposal,
+        primaryKey: 1,
+        statusId: underReviewId,
+      },
+      {
+        ...dummyProposal,
+        primaryKey: 2,
+        statusId: underReviewId,
+      },
+    ]);
+
+    return expect(
+      proposalMutations.changeXpressProposalsStatus(dummyInstrumentScientist, {
+        statusId: submittedId,
+        proposalPks: [1, 2],
+      })
+    ).resolves.toEqual(
+      expect.objectContaining({
+        message: expect.stringContaining('forbidden new status'),
+      })
+    );
+  });
+
   test('A scientist cannot change status when a proposal is historic', async () => {
     jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
       {
@@ -615,6 +641,41 @@ describe('Test Xpress change status', () => {
     ).resolves.toEqual(
       expect.objectContaining({
         message: expect.stringContaining('forbidden status transition'),
+      })
+    );
+  });
+
+  test('A scientist can change status to an allowed status', async () => {
+    jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+      {
+        ...dummyProposal,
+        primaryKey: 1,
+        statusId: submittedId,
+      },
+      {
+        ...dummyProposal,
+        primaryKey: 2,
+        statusId: submittedId,
+      },
+    ]);
+
+    return expect(
+      proposalMutations.changeXpressProposalsStatus(dummyInstrumentScientist, {
+        statusId: underReviewId,
+        proposalPks: [1, 2],
+      })
+    ).resolves.toEqual(
+      expect.objectContaining({
+        proposals: expect.arrayContaining([
+          expect.objectContaining({
+            primaryKey: 1,
+            statusId: 3,
+          }),
+          expect.objectContaining({
+            primaryKey: 2,
+            statusId: 3,
+          }),
+        ]),
       })
     );
   });
