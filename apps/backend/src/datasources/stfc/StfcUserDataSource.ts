@@ -1,3 +1,5 @@
+import { RoleDTO } from '../../generated';
+import { BasicPersonDetailsDTO } from '../../generated/models/BasicPersonDetailsDTO';
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
@@ -9,10 +11,9 @@ import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
 import { UserDataSource } from '../UserDataSource';
-import UOWSSoapClient from './UOWSSoapInterface';
+import UOWSClient from './UOWSClient';
 
 const postgresUserDataSource = new PostgresUserDataSource();
-const client = UOWSSoapClient.getInstance();
 const token = process.env.EXTERNAL_AUTH_TOKEN;
 
 type StfcRolesToEssRole = { [key: string]: Roles[] };
@@ -51,10 +52,32 @@ export interface StfcBasicPersonDetails {
   givenName: string;
   initials: string;
   orgName: string;
-  orgId: number;
+  orgId?: number;
   title: string;
   userNumber: string;
   workPhone: string;
+}
+
+export function toStfcBasicPersonDetails(
+  dto: BasicPersonDetailsDTO
+): StfcBasicPersonDetails {
+  return {
+    country: dto.country ?? '',
+    deptName: dto.deptName ?? '',
+    displayName: dto.displayName ?? '',
+    email: dto.email ?? '',
+    establishmentId: dto.establishmentId ?? '',
+    familyName: dto.familyName ?? '',  
+    firstNameKnownAs: dto.firstNameKnownAs ?? '',
+    fullName: dto.fullName ?? '',
+    givenName: dto.givenName ?? '',
+    initials: dto.initials ?? '',
+    orgName: dto.orgName ?? '',
+    orgId: 1,
+    title: dto.title ?? '',
+    userNumber: dto.userNumber ?? '',
+    workPhone: dto.workPhone ?? ''
+  };
 }
 
 export function toEssBasicUserDetails(
@@ -159,28 +182,34 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     if (cacheMisses.length > 0) {
-      const uowsRequest: Promise<StfcBasicPersonDetails[] | null> = (
+      const uowsRequestTemp: BasicPersonDetailsDTO[] | null = (
         searchableOnly
-          ? client.getSearchableBasicPeopleDetailsFromUserNumbers(
-              token,
+          ? await UOWSClient.basicPersonDetails.getSearchableBasicPersonDetails(
+              undefined,
+              undefined,
               cacheMisses
             )
-          : client.getBasicPeopleDetailsFromUserNumbers(token, cacheMisses)
-      ).then((result) => result?.return);
-
-      for (const userNumber of cacheMisses) {
-        const userRequest = uowsRequest.then((users) =>
-          users?.find((user) => user.userNumber == userNumber)
-        );
-        cache.put(userNumber, userRequest);
-        stfcUserRequests.push(userRequest);
-      }
-
-      const usersFromUows = await uowsRequest;
-
-      if (usersFromUows) {
+          : await UOWSClient.basicPersonDetails.getBasicPersonDetails(
+              undefined, 
+              undefined, 
+              cacheMisses
+            )
+      );
+    
+      const uowsRequest = uowsRequestTemp ? uowsRequestTemp.map(toStfcBasicPersonDetails) : null;
+    
+      if (uowsRequest) {
+        for (const userNumber of cacheMisses) {
+          const userRequest = Promise.resolve(
+            uowsRequest.find((user) => user.userNumber === userNumber) || undefined
+          );
+          
+          cache.put(userNumber, userRequest);
+          stfcUserRequests.push(userRequest);
+        }
+    
         await this.ensureDummyUsersExist(
-          usersFromUows.map((stfcUser) => parseInt(stfcUser.userNumber))
+          uowsRequest.map((stfcUser) => parseInt(stfcUser.userNumber))
         );
       }
     }
@@ -215,10 +244,10 @@ export class StfcUserDataSource implements UserDataSource {
 
     const uowsRequest = (
       searchableOnly
-        ? client.getSearchableBasicPersonDetailsFromEmail(token, email)
-        : client.getBasicPersonDetailsFromEmail(token, email)
+        ? UOWSClient.basicPersonDetails.getSearchableBasicPersonDetails(undefined, [email], undefined)
+        : UOWSClient.basicPersonDetails.getBasicPersonDetails(undefined, email, undefined)
     )
-      .then((response) => response?.return)
+      .then((response) => toStfcBasicPersonDetails(response[0]))
       .then((stfcUser: StfcBasicPersonDetails | null) => {
         if (!stfcUser) {
           return undefined;
@@ -301,8 +330,8 @@ export class StfcUserDataSource implements UserDataSource {
   async setUserRoles(id: number, roles: number[]): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  async getRolesForUser(id: number): Promise<stfcRole[]> {
-    return (await client.getRolesForUser(token, id))?.return;
+  async getRolesForUser(id: number): Promise<RoleDTO[]> {
+    return (await UOWSClient.role.getRolesForUser(id.toString()));
   }
   async getUserRoles(id: number): Promise<Role[]> {
     const cachedRoles = this.uowsRolesCache.get(String(id));
@@ -310,9 +339,8 @@ export class StfcUserDataSource implements UserDataSource {
       return cachedRoles;
     }
 
-    const stfcRolesRequest = client
-      .getRolesForUser(token, id)
-      .then((response): stfcRole[] | null => response?.return)
+    const stfcRolesRequest = UOWSClient.role
+      .getRolesForUser(id.toString())
       .then((stfcRoles) =>
         this.getRoles().then((roleDefinitions) => {
           const userRole: Role | undefined = roleDefinitions.find(
@@ -332,7 +360,7 @@ export class StfcUserDataSource implements UserDataSource {
            * roles.
            */
           const userRolesAsEnum: Roles[] = stfcRoles
-            .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name])
+            .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name!])
             .filter((r) => r !== undefined) as Roles[];
 
           /*
@@ -416,9 +444,9 @@ export class StfcUserDataSource implements UserDataSource {
     if (filter) {
       userDetails = [];
 
-      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] = (
-        await client.getBasicPeopleDetailsFromSurname(token, filter, true)
-      )?.return;
+      const stfcBasicPeopleByLastName: BasicPersonDetailsDTO[] = (
+        await UOWSClient.basicPersonDetails.getBasicPersonDetails(undefined, filter, undefined)
+      );
       if (!stfcBasicPeopleByLastName) return { totalCount: 0, users: [] };
 
       userDetails = stfcBasicPeopleByLastName.map((person) =>

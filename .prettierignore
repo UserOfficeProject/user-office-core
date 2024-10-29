@@ -7,8 +7,8 @@
 **/src/generated/
 
 # backend
-/apps/backend/src/datasources/stfc/UOWSSoapInterface.ts
 /apps/backend/docker-compose-stfc.e2e.yml
+/apps/backend/openapi.yaml
 
 # e2e
 /apps/e2e/cypress/fixtures/

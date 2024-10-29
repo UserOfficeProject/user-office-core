@@ -8,7 +8,7 @@ import {
   StfcBasicPersonDetails,
   stfcRole,
 } from '../datasources/stfc/StfcUserDataSource';
-import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
+import UOWSClient from '../datasources/stfc/UOWSClient';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
@@ -16,8 +16,6 @@ import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { Cache } from '../utils/Cache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
-
-const client = UOWSSoapClient.getInstance();
 
 const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
   'User Officer': ['ISIS', 'ARTEMIS', 'HPL', 'LSF'],
@@ -164,9 +162,10 @@ export class StfcUserAuthorization extends UserAuthorization {
     token: string,
     _redirecturi: string
   ): Promise<User | null> {
-    const stfcUser: StfcBasicPersonDetails | null = await client
-      .getPersonDetailsFromSessionId(token)
-      .then((rawStfcUser) => rawStfcUser?.return)
+    const loginBySession = await UOWSClient.sessions.getLoginBySessionId(token);
+    const stfcUser: StfcBasicPersonDetails | null = await UOWSClient.basicPersonDetails
+      .getBasicPersonDetails(loginBySession.toString())
+      .then((rawStfcUser) => rawStfcUser)
       .catch((error) => {
         const rethrowMessage =
           'Failed to fetch user details for STFC external authentication';
@@ -204,7 +203,7 @@ export class StfcUserAuthorization extends UserAuthorization {
     // Auto-assign users to instruments.
     // This will happen if the user is an instrument scientist for an STFC facility
     const stfcRoles: stfcRole[] | null = (
-      await client.getRolesForUser(process.env.EXTERNAL_AUTH_TOKEN, userNumber)
+      await UOWSClient.role.getRolesForUser(process.env.EXTERNAL_AUTH_TOKEN, userNumber)
     )?.return;
 
     if (stfcRoles) {

@@ -3,5 +3,6 @@ apps/frontend/node_modules
 apps/e2e/node_modules
 apps/e2e/cypress/screenshots
 apps/backend/node_modules
+apps/backend/src/generated
 apps/frontend/src/generated
 .DS_Store
