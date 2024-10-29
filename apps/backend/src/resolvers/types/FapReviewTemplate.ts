@@ -21,7 +21,7 @@ export class TemplateResolver {
     @Ctx() context: ResolverContext
   ): Promise<number> {
     return context.queries.call
-      .getAll(context.user, { templateIds: [template.templateId] })
+      .getAll(context.user, { fapReviewTemplateIds: [template.templateId] })
       .then((result) => result?.length || 0);
   }
 }
