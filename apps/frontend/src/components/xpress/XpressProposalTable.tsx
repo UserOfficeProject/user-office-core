@@ -15,7 +15,8 @@ import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
-import { ProposalsFilter, UserRole } from 'generated/sdk';
+import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
@@ -28,11 +29,12 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
-const XpressProposalTable = () => {
+const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
@@ -42,6 +44,9 @@ const XpressProposalTable = () => {
     useProposalStatusesData();
 
   const [searchParams, setSearchParams] = useSearchParams({});
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_TIME_FORMAT,
+  });
 
   const callId = searchParams.get('callId');
   const instrument = searchParams.get('instrument');
@@ -60,20 +65,33 @@ const XpressProposalTable = () => {
   const { api } = useDataApiWithFeedback();
   const { currentRole } = useContext(UserContext);
 
-  const xpressStatusCodes = [
-    'SUBMITTED_LOCKED',
-    'UNDER_REVIEW',
-    'UNSUCCESSFUL',
-    'APPROVED',
-    'FINISHED',
+  const isHistoricUneditable = (date: Date): boolean =>
+    date.getFullYear() < 2024;
+
+  enum StatusName {
+    DRAFT = 'Draft',
+    SUBMITTED_LOCKED = 'Submitted (locked)',
+    UNDER_REVIEW = 'Under review',
+    APPROVED = 'Approved',
+    UNSUCCESSFUL = 'Unsuccessful',
+    FINISHED = 'Finished',
+  }
+
+  const xpressStatusNames = [
+    StatusName.DRAFT,
+    StatusName.SUBMITTED_LOCKED,
+    StatusName.UNDER_REVIEW,
+    StatusName.APPROVED,
+    StatusName.UNSUCCESSFUL,
+    StatusName.FINISHED,
   ];
 
   const xpressStatuses = proposalStatuses.filter((ps) =>
-    xpressStatusCodes.includes(ps.shortCode)
+    xpressStatusNames.includes(ps.name as StatusName)
   );
 
   const excludedStatusIds = proposalStatuses
-    .filter((status) => !xpressStatusCodes.includes(status.shortCode))
+    .filter((status) => !xpressStatusNames.includes(status.name as StatusName))
     .map((status) => status.id);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -101,13 +119,6 @@ const XpressProposalTable = () => {
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
   let columns: Column<ProposalViewData>[] = [
-    {
-      title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
-      sorting: false,
-      removable: false,
-      field: 'rowActionButtons',
-    },
     {
       title: 'Proposal ID',
       field: 'proposalId',
@@ -141,12 +152,11 @@ const XpressProposalTable = () => {
       emptyValue: '-',
     },
     {
-      title: 'Status',
-      field: 'statusName',
-    },
-    {
       title: 'Date submitted',
       field: 'submittedDate',
+      render: (proposalView: ProposalViewData) => {
+        return toFormattedDateTime(proposalView.submittedDate);
+      },
       ...{ width: 'auto' },
     },
   ];
@@ -170,6 +180,20 @@ const XpressProposalTable = () => {
     refreshTableData();
   };
 
+  const updateProposalStatus = async (
+    proposalPk: number,
+    statusId: number
+  ): Promise<void> => {
+    await api({
+      toastSuccessMessage: 'Proposal status updated successfully!',
+    }).changeXpressProposalsStatus({
+      statusId: statusId,
+      proposalPks: [proposalPk],
+    });
+
+    refreshTableData();
+  };
+
   const instrumentManagementColumns = (
     t: TFunction<'translation', undefined>
   ) => [
@@ -186,7 +210,13 @@ const XpressProposalTable = () => {
           (instrument) => instrument.id
         )[0];
 
-        return (
+        const shouldBeUneditable =
+          rowData.statusName !== StatusName.UNDER_REVIEW ||
+          isHistoricUneditable(new Date(rowData.submittedDate));
+
+        return shouldBeUneditable ? (
+          instrumentList.find((i) => i.id === fieldValue)?.name
+        ) : (
           <>
             <FormControl fullWidth>
               <Select
@@ -194,10 +224,21 @@ const XpressProposalTable = () => {
                 aria-labelledby="instrument-select-label"
                 onChange={(e) => {
                   if (e.target.value) {
-                    assignProposalsToInstruments(
-                      +e.target.value,
-                      rowData.primaryKey
-                    );
+                    confirm(
+                      () => {
+                        assignProposalsToInstruments(
+                          +e.target.value,
+                          rowData.primaryKey
+                        );
+                      },
+                      {
+                        title: 'Change instrument',
+                        description:
+                          'Are you sure you want to change this instrument?',
+                        confirmationText: 'Yes',
+                        cancellationText: 'Cancel',
+                      }
+                    )();
                   }
                 }}
                 value={fieldValue}
@@ -207,6 +248,124 @@ const XpressProposalTable = () => {
                   instrumentList.map((instrument) => (
                     <MenuItem key={instrument.id} value={instrument.id}>
                       {instrument.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </>
+        );
+      },
+      customFilterAndSearch: () => true,
+    },
+  ];
+
+  const statusColumn = () => [
+    {
+      title: 'Status',
+      field: 'statusName',
+      sorting: false,
+      render: (rowData: ProposalViewData) => {
+        const fieldValue = xpressStatuses.find(
+          (s) => s.name === rowData.statusName
+        );
+
+        // Disallow setting back to submitted or draft
+        const availableStatuses = xpressStatuses.filter(
+          (status) =>
+            status.name !== StatusName.SUBMITTED_LOCKED &&
+            status.name !== StatusName.DRAFT
+        );
+
+        // Use a consistent order representing the Xpress flow
+        availableStatuses.sort((a, b) => {
+          return (
+            xpressStatusNames.indexOf(a.name as StatusName) -
+            xpressStatusNames.indexOf(b.name as StatusName)
+          );
+        });
+
+        // Always show the current status at the top of the dropdown
+        if (fieldValue) {
+          const currentIndex = availableStatuses.findIndex(
+            (status) => status.id === fieldValue.id
+          );
+          if (currentIndex > -1) {
+            availableStatuses.splice(currentIndex, 1);
+          }
+          availableStatuses.unshift(fieldValue);
+        }
+
+        const isInstrumentAbsent = (rowData.instruments?.length ?? 0) === 0;
+        const isStatusDraft = fieldValue?.name === StatusName.DRAFT;
+        const isStatusSubmitted =
+          fieldValue?.name === StatusName.SUBMITTED_LOCKED;
+        const isStatusUnsuccessful =
+          fieldValue?.name === StatusName.UNSUCCESSFUL;
+        const isStatusApproved = fieldValue?.name === StatusName.APPROVED;
+        const isStatusFinished = fieldValue?.name === StatusName.FINISHED;
+
+        const shouldDisableUnderReview =
+          isStatusApproved || isStatusUnsuccessful;
+
+        const shouldDisableApproved = isStatusSubmitted || isInstrumentAbsent;
+
+        const shouldDisableUnsuccessful = isStatusSubmitted;
+
+        const shouldDisableFinished = !isStatusApproved || isInstrumentAbsent;
+
+        const shouldBeUneditable =
+          isStatusDraft ||
+          isStatusFinished ||
+          isStatusUnsuccessful ||
+          isHistoricUneditable(new Date(rowData.submittedDate));
+
+        return shouldBeUneditable ? (
+          fieldValue?.name
+        ) : (
+          <>
+            <FormControl fullWidth>
+              <Select
+                id="status-selection"
+                aria-labelledby="status-select-label"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    confirm(
+                      () => {
+                        updateProposalStatus(
+                          rowData.primaryKey,
+                          +e.target.value
+                        );
+                      },
+                      {
+                        title: 'Change status',
+                        description:
+                          'Are you sure you want to change this status?',
+                        confirmationText: 'Yes',
+                        cancellationText: 'Cancel',
+                      }
+                    )();
+                  }
+                }}
+                value={fieldValue?.id}
+                data-cy="status-dropdown"
+              >
+                {availableStatuses &&
+                  availableStatuses.map((status) => (
+                    <MenuItem
+                      key={status.id}
+                      value={status.id}
+                      disabled={
+                        (status.name === StatusName.APPROVED &&
+                          shouldDisableApproved) ||
+                        (status.name === StatusName.FINISHED &&
+                          shouldDisableFinished) ||
+                        (status.name === StatusName.UNDER_REVIEW &&
+                          shouldDisableUnderReview) ||
+                        (status.name === StatusName.UNSUCCESSFUL &&
+                          shouldDisableUnsuccessful)
+                      }
+                    >
+                      {status.name}
                     </MenuItem>
                   ))}
               </Select>
@@ -233,6 +392,7 @@ const XpressProposalTable = () => {
 
   addColumns(columns, instrumentManagementColumns(t));
   addColumns(columns, techniquesColumns());
+  addColumns(columns, statusColumn());
 
   columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
@@ -455,4 +615,4 @@ const XpressProposalTable = () => {
   );
 };
 
-export default XpressProposalTable;
+export default withConfirm(XpressProposalTable);
