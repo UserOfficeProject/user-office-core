@@ -531,6 +531,13 @@ export default class ProposalMutations {
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
+    if (
+      agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
+      agent?.isApiAccessToken
+    ) {
+      return this.processProposalsStatusChange(agent, args);
+    }
+
     const requesterContext = {
       requester: agent?.isApiAccessToken
         ? 'API key'
@@ -598,6 +605,16 @@ export default class ProposalMutations {
       }
 
       if (!(newStatus.shortCode in XpressStatus)) {
+        return rejection(
+          'Could not change status of Xpress proposal(s): forbidden new status',
+          context
+        );
+      }
+
+      if (
+        newStatus.shortCode === XpressStatus.DRAFT ||
+        newStatus.shortCode === XpressStatus.SUBMITTED_LOCKED
+      ) {
         return rejection(
           'Could not change status of Xpress proposal(s): forbidden new status',
           context

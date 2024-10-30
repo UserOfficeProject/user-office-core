@@ -669,11 +669,46 @@ describe('Test Xpress change status', () => {
         proposals: expect.arrayContaining([
           expect.objectContaining({
             primaryKey: 1,
-            statusId: 3,
+            statusId: underReviewId,
           }),
           expect.objectContaining({
             primaryKey: 2,
-            statusId: 3,
+            statusId: underReviewId,
+          }),
+        ]),
+      })
+    );
+  });
+
+  test('A user officer can change to/from any status', async () => {
+    jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+      {
+        ...dummyProposal,
+        primaryKey: 1,
+        statusId: finishedId,
+      },
+      {
+        ...dummyProposal,
+        primaryKey: 2,
+        statusId: finishedId,
+      },
+    ]);
+
+    return expect(
+      proposalMutations.changeXpressProposalsStatus(dummyUserOfficerWithRole, {
+        statusId: draftId,
+        proposalPks: [1, 2],
+      })
+    ).resolves.toEqual(
+      expect.objectContaining({
+        proposals: expect.arrayContaining([
+          expect.objectContaining({
+            primaryKey: 1,
+            statusId: draftId,
+          }),
+          expect.objectContaining({
+            primaryKey: 2,
+            statusId: draftId,
           }),
         ]),
       })

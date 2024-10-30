@@ -18,6 +18,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
@@ -48,6 +49,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     settingsFormatToUse: SettingsId.DATE_TIME_FORMAT,
   });
 
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
+
   const callId = searchParams.get('callId');
   const instrument = searchParams.get('instrument');
   const technique = searchParams.get('technique');
@@ -65,8 +68,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { api } = useDataApiWithFeedback();
   const { currentRole } = useContext(UserContext);
 
-  const isHistoricUneditable = (date: Date): boolean =>
-    date.getFullYear() < 2024;
+  const isHistoricProposal = (date: Date): boolean => date.getFullYear() < 2024;
 
   enum StatusName {
     DRAFT = 'Draft',
@@ -211,8 +213,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         )[0];
 
         const shouldBeUneditable =
-          rowData.statusName !== StatusName.UNDER_REVIEW ||
-          isHistoricUneditable(new Date(rowData.submittedDate));
+          !isUserOfficer &&
+          (rowData.statusName !== StatusName.UNDER_REVIEW ||
+            isHistoricProposal(new Date(rowData.submittedDate)));
 
         return shouldBeUneditable ? (
           instrumentList.find((i) => i.id === fieldValue)?.name
@@ -269,12 +272,17 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           (s) => s.name === rowData.statusName
         );
 
-        // Disallow setting back to submitted or draft
-        const availableStatuses = xpressStatuses.filter(
-          (status) =>
-            status.name !== StatusName.SUBMITTED_LOCKED &&
-            status.name !== StatusName.DRAFT
-        );
+        // Disallow setting submitted or draft status, unless user officer
+        let availableStatuses;
+        if (isUserOfficer) {
+          availableStatuses = xpressStatuses;
+        } else {
+          availableStatuses = xpressStatuses.filter(
+            (status) =>
+              status.name !== StatusName.SUBMITTED_LOCKED &&
+              status.name !== StatusName.DRAFT
+          );
+        }
 
         // Use a consistent order representing the Xpress flow
         availableStatuses.sort((a, b) => {
@@ -314,10 +322,11 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         const shouldDisableFinished = !isStatusApproved || isInstrumentAbsent;
 
         const shouldBeUneditable =
-          isStatusDraft ||
-          isStatusFinished ||
-          isStatusUnsuccessful ||
-          isHistoricUneditable(new Date(rowData.submittedDate));
+          !isUserOfficer &&
+          (isStatusDraft ||
+            isStatusFinished ||
+            isStatusUnsuccessful ||
+            isHistoricProposal(new Date(rowData.submittedDate)));
 
         return shouldBeUneditable ? (
           fieldValue?.name
@@ -355,14 +364,15 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                       key={status.id}
                       value={status.id}
                       disabled={
-                        (status.name === StatusName.APPROVED &&
+                        !isUserOfficer &&
+                        ((status.name === StatusName.APPROVED &&
                           shouldDisableApproved) ||
-                        (status.name === StatusName.FINISHED &&
-                          shouldDisableFinished) ||
-                        (status.name === StatusName.UNDER_REVIEW &&
-                          shouldDisableUnderReview) ||
-                        (status.name === StatusName.UNSUCCESSFUL &&
-                          shouldDisableUnsuccessful)
+                          (status.name === StatusName.FINISHED &&
+                            shouldDisableFinished) ||
+                          (status.name === StatusName.UNDER_REVIEW &&
+                            shouldDisableUnderReview) ||
+                          (status.name === StatusName.UNSUCCESSFUL &&
+                            shouldDisableUnsuccessful))
                       }
                     >
                       {status.name}
