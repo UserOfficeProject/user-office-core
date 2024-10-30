@@ -305,9 +305,29 @@ export default {
       id: 14,
       name: 'EDITABLE_SUBMITTED',
     },
-    editableSubmittedInternal: {
+    submittedLocked: {
       id: 15,
+      name: 'SUBMITTED_LOCKED',
+    },
+    editableSubmittedInternal: {
+      id: 16,
       name: 'EDITABLE_SUBMITTED_INTERNAL',
+    },
+    underReview: {
+      id: 18,
+      name: 'UNDER_REVIEW',
+    },
+    approved: {
+      id: 19,
+      name: 'APPROVED',
+    },
+    finished: {
+      id: 20,
+      name: 'FINISHED',
+    },
+    unsuccessful: {
+      id: 21,
+      name: 'UNSUCCESSFUL',
     },
   },
   scheduledEvents: {
