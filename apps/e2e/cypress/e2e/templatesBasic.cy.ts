@@ -3089,7 +3089,7 @@ context('Template Delete, Archive, Unarchive', () => {
     });
   });
 
-  describe.only('Visit template Delete, Archive, Unarchive', () => {
+  describe('Visit template Delete, Archive, Unarchive', () => {
     const coProposer = initialDBData.users.user2;
     const visitor = initialDBData.users.user3;
     const PI = initialDBData.users.user1;

@@ -14,7 +14,6 @@ BEGIN
                 'Should we display the privacy statement link in the footer'
                 );
 
-
     END;
   END IF;
 END;

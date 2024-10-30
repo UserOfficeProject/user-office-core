@@ -793,7 +793,7 @@ context('Proposal tests', () => {
         .and('have.css', 'white-space', 'nowrap');
     });
 
-    it.only('User should not be able to create and submit proposal on a call that is ended', () => {
+    it('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
