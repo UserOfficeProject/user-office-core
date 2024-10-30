@@ -382,11 +382,12 @@ const XpressProposalTable = () => {
     const {
       callId,
       instrumentFilter,
+      techniqueFilter,
       proposalStatusId,
-      questionaryIds,
       text,
-      questionFilter,
       referenceNumbers,
+      dateFilter,
+      excludeProposalStatusIds,
     } = proposalFilter;
 
     const result: {
@@ -399,15 +400,15 @@ const XpressProposalTable = () => {
         filter: {
           callId: callId,
           instrumentFilter: instrumentFilter,
+          techniqueFilter: techniqueFilter,
           proposalStatusId: proposalStatusId,
-          questionaryIds: questionaryIds,
-          referenceNumbers: referenceNumbers,
-          questionFilter: questionFilter && {
-            ...questionFilter,
-            value:
-              JSON.stringify({ value: questionFilter?.value }) ?? undefined,
-          }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
           text: text,
+          referenceNumbers: referenceNumbers,
+          dateFilter: dateFilter,
+          ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
+          currentRole === UserRole.INTERNAL_REVIEWER
+            ? { excludeProposalStatusIds: excludeProposalStatusIds }
+            : {}),
         },
         searchText: searchParams.get('search'),
       })
