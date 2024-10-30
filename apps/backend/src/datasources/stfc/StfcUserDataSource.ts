@@ -444,10 +444,12 @@ export class StfcUserDataSource implements UserDataSource {
     if (filter) {
       userDetails = [];
 
-      const stfcBasicPeopleByLastName: BasicPersonDetailsDTO[] = (
+      const BasicPeopleByLastName: BasicPersonDetailsDTO[] = (
         await UOWSClient.basicPersonDetails.getBasicPersonDetails(undefined, filter, undefined)
       );
-      if (!stfcBasicPeopleByLastName) return { totalCount: 0, users: [] };
+      if (!BasicPeopleByLastName) return { totalCount: 0, users: [] };
+
+      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] = [toStfcBasicPersonDetails(BasicPeopleByLastName[0])];
 
       userDetails = stfcBasicPeopleByLastName.map((person) =>
         toEssBasicUserDetails(person)

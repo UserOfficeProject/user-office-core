@@ -7,6 +7,7 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
   StfcBasicPersonDetails,
   stfcRole,
+  toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
 import UOWSClient from '../datasources/stfc/UOWSClient';
 import { Instrument } from '../models/Instrument';
@@ -16,6 +17,7 @@ import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { Cache } from '../utils/Cache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
+import { BasicPersonDetailsDTO, RoleDTO, TokenDetails, TokenWrapperDTO } from '../generated';
 
 const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
   'User Officer': ['ISIS', 'ARTEMIS', 'HPL', 'LSF'],
@@ -46,9 +48,9 @@ export class StfcUserAuthorization extends UserAuthorization {
     Tokens.UserDataSource
   ) as StfcUserDataSource;
 
-  getRequiredInstrumentForRole(roles: stfcRole[]) {
+  getRequiredInstrumentForRole(roles: RoleDTO[]) {
     return roles
-      .flatMap((role) => stfcInstrumentScientistRolesToInstrument[role.name])
+      .flatMap((role) => stfcInstrumentScientistRolesToInstrument[role.name!])
       .filter((instrumentName) => instrumentName);
   }
 
@@ -163,7 +165,7 @@ export class StfcUserAuthorization extends UserAuthorization {
     _redirecturi: string
   ): Promise<User | null> {
     const loginBySession = await UOWSClient.sessions.getLoginBySessionId(token);
-    const stfcUser: StfcBasicPersonDetails | null = await UOWSClient.basicPersonDetails
+    const stfcUserTemp: BasicPersonDetailsDTO[] | null = await UOWSClient.basicPersonDetails
       .getBasicPersonDetails(loginBySession.toString())
       .then((rawStfcUser) => rawStfcUser)
       .catch((error) => {
@@ -177,13 +179,15 @@ export class StfcUserAuthorization extends UserAuthorization {
         throw new GraphQLError(rethrowMessage);
       });
 
-    if (!stfcUser) {
+    if (!stfcUserTemp) {
       logger.logInfo('No user found for STFC external authentication', {
         externalToken: token,
       });
 
       return null;
     }
+
+    const stfcUser: StfcBasicPersonDetails = toStfcBasicPersonDetails(stfcUserTemp[0]);
 
     // Create dummy user if one does not exist in the proposals DB.
     // This is needed to satisfy the FOREIGN_KEY constraints
@@ -202,9 +206,9 @@ export class StfcUserAuthorization extends UserAuthorization {
 
     // Auto-assign users to instruments.
     // This will happen if the user is an instrument scientist for an STFC facility
-    const stfcRoles: stfcRole[] | null = (
-      await UOWSClient.role.getRolesForUser(process.env.EXTERNAL_AUTH_TOKEN, userNumber)
-    )?.return;
+    const stfcRoles: RoleDTO[] | null = (
+      await UOWSClient.role.getRolesForUser(userNumber.toString())
+    );
 
     if (stfcRoles) {
       // The UOWS sometimes returns duplicate roles. We remove them here
@@ -252,7 +256,7 @@ export class StfcUserAuthorization extends UserAuthorization {
           return Promise.resolve('User already logged out');
         }
 
-        return await client
+        return await UOWSClient.sessions
           .logout(token)
           .then(() => {
             return 'Successfully logged out user';
@@ -289,13 +293,17 @@ export class StfcUserAuthorization extends UserAuthorization {
       return cachedValidity;
     }
 
-    const tokenRequest: Promise<boolean> = client
-      .isTokenValid(token)
-      .then((response) => response?.return);
+    const stfcToken: TokenWrapperDTO = {
+      token: token
+    }
 
+    const tokenRequest = UOWSClient.token.validateToken(stfcToken).then(response => {
+      return response.identifier !== undefined;
+    });
+    
     this.uowsTokenCache.put(token, tokenRequest);
 
-    const isValid: boolean = await tokenRequest;
+    const isValid = await tokenRequest;
     // Only keep valid tokens cached to avoid locking out users for a long time
     if (!isValid) {
       this.uowsTokenCache.remove(token);
@@ -319,15 +327,15 @@ export class StfcUserAuthorization extends UserAuthorization {
 
     return userId
       ? (this.userDataSource as StfcUserDataSource)
-          .getRolesForUser(userId)
-          .then((roles) => {
-            return roles.some(
-              (role) =>
-                role.name === 'Internal proposal submitter' ||
-                role.name === 'ISIS Instrument Scientist' ||
-                role.name === 'User Officer'
-            );
-          })
+        .getRolesForUser(userId)
+        .then((roles) => {
+          return roles.some(
+            (role) =>
+              role.name === 'Internal proposal submitter' ||
+              role.name === 'ISIS Instrument Scientist' ||
+              role.name === 'User Officer'
+          );
+        })
       : false;
   }
 
