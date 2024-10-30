@@ -30,7 +30,7 @@ export class SampleAuthorization {
     return sample;
   }
 
-  async isSampleSafetyReviewer(agent: UserWithRole | null) {
+  isSampleSafetyReviewer(agent: UserWithRole | null) {
     if (agent == null) {
       return false;
     }
@@ -89,6 +89,10 @@ export class SampleAuthorization {
 
     const isPostProposalSubmission = sample.isPostProposalSubmission === true;
 
-    return canEditProposal || (isMemberOfProposal && isPostProposalSubmission);
+    return (
+      canEditProposal ||
+      (isMemberOfProposal && isPostProposalSubmission) ||
+      this.isSampleSafetyReviewer(agent)
+    );
   }
 }
