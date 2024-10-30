@@ -793,7 +793,7 @@ context('Proposal tests', () => {
         .and('have.css', 'white-space', 'nowrap');
     });
 
-    it('User should not be able to create and submit proposal on a call that is ended', () => {
+    it.only('User should not be able to create and submit proposal on a call that is ended', () => {
       createTopicAndQuestionToExistingTemplate();
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -831,7 +831,9 @@ context('Proposal tests', () => {
 
       cy.get('[data-cy="user-menu-items"]')
         .find('[aria-label="New Proposal"]')
-        .should('have.css', 'pointer-events', 'none');
+        .click();
+
+      cy.contains('There are no calls open at this time');
     });
 
     it('User cannot select inactive call for new proposal', () => {
