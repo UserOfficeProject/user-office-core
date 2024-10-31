@@ -791,6 +791,50 @@ context('Xpress tests', () => {
 
       cy.readFile(`${downloadsFolder}/${downloadedFileName}`).should('exist');
     });
+
+    it('Officer should be able to use the view proposal option', function () {
+      cy.login('officer');
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress Proposals').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal1.abstract);
+      cy.contains(createdProposalId1);
+      cy.contains(technique1.name);
+
+      cy.get('button[role="tab"]').contains('Logs').click({ force: true });
+      cy.contains('PROPOSAL_CREATED');
+      cy.contains('PROPOSAL_UPDATED');
+      cy.contains('PROPOSAL_ASSIGNED_TO_TECHNIQUES');
+    });
+
+    it('Scientist should be able to use the view proposal option', function () {
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress Proposals').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="View proposal"]')
+        .click();
+
+      cy.contains(proposal1.title);
+      cy.contains(proposal1.abstract);
+      cy.contains(createdProposalId1);
+      cy.contains(technique1.name);
+    });
   });
 
   describe('Techniques advanced tests', () => {

@@ -4,9 +4,16 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
+import { Visibility } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import { FormControl, MenuItem, Select } from '@mui/material';
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 import {
   getTranslation,
   ResourceId,
@@ -16,6 +23,10 @@ import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import ProposalReviewContent, {
+  PROPOSAL_MODAL_TAB_NAMES,
+} from 'components/review/ProposalReviewContent';
+import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
@@ -59,6 +70,7 @@ const XpressProposalTable = () => {
   const sortDirection = searchParams.get('sortDirection');
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
+  const reviewModal = searchParams.get('reviewModal');
 
   const { api } = useDataApiWithFeedback();
   const [totalCount, setTotalCount] = useState(0);
@@ -93,6 +105,27 @@ const XpressProposalTable = () => {
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
+  const RowActionButtons = (rowData: ProposalViewData) => {
+    const [, setSearchParams] = useSearchParams();
+
+    return (
+      <Tooltip title="View proposal">
+        <IconButton
+          data-cy="view-proposal"
+          onClick={() => {
+            setSearchParams((searchParams) => {
+              searchParams.set('reviewModal', rowData.primaryKey.toString());
+
+              return searchParams;
+            });
+          }}
+        >
+          <Visibility />
+        </IconButton>
+      </Tooltip>
+    );
+  };
+
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
@@ -100,6 +133,7 @@ const XpressProposalTable = () => {
       sorting: false,
       removable: false,
       field: 'rowActionButtons',
+      render: RowActionButtons,
     },
     {
       title: 'Proposal ID',
@@ -427,10 +461,47 @@ const XpressProposalTable = () => {
     return result;
   };
 
+  const proposalToReview = tableData.find(
+    (proposal) =>
+      (reviewModal != null && proposal.primaryKey === +reviewModal) ||
+      (proposalId != null && proposal.proposalId === proposalId)
+  );
+
+  const userOfficerProposalReviewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.LOGS,
+  ];
+
   return (
     <>
       <StyledContainer maxWidth={false}>
         <StyledPaper data-cy="xpress-proposals-table">
+          <ProposalReviewModal
+            title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
+            proposalReviewModalOpen={!!proposalToReview}
+            setProposalReviewModalOpen={() => {
+              if (searchParams.get('proposalId')) {
+                setProposalFilter({
+                  ...proposalFilter,
+                  referenceNumbers: undefined,
+                });
+              }
+
+              setSearchParams((searchParams) => {
+                searchParams.delete('reviewModal');
+                searchParams.delete('proposalId');
+
+                return searchParams;
+              });
+
+              refreshTableData();
+            }}
+          >
+            <ProposalReviewContent
+              proposalPk={proposalToReview?.primaryKey as number}
+              tabNames={userOfficerProposalReviewTabs}
+            />
+          </ProposalReviewModal>
           <XpressProposalFilterBar
             calls={{ data: calls, isLoading: loadingCalls }}
             instruments={{ data: instruments, isLoading: loadingInstruments }}
