@@ -603,6 +603,7 @@ export default class ProposalMutations {
         APPROVED = 'APPROVED',
         UNSUCCESSFUL = 'UNSUCCESSFUL',
         FINISHED = 'FINISHED',
+        EXPIRED = 'EXPIRED',
       }
 
       if (!(newStatus.shortCode in XpressStatus)) {
@@ -614,7 +615,8 @@ export default class ProposalMutations {
 
       if (
         newStatus.shortCode === XpressStatus.DRAFT ||
-        newStatus.shortCode === XpressStatus.SUBMITTED_LOCKED
+        newStatus.shortCode === XpressStatus.SUBMITTED_LOCKED ||
+        newStatus.shortCode === XpressStatus.EXPIRED
       ) {
         return rejection(
           'Could not change status of Xpress proposal(s): forbidden new status',

@@ -77,6 +77,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     APPROVED = 'Approved',
     UNSUCCESSFUL = 'Unsuccessful',
     FINISHED = 'Finished',
+    EXPIRED = 'EXPIRED',
   }
 
   const xpressStatusNames = [
@@ -86,11 +87,20 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     StatusName.APPROVED,
     StatusName.UNSUCCESSFUL,
     StatusName.FINISHED,
+    StatusName.EXPIRED,
   ];
 
   const xpressStatuses = proposalStatuses.filter((ps) =>
     xpressStatusNames.includes(ps.name as StatusName)
   );
+
+  // Use a consistent order representing the Xpress flow
+  xpressStatuses.sort((a, b) => {
+    return (
+      xpressStatusNames.indexOf(a.name as StatusName) -
+      xpressStatusNames.indexOf(b.name as StatusName)
+    );
+  });
 
   const excludedStatusIds = proposalStatuses
     .filter((status) => !xpressStatusNames.includes(status.name as StatusName))
@@ -280,17 +290,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           availableStatuses = xpressStatuses.filter(
             (status) =>
               status.name !== StatusName.SUBMITTED_LOCKED &&
-              status.name !== StatusName.DRAFT
+              status.name !== StatusName.DRAFT &&
+              status.name !== StatusName.EXPIRED
           );
         }
-
-        // Use a consistent order representing the Xpress flow
-        availableStatuses.sort((a, b) => {
-          return (
-            xpressStatusNames.indexOf(a.name as StatusName) -
-            xpressStatusNames.indexOf(b.name as StatusName)
-          );
-        });
 
         // Always show the current status at the top of the dropdown
         if (fieldValue) {
@@ -311,6 +314,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           fieldValue?.name === StatusName.UNSUCCESSFUL;
         const isStatusApproved = fieldValue?.name === StatusName.APPROVED;
         const isStatusFinished = fieldValue?.name === StatusName.FINISHED;
+        const isStatusExpired = fieldValue?.name === StatusName.EXPIRED;
 
         const shouldDisableUnderReview =
           isStatusApproved || isStatusUnsuccessful;
@@ -326,6 +330,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           (isStatusDraft ||
             isStatusFinished ||
             isStatusUnsuccessful ||
+            isStatusExpired ||
             isHistoricProposal(new Date(rowData.submittedDate)));
 
         return shouldBeUneditable ? (
