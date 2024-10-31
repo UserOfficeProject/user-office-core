@@ -31,9 +31,8 @@ context('Xpress tests', () => {
   let createdTechniquePk1: number;
   let createdTechniquePk2: number;
   let createdTechniquePk3: number;
-  let createdTechniquePk5: number;
   // Technique 4 has no proposals assigned
-  // Proposal 1 is unsubmitted
+  let createdTechniquePk5: number;
 
   const technique1 = {
     name: faker.word.words(1),
@@ -597,6 +596,26 @@ context('Xpress tests', () => {
       cy.contains('Xpress Proposals').click();
 
       cy.get('[data-cy="status-filter"]').click();
+
+      // Ensure the dropdown only contains Xpress statuses
+      cy.get('[role="listbox"] [data-value]').then((options) => {
+        const actualStatuses = [...options].map((option) =>
+          option.innerText.trim()
+        );
+        const expectedStatuses = [
+          'Draft',
+          'Submitted (locked)',
+          'Under review',
+          'Approved',
+          'Finished',
+          'Unsuccessful',
+          'Expired',
+        ];
+
+        // Expect the correct order, too
+        expect(actualStatuses).to.deep.equal(expectedStatuses);
+      });
+
       cy.get('[role="listbox"] [data-value="14"]').click();
 
       cy.finishedLoading();
