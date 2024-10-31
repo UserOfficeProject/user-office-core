@@ -19,7 +19,7 @@ const graphqlRequestDuration = new Histogram({
   name: 'graphql_request_duration_seconds',
   help: 'Duration of GraphQL requests in seconds',
   labelNames: ['operation', 'operation_type', 'status'],
-  buckets: [0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+  buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10], // 10ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s
 });
 
 const graphqlRequestCounter = new Counter({
@@ -32,6 +32,14 @@ const graphqlErrorCounter = new Counter({
   name: 'graphql_errors_total',
   help: 'Total number of GraphQL errors',
   labelNames: ['operation', 'operation_type', 'error_code'],
+});
+
+// response size
+const graphqlResponseSize = new Histogram({
+  name: 'graphql_response_size_bytes',
+  help: 'Size of the GraphQL response in bytes',
+  labelNames: ['operation', 'operation_type', 'status'],
+  buckets: [1000, 5000, 10000, 50000, 100000, 500000, 1000000], // 1KB, 5KB, 10KB, 50KB, 100KB, 500KB, 1MB
 });
 
 // Basic plugin to collect prometheus metrics for GraphQL requests
@@ -50,6 +58,7 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
     };
 
     const end = graphqlRequestDuration.startTimer(labels);
+
     graphqlRequestCounter.inc(labels);
 
     return {
@@ -73,6 +82,11 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
           }
         }
 
+        // Measure the response size
+        const responseSize = JSON.stringify(responseContext.response).length;
+        graphqlResponseSize.observe(labels, responseSize);
+
+        // Measure the duration of the request
         end(labels);
       },
 
