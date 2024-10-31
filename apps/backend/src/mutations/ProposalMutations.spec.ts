@@ -398,6 +398,7 @@ describe('Test Xpress change status', () => {
   const unsuccessfulId = 5;
   const finishedId = 6;
   const nonXpressId = 7;
+  const expiredId = 7;
 
   const dummyProposalStatuses = [
     new ProposalStatus(draftId, 'DRAFT', 'Draft', '', true),
@@ -425,6 +426,7 @@ describe('Test Xpress change status', () => {
       '',
       true
     ),
+    new ProposalStatus(expiredId, 'EXPIRED', 'Expired', '', true),
   ];
 
   beforeEach(() => {
@@ -565,7 +567,59 @@ describe('Test Xpress change status', () => {
     );
   });
 
-  test('A scientist cannot change status back to submitted', async () => {
+  test('A scientist cannot change status to draft', async () => {
+    jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+      {
+        ...dummyProposal,
+        primaryKey: 1,
+        statusId: underReviewId,
+      },
+      {
+        ...dummyProposal,
+        primaryKey: 2,
+        statusId: underReviewId,
+      },
+    ]);
+
+    return expect(
+      proposalMutations.changeXpressProposalsStatus(dummyInstrumentScientist, {
+        statusId: draftId,
+        proposalPks: [1, 2],
+      })
+    ).resolves.toEqual(
+      expect.objectContaining({
+        message: expect.stringContaining('forbidden new status'),
+      })
+    );
+  });
+
+  test('A scientist cannot change status to expired', async () => {
+    jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
+      {
+        ...dummyProposal,
+        primaryKey: 1,
+        statusId: submittedId,
+      },
+      {
+        ...dummyProposal,
+        primaryKey: 2,
+        statusId: underReviewId,
+      },
+    ]);
+
+    return expect(
+      proposalMutations.changeXpressProposalsStatus(dummyInstrumentScientist, {
+        statusId: expiredId,
+        proposalPks: [1, 2],
+      })
+    ).resolves.toEqual(
+      expect.objectContaining({
+        message: expect.stringContaining('forbidden new status'),
+      })
+    );
+  });
+
+  test('A scientist cannot change status to submitted', async () => {
     jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
       {
         ...dummyProposal,
