@@ -40,7 +40,11 @@ export default class ProposalQueries {
       !this.userAuth.isUserOfficer(agent) &&
       !this.userAuth.isInstrumentScientist(agent)
     ) {
-      proposal = omit(proposal, 'commentForManagement') as Proposal;
+      proposal = omit(
+        proposal,
+        'commentForManagement',
+        'commentByScientist'
+      ) as Proposal;
     }
 
     // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer

@@ -56,7 +56,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
     values?.managementDecisionSubmitted || false,
-    values?.submittedDate || new Date()
+    values?.submittedDate || new Date(),
+    values?.commentByScientist || 'comment by scientist'
   );
 };
 
@@ -215,7 +216,8 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       1,
       1,
       new Date(),
-      []
+      [],
+      ''
     );
 
     allProposals = [

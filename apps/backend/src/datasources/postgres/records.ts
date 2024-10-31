@@ -133,6 +133,7 @@ export interface ProposalRecord {
   readonly template_id: number;
   readonly comment_for_user: string;
   readonly comment_for_management: string;
+  readonly comment_by_scientist: string;
   readonly notified: boolean;
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
@@ -161,6 +162,7 @@ export interface ProposalViewRecord {
   readonly full_count: number;
   readonly submitted_date: Date;
   readonly techniques: ProposalViewTechnique[];
+  readonly comment_by_scientist: string;
 }
 
 export interface TopicRecord {
@@ -808,7 +810,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.submitted,
     proposal.reference_number_sequence,
     proposal.management_decision_submitted,
-    proposal.submitted_date
+    proposal.submitted_date,
+    proposal.comment_by_scientist
   );
 };
 
@@ -874,7 +877,8 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.call_id,
     proposal.proposal_workflow_id,
     proposal.submitted_date,
-    proposal.techniques
+    proposal.techniques,
+    proposal.comment_by_scientist
   );
 };
 
@@ -1384,7 +1388,8 @@ export const createProposalViewObjectWithTechniques = (
     proposal.call_id,
     proposal.proposal_workflow_id,
     proposal.submitted_date,
-    techniques
+    techniques,
+    proposal.comment_by_scientist
   );
 };
 export interface StatusActionsLogRecord {

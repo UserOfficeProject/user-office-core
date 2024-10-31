@@ -32,6 +32,7 @@ import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposa
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
+import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { statusActionEngine } from '../statusActionEngine';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
@@ -451,6 +452,34 @@ export default class ProposalMutations {
     return result || rejection('Can not administer proposal', { result });
   }
 
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async updateProposalScientistComment(
+    agent: UserWithRole | null,
+    args: UpdateProposalScientistCommentArgs
+  ): Promise<Proposal | Rejection> {
+    const { proposalPk: primaryKey, commentByScientist } = args;
+
+    const proposal = await this.proposalDataSource.get(primaryKey);
+
+    if (!proposal) {
+      return rejection(
+        'Can not update proposal scientist comment because proposal not found',
+        { args, agent }
+      );
+    }
+
+    if (commentByScientist !== undefined) {
+      proposal.commentByScientist = commentByScientist;
+    }
+
+    const result = await this.proposalDataSource.update(proposal);
+
+    return (
+      result ||
+      rejection('Can not update proposal scientist comment', { result })
+    );
+  }
+
   private async processProposalsStatusChange(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
@@ -780,6 +809,7 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
         submittedDate: null,
+        commentByScientist: '',
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
