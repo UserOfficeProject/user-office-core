@@ -70,40 +70,42 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const isHistoricProposal = (date: Date): boolean => date.getFullYear() < 2024;
 
-  enum StatusName {
-    DRAFT = 'Draft',
-    SUBMITTED_LOCKED = 'Submitted (locked)',
-    UNDER_REVIEW = 'Under review',
-    APPROVED = 'Approved',
-    UNSUCCESSFUL = 'Unsuccessful',
-    FINISHED = 'Finished',
+  enum StatusCode {
+    DRAFT = 'DRAFT',
+    SUBMITTED_LOCKED = 'SUBMITTED_LOCKED',
+    UNDER_REVIEW = 'UNDER_REVIEW',
+    APPROVED = 'APPROVED',
+    UNSUCCESSFUL = 'UNSUCCESSFUL',
+    FINISHED = 'FINISHED',
     EXPIRED = 'EXPIRED',
   }
 
-  const xpressStatusNames = [
-    StatusName.DRAFT,
-    StatusName.SUBMITTED_LOCKED,
-    StatusName.UNDER_REVIEW,
-    StatusName.APPROVED,
-    StatusName.UNSUCCESSFUL,
-    StatusName.FINISHED,
-    StatusName.EXPIRED,
+  const xpressStatusCodes = [
+    StatusCode.DRAFT,
+    StatusCode.SUBMITTED_LOCKED,
+    StatusCode.UNDER_REVIEW,
+    StatusCode.APPROVED,
+    StatusCode.UNSUCCESSFUL,
+    StatusCode.FINISHED,
+    StatusCode.EXPIRED,
   ];
 
   const xpressStatuses = proposalStatuses.filter((ps) =>
-    xpressStatusNames.includes(ps.name as StatusName)
+    xpressStatusCodes.includes(ps.shortCode as StatusCode)
   );
 
   // Use a consistent order representing the Xpress flow
   xpressStatuses.sort((a, b) => {
     return (
-      xpressStatusNames.indexOf(a.name as StatusName) -
-      xpressStatusNames.indexOf(b.name as StatusName)
+      xpressStatusCodes.indexOf(a.shortCode as StatusCode) -
+      xpressStatusCodes.indexOf(b.shortCode as StatusCode)
     );
   });
 
   const excludedStatusIds = proposalStatuses
-    .filter((status) => !xpressStatusNames.includes(status.name as StatusName))
+    .filter(
+      (status) => !xpressStatusCodes.includes(status.shortCode as StatusCode)
+    )
     .map((status) => status.id);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -222,9 +224,13 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           (instrument) => instrument.id
         )[0];
 
+        const selectedStatus = proposalStatuses.find(
+          (ps) => ps.id === rowData.statusId
+        )?.shortCode;
+
         const shouldBeUneditable =
           !isUserOfficer &&
-          (rowData.statusName !== StatusName.UNDER_REVIEW ||
+          (selectedStatus !== StatusCode.UNDER_REVIEW ||
             isHistoricProposal(new Date(rowData.submittedDate)));
 
         return shouldBeUneditable ? (
@@ -278,8 +284,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       field: 'statusName',
       sorting: false,
       render: (rowData: ProposalViewData) => {
-        const fieldValue = xpressStatuses.find(
-          (s) => s.name === rowData.statusName
+        const fieldValue = proposalStatuses.find(
+          (ps) => ps.id === rowData.statusId
         );
 
         // Disallow setting submitted or draft status, unless user officer
@@ -289,9 +295,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         } else {
           availableStatuses = xpressStatuses.filter(
             (status) =>
-              status.name !== StatusName.SUBMITTED_LOCKED &&
-              status.name !== StatusName.DRAFT &&
-              status.name !== StatusName.EXPIRED
+              status.shortCode !== StatusCode.SUBMITTED_LOCKED &&
+              status.shortCode !== StatusCode.DRAFT &&
+              status.shortCode !== StatusCode.EXPIRED
           );
         }
 
@@ -307,14 +313,14 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const isInstrumentAbsent = (rowData.instruments?.length ?? 0) === 0;
-        const isStatusDraft = fieldValue?.name === StatusName.DRAFT;
+        const isStatusDraft = fieldValue?.shortCode === StatusCode.DRAFT;
         const isStatusSubmitted =
-          fieldValue?.name === StatusName.SUBMITTED_LOCKED;
+          fieldValue?.shortCode === StatusCode.SUBMITTED_LOCKED;
         const isStatusUnsuccessful =
-          fieldValue?.name === StatusName.UNSUCCESSFUL;
-        const isStatusApproved = fieldValue?.name === StatusName.APPROVED;
-        const isStatusFinished = fieldValue?.name === StatusName.FINISHED;
-        const isStatusExpired = fieldValue?.name === StatusName.EXPIRED;
+          fieldValue?.shortCode === StatusCode.UNSUCCESSFUL;
+        const isStatusApproved = fieldValue?.shortCode === StatusCode.APPROVED;
+        const isStatusFinished = fieldValue?.shortCode === StatusCode.FINISHED;
+        const isStatusExpired = fieldValue?.shortCode === StatusCode.EXPIRED;
 
         const shouldDisableUnderReview =
           isStatusApproved || isStatusUnsuccessful;
@@ -370,13 +376,13 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                       value={status.id}
                       disabled={
                         !isUserOfficer &&
-                        ((status.name === StatusName.APPROVED &&
+                        ((status.name === StatusCode.APPROVED &&
                           shouldDisableApproved) ||
-                          (status.name === StatusName.FINISHED &&
+                          (status.name === StatusCode.FINISHED &&
                             shouldDisableFinished) ||
-                          (status.name === StatusName.UNDER_REVIEW &&
+                          (status.name === StatusCode.UNDER_REVIEW &&
                             shouldDisableUnderReview) ||
-                          (status.name === StatusName.UNSUCCESSFUL &&
+                          (status.name === StatusCode.UNSUCCESSFUL &&
                             shouldDisableUnsuccessful))
                       }
                     >
