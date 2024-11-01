@@ -14,6 +14,7 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
@@ -47,7 +48,9 @@ export default class InstrumentMutations {
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
-    private reviewDataSource: ReviewDataSource
+    private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.TechniqueDataSource)
+    private techniqueDataSource: TechniqueDataSource
   ) {}
 
   @EventBus(Event.INSTRUMENT_CREATED)
@@ -443,5 +446,46 @@ export default class InstrumentMutations {
           error
         );
       });
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async assignXpressProposalsToInstruments(
+    agent: UserWithRole | null,
+    args: AssignProposalsToInstrumentsArgs
+  ): Promise<InstrumentsHasProposals | Rejection> {
+    const techniquesWithProposal =
+      await this.techniqueDataSource.getTechniquesByProposalPk(
+        args.proposalPks[0]
+      );
+
+    if (!techniquesWithProposal || techniquesWithProposal.length < 1) {
+      return rejection(
+        'Failed to retrieve techniques attached to the proposal',
+        {
+          agent,
+          args,
+        }
+      );
+    }
+
+    const instrumentWithTechnique =
+      await this.techniqueDataSource.getInstrumentsByTechniqueIds(
+        techniquesWithProposal.map((technique) => technique.id)
+      );
+
+    const isXpress = instrumentWithTechnique.find(
+      (instruments) => instruments.id === args.instrumentIds[0]
+    )
+      ? true
+      : false;
+
+    if (!isXpress) {
+      return rejection('No permission to assign instrument for this proposal', {
+        agent,
+        args,
+      });
+    }
+
+    return this.assignProposalsToInstrumentsInternal(agent, args);
   }
 }
