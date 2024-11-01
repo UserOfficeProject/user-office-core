@@ -1,7 +1,7 @@
 query getUserFaps {
   me {
     faps {
-      ...fap
+      ...fapMinimal
     }
   }
 }
