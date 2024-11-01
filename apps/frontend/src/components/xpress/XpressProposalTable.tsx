@@ -14,6 +14,7 @@ import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -216,6 +217,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       field: 'instruments.name',
       sorting: false,
       render: (rowData: ProposalViewData) => {
+        if (loadingProposalStatuses) {
+          return <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />;
+        }
+
         const techIds = rowData.techniques?.map((technique) => technique.id);
         const instrumentList = techniques
           .filter((technique) => techIds?.includes(technique.id))
@@ -225,7 +230,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         )[0];
 
         const selectedStatus = proposalStatuses.find(
-          (ps) => ps.id === rowData.statusId
+          (ps) => ps.name === rowData.statusName
         )?.shortCode;
 
         const shouldBeUneditable =
@@ -284,8 +289,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       field: 'statusName',
       sorting: false,
       render: (rowData: ProposalViewData) => {
+        if (loadingProposalStatuses) {
+          return <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />;
+        }
+
         const fieldValue = proposalStatuses.find(
-          (ps) => ps.id === rowData.statusId
+          (ps) => ps.name === rowData.statusName
         );
 
         // Disallow setting submitted or draft status, unless user officer
@@ -376,13 +385,13 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                       value={status.id}
                       disabled={
                         !isUserOfficer &&
-                        ((status.name === StatusCode.APPROVED &&
+                        ((status.shortCode === StatusCode.APPROVED &&
                           shouldDisableApproved) ||
-                          (status.name === StatusCode.FINISHED &&
+                          (status.shortCode === StatusCode.FINISHED &&
                             shouldDisableFinished) ||
-                          (status.name === StatusCode.UNDER_REVIEW &&
+                          (status.shortCode === StatusCode.UNDER_REVIEW &&
                             shouldDisableUnderReview) ||
-                          (status.name === StatusCode.UNSUCCESSFUL &&
+                          (status.shortCode === StatusCode.UNSUCCESSFUL &&
                             shouldDisableUnsuccessful))
                       }
                     >
