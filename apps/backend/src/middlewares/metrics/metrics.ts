@@ -13,7 +13,7 @@ router.get('/metrics', async (req: Request, res: Response) => {
   res.end(await register.metrics());
 });
 
-// Define the metrics
+// Define http request metrics
 const httpRequestCounter = new Counter({
   name: 'http_requests_total',
   help: 'Total number of HTTP requests',
@@ -27,26 +27,23 @@ const httpRequestDurationMicroseconds = new Histogram({
   buckets: [0.1, 0.25, 0.5, 1, 2.5, 5, 10],
 });
 
-// Middleware to collect metrics
+// Factory function to create the middleware
 export default function (app: express.Application) {
   // Middleware to measure the duration of each request
   app.use((req, res, next) => {
     const end = httpRequestDurationMicroseconds.startTimer();
 
     res.on('finish', () => {
-      // Measure the duration of the request
-      end({
+      const labels = {
         method: req.method,
         route: req.route ? req.route.path : req.path,
         status_code: res.statusCode,
-      });
+      };
 
+      // Measure the duration of the request
+      end(labels);
       // Count the number of requests
-      httpRequestCounter.inc({
-        method: req.method,
-        route: req.route ? req.route.path : req.path,
-        status_code: res.statusCode,
-      });
+      httpRequestCounter.inc(labels);
     });
 
     next();

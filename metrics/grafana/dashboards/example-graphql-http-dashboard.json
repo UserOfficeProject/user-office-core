@@ -109,7 +109,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(5, histogram_quantile(0.95, sum by(operation, le) (rate(graphql_request_duration_seconds_bucket[$__rate_interval]))))",
+          "expr": "topk(20, histogram_quantile(0.95, sum by(operation, le) (rate(graphql_request_duration_seconds_bucket[$__rate_interval])) != 0))",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -205,13 +205,17 @@
       "pluginVersion": "11.3.0",
       "targets": [
         {
+          "editorMode": "code",
           "expr": "sum(rate(graphql_requests_total{status=\"success\"}[$__rate_interval])) by (operation_type)",
           "legendFormat": "Success - {{operation_type}}",
+          "range": true,
           "refId": "A"
         },
         {
+          "editorMode": "code",
           "expr": "sum(rate(graphql_requests_total{status=\"error\"}[$__rate_interval])) by (operation_type)",
           "legendFormat": "Error - {{operation_type}}",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -292,7 +296,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(20,increase(graphql_requests_total{}[$__range]))",
+          "expr": "topk(20, increase(graphql_requests_total{}[$__range]))",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -528,7 +532,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(http_request_duration_seconds_sum{status_code=\"200\"}[$__rate_interval]) / rate(http_request_duration_seconds_count{status_code=\"200\"}[$__rate_interval])",
+          "expr": "sort(rate(http_request_duration_seconds_sum{status_code=\"200\"}[$__rate_interval]) / rate(http_request_duration_seconds_count{status_code=\"200\"}[$__rate_interval]) > 0)",
           "instant": false,
           "legendFormat": "{{method}} {{route}}",
           "range": true,
@@ -617,8 +621,10 @@
       "pluginVersion": "11.3.0",
       "targets": [
         {
+          "editorMode": "code",
           "expr": "rate(graphql_request_duration_seconds_sum[$__rate_interval]) / rate(graphql_request_duration_seconds_count[$__rate_interval])",
           "legendFormat": "{{operation}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -691,7 +697,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(graphql_request_duration_seconds_bucket[$__rate_interval])) by (le, operation_type)",
+          "expr": "sum(rate(graphql_request_duration_seconds_bucket[$__rate_interval])) by (le, operation_type) > 0",
           "format": "heatmap",
           "legendFormat": "{{operation_type}}",
           "range": true,
@@ -835,8 +841,7 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "decbytes"
+          }
         },
         "overrides": []
       },
