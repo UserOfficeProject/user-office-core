@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 
 import DateFilter from './DateFilter';
 
@@ -17,7 +17,7 @@ function ExperimentFilterBar() {
   const experimentFromDate = searchParams.get('from');
   const experimentToDate = searchParams.get('to');
 
-  const { instruments, loadingInstruments } = useInstrumentsData();
+  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const { calls, loadingCalls } = useCallsData();
 
   const handleOnChange = (format: string, from?: Date, to?: Date) => {
