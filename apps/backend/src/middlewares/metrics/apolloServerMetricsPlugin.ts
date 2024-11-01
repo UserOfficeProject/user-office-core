@@ -34,7 +34,6 @@ const graphqlErrorCounter = new Counter({
   labelNames: ['operation', 'operation_type', 'error_code'],
 });
 
-// response size
 const graphqlResponseSize = new Histogram({
   name: 'graphql_response_size_bytes',
   help: 'Size of the GraphQL response in bytes',
