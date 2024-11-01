@@ -84,6 +84,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.TECHNICAL_REVIEW,
       FeatureId.FAP_REVIEW,
       FeatureId.USER_SEARCH_FILTER,
+      FeatureId.USER_ID_IN_API_METADATA,
       FeatureId.STFC_XPRESS_MANAGEMENT,
     ],
     true
