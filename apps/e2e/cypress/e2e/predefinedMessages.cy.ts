@@ -152,7 +152,7 @@ context('Predefined messages tests', () => {
       .should('have.value', '');
   });
 
-  it.only('User officer should be able to delete the selected predefined message and create new one without closing the popup', () => {
+  it('User officer should be able to delete the selected predefined message and create new one without closing the popup', () => {
     cy.login('officer');
     cy.visit('/');
 
