@@ -5,21 +5,17 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import PropTypes from 'prop-types';
 import React, { Fragment, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
-import { Call } from 'generated/sdk';
+import { CallsFilter } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useCallsData } from 'hooks/call/useCallsData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { timeRemaining } from 'utils/Time';
 
-type ProposalChooseCallProps = {
-  callsData: Call[];
-};
-
-const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
+const ProposalChooseCall = () => {
   const navigate = useNavigate();
   const { toFormattedDateTime } = useFormattedDateTime();
   const { isInternalUser } = useContext(UserContext);
@@ -28,6 +24,19 @@ const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
     const url = `/ProposalCreate/${callId}/${templateId}`;
     navigate(url);
   };
+  function getDashBoardCallFilter(): CallsFilter {
+    return isInternalUser
+      ? {
+          isActive: true,
+          isEnded: false,
+          isActiveInternal: true,
+        }
+      : {
+          isActive: true,
+          isEnded: false,
+        };
+  }
+  const { calls } = useCallsData(getDashBoardCallFilter());
 
   return (
     <StyledContainer>
@@ -36,7 +45,7 @@ const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
           Select a call
         </Typography>
         <List data-cy="call-list">
-          {callsData.map((call) => {
+          {calls.map((call) => {
             const timeRemainingText = timeRemaining(new Date(call.endCall));
             const InternalCalltimeRemainingText = timeRemaining(
               new Date(call.endCallInternal)
@@ -116,10 +125,6 @@ const ProposalChooseCall = ({ callsData }: ProposalChooseCallProps) => {
       </StyledPaper>
     </StyledContainer>
   );
-};
-
-ProposalChooseCall.propTypes = {
-  callsData: PropTypes.array.isRequired,
 };
 
 export default ProposalChooseCall;

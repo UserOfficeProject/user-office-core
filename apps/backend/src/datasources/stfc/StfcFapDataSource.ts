@@ -1,5 +1,7 @@
 import { GraphQLError } from 'graphql';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import { Fap } from '../../models/Fap';
 import { UserRoleShortCodeMap } from '../../models/User';
 import {
@@ -11,12 +13,14 @@ import CallDataSource from '../postgres/CallDataSource';
 import PostgresFapDataSource from '../postgres/FapDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
 
-const stfcUserDataSource = new StfcUserDataSource();
-
 export default class StfcFapDataSource
   extends PostgresFapDataSource
   implements FapDataSource
 {
+  protected stfcUserDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
+
   constructor() {
     super(new CallDataSource());
   }
@@ -24,7 +28,7 @@ export default class StfcFapDataSource
   async assignChairOrSecretaryToFap(
     args: AssignChairOrSecretaryToFapInput
   ): Promise<Fap> {
-    const roles = await stfcUserDataSource.getUserRoles(args.userId);
+    const roles = await this.stfcUserDataSource.getUserRoles(args.userId);
 
     if (
       roles.find((role) => {
@@ -43,7 +47,7 @@ export default class StfcFapDataSource
   }
 
   async assignReviewersToFap(args: AssignReviewersToFapArgs): Promise<Fap> {
-    const usersWithRoles = await stfcUserDataSource.getUsersRoles(
+    const usersWithRoles = await this.stfcUserDataSource.getUsersRoles(
       args.memberIds
     );
 
@@ -60,7 +64,7 @@ export default class StfcFapDataSource
     }
 
     const ineligibleUsers = await Promise.resolve(
-      stfcUserDataSource.getUsersByUserNumbers(ineligibleUserIds)
+      this.stfcUserDataSource.getUsersByUserNumbers(ineligibleUserIds)
     );
 
     const ineligibleUserEmails = ineligibleUsers.map((user) => user.email);

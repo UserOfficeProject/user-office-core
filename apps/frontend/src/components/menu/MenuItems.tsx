@@ -1,4 +1,4 @@
-import { Science } from '@mui/icons-material';
+import { Science, Topic, History } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -27,6 +27,7 @@ import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { Call, FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
@@ -86,6 +87,11 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const isSampleSafetyEnabled = context.featuresMap.get(
     FeatureId.SAMPLE_SAFETY
   )?.isEnabled;
+
+  const isXpressRouteEnabled = useXpressAccess([
+    UserRole.USER_OFFICER,
+    UserRole.INSTRUMENT_SCIENTIST,
+  ]);
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
@@ -148,6 +154,16 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           <ListItemText primary="Proposals" />
         </ListItemButton>
       </Tooltip>
+      {isXpressRouteEnabled && (
+        <Tooltip title="Xpress Proposals">
+          <ListItemButton component={NavLink} to="/XpressProposals">
+            <ListItemIcon>
+              <Topic />
+            </ListItemIcon>
+            <ListItemText primary="Xpress Proposals" />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
           <ListItemButton
@@ -167,6 +183,14 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
             <CalendarToday />
           </ListItemIcon>
           <ListItemText primary="Calls" />
+        </ListItemButton>
+      </Tooltip>
+      <Tooltip title="Status Actions Logs">
+        <ListItemButton component={NavLink} to="/StatusActionsLogs">
+          <ListItemIcon>
+            <History />
+          </ListItemIcon>
+          <ListItemText primary="Status Actions Logs" />
         </ListItemButton>
       </Tooltip>
       {isUserManagementEnabled && (
@@ -266,6 +290,14 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItemButton>
+      {isXpressRouteEnabled && (
+        <ListItemButton component={NavLink} to="/XpressProposals">
+          <ListItemIcon>
+            <Topic />
+          </ListItemIcon>
+          <ListItemText primary="Xpress Proposals" />
+        </ListItemButton>
+      )}
       {isInstrumentManagementEnabled && (
         <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>

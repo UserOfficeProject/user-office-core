@@ -1,6 +1,6 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 
-import { Fap, UserRole } from 'generated/sdk';
+import { FapMinimalFragment, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useFapsData({
@@ -15,14 +15,14 @@ export function useFapsData({
   callIds?: number[];
 }): {
   loadingFaps: boolean;
-  faps: Fap[];
-  setFapsWithLoading: Dispatch<SetStateAction<Fap[]>>;
+  faps: FapMinimalFragment[];
+  setFapsWithLoading: Dispatch<SetStateAction<FapMinimalFragment[]>>;
 } {
   const api = useDataApi();
-  const [faps, setFaps] = useState<Fap[]>([]);
+  const [faps, setFaps] = useState<FapMinimalFragment[]>([]);
   const [loadingFaps, setLoadingFaps] = useState(true);
 
-  const setFapsWithLoading = (data: SetStateAction<Fap[]>) => {
+  const setFapsWithLoading = (data: SetStateAction<FapMinimalFragment[]>) => {
     setLoadingFaps(true);
     setFaps(data);
     setLoadingFaps(false);
@@ -35,7 +35,7 @@ export function useFapsData({
 
     if (role === UserRole.USER_OFFICER) {
       api()
-        .getFaps({
+        .getFapsMinimal({
           filter: {
             filter,
             active,
@@ -51,7 +51,7 @@ export function useFapsData({
             setFaps(
               data.faps.faps.map((fap) => {
                 return {
-                  ...fap,
+                  ...(fap as FapMinimalFragment),
                 };
               })
             );
@@ -70,7 +70,7 @@ export function useFapsData({
             setFaps(
               data.me.faps.map((fap) => {
                 return {
-                  ...fap,
+                  ...(fap as FapMinimalFragment),
                 };
               })
             );
