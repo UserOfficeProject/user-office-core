@@ -2700,9 +2700,10 @@ context('Template Delete, Archive, Unarchive', () => {
                 '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
               ).click();
 
-              cy.get(
-                '[data-cy=sample-declaration-modal] [data-cy=questionary-title]'
-              ).should('not.exist');
+              // Make sure the questionary has moved on, else the "save-and-continue-button" is clicked twice without the first click being processed
+              cy.get('[data-cy=sample-declaration-modal]').contains(
+                sampleQuestion
+              );
 
               cy.get(
                 '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
