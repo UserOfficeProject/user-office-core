@@ -1,7 +1,7 @@
-query getFaps($filter: FapsFilter) {
+query getFapsMinimal($filter: FapsFilter) {
   faps(filter: $filter) {
     faps {
-      ...fap
+      ...fapMinimal
     }
     totalCount
   }
