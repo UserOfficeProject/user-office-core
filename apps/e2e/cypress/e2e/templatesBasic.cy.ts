@@ -2121,7 +2121,7 @@ context('Template Basic tests', () => {
   });
 });
 
-context('Template Delete, Archive, Unarchive', () => {
+context.only('Template Delete, Archive, Unarchive', () => {
   let workflowId: number;
   const templateName = faker.lorem.words(3);
 
@@ -2689,6 +2689,8 @@ context('Template Delete, Archive, Unarchive', () => {
 
               cy.finishedLoading();
 
+              cy.pause();
+
               cy.get('[data-cy=add-button]').click();
 
               cy.get('[data-cy=title-input] input')
@@ -2699,6 +2701,10 @@ context('Template Delete, Archive, Unarchive', () => {
               cy.get(
                 '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
               ).click();
+
+              cy.get(
+                '[data-cy=sample-declaration-modal] [data-cy=questionary-title]'
+              ).should('not.exist');
 
               cy.get(
                 '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
@@ -2817,6 +2823,11 @@ context('Template Delete, Archive, Unarchive', () => {
         teamLeadUserId: PI.id,
         scheduledEventId: existingScheduledEventId,
       });
+    });
+
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING))
+        this.skip();
     });
 
     const createShipmentTemplateAndUseItForAProposal = () => {
@@ -2943,7 +2954,7 @@ context('Template Delete, Archive, Unarchive', () => {
       shouldDeleteTemplate(templateName, '/ShipmentDeclarationTemplates');
     });
 
-    it('Shipment Declaration Template can not be deleted if it is associated with any Questionary', () => {
+    it.only('Shipment Declaration Template can not be deleted if it is associated with any Questionary', () => {
       createShipmentTemplateAndUseItForAProposal();
 
       shouldNotDeleteTemplate(templateName, '/ShipmentDeclarationTemplates');
@@ -3213,7 +3224,7 @@ context('Template Delete, Archive, Unarchive', () => {
     });
   });
 
-  describe.only('Visit template Delete, Archive, Unarchive', () => {
+  describe('Visit template Delete, Archive, Unarchive', () => {
     const coProposer = initialDBData.users.user2;
     const visitor = initialDBData.users.user3;
     const PI = initialDBData.users.user1;
