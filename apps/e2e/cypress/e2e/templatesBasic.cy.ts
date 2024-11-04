@@ -2121,7 +2121,7 @@ context('Template Basic tests', () => {
   });
 });
 
-context.only('Template Delete, Archive, Unarchive', () => {
+context('Template Delete, Archive, Unarchive', () => {
   let workflowId: number;
   const templateName = faker.lorem.words(3);
 
@@ -2689,8 +2689,6 @@ context.only('Template Delete, Archive, Unarchive', () => {
 
               cy.finishedLoading();
 
-              cy.pause();
-
               cy.get('[data-cy=add-button]').click();
 
               cy.get('[data-cy=title-input] input')
@@ -2954,7 +2952,7 @@ context.only('Template Delete, Archive, Unarchive', () => {
       shouldDeleteTemplate(templateName, '/ShipmentDeclarationTemplates');
     });
 
-    it.only('Shipment Declaration Template can not be deleted if it is associated with any Questionary', () => {
+    it('Shipment Declaration Template can not be deleted if it is associated with any Questionary', () => {
       createShipmentTemplateAndUseItForAProposal();
 
       shouldNotDeleteTemplate(templateName, '/ShipmentDeclarationTemplates');
