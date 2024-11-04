@@ -245,9 +245,9 @@ export function useDataApi() {
   const { handleUserActive, isIdle } = useContext(IdleContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const clientNameHeaderSetter = getClientNameHeaderSetter(
-    userIdInClientName,
-    user?.id
+  const clientNameHeaderSetter = useCallback(
+    () => getClientNameHeaderSetter(userIdInClientName, user?.id),
+    [user?.id, userIdInClientName]
   );
 
   return useCallback(
@@ -257,7 +257,7 @@ export function useDataApi() {
             new AuthorizedGraphQLClient(
               endpoint,
               token,
-              clientNameHeaderSetter,
+              clientNameHeaderSetter(),
               enqueueSnackbar,
               () => {
                 handleSessionExpired();
