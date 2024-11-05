@@ -19,6 +19,7 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { AssignProposalsToFapsInput } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -66,7 +67,8 @@ export default class FapMutations {
     private callDataSource: CallDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.QuestionaryDataSource)
-    public questionaryDataSource: QuestionaryDataSource
+    public questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource
   ) {}
 
   @ValidateArgs(createFapValidationSchema)
@@ -543,7 +545,12 @@ export default class FapMutations {
     }
 
     return this.dataSource
-      .removeMemberFromFapProposal(args.proposalPk, args.fapId, args.memberId)
+      .removeMemberFromFapProposal(
+        args.proposalPk,
+        args.fapId,
+        args.memberId,
+        args.reviewId
+      )
       .catch((error) => {
         return rejection(
           'Can not remove member from Fap proposal because of an error',

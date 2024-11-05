@@ -894,17 +894,27 @@ export default class PostgresFapDataSource implements FapDataSource {
   async removeMemberFromFapProposal(
     proposalPk: number,
     fapId: number,
-    memberId: number
+    memberId: number,
+    reviewId: number
   ) {
-    const memberRemovedFromProposal = await database('fap_assignments')
-      .del()
-      .where('fap_id', fapId)
-      .andWhere('proposal_pk', proposalPk)
-      .andWhere('fap_member_user_id', memberId);
+    await database.transaction(async (trx) => {
+      await trx
+        .from('fap_reviews')
+        .where('review_id', reviewId)
+        .returning('*')
+        .del();
+
+      await trx('fap_assignments')
+        .del()
+        .where('fap_id', fapId)
+        .andWhere('proposal_pk', proposalPk)
+        .andWhere('fap_member_user_id', memberId)
+        .returning<number>(['*']);
+    });
 
     const fapUpdated = await this.getFap(fapId);
 
-    if (memberRemovedFromProposal && fapUpdated) {
+    if (fapUpdated) {
       return fapUpdated;
     }
 
