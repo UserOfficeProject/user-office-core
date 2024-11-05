@@ -645,34 +645,6 @@ describe('Test Xpress change status', () => {
     );
   });
 
-  test('A scientist cannot change status when a proposal is historic', async () => {
-    jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
-      {
-        ...dummyProposal,
-        primaryKey: 1,
-        statusId: submittedId,
-        submittedDate: new Date(), // Valid date
-      },
-      {
-        ...dummyProposal,
-        primaryKey: 2,
-        statusId: submittedId,
-        submittedDate: new Date(2023, 11, 31), // Historical date
-      },
-    ]);
-
-    return expect(
-      proposalMutations.changeXpressProposalsStatus(dummyInstrumentScientist, {
-        statusId: underReviewId,
-        proposalPks: [1, 2],
-      })
-    ).resolves.toEqual(
-      expect.objectContaining({
-        message: expect.stringContaining('historic proposal'),
-      })
-    );
-  });
-
   test('A scientist cannot change status when the current status and new status cannot connect', async () => {
     jest.spyOn(proposalDataSource, 'getProposalsByPks').mockResolvedValue([
       {

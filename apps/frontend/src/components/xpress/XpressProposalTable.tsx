@@ -69,8 +69,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { api } = useDataApiWithFeedback();
   const { currentRole } = useContext(UserContext);
 
-  const isHistoricProposal = (date: Date): boolean => date.getFullYear() < 2024;
-
   enum StatusCode {
     DRAFT = 'DRAFT',
     SUBMITTED_LOCKED = 'SUBMITTED_LOCKED',
@@ -234,9 +232,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         )?.shortCode;
 
         const shouldBeUneditable =
-          !isUserOfficer &&
-          (selectedStatus !== StatusCode.UNDER_REVIEW ||
-            isHistoricProposal(new Date(rowData.submittedDate)));
+          !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
 
         return shouldBeUneditable ? (
           instrumentList.find((i) => i.id === fieldValue)?.name
@@ -310,6 +306,13 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           );
         }
 
+        xpressStatuses.sort((a, b) => {
+          return (
+            xpressStatusCodes.indexOf(a.shortCode as StatusCode) -
+            xpressStatusCodes.indexOf(b.shortCode as StatusCode)
+          );
+        });
+
         // Always show the current status at the top of the dropdown
         if (fieldValue) {
           const currentIndex = availableStatuses.findIndex(
@@ -345,8 +348,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           (isStatusDraft ||
             isStatusFinished ||
             isStatusUnsuccessful ||
-            isStatusExpired ||
-            isHistoricProposal(new Date(rowData.submittedDate)));
+            isStatusExpired);
 
         return shouldBeUneditable ? (
           fieldValue?.name
