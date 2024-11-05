@@ -26,12 +26,13 @@ test('A user on the proposal can get a proposal it belongs to', () => {
     proposalQueries.get(dummyUserWithRole, 1)
   ).resolves.toStrictEqual(
     dummyProposal.notified
-      ? omit(dummyProposal, 'commentForManagement')
+      ? omit(dummyProposal, 'commentForManagement', 'commentByScientist')
       : omit(
           dummyProposal,
           'commentForManagement',
           'finalStatus',
-          'commentForUser'
+          'commentForUser',
+          'commentByScientist'
         )
   );
 });
