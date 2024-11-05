@@ -1,0 +1,8 @@
+mutation updateProposalScientistComment($proposalPk: Int!, $commentByScientist: String!) {
+  updateProposalScientistComment(
+    proposalPk: $proposalPk
+    commentByScientist: $commentByScientist
+  ) {
+    commentByScientist
+  }
+}

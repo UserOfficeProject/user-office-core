@@ -144,6 +144,9 @@ export class ProposalView implements Partial<ProposalOrigin> {
   @Field(() => String, { nullable: true })
   public callShortCode: string;
 
+  @Field(() => String, { nullable: true })
+  public commentByScientist: string;
+
   @Field(() => Int)
   public callId: number;
 
