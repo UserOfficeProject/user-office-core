@@ -640,17 +640,6 @@ export default class ProposalMutations {
       const isCurrentlyFinished =
         currentStatus.shortCode === XpressStatus.FINISHED;
 
-      const isHistoricProposal = proposal.submittedDate
-        ? proposal.submittedDate.getFullYear() < 2024
-        : false;
-
-      if (isHistoricProposal) {
-        return rejection(
-          'Could not change status of Xpress proposal(s): historic proposal',
-          context
-        );
-      }
-
       if (isCurrentlyDraft || isCurrentlyFinished || isCurrentlyUnsuccessful) {
         return rejection(
           'Could not change status of Xpress proposal(s): unmodifiable current status',
