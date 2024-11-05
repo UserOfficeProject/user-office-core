@@ -1209,6 +1209,25 @@ context('Xpress tests', () => {
       cy.finishedLoading();
       cy.contains(instrument1.name);
     });
+
+    it('Instrument scientist must be able to add comment on to an xpress proposal', function () {
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.setTinyMceContent('commentByScientist', faker.lorem.words(10));
+      cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully saved',
+      });
+    });
   });
 
   describe('Xpress statuses tests', () => {

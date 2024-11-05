@@ -41,7 +41,7 @@ const UpdateProposalScientistComment = (
         onSubmit={async (values): Promise<void> => {
           await api({
             toastSuccessMessage:
-              'Proposal scientist comment successfully saved!',
+              'Proposal scientist comment successfully saved',
           }).updateProposalScientistComment({
             proposalPk: props.proposalPk,
             commentByScientist: values.commentByScientist,
