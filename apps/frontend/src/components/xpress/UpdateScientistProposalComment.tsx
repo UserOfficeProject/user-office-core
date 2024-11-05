@@ -60,7 +60,7 @@ const UpdateProposalScientistComment = (
                 because for some reason it is not firing the onBlur event and form is not updated.
                 */}
                 <Editor
-                  id="proposalScientistComment"
+                  id="commentByScientist"
                   initialValue={initialValues.commentByScientist}
                   init={{
                     skin: false,
