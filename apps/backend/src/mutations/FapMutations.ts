@@ -19,7 +19,6 @@ import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { AssignProposalsToFapsInput } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -67,8 +66,7 @@ export default class FapMutations {
     private callDataSource: CallDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.QuestionaryDataSource)
-    public questionaryDataSource: QuestionaryDataSource,
-    @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource
+    public questionaryDataSource: QuestionaryDataSource
   ) {}
 
   @ValidateArgs(createFapValidationSchema)
