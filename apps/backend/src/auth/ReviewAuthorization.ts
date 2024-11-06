@@ -73,6 +73,13 @@ export class ReviewAuthorization {
     if (isReviewerOfProposal) {
       return true;
     }
+    const isMemberOfFap = await this.userAuth.isMemberOfFap(
+      agent,
+      review.fapID
+    );
+    if (isMemberOfFap) {
+      return true;
+    }
 
     return false;
   }

@@ -151,4 +151,88 @@ context('Predefined messages tests', () => {
       .first()
       .should('have.value', '');
   });
+
+  it('User officer should be able to delete the selected predefined message and create new one without closing the popup', () => {
+    cy.login('officer');
+    cy.visit('/');
+
+    cy.contains(initialDBData.proposal.title)
+      .parent()
+      .find('[data-cy="view-proposal"]')
+      .click();
+
+    cy.get('[role="dialog"] [role="tab"]').contains('Admin').click();
+
+    cy.get(
+      '[data-cy="commentForUser"] [data-cy="select-predefined-message"]'
+    ).click();
+
+    cy.get(
+      '[aria-labelledby="predefined-messages-modal"] [data-cy="message-title"] input'
+    )
+      .clear()
+      .type(messageTitle);
+
+    cy.get(
+      '[aria-labelledby="predefined-messages-modal"] [data-cy="message"] textarea'
+    )
+      .first()
+      .clear()
+      .type(message);
+
+    cy.get('[data-cy="save-and-use-message"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Message created successfully',
+    });
+
+    cy.get('[data-cy="commentForUser"] textarea')
+      .first()
+      .should('have.value', message);
+
+    cy.get(
+      '[data-cy="commentForUser"] [data-cy="select-predefined-message"]'
+    ).click();
+
+    cy.get('[data-cy="delete-message"]').click();
+    cy.get('[data-cy="confirm-ok"]').click();
+    cy.notification({
+      variant: 'success',
+      text: 'Message deleted successfully',
+    });
+
+    cy.get(
+      '[aria-labelledby="predefined-messages-modal"] [data-cy="message-title"] input'
+    ).should('have.value', '');
+
+    cy.get(
+      '[aria-labelledby="predefined-messages-modal"] [data-cy="message"] textarea'
+    )
+      .first()
+      .should('have.value', '');
+
+    const newMessageTitle = faker.random.words();
+    const newMessage = faker.random.words();
+
+    cy.get(
+      '[aria-labelledby="predefined-messages-modal"] [data-cy="message-title"] input'
+    )
+      .clear()
+      .type(newMessageTitle);
+
+    cy.get(
+      '[aria-labelledby="predefined-messages-modal"] [data-cy="message"] textarea'
+    )
+      .first()
+      .clear()
+      .type(newMessage);
+
+    cy.get('[data-cy="save-and-use-message"]').click();
+
+    cy.notification({
+      variant: 'success',
+      text: 'Message created successfully',
+    });
+  });
 });

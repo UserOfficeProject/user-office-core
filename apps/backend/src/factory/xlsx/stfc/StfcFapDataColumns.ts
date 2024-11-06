@@ -5,9 +5,12 @@ export const StfcFapDataColumns = [
   'Instrument Name',
   'Requested Time',
   'Proposal Title',
+  'Technical Review Comment',
   'Average score',
+  'Reviewer 1',
   'Reviewer 1 score',
   'Reviewer 1 review comment',
+  'Reviewer 2',
   'Reviewer 2 score',
   'Reviewer 2 review comment',
 ];

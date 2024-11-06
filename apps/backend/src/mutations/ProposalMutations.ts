@@ -25,7 +25,6 @@ import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
-import { SampleStatus } from '../models/Sample';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
@@ -622,6 +621,7 @@ export default class ProposalMutations {
         submitted: false,
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
+        submittedDate: null,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
@@ -639,8 +639,6 @@ export default class ProposalMutations {
       for await (const sample of proposalSamples) {
         await this.cloneUtils.cloneSample(sample, {
           proposalPk: clonedProposal.primaryKey,
-          safetyStatus: SampleStatus.PENDING_EVALUATION,
-          safetyComment: '',
           shipmentId: null,
         });
       }

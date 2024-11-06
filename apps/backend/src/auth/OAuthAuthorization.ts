@@ -162,21 +162,21 @@ export class OAuthAuthorization extends UserAuthorization {
       return updatedUser;
     } else {
       const newUser = await this.userDataSource.create(
-        'unspecified',
+        (userInfo.title as string) ?? 'unspecified',
         userInfo.given_name,
         undefined,
         userInfo.family_name,
         userInfo.email,
-        userInfo.preferred_username,
+        userInfo.preferred_username ?? '',
         userInfo.sub,
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
-        'unspecified',
+        userInfo.gender ?? 'unspecified',
         1,
         new Date(),
-        1,
+        institutionId ?? 1,
         '',
-        '',
+        (userInfo.position as string) ?? '',
         userInfo.email,
         '',
         undefined

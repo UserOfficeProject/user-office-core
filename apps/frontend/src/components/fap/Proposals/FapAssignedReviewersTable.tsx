@@ -24,6 +24,7 @@ import RankInputModal from './RankInputModal';
 
 type FapAssignedReviewersTableProps = {
   fapProposal: FapProposalType;
+  fapChairAndSecs: number[];
   removeAssignedReviewer: (
     assignedReviewer: FapProposalAssignmentType,
     proposalPk: number
@@ -60,6 +61,7 @@ const assignmentColumns = [
 
 const FapAssignedReviewersTable = ({
   fapProposal,
+  fapChairAndSecs,
   removeAssignedReviewer,
   updateView,
 }: FapAssignedReviewersTableProps) => {
@@ -77,6 +79,7 @@ const FapAssignedReviewersTable = ({
   const [rankReviewer, setRankReviewer] = useState<null | {
     reviewer: number | null;
     proposal: number;
+    rank: number | null;
   }>(null);
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
@@ -171,33 +174,50 @@ const FapAssignedReviewersTable = ({
           proposalPk={fapProposal.proposalPk}
           reviewId={reviewerModal ? +reviewerModal : undefined}
           fapId={fapProposal.fapId}
+          fapSecAndChair={fapChairAndSecs}
           tabNames={reviewProposalTabNames}
         />
       </ProposalReviewModal>
-      <RankInputModal
-        open={!!rankReviewer}
-        onClose={() => setRankReviewer(null)}
-        onSubmit={async (value) => {
-          await api().saveReviewerRank({
-            proposalPk: rankReviewer?.proposal as number,
-            reviewerId: rankReviewer?.reviewer as number,
-            rank: value,
-          });
-          const fapAssignmentsWithUpdatedRank =
-            fapAssignmentsWithIdAndFormattedDate.map((fa) => ({
-              ...fa,
-              rank:
-                fa.proposalPk === rankReviewer?.proposal &&
-                fa.fapMemberUserId === rankReviewer.reviewer
-                  ? value
-                  : fa.rank,
-            }));
+      {rankReviewer && (
+        <RankInputModal
+          open={!!rankReviewer}
+          onClose={() => setRankReviewer(null)}
+          onSubmit={async (value) => {
+            await api().saveReviewerRank({
+              proposalPk: rankReviewer?.proposal as number,
+              reviewerId: rankReviewer?.reviewer as number,
+              rank: value,
+            });
+            const fapAssignmentsWithUpdatedRank =
+              fapAssignmentsWithIdAndFormattedDate.map((fa) => ({
+                ...fa,
+                rank:
+                  fa.proposalPk === rankReviewer?.proposal &&
+                  fa.fapMemberUserId === rankReviewer.reviewer
+                    ? value
+                    : fa.rank,
+              }));
 
-          setFapAssignmentsWithIdAndFormattedDate(
-            fapAssignmentsWithUpdatedRank
-          );
-        }}
-      />
+            setFapAssignmentsWithIdAndFormattedDate(
+              fapAssignmentsWithUpdatedRank
+            );
+            updateView(rankReviewer?.proposal as number);
+          }}
+          currentRank={rankReviewer?.rank}
+          totalReviewers={fapProposal.assignments?.length ?? 0}
+          takenRanks={
+            fapProposal.assignments
+              ? fapProposal.assignments
+                  .filter(
+                    (assignment) =>
+                      assignment.rank !== null &&
+                      assignment.user?.id !== rankReviewer?.reviewer
+                  )
+                  .map((assignment) => assignment.rank as number)
+              : []
+          }
+        />
+      )}
 
       <MaterialTable
         icons={tableIcons}
@@ -246,6 +266,7 @@ const FapAssignedReviewersTable = ({
               setRankReviewer({
                 proposal: rowData.proposalPk,
                 reviewer: rowData.fapMemberUserId,
+                rank: rowData.rank,
               });
             },
             tooltip: 'Rank Reviewer',

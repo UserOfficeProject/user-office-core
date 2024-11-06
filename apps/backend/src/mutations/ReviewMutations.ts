@@ -15,6 +15,7 @@ import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { SampleDataSource } from '../datasources/SampleDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { rejection, Rejection } from '../models/Rejection';
@@ -25,6 +26,7 @@ import { UserWithRole } from '../models/User';
 import { AddTechnicalReviewInput } from '../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../resolvers/mutations/AddUserForReviewMutation';
 import { ProposalPkWithReviewId } from '../resolvers/mutations/SubmitProposalsReviewMutation';
+import { SubmitSampleReviewArg } from '../resolvers/mutations/SubmitSampleReviewMutation';
 import { SubmitTechnicalReviewInput } from '../resolvers/mutations/SubmitTechnicalReviewMutation';
 import { UpdateReviewArgs } from '../resolvers/mutations/UpdateReviewMutation';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
@@ -44,7 +46,8 @@ export default class ReviewMutations {
     private callDataSource: CallDataSource,
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.SampleDataSource) private sampleDataSource: SampleDataSource
   ) {}
 
   @EventBus(Event.PROPOSAL_FAP_REVIEW_UPDATED)
@@ -137,7 +140,12 @@ export default class ReviewMutations {
   }
 
   @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_SUBMITTED)
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
+  ])
   async submitTechnicalReview(
     agent: UserWithRole | null,
     args: SubmitTechnicalReviewInput
@@ -199,12 +207,41 @@ export default class ReviewMutations {
       });
   }
 
+  @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
+  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
+  async submitSampleReview(
+    agent: UserWithRole | null,
+    args: SubmitSampleReviewArg
+  ) {
+    const sample = await this.sampleDataSource.getSample(args.sampleId);
+
+    if (!sample) {
+      return rejection('Sample does not exist', { agent, args });
+    }
+
+    return this.sampleDataSource
+      .submitReview(args)
+      .then((sample) => sample)
+      .catch((error) => {
+        return rejection(
+          'Can not update sample because an error occurred',
+          { agent, args },
+          error
+        );
+      });
+  }
+
   @EventBus(Event.PROPOSAL_FEASIBILITY_REVIEW_UPDATED)
   @ValidateArgs(proposalTechnicalReviewValidationSchema, [
     'comment',
     'publicComment',
   ])
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FAP_CHAIR,
+    Roles.FAP_SECRETARY,
+  ])
   async setTechnicalReview(
     agent: UserWithRole | null,
     args: AddTechnicalReviewInput | SubmitTechnicalReviewInput

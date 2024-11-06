@@ -1,13 +1,13 @@
 import { stripHtml } from 'string-strip-html';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../../../config/Tokens';
 import { StfcUserDataSource } from '../../../datasources/stfc/StfcUserDataSource';
 import { QuestionaryStep } from '../../../models/Questionary';
 import { Review } from '../../../models/Review';
 import { CallRowObj } from '../callFaps';
 import { RowObj } from '../fap';
 import { getDataRow } from '../FapDataRow';
-
-const stfcUserDataSource = new StfcUserDataSource();
 
 export async function getStfcDataRow(
   proposalPk: number,
@@ -19,11 +19,34 @@ export async function getStfcDataRow(
   proposalTitle: string,
   proposalId: number | null,
   technicalReviewTimeAllocation: number | null,
+  technicalReviewComment: string | null,
   propFapRankOrder: number | null,
   proposer_id: number | null,
   proposalAnswers: QuestionaryStep[] | null,
   reviews: Review[] | null
 ) {
+  const stfcUserDataSource: StfcUserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as StfcUserDataSource;
+
+  const individualReviews = reviews
+    ? await Promise.all(
+        reviews.map(async (rev) => {
+          const reviewer = await stfcUserDataSource.getBasicUserInfo(
+            rev.userID
+          );
+
+          return [
+            reviewer
+              ? `${reviewer.preferredname} ${reviewer.lastname} `
+              : '<missing>',
+            rev.grade,
+            rev.comment && stripHtml(rev.comment).result,
+          ];
+        })
+      )
+    : null;
+
   const daysRequested = proposalAnswers
     ?.flatMap((step) => step.fields)
     .find((answer) => answer.question.naturalKey === 'days_requested')
@@ -48,20 +71,16 @@ export async function getStfcDataRow(
       proposalTitle,
       proposalId,
       technicalReviewTimeAllocation,
+      technicalReviewComment,
       propFapRankOrder
     ),
     daysRequested,
-    reviews,
+    reviews: individualReviews,
     piCountry: piCountry,
   };
 }
 
 export function populateStfcRow(row: RowObj) {
-  const individualReviews = row.reviews?.flatMap((rev) => [
-    rev.grade,
-    rev.comment && stripHtml(rev.comment).result,
-  ]);
-
   return [
     row.propShortCode ?? '<missing>',
     row.principalInv ?? '<missing>',
@@ -69,16 +88,12 @@ export function populateStfcRow(row: RowObj) {
     row.instrName ?? '<missing>',
     row.daysRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
+    row.techReviewComment ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
-  ].concat(individualReviews ? individualReviews : []);
+  ].concat(row.reviews ? row.reviews?.flat() : []);
 }
 
 export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
-  const individualReviews = row.reviews?.flatMap((rev) => [
-    rev.grade,
-    rev.comment && stripHtml(rev.comment).result,
-  ]);
-
   return [
     row.propShortCode ?? '<missing>',
     row.principalInv ?? '<missing>',
@@ -86,10 +101,14 @@ export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
     row.instrName ?? '<missing>',
     row.daysRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
+    row.techReviewComment ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
-    row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
-    row.fapMeetingDecision ?? '<missing>',
-    row.fapMeetingInComment ?? '<missing>',
-    row.fapMeetingExComment ?? '<missing>',
-  ].concat(individualReviews ? individualReviews : []);
+  ]
+    .concat(row.reviews ? row.reviews?.flat() : [])
+    .concat([
+      row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
+      row.fapMeetingDecision ?? '<missing>',
+      row.fapMeetingInComment ?? '<missing>',
+      row.fapMeetingExComment ?? '<missing>',
+    ]);
 }

@@ -7,7 +7,14 @@ import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
-import { TemplateGroupId } from 'generated/sdk';
+import {
+  BasicUserDetails,
+  ProposalEndStatus,
+  ProposalPublicStatus,
+  QuestionaryStep,
+  ReviewStatus,
+  TemplateGroupId,
+} from 'generated/sdk';
 import createCustomEventHandlers from 'models/questionary/createCustomEventHandlers';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
 import { FapReviewWithQuestionary } from 'models/questionary/fapReview/FapReviewWithQuestionary';
@@ -20,6 +27,76 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 export interface ReviewContextType extends QuestionaryContextType {
   state: FapReviewSubmissionState | null;
+}
+
+export function createFapReviewStub(
+  templateId: number,
+  questionarySteps: QuestionaryStep[],
+  reviewer: BasicUserDetails
+): FapReviewWithQuestionary {
+  return {
+    id: 0,
+    grade: 0,
+    comment: '',
+    fapID: 0,
+    reviewer: reviewer,
+    status: ReviewStatus.DRAFT,
+    questionary: {
+      questionaryId: 0,
+      isCompleted: false,
+      templateId: templateId,
+      created: new Date(),
+      steps: questionarySteps,
+    },
+    questionaryID: 0,
+    proposal: {
+      primaryKey: 0,
+      title: '',
+      abstract: '',
+      callId: 0,
+      proposer: reviewer,
+      questionary: {
+        questionaryId: 0,
+        isCompleted: false,
+        templateId: templateId,
+        created: new Date(),
+        steps: questionarySteps,
+      },
+      questionaryId: 0,
+      proposalId: '',
+      status: {
+        id: 0,
+        shortCode: 'DRAFT',
+        description: '',
+        name: '',
+        isDefault: true,
+      },
+      submitted: false,
+      users: [],
+      samples: [],
+      genericTemplates: [],
+      commentForManagement: '',
+      commentForUser: '',
+      created: new Date(),
+      fapMeetingDecisions: [],
+      faps: [],
+      finalStatus: ProposalEndStatus.ACCEPTED,
+      instruments: [],
+      managementDecisionSubmitted: false,
+      call: null,
+      notified: false,
+      proposalBookingsCore: null,
+      publicStatus: ProposalPublicStatus.ACCEPTED,
+      reviews: [],
+      proposerId: 0,
+      technicalReviews: [],
+      statusId: 0,
+      visits: [],
+      updated: new Date(),
+      submittedDate: new Date(),
+      techniques: [],
+    },
+  };
 }
 
 interface ReviewQuestionaryProps {

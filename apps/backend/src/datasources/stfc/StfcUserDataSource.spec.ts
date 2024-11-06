@@ -5,7 +5,7 @@ import UOWSSoapClient from './UOWSSoapInterface';
 
 jest.mock('./UOWSSoapInterface');
 jest.mock('../postgres/UserDataSource.ts');
-jest.mock('../../utils/LRUCache');
+jest.mock('../../utils/Cache');
 
 describe('Role tests', () => {
   const dummyUserNumber = 12345;

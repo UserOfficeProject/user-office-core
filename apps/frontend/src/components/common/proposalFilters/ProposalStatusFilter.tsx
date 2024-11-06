@@ -63,7 +63,7 @@ const ProposalStatusFilter = ({
             onChange={(proposalStatus) => {
               setSearchParams((searchParams) => {
                 searchParams.delete('proposalStatus');
-                if (proposalStatus.target.value) {
+                if (proposalStatus.target.value && !!shouldShowAll) {
                   searchParams.set(
                     'proposalStatus',
                     proposalStatus.target.value.toString()

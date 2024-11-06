@@ -37,7 +37,9 @@ import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafety
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
+import { StatusActionsLog } from '../../models/StatusActionsLog';
 import { TechnicalReview } from '../../models/TechnicalReview';
+import { Technique } from '../../models/Technique';
 import {
   DataType,
   FieldCondition,
@@ -63,6 +65,7 @@ import {
   ProposalViewFap,
   ProposalViewInstrument,
   ProposalViewTechnicalReview,
+  ProposalViewTechnique,
 } from '../../resolvers/types/ProposalView';
 import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
@@ -134,6 +137,7 @@ export interface ProposalRecord {
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
+  readonly submitted_date: Date;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -155,6 +159,8 @@ export interface ProposalViewRecord {
   readonly proposal_workflow_id: number;
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly full_count: number;
+  readonly submitted_date: Date;
+  readonly techniques: ProposalViewTechnique[];
 }
 
 export interface TopicRecord {
@@ -461,6 +467,7 @@ export interface FapReviewsRecord {
   readonly fap_time_allocation: number;
   readonly average_grade: number;
   readonly questionary_id: number;
+  readonly comment: string;
 }
 
 export interface FapReviewerRecord {
@@ -800,7 +807,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.notified,
     proposal.submitted,
     proposal.reference_number_sequence,
-    proposal.management_decision_submitted
+    proposal.management_decision_submitted,
+    proposal.submitted_date
   );
 };
 
@@ -864,7 +872,9 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.call_short_code,
     proposal.allocation_time_unit,
     proposal.call_id,
-    proposal.proposal_workflow_id
+    proposal.proposal_workflow_id,
+    proposal.submitted_date,
+    proposal.techniques
   );
 };
 
@@ -1324,7 +1334,19 @@ export const createRedeemCodeObject = (invite: RedeemCodeRecord) =>
     invite.claimed_by,
     invite.claimed_at
   );
-
+export const createStatusActionsLogObject = (
+  statusActionLog: StatusActionsLogRecord
+) => {
+  return new StatusActionsLog(
+    statusActionLog.status_actions_log_id,
+    statusActionLog.connection_id,
+    statusActionLog.action_id,
+    statusActionLog.email_status_action_recipient,
+    statusActionLog.status_actions_successful,
+    statusActionLog.status_actions_message,
+    statusActionLog.status_actions_tstamp
+  );
+};
 export interface TechniqueRecord {
   readonly technique_id: number;
   readonly name: string;
@@ -1336,4 +1358,46 @@ export interface TechniqueRecord {
 export interface TechniqueHasInstrumentsRecord {
   readonly technique_id: number;
   readonly instrument_id: number;
+}
+
+export const createProposalViewObjectWithTechniques = (
+  proposal: ProposalViewRecord,
+  techniques: Technique[]
+) => {
+  return new ProposalView(
+    proposal.proposal_pk,
+    proposal.title || '',
+    proposal.principal_investigator,
+    proposal.proposal_status_id,
+    proposal.proposal_status_name,
+    proposal.proposal_status_description,
+    proposal.proposal_id,
+    proposal.final_status,
+    proposal.notified,
+    proposal.submitted,
+    proposal.instruments,
+    proposal.technical_reviews,
+    proposal.faps,
+    proposal.fap_instruments,
+    proposal.call_short_code,
+    proposal.allocation_time_unit,
+    proposal.call_id,
+    proposal.proposal_workflow_id,
+    proposal.submitted_date,
+    techniques
+  );
+};
+export interface StatusActionsLogRecord {
+  readonly status_actions_log_id: number;
+  readonly connection_id: number;
+  readonly action_id: number;
+  readonly email_status_action_recipient: string;
+  readonly status_actions_successful: boolean;
+  readonly status_actions_message: string;
+  readonly status_actions_tstamp: Date;
+  readonly full_count: number;
+}
+export interface StatusActionsLogHasProposalRecord {
+  readonly status_actions_log_id: number;
+  readonly proposal_pk: number;
 }
