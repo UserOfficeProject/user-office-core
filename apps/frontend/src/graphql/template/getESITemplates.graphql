@@ -1,0 +1,10 @@
+query getProposalESITemplates($filter: TemplatesFilter) {
+  templates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+    questionaryCount
+    proposalESICallCount
+  }
+}

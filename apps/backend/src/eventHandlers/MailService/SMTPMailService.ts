@@ -14,7 +14,7 @@ import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
 import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
-  private _email: EmailTemplates<any>;
+  private emailTemplates: EmailTemplates<any>;
 
   constructor() {
     super();
@@ -29,7 +29,7 @@ export class SMTPMailService extends MailService {
       });
     }
 
-    this._email = new EmailTemplates({
+    this.emailTemplates = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
         attachments,
@@ -100,7 +100,7 @@ export class SMTPMailService extends MailService {
       this.getEmailTemplatePath('html', options.content.template_id) + '.pug';
 
     if (
-      !(await (this._email as any).templateExists(template)) &&
+      !(await (this.emailTemplates as any).templateExists(template)) &&
       process.env.NODE_ENV !== 'test'
     ) {
       logger.logError('Template does not exist', {
@@ -112,7 +112,7 @@ export class SMTPMailService extends MailService {
 
     options.recipients.forEach((participant) => {
       emailPromises.push(
-        this._email.send({
+        this.emailTemplates.send({
           template: options.content.template_id,
           message: {
             ...(typeof participant.address !== 'string'
@@ -155,15 +155,9 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  async getEmailTemplates(
-    includeDraft = false
-  ): ResultsPromise<STFCEmailTemplate[]> {
+  async getEmailTemplates(): ResultsPromise<STFCEmailTemplate[]> {
     return {
       results: [
-        {
-          id: 'call-created-email',
-          name: 'Call Created Email',
-        },
         {
           id: 'clf-proposal-submitted-pi',
           name: 'CLF PI Co-I Submission Email',
