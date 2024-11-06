@@ -11,9 +11,11 @@ import {
 } from '../datasources/mockups/UserDataSource';
 import { isRejection, Rejection } from '../models/Rejection';
 import { Sample, SampleStatus } from '../models/Sample';
+import ReviewMutations from './ReviewMutations';
 import SampleMutations from './SampleMutations';
 
 const sampleMutations = container.resolve(SampleMutations);
+const reviewMutations = container.resolve(ReviewMutations);
 
 beforeEach(() => {
   container.resolve<SampleDataSourceMock>(Tokens.SampleDataSource).init();
@@ -48,44 +50,28 @@ test('User should be able to update title of the sample', () => {
   ).resolves.toHaveProperty('title', newTitle);
 });
 
-test('User should not be able to update the sample safety status', async () => {
+test('User should not be able to update the sample safety status and comment', async () => {
+  const newComment = 'Updated comment';
+
   return expect(
-    sampleMutations.updateSample(dummyUserWithRole, {
+    reviewMutations.submitSampleReview(dummyUserWithRole, {
       sampleId: 1,
       safetyStatus: SampleStatus.HIGH_RISK,
+      safetyComment: newComment,
     })
   ).resolves.not.toHaveProperty('safetyStatus', SampleStatus.HIGH_RISK);
 });
 
-test('User should not be able to update the sample safety comment', () => {
+test('Sample safety reviewer should be able to update the sample safety status and comment', async () => {
   const newComment = 'Updated comment';
 
   return expect(
-    sampleMutations.updateSample(dummyUserWithRole, {
-      sampleId: 1,
-      safetyComment: newComment,
-    })
-  ).resolves.not.toHaveProperty('safetyComment', newComment);
-});
-
-test('Sample safety reviewer should be able to update the sample safety status', async () => {
-  return expect(
-    sampleMutations.updateSample(dummySampleReviewer, {
+    reviewMutations.submitSampleReview(dummySampleReviewer, {
       sampleId: 1,
       safetyStatus: SampleStatus.HIGH_RISK,
-    })
-  ).resolves.toHaveProperty('safetyStatus', SampleStatus.HIGH_RISK);
-});
-
-test('Sample safety reviewer should be able to update the sample safety comment', async () => {
-  const newComment = 'Updated comment';
-
-  return expect(
-    sampleMutations.updateSample(dummySampleReviewer, {
-      sampleId: 1,
       safetyComment: newComment,
     })
-  ).resolves.toHaveProperty('safetyComment', newComment);
+  ).resolves.toHaveProperty('safetyStatus', SampleStatus.HIGH_RISK);
 });
 
 test('User can delete sample', async () => {
