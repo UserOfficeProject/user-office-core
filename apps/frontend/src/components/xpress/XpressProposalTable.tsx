@@ -556,7 +556,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const { calls, loadingCalls } = useCallsData(
-    undefined,
+    {
+      // Only show calls that use the quick review status in workflow
+      proposalStatusShortCode: 'QUICK_REVIEW',
+    },
     CallsDataQuantity.EXTENDED
   );
 
