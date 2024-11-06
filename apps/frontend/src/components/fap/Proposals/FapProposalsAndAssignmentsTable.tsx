@@ -611,15 +611,13 @@ const FapProposalsAndAssignmentsTable = ({
         assignedReviewer: FapProposalAssignmentType,
         proposalPk: number
       ): Promise<void> => {
-        assignedReviewer.review &&
-          (await api({
-            toastSuccessMessage: 'Reviewer removed',
-          }).removeMemberFromFapProposal({
-            proposalPk,
-            fapId: data.id,
-            memberId: assignedReviewer.fapMemberUserId as number,
-            reviewId: assignedReviewer.review.id,
-          }));
+        await api({
+          toastSuccessMessage: 'Reviewer removed',
+        }).removeMemberFromFapProposal({
+          proposalPk,
+          fapId: data.id,
+          memberId: assignedReviewer.fapMemberUserId as number,
+        });
 
         setFapProposalsData((fapProposalData) =>
           fapProposalData.map((proposalItem) => {

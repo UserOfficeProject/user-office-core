@@ -894,13 +894,14 @@ export default class PostgresFapDataSource implements FapDataSource {
   async removeMemberFromFapProposal(
     proposalPk: number,
     fapId: number,
-    memberId: number,
-    reviewId: number
+    memberId: number
   ) {
     await database.transaction(async (trx) => {
       await trx
         .from('fap_reviews')
-        .where('review_id', reviewId)
+        .where('fap_id', fapId)
+        .andWhere('proposal_pk', proposalPk)
+        .andWhere('user_id', memberId)
         .returning('*')
         .del();
 

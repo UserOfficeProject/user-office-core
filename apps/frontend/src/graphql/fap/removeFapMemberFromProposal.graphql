@@ -2,13 +2,11 @@ mutation removeMemberFromFapProposal(
   $memberId: Int!
   $fapId: Int!
   $proposalPk: Int!
-  $reviewId: Int!
 ) {
   removeMemberFromFapProposal(
     memberId: $memberId
     fapId: $fapId
     proposalPk: $proposalPk
-    reviewId: $reviewId
   ) {
     id
   }

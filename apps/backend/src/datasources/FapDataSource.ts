@@ -104,8 +104,7 @@ export interface FapDataSource {
   removeMemberFromFapProposal(
     proposalPk: number,
     fapId: number,
-    memberId: number,
-    reviewId: number
+    memberId: number
   ): Promise<Fap>;
   removeProposalsFromFaps(
     args: RemoveProposalsFromFapsArgs

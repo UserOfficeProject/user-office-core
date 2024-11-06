@@ -543,12 +543,7 @@ export default class FapMutations {
     }
 
     return this.dataSource
-      .removeMemberFromFapProposal(
-        args.proposalPk,
-        args.fapId,
-        args.memberId,
-        args.reviewId
-      )
+      .removeMemberFromFapProposal(args.proposalPk, args.fapId, args.memberId)
       .catch((error) => {
         return rejection(
           'Can not remove member from Fap proposal because of an error',

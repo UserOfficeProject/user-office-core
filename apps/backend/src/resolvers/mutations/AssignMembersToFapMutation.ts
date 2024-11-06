@@ -62,9 +62,6 @@ export class RemoveFapReviewerFromProposalArgs {
 
   @Field(() => Int)
   public proposalPk: number;
-
-  @Field(() => Int)
-  public reviewId: number;
 }
 
 @ArgsType()
