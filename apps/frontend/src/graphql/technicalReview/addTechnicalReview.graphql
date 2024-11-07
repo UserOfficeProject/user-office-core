@@ -1,0 +1,29 @@
+mutation addTechnicalReview(
+  $proposalPk: Int!
+  $timeAllocation: Int
+  $comment: String
+  $publicComment: String
+  $status: TechnicalReviewStatus
+  $submitted: Boolean!
+  $reviewerId: Int!
+  $files: String
+  $instrumentId: Int!
+  $questionaryId: Int!
+) {
+  addTechnicalReview(
+    addTechnicalReviewInput: {
+      proposalPk: $proposalPk
+      timeAllocation: $timeAllocation
+      comment: $comment
+      publicComment: $publicComment
+      status: $status
+      submitted: $submitted
+      reviewerId: $reviewerId
+      files: $files
+      instrumentId: $instrumentId
+      questionaryId: $questionaryId
+    }
+  ) {
+    id
+  }
+}

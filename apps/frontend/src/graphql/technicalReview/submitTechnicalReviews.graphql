@@ -1,0 +1,7 @@
+mutation submitTechnicalReviews(
+  $technicalReviews: [SubmitTechnicalReviewInput!]!
+) {
+  submitTechnicalReviews(
+    submitTechnicalReviewsInput: { technicalReviews: $technicalReviews }
+  )
+}
