@@ -23,23 +23,17 @@ import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-<<<<<<< HEAD
 import UOLoader from 'components/common/UOLoader';
-=======
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
->>>>>>> origin/develop
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
-<<<<<<< HEAD
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-=======
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
->>>>>>> origin/develop
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
