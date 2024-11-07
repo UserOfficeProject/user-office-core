@@ -4,6 +4,8 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Roles } from '../../models/Role';
+import { UserWithRole } from '../../models/User';
 import { UpdateGenericTemplateArgs } from '../../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplatesArgs } from '../../resolvers/queries/GenericTemplatesQuery';
 import { SubTemplateConfig } from '../../resolvers/types/FieldConfig';
@@ -216,33 +218,53 @@ export default class PostgresGenericTemplateDataSource
   }
 
   async getGenericTemplates(
-    args: GenericTemplatesArgs
+    args: GenericTemplatesArgs,
+    agent: UserWithRole | null
   ): Promise<GenericTemplate[]> {
     const filter = args.filter;
 
-    return database('generic_templates')
+    return database
+      .select('*')
+      .from('generic_templates as g')
+      .fullOuterJoin('fap_reviews as f', {
+        'f.proposal_pk': 'g.proposal_pk',
+      })
       .modify((query) => {
-        if (filter?.creatorId) {
-          query.where('creator_id', filter.creatorId);
-        }
-        if (filter?.questionaryIds) {
-          query.where('questionary_id', 'in', filter.questionaryIds);
-        }
-        if (filter?.title) {
-          query.where('title', 'like', `%${filter.title}%`);
-        }
-        if (filter?.genericTemplateIds) {
-          query.where('generic_template_id', 'in', filter.genericTemplateIds);
-        }
-        if (filter?.proposalPk) {
-          query.where('proposal_pk', filter.proposalPk);
-        }
-        if (filter?.questionId) {
-          query.where('question_id', filter.questionId);
+        if (
+          !(
+            agent?.currentRole?.shortCode == Roles.USER_OFFICER ||
+            agent?.currentRole?.shortCode == Roles.INSTRUMENT_SCIENTIST
+          )
+        ) {
+          // User role
+          if (agent?.id) {
+            query.where('creator_id', agent?.id);
+            // query.orWhere('f.user_id', '=', agent?.id);
+          }
+
+          if (filter?.questionaryIds) {
+            query.where('g.questionary_id', 'in', filter.questionaryIds);
+          }
+          if (filter?.title) {
+            query.where('g.title', 'like', `%${filter.title}%`);
+          }
+          if (filter?.genericTemplateIds) {
+            query.where(
+              'g.generic_template_id',
+              'in',
+              filter.genericTemplateIds
+            );
+          }
+          if (filter?.proposalPk) {
+            query.where('g.proposal_pk', filter.proposalPk);
+          }
+          if (filter?.questionId) {
+            query.where('g.question_id', filter.questionId);
+          }
         }
       })
-      .select('*')
-      .orderBy('created_at', 'asc')
+
+      .orderBy('g.created_at', 'asc')
       .then((records: GenericTemplateRecord[]) =>
         records.map((record) => createGenericTemplateObject(record))
       );

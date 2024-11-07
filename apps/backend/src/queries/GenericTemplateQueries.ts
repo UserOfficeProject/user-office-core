@@ -44,7 +44,10 @@ export default class GenericTemplateQueries {
     agent: UserWithRole | null,
     args: GenericTemplatesArgs
   ) {
-    let genericTemplates = await this.dataSource.getGenericTemplates(args);
+    let genericTemplates = await this.dataSource.getGenericTemplates(
+      args,
+      agent
+    );
 
     genericTemplates = await Promise.all(
       genericTemplates.map((genericTemplate) =>
