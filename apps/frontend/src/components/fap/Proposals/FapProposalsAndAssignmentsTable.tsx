@@ -355,11 +355,9 @@ const FapProposalsAndAssignmentsTable = ({
         continue;
       }
 
-      const proposalReviewsWithProposalPk = proposalReviews.map(
-        (proposalReview) => ({ ...proposalReview, proposalPk })
+      proposalReviews.forEach((proposalReview) =>
+        allProposalReviews.push({ ...proposalReview, proposalPk })
       );
-
-      allProposalReviews.push(...proposalReviewsWithProposalPk);
     }
 
     if (allProposalReviews.length === 0) {
