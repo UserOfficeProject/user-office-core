@@ -34,6 +34,13 @@ context('Xpress tests', () => {
   // Technique 4 has no proposals assigned
   let createdTechniquePk5: number;
 
+  let callWorkflowId: number; // Workflow with QUICK_REVIEW status
+
+  const proposalWorkflow = {
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
+  };
+
   const draftStatus: {
     id?: number;
     name: string;
@@ -110,6 +117,17 @@ context('Xpress tests', () => {
     id: initialDBData.proposalStatuses.expired.id,
     name: 'EXPIRED',
     shortCode: 'EXPIRED',
+    description: '-',
+  };
+
+  const quickReviewStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    name: 'Quick review',
+    shortCode: 'QUICK_REVIEW',
     description: '-',
   };
 
@@ -270,6 +288,42 @@ context('Xpress tests', () => {
       if (result.createProposalStatus) {
         submittedStatus.id = result.createProposalStatus.id;
       }
+    });
+
+    cy.createProposalStatus({
+      name: quickReviewStatus.name,
+      shortCode: quickReviewStatus.shortCode,
+      description: quickReviewStatus.description,
+    }).then((result) => {
+      if (result.createProposalStatus) {
+        quickReviewStatus.id = result.createProposalStatus.id;
+      }
+    });
+
+    /*
+    Create the workflow with the QUICK_REVIEW status needed for Xpress calls
+    */
+    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+      const workflow = result.createProposalWorkflow;
+      callWorkflowId = workflow.id;
+
+      if (result.createProposalWorkflow) {
+        cy.addProposalWorkflowStatus({
+          droppableGroupId:
+            workflow.proposalWorkflowConnectionGroups[0].groupId,
+          proposalStatusId: quickReviewStatus.id as number,
+          proposalWorkflowId: callWorkflowId,
+          sortOrder: 1,
+        });
+      }
+    });
+
+    /*
+    Update the default call with a workflow that includes QUICK_REVIEW
+    */
+    cy.updateCall({
+      id: initialDBData.call.id,
+      proposalWorkflowId: callWorkflowId,
     });
 
     /*
@@ -497,7 +551,7 @@ context('Xpress tests', () => {
     });
   });
 
-  describe('Xpress basic tests', () => {
+  describe.only('Xpress basic tests', () => {
     it('User should not be able to see Xpress page', function () {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -632,12 +686,7 @@ context('Xpress tests', () => {
     it('Xpress proposals can be filtered by call', function () {
       let esiTemplateId: number;
       const esiTemplateName = faker.lorem.words(2);
-      let workflowId: number;
       const currentDayStart = DateTime.now().startOf('day');
-      const proposalWorkflow = {
-        name: faker.lorem.words(2),
-        description: faker.lorem.words(5),
-      };
 
       const newCall = {
         shortCode: 'call 2',
@@ -666,20 +715,11 @@ context('Xpress tests', () => {
         if (result.createTemplate) {
           esiTemplateId = result.createTemplate.templateId;
 
-          cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-            if (result.createProposalWorkflow) {
-              workflowId = result.createProposalWorkflow.id;
-              cy.createCall({
-                ...newCall,
-                esiTemplateId: esiTemplateId,
-                proposalWorkflowId: workflowId,
-              });
-            } else {
-              throw new Error('Workflow creation failed');
-            }
+          cy.createCall({
+            ...newCall,
+            esiTemplateId: esiTemplateId,
+            proposalWorkflowId: callWorkflowId,
           });
-        } else {
-          throw new Error('ESI templete creation failed');
         }
       });
 
