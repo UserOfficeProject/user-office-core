@@ -858,28 +858,46 @@ export default class PostgresFapDataSource implements FapDataSource {
     fapId: number
   ) {
     await database.transaction(async (trx) => {
-      await trx<FapAssignmentRecord>('fap_assignments')
-        .insert(
-          assignments.map((assignment) => ({
-            proposal_pk: assignment.proposalPk,
-            fap_member_user_id: assignment.memberId,
-            fap_id: fapId,
-            fap_proposal_id: assignment.fapProposalId,
-          }))
+      try {
+        const fapAssignment = await database<FapAssignmentRecord>(
+          'fap_assignments'
         )
-        .returning<FapAssignmentRecord[]>(['*']);
-      await trx<ReviewRecord>('fap_reviews')
-        .insert(
-          assignments.map((assignment) => ({
-            user_id: assignment.memberId,
-            proposal_pk: assignment.proposalPk,
-            status: ReviewStatus.DRAFT,
-            fap_id: fapId,
-            fap_proposal_id: assignment.fapProposalId,
-            questionary_id: assignment.questionaryId,
-          }))
-        )
-        .returning<ReviewRecord[]>(['*']);
+          .insert(
+            assignments.map((assignment) => ({
+              proposal_pk: assignment.proposalPk,
+              fap_member_user_id: assignment.memberId,
+              fap_id: fapId,
+              fap_proposal_id: assignment.fapProposalId,
+            }))
+          )
+          .transacting(trx);
+        const reviewRecord = await database<ReviewRecord>('fap_reviews')
+          .insert(
+            assignments.map((assignment) => ({
+              user_id: assignment.memberId,
+              proposal_pk: assignment.proposalPk,
+              status: ReviewStatus.DRAFT,
+              fap_id: fapId,
+              fap_proposal_id: assignment.fapProposalId,
+              questionary_id: assignment.questionaryId,
+            }))
+          )
+          .transacting(trx);
+
+        if (!(fapAssignment && reviewRecord)) {
+          throw new GraphQLError('Could not delete reviewer');
+        }
+
+        return await trx.commit();
+      } catch (error) {
+        logger.logException(
+          `Could not delete reviewer ags: '${JSON.stringify(assignments)}'`,
+          error
+        );
+        trx.rollback();
+
+        throw new GraphQLError('Could not delete reviewer');
+      }
     });
 
     const updatedFap = await this.getFap(fapId);
