@@ -551,7 +551,7 @@ context('Xpress tests', () => {
     });
   });
 
-  describe.only('Xpress basic tests', () => {
+  describe('Xpress basic tests', () => {
     it('User should not be able to see Xpress page', function () {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
