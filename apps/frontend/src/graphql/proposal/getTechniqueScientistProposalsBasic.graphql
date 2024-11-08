@@ -1,0 +1,22 @@
+query getTechniqueScientistProposalsBasic(
+  $filter: ProposalsFilter
+  $searchText: String
+) {
+  techniqueScientistProposals(
+    filter: $filter
+    searchText: $searchText
+  ) {
+    proposals {
+      primaryKey
+      proposalId
+      title
+      submitted
+      submittedDate
+      finalStatus
+      statusName
+      callId
+      callShortCode
+    }
+    totalCount
+  }
+}
