@@ -275,17 +275,14 @@ export default class ProposalMutations {
 
   private async submitProposal(
     agent: UserWithRole | null,
-    proposal: Proposal,
-    legacyReferenceNumber?: string
+    proposal: Proposal
   ): Promise<Proposal | Rejection> {
     //Added this because the rejection doesnt like proposal.primaryKey
     const proposalPk = proposal.primaryKey;
 
     try {
-      const submitProposal = await this.proposalDataSource.submitProposal(
-        proposalPk,
-        legacyReferenceNumber
-      );
+      const submitProposal =
+        await this.proposalDataSource.submitProposal(proposalPk);
       logger.logInfo('User Submitted a Proposal:', {
         proposalId: proposal.proposalId,
         title: proposal.title,
@@ -747,8 +744,6 @@ export default class ProposalMutations {
       return rejection('Proposal creation rejected', {});
     }
 
-    proposal.submittedDate = submittedDate;
-
     const updatedProposal = await this.updateProposal(agent, {
       proposal: proposal as Proposal,
       args: {
@@ -763,32 +758,37 @@ export default class ProposalMutations {
       });
     }
 
-    const submitted = await this.submitProposal(
-      agent,
-      updatedProposal,
-      referenceNumber
-    );
+    const submittedProposal =
+      await this.proposalDataSource.submitImportedProposal(
+        proposal.primaryKey,
+        referenceNumber,
+        submittedDate
+      );
 
-    if (submitted instanceof Rejection) {
-      return rejection('Unable to update proposal', {
-        reason: updatedProposal,
+    if (!submittedProposal) {
+      return rejection('Could not submit proposal', {
+        agent: agent,
+        proposalPk: proposal.primaryKey,
+        proposalId: proposal.proposalId,
+        title: proposal.title,
+        userId: proposal.proposerId,
       });
     }
 
     if (techniqueId) {
       this.techniqueDataSource.assignProposalToTechniques(
-        submitted.primaryKey,
+        submittedProposal.primaryKey,
         [techniqueId]
       );
     }
 
     if (instrumentId) {
       this.instrumentDataSource.assignProposalToInstrument(
-        submitted.primaryKey,
+        submittedProposal.primaryKey,
         instrumentId
       );
     }
 
-    return submitted;
+    return submittedProposal;
   }
 }
