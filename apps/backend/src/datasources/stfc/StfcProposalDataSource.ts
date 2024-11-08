@@ -359,7 +359,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
           const dateObject: Date = new Date(year, month, day);
 
-          this.where('created_at', '>=', dateObject);
+          this.where(function () {
+            this.where('submitted_date', '>=', dateObject).orWhere(function () {
+              this.whereNull('submitted_date').andWhere(
+                'created_at',
+                '>=',
+                dateObject
+              );
+            });
+          });
         }
 
         if (
@@ -374,7 +382,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
           const dateObject: Date = new Date(year, month, day);
 
-          this.where('created_at', '<=', dateObject);
+          this.where(function () {
+            this.where('submitted_date', '<=', dateObject).orWhere(function () {
+              this.whereNull('submitted_date').andWhere(
+                'created_at',
+                '<=',
+                dateObject
+              );
+            });
+          });
         }
       });
 
