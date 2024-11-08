@@ -11,14 +11,14 @@ import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import FapStatusFilter, { FapStatus } from 'components/fap/FapStatusFilter';
 import AddFap from 'components/fap/General/AddFap';
 import { UserContext } from 'context/UserContextProvider';
-import { Fap, UserRole } from 'generated/sdk';
+import { Fap, FapMinimalFragment, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapsData } from 'hooks/fap/useFapsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-const columns: Column<Fap>[] = [
+const columns: Column<FapMinimalFragment>[] = [
   {
     title: 'Code',
     field: 'code',
@@ -105,9 +105,9 @@ const FapsTable = () => {
   };
 
   const createModal = (
-    onUpdate: FunctionType<void, [Fap | null]>,
-    onCreate: FunctionType<void, [Fap | null]>,
-    editFap: Fap | null
+    onUpdate: FunctionType<void, [FapMinimalFragment | null]>,
+    onCreate: FunctionType<void, [FapMinimalFragment | null]>,
+    editFap: FapMinimalFragment | null
   ) => {
     if (!!editFap) {
       setEditFapID(editFap.id);
@@ -116,7 +116,7 @@ const FapsTable = () => {
     } else {
       return (
         <AddFap
-          close={(fapAdded: Fap | null | undefined) => {
+          close={(fapAdded: FapMinimalFragment | null | undefined) => {
             setTimeout(() => {
               navigate(`/FapPage/${fapAdded?.id}`);
             });

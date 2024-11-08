@@ -625,6 +625,80 @@ context('Samples tests', () => {
       cy.contains('HIGH_RISK'); // test if status has changed
     });
 
+    it('Sample Safety Reviewer should be able to evaluate sample', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+        this.skip();
+      }
+      cy.createSample({
+        proposalPk: createdProposalPk,
+        templateId: createdSampleTemplateId,
+        questionId: createdSampleQuestionId,
+        title: sampleTitle,
+      });
+      cy.submitProposal({ proposalPk: createdProposalPk });
+
+      const sampleSafetyReviewer = initialDBData.users.user1;
+
+      cy.updateUserRoles({
+        id: sampleSafetyReviewer.id,
+
+        roles: [initialDBData.roles.sampleSafetyReviewer],
+      });
+
+      cy.login(sampleSafetyReviewer);
+
+      cy.visit('/');
+
+      cy.contains('Sample safety').click();
+
+      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+
+      cy.get('[placeholder=Search]').click().clear().type(createdProposalId);
+
+      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+
+      cy.get('[data-cy=samples-table]').should('not.contain', '999999');
+
+      cy.get('[placeholder=Search]').click().clear();
+
+      cy.get('[data-cy=samples-table]').contains('999999');
+
+      cy.contains(createdProposalId)
+        .last()
+        .parent()
+        .find('[aria-label="Review sample"]')
+        .click();
+
+      cy.get('[data-cy="safety-status"]').click();
+
+      cy.get('[role=presentation]').contains('Low risk').click();
+
+      cy.get('[data-cy="safety-comment"]').type(safetyComment);
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.notification({ variant: 'success', text: 'submitted' });
+
+      cy.reload();
+
+      cy.contains(createdProposalId)
+        .last()
+        .parent()
+        .find('[aria-label="Review sample"]')
+        .last()
+        .click();
+
+      cy.contains(safetyComment); // test if comment entered is present after reload
+
+      cy.get('[data-cy="safety-status"]').click();
+
+      cy.contains('High risk').click();
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.contains('HIGH_RISK'); // test if status has changed
+    });
+
     it('Download samples is working with dialog window showing up', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
         this.skip();

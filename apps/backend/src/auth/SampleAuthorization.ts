@@ -2,10 +2,10 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Sample } from './../resolvers/types/Sample';
 import { ProposalAuthorization } from './ProposalAuthorization';
+import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class SampleAuthorization {
@@ -13,7 +13,8 @@ export class SampleAuthorization {
 
   constructor(
     @inject(Tokens.SampleDataSource)
-    private sampleDataSource: SampleDataSource
+    private sampleDataSource: SampleDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   private async resolveSample(
@@ -28,14 +29,6 @@ export class SampleAuthorization {
     }
 
     return sample;
-  }
-
-  async isSampleSafetyReviewer(agent: UserWithRole | null) {
-    if (agent == null) {
-      return false;
-    }
-
-    return agent?.currentRole?.shortCode === Roles.SAMPLE_SAFETY_REVIEWER;
   }
 
   async hasReadRights(
@@ -89,6 +82,10 @@ export class SampleAuthorization {
 
     const isPostProposalSubmission = sample.isPostProposalSubmission === true;
 
-    return canEditProposal || (isMemberOfProposal && isPostProposalSubmission);
+    return (
+      canEditProposal ||
+      (isMemberOfProposal && isPostProposalSubmission) ||
+      this.userAuth.isSampleSafetyReviewer(agent)
+    );
   }
 }

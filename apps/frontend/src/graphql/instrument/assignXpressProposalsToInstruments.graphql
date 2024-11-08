@@ -1,0 +1,9 @@
+mutation assignXpressProposalsToInstruments(
+  $proposalPks: [Int!]!
+  $instrumentIds: [Int!]!
+) {
+  assignXpressProposalsToInstruments(
+    proposalPks: $proposalPks
+    instrumentIds: $instrumentIds
+  )
+}
