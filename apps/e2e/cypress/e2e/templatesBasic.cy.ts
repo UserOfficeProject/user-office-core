@@ -2700,6 +2700,11 @@ context('Template Delete, Archive, Unarchive', () => {
                 '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
               ).click();
 
+              // Make sure the questionary has moved on, else the "save-and-continue-button" is clicked twice without the first click being processed
+              cy.get('[data-cy=sample-declaration-modal]').contains(
+                sampleQuestion
+              );
+
               cy.get(
                 '[data-cy=sample-declaration-modal] [data-cy=save-and-continue-button]'
               ).click();
@@ -2817,6 +2822,11 @@ context('Template Delete, Archive, Unarchive', () => {
         teamLeadUserId: PI.id,
         scheduledEventId: existingScheduledEventId,
       });
+    });
+
+    beforeEach(function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SHIPPING))
+        this.skip();
     });
 
     const createShipmentTemplateAndUseItForAProposal = () => {

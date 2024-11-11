@@ -4,7 +4,16 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import { FormControl, MenuItem, Select } from '@mui/material';
+import { Visibility } from '@mui/icons-material';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import GridOnIcon from '@mui/icons-material/GridOn';
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
 import {
   getTranslation,
   ResourceId,
@@ -14,9 +23,14 @@ import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import ProposalReviewContent, {
+  PROPOSAL_MODAL_TAB_NAMES,
+} from 'components/review/ProposalReviewContent';
+import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
 import { ProposalsFilter, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
+import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { useTechniquesData } from 'hooks/technique/useTechniquesData';
@@ -56,8 +70,15 @@ const XpressProposalTable = () => {
   const sortDirection = searchParams.get('sortDirection');
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
+  const reviewModal = searchParams.get('reviewModal');
 
   const { api } = useDataApiWithFeedback();
+  const [totalCount, setTotalCount] = useState(0);
+  const allPrefetchedProposalsSelected =
+    totalCount === searchParams.getAll('selection').length;
+  const [allProposalSelectionLoading, setAllProposalSelectionLoading] =
+    useState(false);
+
   const { currentRole } = useContext(UserContext);
 
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
@@ -84,6 +105,27 @@ const XpressProposalTable = () => {
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
+  const RowActionButtons = (rowData: ProposalViewData) => {
+    const [, setSearchParams] = useSearchParams();
+
+    return (
+      <Tooltip title="View proposal">
+        <IconButton
+          data-cy="view-proposal"
+          onClick={() => {
+            setSearchParams((searchParams) => {
+              searchParams.set('reviewModal', rowData.primaryKey.toString());
+
+              return searchParams;
+            });
+          }}
+        >
+          <Visibility />
+        </IconButton>
+      </Tooltip>
+    );
+  };
+
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
@@ -91,6 +133,7 @@ const XpressProposalTable = () => {
       sorting: false,
       removable: false,
       field: 'rowActionButtons',
+      render: RowActionButtons,
     },
     {
       title: 'Proposal ID',
@@ -317,6 +360,7 @@ const XpressProposalTable = () => {
           }) || [];
 
         setTableData(tableData);
+        setTotalCount(result?.totalCount || 0);
 
         resolve({
           data: tableData,
@@ -365,10 +409,99 @@ const XpressProposalTable = () => {
     });
   };
 
+  const ExportIcon = (): JSX.Element => <GridOnIcon />;
+  const downloadXLSXProposal = useDownloadXLSXProposal();
+
+  const fetchProposalCoreBasicData = async () => {
+    const {
+      callId,
+      instrumentFilter,
+      techniqueFilter,
+      proposalStatusId,
+      text,
+      referenceNumbers,
+      dateFilter,
+      excludeProposalStatusIds,
+    } = proposalFilter;
+
+    const result: {
+      proposals: ProposalViewData[] | undefined;
+      totalCount: number;
+    } = { proposals: undefined, totalCount: 0 };
+
+    result.proposals = await api()
+      .getTechniqueScientistProposalsBasic({
+        filter: {
+          callId: callId,
+          instrumentFilter: instrumentFilter,
+          techniqueFilter: techniqueFilter,
+          proposalStatusId: proposalStatusId,
+          text: text,
+          referenceNumbers: referenceNumbers,
+          dateFilter: dateFilter,
+          ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
+          currentRole === UserRole.INTERNAL_REVIEWER
+            ? { excludeProposalStatusIds: excludeProposalStatusIds }
+            : {}),
+        },
+        searchText: searchParams.get('search'),
+      })
+      .then((data) => {
+        result.totalCount = data.techniqueScientistProposals?.totalCount || 0;
+
+        return data.techniqueScientistProposals?.proposals.map((proposal) => {
+          return {
+            ...proposal,
+            status: proposal.submitted ? 'Submitted' : 'Open',
+            finalStatus: getTranslation(proposal.finalStatus as ResourceId),
+          } as ProposalViewData;
+        });
+      });
+
+    return result;
+  };
+
+  const proposalToReview = tableData.find(
+    (proposal) =>
+      (reviewModal != null && proposal.primaryKey === +reviewModal) ||
+      (proposalId != null && proposal.proposalId === proposalId)
+  );
+
+  const userOfficerProposalReviewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.LOGS,
+  ];
+
   return (
     <>
       <StyledContainer maxWidth={false}>
         <StyledPaper data-cy="xpress-proposals-table">
+          <ProposalReviewModal
+            title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
+            proposalReviewModalOpen={!!proposalToReview}
+            setProposalReviewModalOpen={() => {
+              if (searchParams.get('proposalId')) {
+                setProposalFilter({
+                  ...proposalFilter,
+                  referenceNumbers: undefined,
+                });
+              }
+
+              setSearchParams((searchParams) => {
+                searchParams.delete('reviewModal');
+                searchParams.delete('proposalId');
+
+                return searchParams;
+              });
+
+              refreshTableData();
+            }}
+          >
+            <ProposalReviewContent
+              proposalPk={proposalToReview?.primaryKey as number}
+              tabNames={userOfficerProposalReviewTabs}
+            />
+          </ProposalReviewModal>
           <XpressProposalFilterBar
             calls={{ data: calls, isLoading: loadingCalls }}
             instruments={{ data: instruments, isLoading: loadingInstruments }}
@@ -406,6 +539,86 @@ const XpressProposalTable = () => {
               pageSize: pageSize ? +pageSize : 5,
               initialPage: page ? +page : 0,
             }}
+            actions={[
+              {
+                icon: ExportIcon,
+                tooltip: 'Export proposals in Excel',
+                onClick: (): void => {
+                  downloadXLSXProposal(
+                    searchParams
+                      .getAll('selection')
+                      .filter((item): item is string => !!item)
+                      .map((item) => +item),
+                    'title',
+                    true
+                  );
+                },
+                position: 'toolbarOnSelect',
+              },
+              {
+                tooltip: 'Select all proposals',
+                icon: DoneAllIcon,
+                hidden: false,
+                iconProps: {
+                  hidden: allPrefetchedProposalsSelected,
+                  defaultValue: totalCount,
+                  className: allProposalSelectionLoading ? 'loading' : '',
+                },
+                onClick: async () => {
+                  setAllProposalSelectionLoading(true);
+                  if (allPrefetchedProposalsSelected) {
+                    setSearchParams((searchParams) => {
+                      searchParams.delete('selection');
+
+                      return searchParams;
+                    });
+                    refreshTableData();
+                  } else {
+                    const selectedProposalsData =
+                      await fetchProposalCoreBasicData();
+
+                    if (!selectedProposalsData) {
+                      return;
+                    }
+
+                    // NOTE: Adding the missing data in the tableData state variable because some proposal group actions use additional data than primaryKey.
+                    const newTableData = selectedProposalsData.proposals?.map(
+                      (sp) => {
+                        const foundProposalData = tableData.find(
+                          (td) => td.primaryKey === sp.primaryKey
+                        );
+
+                        if (foundProposalData) {
+                          return foundProposalData;
+                        } else {
+                          return sp as ProposalViewData;
+                        }
+                      }
+                    );
+
+                    if (newTableData) {
+                      setTableData(newTableData);
+                    }
+
+                    setSearchParams((searchParams) => {
+                      searchParams.delete('selection');
+                      selectedProposalsData.proposals?.forEach((proposal) => {
+                        searchParams.append(
+                          'selection',
+                          proposal.primaryKey.toString()
+                        );
+                      });
+
+                      return searchParams;
+                    });
+                    refreshTableData();
+                  }
+
+                  setAllProposalSelectionLoading(false);
+                },
+                position: 'toolbarOnSelect',
+              },
+            ]}
             onSelectionChange={(selectedItems) => {
               setSearchParams((searchParam) => {
                 searchParam.delete('selection');
