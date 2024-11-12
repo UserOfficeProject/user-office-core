@@ -16,24 +16,7 @@ import { RequestQuery } from 'utils/utilTypes';
 const endpoint = '/graphql';
 
 const clientNameHeader = 'apollographql-client-name';
-const anonymousClientName = 'UOP frontend - anonymous';
-function setAnonymousClientNameHeader(client: GraphQLClient) {
-  return client.setHeader(clientNameHeader, anonymousClientName);
-}
-function getClientNameHeaderSetter(
-  includeUserId: boolean,
-  userId?: number | undefined
-) {
-  if (includeUserId) {
-    return (client: GraphQLClient) =>
-      client.setHeader(
-        clientNameHeader,
-        userId ? `UOP frontend - user ${userId}` : anonymousClientName
-      );
-  } else {
-    return setAnonymousClientNameHeader;
-  }
-}
+const clientName = 'UOP frontend';
 
 const notifyAndLog = async (
   enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
@@ -64,7 +47,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     private skipErrorReport?: boolean
   ) {
     super(endpoint);
-    setAnonymousClientNameHeader(this);
+    this.setHeader(clientNameHeader, clientName);
   }
 
   async request<T = unknown, V extends Variables = Variables>(
@@ -113,7 +96,6 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
     private token: string,
-    private clientNameHeaderSetter: (client: GraphQLClient) => GraphQLClient,
     private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
     private onSessionExpired: () => void,
     private handleUserActive: () => void,
@@ -123,7 +105,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     private externalAuthLoginUrl?: string
   ) {
     super(endpoint);
-    clientNameHeaderSetter(this);
+    this.setHeader(clientNameHeader, clientName);
     token && this.setHeader('authorization', `Bearer ${token}`);
     this.renewalDate = this.getRenewalDate(token);
     this.externalToken = this.getExternalToken(token);
@@ -137,7 +119,10 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     if (this.renewalDate < nowTimestampSeconds) {
       try {
         const data = await getSdk(
-          this.clientNameHeaderSetter(new GraphQLClient(this.endpoint))
+          new GraphQLClient(this.endpoint).setHeader(
+            clientNameHeader,
+            clientName
+          )
         ).getToken({
           token: this.token,
         });
@@ -224,7 +209,9 @@ class AuthorizedGraphQLClient extends GraphQLClient {
 }
 
 export function getUnauthorizedApi() {
-  return getSdk(setAnonymousClientNameHeader(new GraphQLClient(endpoint)));
+  return getSdk(
+    new GraphQLClient(endpoint).setHeader(clientNameHeader, clientName)
+  );
 }
 
 export function useDataApi() {
@@ -236,19 +223,11 @@ export function useDataApi() {
   const isIdleContextEnabled = featureContext.featuresMap.get(
     FeatureId.STFC_IDLE_TIMER
   )?.isEnabled;
-  const userIdInClientName =
-    featureContext.featuresMap.get(FeatureId.USER_ID_IN_API_METADATA)
-      ?.isEnabled ?? false;
 
-  const { token, handleNewToken, handleSessionExpired, user } =
+  const { token, handleNewToken, handleSessionExpired } =
     useContext(UserContext);
   const { handleUserActive, isIdle } = useContext(IdleContext);
   const { enqueueSnackbar } = useSnackbar();
-
-  const clientNameHeaderSetter = useCallback(
-    () => getClientNameHeaderSetter(userIdInClientName, user?.id),
-    [user?.id, userIdInClientName]
-  );
 
   return useCallback(
     () =>
@@ -257,7 +236,6 @@ export function useDataApi() {
             new AuthorizedGraphQLClient(
               endpoint,
               token,
-              clientNameHeaderSetter(),
               enqueueSnackbar,
               () => {
                 handleSessionExpired();
@@ -272,7 +250,6 @@ export function useDataApi() {
         : getUnauthorizedApi(),
     [
       token,
-      clientNameHeaderSetter,
       enqueueSnackbar,
       handleUserActive,
       isIdle,
