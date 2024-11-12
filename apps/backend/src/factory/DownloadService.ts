@@ -17,6 +17,7 @@ export enum XLSXType {
   PROPOSAL = 'proposal',
   FAP = 'fap',
   CALL_FAP = 'call_fap',
+  TECHNIQUE = 'technique',
 }
 
 export enum PDFType {

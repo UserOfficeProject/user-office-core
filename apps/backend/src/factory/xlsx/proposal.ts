@@ -95,3 +95,68 @@ export const collectProposalXLSXData = async (
     ProposalEndStatus[proposal.finalStatus] ?? '<missing>',
   ];
 };
+
+export const collectTechniqueProposalXLSXData = async (
+  proposalPk: number,
+  user: UserWithRole,
+  notify?: CallableFunction
+): Promise<ProposalXLSData> => {
+  const proposal = await baseContext.queries.proposal.get(user, proposalPk);
+
+  if (!proposal) {
+    throw new Error(
+      `Proposal with ID '${proposalPk}' not found, or the user has insufficient rights`
+    );
+  }
+
+  notify?.(
+    `proposal_${proposal.created.getUTCFullYear()}_${proposal.proposalId}.xlsx`
+  );
+
+  const proposer = await baseContext.queries.user.get(
+    user,
+    proposal.proposerId
+  );
+
+  if (!proposer) {
+    throw new Error(
+      `Proposer with ID '${proposal.proposerId}' not found, or the user has insufficient rights`
+    );
+  }
+
+  const instruments =
+    await baseContext.queries.instrument.getInstrumentsByProposalPk(
+      user,
+      proposal.primaryKey
+    );
+
+  const techniques =
+    await baseContext.queries.technique.getTechniquesByProposalPk(
+      user,
+      proposal.primaryKey
+    );
+
+  const submittedDate = proposal.submittedDate
+    ? proposal.submittedDate.toLocaleString()
+    : '';
+
+  const status = await baseContext.queries.proposalSettings.getProposalStatus(
+    user,
+    proposal.statusId
+  );
+
+  return [
+    proposal.proposalId,
+    proposal.title,
+    `${proposer.firstname} ${proposer.lastname}`,
+    proposer.email,
+    submittedDate,
+    techniques.length
+      ? techniques.map((technique) => technique.name ?? '').join(', ')
+      : '',
+    instruments.length
+      ? instruments.map((instrument) => instrument.name ?? '').join(', ')
+      : '',
+    status?.name ?? '',
+  ];
+};
