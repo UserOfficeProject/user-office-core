@@ -40,8 +40,8 @@ export class ImportProposalArgs {
   @Field(() => Date)
   public submittedDate: Date;
 
-  @Field(() => Int, { nullable: true })
-  public techniqueId?: number;
+  @Field(() => [Int], { nullable: true })
+  public techniqueIds?: number[];
 
   @Field(() => Int, { nullable: true })
   public instrumentId?: number;

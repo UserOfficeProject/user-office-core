@@ -684,7 +684,7 @@ export default class ProposalMutations {
       users: coiIds,
       created,
       submittedDate,
-      techniqueId,
+      techniqueIds,
       instrumentId,
     } = args;
 
@@ -758,6 +758,13 @@ export default class ProposalMutations {
       });
     }
 
+    if (!submittedDate) {
+      return rejection(
+        'Can not create proposal because there was no submitted date specified',
+        { call }
+      );
+    }
+
     const submittedProposal =
       await this.proposalDataSource.submitImportedProposal(
         proposal.primaryKey,
@@ -775,10 +782,10 @@ export default class ProposalMutations {
       });
     }
 
-    if (techniqueId) {
+    if (techniqueIds) {
       this.techniqueDataSource.assignProposalToTechniques(
         submittedProposal.primaryKey,
-        [techniqueId]
+        techniqueIds
       );
     }
 
