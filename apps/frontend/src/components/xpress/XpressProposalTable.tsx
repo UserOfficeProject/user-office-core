@@ -375,30 +375,31 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const isInstrumentAbsent = (rowData.instruments?.length ?? 0) === 0;
-        const isStatusDraft = fieldValue?.shortCode === StatusCode.DRAFT;
-        const isStatusSubmitted =
-          fieldValue?.shortCode === StatusCode.SUBMITTED_LOCKED;
-        const isStatusUnsuccessful =
-          fieldValue?.shortCode === StatusCode.UNSUCCESSFUL;
-        const isStatusApproved = fieldValue?.shortCode === StatusCode.APPROVED;
-        const isStatusFinished = fieldValue?.shortCode === StatusCode.FINISHED;
-        const isStatusExpired = fieldValue?.shortCode === StatusCode.EXPIRED;
+
+        const status = {
+          isDraft: fieldValue?.shortCode === StatusCode.DRAFT,
+          isSubmitted: fieldValue?.shortCode === StatusCode.SUBMITTED_LOCKED,
+          isUnsuccessful: fieldValue?.shortCode === StatusCode.UNSUCCESSFUL,
+          isApproved: fieldValue?.shortCode === StatusCode.APPROVED,
+          isFinished: fieldValue?.shortCode === StatusCode.FINISHED,
+          isExpired: fieldValue?.shortCode === StatusCode.EXPIRED,
+        };
 
         const shouldDisableUnderReview =
-          isStatusApproved || isStatusUnsuccessful;
+          status.isApproved || status.isUnsuccessful;
 
-        const shouldDisableApproved = isStatusSubmitted || isInstrumentAbsent;
+        const shouldDisableApproved = status.isSubmitted || isInstrumentAbsent;
 
-        const shouldDisableUnsuccessful = isStatusSubmitted;
+        const shouldDisableUnsuccessful = status.isSubmitted;
 
-        const shouldDisableFinished = !isStatusApproved || isInstrumentAbsent;
+        const shouldDisableFinished = !status.isApproved || isInstrumentAbsent;
 
         const shouldBeUneditable =
           !isUserOfficer &&
-          (isStatusDraft ||
-            isStatusFinished ||
-            isStatusUnsuccessful ||
-            isStatusExpired);
+          (status.isDraft ||
+            status.isFinished ||
+            status.isUnsuccessful ||
+            status.isExpired);
 
         return shouldBeUneditable ? (
           fieldValue?.name
