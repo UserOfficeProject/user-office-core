@@ -1,0 +1,7 @@
+fragment fapMinimal on Fap {
+  id
+  code
+  description
+  active
+  proposalCurrentCount
+}
