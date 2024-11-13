@@ -40,6 +40,12 @@ const notifyAndLog = async (
   }
 };
 
+export function getUnauthorizedApi() {
+  return getSdk(
+    new GraphQLClient(endpoint).setHeader(clientNameHeader, clientName)
+  );
+}
+
 class UnauthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
@@ -118,12 +124,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
       try {
-        const data = await getSdk(
-          new GraphQLClient(this.endpoint).setHeader(
-            clientNameHeader,
-            clientName
-          )
-        ).getToken({
+        const data = await getUnauthorizedApi().getToken({
           token: this.token,
         });
 
@@ -206,12 +207,6 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   private getExternalToken(token: string): string {
     return (jwtDecode(token) as any).externalToken;
   }
-}
-
-export function getUnauthorizedApi() {
-  return getSdk(
-    new GraphQLClient(endpoint).setHeader(clientNameHeader, clientName)
-  );
 }
 
 export function useDataApi() {
