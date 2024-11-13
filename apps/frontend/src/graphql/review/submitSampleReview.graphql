@@ -1,0 +1,13 @@
+mutation submitSampleReview(
+  $sampleId: Int!
+  $safetyComment: String
+  $safetyStatus: SampleStatus!
+) {
+  submitSampleReview(
+    sampleId: $sampleId
+    safetyComment: $safetyComment,
+    safetyStatus: $safetyStatus
+  ) {
+    ...sample
+  }
+}

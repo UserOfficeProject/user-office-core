@@ -355,9 +355,8 @@ const FapProposalsAndAssignmentsTable = ({
         continue;
       }
 
-      allProposalReviews.push(...proposalReviews);
-      allProposalReviews.map(
-        (proposalReview) => (proposalReview.proposalPk = proposalPk)
+      proposalReviews.forEach((proposalReview) =>
+        allProposalReviews.push({ ...proposalReview, proposalPk })
       );
     }
 
@@ -610,10 +609,6 @@ const FapProposalsAndAssignmentsTable = ({
         assignedReviewer: FapProposalAssignmentType,
         proposalPk: number
       ): Promise<void> => {
-        /**
-         * TODO(asztalos): merge `removeMemberFromFapProposal` and `removeUserForReview` (same goes for creation)
-         *                otherwise if one of them fails we may end up with an broken state
-         */
         await api({
           toastSuccessMessage: 'Reviewer removed',
         }).removeMemberFromFapProposal({
@@ -621,12 +616,6 @@ const FapProposalsAndAssignmentsTable = ({
           fapId: data.id,
           memberId: assignedReviewer.fapMemberUserId as number,
         });
-
-        assignedReviewer.review &&
-          (await api().removeUserForReview({
-            reviewId: assignedReviewer.review.id,
-            fapId: data.id,
-          }));
 
         setFapProposalsData((fapProposalData) =>
           fapProposalData.map((proposalItem) => {

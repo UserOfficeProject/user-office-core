@@ -67,4 +67,18 @@ export class AssignProposalsToInstrumentsMutation {
       args
     );
   }
+
+  @Mutation(() => Boolean)
+  async assignXpressProposalsToInstruments(
+    @Args() args: AssignProposalsToInstrumentsArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    const res =
+      await context.mutations.instrument.assignXpressProposalsToInstruments(
+        context.user,
+        args
+      );
+
+    return isRejection(res) ? res : true;
+  }
 }
