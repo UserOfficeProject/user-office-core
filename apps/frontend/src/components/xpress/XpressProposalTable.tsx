@@ -44,6 +44,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
+import XpressNotice from './XpressNotice';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
 const XpressProposalTable = () => {
@@ -474,6 +475,7 @@ const XpressProposalTable = () => {
 
   return (
     <>
+      <XpressNotice />
       <StyledContainer maxWidth={false}>
         <StyledPaper data-cy="xpress-proposals-table">
           <ProposalReviewModal
