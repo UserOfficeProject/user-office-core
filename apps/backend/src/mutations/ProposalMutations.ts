@@ -452,7 +452,7 @@ export default class ProposalMutations {
     return result || rejection('Can not administer proposal', { result });
   }
 
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
   async updateProposalScientistComment(
     agent: UserWithRole | null,
     args: UpdateProposalScientistCommentArgs

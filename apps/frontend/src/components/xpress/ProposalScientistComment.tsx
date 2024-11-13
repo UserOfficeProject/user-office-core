@@ -9,15 +9,13 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { StyledButtonContainer, StyledPaper } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-type UpdateProposalScientistCommentProps = {
+type ProposalScientistCommentProps = {
   proposalPk: number;
   commentByScientist: string;
   close: () => void;
 };
 
-const UpdateProposalScientistComment = (
-  props: UpdateProposalScientistCommentProps
-) => {
+const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const initialValues = {
     commentByScientist: props.commentByScientist,
@@ -114,4 +112,4 @@ const UpdateProposalScientistComment = (
   );
 };
 
-export default UpdateProposalScientistComment;
+export default ProposalScientistComment;

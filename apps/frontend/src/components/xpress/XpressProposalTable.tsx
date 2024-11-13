@@ -47,7 +47,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import UpdateProposalScientistComment from './UpdateScientistProposalComment';
+import ProposalScientistComment from './ProposalScientistComment';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressNotice from './XpressNotice';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
@@ -631,7 +631,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const XpressTablePanelDetails = React.useCallback(
     ({ rowData }: Record<'rowData', ProposalViewData>) => {
       return (
-        <UpdateProposalScientistComment
+        <ProposalScientistComment
           proposalPk={rowData.primaryKey}
           commentByScientist={rowData.commentByScientist || ''}
           close={() => {
@@ -877,7 +877,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             }}
             detailPanel={[
               {
-                tooltip: 'Show information',
+                tooltip: 'Show comment',
                 render: XpressTablePanelDetails,
               },
             ]}
