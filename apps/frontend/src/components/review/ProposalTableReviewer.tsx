@@ -96,7 +96,6 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const reviewStatus = searchParams.get('reviewStatus') ?? ReviewStatus.DRAFT;
   const reviewer = searchParams.get('reviewer') ?? ReviewerFilter.ME;
   const reviewModal = searchParams.get('reviewModal');
-  const selection = searchParams.getAll('selection');
   const sortField = searchParams.get('sortField');
   const sortDirection = searchParams.get('sortDirection');
 
@@ -143,6 +142,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         },
       })) || [];
 
+    const selection = searchParams.getAll('selection');
+
     if (selection.length > 0) {
       const selectionSet = new Set(selection);
       setPreselectedProposalsData(
@@ -151,7 +152,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     } else {
       setPreselectedProposalsData(getProposalsToGradeDataFromUserData());
     }
-  }, [userData, selection]);
+  }, [userData, searchParams]);
 
   const reviewerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
