@@ -20,6 +20,7 @@ import { Instrument } from '../../models/Instrument';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import { ProposalInternalComment } from '../../models/ProposalInternalComment';
 import { ProposalStatusActionType } from '../../models/ProposalStatusAction';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
@@ -133,7 +134,6 @@ export interface ProposalRecord {
   readonly template_id: number;
   readonly comment_for_user: string;
   readonly comment_for_management: string;
-  readonly comment_by_scientist: string;
   readonly notified: boolean;
   readonly submitted: boolean;
   readonly reference_number_sequence: number;
@@ -162,7 +162,6 @@ export interface ProposalViewRecord {
   readonly full_count: number;
   readonly submitted_date: Date;
   readonly techniques: ProposalViewTechnique[];
-  readonly comment_by_scientist: string;
 }
 
 export interface TopicRecord {
@@ -810,8 +809,7 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.submitted,
     proposal.reference_number_sequence,
     proposal.management_decision_submitted,
-    proposal.submitted_date,
-    proposal.comment_by_scientist
+    proposal.submitted_date
   );
 };
 
@@ -877,8 +875,7 @@ export const createProposalViewObject = (proposal: ProposalViewRecord) => {
     proposal.call_id,
     proposal.proposal_workflow_id,
     proposal.submitted_date,
-    proposal.techniques,
-    proposal.comment_by_scientist
+    proposal.techniques
   );
 };
 
@@ -1388,8 +1385,7 @@ export const createProposalViewObjectWithTechniques = (
     proposal.call_id,
     proposal.proposal_workflow_id,
     proposal.submitted_date,
-    techniques,
-    proposal.comment_by_scientist
+    techniques
   );
 };
 export interface StatusActionsLogRecord {
@@ -1406,3 +1402,18 @@ export interface StatusActionsLogHasProposalRecord {
   readonly status_actions_log_id: number;
   readonly proposal_pk: number;
 }
+export interface ProposalInternalCommentRecord {
+  readonly comment_id: number;
+  readonly proposal_pk: number;
+  readonly comment: string;
+}
+
+export const createProposalInternalCommentObject = (
+  proposalInternalComment: ProposalInternalCommentRecord
+) => {
+  return new ProposalInternalComment(
+    proposalInternalComment.comment_id,
+    proposalInternalComment.proposal_pk,
+    proposalInternalComment.comment
+  );
+};

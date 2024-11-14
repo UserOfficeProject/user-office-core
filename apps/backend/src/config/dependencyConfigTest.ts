@@ -15,7 +15,7 @@ import { InternalReviewDataSourceMock } from '../datasources/mockups/InternalRev
 import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
-import { ProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
+import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
@@ -59,7 +59,7 @@ mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);
 mapClass(Tokens.ProposalSettingsDataSource, ProposalSettingsDataSourceMock);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
-  ProposalInternalCommentsDataSourceMock
+  PostgresProposalInternalCommentsDataSourceMock
 );
 mapClass(Tokens.StatusActionsDataSource, StatusActionsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
