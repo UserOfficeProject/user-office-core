@@ -14,6 +14,7 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import ProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -24,6 +25,7 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
+import { ProposalInternalComment } from '../models/ProposalInternalComment';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -32,7 +34,8 @@ import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposa
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
+import { CreateProposalInternalCommentArgs as CreateProposalScientistCommentArgs } from '../resolvers/types/ProposalInternalComment';
+import { UpdateProposalInternalCommentArgs as UpdateProposalScientistCommentArgs } from '../resolvers/types/ProposalInternalComment';
 import { statusActionEngine } from '../statusActionEngine';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
@@ -63,7 +66,9 @@ export default class ProposalMutations {
     private userDataSource: UserDataSource,
     @inject(Tokens.TechniqueDataSource)
     private techniqueDataSource: TechniqueDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalInternalCommentsDataSource)
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -453,31 +458,51 @@ export default class ProposalMutations {
   }
 
   @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async createProposalScientistComment(
+    agent: UserWithRole | null,
+    args: CreateProposalScientistCommentArgs
+  ): Promise<ProposalInternalComment | Rejection> {
+    return await this.proposalInternalCommentsDataSource
+      .create(args)
+      .catch((error) => {
+        return rejection(
+          'Could not create proposal scientist comment',
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
   async updateProposalScientistComment(
     agent: UserWithRole | null,
     args: UpdateProposalScientistCommentArgs
-  ): Promise<Proposal | Rejection> {
-    const { proposalPk: primaryKey, commentByScientist } = args;
+  ): Promise<ProposalInternalComment | Rejection> {
+    return await this.proposalInternalCommentsDataSource
+      .update(args)
+      .catch((error) => {
+        return rejection(
+          `Could not update proposal internal comment: '${args.commentId}`,
+          { agent, args: args },
+          error
+        );
+      });
+  }
 
-    const proposal = await this.proposalDataSource.get(primaryKey);
-
-    if (!proposal) {
-      return rejection(
-        'Can not update proposal scientist comment because proposal not found',
-        { args, agent }
-      );
-    }
-
-    if (commentByScientist !== undefined) {
-      proposal.commentByScientist = commentByScientist;
-    }
-
-    const result = await this.proposalDataSource.update(proposal);
-
-    return (
-      result ||
-      rejection('Can not update proposal scientist comment', { result })
-    );
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async deleteProposalScientistComment(
+    agent: UserWithRole | null,
+    args: { commentId: number }
+  ): Promise<ProposalInternalComment | Rejection> {
+    return await this.proposalInternalCommentsDataSource
+      .delete(args.commentId)
+      .catch((error) => {
+        return rejection(
+          `Could not delete proposal internal comment: '${args.commentId}'`,
+          { agent, args: args },
+          error
+        );
+      });
   }
 
   private async processProposalsStatusChange(
@@ -809,7 +834,6 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
         submittedDate: null,
-        commentByScientist: '',
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(

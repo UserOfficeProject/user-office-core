@@ -4,6 +4,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
@@ -24,7 +25,9 @@ export default class ProposalQueries {
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
     @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalInternalCommentsDataSource)
+    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
   ) {}
 
   @Authorized()
@@ -40,11 +43,7 @@ export default class ProposalQueries {
       !this.userAuth.isUserOfficer(agent) &&
       !this.userAuth.isInstrumentScientist(agent)
     ) {
-      proposal = omit(
-        proposal,
-        'commentForManagement',
-        'commentByScientist'
-      ) as Proposal;
+      proposal = omit(proposal, 'commentForManagement') as Proposal;
     }
 
     // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
@@ -195,5 +194,15 @@ export default class ProposalQueries {
     } else {
       return null;
     }
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async getProposalScientistComment(
+    agent: UserWithRole | null,
+    commentId: number
+  ) {
+    return await this.proposalInternalCommentsDataSource.getProposalInternalComment(
+      commentId
+    );
   }
 }

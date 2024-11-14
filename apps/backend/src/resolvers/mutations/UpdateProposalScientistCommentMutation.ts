@@ -1,28 +1,12 @@
-import {
-  Args,
-  ArgsType,
-  Ctx,
-  Field,
-  Int,
-  Mutation,
-  Resolver,
-} from 'type-graphql';
+import { Args, Ctx, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Proposal } from '../types/Proposal';
-
-@ArgsType()
-export class UpdateProposalScientistCommentArgs {
-  @Field(() => Int)
-  public proposalPk: number;
-
-  @Field(() => String)
-  public commentByScientist: string;
-}
+import { ProposalInternalComment } from '../types/ProposalInternalComment';
+import { UpdateProposalInternalCommentArgs as UpdateProposalScientistCommentArgs } from '../types/ProposalInternalComment';
 
 @Resolver()
 export class UpdateProposalScientistCommentMutation {
-  @Mutation(() => Proposal)
+  @Mutation(() => ProposalInternalComment)
   updateProposalScientistComment(
     @Args()
     args: UpdateProposalScientistCommentArgs,

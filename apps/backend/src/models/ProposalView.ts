@@ -27,7 +27,6 @@ export class ProposalView {
     public callId: number,
     public workflowId: number,
     public submittedDate: Date,
-    public techniques: ProposalViewTechnique[] | null,
-    public commentByScientist: string
+    public techniques: ProposalViewTechnique[] | null
   ) {}
 }
