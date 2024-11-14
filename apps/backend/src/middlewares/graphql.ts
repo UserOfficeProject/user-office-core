@@ -174,6 +174,19 @@ const apolloServer = async (app: Express) => {
         },
       })
     );
+    app.use((req, res, next) => {
+      const clientName = req.headers['apollographql-client-name'];
+      if (
+        typeof clientName === 'string' &&
+        clientName.startsWith('UOP frontend')
+      ) {
+        const userId = req.user?.user.id;
+        req.headers['apollographql-client-name'] = userId
+          ? `UOP frontend - user ${userId}`
+          : 'UOP frontend - anonymous';
+      }
+      next();
+    });
   }
 
   const server = new ApolloServer({
