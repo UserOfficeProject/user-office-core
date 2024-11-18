@@ -25,7 +25,7 @@ import {
 } from 'components/experiment/DateFilter';
 import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { Call, FeatureId, SettingsId, UserRole } from 'generated/sdk';
+import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
@@ -37,7 +37,6 @@ import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
-  callsData: Call[];
 };
 
 const SamplesMenuListItem = () => {
@@ -66,8 +65,7 @@ const ProposalsMenuListItem = () => {
   );
 };
 
-const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
-  const proposalDisabled = callsData.length === 0;
+const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
   const { format } = useFormattedDateTime({
@@ -111,11 +109,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       <Tooltip title="New Proposal">
-        <ListItemButton
-          component={NavLink}
-          to="/ProposalSelectType"
-          disabled={proposalDisabled}
-        >
+        <ListItemButton component={NavLink} to="/ProposalSelectType">
           <ListItemIcon>
             <NoteAdd />
           </ListItemIcon>
