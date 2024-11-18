@@ -482,7 +482,7 @@ export default class ProposalMutations {
       .update(args)
       .catch((error) => {
         return rejection(
-          `Could not update proposal internal comment: '${args.commentId}`,
+          `Could not update proposal scientist comment: '${args.commentId}'`,
           { agent, args: args },
           error
         );
@@ -498,7 +498,7 @@ export default class ProposalMutations {
       .delete(args.commentId)
       .catch((error) => {
         return rejection(
-          `Could not delete proposal internal comment: '${args.commentId}'`,
+          `Could not delete proposal scientist comment: '${args.commentId}'`,
           { agent, args: args },
           error
         );

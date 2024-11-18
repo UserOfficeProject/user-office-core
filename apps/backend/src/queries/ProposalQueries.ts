@@ -8,6 +8,7 @@ import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInter
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
+import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
@@ -201,8 +202,14 @@ export default class ProposalQueries {
     agent: UserWithRole | null,
     commentId: number
   ) {
-    return await this.proposalInternalCommentsDataSource.getProposalInternalComment(
-      commentId
-    );
+    return await this.proposalInternalCommentsDataSource
+      .getProposalInternalComment(commentId)
+      .catch((error) => {
+        return rejection(
+          `Could not get proposal scientist comment: '${commentId}'`,
+          { agent, args: commentId },
+          error
+        );
+      });
   }
 }
