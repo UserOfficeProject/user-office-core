@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('0165_AddProposalInternalCommentTable.sql', 'Farai Mutambara', 'Adding proposal internal comment table', '2024-11-13') THEN
+	IF register_patch('0166_AddProposalInternalCommentTable.sql', 'Farai Mutambara', 'Adding proposal internal comment table', '2024-11-19') THEN
 		BEGIN
 			CREATE TABLE IF NOT EXISTS proposal_internal_comments (
 				comment_id SERIAL PRIMARY KEY,
