@@ -25,17 +25,17 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
-import { ProposalInternalComment } from '../models/ProposalInternalComment';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
+import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
-import { CreateProposalInternalCommentArgs as CreateProposalScientistCommentArgs } from '../resolvers/types/ProposalInternalComment';
-import { UpdateProposalInternalCommentArgs as UpdateProposalScientistCommentArgs } from '../resolvers/types/ProposalInternalComment';
+import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
+import { ProposalScientistComment } from '../resolvers/types/ProposalView';
 import { statusActionEngine } from '../statusActionEngine';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
@@ -461,7 +461,7 @@ export default class ProposalMutations {
   async createProposalScientistComment(
     agent: UserWithRole | null,
     args: CreateProposalScientistCommentArgs
-  ): Promise<ProposalInternalComment | Rejection> {
+  ): Promise<ProposalScientistComment | Rejection> {
     return await this.proposalInternalCommentsDataSource
       .create(args)
       .catch((error) => {
@@ -477,7 +477,7 @@ export default class ProposalMutations {
   async updateProposalScientistComment(
     agent: UserWithRole | null,
     args: UpdateProposalScientistCommentArgs
-  ): Promise<ProposalInternalComment | Rejection> {
+  ): Promise<ProposalScientistComment | Rejection> {
     return await this.proposalInternalCommentsDataSource
       .update(args)
       .catch((error) => {
@@ -493,7 +493,7 @@ export default class ProposalMutations {
   async deleteProposalScientistComment(
     agent: UserWithRole | null,
     args: { commentId: number }
-  ): Promise<ProposalInternalComment | Rejection> {
+  ): Promise<ProposalScientistComment | Rejection> {
     return await this.proposalInternalCommentsDataSource
       .delete(args.commentId)
       .catch((error) => {

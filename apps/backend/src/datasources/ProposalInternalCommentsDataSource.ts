@@ -13,6 +13,6 @@ export interface ProposalInternalCommentsDataSource {
     args: UpdateProposalInternalCommentArgs
   ): Promise<ProposalInternalComment | null>;
   getProposalInternalComment(
-    commentId: number
+    proposalPk: number
   ): Promise<ProposalInternalComment | null>;
 }

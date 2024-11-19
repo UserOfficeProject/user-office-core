@@ -162,6 +162,7 @@ export interface ProposalViewRecord {
   readonly full_count: number;
   readonly submitted_date: Date;
   readonly techniques: ProposalViewTechnique[];
+  readonly internal_comment: ProposalInternalComment;
 }
 
 export interface TopicRecord {
@@ -757,6 +758,12 @@ export interface ProposalWorkflowConnectionHasActionsRecord {
   readonly action_id: number;
   readonly workflow_id: number;
   readonly config: string;
+}
+
+export interface ProposalInternalCommentRecord {
+  readonly comment_id: number;
+  readonly proposal_pk: number;
+  readonly comment: string;
 }
 
 export const createTopicObject = (record: TopicRecord) => {
@@ -1402,12 +1409,6 @@ export interface StatusActionsLogHasProposalRecord {
   readonly status_actions_log_id: number;
   readonly proposal_pk: number;
 }
-export interface ProposalInternalCommentRecord {
-  readonly comment_id: number;
-  readonly proposal_pk: number;
-  readonly comment: string;
-}
-
 export const createProposalInternalCommentObject = (
   proposalInternalComment: ProposalInternalCommentRecord
 ) => {

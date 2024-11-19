@@ -1,12 +1,14 @@
-import { Args, Ctx, Mutation, Resolver } from 'type-graphql';
+import { Args, ArgsType, Ctx, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalInternalComment } from '../types/ProposalInternalComment';
-import { UpdateProposalInternalCommentArgs as UpdateProposalScientistCommentArgs } from '../types/ProposalInternalComment';
+import { UpdateProposalInternalCommentArgs } from '../types/ProposalInternalComment';
+import { ProposalScientistComment } from '../types/ProposalView';
 
+@ArgsType()
+export class UpdateProposalScientistCommentArgs extends UpdateProposalInternalCommentArgs {}
 @Resolver()
 export class UpdateProposalScientistCommentMutation {
-  @Mutation(() => ProposalInternalComment)
+  @Mutation(() => ProposalScientistComment)
   updateProposalScientistComment(
     @Args()
     args: UpdateProposalScientistCommentArgs,

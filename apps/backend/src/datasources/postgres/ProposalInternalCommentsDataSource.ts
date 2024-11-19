@@ -81,19 +81,16 @@ export default class PostgresProposalInternalCommentsDataSource
       );
     }
   }
-  async getProposalInternalComment(commentId: number) {
-    const proposalInternalComment = await database
+  async getProposalInternalComment(
+    proposalPk: number
+  ): Promise<ProposalInternalComment | null> {
+    return await database
       .select<ProposalInternalCommentRecord>()
       .from('proposal_internal_comments')
-      .where('comment_id', commentId)
-      .first();
-
-    if (!proposalInternalComment) {
-      throw new GraphQLError(
-        `Proposal internal comment not found id: ${commentId}`
+      .where('proposal_pk', proposalPk)
+      .first()
+      .then((comment) =>
+        comment ? createProposalInternalCommentObject(comment) : null
       );
-    }
-
-    return createProposalInternalCommentObject(proposalInternalComment);
   }
 }

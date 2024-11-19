@@ -42,11 +42,11 @@ export class PostgresProposalInternalCommentsDataSourceMock
   }
 
   async getProposalInternalComment(
-    commentId: number
+    proposalPk: number
   ): Promise<ProposalInternalComment | null> {
     return (
       dummyProposalInternalComments.find(
-        (comment) => comment.commentId === commentId
+        (comment) => comment.proposalPk === proposalPk
       ) || null
     );
   }

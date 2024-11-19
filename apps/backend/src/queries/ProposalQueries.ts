@@ -200,14 +200,14 @@ export default class ProposalQueries {
   @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
   async getProposalScientistComment(
     agent: UserWithRole | null,
-    commentId: number
+    proposalPk: number
   ) {
     return await this.proposalInternalCommentsDataSource
-      .getProposalInternalComment(commentId)
+      .getProposalInternalComment(proposalPk)
       .catch((error) => {
         return rejection(
-          `Could not get proposal scientist comment: '${commentId}'`,
-          { agent, args: commentId },
+          `Could not get proposal scientist comment proposal: '${proposalPk}'`,
+          { agent, args: proposalPk },
           error
         );
       });
