@@ -1,0 +1,5 @@
+query getCallAllocatedTimeUnit($answerId: Int!) {
+  getCallAllocatedTimeUnit(answerId: $answerId) {
+    allocationTimeUnit
+  }
+}

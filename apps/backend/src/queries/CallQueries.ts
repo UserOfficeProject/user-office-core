@@ -51,7 +51,7 @@ export default class CallQueries {
   }
 
   @Authorized()
-  async getCallByQuestionId(user: UserWithRole | null, questionId: string) {
-    return this.dataSource.getCallByQuestionId(questionId);
+  async getCallByAnswerId(user: UserWithRole | null, answerId: number) {
+    return this.dataSource.getCallByAnswerId(answerId);
   }
 }
