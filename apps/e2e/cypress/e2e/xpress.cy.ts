@@ -1210,7 +1210,7 @@ context('Xpress tests', () => {
       cy.contains(instrument1.name);
     });
 
-    it('Instrument scientist must be able to add comment on to an xpress proposal', function () {
+    it('Instrument scientist must be able to add update and remove comment on an xpress proposal', function () {
       cy.login(scientist1);
       cy.changeActiveRole(initialDBData.roles.instrumentScientist);
       cy.visit('/');
@@ -1221,11 +1221,33 @@ context('Xpress tests', () => {
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
-      cy.setTinyMceContent('commentByScientist', faker.lorem.words(10));
+      cy.get('[data-cy="html-comment"]').clear().type(faker.lorem.words(10));
       cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
       cy.notification({
         variant: 'success',
-        text: 'Proposal scientist comment successfully saved',
+        text: 'Proposal scientist comment successfully created',
+      });
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="html-comment"]').clear().type(faker.lorem.words(10));
+      cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully updated',
+      });
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="delete-proposal-scientist-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully deleted',
       });
     });
   });

@@ -89,7 +89,7 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
                         toolbar: 'bold italic',
                         branding: false,
                       }}
-                      data-cy="html"
+                      data-cy="html-comment"
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -106,7 +106,10 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
                           if (scientistCommentData) {
                             props.confirm(
                               async () => {
-                                await api().deleteProposalScientistComment({
+                                await api({
+                                  toastSuccessMessage:
+                                    'Proposal scientist comment successfully deleted',
+                                }).deleteProposalScientistComment({
                                   commentId: scientistCommentData.commentId,
                                 });
                                 props.close();
