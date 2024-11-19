@@ -395,7 +395,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     statusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
-    return new Proposals(allProposals);
+    const proposals = allProposals.map((p) => {
+      return { ...p, statusId };
+    });
+
+    return { proposals: proposals };
   }
 
   async getProposalBookingsByProposalPk(

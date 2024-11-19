@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useProposalBookingsScheduledEvents } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
@@ -12,7 +12,7 @@ export default function InstrSciUpcomingExperimentTimesTable() {
   const [searchParams] = useSearchParams();
   const instrumentId = searchParams.get('instrument');
 
-  const { instruments, loadingInstruments } = useInstrumentsData();
+  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
 
   const [selectedInstrumentId, setSelectedInstrumentId] = useState<
     number | null | undefined
