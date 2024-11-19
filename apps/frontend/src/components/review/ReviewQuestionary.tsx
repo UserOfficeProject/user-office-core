@@ -77,7 +77,6 @@ export function createFapReviewStub(
       genericTemplates: [],
       commentForManagement: '',
       commentForUser: '',
-      commentByScientist: '',
       created: new Date(),
       fapMeetingDecisions: [],
       faps: [],

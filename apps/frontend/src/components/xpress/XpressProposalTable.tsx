@@ -633,7 +633,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       return (
         <ProposalScientistComment
           proposalPk={rowData.primaryKey}
-          commentByScientist={rowData.commentByScientist || ''}
           close={() => {
             refreshTableData();
           }}

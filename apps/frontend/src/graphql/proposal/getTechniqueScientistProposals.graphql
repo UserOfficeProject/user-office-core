@@ -25,7 +25,6 @@ query getTechniqueScientistProposals(
       allocationTimeUnit
       callId
       callShortCode
-      commentByScientist
       instruments {
         id
         name

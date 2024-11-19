@@ -1,8 +1,9 @@
-mutation updateProposalScientistComment($proposalPk: Int!, $commentByScientist: String!) {
+mutation updateProposalScientistComment($commentId: Int!, $comment: String!) {
   updateProposalScientistComment(
-    proposalPk: $proposalPk
-    commentByScientist: $commentByScientist
+    commentId: $commentId
+    comment: $comment
   ) {
-    commentByScientist
+    comment
+    commentId
   }
 }
