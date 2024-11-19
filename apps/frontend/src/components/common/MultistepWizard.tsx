@@ -51,7 +51,7 @@ export const Wizard = ({
     setStepNumber(Math.max(stepNumber - 1, 0));
   };
 
-  const handleStep = (stepIndex: number, values: FormikValues) => async () => {
+  const handleStep = (stepIndex: number, values: FormikValues) => () => {
     const form = document.querySelector('form');
 
     if (form && !form.checkValidity()) {
