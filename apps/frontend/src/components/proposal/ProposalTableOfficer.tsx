@@ -46,7 +46,7 @@ import {
   Call,
   ProposalsFilter,
   ProposalStatus,
-  InstrumentFragment,
+  InstrumentMinimalFragment,
   FeatureId,
   FapInstrumentInput,
   FapInstrument,
@@ -529,7 +529,7 @@ const ProposalTableOfficer = ({
   };
 
   const assignProposalsToInstruments = async (
-    instruments: InstrumentFragment[] | null
+    instruments: InstrumentMinimalFragment[] | null
   ): Promise<void> => {
     if (instruments?.length) {
       await api({
