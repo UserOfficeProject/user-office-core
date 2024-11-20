@@ -1221,7 +1221,10 @@ context('Xpress tests', () => {
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
-      cy.get('[data-cy="html-comment"]').clear().type(faker.lorem.words(10));
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-scientist-comment`,
+        faker.lorem.words(10)
+      );
       cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
       cy.notification({
         variant: 'success',
@@ -1232,7 +1235,10 @@ context('Xpress tests', () => {
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
-      cy.get('[data-cy="html-comment"]').clear().type(faker.lorem.words(10));
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-scientist-comment`,
+        faker.lorem.words(10)
+      );
       cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
       cy.notification({
         variant: 'success',
