@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Call } from 'generated/sdk';
 
 type CallFilterProps = {
-  calls?: Call[];
+  calls?: Pick<Call, 'shortCode' | 'id'>[];
   isLoading?: boolean;
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
