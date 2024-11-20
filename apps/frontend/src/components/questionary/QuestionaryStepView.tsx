@@ -207,7 +207,8 @@ function QuestionaryStepView(props: {
 
       dispatch({
         type: 'STEP_ANSWERED',
-        step: answerTopic,
+        answers: answerTopic,
+        stepIndex: topicId,
       });
 
       setLastSavedFormValues(initialValues);

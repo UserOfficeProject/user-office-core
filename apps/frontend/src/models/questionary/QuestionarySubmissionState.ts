@@ -39,7 +39,7 @@ export type Event =
   | { type: 'CLEAR_CREATED_LIST' }
   | { type: 'GO_TO_STEP'; stepIndex: number }
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
-  | { type: 'STEP_ANSWERED'; step: QuestionaryStep }
+  | { type: 'STEP_ANSWERED'; answers: Answer[]; stepIndex: number }
   // item with questionary
   | {
       type: 'ITEM_WITH_QUESTIONARY_CREATED';
@@ -243,12 +243,15 @@ export function QuestionarySubmissionModel<
           break;
         }
         case 'STEP_ANSWERED':
-          const updatedStep = action.step;
           const stepIndex = draftState.questionary.steps.findIndex(
-            (step) => step.topic.id === updatedStep.topic.id
+            (step) => step.topic.id === action.stepIndex
           );
-          draftState.questionary.steps[stepIndex] = updatedStep;
 
+          const draftStep = draftState.questionary.steps[stepIndex];
+          draftStep.fields = draftStep.fields.map(
+            (f) =>
+              (f = action.answers.find((u) => u.answerId === f.answerId) ?? f)
+          );
           draftState.isDirty = false;
 
           break;
