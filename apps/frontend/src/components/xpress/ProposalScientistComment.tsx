@@ -85,8 +85,6 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
                         This is because FormikUICustomEditor is not updated properly when we set form field onEditorChange.
                         It works when we use onBlur on Editor but it is problematic to test that with Cypress,
                         because for some reason it is not firing the onBlur event and form is not updated.
-                        There is also warning Added non-passive event listener to a scroll-blocking 'touchstart' event
-                        https://github.com/tinymce/tinymce/issues/8049.
                     */}
                     <Editor
                       initialValue={scientistCommentData?.comment || ''}
