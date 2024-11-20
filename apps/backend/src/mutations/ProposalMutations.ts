@@ -1,10 +1,13 @@
 import { logger } from '@user-office-software/duo-logger';
 import {
   administrationProposalValidationSchema,
+  createProposalScientistCommentValidationSchema,
   createProposalValidationSchema,
+  deleteProposalScientistCommentValidationSchema,
   deleteProposalValidationSchema,
   proposalNotifyValidationSchema,
   submitProposalValidationSchema,
+  updateProposalScientistCommentValidationSchema,
   updateProposalValidationSchema,
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
@@ -457,11 +460,24 @@ export default class ProposalMutations {
     return result || rejection('Can not administer proposal', { result });
   }
 
+  @ValidateArgs(createProposalScientistCommentValidationSchema)
   @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
   async createProposalScientistComment(
     agent: UserWithRole | null,
     args: CreateProposalScientistCommentArgs
   ): Promise<ProposalScientistComment | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+    if (!proposal) {
+      return rejection(
+        'Could not create proposal scientist comment because proposal not found',
+        {
+          agent,
+          proposalPk: args.proposalPk,
+        }
+      );
+    }
+
     return await this.proposalInternalCommentsDataSource
       .create(args)
       .catch((error) => {
@@ -473,6 +489,7 @@ export default class ProposalMutations {
       });
   }
 
+  @ValidateArgs(updateProposalScientistCommentValidationSchema)
   @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
   async updateProposalScientistComment(
     agent: UserWithRole | null,
@@ -489,6 +506,7 @@ export default class ProposalMutations {
       });
   }
 
+  @ValidateArgs(deleteProposalScientistCommentValidationSchema)
   @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
   async deleteProposalScientistComment(
     agent: UserWithRole | null,

@@ -26,7 +26,7 @@
     "@types/yup": "^0.29.13",
     "@uiw/react-codemirror": "^4.22.1",
     "@user-office-software/duo-localisation": "^1.2.0",
-    "@user-office-software/duo-validation": "^5.1.8",
+    "@user-office-software/duo-validation": "^5.1.9",
     "formik": "^2.4.6",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",

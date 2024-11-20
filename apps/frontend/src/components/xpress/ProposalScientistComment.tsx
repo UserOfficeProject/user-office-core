@@ -1,9 +1,10 @@
 import { Button, DialogContent, Grid, Typography } from '@mui/material';
-import { Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import React from 'react';
+import * as Yup from 'yup';
 
-import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import PromptIfDirty from 'components/common/PromptIfDirty';
+import Editor from 'components/common/TinyEditor';
 import UOLoader from 'components/common/UOLoader';
 import { ProposalScientistComment as ProposalScientistCommentType } from 'generated/sdk';
 import { useProposalScientistCommentData } from 'hooks/proposal/useProposalScientistCommentData';
@@ -46,6 +47,9 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
           </Typography>
           <Formik
             initialValues={{ comment: scientistCommentData?.comment }}
+            validationSchema={Yup.object().shape({
+              comment: Yup.string().min(1).required('Comment is required'),
+            })}
             onSubmit={async (values): Promise<void> => {
               if (scientistCommentData) {
                 if (values.comment) {
@@ -72,24 +76,47 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
               props.close();
             }}
           >
-            {({ isSubmitting }) => (
+            {({ isSubmitting, setFieldValue, isValid }) => (
               <Form>
                 <PromptIfDirty />
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <Field
-                      name="comment"
-                      type="text"
-                      component={FormikUICustomEditor}
-                      fullWidth
+                    {/* NOTE: We are using Editor directly instead of FormikUICustomEditor with Formik Field component.
+                        This is because FormikUICustomEditor is not updated properly when we set form field onEditorChange.
+                        It works when we use onBlur on Editor but it is problematic to test that with Cypress,
+                        because for some reason it is not firing the onBlur event and form is not updated.
+                        There is also warning Added non-passive event listener to a scroll-blocking 'touchstart' event
+                        https://github.com/tinymce/tinymce/issues/8049.
+                    */}
+                    <Editor
+                      initialValue={scientistCommentData?.comment || ''}
+                      id={`${props.proposalPk}-scientist-comment`}
                       init={{
                         skin: false,
                         content_css: false,
-                        plugins: ['link', 'preview', 'image', 'code'],
+                        plugins: [
+                          'link',
+                          'preview',
+                          'code',
+                          'charmap',
+                          'wordcount',
+                        ],
                         toolbar: 'bold italic',
                         branding: false,
                       }}
-                      data-cy="html-comment"
+                      onEditorChange={(content, editor) => {
+                        const isStartContentDifferentThanCurrent =
+                          editor.startContent !==
+                          editor.contentDocument.body.innerHTML;
+
+                        if (
+                          isStartContentDifferentThanCurrent ||
+                          editor.isDirty()
+                        ) {
+                          setFieldValue('comment', content);
+                        }
+                      }}
+                      disabled={isSubmitting}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -130,7 +157,7 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
                         type="submit"
                         sx={(theme) => ({ margin: theme.spacing(3, 2, 2) })}
                         data-cy="submit-proposal-scientist-comment"
-                        disabled={isExecutingCall || isSubmitting}
+                        disabled={isExecutingCall || isSubmitting || !isValid}
                       >
                         {isExecutingCall && <UOLoader size={14} />}
                         {isNotCreate(scientistCommentData)
