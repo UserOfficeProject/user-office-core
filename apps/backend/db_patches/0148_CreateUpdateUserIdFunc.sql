@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  --The MERGING_TABLE_REGISTRY table and REPLACE_OLD_USER_ID_WITH_NEW function are only applicable to STFC 
+  --The MERGING_TABLE_REGISTRY table and REPLACE_OLD_USER_ID_WITH_NEW function are applicable to STFC only
   --so they are relocated to STFC private repos and dropped from user-office-core repos. 
   --The business logic of the REPLACE_OLD_USER_ID_WITH_NEW function.
   --  Discover the target column in tables with a foreign key constraint on the USER_ID field of the USERS table, 
