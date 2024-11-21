@@ -68,4 +68,15 @@ export default class TechniqueQueries {
 
     return techniques;
   }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async getTechniquesByScientist(
+    agent: UserWithRole | null,
+    userNumber: number
+  ): Promise<Technique[]> {
+    const techniques =
+      await this.dataSource.getTechniquesByScientist(userNumber);
+
+    return techniques;
+  }
 }

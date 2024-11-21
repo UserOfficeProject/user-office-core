@@ -1,0 +1,5 @@
+query getTechniquesByScientist($userNumber: Int!) {
+  techniquesByScientist(userNumber: $userNumber) {
+    ...techniqueMinimal
+  }
+}
