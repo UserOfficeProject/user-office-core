@@ -416,7 +416,7 @@ export const collectProposalPDFData = async (
   }
 
   const technicalReviews =
-    await baseContext.queries.review.technicalReviewsForProposal(
+    await baseContext.queries.technicalReview.reviewsForProposal(
       user,
       proposal.primaryKey
     );

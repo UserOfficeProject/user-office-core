@@ -25,6 +25,7 @@ const menuMap = {
   PdfTemplates: '/PdfTemplates',
   ProposalTemplates: '/ProposalTemplates',
   FapReviewTemplates: '/FapReviewTemplates',
+  TechnicalReviewTemplates: './TechnicalReviewTemplates',
   SampleDeclarationTemplates: '/SampleDeclarationTemplates',
   GenericTemplates: '/GenericTemplates',
   ShipmentDeclarationTemplates: '/ShipmentDeclarationTemplates',

@@ -332,6 +332,7 @@ context('Instrument tests', () => {
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
         instrumentId: createdInstrumentId,
+        questionaryId: 0,
       });
 
       cy.login('officer', initialDBData.roles.userOfficer);
@@ -422,6 +423,7 @@ context('Instrument tests', () => {
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
         instrumentId: createdInstrumentId,
+        questionaryId: 0,
       });
 
       cy.login('officer');
@@ -1139,6 +1141,7 @@ context('Instrument tests', () => {
             reviewerId: scientist2.id,
             submitted: false,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
         }
       });

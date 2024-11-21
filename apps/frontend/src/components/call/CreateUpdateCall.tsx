@@ -48,6 +48,14 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
   } = useActiveTemplates(TemplateGroupId.FAP_REVIEW, call?.fapReviewTemplateId);
 
   const {
+    templates: technicalReviewTemplates,
+    refreshTemplates: reloadTechnicalReviewTemplates,
+  } = useActiveTemplates(
+    TemplateGroupId.TECHNICAL_REVIEW,
+    call?.technicalReviewTemplateId
+  );
+
+  const {
     proposalWorkflows,
     loadingProposalWorkflows,
     refreshProposalWorkflows: reloadProposalWorkflows,
@@ -157,11 +165,13 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
             reloadEsi={reloadEsi}
             reloadPdfTemplates={reloadPdfTemplates}
             reloadFapReviewTemplates={reloadFapReviewTemplates}
+            reloadTechnicalReviewTemplates={reloadTechnicalReviewTemplates}
             reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
             pdfTemplates={pdfTemplates}
             fapReviewTemplates={fapReviewTemplates}
+            technicalReviewTemplates={technicalReviewTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}

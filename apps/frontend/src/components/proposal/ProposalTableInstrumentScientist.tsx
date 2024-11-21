@@ -507,6 +507,7 @@ const ProposalTableInstrumentScientist = ({
                 reviewerId: user.id,
                 submitted: true,
                 instrumentId: i.id,
+                questionaryId: 0,
               });
             }
           });

@@ -345,7 +345,14 @@ const createProposals = async () => {
 };
 
 const createReviews = async () => {
-  await execute(() => {
+  await execute(async () => {
+    const tmpUserId = dummy.positiveNumber(MAX_USERS);
+
+    const technicalReviewQuestionary = await questionaryDataSource.create(
+      tmpUserId,
+      1
+    );
+
     return reviewDataSource.setTechnicalReview(
       {
         proposalPk: dummy.positiveNumber(MAX_PROPOSALS),
@@ -360,7 +367,7 @@ const createReviews = async () => {
         reviewerId: 1,
         instrumentId: 1,
         files: '[]',
-        questionaryId: 0,
+        questionaryId: technicalReviewQuestionary.questionaryId,
       },
       false
     );

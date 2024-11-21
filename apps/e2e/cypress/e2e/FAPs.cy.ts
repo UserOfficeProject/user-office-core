@@ -1317,6 +1317,7 @@ context('Fap reviews tests', () => {
         submitted: true,
         reviewerId: 6,
         instrumentId: newlyCreatedInstrumentId,
+        questionaryId: 0,
       });
 
       cy.assignFapReviewersToProposals({
@@ -1672,6 +1673,7 @@ context('Fap meeting components tests', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: newlyCreatedInstrumentId,
+        questionaryId: 0,
       });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
@@ -1704,6 +1706,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
 
           cy.setInstrumentAvailabilityTime({
@@ -1872,6 +1875,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
 
           cy.assignProposalsToFaps({
@@ -1964,6 +1968,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
 
           cy.assignProposalsToFaps({
@@ -2128,6 +2133,7 @@ context('Fap meeting components tests', () => {
               submitted: true,
               reviewerId: 0,
               instrumentId: createdInstrumentId,
+              questionaryId: 0,
             });
             cy.createFap({
               code: fap2.code,
@@ -2199,6 +2205,7 @@ context('Fap meeting components tests', () => {
               submitted: true,
               reviewerId: 0,
               instrumentId: createdInstrumentId,
+              questionaryId: 0,
             });
             cy.createFap({
               code: fap2.code,
@@ -2242,6 +2249,7 @@ context('Fap meeting components tests', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: createdInstrumentId,
+        questionaryId: 0,
       });
 
       cy.assignProposalsToFaps({
@@ -2538,6 +2546,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
 
           cy.assignProposalsToFaps({
@@ -3129,6 +3138,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
 
           cy.assignProposalsToFaps({
@@ -3362,6 +3372,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
 
           cy.assignProposalsToFaps({
@@ -3776,6 +3787,7 @@ context('Fap meeting exports test', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: newlyCreatedInstrumentId,
+        questionaryId: 0,
       });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
@@ -3804,6 +3816,7 @@ context('Fap meeting exports test', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
 
           cy.setInstrumentAvailabilityTime({
@@ -3856,6 +3869,7 @@ context('Fap meeting exports test', () => {
           submitted: true,
           reviewerId: 0,
           instrumentId: createdInstrumentId,
+          questionaryId: 0,
         });
 
         cy.assignProposalsToFaps({

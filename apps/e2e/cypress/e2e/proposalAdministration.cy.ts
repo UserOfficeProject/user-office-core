@@ -851,6 +851,7 @@ context('Proposal administration tests', () => {
             submitted: true,
             reviewerId: initialDBData.users.officer.id,
             instrumentId: createdInstrumentId,
+            questionaryId: 0,
           });
         }
       });
@@ -875,6 +876,7 @@ context('Proposal administration tests', () => {
             submitted: true,
             reviewerId: initialDBData.users.officer.id,
             instrumentId: instrumentId,
+            questionaryId: 0,
           });
         }
       });

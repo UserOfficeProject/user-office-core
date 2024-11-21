@@ -12,7 +12,6 @@ import {
 
 import { ResolverContext } from '../../context';
 import { ReviewerFilter } from '../../models/Review';
-import { Review } from '../types/Review';
 import { TechnicalReview } from '../types/TechnicalReview';
 
 @InputType()
@@ -53,18 +52,18 @@ class TechnicalReviewsQueryResult {
   @Field(() => Int)
   public totalCount: number;
 
-  @Field(() => [Review])
+  @Field(() => [TechnicalReview])
   public technicalReviews: TechnicalReview[];
 }
 
 @Resolver()
 export class TechnicalReviewsQuery {
   @Query(() => TechnicalReviewsQueryResult, { nullable: true })
-  async reviews(
+  async technicalReviews(
     @Args() args: TechnicalReviewsArgs,
     @Ctx() context: ResolverContext
   ): Promise<TechnicalReviewsQueryResult | null> {
-    return context.queries.review.getAllTechnicalReviews(
+    return context.queries.technicalReview.getAll(
       context.user,
       args.filter,
       args.first,
