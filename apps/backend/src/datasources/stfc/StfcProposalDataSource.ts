@@ -306,8 +306,15 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    const proposals = database
-      .select('proposal_pk')
+    /*
+    Get proposal PKs and techniques and apply most filtering.
+    It is more efficient to do this filtering earlier on despite
+    multiple rows being returned per PK due to the joins.
+    */
+    type ProposalPkWithTechnique = TechniqueRecord & { proposalPk: number };
+
+    const proposalsWithTechnique: ProposalPkWithTechnique[] = await database
+      .select(['proposals.proposal_pk as proposalPk', 'tech.*'])
       .from('proposals')
       .join(
         'technique_has_proposals as thp',
@@ -334,19 +341,58 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         '=',
         'ins.instrument_id'
       )
-      .where(function () {
+      .modify((query) => {
+        const instrumentId = filter?.instrumentFilter?.instrumentId;
+
+        if (instrumentId && !isNaN(instrumentId)) {
+          query.join('instrument_has_proposals as ihp', function () {
+            this.on('ihp.proposal_pk', '=', 'proposals.proposal_pk').andOnVal(
+              'ihp.instrument_id',
+              '=',
+              instrumentId
+            );
+          });
+        }
+      })
+      .where((query) => {
         if (user.currentRole?.shortCode === Roles.INSTRUMENT_SCIENTIST) {
-          this.where('ths.user_id', user.id);
+          query.where('ths.user_id', user.id);
         }
-        if (filter?.techniqueFilter?.techniqueId) {
-          this.where('tech.technique_id', filter?.techniqueFilter?.techniqueId);
-        }
-        if (filter?.instrumentFilter?.instrumentId) {
-          this.where(
-            'thi.instrument_id',
-            filter?.instrumentFilter?.instrumentId
+
+        if (searchText) {
+          query.andWhere((qb) =>
+            qb
+              .orWhereRaw('proposals.proposal_id ILIKE ?', `%${searchText}%`)
+              .orWhereRaw('title ILIKE ?', `%${searchText}%`)
           );
         }
+
+        if (filter?.callId) {
+          query.where('call_id', filter.callId);
+        }
+
+        if (filter?.proposalStatusId) {
+          query.where('status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.shortCodes) {
+          const filteredAndPreparedShortCodes = filter?.shortCodes
+            .filter((shortCode) => shortCode)
+            .join('|');
+
+          query.whereRaw(
+            `proposals.proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          );
+        }
+
+        if (filter?.referenceNumbers) {
+          query.whereIn('proposals.proposal_id', filter.referenceNumbers);
+        }
+
+        if (filter?.excludeProposalStatusIds) {
+          query.where('status_id', 'not in', filter?.excludeProposalStatusIds);
+        }
+
         if (
           filter?.dateFilter?.from !== undefined &&
           filter?.dateFilter?.from !== null &&
@@ -359,7 +405,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
           const dateObject: Date = new Date(year, month, day);
 
-          this.where('created_at', '>=', dateObject);
+          query.where('created_at', '>=', dateObject);
         }
 
         if (
@@ -374,76 +420,59 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
 
           const dateObject: Date = new Date(year, month, day);
 
-          this.where('created_at', '<=', dateObject);
+          query.where('created_at', '<=', dateObject);
         }
       });
 
-    type techniqueForProposal = {
-      proposalId: number;
-      technique: Technique[];
-    };
-    type proposalId = {
-      proposal_pk: number;
-    };
+    /*
+    Make a map of each unique PK and its techniques.
+    */
+    const proposalTechniquesMap: Record<number, Technique[]> =
+      proposalsWithTechnique.reduce(
+        (acc, record) => {
+          const { proposalPk, ...techniqueRecord } = record;
 
-    let techniqueList: techniqueForProposal[];
-    const proposalIds: proposalId[] = await proposals;
+          const newTechnique = this.createTechniqueObject(techniqueRecord);
 
-    proposalIds.forEach(async (proposalId) => {
-      const techniques = await database('techniques as t')
-        .select('t.*')
-        .join('technique_has_proposals as thp', {
-          'thp.technique_id': 't.technique_id',
-        })
-        .where('thp.proposal_id', proposalId.proposal_pk)
-        .distinct()
-        .then((results: TechniqueRecord[]) =>
-          results.map(this.createTechniqueObject)
-        );
-      const techniqueForPk = {
-        proposalId: proposalId.proposal_pk,
-        technique: techniques,
-      };
-      if (techniqueList === undefined) {
-        techniqueList = [techniqueForPk];
-      } else {
-        techniqueList.push(techniqueForPk);
-      }
-    });
+          if (!acc[proposalPk]) {
+            acc[proposalPk] = [];
+          }
 
+          if (
+            !acc[proposalPk].some(
+              (existingTechnique) => existingTechnique.id === newTechnique.id
+            )
+          ) {
+            acc[proposalPk].push(newTechnique);
+          }
+
+          return acc;
+        },
+        {} as Record<number, Technique[]>
+      );
+
+    const proposalPks = Object.keys(proposalTechniquesMap).map(Number);
+
+    /*
+    Get the unique list of PKs from the view and apply the last part
+    of filtering needed at the end. The technique is retrieved from the map.
+    */
     const result = database
       .select(['*', database.raw('count(*) OVER() AS full_count')])
       .from('proposal_table_view')
-      .whereIn('proposal_pk', proposals)
+      .whereIn('proposal_pk', proposalPks)
       .modify((query) => {
-        if (filter?.callId) {
-          query.where('call_id', filter.callId);
-        }
+        if (filter?.techniqueFilter?.techniqueId) {
+          const filteredPksByTechnique = Object.keys(proposalTechniquesMap)
+            .map(Number)
+            .filter((proposalPk) =>
+              proposalTechniquesMap[proposalPk]?.some(
+                (technique) =>
+                  technique.id === filter.techniqueFilter?.techniqueId
+              )
+            );
 
-        if (filter?.proposalStatusId) {
-          query.where('proposal_status_id', filter?.proposalStatusId);
-        }
-
-        if (filter?.shortCodes) {
-          const filteredAndPreparedShortCodes = filter?.shortCodes
-            .filter((shortCode) => shortCode)
-            .join('|');
-
-          query.whereRaw(
-            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
-          );
-        }
-
-        if (filter?.referenceNumbers) {
-          query.whereIn('proposal_id', filter.referenceNumbers);
-        }
-
-        if (filter?.excludeProposalStatusIds) {
-          query.where(
-            'proposal_status_id',
-            'not in',
-            filter?.excludeProposalStatusIds
-          );
+          query.whereIn('proposal_pk', filteredPksByTechnique);
         }
 
         if (sortField && sortDirection) {
@@ -465,60 +494,18 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       })
       .then((proposals: ProposalViewRecord[]) => {
         const props = proposals.map((proposal) => {
-          const techs = techniqueList
-            .filter((prop) => prop.proposalId === proposal.proposal_pk)
-            .map((item) => {
-              return item.technique;
-            })
-            .at(0);
+          const proposalTechniques =
+            proposalTechniquesMap[proposal.proposal_pk];
 
-          if (techs?.length != undefined && techs?.length > 0) {
-            return createProposalViewObjectWithTechniques(proposal, techs);
+          if (proposalTechniques?.length) {
+            return createProposalViewObjectWithTechniques(
+              proposal,
+              proposalTechniques.sort((a, b) => a.name.localeCompare(b.name))
+            );
           }
 
           return createProposalViewObject(proposal);
         });
-
-        if (searchText) {
-          const proposalsList = props.filter((proposal) => {
-            let techniqueNames: string[] = [];
-            if (proposal.techniques) {
-              techniqueNames = proposal.techniques.map((tech) => {
-                return tech.name;
-              });
-            }
-            if (searchText) {
-              if (
-                proposal.title != null &&
-                proposal.title.includes(searchText)
-              ) {
-                return true;
-              } else if (
-                proposal.proposalId &&
-                proposal.proposalId.includes(searchText)
-              ) {
-                return true;
-              } else if (
-                proposal.statusName != null &&
-                proposal.statusName.includes(searchText)
-              ) {
-                return true;
-              } else if (
-                techniqueNames.length > 0 &&
-                techniqueNames.filter(
-                  (techName) => searchText && techName.includes(searchText)
-                ).length > 0
-              ) {
-                return true;
-              }
-            }
-          });
-
-          return {
-            totalCount: proposalsList ? proposalsList.length : 0,
-            proposals: proposalsList,
-          };
-        }
 
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
