@@ -1,6 +1,8 @@
 DO
 $$
 BEGIN
+  --The MERGING_TABLE_REGISTRY table and REPLACE_OLD_USER_ID_WITH_NEW function are only applicable to STFC 
+  --so they are relocated to STFC private repos and dropped from user-office-core repos. 
   --The business logic of the REPLACE_OLD_USER_ID_WITH_NEW function.
   --  Discover the target column in tables with a foreign key constraint on the USER_ID field of the USERS table, 
   --    then save the findings into the MERGING_TABLE_REGISTRY table.
@@ -17,7 +19,7 @@ BEGIN
   --           update the target column of the target table to the new user ID 
   --           where the target column equals the old user ID.
   --  Delete from USERS table where USER_ID field equals old user id.
-  IF REGISTER_PATCH('CreateOrReplaceOldUserIdWithNewFunc.SQL', 'CHI KAI LAM', 'UPDATE USER ID FOR MERGING', '2024-03-22') THEN
+  IF REGISTER_PATCH('RelocateOldUserIdWithNewFunc.SQL', 'CHI KAI LAM', 'UPDATE USER ID FOR MERGING', '2024-11-21') THEN
     BEGIN
       CREATE TABLE IF NOT EXISTS MERGING_TABLE_REGISTRY (
         TABLE_NAME  VARCHAR(100) NOT NULL, 
@@ -136,7 +138,9 @@ BEGIN
       $DO$;
     END;
     --Testing the health check for the "REPLACE_OLD_USER_ID_WITH_NEW" function. 
-    PERFORM REPLACE_OLD_USER_ID_WITH_NEW(0,0);
+    --PERFORM REPLACE_OLD_USER_ID_WITH_NEW(0,0);
+    DROP TABLE MERGING_TABLE_REGISTRY;
+    DROP FUNCTION REPLACE_OLD_USER_ID_WITH_NEW;
   END IF;
 END;
 $$
