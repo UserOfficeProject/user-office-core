@@ -209,6 +209,7 @@ function QuestionaryStepView(props: {
         type: 'STEP_ANSWERED',
         answers: answerTopic,
         topicId: topicId,
+        isPartialSave: isPartialSave,
       });
 
       setLastSavedFormValues(initialValues);

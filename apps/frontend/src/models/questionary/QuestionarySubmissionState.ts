@@ -39,7 +39,12 @@ export type Event =
   | { type: 'CLEAR_CREATED_LIST' }
   | { type: 'GO_TO_STEP'; stepIndex: number }
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
-  | { type: 'STEP_ANSWERED'; answers: Answer[]; topicId: number }
+  | {
+      type: 'STEP_ANSWERED';
+      answers: Answer[];
+      topicId: number;
+      isPartialSave: boolean;
+    }
   // item with questionary
   | {
       type: 'ITEM_WITH_QUESTIONARY_CREATED';
@@ -254,6 +259,9 @@ export function QuestionarySubmissionModel<
                   action.answers.find((u) => u.question.id === f.question.id) ??
                   f)
             );
+
+          draftState.questionary.steps[stepIndex].isCompleted =
+            !action.isPartialSave;
           draftState.isDirty = false;
 
           break;
