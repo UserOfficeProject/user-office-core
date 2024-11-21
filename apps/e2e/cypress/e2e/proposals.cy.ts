@@ -831,7 +831,9 @@ context('Proposal tests', () => {
 
       cy.get('[data-cy="user-menu-items"]')
         .find('[aria-label="New Proposal"]')
-        .should('have.css', 'pointer-events', 'none');
+        .click();
+
+      cy.contains('There are no calls open at this time');
     });
 
     it('User cannot select inactive call for new proposal', () => {

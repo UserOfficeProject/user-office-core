@@ -37,7 +37,10 @@ export const questionaryFilterFromUrlQuery = (urlQuery: {
   }
 };
 type ProposalFilterBarProps = {
-  calls?: { data: Call[]; isLoading: boolean };
+  calls?: {
+    data: Pick<Call, 'shortCode' | 'id' | 'templateId'>[];
+    isLoading: boolean;
+  };
   instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
   proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
