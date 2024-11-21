@@ -121,7 +121,7 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
         isRowRemovable={(rowData) => {
           const pdfTemplateRowData = rowData as PdfTemplateRowDataType;
 
-          return pdfTemplateRowData.callCount === 0;
+          return pdfTemplateRowData.pdfCallCount === 0;
         }}
         dataProvider={props.dataProvider}
       />
