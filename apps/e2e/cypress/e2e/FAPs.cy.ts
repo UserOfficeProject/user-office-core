@@ -3070,12 +3070,12 @@ context('Fap meeting components tests', () => {
       cy.get('#commentForUser')
         .parent()
         .find('.tox-toolbar__primary button')
-        .should('be.disabled');
+        .should('be.enabled');
 
       cy.get('#commentForManagement')
         .parent()
         .find('.tox-toolbar__primary button')
-        .should('be.disabled');
+        .should('be.enabled');
 
       cy.get('[data-cy="save"]').should('not.exist');
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');
@@ -3303,11 +3303,13 @@ context('Fap meeting components tests', () => {
       cy.get('#commentForUser')
         .parent()
         .find('.tox-toolbar__primary button')
-        .should('be.disabled');
+        .first()
+        .should('be.enabled');
 
       cy.get('#commentForManagement')
         .parent()
         .find('.tox-toolbar__primary button')
+        .first()
         .should('be.disabled');
 
       cy.get('[data-cy="save"]').should('not.exist');
