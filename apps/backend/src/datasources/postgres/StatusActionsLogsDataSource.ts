@@ -51,8 +51,7 @@ export default class PostgresStatusActionsLogsDataSource
             .into('status_actions_logs')
             .returning('*')
             .transacting(trx);
-          // eslint-disable-next-line no-console
-          console.log('statusActionsLog', statusActionsLog);
+
           if (statusActionsLog[0].status_actions_log_id) {
             await database
               .insert(
