@@ -30,6 +30,16 @@ export function useXpressInstrumentsData(
   const api = useDataApi();
 
   useEffect(() => {
+    if (!techniques) {
+      return;
+    }
+
+    if (techniques.length === 0) {
+      setLoadingInstruments(false);
+
+      return;
+    }
+
     let unmounted = false;
 
     setLoadingInstruments(true);
@@ -37,9 +47,7 @@ export function useXpressInstrumentsData(
       currentRole &&
       [UserRole.USER_OFFICER, UserRole.INSTRUMENT_SCIENTIST].includes(
         currentRole
-      ) &&
-      techniques &&
-      techniques.length > 0
+      )
     ) {
       api()
         .getInstrumentsMinimal()
