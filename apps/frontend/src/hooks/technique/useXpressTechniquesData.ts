@@ -44,7 +44,11 @@ export function useXpressTechniquesData(): {
           }
 
           if (data.techniquesByScientist) {
-            setTechniques(data.techniquesByScientist);
+            const sortedTechniques = data.techniquesByScientist.sort((a, b) =>
+              a.name.localeCompare(b.name)
+            );
+
+            setTechniques(sortedTechniques);
           }
           setLoadingTechniques(false);
         });
