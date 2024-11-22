@@ -14,7 +14,6 @@ import { StatusActionsLog as StatusActionsLogOrigin } from '../../models/StatusA
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { Proposal } from './Proposal';
 import { EmailStatusActionRecipients } from './ProposalStatusActionConfig';
-import { User } from './User';
 
 @ObjectType()
 @Directive('@key(fields: "statusActionsLogId")')
@@ -36,7 +35,6 @@ export class StatusActionsLog implements Partial<StatusActionsLogOrigin> {
 }
 @Resolver(() => StatusActionsLog)
 export class StatusActionsLogResolver {
-  @FieldResolver(() => User, { nullable: true })
   @FieldResolver(() => ConnectionStatusAction, { nullable: true })
   async connectionStatusAction(
     @Root() statusActionsLog: StatusActionsLogOrigin,

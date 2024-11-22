@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 
@@ -52,7 +51,8 @@ export default class PostgresStatusActionsLogsDataSource
             .into('status_actions_logs')
             .returning('*')
             .transacting(trx);
-
+          // eslint-disable-next-line no-console
+          console.log('statusActionsLog', statusActionsLog);
           if (statusActionsLog[0].status_actions_log_id) {
             await database
               .insert(
@@ -113,7 +113,7 @@ export default class PostgresStatusActionsLogsDataSource
       .select(['sal.*', 'p.*', database.raw('count(*) OVER() AS full_count')])
       .from('status_actions_logs as sal')
       .distinct('sal.status_actions_log_id')
-      .leftJoin(
+      .join(
         'status_actions_log_has_proposals as salhp',
         'salhp.status_actions_log_id',
         '=',
