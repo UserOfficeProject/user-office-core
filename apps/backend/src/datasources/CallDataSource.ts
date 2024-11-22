@@ -28,5 +28,5 @@ export interface CallDataSource {
   getCallsByInstrumentScientist(scientistId: number): Promise<Call[]>;
   isCallEnded(callId: number, checkIfInternalEnded: boolean): Promise<boolean>;
   isCallEnded(callId: number): Promise<boolean>;
-  getCallByAnswerId(answerId: number): Promise<Call>;
+  getCallOfAnswersProposal(answerId: number): Promise<Call>;
 }

@@ -18,6 +18,9 @@ export class CallQuery {
     @Arg('answerId', () => Int) answerId: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.queries.call.getCallByAnswerId(context.user, answerId);
+    return context.queries.call.getCallOfAnswersProposal(
+      context.user,
+      answerId
+    );
   }
 }
