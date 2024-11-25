@@ -1,5 +1,6 @@
 import MaterialTableCore, {
   Column,
+  OrderByCollection,
   Query,
   QueryResult,
 } from '@material-table/core';
@@ -94,7 +95,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   if (localStorageValue) {
     columns = columns.map((column) => ({
       ...column,
-      hidden: localStorageValue?.find(
+      hidden: localStorageValue.find(
         (localStorageValueItem) => localStorageValueItem.title === column.title
       )?.hidden,
     }));
@@ -108,6 +109,19 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
       return searchParams;
     });
     tableRef.current && tableRef.current.onQueryChange({});
+  };
+  const handleSortOrderChange = (orderByCollection: OrderByCollection[]) => {
+    const [orderBy] = orderByCollection;
+    setSearchParams((searchParam) => {
+      searchParam.delete('sortField');
+      searchParam.delete('sortDirection');
+      if (orderBy?.orderByField != null && orderBy?.orderDirection != null) {
+        searchParam.set('sortField', orderBy?.orderByField);
+        searchParam.set('sortDirection', orderBy?.orderDirection);
+      }
+
+      return searchParam;
+    });
   };
   const fetchStatusActionsLogsData = (tableQuery: Query<StatusActionsLog>) =>
     new Promise<QueryResult<StatusActionsLog>>(async (resolve, reject) => {
@@ -293,9 +307,11 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
             setLocalStorageValue(proposalColumns);
           }}
           onPageChange={(page, pageSize) => {
-            setSearchParams({
-              page: page.toString(),
-              pageSize: pageSize.toString(),
+            setSearchParams((searchParams) => {
+              searchParams.set('page', page.toString());
+              searchParams.set('pageSize', pageSize.toString());
+
+              return searchParams;
             });
           }}
           onSearchChange={(searchText) => {
@@ -317,25 +333,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
               });
             }
           }}
-          onOrderCollectionChange={(orderByCollection) => {
-            const [orderBy] = orderByCollection;
-
-            if (!orderBy) {
-              setSearchParams((searchParams) => {
-                searchParams.delete('sortField');
-                searchParams.delete('sortDirection');
-
-                return searchParams;
-              });
-            } else {
-              setSearchParams((searchParams) => {
-                searchParams.set('sortField', orderBy?.orderByField);
-                searchParams.set('sortDirection', orderBy?.orderDirection);
-
-                return searchParams;
-              });
-            }
-          }}
+          onOrderCollectionChange={handleSortOrderChange}
         />
       </div>
     </>

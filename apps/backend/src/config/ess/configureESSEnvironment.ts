@@ -98,6 +98,14 @@ async function enableDefaultEssFeatures() {
     settingsId: SettingsId.GRADE_PRECISION,
     settingsValue: '1',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_FAQ_LINK,
+    settingsValue: 'true',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK,
+    settingsValue: 'true',
+  });
 }
 
 export async function configureESSDevelopmentEnvironment() {
