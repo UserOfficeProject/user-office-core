@@ -2,9 +2,6 @@ query getStatusActionsLogs($filter: StatusActionsLogsFilter,$searchText: String,
   statusActionsLogs(filter: $filter, first: $first, sortField: $sortField, sortDirection: $sortDirection, searchText: $searchText, offset: $offset) {
     statusActionsLogs {
       ...statusActionsLog
-      connectionStatusAction {
-        ...connectionStatusAction
-      }
     }
     totalCount
   }
