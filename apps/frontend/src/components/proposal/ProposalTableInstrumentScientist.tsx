@@ -41,7 +41,7 @@ import {
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import {
@@ -332,7 +332,7 @@ const ProposalTableInstrumentScientist = ({
     },
     searchText: search ?? undefined,
   });
-  const { instruments, loadingInstruments } = useInstrumentsData();
+  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
