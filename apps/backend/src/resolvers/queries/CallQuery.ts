@@ -14,7 +14,7 @@ export class CallQuery {
   }
 
   @Query(() => Call, { nullable: true })
-  getCallAllocatedTimeUnit(
+  getCallByAnswerId(
     @Arg('answerId', () => Int) answerId: number,
     @Ctx() context: ResolverContext
   ) {

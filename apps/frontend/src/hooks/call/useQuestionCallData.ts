@@ -20,16 +20,15 @@ export function useAnswerCallData(answerId: number | null) {
 
     setLoadingCalls(true);
     api()
-      .getCallAllocatedTimeUnit({ answerId })
+      .getCallByAnswerId({ answerId })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.getCallAllocatedTimeUnit) {
+        if (data.getCallByAnswerId) {
           setCallAllocatedTimeUnit(
-            data.getCallAllocatedTimeUnit
-              .allocationTimeUnit as AllocationTimeUnits
+            data.getCallByAnswerId.allocationTimeUnit as AllocationTimeUnits
           );
         }
         setLoadingCalls(false);

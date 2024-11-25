@@ -200,7 +200,7 @@ const addTopicInformation = async (
         );
         const instruments = await instrumentDataSource.getInstrumentsByIds(ids);
 
-        const call = await callDataSource.getCallOfAnswersProposal(
+        const call = await callDataSource.getCallByAnswerIdProposal(
           answer.answerId
         );
         answer.value = instrumentPickerAnswer(answer, instruments, call);
