@@ -193,7 +193,7 @@ function ReviewSummary({ confirm }: ReviewSummaryProps) {
                       try {
                         const { updateReview } = await api({
                           toastSuccessMessage:
-                            'Your review has been submitted successfully. You will receive a confirmation email soon.',
+                            'Your review has been submitted successfully.',
                         }).updateReview({
                           reviewID: state.fapReview.id,
                           grade: state.fapReview.grade || 0,
