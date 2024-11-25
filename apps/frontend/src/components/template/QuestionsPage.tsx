@@ -36,9 +36,7 @@ let columns: Column<QuestionWithUsage>[] = [
   { title: 'Category', field: 'categoryId' },
   {
     title: '# Answers',
-    field: 'answerCountButton',
-    customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
-      a.answers.length - b.answers.length,
+    field: 'answers',
     render: (rowData: QuestionWithUsage) => (
       <ButtonWithDialog
         label={rowData.answers.length.toString()}
@@ -51,9 +49,7 @@ let columns: Column<QuestionWithUsage>[] = [
   },
   {
     title: '# Templates',
-    field: 'templateCountButton',
-    customSort: (a: QuestionWithUsage, b: QuestionWithUsage) =>
-      a.templates.length - b.templates.length,
+    field: 'templates',
     render: (rowData: QuestionWithUsage) => (
       <ButtonWithDialog
         label={rowData.templates.length.toString()}
