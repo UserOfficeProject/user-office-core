@@ -72,10 +72,10 @@ export default class TechniqueQueries {
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getTechniquesByScientist(
     agent: UserWithRole | null,
-    userNumber: number
+    userId: number
   ): Promise<Technique[]> {
     const techniques =
-      await this.dataSource.getTechniquesByScientist(userNumber);
+      await this.dataSource.getTechniquesByScientist(userId);
 
     return techniques;
   }

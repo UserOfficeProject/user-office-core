@@ -125,8 +125,8 @@ export class TechniqueDataSourceMock implements TechniqueDataSource {
     return [];
   }
 
-  async getTechniquesByScientist(userNumber: number): Promise<Technique[]> {
-    if (userNumber) {
+  async getTechniquesByScientist(userId: number): Promise<Technique[]> {
+    if (userId) {
       return dummyTechniques;
     }
 

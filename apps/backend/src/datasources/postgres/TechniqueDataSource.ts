@@ -339,7 +339,7 @@ export default class PostgresTechniqueDataSource
       : [];
   }
 
-  async getTechniquesByScientist(userNumber: number): Promise<Technique[]> {
+  async getTechniquesByScientist(userId: number): Promise<Technique[]> {
     const uniqueTechniques: TechniqueRecord[] = await database(
       'techniques as t'
     )
@@ -347,7 +347,7 @@ export default class PostgresTechniqueDataSource
       .join('technique_has_scientists as thi', {
         'thi.technique_id': 't.technique_id',
       })
-      .where('thi.user_id', userNumber)
+      .where('thi.user_id', userId)
       .distinct();
 
     return uniqueTechniques

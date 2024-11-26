@@ -48,12 +48,12 @@ export class TechniqueQuery {
 
   @Query(() => [Technique], { nullable: true })
   techniquesByScientist(
-    @Arg('userNumber', () => Int) userNumber: number,
+    @Arg('userNumber', () => Int) userId: number,
     @Ctx() context: ResolverContext
   ) {
     return context.queries.technique.getTechniquesByScientist(
       context.user,
-      userNumber
+      userId
     );
   }
 }

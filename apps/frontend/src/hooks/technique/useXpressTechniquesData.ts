@@ -37,7 +37,7 @@ export function useXpressTechniquesData(): {
     setLoadingTechniques(true);
     if (currentRole && [UserRole.INSTRUMENT_SCIENTIST].includes(currentRole)) {
       api()
-        .getTechniquesByScientist({ userNumber: user.id })
+        .getTechniquesByScientist({ userId: user.id })
         .then((data) => {
           if (unmounted) {
             return;
