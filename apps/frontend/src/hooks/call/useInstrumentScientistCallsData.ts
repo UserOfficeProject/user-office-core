@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
 
-import { Call } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
+export type InstrumentScientistCallsData = {
+  id: number;
+  shortCode: string;
+  templateId: number;
+};
+
 export function useInstrumentScientistCallsData(scientistId: number) {
-  const [calls, setCalls] = useState<Call[]>([]);
+  const [calls, setCalls] = useState<InstrumentScientistCallsData[]>([]);
   const [loadingCalls, setLoadingCalls] = useState(true);
 
   const api = useDataApi();
@@ -21,7 +26,7 @@ export function useInstrumentScientistCallsData(scientistId: number) {
         }
 
         if (data.callsByInstrumentScientist) {
-          setCalls(data.callsByInstrumentScientist as Call[]);
+          setCalls(data.callsByInstrumentScientist);
         }
         setLoadingCalls(false);
       });
