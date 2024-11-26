@@ -48,6 +48,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
+import XpressNotice from './XpressNotice';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
 const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
@@ -692,6 +693,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   return (
     <>
+      <XpressNotice />
       <StyledContainer maxWidth={false}>
         <StyledPaper data-cy="xpress-proposals-table">
           <ProposalReviewModal
