@@ -36,7 +36,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { useTechniquesData } from 'hooks/technique/useTechniquesData';
+import { useXpressTechniquesData } from 'hooks/technique/useXpressTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import {
   addColumns,
@@ -56,9 +56,26 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
-  const { techniques, loadingTechniques } = useTechniquesData();
+
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
+
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
+
+  // Only show calls that use the quick review workflow status
+  const { calls, loadingCalls } = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+    },
+    CallsDataQuantity.MINIMAL
+  );
+
+  // Only show techniques that the user is assigned to
+  const { techniques, loadingTechniques } = useXpressTechniquesData();
+
+  // Only show instruments in the user's techniques
+  const { instruments, loadingInstruments } =
+    useXpressInstrumentsData(techniques);
 
   const [searchParams, setSearchParams] = useSearchParams({});
   const { toFormattedDateTime } = useFormattedDateTime({
@@ -150,8 +167,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     text: search,
     excludeProposalStatusIds: excludedStatusIds,
   });
-
-  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
   const RowActionButtons = (rowData: ProposalViewData) => {
     const [, setSearchParams] = useSearchParams();
@@ -510,10 +525,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
-              ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
-              currentRole === UserRole.INTERNAL_REVIEWER
-                ? { excludeProposalStatusIds: excludeProposalStatusIds }
-                : {}),
+              excludeProposalStatusIds: excludeProposalStatusIds,
             },
             sortField: orderBy?.orderByField,
             sortDirection: orderBy?.orderDirection,
@@ -554,6 +566,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             const selection = new Set(searchParams.getAll('selection'));
             const proposalData = {
               ...proposal,
+              id: proposal.proposalId,
               status: proposal.submitted ? 'Submitted' : 'Open',
               technicalReviews: proposal.technicalReviews?.map(
                 (technicalReview) => ({
@@ -608,20 +621,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     refreshTableData();
   };
 
-  const { calls, loadingCalls } = useCallsData(
-    {
-      // Only show calls that use the quick review status in workflow
-      proposalStatusShortCode: 'QUICK_REVIEW',
-    },
-    CallsDataQuantity.EXTENDED
-  );
-
-  const { instruments, loadingInstruments } = useXpressInstrumentsData(
-    tableData,
-    techniques,
-    calls
-  );
-
   const handleSearchChange = (searchText: string) => {
     setSearchParams({
       search: searchText ? searchText : '',
@@ -660,7 +659,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           referenceNumbers: referenceNumbers,
           dateFilter: dateFilter,
           ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
-          currentRole === UserRole.INTERNAL_REVIEWER
+          currentRole === UserRole.USER_OFFICER
             ? { excludeProposalStatusIds: excludeProposalStatusIds }
             : {}),
         },
