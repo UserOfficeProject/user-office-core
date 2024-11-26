@@ -74,8 +74,7 @@ export default class TechniqueQueries {
     agent: UserWithRole | null,
     userId: number
   ): Promise<Technique[]> {
-    const techniques =
-      await this.dataSource.getTechniquesByScientist(userId);
+    const techniques = await this.dataSource.getTechniquesByScientist(userId);
 
     return techniques;
   }
