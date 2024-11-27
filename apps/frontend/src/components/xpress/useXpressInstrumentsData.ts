@@ -8,30 +8,38 @@ import {
 
 import { UserContext } from 'context/UserContextProvider';
 import {
-  Call,
-  InstrumentFragment,
-  TechniqueFragment,
+  InstrumentMinimalFragment,
+  TechniqueMinimalFragment,
   UserRole,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 
 export function useXpressInstrumentsData(
-  proposals?: ProposalViewData[],
-  techniques?: TechniqueFragment[],
-  calls?: Call[]
+  techniques?: TechniqueMinimalFragment[]
 ): {
   loadingInstruments: boolean;
-  instruments: InstrumentFragment[];
-  setInstruments: Dispatch<SetStateAction<InstrumentFragment[]>>;
+  instruments: InstrumentMinimalFragment[];
+  setInstruments: Dispatch<SetStateAction<InstrumentMinimalFragment[]>>;
 } {
-  const [instruments, setInstruments] = useState<InstrumentFragment[]>([]);
+  const [instruments, setInstruments] = useState<InstrumentMinimalFragment[]>(
+    []
+  );
   const [loadingInstruments, setLoadingInstruments] = useState(true);
   const { currentRole } = useContext(UserContext);
 
   const api = useDataApi();
 
   useEffect(() => {
+    if (!techniques) {
+      return;
+    }
+
+    if (techniques.length === 0) {
+      setLoadingInstruments(false);
+
+      return;
+    }
+
     let unmounted = false;
 
     setLoadingInstruments(true);
@@ -41,54 +49,37 @@ export function useXpressInstrumentsData(
         currentRole
       )
     ) {
-      const instrumentIdsFromCalls = calls
-        ? calls
-            .filter(
-              (call) =>
-                call.instruments != null || call.instruments != undefined
-            )
-            .flatMap((call) => call.instruments)
-            .map((instrument) => instrument.id)
-        : [];
-
-      const instrumentsFromTechniques = techniques
-        ? techniques
-            .filter(
-              (technique) =>
-                technique.instruments != null ||
-                technique.instruments != undefined
-            )
-            .flatMap((technique) => technique.instruments)
-        : [];
-
-      const uniqueInstruments = Array.from(new Set(instrumentsFromTechniques));
-
-      const instrumentsList = uniqueInstruments
-        .filter((instrument) => {
-          if (instrumentIdsFromCalls.includes(instrument.id)) {
-            return instrument;
-          }
-        })
-        .reduce((unique: InstrumentFragment[], item) => {
-          if (!unique.find((obj: InstrumentFragment) => obj.id === item.id)) {
-            unique.push(item);
+      api()
+        .getInstrumentsMinimal()
+        .then((data) => {
+          if (unmounted) {
+            return;
           }
 
-          return unique;
-        }, []);
+          if (data.instruments) {
+            const techniqueInstrumentIds = new Set(
+              techniques?.flatMap((technique) =>
+                technique.instruments.map((instrument) => instrument.id)
+              ) || []
+            );
 
-      if (unmounted) {
-        return;
-      }
-      setInstruments(instrumentsList);
-      setLoadingInstruments(false);
+            const filteredInstruments = data.instruments.instruments.filter(
+              (instrument) => techniqueInstrumentIds.has(instrument.id)
+            );
+
+            filteredInstruments.sort((a, b) => a.name.localeCompare(b.name));
+
+            setInstruments(filteredInstruments);
+          }
+          setLoadingInstruments(false);
+        });
     }
 
     return () => {
       // used to avoid unmounted component state update error
       unmounted = true;
     };
-  }, [api, currentRole, proposals, calls, techniques]);
+  }, [api, currentRole, techniques]);
 
   return {
     loadingInstruments,

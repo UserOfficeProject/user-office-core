@@ -21,12 +21,12 @@ import { downloadBlob } from 'utils/downloadBlob';
 
 import { UserContext } from './UserContextProvider';
 
-const DownloadMonitorDialog = ({
+export const DownloadMonitorDialog = ({
   items,
   cancel,
 }: {
   items: InProgressItem[];
-  cancel: (id: string) => void;
+  cancel?: (id: string) => void;
 }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(true);
@@ -92,9 +92,11 @@ const DownloadMonitorDialog = ({
                       )
                     }
                   />
-                  <Button variant="text" onClick={() => cancel(item.id)}>
-                    Cancel
-                  </Button>
+                  {cancel && (
+                    <Button variant="text" onClick={() => cancel(item.id)}>
+                      Cancel
+                    </Button>
+                  )}
                 </ListItem>
               );
             })}
