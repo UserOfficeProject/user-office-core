@@ -1235,6 +1235,11 @@ context('Xpress tests', () => {
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
       cy.setTinyMceContent(
         `${createdProposalPk1}-scientist-comment`,
         faker.lorem.words(10)
@@ -1244,6 +1249,11 @@ context('Xpress tests', () => {
         variant: 'success',
         text: 'Proposal scientist comment successfully updated',
       });
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
       cy.finishedLoading();
       cy.contains(proposal1.title)
         .parent()
