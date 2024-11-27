@@ -16,6 +16,7 @@ export function useProposalsData(filter: ProposalsFilter) {
     proposalStatusId,
     questionaryIds,
     questionFilter,
+    templateIds,
     text,
     referenceNumbers,
   } = filter;
@@ -33,6 +34,7 @@ export function useProposalsData(filter: ProposalsFilter) {
           proposalStatusId,
           questionaryIds,
           questionFilter,
+          templateIds,
           text,
           referenceNumbers,
         },
@@ -57,6 +59,7 @@ export function useProposalsData(filter: ProposalsFilter) {
     proposalStatusId,
     questionaryIds,
     questionFilter,
+    templateIds,
     text,
     api,
     currentRole,
