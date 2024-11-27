@@ -9,7 +9,10 @@ import StyledDialog from 'components/common/StyledDialog';
 import { Proposal, ProposalTemplate, TemplateGroupId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useProposalsData } from 'hooks/proposal/useProposalsData';
+import {
+  ProposalsDataQuantity,
+  useProposalsData,
+} from 'hooks/proposal/useProposalsData';
 import { tableIcons } from 'utils/materialIcons';
 
 import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
@@ -49,9 +52,12 @@ function CallsList(props: { filterTemplateId: number }) {
 }
 
 function ProposalsList(props: { filterTemplateId: number }) {
-  const { proposalsData } = useProposalsData({
-    templateIds: [props.filterTemplateId],
-  });
+  const { proposalsData } = useProposalsData(
+    {
+      templateIds: [props.filterTemplateId],
+    },
+    ProposalsDataQuantity.MINIMAL
+  );
 
   const proposalListColumns = [
     {
