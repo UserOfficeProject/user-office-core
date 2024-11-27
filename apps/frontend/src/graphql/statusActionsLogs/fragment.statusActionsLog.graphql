@@ -5,12 +5,8 @@ fragment statusActionsLog on StatusActionsLog {
     statusActionsSuccessful
     statusActionsTstamp
     proposals {
-      ...proposal  
+        proposalId
+        primaryKey
     }
-    connectionStatusAction {
-      action {
-        name
-        type
-      }
-    }
+    
 }

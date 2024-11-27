@@ -13,6 +13,7 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -46,6 +47,8 @@ export default class InstrumentMutations {
     @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ProposalSettingsDataSource)
+    private proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource,
@@ -453,6 +456,48 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentsArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
+    /*
+    If the user is not a User Officer, ensure
+    the status is currently Under Review.
+    */
+    const isUserOfficerOrApiToken =
+      agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
+      agent?.isApiAccessToken;
+
+    if (!isUserOfficerOrApiToken) {
+      const proposal = await this.proposalDataSource.get(args.proposalPks[0]);
+
+      if (!proposal) {
+        return rejection(
+          'Could not assign instrument: failed to retrieve proposal',
+          {
+            agent,
+            args,
+          }
+        );
+      }
+
+      const statuses =
+        await this.proposalSettingsDataSource.getAllProposalStatuses();
+
+      const currentStatus = statuses.find((s) => s.id === proposal.statusId);
+
+      if (currentStatus?.shortCode !== 'UNDER_REVIEW') {
+        return rejection(
+          'Could not assign instrument: forbidden current status',
+          {
+            agent,
+            args,
+            currentStatus: currentStatus,
+          }
+        );
+      }
+    }
+
+    /*
+    Ensure the instruments to be assigned belong
+    to the technique of the proposal.
+    */
     const techniquesWithProposal =
       await this.techniqueDataSource.getTechniquesByProposalPk(
         args.proposalPks[0]
@@ -460,7 +505,7 @@ export default class InstrumentMutations {
 
     if (!techniquesWithProposal || techniquesWithProposal.length < 1) {
       return rejection(
-        'Failed to retrieve techniques attached to the proposal',
+        'Could not assign instrument: failed to retrieve proposal techniques',
         {
           agent,
           args,
@@ -480,10 +525,13 @@ export default class InstrumentMutations {
       : false;
 
     if (!isXpress) {
-      return rejection('No permission to assign instrument for this proposal', {
-        agent,
-        args,
-      });
+      return rejection(
+        'Could not assign instrument: instrument does not belong to proposal techniques',
+        {
+          agent,
+          args,
+        }
+      );
     }
 
     return this.assignProposalsToInstrumentsInternal(agent, args);

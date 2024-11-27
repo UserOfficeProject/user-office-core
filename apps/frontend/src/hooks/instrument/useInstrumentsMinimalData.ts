@@ -7,16 +7,10 @@ import {
 } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
-import {
-  InstrumentMinimalFragment,
-  TechniqueMinimalFragment,
-  UserRole,
-} from 'generated/sdk';
+import { InstrumentMinimalFragment, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useXpressInstrumentsData(
-  techniques?: TechniqueMinimalFragment[]
-): {
+export function useInstrumentsMinimalData(callIds?: number[]): {
   loadingInstruments: boolean;
   instruments: InstrumentMinimalFragment[];
   setInstruments: Dispatch<SetStateAction<InstrumentMinimalFragment[]>>;
@@ -30,46 +24,41 @@ export function useXpressInstrumentsData(
   const api = useDataApi();
 
   useEffect(() => {
-    if (!techniques) {
-      return;
-    }
-
-    if (techniques.length === 0) {
-      setLoadingInstruments(false);
-
-      return;
-    }
-
     let unmounted = false;
 
     setLoadingInstruments(true);
     if (
       currentRole &&
-      [UserRole.USER_OFFICER, UserRole.INSTRUMENT_SCIENTIST].includes(
-        currentRole
-      )
+      [
+        UserRole.USER_OFFICER,
+        UserRole.FAP_REVIEWER,
+        UserRole.FAP_CHAIR,
+        UserRole.FAP_SECRETARY,
+        UserRole.USER,
+      ].includes(currentRole)
     ) {
       api()
-        .getInstrumentsMinimal()
+        .getInstrumentsMinimal({ callIds })
         .then((data) => {
           if (unmounted) {
             return;
           }
 
           if (data.instruments) {
-            const techniqueInstrumentIds = new Set(
-              techniques?.flatMap((technique) =>
-                technique.instruments.map((instrument) => instrument.id)
-              ) || []
-            );
+            setInstruments(data.instruments.instruments);
+          }
+          setLoadingInstruments(false);
+        });
+    } else {
+      api()
+        .getMyInstrumentsMinimal()
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
 
-            const filteredInstruments = data.instruments.instruments.filter(
-              (instrument) => techniqueInstrumentIds.has(instrument.id)
-            );
-
-            filteredInstruments.sort((a, b) => a.name.localeCompare(b.name));
-
-            setInstruments(filteredInstruments);
+          if (data.me?.instruments) {
+            setInstruments(data.me.instruments);
           }
           setLoadingInstruments(false);
         });
@@ -79,7 +68,7 @@ export function useXpressInstrumentsData(
       // used to avoid unmounted component state update error
       unmounted = true;
     };
-  }, [api, currentRole, techniques]);
+  }, [api, currentRole, callIds]);
 
   return {
     loadingInstruments,
