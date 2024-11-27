@@ -2,11 +2,16 @@ import MaterialTable, { Column } from '@material-table/core';
 import { DialogActions, DialogContent } from '@mui/material';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
 import StyledDialog from 'components/common/StyledDialog';
-import { Proposal, ProposalTemplate, TemplateGroupId } from 'generated/sdk';
+import {
+  Proposal,
+  ProposalsFilter,
+  ProposalTemplate,
+  TemplateGroupId,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import {
@@ -52,10 +57,12 @@ function CallsList(props: { filterTemplateId: number }) {
 }
 
 function ProposalsList(props: { filterTemplateId: number }) {
+  const filter = useMemo<ProposalsFilter>(
+    () => ({ templateIds: [props.filterTemplateId] }),
+    [props.filterTemplateId]
+  );
   const { proposalsData } = useProposalsData(
-    {
-      templateIds: [props.filterTemplateId],
-    },
+    filter,
     ProposalsDataQuantity.MINIMAL
   );
 
