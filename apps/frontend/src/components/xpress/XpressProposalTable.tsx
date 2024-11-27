@@ -125,7 +125,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     StatusCode.APPROVED,
     StatusCode.UNSUCCESSFUL,
     StatusCode.FINISHED,
-    StatusCode.EXPIRED,
+    ...(currentRole === UserRole.USER_OFFICER ? [StatusCode.EXPIRED] : []),
   ];
 
   const xpressStatuses = proposalStatuses.filter((ps) =>
