@@ -10,7 +10,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Answer } from '../types/Answer';
+import { AnswerBasic } from '../types/AnswerBasic';
 
 @InputType()
 export class AnswerInput {
@@ -38,7 +38,7 @@ export class AnswerTopicArgs {
 
 @Resolver()
 export class UpdateQuestionaryMutation {
-  @Mutation(() => [Answer])
+  @Mutation(() => [AnswerBasic])
   answerTopic(
     @Args()
     args: AnswerTopicArgs,

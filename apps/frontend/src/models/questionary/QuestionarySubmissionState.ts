@@ -23,6 +23,12 @@ export enum GENERIC_TEMPLATE_EVENT {
   ITEMS_MODIFIED = 'ITEMS_MODIFIED',
   ITEMS_DELETED = 'ITEMS_DELETED',
 }
+
+type AnswerMinimal = {
+  questionId: string;
+  answer: any;
+};
+
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
   | { type: 'BACK_CLICKED'; confirm?: WithConfirmType }
@@ -41,7 +47,7 @@ export type Event =
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
   | {
       type: 'STEP_ANSWERED';
-      answers: Answer[];
+      answers: AnswerMinimal[];
       topicId: number;
       isPartialSave: boolean;
     }
@@ -253,12 +259,16 @@ export function QuestionarySubmissionModel<
           );
 
           draftState.questionary.steps[stepIndex].fields =
-            draftState.questionary.steps[stepIndex].fields.map(
-              (f) =>
-                (f =
-                  action.answers.find((u) => u.question.id === f.question.id) ??
-                  f)
-            );
+            draftState.questionary.steps[stepIndex].fields.map((f) => {
+              const newValue =
+                action.answers.find((u) => u.questionId === f.question.id)
+                  ?.answer ?? f.value;
+
+              console.log(newValue);
+              f.value = newValue;
+
+              return f;
+            });
 
           draftState.questionary.steps[stepIndex].isCompleted =
             !action.isPartialSave;
