@@ -201,7 +201,7 @@ function ProposalTemplatesTable(props: ProposalTemplatesTableProps) {
           setShowTemplateProposals(true);
         }}
         style={{ cursor: 'pointer' }}
-        data-cy="proposals-count"
+        data-cy={`proposals-count-${rowData.templateId}`}
       >
         {rowData.questionaryCount || 0}
       </Link>
