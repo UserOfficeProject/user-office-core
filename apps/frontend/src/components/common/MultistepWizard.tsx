@@ -51,9 +51,17 @@ export const Wizard = ({
     setStepNumber(Math.max(stepNumber - 1, 0));
   };
 
-  const handleStep = (step: number, values: FormikValues) => () => {
+  const handleStep = (stepIndex: number, values: FormikValues) => () => {
+    const form = document.querySelector('form');
+
+    if (form && !form.checkValidity()) {
+      form.reportValidity();
+
+      return;
+    }
+
     setSnapshot(values);
-    setStepNumber(step);
+    setStepNumber(stepIndex);
   };
 
   const handleSubmit = async (
@@ -134,7 +142,11 @@ export const Wizard = ({
               disabled={formik.isSubmitting}
             >
               {formik.isSubmitting && <UOLoader size={14} />}
-              {isLastStep ? (shouldCreate ? 'Create' : 'Update') : 'Next'}
+              {isLastStep
+                ? shouldCreate
+                  ? 'Create'
+                  : 'Update'
+                : 'Save and Continue'}
             </Button>
           </ActionButtonContainer>
         </Form>
