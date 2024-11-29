@@ -200,8 +200,8 @@ const addTopicInformation = async (
         );
         const instruments = await instrumentDataSource.getInstrumentsByIds(ids);
 
-        const call = await callDataSource.getCallByQuestionId(
-          answer.question.id
+        const call = await callDataSource.getCallByAnswerIdProposal(
+          answer.answerId
         );
         answer.value = instrumentPickerAnswer(answer, instruments, call);
       }
@@ -386,9 +386,9 @@ export const collectProposalPDFData = async (
           : [Number(answer.value?.instrumentId || '0')];
         const instruments =
           await baseContext.queries.instrument.getInstrumentsByIds(user, ids);
-        const call = await baseContext.queries.call.getCallByQuestionId(
+        const call = await baseContext.queries.call.getCallOfAnswersProposal(
           user,
-          answer.question.id
+          answer.answerId
         );
         answer.value = instrumentPickerAnswer(answer, instruments, call);
       } else if (answer.question.dataType === DataType.TECHNIQUE_PICKER) {
