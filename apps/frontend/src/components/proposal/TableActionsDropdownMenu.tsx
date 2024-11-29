@@ -6,8 +6,10 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import React, { useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 type TableActionsDropdownMenuProps = {
   event: null | HTMLElement;
@@ -119,16 +121,26 @@ const TableActionsDropdownMenu = ({
   );
   const [open, setOpen] = React.useState<boolean>(false);
   const [menuItems, setMenuItems] = React.useState(getMenuItems());
-  const [searchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      selection: [],
+    }),
+    []
+  );
+
+  const [typedParams] = useTypeSafeSearchParams<{
+    selection: string[];
+  }>(initialParams);
+
   const { search } = useLocation();
 
   useEffect(() => {
-    if (searchParams.getAll('selection').length <= 1) {
+    if (typedParams.selection.length === 0) {
       setMenuItems(getMenuItems(false));
     } else {
       setMenuItems(getMenuItems());
     }
-  }, [search, searchParams]);
+  }, [search, typedParams.selection.length]);
 
   useEffect(() => {
     if (event) {

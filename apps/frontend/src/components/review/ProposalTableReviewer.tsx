@@ -8,9 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { proposalGradeValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
@@ -24,6 +23,7 @@ import {
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
@@ -90,14 +90,40 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
   const { user } = useContext(UserContext);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const call = searchParams.get('call');
-  const instrument = searchParams.get('instrument');
-  const reviewStatus = searchParams.get('reviewStatus') ?? ReviewStatus.DRAFT;
-  const reviewer = searchParams.get('reviewer') ?? ReviewerFilter.ME;
-  const reviewModal = searchParams.get('reviewModal');
-  const sortField = searchParams.get('sortField');
-  const sortDirection = searchParams.get('sortDirection');
+  const initialParams = useMemo(
+    () => ({
+      call: null,
+      instrument: null,
+      reviewStatus: ReviewStatus.DRAFT,
+      reviewer: ReviewerFilter.ME,
+      reviewModal: null,
+      sortField: 'title',
+      sortDirection: 'asc',
+      selection: [],
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    call: string | null;
+    instrument: string | null;
+    reviewStatus: string;
+    reviewer: string;
+    reviewModal: string | null;
+    sortField: string;
+    sortDirection: string;
+    selection: string[];
+  }>(initialParams);
+
+  const {
+    call,
+    instrument,
+    reviewStatus,
+    reviewer,
+    reviewModal,
+    sortField,
+    sortDirection,
+  } = typedParams;
 
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     UserWithReview[]
@@ -142,7 +168,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         },
       })) || [];
 
-    const selection = searchParams.getAll('selection');
+    const selection = Array.from(typedParams.selection);
 
     if (selection.length > 0) {
       const selectionSet = new Set(selection);
@@ -152,7 +178,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     } else {
       setPreselectedProposalsData(getProposalsToGradeDataFromUserData());
     }
-  }, [userData, searchParams]);
+  }, [userData, typedParams.selection]);
 
   const reviewerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
@@ -191,22 +217,19 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         >
           <IconButton
             onClick={() => {
-              setSearchParams((searchParams) => {
-                searchParams.set('reviewModal', rowData.reviewId.toString());
-                searchParams.set(
-                  'modalTab',
+              setTypedParams((prev) => ({
+                ...prev,
+                reviewModal: rowData.reviewId.toString(),
+                modalTab:
                   rowData.status === ReviewStatus.DRAFT &&
-                    rowData.reviewerId === user.id
+                  rowData.reviewerId === user.id
                     ? reviewerProposalReviewTabs
                         .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
                         .toString()
                     : reviewerProposalReviewTabs
                         .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
-                        .toString()
-                );
-
-                return searchParams;
-              });
+                        .toString(),
+              }));
             }}
           >
             {rowData.status === ReviewStatus.DRAFT &&
@@ -261,38 +284,32 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleStatusFilterChange = (reviewStatus: ReviewStatus) => {
-    setSearchParams((searchParams) => {
-      searchParams.set('reviewStatus', reviewStatus);
+    setTypedParams((prev) => ({
+      ...prev,
+      reviewStatus: reviewStatus,
+    }));
 
-      return searchParams;
-    });
     setUserWithReviewsFilter((filter) => ({
       ...filter,
       status: getFilterStatus(reviewStatus),
     }));
   };
   const handleReviewerFilterChange = (reviewer: ReviewerFilter) => {
-    setSearchParams((searchParams) => {
-      searchParams.set('reviewer', reviewer);
+    setTypedParams((prev) => ({
+      ...prev,
+      reviewer: reviewer,
+    }));
 
-      return searchParams;
-    });
     setUserWithReviewsFilter((filter) => ({
       ...filter,
       reviewer: getFilterReviewer(reviewer),
     }));
   };
   const handleColumnSelectionChange = (selectedItems: UserWithReview[]) => {
-    setSearchParams((searchParams) => {
-      searchParams.delete('selection');
-      if (selectedItems.length > 0) {
-        selectedItems.forEach((selectedItem) => {
-          searchParams.append('selection', selectedItem.proposalPk.toString());
-        });
-      }
-
-      return searchParams;
-    });
+    setTypedParams((prev) => ({
+      ...prev,
+      selection: selectedItems.map((item) => item.proposalPk.toString()),
+    }));
   };
 
   const handleColumnSortOrderChange = (
@@ -300,12 +317,11 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   ) => {
     const [orderBy] = orderByCollection;
 
-    setSearchParams((searchParams) => {
-      searchParams.set('sortField', orderBy?.orderByField);
-      searchParams.set('sortDirection', orderBy?.orderDirection);
-
-      return searchParams;
-    });
+    setTypedParams((prev) => ({
+      ...prev,
+      sortField: orderBy?.orderByField || 'title',
+      sortDirection: orderBy?.orderDirection || '',
+    }));
   };
 
   const handleBulkDownLoadClick = (
@@ -458,12 +474,11 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         setProposalReviewModalOpen={() => {
           updateView(reviewModal ? +reviewModal : undefined);
 
-          setSearchParams((searchParams) => {
-            searchParams.delete('reviewModal');
-            searchParams.delete('modalTab');
-
-            return searchParams;
-          });
+          setTypedParams((prev) => ({
+            ...prev,
+            reviewModal: null,
+            modalTab: null,
+          }));
         }}
       >
         <ProposalReviewContent

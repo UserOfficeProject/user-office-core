@@ -5,14 +5,14 @@ import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import React, { Dispatch } from 'react';
+import React, { Dispatch, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import {
   InstrumentFilterInput,
   InstrumentMinimalFragment,
 } from 'generated/sdk';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 export enum InstrumentFilterEnum {
   ALL = 'all',
@@ -38,7 +38,17 @@ const InstrumentFilter = ({
   shouldShowMultiple,
   showMultiInstrumentProposals,
 }: InstrumentFilterProps) => {
-  const [, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      instrument: InstrumentFilterEnum.ALL,
+    }),
+    []
+  );
+
+  const [, setTypedParams] = useTypeSafeSearchParams<{
+    instrument: InstrumentFilterEnum;
+  }>(initialParams);
+
   const { t } = useTranslation();
 
   if (instruments === undefined) {
@@ -68,17 +78,11 @@ const InstrumentFilter = ({
                 showAllProposals: false,
               };
 
-              setSearchParams((searchParams) => {
-                searchParams.delete('instrument');
-                if (
-                  e.target.value &&
-                  e.target.value != InstrumentFilterEnum.ALL
-                ) {
-                  searchParams.set('instrument', e.target.value.toString());
-                }
+              setTypedParams((prev) => ({
+                ...prev,
+                instrument: e.target.value as InstrumentFilterEnum,
+              }));
 
-                return searchParams;
-              });
               if (
                 e.target.value === InstrumentFilterEnum.ALL ||
                 e.target.value === InstrumentFilterEnum.MULTI

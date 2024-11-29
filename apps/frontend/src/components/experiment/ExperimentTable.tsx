@@ -1,14 +1,14 @@
 import { Typography } from '@mui/material';
 import { TFunction } from 'i18next';
 import { DateTime } from 'luxon';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import ProposalEsiDetailsButton from 'components/questionary/questionaryComponents/ProposalEsiBasis/ProposalEsiDetailsButton';
 import { GetScheduledEventsCoreQuery, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useScheduledEvents } from 'hooks/scheduledEvent/useScheduledEvents';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
@@ -19,11 +19,30 @@ import ExperimentVisitsTable from './ExperimentVisitsTable';
 type RowType = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
 
 function ExperimentTable() {
-  const [searchParams] = useSearchParams();
-  const call = searchParams.get('call');
-  const instrument = searchParams.get('instrument');
-  const experimentFromDate = searchParams.get('from');
-  const experimentToDate = searchParams.get('to');
+  const initialParams = useMemo(
+    () => ({
+      call: null,
+      instrument: null,
+      from: null,
+      to: null,
+    }),
+    []
+  );
+
+  const [typedParams] = useTypeSafeSearchParams<{
+    call: string | null;
+    instrument: string | null;
+    from: string | null;
+    to: string | null;
+  }>(initialParams);
+
+  const {
+    call,
+    instrument,
+    from: experimentFromDate,
+    to: experimentToDate,
+  } = typedParams;
+
   const { scheduledEvents, setScheduledEvents, loadingEvents, setArgs } =
     useScheduledEvents({});
 

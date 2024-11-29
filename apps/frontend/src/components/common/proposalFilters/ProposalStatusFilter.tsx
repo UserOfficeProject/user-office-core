@@ -4,10 +4,10 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import PropTypes from 'prop-types';
-import React, { Dispatch } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { Dispatch, useMemo } from 'react';
 
 import { ProposalStatus } from 'generated/sdk';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 type ProposalStatusFilterProps = {
   proposalStatuses?: ProposalStatus[];
@@ -39,7 +39,17 @@ const ProposalStatusFilter = ({
   shouldShowAll,
   hiddenStatuses,
 }: ProposalStatusFilterProps) => {
-  const [, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      proposalStatus: null,
+    }),
+    []
+  );
+
+  const [, setTypedParams] = useTypeSafeSearchParams<{
+    proposalStatus: string | null;
+  }>(initialParams);
+
   if (proposalStatuses === undefined) {
     return null;
   }
@@ -61,17 +71,13 @@ const ProposalStatusFilter = ({
             id="proposal-status-select"
             aria-labelledby="proposal-status-select-label"
             onChange={(proposalStatus) => {
-              setSearchParams((searchParams) => {
-                searchParams.delete('proposalStatus');
-                if (proposalStatus.target.value && !!shouldShowAll) {
-                  searchParams.set(
-                    'proposalStatus',
-                    proposalStatus.target.value.toString()
-                  );
-                }
+              if (proposalStatus.target.value && !!shouldShowAll) {
+                setTypedParams((prev) => ({
+                  ...prev,
+                  proposalStatus: proposalStatus.target.value.toString(),
+                }));
+              }
 
-                return searchParams;
-              });
               onChange?.(proposalStatus.target.value as number);
             }}
             value={proposalStatusId || 0}

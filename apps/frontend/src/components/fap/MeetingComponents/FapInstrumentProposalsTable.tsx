@@ -10,9 +10,14 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useContext, DragEvent, useState, useEffect } from 'react';
+import React, {
+  useContext,
+  DragEvent,
+  useState,
+  useEffect,
+  useMemo,
+} from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -26,6 +31,7 @@ import {
   ProposalPkWithRankOrder,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useFapProposalsByInstrument } from 'hooks/fap/useFapProposalsByInstrument';
 import { tableIcons } from 'utils/materialIcons';
 import {
@@ -101,9 +107,18 @@ const FapInstrumentProposalsTable = ({
   fapId,
   selectedCall,
 }: FapInstrumentProposalsTableProps) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      fapMeetingModal: null,
+    }),
+    []
+  );
 
-  const fapMeetingModal = searchParams.get('fapMeetingModal');
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    fapMeetingModal: string | null;
+  }>(initialParams);
+
+  const { fapMeetingModal } = typedParams;
 
   const {
     instrumentProposalsData,
@@ -408,14 +423,10 @@ const FapInstrumentProposalsTable = ({
             <IconButton
               color="inherit"
               onClick={() => {
-                setSearchParams((searchParams) => {
-                  searchParams.set(
-                    'fapMeetingModal',
-                    String(rowData.proposal.primaryKey)
-                  );
-
-                  return searchParams;
-                });
+                setTypedParams((prev) => ({
+                  ...prev,
+                  fapMeetingModal: String(rowData.proposal.primaryKey),
+                }));
                 setOpenProposal(rowData.proposal);
               }}
             >
@@ -726,11 +737,10 @@ const FapInstrumentProposalsTable = ({
           !!fapMeetingModal && +fapMeetingModal === openProposal?.primaryKey
         }
         setProposalViewModalOpen={() => {
-          setSearchParams((searchParams) => {
-            searchParams.delete('fapMeetingModal');
-
-            return searchParams;
-          });
+          setTypedParams((prev) => ({
+            ...prev,
+            fapMeetingModal: null,
+          }));
           setOpenProposal(null);
           refreshInstrumentProposalsData();
         }}

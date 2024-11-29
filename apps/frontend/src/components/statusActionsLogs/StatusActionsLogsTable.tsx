@@ -6,8 +6,8 @@ import MaterialTableCore, {
 } from '@material-table/core';
 import { Replay, Refresh } from '@mui/icons-material';
 import { Grid, Typography, useTheme } from '@mui/material';
-import React, { useState } from 'react';
-import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
@@ -15,6 +15,7 @@ import { StatusActionsLog } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -36,16 +37,39 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const RefreshIcon = (): JSX.Element => <Refresh />;
   const [selectedStatusActionsLog, setStatusActionsLog] =
     useState<StatusActionsLog | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams({
-    statusActionsLogStatus: StatusActionsLogStatus.ALL,
-  });
-  const sortField = searchParams.get('sortField');
-  const sortDirection = searchParams.get('sortDirection');
-  const statusActionsLogStatus = searchParams.get('statusActionsLogStatus');
-  const call = searchParams.get('call');
-  const search = searchParams.get('search');
-  const page = searchParams.get('page');
-  const pageSize = searchParams.get('pageSize');
+
+  const initialParams = useMemo(
+    () => ({
+      statusActionsLogStatus: StatusActionsLogStatus.ALL,
+      call: '',
+      search: '',
+      page: '0',
+      pageSize: '20',
+      sortField: '',
+      sortDirection: '',
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    statusActionsLogStatus: StatusActionsLogStatus;
+    call: string;
+    search: string;
+    page: string;
+    pageSize: string;
+    sortField: string;
+    sortDirection: string;
+  }>(initialParams);
+
+  const {
+    statusActionsLogStatus,
+    call,
+    search,
+    page,
+    pageSize,
+    sortDirection,
+    sortField,
+  } = typedParams;
   let columns: Column<StatusActionsLog>[] = [
     {
       title: 'Email Status Action Recipient',
@@ -60,7 +84,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           <ReactRouterLink
             key={proposal.primaryKey}
             to={`/Proposals?reviewModal=${proposal.primaryKey}`}
-            onClick={() => setSearchParams({})}
+            onClick={() => setTypedParams((prev) => ({ ...prev, search: '' }))}
           >
             {proposal.proposalId}
           </ReactRouterLink>
@@ -103,25 +127,19 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const handleStatusActionsLogStatusFilterChange = (
     statusActionsLogStatus: StatusActionsLogStatus
   ) => {
-    setSearchParams((searchParams) => {
-      searchParams.set('statusActionsLogStatus', statusActionsLogStatus);
-
-      return searchParams;
-    });
+    setTypedParams((prev) => ({
+      ...prev,
+      statusActionsLogStatus,
+    }));
     tableRef.current && tableRef.current.onQueryChange({});
   };
   const handleSortOrderChange = (orderByCollection: OrderByCollection[]) => {
     const [orderBy] = orderByCollection;
-    setSearchParams((searchParam) => {
-      searchParam.delete('sortField');
-      searchParam.delete('sortDirection');
-      if (orderBy?.orderByField != null && orderBy?.orderDirection != null) {
-        searchParam.set('sortField', orderBy?.orderByField);
-        searchParam.set('sortDirection', orderBy?.orderDirection);
-      }
-
-      return searchParam;
-    });
+    setTypedParams((prev) => ({
+      ...prev,
+      sortField: orderBy?.orderByField || '',
+      sortDirection: orderBy?.orderDirection || '',
+    }));
   };
   const fetchStatusActionsLogsData = (tableQuery: Query<StatusActionsLog>) =>
     new Promise<QueryResult<StatusActionsLog>>(async (resolve, reject) => {
@@ -175,11 +193,10 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           statusActionsLogStatus &&
           statusActionsLogStatus === StatusActionsLogStatus.ALL
         ) {
-          setSearchParams((searchParams) => {
-            searchParams.delete('statusActionsLogStatus');
-
-            return searchParams;
-          });
+          setTypedParams((prev) => ({
+            ...prev,
+            statusActionsLogStatus: StatusActionsLogStatus.ALL,
+          }));
         }
       }
     });
@@ -307,30 +324,27 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
             setLocalStorageValue(proposalColumns);
           }}
           onPageChange={(page, pageSize) => {
-            setSearchParams((searchParams) => {
-              searchParams.set('page', page.toString());
-              searchParams.set('pageSize', pageSize.toString());
-
-              return searchParams;
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              page: page.toString(),
+              pageSize: pageSize.toString(),
+            }));
           }}
           onSearchChange={(searchText) => {
-            setSearchParams({
-              search: searchText ? searchText : '',
-              page: searchText ? '0' : page || '',
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              search: searchText,
+            }));
             if (!searchText) {
-              setSearchParams((searchParams) => {
-                searchParams.delete('searchText');
-
-                return searchParams;
-              });
+              setTypedParams((prev) => ({
+                ...prev,
+                search: '',
+              }));
             } else {
-              setSearchParams((searchParams) => {
-                searchParams.set('searchText', searchText);
-
-                return searchParams;
-              });
+              setTypedParams((prev) => ({
+                ...prev,
+                search: searchText,
+              }));
             }
           }}
           onOrderCollectionChange={handleSortOrderChange}

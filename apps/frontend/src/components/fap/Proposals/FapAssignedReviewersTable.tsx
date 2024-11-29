@@ -3,8 +3,7 @@ import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import Visibility from '@mui/icons-material/Visibility';
 import Box from '@mui/material/Box';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
@@ -13,6 +12,7 @@ import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { ReviewStatus, UserRole, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import {
   FapProposalAssignmentType,
   FapProposalType,
@@ -67,8 +67,20 @@ const FapAssignedReviewersTable = ({
 }: FapAssignedReviewersTableProps) => {
   const { api } = useDataApiWithFeedback();
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const reviewerModal = searchParams.get('reviewerModal');
+  const initialParams = useMemo(
+    () => ({
+      reviewerModal: null,
+      modalTab: null,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    reviewerModal: string | null;
+    modalTab: string | null;
+  }>(initialParams);
+
+  const { reviewerModal } = typedParams;
 
   const [openProposalPk, setOpenProposalPk] = useState<number | null>(null);
   const hasAccessRights = useCheckAccess([
@@ -132,12 +144,11 @@ const FapAssignedReviewersTable = ({
     !!reviewerModal && openProposalPk === fapProposal.proposalPk;
 
   const onProposalReviewModalClose = () => {
-    setSearchParams((searchParams) => {
-      searchParams.delete('reviewerModal');
-      searchParams.delete('modalTab');
-
-      return searchParams;
-    });
+    setTypedParams((prev) => ({
+      ...prev,
+      reviewerModal: null,
+      modalTab: null,
+    }));
     openProposalPk && updateView(openProposalPk);
     setOpenProposalPk(null);
   };
@@ -235,25 +246,19 @@ const FapAssignedReviewersTable = ({
                 return;
               }
 
-              setSearchParams((searchParams) => {
-                if (rowData.review)
-                  searchParams.set(
-                    'reviewerModal',
-                    rowData.review.id.toString()
-                  );
-                searchParams.set(
-                  'modalTab',
-                  isDraftStatus(rowData?.review?.status)
-                    ? reviewProposalTabNames
-                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
-                        .toString()
-                    : reviewProposalTabNames
-                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
-                        .toString()
-                );
-
-                return searchParams;
-              });
+              setTypedParams((prev) => ({
+                ...prev,
+                reviewerModal: rowData.review
+                  ? rowData.review.id.toString()
+                  : null,
+                modalTab: isDraftStatus(rowData?.review?.status)
+                  ? reviewProposalTabNames
+                      .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
+                      .toString()
+                  : reviewProposalTabNames
+                      .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
+                      .toString(),
+              }));
               setOpenProposalPk(fapProposal.proposalPk);
             },
             tooltip: isDraftStatus(rowData?.review?.status)

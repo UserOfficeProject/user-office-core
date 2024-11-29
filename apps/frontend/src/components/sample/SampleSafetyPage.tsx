@@ -10,8 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { Field, Form, Formik } from 'formik';
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import TextField from 'components/common/FormikUITextField';
@@ -19,6 +18,7 @@ import CallFilter from 'components/common/proposalFilters/CallFilter';
 import StyledDialog from 'components/common/StyledDialog';
 import { Maybe, SampleStatus } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useDownloadPDFSample } from 'hooks/sample/useDownloadPDFSample';
 import { SampleWithProposalData } from 'models/questionary/sample/SampleWithProposalData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -177,9 +177,19 @@ const columns = [
 function SampleSafetyPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { calls, loadingCalls } = useCallsData({ isActive: true });
-  const [searchParam] = useSearchParams();
-  const call = searchParam.get('call');
 
+  const initialParams = useMemo(
+    () => ({
+      callId: null,
+    }),
+    []
+  );
+
+  const [typedParams] = useTypeSafeSearchParams<{
+    callId: string | null;
+  }>(initialParams);
+
+  const call = typedParams.callId;
   const [selectedCallId, setSelectedCallId] = useState<number>(
     call ? +call : 0
   );

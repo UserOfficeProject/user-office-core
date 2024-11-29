@@ -2,11 +2,11 @@ import { MaterialTableProps } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
 import { DialogContent, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
-import React, { SetStateAction, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { SetStateAction, useMemo, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
@@ -56,15 +56,28 @@ export function SuperMaterialTable<Entry extends EntryID>({
   let { data, columns } = props;
   const { setData, options, actions, createModal } = props;
   const { persistUrlQueryParams = false } = props;
-  const [searchParam, setSearchParam] = useSearchParams();
-  const selection = persistUrlQueryParams
-    ? searchParam.getAll('selection')
-    : [];
-  const search = persistUrlQueryParams ? searchParam.get('search') : '';
-  const sortField = persistUrlQueryParams ? searchParam.get('sortField') : '';
-  const sortDirection = persistUrlQueryParams
-    ? searchParam.get('sortDirection')
-    : '';
+
+  const initialParams = useMemo(
+    () => ({
+      search: '',
+      selection: [],
+      sortField: '',
+      sortDirection: '',
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    search: string;
+    selection: string[];
+    sortField: string;
+    sortDirection: string;
+  }>(initialParams);
+
+  const selection = persistUrlQueryParams ? typedParams.selection : [];
+  const search = persistUrlQueryParams ? typedParams.search : '';
+  const sortField = persistUrlQueryParams ? typedParams.sortField : '';
+  const sortDirection = persistUrlQueryParams ? typedParams.sortDirection : '';
 
   // NOTE: If selection is on than read the selected items from the url.
   if (options?.selection) {
@@ -211,41 +224,25 @@ export function SuperMaterialTable<Entry extends EntryID>({
         }
         onSearchChange={(searchText) => {
           persistUrlQueryParams &&
-            setSearchParam((searchParam) => {
-              searchParam.delete('search');
-              if (searchText) searchParam.set('search', searchText);
-
-              return searchParam;
-            });
+            setTypedParams((prev) => ({ ...prev, search: searchText }));
         }}
         onSelectionChange={(selectedItems) => {
           persistUrlQueryParams &&
-            setSearchParam((searchParam) => {
-              searchParam.delete('selection');
-              selectedItems.map((selectedItem) =>
-                searchParam.append('selection', selectedItem.id.toString())
-              );
-
-              return searchParam;
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              selection: selectedItems.map((selectedItem) =>
+                selectedItem.id.toString()
+              ),
+            }));
         }}
         onOrderCollectionChange={(orderByCollection) => {
           const [orderBy] = orderByCollection;
           persistUrlQueryParams &&
-            setSearchParam((searchParam) => {
-              searchParam.delete('sortField');
-              searchParam.delete('sortDirection');
-
-              if (
-                orderBy?.orderByField != null &&
-                orderBy?.orderDirection != null
-              ) {
-                searchParam.set('sortField', orderBy?.orderByField);
-                searchParam.set('sortDirection', orderBy?.orderDirection);
-              }
-
-              return searchParam;
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              sortField: orderBy?.orderByField ?? '',
+              sortDirection: orderBy?.orderDirection ?? '',
+            }));
         }}
       />
       {hasAccess.create && createModal && (

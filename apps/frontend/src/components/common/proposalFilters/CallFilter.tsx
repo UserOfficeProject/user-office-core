@@ -3,10 +3,10 @@ import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
-import React, { Dispatch } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { Dispatch, useMemo } from 'react';
 
 import { Call } from 'generated/sdk';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 type CallFilterProps = {
   calls?: Pick<Call, 'shortCode' | 'id'>[];
@@ -23,7 +23,16 @@ const CallFilter = ({
   onChange,
   shouldShowAll,
 }: CallFilterProps) => {
-  const [, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      call: null,
+    }),
+    []
+  );
+
+  const [, setTypedParams] = useTypeSafeSearchParams<{
+    call: number | null;
+  }>(initialParams);
 
   if (calls === undefined) {
     return null;
@@ -66,12 +75,10 @@ const CallFilter = ({
              */
             disableClearable
             onChange={(_, call) => {
-              setSearchParams((searchParams) => {
-                searchParams.delete('call');
-                if (call?.id) searchParams.set('call', String(call.id));
-
-                return searchParams;
-              });
+              setTypedParams((prev) => ({
+                ...prev,
+                call: call.id,
+              }));
               onChange?.(call?.id as number);
             }}
             getOptionLabel={(option) => option.shortCode}

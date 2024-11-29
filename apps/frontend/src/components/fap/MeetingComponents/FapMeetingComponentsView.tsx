@@ -1,10 +1,10 @@
 import Grid from '@mui/material/Grid';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 import FapMeetingInstrumentsTable from './FapMeetingInstrumentsTable';
 
@@ -19,18 +19,26 @@ const FapMeetingComponentsView = ({
 }: FapMeetingComponentsViewProps) => {
   const { loadingCalls, calls } = useCallsData({ fapIds: [fapId] });
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      call: null,
+    }),
+    []
+  );
 
-  const call = searchParams.get('call');
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    call: string | null;
+  }>(initialParams);
+
+  const { call } = typedParams;
   useEffect(() => {
     if (calls.length && !call) {
-      setSearchParams((searchParams) => {
-        searchParams.set('call', calls[0].id.toString());
-
-        return searchParams;
-      });
+      setTypedParams((prev) => ({
+        ...prev,
+        call: calls[0].id.toString(),
+      }));
     }
-  }, [call, calls, setSearchParams]);
+  }, [call, calls, setTypedParams]);
 
   const selectedCall = calls.find((c) => call && c.id === +call);
 

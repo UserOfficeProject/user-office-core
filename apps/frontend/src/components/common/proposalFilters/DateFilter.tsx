@@ -2,11 +2,11 @@ import { FormControl, Grid } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterLuxon as DateAdapter } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
-import React, { Dispatch } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { Dispatch, useMemo } from 'react';
 
 import { DateFilterInput, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 export const DEFAULT_DATE_FORMAT = 'dd-MM-yyyy';
 
@@ -23,10 +23,21 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
 
   const inputDateFormat = format ?? DEFAULT_DATE_FORMAT;
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      startsAt: null,
+      endsAt: null,
+    }),
+    []
+  );
 
-  const fromDate = searchParams.get('startsAt');
-  const toDate = searchParams.get('endsAt');
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    startsAt: string | null;
+    endsAt: string | null;
+  }>(initialParams);
+
+  const fromDate = typedParams.startsAt;
+  const toDate = typedParams.endsAt;
 
   return (
     <>
@@ -43,22 +54,17 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
                     : null
                 }
                 onChange={(startsAt) => {
-                  setSearchParams((searchParams) => {
-                    searchParams.delete('startsAt');
-                    if (startsAt) {
-                      searchParams.set(
-                        'startsAt',
-                        DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
-                          inputDateFormat
-                        )
-                      );
-                    }
-
-                    return searchParams;
-                  });
+                  if (startsAt) {
+                    setTypedParams((prev) => ({
+                      ...prev,
+                      startsAt: DateTime.fromJSDate(
+                        startsAt?.toJSDate()
+                      ).toFormat(inputDateFormat),
+                    }));
+                  }
 
                   const newValue: DateFilterInput = {
-                    to: searchParams.get('endsAt'),
+                    to: typedParams.endsAt,
                     from: startsAt
                       ? DateTime.fromJSDate(startsAt?.toJSDate()).toFormat(
                           inputDateFormat
@@ -86,19 +92,14 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
                   toDate ? DateTime.fromFormat(toDate, inputDateFormat) : null
                 }
                 onChange={(endsAt) => {
-                  setSearchParams((searchParams) => {
-                    searchParams.delete('endsAt');
-                    if (endsAt) {
-                      searchParams.set(
-                        'endsAt',
-                        DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
-                          inputDateFormat
-                        )
-                      );
-                    }
-
-                    return searchParams;
-                  });
+                  if (endsAt) {
+                    setTypedParams((prev) => ({
+                      ...prev,
+                      endsAt: DateTime.fromJSDate(endsAt?.toJSDate()).toFormat(
+                        inputDateFormat
+                      ),
+                    }));
+                  }
 
                   const newValue: DateFilterInput = {
                     to: endsAt
@@ -106,7 +107,7 @@ const DateFilter = ({ onChange }: DateFilterProps) => {
                           inputDateFormat
                         )
                       : undefined,
-                    from: searchParams.get('startsAt'),
+                    from: typedParams.startsAt,
                   };
                   onChange?.(newValue);
                 }}
