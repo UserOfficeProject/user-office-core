@@ -18,6 +18,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -59,6 +60,8 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
+    @inject(Tokens.TechniqueDataSource)
+    private techniqueDataSource: TechniqueDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
@@ -272,17 +275,14 @@ export default class ProposalMutations {
 
   private async submitProposal(
     agent: UserWithRole | null,
-    proposal: Proposal,
-    legacyReferenceNumber?: string
+    proposal: Proposal
   ): Promise<Proposal | Rejection> {
     //Added this because the rejection doesnt like proposal.primaryKey
     const proposalPk = proposal.primaryKey;
 
     try {
-      const submitProposal = await this.proposalDataSource.submitProposal(
-        proposalPk,
-        legacyReferenceNumber
-      );
+      const submitProposal =
+        await this.proposalDataSource.submitProposal(proposalPk);
       logger.logInfo('User Submitted a Proposal:', {
         proposalId: proposal.proposalId,
         title: proposal.title,
@@ -841,6 +841,9 @@ export default class ProposalMutations {
       referenceNumber,
       users: coiIds,
       created,
+      submittedDate,
+      techniqueIds,
+      instrumentId,
     } = args;
 
     const submitter = await this.userDataSource.getUser(submitterId);
@@ -913,12 +916,44 @@ export default class ProposalMutations {
       });
     }
 
-    const submitted = await this.submitProposal(
-      agent,
-      updatedProposal,
-      referenceNumber
-    );
+    if (!submittedDate) {
+      return rejection(
+        'Can not create proposal because there was no submitted date specified',
+        { call }
+      );
+    }
 
-    return submitted;
+    const submittedProposal =
+      await this.proposalDataSource.submitImportedProposal(
+        proposal.primaryKey,
+        referenceNumber,
+        submittedDate
+      );
+
+    if (!submittedProposal) {
+      return rejection('Could not submit proposal', {
+        agent: agent,
+        proposalPk: proposal.primaryKey,
+        proposalId: proposal.proposalId,
+        title: proposal.title,
+        userId: proposal.proposerId,
+      });
+    }
+
+    if (techniqueIds) {
+      this.techniqueDataSource.assignProposalToTechniques(
+        submittedProposal.primaryKey,
+        techniqueIds
+      );
+    }
+
+    if (instrumentId) {
+      this.instrumentDataSource.assignProposalToInstrument(
+        submittedProposal.primaryKey,
+        instrumentId
+      );
+    }
+
+    return submittedProposal;
   }
 }
