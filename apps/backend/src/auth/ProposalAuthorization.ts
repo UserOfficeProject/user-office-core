@@ -7,6 +7,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
@@ -163,10 +164,7 @@ export class ProposalAuthorization {
       });
   }
 
-  isVisitorOfProposal(
-    agent: UserWithRole,
-    proposalPk: number
-  ): boolean | PromiseLike<boolean> {
+  async isVisitorOfProposal(agent: UserWithRole, proposalPk: number) {
     return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
 
@@ -182,6 +180,27 @@ export class ProposalAuthorization {
       agent.id,
       proposalPk
     );
+  }
+
+  async isInternalReviewer(agent: UserWithRole, proposalPk: number) {
+    const technicalReviews =
+      await this.reviewDataSource.getTechnicalReviews(proposalPk);
+
+    const isInternalReviewerOnSomeTechnicalReview = technicalReviews
+      ? (
+          await Promise.all(
+            technicalReviews.map(
+              async (technicalReview) =>
+                await this.userAuth.isInternalReviewerOnTechnicalReview(
+                  agent,
+                  technicalReview.id
+                )
+            )
+          )
+        ).some((value) => value)
+      : false;
+
+    return isInternalReviewerOnSomeTechnicalReview;
   }
 
   async hasReadRights(
@@ -206,37 +225,44 @@ export class ProposalAuthorization {
       return false;
     }
 
-    const technicalReviews = await this.reviewDataSource.getTechnicalReviews(
-      proposal?.primaryKey
-    );
+    const currentRole = agent?.currentRole?.shortCode;
 
-    const isInternalReviewerOnSomeTechnicalReview = technicalReviews
-      ? (
-          await Promise.all(
-            technicalReviews.map(
-              async (technicalReview) =>
-                await this.userAuth.isInternalReviewerOnTechnicalReview(
-                  agent,
-                  technicalReview.id
-                )
-            )
-          )
-        ).some((value) => value)
-      : false;
+    let haveAccess = false;
+
+    switch (currentRole) {
+      case Roles.USER:
+        haveAccess =
+          (await this.isMemberOfProposal(agent, proposal)) ||
+          (await this.isVisitorOfProposal(agent, proposal.primaryKey));
+        break;
+      // case Roles.INSTRUMENT_SCIENTIST:
+      //   haveAccess =
+      //     (await this.isInstrumentManagerToProposal(
+      //       agent,
+      //       proposal.primaryKey
+      //     )) || (await this.isScientistToProposal(agent, proposal.primaryKey));
+      //   break;
+      case Roles.INTERNAL_REVIEWER:
+        haveAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
+        break;
+      case Roles.FAP_REVIEWER:
+      case Roles.FAP_SECRETARY:
+      case Roles.FAP_CHAIR:
+        haveAccess = await this.isMemberOfFapProposal(
+          agent,
+          proposal.primaryKey
+        );
+        break;
+      default:
+        break;
+    }
 
     return (
       this.userAuth.isUserOfficer(agent) ||
       this.userAuth.isSampleSafetyReviewer(agent) ||
       this.userAuth.isInstrumentScientist(agent) ||
       this.userAuth.hasGetAccessByToken(agent) ||
-      (await this.isMemberOfProposal(agent, proposal)) ||
-      (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
-      (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
-      isInternalReviewerOnSomeTechnicalReview ||
-      (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isMemberOfFapProposal(agent, proposal.primaryKey))
+      haveAccess
     );
   }
 
