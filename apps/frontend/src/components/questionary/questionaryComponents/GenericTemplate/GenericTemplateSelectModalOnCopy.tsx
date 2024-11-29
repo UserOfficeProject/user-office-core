@@ -17,7 +17,7 @@ import UOLoader from 'components/common/UOLoader';
 import {
   CopyAnswerInput,
   GenericTemplatesFilter,
-  GetGenericTemplatesWithProposalDataQuery,
+  GetGenericTemplatesOnCopyQuery,
   Maybe,
 } from 'generated/sdk';
 import { capitalize } from 'utils/helperFunctions';
@@ -33,8 +33,11 @@ type GenericTemplateSelectModalOnCopyProps = {
   handleGenericTemplateOnCopy: (copyAnswersInput: CopyAnswerInput[]) => void;
 };
 
-type GenericTemplates =
-  GetGenericTemplatesWithProposalDataQuery['genericTemplates'];
+// type GenericTemplates =
+//   GetGenericTemplatesWithProposalDataQuery['genericTemplates'];
+
+type GenericTemplateCopy =
+  GetGenericTemplatesOnCopyQuery['genericTemplatesOnCopy'];
 
 const GenericTemplateSelectModalOnCopy = ({
   close,
@@ -49,7 +52,7 @@ const GenericTemplateSelectModalOnCopy = ({
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { enqueueSnackbar } = useSnackbar();
   const [genericTemplates, setGenericTemplates] = useState<
-    NonNullable<GenericTemplates>
+    NonNullable<GenericTemplateCopy>
   >([]);
   const [selectedProposalPk, setSelectedProposalPk] = useState<number>(0);
 
@@ -79,16 +82,14 @@ const GenericTemplateSelectModalOnCopy = ({
   useEffect(() => {
     let unmounted = false;
     api()
-      .getGenericTemplatesWithProposalData({
-        filter,
-      })
+      .getGenericTemplatesOnCopy({})
       .then((result) => {
         if (unmounted) {
           return;
         }
-        if (result.genericTemplates) {
+        if (result.genericTemplatesOnCopy) {
           setGenericTemplates(
-            result.genericTemplates.filter(
+            result.genericTemplatesOnCopy.filter(
               (value) => value.proposalPk !== currentProposalPk
             )
           );

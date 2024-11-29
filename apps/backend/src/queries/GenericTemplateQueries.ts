@@ -57,4 +57,20 @@ export default class GenericTemplateQueries {
 
     return genericTemplates;
   }
+
+  @Authorized()
+  async genericTemplatesOnCopy(agent: UserWithRole | null) {
+    let genericTemplates = await this.dataSource.getGenericTemplatesForCopy(
+      agent?.id,
+      agent?.currentRole
+    );
+
+    genericTemplates = await Promise.all(
+      genericTemplates.map((genericTemplate) =>
+        this.genericTemplateAuth.hasReadRights(agent, genericTemplate.id)
+      )
+    ).then((results) => genericTemplates.filter((_v, index) => results[index]));
+
+    return genericTemplates;
+  }
 }

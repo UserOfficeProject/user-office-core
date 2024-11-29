@@ -1,4 +1,5 @@
 import { GenericTemplate } from '../models/GenericTemplate';
+import { Role } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplatesArgs } from '../resolvers/queries/GenericTemplatesQuery';
@@ -25,6 +26,10 @@ export interface GenericTemplateDataSource {
   getGenericTemplates(
     args: GenericTemplatesArgs,
     agent: UserWithRole | null
+  ): Promise<GenericTemplate[]>;
+  getGenericTemplatesForCopy(
+    agent?: number,
+    role?: Role
   ): Promise<GenericTemplate[]>;
   createGenericTemplateWithCopiedAnswers(
     title: string,
