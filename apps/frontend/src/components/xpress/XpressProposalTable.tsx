@@ -207,6 +207,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
+      cellStyle: {
+        whiteSpace: 'nowrap',
+        maxWidth: '400px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      },
     },
     {
       title: 'Principal Investigator',
@@ -222,6 +228,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         return '';
+      },
+      cellStyle: {
+        whiteSpace: 'nowrap',
+        maxWidth: '400px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
       },
       customFilterAndSearch: () => true,
     },
@@ -489,6 +501,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           rowData.techniques?.map((technique) => technique.name)
         ),
       customFilterAndSearch: () => true,
+      cellStyle: {
+        whiteSpace: 'nowrap',
+        maxWidth: '400px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      },
     },
   ];
 
