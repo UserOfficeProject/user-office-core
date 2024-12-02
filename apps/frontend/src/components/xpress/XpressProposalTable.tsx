@@ -235,7 +235,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Date submitted',
       field: 'submittedDate',
       render: (proposalView: ProposalViewData) => {
-        return toFormattedDateTime(proposalView.submittedDate);
+        if (proposalView.submittedDate) {
+          return toFormattedDateTime(proposalView.submittedDate);
+        }
       },
       ...{ width: 'auto' },
     },
