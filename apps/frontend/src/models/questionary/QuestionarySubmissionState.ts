@@ -260,12 +260,9 @@ export function QuestionarySubmissionModel<
 
           draftState.questionary.steps[stepIndex].fields =
             draftState.questionary.steps[stepIndex].fields.map((f) => {
-              const newValue =
+              f.value =
                 action.answers.find((u) => u.questionId === f.question.id)
-                  ?.answer ?? f.value;
-
-              console.log(newValue);
-              f.value = newValue;
+                  ?.answer.value ?? f.value;
 
               return f;
             });
