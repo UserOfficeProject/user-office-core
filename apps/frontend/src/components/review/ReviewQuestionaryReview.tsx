@@ -6,7 +6,6 @@ import { TableRowData } from 'components/questionary/QuestionaryDetails';
 import { ReviewStatus } from 'generated/sdk';
 import { FapReviewWithQuestionary } from 'models/questionary/fapReview/FapReviewWithQuestionary';
 import stripHtml from 'utils/stripHtml';
-import { truncateString } from 'utils/truncateString';
 
 import ReviewQuestionaryDetails from './ReviewQuestionaryDetails';
 
@@ -31,7 +30,7 @@ export default function ReviewQuestionaryReview(
     },
     {
       label: 'Comment',
-      value: truncateString(stripHtml(data.comment || ''), 100),
+      value: stripHtml(data.comment || ''),
     },
     { label: 'Grade', value: data.grade ? data.grade.toString() : '' },
   ];
