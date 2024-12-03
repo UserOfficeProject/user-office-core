@@ -183,7 +183,7 @@ export class CallDataSourceMock implements CallDataSource {
   async isCallEnded(callId: number): Promise<boolean> {
     return callId !== 1;
   }
-  async getCallByQuestionId(questionId: string) {
+  async getCallByAnswerIdProposal(answer_id: number) {
     return dummyCall;
   }
 }
