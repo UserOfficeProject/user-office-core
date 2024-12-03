@@ -1,27 +1,35 @@
 import { useEffect, useState } from 'react';
 
-import { Call } from 'generated/sdk';
+import { AllocationTimeUnits } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useQuestionCallData(questionId: string) {
-  const [call, setCall] = useState<Call | null>();
+export function useAnswerCallData(answerId: number | null) {
+  const [callAllocatedTimeUnit, setCallAllocatedTimeUnit] =
+    useState<AllocationTimeUnits | null>();
   const [loadingCalls, setLoadingCalls] = useState(true);
 
   const api = useDataApi();
 
   useEffect(() => {
+    if (answerId === null) {
+      setCallAllocatedTimeUnit(null);
+
+      return;
+    }
     let unmounted = false;
 
     setLoadingCalls(true);
     api()
-      .getCallByQuestionId({ questionId })
+      .getCallByAnswerId({ answerId })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.callByQuestionId) {
-          setCall(data.callByQuestionId as Call);
+        if (data.getCallByAnswerId) {
+          setCallAllocatedTimeUnit(
+            data.getCallByAnswerId.allocationTimeUnit as AllocationTimeUnits
+          );
         }
         setLoadingCalls(false);
       });
@@ -29,7 +37,7 @@ export function useQuestionCallData(questionId: string) {
     return () => {
       unmounted = true;
     };
-  }, [questionId, api]);
+  }, [answerId, api]);
 
-  return { loadingCalls, call };
+  return { loadingCalls, callAllocatedTimeUnit };
 }
