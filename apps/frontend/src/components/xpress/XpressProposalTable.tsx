@@ -190,6 +190,13 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     );
   };
 
+  const cellType = {
+    whiteSpace: 'nowrap',
+    maxWidth: '400px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
@@ -207,12 +214,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
-      cellStyle: {
-        whiteSpace: 'nowrap',
-        maxWidth: '400px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      },
+      cellStyle: cellType,
     },
     {
       title: 'Principal Investigator',
@@ -229,12 +231,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         return '';
       },
-      cellStyle: {
-        whiteSpace: 'nowrap',
-        maxWidth: '400px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      },
+      cellStyle: cellType,
       customFilterAndSearch: () => true,
     },
     {
@@ -501,12 +498,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           rowData.techniques?.map((technique) => technique.name)
         ),
       customFilterAndSearch: () => true,
-      cellStyle: {
-        whiteSpace: 'nowrap',
-        maxWidth: '400px',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-      },
+      cellStyle: cellType,
     },
   ];
 
@@ -715,7 +707,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
   return (
