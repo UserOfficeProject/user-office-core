@@ -852,7 +852,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
                   setAllProposalSelectionLoading(false);
                 },
-                position: 'toolbarOnSelect',
+                position: 'toolbar',
               },
             ]}
             onSelectionChange={(selectedItems) => {
