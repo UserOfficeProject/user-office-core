@@ -109,10 +109,12 @@ export const apolloServerMetricsPlugin = (): ApolloServerPlugin => ({
 function getOperationType(query: string | undefined): OperationType {
   if (!query) return 'unknown';
 
-  const trimmedQuery = query.trim().toLowerCase();
-  if (trimmedQuery.startsWith('query')) return 'query';
-  if (trimmedQuery.startsWith('mutation')) return 'mutation';
-  if (trimmedQuery.startsWith('subscription')) return 'subscription';
+  // Extract the operation type from the query
+  const operation = query.trim().split(/\s+/)[0].toLowerCase();
+
+  if (['query', 'mutation', 'subscription'].includes(operation)) {
+    return operation as OperationType;
+  }
 
   return 'unknown';
 }
