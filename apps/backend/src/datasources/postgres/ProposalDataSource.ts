@@ -534,11 +534,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.templateIds) {
           query
             .leftJoin(
-              'questionary',
-              'questionary.questionary_id',
+              'questionaries',
+              'questionaries.questionary_id',
               'proposals.questionary_id'
             )
-            .whereIn('questionary.template_id', filter.templateIds);
+            .whereIn('questionaries.template_id', filter.templateIds);
         }
 
         if (filter?.proposalStatusId) {
