@@ -3736,7 +3736,7 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 });
 
-context('Fap meeting exports test', () => {
+context.only('Fap meeting exports test', () => {
   let createdInstrumentId: number;
   let proposalPK: number;
 
@@ -3776,6 +3776,7 @@ context('Fap meeting exports test', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: newlyCreatedInstrumentId,
+        publicComment: comment1,
       });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
@@ -3856,6 +3857,7 @@ context('Fap meeting exports test', () => {
           submitted: true,
           reviewerId: 0,
           instrumentId: createdInstrumentId,
+          publicComment: comment2,
         });
 
         cy.assignProposalsToFaps({
