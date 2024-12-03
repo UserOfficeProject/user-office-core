@@ -830,7 +830,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
                  notified,
                  submitted,
                  management_decision_submitted
-                 
           FROM proposals
           WHERE proposal_pk = ${sourceProposal.primaryKey} RETURNING *
       `)
