@@ -162,7 +162,6 @@ export interface ProposalViewRecord {
   readonly full_count: number;
   readonly submitted_date: Date;
   readonly techniques: ProposalViewTechnique[];
-  readonly internal_comment: ProposalInternalComment;
 }
 
 export interface TopicRecord {
