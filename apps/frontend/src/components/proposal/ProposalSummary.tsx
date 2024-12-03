@@ -91,7 +91,9 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
         return;
       }
-      const { call } = await api().getCall({ callId: proposal.callId });
+      const { call } = await api().getCallSubmissionDetails({
+        callId: proposal.callId,
+      });
       const workflowId = call?.proposalWorkflowId;
       if (workflowId) {
         const connections = (
