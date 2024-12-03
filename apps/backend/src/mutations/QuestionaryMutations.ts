@@ -168,12 +168,6 @@ export default class QuestionaryMutations {
       );
     }
 
-    /*return (await this.dataSource.getQuestionarySteps(questionaryId))
-      .find((step) => step.topic.id === topicId)!
-      .fields.filter((f) =>
-        answers.find((a) => a.questionId === f.question.id)
-      );*/
-
     return updatedAnswers;
   }
 
