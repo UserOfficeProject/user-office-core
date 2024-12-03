@@ -190,7 +190,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     );
   };
 
-  const cellType = {
+  const cellStyleSpecs = {
     whiteSpace: 'nowrap',
     maxWidth: '400px',
     overflow: 'hidden',
@@ -200,7 +200,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
+      cellStyle: { minWidth: 120 },
       sorting: false,
       removable: false,
       field: 'rowActionButtons',
@@ -214,7 +214,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
-      cellStyle: cellType,
+      cellStyle: cellStyleSpecs,
     },
     {
       title: 'Principal Investigator',
@@ -231,7 +231,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         return '';
       },
-      cellStyle: cellType,
+      cellStyle: cellStyleSpecs,
       customFilterAndSearch: () => true,
     },
     {
@@ -498,7 +498,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           rowData.techniques?.map((technique) => technique.name)
         ),
       customFilterAndSearch: () => true,
-      cellStyle: cellType,
+      cellStyle: cellStyleSpecs,
     },
   ];
 
@@ -635,10 +635,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleSearchChange = (searchText: string) => {
-    setSearchParams({
-      search: searchText ? searchText : '',
-      page: searchText ? '0' : page || '',
-    });
+    searchParams.set('search', searchText ? searchText : '');
+    searchParams.set('page', searchText ? '0' : page || '');
   };
   const XpressTablePanelDetails = React.useCallback(
     ({ rowData }: Record<'rowData', ProposalViewData>) => {
@@ -873,10 +871,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
             onPageChange={(page, pageSize) => {
-              setSearchParams({
-                page: page.toString(),
-                pageSize: pageSize.toString(),
-              });
+              searchParams.set('page', page.toString());
+              searchParams.set('pageSize', pageSize.toString());
             }}
             detailPanel={[
               {
