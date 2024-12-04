@@ -2,9 +2,9 @@ import { Column } from '@material-table/core';
 import Edit from '@mui/icons-material/Edit';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
@@ -13,6 +13,7 @@ import AddFap from 'components/fap/General/AddFap';
 import { UserContext } from 'context/UserContextProvider';
 import { Fap, FapMinimalFragment, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useFapsData } from 'hooks/fap/useFapsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -62,18 +63,28 @@ const FapsTable = () => {
   });
   const [editFapID, setEditFapID] = useState(0);
 
-  const [searchParam, setSearchParam] = useSearchParams();
-  const fapStatus = searchParam.get('fapStatus');
+  const initialParams = useMemo(
+    () => ({
+      fapStatus: FapStatus.ACTIVE,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    fapStatus: FapStatus;
+  }>(initialParams);
+
+  const { fapStatus } = typedParams;
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const { t } = useTranslation();
 
   const handleStatusFilterChange = (fapStatus: FapStatus) => {
-    setSearchParam((searchParam) => {
-      searchParam.set('fapStatus', fapStatus);
+    setTypedParams((prev) => ({
+      ...prev,
+      fapStatus,
+    }));
 
-      return searchParam;
-    });
     if (fapStatus === FapStatus.ALL) {
       setIsActiveFilter(undefined);
     } else {

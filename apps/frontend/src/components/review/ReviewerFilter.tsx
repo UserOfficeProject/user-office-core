@@ -2,11 +2,11 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import React, { useContext } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useContext, useMemo } from 'react';
 
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { ReviewerFilter, SettingsId } from 'generated/sdk';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 type ReviewerFilterComponentProps = {
   reviewer: string;
@@ -30,9 +30,17 @@ const ReviewerFilterComponent = ({
   if (!reviewerFilter) {
     reviewerFilter = ReviewerFilter.ME;
   }
-  const [, setSearchParams] = useSearchParams({
-    reviewer: reviewerFilter,
-  });
+
+  const initialParams = useMemo(
+    () => ({
+      reviewer: reviewerFilter,
+    }),
+    [reviewerFilter]
+  );
+
+  const [, setTypedParams] = useTypeSafeSearchParams<{
+    reviewer: string;
+  }>(initialParams);
 
   return (
     <FormControl fullWidth>
@@ -40,11 +48,10 @@ const ReviewerFilterComponent = ({
       <Select
         id="reviewer-selection"
         onChange={(e) => {
-          setSearchParams((searchParam) => {
-            searchParam.set('reviewer', e.target.value as string);
-
-            return searchParam;
-          });
+          setTypedParams((prev) => ({
+            ...prev,
+            reviewer: e.target.value as string,
+          }));
           onChange?.(e.target.value as ReviewerFilter);
         }}
         value={reviewer}

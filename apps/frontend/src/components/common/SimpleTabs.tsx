@@ -3,8 +3,9 @@ import { useTheme } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
+
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -58,11 +59,25 @@ const SimpleTabs = ({
 }: SimpleTabsProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery('(max-width: 500px)');
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const tab = searchParams.get('tab') ?? '0';
-  const modalTab = searchParams.get('modalTab') ?? '0';
-  const verticalTab = searchParams.get('verticalTab') ?? '0';
+  const initialParams = useMemo(
+    () => ({
+      verticalTab: null,
+      modalTab: null,
+      tab: null,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    verticalTab: number | null;
+    modalTab: number | null;
+    tab: number | null;
+  }>(initialParams);
+  typedParams;
+  const tab = typedParams.tab ?? 0;
+  const modalTab = typedParams.modalTab ?? 0;
+  const verticalTab = typedParams.verticalTab ?? 0;
 
   const noItems = children.length === 0;
 
@@ -99,29 +114,20 @@ const SimpleTabs = ({
     const tabValue = newValue > 0 ? newValue : undefined;
 
     if (isVerticalOrientation) {
-      setSearchParams((searchParam) => {
-        const searchParamCloned = new URLSearchParams(searchParam);
-        searchParamCloned.delete('verticalTab');
-        if (tabValue) searchParamCloned.append('verticalTab', String(tabValue));
-
-        return searchParamCloned;
-      });
+      setTypedParams((prev) => ({
+        ...prev,
+        verticalTab: tabValue ?? null,
+      }));
     } else if (isInsideModal) {
-      setSearchParams((searchParam) => {
-        const searchParamCloned = new URLSearchParams(searchParam);
-        searchParamCloned.delete('modalTab');
-        if (tabValue) searchParamCloned.append('modalTab', String(tabValue));
-
-        return searchParamCloned;
-      });
+      setTypedParams((prev) => ({
+        ...prev,
+        modalTab: tabValue ?? null,
+      }));
     } else {
-      setSearchParams((searchParam) => {
-        const searchParamCloned = new URLSearchParams(searchParam);
-        searchParamCloned.delete('tab');
-        if (tabValue) searchParamCloned.append('tab', String(tabValue));
-
-        return searchParamCloned;
-      });
+      setTypedParams((prev) => ({
+        ...prev,
+        tab: tabValue ?? null,
+      }));
     }
   };
 

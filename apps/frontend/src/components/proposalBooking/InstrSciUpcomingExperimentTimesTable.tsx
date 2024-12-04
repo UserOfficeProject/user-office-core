@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
 
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useProposalBookingsScheduledEvents } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -9,9 +9,18 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import ExperimentsTable from './ExperimentTimesTable';
 
 export default function InstrSciUpcomingExperimentTimesTable() {
-  const [searchParams] = useSearchParams();
-  const instrumentId = searchParams.get('instrument');
+  const initialParams = useMemo(
+    () => ({
+      instrument: null,
+    }),
+    []
+  );
 
+  const [typedParams] = useTypeSafeSearchParams<{
+    instrument: string | null;
+  }>(initialParams);
+
+  const instrumentId = typedParams.instrument;
   const { instruments, loadingInstruments } = useInstrumentsMinimalData();
 
   const [selectedInstrumentId, setSelectedInstrumentId] = useState<

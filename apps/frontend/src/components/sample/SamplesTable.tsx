@@ -3,9 +3,9 @@ import MaterialTable, {
   Column,
 } from '@material-table/core';
 import { Typography } from '@mui/material';
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
 
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { SampleWithProposalData } from 'models/questionary/sample/SampleWithProposalData';
 import { tableIcons } from 'utils/materialIcons';
 
@@ -20,8 +20,18 @@ const SamplesTable = (
     columns?: Column<SampleWithProposalData>[];
   }
 ) => {
-  const [searchParam, setSearchParam] = useSearchParams();
-  const search = searchParam.get('search');
+  const initialParams = useMemo(
+    () => ({
+      search: null,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    search: string | null;
+  }>(initialParams);
+
+  const search = typedParams.search;
 
   return (
     <div data-cy="samples-table">
@@ -34,11 +44,10 @@ const SamplesTable = (
           </Typography>
         }
         onSearchChange={(searchText) => {
-          setSearchParam((searchParam) => {
-            searchParam.set('search', searchText);
-
-            return searchParam;
-          });
+          setTypedParams((prev) => ({
+            ...prev,
+            search: searchText,
+          }));
         }}
         options={{
           ...props.options,

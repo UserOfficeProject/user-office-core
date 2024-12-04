@@ -6,9 +6,8 @@ import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -31,6 +30,7 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import {
   useFapProposalsData,
   FapProposalType,
@@ -171,9 +171,18 @@ const FapProposalsAndAssignmentsTable = ({
   selectedCallId,
   confirm,
 }: FapProposalsAndAssignmentsTableProps) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const reviewModal = searchParams.get('reviewModal');
+  const initialParams = useMemo(
+    () => ({
+      reviewModal: null,
+    }),
+    []
+  );
 
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    reviewModal: string | null;
+  }>(initialParams);
+
+  const { reviewModal } = typedParams;
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
     useFapProposalsData(data.id, selectedCallId);
   const { api } = useDataApiWithFeedback();
@@ -209,11 +218,10 @@ const FapProposalsAndAssignmentsTable = ({
         <IconButton
           data-cy="view-proposal"
           onClick={() => {
-            setSearchParams((searchParams) => {
-              searchParams.set('reviewModal', rowData.proposalPk.toString());
-
-              return searchParams;
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              reviewModal: rowData.proposalPk.toString(),
+            }));
           }}
         >
           <Visibility />
@@ -727,11 +735,10 @@ const FapProposalsAndAssignmentsTable = ({
         title={`${t('Fap')} - Proposal View`}
         proposalReviewModalOpen={!!reviewModal}
         setProposalReviewModalOpen={() => {
-          setSearchParams((searchParams) => {
-            searchParams.delete('reviewModal');
-
-            return searchParams;
-          });
+          setTypedParams((prev) => ({
+            ...prev,
+            reviewModal: null,
+          }));
         }}
       >
         <ProposalReviewContent

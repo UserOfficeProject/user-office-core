@@ -1,10 +1,10 @@
 import Grid from '@mui/material/Grid';
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import { Fap } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 import FapProposalsAndAssignmentsTable from './FapProposalsAndAssignmentsTable';
 
@@ -21,8 +21,18 @@ const FapProposalsAndAssignments = ({
   const { loadingCalls, calls } = useCallsData({ fapIds: [fapData.id] });
   // NOTE: Default null means load all calls if nothing is selected
 
-  const [searchParams] = useSearchParams();
-  const call = searchParams.get('call');
+  const initialParams = useMemo(
+    () => ({
+      call: null,
+    }),
+    []
+  );
+
+  const [typedParams] = useTypeSafeSearchParams<{
+    call: string | null;
+  }>(initialParams);
+
+  const { call } = typedParams;
 
   return (
     <>

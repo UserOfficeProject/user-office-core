@@ -6,9 +6,8 @@ import { DialogContent } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import StyledDialog from 'components/common/StyledDialog';
@@ -23,6 +22,7 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useDownloadXLSXCallFap } from 'hooks/fap/useDownloadXLSXCallFap';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -63,13 +63,20 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   >(null);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const [searchParam, setSearchParam] = useSearchParams({
-    callStatus: CallStatus.ACTIVE,
-  });
+  const initialParams = useMemo(
+    () => ({
+      callStatus: CallStatus.ACTIVE,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    callStatus: CallStatusFilters;
+  }>(initialParams);
 
   const exportFapData = useDownloadXLSXCallFap();
 
-  const callStatus = searchParam.get('callStatus');
+  const callStatus = typedParams.callStatus;
 
   const {
     loadingCalls,
@@ -86,12 +93,10 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   );
 
   const handleStatusFilterChange = (callStatus: CallStatus) => {
-    setSearchParam((searchParam) => {
-      searchParam.set('callStatus', callStatus);
-
-      return searchParam;
-    });
-
+    setTypedParams((prev) => ({
+      ...prev,
+      callStatus: callStatus as CallStatusFilters,
+    }));
     setCallsFilter(() => ({
       ...getFilterStatus(callStatus as CallStatusFilters),
     }));

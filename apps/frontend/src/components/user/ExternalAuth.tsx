@@ -1,8 +1,8 @@
 import BugReportIcon from '@mui/icons-material/BugReport';
 import Lock from '@mui/icons-material/Lock';
 import { Button } from '@mui/material';
-import React, { useContext, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import AnimatedEllipsis from 'components/AnimatedEllipsis';
 import CenteredAlert from 'components/common/CenteredAlert';
@@ -10,6 +10,7 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { SettingsId } from 'generated/sdk';
 import { useUnauthorizedApi } from 'hooks/common/useDataApi';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import clearSession from 'utils/clearSession';
 
 export const getCurrentUrlValues = () => {
@@ -30,11 +31,29 @@ export const getCurrentUrlValues = () => {
 };
 
 function ExternalAuth() {
-  const [searchParams] = useSearchParams();
-  const sessionid = searchParams.get('sessionid');
-  const code = searchParams.get('code');
-  const token = searchParams.get('token');
-  const errorDescription = searchParams.get('error_description');
+  const initialParams = useMemo(
+    () => ({
+      sessionid: null,
+      code: null,
+      token: null,
+      error_description: null,
+    }),
+    []
+  );
+
+  const [typedParams] = useTypeSafeSearchParams<{
+    sessionid: string | null;
+    code: string | null;
+    token: string | null;
+    error_description: string | null;
+  }>(initialParams);
+
+  const {
+    sessionid,
+    code,
+    token,
+    error_description: errorDescription,
+  } = typedParams;
 
   const unauthorizedApi = useUnauthorizedApi();
   const navigate = useNavigate();

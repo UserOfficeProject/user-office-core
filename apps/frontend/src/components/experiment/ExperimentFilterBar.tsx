@@ -1,40 +1,46 @@
 import Grid from '@mui/material/Grid';
 import { DateTime } from 'luxon';
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 
 import DateFilter from './DateFilter';
 
 function ExperimentFilterBar() {
-  const [searchParams, setSearchParam] = useSearchParams();
-  const call = searchParams.get('call');
-  const instrument = searchParams.get('instrument');
-  const experimentFromDate = searchParams.get('from');
-  const experimentToDate = searchParams.get('to');
+  const initialParams = useMemo(
+    () => ({
+      call: null,
+      instrument: null,
+      from: null,
+      to: null,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    call: string | null;
+    instrument: string | null;
+    from: string | null;
+    to: string | null;
+  }>(initialParams);
+  const call = typedParams.call;
+  const instrument = typedParams.instrument;
+  const experimentFromDate = typedParams.from;
+  const experimentToDate = typedParams.to;
 
   const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const { calls, loadingCalls } = useCallsData();
 
   const handleOnChange = (format: string, from?: Date, to?: Date) => {
-    setSearchParam((searchParam) => {
-      searchParam.delete('from');
-      searchParam.delete('to');
-
-      if (from) {
-        searchParam.set('from', DateTime.fromJSDate(from).toFormat(format));
-      }
-
-      if (to) {
-        searchParam.set('to', DateTime.fromJSDate(to).toFormat(format));
-      }
-
-      return searchParam;
-    });
+    setTypedParams((prev) => ({
+      ...prev,
+      from: from ? DateTime.fromJSDate(from).toFormat(format) : null,
+      to: to ? DateTime.fromJSDate(to).toFormat(format) : null,
+    }));
   };
 
   return (

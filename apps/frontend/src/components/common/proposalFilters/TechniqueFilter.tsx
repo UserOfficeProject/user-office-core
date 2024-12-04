@@ -5,11 +5,11 @@ import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import React, { Dispatch } from 'react';
+import React, { Dispatch, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import { TechniqueMinimalFragment, TechniqueFilterInput } from 'generated/sdk';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 
 export enum TechniqueFilterEnum {
   ALL = 'all',
@@ -35,7 +35,17 @@ const TechniqueFilter = ({
   shouldShowMultiple,
   showMultiTechniqueProposals,
 }: TechniqueFilterProps) => {
-  const [, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      technique: TechniqueFilterEnum.ALL,
+    }),
+    []
+  );
+
+  const [, setTypedParams] = useTypeSafeSearchParams<{
+    technique: TechniqueFilterEnum;
+  }>(initialParams);
+
   const { t } = useTranslation();
 
   if (techniques === undefined) {
@@ -60,18 +70,10 @@ const TechniqueFilter = ({
                 showMultiTechniqueProposals: false,
                 showAllProposals: false,
               };
-              setSearchParams((searchParams) => {
-                searchParams.delete('technique');
-
-                if (
-                  e.target.value &&
-                  e.target.value != TechniqueFilterEnum.ALL
-                ) {
-                  searchParams.set('technique', e.target.value.toString());
-                }
-
-                return searchParams;
-              });
+              setTypedParams((prev) => ({
+                ...prev,
+                technique: e.target.value as TechniqueFilterEnum,
+              }));
               if (
                 e.target.value === TechniqueFilterEnum.ALL ||
                 e.target.value === TechniqueFilterEnum.MULTI

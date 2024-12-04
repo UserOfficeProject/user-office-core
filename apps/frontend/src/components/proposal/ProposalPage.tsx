@@ -1,8 +1,8 @@
-import React from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useMemo } from 'react';
 
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -26,16 +26,45 @@ export interface ProposalUrlQueryParams extends URLSearchParams {
 }
 
 export default function ProposalPage() {
-  const [searchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      call: null,
+      instrument: null,
+      proposalStatus: null,
+      reviewModal: null,
+      modalTab: null,
+      questionId: null,
+      proposalId: null,
+      compareOperator: null,
+      value: null,
+      dataType: null,
+    }),
+    []
+  );
 
-  const callId = searchParams.get('call');
-  const instrumentId = searchParams.get('instrument');
-  const proposalStatusId = searchParams.get('proposalStatus');
-  const questionId = searchParams.get('questionId');
-  const proposalId = searchParams.get('proposalId');
-  const compareOperator = searchParams.get('compareOperator');
-  const value = searchParams.get('value');
-  const dataType = searchParams.get('dataType');
+  const [typedParams] = useTypeSafeSearchParams<{
+    call: string | null;
+    instrument: string | null;
+    proposalStatus: string | null;
+    reviewModal: string | null;
+    modalTab: string | null;
+    questionId: string | null;
+    proposalId: string | null;
+    compareOperator: string | null;
+    value: string | null;
+    dataType: string | null;
+  }>(initialParams);
+
+  const {
+    call: callId,
+    instrument: instrumentId,
+    proposalStatus: proposalStatusId,
+    questionId,
+    proposalId,
+    compareOperator,
+    value,
+    dataType,
+  } = typedParams;
 
   const [proposalFilter, setProposalFilter] = React.useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,

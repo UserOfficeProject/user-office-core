@@ -25,10 +25,9 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { TFunction } from 'i18next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -53,6 +52,7 @@ import {
   ProposalViewInstrument,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
@@ -297,18 +297,26 @@ const ToolbarWithSelectAllPrefetched = (props: {
  * and selection flag is true they are not working properly.
  */
 const RowActionButtons = (rowData: ProposalViewData) => {
-  const [, setSearchParams] = useSearchParams();
+  const initialParams = useMemo(
+    () => ({
+      reviewModal: null,
+    }),
+    []
+  );
+
+  const [, setTypedParams] = useTypeSafeSearchParams<{
+    reviewModal: string | null;
+  }>(initialParams);
 
   return (
     <Tooltip title="View proposal">
       <IconButton
         data-cy="view-proposal"
         onClick={() => {
-          setSearchParams((searchParams) => {
-            searchParams.set('reviewModal', rowData.primaryKey.toString());
-
-            return searchParams;
-          });
+          setTypedParams((prev) => ({
+            ...prev,
+            reviewModal: rowData.primaryKey.toString(),
+          }));
         }}
       >
         <Visibility />
@@ -345,7 +353,31 @@ const ProposalTableOfficer = ({
     Column<ProposalViewData>[] | null
   >('proposalColumnsOfficer', null);
   const featureContext = useContext(FeatureContext);
-  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialParams = useMemo(
+    () => ({
+      selection: [],
+      sortField: null,
+      sortDirection: null,
+      page: '0',
+      pageSize: DEFAULT_PAGE_SIZE.toString(),
+      search: '',
+      reviewModal: null,
+      proposalId: null,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    selection: string[];
+    sortField: string | null;
+    sortDirection: string | null;
+    page: string;
+    pageSize: string;
+    search: string;
+    reviewModal: string | null;
+    proposalId: string | null;
+  }>(initialParams);
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -442,14 +474,11 @@ const ProposalTableOfficer = ({
   }
 
   const getSelectedProposalPks = () =>
-    searchParams
-      .getAll('selection')
-      .filter((proposalPk): proposalPk is string => proposalPk !== null)
-      .map((proposalPk) => +proposalPk);
+    typedParams.selection.map((proposalPk) => +proposalPk);
 
   const getSelectedProposalsData = () =>
     tableData.filter((item) =>
-      searchParams.getAll('selection').includes(item.primaryKey.toString())
+      typedParams.selection.includes(item.primaryKey.toString())
     );
 
   const handleClose = (selectedOption: string) => {
@@ -587,12 +616,11 @@ const ProposalTableOfficer = ({
 
   columns = setSortDirectionOnSortField(
     columns,
-    searchParams.get('sortField'),
-    searchParams.get('sortDirection')
+    typedParams.sortField,
+    typedParams.sortDirection
   );
 
-  const reviewModal = searchParams.get('reviewModal');
-  const proposalId = searchParams.get('proposalId');
+  const { reviewModal, proposalId } = typedParams;
 
   const proposalToReview = tableData.find(
     (proposal) =>
@@ -647,7 +675,8 @@ const ProposalTableOfficer = ({
 
         const tableData =
           proposalsView?.proposalViews.map((proposal) => {
-            const selection = new Set(searchParams.getAll('selection'));
+            const selection = new Set(typedParams.selection);
+
             const proposalData = {
               ...proposal,
               status: proposal.submitted ? 'Submitted' : 'Open',
@@ -660,7 +689,7 @@ const ProposalTableOfficer = ({
               finalStatus: getTranslation(proposal.finalStatus as ResourceId),
             } as ProposalViewData;
 
-            if (searchParams.getAll('selection').length > 0) {
+            if (typedParams.selection.length > 0) {
               return {
                 ...proposalData,
                 tableData: {
@@ -709,7 +738,7 @@ const ProposalTableOfficer = ({
         }, // We wrap the value in JSON formatted string, because GraphQL can not handle UnionType input
         text: text,
       },
-      searchText: searchParams.get('search'),
+      searchText: typedParams.search,
     });
 
     return proposalsView?.proposalViews;
@@ -717,15 +746,17 @@ const ProposalTableOfficer = ({
 
   const selectedProposalsData = getSelectedProposalsData();
 
-  const pageSize = searchParams.get('pageSize');
-  const page = searchParams.get('page');
-  const search = searchParams.get('search');
+  // const pageSize = searchParams.get('pageSize');
+  // const page = searchParams.get('page');
+  // const search = searchParams.get('search');
+
+  const { pageSize, page, search } = typedParams;
   const shouldShowSelectAllAction =
     totalCount > (pageSize ? +pageSize : DEFAULT_PAGE_SIZE)
       ? SELECT_ALL_ACTION_TOOLTIP
       : undefined;
   const allPrefetchedProposalsSelected =
-    totalCount === searchParams.getAll('selection').length;
+    totalCount === typedParams.selection.length;
 
   const proposalFapInstruments = selectedProposalsData
     .filter((item) => !!item.instruments)
@@ -845,21 +876,17 @@ const ProposalTableOfficer = ({
         title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
         proposalReviewModalOpen={!!proposalToReview}
         setProposalReviewModalOpen={() => {
-          if (searchParams.get('proposalId')) {
+          if (typedParams.proposalId) {
             setProposalFilter({
               ...proposalFilter,
               referenceNumbers: undefined,
             });
           }
 
-          setSearchParams((searchParams) => {
-            searchParams.delete('reviewModal');
-            searchParams.delete('proposalId');
-            searchParams.delete('modalTab');
-
-            return searchParams;
-          });
-
+          setTypedParams((prev) => ({
+            ...prev,
+            reviewModal: null,
+          }));
           refreshTableData();
         }}
       >
@@ -880,38 +907,39 @@ const ProposalTableOfficer = ({
         data={fetchRemoteProposalsData}
         localization={{
           toolbar: {
-            nRowsSelected: `${searchParams.getAll('selection').length} row(s) selected`,
+            nRowsSelected: `${typedParams.selection.length} row(s) selected`,
           },
         }}
         components={{
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}
         onPageChange={(page, pageSize) => {
-          setSearchParams({
+          setTypedParams((searchParams) => ({
+            ...searchParams,
             page: page.toString(),
             pageSize: pageSize.toString(),
-          });
+          }));
         }}
         onSearchChange={(searchText) => {
-          setSearchParams({
+          setTypedParams((searchParams) => ({
+            ...searchParams,
             search: searchText ? searchText : '',
             page: searchText ? '0' : page || '',
-          });
+          }));
         }}
         onSelectionChange={(selectedItems) => {
           if (selectedItems.length) {
-            setSearchParams({
-              ...searchParams,
+            setTypedParams((prev) => ({
+              ...prev,
               selection: selectedItems.map((selectedItem) =>
                 selectedItem.primaryKey.toString()
               ),
-            });
+            }));
           } else {
-            setSearchParams((searchParams) => {
-              searchParams.delete('selection');
-
-              return searchParams;
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              selection: [],
+            }));
           }
         }}
         options={{
@@ -953,10 +981,7 @@ const ProposalTableOfficer = ({
             tooltip: 'Export proposals in Excel',
             onClick: (): void => {
               downloadXLSXProposal(
-                searchParams
-                  .getAll('selection')
-                  .filter((item): item is string => !!item)
-                  .map((item) => +item),
+                typedParams.selection.map((item) => +item),
                 selectedProposalsData?.[0].title
               );
             },
@@ -1035,11 +1060,10 @@ const ProposalTableOfficer = ({
             onClick: async () => {
               setAllProposalSelectionLoading(true);
               if (allPrefetchedProposalsSelected) {
-                setSearchParams((searchParams) => {
-                  searchParams.delete('selection');
-
-                  return searchParams;
-                });
+                setTypedParams((prev) => ({
+                  ...prev,
+                  selection: [],
+                }));
                 refreshTableData();
               } else {
                 const selectedProposalsData =
@@ -1064,17 +1088,12 @@ const ProposalTableOfficer = ({
 
                 setTableData(newTableData);
 
-                setSearchParams((searchParams) => {
-                  searchParams.delete('selection');
-                  selectedProposalsData.forEach((proposal) => {
-                    searchParams.append(
-                      'selection',
-                      proposal.primaryKey.toString()
-                    );
-                  });
-
-                  return searchParams;
-                });
+                setTypedParams((prev) => ({
+                  ...prev,
+                  selection: selectedProposalsData.map((proposal) =>
+                    proposal.primaryKey.toString()
+                  ),
+                }));
                 refreshTableData();
               }
 
@@ -1100,12 +1119,17 @@ const ProposalTableOfficer = ({
           const [orderBy] = orderByCollection;
 
           if (!orderBy) {
-            setSearchParams({});
+            setTypedParams((prev) => ({
+              ...prev,
+              sortField: null,
+              sortDirection: null,
+            }));
           } else {
-            setSearchParams({
-              sortField: orderBy?.orderByField,
-              sortDirection: orderBy?.orderDirection,
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              sortField: orderBy.orderByField,
+              sortDirection: orderBy.orderDirection,
+            }));
           }
         }}
       />

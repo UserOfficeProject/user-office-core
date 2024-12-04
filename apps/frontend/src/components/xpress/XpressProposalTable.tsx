@@ -20,8 +20,7 @@ import {
 } from '@user-office-software/duo-localisation';
 import i18n from 'i18n';
 import { t, TFunction } from 'i18next';
-import React, { useContext, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useContext, useMemo, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
@@ -33,6 +32,7 @@ import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
+import { useTypeSafeSearchParams } from 'hooks/common/useTypeSafeSearchParams';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
@@ -77,32 +77,69 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { instruments, loadingInstruments } =
     useXpressInstrumentsData(techniques);
 
-  const [searchParams, setSearchParams] = useSearchParams({});
+  const initialParams = useMemo(
+    () => ({
+      callId: null,
+      instrument: null,
+      technique: null,
+      proposalId: null,
+      to: null,
+      from: null,
+      proposalStatusId: null,
+      search: null,
+      selection: [],
+      sortField: null,
+      sortDirection: null,
+      page: null,
+      pageSize: null,
+      reviewModal: null,
+    }),
+    []
+  );
+
+  const [typedParams, setTypedParams] = useTypeSafeSearchParams<{
+    callId: string | null;
+    instrument: string | null;
+    technique: string | null;
+    proposalId: string | null;
+    to: string | null;
+    from: string | null;
+    proposalStatusId: string | null;
+    search: string | null;
+    selection: string[];
+    sortField: string | null;
+    sortDirection: string | null;
+    page: string | null;
+    pageSize: string | null;
+    reviewModal: string | null;
+  }>(initialParams);
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_TIME_FORMAT,
   });
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const callId = searchParams.get('callId');
-  const instrument = searchParams.get('instrument');
-  const technique = searchParams.get('technique');
-  const proposalId = searchParams.get('proposalId');
-  const to = searchParams.get('to');
-  const from = searchParams.get('from');
-  const proposalStatusId = searchParams.get('proposalStatusId');
-  const search = searchParams.get('search');
-  const selection = searchParams.getAll('selection');
-  const sortField = searchParams.get('sortField');
-  const sortDirection = searchParams.get('sortDirection');
-  const page = searchParams.get('page');
-  const pageSize = searchParams.get('pageSize');
-  const reviewModal = searchParams.get('reviewModal');
+  const {
+    callId,
+    instrument,
+    technique,
+    proposalId,
+    to,
+    from,
+    proposalStatusId,
+    search,
+    selection,
+    sortField,
+    sortDirection,
+    page,
+    pageSize,
+    reviewModal,
+  } = typedParams;
 
   const { api } = useDataApiWithFeedback();
   const [totalCount, setTotalCount] = useState(0);
   const allPrefetchedProposalsSelected =
-    totalCount === searchParams.getAll('selection').length;
+    typedParams.selection.length === totalCount;
   const [allProposalSelectionLoading, setAllProposalSelectionLoading] =
     useState(false);
 
@@ -169,18 +206,26 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   });
 
   const RowActionButtons = (rowData: ProposalViewData) => {
-    const [, setSearchParams] = useSearchParams();
+    const initialParams = useMemo(
+      () => ({
+        reviewModal: null,
+      }),
+      []
+    );
+
+    const [, setTypedParams] = useTypeSafeSearchParams<{
+      reviewModal: string | null;
+    }>(initialParams);
 
     return (
       <Tooltip title="View proposal">
         <IconButton
           data-cy="view-proposal"
           onClick={() => {
-            setSearchParams((searchParams) => {
-              searchParams.set('reviewModal', rowData.primaryKey.toString());
-
-              return searchParams;
-            });
+            setTypedParams((prev) => ({
+              ...prev,
+              reviewModal: rowData.primaryKey.toString(),
+            }));
           }}
         >
           <Visibility />
@@ -563,7 +608,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
         const tableData =
           result.proposals.map((proposal) => {
-            const selection = new Set(searchParams.getAll('selection'));
+            const selection = new Set(typedParams.selection);
             const proposalData = {
               ...proposal,
               id: proposal.proposalId,
@@ -577,7 +622,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               finalStatus: getTranslation(proposal.finalStatus as ResourceId),
             } as ProposalViewData;
 
-            if (searchParams.getAll('selection').length > 0) {
+            if (typedParams.selection.length > 0) {
               return {
                 ...proposalData,
                 tableData: {
@@ -604,16 +649,11 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const handleSortOrderChange = (orderByCollection: OrderByCollection[]) => {
     const [orderBy] = orderByCollection;
-    setSearchParams((searchParam) => {
-      searchParam.delete('sortField');
-      searchParam.delete('sortDirection');
-      if (orderBy?.orderByField != null && orderBy?.orderDirection != null) {
-        searchParam.set('sortField', orderBy?.orderByField);
-        searchParam.set('sortDirection', orderBy?.orderDirection);
-      }
-
-      return searchParam;
-    });
+    setTypedParams((prev) => ({
+      ...prev,
+      sortField: orderBy?.orderByField,
+      sortDirection: orderBy?.orderDirection,
+    }));
   };
 
   const handleFilterChange = (filter: ProposalsFilter) => {
@@ -622,10 +662,11 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleSearchChange = (searchText: string) => {
-    setSearchParams({
+    setTypedParams((prev) => ({
+      ...prev,
       search: searchText ? searchText : '',
       page: searchText ? '0' : page || '',
-    });
+    }));
   };
 
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
@@ -663,7 +704,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             ? { excludeProposalStatusIds: excludeProposalStatusIds }
             : {}),
         },
-        searchText: searchParams.get('search'),
+        searchText: typedParams.search,
       })
       .then((data) => {
         result.totalCount = data.techniqueScientistProposals?.totalCount || 0;
@@ -700,19 +741,18 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
             proposalReviewModalOpen={!!proposalToReview}
             setProposalReviewModalOpen={() => {
-              if (searchParams.get('proposalId')) {
+              if (typedParams.proposalId) {
                 setProposalFilter({
                   ...proposalFilter,
                   referenceNumbers: undefined,
                 });
               }
 
-              setSearchParams((searchParams) => {
-                searchParams.delete('reviewModal');
-                searchParams.delete('proposalId');
-
-                return searchParams;
-              });
+              setTypedParams((prev) => ({
+                ...prev,
+                reviewModal: null,
+                proposalId: null,
+              }));
 
               refreshTableData();
             }}
@@ -765,8 +805,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 tooltip: 'Export proposals in Excel',
                 onClick: (): void => {
                   downloadXLSXProposal(
-                    searchParams
-                      .getAll('selection')
+                    typedParams.selection
                       .filter((item): item is string => !!item)
                       .map((item) => +item),
                     'title',
@@ -787,11 +826,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 onClick: async () => {
                   setAllProposalSelectionLoading(true);
                   if (allPrefetchedProposalsSelected) {
-                    setSearchParams((searchParams) => {
-                      searchParams.delete('selection');
-
-                      return searchParams;
-                    });
+                    setTypedParams((prev) => ({
+                      ...prev,
+                      selection: [],
+                    }));
                     refreshTableData();
                   } else {
                     const selectedProposalsData =
@@ -820,17 +858,13 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                       setTableData(newTableData);
                     }
 
-                    setSearchParams((searchParams) => {
-                      searchParams.delete('selection');
-                      selectedProposalsData.proposals?.forEach((proposal) => {
-                        searchParams.append(
-                          'selection',
-                          proposal.primaryKey.toString()
-                        );
-                      });
-
-                      return searchParams;
-                    });
+                    setTypedParams((prev) => ({
+                      ...prev,
+                      selection:
+                        selectedProposalsData.proposals
+                          ?.map((proposal) => proposal.primaryKey.toString())
+                          .filter((item): item is string => !!item) ?? [],
+                    }));
                     refreshTableData();
                   }
 
@@ -840,25 +874,21 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               },
             ]}
             onSelectionChange={(selectedItems) => {
-              setSearchParams((searchParam) => {
-                searchParam.delete('selection');
-                selectedItems.map((selectedItem) =>
-                  searchParam.append(
-                    'selection',
-                    selectedItem.primaryKey.toString()
-                  )
-                );
-
-                return searchParam;
-              });
+              setTypedParams((prev) => ({
+                ...prev,
+                selection: selectedItems.map((selectedItem) =>
+                  selectedItem.primaryKey.toString()
+                ),
+              }));
             }}
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
             onPageChange={(page, pageSize) => {
-              setSearchParams({
+              setTypedParams((prev) => ({
+                ...prev,
                 page: page.toString(),
                 pageSize: pageSize.toString(),
-              });
+              }));
             }}
             localization={{
               toolbar: {
