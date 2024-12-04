@@ -18,7 +18,7 @@ CREATE OR REPLACE VIEW review_data AS
 	    proposal.fap_time_allocation,
 	    proposal.questionary_id,
 	    grade.avg AS average_grade,
-		proposal.comment
+		proposal.public_comment as comment
 		from (
         Select 
                 fp.proposal_pk,
