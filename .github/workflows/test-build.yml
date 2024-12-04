@@ -13,7 +13,9 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   resolve_dep:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    container:
+      image: ubuntu:latest
     outputs:
       FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
 
@@ -73,7 +75,9 @@ jobs:
   install-and-cache:
     name: Run install and cache
     needs: resolve_dep
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    container:
+      image: ubuntu:latest
 
     steps:
       - name: Check out Git repository
@@ -133,7 +137,9 @@ jobs:
 
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    container:
+      image: ubuntu:latest
     needs: install-and-cache
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -186,7 +192,9 @@ jobs:
           SPARKPOST_TOKEN: wrong_token_for_test
 
   test_backend:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    container:
+      image: ubuntu:latest
     needs: build
 
     steps:
@@ -221,7 +229,9 @@ jobs:
 
           npm run test:backend
   e2e:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    container:
+      image: ubuntu:latest
     needs: [resolve_dep, build]
 
     strategy:
