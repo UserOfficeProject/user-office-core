@@ -312,6 +312,14 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         const shouldBeUneditable =
           !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
 
+        // Always show the current instrument at the top of the dropdown
+        instrumentList.forEach(function (instrument, i) {
+          if (fieldValue && instrument.id === fieldValue) {
+            instrumentList.splice(i, 1);
+            instrumentList.unshift(instrument);
+          }
+        });
+
         return shouldBeUneditable ? (
           instrumentList.find((i) => i.id === fieldValue)?.name
         ) : (
