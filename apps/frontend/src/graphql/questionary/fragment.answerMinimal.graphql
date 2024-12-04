@@ -1,4 +1,5 @@
 fragment answerMinimal on AnswerBasic {
   questionId
   answer
+  answerId
 }

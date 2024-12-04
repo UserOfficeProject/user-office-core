@@ -27,6 +27,7 @@ export enum GENERIC_TEMPLATE_EVENT {
 type AnswerMinimal = {
   questionId: string;
   answer: any;
+  answerId: number | null;
 };
 
 export type Event =
@@ -260,9 +261,14 @@ export function QuestionarySubmissionModel<
 
           draftState.questionary.steps[stepIndex].fields =
             draftState.questionary.steps[stepIndex].fields.map((f) => {
-              f.value =
-                action.answers.find((u) => u.questionId === f.question.id)
-                  ?.answer.value ?? f.value;
+              const updatedAnswer = action.answers.find(
+                (u) => u.questionId === f.question.id
+              );
+
+              if (updatedAnswer) {
+                f.value = updatedAnswer.answer.value;
+                f.answerId = updatedAnswer.answerId;
+              }
 
               return f;
             });
