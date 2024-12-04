@@ -23,6 +23,7 @@ jobs:
       - name: Resolve required repositories
         id: resolve_rep
         run: |
+          apt install jq
           # this assumes the result is an array, and .name property is used
           check_feature() {
             # first param is the branch, everything after is endpoint for curl
