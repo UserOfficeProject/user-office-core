@@ -7,32 +7,34 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import TextField from 'components/common/FormikUITextField';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-interface RedeemCodeProps {
+interface JoinProposalFormProps {
   title?: string;
-  onRedeemed?: () => void;
-  onClose?: () => void;
+  onProposalJoined?: () => void;
+  onFormClose?: () => void;
 }
 
-function RedeemCode(props: RedeemCodeProps) {
+function JoinProposalForm(props: JoinProposalFormProps) {
   const { api } = useDataApiWithFeedback();
 
-  const [successfullyRedeemed, setSuccessfullyRedeemed] = React.useState(false);
+  const [isJoined, setIsJoined] = React.useState(false);
 
   return (
     <Formik
       initialValues={{
-        code: '',
+        inviteCode: '',
       }}
       onSubmit={async (values): Promise<void> => {
         api({ toastSuccessMessage: 'Code verification successful' })
-          .redeemCode({ code: values.code })
+          .verifyAndJoinProposal({ code: values.inviteCode })
           .then(() => {
-            setSuccessfullyRedeemed(true);
-            props.onRedeemed?.();
-            props.onClose?.();
+            setIsJoined(true);
+            props.onProposalJoined?.();
+            props.onFormClose?.();
           });
       }}
-      validationSchema={Yup.object().shape({ code: Yup.string().required() })}
+      validationSchema={Yup.object().shape({
+        inviteCode: Yup.string().required('Invitation code is required'),
+      })}
     >
       {() => (
         <Form>
@@ -40,23 +42,23 @@ function RedeemCode(props: RedeemCodeProps) {
             {props.title}
           </Typography>
           <Field
-            id="code"
-            name="code"
-            label="Redeem code"
+            id="inviteCode"
+            name="inviteCode"
+            label="Invitation Code"
             type="text"
             component={TextField}
             fullWidth
-            data-cy="code"
-            disabled={successfullyRedeemed}
+            data-cy="invite-code"
+            disabled={isJoined}
           />
 
           <ActionButtonContainer>
             <Button
               type="submit"
               data-cy="invitation-submit"
-              disabled={successfullyRedeemed}
+              disabled={isJoined}
             >
-              Redeem
+              Join Proposal
             </Button>
           </ActionButtonContainer>
         </Form>
@@ -65,4 +67,4 @@ function RedeemCode(props: RedeemCodeProps) {
   );
 }
 
-export default RedeemCode;
+export default JoinProposalForm;

@@ -29,12 +29,12 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
+import EnterInviteCodeForm from './JoinProposalForm';
 import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
 import {
   PartialProposalsDataType,
   UserProposalDataType,
 } from './ProposalTableUser';
-import RedeemCode from './RedeemCode';
 
 type ProposalTableProps = {
   /** Error flag */
@@ -308,8 +308,8 @@ const ProposalTable = ({
             startIcon={<AddIcon />}
             title="Join proposal"
           >
-            <RedeemCode
-              onRedeemed={() => {
+            <EnterInviteCodeForm
+              onProposalJoined={() => {
                 searchQuery().then((data) => {
                   if (data) {
                     setPartialProposalsData(data.data);
