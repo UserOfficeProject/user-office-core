@@ -20,11 +20,6 @@ jobs:
       FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
 
     steps:
-      - name: Update package index and install jq
-        run: |
-          apt-get update
-          apt-get install -y jq
-
       - name: Resolve required repositories
         id: resolve_rep
         run: |
