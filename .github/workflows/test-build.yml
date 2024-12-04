@@ -15,7 +15,7 @@ jobs:
   resolve_dep:
     runs-on: self-hosted
     container:
-      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0
+      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu-github
     outputs:
       FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
 
@@ -82,7 +82,7 @@ jobs:
     needs: resolve_dep
     runs-on: self-hosted
     container:
-      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0
+      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu-github
 
     steps:
       - name: Check out Git repository
@@ -144,7 +144,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: self-hosted
     container:
-      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0
+      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu-github
     needs: install-and-cache
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -199,7 +199,7 @@ jobs:
   test_backend:
     runs-on: self-hosted
     container:
-      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0
+      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu-github
     needs: build
 
     steps:
@@ -236,7 +236,7 @@ jobs:
   e2e:
     runs-on: self-hosted
     container:
-      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0
+      image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu-github
     needs: [resolve_dep, build]
 
     strategy:
