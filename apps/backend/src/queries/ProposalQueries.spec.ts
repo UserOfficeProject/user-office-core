@@ -7,6 +7,11 @@ import {
   ProposalDataSourceMock,
 } from '../datasources/mockups/ProposalDataSource';
 import {
+  dummyProposalInternalCommentOne,
+  dummyProposalInternalCommentTwo,
+} from '../datasources/mockups/ProposalInternalCommentsDataSource';
+import {
+  dummyInstrumentScientist,
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -77,4 +82,22 @@ test('User officer should get the proposal', async () => {
   return expect(
     proposalQueries.getProposalById(dummyUserOfficerWithRole, 'shortCode')
   ).resolves.toBeInstanceOf(Proposal);
+});
+
+test('A user officer can get proposal scientist comment', () => {
+  return expect(
+    proposalQueries.getProposalScientistComment(
+      dummyInstrumentScientist,
+      dummyProposalInternalCommentTwo.commentId
+    )
+  ).resolves.toBe(dummyProposalInternalCommentTwo);
+});
+
+test('A scientist can get proposal scientist comment', () => {
+  return expect(
+    proposalQueries.getProposalScientistComment(
+      dummyInstrumentScientist,
+      dummyProposalInternalCommentOne.commentId
+    )
+  ).resolves.toBe(dummyProposalInternalCommentOne);
 });
