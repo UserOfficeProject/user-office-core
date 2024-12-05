@@ -298,9 +298,14 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = techniques
-          .filter((technique) => techIds?.includes(technique.id))
-          .flatMap((technique) => technique.instruments);
+        const instrumentList = Array.from(
+          new Map(
+            techniques
+              .filter((technique) => techIds?.includes(technique.id))
+              .flatMap((technique) => technique.instruments)
+              .map((instrument) => [instrument.id, instrument])
+          ).values()
+        );
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
