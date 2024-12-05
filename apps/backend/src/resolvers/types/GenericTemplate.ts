@@ -42,12 +42,12 @@ export class GenericTemplate implements Partial<GenericTemplateOrigin> {
 export class GenericTemplateResolver {
   @FieldResolver(() => Questionary)
   async questionary(
-    @Root() GenericTemplate: GenericTemplate,
+    @Root() genericTemplate: GenericTemplate,
     @Ctx() context: ResolverContext
   ): Promise<Questionary> {
     return context.queries.questionary.getQuestionaryOrDefault(
       context.user,
-      GenericTemplate.questionaryId,
+      genericTemplate.questionaryId,
       TemplateCategoryId.GENERIC_TEMPLATE
     );
   }

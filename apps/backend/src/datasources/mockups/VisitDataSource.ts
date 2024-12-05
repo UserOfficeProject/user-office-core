@@ -154,6 +154,8 @@ export class VisitDataSourceMock implements VisitDataSource {
     visitorId: number,
     proposalPk: number
   ): Promise<boolean> {
+    if (proposalPk === 1 && visitorId === 102) return true;
+
     return false;
   }
 
