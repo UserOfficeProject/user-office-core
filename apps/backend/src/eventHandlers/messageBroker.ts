@@ -10,6 +10,7 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -194,6 +195,10 @@ export async function createPostToRabbitMQHandler() {
     Tokens.ProposalDataSource
   );
 
+  const templateDataSource = container.resolve<TemplateDataSource>(
+    Tokens.TemplateDataSource
+  );
+
   return async (event: ApplicationEvent) => {
     // if the original method failed
     // there is no point of publishing any event
@@ -231,24 +236,28 @@ export async function createPostToRabbitMQHandler() {
       }
       case Event.TOPIC_ANSWERED: {
         const proposal = await proposalDataSource.getProposals({
-          questionaryIds: [event.questionarystep.questionaryId],
+          questionaryIds: event.array.map((a) => a.questionaryId),
         });
 
         if (proposal.proposals.length !== 1) {
           // this checks if the questionary answered is attached to proposal
           return;
         }
-        const answers = event.questionarystep.fields.map((field) => {
+        const answers = event.array.map(async (answer) => {
+          const question = await templateDataSource.getQuestion(
+            answer.questionId
+          );
+
           return {
             proposalId: proposal.proposals[0].proposalId,
-            question: field.question.question,
-            questionId: field.question.naturalKey,
-            dataType: field.question.dataType,
-            answer: field.value,
+            question: question,
+            questionId: answer.questionId,
+            dataType: question?.dataType,
+            answer: answer.answer,
           };
         });
 
-        const jsonMessage = JSON.stringify(answers);
+        const jsonMessage = JSON.stringify(await Promise.all(answers));
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
