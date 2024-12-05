@@ -260,18 +260,21 @@ export function QuestionarySubmissionModel<
           );
 
           draftState.questionary.steps[stepIndex].fields =
-            draftState.questionary.steps[stepIndex].fields.map((f) => {
-              const updatedAnswer = action.answers.find(
-                (u) => u.questionId === f.question.id
-              );
+            draftState.questionary.steps[stepIndex].fields.map(
+              (draftAnswer) => {
+                const updatedAnswer = action.answers.find(
+                  (updatedAnswer) =>
+                    updatedAnswer.questionId === draftAnswer.question.id
+                );
 
-              if (updatedAnswer) {
-                f.value = updatedAnswer.answer.value;
-                f.answerId = updatedAnswer.answerId;
+                if (updatedAnswer) {
+                  draftAnswer.value = updatedAnswer.answer.value;
+                  draftAnswer.answerId = updatedAnswer.answerId;
+                }
+
+                return draftAnswer;
               }
-
-              return f;
-            });
+            );
 
           draftState.questionary.steps[stepIndex].isCompleted =
             !action.isPartialSave;
