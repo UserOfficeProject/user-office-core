@@ -4,22 +4,22 @@ BEGIN
     IF register_patch('0166_ExcludeExpiredProposalsFromReviewProposalView.sql', 'Thomas Cottee Meldrum', 'Update review column in the view', '2024-12-03') THEN
 
 CREATE OR REPLACE VIEW review_data AS 
-	 SELECT proposal.proposal_pk,
-	    proposal.proposal_id,
-	    proposal.title,
-	    proposal.instrument_name,
-	    proposal.availability_time,
-	    proposal.time_allocation,
-	    proposal.fap_id,
-	    proposal.rank_order,
-	    proposal.call_id,
-	    proposal.proposer_id,
-	    proposal.instrument_id,
-	    proposal.fap_time_allocation,
-	    proposal.questionary_id,
-	    grade.avg AS average_grade,
-		proposal.public_comment as comment
-		from (
+    SELECT proposal.proposal_pk,
+        proposal.proposal_id,
+        proposal.title,
+        proposal.instrument_name,
+        proposal.availability_time,
+        proposal.time_allocation,
+        proposal.fap_id,
+        proposal.rank_order,
+        proposal.call_id,
+        proposal.proposer_id,
+        proposal.instrument_id,
+        proposal.fap_time_allocation,
+        proposal.questionary_id,
+        grade.avg AS average_grade,
+        proposal.public_comment as comment
+        from (
         Select 
                 fp.proposal_pk,
                 p.proposal_id,
@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW review_data AS
                 p.proposer_id,
                 i.instrument_id,
                 fp.fap_time_allocation,
-				p.questionary_id,
+                p.questionary_id,
                 tr.public_comment
             from fap_proposals as fp
             join faps as f on f.fap_id = fp.fap_id
@@ -43,8 +43,8 @@ CREATE OR REPLACE VIEW review_data AS
             left join fap_meeting_decisions as fmd on fmd.proposal_pk = p.proposal_pk
             join call_has_instruments as chi on chi.instrument_id = fp.instrument_id and chi.call_id = c.call_id
             join instruments as i on i.instrument_id = chi.instrument_id
-			where p.status_id <> 9 and p.status_id <> 1 /* EXPIRED  OR DRAFT*/
-			) as proposal
+            where p.status_id <> 9 and p.status_id <> 1 /* EXPIRED  OR DRAFT*/
+            ) as proposal
             left join (
                 Select fr.proposal_pk, AVG(fr.grade) from 
                 fap_proposals as fp

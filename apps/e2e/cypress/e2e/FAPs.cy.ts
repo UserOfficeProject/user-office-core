@@ -3769,15 +3769,6 @@ context.only('Fap meeting exports test', () => {
         }
       });
 
-      cy.addProposalTechnicalReview({
-        proposalPk: firstCreatedProposalPk,
-        status: TechnicalReviewStatus.FEASIBLE,
-        timeAllocation: firstProposalTimeAllocation,
-        submitted: true,
-        reviewerId: 0,
-        instrumentId: newlyCreatedInstrumentId,
-        publicComment: comment1,
-      });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
         if (createdInstrument) {
@@ -3805,6 +3796,7 @@ context.only('Fap meeting exports test', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            publicComment: comment1,
           });
 
           cy.setInstrumentAvailabilityTime({
