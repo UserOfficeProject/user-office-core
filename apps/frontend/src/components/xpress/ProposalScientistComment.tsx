@@ -14,15 +14,13 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type ProposalScientistCommentProps = {
   proposalPk: number;
-  close: () => void;
   confirm: WithConfirmType;
 };
 
 const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
-  const { loading, scientistCommentData } = useProposalScientistCommentData(
-    props.proposalPk
-  );
+  const { loading, scientistCommentData, setScientistCommentData } =
+    useProposalScientistCommentData(props.proposalPk);
   const isNotCreate = (
     scientistCommentData: ProposalScientistCommentType | null
   ) => !!scientistCommentData;
@@ -53,27 +51,35 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
             onSubmit={async (values): Promise<void> => {
               if (scientistCommentData) {
                 if (values.comment) {
-                  await api({
+                  const response = await api({
                     toastSuccessMessage:
                       'Proposal scientist comment successfully updated',
                   }).updateProposalScientistComment({
                     commentId: scientistCommentData.commentId,
                     comment: values.comment,
                   });
+
+                  setScientistCommentData({
+                    ...response.updateProposalScientistComment,
+                    proposalPk: props.proposalPk,
+                  });
                 }
               } else {
                 if (values.comment) {
-                  await api({
+                  const response = await api({
                     toastSuccessMessage:
                       'Proposal scientist comment successfully created',
                   }).createProposalScientistComment({
                     proposalPk: props.proposalPk,
                     comment: values.comment,
                   });
+
+                  setScientistCommentData({
+                    ...response.createProposalScientistComment,
+                    proposalPk: props.proposalPk,
+                  });
                 }
               }
-
-              props.close();
             }}
           >
             {({ isSubmitting, setFieldValue, isValid }) => (
@@ -137,7 +143,8 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
                                 }).deleteProposalScientistComment({
                                   commentId: scientistCommentData.commentId,
                                 });
-                                props.close();
+
+                                setScientistCommentData(null);
                               },
                               {
                                 title: 'Are you sure?',

@@ -630,14 +630,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
   const XpressTablePanelDetails = React.useCallback(
     ({ rowData }: Record<'rowData', ProposalViewData>) => {
-      return (
-        <ProposalScientistComment
-          proposalPk={rowData.primaryKey}
-          close={() => {
-            refreshTableData();
-          }}
-        />
-      );
+      return <ProposalScientistComment proposalPk={rowData.primaryKey} />;
     },
     []
   );
