@@ -3,8 +3,8 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { creatableQuestions } from 'components/questionary/QuestionaryComponentRegistry';
 import { DataType, QuestionsFilter, TemplateCategoryId } from 'generated/sdk';
@@ -15,15 +15,23 @@ interface QuestionsTableFilterProps {
 }
 
 function QuestionsTableFilter(props: QuestionsTableFilterProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categorySearchParam = searchParams.get(
+    'category'
+  ) as TemplateCategoryId;
+  const typeSearchParam = searchParams.get('type') as DataType;
+
   const { categories } = useTemplateCategories();
-  const [category, setCategory] = useState<TemplateCategoryId | undefined>();
-  const [questionType, setQuestionType] = useState<DataType[] | undefined>();
-  const [searchText, setSearchText] = useState<string | undefined>();
+  const [category, setCategory] = useState<TemplateCategoryId | undefined>(
+    categorySearchParam ?? undefined
+  );
+  const [questionType, setQuestionType] = useState<DataType[] | undefined>(
+    typeSearchParam ? [typeSearchParam] : undefined
+  );
 
   const handleChange = (update: Partial<QuestionsFilter>) => {
     props.onChange?.({
       dataType: questionType,
-      text: searchText,
       category: category,
       ...update,
     });
@@ -36,6 +44,14 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
           <InputLabel id="filter-category">Category</InputLabel>
           <Select
             onChange={(e) => {
+              setSearchParams((searchParams) => {
+                searchParams.delete('category');
+                if (e.target.value)
+                  searchParams.set('category', e.target.value);
+
+                return searchParams;
+              });
+
               const newCategory = e.target.value as TemplateCategoryId;
               setCategory(newCategory);
               handleChange({ category: newCategory });
@@ -63,6 +79,13 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
               const value = e.target.value as DataType | undefined;
               const newDataType = value ? [value] : undefined;
 
+              setSearchParams((searchParams) => {
+                searchParams.delete('type');
+                if (value) searchParams.set('type', value);
+
+                return searchParams;
+              });
+
               setQuestionType(newDataType);
               handleChange({ dataType: newDataType });
             }}
@@ -82,25 +105,6 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
-      </Grid>
-      <Grid item sm={4} xs={12}>
-        <FormControl fullWidth>
-          <TextField
-            label="Search"
-            value={searchText ?? ''}
-            margin="none"
-            onChange={(event) => setSearchText(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                const trimmedSearchText = searchText?.trim();
-                setSearchText(trimmedSearchText);
-                handleChange({ text: trimmedSearchText });
-                event.preventDefault();
-              }
-            }}
-            data-cy="search-input"
-          />
         </FormControl>
       </Grid>
     </Grid>
