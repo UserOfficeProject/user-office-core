@@ -47,6 +47,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import ProposalScientistComment from './ProposalScientistComment';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressNotice from './XpressNotice';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
@@ -627,6 +628,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       page: searchText ? '0' : page || '',
     });
   };
+  const XpressTablePanelDetails = React.useCallback(
+    ({ rowData }: Record<'rowData', ProposalViewData>) => {
+      return <ProposalScientistComment proposalPk={rowData.primaryKey} />;
+    },
+    []
+  );
 
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
   const downloadXLSXProposal = useDownloadXLSXProposal();
@@ -860,6 +867,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 pageSize: pageSize.toString(),
               });
             }}
+            detailPanel={[
+              {
+                tooltip: 'Show comment',
+                render: XpressTablePanelDetails,
+              },
+            ]}
             localization={{
               toolbar: {
                 nRowsSelected: `${selection.length} row(s) selected`,
