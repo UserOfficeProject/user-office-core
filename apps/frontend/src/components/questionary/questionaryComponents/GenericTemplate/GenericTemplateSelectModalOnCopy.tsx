@@ -33,9 +33,6 @@ type GenericTemplateSelectModalOnCopyProps = {
   handleGenericTemplateOnCopy: (copyAnswersInput: CopyAnswerInput[]) => void;
 };
 
-// type GenericTemplates =
-//   GetGenericTemplatesWithProposalDataQuery['genericTemplates'];
-
 type GenericTemplateCopy =
   GetGenericTemplatesOnCopyQuery['genericTemplatesOnCopy'];
 

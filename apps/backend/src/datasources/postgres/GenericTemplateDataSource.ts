@@ -273,7 +273,7 @@ export default class PostgresGenericTemplateDataSource
           query.orWhere('visitor', agent);
           query.distinctOn('generic_template_id');
         })
-        .orderBy('created_at', 'asc')
+        .orderBy('generic_template_id', 'asc')
         .then((records: GenericTemplateRecord[]) =>
           records.map((record) => createGenericTemplateObject(record))
         );
