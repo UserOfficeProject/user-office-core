@@ -305,6 +305,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           (instrument) => instrument.id
         )[0];
 
+        const selectedValue: number | undefined = fieldValue ? fieldValue : 0;
+
         const selectedStatus = proposalStatuses.find(
           (ps) => ps.name === rowData.statusName
         )?.shortCode;
@@ -347,7 +349,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     )();
                   }
                 }}
-                value={fieldValue}
+                value={selectedValue}
                 data-cy="instrument-dropdown"
               >
                 {instrumentList &&
