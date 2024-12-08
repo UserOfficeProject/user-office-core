@@ -77,7 +77,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Removed caching steps and conditions
+      
       - name: Install root dependencies
         run: npm ci --ignore-scripts
 
@@ -87,12 +87,16 @@ jobs:
       - name: Install frontend dependencies
         run: npm run install:frontend
 
-      # Removed frontend SDK cache
       - name: Generate frontend SDK
         run: |
           cp apps/frontend/example.development.env apps/frontend/.env
           npm run generate:sdk
 
+      - name: Upload SDK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-sdk
+          path: apps/frontend/src/generated
   build:
     runs-on: self-hosted
     needs: install-and-cache
@@ -106,15 +110,16 @@ jobs:
 
       - run: npm ci
 
-      - name: Generate frontend SDK
-        run: |
-          cp apps/frontend/example.development.env apps/frontend/.env
-          npm run generate:sdk
+      - name: Download SDK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-sdk
+          path: apps/frontend/src/generated
 
       - run: npm run build
         env:
           NODE_ENV: development
-          JWT_SECRET: ${{secrets.secret}}
+          JWT_SECRET: ${{ secrets.secret }}
           JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: wrong_token_for_test
 
@@ -129,7 +134,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Removed backend node_modules restore cache
+      
       - name: Run backend unit tests
         env:
           TZ: Europe/Stockholm
@@ -181,7 +186,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Removed restore cache steps for node_modules and SDK
+      
       # The commented cache for e2e node_modules is also removed
       - name: Install e2e dependencies
         env:
