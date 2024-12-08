@@ -104,13 +104,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Removed all restore cache steps
       - run: npm ci
+
+      - name: Generate frontend SDK
+        run: |
+          cp apps/frontend/example.development.env apps/frontend/.env
+          npm run generate:sdk
 
       - run: npm run build
         env:
           NODE_ENV: development
-          JWT_SECRET: ${{ secrets.secret }}
+          JWT_SECRET: ${{secrets.secret}}
           JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: wrong_token_for_test
 
