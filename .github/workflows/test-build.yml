@@ -1,7 +1,5 @@
 name: E2E and build testing.
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the develop and master branches
 on:
   pull_request:
     branches: [develop]
@@ -10,28 +8,22 @@ env:
   NODE_VERSION: 18.x
   FRONTEND_SDK_KEY: sdk-frontend-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   resolve_dep:
     runs-on: self-hosted
-    
     outputs:
       FACTORY_TAG: ${{ steps.resolve_rep.outputs.FACTORY_TAG }}
-
     steps:
       - name: Resolve required repositories
         id: resolve_rep
         run: |
-          # this assumes the result is an array, and .name property is used
           check_feature() {
-            # first param is the branch, everything after is endpoint for curl
             local branch=$1
             local found=0
             shift
             for endpoint in $@; do
               local json=$(curl -s $endpoint)
               local branch_found=$(echo $json | jq -c ".[] | select(.name==\"$branch\") | .name")
-              # to track what we found
               >&2 echo "$endpoint -> $branch_found"
               if [[ $branch_found != "" ]]; then
                 found=$((found += 1))
@@ -56,7 +48,7 @@ jobs:
 
           echo $CHECK_IF_IMAGE_EXISTS
 
-          if [[ $CHECK_IF_IMAGE_EXISTS == null  ]]; then 
+          if [[ $CHECK_IF_IMAGE_EXISTS == null ]]; then
               FACTORY_TAGS=$((FACTORY_TAGS+1))
           fi
 
@@ -75,7 +67,6 @@ jobs:
     name: Run install and cache
     needs: resolve_dep
     runs-on: self-hosted
-    
 
     steps:
       - name: Check out Git repository
@@ -86,60 +77,25 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Cache node_modules
-        id: cached-node-modules-root
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
-
+      # Removed caching steps and conditions
       - name: Install root dependencies
-        if: steps.cached-node-modules-root.outputs.cache-hit != 'true'
-        # We use --ignore-scripts flag to ignore the postinstall script which is actually installing dependencies in all other apps.
-        # Caution! The option --ignore-scripts disables ALL scripts - even from the dependencies. If the dependencies need to run scripts to e.g. install some binaries they may break / be incomplete. For now this works and if we experience some issues we can try to find better solution.
         run: npm ci --ignore-scripts
 
-      - name: Cache backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v4
-        with:
-          path: apps/backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
       - name: Install backend dependencies
-        if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
         run: npm run install:backend
 
-      - name: Cache frontend node_modules
-        id: cached-node-modules-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
       - name: Install frontend dependencies
-        if: steps.cached-node-modules-frontend.outputs.cache-hit != 'true'
         run: npm run install:frontend
 
-      - name: Cache frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/src/generated
-          key: ${{ env.FRONTEND_SDK_KEY }}
-
+      # Removed frontend SDK cache
       - name: Generate frontend SDK
         run: |
           cp apps/frontend/example.development.env apps/frontend/.env
           npm run generate:sdk
 
   build:
-    # The type of runner that the job will run on
     runs-on: self-hosted
-    
     needs: install-and-cache
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v4
 
@@ -148,51 +104,19 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Restore node_modules
-        id: cached-node-modules-root
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v4
-        with:
-          path: apps/backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend node_modules
-        id: cached-node-modules-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/src/generated
-          key: ${{ env.FRONTEND_SDK_KEY }}
-          restore-keys: |
-            ${{ env.FRONTEND_SDK_KEY }}
-            sdk-frontend-
-
+      # Removed all restore cache steps
       - run: npm ci
 
       - run: npm run build
         env:
           NODE_ENV: development
-          JWT_SECRET: ${{secrets.secret}}
+          JWT_SECRET: ${{ secrets.secret }}
           JWT_TOKEN_LIFE: 7d
           SPARKPOST_TOKEN: wrong_token_for_test
 
   test_backend:
     runs-on: self-hosted
-    
     needs: build
-
     steps:
       - uses: actions/checkout@v4
 
@@ -201,13 +125,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v4
-        with:
-          path: apps/backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
+      # Removed backend node_modules restore cache
       - name: Run backend unit tests
         env:
           TZ: Europe/Stockholm
@@ -222,11 +140,10 @@ jobs:
           DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
           npm run test:backend
+
   e2e:
     runs-on: self-hosted
-    
     needs: [resolve_dep, build]
 
     strategy:
@@ -260,54 +177,11 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Restore node_modules
-        id: cached-node-modules-root
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: node-modules-root-${{ hashFiles('package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore backend node_modules
-        id: cached-node-modules-backend
-        uses: actions/cache@v4
-        with:
-          path: apps/backend/node_modules
-          key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend node_modules
-        id: cached-node-modules-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/node_modules
-          key: node-modules-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}-${{ env.NODE_VERSION }}
-
-      - name: Restore frontend SDK
-        id: cached-sdk-frontend
-        uses: actions/cache@v4
-        with:
-          path: apps/frontend/src/generated
-          key: ${{ env.FRONTEND_SDK_KEY }}
-          restore-keys: |
-            ${{ env.FRONTEND_SDK_KEY }}
-            sdk-frontend-
-
-      # TODO: See how to proceed with e2e caching because there is some error:
-      # - You're caching 'node_modules' but are not caching this path: /home/runner/.cache/Cypress
-      # - You ran 'npm install' at an earlier build step but did not persist: /home/runner/.cache/Cypress
-      # For now it doesn't take so much time to install node_modules in the e2e because there are only few.
-      # - name: Cache e2e node_modules
-      #   env:
-      #     CYPRESS_CACHE_FOLDER: cache/Cypress
-      #   id: cached-node-modules-e2e
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: apps/e2e/node_modules
-      #     key: node-modules-${{ hashFiles('apps/e2e/package-lock.json') }}-${{ env.NODE_VERSION }}
-
+      # Removed restore cache steps for node_modules and SDK
+      # The commented cache for e2e node_modules is also removed
       - name: Install e2e dependencies
         env:
           CYPRESS_CACHE_FOLDER: .cache/Cypress
-        if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
 
       - name: Download required repositories
@@ -356,7 +230,6 @@ jobs:
           PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
           npm run e2e:after:dev:stfc
 
       - name: Run e2e tests
@@ -395,7 +268,6 @@ jobs:
           AUTH_CLIENT_SECRET: useroffice
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
           npm run e2e:after:dev -- --dns-result-order=ipv4first
 
       - name: Upload cypres screenshots
