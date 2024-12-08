@@ -2,13 +2,13 @@ version: "3.1"
 
 services:
   duo-cron-job:
-    image: ghcr.io/userofficeproject/user-office-cron:develop
+    image: registry.esss.lu.se/jekabskarklins/jekabs-test/user-office-cron:develop
     environment:
       API_URL: http://host.docker.internal:4000/graphql
       API_AUTH_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoyLCJ1c2VyX3RpdGxlIjoiTXIuIiwiZmlyc3RuYW1lIjoiQW5kZXJzIiwibWlkZGxlbmFtZSI6IkFkYW0iLCJsYXN0bmFtZSI6IkFuZGVyc3NvbiIsInVzZXJuYW1lIjoidGVzdG9mZmljZXIiLCJwcmVmZXJyZWRuYW1lIjoiUmhpYW5ub24iLCJvcmNpZCI6Ijg3ODMyMTg5NyIsImdlbmRlciI6Im1hbGUiLCJuYXRpb25hbGl0eSI6IkZyZW5jaCIsImJpcnRoZGF0ZSI6IjE5ODEtMDgtMDRUMjI6MDA6MDAuMDAwWiIsIm9yZ2FuaXNhdGlvbiI6IlBmYW5uZXJzdGlsbCBhbmQgU29ucyIsImRlcGFydG1lbnQiOiJJVCBkZXBhcnRtZW50Iiwib3JnYW5pc2F0aW9uX2FkZHJlc3MiOiJDb25nbywgQWxsZW5ldmlsbGUsIDM1ODIzIE11ZWxsZXIgR2xlbnMiLCJwb3NpdGlvbiI6IkxpYWlzb24iLCJlbWFpbCI6IkFhcm9uX0hhcnJpczQ5QGdtYWlsLmNvbSIsImVtYWlsVmVyaWZpZWQiOnRydWUsInRlbGVwaG9uZSI6IjcxMS0zMTYtNTcyOCIsInRlbGVwaG9uZV9hbHQiOiIxLTM1OS04NjQtMzQ4OSB4NzM5MCIsImNyZWF0ZWQiOiIyMDE5LTEwLTE3VDEwOjU4OjM4LjczNVoiLCJ1cGRhdGVkIjoiMjAxOS0xMC0xN1QxMDo1ODozOC43MzVaIn0sInJvbGVzIjpbeyJpZCI6Miwic2hvcnRDb2RlIjoidXNlcl9vZmZpY2VyIiwidGl0bGUiOiJVc2VyIE9mZmljZXIifV0sImlhdCI6MTU3MTMyNzQ2Mn0.NinmUuwuu0D6syqwd2z5J1BaqhwRPlFaxtML8sA2Ang
 
   db:
-    image: postgres:16-alpine
+    image: registry.esss.lu.se/jekabskarklins/jekabs-test/postgres:16-alpine
     restart: always
     environment:
       POSTGRES_PASSWORD: duopassword
@@ -20,7 +20,7 @@ services:
       - ./db_patches/:/docker-entrypoint-initdb.d/
 
   dev-auth-server:
-    image: "ghcr.io/userofficeproject/user-office-development-authorization-server:develop"
+    image: "registry.esss.lu.se/jekabskarklins/jekabs-test/user-office-development-authorization-server:develop"
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       PORT: 5000
@@ -30,7 +30,7 @@ services:
       - "db"
 
   factory:
-    image: ghcr.io/userofficeproject/user-office-factory:${USER_OFFICE_FACTORY_TAG}
+    image: registry.esss.lu.se/jekabskarklins/jekabs-test/user-office-factory:${USER_OFFICE_FACTORY_TAG}
     init: true
     environment:
       NODE_ENV: development
