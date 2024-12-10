@@ -5,7 +5,7 @@ import NotFound from 'components/common/NotFound';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, Call, QuestionaryStep } from 'generated/sdk';
-import { useCallData } from 'hooks/call/useCallData';
+import { useCallCloseData } from 'hooks/call/useCallCloseData';
 import { useBlankQuestionaryStepsDataByCallId } from 'hooks/questionary/useBlankQuestionaryStepsDataByCallId';
 import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
@@ -57,8 +57,7 @@ export default function ProposalCreate() {
   }>();
   const { questionarySteps } = useBlankQuestionaryStepsDataByCallId(callId);
 
-  // get call using api
-  const { call } = useCallData(callId);
+  const { call } = useCallCloseData(callId);
   const { userData } = useBasicUserData(user.id);
   if (!questionarySteps || !call || !userData) {
     return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;

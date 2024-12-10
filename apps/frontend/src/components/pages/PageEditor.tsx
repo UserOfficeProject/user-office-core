@@ -1,12 +1,15 @@
 import React from 'react';
 
 import SimpleTabs from 'components/common/SimpleTabs';
-import { PageName } from 'generated/sdk';
+import { PageName, UserRole } from 'generated/sdk';
+import { useXpressAccess } from 'hooks/common/useXpressAccess';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import PageInputBox from './PageInputBox';
 
 export default function PageEditor() {
+  const isXpressRouteEnabled = useXpressAccess([UserRole.USER_OFFICER]);
+
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
@@ -20,6 +23,7 @@ export default function PageEditor() {
             'Footer',
             'Login',
             'Grade guide',
+            ...(isXpressRouteEnabled ? ['Xpress management'] : []),
           ]}
         >
           <PageInputBox
@@ -54,6 +58,12 @@ export default function PageEditor() {
             pageName={PageName.GRADEGUIDEPAGE}
             heading={'Set grade guide page'}
           />
+          {isXpressRouteEnabled && (
+            <PageInputBox
+              pageName={PageName.XPRESSMANAGEMENTPAGE}
+              heading={'Set Xpress management page notice'}
+            />
+          )}
         </SimpleTabs>
       </StyledPaper>
     </StyledContainer>

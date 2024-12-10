@@ -61,6 +61,11 @@ export interface ProposalDataSource {
     primaryKey: number,
     referenceNumber?: string
   ): Promise<Proposal>;
+  submitImportedProposal(
+    primaryKey: number,
+    referenceNumber: string,
+    submittedDate: Date
+  ): Promise<Proposal | null>;
   deleteProposal(primaryKey: number): Promise<Proposal>;
   markEventAsDoneOnProposals(
     event: Event,

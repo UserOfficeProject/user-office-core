@@ -1,0 +1,6 @@
+query getCallSubmissionDetails($callId: Int!) {
+  call(callId: $callId) {
+    proposalWorkflowId
+    submissionMessage
+  }
+}

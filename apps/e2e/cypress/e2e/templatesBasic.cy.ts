@@ -846,17 +846,70 @@ context('Template Basic tests', () => {
     });
 
     it('User officer can view proposals on template', () => {
-      cy.login('officer');
-      cy.visit('/ProposalTemplates');
+      const alternateTitle = 'Alternate title';
+      // Create a proposal on a new call using a new template
+      cy.createTemplate({
+        name: 'alternate template',
+        groupId: TemplateGroupId.PROPOSAL,
+      }).then((templateResult) =>
+        cy
+          .createCall({
+            ...newCall,
+            proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+            templateId: templateResult.createTemplate.templateId,
+          })
+          .then((callResult) =>
+            cy
+              .createProposal({ callId: callResult.createCall.id })
+              .then((result) =>
+                cy
+                  .updateProposal({
+                    proposalPk: result.createProposal.primaryKey,
+                    title: alternateTitle,
+                    abstract: proposal.abstract,
+                    proposerId: initialDBData.users.user1.id,
+                  })
+                  .then(() => {
+                    cy.login('officer');
+                    cy.visit('/ProposalTemplates');
+                    // Both templates should be listed
+                    cy.get('[data-cy^="proposals-count-"]').should(
+                      'have.length',
+                      2
+                    );
 
-      cy.contains(initialDBData.template.name)
-        .parent()
-        .find('[data-cy=proposals-count]')
-        .contains('1')
-        .click();
+                    // Only the default proposal should count against the default call and appear when the count is clicked
+                    cy.get(
+                      `[data-cy=proposals-count-${initialDBData.template.id}]`
+                    )
+                      .contains('1')
+                      .click();
 
-      cy.get('[data-cy=proposals-modal]').contains(
-        initialDBData.proposal.title
+                    cy.get('[data-cy=proposals-modal]').contains(
+                      initialDBData.proposal.title
+                    );
+                    cy.get('[data-cy=proposals-modal]')
+                      .contains(alternateTitle)
+                      .should('not.exist');
+
+                    cy.get('[data-testid="CloseIcon"').click();
+
+                    // Only the new proposal should count against the new call and appear when the count is clicked
+                    cy.get(
+                      `[data-cy=proposals-count-${templateResult.createTemplate.templateId}]`
+                    )
+                      .contains('1')
+                      .click();
+
+                    cy.get('[data-cy=proposals-modal]')
+                      .contains(initialDBData.proposal.title)
+                      .should('not.exist');
+                    cy.get('[data-cy=proposals-modal]').contains(
+                      alternateTitle
+                    );
+                  })
+              )
+          )
       );
     });
 

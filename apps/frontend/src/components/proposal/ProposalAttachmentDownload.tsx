@@ -10,7 +10,10 @@ import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
 import { DataType, Question } from 'generated/sdk';
-import { useProposalsData } from 'hooks/proposal/useProposalsData';
+import {
+  ProposalsDataQuantity,
+  useProposalsData,
+} from 'hooks/proposal/useProposalsData';
 
 type ProposalAttachmentDownloadProps = {
   close: () => void;
@@ -26,7 +29,10 @@ const ProposalAttachmentDownload = ({
   referenceNumbers,
   downloadProposalAttachment,
 }: ProposalAttachmentDownloadProps) => {
-  const { proposalsData, loading } = useProposalsData({ referenceNumbers });
+  const { proposalsData, loading } = useProposalsData(
+    { referenceNumbers },
+    ProposalsDataQuantity.FULL
+  );
   const { enqueueSnackbar } = useSnackbar();
   const [selectedAttachmentsQuestions, setSelectedAttachmentsQuestions] =
     useState<string[]>([]);

@@ -1,0 +1,10 @@
+query getCallCloseDetails($callId: Int!) {
+  call(callId: $callId) {
+    isActive
+    isActiveInternal
+    referenceNumberFormat
+    endCallInternal
+    startCall
+    endCall
+  }
+}

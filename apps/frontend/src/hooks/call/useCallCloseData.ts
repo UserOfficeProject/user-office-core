@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Call } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useCallData(callId?: string | null) {
+export function useCallCloseData(callId?: string | null) {
   const [call, setCall] = useState<Call | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +13,7 @@ export function useCallData(callId?: string | null) {
     let unmounted = false;
     if (callId) {
       api()
-        .getCall({ callId: parseInt(callId) })
+        .getCallCloseDetails({ callId: parseInt(callId) })
         .then((data) => {
           if (unmounted) {
             return;

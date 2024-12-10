@@ -1,0 +1,8 @@
+mutation deleteProposalScientistComment(
+  $commentId: Int!
+) {
+  deleteProposalScientistComment(commentId: $commentId) {
+    commentId
+    comment
+  }
+}

@@ -1,0 +1,7 @@
+query getTechniquesMinimal {
+  techniques {
+    techniques {
+      ...techniqueMinimal
+    }
+  }
+}

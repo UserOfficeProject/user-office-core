@@ -333,6 +333,7 @@ test('User cannot import a proposal', () => {
       submitterId: 1,
       referenceNumber: '21219999',
       callId: 1,
+      submittedDate: new Date(),
     })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
@@ -343,6 +344,7 @@ test('User Officer can import a legacy proposal', () => {
       submitterId: 1,
       referenceNumber: '21219999',
       callId: 1,
+      submittedDate: new Date(),
     })
   ).resolves.toBeInstanceOf(Proposal);
 });
@@ -353,6 +355,7 @@ test('Proposal import is creating a proposal', () => {
       submitterId: 1,
       referenceNumber: '21219999',
       callId: 1,
+      submittedDate: new Date(),
     })
   ).resolves.toHaveProperty('proposerId', 1);
 });
@@ -363,6 +366,7 @@ test('Proposal import is updating the proposal', async () => {
     referenceNumber: '21219999',
     callId: 1,
     title: 'new title',
+    submittedDate: new Date(),
   });
 
   return expect(
@@ -376,6 +380,7 @@ test('Proposal import is submitting the proposal', () => {
       submitterId: 1,
       referenceNumber: '21219999',
       callId: 1,
+      submittedDate: new Date(),
     })
   ).resolves.toHaveProperty('proposalId', '21219999');
 });
@@ -386,6 +391,20 @@ test('Proposal cannot be submitted without a call', () => {
       submitterId: 1,
       referenceNumber: '21219999',
       callId: -1,
+      submittedDate: new Date(),
+    })
+  ).resolves.not.toBeInstanceOf(Proposal);
+});
+
+test('Proposal can be submitted with techniques and instrument', () => {
+  return expect(
+    proposalMutations.import(dummyUserOfficerWithRole, {
+      submitterId: 1,
+      referenceNumber: '21219999',
+      callId: -1,
+      submittedDate: new Date(),
+      techniqueIds: [1, 2],
+      instrumentId: 1,
     })
   ).resolves.not.toBeInstanceOf(Proposal);
 });
