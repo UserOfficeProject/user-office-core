@@ -1,5 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
@@ -13,14 +13,14 @@ import { UserAuthorization } from '../UserAuthorization';
 export class GenericTemplateQuestionaryAuthorizer
   implements QuestionaryAuthorizer
 {
-  private proposalAuth = container.resolve(ProposalAuthorization);
-
   constructor(
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.GenericTemplateDataSource)
     private genericTemplateDataSource: GenericTemplateDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
     return this.hasRights(agent, questionaryId);

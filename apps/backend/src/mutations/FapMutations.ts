@@ -8,7 +8,7 @@ import {
   saveFapMeetingDecisionValidationSchema,
   createFapValidationSchema,
 } from '@user-office-software/duo-validation';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -52,7 +52,6 @@ import { UpdateFapTimeAllocationArgs } from '../resolvers/mutations/UpdateFapPro
 
 @injectable()
 export default class FapMutations {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.FapDataSource)
     private dataSource: FapDataSource,
@@ -66,7 +65,9 @@ export default class FapMutations {
     private callDataSource: CallDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.QuestionaryDataSource)
-    public questionaryDataSource: QuestionaryDataSource
+    public questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @ValidateArgs(createFapValidationSchema)

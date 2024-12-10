@@ -32,7 +32,7 @@ export class ProposalAuthorization {
     private callDataSource: CallDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
   private async resolveProposal(
@@ -61,14 +61,6 @@ export class ProposalAuthorization {
     }
   }
 
-  async isMemberOfProposal(
-    agent: UserJWT | null,
-    proposalPk: number
-  ): Promise<boolean>;
-  async isMemberOfProposal(
-    agent: UserJWT | null,
-    proposal: Proposal | null
-  ): Promise<boolean>;
   async isMemberOfProposal(
     agent: UserJWT | null,
     proposalOrPk: Proposal | number | null
@@ -205,14 +197,6 @@ export class ProposalAuthorization {
 
   async hasReadRights(
     agent: UserWithRole | null,
-    proposal: Proposal
-  ): Promise<boolean>;
-  async hasReadRights(
-    agent: UserWithRole | null,
-    proposalId: number
-  ): Promise<boolean>;
-  async hasReadRights(
-    agent: UserWithRole | null,
     proposalOrProposalId: Proposal | number
   ): Promise<boolean> {
     if (!agent) {
@@ -235,13 +219,13 @@ export class ProposalAuthorization {
           (await this.isMemberOfProposal(agent, proposal)) ||
           (await this.isVisitorOfProposal(agent, proposal.primaryKey));
         break;
-      // case Roles.INSTRUMENT_SCIENTIST:
-      //   haveAccess =
-      //     (await this.isInstrumentManagerToProposal(
-      //       agent,
-      //       proposal.primaryKey
-      //     )) || (await this.isScientistToProposal(agent, proposal.primaryKey));
-      //   break;
+      case Roles.INSTRUMENT_SCIENTIST:
+        haveAccess =
+          (await this.isInstrumentManagerToProposal(
+            agent,
+            proposal.primaryKey
+          )) || (await this.isScientistToProposal(agent, proposal.primaryKey));
+        break;
       case Roles.INTERNAL_REVIEWER:
         haveAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
         break;
@@ -294,14 +278,6 @@ export class ProposalAuthorization {
     }
   }
 
-  async hasWriteRights(
-    agent: UserWithRole | null,
-    proposal: Proposal
-  ): Promise<boolean>;
-  async hasWriteRights(
-    agent: UserWithRole | null,
-    proposalId: number
-  ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
     proposalOrProposalId: Proposal | number

@@ -2,6 +2,7 @@ import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
@@ -83,6 +84,7 @@ mapClass(
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
+mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
