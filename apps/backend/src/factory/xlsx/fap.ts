@@ -1,4 +1,5 @@
 import { groupBy } from 'lodash';
+import { stripHtml } from 'string-strip-html';
 import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
@@ -125,7 +126,7 @@ export const collectFapXLSXRowData = async (
           proposal.title,
           proposal.proposal_id,
           proposal.time_allocation,
-          proposal.comment,
+          stripHtml(proposal.comment ?? '').result,
           proposal.rank_order,
           proposal.proposer_id,
           proposalAnswers,

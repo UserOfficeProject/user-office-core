@@ -44,4 +44,7 @@ export const Tokens = {
   PopulateCallRow: Symbol('PopulateCallRow'),
   DownloadService: Symbol('DownloadService'),
   StatusActionsLogsDataSource: Symbol('StatusActionsLogsDataSource'),
+  ProposalInternalCommentsDataSource: Symbol(
+    'ProposalInternalCommentsDataSource'
+  ),
 };
