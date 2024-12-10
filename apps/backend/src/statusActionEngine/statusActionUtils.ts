@@ -2,14 +2,21 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
+import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { InstrumentWithManagementTime } from '../models/Instrument';
+import { Answer } from '../models/Questionary';
+import { Technique } from '../models/Technique';
+import { DataType } from '../models/Template';
 import { BasicUserDetails, User } from '../models/User';
 import { StatusActionsLogsArgs } from '../resolvers/queries/StatusActionsLogsQuery';
 import {
@@ -60,7 +67,56 @@ export type EmailReadyType = {
   pi?: BasicUserDetails | null;
   coProposers?: BasicUserDetails[] | null;
   instruments?: InstrumentWithManagementTime[];
+  techniques?: Technique[];
+  samples?: Answer[];
+  hazards?: Answer[];
 };
+
+async function stepAnswers(
+  fields: Answer[],
+  answerProposalPk: number
+): Promise<Answer[] | null> {
+  const retVal: Answer[] = [];
+  const questionaryDataSource: QuestionaryDataSource = container.resolve(
+    Tokens.QuestionaryDataSource
+  );
+  for (const answer of fields) {
+    if (answer.value !== null) {
+      if (answer.question.dataType === DataType.GENERIC_TEMPLATE) {
+        const genericTemplateDataSource =
+          container.resolve<GenericTemplateDataSource>(
+            Tokens.GenericTemplateDataSource
+          );
+        const genericTemplates =
+          await genericTemplateDataSource.getGenericTemplates({
+            filter: { proposalPk: answerProposalPk },
+          });
+        const subGenericTemplates = genericTemplates
+          .filter(
+            (genericTemplate) =>
+              genericTemplate.questionId === answer.question.id
+          )
+          .map((genericTemplate) => genericTemplate);
+        for (const sTemplate of subGenericTemplates) {
+          const stQuestionarySteps =
+            await questionaryDataSource.getQuestionarySteps(
+              sTemplate.questionaryId
+            );
+          for (const stStep of stQuestionarySteps) {
+            const stFields = stStep.fields.map((field) => field);
+            for (const stAnswer of stFields) {
+              retVal.push(stAnswer);
+            }
+          }
+        }
+      } else {
+        retVal.push(answer);
+      }
+    }
+  }
+
+  return retVal;
+}
 
 /**
  * Populates an array of EmailReadyType[] objects containing all user and proposal data needed to send one or more emails.
@@ -99,6 +155,51 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           ? await usersDataSource.getProposalUsers(proposal.primaryKey)
           : null;
 
+        const callDataSource = container.resolve<CallDataSource>(
+          Tokens.CallDataSource
+        );
+        let techniques: Technique[] = [];
+        let hazardAnswers: Answer[] = [];
+        let sampleAnswers: Answer[] = [];
+        const XCalls = await callDataSource
+          .getCalls({
+            proposalStatusShortCode: 'QUICK_REVIEW',
+          })
+          .then((calls) => calls.map((call) => call.id));
+        if (XCalls.includes(proposal.callId)) {
+          const techniqueDataSource: TechniqueDataSource = container.resolve(
+            Tokens.TechniqueDataSource
+          );
+          techniques = await techniqueDataSource.getTechniquesByProposalPk(
+            proposal.primaryKey
+          );
+          const questionaryDataSource: QuestionaryDataSource =
+            container.resolve(Tokens.QuestionaryDataSource);
+          const questionarySteps =
+            await questionaryDataSource.getQuestionarySteps(
+              proposal.questionaryId
+            );
+          for await (const step of questionarySteps) {
+            const stepFields = step.fields.map((field) => field);
+            if (step.topic.title === 'Samples') {
+              const answers = await stepAnswers(
+                stepFields,
+                proposal.primaryKey
+              );
+              if (answers !== null) {
+                sampleAnswers = sampleAnswers.concat(answers);
+              }
+            } else if (step.topic.title === 'Hazards') {
+              const answers = await stepAnswers(
+                stepFields,
+                proposal.primaryKey
+              );
+              if (answers !== null) {
+                hazardAnswers = hazardAnswers.concat(answers);
+              }
+            }
+          }
+        }
         emailReadyUsersWithProposals.push({
           id: recipientsWithEmailTemplate.recipient.name,
           proposals: [proposal],
@@ -109,6 +210,9 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           preferredName: recipient.preferredname,
           pi: pi,
           coProposers: coProposers,
+          techniques: techniques,
+          samples: sampleAnswers,
+          hazards: hazardAnswers,
         });
       }
     })

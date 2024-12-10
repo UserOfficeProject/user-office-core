@@ -144,7 +144,6 @@ export const emailStatusActionRecipient = async (
         proposals,
         recipientWithTemplate
       );
-
       await sendMail(
         ISs,
         statusActionLogger({
@@ -357,6 +356,9 @@ const sendMail = async (
               firstName: recipientWithData.firstName,
               lastName: recipientWithData.lastName,
               preferredName: recipientWithData.preferredName,
+              techniques: recipientWithData.techniques,
+              samples: recipientWithData.samples,
+              hazards: recipientWithData.hazards,
             },
             recipients: [{ address: recipientWithData.email }],
           });
