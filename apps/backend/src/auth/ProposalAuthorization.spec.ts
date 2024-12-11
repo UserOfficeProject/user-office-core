@@ -98,9 +98,25 @@ test('A FAP Chair does not have access to proposal not there FAP', async () => {
   ).resolves.toEqual(false);
 });
 
-test('A instrument sci has access to any proposal', async () => {
+test('A instrument sci can access proposals they are on', async () => {
   return expect(
     proposalAuthorization.hasReadRights(dummyInstrumentScientist, 1)
+  ).resolves.toEqual(true);
+});
+
+test('A instrument sci cannott access proposals they are not on', async () => {
+  return expect(
+    proposalAuthorization.hasReadRights(
+      {
+        ...dummyUserNotOnProposalWithRole,
+        currentRole: {
+          id: 1,
+          title: 'Instrument Scientist',
+          shortCode: 'instrument_scientist',
+        },
+      },
+      1
+    )
   ).resolves.toEqual(true);
 });
 
