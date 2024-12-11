@@ -52,4 +52,14 @@ export class GenericTemplatesQuery {
 
     return response;
   }
+
+  @Query(() => [GenericTemplate], { nullable: true })
+  async genericTemplatesOnCopy(@Ctx() context: ResolverContext) {
+    const response =
+      await context.queries.genericTemplate.genericTemplatesOnCopy(
+        context.user
+      );
+
+    return response;
+  }
 }

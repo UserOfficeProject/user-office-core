@@ -254,6 +254,42 @@ context('GenericTemplates tests', () => {
     });
   };
 
+  const createProposalsWithGenericTemplate = () => {
+    cy.contains('New proposal', { matchCase: false }).click();
+    cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+    cy.get('[data-cy=title] input').type(proposalTitle[1]);
+
+    cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
+
+    cy.contains('Save and continue').click();
+
+    cy.finishedLoading();
+
+    cy.contains(addButtonLabel[0]).click();
+
+    cy.contains(genericTemplateQuestions[0]);
+
+    cy.get('[data-cy=title-input] textarea').first().clear();
+
+    cy.get(
+      '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+    ).click();
+
+    cy.contains('This is a required field');
+
+    cy.get('[data-cy=title-input] textarea')
+      .first()
+      .clear()
+      .type(genericTemplateTitle)
+      .should('have.value', genericTemplateTitle)
+      .blur();
+
+    cy.get(
+      '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+    ).click();
+  };
+
   beforeEach(() => {
     // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page before each test.
     // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
@@ -679,32 +715,16 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal) {
-          cy.updateProposal({
-            proposalPk: result.createProposal.primaryKey,
-            title: proposalTitle[0],
-            abstract: faker.lorem.words(3),
-            proposerId: initialDBData.users.user1.id,
-          });
-          cy.createGenericTemplate({
-            proposalPk: result.createProposal.primaryKey,
-            title: genericTemplateTitle,
-            templateId: createdGenericTemplateId,
-            questionId: createdQuestion1Id,
-          });
-        }
-      });
 
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
-
+      createProposalsWithGenericTemplate();
+      cy.finishedLoading();
       cy.contains('New proposal', { matchCase: false }).click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
 
       cy.get('[data-cy=title] input').type(proposalTitle[1]);
-
-      cy.get('[data-cy=abstract] textarea').first().type(faker.lorem.words(2));
+      cy.get('[data-cy=abstract] textarea').first().type(proposalTitle[1]);
 
       cy.contains('Save and continue').click();
 
@@ -715,7 +735,7 @@ context('GenericTemplates tests', () => {
       cy.contains(copyButtonLabel);
 
       cy.get('[data-cy="genericTemplateProposalTitle"]').click();
-      cy.get('[role=presentation]').contains(proposalTitle[0]).click();
+      cy.get('[role=presentation]').contains(proposalTitle[1]).click();
 
       cy.get('[data-cy="genericTemplateAnswers"]').click();
       cy.get('[role=presentation]').contains(genericTemplateTitle).click();
@@ -734,25 +754,12 @@ context('GenericTemplates tests', () => {
         templateId: createdTemplateId,
         proposalWorkflowId: workflowId,
       });
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal) {
-          cy.updateProposal({
-            proposalPk: result.createProposal.primaryKey,
-            title: proposalTitle[0],
-            abstract: faker.lorem.words(3),
-            proposerId: initialDBData.users.user1.id,
-          });
-          cy.createGenericTemplate({
-            proposalPk: result.createProposal.primaryKey,
-            title: genericTemplateTitle,
-            templateId: createdGenericTemplateId,
-            questionId: createdQuestion1Id,
-          });
-        }
-      });
 
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
+
+      createProposalsWithGenericTemplate();
+      cy.finishedLoading();
 
       cy.contains('New proposal', { matchCase: false }).click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -770,7 +777,7 @@ context('GenericTemplates tests', () => {
       cy.contains(copyButtonLabel);
 
       cy.get('[data-cy="genericTemplateProposalTitle"]').click();
-      cy.get('[role=presentation]').contains(proposalTitle[0]).click();
+      cy.get('[role=presentation]').contains(proposalTitle[1]).click();
 
       cy.get('[data-cy="genericTemplateAnswers"]').click();
       cy.get('[role=presentation]').contains(genericTemplateTitle).click();
@@ -792,30 +799,24 @@ context('GenericTemplates tests', () => {
         proposalWorkflowId: workflowId,
       });
 
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        if (result.createProposal) {
-          cy.updateProposal({
-            proposalPk: result.createProposal.primaryKey,
-            title: proposalTitle[0],
-            abstract: faker.lorem.words(3),
-            proposerId: initialDBData.users.user1.id,
-          });
-          cy.createGenericTemplate({
-            proposalPk: result.createProposal.primaryKey,
-            title: genericTemplateTitle,
-            templateId: createdGenericTemplateId,
-            questionId: createdQuestion1Id,
-          });
-        }
-      });
       cy.updateQuestion({
         id: createdQuestion1Id,
         question: genericTemplateQuestion[0],
         config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":false,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
       });
 
+      cy.updateQuestionTemplateRelationSettings({
+        questionId: createdQuestion1Id,
+        templateId: 4,
+        config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":false,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+        dependencies: [],
+      });
+
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
+
+      createProposalsWithGenericTemplate();
+      cy.finishedLoading();
 
       cy.contains('New proposal', { matchCase: false }).click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -833,15 +834,13 @@ context('GenericTemplates tests', () => {
       cy.contains(copyButtonLabel);
 
       cy.get('[data-cy="genericTemplateProposalTitle"]').click();
-      cy.get('[role=presentation]').contains(proposalTitle[0]).click();
+      cy.get('[role=presentation]').contains(proposalTitle[1]).click();
 
       cy.get('[data-cy="genericTemplateAnswers"]').click();
       cy.get('[role=presentation]').contains(genericTemplateTitle).click();
-
       cy.get('[data-cy="genericTemplateAnswerSaveButton"]').click({
         force: true,
       });
-
       cy.contains(genericTemplateTitle);
 
       cy.contains('Save and continue').click();
