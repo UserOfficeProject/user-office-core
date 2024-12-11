@@ -300,6 +300,20 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return newObj;
   }
 
+  async submitImportedProposal(
+    primaryKey: number,
+    referenceNumber: string,
+    submittedDate: Date
+  ): Promise<Proposal> {
+    const submitted = await this.submitProposal(primaryKey, referenceNumber);
+
+    const newObj = { ...submitted, submittedDate };
+
+    Object.setPrototypeOf(newObj, Proposal.prototype);
+
+    return newObj;
+  }
+
   async get(id: number) {
     return allProposals.find((proposal) => proposal.primaryKey === id) || null;
   }
@@ -382,7 +396,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     statusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
-    return new Proposals(allProposals);
+    const proposals = allProposals.map((p) => {
+      return { ...p, statusId };
+    });
+
+    return { proposals: proposals };
   }
 
   async getProposalBookingsByProposalPk(

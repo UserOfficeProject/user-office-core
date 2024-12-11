@@ -200,8 +200,8 @@ const addTopicInformation = async (
         );
         const instruments = await instrumentDataSource.getInstrumentsByIds(ids);
 
-        const call = await callDataSource.getCallByQuestionId(
-          answer.question.id
+        const call = await callDataSource.getCallByAnswerIdProposal(
+          answer.answerId
         );
         answer.value = instrumentPickerAnswer(answer, instruments, call);
       }
@@ -238,6 +238,10 @@ export const collectProposalPDFData = async (
   }
 
   const call = await baseContext.queries.call.get(user, proposal.callId);
+
+  if (call === null) {
+    throw new Error('Call not found for the proposal');
+  }
 
   /*
    * Because naming things is hard, the PDF template ID is the templateId for
@@ -386,10 +390,7 @@ export const collectProposalPDFData = async (
           : [Number(answer.value?.instrumentId || '0')];
         const instruments =
           await baseContext.queries.instrument.getInstrumentsByIds(user, ids);
-        const call = await baseContext.queries.call.getCallByQuestionId(
-          user,
-          answer.question.id
-        );
+
         answer.value = instrumentPickerAnswer(answer, instruments, call);
       } else if (answer.question.dataType === DataType.TECHNIQUE_PICKER) {
         const techniqueIds = Array.isArray(answer.value)

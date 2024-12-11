@@ -12,10 +12,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import parse from 'html-react-parser';
 import React, { Suspense, useContext, useEffect } from 'react';
 
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { CallsFilter, PageName } from 'generated/sdk';
+import { PageName, SettingsId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
-import { useCallsData } from 'hooks/call/useCallsData';
 
 import AppToolbar from './AppToolbar/AppToolbar';
 import MenuItems from './menu/MenuItems';
@@ -23,15 +23,15 @@ import InformationModal from './pages/InformationModal';
 
 type BottomNavItemProps = {
   /** Content of the information modal. */
-  text?: string;
-  /** Text of the button link in the information modal. */
   linkText?: string;
+  /** Page to load */
+  pageName: PageName;
 };
 
-const BottomNavItem = ({ text, linkText }: BottomNavItemProps) => {
+const BottomNavItem = ({ pageName, linkText }: BottomNavItemProps) => {
   return (
     <InformationModal
-      text={text}
+      pageName={pageName}
       linkText={linkText}
       linkStyle={{
         fontSize: '12px',
@@ -58,20 +58,8 @@ const PageLayout = ({
       : !isTabletOrMobile
   );
 
-  const { currentRole, isInternalUser } = useContext(UserContext);
-  function getDashBoardCallFilter(): CallsFilter {
-    return isInternalUser
-      ? {
-          isActive: true,
-          isEnded: false,
-          isActiveInternal: true,
-        }
-      : {
-          isActive: true,
-          isEnded: false,
-        };
-  }
-  const { calls } = useCallsData(getDashBoardCallFilter());
+  const { currentRole } = useContext(UserContext);
+  const { settingsMap } = useContext(SettingsContext);
 
   const drawer = {
     width: drawerWidth,
@@ -121,8 +109,11 @@ const PageLayout = ({
     }
   }, [isTabletOrMobile]);
 
-  const [, privacyPageContent] = useGetPageContent(PageName.PRIVACYPAGE);
-  const [, faqPageContent] = useGetPageContent(PageName.HELPPAGE);
+  const displayPrivacyPageLink =
+    settingsMap.get(SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK)
+      ?.settingsValue === 'true';
+  const displayFAQLink =
+    settingsMap.get(SettingsId.DISPLAY_FAQ_LINK)?.settingsValue === 'true';
   const [, footerContent] = useGetPageContent(PageName.FOOTERCONTENT);
 
   return (
@@ -174,7 +165,7 @@ const PageLayout = ({
           </Box>
           <Divider />
           <List disablePadding>
-            <MenuItems callsData={calls} currentRole={currentRole} />
+            <MenuItems currentRole={currentRole} />
           </List>
           <Divider />
         </Drawer>
@@ -217,12 +208,15 @@ const PageLayout = ({
               background: 'transparent',
             }}
           >
-            <BottomNavItem
-              text={privacyPageContent}
-              linkText={'Privacy Statement'}
-            />
-            <BottomNavItem text={faqPageContent} linkText={'FAQ'} />
-            <BottomNavItem />
+            {displayPrivacyPageLink && (
+              <BottomNavItem
+                pageName={PageName.PRIVACYPAGE}
+                linkText={'Privacy Statement'}
+              />
+            )}
+            {displayFAQLink && (
+              <BottomNavItem pageName={PageName.HELPPAGE} linkText={'FAQ'} />
+            )}
           </BottomNavigation>
         </Box>
       </Box>

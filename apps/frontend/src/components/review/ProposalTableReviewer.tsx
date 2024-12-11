@@ -24,7 +24,7 @@ import {
 } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useUserWithReviewsData } from 'hooks/user/useUserData';
 import { capitalize, setSortDirectionOnSortField } from 'utils/helperFunctions';
@@ -84,7 +84,7 @@ const columns: (
 const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const downloadPDFProposal = useDownloadPDFProposal();
   const { calls, loadingCalls } = useCallsData();
-  const { instruments, loadingInstruments } = useInstrumentsData();
+  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
   const isFapReviewer = useCheckAccess([UserRole.FAP_REVIEWER]);
@@ -96,7 +96,6 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
   const reviewStatus = searchParams.get('reviewStatus') ?? ReviewStatus.DRAFT;
   const reviewer = searchParams.get('reviewer') ?? ReviewerFilter.ME;
   const reviewModal = searchParams.get('reviewModal');
-  const selection = searchParams.getAll('selection');
   const sortField = searchParams.get('sortField');
   const sortDirection = searchParams.get('sortDirection');
 
@@ -143,6 +142,8 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
         },
       })) || [];
 
+    const selection = searchParams.getAll('selection');
+
     if (selection.length > 0) {
       const selectionSet = new Set(selection);
       setPreselectedProposalsData(
@@ -151,7 +152,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     } else {
       setPreselectedProposalsData(getProposalsToGradeDataFromUserData());
     }
-  }, [userData, selection]);
+  }, [userData, searchParams]);
 
   const reviewerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
