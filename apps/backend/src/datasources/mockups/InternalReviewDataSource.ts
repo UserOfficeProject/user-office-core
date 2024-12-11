@@ -28,7 +28,17 @@ export const anotherDummyReview = new InternalReview(
   1,
   new Date('2023-06-21')
 );
-export const dummyReviews = [dummyReview, anotherDummyReview];
+export const thirdDummyReview = new InternalReview(
+  3,
+  'Safety_review',
+  'This is just a test for internal review',
+  '',
+  2,
+  1,
+  1,
+  new Date('2023-06-21')
+);
+export const dummyReviews = [dummyReview, anotherDummyReview, thirdDummyReview];
 
 export class InternalReviewDataSourceMock implements InternalReviewDataSource {
   async getInternalReview(id: number): Promise<InternalReview | null> {
@@ -112,10 +122,11 @@ export class InternalReviewDataSourceMock implements InternalReviewDataSource {
     technicalReviewId: number
   ) {
     if (
-      dummyReviews.find((review) => {
-        review.technicalReviewId === technicalReviewId &&
-          review.reviewerId === userId;
-      })
+      dummyReviews.find(
+        (review) =>
+          review.technicalReviewId === technicalReviewId &&
+          review.reviewerId === userId
+      )
     ) {
       return true;
     } else {

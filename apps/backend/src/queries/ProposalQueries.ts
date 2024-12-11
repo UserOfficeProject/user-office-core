@@ -1,5 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -21,12 +21,12 @@ import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 @injectable()
 export default class ProposalQueries {
-  private proposalAuth = container.resolve(ProposalAuthorization);
-
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
     @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
     public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
   ) {}

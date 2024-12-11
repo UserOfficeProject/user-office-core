@@ -47,7 +47,6 @@ import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   private cloneUtils = container.resolve(CloneUtils);
   constructor(
     @inject(Tokens.ProposalDataSource)
@@ -70,6 +69,8 @@ export default class ProposalMutations {
     @inject(Tokens.TechniqueDataSource)
     private techniqueDataSource: TechniqueDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
     private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
   ) {}

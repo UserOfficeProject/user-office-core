@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
@@ -8,10 +8,11 @@ import { ProposalAuthorization } from './ProposalAuthorization';
 
 @injectable()
 export class GenericTemplateAuthorization {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.GenericTemplateDataSource)
-    private genericTemplateDataSource: GenericTemplateDataSource
+    private genericTemplateDataSource: GenericTemplateDataSource,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   private async resolveGenericTemplate(

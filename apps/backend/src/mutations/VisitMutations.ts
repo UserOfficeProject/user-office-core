@@ -23,7 +23,6 @@ import { UserAuthorization } from './../auth/UserAuthorization';
 
 @injectable()
 export default class VisitMutations {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   private visitAuth = container.resolve(VisitAuthorization);
 
   constructor(
@@ -37,7 +36,9 @@ export default class VisitMutations {
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ScheduledEventDataSource)
     private scheduledEventDataSource: ScheduledEventDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @Authorized()

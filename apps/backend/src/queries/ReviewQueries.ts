@@ -14,12 +14,13 @@ import { ReviewsFilter } from '../resolvers/queries/ReviewsQuery';
 
 @injectable()
 export default class ReviewQueries {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   private reviewAuth = container.resolve(ReviewAuthorization);
   private technicalReviewAuth = container.resolve(TechnicalReviewAuthorization);
 
   constructor(
-    @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource
+    @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @Authorized()

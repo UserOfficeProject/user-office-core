@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -16,8 +16,6 @@ import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
 export default class ProposalEsiMutations {
-  private proposalAuth = container.resolve(ProposalAuthorization);
-
   constructor(
     @inject(Tokens.ProposalEsiDataSource)
     private dataSource: ProposalEsiDataSource,
@@ -29,7 +27,9 @@ export default class ProposalEsiMutations {
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @Authorized()
