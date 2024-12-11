@@ -213,7 +213,8 @@ export default function createHandler() {
             event.loggedInUserId,
             event.type,
             json,
-            event.questionarystep.questionaryId.toString()
+            event.array.at(0)?.questionaryId.toString() ??
+              'Questionary ID not found'
           );
           break;
         case Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE:
