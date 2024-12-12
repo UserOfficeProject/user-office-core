@@ -238,7 +238,7 @@ export class ProposalAuthorization {
         );
         break;
       case Roles.USER_OFFICER:
-        haveAccess = this.userAuth.isUserOfficer(agent);
+        haveAccess = true;
         break;
       case Roles.SAMPLE_SAFETY_REVIEWER:
         haveAccess = true;
