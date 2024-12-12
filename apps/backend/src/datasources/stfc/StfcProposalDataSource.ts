@@ -11,6 +11,7 @@ import { Technique } from '../../models/Technique';
 import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
+import { CallDataSource } from '../CallDataSource';
 import database from '../postgres/database';
 import {
   CallRecord,
@@ -41,6 +42,9 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
   protected stfcUserDataSource: StfcUserDataSource = container.resolve(
     Tokens.UserDataSource
   ) as StfcUserDataSource;
+  protected callDataSource: CallDataSource = container.resolve(
+    Tokens.CallDataSource
+  ) as CallDataSource;
 
   async getInstrumentScientistProposals(
     user: UserWithRole,
@@ -55,6 +59,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           ).users.map((user) => user.id),
         ]
       : [];
+
+    const xpressCallIds: number[] = (
+      await this.callDataSource.getCalls({
+        proposalStatusShortCode: 'QUICK_REVIEW',
+      })
+    ).map((call) => call.id);
 
     const proposals = database
       .select('proposal_pk')
@@ -73,6 +83,10 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         'chi.instrument_id'
       )
       .where(function () {
+        if (xpressCallIds) {
+          this.where('proposal_table_view.call_id', 'not in', xpressCallIds);
+        }
+
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains internalReviewers array of objects with id equal to user.id
           this.whereRaw(
