@@ -237,17 +237,17 @@ export class ProposalAuthorization {
           proposal.primaryKey
         );
         break;
-      default:
+      case Roles.USER_OFFICER:
+        haveAccess = this.userAuth.isUserOfficer(agent);
         break;
+      case Roles.SAMPLE_SAFETY_REVIEWER:
+        this.userAuth.isSampleSafetyReviewer(agent);
+        break;
+      default:
+        haveAccess = this.userAuth.hasGetAccessByToken(agent);
     }
 
-    return (
-      this.userAuth.isUserOfficer(agent) ||
-      this.userAuth.isSampleSafetyReviewer(agent) ||
-      this.userAuth.isInstrumentScientist(agent) ||
-      this.userAuth.hasGetAccessByToken(agent) ||
-      haveAccess
-    );
+    return haveAccess;
   }
 
   private async isProposalEditable(
