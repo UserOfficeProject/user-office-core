@@ -104,7 +104,7 @@ test('A instrument sci can access proposals they are on', async () => {
   ).resolves.toEqual(true);
 });
 
-test('A instrument sci cannott access proposals they are not on', async () => {
+test('A instrument sci cannot access proposals they are not on', async () => {
   return expect(
     proposalAuthorization.hasReadRights(
       {
@@ -117,7 +117,7 @@ test('A instrument sci cannott access proposals they are not on', async () => {
       },
       1
     )
-  ).resolves.toEqual(true);
+  ).resolves.toEqual(false);
 });
 
 test('A user officer has access to any proposal', async () => {
