@@ -241,7 +241,7 @@ export class ProposalAuthorization {
         haveAccess = this.userAuth.isUserOfficer(agent);
         break;
       case Roles.SAMPLE_SAFETY_REVIEWER:
-        this.userAuth.isSampleSafetyReviewer(agent);
+        haveAccess = true;
         break;
       default:
         haveAccess = this.userAuth.hasGetAccessByToken(agent);
