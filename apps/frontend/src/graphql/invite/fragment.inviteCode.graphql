@@ -1,0 +1,10 @@
+fragment inviteCode on InviteCode {
+    id
+    code
+    email
+    note
+    createdAt
+    createdByUserId
+    claimedAt
+    claimedByUserId
+}

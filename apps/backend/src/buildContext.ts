@@ -11,6 +11,7 @@ import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import InternalReviewMutations from './mutations/InternalReviewMutations';
+import InviteMutations from './mutations/InviteMutations';
 import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
@@ -93,6 +94,7 @@ const context: BasicResolverContext = {
     file: container.resolve(FileMutations),
     genericTemplate: container.resolve(GenericTemplateMutations),
     instrument: container.resolve(InstrumentMutations),
+    invite: container.resolve(InviteMutations),
     pdfTemplate: container.resolve(PdfTemplateMutations),
     proposal: container.resolve(ProposalMutations),
     proposalEsi: container.resolve(ProposalEsiMutations),
