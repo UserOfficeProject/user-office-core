@@ -425,4 +425,33 @@ export class UserDataSourceMock implements UserDataSource {
   async getUsersByUserNumbers(id: readonly number[]): Promise<User[]> {
     return [dummyUser, dummyUserOfficer];
   }
+
+  async getRolesForUser(id: number) {
+    return [
+      {
+        name: 'ISIS Instrument Scientist',
+      },
+      {
+        name: 'ISIS Administrator',
+      },
+      {
+        name: 'Developer',
+      },
+      {
+        name: 'Admin',
+      },
+      {
+        name: 'ISIS Instrument Scientist',
+      },
+      {
+        name: 'User Officer',
+      },
+      {
+        name: 'User Officer',
+      },
+      {
+        name: 'User',
+      },
+    ];
+  }
 }
