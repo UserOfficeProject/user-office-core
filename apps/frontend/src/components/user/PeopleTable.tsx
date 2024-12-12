@@ -16,7 +16,6 @@ import { TFunction } from 'i18next';
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import EmailSearchBar from 'components/common/EmailSearchBar';
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -36,12 +35,6 @@ import { tableIcons } from 'utils/materialIcons';
 import { FunctionType } from 'utils/utilTypes';
 
 import InviteUserForm from './InviteUserForm';
-
-type InvitationButtonProps = {
-  title: string;
-  action: FunctionType;
-  'data-cy'?: string;
-};
 
 type BasicUserDetailsWithTableData = (BasicUserDetails & {
   tableData?: { checked: boolean };
@@ -67,7 +60,6 @@ type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   onUpdate?: FunctionType<void, [T[]]>;
   emailInvite?: boolean;
   emailSearch?: boolean;
-  showInvitationButtons?: boolean;
   selectedUsers?: number[];
   mtOptions?: Options<T>;
   columns?: Column<T>[];
@@ -167,7 +159,6 @@ const PeopleTable = ({
   emailSearch,
   invitationUserRole,
   isFreeAction,
-  showInvitationButtons,
   columns,
   mtOptions,
   onRemove,
@@ -275,33 +266,6 @@ const PeopleTable = ({
         });
       },
     });
-
-  const invitationButtons: InvitationButtonProps[] = [];
-
-  if (showInvitationButtons) {
-    invitationButtons.push(
-      {
-        title: 'Invite User',
-        action: () =>
-          setInviteUserModal({
-            show: true,
-            title: 'Invite User',
-            userRole: UserRole.USER,
-          }),
-        'data-cy': 'invite-user-button',
-      },
-      {
-        title: 'Invite Reviewer',
-        action: () =>
-          setInviteUserModal({
-            show: true,
-            title: 'Invite Reviewer',
-            userRole: UserRole.FAP_REVIEWER,
-          }),
-        'data-cy': 'invite-reviewer-button',
-      }
-    );
-  }
 
   const handleColumnSelectionChange = (
     selectedItems: BasicUserDetailsWithRole[],
@@ -562,20 +526,6 @@ const PeopleTable = ({
                 : MTableToolbar,
           }}
         />
-        {showInvitationButtons && (
-          <ActionButtonContainer>
-            {invitationButtons.map((item: InvitationButtonProps, i) => (
-              <Button
-                type="button"
-                onClick={() => item.action()}
-                data-cy={item['data-cy']}
-                key={i}
-              >
-                {item.title}
-              </Button>
-            ))}
-          </ActionButtonContainer>
-        )}
       </Box>
     </Formik>
   );
