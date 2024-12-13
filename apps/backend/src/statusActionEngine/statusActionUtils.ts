@@ -161,12 +161,12 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         let techniques: Technique[] = [];
         let hazardAnswers: Answer[] = [];
         let sampleAnswers: Answer[] = [];
-        const XCalls = await callDataSource
+        const quickReviewCalls = await callDataSource
           .getCalls({
             proposalStatusShortCode: 'QUICK_REVIEW',
           })
           .then((calls) => calls.map((call) => call.id));
-        if (XCalls.includes(proposal.callId)) {
+        if (quickReviewCalls.includes(proposal.callId)) {
           const techniqueDataSource: TechniqueDataSource = container.resolve(
             Tokens.TechniqueDataSource
           );
@@ -175,26 +175,25 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           );
           const questionaryDataSource: QuestionaryDataSource =
             container.resolve(Tokens.QuestionaryDataSource);
-          const questionarySteps =
-            await questionaryDataSource.getQuestionarySteps(
-              proposal.questionaryId
-            );
-          for await (const step of questionarySteps) {
+          const questionarySteps = questionaryDataSource.getQuestionarySteps(
+            proposal.questionaryId
+          );
+          for (const step of await questionarySteps) {
             const stepFields = step.fields.map((field) => field);
-            if (step.topic.title === 'Samples') {
+            if (step.topic.title.toUpperCase() === 'SAMPLES') {
               const answers = await stepAnswers(
                 stepFields,
                 proposal.primaryKey
               );
-              if (answers !== null) {
+              if (answers !== null && answers.length > 0) {
                 sampleAnswers = sampleAnswers.concat(answers);
               }
-            } else if (step.topic.title === 'Hazards') {
+            } else if (step.topic.title.toUpperCase() === 'HAZARDS') {
               const answers = await stepAnswers(
                 stepFields,
                 proposal.primaryKey
               );
-              if (answers !== null) {
+              if (answers !== null && answers.length > 0) {
                 hazardAnswers = hazardAnswers.concat(answers);
               }
             }

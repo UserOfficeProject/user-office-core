@@ -175,20 +175,28 @@ export class SMTPMailService extends MailService {
           name: 'ISIS Rapid User Office Submission Email',
         },
         {
-          id: 'exp-proposal-submitted',
-          name: 'Express PI Co-I Submission Email',
+          id: 'xpress-proposal-submitted',
+          name: 'ISIS Xpress PI Co-I Submission Email',
         },
         {
-          id: 'exp-proposal-review',
-          name: 'Express update to Under Review Status Email',
+          id: 'xpress-proposal-review',
+          name: 'ISIS Xpress PI Co-I Under Review Email',
         },
         {
-          id: 'exp-proposal-request-can',
-          name: 'Express update to Successful - request can Email',
+          id: 'xpress-proposal-approval',
+          name: 'ISIS Xpress PI Co-I Approval Email',
         },
         {
-          id: 'exp-proposal-sra',
-          name: 'Express SRA Request Email',
+          id: 'xpress-proposal-sra',
+          name: 'ISIS Xpress SRA Request Email',
+        },
+        {
+          id: 'xpress-proposal-unsuccessful',
+          name: 'ISIS Xpress PI Co-I Reject Email',
+        },
+        {
+          id: 'xpress-proposal-finish',
+          name: 'ISIS Xpress PI Co-I Finish Email',
         },
       ],
     };
