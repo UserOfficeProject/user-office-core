@@ -1,11 +1,34 @@
-import { Arg, Ctx, InputType, Mutation, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Int,
+  Mutation,
+  Resolver,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { InviteCode } from '../types/Invite';
-import { CreateInviteInput } from './CreateInviteMutation';
+import { ClaimsInput } from './CreateInviteMutation';
 
 @InputType()
-export class UpdateInviteInput extends CreateInviteInput {}
+export class UpdateInviteInput {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => String)
+  code: string;
+
+  @Field(() => String)
+  email: string;
+
+  @Field(() => String)
+  note: string;
+
+  @Field(() => ClaimsInput)
+  claims: ClaimsInput;
+}
 
 @Resolver()
 export class UpdateInvite {

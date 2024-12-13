@@ -47,7 +47,22 @@ export default class PostgresInviteCodesDataSource
       );
   }
 
-  async update(args: UpdateInviteInput): Promise<InviteCode> {
-    throw new Error('Method not implemented.');
+  async update(
+    args: UpdateInviteInput & Pick<InviteCode, 'claimedAt' | 'claimedByUserId'>
+  ): Promise<InviteCode> {
+    return database
+      .update({
+        code: args.code,
+        email: args.email,
+        note: args.note,
+        claimed_at: args.claimedAt,
+        claimed_by: args.claimedByUserId,
+      })
+      .from('invite_codes')
+      .where('id', args.id)
+      .returning('*')
+      .then((invites: InviteCodeRecord[]) =>
+        createInviteCodeObject(invites[0])
+      );
   }
 }
