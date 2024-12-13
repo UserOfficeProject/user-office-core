@@ -24,6 +24,7 @@ export const Tokens = {
   StatusActionsDataSource: Symbol('StatusActionsDataSource'),
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
   RedeemCodesDataSource: Symbol('RedeemCodesDataSource'),
+  RoleInviteDataSource: Symbol('RoleInviteDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),
   FapDataSource: Symbol('FapDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),
