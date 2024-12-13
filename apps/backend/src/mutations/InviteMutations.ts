@@ -50,4 +50,8 @@ export default class InviteMutations {
 
     return inviteCode;
   }
+
+  async accept(agent: UserWithRole | null, code: string): Promise<InviteCode> {
+    const inviteCode = await this.dataSource.findByCode(code);
+  }
 }
