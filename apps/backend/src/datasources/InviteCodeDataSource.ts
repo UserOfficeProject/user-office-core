@@ -10,5 +10,8 @@ export interface InviteCodeDataSource {
 
   findByCode(code: string): Promise<InviteCode | null>;
 
-  update(args: UpdateInviteInput): Promise<InviteCode>;
+  update(
+    args: UpdateInviteInput &
+      Partial<Pick<InviteCode, 'claimedAt' | 'claimedByUserId'>>
+  ): Promise<InviteCode>;
 }

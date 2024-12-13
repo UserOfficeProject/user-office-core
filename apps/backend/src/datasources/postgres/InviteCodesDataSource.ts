@@ -59,7 +59,7 @@ export default class PostgresInviteCodesDataSource
         claimed_by: args.claimedByUserId,
       })
       .from('invite_codes')
-      .where('id', args.id)
+      .where('invite_code_id', args.id)
       .returning('*')
       .then((invites: InviteCodeRecord[]) =>
         createInviteCodeObject(invites[0])

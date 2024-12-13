@@ -1,4 +1,3 @@
-import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -7,8 +6,8 @@ import { RoleInviteDataSource } from '../datasources/RoleInviteDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
 import { InviteCode } from '../models/InviteCode';
-import { Rejection } from '../models/Rejection';
-import { Roles } from '../models/Role';
+import { rejection, Rejection } from '../models/Rejection';
+import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
 import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
@@ -24,7 +23,7 @@ export default class InviteMutations {
   ) {}
 
   // @ValidateArgs(createInviteValidationSchema)
-  @Authorized([Roles.USER])
+  @Authorized()
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
@@ -46,25 +45,37 @@ export default class InviteMutations {
     return inviteCode;
   }
   @Authorized()
-  async accept(agent: UserWithRole | null, code: string): Promise<InviteCode> {
+  async accept(
+    agent: UserWithRole | null,
+    code: string
+  ): Promise<boolean | Rejection> {
     const inviteCode = await this.inviteDataSource.findByCode(code);
     if (inviteCode === null) {
-      throw new GraphQLError('Invite code not found');
+      return rejection('Invite code not found', { inviteCode: code });
+    }
+
+    if (inviteCode.claimedByUserId !== null) {
+      return rejection('Invite code already claimed', { inviteCode: code });
     }
 
     await this.acceptRoleInvites(agent!.id, inviteCode.id);
+    await this.inviteDataSource.update({
+      id: inviteCode.id,
+      claimedAt: new Date(),
+      claimedByUserId: agent!.id,
+    });
 
-    return inviteCode;
+    return true;
   }
 
   @Authorized([Roles.USER_OFFICER])
   async update(user: UserWithRole | null, input: UpdateInviteInput) {
-    if (input.claims.roleIds && input.claims.roleIds.length > 0) {
+    if (input.claims?.roleIds && input.claims.roleIds.length > 0) {
       this.replaceRoleInvites(input.id, input.claims.roleIds);
     }
 
     const updatedInvite = await this.inviteDataSource.update(input);
-    await this.replaceRoleInvites(updatedInvite.id, input.claims.roleIds);
+    await this.replaceRoleInvites(updatedInvite.id, input.claims?.roleIds);
 
     return updatedInvite;
   }
@@ -88,9 +99,16 @@ export default class InviteMutations {
 
     if (roleInvites.length > 0) {
       for await (const roleInvite of roleInvites) {
+        const existingUserRoles: Role[] =
+          await this.userDataSource.getUserRoles(claimerUserId);
+
+        if (existingUserRoles.find((role) => role.id === roleInvite.roleId)) {
+          continue;
+        }
+
         await this.userDataSource.addUserRole({
           userID: claimerUserId,
-          roleID: roleInvite.role_id,
+          roleID: roleInvite.roleId,
         });
       }
     }

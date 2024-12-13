@@ -17,17 +17,17 @@ export class UpdateInviteInput {
   @Field(() => Int)
   id: number;
 
-  @Field(() => String)
-  code: string;
+  @Field(() => String, { nullable: true })
+  code?: string;
 
-  @Field(() => String)
-  email: string;
+  @Field(() => String, { nullable: true })
+  email?: string;
 
-  @Field(() => String)
-  note: string;
+  @Field(() => String, { nullable: true })
+  note?: string;
 
-  @Field(() => ClaimsInput)
-  claims: ClaimsInput;
+  @Field(() => ClaimsInput, { nullable: true })
+  claims?: ClaimsInput;
 }
 
 @Resolver()
