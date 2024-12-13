@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -10,12 +11,12 @@ import { Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
-import { GraphQLError } from 'graphql';
+import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
 @injectable()
 export default class InviteMutations {
   constructor(
     @inject(Tokens.InviteCodeDataSource)
-    private dataSource: InviteCodeDataSource,
+    private inviteDataSource: InviteCodeDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
     @inject(Tokens.RoleInviteDataSource)
@@ -34,7 +35,7 @@ export default class InviteMutations {
 
     // Create Code
     const code = Math.random().toString(36).substr(2, 10).toUpperCase();
-    const inviteCode = await this.dataSource.create(
+    const inviteCode = await this.inviteDataSource.create(
       agent!.id,
       code,
       args.email
@@ -50,8 +51,36 @@ export default class InviteMutations {
 
     return inviteCode;
   }
-
+  @Authorized()
   async accept(agent: UserWithRole | null, code: string): Promise<InviteCode> {
-    const inviteCode = await this.dataSource.findByCode(code);
+    const inviteCode = await this.inviteDataSource.findByCode(code);
+    if (inviteCode === null) {
+      throw new GraphQLError('Invite code not found');
+    }
+
+    await this.handleRoleInvites(agent!.id, inviteCode.id);
+
+    return inviteCode;
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async update(user: UserWithRole | null, input: UpdateInviteInput) {
+    const updatedInvite = await this.inviteDataSource.update(input);
+
+    return updatedInvite;
+  }
+
+  private async handleRoleInvites(claimerUserId: number, inviteCodeId: number) {
+    const roleInvites =
+      await this.roleInviteDataSource.findByInviteCodeId(inviteCodeId);
+
+    if (roleInvites.length > 0) {
+      for await (const roleInvite of roleInvites) {
+        await this.userDataSource.addUserRole({
+          userID: claimerUserId,
+          roleID: roleInvite.role_id,
+        });
+      }
+    }
   }
 }

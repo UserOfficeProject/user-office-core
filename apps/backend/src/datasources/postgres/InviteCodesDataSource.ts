@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { InviteCode } from '../../models/InviteCode';
+import { UpdateInviteInput } from '../../resolvers/mutations/UpdateInviteMutation';
 import { InviteCodeDataSource } from '../InviteCodeDataSource';
 import database from './database';
 import { createInviteCodeObject, InviteCodeRecord } from './records';
@@ -44,5 +45,9 @@ export default class PostgresInviteCodesDataSource
       .then((invites: InviteCodeRecord[]) =>
         createInviteCodeObject(invites[0])
       );
+  }
+
+  async update(args: UpdateInviteInput): Promise<InviteCode> {
+    throw new Error('Method not implemented.');
   }
 }
