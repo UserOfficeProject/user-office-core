@@ -15,6 +15,9 @@ import { RequestQuery } from 'utils/utilTypes';
 
 const endpoint = '/graphql';
 
+const clientNameHeader = 'apollographql-client-name';
+const clientName = 'UOP frontend';
+
 const notifyAndLog = async (
   enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
   userMessage: string,
@@ -37,6 +40,12 @@ const notifyAndLog = async (
   }
 };
 
+export function getUnauthorizedApi() {
+  return getSdk(
+    new GraphQLClient(endpoint).setHeader(clientNameHeader, clientName)
+  );
+}
+
 class UnauthorizedGraphQLClient extends GraphQLClient {
   constructor(
     private endpoint: string,
@@ -44,6 +53,7 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
     private skipErrorReport?: boolean
   ) {
     super(endpoint);
+    this.setHeader(clientNameHeader, clientName);
   }
 
   async request<T = unknown, V extends Variables = Variables>(
@@ -101,6 +111,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     private externalAuthLoginUrl?: string
   ) {
     super(endpoint);
+    this.setHeader(clientNameHeader, clientName);
     token && this.setHeader('authorization', `Bearer ${token}`);
     this.renewalDate = this.getRenewalDate(token);
     this.externalToken = this.getExternalToken(token);
@@ -113,7 +124,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
       try {
-        const data = await getSdk(new GraphQLClient(this.endpoint)).getToken({
+        const data = await getUnauthorizedApi().getToken({
           token: this.token,
         });
 
@@ -215,9 +226,9 @@ export function useDataApi() {
 
   return useCallback(
     () =>
-      getSdk(
-        token
-          ? new AuthorizedGraphQLClient(
+      token
+        ? getSdk(
+            new AuthorizedGraphQLClient(
               endpoint,
               token,
               enqueueSnackbar,
@@ -230,8 +241,8 @@ export function useDataApi() {
               handleNewToken,
               externalAuthLoginUrl ? externalAuthLoginUrl : undefined
             )
-          : new GraphQLClient(endpoint)
-      ),
+          )
+        : getUnauthorizedApi(),
     [
       token,
       enqueueSnackbar,
@@ -252,8 +263,4 @@ export function useUnauthorizedApi() {
     () => getSdk(new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar)),
     [enqueueSnackbar]
   );
-}
-
-export function getUnauthorizedApi() {
-  return getSdk(new GraphQLClient(endpoint));
 }
