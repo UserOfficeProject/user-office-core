@@ -41,13 +41,7 @@ export default class InviteMutations {
       args.email
     );
 
-    // Add RoleInvites
-    const { roleIds } = args.claims;
-    if (roleIds !== undefined && roleIds.length > 0) {
-      for await (const roleId of roleIds) {
-        await this.roleInviteDataSource.create(inviteCode.id, roleId);
-      }
-    }
+    await this.replaceRoleInvites(inviteCode.id, args.claims.roleIds);
 
     return inviteCode;
   }
@@ -58,19 +52,37 @@ export default class InviteMutations {
       throw new GraphQLError('Invite code not found');
     }
 
-    await this.handleRoleInvites(agent!.id, inviteCode.id);
+    await this.acceptRoleInvites(agent!.id, inviteCode.id);
 
     return inviteCode;
   }
 
   @Authorized([Roles.USER_OFFICER])
   async update(user: UserWithRole | null, input: UpdateInviteInput) {
+    if (input.claims.roleIds && input.claims.roleIds.length > 0) {
+      this.replaceRoleInvites(input.id, input.claims.roleIds);
+    }
+
     const updatedInvite = await this.inviteDataSource.update(input);
+    await this.replaceRoleInvites(updatedInvite.id, input.claims.roleIds);
 
     return updatedInvite;
   }
 
-  private async handleRoleInvites(claimerUserId: number, inviteCodeId: number) {
+  private async replaceRoleInvites(
+    inviteCodeId: number,
+    roleIds: number[] | undefined
+  ) {
+    await this.roleInviteDataSource.deleteByInviteCodeId(inviteCodeId);
+
+    if (!roleIds) return;
+
+    for await (const roleId of roleIds) {
+      await this.roleInviteDataSource.create(inviteCodeId, roleId);
+    }
+  }
+
+  private async acceptRoleInvites(claimerUserId: number, inviteCodeId: number) {
     const roleInvites =
       await this.roleInviteDataSource.findByInviteCodeId(inviteCodeId);
 

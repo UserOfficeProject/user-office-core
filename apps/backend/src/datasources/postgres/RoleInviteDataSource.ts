@@ -15,4 +15,21 @@ export default class PostgresRoleInviteDataSource
         createRoleInviteObject(records[0])
       );
   }
+
+  async findByInviteCodeId(invite_code_id: number): Promise<RoleInvite[]> {
+    return database
+      .select('*')
+      .from('role_invites')
+      .where('invite_code_id', invite_code_id)
+      .then((records: RoleInviteRecord[]) =>
+        records.map(createRoleInviteObject)
+      );
+  }
+
+  async deleteByInviteCodeId(invite_code_id: number): Promise<boolean> {
+    return database('role_invites')
+      .where('invite_code_id', invite_code_id)
+      .del()
+      .then(() => true);
+  }
 }
