@@ -535,7 +535,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           text,
           referenceNumbers,
           dateFilter,
-          excludeProposalStatusIds,
         } = proposalFilter;
 
         const result: {
@@ -553,7 +552,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
-              excludeProposalStatusIds: excludeProposalStatusIds,
+              excludeProposalStatusIds:
+                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
             sortField: orderBy?.orderByField,
             sortDirection: orderBy?.orderDirection,
