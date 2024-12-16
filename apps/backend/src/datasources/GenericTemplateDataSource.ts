@@ -28,7 +28,7 @@ export interface GenericTemplateDataSource {
     agent: UserWithRole | null
   ): Promise<GenericTemplate[]>;
   getGenericTemplatesForCopy(
-    agent?: number,
+    userId?: number,
     role?: Role
   ): Promise<GenericTemplate[]>;
   createGenericTemplateWithCopiedAnswers(

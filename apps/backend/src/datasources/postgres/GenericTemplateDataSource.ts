@@ -250,7 +250,7 @@ export default class PostgresGenericTemplateDataSource
   }
 
   async getGenericTemplatesForCopy(
-    agent?: number | null,
+    userId?: number | null,
     role?: Role
   ): Promise<GenericTemplate[]> {
     if (
@@ -264,13 +264,13 @@ export default class PostgresGenericTemplateDataSource
         .from('generic_templates_view')
         .modify((query) => {
           // add filter for user role
-          query.where('fap_reviewer', agent);
-          query.orWhere('creator_id', agent);
-          query.orWhere('scientist_on_proposal', agent);
-          query.orWhere('fap_chair', agent);
-          query.orWhere('fap_secretary', agent);
-          query.orWhere('instrument_manager', agent);
-          query.orWhere('visitor', agent);
+          query.where('fap_reviewer', userId);
+          query.orWhere('creator_id', userId);
+          query.orWhere('scientist_on_proposal', userId);
+          query.orWhere('fap_chair', userId);
+          query.orWhere('fap_secretary', userId);
+          query.orWhere('instrument_manager', userId);
+          query.orWhere('visitor', userId);
           query.distinctOn('generic_template_id');
         })
         .orderBy('generic_template_id', 'asc')

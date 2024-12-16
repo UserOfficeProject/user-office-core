@@ -44,7 +44,7 @@ export class GenericTemplateDataSourceMock
   }
 
   async getGenericTemplatesForCopy(
-    agent?: number,
+    userId?: number,
     role?: Role
   ): Promise<GenericTemplate[]> {
     return this.genericTemplates;
