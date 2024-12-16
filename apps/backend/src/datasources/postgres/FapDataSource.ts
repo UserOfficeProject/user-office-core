@@ -371,14 +371,17 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getCurrentFapProposalCount(fapId: number): Promise<number> {
+  async getCurrentFapProposalCount(
+    fapId: number,
+    callId?: number
+  ): Promise<number> {
     const callFilter = {
       isFapReviewEnded: false,
     };
 
-    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
-      (call) => call.id
-    );
+    const callIds = callId
+      ? [callId]
+      : (await this.callDataSource.getCalls(callFilter)).map((call) => call.id);
 
     return database('fap_proposals as fp')
       .join('proposals as p', { 'p.proposal_pk': 'fp.proposal_pk' })
@@ -580,10 +583,12 @@ export default class PostgresFapDataSource implements FapDataSource {
       'fap_secretaries'
     )
       .select('user_id')
-      .where('fap_id', fapId);
+      .where('fap_id', fapId)
+      .andWhere('user_id', userId);
     const fapChairs = await database<FapChairsRecord>('fap_chairs')
       .select('user_id')
-      .where('fap_id', fapId);
+      .where('fap_id', fapId)
+      .andWhere('user_id', userId);
 
     if (!fap) {
       throw new GraphQLError(`Fap not found ${fapId}`);
@@ -591,17 +596,9 @@ export default class PostgresFapDataSource implements FapDataSource {
 
     let shortCode: Roles;
 
-    if (
-      !!fapChairs.find((chair) => {
-        chair.user_id === userId;
-      })
-    ) {
+    if (fapChairs.length > 0) {
       shortCode = Roles.FAP_CHAIR;
-    } else if (
-      !!fapSecretaries.find((secretary) => {
-        secretary.user_id === userId;
-      })
-    ) {
+    } else if (fapSecretaries.length > 0) {
       shortCode = Roles.FAP_SECRETARY;
     } else {
       shortCode = Roles.FAP_REVIEWER;

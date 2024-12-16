@@ -35,9 +35,28 @@ export class FapQuery {
   async fapProposals(
     @Arg('fapId', () => Int) fapId: number,
     @Arg('callId', () => Int, { nullable: true }) callId: number | null,
+    @Arg('first', () => Int, { nullable: true }) first: number,
+    @Arg('offset', () => Int, { nullable: true }) offset: number,
     @Ctx() context: ResolverContext
   ): Promise<FapProposal[] | null> {
-    return context.queries.fap.getFapProposals(context.user, { fapId, callId });
+    return context.queries.fap.getFapProposals(context.user, {
+      fapId,
+      callId,
+      first,
+      offset,
+    });
+  }
+
+  @Query(() => Int, { nullable: true })
+  async fapProposalsCount(
+    @Arg('fapId', () => Int) fapId: number,
+    @Arg('callId', () => Int, { nullable: true }) callId: number | null,
+    @Ctx() context: ResolverContext
+  ): Promise<number | null> {
+    return context.queries.fap.getFapProposalsCount(context.user, {
+      fapId,
+      callId: callId ? callId : undefined,
+    });
   }
 
   @Query(() => FapProposal, { nullable: true })

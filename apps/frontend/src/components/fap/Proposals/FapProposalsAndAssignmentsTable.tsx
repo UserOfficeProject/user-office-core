@@ -173,9 +173,21 @@ const FapProposalsAndAssignmentsTable = ({
 }: FapProposalsAndAssignmentsTableProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
-
-  const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
-    useFapProposalsData(data.id, selectedCallId);
+  const [pageOptions, setPageOptions] = useState<{
+    first: number;
+    offset: number;
+  }>({ first: 10, offset: 0 });
+  const {
+    loadingFapProposals,
+    FapProposalsData,
+    setFapProposalsData,
+    totalCount,
+  } = useFapProposalsData(
+    data.id,
+    selectedCallId,
+    pageOptions.first,
+    pageOptions.offset
+  );
   const { api } = useDataApiWithFeedback();
   const [proposalPks, setProposalPks] = useState<number[]>([]);
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -715,11 +727,9 @@ const FapProposalsAndAssignmentsTable = ({
     })
   );
 
-  const maxPageLength = FapProposalsWitIdAndFormattedDate.length;
-
-  const pageSizeOptions = [5, 10, 20, maxPageLength]
+  const pageSizeOptions = [5, 10, 20, totalCount]
     .sort((a, b) => a - b)
-    .filter((n) => n <= maxPageLength);
+    .filter((n) => n <= totalCount);
 
   return (
     <>
@@ -774,10 +784,13 @@ const FapProposalsAndAssignmentsTable = ({
             },
           ]}
           actions={tableActions}
+          onPageChange={(page, pageSize) =>
+            setPageOptions({ first: pageSize, offset: page * pageSize })
+          }
           options={{
             search: true,
             selection: true,
-            pageSize: Math.min(10, maxPageLength),
+            pageSize: Math.min(10, totalCount),
             pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
               inputProps: {

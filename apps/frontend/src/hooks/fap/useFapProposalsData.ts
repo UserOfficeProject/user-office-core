@@ -14,22 +14,26 @@ export type FapProposalAssignmentType = Unpacked<
 
 export function useFapProposalsData(
   fapId: number,
-  callId: number | null
+  callId: number | null,
+  first: number | null,
+  offset: number | null
 ): {
   loadingFapProposals: boolean;
   FapProposalsData: FapProposalType[];
   setFapProposalsData: Dispatch<SetStateAction<FapProposalType[]>>;
+  totalCount: number;
 } {
   const api = useDataApi();
   const [FapProposalsData, setFapProposalsData] = useState<FapProposalType[]>(
     []
   );
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [loadingFapProposals, setLoadingFapProposals] = useState(true);
   useEffect(() => {
     let cancelled = false;
     setLoadingFapProposals(true);
     api()
-      .getFapProposals({ fapId, callId })
+      .getFapProposals({ fapId, callId, first, offset })
       .then((data) => {
         if (cancelled) {
           return;
@@ -38,17 +42,21 @@ export function useFapProposalsData(
         if (data.fapProposals) {
           setFapProposalsData(data.fapProposals);
         }
+        if (data.fapProposalsCount) {
+          setTotalCount(data.fapProposalsCount);
+        }
         setLoadingFapProposals(false);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [fapId, api, callId]);
+  }, [fapId, api, callId, first, offset]);
 
   return {
     loadingFapProposals,
     FapProposalsData,
     setFapProposalsData,
+    totalCount,
   } as const;
 }
