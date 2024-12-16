@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-    IF register_patch('0166_ExcludeExpiredProposalsFromReviewProposalView.sql', 'Thomas Cottee Meldrum', 'Update review column in the view', '2024-12-03') THEN
+    IF register_patch('0166_UpdateWhichCommentOnReviewProposalView.sql', 'Thomas Cottee Meldrum', 'Update review column in the view', '2024-12-03') THEN
 
 CREATE OR REPLACE VIEW review_data AS 
     SELECT proposal.proposal_pk,
