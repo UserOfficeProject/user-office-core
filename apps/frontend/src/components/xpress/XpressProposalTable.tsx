@@ -190,10 +190,17 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     );
   };
 
+  const cellStyleSpecs = {
+    whiteSpace: 'nowrap',
+    maxWidth: '400px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
+      cellStyle: { minWidth: 120 },
       sorting: false,
       removable: false,
       field: 'rowActionButtons',
@@ -207,6 +214,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
+      cellStyle: cellStyleSpecs,
     },
     {
       title: 'Principal Investigator',
@@ -223,6 +231,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         return '';
       },
+      cellStyle: cellStyleSpecs,
       customFilterAndSearch: () => true,
     },
     {
@@ -235,7 +244,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Date submitted',
       field: 'submittedDate',
       render: (proposalView: ProposalViewData) => {
-        return toFormattedDateTime(proposalView.submittedDate);
+        if (proposalView.submittedDate) {
+          return toFormattedDateTime(proposalView.submittedDate);
+        }
       },
       ...{ width: 'auto' },
     },
@@ -294,12 +305,22 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           (instrument) => instrument.id
         )[0];
 
+        const selectedValue: number | undefined = fieldValue ? fieldValue : 0;
+
         const selectedStatus = proposalStatuses.find(
           (ps) => ps.name === rowData.statusName
         )?.shortCode;
 
         const shouldBeUneditable =
           !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
+
+        // Always show the current instrument at the top of the dropdown
+        instrumentList.forEach(function (instrument, i) {
+          if (fieldValue && instrument.id === fieldValue) {
+            instrumentList.splice(i, 1);
+            instrumentList.unshift(instrument);
+          }
+        });
 
         return shouldBeUneditable ? (
           instrumentList.find((i) => i.id === fieldValue)?.name
@@ -328,7 +349,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     )();
                   }
                 }}
-                value={fieldValue}
+                value={selectedValue}
                 data-cy="instrument-dropdown"
               >
                 {instrumentList &&
@@ -487,6 +508,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           rowData.techniques?.map((technique) => technique.name)
         ),
       customFilterAndSearch: () => true,
+      cellStyle: cellStyleSpecs,
     },
   ];
 
@@ -623,10 +645,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleSearchChange = (searchText: string) => {
-    setSearchParams({
-      search: searchText ? searchText : '',
-      page: searchText ? '0' : page || '',
-    });
+    searchParams.set('search', searchText ? searchText : '');
+    searchParams.set('page', searchText ? '0' : page || '');
   };
   const XpressTablePanelDetails = React.useCallback(
     ({ rowData }: Record<'rowData', ProposalViewData>) => {
@@ -695,7 +715,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
   return (
@@ -843,7 +862,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
                   setAllProposalSelectionLoading(false);
                 },
-                position: 'toolbarOnSelect',
+                position: 'toolbar',
               },
             ]}
             onSelectionChange={(selectedItems) => {
@@ -862,10 +881,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
             onPageChange={(page, pageSize) => {
-              setSearchParams({
-                page: page.toString(),
-                pageSize: pageSize.toString(),
-              });
+              searchParams.set('page', page.toString());
+              searchParams.set('pageSize', pageSize.toString());
             }}
             detailPanel={[
               {
