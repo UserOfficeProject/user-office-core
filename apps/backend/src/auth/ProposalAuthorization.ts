@@ -211,43 +211,43 @@ export class ProposalAuthorization {
 
     const currentRole = agent?.currentRole?.shortCode;
 
-    let haveAccess = false;
+    let hasAccess = false;
 
     switch (currentRole) {
       case Roles.USER:
-        haveAccess =
+        hasAccess =
           (await this.isMemberOfProposal(agent, proposal)) ||
           (await this.isVisitorOfProposal(agent, proposal.primaryKey));
         break;
       case Roles.INSTRUMENT_SCIENTIST:
-        haveAccess =
+        hasAccess =
           (await this.isInstrumentManagerToProposal(
             agent,
             proposal.primaryKey
           )) || (await this.isScientistToProposal(agent, proposal.primaryKey));
         break;
       case Roles.INTERNAL_REVIEWER:
-        haveAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
+        hasAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
         break;
       case Roles.FAP_REVIEWER:
       case Roles.FAP_SECRETARY:
       case Roles.FAP_CHAIR:
-        haveAccess = await this.isMemberOfFapProposal(
+        hasAccess = await this.isMemberOfFapProposal(
           agent,
           proposal.primaryKey
         );
         break;
       case Roles.USER_OFFICER:
-        haveAccess = true;
+        hasAccess = true;
         break;
       case Roles.SAMPLE_SAFETY_REVIEWER:
-        haveAccess = true;
+        hasAccess = true;
         break;
       default:
-        haveAccess = this.userAuth.hasGetAccessByToken(agent);
+        hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }
 
-    return haveAccess;
+    return hasAccess;
   }
 
   private async isProposalEditable(

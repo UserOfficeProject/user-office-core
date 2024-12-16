@@ -56,25 +56,25 @@ test('A internal reviewer does not have access to proposal they are not reviewer
   ).resolves.toEqual(false);
 });
 
-test('A FAP Reviewer has access to proposal on there FAP', async () => {
+test('A FAP Reviewer has access to a proposal on their FAP', async () => {
   return expect(
     proposalAuthorization.hasReadRights(dummyFapReviewerWithRole, 1)
   ).resolves.toEqual(true);
 });
 
-test('A FAP Sec has access to proposal on there FAP', async () => {
+test('A FAP Sec has access to a proposal on their FAP', async () => {
   return expect(
     proposalAuthorization.hasReadRights(dummyFapSecretaryWithRole, 1)
   ).resolves.toEqual(true);
 });
 
-test('A FAP Chair has access to proposal on there FAP', async () => {
+test('A FAP Chair has access to a proposal on their FAP', async () => {
   return expect(
     proposalAuthorization.hasReadRights(dummyFapChairWithRole, 1)
   ).resolves.toEqual(true);
 });
 
-test('A FAP Reviewer does not have access to proposal not there FAP', async () => {
+test('A FAP Reviewer does not have access to a proposal not their FAP', async () => {
   return expect(
     proposalAuthorization.hasReadRights(
       { ...dummyFapReviewerWithRole, id: 3 },
@@ -83,7 +83,7 @@ test('A FAP Reviewer does not have access to proposal not there FAP', async () =
   ).resolves.toEqual(false);
 });
 
-test('A FAP Sec does not have access to proposal not there FAP', async () => {
+test('A FAP Sec does not have access to a proposal not their FAP', async () => {
   return expect(
     proposalAuthorization.hasReadRights(
       { ...dummyFapSecretaryWithRole, id: 3 },
@@ -92,7 +92,7 @@ test('A FAP Sec does not have access to proposal not there FAP', async () => {
   ).resolves.toEqual(false);
 });
 
-test('A FAP Chair does not have access to proposal not there FAP', async () => {
+test('A FAP Chair does not have access to a proposal not their FAP', async () => {
   return expect(
     proposalAuthorization.hasReadRights({ ...dummyFapChairWithRole, id: 3 }, 1)
   ).resolves.toEqual(false);
