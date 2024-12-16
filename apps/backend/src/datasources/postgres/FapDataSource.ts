@@ -300,15 +300,22 @@ export default class PostgresFapDataSource implements FapDataSource {
       createFapAssignmentObject(fapAssignment)
     );
   }
-
   async getFapProposals(
     fapId: number,
-    callId: number | null
+    callId: number | null,
+    first: number | null,
+    offset: number | null
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
       .modify((query) => {
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
         query
           .join('proposals as p', {
             'p.proposal_pk': 'fp.proposal_pk',
