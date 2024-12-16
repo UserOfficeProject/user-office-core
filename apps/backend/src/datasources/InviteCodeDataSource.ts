@@ -9,6 +9,7 @@ export interface InviteCodeDataSource {
   ): Promise<InviteCode>;
 
   findByCode(code: string): Promise<InviteCode | null>;
+  findById(id: number): Promise<InviteCode | null>;
 
   update(
     args: UpdateInviteInput &

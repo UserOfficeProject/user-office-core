@@ -65,4 +65,21 @@ export default class PostgresInviteCodesDataSource
         createInviteCodeObject(invites[0])
       );
   }
+
+  async findById(id: number): Promise<InviteCode | null> {
+    return database
+      .select('*')
+      .from('invite_codes')
+      .where('invite_code_id', id)
+      .catch((error: Error) => {
+        throw new Error(`Could not find invite: ${error.message}`);
+      })
+      .then((invites: InviteCodeRecord[]) => {
+        if (invites.length === 0) {
+          return null;
+        }
+
+        return createInviteCodeObject(invites[0]);
+      });
+  }
 }
