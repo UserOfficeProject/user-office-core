@@ -1209,6 +1209,63 @@ context('Xpress tests', () => {
       cy.finishedLoading();
       cy.contains(instrument1.name);
     });
+
+    it('Instrument scientist must be able to add update and remove comment on an xpress proposal', function () {
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-scientist-comment`,
+        faker.lorem.words(10)
+      );
+      cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully created',
+      });
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-scientist-comment`,
+        faker.lorem.words(10)
+      );
+      cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully updated',
+      });
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="delete-proposal-scientist-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully deleted',
+      });
+    });
   });
 
   describe('Xpress statuses tests', () => {
