@@ -123,15 +123,15 @@ export class StfcUserDataSource implements UserDataSource {
     StfcUserDataSource.userDetailsCacheSecondsToLive
   ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
 
-  private uowsRolesCache = new Cache<Promise<Role[]>>(
+  private uopRolesCache = new Cache<Promise<Role[]>>(
     StfcUserDataSource.rolesCacheMaxElements,
     StfcUserDataSource.rolesCacheSecondsToLive
-  ).enableStatsLogging('uowsRolesCache');
+  ).enableStatsLogging('uopRolesCache');
 
-  private uowsRawRolesCache = new Cache<Promise<stfcRole[] | null>>(
+  private stfcRolesCache = new Cache<Promise<stfcRole[] | null>>(
     StfcUserDataSource.rolesCacheMaxElements,
     StfcUserDataSource.rolesCacheSecondsToLive
-  ).enableStatsLogging('uowsRawRolesCache');
+  ).enableStatsLogging('stfcRolesCache');
 
   private async getStfcBasicPersonByUserNumber(
     userNumber: string,
@@ -307,7 +307,7 @@ export class StfcUserDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
   async getRolesForUser(id: number): Promise<stfcRole[] | null> {
-    const cachedRoles = this.uowsRawRolesCache.get(String(id));
+    const cachedRoles = this.stfcRolesCache.get(String(id));
     if (cachedRoles) {
       return cachedRoles;
     }
@@ -316,12 +316,12 @@ export class StfcUserDataSource implements UserDataSource {
       .getRolesForUser(token, id)
       .then((response): stfcRole[] | null => response?.return);
 
-    this.uowsRawRolesCache.put(String(id), stfcRawRolesRequest);
+    this.stfcRolesCache.put(String(id), stfcRawRolesRequest);
 
     return stfcRawRolesRequest;
   }
   async getUserRoles(id: number): Promise<Role[]> {
-    const cachedRoles = this.uowsRolesCache.get(String(id));
+    const cachedRoles = this.uopRolesCache.get(String(id));
     if (cachedRoles) {
       return cachedRoles;
     }
@@ -373,7 +373,7 @@ export class StfcUserDataSource implements UserDataSource {
       });
     });
 
-    this.uowsRolesCache.put(String(id), stfcRolesRequest);
+    this.uopRolesCache.put(String(id), stfcRolesRequest);
 
     return stfcRolesRequest;
   }
