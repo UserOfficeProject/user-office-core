@@ -25,7 +25,7 @@ const menuMap = {
   PdfTemplates: '/PdfTemplates',
   ProposalTemplates: '/ProposalTemplates',
   FapReviewTemplates: '/FapReviewTemplates',
-  TechnicalReviewTemplates: './TechnicalReviewTemplates',
+  TechnicalReviewTemplates: '/TechnicalReviewTemplates',
   SampleDeclarationTemplates: '/SampleDeclarationTemplates',
   GenericTemplates: '/GenericTemplates',
   ShipmentDeclarationTemplates: '/ShipmentDeclarationTemplates',
@@ -152,6 +152,18 @@ export function TemplateMenuListItem() {
               <DescriptionIcon />
             </ListItemIcon>
             <ListItemText primary={t('FAP Review')} />
+          </ListItemButton>
+        </Tooltip>
+
+        <Tooltip title="Technical Review">
+          <ListItemButton
+            component={NavLink}
+            to={menuMap['TechnicalReviewTemplates']}
+          >
+            <ListItemIcon>
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary="Technical Review" />
           </ListItemButton>
         </Tooltip>
 

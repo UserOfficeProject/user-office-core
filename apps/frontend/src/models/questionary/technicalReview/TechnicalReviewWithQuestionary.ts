@@ -1,16 +1,33 @@
-/*import { TechnicalReview } from 'generated/sdk';
+import { Call, Maybe, TechnicalReview } from 'generated/sdk';
 
-export type FapReviewWithQuestionary = Pick<
+export type TechnicalReviewWithQuestionary = Pick<
   TechnicalReview,
   | 'id'
-  | 'grade'
   | 'comment'
-  | 'fapID'
   | 'reviewer'
   | 'status'
+  | 'files'
+  | 'submitted'
+  | 'publicComment'
   | 'questionary'
-  | 'questionaryID'
-  | 'questionary'
+  | 'questionaryId'
+  | 'instrumentId'
+  | 'proposalPk'
   | 'proposal'
->;*/
-export {};
+  | 'reviewerId'
+  | 'timeAllocation'
+  | 'technicalReviewAssignee'
+  | 'technicalReviewAssigneeId'
+> & {
+  call?: Maybe<
+    Pick<
+      Call,
+      | 'isActive'
+      | 'isActiveInternal'
+      | 'referenceNumberFormat'
+      | 'endCallInternal'
+      | 'startCall'
+      | 'endCall'
+    >
+  >;
+};

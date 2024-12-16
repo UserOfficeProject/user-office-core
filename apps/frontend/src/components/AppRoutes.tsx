@@ -346,7 +346,7 @@ const AppRoutes = () => {
           path="/TechnicalReviewTemplates"
           element={
             <TitledRoute
-              title={i18n.format(t('Technical Review Template'), 'plural')}
+              title="Technical Review Templates"
               element={<TechnicalReviewTemplatesPage />}
             />
           }
