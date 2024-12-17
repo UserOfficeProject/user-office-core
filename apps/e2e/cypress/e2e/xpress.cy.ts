@@ -1067,6 +1067,35 @@ context('Xpress tests', () => {
         cy.contains(proposal2.title).should('exist');
       });
     });
+
+    it('Scientist cannot filter by expired status', function () {
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress Proposals').click();
+
+      cy.get('[data-cy="status-filter"]').click();
+
+      // Ensure the dropdown only contains Xpress statuses
+      cy.get('[role="listbox"] [data-value]').then((options) => {
+        const actualStatuses = [...options].map((option) =>
+          option.innerText.trim()
+        );
+        const expectedStatuses = [
+          'All',
+          draftStatus.name,
+          submittedStatus.name,
+          underReviewStatus.name,
+          approvedStatus.name,
+          unsuccessfulStatus.name,
+          finishedStatus.name,
+        ];
+
+        // Expect the correct order and exact amount of items
+        expect(actualStatuses).to.deep.equal(expectedStatuses);
+      });
+    });
   });
 
   describe('Techniques advanced tests', () => {
