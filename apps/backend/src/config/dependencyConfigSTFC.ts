@@ -1,6 +1,7 @@
 import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
+import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -92,6 +93,7 @@ mapClass(
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
+mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

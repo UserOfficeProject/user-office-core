@@ -19,7 +19,6 @@ import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericT
 @injectable()
 export default class GenericTemplateMutations {
   private genericTemplateAuth = container.resolve(GenericTemplateAuthorization);
-  private proposalAuth = container.resolve(ProposalAuthorization);
   private questionaryAuth = container.resolve(QuestionaryAuthorization);
 
   constructor(
@@ -30,7 +29,9 @@ export default class GenericTemplateMutations {
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @Authorized()
