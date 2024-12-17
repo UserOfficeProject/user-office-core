@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
@@ -10,13 +10,14 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class EsiAuthorization {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.ScheduledEventDataSource)
     private scheduledEventDataSource: ScheduledEventDataSource,
     @inject(Tokens.ProposalEsiDataSource)
     private esiDataSource: ProposalEsiDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   getScheduledEvent = async (scheduledEventId: number) =>
