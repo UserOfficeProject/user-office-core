@@ -1,4 +1,3 @@
-import { Logger } from 'concurrently';
 import { BasicPersonDetailsDTO } from '../../generated/models/BasicPersonDetailsDTO';
 import { RoleDTO } from '../../generated/models/RoleDTO';
 import { Country } from '../../models/Country';
