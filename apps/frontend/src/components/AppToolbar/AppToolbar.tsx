@@ -106,9 +106,7 @@ const AppToolbar = ({ open, handleDrawerOpen, header }: AppToolbarProps) => {
             noWrap
             sx={{ flexGrow: 1 }}
           >
-            {location.pathname === '/'
-              ? 'User Office / Dashboard'
-              : 'User Office / ' + header}
+            {location.pathname === '/' ? 'Dashboard' : header}
           </Typography>
         )}
         <Box sx={{ marginLeft: 'auto', margin: theme.spacing(0, 0.5) }}>

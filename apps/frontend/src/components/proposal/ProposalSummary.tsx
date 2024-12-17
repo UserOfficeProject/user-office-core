@@ -91,44 +91,41 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
 
         return;
       }
-      const { call } = await api().getCall({ callId: proposal.callId });
-      const workflowId = call?.proposalWorkflowId;
-      if (workflowId) {
-        const connections = (
-          await api().getProposalWorkflow({ proposalWorkflowId: workflowId })
-        ).proposalWorkflow?.proposalWorkflowConnectionGroups;
+      const { call } = await api().getCallSubmissionDetails({
+        callId: proposal.callId,
+      });
+      const connections =
+        call?.proposalWorkflow?.proposalWorkflowConnectionGroups;
 
-        if (connections) {
-          const statuses = (await api().getProposalStatuses()).proposalStatuses;
-          const editableStatuses = statuses
-            ?.filter(
-              //needs to be provided
-              (s) =>
-                s.shortCode ===
-                  ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||
-                s.shortCode ===
-                  ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+      const currentStatusId = proposal.status?.id;
+
+      if (connections) {
+        const editableStatusesShortCodes = [
+          ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED.valueOf(),
+          ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL.valueOf(),
+        ];
+        const hasUpcomingEditableStatus =
+          connections &&
+          connections.some((group) =>
+            group.connections.find(
+              (conn) =>
+                conn.prevProposalStatusId &&
+                currentStatusId &&
+                conn.prevProposalStatusId === currentStatusId &&
+                editableStatusesShortCodes?.includes(
+                  conn.proposalStatus.shortCode
+                )
             )
-            .map((status) => status.id);
-          const hasUpcomingEditableStatus =
-            connections &&
-            connections.some((group) =>
-              group.connections.find(
-                (conn) =>
-                  conn.nextProposalStatusId &&
-                  editableStatuses?.includes(conn.nextProposalStatusId)
-              )
-            );
+          );
 
-          if (proposal.status != null && hasUpcomingEditableStatus) {
-            setSubmitButtonMessage(
-              'Submit proposal? The proposal can be edited after submission.'
-            );
-          } else {
-            setSubmitButtonMessage(
-              'I am aware that no further edits can be made after proposal submission.'
-            );
-          }
+        if (proposal.status != null && hasUpcomingEditableStatus) {
+          setSubmitButtonMessage(
+            'Submit proposal? The proposal can be edited after submission.'
+          );
+        } else {
+          setSubmitButtonMessage(
+            'I am aware that no further edits can be made after proposal submission.'
+          );
         }
       }
 

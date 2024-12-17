@@ -33,6 +33,7 @@ export const Tokens = {
   TemplateDataSource: Symbol('TemplateDataSource'),
   UnitDataSource: Symbol('UnitDataSource'),
   UserAuthorization: Symbol('UserAuthorization'),
+  ProposalAuthorization: Symbol('ProposalAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
@@ -43,4 +44,7 @@ export const Tokens = {
   PopulateCallRow: Symbol('PopulateCallRow'),
   DownloadService: Symbol('DownloadService'),
   StatusActionsLogsDataSource: Symbol('StatusActionsLogsDataSource'),
+  ProposalInternalCommentsDataSource: Symbol(
+    'ProposalInternalCommentsDataSource'
+  ),
 };
