@@ -6,7 +6,7 @@ BEGIN
 
       CREATE TABLE invite_codes (
         invite_code_id SERIAL PRIMARY KEY,
-        code VARCHAR(12) NOT NULL,
+        code VARCHAR(12) NOT NULL UNIQUE,
         email VARCHAR(255) NOT NULL,
         note TEXT DEFAULT '',
         created_by INT NOT NULL REFERENCES users(user_id),
