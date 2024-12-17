@@ -22,35 +22,41 @@ jest.mock('../datasources/stfc/UOWSClient.ts', () => {
             ]);
           } else {
             return Promise.reject(
-              new Error('Failed to fetch user details for STFC external authentication')
+              new Error(
+                'Failed to fetch user details for STFC external authentication'
+              )
             );
           }
         }),
       },
       basicPersonDetails: {
-        getBasicPersonDetails: jest.fn().mockImplementation((fedid, surname, email, usernumber) => {
-          if (usernumber) {
-            return Promise.resolve([{
-              userNumber: 1,
-              country: 'fake',
-              deptName: 'fake',
-              displayName: 'fake',
-              email: 'valid',
-              establishmentId: 'fake',
-              familyName: 'fake',
-              firstNameKnownAs: 'fake',
-              fullName: 'fake',
-              givenName: 'fake',
-              initials: 'fake',
-              orgName: 'fake',
-              orgId: 'fake',
-              title: 'fake',
-              workPhone: 'fake',
-            }]);
-          } else {
-            return Promise.resolve([]);
-          }
-        }),
+        getBasicPersonDetails: jest
+          .fn()
+          .mockImplementation((fedid, surname, email, usernumber) => {
+            if (usernumber) {
+              return Promise.resolve([
+                {
+                  userNumber: 1,
+                  country: 'fake',
+                  deptName: 'fake',
+                  displayName: 'fake',
+                  email: 'valid',
+                  establishmentId: 'fake',
+                  familyName: 'fake',
+                  firstNameKnownAs: 'fake',
+                  fullName: 'fake',
+                  givenName: 'fake',
+                  initials: 'fake',
+                  orgName: 'fake',
+                  orgId: 'fake',
+                  title: 'fake',
+                  workPhone: 'fake',
+                },
+              ]);
+            } else {
+              return Promise.resolve([]);
+            }
+          }),
       },
       role: {
         getRolesForUser: jest.fn().mockResolvedValue([
@@ -78,8 +84,7 @@ jest.mock('../datasources/stfc/UOWSClient.ts', () => {
           {
             name: 'User',
           },
-        ],
-        )
+        ]),
       },
     }),
   };

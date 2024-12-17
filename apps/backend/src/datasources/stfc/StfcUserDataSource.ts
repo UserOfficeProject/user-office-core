@@ -66,6 +66,7 @@ export function toStfcBasicPersonDetails(
   if (!dto) {
     return null;
   }
+
   return {
     country: dto.country ?? '',
     deptName: dto.deptName ?? '',
@@ -189,16 +190,16 @@ export class StfcUserDataSource implements UserDataSource {
     if (cacheMisses.length > 0) {
       const uowsRequestTemp: BasicPersonDetailsDTO[] | null = searchableOnly
         ? await UOWSClient.basicPersonDetails.getSearchableBasicPersonDetails(
-          undefined,
-          undefined,
-          cacheMisses
-        )
+            undefined,
+            undefined,
+            cacheMisses
+          )
         : await UOWSClient.basicPersonDetails.getBasicPersonDetails(
-          undefined,
-          undefined,
-          undefined,
-          cacheMisses
-        );
+            undefined,
+            undefined,
+            undefined,
+            cacheMisses
+          );
 
       const uowsRequest = uowsRequestTemp
         ? uowsRequestTemp.map(toStfcBasicPersonDetails)
@@ -208,7 +209,7 @@ export class StfcUserDataSource implements UserDataSource {
         for (const userNumber of cacheMisses) {
           const userRequest = Promise.resolve(
             uowsRequest.find((user) => user?.userNumber === userNumber) ||
-            undefined
+              undefined
           );
 
           cache.put(userNumber, userRequest);
@@ -252,16 +253,16 @@ export class StfcUserDataSource implements UserDataSource {
     const uowsRequest = (
       searchableOnly
         ? UOWSClient.basicPersonDetails.getSearchableBasicPersonDetails(
-          undefined,
-          [email],
-          undefined
-        )
+            undefined,
+            [email],
+            undefined
+          )
         : UOWSClient.basicPersonDetails.getBasicPersonDetails(
-          undefined,
-          undefined,
-          [email],
-          undefined
-        )
+            undefined,
+            undefined,
+            [email],
+            undefined
+          )
     )
       .then((response) => toStfcBasicPersonDetails(response[0]))
       .then((stfcUser: StfcBasicPersonDetails | null) => {
@@ -338,6 +339,7 @@ export class StfcUserDataSource implements UserDataSource {
       stfcUser ? toEssUser(stfcUser) : null
     );
     console.log(dd);
+
     return dd;
   }
 
@@ -473,9 +475,10 @@ export class StfcUserDataSource implements UserDataSource {
         );
       if (!BasicPeopleByLastName) return { totalCount: 0, users: [] };
 
-      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] = BasicPeopleByLastName
-        .map(toStfcBasicPersonDetails)
-        .filter((person): person is StfcBasicPersonDetails => person !== null);
+      const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] =
+        BasicPeopleByLastName.map(toStfcBasicPersonDetails).filter(
+          (person): person is StfcBasicPersonDetails => person !== null
+        );
 
       userDetails = stfcBasicPeopleByLastName.map((person) =>
         toEssBasicUserDetails(person)

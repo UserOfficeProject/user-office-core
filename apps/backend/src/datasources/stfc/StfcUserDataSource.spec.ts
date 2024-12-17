@@ -8,91 +8,102 @@ jest.mock('./UOWSClient.ts', () => {
   return {
     createUOWSClient: jest.fn().mockReturnValue({
       basicPersonDetails: {
-        getBasicPersonDetails: jest.fn().mockImplementation((fedid, surname, email, usernumber) => {
-          if (email == 'valid') {
-            return Promise.resolve([{
-              userNumber: '12345',
-              country: 'fake',
-              deptName: 'fake',
-              displayName: 'fake',
-              email: 'valid',
-              establishmentId: 'fake',
-              familyName: 'fake',
-              firstNameKnownAs: 'fake',
-              fullName: 'fake',
-              givenName: 'fake',
-              initials: 'fake',
-              orgName: 'fake',
-              orgId: 'fake',
-              title: 'fake',
-              workPhone: 'fake',
-            }]);
-          } 
-          if (usernumber == 1){
-            return Promise.resolve([{
-              userNumber: '1',
-              country: 'fake',
-              deptName: 'fake',
-              displayName: 'fake',
-              email: 'valid',
-              establishmentId: 'fake',
-              familyName: 'fake',
-              firstNameKnownAs: 'fake',
-              fullName: 'fake',
-              givenName: 'fake',
-              initials: 'fake',
-              orgName: 'fake',
-              orgId: 'fake',
-              title: 'fake',
-              workPhone: 'fake',
-            }]);
-          }
-            else {
-            return Promise.resolve([]);
-          }
-        }),
-        getSearchableBasicPersonDetails: jest.fn().mockImplementation((surname, email, usernumber) => {
-          if (email == 'valid') {
-            return Promise.resolve([{
-              userNumber: '12345',
-              country: 'fake',
-              deptName: 'fake',
-              displayName: 'fake',
-              email: 'valid',
-              establishmentId: 'fake',
-              familyName: 'fake',
-              firstNameKnownAs: 'fake',
-              fullName: 'fake',
-              givenName: 'fake',
-              initials: 'fake',
-              orgName: 'fake',
-              orgId: 'fake',
-              title: 'fake',
-              workPhone: 'fake',
-            }]);
-          } 
-          if (usernumber == 1){
-            return Promise.resolve([{
-              userNumber: '1',
-              country: 'fake',
-              deptName: 'fake',
-              displayName: 'fake',
-              email: 'userNumCheck',
-              establishmentId: 'fake',
-              familyName: 'fake',
-              firstNameKnownAs: 'fake',
-              fullName: 'fake',
-              givenName: 'fake',
-              initials: 'fake',
-              orgName: 'fake',
-              orgId: 'fake',
-              title: 'fake',
-              workPhone: 'fake',
-            }]);
-          } else {
-            return Promise.resolve([]);
-          }
-        }),
+        getBasicPersonDetails: jest
+          .fn()
+          .mockImplementation((fedid, surname, email, usernumber) => {
+            if (email == 'valid') {
+              return Promise.resolve([
+                {
+                  userNumber: '12345',
+                  country: 'fake',
+                  deptName: 'fake',
+                  displayName: 'fake',
+                  email: 'valid',
+                  establishmentId: 'fake',
+                  familyName: 'fake',
+                  firstNameKnownAs: 'fake',
+                  fullName: 'fake',
+                  givenName: 'fake',
+                  initials: 'fake',
+                  orgName: 'fake',
+                  orgId: 'fake',
+                  title: 'fake',
+                  workPhone: 'fake',
+                },
+              ]);
+            }
+            if (usernumber == 1) {
+              return Promise.resolve([
+                {
+                  userNumber: '1',
+                  country: 'fake',
+                  deptName: 'fake',
+                  displayName: 'fake',
+                  email: 'valid',
+                  establishmentId: 'fake',
+                  familyName: 'fake',
+                  firstNameKnownAs: 'fake',
+                  fullName: 'fake',
+                  givenName: 'fake',
+                  initials: 'fake',
+                  orgName: 'fake',
+                  orgId: 'fake',
+                  title: 'fake',
+                  workPhone: 'fake',
+                },
+              ]);
+            } else {
+              return Promise.resolve([]);
+            }
+          }),
+        getSearchableBasicPersonDetails: jest
+          .fn()
+          .mockImplementation((surname, email, usernumber) => {
+            if (email == 'valid') {
+              return Promise.resolve([
+                {
+                  userNumber: '12345',
+                  country: 'fake',
+                  deptName: 'fake',
+                  displayName: 'fake',
+                  email: 'valid',
+                  establishmentId: 'fake',
+                  familyName: 'fake',
+                  firstNameKnownAs: 'fake',
+                  fullName: 'fake',
+                  givenName: 'fake',
+                  initials: 'fake',
+                  orgName: 'fake',
+                  orgId: 'fake',
+                  title: 'fake',
+                  workPhone: 'fake',
+                },
+              ]);
+            }
+            if (usernumber == 1) {
+              return Promise.resolve([
+                {
+                  userNumber: '1',
+                  country: 'fake',
+                  deptName: 'fake',
+                  displayName: 'fake',
+                  email: 'userNumCheck',
+                  establishmentId: 'fake',
+                  familyName: 'fake',
+                  firstNameKnownAs: 'fake',
+                  fullName: 'fake',
+                  givenName: 'fake',
+                  initials: 'fake',
+                  orgName: 'fake',
+                  orgId: 'fake',
+                  title: 'fake',
+                  workPhone: 'fake',
+                },
+              ]);
+            } else {
+              return Promise.resolve([]);
+            }
+          }),
       },
       role: {
         getRolesForUser: jest.fn().mockResolvedValue([
@@ -120,9 +131,8 @@ jest.mock('./UOWSClient.ts', () => {
           {
             name: 'User',
           },
-        ],
-        )
-      }
+        ]),
+      },
     }),
   };
 });
@@ -214,7 +224,7 @@ describe('Email search tests', () => {
   });
 
   test('When getting basic user details, the basic user is created and returned', async () => {
-    const result = await userdataSource.getBasicUserDetailsByEmail("valid");
+    const result = await userdataSource.getBasicUserDetailsByEmail('valid');
 
     expect(mockGetBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(0);
     expect(mockGetSearchableBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(
@@ -226,7 +236,7 @@ describe('Email search tests', () => {
   });
 
   test('When getting non-basic user details, the non-basic user is created and returned', async () => {
-    const result = await userdataSource.getByEmail("valid");
+    const result = await userdataSource.getByEmail('valid');
     console.log(result);
 
     expect(mockGetBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(1);
@@ -266,9 +276,11 @@ describe('Searchable user tests', () => {
     const result = await userDataSource.isSearchableUser(searchableUser);
 
     expect(mockGetSearchableBasicPeople).toHaveBeenCalledTimes(1);
-    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(undefined, undefined, [
-      String(searchableUser),
-    ]);
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      [String(searchableUser)]
+    );
     expect(result).toBe(true);
   });
 
@@ -278,9 +290,11 @@ describe('Searchable user tests', () => {
     const result = await userDataSource.isSearchableUser(nonSearchableUser);
 
     expect(mockGetSearchableBasicPeople).toHaveBeenCalledTimes(1);
-    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(undefined, undefined, [
-      String(nonSearchableUser),
-    ]);
+    expect(mockGetSearchableBasicPeople).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      [String(nonSearchableUser)]
+    );
     expect(result).toBe(false);
   });
 });

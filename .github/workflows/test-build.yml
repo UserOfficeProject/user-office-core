@@ -178,6 +178,8 @@ jobs:
 
       - run: npm ci
 
+      - run: npm run generate:uows
+
       - run: npm run build
         env:
           NODE_ENV: development
