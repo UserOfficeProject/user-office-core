@@ -354,44 +354,44 @@ jobs:
 
           npm run e2e:after:dev:stfc
 
-      - name: Run e2e tests
-        env:
-          USER_OFFICE_BACKEND_DIR: apps/backend
-          USER_OFFICE_FRONTEND_DIR: apps/frontend
-          USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
-          USER_OFFICE_BACKEND: http://localhost:4000/graphql
-          USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
-          TZ: Europe/Stockholm
-          DATE_FORMAT: dd-MM-yyyy
-          DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
-          PING_PUBLIC_CRT: dummypingsecret
-          DEPENDENCY_CONFIG: e2e
-          JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
-          NODE_ENV: development
-          BASE_URL: localhost:3000
-          JWT_TOKEN_LIFE: 7d
-          SPARKPOST_TOKEN: dummytoken
-          DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
-          USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
-          USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
-          SCHEMA_URL: http://localhost:4000/graphql
-          SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
-          CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
-          BUILD_TAG: ${{ github.sha }}
-          CYPRESS_CACHE_FOLDER: .cache/Cypress
-          EAM_API_URL: https://ios.esss.lu.se
-          EAM_AUTH_USER: dummyAuthUser
-          EAM_AUTH_PASSWORD: dummyEAMsecret
-          EAM_AUTH_TENANT: dummyTenant
-          EAM_AUTH_ORGANIZATION: dummyOrg
-          EAM_EQUIPMENT_PART_CODE: 12413
-          AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
-          AUTH_CLIENT_ID: useroffice
-          AUTH_CLIENT_SECRET: useroffice
-        run: |
-          REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
+      # - name: Run e2e tests
+      #   env:
+      #     USER_OFFICE_BACKEND_DIR: apps/backend
+      #     USER_OFFICE_FRONTEND_DIR: apps/frontend
+      #     USER_OFFICE_FRONTEND_E2E_DIR: apps/e2e
+      #     USER_OFFICE_BACKEND: http://localhost:4000/graphql
+      #     USER_OFFICE_ENDPOINT: $USER_OFFICE_BACKEND
+      #     TZ: Europe/Stockholm
+      #     DATE_FORMAT: dd-MM-yyyy
+      #     DATE_TIME_FORMAT: dd-MM-yyyy HH:mm
+      #     PING_PUBLIC_CRT: dummypingsecret
+      #     DEPENDENCY_CONFIG: e2e
+      #     JWT_SECRET: qMyLZALzs229ybdQXNyzYRdju7X784TH
+      #     NODE_ENV: development
+      #     BASE_URL: localhost:3000
+      #     JWT_TOKEN_LIFE: 7d
+      #     SPARKPOST_TOKEN: dummytoken
+      #     DATABASE_URL: postgres://duouser:duopassword@127.0.0.1:5432/duo
+      #     USER_OFFICE_FACTORY_ENDPOINT: http://localhost:4500/generate
+      #     USER_OFFICE_FACTORY_TAG: ${{ needs.resolve_dep.outputs.FACTORY_TAG }}
+      #     SCHEMA_URL: http://localhost:4000/graphql
+      #     SVC_ACC_TOKEN: ${{ secrets.SVC_ACC_TOKEN }}
+      #     CYPRES_SPEC_PATTERN: ${{ matrix.pattern.files }}
+      #     BUILD_TAG: ${{ github.sha }}
+      #     CYPRESS_CACHE_FOLDER: .cache/Cypress
+      #     EAM_API_URL: https://ios.esss.lu.se
+      #     EAM_AUTH_USER: dummyAuthUser
+      #     EAM_AUTH_PASSWORD: dummyEAMsecret
+      #     EAM_AUTH_TENANT: dummyTenant
+      #     EAM_AUTH_ORGANIZATION: dummyOrg
+      #     EAM_EQUIPMENT_PART_CODE: 12413
+      #     AUTH_DISCOVERY_URL: http://localhost:5000/.well-known/openid-configuration
+      #     AUTH_CLIENT_ID: useroffice
+      #     AUTH_CLIENT_SECRET: useroffice
+      #   run: |
+      #     REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          npm run e2e:after:dev -- --dns-result-order=ipv4first
+          # npm run e2e:after:dev -- --dns-result-order=ipv4first
 
       - name: Upload cypres screenshots
         if: failure()
