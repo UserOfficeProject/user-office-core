@@ -334,11 +334,9 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getByEmail(email: string): Promise<User | null> {
-    console.log(email);
     const dd = this.getStfcBasicPersonByEmail(email).then((stfcUser) =>
       stfcUser ? toEssUser(stfcUser) : null
     );
-    console.log(dd);
 
     return dd;
   }

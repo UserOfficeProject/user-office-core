@@ -1,6 +1,7 @@
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
+import { createUOWSClient } from './UOWSClient';
 
 jest.mock('../postgres/UserDataSource.ts');
 jest.mock('../../utils/Cache');
@@ -200,7 +201,7 @@ describe('Role tests', () => {
 describe('Email search tests', () => {
   const userdataSource = new StfcUserDataSource();
 
-  const mockedClient = require('./UOWSClient').createUOWSClient();
+  const mockedClient = createUOWSClient();
 
   const mockGetSearchableBasicPersonDetailsFromEmail = jest.spyOn(
     mockedClient.basicPersonDetails,
@@ -237,7 +238,6 @@ describe('Email search tests', () => {
 
   test('When getting non-basic user details, the non-basic user is created and returned', async () => {
     const result = await userdataSource.getByEmail('valid');
-    console.log(result);
 
     expect(mockGetBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(1);
     expect(mockGetSearchableBasicPersonDetailsFromEmail).toHaveBeenCalledTimes(
@@ -259,7 +259,7 @@ describe('Email search tests', () => {
 
 describe('Searchable user tests', () => {
   const userDataSource = new StfcUserDataSource();
-  const mockedClient = require('./UOWSClient').createUOWSClient();
+  const mockedClient = createUOWSClient();
 
   const mockGetSearchableBasicPeople = jest.spyOn(
     mockedClient.basicPersonDetails,
