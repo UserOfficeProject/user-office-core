@@ -6,9 +6,10 @@ import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
   StfcBasicPersonDetails,
-  stfcRole,
+  toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
-import UOWSSoapClient from '../datasources/stfc/UOWSSoapInterface';
+import { createUOWSClient } from '../datasources/stfc/UOWSClient';
+import { BasicPersonDetailsDTO, RoleDTO, TokenWrapperDTO } from '../generated';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
@@ -17,7 +18,7 @@ import { Cache } from '../utils/Cache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
 
-const client = UOWSSoapClient.getInstance();
+const UOWSClient = createUOWSClient();
 
 const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
   'User Officer': ['ISIS', 'ARTEMIS', 'HPL', 'LSF'],
@@ -48,9 +49,9 @@ export class StfcUserAuthorization extends UserAuthorization {
     Tokens.UserDataSource
   ) as StfcUserDataSource;
 
-  getRequiredInstrumentForRole(roles: stfcRole[]) {
+  getRequiredInstrumentForRole(roles: RoleDTO[]) {
     return roles
-      .flatMap((role) => stfcInstrumentScientistRolesToInstrument[role.name])
+      .flatMap((role) => stfcInstrumentScientistRolesToInstrument[role.name!])
       .filter((instrumentName) => instrumentName);
   }
 
@@ -164,21 +165,23 @@ export class StfcUserAuthorization extends UserAuthorization {
     token: string,
     _redirecturi: string
   ): Promise<User | null> {
-    const stfcUser: StfcBasicPersonDetails | null = await client
-      .getPersonDetailsFromSessionId(token)
-      .then((rawStfcUser) => rawStfcUser?.return)
-      .catch((error) => {
-        const rethrowMessage =
-          'Failed to fetch user details for STFC external authentication';
-        logger.logWarn(rethrowMessage, {
-          cause: error,
-          token: token,
+    const loginBySession = await UOWSClient.sessions.getLoginBySessionId(token);
+    const stfcUserTemp: BasicPersonDetailsDTO[] | null =
+      await UOWSClient.basicPersonDetails
+        .getBasicPersonDetails(undefined, undefined, undefined, [loginBySession.userId])
+        .then((rawStfcUser) => rawStfcUser)
+        .catch((error) => {
+          const rethrowMessage =
+            'Failed to fetch user details for STFC external authentication';
+          logger.logWarn(rethrowMessage, {
+            cause: error,
+            token: token,
+          });
+
+          throw new GraphQLError(rethrowMessage);
         });
 
-        throw new GraphQLError(rethrowMessage);
-      });
-
-    if (!stfcUser) {
+    if (!stfcUserTemp) {
       logger.logInfo('No user found for STFC external authentication', {
         externalToken: token,
       });
@@ -186,26 +189,30 @@ export class StfcUserAuthorization extends UserAuthorization {
       return null;
     }
 
+    const stfcUser: StfcBasicPersonDetails | null = toStfcBasicPersonDetails(
+      stfcUserTemp[0]
+    );
+
     // Create dummy user if one does not exist in the proposals DB.
     // This is needed to satisfy the FOREIGN_KEY constraints
     // in tables that link to a user (such as proposals)
-    const userNumber = parseInt(stfcUser.userNumber);
+    const userNumber = parseInt(stfcUser!.userNumber);
     const dummyUser =
       await this.userDataSource.ensureDummyUserExists(userNumber);
 
     // With dummyUser created and written (ensureDummyUserExists), info can now
     // be added to it without persisting it to the database, which is not wanted.
     // This info is used in the userContext.
-    dummyUser.email = stfcUser.email;
-    dummyUser.firstname = stfcUser.givenName;
-    dummyUser.preferredname = stfcUser.firstNameKnownAs;
-    dummyUser.lastname = stfcUser.familyName;
+    dummyUser.email = stfcUser!.email;
+    dummyUser.firstname = stfcUser!.givenName;
+    dummyUser.preferredname = stfcUser!.firstNameKnownAs;
+    dummyUser.lastname = stfcUser!.familyName;
 
     // Auto-assign users to instruments.
     // This will happen if the user is an instrument scientist for an STFC facility
-    const stfcRoles: stfcRole[] | null = (
-      await client.getRolesForUser(process.env.EXTERNAL_AUTH_TOKEN, userNumber)
-    )?.return;
+    const stfcRoles: RoleDTO[] | null = await UOWSClient.role.getRolesForUser(
+      userNumber.toString()
+    );
 
     if (stfcRoles) {
       // The UOWS sometimes returns duplicate roles. We remove them here
@@ -253,7 +260,7 @@ export class StfcUserAuthorization extends UserAuthorization {
           return Promise.resolve('User already logged out');
         }
 
-        return await client
+        return await UOWSClient.sessions
           .logout(token)
           .then(() => {
             return 'Successfully logged out user';
@@ -290,13 +297,19 @@ export class StfcUserAuthorization extends UserAuthorization {
       return cachedValidity;
     }
 
-    const tokenRequest: Promise<boolean> = client
-      .isTokenValid(token)
-      .then((response) => response?.return);
+    const stfcToken: TokenWrapperDTO = {
+      token: token,
+    };
+
+    const tokenRequest = UOWSClient.token
+      .validateToken(stfcToken)
+      .then((response) => {
+        return response.identifier !== undefined;
+      });
 
     this.uowsTokenCache.put(token, tokenRequest);
 
-    const isValid: boolean = await tokenRequest;
+    const isValid = await tokenRequest;
     // Only keep valid tokens cached to avoid locking out users for a long time
     if (!isValid) {
       this.uowsTokenCache.remove(token);

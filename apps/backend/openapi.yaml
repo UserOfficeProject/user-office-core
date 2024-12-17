@@ -1,0 +1,4343 @@
+openapi: 3.0.1
+info:
+  title: User Office Web Service REST API
+  description: "This is a REST API for the User Office Web Service. There are two\
+    \ main use cases for the API: User Management and Authentication/Authorisation.\n\
+    \n  * The user management aspect can be used to retrieve, create and modify information\
+    \ about Users (Person, PersonDetails, etc.) of the system and their affiliated\
+    \ resources (Establishment, Address, etc.).\n\n* Auth consists of the ability\
+    \ to register, authenticate and authorise with the Users backend system. It allows\
+    \ for group and permission management and is responsible for generating sessions\
+    \ and access tokens.\n***\n\n## Authentication\nTo access most of the endpoints\
+    \ a client will need to autenticate with a system using either a __Bearer__ or\
+    \ an __Api-key__ schema. In both cases each request to the secured endpoint will\
+    \ need to contain an `Authorization` header that holds an authorisation secret\
+    \ with a correct prefix.\n\n* To make use of __Bearer__ a client will need to\
+    \ use a `login`(sessions/login) endpoint and supply it with a user name and a\
+    \ password. If the authentication was successful a response will contain a session\
+    \ ID which can be used in  the `Authorization` header with a prefix of __Bearer__\
+    \ in any future requests until the session expires.\n\n* To make use of an __Api-key__\
+    \ schema, a client will need to submit a request with the Users & Auth team for\
+    \ an API key. Once the API key is supplied it can be used as a value in the `Authorization`\
+    \ header with a prefix __Api-key__.\n\n### Examples\nFor example if using a __Bearer__\
+    \ schema, the `Authorization` header will look like this: `Authorization: Bearer\
+    \ <some-session-id>`. If using an __Api-key__ schema, the `Authorization` header\
+    \ will look like this: `Authorization: Api-key <some-api-key>`\n\n```\n# Curl\
+    \ of the entire request\n\ncurl --location 'http://localhost:4008/users-service/v0/person/123'\
+    \ \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Api-key\
+    \ some-api-key'\n```\n\n## Permissions\nThe API supports a range of permissions.\
+    \ To access a secured endpoint a client will need to have the required permissions.\n\
+    Each endpoint should have a permission level specified within its description.\n\
+    Sometimes the description will mention `Self reference only` this means that only\
+    \ the owner of the resource can access it,\nor the client will need a high permission\
+    \ level that could enable it to bypass this requirement.\n\nBearer and API key\
+    \ permissions are hierarchical:\n* For Bearer the hierarchy (left is the most\
+    \ powerful one) is SUPER-ADMIN -> ADMIN -> USER_OFFICE -> USER\n* FOR API key\
+    \ the hierarchy (left is the most powerful one) is ADMIN -> FAP -> GET_ALL_PERSONDETAILS\
+    \ -> GET_ALL_BASICPERSONDETAILS\n\n### Examples\n`/person/createPerson` requires\
+    \ ADMIN API key permissions, this means that only a client with an ADMIN API key\
+    \ can access this endpoint.\n\n`/person/updatePerson` requires USER_OFFICE role\
+    \ or an API key with GET_ALL_BASICPERSONDETAILS,\nthis means that the client will\
+    \ be required to use either of those.\n\n`/person/deactivatePerson` requires a\
+    \ USER role or an ADMIN API key, however, this endpoint is __Self Reference Only__.\n\
+    This means that a client can only deactivate a person object if they own it. However,\
+    \ it can bypassed if the client has a USER_OFFICE role.\n\n### This request will\
+    \ fail as the client does not match requested resource\n\n```\ncurl -X 'PUT' --location\
+    \ 'http://localhost:4008/users-service/v0/person/123/deactivate\n  --header 'Accept:\
+    \ application/json' \\\n  --header 'Authorization: Bearer <sessionID-for-person-123456-with-USER-role>'\n\
+    ```\n### This request will succeed as the client does own a requested resource\
+    \ \n```\ncurl -X 'PUT' --location 'http://localhost:4008/users-service/v0/person/123/deactivate\n\
+    \  --header 'Accept: application/json' \\\n  --header 'Authorization: Bearer <sessionID-for-person-123-with-USER-role>'\n\
+    ```\n### This request will succeed as the client uses an API key\n```\n# This\
+    \ request will succeed as the client uses an API key\ncurl -X 'PUT' --location\
+    \ 'http://localhost:4008/users-service/v0/person/123/deactivate\n  --header 'Accept:\
+    \ application/json' \\\n  --header 'Authorization: Api-key <admin-api-key>'\n\
+    ```\n### This request will succeed as the client has a USER_OFFICE role and bypasses\
+    \ __Self reference only__\n```\ncurl -X 'PUT' --location 'http://localhost:4008/users-service/v0/person/123/deactivate\n\
+    \  --header 'Accept: application/json' \\\n  --header 'Authorization: Bearer <sessionID-for-person-123456-with-USER_OFFICE-role>'\n\
+    ```"
+  contact:
+    email: facilitiesbusinesssystem@stfc.ac.uk
+  version: "1.0"
+servers:
+- url: http://localhost:4008/users-service
+  description: Local users REST API server
+- url: https://devapi.facilities.rl.ac.uk/users-service
+  description: Dev users REST API server
+- url: https://api.facilities.rl.ac.uk/users-service
+  description: Prod users REST API server
+paths:
+  /v1/account-activation/{encryptedId}:
+    put:
+      tags:
+      - account-activation
+      summary: Activate an account by activation ID
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: activateAccount
+      parameters:
+      - name: encryptedId
+        in: path
+        description: The encrypted activation ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateAccountWrapperDTO'
+      responses:
+        "200":
+          description: Account activated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountActivationDTO'
+        "400":
+          description: Invalid activation ID or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: Activation ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Account already activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "410":
+          description: Activation expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Failed to send email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/account-activation/{email}:
+    post:
+      tags:
+      - account-activation
+      summary: Activate an account and send activation email
+      description: Requires at least ADMIN role OR an API key with ADMIN permissions
+      operationId: sendActivationEmail
+      parameters:
+      - name: email
+        in: path
+        description: The email address of the user to send the activation email to
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Activation email sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountActivationDTO'
+        "400":
+          description: Invalid email address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No account found with the specified email address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Active account found with the specified email address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/address:
+    post:
+      tags:
+      - address
+      summary: Create address
+      description: Requires at least USER_OFFICE role OR an API key with ADMIN permissions
+      operationId: createAddress
+      requestBody:
+        description: "Address to create, postalAddressId will be ignored"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressDTO'
+        required: true
+      responses:
+        "201":
+          description: Address created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressDTO'
+        "400":
+          description: Bad request is returned if no body is supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/address/{id}:
+    get:
+      tags:
+      - address
+      summary: Get address by ID
+      description: Requires at least USER_OFFICE role OR an API key with GET_ALL_BASICPERSONDETAILS
+        permissions
+      operationId: getAddress
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Address found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressDTO'
+        "404":
+          description: Address not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    put:
+      tags:
+      - address
+      summary: Update address
+      description: Requires at least USER_OFFICE role OR an API key with ADMIN permissions
+      operationId: updateAddress
+      parameters:
+      - name: id
+        in: path
+        description: Address ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: "Address to update, postalAddressId will be used to determine\
+          \ which record to update"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressDTO'
+        required: true
+      responses:
+        "200":
+          description: Address updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressDTO'
+        "400":
+          description: Bad request is returned if no body is supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/api-keys:
+    get:
+      tags:
+      - api-keys
+      summary: Get all API Keys
+      description: Requires at least ADMIN role to access this endpoint please contact
+        us using contact details provided in the documentation if you need to access
+        this endpoint
+      operationId: getAllApiKeys
+      responses:
+        "200":
+          description: API Keys found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiKeyDTO'
+      security:
+      - Bearer: []
+    post:
+      tags:
+      - api-keys
+      summary: Create API Key
+      description: "Requires at least SUPER_ADMIN role to access this endpoint, this\
+        \ role is reserved for the U&A team leadplease contact us using contact details\
+        \ provided in the documentation if you need to access this endpoint.This endpoint\
+        \ ignores the token field if provided."
+      operationId: createApiKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyDTO'
+      responses:
+        "201":
+          description: API Key created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyDTO'
+        "400":
+          description: "Bad request is returned if no body is supplied or if service\
+            \ name, contact and role are not provided"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+  /v1/api-keys/individual:
+    get:
+      tags:
+      - api-keys
+      summary: Get API Key by token
+      description: Requires at least ADMIN role or API-key to access this endpoint.
+        If API key is used for auth it must be the same as the token supplied in the
+        header X-API-key. If API-key auth is used it only allows to query the information
+        about itself.
+      operationId: getApiKeyByToken
+      parameters:
+      - name: X-API-key
+        in: header
+        description: The api key to search for
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: API Key found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyDTO'
+        "400":
+          description: Bad request is returned if no token is supplied in the header
+            X-API-key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "403":
+          description: Forbidden is returned if the token checked is different from
+            the token used to access this endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: API Key not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    delete:
+      tags:
+      - api-keys
+      summary: Delete API Key by token
+      description: "Requires at least SUPER_ADMIN role to access this endpoint, this\
+        \ role is reserved for the U&A team leadplease contact us using contact details\
+        \ provided in the documentation if you need to access this endpoint"
+      operationId: softDeleteApiKey
+      parameters:
+      - name: X-API-key
+        in: header
+        description: The API key to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: API Key deleted
+        "404":
+          description: API Key not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+  /v1/basic-person-details:
+    get:
+      tags:
+      - basic-person-details
+      summary: Get all basic person details
+      description: Requires an API key with the permission to get all basic person
+        details
+      operationId: getBasicPersonDetails
+      parameters:
+      - name: fedId
+        in: query
+        description: 'The fedId to search for '
+        schema:
+          type: string
+      - name: surname
+        in: query
+        description: The surname to search for
+        schema:
+          type: string
+      - name: emails
+        in: query
+        description: List of emails to search for
+        schema:
+          type: array
+          items:
+            type: string
+      - name: userNumbers
+        in: query
+        description: List of userNumbers
+        schema:
+          type: array
+          items:
+            type: string
+      - name: fromDate
+        in: query
+        description: Search for people modified since this date
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Basic person details found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasicPersonDetailsDTO'
+        "400":
+          description: "Invalid date format was passed, please use yyyy-mm-dd"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+  /v1/basic-person-details/account-activation-id/{activationId}:
+    get:
+      tags:
+      - basic-person-details
+      summary: Get basic person details by account activation id
+      description: Requires API key permissions ADMIN
+      operationId: getBasicPersonDetailsByActivationId
+      parameters:
+      - name: activationId
+        in: path
+        description: The id of the activation to search the person
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Basic person details found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicPersonDetailsDTO'
+        "400":
+          description: Invalid account activation id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: The activation has already been used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "410":
+          description: The activation has already expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+  /v1/basic-person-details/reset-id/{resetId}:
+    get:
+      tags:
+      - basic-person-details
+      summary: Get basic person details by password reset id
+      description: Requires API key permissions ADMIN
+      operationId: getBasicPersonDetailsByEncryptedId
+      parameters:
+      - name: resetId
+        in: path
+        description: The id of the reset to search the person
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Basic person details found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasicPersonDetailsDTO'
+        "400":
+          description: Invalid reset id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: The reset has already been used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "410":
+          description: The reset has already expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+  /v1/basic-person-details/searchable:
+    get:
+      tags:
+      - basic-person-details
+      summary: Search for basic person details
+      description: Requires USER role or API key permissions GET_ALL_BASICPERSONDETAILS
+      operationId: getSearchableBasicPersonDetails
+      parameters:
+      - name: surname
+        in: query
+        description: Surname to search for
+        schema:
+          type: string
+      - name: emails
+        in: query
+        description: List of emails to search for
+        schema:
+          type: array
+          items:
+            type: string
+      - name: userNumbers
+        in: query
+        description: List of user numbers to search for
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Basic person details found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasicPersonDetailsDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/basic-person-details/search/by-establishment:
+    post:
+      tags:
+      - basic-person-details
+      summary: Search for basic person details by establishment
+      description: Requires API key permissions GET_ALL_BASICPERSONDETAILS
+      operationId: searchBasicPeopleDetailsListByEstablishments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/EstablishmentSearchDetails'
+      responses:
+        "200":
+          description: Basic person details found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BasicPersonDetailsDTO'
+      security:
+      - ApiKey: []
+  /v1/countries:
+    get:
+      tags:
+      - country
+      summary: Get all countries
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getCountries
+      responses:
+        "200":
+          description: List of countries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CountryDTO'
+  /v1/countries/eu:
+    get:
+      tags:
+      - country
+      summary: Get all EU countries
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getEUCountries
+      responses:
+        "200":
+          description: List of EU countries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CountryDTO'
+  /v1/data-lookup/data-usages:
+    get:
+      tags:
+      - data-lookup
+      summary: Get data lookup value that are used within data usage messages
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getAllDataUsages
+      responses:
+        "200":
+          description: Data lookup values for data usages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataLookupDTO'
+  /v1/data-lookup/{keyName}:
+    get:
+      tags:
+      - data-lookup
+      summary: Get data lookup value by key name
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getDataLookup
+      parameters:
+      - name: keyName
+        in: path
+        description: The name of the value to lookup
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Data lookup value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataLookupDTO'
+        "404":
+          description: Data lookup value not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/emergency-contact/{userNumber}:
+    get:
+      tags:
+      - emergency-contact
+      summary: Get emergency contact details for a user
+      description: "Requires at least USER role OR an API key with  GET_ALL_BASICPERSONDETAILS\
+        \ permissions, this is self-reference only meaning only a user owning the\
+        \ resource can access it, clients with USER_OFFICE role can bypass this restriction"
+      operationId: getEmergencyContact
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number of the user to get emergency contact details
+          for
+        required: true
+        schema:
+          type: string
+        example: 123456
+      responses:
+        "200":
+          description: Emergency contact details for the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyContactDTO'
+        "404":
+          description: No emergency contact details found for the user
+      security:
+      - Bearer: []
+      - ApiKey: []
+    put:
+      tags:
+      - emergency-contact
+      summary: Update emergency contact details for a user
+      description: "Requires at least USER role OR an API key with ADMIN permissions,\
+        \ this is self-reference only meaning only a user owning the resource can\
+        \ access it, clients with USER_OFFICE role can bypass this restriction"
+      operationId: updateEmergencyContact
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number of the user to update emergency contact details
+          for
+        required: true
+        schema:
+          type: string
+        example: 123456
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmergencyContactDTO'
+        required: true
+      responses:
+        "200":
+          description: Updated emergency contact details for the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmergencyContactDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/establishment:
+    get:
+      tags:
+      - establishment
+      summary: Get all establishments matching the search query
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getEstablishmentsByQuery
+      parameters:
+      - name: search
+        in: query
+        description: "Establishment to search for: organisation name, department name\
+          \ or acronym of both can be used to search"
+        required: true
+        schema:
+          type: string
+        example: STFC
+      responses:
+        "200":
+          description: Establishments found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentDTO'
+    post:
+      tags:
+      - establishment
+      summary: Create establishment
+      description: Requires at least ADMIN role to access this endpoint OR an API
+        key with the ADMIN permission
+      operationId: createEstablishment
+      requestBody:
+        description: Establishment to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentDTO'
+        required: true
+      responses:
+        "201":
+          description: Establishment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        "400":
+          description: Bad request is returned if the DTO object does not have all
+            required fields.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/establishment/{establishmentId}:
+    get:
+      tags:
+      - establishment
+      summary: Get establishment by id
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getEstablishment
+      parameters:
+      - name: establishmentId
+        in: path
+        description: The id of the establishment to search for
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 1
+      responses:
+        "200":
+          description: Establishment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        "404":
+          description: Establishment not found
+    put:
+      tags:
+      - establishment
+      summary: Update establishment
+      description: Requires at least USER_OFFICE role or an ADMIN API-key to access
+        this endpoint
+      operationId: updateEstablishment
+      parameters:
+      - name: establishmentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: Establishment to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstablishmentDTO'
+        required: true
+      responses:
+        "200":
+          description: Establishment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        "400":
+          description: Bad request is returned if the DTO object is missing or does
+            not match the establishment id provided in the path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: Not found is returned if no establishment is found with the
+            id provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate results is returned if an establishment with the
+            same details already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    delete:
+      tags:
+      - establishment
+      summary: Delete establishment
+      description: Requires at least USER_OFFICE role or an ADMIN API-key to access
+        this endpoint
+      operationId: deleteEstablishment
+      parameters:
+      - name: establishmentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Establishment deleted
+        "400":
+          description: Bad request is returned if the establishment has people associated
+            with it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Conflict is returned if duplicate establishment is found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/establishment/similar/{establishmentId}:
+    get:
+      tags:
+      - establishment
+      summary: "Returns all establishments which are similar to the given establishment's\
+        \ postcode, org name, or org acronym"
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getSimilarEstablishments
+      parameters:
+      - name: establishmentId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful search
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentDTO'
+        "404":
+          description: Not found is returned if no establishment is found with the
+            id provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/establishment/unverified:
+    get:
+      tags:
+      - establishment
+      summary: Get all unverified establishments
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getUnverifiedEstablishments
+      responses:
+        "200":
+          description: Establishments found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstablishmentDTO'
+  /v1/establishment/merge:
+    put:
+      tags:
+      - establishment
+      summary: Merges two establishments based on ids
+      description: Requires at least USER_OFFICE role or an ADMIN API-key to access
+        this endpoint
+      operationId: mergeEstablishment
+      parameters:
+      - name: oldEst
+        in: query
+        description: The id of the establishment to merge
+        required: true
+        schema:
+          type: string
+        example: 1
+      - name: newEst
+        in: query
+        description: The id of the establishment to merge into
+        required: true
+        schema:
+          type: string
+        example: 2
+      responses:
+        "200":
+          description: Establishment merged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstablishmentDTO'
+        "400":
+          description: Bad request is returned if oldEst and newEst parameters are
+            not provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Conflict is returned if duplicate establishment is found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/facilities:
+    get:
+      tags:
+      - facility
+      summary: Get all facilities
+      description: This endpoint is anonymous and does not require any authentication
+      operationId: getAllFacilities
+      responses:
+        "200":
+          description: List of facilities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FacilityDTO'
+  /v1/failed-login/{userNumber}:
+    delete:
+      tags:
+      - failed-login
+      summary: Unlock an account
+      description: This endpoint is secured and requires a valid JWT token with the
+        User Office role or an ADMIN API-key
+      operationId: deleteFailedLogin
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to unlock the account for
+        required: true
+        schema:
+          type: string
+        example: 123456
+      responses:
+        "204":
+          description: The failed login has been deleted
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/failed-login/{userNumber}/status:
+    get:
+      tags:
+      - failed-login
+      summary: Get the account lock status for a user
+      description: This endpoint is secured and requires a valid JWT token with the
+        User Office role or an ADMIN API-key
+      operationId: getAccountLockedStatus
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to check the account lock status for
+        required: true
+        schema:
+          type: string
+        example: 123456
+      responses:
+        "200":
+          description: The account lock status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedLoginDTO'
+        "204":
+          description: The account is not locked
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/fed-ids:
+    post:
+      tags:
+      - fed-ids
+      summary: Create a Fed ID
+      description: Requires at least USER_OFFICE role or ADMIN API-Key to access this
+        endpoint
+      operationId: createFedId
+      requestBody:
+        description: "The Fed ID request to create, FedID request will be created\
+          \ for the user whose user number is provided in the body"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FedIdDTOWrapper'
+      responses:
+        "201":
+          description: Fed ID created
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          description: The body is missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/fed-ids/{userNumber}:
+    get:
+      tags:
+      - fed-ids
+      summary: Get Fed ID information from CDR for the specified user-number
+      description: Requires at least USER_OFFICE role or ADMIN API-Key to access this
+        endpoint
+      operationId: getFedIDsFromCDR
+      parameters:
+      - name: userNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/fed-ids/{userId}/end-date:
+    put:
+      tags:
+      - fed-ids
+      summary: Update the specified Fed ID's end date
+      description: Requires at least USER_OFFICE role or ADMIN API-Key to access this
+        endpoint
+      operationId: updateFedIdEndDate
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FedIdEndDateWrapper'
+      responses:
+        "200":
+          description: Fed id end date updated
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/fed-ids/{fedId}/password:
+    put:
+      tags:
+      - fed-ids
+      summary: Update the specified Fed ID's password
+      description: Requires at least USER_OFFICE role or ADMIN API-Key to access this
+        endpoint
+      operationId: updateFedIdPassword
+      parameters:
+      - name: fedId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordWrapperDTO'
+      responses:
+        "200":
+          description: Fed id password reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordWrapperDTO'
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/fed-id-requests:
+    get:
+      tags:
+      - fed-id-requests
+      summary: Get all Fed ID requests
+      description: Requires at least USER_OFFICE role or ADMIN API-Key to access this
+        endpoint
+      operationId: getAllFedIdRequests
+      responses:
+        "200":
+          description: List of Fed ID requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FedIdRequestDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    post:
+      tags:
+      - fed-id-requests
+      summary: Request a Fed ID
+      description: "Requires at least USER role to access this endpoint, this is self-reference\
+        \ only meaning only a user owning the resource can access it, clients with\
+        \ ADMIN role or API-Key can bypass this restriction"
+      operationId: requestFedId
+      requestBody:
+        description: "The Fed ID request to create, FedID request will be created\
+          \ for the user whose user number is provided in the body"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FedIdRequestDTO'
+      responses:
+        "201":
+          description: Fed ID request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FedIdRequestDTO'
+        "400":
+          description: "The body is missing required fields, or if the date of birth\
+            \ provided is not before today"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    delete:
+      tags:
+      - fed-id-requests
+      summary: Delete Fed ID requests for a user
+      description: Requires at least USER_OFFICE role to access this endpoint clients
+        with ADMIN role or API-Key can bypass this restriction
+      operationId: deleteFedIdRequestsForAUser
+      parameters:
+      - name: userNumber
+        in: query
+        description: A user number who's FedID request should be deleted
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Fed ID requests deleted
+        "400":
+          description: The user number is missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No Fed ID requests found for the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/group-memberships/fap:
+    post:
+      tags:
+      - group-memberships
+      summary: Add a person to FAP groups
+      description: Requires an API key with the FAP permission to access this endpoint
+      operationId: addPersonToFapGroup
+      requestBody:
+        description: User number and the list of groups to add the person to
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupMembershipWrapper'
+      responses:
+        "200":
+          description: "Success, returns the groups the person was added to"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupMembershipWrapper'
+        "400":
+          description: No FAP groups found in the list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No results were found for user number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate records of person were found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+    delete:
+      tags:
+      - group-memberships
+      summary: Remove a person from FAP groups
+      description: Requires an API key with the FAP permission to access this endpoint
+      operationId: removePersonFromFapGroup
+      parameters:
+      - name: userNumber
+        in: query
+        description: User number of the person to remove the membership from
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: groupName
+        in: query
+        description: The name of the group to remove the person from
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Group is not a FAP group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No results were found for user number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate records of person were found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+  /v1/group-memberships:
+    post:
+      tags:
+      - group-memberships
+      summary: Add a person to groups
+      description: Requires at least ADMIN role or ADMIN API-Key to access this endpoint
+      operationId: addUserToGroups
+      requestBody:
+        description: User number and the list of groups to add the person to
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupMembershipWrapper'
+      responses:
+        "200":
+          description: "Success, returns the groups the person was added to"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupMembershipWrapper'
+        "400":
+          description: No groups found with the given names
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No results were found for user number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate records of person were found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/health-check/mailchimp-webhooks:
+    get:
+      tags:
+      - healthcheck
+      summary: Ping mailchimp-webhooks
+      description: This service is used to check if the mailchimp-webhooks is active
+        and responding to requests
+      operationId: pollMailchimpWebhooks
+      responses:
+        "200":
+          description: mailchimp-webhooks is active and responding to requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthcheckResponse'
+        "503":
+          description: mailchimp-webhooks is currently unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/health-check/merge-user-tool:
+    get:
+      tags:
+      - healthcheck
+      summary: Ping merge-user-tool
+      description: This service is used to check if the merge-user-tool is active
+        and responding to requests
+      operationId: pollMergeUserTool
+      responses:
+        "200":
+          description: merge-user-tool is active and responding to requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthcheckResponse'
+        "503":
+          description: merge-user-tool is currently unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/health-check:
+    get:
+      tags:
+      - healthcheck
+      summary: Ping users REST API
+      description: This service is used to check if the REST API is active and responding
+        to requests
+      operationId: pollRestAPI
+      responses:
+        "200":
+          description: REST API is active and responding to requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthcheckResponse'
+        "503":
+          description: REST API is currently unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/ideiio/{userNumber}:
+    get:
+      tags:
+      - ideiio
+      summary: Get Ideiio account for the userNumber
+      description: Requires USER_OFFICE role or ADMIN API-Key
+      operationId: getAccount
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to get Ideiio account for
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: No results for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate results found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Ideiio service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "200":
+          description: Ideiio account for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeiioDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    put:
+      tags:
+      - ideiio
+      summary: Update Ideiio account for the userNumber
+      description: Requires USER_OFFICE role or ADMIN API-Key
+      operationId: updateAccount
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number of the account to update
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdeiioDTO'
+        required: true
+      responses:
+        "404":
+          description: No results for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate results found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Ideiio service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "200":
+          description: Updated Ideiio account for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeiioDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    post:
+      tags:
+      - ideiio
+      summary: Create Ideiio account for the userNumber
+      description: Requires USER_OFFICE role or ADMIN API-Key
+      operationId: createAccount
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to associate new Ideiio account with
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdeiioDTO'
+      responses:
+        "404":
+          description: No results for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate results found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Ideiio service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "200":
+          description: Created Ideiio account for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeiioDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/ideiio/excluding:
+    get:
+      tags:
+      - ideiio
+      summary: Get all Ideiio accounts excluding the provided FedID
+      description: Requires USER_OFFICE role or ADMIN API-Key
+      operationId: getAccountsExcludeActive
+      parameters:
+      - name: filter
+        in: query
+        description: SCIM filter to use for searching
+        schema:
+          type: string
+      - name: startIndex
+        in: query
+        description: Record index to return the list from
+        schema:
+          type: integer
+          format: int32
+      - name: count
+        in: query
+        description: The number of accounts per page
+        schema:
+          type: integer
+          format: int32
+      - name: exclude
+        in: query
+        description: Filter out specified FedID
+        schema:
+          type: string
+      responses:
+        "404":
+          description: No results for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate results found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Ideiio service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "200":
+          description: List of Ideiio accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeiioList'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/ideiio:
+    get:
+      tags:
+      - ideiio
+      summary: Get all Ideiio accounts
+      description: Requires USER_OFFICE role or ADMIN API-Key
+      operationId: getAllAccounts
+      parameters:
+      - name: filter
+        in: query
+        description: SCIM filter to use for searching
+        schema:
+          type: string
+      - name: startIndex
+        in: query
+        description: Record index to return the list from
+        schema:
+          type: integer
+          format: int32
+      - name: count
+        in: query
+        description: The number of accounts per page
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          description: No results for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate results found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Ideiio service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "200":
+          description: List of Ideiio accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeiioList'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/ideiio/{userNumber}/reset-password:
+    post:
+      tags:
+      - ideiio
+      summary: Reset Ideiio password for the userNumber
+      description: Requires USER_OFFICE role or ADMIN API-Key
+      operationId: resetIdeiioPassword
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to reset password for
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: No results for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate results found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Ideiio service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "200":
+          description: Reset Ideiio password for the userNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdeiioDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/monitor/options:
+    get:
+      tags:
+      - monitor
+      summary: Get all the options for equal ops information we collect
+      description: No auth required
+      operationId: getEqualOpsOptions
+      responses:
+        "200":
+          description: Equal ops options
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EqualOpsWrapperDTO'
+  /v1/monitor/{userNumber}:
+    get:
+      tags:
+      - monitor
+      summary: Get monitor data for user
+      description: "Requires at least USER role to access this endpoint, this is self-reference\
+        \ only endpoint meaning only a user owning the resource can access it. ADMIN\
+        \ role or API-Key can bypass this restriction."
+      operationId: getMonitorForUser
+      parameters:
+      - name: userNumber
+        in: path
+        description: User number of the person whose monitor data is searched
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Monitor data for user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorDTO'
+        "404":
+          description: No monitor data found for user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    put:
+      tags:
+      - monitor
+      summary: Set monitor data for user
+      description: "Requires at least USER role to access this endpoint, this is self-reference\
+        \ only endpoint meaning only a user owning the resource can access it. ADMIN\
+        \ role or API-Key can bypass this restriction."
+      operationId: setMonitorForUser
+      parameters:
+      - name: userNumber
+        in: path
+        description: User number of the person whose monitor data is updated
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Monitor data to be set for user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitorDTO'
+        required: true
+      responses:
+        "200":
+          description: Monitor data for user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonitorDTO'
+        "400":
+          description: Invalid monitor data was submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/password-reset:
+    post:
+      tags:
+      - password-reset
+      summary: Send password reset email
+      description: Requires an API key with ADMIN role
+      operationId: createPasswordResetAndSendEmail
+      requestBody:
+        description: "Email address of the user who needs password reset, password\
+          \ reset link will be sent to the email provided"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailWrapperDTO'
+        required: true
+      responses:
+        "202":
+          description: Password reset was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetDTO'
+        "400":
+          description: Invalid email address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Account is not active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No person found for email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: Failed to send password reset email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+  /v1/password-reset/{encryptedResetId}:
+    put:
+      tags:
+      - password-reset
+      summary: Reset password
+      description: "This endpoint is anonymous, no authentication is required"
+      operationId: resetPassword
+      parameters:
+      - name: encryptedResetId
+        in: path
+        description: The encrypted reset ID to reset a password
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: New password to be set
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordWrapperDTO'
+        required: true
+      responses:
+        "200":
+          description: Password was reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetDTO'
+        "400":
+          description: Password reset has expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No password reset found for resetId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Account is not active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "500":
+          description: Failed to update password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/permission-user-groups:
+    get:
+      tags:
+      - permission-user-group
+      summary: Get permission groups
+      description: "Requires at least USER_OFFICE role or ADMIN API-Key. If user number\
+        \ is provided, it will return the permission groups for the user. If no user\
+        \ number is provided, it will return all permission groups."
+      operationId: getPermissionGroups
+      parameters:
+      - name: userNumber
+        in: query
+        description: "If provided, only groups for the person are returned"
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Permission groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PermissionUserGroupDTO'
+        "404":
+          description: "If userNumber is provided, but no people found with that user\
+            \ number"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "502":
+          description: "if userNumber is provided, but there was an error getting\
+            \ AD groups"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: "If userNumber is provided, but duplicate records were found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    post:
+      tags:
+      - permission-user-group
+      summary: Create a permission group
+      description: Requires ADMIN role or API-Key
+      operationId: createPermissionGroup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionUserGroupDTO'
+      responses:
+        "201":
+          description: Permission group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionUserGroupDTO'
+        "400":
+          description: If group name is empty
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/permission-user-groups/{groupId}:
+    delete:
+      tags:
+      - permission-user-group
+      summary: Remove a permission group
+      description: Requires ADMIN role or API-Key
+      operationId: removePermissionGroup
+      parameters:
+      - name: groupId
+        in: path
+        description: Id of the group to remove
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Permission group removed
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person:
+    get:
+      tags:
+      - person
+      summary: Get a list of people by specified parameter
+      description: Requires at least USER_OFFICE role to access this endpoint OR an
+        API key with the ADMIN permission. This endpoint takes a number of parameters
+        and does a search on all provided. The search is additive meaning that all
+        results from each search parameter are combined into one list. It is advised
+        to use only one search parameter at a time
+      operationId: getPeople
+      parameters:
+      - name: surname
+        in: query
+        description: The surname to search for
+        schema:
+          type: string
+      - name: fedId
+        in: query
+        description: The fedid to search for
+        schema:
+          type: string
+      - name: estId
+        in: query
+        description: The establishment id to search for Person objects that are associated
+          with it
+        schema:
+          type: integer
+          format: int64
+      - name: marketingEmail
+        in: query
+        description: The marketing email used to search for a person
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonDTO'
+        "400":
+          description: Bad request is returned if no parameters were supplied or a
+            parameter is missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    post:
+      tags:
+      - person
+      summary: Create a person from a PersonCreationDTO
+      description: Requires an API key with the ADMIN permission to access this endpoint
+      operationId: createPerson
+      requestBody:
+        description: The person to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonCreationDTO'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDTO'
+        "400":
+          description: Bad request is returned if the submitted DTO does have all
+            required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+  /v1/person/{userNumber}/deactivate:
+    put:
+      tags:
+      - person
+      summary: Deactivate a person by user number
+      description: Requires at least USER role to access this endpoint OR an API key
+        with the ADMIN permission.Only the user themselves can deactivate their account
+        unless an API key with the ADMIN permission is used or the client has the
+        USER_OFFICE role
+      operationId: deactivatePerson
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to deactivate
+        required: true
+        schema:
+          type: string
+        example: 1234567
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDTO'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person/{userNumber}:
+    get:
+      tags:
+      - person
+      summary: Get a person by user number
+      description: Requires an API key with the ADMIN permission to access this endpoint
+      operationId: getPerson
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to search for
+        required: true
+        schema:
+          type: string
+        example: 1234567
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDTO'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+    put:
+      tags:
+      - person
+      summary: Update a person from a PersonDTO
+      description: Requires at least USER_OFFICE role to access this endpoint OR an
+        API key with the ADMIN permissions
+      operationId: updatePerson
+      parameters:
+      - name: userNumber
+        in: path
+        description: Person user number
+        required: true
+        schema:
+          type: string
+      - name: isMailingApi
+        in: query
+        description: A boolean to indicate if the request is from the mailing API
+        schema:
+          type: boolean
+        example: true
+      requestBody:
+        description: "The person DTO to update, DTOs userNumber will be used to determine\
+          \ which record is being updated"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonDTO'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDTO'
+        "400":
+          description: Bad request is returned if the DTO does not have required fields
+            or is missing a UserNumber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Conflict is returned if duplicate records were found or if
+            an email already exists
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person/{userNumber}/including-old:
+    get:
+      tags:
+      - person
+      summary: Get a person by current user number or old user number
+      description: Requires at least USER_OFFICE role to access this endpoint OR an
+        API key with the ADMIN permission
+      operationId: getPersonByCurrentOrOldUserNumber
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to search for
+        required: true
+        schema:
+          type: string
+        example: 1234567
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDTO'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Conflict if two duplicate records are found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person/{userNumber}/history:
+    get:
+      tags:
+      - person
+      summary: Get a person's history by user number
+      description: Requires at least USER_OFFICE role to access this endpoint OR an
+        API key with the ADMIN permission
+      operationId: getPersonHistoryByUserNumber
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number to search for
+        required: true
+        schema:
+          type: string
+        example: 1234567
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonDTO'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person/{userNumber}/facilities:
+    get:
+      tags:
+      - person
+      summary: Get a list of facilities by user number
+      description: Requires at least USER_OFFICE role or GET_ALL_BASICPERSONDETAILS
+        API-Key to access this endpoint
+      operationId: getPersonsFacility
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number of the person to get facilities for
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FacilityDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    put:
+      tags:
+      - person
+      summary: Update a person's facilities
+      description: Requires at least USER_OFFICE role or GET_ALL_BASICPERSONDETAILS
+        API-Key to access this endpoint
+      operationId: updatePersonsFacilities
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number of the person to update the facilities for
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The list of facilities to update
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/FacilityDTO'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FacilityDTO'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Conflict is returned if duplicate records of person were found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "400":
+          description: "Bad request is returned if one or more facilities do not exist,\
+            \ or if no facilities are provided"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+    delete:
+      tags:
+      - person
+      summary: Remove a person's facilities
+      description: Requires at least USER_OFFICE role or ADMIN API-Key to access this
+        endpoint
+      operationId: removePersonsFacilities
+      parameters:
+      - name: userNumber
+        in: path
+        description: The user number of the person to remove the facilities for
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Success
+        "409":
+          description: Conflict is returned if duplicate records of person were found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person/merge:
+    put:
+      tags:
+      - person
+      summary: Merge two users
+      description: Requires at least USER_OFFICE role or ADMIN API-Key to access this
+        endpoint
+      operationId: mergeUsers
+      parameters:
+      - name: userNumbers
+        in: query
+        description: A list of the two unique user numbers of the users to merge
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
+      requestBody:
+        description: "The new person to create, their emergency contact info, and\
+          \ the user number of the person we want to keep facilities from. The new\
+          \ user will have a new user number automatically assigned."
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeObjectsWrapperDTO'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeObjectsWrapperDTO'
+        "400":
+          description: Did not receive two unique user numbers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Conflict if duplicate records are found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person/{userNumber}/privacy:
+    post:
+      tags:
+      - person
+      summary: Set a person's privacy
+      description: "Requires at least USER role or ADMIN API-Key to access this endpoint,\
+        \ this is self-reference only endpoint meaning only a user owning the resource\
+        \ can access it. ADMIN role can bypass this restriction"
+      operationId: setPrivacy
+      parameters:
+      - name: userNumber
+        in: path
+        description: User number to set privacy to
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The privacy DTO to set
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivacyDTO'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivacyDTO'
+        "409":
+          description: Conflict is returned if duplicate records of person were found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person/{userNumber}/update-password:
+    put:
+      tags:
+      - person
+      summary: Update a person's password
+      description: "Requires at least USER role to access this endpoint, this is self-reference\
+        \ only endpoint meaning only a user owning the resource can access it"
+      operationId: updatePassword
+      parameters:
+      - name: userNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: The old password and the new password to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordWrapperDTO'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDTO'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "400":
+          description: Bad request is returned if the new password does not meet security
+            requirements or if the old password is incorrect or if the password body
+            was not of the correct format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+  /v1/person-details/{userNumber}:
+    get:
+      tags:
+      - person-details
+      summary: Get person details by user number
+      description: Requires USER OFFICE role or API key GET_ALL_PERSONDETAILS permissions
+      operationId: getPersonDetails
+      parameters:
+      - name: userNumber
+        in: path
+        description: User number to get details for
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Person details found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDetailsDTO'
+        "404":
+          description: No person details found for user number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person-details:
+    get:
+      tags:
+      - person-details
+      summary: Get person details by search parameters
+      description: Requires USER OFFICE role or API key GET_ALL_PERSONDETAILS permissions
+      operationId: getPersonDetailsList
+      parameters:
+      - name: userNumber
+        in: query
+        description: A list of userNumbers to search for
+        schema:
+          type: array
+          items:
+            type: string
+      - name: email
+        in: query
+        description: A list of emails to search for
+        schema:
+          type: array
+          items:
+            type: string
+      - name: exactSurname
+        in: query
+        description: An exact surname to search for
+        schema:
+          type: string
+      - name: surname
+        in: query
+        description: A surname to search for
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Person details found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonDetailsDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/person-statuses:
+    get:
+      tags:
+      - person-status
+      summary: Get all person statuses
+      operationId: getPersonStatus
+      responses:
+        "200":
+          description: List of person statuses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonStatusDTO'
+  /v1/person-titles:
+    get:
+      tags:
+      - person-title
+      summary: Get all person titles
+      operationId: getPersonTitles
+      responses:
+        "200":
+          description: List of person titles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PersonTitleDTO'
+  /v1/privacy/{userNumber}:
+    get:
+      tags:
+      - privacy
+      summary: Get privacy settings for a user
+      description: Requires USER role. Requires ADMIN role or API-Key to access other
+        users' privacies.
+      operationId: getPrivacy
+      parameters:
+      - name: userNumber
+        in: path
+        description: User number to search for
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Privacy settings found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivacyDTO'
+        "403":
+          description: Forbidden if accessing not own privacy settings and not Admin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No privacy settings found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/role/{userNumber}:
+    get:
+      tags:
+      - role
+      summary: Get roles for a user
+      description: Requires API key GET_ALL_BASICPERSONDETAILS permissions
+      operationId: getRolesForUser
+      parameters:
+      - name: userNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Roles for the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleDTO'
+        "404":
+          description: No person found for user number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Duplicate records found for user number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+  /v1/sessions/{sessionId}:
+    get:
+      tags:
+      - sessions
+      summary: Get login by session ID
+      description: No auth required
+      operationId: getLoginBySessionId
+      parameters:
+      - name: sessionId
+        in: path
+        description: SessionID associated with the login
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Login found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginDTO'
+        "404":
+          description: No login found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "401":
+          description: Session expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    delete:
+      tags:
+      - sessions
+      summary: Logout - delete session
+      description: Requires at least USER roleOnly the user themselves can logout
+        their account. ADMIN role or ADMIN API-key can logout any account.
+      operationId: logout
+      parameters:
+      - name: sessionId
+        in: path
+        description: SessionID to logout
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Successfully logged out
+        "401":
+          description: Unauthorized to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: Session does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/sessions:
+    post:
+      tags:
+      - sessions
+      summary: Login - create session
+      description: No auth required
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsernamePasswordWrapperDTO'
+      responses:
+        "201":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginDTO'
+        "400":
+          description: No username or password provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "401":
+          description: Username or password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "403":
+          description: Account locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "503":
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /v1/sessions/all:
+    delete:
+      tags:
+      - sessions
+      summary: Logout all sessions for a user
+      description: Requires at least USER_OFFICE role or ADMIN API-Key
+      operationId: logoutAllSessionsForUser
+      parameters:
+      - name: email
+        in: query
+        description: Email of the user who is being logged out
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Successfully logged out
+        "401":
+          description: Unauthorized to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "404":
+          description: No account found with email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        "409":
+          description: Multiple records found for email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - Bearer: []
+      - ApiKey: []
+  /v1/token:
+    post:
+      tags:
+      - token
+      summary: Validate a sessionID or an API-key
+      description: Requires an API-key GET_ALL_BASICPERSONDETAILS permissions
+      operationId: validateToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenWrapperDTO'
+      responses:
+        "200":
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenDetails'
+        "409":
+          description: Token is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+      security:
+      - ApiKey: []
+components:
+  schemas:
+    AccountActivationDTO:
+      required:
+      - activationId
+      type: object
+      properties:
+        activationId:
+          type: integer
+          description: The id of the activation
+          format: int64
+          example: 12345
+        activationIp:
+          type: string
+          description: The IP address of the user that requested the activation
+          nullable: true
+          readOnly: true
+          example: 0.0.0.0
+        activationUsed:
+          type: string
+          description: The time when the activation url was used
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-13T00:00:00Z
+        expiryTime:
+          type: string
+          description: The time when the activation will expire
+          format: date-time
+          readOnly: true
+          example: 2012-09-08T00:00:00Z
+        userNumber:
+          type: string
+          description: The user number of the user that the activation is for
+          nullable: true
+          readOnly: true
+          example: "123456"
+    ErrorDTO:
+      type: object
+      properties:
+        shortcode:
+          type: string
+          description: HTTP status code to be returned to the client
+        reason:
+          type: string
+          description: A string used to identify the cause of the failure to the client
+        details:
+          type: array
+          description: A detailed message of the cause of the failure to the client
+          items:
+            type: string
+            description: A detailed message of the cause of the failure to the client
+      description: The DTO for the error response from REST services
+    ActivateAccountWrapperDTO:
+      required:
+      - ipAddress
+      type: object
+      properties:
+        ipAddress:
+          type: string
+          description: The ip address that the activation is coming from
+        password:
+          type: string
+          description: The password to set for the account
+    AddressDTO:
+      required:
+      - postalAddressId
+      type: object
+      properties:
+        building:
+          type: string
+          description: Building name
+          nullable: true
+          example: Building 1
+        buildingNo:
+          type: string
+          description: Building number
+          nullable: true
+          example: "1"
+        comments:
+          type: string
+          description: Comments
+          nullable: true
+          example: This is a comment
+        country:
+          type: string
+          description: Country
+          nullable: true
+          example: UK
+        countyProvinceState:
+          type: string
+          description: "County, province or state"
+          nullable: true
+          example: Oxfordshire
+        district:
+          type: string
+          description: District
+          nullable: true
+          example: District 1
+        fromDate:
+          type: string
+          description: The date the address record became active
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-01T00:00:00Z
+        postalAddressId:
+          type: integer
+          description: The id of the address record
+          format: int64
+          readOnly: true
+        postalCode:
+          type: string
+          description: Postal code
+          nullable: true
+          example: OX11 0QX
+        poBox:
+          type: string
+          description: PO Box
+          nullable: true
+          example: PO Box 123
+        rid:
+          type: integer
+          description: The unique identifier for the address record - row id
+          format: int64
+          readOnly: true
+        site:
+          type: string
+          description: Site
+          nullable: true
+          example: RAL
+        street:
+          type: string
+          description: Street
+          nullable: true
+          example: Road 1
+        thruDate:
+          type: string
+          description: The date the address record stopped being active
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-01T00:00:00Z
+        townCity:
+          type: string
+          description: Town or City
+          nullable: true
+          example: Birmingham
+    ApiKeyDTO:
+      required:
+      - apiKey
+      - role
+      - serviceContact
+      - serviceName
+      type: object
+      properties:
+        role:
+          type: string
+          description: Permission level of the API key
+          enum:
+          - ADMIN
+          - FAP
+          - GET_ALL_PERSONDETAILS
+          - GET_ALL_BASICPERSONDETAILS
+        apiKey:
+          type: string
+          description: The API key itself
+          format: UUID
+          readOnly: true
+          example: 123e4567-e89b-12d3-a456-123456789000
+        serviceName:
+          type: string
+          description: The name of the service using the key
+          example: User Office Service
+        serviceContact:
+          type: string
+          description: Contact details for the service using the key
+          example: UsersAndAuthSupport@email.stfc
+        thruDate:
+          type: string
+          description: The date the key stopped being active until
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2022-12-31T23:59:59Z
+    BasicPersonDetailsDTO:
+      type: object
+      properties:
+        familyName:
+          type: string
+          description: Family name of the person
+          nullable: true
+          example: Smith
+        firstNameKnownAs:
+          type: string
+          description: First name known as
+          nullable: true
+          example: John
+        givenName:
+          type: string
+          description: Given name of the person
+          nullable: true
+          example: John
+        initials:
+          type: string
+          description: Initials of the person
+          nullable: true
+          example: J
+        title:
+          type: string
+          description: Title of the person
+          nullable: true
+          example: Dr
+        userNumber:
+          type: string
+          description: User number of the person
+          example: "123456"
+        orgName:
+          type: string
+          description: Organisation name of the person of which the person is part
+            of
+          nullable: true
+          example: Science and Technology Facilities Council
+        orgAcronym:
+          type: string
+          description: Organisation acronym
+          nullable: true
+          example: STFC
+        deptName:
+          type: string
+          description: Department name of which the person is part of
+          nullable: true
+          example: Scientific Computing Department
+        deptAcronym:
+          type: string
+          description: Department acronym
+          nullable: true
+          example: SCD
+        country:
+          type: string
+          description: Country of the person
+          nullable: true
+          example: United Kingdom
+        email:
+          type: string
+          description: Email of the person
+          nullable: true
+          example: email.example@stfc.ac.uk
+        workPhone:
+          type: string
+          description: Work phone of the person
+          nullable: true
+          example: "0123456789"
+        establishmentId:
+          type: string
+          description: Establishment ID of the person
+          nullable: true
+          example: "123456"
+        fullName:
+          type: string
+          description: Full name of the person
+          nullable: true
+          example: Dr John Smith
+        displayName:
+          type: string
+          description: Display name of the person
+          nullable: true
+          example: Dr John Smith
+      readOnly: true
+    EstablishmentSearchDetails:
+      type: object
+      properties:
+        orgName:
+          type: string
+        deptName:
+          type: string
+    CountryDTO:
+      type: object
+      properties:
+        comments:
+          type: string
+          description: Comments
+          nullable: true
+          example: This is a comment
+        eu:
+          type: string
+          description: Determines if the country is in the EU
+          enum:
+          - "Yes"
+          - "No"
+        name:
+          type: string
+          description: Country name
+          example: United Kingdom
+        nationality:
+          type: string
+          description: Nationality
+          nullable: true
+          example: British
+    DataLookupDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the data to lookup in the database
+          example: System email
+        value:
+          type: string
+          description: The value of the data to lookup in the database
+          nullable: true
+          example: users@stfc.ac.uk
+    EmergencyContactDTO:
+      required:
+      - contact
+      - contactId
+      - userNumber
+      type: object
+      properties:
+        contactId:
+          type: integer
+          description: The unique identifier for the emergency contact
+          format: int64
+          readOnly: true
+          example: 1
+        userNumber:
+          type: string
+          description: The user number of the person the emergency contact is for
+          example: "123456"
+        contact:
+          type: string
+          description: The contact details of the emergency contact
+          nullable: true
+          example: "0123456789"
+        dateAdded:
+          type: string
+          description: The date the emergency contact was added
+          format: date-time
+          readOnly: true
+          example: 2024-01-13T00:00:00Z
+      description: The new person's emergency contact
+    EstablishmentDTO:
+      required:
+      - country
+      - deptName
+      - establishmentId
+      - orgName
+      type: object
+      properties:
+        establishmentId:
+          type: integer
+          description: The unique identifier for the establishment
+          format: int64
+          readOnly: true
+          example: 1
+        orgName:
+          type: string
+          description: The name of the establishment
+          nullable: true
+          example: Science and Technology Facilities Council
+        orgAcronym:
+          type: string
+          description: The acronym of the establishment
+          nullable: true
+          example: STFC
+        deptName:
+          type: string
+          description: The name of the department
+          nullable: true
+          example: Scientific Computing Department
+        deptAcronym:
+          type: string
+          description: The acronym of the department
+          nullable: true
+          example: SCD
+        site:
+          type: string
+          description: The site of the establishment
+          nullable: true
+          example: RAL
+        poBox:
+          type: string
+          description: PO Box
+          nullable: true
+          example: PO Box 123
+        buildingNumber:
+          type: string
+          description: Building number
+          nullable: true
+          example: "1"
+        buildingName:
+          type: string
+          description: Building name
+          nullable: true
+          example: Building one
+        street:
+          type: string
+          description: Street
+          nullable: true
+          example: Road 1
+        district:
+          type: string
+          description: District
+          nullable: true
+          example: District 1
+        cityTown:
+          type: string
+          description: City or town
+          nullable: true
+          example: Didcot
+        countyProvinceState:
+          type: string
+          description: "County, province or state"
+          nullable: true
+          example: Oxfordshire
+        postalCode:
+          type: string
+          description: Postal code
+          nullable: true
+          example: OX11 0QX
+        country:
+          type: string
+          description: Country
+          nullable: true
+          example: United Kingdom
+        postalAddressId:
+          type: integer
+          description: The id of the postal address record that is associated with
+            this establishment
+          format: int64
+          nullable: true
+          example: 1
+        fromDate:
+          type: string
+          description: The date the address record became active
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-01T00:00:00Z
+        thruDate:
+          type: string
+          description: The date the address record stopped being active
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-01T00:00:00Z
+        verified:
+          type: string
+          description: The verification status of the establishment
+          nullable: true
+          enum:
+          - "Yes"
+          - "No"
+      description: "Please be aware values of fromDate, thruDate always null"
+    FacilityDTO:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier of the facility.
+          format: int64
+          readOnly: true
+          example: 1
+        name:
+          type: string
+          description: The name of the facility.
+          example: Facility 1
+    FailedLoginDTO:
+      type: object
+      properties:
+        locked:
+          type: string
+          description: The account lock status
+          nullable: true
+          readOnly: true
+          enum:
+          - "Yes"
+          - "null"
+        lockedUntil:
+          type: string
+          format: date-time
+          writeOnly: true
+        numberOfFailedLogins:
+          type: integer
+          description: The number of failed logins
+          format: int64
+          readOnly: true
+          example: 1
+        userNumber:
+          type: string
+          description: The user number that failed login is associated with
+          readOnly: true
+          example: "123456"
+    FedIdDTOWrapper:
+      required:
+      - dateOfBirth
+      - expiryDate
+      - person
+      - status
+      type: object
+      properties:
+        person:
+          $ref: '#/components/schemas/PersonDTO'
+        dateOfBirth:
+          type: string
+          description: The person's date of birth
+          format: date-time
+        expiryDate:
+          type: string
+          description: The expiry date for the Fed ID
+          format: date-time
+        status:
+          type: string
+          description: The person's status
+    PersonDTO:
+      required:
+      - email
+      - establishmentId
+      - familyName
+      - firstName
+      - status
+      - title
+      - userNumber
+      type: object
+      properties:
+        rid:
+          type: integer
+          description: The unique identifier for the person record - row id
+          format: int64
+          readOnly: true
+        userNumber:
+          type: string
+          description: The user number of the person
+          readOnly: true
+          example: "1234567"
+        fedId:
+          type: string
+          description: The FedID of the person
+          nullable: true
+          example: abc12345
+        title:
+          type: string
+          description: The title of the person
+          nullable: true
+          example: Dr
+        firstName:
+          type: string
+          description: The first name of the person
+          nullable: true
+          example: John
+        firstNameKnownAs:
+          type: string
+          description: The nickname of the person
+          nullable: true
+          example: Johnny
+        familyName:
+          type: string
+          description: The family name (surname) of the person
+          nullable: true
+          example: Smith
+        initials:
+          type: string
+          description: The initials of the person
+          nullable: true
+          example: JS
+          default: "null"
+        fullName:
+          type: string
+          description: "The full name of the person, constructed from title, first\
+            \ name and family name"
+          nullable: true
+          readOnly: true
+          example: Dr John Smith
+        displayName:
+          type: string
+          description: The display name of the person
+          nullable: true
+          example: Dr John Smith
+        status:
+          type: string
+          description: The academic status of the person
+          nullable: true
+          enum:
+          - Postdoctoral Researcher
+          - Non-Research Staff
+          - Undergraduate Student
+          - Masters Student
+          - PhD Student
+          - Academic Staff
+          - Industrial Collaborator
+        email:
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          type: string
+          description: The email of the person
+          format: email
+          nullable: true
+          example: john.smith@example.ukri
+        workPhone:
+          type: string
+          description: The work phone number of the person
+          format: phone
+          nullable: true
+          example: "01234567890"
+        mobilePhone:
+          type: string
+          description: The mobile phone number of the person
+          nullable: true
+          example: "09876543210"
+        marketingEmail:
+          type: string
+          description: The marketing email of the person
+          nullable: true
+          example: john.smith.marketing@example.ukri
+        subscribedToMarketingEmails:
+          type: boolean
+          description: Determines if person is subscribed to marketing emails or not
+          format: boolean
+          nullable: true
+          example: true
+          default: false
+        establishmentId:
+          type: integer
+          description: The ID of the establishment that the person is a part of
+          format: int64
+          nullable: true
+          example: 1234
+        orcidId:
+          type: string
+          description: The ORCID ID of the person
+          nullable: true
+          example: 0000-0000-0000-0000
+        joinedDate:
+          type: string
+          description: The date the person first created an account
+          format: date-time
+          nullable: true
+        fromDate:
+          type: string
+          description: The date the person record became active
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-01T00:00:00Z
+        thruDate:
+          type: string
+          description: The date the person record stopped being active
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-01T00:00:00Z
+        lastAccessTime:
+          type: string
+          description: The last time the person accessed the system
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-13T00:00:00Z
+        dpaDate:
+          type: string
+          description: The latest date the person agreed to the Data Protection Act
+          format: date-time
+          nullable: true
+        resetPasswordDate:
+          type: string
+          description: The latest date the person reset their password
+          format: date-time
+          nullable: true
+        deactivated:
+          type: boolean
+          description: Determines if person is deactivate or not
+          format: boolean
+          nullable: true
+          example: false
+          default: false
+    FedIdEndDateWrapper:
+      required:
+      - endDate
+      - objdomid
+      type: object
+      properties:
+        objdomid:
+          type: string
+          description: Probably the ID of the person's domain in CDR
+          example: "8000000"
+        endDate:
+          type: string
+          description: The expiry date of the Fed ID
+          format: date-time
+    PasswordWrapperDTO:
+      type: object
+      properties:
+        password:
+          type: string
+    FedIdRequestDTO:
+      required:
+      - dob
+      - userNumber
+      type: object
+      properties:
+        rid:
+          type: integer
+          description: The unique identifier for the fedIdRequest record - row id
+          format: int64
+          readOnly: true
+        userNumber:
+          type: string
+          description: The user number of the person the Fed ID will be associated
+            with
+          example: "123456"
+        dob:
+          type: string
+          description: The date of birth of the person the Fed ID will be associated
+            with
+          format: date-time
+          nullable: true
+          example: 2021-01-01T00:00:00Z
+        linkExisting:
+          type: boolean
+          description: Whether the person already has a Fed ID and want to link it
+            to their account
+          example: true
+          default: false
+        thruDate:
+          type: string
+          description: The date and time the record stopped being active (when the
+            FedID request was fulfilled)
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-01T00:00:00Z
+    GroupMembershipWrapper:
+      required:
+      - groups
+      - userNumber
+      type: object
+      properties:
+        userNumber:
+          type: integer
+          description: The user number of the user to add to the groups
+          format: int64
+          example: 123456
+        groups:
+          type: array
+          description: DTOs of the groups to add the user to
+          items:
+            $ref: '#/components/schemas/PermissionUserGroupDTO'
+    PermissionUserGroupDTO:
+      required:
+      - groupName
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier for the permission user group
+          format: int64
+          readOnly: true
+          example: 1
+        groupName:
+          type: string
+          description: The name of the permission user group
+          example: User Office
+        comments:
+          type: string
+          description: Comments about the permission user group
+          nullable: true
+          readOnly: true
+          example: This group is for users of the User Office
+    HealthcheckResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message indicating the status of the service
+          example: REST API active
+        timestamp:
+          type: string
+          description: Timestamp of the response
+          format: date-time
+          example: 2021-08-25T14:15:00Z
+    IdeiioCustom:
+      required:
+      - jobtitle
+      type: object
+      properties:
+        initials:
+          type: string
+        jobtitle:
+          type: string
+        visitingDepartment:
+          type: string
+    IdeiioDTO:
+      required:
+      - emails
+      - name
+      - urn:scim:schemas:com_ideiio:1.0
+      - urn:scim:schemas:com_ideiio_custom:1.0
+      - urn:scim:schemas:extension:enterprise:1.0
+      type: object
+      properties:
+        schemas:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        externalId:
+          type: string
+        meta:
+          $ref: '#/components/schemas/IdeiioMeta'
+        userName:
+          type: string
+        name:
+          $ref: '#/components/schemas/IdeiioName'
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdeiioEmail'
+        urn:scim:schemas:extension:enterprise:1.0:
+          $ref: '#/components/schemas/IdeiioOrganisation'
+        urn:scim:schemas:com_ideiio:1.0:
+          $ref: '#/components/schemas/IdeiioDates'
+        urn:scim:schemas:com_ideiio_custom:1.0:
+          $ref: '#/components/schemas/IdeiioCustom'
+    IdeiioDates:
+      required:
+      - dob
+      type: object
+      properties:
+        dob:
+          type: string
+          format: date-time
+        startdate:
+          type: string
+          format: date-time
+        termdate:
+          type: string
+          format: date-time
+        openended:
+          type: boolean
+    IdeiioEmail:
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          type: string
+        type:
+          type: string
+        primary:
+          type: boolean
+    IdeiioMeta:
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+        lastModified:
+          type: string
+          format: date-time
+    IdeiioName:
+      required:
+      - familyName
+      - givenName
+      type: object
+      properties:
+        familyName:
+          type: string
+        givenName:
+          type: string
+    IdeiioOrganisation:
+      required:
+      - organization
+      type: object
+      properties:
+        organization:
+          type: string
+        department:
+          type: string
+    IdeiioList:
+      required:
+      - Resources
+      - itemsPerPage
+      - startIndex
+      - totalResults
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          format: int32
+        startIndex:
+          type: integer
+          format: int32
+        itemsPerPage:
+          type: integer
+          format: int32
+        Resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdeiioDTO'
+      readOnly: true
+    EqualOpsWrapperDTO:
+      type: object
+      properties:
+        ethnicityList:
+          type: array
+          description: List of ethnicities
+          items:
+            type: string
+            description: List of ethnicities
+        ageOptionList:
+          type: array
+          description: List of age options
+          items:
+            type: string
+            description: List of age options
+        disabilityList:
+          type: array
+          description: List of disabilities
+          items:
+            type: string
+            description: List of disabilities
+        frequentGenderList:
+          type: array
+          description: List of frequently used genders
+          items:
+            type: string
+            description: List of frequently used genders
+      description: DTO providing the equal opportunity options to be presented to
+        users
+    MonitorDTO:
+      required:
+      - ageOption
+      - disability
+      - ethnicity
+      - gender
+      - optIn
+      type: object
+      properties:
+        optIn:
+          type: string
+          description: "The user's opt in status. OptIn, OptOut or Unknown"
+          example: OptIn
+          enum:
+          - OptIn
+          - OptOut
+          - Unknown
+        ageOption:
+          type: string
+          description: The user's age option
+          nullable: true
+          example: 0-29
+        disability:
+          type: string
+          description: The user's disability
+          nullable: true
+          example: Not Disclosed
+        gender:
+          type: string
+          description: The user's gender
+          nullable: true
+          example: Example Gender
+        ethnicity:
+          type: string
+          description: The user's ethnicity
+          nullable: true
+          example: Not Disclosed
+    PasswordResetDTO:
+      required:
+      - userNumber
+      type: object
+      properties:
+        userNumber:
+          type: string
+          description: The usernumber of the person that the password reset is for
+          readOnly: true
+          example: "123456"
+        resetUsed:
+          type: string
+          description: The time when the password reset was used to create a new password.
+          format: date-time
+          nullable: true
+          readOnly: true
+        resetId:
+          type: integer
+          description: The id of the password reset record.
+          format: int64
+          readOnly: true
+          example: 123456
+        expiryTime:
+          type: string
+          description: The time when the reset password expires
+          format: date-time
+          readOnly: true
+    EmailWrapperDTO:
+      type: object
+      properties:
+        email:
+          type: string
+    PersonCreationDTO:
+      required:
+      - email
+      - establishmentId
+      - familyName
+      - firstName
+      - status
+      - title
+      type: object
+      properties:
+        fedId:
+          type: string
+          description: The FedID of the person
+          nullable: true
+          example: abc12345
+        title:
+          type: string
+          description: The title of the person
+          nullable: true
+          example: Dr
+        firstName:
+          type: string
+          description: The first name of the person
+          nullable: true
+          example: John
+        firstNameKnownAs:
+          type: string
+          description: The nickname of the person
+          nullable: true
+          example: Johnny
+        familyName:
+          type: string
+          description: The family name (surname) of the person
+          nullable: true
+          example: Smith
+        initials:
+          type: string
+          description: The initials of the person
+          nullable: true
+          example: JS
+          default: "null"
+        status:
+          type: string
+          description: The academic status of the person
+          nullable: true
+          enum:
+          - Postdoctoral Researcher
+          - Non-Research Staff
+          - Undergraduate Student
+          - Masters Student
+          - PhD Student
+          - Academic Staff
+          - Industrial Collaborator
+        email:
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          type: string
+          description: The email of the person
+          format: email
+          nullable: true
+          example: john.smith@example.ukri
+        workPhone:
+          type: string
+          description: The work phone number of the person
+          format: phone
+          nullable: true
+          example: "01234567890"
+        mobilePhone:
+          type: string
+          description: The mobile phone number of the person
+          nullable: true
+          example: "09876543210"
+        marketingEmail:
+          type: string
+          description: The marketing email of the person
+          nullable: true
+          example: john.smith.marketing@example.ukri
+        subscribedToMarketingEmails:
+          type: boolean
+          description: Determines if person is subscribed to marketing emails or not
+          format: boolean
+          nullable: true
+          example: true
+          default: false
+        establishmentId:
+          type: integer
+          description: The ID of the establishment that the person is a part of
+          format: int64
+          nullable: true
+          example: 1234
+        orcidId:
+          type: string
+          description: The ORCID ID of the person
+          nullable: true
+          example: 0000-0000-0000-0000
+        dpaDate:
+          type: string
+          description: The latest date the person agreed to the Data Protection Act
+          format: date-time
+          nullable: true
+    MergeObjectsWrapperDTO:
+      required:
+      - keepFacilityUserNumber
+      - person
+      type: object
+      properties:
+        person:
+          $ref: '#/components/schemas/PersonDTO'
+        emergencyContact:
+          $ref: '#/components/schemas/EmergencyContactDTO'
+        keepFacilityUserNumber:
+          type: string
+          description: The user number from/assigned to the new person's facilities
+    PrivacyDTO:
+      required:
+      - id
+      - searchable
+      type: object
+      properties:
+        searchable:
+          type: string
+          description: Whether the user is searchable
+          nullable: true
+          example: "Yes"
+          enum:
+          - "Yes"
+          - "No"
+        id:
+          type: integer
+          description: The id of the privacy
+          format: int64
+          readOnly: true
+          example: 1
+    UpdatePasswordWrapperDTO:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+    PersonDetailsDTO:
+      required:
+      - country
+      - deptName
+      - email
+      - establishmentId
+      - familyName
+      - givenName
+      - orgName
+      - status
+      - title
+      - userNumber
+      type: object
+      properties:
+        userNumber:
+          type: string
+          description: The user number of the person
+          example: "123456"
+        fedId:
+          type: string
+          description: The FedID of the person
+          nullable: true
+          example: abc12345
+        title:
+          type: string
+          description: The title of the person
+          nullable: true
+          example: Dr
+        givenName:
+          type: string
+          description: The given/first name of the person
+          nullable: true
+          example: John
+        firstNameKnownAs:
+          type: string
+          description: The name the person is known by
+          nullable: true
+          example: Johny
+        familyName:
+          type: string
+          description: The family name of the person
+          nullable: true
+          example: Smith
+        initials:
+          type: string
+          description: The initials of the person
+          nullable: true
+          example: J
+        fullName:
+          type: string
+          description: "The full name of the person, constructed from title, first\
+            \ name and family name"
+          nullable: true
+          readOnly: true
+          example: Dr John Smith
+        displayName:
+          type: string
+          description: The display name of the person
+          nullable: true
+          example: Dr John Smith
+        status:
+          type: string
+          description: The academic status of the person
+          nullable: true
+          example: Postgrad Student
+        email:
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          type: string
+          description: The email of the person
+          format: email
+          nullable: true
+          example: john.smith@example.ukri
+        workPhone:
+          type: string
+          description: The work phone of the person
+          nullable: true
+          example: "0123456789"
+        mobilePhone:
+          type: string
+          description: The mobile phone of the person
+          nullable: true
+          example: "0123456789"
+        emergencyContact:
+          type: string
+          description: The emergency contact of the person
+          nullable: true
+          example: Jane Smith
+        establishmentId:
+          type: string
+          description: The ID of the establishment that the person is a part of
+          nullable: true
+          example: "1234"
+        orgName:
+          type: string
+          description: The name of the organisation the person is part of
+          nullable: true
+          example: Science and Technology Facilities Council
+        orgAcronym:
+          type: string
+          description: The acronym of the organisation the person is part of
+          nullable: true
+          example: STFC
+        deptName:
+          type: string
+          description: The name of the department the person is part of
+          nullable: true
+          example: Scientific Computing Department
+        deptAcronym:
+          type: string
+          description: The acronym of the department the person is part of
+          nullable: true
+          example: SCD
+        country:
+          type: string
+          description: The country the person is from
+          nullable: true
+          example: United Kingdom
+        lastAccessTime:
+          type: string
+          description: The last time the person accessed the system
+          format: date-time
+          nullable: true
+          readOnly: true
+          example: 2021-01-13T00:00:00Z
+        joinedDate:
+          type: string
+          description: The date the person first created an account
+          format: date-time
+          nullable: true
+      readOnly: true
+    PersonStatusDTO:
+      type: object
+      properties:
+        comments:
+          type: string
+          description: Comments for the status
+          nullable: true
+          example: Comments
+        name:
+          type: string
+          description: Name of the status
+          example: Non-Research Staff
+        rid:
+          type: integer
+          description: A unique identifier for a status
+          format: int64
+          example: 1
+        seqNumber:
+          type: integer
+          description: A sequence number that determines the order statuses should
+            appear
+          format: int64
+          example: 1
+      readOnly: true
+    PersonTitleDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the title
+          example: Dr
+        seqNumber:
+          type: integer
+          description: A sequence number that determines the order titles should appear
+          format: int64
+          example: 1
+      readOnly: true
+    RoleDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the role
+          example: User Office
+      readOnly: true
+    LoginDTO:
+      required:
+      - sessionId
+      - userId
+      type: object
+      properties:
+        userId:
+          type: string
+          description: The user number of the user to whom the login belongs
+          example: "123456"
+        sessionId:
+          type: string
+          description: "The session identifier in the form of UUID, sessionID"
+          example: 123e4567-e89b-12d3-a456-123456789000
+        lastAccessTime:
+          type: string
+          description: The date and time of the last access to the session
+          format: date-time
+          readOnly: true
+          example: 2022-12-31T23:59:59Z
+        loginType:
+          type: string
+          description: The type of login
+          readOnly: true
+          enum:
+          - DATABASE
+          - LDAP
+          - ALTERNATIVE_IDENTIFIER
+        comments:
+          type: string
+          description: Comments about the login
+          nullable: true
+          example: This is a test login
+    UsernamePasswordWrapperDTO:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: The username of the user
+          example: user
+        password:
+          type: string
+          description: The password of the user
+          example: password
+    TokenDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of token
+          example: API_KEY
+          enum:
+          - API_KEY
+          - SESSION_ID
+        identifier:
+          type: string
+          description: Identifier of the token - a service name or user number
+          example: service-name
+      readOnly: true
+    TokenWrapperDTO:
+      type: object
+      properties:
+        token:
+          type: string
+  securitySchemes:
+    Bearer:
+      type: http
+      description: "To authenticate with the API, use the SessionID or JWT token provided\
+        \ by the authentication service."
+      scheme: Bearer
+    ApiKey:
+      type: apiKey
+      name: Authorization
+      in: header

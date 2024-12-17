@@ -7,8 +7,83 @@ import { dummyUser } from '../datasources/mockups/UserDataSource';
 import { Instrument } from '../models/Instrument';
 import { StfcUserAuthorization } from './StfcUserAuthorization';
 
-jest.mock('../datasources/stfc/UOWSSoapInterface.ts');
 jest.mock('../utils/Cache');
+jest.mock('../datasources/stfc/UOWSClient.ts', () => {
+  return {
+    createUOWSClient: jest.fn().mockReturnValue({
+      sessions: {
+        getLoginBySessionId: jest.fn().mockImplementation((sessionId) => {
+          if (sessionId == 'valid') {
+            return Promise.resolve([
+              {
+                userId: 1,
+                sessionId: 'fake',
+              },
+            ]);
+          } else {
+            return Promise.reject(
+              new Error('Failed to fetch user details for STFC external authentication')
+            );
+          }
+        }),
+      },
+      basicPersonDetails: {
+        getBasicPersonDetails: jest.fn().mockImplementation((fedid, surname, email, usernumber) => {
+          if (usernumber) {
+            return Promise.resolve([{
+              userNumber: 1,
+              country: 'fake',
+              deptName: 'fake',
+              displayName: 'fake',
+              email: 'valid',
+              establishmentId: 'fake',
+              familyName: 'fake',
+              firstNameKnownAs: 'fake',
+              fullName: 'fake',
+              givenName: 'fake',
+              initials: 'fake',
+              orgName: 'fake',
+              orgId: 'fake',
+              title: 'fake',
+              workPhone: 'fake',
+            }]);
+          } else {
+            return Promise.resolve([]);
+          }
+        }),
+      },
+      role: {
+        getRolesForUser: jest.fn().mockResolvedValue([
+          {
+            name: 'ISIS Instrument Scientist',
+          },
+          {
+            name: 'ISIS Administrator',
+          },
+          {
+            name: 'Developer',
+          },
+          {
+            name: 'Admin',
+          },
+          {
+            name: 'ISIS Instrument Scientist',
+          },
+          {
+            name: 'User Officer',
+          },
+          {
+            name: 'User Officer',
+          },
+          {
+            name: 'User',
+          },
+        ],
+        )
+      },
+    }),
+  };
+});
 
 const userAuthorization = container.resolve(StfcUserAuthorization);
 
