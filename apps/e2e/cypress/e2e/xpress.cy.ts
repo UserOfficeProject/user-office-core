@@ -1045,6 +1045,28 @@ context('Xpress tests', () => {
       cy.contains(createdProposalId1);
       cy.contains(technique1.name);
     });
+
+    it('Scientist should not see expired proposals', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: finishedStatus.id as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+
+        cy.login(scientist1);
+        cy.visit('/');
+        cy.finishedLoading();
+
+        cy.contains('Xpress').click();
+        cy.finishedLoading();
+
+        cy.contains(proposal1.title).should('not.exist');
+        cy.contains(proposal2.title).should('exist');
+      });
+    });
   });
 
   describe('Techniques advanced tests', () => {
