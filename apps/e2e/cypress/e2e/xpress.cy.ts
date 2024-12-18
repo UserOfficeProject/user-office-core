@@ -1059,7 +1059,7 @@ context('Xpress tests', () => {
     it('Scientist should not see expired proposals', function () {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
-        statusId: finishedStatus.id as number,
+        statusId: expiredStatus.id as number,
       }).then(() => {
         cy.assignProposalsToInstruments({
           proposalPks: createdProposalPk1,
@@ -1565,58 +1565,6 @@ context('Xpress tests', () => {
       cy.contains(proposal1.title)
         .parent()
         .should('contain', unsuccessfulStatus.name)
-        .find('[data-cy="status-dropdown"]')
-        .should('not.exist');
-
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[data-cy="instrument-dropdown"]')
-        .should('not.exist');
-    });
-
-    it('Scientist cannot change status or instrument when the status is expired', function () {
-      /*
-      Status and instrument are uneditable when there is an instrument
-      */
-      cy.changeProposalsStatus({
-        proposalPks: createdProposalPk1,
-        statusId: expiredStatus.id as number,
-      }).then(() => {
-        cy.assignProposalsToInstruments({
-          proposalPks: createdProposalPk1,
-          instrumentIds: createdInstrumentId1,
-        });
-      });
-
-      cy.login(scientist1);
-      cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Xpress').click();
-      cy.finishedLoading();
-
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', expiredStatus.name)
-        .find('[data-cy="status-dropdown"]')
-        .should('not.exist');
-
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', instrument1.name)
-        .find('[data-cy="instrument-dropdown"]')
-        .should('not.exist');
-
-      /*
-      Status and instrument are uneditable when there is no instrument
-      */
-      cy.removeProposalsFromInstrument({
-        proposalPks: createdProposalPk1,
-      });
-
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', expiredStatus.name)
         .find('[data-cy="status-dropdown"]')
         .should('not.exist');
 
