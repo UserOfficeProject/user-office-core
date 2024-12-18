@@ -1061,12 +1061,7 @@ context('Xpress tests', () => {
         proposalPks: createdProposalPk1,
         statusId: expiredStatus.id as number,
       }).then(() => {
-        cy.assignProposalsToInstruments({
-          proposalPks: createdProposalPk1,
-          instrumentIds: createdInstrumentId1,
-        });
-
-        cy.login(scientist1);
+        cy.login(scientist2);
         cy.visit('/');
         cy.finishedLoading();
 
