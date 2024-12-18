@@ -298,9 +298,14 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = techniques
-          .filter((technique) => techIds?.includes(technique.id))
-          .flatMap((technique) => technique.instruments);
+        const instrumentList = Array.from(
+          new Map(
+            techniques
+              .filter((technique) => techIds?.includes(technique.id))
+              .flatMap((technique) => technique.instruments)
+              .map((instrument) => [instrument.id, instrument])
+          ).values()
+        );
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
@@ -530,7 +535,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           text,
           referenceNumbers,
           dateFilter,
-          excludeProposalStatusIds,
         } = proposalFilter;
 
         const result: {
@@ -548,7 +552,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
-              excludeProposalStatusIds: excludeProposalStatusIds,
+              excludeProposalStatusIds:
+                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
             sortField: orderBy?.orderByField,
             sortDirection: orderBy?.orderDirection,
@@ -565,14 +570,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalReviews: proposal.technicalReviews?.map(
-                    (technicalReview) => ({
-                      ...technicalReview,
-                      status: getTranslation(
-                        technicalReview.status as ResourceId
-                      ),
-                    })
-                  ),
                   finalStatus: getTranslation(
                     proposal.finalStatus as ResourceId
                   ),
