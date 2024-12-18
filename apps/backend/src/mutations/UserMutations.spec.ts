@@ -16,8 +16,6 @@ import { AuthJwtPayload, UserRole } from '../models/User';
 import { verifyToken } from '../utils/jwt';
 import UserMutations from './UserMutations';
 
-jest.mock('../datasources/stfc/UOWSSoapInterface');
-
 const secret = process.env.JWT_SECRET as string;
 
 const goodToken = jsonwebtoken.sign(
