@@ -54,13 +54,15 @@ context('Questions tests', () => {
     cy.contains(textQuestion);
 
     const modifiedQuestion = textQuestion.split('').reverse().join();
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${modifiedQuestion}{enter}`);
 
     cy.contains(textQuestion).should('not.exist');
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${textQuestion}{enter}`);
 
@@ -75,7 +77,8 @@ context('Questions tests', () => {
 
     const samplesQuestionWithSpaces = '   ' + samplesQuestion + '   ';
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${samplesQuestionWithSpaces}{enter}`);
 
@@ -90,7 +93,8 @@ context('Questions tests', () => {
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${textQuestion}{enter}`);
 
@@ -111,7 +115,8 @@ context('Questions tests', () => {
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${textQuestion}{enter}`);
 
@@ -119,7 +124,7 @@ context('Questions tests', () => {
     cy.get('[data-cy=questions-table]')
       .contains(textQuestion)
       .closest('tr')
-      .find('[aria-label=Edit]')
+      .find('[data-testid=EditIcon]')
       .click();
 
     cy.finishedLoading();
@@ -156,7 +161,8 @@ context('Questions tests', () => {
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${initialDBData.questions.boolean.text}{enter}`);
 
