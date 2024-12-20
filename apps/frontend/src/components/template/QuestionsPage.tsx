@@ -119,7 +119,7 @@ function QuestionsPage() {
 
   return (
     <StyledContainer maxWidth={false}>
-      <StyledPaper data-cy="questions-table">
+      <StyledPaper>
         {/* Edit Form Modal */}
         <StyledDialog
           open={isEditQuestionModalOpen}
@@ -163,76 +163,78 @@ function QuestionsPage() {
         />
 
         {/* Server Paginated Table */}
-        <DenseMaterialTable
-          tableRef={tableRef}
-          title={
-            <Typography variant="h6" component="h1">
-              Questions
-            </Typography>
-          }
-          editable={{
-            onRowDelete: (oldData) => {
-              return api({
-                toastSuccessMessage: 'Question deleted',
-              }).deleteQuestion({ questionId: oldData.id });
-            },
-            isDeletable: (rowData) => rowData.templates.length === 0,
-          }}
-          actions={[
-            {
-              icon: () => <Edit />,
-              tooltip: 'Edit Question',
-              onClick: (event, data) => {
-                setIsEditQuestionModalOpen(true);
-                setSelectedQuestion(Array.isArray(data) ? data[0] : data);
+        <div data-cy="questions-table">
+          <DenseMaterialTable
+            tableRef={tableRef}
+            title={
+              <Typography variant="h6" component="h1">
+                Questions
+              </Typography>
+            }
+            editable={{
+              onRowDelete: (oldData) => {
+                return api({
+                  toastSuccessMessage: 'Question deleted',
+                }).deleteQuestion({ questionId: oldData.id });
               },
-            },
-          ]}
-          columns={columns}
-          data={fetchQuestionsData}
-          onSearchChange={(searchText) => {
-            setSearchParam((searchParam) => {
-              searchParam.delete('search');
-              if (searchText) searchParam.set('search', searchText);
+              isDeletable: (rowData) => rowData.templates.length === 0,
+            }}
+            actions={[
+              {
+                icon: () => <Edit />,
+                tooltip: 'Edit Question',
+                onClick: (event, data) => {
+                  setIsEditQuestionModalOpen(true);
+                  setSelectedQuestion(Array.isArray(data) ? data[0] : data);
+                },
+              },
+            ]}
+            columns={columns}
+            data={fetchQuestionsData}
+            onSearchChange={(searchText) => {
+              setSearchParam((searchParam) => {
+                searchParam.delete('search');
+                if (searchText) searchParam.set('search', searchText);
 
-              return searchParam;
-            });
-          }}
-          onOrderCollectionChange={(orderByCollection) => {
-            const [orderBy] = orderByCollection;
-            setSearchParam((searchParam) => {
-              searchParam.delete('sortField');
-              searchParam.delete('sortDirection');
+                return searchParam;
+              });
+            }}
+            onOrderCollectionChange={(orderByCollection) => {
+              const [orderBy] = orderByCollection;
+              setSearchParam((searchParam) => {
+                searchParam.delete('sortField');
+                searchParam.delete('sortDirection');
 
-              if (
-                orderBy?.orderByField != null &&
-                orderBy?.orderDirection != null
-              ) {
-                searchParam.set('sortField', orderBy?.orderByField);
-                searchParam.set('sortDirection', orderBy?.orderDirection);
-              }
+                if (
+                  orderBy?.orderByField != null &&
+                  orderBy?.orderDirection != null
+                ) {
+                  searchParam.set('sortField', orderBy?.orderByField);
+                  searchParam.set('sortDirection', orderBy?.orderDirection);
+                }
 
-              return searchParam;
-            });
-          }}
-          onPageChange={(page, pageSize) => {
-            setSearchParam((searchParam) => {
-              searchParam.delete('page');
-              searchParam.delete('pageSize');
+                return searchParam;
+              });
+            }}
+            onPageChange={(page, pageSize) => {
+              setSearchParam((searchParam) => {
+                searchParam.delete('page');
+                searchParam.delete('pageSize');
 
-              searchParam.set('page', page.toString());
-              searchParam.set('pageSize', pageSize.toString());
+                searchParam.set('page', page.toString());
+                searchParam.set('pageSize', pageSize.toString());
 
-              return searchParam;
-            });
-          }}
-          options={{
-            searchText: searchText ?? undefined,
-            pageSize: pageSize ? +pageSize : undefined,
-            initialPage: searchText ? 0 : page ? +page : 0,
-            debounceInterval: 600,
-          }}
-        />
+                return searchParam;
+              });
+            }}
+            options={{
+              searchText: searchText ?? undefined,
+              pageSize: pageSize ? +pageSize : undefined,
+              initialPage: searchText ? 0 : page ? +page : 0,
+              debounceInterval: 600,
+            }}
+          />
+        </div>
       </StyledPaper>
     </StyledContainer>
   );
