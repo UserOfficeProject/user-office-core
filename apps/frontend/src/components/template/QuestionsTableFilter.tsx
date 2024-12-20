@@ -38,7 +38,7 @@ function QuestionsTableFilter(props: QuestionsTableFilterProps) {
   };
 
   return (
-    <Grid container spacing={2} data-cy="questions-table-filter">
+    <Grid container spacing={2}>
       <Grid item sm={4} xs={12}>
         <FormControl fullWidth>
           <InputLabel id="filter-category">Category</InputLabel>
