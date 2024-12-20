@@ -534,11 +534,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.templateIds) {
           query
             .leftJoin(
-              'questionary',
-              'questionary.questionary_id',
+              'questionaries',
+              'questionaries.questionary_id',
               'proposals.questionary_id'
             )
-            .whereIn('questionary.template_id', filter.templateIds);
+            .whereIn('questionaries.template_id', filter.templateIds);
         }
 
         if (filter?.proposalStatusId) {
@@ -700,11 +700,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select('p.*')
       .from('proposals as p')
       .where('p.proposer_id', id) // Principal investigator
-      .orWhereIn('proposal_pk', function () {
+      .orWhereIn('p.proposal_pk', function () {
         // co-proposer
         this.select('proposal_pk').from('proposal_user').where('user_id', id);
       })
-      .orWhereIn('proposal_pk', function () {
+      .orWhereIn('p.proposal_pk', function () {
         // visitor
         this.select('proposal_pk')
           .from('visits')
@@ -1160,5 +1160,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return { totalCount: 0, proposals: [] };
+  }
+
+  async submitImportedProposal(
+    primaryKey: number,
+    referenceNumber: string,
+    submittedDate: Date
+  ): Promise<Proposal | null> {
+    await this.submitProposal(primaryKey, referenceNumber);
+
+    const proposal: ProposalRecord[] | undefined = await database
+      .from('proposals')
+      .where('proposal_pk', primaryKey)
+      .update({ submitted_date: submittedDate })
+      .returning('*');
+
+    return proposal ? createProposalObject(proposal[0]) : null;
   }
 }

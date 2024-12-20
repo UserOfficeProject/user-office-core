@@ -1,6 +1,7 @@
 import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
+import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -12,6 +13,7 @@ import PostgresInternalReviewDataSource from '../datasources/postgres/InternalRe
 import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalEsiDataSource from '../datasources/postgres/ProposalEsiDataSource';
+import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
 import PostgresProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
@@ -61,6 +63,10 @@ mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, StfcProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
+mapClass(
+  Tokens.ProposalInternalCommentsDataSource,
+  PostgresProposalInternalCommentsDataSource
+);
 mapClass(Tokens.StatusActionsDataSource, PostgresStatusActionsDataSource);
 mapClass(Tokens.QuestionaryDataSource, PostgresQuestionaryDataSource);
 mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
@@ -83,6 +89,7 @@ mapClass(
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
+mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

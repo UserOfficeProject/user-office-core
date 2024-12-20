@@ -36,7 +36,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { useTechniquesData } from 'hooks/technique/useTechniquesData';
+import { useXpressTechniquesData } from 'hooks/technique/useXpressTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import {
   addColumns,
@@ -47,7 +47,9 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import ProposalScientistComment from './ProposalScientistComment';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
+import XpressNotice from './XpressNotice';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
 const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
@@ -55,9 +57,26 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
-  const { techniques, loadingTechniques } = useTechniquesData();
+
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
+
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
+
+  // Only show calls that use the quick review workflow status
+  const { calls, loadingCalls } = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+    },
+    CallsDataQuantity.MINIMAL
+  );
+
+  // Only show techniques that the user is assigned to
+  const { techniques, loadingTechniques } = useXpressTechniquesData();
+
+  // Only show instruments in the user's techniques
+  const { instruments, loadingInstruments } =
+    useXpressInstrumentsData(techniques);
 
   const [searchParams, setSearchParams] = useSearchParams({});
   const { toFormattedDateTime } = useFormattedDateTime({
@@ -107,7 +126,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     StatusCode.APPROVED,
     StatusCode.UNSUCCESSFUL,
     StatusCode.FINISHED,
-    StatusCode.EXPIRED,
+    ...(currentRole === UserRole.USER_OFFICER ? [StatusCode.EXPIRED] : []),
   ];
 
   const xpressStatuses = proposalStatuses.filter((ps) =>
@@ -150,8 +169,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     excludeProposalStatusIds: excludedStatusIds,
   });
 
-  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
-
   const RowActionButtons = (rowData: ProposalViewData) => {
     const [, setSearchParams] = useSearchParams();
 
@@ -173,10 +190,17 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     );
   };
 
+  const cellStyleSpecs = {
+    whiteSpace: 'nowrap',
+    maxWidth: '400px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
+      cellStyle: { minWidth: 120 },
       sorting: false,
       removable: false,
       field: 'rowActionButtons',
@@ -190,6 +214,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
+      cellStyle: cellStyleSpecs,
     },
     {
       title: 'Principal Investigator',
@@ -206,6 +231,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         return '';
       },
+      cellStyle: cellStyleSpecs,
       customFilterAndSearch: () => true,
     },
     {
@@ -218,7 +244,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Date submitted',
       field: 'submittedDate',
       render: (proposalView: ProposalViewData) => {
-        return toFormattedDateTime(proposalView.submittedDate);
+        if (proposalView.submittedDate) {
+          return toFormattedDateTime(proposalView.submittedDate);
+        }
       },
       ...{ width: 'auto' },
     },
@@ -270,12 +298,19 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = techniques
-          .filter((technique) => techIds?.includes(technique.id))
-          .flatMap((technique) => technique.instruments);
+        const instrumentList = Array.from(
+          new Map(
+            techniques
+              .filter((technique) => techIds?.includes(technique.id))
+              .flatMap((technique) => technique.instruments)
+              .map((instrument) => [instrument.id, instrument])
+          ).values()
+        );
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
+
+        const selectedValue: number | undefined = fieldValue ? fieldValue : 0;
 
         const selectedStatus = proposalStatuses.find(
           (ps) => ps.name === rowData.statusName
@@ -283,6 +318,14 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         const shouldBeUneditable =
           !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
+
+        // Always show the current instrument at the top of the dropdown
+        instrumentList.forEach(function (instrument, i) {
+          if (fieldValue && instrument.id === fieldValue) {
+            instrumentList.splice(i, 1);
+            instrumentList.unshift(instrument);
+          }
+        });
 
         return shouldBeUneditable ? (
           instrumentList.find((i) => i.id === fieldValue)?.name
@@ -311,7 +354,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     )();
                   }
                 }}
-                value={fieldValue}
+                value={selectedValue}
                 data-cy="instrument-dropdown"
               >
                 {instrumentList &&
@@ -470,6 +513,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           rowData.techniques?.map((technique) => technique.name)
         ),
       customFilterAndSearch: () => true,
+      cellStyle: cellStyleSpecs,
     },
   ];
 
@@ -491,7 +535,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           text,
           referenceNumbers,
           dateFilter,
-          excludeProposalStatusIds,
         } = proposalFilter;
 
         const result: {
@@ -509,10 +552,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
-              ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
-              currentRole === UserRole.INTERNAL_REVIEWER
-                ? { excludeProposalStatusIds: excludeProposalStatusIds }
-                : {}),
+              excludeProposalStatusIds:
+                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
             sortField: orderBy?.orderByField,
             sortDirection: orderBy?.orderDirection,
@@ -529,14 +570,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalReviews: proposal.technicalReviews?.map(
-                    (technicalReview) => ({
-                      ...technicalReview,
-                      status: getTranslation(
-                        technicalReview.status as ResourceId
-                      ),
-                    })
-                  ),
                   finalStatus: getTranslation(
                     proposal.finalStatus as ResourceId
                   ),
@@ -553,6 +586,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             const selection = new Set(searchParams.getAll('selection'));
             const proposalData = {
               ...proposal,
+              id: proposal.proposalId,
               status: proposal.submitted ? 'Submitted' : 'Open',
               technicalReviews: proposal.technicalReviews?.map(
                 (technicalReview) => ({
@@ -607,26 +641,16 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     refreshTableData();
   };
 
-  const { calls, loadingCalls } = useCallsData(
-    {
-      // Only show calls that use the quick review status in workflow
-      proposalStatusShortCode: 'QUICK_REVIEW',
-    },
-    CallsDataQuantity.EXTENDED
-  );
-
-  const { instruments, loadingInstruments } = useXpressInstrumentsData(
-    tableData,
-    techniques,
-    calls
-  );
-
   const handleSearchChange = (searchText: string) => {
-    setSearchParams({
-      search: searchText ? searchText : '',
-      page: searchText ? '0' : page || '',
-    });
+    searchParams.set('search', searchText ? searchText : '');
+    searchParams.set('page', searchText ? '0' : page || '');
   };
+  const XpressTablePanelDetails = React.useCallback(
+    ({ rowData }: Record<'rowData', ProposalViewData>) => {
+      return <ProposalScientistComment proposalPk={rowData.primaryKey} />;
+    },
+    []
+  );
 
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
   const downloadXLSXProposal = useDownloadXLSXProposal();
@@ -659,7 +683,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           referenceNumbers: referenceNumbers,
           dateFilter: dateFilter,
           ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
-          currentRole === UserRole.INTERNAL_REVIEWER
+          currentRole === UserRole.USER_OFFICER
             ? { excludeProposalStatusIds: excludeProposalStatusIds }
             : {}),
         },
@@ -688,11 +712,11 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
   return (
     <>
+      <XpressNotice />
       <StyledContainer maxWidth={false}>
         <StyledPaper data-cy="xpress-proposals-table">
           <ProposalReviewModal
@@ -835,7 +859,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
                   setAllProposalSelectionLoading(false);
                 },
-                position: 'toolbarOnSelect',
+                position: 'toolbar',
               },
             ]}
             onSelectionChange={(selectedItems) => {
@@ -854,11 +878,15 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
             onPageChange={(page, pageSize) => {
-              setSearchParams({
-                page: page.toString(),
-                pageSize: pageSize.toString(),
-              });
+              searchParams.set('page', page.toString());
+              searchParams.set('pageSize', pageSize.toString());
             }}
+            detailPanel={[
+              {
+                tooltip: 'Show comment',
+                render: XpressTablePanelDetails,
+              },
+            ]}
             localization={{
               toolbar: {
                 nRowsSelected: `${selection.length} row(s) selected`,
