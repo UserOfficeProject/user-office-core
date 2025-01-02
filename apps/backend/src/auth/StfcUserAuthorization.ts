@@ -168,7 +168,9 @@ export class StfcUserAuthorization extends UserAuthorization {
     const loginBySession = await UOWSClient.sessions.getLoginBySessionId(token);
     const stfcUserTemp: BasicPersonDetailsDTO[] | null =
       await UOWSClient.basicPersonDetails
-        .getBasicPersonDetails(undefined, undefined, undefined, [loginBySession.userId])
+        .getBasicPersonDetails(undefined, undefined, undefined, [
+          loginBySession.userId,
+        ])
         .then((rawStfcUser) => rawStfcUser)
         .catch((error) => {
           const rethrowMessage =
