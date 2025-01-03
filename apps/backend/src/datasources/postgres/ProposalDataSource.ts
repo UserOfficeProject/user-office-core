@@ -700,11 +700,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select('p.*')
       .from('proposals as p')
       .where('p.proposer_id', id) // Principal investigator
-      .orWhereIn('proposal_pk', function () {
+      .orWhereIn('p.proposal_pk', function () {
         // co-proposer
         this.select('proposal_pk').from('proposal_user').where('user_id', id);
       })
-      .orWhereIn('proposal_pk', function () {
+      .orWhereIn('p.proposal_pk', function () {
         // visitor
         this.select('proposal_pk')
           .from('visits')

@@ -27,7 +27,7 @@ context('Scheduler tests', () => {
       ],
     });
     cy.assignScientistsToInstrument({
-      instrumentId: initialDBData.instrument2.id,
+      instrumentId: initialDBData.instrument1.id,
       scientistIds: [scientist.id],
     });
 
