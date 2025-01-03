@@ -12,16 +12,27 @@ services:
       - '--providers.docker=true'
       - '--providers.docker.exposedbydefault=false'
       - '--entrypoints.web.address=:80'
+      - '--entrypoints.websecure.address=:443' # Enable HTTPS
+      - '--certificatesresolvers.myresolver.acme.httpchallenge=true'
+      - '--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web'
+      - '--certificatesresolvers.myresolver.acme.email=mohamed.hassan@stfc.ac.uk'
+      - '--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json'
+
     ports:
-      - '33000:80' # The HTTP port
+      - '80:80'
+      - '443:443'
+      # - '33000:80' # The HTTP port
       - '8080:8080' # The Web UI (enabled by --api)
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+        - ./letsencrypt:/letsencrypt # For certificate storage
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.traefik.rule=Host(`localhost`)'
-      - 'traefik.http.routers.traefik.entrypoints=web'
-      - 'traefik.http.routers.traefik.service=api@internal'
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.traefik.rule=Host(`172.16.101.230`)'
+        - 'traefik.http.routers.traefik.entrypoints=websecure'
+        - 'traefik.http.routers.traefik.tls=true'
+        - 'traefik.http.routers.traefik.tls.certresolver=myresolver'
+        - 'traefik.http.middlewares.https-redirect.redirectscheme.scheme=https'
   db:
     image: postgres:16-alpine
     restart: always
