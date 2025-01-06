@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
+import { InviteCodesDataSourceMock } from '../datasources/mockups/InviteCodesDataSource';
+import { RoleInviteDataSourceMock } from '../datasources/mockups/RoleInviteDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
@@ -10,6 +13,15 @@ import InviteMutations from './InviteMutations';
 const inviteMutations = container.resolve(InviteMutations);
 
 describe('Test Invite Mutations', () => {
+  beforeEach(() => {
+    container
+      .resolve<InviteCodesDataSourceMock>(Tokens.InviteCodeDataSource)
+      .init();
+    container
+      .resolve<RoleInviteDataSourceMock>(Tokens.RoleInviteDataSource)
+      .init();
+  });
+
   test('A user officer can create an invite for reviewer', () => {
     const email = 'user@example.com';
 
@@ -65,6 +77,22 @@ describe('Test Invite Mutations', () => {
         email: updatedEmail,
       })
     ).resolves.toHaveProperty('email', updatedEmail);
+  });
+
+  test('A user officer can add roles to invite', async () => {
+    const roleIds = [1, 2, 3];
+
+    await inviteMutations.update(dummyUserOfficerWithRole, {
+      id: 1,
+      claims: { roleIds },
+    });
+
+    const roleInvite = await container
+      .resolve<RoleInviteDataSourceMock>(Tokens.RoleInviteDataSource)
+      .findByInviteCodeId(1);
+
+    expect(roleInvite).toBeDefined();
+    expect(roleInvite.map((roleInvite) => roleInvite.roleId)).toEqual(roleIds);
   });
 
   test('A user can not update invite', async () => {

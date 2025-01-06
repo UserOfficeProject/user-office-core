@@ -68,10 +68,6 @@ export default class InviteMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async update(user: UserWithRole | null, input: UpdateInviteInput) {
-    if (input.claims?.roleIds && input.claims.roleIds.length > 0) {
-      this.replaceRoleInvites(input.id, input.claims.roleIds);
-    }
-
     const updatedInvite = await this.inviteDataSource.update(input);
     await this.replaceRoleInvites(updatedInvite.id, input.claims?.roleIds);
 

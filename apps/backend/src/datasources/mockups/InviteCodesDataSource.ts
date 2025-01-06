@@ -10,7 +10,7 @@ export class InviteCodesDataSourceMock implements InviteCodesDataSource {
   }
 
   async findById(id: number): Promise<InviteCode | null> {
-    return this.inviteCodes.find((inviteCode) => inviteCode.id === id) ?? null;
+    return this.inviteCodes.find((inviteCode) => inviteCode.id === id) || null;
   }
 
   public init() {
