@@ -144,15 +144,10 @@ export default class QuestionaryMutations {
           );
         }
 
-        await this.dataSource.updateAnswer(
+        const updatedAnswer = await this.dataSource.updateAnswer(
           questionaryId,
           answer.questionId,
           answer.value
-        );
-
-        const updatedAnswer = await this.dataSource.getAnswer(
-          questionaryId,
-          questionTemplateRelation.question.naturalKey
         );
 
         if (updatedAnswer) {

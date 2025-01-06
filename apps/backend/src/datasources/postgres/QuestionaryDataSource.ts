@@ -22,6 +22,7 @@ import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
   CallRecord,
+  AnswerRecord,
   createAnswerBasic,
   createCallObject,
   createProposalTemplateObject,
@@ -37,7 +38,7 @@ import {
   createProposalObject,
 } from './records';
 
-type AnswerRecord<T extends DataType> = QuestionRecord &
+type QuestionaryAnswerRecord<T extends DataType> = QuestionRecord &
   QuestionTemplateRelRecord & { value: any; answer_id: number } & {
     config: QuestionDataTypeConfigMapping<T>;
     dependency_natural_key: string;
@@ -161,7 +162,7 @@ export default class PostgresQuestionaryDataSource
     questionary_id: number,
     question_id: string,
     answer: string
-  ): Promise<string> {
+  ): Promise<AnswerBasic> {
     const results: { count?: string | number | undefined } | undefined =
       await database
         .count()
@@ -182,7 +183,10 @@ export default class PostgresQuestionaryDataSource
           questionary_id,
           question_id,
         })
-        .then(() => question_id);
+        .returning('*')
+        .then((answer: AnswerRecord[]) => {
+          return createAnswerBasic(answer[0]);
+        });
     } else {
       return database('answers')
         .insert({
@@ -190,7 +194,10 @@ export default class PostgresQuestionaryDataSource
           question_id,
           answer,
         })
-        .then(() => question_id);
+        .returning('*')
+        .then((answer: AnswerRecord[]) => {
+          return createAnswerBasic(answer[0]);
+        });
     }
   }
 
@@ -314,7 +321,7 @@ export default class PostgresQuestionaryDataSource
 
   // TODO: This is repeated in template datasource. Find a way to reuse it.
   async getQuestionsDependencies(
-    questionRecords: AnswerRecord<DataType>[],
+    questionRecords: QuestionaryAnswerRecord<DataType>[],
     templateId: number
   ): Promise<FieldDependency[]> {
     const questionDependencies: QuestionDependencyRecord[] = await database
@@ -374,7 +381,7 @@ export default class PostgresQuestionaryDataSource
 
     // this contains all questions for template, with left joined answers
     // meaning that if there is no answer, it will still be on the list but `null`
-    const answerRecords: AnswerRecord<DataType>[] = (
+    const answerRecords: QuestionaryAnswerRecord<DataType>[] = (
       await database.raw(`
         SELECT 
           templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, questions.natural_key as dependency_natural_key
