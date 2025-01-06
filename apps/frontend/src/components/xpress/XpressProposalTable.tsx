@@ -4,7 +4,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Visibility } from '@mui/icons-material';
+import { Info, Visibility } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import {
@@ -289,7 +289,32 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     t: TFunction<'translation', undefined>
   ) => [
     {
-      title: t('instrument'),
+      title: (
+        <>
+          <span>
+            {t('instrument')}
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1.Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2.Once a proposal is marked as Approved / Unsuccessful, the
+                    selected experimental area cannot be changed.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
       field: 'instruments.name',
       sorting: false,
       render: (rowData: ProposalViewData) => {
@@ -374,7 +399,47 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const statusColumn = () => [
     {
-      title: 'Status',
+      title: (
+        <>
+          <span>
+            Status
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1.Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2.Status can be changed to Approved / Unsuccessful, once
+                    experimental area selection and review is completed.
+                  </p>
+                  <p>
+                    3.Once a proposal is marked as Approved / Unsuccessful, the
+                    selected experimental area cannot be changed.
+                  </p>
+                  <p>
+                    4.Further status changes are not allowed once a proposal is
+                    marked as Unsuccessful.
+                  </p>
+                  <p>
+                    5.Status of Approved proposals can be changed to
+                    Unsuccessful / Finished.
+                  </p>
+                  <p>
+                    6.Finished status can be marked only for Approved proposals.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
       field: 'statusName',
       sorting: false,
       render: (rowData: ProposalViewData) => {
