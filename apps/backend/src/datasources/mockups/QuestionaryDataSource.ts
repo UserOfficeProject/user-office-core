@@ -430,23 +430,35 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     _proposalPk: number,
     questionId: string,
     answer: string
-  ): Promise<string> {
-    const updated = dummyQuestionarySteps.some((step) =>
-      step.fields.some((field) => {
-        if (field.question.id === questionId) {
-          field.value = answer;
+  ): Promise<AnswerBasic> {
+    let updatedAnswer: Answer | undefined;
+    let questionaryId = 1;
 
-          return true;
-        }
+    dummyQuestionarySteps.forEach(
+      (step) =>
+        (updatedAnswer = step.fields.find((field) => {
+          if (field.question.id === questionId) {
+            questionaryId = step.questionaryId;
+            field.value = answer;
 
-        return false;
-      })
+            return true;
+          }
+
+          return false;
+        }))
     );
-    if (!updated) {
+
+    if (!updatedAnswer) {
       throw new Error('Question not found');
     }
 
-    return questionId;
+    return new AnswerBasic(
+      updatedAnswer.answerId,
+      questionaryId,
+      updatedAnswer.question.id,
+      updatedAnswer.value,
+      new Date()
+    );
   }
   async insertFiles(
     _proposalPk: number,
