@@ -298,12 +298,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 <span>
                   <p>Tips: </p>
                   <p>
-                    1.Change the status of a proposal to Under Review to enable
+                    1. Change the status of a proposal to Under Review to enable
                     experimental area selection.
                   </p>
                   <p>
-                    2.Once a proposal is marked as Approved / Unsuccessful, the
-                    selected experimental area cannot be changed.
+                    2. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
                   </p>
                 </span>
               }
@@ -408,27 +408,28 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 <span>
                   <p>Tips: </p>
                   <p>
-                    1.Change the status of a proposal to Under Review to enable
+                    1. Change the status of a proposal to Under Review to enable
                     experimental area selection.
                   </p>
                   <p>
-                    2.Status can be changed to Approved / Unsuccessful, once
-                    experimental area selection and review is completed.
+                    2. Status can be changed to Unsuccessful, or Approved after
+                    an experimental area is selected.
                   </p>
                   <p>
-                    3.Once a proposal is marked as Approved / Unsuccessful, the
-                    selected experimental area cannot be changed.
+                    3. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
                   </p>
                   <p>
-                    4.Further status changes are not allowed once a proposal is
+                    4. Further status changes are not allowed once a proposal is
                     marked as Unsuccessful.
                   </p>
                   <p>
-                    5.Status of Approved proposals can be changed to
+                    5. Status of Approved proposals can be changed to
                     Unsuccessful / Finished.
                   </p>
                   <p>
-                    6.Finished status can be marked only for Approved proposals.
+                    6. Finished status can be marked only for Approved
+                    proposals.
                   </p>
                 </span>
               }
