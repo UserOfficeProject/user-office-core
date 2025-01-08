@@ -12,6 +12,7 @@ import {
   isMatchingConstraints,
   transformAnswerValueIfNeeded,
 } from '../models/ProposalModelFunctions';
+import { AnswerBasic } from '../models/Questionary';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { rejection } from '../models/Rejection';
 import { UserJWT, UserWithRole } from '../models/User';
@@ -90,6 +91,7 @@ export default class QuestionaryMutations {
 
     await this.deleteOldAnswers(template.templateId, questionaryId, topicId);
 
+    const updatedAnswers: AnswerBasic[] = [];
     for (const answer of answers) {
       if (answer.value !== undefined) {
         const questionTemplateRelation =
@@ -142,11 +144,15 @@ export default class QuestionaryMutations {
           );
         }
 
-        await this.dataSource.updateAnswer(
+        const updatedAnswer = await this.dataSource.updateAnswer(
           questionaryId,
           answer.questionId,
           answer.value
         );
+
+        if (updatedAnswer) {
+          updatedAnswers.push(updatedAnswer);
+        }
       }
     }
     if (!isPartialSave) {
@@ -157,9 +163,7 @@ export default class QuestionaryMutations {
       );
     }
 
-    return (await this.dataSource.getQuestionarySteps(questionaryId)).find(
-      (step) => step.topic.id === topicId
-    )!;
+    return updatedAnswers;
   }
 
   @Authorized()

@@ -7,7 +7,6 @@ import {
   ProposalStatus,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { timeAgo } from 'utils/Time';
 
 import ProposalTable from './ProposalTable';
 
@@ -78,7 +77,7 @@ const ProposalTableUser = () => {
                   !proposal.submitted && hasReferenceNumberFormat
                     ? `* ${proposal.proposalId}`
                     : proposal.proposalId,
-                created: timeAgo(proposal.created),
+                created: proposal.created,
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
                 call: proposal.call,
