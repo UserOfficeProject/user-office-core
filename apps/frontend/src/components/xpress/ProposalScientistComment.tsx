@@ -1,4 +1,12 @@
-import { Button, DialogContent, Grid, Typography } from '@mui/material';
+import { Info } from '@mui/icons-material';
+import {
+  Button,
+  DialogContent,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { Form, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
@@ -42,6 +50,25 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
             gutterBottom
           >
             Proposal Scientist Comment
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>1. Comments are managed by only instrument scientists.</p>
+                  <p>
+                    2. Comments are not be accessible to users or sample safety.
+                  </p>
+                  <p>
+                    3. Comments will be available for editing in all proposal
+                    statuses.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
           </Typography>
           <Formik
             initialValues={{ comment: scientistCommentData?.comment }}
