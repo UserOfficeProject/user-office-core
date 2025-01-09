@@ -171,7 +171,9 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
         if (filter?.dataType !== undefined) {
           query.whereIn('questions.data_type', filter.dataType);
         }
-
+        if (filter?.excludeDataType !== undefined) {
+          query.whereNotIn('questions.data_type', filter.excludeDataType);
+        }
         if (searchText) {
           query.andWhere((qb) =>
             qb

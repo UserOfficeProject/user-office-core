@@ -40,6 +40,9 @@ export class AllQuestionsFilter {
 
   @Field(() => [DataType], { nullable: true })
   public dataType?: DataType[];
+
+  @Field(() => [DataType], { nullable: true })
+  public excludeDataType?: DataType[];
 }
 
 @ObjectType()
