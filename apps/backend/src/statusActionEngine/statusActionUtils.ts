@@ -105,7 +105,16 @@ async function stepAnswers(
           for (const stStep of stQuestionarySteps) {
             const stFields = stStep.fields.map((field) => field);
             for (const stAnswer of stFields) {
-              retVal.push(stAnswer);
+              if (
+                stAnswer.question.question.toUpperCase() ===
+                'SUB TEMPLATE BASIC INFORMATION'
+              ) {
+                const subTitle: Answer = stAnswer;
+                subTitle.value = sTemplate.title;
+                retVal.push(subTitle);
+              } else {
+                retVal.push(stAnswer);
+              }
             }
           }
         }
