@@ -88,9 +88,12 @@ async function stepAnswers(
             Tokens.GenericTemplateDataSource
           );
         const genericTemplates =
-          await genericTemplateDataSource.getGenericTemplates({
-            filter: { proposalPk: answerProposalPk },
-          });
+          await genericTemplateDataSource.getGenericTemplates(
+            {
+              filter: { proposalPk: answerProposalPk },
+            },
+            null
+          );
         const subGenericTemplates = genericTemplates
           .filter(
             (genericTemplate) =>
