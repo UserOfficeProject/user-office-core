@@ -316,125 +316,129 @@ context('Xpress tests', () => {
           sortOrder: 1,
         });
       }
+
+      /*
+      Update the default call with a workflow that includes QUICK_REVIEW
+      */
+      cy.updateCall({
+        id: initialDBData.call.id,
+        proposalWorkflowId: callWorkflowId,
+      });
     });
 
     /*
-    Update the default call with a workflow that includes QUICK_REVIEW
-    */
-    cy.updateCall({
-      id: initialDBData.call.id,
-      proposalWorkflowId: callWorkflowId,
-    });
+      Create instruments and assign them to the call
+      */
+    cy.createInstrument(instrument1)
+      .then((result) => {
+        if (result.createInstrument) {
+          createdInstrumentId1 = result.createInstrument.id;
+        }
+      })
+      .then(() => {
+        cy.createInstrument(instrument2)
+          .then((result) => {
+            if (result.createInstrument) {
+              createdInstrumentId2 = result.createInstrument.id;
+            }
+          })
+          .then(() => {
+            cy.createInstrument(instrument3)
+              .then((result) => {
+                if (result.createInstrument) {
+                  createdInstrumentId3 = result.createInstrument.id;
+                }
+              })
+              .then(() => {
+                cy.createInstrument(instrument4)
+                  .then((result) => {
+                    if (result.createInstrument) {
+                      createdInstrumentId4 = result.createInstrument.id;
+                    }
+                  })
+                  .then(() => {
+                    cy.createInstrument(instrument5)
+                      .then((result) => {
+                        if (result.createInstrument) {
+                          createdInstrumentId5 = result.createInstrument.id;
+                        }
+                      })
+                      .then(() => {
+                        cy.assignInstrumentToCall({
+                          callId: initialDBData.call.id,
+                          instrumentFapIds: [
+                            { instrumentId: createdInstrumentId1 },
+                            { instrumentId: createdInstrumentId2 },
+                            { instrumentId: createdInstrumentId3 },
+                            { instrumentId: createdInstrumentId4 },
+                            { instrumentId: createdInstrumentId5 },
+                          ],
+                        });
+                      });
+                  });
+              });
+          });
+      });
 
     /*
-    Create instruments and assign them to the call
-    */
-    cy.createInstrument(instrument1).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId1 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId1 }],
-        });
-      }
-    });
-
-    cy.createInstrument(instrument2).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId2 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId2 }],
-        });
-      }
-    });
-
-    cy.createInstrument(instrument3).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId3 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId3 }],
-        });
-      }
-    });
-
-    cy.createInstrument(instrument4).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId4 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId4 }],
-        });
-      }
-    });
-
-    cy.createInstrument(instrument5).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId5 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId5 }],
-        });
-      }
-    });
-
-    /*
-    Create techniques and assign scientists to them
-    */
+      Create techniques and assign scientists to them
+      */
     cy.createTechnique(technique1).then((result) => {
       createdTechniquePk1 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist1.id, scientist2.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId1, createdInstrumentId2],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId1, createdInstrumentId2],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
+
     cy.createTechnique(technique2).then((result) => {
       createdTechniquePk2 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist2.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId2],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId2],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
+
     cy.createTechnique(technique3).then((result) => {
       createdTechniquePk3 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist3.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId3],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId3],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
+
     cy.createTechnique(technique4).then((result) => {
       cy.assignInstrumentsToTechnique({
         instrumentIds: [createdInstrumentId4],
         techniqueId: result.createTechnique.id,
       });
     });
+
     cy.createTechnique(technique5).then((result) => {
       createdTechniquePk5 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist2.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId5],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId5],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
 
@@ -450,11 +454,11 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk1,
           title: proposal1.title,
           abstract: proposal1.abstract,
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk1,
-          techniqueIds: [createdTechniquePk1],
+        }).then(() => {
+          cy.assignProposalToTechniques({
+            proposalPk: createdProposalPk1,
+            techniqueIds: [createdTechniquePk1],
+          });
         });
       }
     });
@@ -467,15 +471,17 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk2,
           title: proposal2.title,
           abstract: proposal2.abstract,
-        });
-
-        cy.submitProposal({ proposalPk: createdProposalPk2 }).then((result) => {
-          createdProposalId2 = result.submitProposal.proposalId;
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk2,
-          techniqueIds: [createdTechniquePk2],
+        }).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk2 })
+            .then((result) => {
+              createdProposalId2 = result.submitProposal.proposalId;
+            })
+            .then(() => {
+              cy.assignProposalToTechniques({
+                proposalPk: createdProposalPk2,
+                techniqueIds: [createdTechniquePk2],
+              });
+            });
         });
       }
     });
@@ -488,20 +494,22 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk3,
           title: proposal3.title,
           abstract: proposal3.abstract,
-        });
-
-        cy.submitProposal({ proposalPk: createdProposalPk3 }).then((result) => {
-          createdProposalId3 = result.submitProposal.proposalId;
-        });
-
-        cy.changeProposalsStatus({
-          statusId: submittedStatus.id as number,
-          proposalPks: [createdProposalPk3],
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk3,
-          techniqueIds: [createdTechniquePk3],
+        }).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk3 })
+            .then((result) => {
+              createdProposalId3 = result.submitProposal.proposalId;
+            })
+            .then(() => {
+              cy.changeProposalsStatus({
+                statusId: submittedStatus.id as number,
+                proposalPks: [createdProposalPk3],
+              }).then(() => {
+                cy.assignProposalToTechniques({
+                  proposalPk: createdProposalPk3,
+                  techniqueIds: [createdTechniquePk3],
+                });
+              });
+            });
         });
       }
     });
@@ -514,15 +522,17 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk4,
           title: proposal4.title,
           abstract: proposal4.abstract,
-        });
-
-        cy.submitProposal({ proposalPk: createdProposalPk4 }).then((result) => {
-          createdProposalId4 = result.submitProposal.proposalId;
-        });
-
-        cy.changeProposalsStatus({
-          statusId: submittedStatus.id as number,
-          proposalPks: [createdProposalPk4],
+        }).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk4 })
+            .then((result) => {
+              createdProposalId4 = result.submitProposal.proposalId;
+            })
+            .then(() => {
+              cy.changeProposalsStatus({
+                statusId: submittedStatus.id as number,
+                proposalPks: [createdProposalPk4],
+              });
+            });
         });
       }
     });
@@ -536,16 +546,16 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk5,
           title: proposal5.title,
           abstract: proposal5.abstract,
-        });
-
-        cy.changeProposalsStatus({
-          statusId: expiredStatus.id as number,
-          proposalPks: [createdProposalPk5],
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk5,
-          techniqueIds: [createdTechniquePk5],
+        }).then(() => {
+          cy.changeProposalsStatus({
+            statusId: expiredStatus.id as number,
+            proposalPks: [createdProposalPk5],
+          }).then(() => {
+            cy.assignProposalToTechniques({
+              proposalPk: createdProposalPk5,
+              techniqueIds: [createdTechniquePk5],
+            });
+          });
         });
       }
     });
@@ -623,11 +633,11 @@ context('Xpress tests', () => {
       cy.assignProposalsToInstruments({
         proposalPks: [createdProposalPk1, createdProposalPk2],
         instrumentIds: createdInstrumentId1,
-      });
-
-      cy.assignProposalsToInstruments({
-        proposalPks: [createdProposalPk3, createdProposalPk4],
-        instrumentIds: createdInstrumentId2,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: [createdProposalPk3, createdProposalPk4],
+          instrumentIds: createdInstrumentId2,
+        });
       });
 
       cy.login('officer');
@@ -1045,6 +1055,52 @@ context('Xpress tests', () => {
       cy.contains(createdProposalId1);
       cy.contains(technique1.name);
     });
+
+    it('Scientist should not see expired proposals', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: expiredStatus.id as number,
+      }).then(() => {
+        cy.login(scientist2);
+        cy.visit('/');
+        cy.finishedLoading();
+
+        cy.contains('Xpress').click();
+        cy.finishedLoading();
+
+        cy.contains(proposal1.title).should('not.exist');
+        cy.contains(proposal2.title).should('exist');
+      });
+    });
+
+    it('Scientist cannot filter by expired status', function () {
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress Proposals').click();
+
+      cy.get('[data-cy="status-filter"]').click();
+
+      // Ensure the dropdown only contains Xpress statuses
+      cy.get('[role="listbox"] [data-value]').then((options) => {
+        const actualStatuses = [...options].map((option) =>
+          option.innerText.trim()
+        );
+        const expectedStatuses = [
+          'All',
+          draftStatus.name,
+          submittedStatus.name,
+          underReviewStatus.name,
+          approvedStatus.name,
+          unsuccessfulStatus.name,
+          finishedStatus.name,
+        ];
+
+        // Expect the correct order and exact amount of items
+        expect(actualStatuses).to.deep.equal(expectedStatuses);
+      });
+    });
   });
 
   describe('Techniques advanced tests', () => {
@@ -1370,11 +1426,11 @@ context('Xpress tests', () => {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
         statusId: draftStatus.id as number,
-      });
-
-      cy.assignProposalsToInstruments({
-        proposalPks: createdProposalPk1,
-        instrumentIds: createdInstrumentId1,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
       });
 
       cy.login(scientist1);
@@ -1422,11 +1478,11 @@ context('Xpress tests', () => {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
         statusId: finishedStatus.id as number,
-      });
-
-      cy.assignProposalsToInstruments({
-        proposalPks: createdProposalPk1,
-        instrumentIds: createdInstrumentId1,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
       });
 
       cy.login(scientist1);
@@ -1468,11 +1524,11 @@ context('Xpress tests', () => {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
         statusId: unsuccessfulStatus.id as number,
-      });
-
-      cy.assignProposalsToInstruments({
-        proposalPks: createdProposalPk1,
-        instrumentIds: createdInstrumentId1,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
       });
 
       cy.login(scientist1);
@@ -1504,58 +1560,6 @@ context('Xpress tests', () => {
       cy.contains(proposal1.title)
         .parent()
         .should('contain', unsuccessfulStatus.name)
-        .find('[data-cy="status-dropdown"]')
-        .should('not.exist');
-
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[data-cy="instrument-dropdown"]')
-        .should('not.exist');
-    });
-
-    it('Scientist cannot change status or instrument when the status is expired', function () {
-      /*
-      Status and instrument are uneditable when there is an instrument
-      */
-      cy.changeProposalsStatus({
-        proposalPks: createdProposalPk1,
-        statusId: expiredStatus.id as number,
-      });
-
-      cy.assignProposalsToInstruments({
-        proposalPks: createdProposalPk1,
-        instrumentIds: createdInstrumentId1,
-      });
-
-      cy.login(scientist1);
-      cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Xpress').click();
-      cy.finishedLoading();
-
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', expiredStatus.name)
-        .find('[data-cy="status-dropdown"]')
-        .should('not.exist');
-
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', instrument1.name)
-        .find('[data-cy="instrument-dropdown"]')
-        .should('not.exist');
-
-      /*
-      Status and instrument are uneditable when there is no instrument
-      */
-      cy.removeProposalsFromInstrument({
-        proposalPks: createdProposalPk1,
-      });
-
-      cy.contains(proposal1.title)
-        .parent()
-        .should('contain', expiredStatus.name)
         .find('[data-cy="status-dropdown"]')
         .should('not.exist');
 
@@ -1705,11 +1709,11 @@ context('Xpress tests', () => {
       cy.changeProposalsStatus({
         proposalPks: createdProposalPk1,
         statusId: approvedStatus.id as number,
-      });
-
-      cy.assignProposalsToInstruments({
-        proposalPks: createdProposalPk1,
-        instrumentIds: createdInstrumentId1,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
       });
 
       cy.login(scientist1);
