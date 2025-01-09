@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
@@ -54,7 +54,7 @@ export default function ProposalPage() {
     }),
   });
   const { calls, loadingCalls } = useCallsData();
-  const { instruments, loadingInstruments } = useInstrumentsData();
+  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
 

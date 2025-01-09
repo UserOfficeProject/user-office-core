@@ -4,7 +4,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Visibility } from '@mui/icons-material';
+import { Info, Visibility } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import {
@@ -23,17 +23,20 @@ import { t, TFunction } from 'i18next';
 import React, { useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import UOLoader from 'components/common/UOLoader';
 import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
-import { ProposalsFilter, UserRole } from 'generated/sdk';
+import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
-import { useTechniquesData } from 'hooks/technique/useTechniquesData';
+import { useXpressTechniquesData } from 'hooks/technique/useXpressTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import {
   addColumns,
@@ -42,20 +45,45 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import ProposalScientistComment from './ProposalScientistComment';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
+import XpressNotice from './XpressNotice';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
 
-const XpressProposalTable = () => {
+const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
   };
-  const { techniques, loadingTechniques } = useTechniquesData();
+
+  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
+
   const { proposalStatuses, loadingProposalStatuses } =
     useProposalStatusesData();
 
+  // Only show calls that use the quick review workflow status
+  const { calls, loadingCalls } = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+    },
+    CallsDataQuantity.MINIMAL
+  );
+
+  // Only show techniques that the user is assigned to
+  const { techniques, loadingTechniques } = useXpressTechniquesData();
+
+  // Only show instruments in the user's techniques
+  const { instruments, loadingInstruments } =
+    useXpressInstrumentsData(techniques);
+
   const [searchParams, setSearchParams] = useSearchParams({});
+  const { toFormattedDateTime } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_TIME_FORMAT,
+  });
+
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const callId = searchParams.get('callId');
   const instrument = searchParams.get('instrument');
@@ -81,6 +109,44 @@ const XpressProposalTable = () => {
 
   const { currentRole } = useContext(UserContext);
 
+  enum StatusCode {
+    DRAFT = 'DRAFT',
+    SUBMITTED_LOCKED = 'SUBMITTED_LOCKED',
+    UNDER_REVIEW = 'UNDER_REVIEW',
+    APPROVED = 'APPROVED',
+    UNSUCCESSFUL = 'UNSUCCESSFUL',
+    FINISHED = 'FINISHED',
+    EXPIRED = 'EXPIRED',
+  }
+
+  const xpressStatusCodes = [
+    StatusCode.DRAFT,
+    StatusCode.SUBMITTED_LOCKED,
+    StatusCode.UNDER_REVIEW,
+    StatusCode.APPROVED,
+    StatusCode.UNSUCCESSFUL,
+    StatusCode.FINISHED,
+    ...(currentRole === UserRole.USER_OFFICER ? [StatusCode.EXPIRED] : []),
+  ];
+
+  const xpressStatuses = proposalStatuses.filter((ps) =>
+    xpressStatusCodes.includes(ps.shortCode as StatusCode)
+  );
+
+  // Use a consistent order representing the Xpress flow
+  xpressStatuses.sort((a, b) => {
+    return (
+      xpressStatusCodes.indexOf(a.shortCode as StatusCode) -
+      xpressStatusCodes.indexOf(b.shortCode as StatusCode)
+    );
+  });
+
+  const excludedStatusIds = proposalStatuses
+    .filter(
+      (status) => !xpressStatusCodes.includes(status.shortCode as StatusCode)
+    )
+    .map((status) => status.id);
+
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,
     instrumentFilter: {
@@ -100,10 +166,8 @@ const XpressProposalTable = () => {
     referenceNumbers: proposalId ? [proposalId] : undefined,
     proposalStatusId: proposalStatusId ? +proposalStatusId : undefined,
     text: search,
-    excludeProposalStatusIds: [9],
+    excludeProposalStatusIds: excludedStatusIds,
   });
-
-  const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
   const RowActionButtons = (rowData: ProposalViewData) => {
     const [, setSearchParams] = useSearchParams();
@@ -126,10 +190,17 @@ const XpressProposalTable = () => {
     );
   };
 
+  const cellStyleSpecs = {
+    whiteSpace: 'nowrap',
+    maxWidth: '400px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
+      cellStyle: { minWidth: 120 },
       sorting: false,
       removable: false,
       field: 'rowActionButtons',
@@ -143,6 +214,7 @@ const XpressProposalTable = () => {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
+      cellStyle: cellStyleSpecs,
     },
     {
       title: 'Principal Investigator',
@@ -159,6 +231,7 @@ const XpressProposalTable = () => {
 
         return '';
       },
+      cellStyle: cellStyleSpecs,
       customFilterAndSearch: () => true,
     },
     {
@@ -168,12 +241,13 @@ const XpressProposalTable = () => {
       emptyValue: '-',
     },
     {
-      title: 'Status',
-      field: 'statusName',
-    },
-    {
       title: 'Date submitted',
       field: 'submittedDate',
+      render: (proposalView: ProposalViewData) => {
+        if (proposalView.submittedDate) {
+          return toFormattedDateTime(proposalView.submittedDate);
+        }
+      },
       ...{ width: 'auto' },
     },
   ];
@@ -197,23 +271,90 @@ const XpressProposalTable = () => {
     refreshTableData();
   };
 
+  const updateProposalStatus = async (
+    proposalPk: number,
+    statusId: number
+  ): Promise<void> => {
+    await api({
+      toastSuccessMessage: 'Proposal status updated successfully!',
+    }).changeXpressProposalsStatus({
+      statusId: statusId,
+      proposalPks: [proposalPk],
+    });
+
+    refreshTableData();
+  };
+
   const instrumentManagementColumns = (
     t: TFunction<'translation', undefined>
   ) => [
     {
-      title: t('instrument'),
+      title: (
+        <>
+          <span>
+            {t('instrument')}
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1. Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
       field: 'instruments.name',
       sorting: false,
       render: (rowData: ProposalViewData) => {
+        if (loadingProposalStatuses) {
+          return <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />;
+        }
+
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = techniques
-          .filter((technique) => techIds?.includes(technique.id))
-          .flatMap((technique) => technique.instruments);
+        const instrumentList = Array.from(
+          new Map(
+            techniques
+              .filter((technique) => techIds?.includes(technique.id))
+              .flatMap((technique) => technique.instruments)
+              .map((instrument) => [instrument.id, instrument])
+          ).values()
+        );
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
 
-        return (
+        const selectedValue: number | undefined = fieldValue ? fieldValue : 0;
+
+        const selectedStatus = proposalStatuses.find(
+          (ps) => ps.name === rowData.statusName
+        )?.shortCode;
+
+        const shouldBeUneditable =
+          !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
+
+        // Always show the current instrument at the top of the dropdown
+        instrumentList.forEach(function (instrument, i) {
+          if (fieldValue && instrument.id === fieldValue) {
+            instrumentList.splice(i, 1);
+            instrumentList.unshift(instrument);
+          }
+        });
+
+        return shouldBeUneditable ? (
+          instrumentList.find((i) => i.id === fieldValue)?.name
+        ) : (
           <>
             <FormControl fullWidth>
               <Select
@@ -221,19 +362,202 @@ const XpressProposalTable = () => {
                 aria-labelledby="instrument-select-label"
                 onChange={(e) => {
                   if (e.target.value) {
-                    assignProposalsToInstruments(
-                      +e.target.value,
-                      rowData.primaryKey
-                    );
+                    confirm(
+                      () => {
+                        assignProposalsToInstruments(
+                          +e.target.value,
+                          rowData.primaryKey
+                        );
+                      },
+                      {
+                        title: 'Change instrument',
+                        description:
+                          'Are you sure you want to change this instrument?',
+                        confirmationText: 'Yes',
+                        cancellationText: 'Cancel',
+                      }
+                    )();
                   }
                 }}
-                value={fieldValue}
+                value={selectedValue}
                 data-cy="instrument-dropdown"
               >
                 {instrumentList &&
                   instrumentList.map((instrument) => (
                     <MenuItem key={instrument.id} value={instrument.id}>
                       {instrument.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </>
+        );
+      },
+      customFilterAndSearch: () => true,
+    },
+  ];
+
+  const statusColumn = () => [
+    {
+      title: (
+        <>
+          <span>
+            Status
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1. Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2. Status can be changed to Unsuccessful, or Approved after
+                    an experimental area is selected.
+                  </p>
+                  <p>
+                    3. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
+                  </p>
+                  <p>
+                    4. Further status changes are not allowed once a proposal is
+                    marked as Unsuccessful.
+                  </p>
+                  <p>
+                    5. Status of Approved proposals can be changed to
+                    Unsuccessful / Finished.
+                  </p>
+                  <p>
+                    6. Finished status can be marked only for Approved
+                    proposals.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
+      field: 'statusName',
+      sorting: false,
+      render: (rowData: ProposalViewData) => {
+        if (loadingProposalStatuses) {
+          return <UOLoader style={{ marginLeft: '50%', marginTop: '20px' }} />;
+        }
+
+        const fieldValue = proposalStatuses.find(
+          (ps) => ps.name === rowData.statusName
+        );
+
+        // Disallow setting submitted or draft status, unless user officer
+        let availableStatuses;
+        if (isUserOfficer) {
+          availableStatuses = xpressStatuses;
+        } else {
+          availableStatuses = xpressStatuses.filter(
+            (status) =>
+              status.shortCode !== StatusCode.SUBMITTED_LOCKED &&
+              status.shortCode !== StatusCode.DRAFT &&
+              status.shortCode !== StatusCode.EXPIRED
+          );
+        }
+
+        xpressStatuses.sort((a, b) => {
+          return (
+            xpressStatusCodes.indexOf(a.shortCode as StatusCode) -
+            xpressStatusCodes.indexOf(b.shortCode as StatusCode)
+          );
+        });
+
+        // Always show the current status at the top of the dropdown
+        if (fieldValue) {
+          const currentIndex = availableStatuses.findIndex(
+            (status) => status.id === fieldValue.id
+          );
+          if (currentIndex > -1) {
+            availableStatuses.splice(currentIndex, 1);
+          }
+          availableStatuses.unshift(fieldValue);
+        }
+
+        const isInstrumentAbsent = (rowData.instruments?.length ?? 0) === 0;
+
+        const status = {
+          isDraft: fieldValue?.shortCode === StatusCode.DRAFT,
+          isSubmitted: fieldValue?.shortCode === StatusCode.SUBMITTED_LOCKED,
+          isUnsuccessful: fieldValue?.shortCode === StatusCode.UNSUCCESSFUL,
+          isApproved: fieldValue?.shortCode === StatusCode.APPROVED,
+          isFinished: fieldValue?.shortCode === StatusCode.FINISHED,
+          isExpired: fieldValue?.shortCode === StatusCode.EXPIRED,
+        };
+
+        const shouldDisableUnderReview =
+          status.isApproved || status.isUnsuccessful;
+
+        const shouldDisableApproved = status.isSubmitted || isInstrumentAbsent;
+
+        const shouldDisableUnsuccessful = status.isSubmitted;
+
+        const shouldDisableFinished = !status.isApproved || isInstrumentAbsent;
+
+        const shouldBeUneditable =
+          !isUserOfficer &&
+          (status.isDraft ||
+            status.isFinished ||
+            status.isUnsuccessful ||
+            status.isExpired);
+
+        return shouldBeUneditable ? (
+          fieldValue?.name
+        ) : (
+          <>
+            <FormControl fullWidth>
+              <Select
+                id="status-selection"
+                aria-labelledby="status-select-label"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    confirm(
+                      () => {
+                        updateProposalStatus(
+                          rowData.primaryKey,
+                          +e.target.value
+                        );
+                      },
+                      {
+                        title: 'Change status',
+                        description:
+                          'Are you sure you want to change this status?',
+                        confirmationText: 'Yes',
+                        cancellationText: 'Cancel',
+                      }
+                    )();
+                  }
+                }}
+                value={fieldValue?.id}
+                data-cy="status-dropdown"
+              >
+                {availableStatuses &&
+                  availableStatuses.map((status) => (
+                    <MenuItem
+                      key={status.id}
+                      value={status.id}
+                      disabled={
+                        !isUserOfficer &&
+                        ((status.shortCode === StatusCode.APPROVED &&
+                          shouldDisableApproved) ||
+                          (status.shortCode === StatusCode.FINISHED &&
+                            shouldDisableFinished) ||
+                          (status.shortCode === StatusCode.UNDER_REVIEW &&
+                            shouldDisableUnderReview) ||
+                          (status.shortCode === StatusCode.UNSUCCESSFUL &&
+                            shouldDisableUnsuccessful))
+                      }
+                    >
+                      {status.name}
                     </MenuItem>
                   ))}
               </Select>
@@ -255,11 +579,13 @@ const XpressProposalTable = () => {
           rowData.techniques?.map((technique) => technique.name)
         ),
       customFilterAndSearch: () => true,
+      cellStyle: cellStyleSpecs,
     },
   ];
 
   addColumns(columns, instrumentManagementColumns(t));
   addColumns(columns, techniquesColumns());
+  addColumns(columns, statusColumn());
 
   columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
@@ -275,7 +601,6 @@ const XpressProposalTable = () => {
           text,
           referenceNumbers,
           dateFilter,
-          excludeProposalStatusIds,
         } = proposalFilter;
 
         const result: {
@@ -293,10 +618,8 @@ const XpressProposalTable = () => {
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
-              ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
-              currentRole === UserRole.INTERNAL_REVIEWER
-                ? { excludeProposalStatusIds: excludeProposalStatusIds }
-                : {}),
+              excludeProposalStatusIds:
+                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
             sortField: orderBy?.orderByField,
             sortDirection: orderBy?.orderDirection,
@@ -313,14 +636,6 @@ const XpressProposalTable = () => {
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalReviews: proposal.technicalReviews?.map(
-                    (technicalReview) => ({
-                      ...technicalReview,
-                      status: getTranslation(
-                        technicalReview.status as ResourceId
-                      ),
-                    })
-                  ),
                   finalStatus: getTranslation(
                     proposal.finalStatus as ResourceId
                   ),
@@ -337,6 +652,7 @@ const XpressProposalTable = () => {
             const selection = new Set(searchParams.getAll('selection'));
             const proposalData = {
               ...proposal,
+              id: proposal.proposalId,
               status: proposal.submitted ? 'Submitted' : 'Open',
               technicalReviews: proposal.technicalReviews?.map(
                 (technicalReview) => ({
@@ -391,23 +707,16 @@ const XpressProposalTable = () => {
     refreshTableData();
   };
 
-  const { calls, loadingCalls } = useCallsData(
-    undefined,
-    CallsDataQuantity.EXTENDED
-  );
-
-  const { instruments, loadingInstruments } = useXpressInstrumentsData(
-    tableData,
-    techniques,
-    calls
-  );
-
   const handleSearchChange = (searchText: string) => {
-    setSearchParams({
-      search: searchText ? searchText : '',
-      page: searchText ? '0' : page || '',
-    });
+    searchParams.set('search', searchText ? searchText : '');
+    searchParams.set('page', searchText ? '0' : page || '');
   };
+  const XpressTablePanelDetails = React.useCallback(
+    ({ rowData }: Record<'rowData', ProposalViewData>) => {
+      return <ProposalScientistComment proposalPk={rowData.primaryKey} />;
+    },
+    []
+  );
 
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
   const downloadXLSXProposal = useDownloadXLSXProposal();
@@ -440,7 +749,7 @@ const XpressProposalTable = () => {
           referenceNumbers: referenceNumbers,
           dateFilter: dateFilter,
           ...(currentRole === UserRole.INSTRUMENT_SCIENTIST ||
-          currentRole === UserRole.INTERNAL_REVIEWER
+          currentRole === UserRole.USER_OFFICER
             ? { excludeProposalStatusIds: excludeProposalStatusIds }
             : {}),
         },
@@ -469,11 +778,11 @@ const XpressProposalTable = () => {
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
   return (
     <>
+      <XpressNotice />
       <StyledContainer maxWidth={false}>
         <StyledPaper data-cy="xpress-proposals-table">
           <ProposalReviewModal
@@ -510,7 +819,7 @@ const XpressProposalTable = () => {
               isLoading: loadingTechniques,
             }}
             proposalStatuses={{
-              data: proposalStatuses,
+              data: xpressStatuses,
               isLoading: loadingProposalStatuses,
             }}
             handleFilterChange={handleFilterChange}
@@ -616,7 +925,7 @@ const XpressProposalTable = () => {
 
                   setAllProposalSelectionLoading(false);
                 },
-                position: 'toolbarOnSelect',
+                position: 'toolbar',
               },
             ]}
             onSelectionChange={(selectedItems) => {
@@ -635,11 +944,15 @@ const XpressProposalTable = () => {
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
             onPageChange={(page, pageSize) => {
-              setSearchParams({
-                page: page.toString(),
-                pageSize: pageSize.toString(),
-              });
+              searchParams.set('page', page.toString());
+              searchParams.set('pageSize', pageSize.toString());
             }}
+            detailPanel={[
+              {
+                tooltip: 'Show comment',
+                render: XpressTablePanelDetails,
+              },
+            ]}
             localization={{
               toolbar: {
                 nRowsSelected: `${selection.length} row(s) selected`,
@@ -652,4 +965,4 @@ const XpressProposalTable = () => {
   );
 };
 
-export default XpressProposalTable;
+export default withConfirm(XpressProposalTable);

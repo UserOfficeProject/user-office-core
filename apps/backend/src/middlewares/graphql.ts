@@ -31,6 +31,7 @@ import { registerEnums } from '../resolvers/registerEnums';
 import { buildFederatedSchema } from '../utils/buildFederatedSchema';
 import { isProduction } from '../utils/helperFunctions';
 import initGraphQLClient from './graphqlClient';
+import { apolloServerMetricsPlugin } from './metrics/apolloServerMetricsPlugin';
 
 export const context: ContextFunction<
   [ExpressContextFunctionArgument],
@@ -146,6 +147,7 @@ const apolloServer = async (app: Express) => {
   };
 
   const plugins = [
+    apolloServerMetricsPlugin(),
     ApolloServerPluginInlineTraceDisabled(),
     // Explicitly disable playground in prod
     isProduction
@@ -174,6 +176,19 @@ const apolloServer = async (app: Express) => {
         },
       })
     );
+    app.use((req, res, next) => {
+      const clientName = req.headers['apollographql-client-name'];
+      if (
+        typeof clientName === 'string' &&
+        clientName.startsWith('UOP frontend')
+      ) {
+        const userId = req.user?.user.id;
+        req.headers['apollographql-client-name'] = userId
+          ? `UOP frontend - user ${userId}`
+          : 'UOP frontend - anonymous';
+      }
+      next();
+    });
   }
 
   const server = new ApolloServer({

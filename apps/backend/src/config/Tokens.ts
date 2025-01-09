@@ -12,6 +12,7 @@ export const Tokens = {
   FileDataSource: Symbol('FileDataSource'),
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
   InstrumentDataSource: Symbol('InstrumentDataSource'),
+  InviteCodeDataSource: Symbol('InviteCodeDataSource'),
   TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   MailService: Symbol('MailService'),
@@ -23,6 +24,7 @@ export const Tokens = {
   StatusActionsDataSource: Symbol('StatusActionsDataSource'),
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
   RedeemCodesDataSource: Symbol('RedeemCodesDataSource'),
+  RoleInviteDataSource: Symbol('RoleInviteDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),
   FapDataSource: Symbol('FapDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),
@@ -33,6 +35,7 @@ export const Tokens = {
   TemplateDataSource: Symbol('TemplateDataSource'),
   UnitDataSource: Symbol('UnitDataSource'),
   UserAuthorization: Symbol('UserAuthorization'),
+  ProposalAuthorization: Symbol('ProposalAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
@@ -43,4 +46,7 @@ export const Tokens = {
   PopulateCallRow: Symbol('PopulateCallRow'),
   DownloadService: Symbol('DownloadService'),
   StatusActionsLogsDataSource: Symbol('StatusActionsLogsDataSource'),
+  ProposalInternalCommentsDataSource: Symbol(
+    'ProposalInternalCommentsDataSource'
+  ),
 };

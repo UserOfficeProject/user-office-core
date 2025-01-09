@@ -1,10 +1,13 @@
 import { logger } from '@user-office-software/duo-logger';
 import {
   administrationProposalValidationSchema,
+  createProposalScientistCommentValidationSchema,
   createProposalValidationSchema,
+  deleteProposalScientistCommentValidationSchema,
   deleteProposalValidationSchema,
   proposalNotifyValidationSchema,
   submitProposalValidationSchema,
+  updateProposalScientistCommentValidationSchema,
   updateProposalValidationSchema,
 } from '@user-office-software/duo-validation';
 import { container, inject, injectable } from 'tsyringe';
@@ -14,10 +17,12 @@ import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import ProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -29,8 +34,11 @@ import { UserWithRole } from '../models/User';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
+import { CreateProposalScientistCommentArgs } from '../resolvers/mutations/CreateProposalScientistCommentMutation';
 import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutation';
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
+import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
+import { ProposalScientistComment } from '../resolvers/types/ProposalView';
 import { statusActionEngine } from '../statusActionEngine';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
@@ -39,7 +47,6 @@ import { CloneUtils } from './../utils/CloneUtils';
 
 @injectable()
 export default class ProposalMutations {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   private cloneUtils = container.resolve(CloneUtils);
   constructor(
     @inject(Tokens.ProposalDataSource)
@@ -59,7 +66,13 @@ export default class ProposalMutations {
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.TechniqueDataSource)
+    private techniqueDataSource: TechniqueDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.ProposalInternalCommentsDataSource)
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -272,17 +285,14 @@ export default class ProposalMutations {
 
   private async submitProposal(
     agent: UserWithRole | null,
-    proposal: Proposal,
-    legacyReferenceNumber?: string
+    proposal: Proposal
   ): Promise<Proposal | Rejection> {
     //Added this because the rejection doesnt like proposal.primaryKey
     const proposalPk = proposal.primaryKey;
 
     try {
-      const submitProposal = await this.proposalDataSource.submitProposal(
-        proposalPk,
-        legacyReferenceNumber
-      );
+      const submitProposal =
+        await this.proposalDataSource.submitProposal(proposalPk);
       logger.logInfo('User Submitted a Proposal:', {
         proposalId: proposal.proposalId,
         title: proposal.title,
@@ -451,9 +461,70 @@ export default class ProposalMutations {
     return result || rejection('Can not administer proposal', { result });
   }
 
-  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
-  @Authorized([Roles.USER_OFFICER])
-  async changeProposalsStatus(
+  @ValidateArgs(createProposalScientistCommentValidationSchema)
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async createProposalScientistComment(
+    agent: UserWithRole | null,
+    args: CreateProposalScientistCommentArgs
+  ): Promise<ProposalScientistComment | Rejection> {
+    const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+    if (!proposal) {
+      return rejection(
+        'Could not create proposal scientist comment because proposal not found',
+        {
+          agent,
+          proposalPk: args.proposalPk,
+        }
+      );
+    }
+
+    return await this.proposalInternalCommentsDataSource
+      .create(args)
+      .catch((error) => {
+        return rejection(
+          'Could not create proposal scientist comment',
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @ValidateArgs(updateProposalScientistCommentValidationSchema)
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async updateProposalScientistComment(
+    agent: UserWithRole | null,
+    args: UpdateProposalScientistCommentArgs
+  ): Promise<ProposalScientistComment | Rejection> {
+    return await this.proposalInternalCommentsDataSource
+      .update(args)
+      .catch((error) => {
+        return rejection(
+          `Could not update proposal scientist comment: '${args.commentId}'`,
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  @ValidateArgs(deleteProposalScientistCommentValidationSchema)
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async deleteProposalScientistComment(
+    agent: UserWithRole | null,
+    args: { commentId: number }
+  ): Promise<ProposalScientistComment | Rejection> {
+    return await this.proposalInternalCommentsDataSource
+      .delete(args.commentId)
+      .catch((error) => {
+        return rejection(
+          `Could not delete proposal scientist comment: '${args.commentId}'`,
+          { agent, args: args },
+          error
+        );
+      });
+  }
+
+  private async processProposalsStatusChange(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
@@ -490,6 +561,7 @@ export default class ProposalMutations {
             return rejection(
               `No propsal workflow found for the specific proposal call with id: ${fullProposal.callId}`,
               {
+                agent,
                 args,
               }
             );
@@ -515,6 +587,165 @@ export default class ProposalMutations {
     }
 
     return result || rejection('Can not change proposal status', { result });
+  }
+
+  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
+  @Authorized([Roles.USER_OFFICER])
+  async changeProposalsStatus(
+    agent: UserWithRole | null,
+    args: ChangeProposalsStatusInput
+  ): Promise<Proposals | Rejection> {
+    return this.processProposalsStatusChange(agent, args);
+  }
+
+  @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async changeXpressProposalsStatus(
+    agent: UserWithRole | null,
+    args: ChangeProposalsStatusInput
+  ): Promise<Proposals | Rejection> {
+    if (
+      agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
+      agent?.isApiAccessToken
+    ) {
+      return this.processProposalsStatusChange(agent, args);
+    }
+
+    const requesterContext = {
+      requester: agent?.isApiAccessToken
+        ? 'API key'
+        : agent?.currentRole?.title,
+      requesterUserId: agent?.id,
+    };
+
+    const proposals = await this.proposalDataSource.getProposalsByPks(
+      args.proposalPks
+    );
+
+    const foundProposalPks = proposals.map((proposal) => proposal.primaryKey);
+    const missingProposalPks = args.proposalPks.filter(
+      (pk) => !foundProposalPks.includes(pk)
+    );
+
+    if (missingProposalPks.length > 0) {
+      return rejection(
+        'Could not change status of Xpress proposal(s): proposals not found',
+        {
+          missingProposalPks: missingProposalPks,
+          ...requesterContext,
+        }
+      );
+    }
+
+    const allStatuses =
+      await this.proposalSettingsDataSource.getAllProposalStatuses();
+
+    for (const proposal of proposals) {
+      const currentStatus = allStatuses.find(
+        (ps) => ps.id === proposal.statusId
+      );
+
+      const newStatus = allStatuses.find((ps) => ps.id === args.statusId);
+
+      const context = {
+        currentStatus: currentStatus,
+        newStatus: newStatus,
+        proposalId: proposal.proposalId,
+        ...requesterContext,
+      };
+
+      if (!currentStatus || !newStatus) {
+        return rejection(
+          'Could not change status of Xpress proposal(s): cannot determine statuses',
+          context
+        );
+      }
+
+      if (currentStatus.id === newStatus.id) {
+        return rejection(
+          'Could not change status of Xpress proposal(s): same status',
+          context
+        );
+      }
+
+      enum XpressStatus {
+        DRAFT = 'DRAFT',
+        SUBMITTED_LOCKED = 'SUBMITTED_LOCKED',
+        UNDER_REVIEW = 'UNDER_REVIEW',
+        APPROVED = 'APPROVED',
+        UNSUCCESSFUL = 'UNSUCCESSFUL',
+        FINISHED = 'FINISHED',
+        EXPIRED = 'EXPIRED',
+      }
+
+      if (!(newStatus.shortCode in XpressStatus)) {
+        return rejection(
+          'Could not change status of Xpress proposal(s): forbidden new status',
+          context
+        );
+      }
+
+      if (
+        newStatus.shortCode === XpressStatus.DRAFT ||
+        newStatus.shortCode === XpressStatus.SUBMITTED_LOCKED ||
+        newStatus.shortCode === XpressStatus.EXPIRED
+      ) {
+        return rejection(
+          'Could not change status of Xpress proposal(s): forbidden new status',
+          context
+        );
+      }
+
+      const proposalInstruments =
+        await this.instrumentDataSource.getInstrumentsByProposalPk(
+          proposal.primaryKey
+        );
+
+      const isInstrumentAbsent = (proposalInstruments?.length ?? 0) === 0;
+
+      const isCurrentlyDraft = currentStatus.shortCode === XpressStatus.DRAFT;
+      const isCurrentlySubmitted =
+        currentStatus.shortCode === XpressStatus.SUBMITTED_LOCKED;
+      const isCurrentlyUnsuccessful =
+        currentStatus.shortCode === XpressStatus.UNSUCCESSFUL;
+      const isCurrentlyApproved =
+        currentStatus.shortCode === XpressStatus.APPROVED;
+      const isCurrentlyFinished =
+        currentStatus.shortCode === XpressStatus.FINISHED;
+
+      if (isCurrentlyDraft || isCurrentlyFinished || isCurrentlyUnsuccessful) {
+        return rejection(
+          'Could not change status of Xpress proposal(s): unmodifiable current status',
+          context
+        );
+      }
+
+      const shouldDisableUnderReview =
+        isCurrentlyApproved || isCurrentlyUnsuccessful;
+
+      const shouldDisableApproved = isCurrentlySubmitted || isInstrumentAbsent;
+
+      const shouldDisableUnsuccessful = isCurrentlySubmitted;
+
+      const shouldDisableFinished = !isCurrentlyApproved || isInstrumentAbsent;
+
+      if (
+        (newStatus.shortCode === XpressStatus.UNDER_REVIEW &&
+          shouldDisableUnderReview) ||
+        (newStatus.shortCode === XpressStatus.APPROVED &&
+          shouldDisableApproved) ||
+        (newStatus.shortCode === XpressStatus.UNSUCCESSFUL &&
+          shouldDisableUnsuccessful) ||
+        (newStatus.shortCode === XpressStatus.FINISHED && shouldDisableFinished)
+      ) {
+        return rejection(
+          'Could not change status of Xpress proposal(s): forbidden status transition',
+          context
+        );
+      }
+    }
+
+    return this.processProposalsStatusChange(agent, args);
   }
 
   @Authorized()
@@ -644,9 +875,12 @@ export default class ProposalMutations {
       }
 
       const proposalGenericTemplates =
-        await this.genericTemplateDataSource.getGenericTemplates({
-          filter: { proposalPk: sourceProposal.primaryKey },
-        });
+        await this.genericTemplateDataSource.getGenericTemplates(
+          {
+            filter: { proposalPk: sourceProposal.primaryKey },
+          },
+          agent
+        );
 
       for await (const genericTemplate of proposalGenericTemplates) {
         const clonedGenericTemplate =
@@ -683,6 +917,9 @@ export default class ProposalMutations {
       referenceNumber,
       users: coiIds,
       created,
+      submittedDate,
+      techniqueIds,
+      instrumentId,
     } = args;
 
     const submitter = await this.userDataSource.getUser(submitterId);
@@ -755,12 +992,44 @@ export default class ProposalMutations {
       });
     }
 
-    const submitted = await this.submitProposal(
-      agent,
-      updatedProposal,
-      referenceNumber
-    );
+    if (!submittedDate) {
+      return rejection(
+        'Can not create proposal because there was no submitted date specified',
+        { call }
+      );
+    }
 
-    return submitted;
+    const submittedProposal =
+      await this.proposalDataSource.submitImportedProposal(
+        proposal.primaryKey,
+        referenceNumber,
+        submittedDate
+      );
+
+    if (!submittedProposal) {
+      return rejection('Could not submit proposal', {
+        agent: agent,
+        proposalPk: proposal.primaryKey,
+        proposalId: proposal.proposalId,
+        title: proposal.title,
+        userId: proposal.proposerId,
+      });
+    }
+
+    if (techniqueIds) {
+      this.techniqueDataSource.assignProposalToTechniques(
+        submittedProposal.primaryKey,
+        techniqueIds
+      );
+    }
+
+    if (instrumentId) {
+      this.instrumentDataSource.assignProposalToInstrument(
+        submittedProposal.primaryKey,
+        instrumentId
+      );
+    }
+
+    return submittedProposal;
   }
 }

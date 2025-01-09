@@ -4,7 +4,7 @@ import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { InternalReview } from '../models/InternalReview';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
-import { QuestionaryStep } from '../models/Questionary';
+import { AnswerBasic } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
@@ -211,7 +211,7 @@ interface ProposalFapMeetingReorderEvent extends GeneralEvent {
 
 interface ProposalTopicAnsweredEvent extends GeneralEvent {
   type: Event.TOPIC_ANSWERED;
-  questionarystep: QuestionaryStep;
+  array: AnswerBasic[];
 }
 
 interface UserUpdateEvent extends GeneralEvent {

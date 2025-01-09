@@ -17,9 +17,11 @@ import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
+import { InviteCode } from '../../models/InviteCode';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
+import { ProposalInternalComment } from '../../models/ProposalInternalComment';
 import { ProposalStatusActionType } from '../../models/ProposalStatusAction';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
@@ -32,6 +34,7 @@ import {
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
+import { RoleInvite } from '../../models/RoleInvite';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
@@ -758,6 +761,12 @@ export interface ProposalWorkflowConnectionHasActionsRecord {
   readonly config: string;
 }
 
+export interface ProposalInternalCommentRecord {
+  readonly comment_id: number;
+  readonly proposal_pk: number;
+  readonly comment: string;
+}
+
 export const createTopicObject = (record: TopicRecord) => {
   return new Topic(
     record.topic_id,
@@ -1401,3 +1410,44 @@ export interface StatusActionsLogHasProposalRecord {
   readonly status_actions_log_id: number;
   readonly proposal_pk: number;
 }
+export const createProposalInternalCommentObject = (
+  proposalInternalComment: ProposalInternalCommentRecord
+) => {
+  return new ProposalInternalComment(
+    proposalInternalComment.comment_id,
+    proposalInternalComment.proposal_pk,
+    proposalInternalComment.comment
+  );
+};
+
+export interface InviteCodeRecord {
+  readonly invite_code_id: number;
+  readonly code: string;
+  readonly email: string;
+  readonly note: string;
+  readonly created_by: number;
+  readonly created_at: Date;
+  readonly claimed_by: number | null;
+  readonly claimed_at: Date | null;
+}
+
+export const createInviteCodeObject = (invite: InviteCodeRecord) =>
+  new InviteCode(
+    invite.invite_code_id,
+    invite.code,
+    invite.email,
+    invite.note,
+    invite.created_at,
+    invite.created_by,
+    invite.claimed_at,
+    invite.claimed_by
+  );
+
+export interface RoleInviteRecord {
+  readonly role_invite_id: number;
+  readonly invite_code_id: number;
+  readonly role_id: number;
+}
+
+export const createRoleInviteObject = (invite: RoleInviteRecord) =>
+  new RoleInvite(invite.role_invite_id, invite.invite_code_id, invite.role_id);

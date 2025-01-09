@@ -31,9 +31,105 @@ context('Xpress tests', () => {
   let createdTechniquePk1: number;
   let createdTechniquePk2: number;
   let createdTechniquePk3: number;
-  let createdTechniquePk5: number;
   // Technique 4 has no proposals assigned
-  // Proposal 1 is unsubmitted
+  let createdTechniquePk5: number;
+
+  let callWorkflowId: number; // Workflow with QUICK_REVIEW status
+
+  const proposalWorkflow = {
+    name: faker.lorem.words(2),
+    description: faker.lorem.words(5),
+  };
+
+  const draftStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    id: initialDBData.proposalStatuses.draft.id,
+    name: 'DRAFT',
+    shortCode: 'SUBMITTED_LOCKED',
+    description: '-',
+  };
+
+  const submittedStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    name: 'Submitted (locked)',
+    shortCode: 'SUBMITTED_LOCKED',
+    description: '-',
+  };
+
+  const underReviewStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    name: 'Under review',
+    shortCode: 'UNDER_REVIEW',
+    description: '-',
+  };
+
+  const approvedStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    name: 'Approved',
+    shortCode: 'APPROVED',
+    description: '-',
+  };
+
+  const unsuccessfulStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    name: 'Unsucessful',
+    shortCode: 'UNSUCCESSFUL',
+    description: '-',
+  };
+
+  const finishedStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    name: 'Finished',
+    shortCode: 'FINISHED',
+    description: '-',
+  };
+
+  const expiredStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    id: initialDBData.proposalStatuses.expired.id,
+    name: 'EXPIRED',
+    shortCode: 'EXPIRED',
+    description: '-',
+  };
+
+  const quickReviewStatus: {
+    id?: number;
+    name: string;
+    shortCode: string;
+    description: string;
+  } = {
+    name: 'Quick review',
+    shortCode: 'QUICK_REVIEW',
+    description: '-',
+  };
 
   const technique1 = {
     name: faker.word.words(1),
@@ -140,112 +236,215 @@ context('Xpress tests', () => {
       }
     });
 
-    cy.createInstrument(instrument1).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId1 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId1 }],
-        });
+    /*
+     Create Xpress-specific statuses to avoid patching them in.
+     Others in the Xpress workflow are already created.
+    */
+    cy.createProposalStatus({
+      name: underReviewStatus.name,
+      shortCode: underReviewStatus.shortCode,
+      description: underReviewStatus.description,
+    }).then((result) => {
+      if (result.createProposalStatus) {
+        underReviewStatus.id = result.createProposalStatus.id;
       }
     });
 
-    cy.createInstrument(instrument2).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId2 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId2 }],
-        });
+    cy.createProposalStatus({
+      name: approvedStatus.name,
+      shortCode: approvedStatus.shortCode,
+      description: approvedStatus.description,
+    }).then((result) => {
+      if (result.createProposalStatus) {
+        approvedStatus.id = result.createProposalStatus.id;
       }
     });
 
-    cy.createInstrument(instrument3).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId3 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId3 }],
-        });
+    cy.createProposalStatus({
+      name: unsuccessfulStatus.name,
+      shortCode: unsuccessfulStatus.shortCode,
+      description: unsuccessfulStatus.description,
+    }).then((result) => {
+      if (result.createProposalStatus) {
+        unsuccessfulStatus.id = result.createProposalStatus.id;
       }
     });
 
-    cy.createInstrument(instrument4).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId4 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId4 }],
-        });
+    cy.createProposalStatus({
+      name: finishedStatus.name,
+      shortCode: finishedStatus.shortCode,
+      description: finishedStatus.description,
+    }).then((result) => {
+      if (result.createProposalStatus) {
+        finishedStatus.id = result.createProposalStatus.id;
       }
     });
 
-    cy.createInstrument(instrument5).then((result) => {
-      if (result.createInstrument) {
-        createdInstrumentId5 = result.createInstrument.id;
-
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: createdInstrumentId5 }],
-        });
+    cy.createProposalStatus({
+      name: submittedStatus.name,
+      shortCode: submittedStatus.shortCode,
+      description: submittedStatus.description,
+    }).then((result) => {
+      if (result.createProposalStatus) {
+        submittedStatus.id = result.createProposalStatus.id;
       }
     });
 
+    cy.createProposalStatus({
+      name: quickReviewStatus.name,
+      shortCode: quickReviewStatus.shortCode,
+      description: quickReviewStatus.description,
+    }).then((result) => {
+      if (result.createProposalStatus) {
+        quickReviewStatus.id = result.createProposalStatus.id;
+      }
+    });
+
+    /*
+    Create the workflow with the QUICK_REVIEW status needed for Xpress calls
+    */
+    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+      const workflow = result.createProposalWorkflow;
+      callWorkflowId = workflow.id;
+
+      if (result.createProposalWorkflow) {
+        cy.addProposalWorkflowStatus({
+          droppableGroupId:
+            workflow.proposalWorkflowConnectionGroups[0].groupId,
+          proposalStatusId: quickReviewStatus.id as number,
+          proposalWorkflowId: callWorkflowId,
+          sortOrder: 1,
+        });
+      }
+
+      /*
+      Update the default call with a workflow that includes QUICK_REVIEW
+      */
+      cy.updateCall({
+        id: initialDBData.call.id,
+        proposalWorkflowId: callWorkflowId,
+      });
+    });
+
+    /*
+      Create instruments and assign them to the call
+      */
+    cy.createInstrument(instrument1)
+      .then((result) => {
+        if (result.createInstrument) {
+          createdInstrumentId1 = result.createInstrument.id;
+        }
+      })
+      .then(() => {
+        cy.createInstrument(instrument2)
+          .then((result) => {
+            if (result.createInstrument) {
+              createdInstrumentId2 = result.createInstrument.id;
+            }
+          })
+          .then(() => {
+            cy.createInstrument(instrument3)
+              .then((result) => {
+                if (result.createInstrument) {
+                  createdInstrumentId3 = result.createInstrument.id;
+                }
+              })
+              .then(() => {
+                cy.createInstrument(instrument4)
+                  .then((result) => {
+                    if (result.createInstrument) {
+                      createdInstrumentId4 = result.createInstrument.id;
+                    }
+                  })
+                  .then(() => {
+                    cy.createInstrument(instrument5)
+                      .then((result) => {
+                        if (result.createInstrument) {
+                          createdInstrumentId5 = result.createInstrument.id;
+                        }
+                      })
+                      .then(() => {
+                        cy.assignInstrumentToCall({
+                          callId: initialDBData.call.id,
+                          instrumentFapIds: [
+                            { instrumentId: createdInstrumentId1 },
+                            { instrumentId: createdInstrumentId2 },
+                            { instrumentId: createdInstrumentId3 },
+                            { instrumentId: createdInstrumentId4 },
+                            { instrumentId: createdInstrumentId5 },
+                          ],
+                        });
+                      });
+                  });
+              });
+          });
+      });
+
+    /*
+      Create techniques and assign scientists to them
+      */
     cy.createTechnique(technique1).then((result) => {
       createdTechniquePk1 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist1.id, scientist2.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId1, createdInstrumentId2],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId1, createdInstrumentId2],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
+
     cy.createTechnique(technique2).then((result) => {
       createdTechniquePk2 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist2.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId2],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId2],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
+
     cy.createTechnique(technique3).then((result) => {
       createdTechniquePk3 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist3.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId3],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId3],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
+
     cy.createTechnique(technique4).then((result) => {
       cy.assignInstrumentsToTechnique({
         instrumentIds: [createdInstrumentId4],
         techniqueId: result.createTechnique.id,
       });
     });
+
     cy.createTechnique(technique5).then((result) => {
       createdTechniquePk5 = result.createTechnique.id;
       cy.assignScientistsToTechnique({
         scientistIds: [scientist2.id],
         techniqueId: result.createTechnique.id,
-      });
-      cy.assignInstrumentsToTechnique({
-        instrumentIds: [createdInstrumentId5],
-        techniqueId: result.createTechnique.id,
+      }).then(() => {
+        cy.assignInstrumentsToTechnique({
+          instrumentIds: [createdInstrumentId5],
+          techniqueId: result.createTechnique.id,
+        });
       });
     });
 
+    /*
+    Create proposals and assign techniques to them
+    */
     cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
       if (result.createProposal) {
         createdProposalPk1 = result.createProposal.primaryKey;
@@ -255,11 +454,11 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk1,
           title: proposal1.title,
           abstract: proposal1.abstract,
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk1,
-          techniqueIds: [createdTechniquePk1],
+        }).then(() => {
+          cy.assignProposalToTechniques({
+            proposalPk: createdProposalPk1,
+            techniqueIds: [createdTechniquePk1],
+          });
         });
       }
     });
@@ -272,15 +471,17 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk2,
           title: proposal2.title,
           abstract: proposal2.abstract,
-        });
-
-        cy.submitProposal({ proposalPk: createdProposalPk2 }).then((result) => {
-          createdProposalId2 = result.submitProposal.proposalId;
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk2,
-          techniqueIds: [createdTechniquePk2],
+        }).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk2 })
+            .then((result) => {
+              createdProposalId2 = result.submitProposal.proposalId;
+            })
+            .then(() => {
+              cy.assignProposalToTechniques({
+                proposalPk: createdProposalPk2,
+                techniqueIds: [createdTechniquePk2],
+              });
+            });
         });
       }
     });
@@ -293,20 +494,22 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk3,
           title: proposal3.title,
           abstract: proposal3.abstract,
-        });
-
-        cy.submitProposal({ proposalPk: createdProposalPk3 }).then((result) => {
-          createdProposalId3 = result.submitProposal.proposalId;
-        });
-
-        cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.editableSubmitted.id,
-          proposalPks: [createdProposalPk3],
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk3,
-          techniqueIds: [createdTechniquePk3],
+        }).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk3 })
+            .then((result) => {
+              createdProposalId3 = result.submitProposal.proposalId;
+            })
+            .then(() => {
+              cy.changeProposalsStatus({
+                statusId: submittedStatus.id as number,
+                proposalPks: [createdProposalPk3],
+              }).then(() => {
+                cy.assignProposalToTechniques({
+                  proposalPk: createdProposalPk3,
+                  techniqueIds: [createdTechniquePk3],
+                });
+              });
+            });
         });
       }
     });
@@ -319,15 +522,17 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk4,
           title: proposal4.title,
           abstract: proposal4.abstract,
-        });
-
-        cy.submitProposal({ proposalPk: createdProposalPk4 }).then((result) => {
-          createdProposalId4 = result.submitProposal.proposalId;
-        });
-
-        cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.editableSubmitted.id,
-          proposalPks: [createdProposalPk4],
+        }).then(() => {
+          cy.submitProposal({ proposalPk: createdProposalPk4 })
+            .then((result) => {
+              createdProposalId4 = result.submitProposal.proposalId;
+            })
+            .then(() => {
+              cy.changeProposalsStatus({
+                statusId: submittedStatus.id as number,
+                proposalPks: [createdProposalPk4],
+              });
+            });
         });
       }
     });
@@ -341,16 +546,16 @@ context('Xpress tests', () => {
           proposalPk: createdProposalPk5,
           title: proposal5.title,
           abstract: proposal5.abstract,
-        });
-
-        cy.changeProposalsStatus({
-          statusId: initialDBData.proposalStatuses.expired.id,
-          proposalPks: [createdProposalPk5],
-        });
-
-        cy.assignProposalToTechniques({
-          proposalPk: createdProposalPk5,
-          techniqueIds: [createdTechniquePk5],
+        }).then(() => {
+          cy.changeProposalsStatus({
+            statusId: expiredStatus.id as number,
+            proposalPks: [createdProposalPk5],
+          }).then(() => {
+            cy.assignProposalToTechniques({
+              proposalPk: createdProposalPk5,
+              techniqueIds: [createdTechniquePk5],
+            });
+          });
         });
       }
     });
@@ -425,31 +630,45 @@ context('Xpress tests', () => {
     });
 
     it('Xpress proposals can be filtered by instrument', function () {
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk1, createdProposalPk2],
+        instrumentIds: createdInstrumentId1,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: [createdProposalPk3, createdProposalPk4],
+          instrumentIds: createdInstrumentId2,
+        });
+      });
+
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
 
       cy.contains('Xpress Proposals').click();
 
+      cy.finishedLoading();
+
       cy.get('[data-cy="instrument-filter"]').click();
+
+      // Wait for instruments to load
+      cy.get('ul[role="listbox"]')
+        .should('be.visible')
+        .then(() => {
+          cy.get('ul[role="listbox"] li')
+            .filter('[data-value]:not([data-value="all"])')
+            .should('have.length.greaterThan', 0);
+        });
+
       cy.get('[role="listbox"]').contains(instrument1.name).click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
 
-      cy.get('table.MuiTable-root tbody tr').should(
-        'not.contain',
-        proposal2.title
-      );
+      cy.contains(proposal2.title);
 
       cy.get('table.MuiTable-root tbody tr').should(
         'not.contain',
         proposal3.title
-      );
-
-      cy.get('table.MuiTable-root tbody tr').should(
-        'not.contain',
-        proposal4.title
       );
 
       cy.get('[data-cy="instrument-filter"]').click();
@@ -466,17 +685,16 @@ context('Xpress tests', () => {
       cy.get('[role="listbox"]').contains(instrument2.name).click();
       cy.finishedLoading();
 
-      cy.contains(proposal1.title);
-      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
 
       cy.get('table.MuiTable-root tbody tr').should(
         'not.contain',
-        proposal3.title
+        proposal1.title
       );
 
       cy.get('table.MuiTable-root tbody tr').should(
         'not.contain',
-        proposal4.title
+        proposal2.title
       );
 
       cy.get('[data-cy="instrument-filter"]').click();
@@ -491,12 +709,7 @@ context('Xpress tests', () => {
     it('Xpress proposals can be filtered by call', function () {
       let esiTemplateId: number;
       const esiTemplateName = faker.lorem.words(2);
-      let workflowId: number;
       const currentDayStart = DateTime.now().startOf('day');
-      const proposalWorkflow = {
-        name: faker.lorem.words(2),
-        description: faker.lorem.words(5),
-      };
 
       const newCall = {
         shortCode: 'call 2',
@@ -525,20 +738,11 @@ context('Xpress tests', () => {
         if (result.createTemplate) {
           esiTemplateId = result.createTemplate.templateId;
 
-          cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-            if (result.createProposalWorkflow) {
-              workflowId = result.createProposalWorkflow.id;
-              cy.createCall({
-                ...newCall,
-                esiTemplateId: esiTemplateId,
-                proposalWorkflowId: workflowId,
-              });
-            } else {
-              throw new Error('Workflow creation failed');
-            }
+          cy.createCall({
+            ...newCall,
+            esiTemplateId: esiTemplateId,
+            proposalWorkflowId: callWorkflowId,
           });
-        } else {
-          throw new Error('ESI templete creation failed');
         }
       });
 
@@ -597,7 +801,28 @@ context('Xpress tests', () => {
       cy.contains('Xpress Proposals').click();
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="14"]').click();
+
+      // Ensure the dropdown only contains Xpress statuses
+      cy.get('[role="listbox"] [data-value]').then((options) => {
+        const actualStatuses = [...options].map((option) =>
+          option.innerText.trim()
+        );
+        const expectedStatuses = [
+          'All',
+          draftStatus.name,
+          submittedStatus.name,
+          underReviewStatus.name,
+          approvedStatus.name,
+          unsuccessfulStatus.name,
+          finishedStatus.name,
+          expiredStatus.name,
+        ];
+
+        // Expect the correct order and exact amount of items
+        expect(actualStatuses).to.deep.equal(expectedStatuses);
+      });
+
+      cy.get('[role="listbox"]').contains(submittedStatus.name).click();
 
       cy.finishedLoading();
 
@@ -614,7 +839,7 @@ context('Xpress tests', () => {
       );
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="1"]').click();
+      cy.get('[role="listbox"]').contains(draftStatus.name).click();
 
       cy.finishedLoading();
 
@@ -641,6 +866,11 @@ context('Xpress tests', () => {
     });
 
     it('Xpress proposals can be filtered by multiple filters', function () {
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk2, createdProposalPk3],
+        instrumentIds: createdInstrumentId2,
+      });
+
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -648,7 +878,7 @@ context('Xpress tests', () => {
       cy.contains('Xpress Proposals').click();
 
       cy.get('[data-cy="call-filter"]').click();
-      cy.get('[role="listbox"]').contains('call 1').click();
+      cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -669,40 +899,49 @@ context('Xpress tests', () => {
       cy.get('[role="listbox"]').contains(instrument2.name).click();
       cy.finishedLoading();
 
-      cy.contains(proposal1.title);
       cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
+
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
 
       cy.get('[data-cy="status-filter"]').click();
-      cy.get('[role="listbox"] [data-value="1"]').click();
+      cy.get('[role="listbox"]').contains(submittedStatus.name).click();
 
       cy.finishedLoading();
 
-      cy.contains(proposal1.title);
-      cy.contains(proposal2.title);
+      cy.contains(proposal3.title);
 
-      cy.get('[data-cy="technique-filter"]').click();
-      cy.get('[role="listbox"]').contains(technique1.name).click();
-      cy.finishedLoading();
-
-      cy.contains(proposal1.title);
+      cy.get('table.MuiTable-root tbody tr').should(
+        'not.contain',
+        proposal1.title
+      );
 
       cy.get('table.MuiTable-root tbody tr').should(
         'not.contain',
         proposal2.title
       );
 
+      cy.get('[data-cy="technique-filter"]').click();
+      cy.get('[role="listbox"]').contains(technique3.name).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal3.title);
+
       cy.get('table.MuiTable-root tbody tr').should(
         'not.contain',
-        proposal3.title
+        proposal1.title
       );
 
       cy.get('table.MuiTable-root tbody tr').should(
         'not.contain',
-        proposal4.title
+        proposal2.title
       );
     });
 
-    it('Xpress proposals can be searched for by title, technique, instrument, proposal ID', function () {
+    it('Xpress proposals can be searched for by title and proposal ID', function () {
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -733,20 +972,6 @@ context('Xpress tests', () => {
         'not.contain',
         proposal3.title
       );
-      cy.get('input[aria-label="Search"]').focus().clear();
-
-      // Test with technique name
-      cy.get('input[aria-label="Search"]').focus().type(technique1.name);
-      cy.contains(proposal1.title);
-      cy.get('table.MuiTable-root tbody tr').should(
-        'not.contain',
-        proposal2.title
-      );
-      cy.get('table.MuiTable-root tbody tr').should(
-        'not.contain',
-        proposal3.title
-      );
-      cy.get('input[aria-label="Search"]').focus().clear();
     });
 
     it('Officer should be able to export the proposals into excel', function () {
@@ -810,11 +1035,6 @@ context('Xpress tests', () => {
       cy.contains(proposal1.abstract);
       cy.contains(createdProposalId1);
       cy.contains(technique1.name);
-
-      cy.get('button[role="tab"]').contains('Logs').click({ force: true });
-      cy.contains('PROPOSAL_CREATED');
-      cy.contains('PROPOSAL_UPDATED');
-      cy.contains('PROPOSAL_ASSIGNED_TO_TECHNIQUES');
     });
 
     it('Scientist should be able to use the view proposal option', function () {
@@ -834,6 +1054,52 @@ context('Xpress tests', () => {
       cy.contains(proposal1.abstract);
       cy.contains(createdProposalId1);
       cy.contains(technique1.name);
+    });
+
+    it('Scientist should not see expired proposals', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: expiredStatus.id as number,
+      }).then(() => {
+        cy.login(scientist2);
+        cy.visit('/');
+        cy.finishedLoading();
+
+        cy.contains('Xpress').click();
+        cy.finishedLoading();
+
+        cy.contains(proposal1.title).should('not.exist');
+        cy.contains(proposal2.title).should('exist');
+      });
+    });
+
+    it('Scientist cannot filter by expired status', function () {
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress Proposals').click();
+
+      cy.get('[data-cy="status-filter"]').click();
+
+      // Ensure the dropdown only contains Xpress statuses
+      cy.get('[role="listbox"] [data-value]').then((options) => {
+        const actualStatuses = [...options].map((option) =>
+          option.innerText.trim()
+        );
+        const expectedStatuses = [
+          'All',
+          draftStatus.name,
+          submittedStatus.name,
+          underReviewStatus.name,
+          approvedStatus.name,
+          unsuccessfulStatus.name,
+          finishedStatus.name,
+        ];
+
+        // Expect the correct order and exact amount of items
+        expect(actualStatuses).to.deep.equal(expectedStatuses);
+      });
     });
   });
 
@@ -952,11 +1218,18 @@ context('Xpress tests', () => {
         instrument1.name
       );
       cy.get('[role="listbox"]').contains(instrument1.name).click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
       cy.finishedLoading();
       cy.contains(instrument1.name);
     });
 
     it('Instrument scientist able to select and assign an instrument for a proposal', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: underReviewStatus.id as number,
+      });
+
       /*
       Scientist 1 belongs to technique 1, which only has proposal 1
       */
@@ -986,6 +1259,502 @@ context('Xpress tests', () => {
       cy.get('[role="listbox"]').contains(instrument1.name).click();
       cy.finishedLoading();
       cy.contains(instrument1.name);
+    });
+
+    it('Instrument scientist must be able to add update and remove comment on an xpress proposal', function () {
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-scientist-comment`,
+        faker.lorem.words(10)
+      );
+      cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully created',
+      });
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.setTinyMceContent(
+        `${createdProposalPk1}-scientist-comment`,
+        faker.lorem.words(10)
+      );
+      cy.get('[data-cy="submit-proposal-scientist-comment"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully updated',
+      });
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="delete-proposal-scientist-comment"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Proposal scientist comment successfully deleted',
+      });
+    });
+  });
+
+  describe('Xpress statuses tests', () => {
+    it('User officer can change to/from any Xpress status', function () {
+      cy.login('officer');
+      cy.changeActiveRole(initialDBData.roles.userOfficer);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      /*
+      Check all statuses are visible and not disabled
+      */
+      cy.get('[role="listbox"]')
+        .contains(draftStatus.name)
+        .should('not.be.disabled');
+      cy.get('[role="listbox"]')
+        .contains(submittedStatus.name)
+        .should('not.be.disabled');
+      cy.get('[role="listbox"]')
+        .contains(underReviewStatus.name)
+        .should('not.be.disabled');
+      cy.get('[role="listbox"]')
+        .contains(approvedStatus.name)
+        .should('not.be.disabled');
+      cy.get('[role="listbox"]')
+        .contains(unsuccessfulStatus.name)
+        .should('not.be.disabled');
+      cy.get('[role="listbox"]')
+        .contains(finishedStatus.name)
+        .should('not.be.disabled');
+      cy.get('[role="listbox"]')
+        .contains(expiredStatus.name)
+        .should('not.be.disabled');
+
+      /*
+      Check the dropdown has the exact amount of items in the correct order
+      */
+      cy.get('[role="listbox"] [data-value]').then((options) => {
+        const actualStatuses = [...options].map((option) =>
+          option.innerText.trim()
+        );
+        const expectedOrder = [
+          draftStatus.name,
+          submittedStatus.name,
+          underReviewStatus.name,
+          approvedStatus.name,
+          unsuccessfulStatus.name,
+          finishedStatus.name,
+          expiredStatus.name,
+        ];
+
+        expect(actualStatuses).to.deep.equal(expectedOrder);
+      });
+
+      /*
+      Change the status of proposal 1 from draft -> finished
+      */
+      cy.get('[role="listbox"]')
+        .contains(draftStatus.name)
+        .should('be.selected');
+      cy.get('[role="listbox"]').contains(finishedStatus.name).click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .should('have.text', finishedStatus.name);
+
+      /*
+      Change the status of proposal 1 from finished -> submitted
+      */
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]')
+        .contains(finishedStatus.name)
+        .should('be.selected');
+      cy.get('[role="listbox"]').contains(submittedStatus.name).click();
+
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.notification({ variant: 'success', text: 'successfully' });
+
+      cy.finishedLoading();
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .should('have.text', submittedStatus.name);
+    });
+
+    it('Scientist cannot change status or instrument when the status is draft', function () {
+      /*
+      Status and instrument are uneditable when there is an instrument
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: draftStatus.id as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', draftStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', instrument1.name)
+        .find('[data-cy="instrument-dropdown"]')
+        .should('not.exist');
+
+      /*
+      Status and instrument are uneditable when there is no instrument
+      */
+      cy.removeProposalsFromInstrument({
+        proposalPks: createdProposalPk1,
+      });
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', draftStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .should('not.exist');
+    });
+
+    it('Scientist cannot change status or instrument when the status is finished', function () {
+      /*
+      Status and instrument are uneditable when there is an instrument
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: finishedStatus.id as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', finishedStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+
+      /*
+      Status and instrument are uneditable when there is no instrument
+      */
+      cy.removeProposalsFromInstrument({
+        proposalPks: createdProposalPk1,
+      });
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', finishedStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .should('not.exist');
+    });
+
+    it('Scientist cannot change status or instrument when the status is unsuccessful', function () {
+      /*
+      Status and instrument are uneditable when there is an instrument
+      */
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: unsuccessfulStatus.id as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', unsuccessfulStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', instrument1.name)
+        .find('[data-cy="instrument-dropdown"]')
+        .should('not.exist');
+
+      /*
+      Status and instrument are uneditable when there is no instrument
+      */
+      cy.removeProposalsFromInstrument({
+        proposalPks: createdProposalPk1,
+      });
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', unsuccessfulStatus.name)
+        .find('[data-cy="status-dropdown"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .should('not.exist');
+    });
+
+    it('Scientist can only change to specific statuses and cannot assign an instrument when the current status is submitted', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: submittedStatus.id as number,
+      });
+
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]')
+        .contains(submittedStatus.name)
+        .should('be.selected');
+
+      cy.get('[role="listbox"]').contains(draftStatus.name).should('not.exist');
+
+      cy.get('[role="listbox"]')
+        .contains(underReviewStatus.name)
+        .should('not.be.disabled');
+
+      cy.get('[role="listbox"]')
+        .contains(approvedStatus.name)
+        .should('have.attr', 'aria-disabled', 'true');
+
+      cy.get('[role="listbox"]')
+        .contains(finishedStatus.name)
+        .should('have.attr', 'aria-disabled', 'true');
+
+      cy.get('[role="listbox"]')
+        .contains(unsuccessfulStatus.name)
+        .should('have.attr', 'aria-disabled', 'true');
+
+      cy.get('[role="listbox"]')
+        .contains(expiredStatus.name)
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .should('not.exist');
+    });
+
+    it('Scientist can only change to specific statuses when the current status is under review', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: underReviewStatus.id as number,
+      });
+
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]')
+        .contains(underReviewStatus.name)
+        .should('be.selected');
+
+      /*
+      Without instrument assigned
+      */
+      cy.get('[role="listbox"]').contains(draftStatus.name).should('not.exist');
+
+      // There is no instrument so approved is disabled
+      cy.get('[role="listbox"]')
+        .contains(approvedStatus.name)
+        .should('have.attr', 'aria-disabled', 'true');
+
+      cy.get('[role="listbox"]')
+        .contains(finishedStatus.name)
+        .should('have.attr', 'aria-disabled', 'true');
+
+      cy.get('[role="listbox"]')
+        .contains(unsuccessfulStatus.name)
+        .should('not.be.disabled');
+
+      cy.get('[role="listbox"]')
+        .contains(expiredStatus.name)
+        .should('not.exist');
+
+      /*
+      With instrument assigned
+      */
+      cy.assignProposalsToInstruments({
+        proposalPks: createdProposalPk1,
+        instrumentIds: createdInstrumentId1,
+      });
+
+      cy.reload();
+
+      // Instrument can be changed
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', instrument1.name)
+        .find('[data-cy="instrument-dropdown"]')
+        .should('exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]').contains(draftStatus.name).should('not.exist');
+
+      // Approved is no longer disabled
+      cy.get('[role="listbox"]')
+        .contains(approvedStatus.name)
+        .should('not.be.disabled');
+
+      cy.get('[role="listbox"]')
+        .contains(finishedStatus.name)
+        .should('have.attr', 'aria-disabled', 'true');
+
+      cy.get('[role="listbox"]')
+        .contains(unsuccessfulStatus.name)
+        .should('not.be.disabled');
+
+      cy.get('[role="listbox"]')
+        .contains(expiredStatus.name)
+        .should('not.exist');
+    });
+
+    it('Scientist can only change to specific statuses when the current status is approved', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: approvedStatus.id as number,
+      }).then(() => {
+        cy.assignProposalsToInstruments({
+          proposalPks: createdProposalPk1,
+          instrumentIds: createdInstrumentId1,
+        });
+      });
+
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .should('contain', instrument1.name)
+        .find('[data-cy="instrument-dropdown"]')
+        .should('not.exist');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="status-dropdown"]')
+        .click();
+
+      cy.get('[role="listbox"]')
+        .contains(approvedStatus.name)
+        .should('be.selected');
+
+      cy.get('[role="listbox"]').contains(draftStatus.name).should('not.exist');
+
+      cy.get('[role="listbox"]')
+        .contains(underReviewStatus.name)
+        .should('have.attr', 'aria-disabled', 'true');
+
+      cy.get('[role="listbox"]')
+        .contains(finishedStatus.name)
+        .should('not.be.disabled');
+
+      cy.get('[role="listbox"]')
+        .contains(unsuccessfulStatus.name)
+        .should('not.be.disabled');
+
+      cy.get('[role="listbox"]')
+        .contains(expiredStatus.name)
+        .should('not.exist');
     });
   });
 });
