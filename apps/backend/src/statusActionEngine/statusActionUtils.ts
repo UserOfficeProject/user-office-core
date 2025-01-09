@@ -396,6 +396,38 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
   return ISs;
 };
 
+export const getOtherAndFormatOutputForEmailSending = async (
+  proposals: WorkflowEngineProposalType[],
+  recipientWithTemplate: EmailStatusActionRecipientsWithTemplate,
+  otherEmail: string
+) => {
+  const Others: EmailReadyType[] = [];
+  for (const proposal of proposals) {
+    const Other = new BasicUserDetails(
+      0,
+      '',
+      '',
+      '',
+      '',
+      0,
+      '',
+      new Date(),
+      true,
+      otherEmail,
+      ''
+    );
+
+    await getEmailReadyArrayOfUsersAndProposals(
+      Others,
+      [Other],
+      proposal,
+      recipientWithTemplate
+    );
+  }
+
+  return Others;
+};
+
 export const publishProposalMessageToTheEventBus = async (
   proposal: WorkflowEngineProposalType,
   messageDescription: string,
