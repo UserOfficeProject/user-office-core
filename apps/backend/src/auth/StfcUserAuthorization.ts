@@ -1,5 +1,5 @@
 import { logger } from '@user-office-software/duo-logger';
-import { GraphQLError } from 'graphql';
+import { graphql, GraphQLError } from 'graphql';
 import { injectable, container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -9,7 +9,7 @@ import {
   toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
 import { createUOWSClient } from '../datasources/stfc/UOWSClient';
-import { BasicPersonDetailsDTO, RoleDTO, TokenWrapperDTO } from '../generated';
+import { BasicPersonDetailsDTO, LoginDTO, RoleDTO, TokenWrapperDTO } from '../generated';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
@@ -17,6 +17,7 @@ import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { Cache } from '../utils/Cache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
+import { error } from 'console';
 
 const UOWSClient = createUOWSClient();
 
@@ -165,7 +166,14 @@ export class StfcUserAuthorization extends UserAuthorization {
     token: string,
     _redirecturi: string
   ): Promise<User | null> {
-    const loginBySession = await UOWSClient.sessions.getLoginBySessionId(token);
+    const loginBySession: LoginDTO = await UOWSClient.sessions.getLoginBySessionId(token);
+    if (!loginBySession) {
+      const rethrowMessage =
+        'Failed to fetch user details for STFC external authentication';
+      logger.logWarn(rethrowMessage, {
+        token: token,
+      });
+    }
     const stfcUserTemp: BasicPersonDetailsDTO[] | null =
       await UOWSClient.basicPersonDetails
         .getBasicPersonDetails(undefined, undefined, undefined, [
@@ -198,9 +206,14 @@ export class StfcUserAuthorization extends UserAuthorization {
     // Create dummy user if one does not exist in the proposals DB.
     // This is needed to satisfy the FOREIGN_KEY constraints
     // in tables that link to a user (such as proposals)
-    const userNumber = parseInt(stfcUser!.userNumber);
-    const dummyUser =
-      await this.userDataSource.ensureDummyUserExists(userNumber);
+    let userNumber;
+    let dummyUser;
+    if (stfcUser!.userNumber != null) {
+      userNumber = parseInt(stfcUser!.userNumber);
+      dummyUser = await this.userDataSource.ensureDummyUserExists(userNumber);
+    }else{
+      throw error;
+    }
 
     // With dummyUser created and written (ensureDummyUserExists), info can now
     // be added to it without persisting it to the database, which is not wanted.
@@ -335,15 +348,15 @@ export class StfcUserAuthorization extends UserAuthorization {
 
     return userId
       ? (this.userDataSource as StfcUserDataSource)
-          .getRolesForUser(userId)
-          .then((roles) => {
-            return roles.some(
-              (role) =>
-                role.name === 'Internal proposal submitter' ||
-                role.name === 'ISIS Instrument Scientist' ||
-                role.name === 'User Officer'
-            );
-          })
+        .getRolesForUser(userId)
+        .then((roles) => {
+          return roles.some(
+            (role) =>
+              role.name === 'Internal proposal submitter' ||
+              role.name === 'ISIS Instrument Scientist' ||
+              role.name === 'User Officer'
+          );
+        })
       : false;
   }
 
