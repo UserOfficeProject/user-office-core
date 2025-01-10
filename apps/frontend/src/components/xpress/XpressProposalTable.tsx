@@ -4,7 +4,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Visibility } from '@mui/icons-material';
+import { Info, Visibility } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import {
@@ -289,7 +289,32 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     t: TFunction<'translation', undefined>
   ) => [
     {
-      title: t('instrument'),
+      title: (
+        <>
+          <span>
+            {t('instrument')}
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1. Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
       field: 'instruments.name',
       sorting: false,
       render: (rowData: ProposalViewData) => {
@@ -298,9 +323,14 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = techniques
-          .filter((technique) => techIds?.includes(technique.id))
-          .flatMap((technique) => technique.instruments);
+        const instrumentList = Array.from(
+          new Map(
+            techniques
+              .filter((technique) => techIds?.includes(technique.id))
+              .flatMap((technique) => technique.instruments)
+              .map((instrument) => [instrument.id, instrument])
+          ).values()
+        );
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
@@ -369,7 +399,48 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const statusColumn = () => [
     {
-      title: 'Status',
+      title: (
+        <>
+          <span>
+            Status
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1. Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2. Status can be changed to Unsuccessful, or Approved after
+                    an experimental area is selected.
+                  </p>
+                  <p>
+                    3. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
+                  </p>
+                  <p>
+                    4. Further status changes are not allowed once a proposal is
+                    marked as Unsuccessful.
+                  </p>
+                  <p>
+                    5. Status of Approved proposals can be changed to
+                    Unsuccessful / Finished.
+                  </p>
+                  <p>
+                    6. Finished status can be marked only for Approved
+                    proposals.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
       field: 'statusName',
       sorting: false,
       render: (rowData: ProposalViewData) => {
@@ -530,7 +601,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           text,
           referenceNumbers,
           dateFilter,
-          excludeProposalStatusIds,
         } = proposalFilter;
 
         const result: {
@@ -548,7 +618,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
-              excludeProposalStatusIds: excludeProposalStatusIds,
+              excludeProposalStatusIds:
+                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
             sortField: orderBy?.orderByField,
             sortDirection: orderBy?.orderDirection,
@@ -565,14 +636,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalReviews: proposal.technicalReviews?.map(
-                    (technicalReview) => ({
-                      ...technicalReview,
-                      status: getTranslation(
-                        technicalReview.status as ResourceId
-                      ),
-                    })
-                  ),
                   finalStatus: getTranslation(
                     proposal.finalStatus as ResourceId
                   ),

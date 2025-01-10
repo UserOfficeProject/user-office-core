@@ -225,9 +225,8 @@ export class StfcUserAuthorization extends UserAuthorization {
 
     // Auto-assign users to instruments.
     // This will happen if the user is an instrument scientist for an STFC facility
-    const stfcRoles: RoleDTO[] | null = await UOWSClient.role.getRolesForUser(
-      userNumber.toString()
-    );
+    const stfcRoles: RoleDTO[] | null =
+      await this.userDataSource.getRolesForUser(userNumber);
 
     if (stfcRoles) {
       // The UOWS sometimes returns duplicate roles. We remove them here
@@ -347,7 +346,7 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
 
     return userId
-      ? (this.userDataSource as StfcUserDataSource)
+      ? this.userDataSource
         .getRolesForUser(userId)
         .then((roles) => {
           return roles.some(

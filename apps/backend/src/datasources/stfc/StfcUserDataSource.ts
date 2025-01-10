@@ -152,10 +152,15 @@ export class StfcUserDataSource implements UserDataSource {
     StfcUserDataSource.userDetailsCacheSecondsToLive
   ).enableStatsLogging('uowsSearchableBasicUserDetailsCache');
 
-  private uowsRolesCache = new Cache<Promise<Role[]>>(
+  private uopRolesCache = new Cache<Promise<Role[]>>(
     StfcUserDataSource.rolesCacheMaxElements,
     StfcUserDataSource.rolesCacheSecondsToLive
-  ).enableStatsLogging('uowsRolesCache');
+  ).enableStatsLogging('uopRolesCache');
+
+  private stfcRolesCache = new Cache<Promise<RoleDTO[]>>(
+    StfcUserDataSource.rolesCacheMaxElements,
+    StfcUserDataSource.rolesCacheSecondsToLive
+  ).enableStatsLogging('stfcRolesCache');
 
   private async getStfcBasicPersonByUserNumber(
     userNumber: string,
@@ -350,64 +355,72 @@ export class StfcUserDataSource implements UserDataSource {
     throw new Error('Method not implemented.');
   }
   async getRolesForUser(id: number): Promise<RoleDTO[]> {
-    return await UOWSClient.role.getRolesForUser(id.toString());
+    const cachedRoles = this.stfcRolesCache.get(String(id));
+    if (cachedRoles) {
+      return cachedRoles;
+    }
+    
+    const stfcRawRolesRequest = UOWSClient.role.getRolesForUser(id.toString());
+
+    this.stfcRolesCache.put(String(id), stfcRawRolesRequest);
+
+    return stfcRawRolesRequest;
   }
+
   async getUserRoles(id: number): Promise<Role[]> {
-    const cachedRoles = this.uowsRolesCache.get(String(id));
+    const cachedRoles = this.uopRolesCache.get(String(id));
     if (cachedRoles) {
       return cachedRoles;
     }
 
-    const stfcRolesRequest = UOWSClient.role
-      .getRolesForUser(id.toString())
-      .then((stfcRoles) =>
-        this.getRoles().then((roleDefinitions) => {
-          const userRole: Role | undefined = roleDefinitions.find(
-            (role) => role.shortCode == Roles.USER
-          );
-          if (!userRole) {
-            return [];
-          }
+    const stfcRawRolesRequest = this.getRolesForUser(id);
 
-          if (!stfcRoles || stfcRoles.length == 0) {
-            return [userRole];
-          }
+    const stfcRolesRequest = stfcRawRolesRequest.then((stfcRoles) => {
+      return this.getRoles().then((roleDefinitions) => {
+        const userRole: Role | undefined = roleDefinitions.find(
+          (role) => role.shortCode == Roles.USER
+        );
+        if (!userRole) {
+          return [];
+        }
 
-          /*
-           * Convert the STFC roles to the Roles enums which refers to roles
-           * by short code. We will use the short code to filter relevant
-           * roles.
-           */
-          const userRolesAsEnum: Roles[] = stfcRoles
-            .flatMap(
-              (stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name!]
-            )
-            .filter((r) => r !== undefined) as Roles[];
+        if (!stfcRoles || stfcRoles.length == 0) {
+          return [userRole];
+        }
 
-          /*
-           * Filter relevant roles by short code.
-           */
-          const userRolesAsRole: Role[] = userRolesAsEnum
-            .map((r) => roleDefinitions.find((d) => d.shortCode === r))
-            .filter((r) => r !== undefined) as Role[];
+        /*
+         * Convert the STFC roles to the Roles enums which refers to roles
+         * by short code. We will use the short code to filter relevant
+         * roles.
+         */
+        const userRolesAsEnum: Roles[] = stfcRoles
+          .flatMap((stfcRole) => stfcRolesToEssRoleDefinitions[stfcRole.name!])
+          .filter((r) => r !== undefined) as Roles[];
 
-          /*
-           * We can't return non-unique roles.
-           */
-          const uniqueRoles: Role[] = [...new Set(userRolesAsRole)];
+        /*
+         * Filter relevant roles by short code.
+         */
+        const userRolesAsRole: Role[] = userRolesAsEnum
+          .map((r) => roleDefinitions.find((d) => d.shortCode === r))
+          .filter((r) => r !== undefined) as Role[];
 
-          uniqueRoles.sort((a, b) => a.id - b.id);
+        /*
+         * We can't return non-unique roles.
+         */
+        const uniqueRoles: Role[] = [...new Set(userRolesAsRole)];
 
-          /*
-           * Prepend the user role as it must be first.
-           */
-          const userRoles = [userRole, ...uniqueRoles];
+        uniqueRoles.sort((a, b) => a.id - b.id);
 
-          return userRoles;
-        })
-      );
+        /*
+         * Prepend the user role as it must be first.
+         */
+        const userRoles = [userRole, ...uniqueRoles];
 
-    this.uowsRolesCache.put(String(id), stfcRolesRequest);
+        return userRoles;
+      });
+    });
+
+    this.uopRolesCache.put(String(id), stfcRolesRequest);
 
     return stfcRolesRequest;
   }
