@@ -1,7 +1,6 @@
 import { Role, Roles } from '../../models/Role';
 import { dummyUser } from '../mockups/UserDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
-import { createUOWSClient } from './UOWSClient';
 
 jest.mock('../postgres/UserDataSource.ts');
 jest.mock('../../utils/Cache');
@@ -201,7 +200,8 @@ describe('Role tests', () => {
 describe('Email search tests', () => {
   const userdataSource = new StfcUserDataSource();
 
-  const mockedClient = createUOWSClient();
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const mockedClient = require('./UOWSClient').createUOWSClient();
 
   const mockGetSearchableBasicPersonDetailsFromEmail = jest.spyOn(
     mockedClient.basicPersonDetails,
@@ -259,7 +259,9 @@ describe('Email search tests', () => {
 
 describe('Searchable user tests', () => {
   const userDataSource = new StfcUserDataSource();
-  const mockedClient = createUOWSClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const mockedClient = require('./UOWSClient').createUOWSClient();
 
   const mockGetSearchableBasicPeople = jest.spyOn(
     mockedClient.basicPersonDetails,

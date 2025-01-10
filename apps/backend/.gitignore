@@ -5,6 +5,7 @@ coverage
 .DS_Store
 downloads
 uploads
+src/generated
 
 .idea
 
