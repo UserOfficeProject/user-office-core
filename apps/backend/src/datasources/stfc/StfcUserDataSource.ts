@@ -359,7 +359,7 @@ export class StfcUserDataSource implements UserDataSource {
     if (cachedRoles) {
       return cachedRoles;
     }
-    
+
     const stfcRawRolesRequest = UOWSClient.role.getRolesForUser(id.toString());
 
     this.stfcRolesCache.put(String(id), stfcRawRolesRequest);

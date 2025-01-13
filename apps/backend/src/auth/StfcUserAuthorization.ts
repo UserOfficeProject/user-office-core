@@ -1,5 +1,7 @@
+import { error } from 'console';
+
 import { logger } from '@user-office-software/duo-logger';
-import { graphql, GraphQLError } from 'graphql';
+import { GraphQLError } from 'graphql';
 import { injectable, container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -9,7 +11,12 @@ import {
   toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
 import { createUOWSClient } from '../datasources/stfc/UOWSClient';
-import { BasicPersonDetailsDTO, LoginDTO, RoleDTO, TokenWrapperDTO } from '../generated';
+import {
+  BasicPersonDetailsDTO,
+  LoginDTO,
+  RoleDTO,
+  TokenWrapperDTO,
+} from '../generated';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
@@ -17,7 +24,6 @@ import { AuthJwtPayload, User, UserWithRole } from '../models/User';
 import { Cache } from '../utils/Cache';
 import { StfcUserDataSource } from './../datasources/stfc/StfcUserDataSource';
 import { UserAuthorization } from './UserAuthorization';
-import { error } from 'console';
 
 const UOWSClient = createUOWSClient();
 
@@ -166,7 +172,8 @@ export class StfcUserAuthorization extends UserAuthorization {
     token: string,
     _redirecturi: string
   ): Promise<User | null> {
-    const loginBySession: LoginDTO = await UOWSClient.sessions.getLoginBySessionId(token);
+    const loginBySession: LoginDTO =
+      await UOWSClient.sessions.getLoginBySessionId(token);
     if (!loginBySession) {
       const rethrowMessage =
         'Failed to fetch user details for STFC external authentication';
@@ -211,7 +218,7 @@ export class StfcUserAuthorization extends UserAuthorization {
     if (stfcUser!.userNumber != null) {
       userNumber = parseInt(stfcUser!.userNumber);
       dummyUser = await this.userDataSource.ensureDummyUserExists(userNumber);
-    }else{
+    } else {
       throw error;
     }
 
@@ -346,9 +353,7 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
 
     return userId
-      ? this.userDataSource
-        .getRolesForUser(userId)
-        .then((roles) => {
+      ? this.userDataSource.getRolesForUser(userId).then((roles) => {
           return roles.some(
             (role) =>
               role.name === 'Internal proposal submitter' ||
