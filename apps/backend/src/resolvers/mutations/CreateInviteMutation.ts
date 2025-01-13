@@ -13,10 +13,11 @@ import { InviteCode } from '../types/Invite';
 
 @InputType()
 export class ClaimsInput {
-  @Field(() => [Int!])
+  @Field(() => [Int!], { nullable: true })
   roleIds?: number[];
 
-  // TODO: Add more fields here such as co-proposer proposal id
+  @Field(() => Int, { nullable: true })
+  coProposerProposalId?: number;
 }
 
 @InputType()
@@ -24,8 +25,8 @@ export class CreateInviteInput {
   @Field(() => String)
   email: string;
 
-  @Field(() => String)
-  note: string;
+  @Field(() => String, { nullable: true })
+  note?: string;
 
   @Field(() => ClaimsInput)
   claims: ClaimsInput;

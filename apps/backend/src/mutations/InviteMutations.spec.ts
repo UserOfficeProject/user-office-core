@@ -2,12 +2,14 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CoProposerInviteDataSourceMock } from '../datasources/mockups/CoProposerInviteDataSource';
 import { InviteCodesDataSourceMock } from '../datasources/mockups/InviteCodesDataSource';
 import { RoleInviteDataSourceMock } from '../datasources/mockups/RoleInviteDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { InviteCode } from '../models/InviteCode';
 import InviteMutations from './InviteMutations';
 
 const inviteMutations = container.resolve(InviteMutations);
@@ -19,6 +21,11 @@ describe('Test Invite Mutations', () => {
       .init();
     container
       .resolve<RoleInviteDataSourceMock>(Tokens.RoleInviteDataSource)
+      .init();
+    container
+      .resolve<CoProposerInviteDataSourceMock>(
+        Tokens.CoProposerInviteDataSource
+      )
       .init();
   });
 
@@ -104,5 +111,29 @@ describe('Test Invite Mutations', () => {
         email: updatedEmail,
       })
     ).resolves.toHaveProperty('reason', 'INSUFFICIENT_PERMISSIONS');
+  });
+
+  test('A user can create an invite for co-proposer', async () => {
+    const email = 'test@example.com';
+    const proposalPk = 1;
+
+    const invite = (await inviteMutations.create(dummyUserWithRole, {
+      email,
+      note: 'Test note',
+      claims: {
+        roleIds: [1],
+        coProposerProposalId: proposalPk,
+      },
+    })) as InviteCode;
+
+    const coProposerInvite = await container
+      .resolve<CoProposerInviteDataSourceMock>(
+        Tokens.CoProposerInviteDataSource
+      )
+      .findByInviteCodeId(invite.id);
+
+    expect(coProposerInvite).toMatchObject([
+      { inviteCodeId: invite.id, proposalPk },
+    ]);
   });
 });

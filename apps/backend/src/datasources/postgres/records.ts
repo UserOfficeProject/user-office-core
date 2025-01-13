@@ -8,6 +8,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
+import { CoProposerInvite } from '../../models/CoProposerInvite';
 import { Country } from '../../models/Country';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
@@ -1451,3 +1452,16 @@ export interface RoleInviteRecord {
 
 export const createRoleInviteObject = (invite: RoleInviteRecord) =>
   new RoleInvite(invite.role_invite_id, invite.invite_code_id, invite.role_id);
+
+export interface CoProposerInviteRecord {
+  readonly co_proposer_invite_id: number;
+  readonly invite_code_id: number;
+  readonly proposal_pk: number;
+}
+
+export const createCoProposerInviteRecord = (invite: CoProposerInviteRecord) =>
+  new CoProposerInvite(
+    invite.co_proposer_invite_id,
+    invite.invite_code_id,
+    invite.proposal_pk
+  );

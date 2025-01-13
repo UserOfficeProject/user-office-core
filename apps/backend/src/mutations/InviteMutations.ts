@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CoProposerInviteDataSource } from '../datasources/CoProposerInviteDataSource';
 import { InviteCodeDataSource } from '../datasources/InviteCodeDataSource';
 import { RoleInviteDataSource } from '../datasources/RoleInviteDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
@@ -19,24 +20,27 @@ export default class InviteMutations {
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
     @inject(Tokens.RoleInviteDataSource)
-    private roleInviteDataSource: RoleInviteDataSource
+    private roleInviteDataSource: RoleInviteDataSource,
+    @inject(Tokens.CoProposerInviteDataSource)
+    private coProposerInviteDataSource: CoProposerInviteDataSource
   ) {}
 
-  @Authorized([Roles.USER_OFFICER])
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
   ): Promise<InviteCode | Rejection> {
     // Create Code
-    const newCode = Math.random().toString(36).substr(2, 10).toUpperCase();
+    const newCode = Math.random().toString(36).substring(2, 12).toUpperCase();
     const newInvite = await this.inviteDataSource.create(
       agent!.id,
       newCode,
       args.email
     );
 
-    await this.replaceRoleInvites(newInvite.id, args.claims.roleIds);
-    // TODO: add more claims to the invite such as "co-proposer"
+    const { roleIds, coProposerProposalId } = args.claims;
+
+    await this.setRoleInvites(newInvite.id, roleIds);
+    await this.setCoProposerInvites(newInvite.id, coProposerProposalId);
 
     return newInvite;
   }
@@ -69,12 +73,12 @@ export default class InviteMutations {
   @Authorized([Roles.USER_OFFICER])
   async update(user: UserWithRole | null, input: UpdateInviteInput) {
     const updatedInvite = await this.inviteDataSource.update(input);
-    await this.replaceRoleInvites(updatedInvite.id, input.claims?.roleIds);
+    await this.setRoleInvites(updatedInvite.id, input.claims?.roleIds);
 
     return updatedInvite;
   }
 
-  private async replaceRoleInvites(
+  private async setRoleInvites(
     inviteCodeId: number,
     roleIds: number[] | undefined
   ) {
@@ -85,6 +89,12 @@ export default class InviteMutations {
     for await (const roleId of roleIds) {
       await this.roleInviteDataSource.create(inviteCodeId, roleId);
     }
+  }
+
+  private async setCoProposerInvites(invCodeId: number, proposalPk?: number) {
+    if (!proposalPk) return;
+
+    return this.coProposerInviteDataSource.create(invCodeId, proposalPk);
   }
 
   private async acceptRoleInvites(claimerUserId: number, inviteCodeId: number) {

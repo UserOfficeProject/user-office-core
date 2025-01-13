@@ -6,6 +6,7 @@ import 'reflect-metadata';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
+import { CoProposerInviteDataSourceMock } from '../datasources/mockups/CoProposerInviteDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
@@ -49,6 +50,7 @@ import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
+mapClass(Tokens.CoProposerInviteDataSource, CoProposerInviteDataSourceMock);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);
 mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);

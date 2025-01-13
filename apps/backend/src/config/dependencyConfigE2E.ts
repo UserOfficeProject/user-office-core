@@ -5,6 +5,7 @@ import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
+import PostgresCoProposerInviteDataSource from '../datasources/postgres/CoProposerInviteDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
@@ -55,6 +56,7 @@ import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSource);
+mapClass(Tokens.CoProposerInviteDataSource, PostgresCoProposerInviteDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);

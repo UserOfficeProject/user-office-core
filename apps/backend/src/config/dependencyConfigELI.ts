@@ -4,6 +4,7 @@ import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
+import PostgresCoProposerInviteDataSource from '../datasources/postgres/CoProposerInviteDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
@@ -57,6 +58,7 @@ import { mapClass, mapValue } from './utils';
 const isProduction = process.env.NODE_ENV === 'production';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
+mapClass(Tokens.CoProposerInviteDataSource, PostgresCoProposerInviteDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);

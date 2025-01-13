@@ -5,6 +5,7 @@ import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
+import PostgresCoProposerInviteDataSource from '../datasources/postgres/CoProposerInviteDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
@@ -55,6 +56,7 @@ import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
+mapClass(Tokens.CoProposerInviteDataSource, PostgresCoProposerInviteDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);

@@ -5,6 +5,7 @@ export const Tokens = {
   CallDataSource: Symbol('CallDataSource'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
+  CoProposerInviteDataSource: Symbol('CoProposerInviteDataSource'),
   EmailEventHandler: Symbol('EmailEventHandler'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
