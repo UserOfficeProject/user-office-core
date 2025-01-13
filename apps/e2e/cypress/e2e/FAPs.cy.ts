@@ -3747,7 +3747,7 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 });
 
-context('Fap meeting exports test', () => {
+context.only('Fap meeting exports test', () => {
   let createdInstrumentId: number;
   let proposalPK: number;
 
@@ -3816,6 +3816,7 @@ context('Fap meeting exports test', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            publicComment: comment1,
             questionaryId: 0,
           });
 
@@ -3869,6 +3870,7 @@ context('Fap meeting exports test', () => {
           submitted: true,
           reviewerId: 0,
           instrumentId: createdInstrumentId,
+          publicComment: comment2,
           questionaryId: 0,
         });
 
