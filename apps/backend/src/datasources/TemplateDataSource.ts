@@ -17,7 +17,10 @@ import { DeleteQuestionTemplateRelationArgs } from '../resolvers/mutations/templ
 import { SetActiveTemplateArgs } from '../resolvers/mutations/template/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../resolvers/mutations/template/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../resolvers/mutations/template/UpdateTemplateMutation';
-import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
+import {
+  AllQuestionsFilterArgs,
+  QuestionsFilter,
+} from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 import { ConflictResolution } from '../resolvers/types/ConflictResolution';
 import { TemplateGroup } from '../resolvers/types/TemplateGroup';
@@ -64,6 +67,9 @@ export interface TemplateDataSource {
   deleteQuestion(questionId: string): Promise<Question>;
   getComplementaryQuestions(templateId: number): Promise<Question[] | null>;
   getQuestions(filter?: QuestionsFilter): Promise<Question[]>;
+  getAllQuestions(
+    args: AllQuestionsFilterArgs
+  ): Promise<{ totalCount: number; questions: Question[] }>;
   getQuestionsInTemplate(templateId: number): Promise<Question[]>;
 
   // TemplateField rel
