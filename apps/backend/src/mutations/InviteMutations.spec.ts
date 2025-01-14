@@ -122,7 +122,7 @@ describe('Test Invite Mutations', () => {
       note: 'Test note',
       claims: {
         roleIds: [1],
-        coProposerProposalId: proposalPk,
+        coProposerProposalPk: proposalPk,
       },
     })) as InviteCode;
 

@@ -15,6 +15,7 @@ import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
 import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
+
 @injectable()
 export default class InviteMutations {
   constructor(
@@ -34,6 +35,8 @@ export default class InviteMutations {
     private proposalAuth: ProposalAuthorization
   ) {}
 
+  @Authorized()
+  // @ValidateArgs(createInviteValidationSchema)
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
@@ -55,10 +58,10 @@ export default class InviteMutations {
     );
 
     // Update database
-    const { roleIds, coProposerProposalId } = args.claims;
+    const { roleIds, coProposerProposalPk } = args.claims;
 
     await this.setRoleInvites(newInvite.id, roleIds);
-    await this.setCoProposerInvites(newInvite.id, coProposerProposalId);
+    await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
 
     return newInvite;
   }
@@ -90,6 +93,7 @@ export default class InviteMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
+  // @ValidateArgs(updateInviteValidationSchema)
   async update(user: UserWithRole | null, input: UpdateInviteInput) {
     // Authorize request
     if (
@@ -103,7 +107,7 @@ export default class InviteMutations {
     await this.setRoleInvites(updatedInvite.id, input.claims?.roleIds);
     await this.setCoProposerInvites(
       updatedInvite.id,
-      input.claims?.coProposerProposalId
+      input.claims?.coProposerProposalPk
     );
 
     return updatedInvite;

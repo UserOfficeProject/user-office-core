@@ -17,7 +17,7 @@ export class ClaimsInput {
   roleIds?: number[];
 
   @Field(() => Int, { nullable: true })
-  coProposerProposalId?: number;
+  coProposerProposalPk?: number;
 }
 
 @InputType()
