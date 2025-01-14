@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -32,7 +33,9 @@ export default class InviteMutations {
     @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.InviteAuthorization)
+    private inviteAuth: InviteAuthorization
   ) {}
 
   @Authorized()
@@ -41,12 +44,28 @@ export default class InviteMutations {
     agent: UserWithRole | null,
     args: CreateInviteInput
   ): Promise<InviteCode | Rejection> {
-    // Authorize request
-    if (
-      !this.userAuth.isUserOfficer(agent) &&
-      !this.userAuth.isMemberOfFap(agent)
-    ) {
-      return rejection('User is not authorized to create invites');
+    const { roleIds, coProposerProposalPk } = args.claims;
+
+    const isRoleClaimAuthorized = await this.inviteAuth.isRoleInviteAuthorized(
+      agent,
+      roleIds
+    );
+    if (isRoleClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to create invites to this user type',
+        { userId: agent?.id, roleIds }
+      );
+    }
+
+    const isCoProposerClaimAuthorized =
+      coProposerProposalPk === undefined ||
+      (await this.proposalAuth.isMemberOfProposal(agent, coProposerProposalPk));
+
+    if (isCoProposerClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to create invites to this proposal',
+        { userId: agent?.id, proposalPk: coProposerProposalPk }
+      );
     }
 
     // Create Code
@@ -58,8 +77,6 @@ export default class InviteMutations {
     );
 
     // Update database
-    const { roleIds, coProposerProposalPk } = args.claims;
-
     await this.setRoleInvites(newInvite.id, roleIds);
     await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
 
@@ -94,20 +111,36 @@ export default class InviteMutations {
 
   @Authorized([Roles.USER_OFFICER])
   // @ValidateArgs(updateInviteValidationSchema)
-  async update(user: UserWithRole | null, input: UpdateInviteInput) {
-    // Authorize request
-    if (
-      !this.userAuth.isUserOfficer(user) &&
-      !this.userAuth.isMemberOfFap(user)
-    ) {
-      return rejection('User is not authorized to create invites');
+  async update(agent: UserWithRole | null, args: UpdateInviteInput) {
+    const { roleIds, coProposerProposalPk } = args.claims ?? {};
+
+    const isRoleClaimAuthorized = await this.inviteAuth.isRoleInviteAuthorized(
+      agent,
+      roleIds
+    );
+    if (isRoleClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to update invites to this user type',
+        { userId: agent?.id, roleIds }
+      );
     }
 
-    const updatedInvite = await this.inviteDataSource.update(input);
-    await this.setRoleInvites(updatedInvite.id, input.claims?.roleIds);
+    const isCoProposerClaimAuthorized =
+      coProposerProposalPk === undefined ||
+      (await this.proposalAuth.isMemberOfProposal(agent, coProposerProposalPk));
+
+    if (isCoProposerClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to update invites to this proposal',
+        { userId: agent?.id, proposalPk: coProposerProposalPk }
+      );
+    }
+
+    const updatedInvite = await this.inviteDataSource.update(args);
+    await this.setRoleInvites(updatedInvite.id, args.claims?.roleIds);
     await this.setCoProposerInvites(
       updatedInvite.id,
-      input.claims?.coProposerProposalPk
+      args.claims?.coProposerProposalPk
     );
 
     return updatedInvite;
