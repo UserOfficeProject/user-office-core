@@ -269,7 +269,9 @@ export class StfcUserDataSource implements UserDataSource {
             undefined
           )
     )
-      .then((response: BasicPersonDetailsDTO[]) => toStfcBasicPersonDetails(response[0]))
+      .then((response: BasicPersonDetailsDTO[]) =>
+        toStfcBasicPersonDetails(response[0])
+      )
       .then((stfcUser: StfcBasicPersonDetails | null) => {
         if (!stfcUser) {
           return undefined;
