@@ -38,7 +38,7 @@ ________________________________________________________________________________
 
     - **Active:** Checking this box will set the FAP as active. This means that it can be assigned to calls and proposals. 
 
-* This will open the FAP page in which settings can be changed. 
+* This will open the FAP page in which settings can be chaklihnged. 
 
 The FAP page will open where you may edit the following information:
 
