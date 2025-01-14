@@ -1,3 +1,7 @@
+import {
+  createInviteValidationSchema,
+  updateInviteValidationSchema,
+} from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
@@ -9,7 +13,7 @@ import { InviteCodeDataSource } from '../datasources/InviteCodeDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleInviteDataSource } from '../datasources/RoleInviteDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import { InviteCode } from '../models/InviteCode';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
@@ -39,7 +43,7 @@ export default class InviteMutations {
   ) {}
 
   @Authorized()
-  // @ValidateArgs(createInviteValidationSchema)
+  @ValidateArgs(createInviteValidationSchema)
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
@@ -68,7 +72,6 @@ export default class InviteMutations {
       );
     }
 
-    // Create Code
     const newCode = Math.random().toString(36).substring(2, 12).toUpperCase();
     const newInvite = await this.inviteDataSource.create(
       agent!.id,
@@ -76,7 +79,6 @@ export default class InviteMutations {
       args.email
     );
 
-    // Update database
     await this.setRoleInvites(newInvite.id, roleIds);
     await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
 
@@ -110,7 +112,7 @@ export default class InviteMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  // @ValidateArgs(updateInviteValidationSchema)
+  @ValidateArgs(updateInviteValidationSchema)
   async update(agent: UserWithRole | null, args: UpdateInviteInput) {
     const { roleIds, coProposerProposalPk } = args.claims ?? {};
 
