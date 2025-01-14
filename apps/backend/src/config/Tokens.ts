@@ -14,6 +14,7 @@ export const Tokens = {
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
   InstrumentDataSource: Symbol('InstrumentDataSource'),
   InviteCodeDataSource: Symbol('InviteCodeDataSource'),
+  InviteAuthorization: Symbol('InviteAuthorization'),
   TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   MailService: Symbol('MailService'),

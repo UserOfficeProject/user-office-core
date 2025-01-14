@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import 'reflect-metadata';
 
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
@@ -67,6 +68,7 @@ mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
 mapClass(Tokens.InviteCodeDataSource, PostgresInviteCodesDataSource);
 mapClass(Tokens.RoleInviteDataSource, PostgresRoleInviteDataSource);
+mapClass(Tokens.InviteAuthorization, InviteAuthorization);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
