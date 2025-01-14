@@ -6,6 +6,7 @@ import {
   Resolver,
   Root,
   Ctx,
+  Arg,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -126,8 +127,12 @@ export class FapResolvers {
   @FieldResolver(() => Int)
   async proposalCurrentCount(
     @Root() fap: Fap,
-    @Ctx() context: ResolverContext
+    @Ctx() context: ResolverContext,
+    @Arg('callId', () => Int, { nullable: true }) callId: number | null
   ) {
-    return context.queries.fap.dataSource.getCurrentFapProposalCount(fap.id);
+    return context.queries.fap.dataSource.getCurrentFapProposalCount(
+      fap.id,
+      callId
+    );
   }
 }

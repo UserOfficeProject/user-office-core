@@ -29,7 +29,7 @@ type FapAssignedReviewersTableProps = {
     assignedReviewer: FapProposalAssignmentType,
     proposalPk: number
   ) => Promise<void>;
-  updateView: (proposalPk: number) => Promise<void>;
+  updateView: () => void;
 };
 
 const assignmentColumns = [
@@ -138,7 +138,7 @@ const FapAssignedReviewersTable = ({
 
       return searchParams;
     });
-    openProposalPk && updateView(openProposalPk);
+    openProposalPk && updateView();
     setOpenProposalPk(null);
   };
 
@@ -201,7 +201,7 @@ const FapAssignedReviewersTable = ({
             setFapAssignmentsWithIdAndFormattedDate(
               fapAssignmentsWithUpdatedRank
             );
-            updateView(rankReviewer?.proposal as number);
+            updateView();
           }}
           currentRank={rankReviewer?.rank}
           totalReviewers={fapProposal.assignments?.length ?? 0}

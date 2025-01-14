@@ -303,7 +303,9 @@ export default class PostgresFapDataSource implements FapDataSource {
 
   async getFapProposals(
     fapId: number,
-    callId: number | null
+    callId: number | null,
+    first: number | null,
+    offset: number | null
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
@@ -320,8 +322,11 @@ export default class PostgresFapDataSource implements FapDataSource {
             this.where('ps.name', 'ilike', 'FAP_%');
           });
 
-        if (callId) {
-          query.andWhere('fp.call_id', callId);
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
         }
       })
       .where('fp.fap_id', fapId)
@@ -371,14 +376,19 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getCurrentFapProposalCount(fapId: number): Promise<number> {
+  async getCurrentFapProposalCount(
+    fapId: number,
+    callId: number
+  ): Promise<number> {
     const callFilter = {
       isFapReviewEnded: false,
     };
 
-    const callIds = (await this.callDataSource.getCalls(callFilter)).map(
-      (call) => call.id
-    );
+    const callIds = callId
+      ? (await this.callDataSource.getCall(callId))?.callFapReviewEnded
+        ? []
+        : [callId]
+      : (await this.callDataSource.getCalls(callFilter)).map((call) => call.id);
 
     return database('fap_proposals as fp')
       .join('proposals as p', { 'p.proposal_pk': 'fp.proposal_pk' })

@@ -71,13 +71,21 @@ export interface FapDataSource {
     userId: number,
     proposalPk: number
   ): Promise<boolean>;
-  getFapProposals(fapId: number, callId: number | null): Promise<FapProposal[]>;
+  getFapProposals(
+    fapId: number,
+    callId: number | null,
+    first: number | null,
+    offset: number | null
+  ): Promise<FapProposal[]>;
   getFapUsersByProposalPkAndCallId(
     proposalPk: number,
     callId: number
   ): Promise<BasicUserDetails[]>;
   getFapProposalCount(fapId: number): Promise<number>;
-  getCurrentFapProposalCount(fapId: number): Promise<number>;
+  getCurrentFapProposalCount(
+    fapId: number,
+    callId: number | null
+  ): Promise<number>;
   getFapReviewerProposalCount(reviewerId: number): Promise<number>;
   getCurrentFapReviewerProposalCount(reviewerId: number): Promise<number>;
   getFapProposal(

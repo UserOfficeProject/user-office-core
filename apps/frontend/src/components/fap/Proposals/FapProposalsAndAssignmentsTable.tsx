@@ -1,10 +1,14 @@
-import { Action, Column } from '@material-table/core';
+import MaterialTableCore, {
+  Action,
+  Column,
+  Query,
+  QueryResult,
+} from '@material-table/core';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { IconButton, Tooltip, Typography } from '@mui/material';
-import { DateTime } from 'luxon';
 import { useSnackbar } from 'notistack';
 import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +36,6 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
-  useFapProposalsData,
   FapProposalType,
   FapProposalAssignmentType,
 } from 'hooks/fap/useFapProposalsData';
@@ -171,19 +174,29 @@ const FapProposalsAndAssignmentsTable = ({
   selectedCallId,
   confirm,
 }: FapProposalsAndAssignmentsTableProps) => {
+  const tableRef = React.useRef<MaterialTableCore<FapProposalType>>();
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
 
-  const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
-    useFapProposalsData(data.id, selectedCallId);
+  // const { FapProposalsData, setFapProposalsData } = useFapProposalsData(
+  //   data.id,
+  //   selectedCallId
+  // );
   const { api } = useDataApiWithFeedback();
   const [proposalPks, setProposalPks] = useState<number[]>([]);
+  const [selectedFapProposals, setSelectedFapProposals] = useState<
+    FapProposalType[]
+  >([]);
   const downloadPDFProposal = useDownloadPDFProposal();
   const { toFormattedDateTime } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { enqueueSnackbar } = useSnackbar();
   const { featuresMap } = useContext(FeatureContext);
+
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
+  };
 
   const isUseConflictOfInterestWarningEnabled = featuresMap.get(
     FeatureId.CONFLICT_OF_INTEREST_WARNING
@@ -248,14 +261,15 @@ const FapProposalsAndAssignmentsTable = ({
       fapIds: [data.id],
     });
 
-    setFapProposalsData((fapProposalData) =>
-      fapProposalData.filter((proposalItem) =>
-        proposalsToRemove.every(
-          (proposalToRemove) =>
-            proposalToRemove.proposalPk !== proposalItem.proposalPk
-        )
-      )
-    );
+    refreshTableData();
+    // setFapProposalsData((fapProposalData) =>
+    //   fapProposalData.filter((proposalItem) =>
+    //     proposalsToRemove.every(
+    //       (proposalToRemove) =>
+    //         proposalToRemove.proposalPk !== proposalItem.proposalPk
+    //     )
+    //   )
+    // );
   };
 
   const handleAssignMembersToFapProposals = async (
@@ -270,6 +284,8 @@ const FapProposalsAndAssignmentsTable = ({
       (proposalToAssign) => proposalToAssign.proposalPk
     );
     setProposalPks(proposalPksToAssign);
+    setSelectedFapProposals(proposalsToAssign);
+    console.log(selectedFapProposals);
   };
 
   const handleBulkRemoveProposalsFromFap = async (
@@ -286,13 +302,15 @@ const FapProposalsAndAssignmentsTable = ({
   };
 
   const assignMembersToFapProposals = async (
-    assignedMembers: FapAssignedMember[]
+    assignedMembers: FapAssignedMember[],
+    selectedProposals: FapProposalType[]
   ) => {
-    if (proposalPks.length === 0) {
+    if (selectedProposals.length === 0) {
       return;
     }
+    const proposalPks = selectedProposals.map((fp) => fp.proposalPk);
 
-    const existingProposalAssignments = FapProposalsData.flatMap(
+    const existingProposalAssignments = selectedProposals.flatMap(
       (assignment) => assignment.assignments
     );
 
@@ -342,6 +360,7 @@ const FapProposalsAndAssignmentsTable = ({
     });
 
     setProposalPks([]);
+    setSelectedFapProposals([]);
 
     const allProposalReviews: ProposalReview[] = [];
 
@@ -364,52 +383,7 @@ const FapProposalsAndAssignmentsTable = ({
       return;
     }
 
-    setFapProposalsData((fapProposalData) => {
-      const proposalAssignmentsPks = proposalAssignments.map(
-        (proposalAssignment) => proposalAssignment.proposalPk
-      );
-      const updatedMembersValues = Array.from(updatedMembers);
-
-      return fapProposalData.map((proposalItem) => {
-        if (proposalAssignmentsPks.includes(proposalItem.proposalPk)) {
-          const newlyAssignedFapMemberIds = proposalAssignments
-            .filter(
-              (proposalAssignment) =>
-                proposalAssignment.proposalPk === proposalItem.proposalPk
-            )
-            .map((proposalAssignment) => proposalAssignment.memberId);
-          const newlyAssignedFapMembers = updatedMembersValues.filter(
-            (updatedMember) =>
-              newlyAssignedFapMemberIds.includes(updatedMember.id)
-          );
-
-          const newAssignments: FapProposalAssignmentType[] = [
-            ...(proposalItem.assignments ?? []),
-            ...newlyAssignedFapMembers.map(({ role = null, ...user }) => ({
-              proposalPk: proposalItem.proposalPk,
-              fapMemberUserId: user.id,
-              dateAssigned: DateTime.now(),
-              user,
-              role,
-              rank: null,
-              review:
-                allProposalReviews.find(
-                  (review) =>
-                    review.userID === user.id &&
-                    review.proposalPk === proposalItem.proposalPk
-                ) ?? null,
-            })),
-          ];
-
-          return {
-            ...proposalItem,
-            assignments: newAssignments,
-          };
-        } else {
-          return proposalItem;
-        }
-      });
-    });
+    refreshTableData();
 
     onAssignmentsUpdate({
       ...data,
@@ -440,12 +414,9 @@ const FapProposalsAndAssignmentsTable = ({
   };
 
   const handleMemberAssignmentToFapProposals = (
-    memberUsers: FapAssignedMember[]
+    memberUsers: FapAssignedMember[],
+    selectedProposals: FapProposalType[]
   ) => {
-    const selectedProposals = FapProposalsData.filter((fapProposal) =>
-      proposalPks.includes(fapProposal.proposalPk)
-    );
-
     if (selectedProposals.length === 0) {
       return;
     }
@@ -561,25 +532,28 @@ const FapProposalsAndAssignmentsTable = ({
     }
 
     if (shouldShowWarning) {
-      confirm(() => assignMembersToFapProposals(memberUsers), {
-        title: `${t('Fap')} reviewers assignment`,
-        description: ' ',
-        shouldEnableOKWithAlert: true,
-        alertText: (
-          <>
-            Some of the selected reviewers are already part of the proposal(s)
-            as a PI/Co-proposer or belong to the same institution{' '}
-            <strong>{alertText}</strong>
-            {`Are you sure you want to assign all selected users to the ${t('Fap')} proposal(s)?`}
-          </>
-        ),
-      })();
+      confirm(
+        () => assignMembersToFapProposals(memberUsers, selectedProposals),
+        {
+          title: `${t('Fap')} reviewers assignment`,
+          description: ' ',
+          shouldEnableOKWithAlert: true,
+          alertText: (
+            <>
+              Some of the selected reviewers are already part of the proposal(s)
+              as a PI/Co-proposer or belong to the same institution{' '}
+              <strong>{alertText}</strong>
+              {`Are you sure you want to assign all selected users to the ${t('Fap')} proposal(s)?`}
+            </>
+          ),
+        }
+      )();
     } else {
-      assignMembersToFapProposals(memberUsers);
+      assignMembersToFapProposals(memberUsers, selectedProposals);
     }
   };
 
-  const initialValues: FapProposalType[] = FapProposalsData;
+  // const initialValues: FapProposalType[] = FapProposalsData;
   const tableActions: Action<FapProposalType>[] = [];
   hasRightToAssignReviewers &&
     tableActions.push({
@@ -603,6 +577,8 @@ const FapProposalsAndAssignmentsTable = ({
       position: 'toolbarOnSelect',
     });
 
+  console.log(tableActions.length);
+
   const ReviewersTable = React.useCallback(
     ({ rowData }: Record<'rowData', FapProposalType>) => {
       const removeAssignedReviewer = async (
@@ -617,25 +593,26 @@ const FapProposalsAndAssignmentsTable = ({
           memberId: assignedReviewer.fapMemberUserId as number,
         });
 
-        setFapProposalsData((fapProposalData) =>
-          fapProposalData.map((proposalItem) => {
-            if (proposalItem.proposalPk === proposalPk) {
-              const newAssignments =
-                proposalItem.assignments?.filter(
-                  (oldAssignment) =>
-                    oldAssignment.fapMemberUserId !==
-                    assignedReviewer.fapMemberUserId
-                ) || [];
+        refreshTableData();
+        // setFapProposalsData((fapProposalData) =>
+        //   fapProposalData.map((proposalItem) => {
+        //     if (proposalItem.proposalPk === proposalPk) {
+        //       const newAssignments =
+        //         proposalItem.assignments?.filter(
+        //           (oldAssignment) =>
+        //             oldAssignment.fapMemberUserId !==
+        //             assignedReviewer.fapMemberUserId
+        //         ) || [];
 
-              return {
-                ...proposalItem,
-                assignments: newAssignments,
-              };
-            } else {
-              return proposalItem;
-            }
-          })
-        );
+        //       return {
+        //         ...proposalItem,
+        //         assignments: newAssignments,
+        //       };
+        //     } else {
+        //       return proposalItem;
+        //     }
+        //   })
+        // );
 
         onAssignmentsUpdate({
           ...data,
@@ -662,37 +639,6 @@ const FapProposalsAndAssignmentsTable = ({
         });
       };
 
-      const loadFapProposal = async (proposalPk: number) => {
-        return api()
-          .getFapProposal({ fapId: data.id, proposalPk })
-          .then((data) => {
-            return data.fapProposal;
-          });
-      };
-
-      const updateFapProposalAssignmentsView = async (proposalPk: number) => {
-        const refreshedFapProposal = await loadFapProposal(proposalPk);
-
-        if (refreshedFapProposal) {
-          setFapProposalsData((fapProposalsData) => {
-            return fapProposalsData.map((fapProposal) => ({
-              ...fapProposal,
-              proposal: {
-                ...fapProposal.proposal,
-                status:
-                  refreshedFapProposal.proposalPk === fapProposal.proposalPk
-                    ? refreshedFapProposal.proposal.status
-                    : fapProposal.proposal.status,
-              },
-              assignments:
-                refreshedFapProposal.proposalPk === fapProposal.proposalPk
-                  ? refreshedFapProposal.assignments
-                  : fapProposal.assignments,
-            }));
-          });
-        }
-      };
-
       return (
         <FapAssignedReviewersTable
           fapProposal={rowData}
@@ -700,26 +646,44 @@ const FapProposalsAndAssignmentsTable = ({
             .map((user) => user.id)
             .concat(data.fapSecretaries.map((user) => user.id))}
           removeAssignedReviewer={removeAssignedReviewer}
-          updateView={updateFapProposalAssignmentsView}
+          updateView={refreshTableData}
         />
       );
     },
-    [setFapProposalsData, data, onAssignmentsUpdate, api]
+    [data, onAssignmentsUpdate, api]
   );
 
-  const FapProposalsWitIdAndFormattedDate = initialValues.map((fapProposal) =>
-    Object.assign(fapProposal, {
-      id: fapProposal.proposalPk,
-      rowActionButtons: RowActionButtons(fapProposal),
-      dateAssignedFormatted: toFormattedDateTime(fapProposal.dateAssigned),
-    })
-  );
+  const fetchRemoteData = (tableQuery: Query<FapProposalType>) =>
+    new Promise<QueryResult<FapProposalType>>(async (resolve, reject) => {
+      try {
+        const result = await api().getFapProposals({
+          fapId: data.id,
+          callId: selectedCallId,
+          first: tableQuery.pageSize,
+          offset: tableQuery.page * tableQuery.pageSize,
+        });
 
-  const maxPageLength = FapProposalsWitIdAndFormattedDate.length;
-
-  const pageSizeOptions = [5, 10, 20, maxPageLength]
-    .sort((a, b) => a - b)
-    .filter((n) => n <= maxPageLength);
+        resolve({
+          data: result.fapProposals
+            ? result.fapProposals.map((fapProposal) =>
+                Object.assign(fapProposal, {
+                  id: fapProposal.proposalPk,
+                  rowActionButtons: RowActionButtons(fapProposal),
+                  dateAssignedFormatted: toFormattedDateTime(
+                    fapProposal.dateAssigned
+                  ),
+                })
+              )
+            : [],
+          page: tableQuery.page,
+          totalCount: result.fap?.proposalCurrentCount
+            ? result.fap?.proposalCurrentCount
+            : 0,
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
 
   return (
     <>
@@ -748,11 +712,14 @@ const FapProposalsAndAssignmentsTable = ({
       <AssignFapMemberToProposalModal
         proposalPks={proposalPks}
         setProposalPks={setProposalPks}
+        selectedFapProposals={selectedFapProposals}
+        setSelectedFapProposal={setSelectedFapProposals}
         fapId={data.id}
         assignMembersToFapProposals={handleMemberAssignmentToFapProposals}
       />
       <div data-cy="fap-assignments-table">
         <MaterialTable
+          tableRef={tableRef}
           icons={tableIcons}
           columns={FapProposalColumns}
           title={
@@ -760,8 +727,8 @@ const FapProposalsAndAssignmentsTable = ({
               {`${data.code} - ${t('Fap')} Proposals`}
             </Typography>
           }
-          data={FapProposalsWitIdAndFormattedDate}
-          isLoading={loadingFapProposals}
+          data={fetchRemoteData}
+          // isLoading={loadingFapProposals}
           localization={{
             toolbar: {
               nRowsSelected: '{0} proposal(s) selected',
@@ -777,8 +744,8 @@ const FapProposalsAndAssignmentsTable = ({
           options={{
             search: true,
             selection: true,
-            pageSize: Math.min(10, maxPageLength),
-            pageSizeOptions: pageSizeOptions,
+            // pageSize: Math.min(10, maxPageLength),
+            // pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
               inputProps: {
                 'aria-label': 'Select all rows',

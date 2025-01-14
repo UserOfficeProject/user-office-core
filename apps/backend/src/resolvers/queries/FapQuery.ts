@@ -12,6 +12,8 @@ export class FapQuery {
     @Arg('id', () => Int) id: number,
     @Ctx() context: ResolverContext
   ): Promise<Fap | null> {
+    console.log('FAP basic info query');
+
     return context.queries.fap.get(context.user, id);
   }
 
@@ -35,9 +37,16 @@ export class FapQuery {
   async fapProposals(
     @Arg('fapId', () => Int) fapId: number,
     @Arg('callId', () => Int, { nullable: true }) callId: number | null,
+    @Arg('first', () => Int, { nullable: true }) first: number | null,
+    @Arg('offset', () => Int, { nullable: true }) offset: number | null,
     @Ctx() context: ResolverContext
   ): Promise<FapProposal[] | null> {
-    return context.queries.fap.getFapProposals(context.user, { fapId, callId });
+    return context.queries.fap.getFapProposals(context.user, {
+      fapId,
+      callId,
+      first,
+      offset,
+    });
   }
 
   @Query(() => FapProposal, { nullable: true })
