@@ -63,6 +63,7 @@ export default class InviteMutations {
 
     const isCoProposerClaimAuthorized =
       coProposerProposalPk === undefined ||
+      this.userAuth.isUserOfficer(agent) ||
       (await this.proposalAuth.isMemberOfProposal(agent, coProposerProposalPk));
 
     if (isCoProposerClaimAuthorized === false) {
