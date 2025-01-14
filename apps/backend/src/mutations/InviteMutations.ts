@@ -1,8 +1,11 @@
 import { inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CoProposerInviteDataSource } from '../datasources/CoProposerInviteDataSource';
 import { InviteCodeDataSource } from '../datasources/InviteCodeDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleInviteDataSource } from '../datasources/RoleInviteDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
@@ -19,16 +22,30 @@ export default class InviteMutations {
     private inviteDataSource: InviteCodeDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
     @inject(Tokens.RoleInviteDataSource)
     private roleInviteDataSource: RoleInviteDataSource,
     @inject(Tokens.CoProposerInviteDataSource)
-    private coProposerInviteDataSource: CoProposerInviteDataSource
+    private coProposerInviteDataSource: CoProposerInviteDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
   ): Promise<InviteCode | Rejection> {
+    // Authorize request
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !this.userAuth.isMemberOfFap(agent)
+    ) {
+      return rejection('User is not authorized to create invites');
+    }
+
     // Create Code
     const newCode = Math.random().toString(36).substring(2, 12).toUpperCase();
     const newInvite = await this.inviteDataSource.create(
@@ -37,6 +54,7 @@ export default class InviteMutations {
       args.email
     );
 
+    // Update database
     const { roleIds, coProposerProposalId } = args.claims;
 
     await this.setRoleInvites(newInvite.id, roleIds);
@@ -44,6 +62,7 @@ export default class InviteMutations {
 
     return newInvite;
   }
+
   @Authorized()
   async accept(
     agent: UserWithRole | null,
@@ -59,7 +78,7 @@ export default class InviteMutations {
     }
 
     await this.acceptRoleInvites(agent!.id, inviteCode.id);
-    // TODO: accept more claims in the invite such as "co-proposer"
+    await this.acceptCoProposerInvites(agent!.id, inviteCode.id);
 
     await this.inviteDataSource.update({
       id: inviteCode.id,
@@ -72,8 +91,20 @@ export default class InviteMutations {
 
   @Authorized([Roles.USER_OFFICER])
   async update(user: UserWithRole | null, input: UpdateInviteInput) {
+    // Authorize request
+    if (
+      !this.userAuth.isUserOfficer(user) &&
+      !this.userAuth.isMemberOfFap(user)
+    ) {
+      return rejection('User is not authorized to create invites');
+    }
+
     const updatedInvite = await this.inviteDataSource.update(input);
     await this.setRoleInvites(updatedInvite.id, input.claims?.roleIds);
+    await this.setCoProposerInvites(
+      updatedInvite.id,
+      input.claims?.coProposerProposalId
+    );
 
     return updatedInvite;
   }
@@ -116,5 +147,39 @@ export default class InviteMutations {
         });
       }
     }
+  }
+
+  private async acceptCoProposerInvites(
+    claimerUserId: number,
+    inviteCodeId: number
+  ) {
+    const coProposerInvites =
+      await this.coProposerInviteDataSource.findByInviteCodeId(inviteCodeId);
+
+    if (coProposerInvites.length === 0) {
+      return;
+    }
+
+    for await (const coProposerInvite of coProposerInvites) {
+      const proposalHasUser = await this.proposalHasUser(
+        coProposerInvite.proposalPk,
+        claimerUserId
+      );
+      if (proposalHasUser) {
+        continue;
+      }
+
+      await this.proposalDataSource.addProposalUser(
+        coProposerInvite.proposalPk,
+        claimerUserId
+      );
+    }
+  }
+
+  private async proposalHasUser(proposalPk: number, userId: number) {
+    const proposalUsers =
+      await this.userDataSource.getProposalUsers(proposalPk);
+
+    return proposalUsers.some((user) => user.id === userId);
   }
 }
