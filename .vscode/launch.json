@@ -1,14 +1,24 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
       {
-        "name": "Attach to Docker container",
-        "type": "node",
-        "request": "attach",
-        "port": 9229,
-        "protocol": "inspector",
-        "localRoot": "${workspaceFolder}/apps/backend",
-        "remoteRoot": "/app"
+          "name": "Debug on chrome",
+          "request": "launch",
+          "type": "pwa-chrome",
+          "url": "http://localhost:3000",
+          "webRoot": "${workspaceFolder}"
+      },
+      {
+          "name": "Attach to Windows Docker container",
+          "type": "node",
+          "request": "attach",
+          "port": 9229,
+          "protocol": "inspector",
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "C:\\app"
       }
-    ]
-  }
+  ]
+}
