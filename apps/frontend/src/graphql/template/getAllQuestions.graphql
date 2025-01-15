@@ -1,0 +1,35 @@
+query getAllQuestions(
+  $filter: AllQuestionsFilter 
+  $first: Int
+  $offset: Int
+  $sortField: String
+  $sortDirection: String
+  $searchText: String
+) {
+  allQuestions(
+    filter: $filter
+    first: $first
+    offset: $offset
+    sortField: $sortField
+    sortDirection: $sortDirection
+    searchText: $searchText
+  ) {
+    questions{
+      id
+      question
+      naturalKey
+      dataType
+      categoryId
+      config {
+        ...fieldConfig
+      }
+      answers {
+        questionaryId
+      }
+      templates {
+        templateId
+      }
+    }
+    totalCount
+  }
+}
