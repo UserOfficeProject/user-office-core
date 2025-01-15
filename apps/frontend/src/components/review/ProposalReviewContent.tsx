@@ -14,9 +14,7 @@ import ProposalAdmin, {
 } from 'components/proposal/ProposalAdmin';
 import { UserContext } from 'context/UserContextProvider';
 import {
-  CoreTechnicalReviewFragment,
   InstrumentWithManagementTime,
-  Proposal,
   Review,
   TechnicalReview,
   UserRole,
@@ -28,8 +26,8 @@ import {
 } from 'hooks/proposal/useProposalData';
 
 import ProposalReviewContainer from './ProposalReviewContainer';
-import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
+import TechnicalReviewContainer from './TechnicalReviewContainer';
 import TechnicalReviewInformation from './TechnicalReviewInformation';
 import InternalReviews from '../internalReview/InternalReviews';
 
@@ -149,7 +147,7 @@ const ProposalReviewContent = ({
               }}
             />
           )}
-          <ProposalTechnicalReview
+          {/* <ProposalTechnicalReview
             proposal={proposalData as Proposal}
             data={technicalReview}
             setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
@@ -167,7 +165,10 @@ const ProposalReviewContent = ({
                   }) || null,
               })
             }
-          />
+          /> */}
+          <TechnicalReviewContainer
+            technicalReviewId={technicalReview.id}
+          ></TechnicalReviewContainer>
         </Fragment>
       ) : (
         <TechnicalReviewInformation data={technicalReview as TechnicalReview} />

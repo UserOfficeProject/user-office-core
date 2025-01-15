@@ -1,4 +1,5 @@
 import {
+  Arg,
   Args,
   ArgsType,
   Ctx,
@@ -58,6 +59,16 @@ class TechnicalReviewsQueryResult {
 
 @Resolver()
 export class TechnicalReviewsQuery {
+  @Query(() => TechnicalReview, { nullable: true })
+  technicalReview(
+    @Arg('technicalReviewId', () => Int) technicalReviewId: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.technicalReview.get(context.user, {
+      technicalReviewId,
+    });
+  }
+
   @Query(() => TechnicalReviewsQueryResult, { nullable: true })
   async technicalReviews(
     @Args() args: TechnicalReviewsArgs,

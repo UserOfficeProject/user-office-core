@@ -13,7 +13,7 @@ import {
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
-import { useTechnicalReviewsData } from 'hooks/technicalReview/useTechnicalReviewData';
+import { useTechnicalReviewsData } from 'hooks/technicalReview/useTechnicalReviewsData';
 import { tableIcons } from 'utils/materialIcons';
 
 import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';

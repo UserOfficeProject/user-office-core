@@ -25,10 +25,11 @@ export const technicalReviewBasisDefinition: QuestionaryComponentDefinition = {
     const technicalReviewState = state as TechnicalReviewSubmissionState;
 
     return {
-      status: technicalReviewState.technicalReview.status || false,
-      timeAllocation: technicalReviewState.technicalReview.timeAllocation || 0,
+      status: technicalReviewState.technicalReview.status || null,
+      timeAllocation: technicalReviewState.technicalReview.timeAllocation || '',
       comment: technicalReviewState.technicalReview.comment || '',
       publicComment: technicalReviewState.technicalReview.publicComment || '',
+      files: technicalReviewState.technicalReview.files || [],
     };
   },
 };

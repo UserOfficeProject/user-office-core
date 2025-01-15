@@ -28,8 +28,10 @@ export const technicalReviewQuestionaryDefinition: QuestionaryDefinition = {
     api: Sdk,
     itemId: number
   ): Promise<ItemWithQuestionary | null> {
-    return api.getReview({ reviewId: itemId }).then(({ review }) => {
-      return review;
-    });
+    return api
+      .getTechnicalReview({ technicalReviewId: itemId })
+      .then(({ technicalReview }) => {
+        return technicalReview;
+      });
   },
 };

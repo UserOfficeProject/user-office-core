@@ -8,7 +8,7 @@ export const createTechnicalReviewBasisValidationSchema: QuestionaryComponentDef
     const TECHNICAL_REVIEW_COMMENT_CHAR_LIMIT = 6000;
     const TECHNICAL_REVIEW_PUBLIC_COMMENT_CHAR_LIMIT = 6000;
 
-    const statusSchema = Yup.number().required('Status is required');
+    const statusSchema = Yup.object().required('Status is required');
 
     const timeAllocationSchema = Yup.number().min(
       1,

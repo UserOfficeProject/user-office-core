@@ -19,6 +19,24 @@ export default class TechnicalReviewQueries {
     @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource
   ) {}
 
+  @Authorized()
+  async get(
+    agent: UserWithRole | null,
+    { technicalReviewId }: { technicalReviewId: number }
+  ): Promise<TechnicalReview | null> {
+    const technicalReview =
+      await this.dataSource.getTechnicalReviewById(technicalReviewId);
+    if (!technicalReview) {
+      return null;
+    }
+
+    if (await this.technicalReviewAuth.hasReadRights(agent, technicalReview)) {
+      return technicalReview;
+    } else {
+      return null;
+    }
+  }
+
   @Authorized([Roles.USER_OFFICER])
   async getAll(
     agent: UserWithRole | null,
