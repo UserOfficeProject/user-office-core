@@ -43,7 +43,7 @@ ________________________________________________________________________________
     * [**How do I clone proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-clone-proposal-templates)
     * [**How do I archive and unarchive proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-archive-and-unarchive-proposal-templates)
     * [**How do I import and export proposal templates?**](user-guide/user-officer/templates/proposal_template.md#how-do-i-import-and-export-proposal-templates)
-    * [**What does #proposals and #calls mean on proposal templates?**](user-guide/user-officer/templates/proposal_template.md#what-does-calls-mean-on-proposal-templates)
+    * [**What do #proposals and #calls mean on proposal templates?**](user-guide/user-officer/templates/proposal_template.md#what-does-calls-mean-on-proposal-templates)
 
 ??? info "**Sample declaration templates**"
     ### **Sample declaration templates**
@@ -61,17 +61,17 @@ ________________________________________________________________________________
     ### **Visit registration templates**
     * [**What are visit registration templates?**](user-guide/user-officer/templates/visit_template.md#what-are-visit-registration-templates)
 
-??? info "**Proposal Experiment Safety Input (ESI) templates**"
+??? info "**Proposal experiment safety input (ESI) templates**"
     ### **Proposal ESI templates**
-    * [**What are proposal ESI templates**](user-guide/user-officer/templates/proposalESI_template.md#what-are-proposal-esi-templates)
+    * [**What are proposal ESI templates?**](user-guide/user-officer/templates/proposalESI_template.md#what-are-proposal-esi-templates)
 
-??? info "**Sample Experiment Safety Input (ESI) templates**"
+??? info "**Sample experiment safety input (ESI) templates**"
     ### **Sample ESI templates**
     * [**What are sample ESI templates?**](user-guide/user-officer/templates/sampleESI_template.md#what-are-sample-esi-templates)
 
 ??? info "**Feedback templates**"
     ### **Feedback templates**
-    * [**What are feedback templates**](user-guide/user-officer/templates/feedback_template.md#what-are-feedback-templates)
+    * [**What are feedback templates?**](user-guide/user-officer/templates/feedback_template.md#what-are-feedback-templates)
     * [**How do I mark a feedback template as active?**](user-guide/user-officer/templates/feedback_template.md#how-to-mark-a-feedback-template-as-active)
     * [**How do I create feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-create-feedback-templates)
     * [**How do I edit feedback templates?**](user-guide/user-officer/templates/feedback_template.md#how-do-i-edit-feedback-templates)
