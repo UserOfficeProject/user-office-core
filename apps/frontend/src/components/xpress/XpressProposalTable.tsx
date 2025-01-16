@@ -4,7 +4,7 @@ import MaterialTableCore, {
   Query,
   QueryResult,
 } from '@material-table/core';
-import { Visibility } from '@mui/icons-material';
+import { Info, Visibility } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import {
@@ -47,6 +47,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import ProposalScientistComment from './ProposalScientistComment';
 import { useXpressInstrumentsData } from './useXpressInstrumentsData';
 import XpressNotice from './XpressNotice';
 import XpressProposalFilterBar from './XpressProposalFilterBar';
@@ -189,10 +190,17 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     );
   };
 
+  const cellStyleSpecs = {
+    whiteSpace: 'nowrap',
+    maxWidth: '400px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  };
+
   let columns: Column<ProposalViewData>[] = [
     {
       title: 'Actions',
-      cellStyle: { padding: 0, minWidth: 120 },
+      cellStyle: { minWidth: 120 },
       sorting: false,
       removable: false,
       field: 'rowActionButtons',
@@ -206,6 +214,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Title',
       field: 'title',
       ...{ width: 'auto' },
+      cellStyle: cellStyleSpecs,
     },
     {
       title: 'Principal Investigator',
@@ -222,6 +231,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         return '';
       },
+      cellStyle: cellStyleSpecs,
       customFilterAndSearch: () => true,
     },
     {
@@ -234,7 +244,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
       title: 'Date submitted',
       field: 'submittedDate',
       render: (proposalView: ProposalViewData) => {
-        return toFormattedDateTime(proposalView.submittedDate);
+        if (proposalView.submittedDate) {
+          return toFormattedDateTime(proposalView.submittedDate);
+        }
       },
       ...{ width: 'auto' },
     },
@@ -277,7 +289,32 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     t: TFunction<'translation', undefined>
   ) => [
     {
-      title: t('instrument'),
+      title: (
+        <>
+          <span>
+            {t('instrument')}
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1. Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
       field: 'instruments.name',
       sorting: false,
       render: (rowData: ProposalViewData) => {
@@ -286,12 +323,19 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = techniques
-          .filter((technique) => techIds?.includes(technique.id))
-          .flatMap((technique) => technique.instruments);
+        const instrumentList = Array.from(
+          new Map(
+            techniques
+              .filter((technique) => techIds?.includes(technique.id))
+              .flatMap((technique) => technique.instruments)
+              .map((instrument) => [instrument.id, instrument])
+          ).values()
+        );
         const fieldValue = rowData.instruments?.map(
           (instrument) => instrument.id
         )[0];
+
+        const selectedValue: number | undefined = fieldValue ? fieldValue : 0;
 
         const selectedStatus = proposalStatuses.find(
           (ps) => ps.name === rowData.statusName
@@ -299,6 +343,14 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
         const shouldBeUneditable =
           !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
+
+        // Always show the current instrument at the top of the dropdown
+        instrumentList.forEach(function (instrument, i) {
+          if (fieldValue && instrument.id === fieldValue) {
+            instrumentList.splice(i, 1);
+            instrumentList.unshift(instrument);
+          }
+        });
 
         return shouldBeUneditable ? (
           instrumentList.find((i) => i.id === fieldValue)?.name
@@ -327,7 +379,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     )();
                   }
                 }}
-                value={fieldValue}
+                value={selectedValue}
                 data-cy="instrument-dropdown"
               >
                 {instrumentList &&
@@ -347,7 +399,48 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const statusColumn = () => [
     {
-      title: 'Status',
+      title: (
+        <>
+          <span>
+            Status
+            <Tooltip
+              title={
+                <span>
+                  <p>Tips: </p>
+                  <p>
+                    1. Change the status of a proposal to Under Review to enable
+                    experimental area selection.
+                  </p>
+                  <p>
+                    2. Status can be changed to Unsuccessful, or Approved after
+                    an experimental area is selected.
+                  </p>
+                  <p>
+                    3. Once a proposal is marked as Approved / Unsuccessful /
+                    Finished, the selected experimental area cannot be changed.
+                  </p>
+                  <p>
+                    4. Further status changes are not allowed once a proposal is
+                    marked as Unsuccessful.
+                  </p>
+                  <p>
+                    5. Status of Approved proposals can be changed to
+                    Unsuccessful / Finished.
+                  </p>
+                  <p>
+                    6. Finished status can be marked only for Approved
+                    proposals.
+                  </p>
+                </span>
+              }
+            >
+              <IconButton>
+                <Info />
+              </IconButton>
+            </Tooltip>
+          </span>
+        </>
+      ),
       field: 'statusName',
       sorting: false,
       render: (rowData: ProposalViewData) => {
@@ -486,6 +579,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           rowData.techniques?.map((technique) => technique.name)
         ),
       customFilterAndSearch: () => true,
+      cellStyle: cellStyleSpecs,
     },
   ];
 
@@ -507,7 +601,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           text,
           referenceNumbers,
           dateFilter,
-          excludeProposalStatusIds,
         } = proposalFilter;
 
         const result: {
@@ -525,7 +618,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               text: text,
               referenceNumbers: referenceNumbers,
               dateFilter: dateFilter,
-              excludeProposalStatusIds: excludeProposalStatusIds,
+              excludeProposalStatusIds:
+                currentRole === UserRole.INSTRUMENT_SCIENTIST ? [9] : [], // Hide expired from scientists
             },
             sortField: orderBy?.orderByField,
             sortDirection: orderBy?.orderDirection,
@@ -542,14 +636,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalReviews: proposal.technicalReviews?.map(
-                    (technicalReview) => ({
-                      ...technicalReview,
-                      status: getTranslation(
-                        technicalReview.status as ResourceId
-                      ),
-                    })
-                  ),
                   finalStatus: getTranslation(
                     proposal.finalStatus as ResourceId
                   ),
@@ -622,11 +708,15 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   };
 
   const handleSearchChange = (searchText: string) => {
-    setSearchParams({
-      search: searchText ? searchText : '',
-      page: searchText ? '0' : page || '',
-    });
+    searchParams.set('search', searchText ? searchText : '');
+    searchParams.set('page', searchText ? '0' : page || '');
   };
+  const XpressTablePanelDetails = React.useCallback(
+    ({ rowData }: Record<'rowData', ProposalViewData>) => {
+      return <ProposalScientistComment proposalPk={rowData.primaryKey} />;
+    },
+    []
+  );
 
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
   const downloadXLSXProposal = useDownloadXLSXProposal();
@@ -688,7 +778,6 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const userOfficerProposalReviewTabs = [
     PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    PROPOSAL_MODAL_TAB_NAMES.LOGS,
   ];
 
   return (
@@ -836,7 +925,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
                   setAllProposalSelectionLoading(false);
                 },
-                position: 'toolbarOnSelect',
+                position: 'toolbar',
               },
             ]}
             onSelectionChange={(selectedItems) => {
@@ -855,11 +944,15 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             onOrderCollectionChange={handleSortOrderChange}
             onSearchChange={handleSearchChange}
             onPageChange={(page, pageSize) => {
-              setSearchParams({
-                page: page.toString(),
-                pageSize: pageSize.toString(),
-              });
+              searchParams.set('page', page.toString());
+              searchParams.set('pageSize', pageSize.toString());
             }}
+            detailPanel={[
+              {
+                tooltip: 'Show comment',
+                render: XpressTablePanelDetails,
+              },
+            ]}
             localization={{
               toolbar: {
                 nRowsSelected: `${selection.length} row(s) selected`,

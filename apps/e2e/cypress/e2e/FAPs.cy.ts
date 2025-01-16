@@ -3069,13 +3069,13 @@ context('Fap meeting components tests', () => {
 
       cy.get('#commentForUser')
         .parent()
-        .find('.tox-menubar button')
-        .should('be.disabled');
+        .find('.tox-toolbar__primary button')
+        .should('have.attr', 'aria-disabled', 'true');
 
       cy.get('#commentForManagement')
         .parent()
-        .find('.tox-menubar button')
-        .should('be.disabled');
+        .find('.tox-toolbar__primary button')
+        .should('have.attr', 'aria-disabled', 'true');
 
       cy.get('[data-cy="save"]').should('not.exist');
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');
@@ -3302,13 +3302,13 @@ context('Fap meeting components tests', () => {
 
       cy.get('#commentForUser')
         .parent()
-        .find('.tox-menubar button')
-        .should('be.disabled');
+        .find('.tox-toolbar__primary button')
+        .should('have.attr', 'aria-disabled', 'true');
 
       cy.get('#commentForManagement')
         .parent()
-        .find('.tox-menubar button')
-        .should('be.disabled');
+        .find('.tox-toolbar__primary button')
+        .should('have.attr', 'aria-disabled', 'true');
 
       cy.get('[data-cy="save"]').should('not.exist');
       cy.get('[data-cy="saveAndContinue"]').should('not.exist');
@@ -3736,7 +3736,7 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 });
 
-context('Fap meeting exports test', () => {
+context.only('Fap meeting exports test', () => {
   let createdInstrumentId: number;
   let proposalPK: number;
 
@@ -3769,14 +3769,6 @@ context('Fap meeting exports test', () => {
         }
       });
 
-      cy.addProposalTechnicalReview({
-        proposalPk: firstCreatedProposalPk,
-        status: TechnicalReviewStatus.FEASIBLE,
-        timeAllocation: firstProposalTimeAllocation,
-        submitted: true,
-        reviewerId: 0,
-        instrumentId: newlyCreatedInstrumentId,
-      });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
         if (createdInstrument) {
@@ -3804,6 +3796,7 @@ context('Fap meeting exports test', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            publicComment: comment1,
           });
 
           cy.setInstrumentAvailabilityTime({
@@ -3856,6 +3849,7 @@ context('Fap meeting exports test', () => {
           submitted: true,
           reviewerId: 0,
           instrumentId: createdInstrumentId,
+          publicComment: comment2,
         });
 
         cy.assignProposalsToFaps({

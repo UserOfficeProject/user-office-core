@@ -7,6 +7,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
 import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
@@ -31,7 +32,7 @@ export class ProposalAuthorization {
     private callDataSource: CallDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
   private async resolveProposal(
@@ -60,14 +61,6 @@ export class ProposalAuthorization {
     }
   }
 
-  async isMemberOfProposal(
-    agent: UserJWT | null,
-    proposalPk: number
-  ): Promise<boolean>;
-  async isMemberOfProposal(
-    agent: UserJWT | null,
-    proposal: Proposal | null
-  ): Promise<boolean>;
   async isMemberOfProposal(
     agent: UserJWT | null,
     proposalOrPk: Proposal | number | null
@@ -163,10 +156,7 @@ export class ProposalAuthorization {
       });
   }
 
-  isVisitorOfProposal(
-    agent: UserWithRole,
-    proposalPk: number
-  ): boolean | PromiseLike<boolean> {
+  async isVisitorOfProposal(agent: UserWithRole, proposalPk: number) {
     return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
 
@@ -184,31 +174,9 @@ export class ProposalAuthorization {
     );
   }
 
-  async hasReadRights(
-    agent: UserWithRole | null,
-    proposal: Proposal
-  ): Promise<boolean>;
-  async hasReadRights(
-    agent: UserWithRole | null,
-    proposalId: number
-  ): Promise<boolean>;
-  async hasReadRights(
-    agent: UserWithRole | null,
-    proposalOrProposalId: Proposal | number
-  ): Promise<boolean> {
-    if (!agent) {
-      return false;
-    }
-
-    const proposal = await this.resolveProposal(proposalOrProposalId);
-
-    if (!proposal) {
-      return false;
-    }
-
-    const technicalReviews = await this.reviewDataSource.getTechnicalReviews(
-      proposal?.primaryKey
-    );
+  async isInternalReviewer(agent: UserWithRole, proposalPk: number) {
+    const technicalReviews =
+      await this.reviewDataSource.getTechnicalReviews(proposalPk);
 
     const isInternalReviewerOnSomeTechnicalReview = technicalReviews
       ? (
@@ -224,20 +192,62 @@ export class ProposalAuthorization {
         ).some((value) => value)
       : false;
 
-    return (
-      this.userAuth.isUserOfficer(agent) ||
-      this.userAuth.isSampleSafetyReviewer(agent) ||
-      this.userAuth.isInstrumentScientist(agent) ||
-      this.userAuth.hasGetAccessByToken(agent) ||
-      (await this.isMemberOfProposal(agent, proposal)) ||
-      (await this.isReviewerOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
-      (await this.isInstrumentManagerToProposal(agent, proposal.primaryKey)) ||
-      isInternalReviewerOnSomeTechnicalReview ||
-      (await this.isChairOrSecretaryOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
-      (await this.isMemberOfFapProposal(agent, proposal.primaryKey))
-    );
+    return isInternalReviewerOnSomeTechnicalReview;
+  }
+
+  async hasReadRights(
+    agent: UserWithRole | null,
+    proposalOrProposalId: Proposal | number
+  ): Promise<boolean> {
+    if (!agent) {
+      return false;
+    }
+
+    const proposal = await this.resolveProposal(proposalOrProposalId);
+
+    if (!proposal) {
+      return false;
+    }
+
+    const currentRole = agent?.currentRole?.shortCode;
+
+    let hasAccess = false;
+
+    switch (currentRole) {
+      case Roles.USER:
+        hasAccess =
+          (await this.isMemberOfProposal(agent, proposal)) ||
+          (await this.isVisitorOfProposal(agent, proposal.primaryKey));
+        break;
+      case Roles.INSTRUMENT_SCIENTIST:
+        hasAccess =
+          (await this.isInstrumentManagerToProposal(
+            agent,
+            proposal.primaryKey
+          )) || (await this.isScientistToProposal(agent, proposal.primaryKey));
+        break;
+      case Roles.INTERNAL_REVIEWER:
+        hasAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
+        break;
+      case Roles.FAP_REVIEWER:
+      case Roles.FAP_SECRETARY:
+      case Roles.FAP_CHAIR:
+        hasAccess = await this.isMemberOfFapProposal(
+          agent,
+          proposal.primaryKey
+        );
+        break;
+      case Roles.USER_OFFICER:
+        hasAccess = true;
+        break;
+      case Roles.SAMPLE_SAFETY_REVIEWER:
+        hasAccess = true;
+        break;
+      default:
+        hasAccess = this.userAuth.hasGetAccessByToken(agent);
+    }
+
+    return hasAccess;
   }
 
   private async isProposalEditable(
@@ -268,14 +278,6 @@ export class ProposalAuthorization {
     }
   }
 
-  async hasWriteRights(
-    agent: UserWithRole | null,
-    proposal: Proposal
-  ): Promise<boolean>;
-  async hasWriteRights(
-    agent: UserWithRole | null,
-    proposalId: number
-  ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
     proposalOrProposalId: Proposal | number
