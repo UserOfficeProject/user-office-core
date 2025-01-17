@@ -113,6 +113,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Reviewers',
     render: (data) => data.assignments?.length,
+    field: 'fr.reviewer_count',
   },
   {
     title: 'Reviews',
@@ -126,6 +127,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
 
       return totalReviews === 0 ? '-' : `${countReviews} / ${totalReviews}`;
     },
+    field: 'fr.reviews_complete',
   },
   {
     title: 'Average grade',
@@ -145,6 +147,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
       average(
         getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
       ),
+    field: 'fr.avg_grade',
   },
   {
     title: 'Deviation',
@@ -165,6 +168,7 @@ const FapProposalColumns: Column<FapProposalType>[] = [
       standardDeviation(
         getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
       ),
+    sorting: false,
   },
 ];
 
@@ -178,10 +182,7 @@ const FapProposalsAndAssignmentsTable = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
 
-  // const { FapProposalsData, setFapProposalsData } = useFapProposalsData(
-  //   data.id,
-  //   selectedCallId
-  // );
+  const [maxTableLength, setMaxTableLength] = useState<number>(20);
   const { api } = useDataApiWithFeedback();
   const [proposalPks, setProposalPks] = useState<number[]>([]);
   const [selectedFapProposals, setSelectedFapProposals] = useState<
@@ -285,7 +286,6 @@ const FapProposalsAndAssignmentsTable = ({
     );
     setProposalPks(proposalPksToAssign);
     setSelectedFapProposals(proposalsToAssign);
-    console.log(selectedFapProposals);
   };
 
   const handleBulkRemoveProposalsFromFap = async (
@@ -577,8 +577,6 @@ const FapProposalsAndAssignmentsTable = ({
       position: 'toolbarOnSelect',
     });
 
-  console.log(tableActions.length);
-
   const ReviewersTable = React.useCallback(
     ({ rowData }: Record<'rowData', FapProposalType>) => {
       const removeAssignedReviewer = async (
@@ -655,13 +653,23 @@ const FapProposalsAndAssignmentsTable = ({
 
   const fetchRemoteData = (tableQuery: Query<FapProposalType>) =>
     new Promise<QueryResult<FapProposalType>>(async (resolve, reject) => {
+      console.log(tableQuery.orderByCollection);
+      const [orderBy] = tableQuery.orderByCollection;
       try {
         const result = await api().getFapProposals({
           fapId: data.id,
           callId: selectedCallId,
           first: tableQuery.pageSize,
           offset: tableQuery.page * tableQuery.pageSize,
+          search: tableQuery.search,
+          sortField: orderBy?.orderByField,
+          sortDirection: orderBy?.orderDirection,
         });
+
+        const totalCount = result.fap?.proposalCurrentCount
+          ? result.fap?.proposalCurrentCount
+          : 0;
+        setMaxTableLength(totalCount);
 
         resolve({
           data: result.fapProposals
@@ -676,14 +684,16 @@ const FapProposalsAndAssignmentsTable = ({
               )
             : [],
           page: tableQuery.page,
-          totalCount: result.fap?.proposalCurrentCount
-            ? result.fap?.proposalCurrentCount
-            : 0,
+          totalCount,
         });
       } catch (error) {
         reject(error);
       }
     });
+
+  const pageSizeOptions = Array.from(new Set([5, 10, 20, maxTableLength]))
+    .sort((a, b) => a - b)
+    .filter((n) => n <= maxTableLength);
 
   return (
     <>
@@ -744,8 +754,8 @@ const FapProposalsAndAssignmentsTable = ({
           options={{
             search: true,
             selection: true,
-            // pageSize: Math.min(10, maxPageLength),
-            // pageSizeOptions: pageSizeOptions,
+            pageSize: Math.min(10, maxTableLength),
+            pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
               inputProps: {
                 'aria-label': 'Select all rows',

@@ -305,7 +305,10 @@ export default class PostgresFapDataSource implements FapDataSource {
     fapId: number,
     callId: number | null,
     first: number | null,
-    offset: number | null
+    offset: number | null,
+    search: string | null,
+    sortField: string | null,
+    sortDirection: string | null
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
@@ -318,19 +321,40 @@ export default class PostgresFapDataSource implements FapDataSource {
           .join('proposal_statuses as ps', {
             'p.status_id': 'ps.proposal_status_id',
           })
+          .join(
+            database
+              .select(['fr.proposal_pk'])
+              .from('fap_reviews as fr')
+              .avg('fr.grade as avg_grade')
+              .sum('fr.status as reviews_complete')
+              .count('* as reviewer_count')
+              .groupBy('fr.proposal_pk')
+              .as('fr'),
+            'fr.proposal_pk',
+            'p.proposal_pk'
+          )
           .where(function () {
             this.where('ps.name', 'ilike', 'FAP_%');
+            if (search) {
+              this.where(function () {
+                this.where('p.title', 'ilike', `%${search}%`);
+                this.orWhere('p.proposal_id', 'ilike', `%${search}%`);
+              });
+            }
           });
-
+        if (callId) {
+          query.andWhere('fp.call_id', callId);
+        }
         if (first) {
           query.limit(first);
         }
         if (offset) {
           query.offset(offset);
         }
+        query.orderBy('fr.avg_grade');
       })
-      .where('fp.fap_id', fapId)
-      .distinctOn('fp.proposal_pk');
+      .where('fp.fap_id', fapId);
+    // .distinctOn('fp.proposal_pk');
 
     return fapProposals.map((fapProposal) =>
       createFapProposalObject(fapProposal)

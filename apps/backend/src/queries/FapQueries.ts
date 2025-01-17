@@ -69,11 +69,17 @@ export default class FapQueries {
       callId,
       first,
       offset,
+      search,
+      sortField,
+      sortDirection,
     }: {
       fapId: number;
       callId: number | null;
       first: number | null;
       offset: number | null;
+      search: string | null;
+      sortField: string | null;
+      sortDirection: string | null;
     }
   ) {
     if (
@@ -81,7 +87,15 @@ export default class FapQueries {
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
-      return this.dataSource.getFapProposals(fapId, callId, first, offset);
+      return this.dataSource.getFapProposals(
+        fapId,
+        callId,
+        first,
+        offset,
+        search,
+        sortField,
+        sortDirection
+      );
     } else {
       return null;
     }

@@ -1,8 +1,8 @@
-query getFapProposals($fapId: Int!, $callId: Int, $first: Int, $offset: Int) {
+query getFapProposals($fapId: Int!, $callId: Int, $first: Int, $offset: Int, $search: String, $sortField: String , $sortDirection: String) {
   fap(id: $fapId) {
     proposalCurrentCount(callId: $callId)
   }
-  fapProposals(fapId: $fapId, callId: $callId, first: $first, offset: $offset) {
+  fapProposals(fapId: $fapId, callId: $callId, first: $first, offset: $offset, search: $search, sortField: $sortField, sortDirection: $sortDirection) {
     proposalPk
     dateAssigned
     fapId

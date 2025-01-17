@@ -75,7 +75,10 @@ export interface FapDataSource {
     fapId: number,
     callId: number | null,
     first: number | null,
-    offset: number | null
+    offset: number | null,
+    search: string | null,
+    sortField: string | null,
+    sortDirection: string | null
   ): Promise<FapProposal[]>;
   getFapUsersByProposalPkAndCallId(
     proposalPk: number,
