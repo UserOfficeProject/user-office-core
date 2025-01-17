@@ -1,11 +1,4 @@
-import {
-  Box,
-  CssBaseline,
-  Grid,
-  InputLabel,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Box, CssBaseline, Grid, InputLabel, useTheme } from '@mui/material';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
@@ -24,12 +17,10 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { TechnicalReviewContextType } from 'components/review/TechnicalReviewQuestionary';
 import { SettingsContext } from 'context/SettingsContextProvider';
-import { UserContext } from 'context/UserContextProvider';
 import { SettingsId, TechnicalReviewStatus, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { TechnicalReviewSubmissionState } from 'models/questionary/technicalReview/TechnicalReviewSubmissionState';
-import { getFullUserName } from 'utils/user';
 import { Option } from 'utils/utilTypes';
 
 function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
@@ -52,7 +43,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
   ]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const { user } = useContext(UserContext);
   const { settingsMap } = useContext(SettingsContext);
 
   const fapSecOrChairCanEdit =
@@ -126,12 +116,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
 
   return (
     <>
-      {state?.technicalReview.technicalReviewAssignee && (
-        <Typography variant="subtitle2" data-cy="reviewed-by-info">
-          {`Reviewed by ${getFullUserName(state?.technicalReview.technicalReviewAssignee)}`}
-        </Typography>
-      )}
-
       <div>
         <Box sx={{ margin: theme.spacing(2, 0) }}>
           <CssBaseline />
@@ -143,6 +127,7 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                 value={localStatus}
                 options={statusOptions}
                 component={Select}
+                required
                 inputLabel={{ htmlFor: 'status', required: true }}
                 label="Status"
                 data-cy="technical-review-status"
@@ -153,7 +138,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                     type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                     itemWithQuestionary: {
                       status: event?.target.value,
-                      reviewerId: user.id,
                     },
                   });
                 }}
@@ -163,20 +147,19 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
               <Field
                 name={timeAllocationFieldId}
                 value={localTimeAllocation}
-                //label={`Time allocation(${state?.technicalReview?.proposal?.ca2ll?.allocationTimeUnit}s)`}
-                label="Heka"
+                label={`Time allocation(${state?.technicalReview?.proposal?.call?.allocationTimeUnit}s)`}
                 id="time-allocation-input"
                 type="number"
                 data-cy="timeAllocation"
                 disabled={fapSecOrChairCanEdit || shouldDisableForm}
                 component={TextField}
+                required
                 autoComplete="off"
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   dispatch({
                     type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                     itemWithQuestionary: {
                       timeAllocation: +event.target.value,
-                      reviewerId: user.id,
                     },
                   });
                 }}
@@ -228,7 +211,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                       type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                       itemWithQuestionary: {
                         comment: localComment,
-                        reviewerId: user.id,
                       },
                     })
                   }
@@ -260,7 +242,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                       type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                       itemWithQuestionary: {
                         files: newStateValue,
-                        reviewerId: user.id,
                       },
                     });
                   }}
@@ -297,7 +278,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                     type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                     itemWithQuestionary: {
                       publicComment: localPublicComment,
-                      reviewerId: user.id,
                     },
                   })
                 }
@@ -309,128 +289,19 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
       </div>
     </>
   );
-
-  /*const [localComment, setLocalComment] = useState(
-    state?.technicalReview.comment || ''
-  );
-  const [numberOfChars, setNumberOfChars] = useState(0);
-
-  const [localPublicComment, setLocalPublicComment] = useState(
-    state?.technicalReview.publicComment || ''
-  );
-
-  if (!state || !dispatch) {
-    throw new Error(createMissingContextErrorMessage());
-  }
-
-  const handleCharacterCount = (editor: TinyMCEEditor) => {
-    const wordCount = editor.plugins.wordcount;
-    setNumberOfChars(wordCount.body.getCharacterCount());
-  };
-
-  const commentFieldId = `${id}.comment`;
-  const publicCommentField = `${id}.publicComment`;
-
-  return (
-    <div>
-      <Box sx={{ margin: theme.spacing(2, 0) }}>
-        <CssBaseline />
-        <InputLabel htmlFor="comment" shrink margin="dense" required>
-          Comment
-        </InputLabel>
-
-        <Editor
-          id="comment"
-          initialValue={state?.technicalReview.comment || ''}
-          value={localComment}
-          init={{
-            skin: false,
-            content_css: false,
-            plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
-            toolbar: 'bold italic',
-            branding: false,
-            init_instance_callback: (editor) => {
-              handleCharacterCount(editor);
-            },
-          }}
-          onEditorChange={(content, editor) => {
-            const isStartContentDifferentThanCurrent =
-              editor.startContent !== editor.contentDocument.body.innerHTML;
-
-            if (isStartContentDifferentThanCurrent || editor.isDirty()) {
-              handleCharacterCount(editor);
-            }
-            setLocalComment(content);
-          }}
-          onBlur={() =>
-            dispatch({
-              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-              itemWithQuestionary: { comment: localComment },
-            })
-          }
-        />
-        <FormHelperText>
-          Characters: {numberOfChars} / {6000}
-        </FormHelperText>
-        <ErrorMessage name={commentFieldId} />
-      </Box>
-      <Box sx={{ margin: theme.spacing(2, 0) }}>
-        <CssBaseline />
-        <InputLabel htmlFor="publicComment" shrink margin="dense" required>
-          Public Comment
-        </InputLabel>
-
-        <Editor
-          id="comment"
-          initialValue={state?.technicalReview.publicComment || ''}
-          value={localPublicComment}
-          init={{
-            skin: false,
-            content_css: false,
-            plugins: ['link', 'preview', 'code', 'charmap', 'wordcount'],
-            toolbar: 'bold italic',
-            branding: false,
-            init_instance_callback: (editor) => {
-              handleCharacterCount(editor);
-            },
-          }}
-          onEditorChange={(content, editor) => {
-            const isStartContentDifferentThanCurrent =
-              editor.startContent !== editor.contentDocument.body.innerHTML;
-
-            if (isStartContentDifferentThanCurrent || editor.isDirty()) {
-              handleCharacterCount(editor);
-            }
-            setLocalPublicComment(content);
-          }}
-          onBlur={() =>
-            dispatch({
-              type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-              itemWithQuestionary: { publicComment: localPublicComment },
-            })
-          }
-        />
-        <FormHelperText>
-          Characters: {numberOfChars} / {6000}
-        </FormHelperText>
-        <ErrorMessage name={publicCommentField} />
-      </Box>
-    </div>
-  );*/
 }
 
 const technicalReviewBasisPreSubmit =
   () =>
   async ({ api, state }: SubmitActionDependencyContainer) => {
-    const technicalReview = (state as TechnicalReviewSubmissionState)
-      .technicalReview;
+    const submissionState = state as TechnicalReviewSubmissionState;
+    const technicalReview = submissionState.technicalReview;
     const {
       id,
       status,
       comment,
       publicComment,
       submitted,
-      reviewerId,
       questionaryId,
       timeAllocation,
       proposalPk,
@@ -440,8 +311,6 @@ const technicalReviewBasisPreSubmit =
 
     const returnValue = state.questionary.questionaryId;
 
-    console.log(technicalReview);
-
     if (id > 0) {
       await api.addTechnicalReview({
         proposalPk: proposalPk,
@@ -450,7 +319,7 @@ const technicalReviewBasisPreSubmit =
         publicComment: publicComment,
         status: status,
         submitted: submitted,
-        reviewerId: reviewerId,
+        reviewerId: submissionState.reviewerId,
         files: files,
         instrumentId: instrumentId,
         questionaryId: questionaryId,

@@ -8,12 +8,11 @@ export const createTechnicalReviewBasisValidationSchema: QuestionaryComponentDef
     const TECHNICAL_REVIEW_COMMENT_CHAR_LIMIT = 6000;
     const TECHNICAL_REVIEW_PUBLIC_COMMENT_CHAR_LIMIT = 6000;
 
-    const statusSchema = Yup.object().required('Status is required');
+    const statusSchema = Yup.string().required('Status is required');
 
-    const timeAllocationSchema = Yup.number().min(
-      1,
-      'Time allocation is required'
-    );
+    const timeAllocationSchema = Yup.number()
+      .min(0, 'Value must be greater than or equal to 0')
+      .nullable();
 
     let commentSchema = Yup.string().transform(function (value: string) {
       return sanitizeHtmlAndCleanText(value);

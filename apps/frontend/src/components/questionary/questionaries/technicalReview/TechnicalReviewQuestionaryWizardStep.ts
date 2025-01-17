@@ -7,6 +7,6 @@ export class TechnicalReviewQuestionaryWizardStep extends QuestionaryWizardStep 
   isItemWithQuestionaryEditable(state: QuestionarySubmissionState) {
     const { technicalReview } = state as TechnicalReviewSubmissionState;
 
-    return !technicalReview.submitted;
+    return technicalReview.submitted === false;
   }
 }

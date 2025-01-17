@@ -9,7 +9,8 @@ export class TechnicalReviewSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
   constructor(
     public technicalReview: TechnicalReviewWithQuestionary,
-    public isPreviewMode: boolean | undefined
+    public isPreviewMode: boolean | undefined,
+    public reviewerId: number
   ) {
     super(TemplateGroupId.TECHNICAL_REVIEW, technicalReview, isPreviewMode);
     this.stepIndex = this.getInitialStepIndex();

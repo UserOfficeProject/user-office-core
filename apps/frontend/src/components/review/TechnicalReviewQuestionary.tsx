@@ -1,5 +1,5 @@
 import { PaperProps } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import Questionary from 'components/questionary/Questionary';
@@ -7,11 +7,13 @@ import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
+import { UserContext } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
   ProposalEndStatus,
   ProposalPublicStatus,
   QuestionaryStep,
+  TechnicalReview,
   TechnicalReviewStatus,
   TemplateGroupId,
 } from 'generated/sdk';
@@ -23,7 +25,6 @@ import {
 import { TechnicalReviewSubmissionState } from 'models/questionary/technicalReview/TechnicalReviewSubmissionState';
 import { TechnicalReviewWithQuestionary } from 'models/questionary/technicalReview/TechnicalReviewWithQuestionary';
 import useEventHandlers from 'models/questionary/useEventHandlers';
-import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 export interface TechnicalReviewContextType extends QuestionaryContextType {
   state: TechnicalReviewSubmissionState | null;
@@ -109,27 +110,22 @@ export function createTechnicalReviewStub(
 
 interface TechnicalReviewQuestionaryProps {
   technicalReview?: TechnicalReviewWithQuestionary;
-  technicalReviewUpdated?: (
-    technicalReview: TechnicalReviewWithQuestionary
-  ) => void;
+  technicalReviewUpdated?: (technicalReview: TechnicalReview) => void;
   elevation?: PaperProps['elevation'];
   previewMode?: boolean;
 }
 export default function TechnicalReviewQuestionary(
   props: TechnicalReviewQuestionaryProps
 ) {
-  const { technicalReview, technicalReviewUpdated, elevation, previewMode } =
-    props;
+  const { technicalReview, technicalReviewUpdated, previewMode } = props;
+
+  const { user } = useContext(UserContext);
 
   const [initialState] = useState(
-    new TechnicalReviewSubmissionState(technicalReview!, previewMode)
+    new TechnicalReviewSubmissionState(technicalReview!, previewMode, user.id)
   );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.TECHNICAL_REVIEW);
-
-  if (!technicalReview) {
-    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
-  }
 
   const customEventHandlers = createCustomEventHandlers(
     (state: TechnicalReviewSubmissionState, action: Event) => {
@@ -149,13 +145,21 @@ export default function TechnicalReviewQuestionary(
     customEventHandlers,
   ]);
 
+  if (!technicalReview) {
+    return <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />;
+  }
+
   return (
-    <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <StyledContainer>
-        <StyledPaper elevation={elevation}>
-          <Questionary title="Technical Review" previewMode={previewMode} />
-        </StyledPaper>
-      </StyledContainer>
-    </QuestionaryContext.Provider>
+    <>
+      <QuestionaryContext.Provider value={{ state, dispatch }}>
+        {/* <StyledContainer maxWidth={false}>
+          <StyledPaper elevation={elevation}> */}
+
+        <Questionary title="Technical Review" previewMode={previewMode} />
+
+        {/* </StyledPaper>
+        </StyledContainer> */}
+      </QuestionaryContext.Provider>
+    </>
   );
 }

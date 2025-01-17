@@ -279,7 +279,7 @@ export default class ReviewMutations {
       });
     }
 
-    if (shouldUpdateReview) {
+    if (!shouldUpdateReview) {
       const proposal = await this.proposalDataSource.get(args.proposalPk);
 
       if (!proposal) {

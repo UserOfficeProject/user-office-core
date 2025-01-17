@@ -21,10 +21,18 @@ export default function TechnicalReviewQuestionaryReview(
 
   const additionalDetails: TableRowData[] = [
     {
-      label: 'Review ID',
+      label: 'Technical Review ID',
       value: !data.submitted
         ? data.id + ' (Pre-submission)'
         : data.id.toString(),
+    },
+    {
+      label: 'Status',
+      value: data.status || '',
+    },
+    {
+      label: `Time allocation(${data?.proposal?.call?.allocationTimeUnit}s)`,
+      value: data.timeAllocation?.toString() || '',
     },
     {
       label: 'Comment',

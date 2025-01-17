@@ -1,3 +1,4 @@
+import { Paper, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
@@ -14,6 +15,7 @@ import ProposalAdmin, {
 } from 'components/proposal/ProposalAdmin';
 import { UserContext } from 'context/UserContextProvider';
 import {
+  CoreTechnicalReviewFragment,
   InstrumentWithManagementTime,
   Review,
   TechnicalReview,
@@ -24,6 +26,7 @@ import {
   ProposalDataTechnicalReview,
   useProposalData,
 } from 'hooks/proposal/useProposalData';
+import { getFullUserName } from 'utils/user';
 
 import ProposalReviewContainer from './ProposalReviewContainer';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
@@ -166,9 +169,38 @@ const ProposalReviewContent = ({
               })
             }
           /> */}
-          <TechnicalReviewContainer
-            technicalReviewId={technicalReview.id}
-          ></TechnicalReviewContainer>
+          <Paper
+            elevation={1}
+            sx={(theme) => ({
+              padding: theme.spacing(2),
+              marginTop: 0,
+              marginBottom: theme.spacing(2),
+            })}
+          >
+            <Typography variant="h6" component="h2" gutterBottom>
+              {`Reviewed by ${getFullUserName(technicalReview.technicalReviewAssignee)}`}
+            </Typography>
+            <TechnicalReviewContainer
+              technicalReview={technicalReview}
+              technicalReviewUpdated={(
+                data: CoreTechnicalReviewFragment | null | undefined
+              ) =>
+                setProposalData({
+                  ...proposalData,
+                  technicalReviews:
+                    proposalData.technicalReviews.map((technicalReview) => {
+                      if (technicalReview.id === data?.id) {
+                        return { ...technicalReview, ...data };
+                      } else {
+                        return {
+                          ...technicalReview,
+                        };
+                      }
+                    }) || null,
+                })
+              }
+            ></TechnicalReviewContainer>
+          </Paper>
         </Fragment>
       ) : (
         <TechnicalReviewInformation data={technicalReview as TechnicalReview} />

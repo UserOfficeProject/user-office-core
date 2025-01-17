@@ -11,11 +11,7 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { UserContext } from 'context/UserContextProvider';
-import {
-  ReviewStatus,
-  SubmitTechnicalReviewInput,
-  UserRole,
-} from 'generated/sdk';
+import { SubmitTechnicalReviewInput, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { isCallEnded } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -74,7 +70,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
       isCallActiveInternal &&
       allStepsComplete
     ) {
-      submissionDisabled = false; // allow submit for intenal users if the call ended
+      submissionDisabled = false; // allow submit for internal users if the call ended
     }
     if (isInstrumentScientist) {
       //reviewers should not be able to submit a grade for proposals on which they are not a reviewer
@@ -131,9 +127,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                   dispatch({
                     type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                     itemWithQuestionary: {
-                      status: evt.target.checked
-                        ? ReviewStatus.SUBMITTED
-                        : ReviewStatus.DRAFT,
+                      submitted: evt.target.checked ? true : false,
                     },
                   });
                 }}
@@ -173,7 +167,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                       publicComment: state?.technicalReview.publicComment,
                       status: state?.technicalReview.status,
                       submitted: state?.technicalReview.submitted,
-                      reviewerId: state?.technicalReview.reviewerId,
+                      reviewerId: user.id,
                       files: state?.technicalReview.files,
                       instrumentId: state?.technicalReview.instrumentId,
                       questionaryId: state?.technicalReview.questionaryId,

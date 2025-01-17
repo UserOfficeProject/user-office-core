@@ -191,6 +191,7 @@ export function QuestionarySubmissionModel<
 ) {
   function reducer(state: T, action: Event) {
     return produce(state, (draftState) => {
+      console.log(action);
       switch (action.type) {
         case 'ITEM_WITH_QUESTIONARY_CREATED':
         case 'ITEM_WITH_QUESTIONARY_LOADED':
