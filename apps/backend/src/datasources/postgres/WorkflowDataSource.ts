@@ -112,7 +112,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         return workflows.map((workflow) => this.createWorkflowObject(workflow));
       });
   }
-  async updateWorkflow(workflow: Workflow): Promise<Workflow> {
+  async updateWorkflow(
+    workflow: Omit<Workflow, 'entityType'>
+  ): Promise<Workflow> {
     // TODO: To test
     return database
       .update(

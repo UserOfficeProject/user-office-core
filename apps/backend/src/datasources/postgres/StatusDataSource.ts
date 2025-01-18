@@ -35,7 +35,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .returning(['*']);
 
     if (!addedStatus) {
-      throw new GraphQLError('Could not create proposal status');
+      throw new GraphQLError('Could not create status');
     }
 
     return this.createStatusObject(addedStatus);
@@ -56,15 +56,13 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   }
   async getAllStatuses(entityType: Status['entityType']): Promise<Status[]> {
     // TODO: To test
-    const proposalStatuses: StatusRecord[] = await database
+    const statuses: StatusRecord[] = await database
       .select('*')
       .from('statuses')
       .where('entity_type', entityType)
       .orderBy('status_id', 'asc');
 
-    return proposalStatuses.map((proposalStatus) =>
-      this.createStatusObject(proposalStatus)
-    );
+    return statuses.map((status) => this.createStatusObject(status));
   }
   async updateStatus(status: Status): Promise<Status> {
     // TODO: To test
@@ -85,20 +83,18 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return this.createStatusObject(updatedStatus);
   }
-  async deleteProposalStatus(statusId: number): Promise<Status> {
+  async deleteStatus(statusId: number): Promise<Status> {
     // TODO: To test
-    const [removedProposalStatus]: StatusRecord[] = await database('statuses')
+    const [removedStatus]: StatusRecord[] = await database('statuses')
       .where('status_id', statusId)
       .andWhere('is_default', false)
       .del()
       .returning('*');
 
-    if (!removedProposalStatus) {
-      throw new GraphQLError(
-        `Could not delete proposalStatus with id: ${statusId} `
-      );
+    if (!removedStatus) {
+      throw new GraphQLError(`Could not delete status with id: ${statusId} `);
     }
 
-    return this.createStatusObject(removedProposalStatus);
+    return this.createStatusObject(removedStatus);
   }
 }

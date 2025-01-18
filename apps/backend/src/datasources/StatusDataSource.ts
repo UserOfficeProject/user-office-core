@@ -10,5 +10,5 @@ export interface StatusDataSource {
   ): Promise<Status | null>;
   getAllStatuses(entityType: Status['entityType']): Promise<Status[]>;
   updateStatus(proposalStatus: Status): Promise<Status>;
-  deleteProposalStatus(statusId: number): Promise<Status>;
+  deleteStatus(statusId: number): Promise<Status>;
 }

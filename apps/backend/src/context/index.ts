@@ -22,12 +22,15 @@ import ReviewMutations from '../mutations/ReviewMutations';
 import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
+import StatusActionMutations from '../mutations/StatusActionMutations';
 import StatusActionsLogsMutations from '../mutations/StatusActionsLogsMutations';
+import StatusMutations from '../mutations/StatusMutations';
 import TechniqueMutations from '../mutations/TechniqueMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
 import UnitMutations from '../mutations/UnitMutations';
 import UserMutations from '../mutations/UserMutations';
 import VisitMutations from '../mutations/VisitMutations';
+import WorkflowMutations from '../mutations/WorkflowMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
@@ -48,13 +51,16 @@ import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
 import ScheduledEventQueries from '../queries/ScheduledEventQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
+import StatusActionQueries from '../queries/StatusActionQueries';
 import StatusActionsLogsQueries from '../queries/StatusActionsLogsQueries';
+import StatusQueries from '../queries/StatusQueries';
 import SystemQueries from '../queries/SystemQueries';
 import TechniqueQueries from '../queries/TechniqueQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UnitQueries from '../queries/UnitQueries';
 import UserQueries from '../queries/UserQueries';
 import VisitQueries from '../queries/VisitQueries';
+import WorkflowQueries from '../queries/WorkflowQueries';
 
 interface ResolverContextQueries {
   admin: AdminQueries;
@@ -84,6 +90,9 @@ interface ResolverContextQueries {
   predefinedMessage: PredefinedMessageQueries;
   internalReview: InternalReviewQueries;
   statusActionsLogs: StatusActionsLogsQueries;
+  status: StatusQueries;
+  workflow: WorkflowQueries;
+  statusAction: StatusActionQueries;
 }
 
 interface ResolverContextMutations {
@@ -113,6 +122,9 @@ interface ResolverContextMutations {
   internalReview: InternalReviewMutations;
   technique: TechniqueMutations;
   statusActionsLogs: StatusActionsLogsMutations;
+  status: StatusMutations;
+  workflow: WorkflowMutations;
+  statusAction: StatusActionMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

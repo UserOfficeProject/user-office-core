@@ -1,7 +1,4 @@
 import {
-  createProposalStatusValidationSchema,
-  updateProposalStatusValidationSchema,
-  deleteProposalStatusValidationSchema,
   createProposalWorkflowValidationSchema,
   updateProposalWorkflowValidationSchema,
   deleteProposalWorkflowValidationSchema,
@@ -16,7 +13,6 @@ import { Tokens } from '../config/Tokens';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { ProposalStatus } from '../models/ProposalStatus';
 import {
   ConnectionHasStatusAction,
   ProposalStatusActionType,
@@ -30,7 +26,6 @@ import { UserWithRole } from '../models/User';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
 import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnectionMutation';
-import { CreateProposalStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
 import { CreateProposalWorkflowInput } from '../resolvers/mutations/settings/CreateProposalWorkflowMutation';
 import { DeleteProposalWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteProposalWorkflowStatusMutation';
 import { MoveProposalWorkflowStatusInput } from '../resolvers/mutations/settings/MoveProposalWorkflowStatusMutation';
@@ -664,3 +659,5 @@ export default class ProposalSettingsMutations {
     );
   }
 }
+
+//TODO: This file can now be removed

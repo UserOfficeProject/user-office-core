@@ -1,7 +1,6 @@
 import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalStatus } from '../../types/ProposalStatus';
 import { Status } from '../../types/Status';
 
 @InputType()
@@ -20,16 +19,13 @@ export class CreateStatusInput implements Partial<Status> {
 }
 
 @Resolver()
-export class CreateProposalStatusMutation {
-  @Mutation(() => ProposalStatus)
-  async createProposalStatus(
+export class CreateStatusMutation {
+  @Mutation(() => Status)
+  async createStatus(
     @Ctx() context: ResolverContext,
-    @Arg('newProposalStatusInput')
-    newProposalStatusInput: CreateProposalStatusInput
+    @Arg('newStatusInput')
+    newStatusInput: CreateStatusInput
   ) {
-    return context.mutations.proposalSettings.createProposalStatus(
-      context.user,
-      newProposalStatusInput
-    );
+    return context.mutations.status.createStatus(context.user, newStatusInput);
   }
 }

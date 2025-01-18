@@ -9,14 +9,12 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { ProposalWorkflowConnection } from '../../types/ProposalWorkflowConnection';
+import { WorkflowConnection } from '../../../models/ProposalWorkflowConnections';
 
 @InputType()
-export class AddProposalWorkflowStatusInput
-  implements Partial<ProposalWorkflowConnection>
-{
+export class AddWorkflowStatusInput implements Partial<WorkflowConnection> {
   @Field(() => Int)
-  public proposalWorkflowId: number;
+  public workflowId: number;
 
   @Field(() => Int)
   public sortOrder: number;
@@ -28,26 +26,29 @@ export class AddProposalWorkflowStatusInput
   public parentDroppableGroupId: string | null;
 
   @Field(() => Int)
-  public proposalStatusId: number;
+  public statusId: number;
 
   @Field(() => Int, { nullable: true })
   public nextStatusId: number | null;
 
   @Field(() => Int, { nullable: true })
   public prevStatusId: number | null;
+
+  @Field(() => String)
+  public entityType: 'proposal' | 'experiment';
 }
 
 @Resolver()
-export class AddProposalWorkflowStatusMutation {
-  @Mutation(() => ProposalWorkflowConnection)
-  async addProposalWorkflowStatus(
+export class AddWorkflowStatusMutation {
+  @Mutation(() => WorkflowConnection)
+  async addWorkflowStatus(
     @Ctx() context: ResolverContext,
-    @Arg('newProposalWorkflowStatusInput')
-    newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
+    @Arg('newWorkflowStatusInput')
+    newWorkflowStatusInput: AddWorkflowStatusInput
   ) {
     return context.mutations.workflow.addWorkflowStatus(
       context.user,
-      newProposalWorkflowStatusInput
+      newWorkflowStatusInput
     );
   }
 }

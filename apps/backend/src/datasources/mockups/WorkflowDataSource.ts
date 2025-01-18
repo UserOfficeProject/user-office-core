@@ -18,7 +18,7 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]> {
     throw new Error('Method not implemented.');
   }
-  updateWorkflow(workflow: Workflow): Promise<Workflow> {
+  updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow> {
     throw new Error('Method not implemented.');
   }
   deleteWorkflow(workflowId: number): Promise<Workflow> {

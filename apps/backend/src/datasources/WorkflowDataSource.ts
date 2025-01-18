@@ -13,13 +13,13 @@ export interface WorkflowDataSource {
     entityType: Workflow['entityType']
   ): Promise<Workflow | null>;
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]>;
-  updateWorkflow(workflow: Workflow): Promise<Workflow>;
+  updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId'],
     entityType: WorkflowConnection['entityType'],
     droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: WorkflowConnection['parentDroppableGroupId']
+    byParentGroupId?: boolean | undefined
   ): Promise<WorkflowConnection[]>;
   getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],

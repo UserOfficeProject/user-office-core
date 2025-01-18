@@ -39,6 +39,9 @@ export class AddConnectionStatusActionsInput
 
   @Field(() => [ConnectionHasActionsInput])
   public actions: ConnectionHasActionsInput[];
+
+  @Field(() => String)
+  public entityType: 'proposal' | 'experiment';
 }
 
 @Resolver()
@@ -49,7 +52,7 @@ export class AddConnectionStatusActionsMutation {
     @Arg('newConnectionStatusActionsInput')
     newConnectionStatusActionsInput: AddConnectionStatusActionsInput
   ) {
-    return context.mutations.proposalSettings.addConnectionStatusActions(
+    return context.mutations.workflow.addConnectionStatusActions(
       context.user,
       newConnectionStatusActionsInput
     );
