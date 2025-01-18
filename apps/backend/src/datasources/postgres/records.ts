@@ -22,7 +22,7 @@ import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
-import { ProposalStatusActionType } from '../../models/ProposalStatusAction';
+import { StatusActionType } from '../../models/ProposalStatusAction';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -779,18 +779,19 @@ export interface RedeemCodeRecord {
   readonly claimed_at: Date | null;
 }
 
-export interface ProposalStatusActionRecord {
-  readonly proposal_status_action_id: number;
+export interface StatusActionRecord {
+  readonly status_action_id: number;
   readonly name: string;
   readonly description: string;
-  readonly type: ProposalStatusActionType;
+  readonly type: StatusActionType;
 }
 
-export interface ProposalWorkflowConnectionHasActionsRecord {
+export interface WorkflowConnectionHasActionsRecord {
   readonly connection_id: number;
   readonly action_id: number;
   readonly workflow_id: number;
   readonly config: string;
+  readonly entity_type: 'proposal' | 'experiment';
 }
 
 export interface ProposalInternalCommentRecord {
