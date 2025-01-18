@@ -24,7 +24,7 @@ export interface ProposalSettingsDataSource {
   getProposalWorkflow(
     proposalWorkflowId: number
   ): Promise<ProposalWorkflow | null>;
-  getProposalWorkflowByCall(callId: number): Promise<ProposalWorkflow | null>;
+  getProposalWorkflowByCall(callId: number): Promise<ProposalWorkflow | null>; //TODO: This is not moved to WorkflowDataSource. This needs to be planned later
   getAllWorkflows(entityType: 'proposal' | 'experiment'): Promise<Workflow[]>;
   updateProposalWorkflow(
     proposalWorkflow: ProposalWorkflow
