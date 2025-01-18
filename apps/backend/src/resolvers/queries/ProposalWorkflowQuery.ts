@@ -19,8 +19,9 @@ export class ProposalWorkflowQuery {
 
   @Query(() => [ProposalWorkflow], { nullable: true })
   proposalWorkflows(@Ctx() context: ResolverContext) {
-    return context.queries.proposalSettings.getAllProposalWorkflows(
-      context.user
+    return context.queries.proposalSettings.getAllWorkflows(
+      context.user,
+      'proposal'
     );
   }
 

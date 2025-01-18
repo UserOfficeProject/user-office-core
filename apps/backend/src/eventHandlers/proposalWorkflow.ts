@@ -37,7 +37,7 @@ const publishProposalStatusChange = async (
       );
       const previousProposalStatus =
         await proposalSettingsDataSource.getProposalStatus(
-          updatedProposal.prevProposalStatusId
+          updatedProposal.prevStatusId
         );
 
       return eventBus.publish({

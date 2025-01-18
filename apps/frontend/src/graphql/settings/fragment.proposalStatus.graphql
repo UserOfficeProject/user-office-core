@@ -1,4 +1,4 @@
-fragment proposalStatus on ProposalStatus {
+fragment status on ProposalStatus {
   id
   shortCode
   name

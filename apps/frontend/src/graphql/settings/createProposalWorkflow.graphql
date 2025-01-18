@@ -11,13 +11,13 @@ mutation createProposalWorkflow($name: String!, $description: String!) {
       connections {
         id
         sortOrder
-        proposalWorkflowId
-        proposalStatusId
-        proposalStatus {
-          ...proposalStatus
+        workflowId
+        statusId
+        status {
+          ...status
         }
-        nextProposalStatusId
-        prevProposalStatusId
+        nextStatusId
+        prevStatusId
         droppableGroupId
         statusChangingEvents {
           statusChangingEventId

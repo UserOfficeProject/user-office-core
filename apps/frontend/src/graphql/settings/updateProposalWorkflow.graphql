@@ -19,15 +19,15 @@ mutation updateProposalWorkflow(
       connections {
         id
         sortOrder
-        proposalWorkflowId
-        proposalStatusId
-        proposalStatus {
+        workflowId
+        statusId
+        status {
           id
           name
           description
         }
-        nextProposalStatusId
-        prevProposalStatusId
+        nextStatusId
+        prevStatusId
         droppableGroupId
         statusChangingEvents {
           statusChangingEventId

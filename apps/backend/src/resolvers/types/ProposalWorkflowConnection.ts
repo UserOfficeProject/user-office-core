@@ -26,19 +26,19 @@ export class ProposalWorkflowConnection
   public sortOrder: number;
 
   @Field(() => Int)
-  public proposalWorkflowId: number;
+  public workflowId: number;
 
   @Field(() => Int)
-  public proposalStatusId: number;
+  public statusId: number;
 
   @Field(() => ProposalStatus)
-  public proposalStatus: ProposalStatus;
+  public status: ProposalStatus;
 
   @Field(() => Int, { nullable: true })
-  public nextProposalStatusId: number | null;
+  public nextStatusId: number | null;
 
   @Field(() => Int, { nullable: true })
-  public prevProposalStatusId: number | null;
+  public prevStatusId: number | null;
 
   @Field()
   public droppableGroupId: string;

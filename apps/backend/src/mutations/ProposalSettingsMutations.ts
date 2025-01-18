@@ -151,11 +151,11 @@ export default class ProposalSettingsMutations {
       return {
         ...workflowConnection,
         sortOrder: index,
-        prevProposalStatusId: proposalWorkflowConnections[index - 1]
+        prevStatusId: proposalWorkflowConnections[index - 1]
           ? proposalWorkflowConnections[index - 1].proposalStatusId
           : null,
-        nextProposalStatusId: nextShouldNotBeTouched
-          ? workflowConnection.nextProposalStatusId
+        nextStatusId: nextShouldNotBeTouched
+          ? workflowConnection.nextStatusId
           : proposalWorkflowConnections[index + 1]
             ? proposalWorkflowConnections[index + 1].proposalStatusId
             : null,
@@ -183,10 +183,9 @@ export default class ProposalSettingsMutations {
     firstConnectionStatusId: number
   ) {
     const lastConnectionInParentGroupHasNext =
-      !!lastConnectionInParentDroppableGroup.nextProposalStatusId;
+      !!lastConnectionInParentDroppableGroup.nextStatusId;
 
-    lastConnectionInParentDroppableGroup.nextProposalStatusId =
-      firstConnectionStatusId;
+    lastConnectionInParentDroppableGroup.nextStatusId = firstConnectionStatusId;
 
     if (lastConnectionInParentGroupHasNext) {
       const newConnection = omit(lastConnectionInParentDroppableGroup, 'id');
@@ -228,9 +227,9 @@ export default class ProposalSettingsMutations {
       const [lastConnectionInParentDroppableGroup] =
         await this.dataSource.getProposalWorkflowConnectionsById(
           proposalWorkflowConnections[0].proposalWorkflowId,
-          proposalWorkflowConnections[0].prevProposalStatusId as number,
+          proposalWorkflowConnections[0].prevStatusId as number,
           {
-            nextProposalStatusId:
+            nextStatusId:
               secondConnection && isFirstConnectionInChildGroup
                 ? proposalWorkflowConnections[1]?.proposalStatusId
                 : null,
@@ -238,14 +237,14 @@ export default class ProposalSettingsMutations {
         );
 
       if (secondConnection && isFirstConnectionInChildGroup) {
-        updatedWorkflowConnections[0].prevProposalStatusId =
-          proposalWorkflowConnections[1].prevProposalStatusId;
+        updatedWorkflowConnections[0].prevStatusId =
+          proposalWorkflowConnections[1].prevStatusId;
       } else {
-        updatedWorkflowConnections[0].prevProposalStatusId =
+        updatedWorkflowConnections[0].prevStatusId =
           lastConnectionInParentDroppableGroup?.proposalStatusId;
       }
 
-      updatedWorkflowConnections[0].prevProposalStatusId =
+      updatedWorkflowConnections[0].prevStatusId =
         lastConnectionInParentDroppableGroup?.proposalStatusId;
 
       if (isFirstConnectionInChildGroup) {
@@ -280,8 +279,8 @@ export default class ProposalSettingsMutations {
             (proposalWorkflowConnection) =>
               proposalWorkflowConnection.proposalStatusId ===
                 secondLastConnection.proposalStatusId &&
-              proposalWorkflowConnection.prevProposalStatusId ===
-                secondLastConnection.prevProposalStatusId
+              proposalWorkflowConnection.prevStatusId ===
+                secondLastConnection.prevStatusId
           )?.sortOrder;
 
         await this.dataSource.deleteProposalWorkflowStatus(
@@ -302,7 +301,7 @@ export default class ProposalSettingsMutations {
         .filter((childConnection) => childConnection.sortOrder === 0)
         .map((firstChildConnection) => ({
           ...firstChildConnection,
-          prevProposalStatusId: lastConnection.proposalStatusId,
+          prevStatusId: lastConnection.proposalStatusId,
         }));
 
       if (
@@ -314,7 +313,7 @@ export default class ProposalSettingsMutations {
         allFirstChildrenGroupConnections.forEach((firstChildConnection) => {
           updatedWorkflowConnections.push({
             ...lastConnection,
-            nextProposalStatusId: firstChildConnection.proposalStatusId,
+            nextStatusId: firstChildConnection.proposalStatusId,
           });
         });
       }
@@ -338,11 +337,11 @@ export default class ProposalSettingsMutations {
 
     const isFirstConnectionInChildGroup =
       newWorkflowConnection.sortOrder === 0 &&
-      !!newWorkflowConnection.prevProposalStatusId;
+      !!newWorkflowConnection.prevStatusId;
 
     const isLastConnectionInParentGroup =
       newWorkflowConnection.sortOrder === allWorkflowGroupConnections.length &&
-      !!newWorkflowConnection.nextProposalStatusId;
+      !!newWorkflowConnection.nextStatusId;
 
     // Insert new connection in the correct place inside its group
     allWorkflowGroupConnections.splice(
@@ -397,8 +396,7 @@ export default class ProposalSettingsMutations {
     agent: UserWithRole | null,
     args: AddProposalWorkflowStatusInput
   ): Promise<ProposalWorkflowConnection | Rejection> {
-    const isVeryFirstConnection =
-      !args.nextProposalStatusId && !args.prevProposalStatusId;
+    const isVeryFirstConnection = !args.nextStatusId && !args.prevStatusId;
     try {
       if (isVeryFirstConnection) {
         return this.insertProposalWorkflowStatus(args);
@@ -492,7 +490,7 @@ export default class ProposalSettingsMutations {
           proposalWorkflowId,
           previousConnectionId,
           {
-            nextProposalStatusId: currentConnectionId,
+            nextStatusId: currentConnectionId,
           }
         )
       : [];
@@ -502,7 +500,7 @@ export default class ProposalSettingsMutations {
           proposalWorkflowId,
           nextConnectionId,
           {
-            prevProposalStatusId: currentConnectionId,
+            prevStatusId: currentConnectionId,
           }
         )
       : [];
@@ -545,14 +543,14 @@ export default class ProposalSettingsMutations {
         allGroupWorkflowConnections.length;
       const lastConnectionInParentGroupRemoved =
         isLastConnectionInGroupRemoved &&
-        firstWorkflowConnectionToRemove.nextProposalStatusId &&
-        firstWorkflowConnectionToRemove.prevProposalStatusId;
+        firstWorkflowConnectionToRemove.nextStatusId &&
+        firstWorkflowConnectionToRemove.prevStatusId;
 
       if (lastConnectionInParentGroupRemoved) {
         const [workflowConnectionToReplaceRemoved] =
           await this.dataSource.getProposalWorkflowConnectionsById(
             firstWorkflowConnectionToRemove.proposalWorkflowId,
-            firstWorkflowConnectionToRemove.prevProposalStatusId as number,
+            firstWorkflowConnectionToRemove.prevStatusId as number,
             {}
           );
 
@@ -566,26 +564,25 @@ export default class ProposalSettingsMutations {
         workflowConnectionsToRemove.forEach(async (connection) => {
           const updatedWorkflowConnections: ProposalWorkflowConnection[] = [];
 
-          if (connection.nextProposalStatusId) {
+          if (connection.nextStatusId) {
             const [nextConnection] =
               await this.dataSource.getProposalWorkflowConnectionsById(
                 connection.proposalWorkflowId,
-                connection.nextProposalStatusId as number,
+                connection.nextStatusId as number,
                 {}
               );
 
             if (nextConnection) {
               updatedWorkflowConnections.push({
                 ...nextConnection,
-                prevProposalStatusId: connection.prevProposalStatusId,
+                prevStatusId: connection.prevStatusId,
               });
             }
           }
 
           updatedWorkflowConnections.push({
             ...connection,
-            prevProposalStatusId:
-              workflowConnectionToReplaceRemoved.prevProposalStatusId,
+            prevStatusId: workflowConnectionToReplaceRemoved.prevStatusId,
             proposalStatusId:
               workflowConnectionToReplaceRemoved.proposalStatusId,
             sortOrder: workflowConnectionToReplaceRemoved.sortOrder,
@@ -611,8 +608,8 @@ export default class ProposalSettingsMutations {
         const [previousConnection, nextConnection] =
           await this.findPreviousAndNextConnections(args.proposalWorkflowId, {
             currentConnectionId: result.proposalStatusId,
-            previousConnectionId: result.prevProposalStatusId,
-            nextConnectionId: result.nextProposalStatusId,
+            previousConnectionId: result.prevStatusId,
+            nextConnectionId: result.nextStatusId,
           });
 
         const connectionsToUpdate = [];
@@ -620,14 +617,14 @@ export default class ProposalSettingsMutations {
         if (previousConnection) {
           connectionsToUpdate.push({
             ...previousConnection,
-            nextProposalStatusId: result.nextProposalStatusId,
+            nextStatusId: result.nextStatusId,
           });
         }
 
         if (nextConnection) {
           connectionsToUpdate.push({
             ...nextConnection,
-            prevProposalStatusId: result.prevProposalStatusId,
+            prevStatusId: result.prevStatusId,
           });
         }
 

@@ -868,16 +868,20 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
             .raw(
               `
         SELECT *
-        FROM proposal_workflow_connections AS pwc
-        JOIN status_changing_events
-        ON status_changing_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
-        WHERE pwc.proposal_workflow_connection_id >= (
-          SELECT proposal_workflow_connection_id
-          FROM proposal_workflow_connections
-          WHERE proposal_workflow_id = ${proposalWorkflowId}
-          AND proposal_status_id = ${statusId}
+        FROM workflow_connections AS wc
+        JOIN status_changing_events sce
+        ON sce.workflow_connection_id = wc.workflow_connection_id
+        WHERE wc.workflow_connection_id >= (
+          SELECT workflow_connection_id
+          FROM workflow_connections
+          WHERE workflow_id = ${proposalWorkflowId}
+          AND status_id = ${statusId}
+          AND 
+          entity_type = 'proposal'
         )
-        AND pwc.proposal_workflow_id = ${proposalWorkflowId};
+        AND wc.workflow_id = ${proposalWorkflowId};
+        AND wc.entity_type = 'proposal'
+        AND sce.entity_type = 'proposal'
       `
             )
             .transacting(trx)
@@ -1146,7 +1150,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
 
     return !!proposalStatus.find((status) =>
-      status.proposalStatus.shortCode.match(workflowStatus)
+      status.status.shortCode.match(workflowStatus)
     );
   }
 

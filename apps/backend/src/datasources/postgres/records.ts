@@ -565,7 +565,7 @@ export interface ShipmentRecord {
 }
 
 export interface ProposalStatusRecord {
-  readonly proposal_status_id: number;
+  readonly status_id: number;
   readonly short_code: string;
   readonly name: string;
   readonly description: string;
@@ -573,27 +573,57 @@ export interface ProposalStatusRecord {
   readonly full_count: number;
 }
 
+export interface StatusRecord {
+  readonly status_id: number;
+  readonly short_code: string;
+  readonly name: string;
+  readonly description: string;
+  readonly is_default: boolean;
+  readonly full_count: number;
+  readonly entity_type: 'proposal' | 'experiment';
+}
+
 export interface ProposalWorkflowRecord {
-  readonly proposal_workflow_id: number;
+  readonly workflow_id: number;
   readonly name: string;
   readonly description: string;
   readonly full_count: number;
 }
 
+export interface WorkflowRecord {
+  readonly workflow_id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly full_count: number;
+  readonly entity_type: 'proposal' | 'experiment';
+}
+
 export interface ProposalWorkflowConnectionRecord {
-  readonly proposal_workflow_connection_id: number;
+  readonly workflow_connection_id: number;
   readonly sort_order: number;
-  readonly proposal_workflow_id: number;
-  readonly proposal_status_id: number;
-  readonly next_proposal_status_id: number | null;
-  readonly prev_proposal_status_id: number | null;
+  readonly workflow_id: number;
+  readonly status_id: number;
+  readonly next_status_id: number | null;
+  readonly prev_status_id: number | null;
   readonly droppable_group_id: string;
   readonly parent_droppable_group_id: string;
 }
 
+export interface WorkflowConnectionRecord {
+  readonly workflow_connection_id: number;
+  readonly sort_order: number;
+  readonly workflow_id: number;
+  readonly status_id: number;
+  readonly next_status_id: number | null;
+  readonly prev_status_id: number | null;
+  readonly droppable_group_id: string;
+  readonly parent_droppable_group_id: string;
+  readonly entity_type: 'proposal' | 'experiment';
+}
+
 export interface StatusChangingEventRecord {
   readonly status_changing_event_id: number;
-  readonly proposal_workflow_connection_id: number;
+  readonly workflow_connection_id: number;
   readonly status_changing_event: string;
 }
 

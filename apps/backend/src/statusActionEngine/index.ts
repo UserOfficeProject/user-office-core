@@ -26,12 +26,12 @@ export const statusActionEngine = async (
   Promise.all(
     groupResult.map(async (groupedProposals) => {
       // NOTE: We get the needed ids from the first proposal in the group.
-      const [{ workflowId, statusId, prevProposalStatusId }] = groupedProposals;
+      const [{ workflowId, statusId, prevStatusId }] = groupedProposals;
 
       const [currentConnection] = await getProposalWorkflowConnectionByStatusId(
         workflowId,
         statusId,
-        prevProposalStatusId
+        prevStatusId
       );
 
       if (!currentConnection) {

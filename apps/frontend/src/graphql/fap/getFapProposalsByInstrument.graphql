@@ -20,7 +20,7 @@ query fapProposalsByInstrument(
         country
       }
       status {
-        ...proposalStatus
+        ...status
       }
       fapMeetingDecisions(fapId: $fapId) {
         ...fapMeetingDecision

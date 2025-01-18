@@ -9,13 +9,13 @@ query getProposalWorkflow($proposalWorkflowId: Int!) {
       connections {
         id
         sortOrder
-        proposalWorkflowId
-        proposalStatusId
-        proposalStatus {
-          ...proposalStatus
+        workflowId
+        statusId
+        status {
+          ...status
         }
-        nextProposalStatusId
-        prevProposalStatusId
+        nextStatusId
+        prevStatusId
         droppableGroupId
         statusChangingEvents {
           statusChangingEventId

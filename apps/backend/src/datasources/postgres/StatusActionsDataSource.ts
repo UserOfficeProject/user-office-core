@@ -84,12 +84,13 @@ export default class PostgresStatusActionsDataSource
         config: typeof ProposalStatusActionConfig;
       })[] = await database
       .select()
-      .from('proposal_status_actions as psa')
-      .join('proposal_workflow_connection_has_actions as pwca', {
-        'pwca.action_id': 'psa.proposal_status_action_id',
+      .from('status_actions as sa')
+      .join('workflow_connection_has_actions as wca', {
+        'wca.action_id': 'sa.status_action_id',
       })
-      .where('pwca.workflow_id', proposalWorkflowId)
-      .andWhere('pwca.connection_id', proposalWorkflowConnectionId);
+      .where('wca.workflow_id', proposalWorkflowId)
+      .andWhere('wca.connection_id', proposalWorkflowConnectionId)
+      .andWhere('wca.entity_type', 'proposal');
 
     const proposalStatusActions = proposalActionStatusRecords.map(
       (proposalActionStatusRecord) =>
@@ -108,12 +109,12 @@ export default class PostgresStatusActionsDataSource
         config: typeof ProposalStatusActionConfig;
       } = await database
       .select()
-      .from('proposal_status_actions as psa')
-      .join('proposal_workflow_connection_has_actions as pwca', {
-        'pwca.action_id': 'psa.proposal_status_action_id',
+      .from('status_actions as sa')
+      .join('workflow_connection_has_actions as wca', {
+        'wca.action_id': 'sa.status_action_id',
       })
-      .where('pwca.action_id', proposalStatusActionId)
-      .andWhere('pwca.connection_id', proposalWorkflowConnectionId)
+      .where('wca.action_id', proposalStatusActionId)
+      .andWhere('wca.connection_id', proposalWorkflowConnectionId)
       .first();
 
     if (!proposalActionStatusRecord) {
@@ -139,9 +140,10 @@ export default class PostgresStatusActionsDataSource
         },
         ['*']
       )
-      .from('proposal_workflow_connection_has_actions')
+      .from('workflow_connection_has_actions')
       .where('connection_id', proposalStatusAction.connectionId)
-      .andWhere('action_id', proposalStatusAction.actionId);
+      .andWhere('action_id', proposalStatusAction.actionId)
+      .andWhere('entity_type', 'proposal');
 
     if (!updatedProposalAction) {
       throw new GraphQLError(
@@ -160,8 +162,9 @@ export default class PostgresStatusActionsDataSource
   async getStatusAction(actionId: number): Promise<ProposalStatusAction> {
     const statusAction = await database
       .select<ProposalStatusActionRecord>()
-      .from('proposal_status_actions')
+      .from('status_actions')
       .where('proposal_status_action_id', actionId)
+      .andWhere('entity_type', 'proposal')
       .first();
 
     if (!statusAction) {
@@ -174,7 +177,8 @@ export default class PostgresStatusActionsDataSource
   async getStatusActions(): Promise<ProposalStatusAction[]> {
     const statusActions = await database
       .select<ProposalStatusActionRecord[]>('*')
-      .from('proposal_status_actions');
+      .from('status_actions')
+      .where('entity_type', 'proposal');
 
     return statusActions.map((statusAction) =>
       this.createProposalStatusActionObject(statusAction)
@@ -190,6 +194,7 @@ export default class PostgresStatusActionsDataSource
         action_id: item.actionId,
         workflow_id: connectionStatusActionsInput.workflowId,
         config: item.config,
+        entity_type: 'proposal',
       }));
     const connectionHasStatusActions:
       | (ProposalWorkflowConnectionHasActionsRecord &
@@ -201,17 +206,19 @@ export default class PostgresStatusActionsDataSource
         if (!connectionStatusActionsInput.actions.length) {
           const removedActions = await database
             .delete()
-            .from('proposal_workflow_connection_has_actions')
+            .from('workflow_connection_has_actions')
             .where('connection_id', connectionStatusActionsInput.connectionId)
             .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
+            .andWhere('entity_type', 'proposal')
             .transacting(trx);
 
           return await trx.commit(removedActions);
         }
         const currentConnectionStatusActionsIds: number[] = await database
           .select('*')
-          .from('proposal_workflow_connection_has_actions')
+          .from('workflow_connection_has_actions')
           .where('connection_id', connectionStatusActionsInput.connectionId)
+          .andWhere('entity_type', 'proposal')
           .transacting(trx)
           .then((results: ProposalWorkflowConnectionHasActionsRecord[]) => {
             return results.map((result) => result.action_id);
@@ -227,13 +234,14 @@ export default class PostgresStatusActionsDataSource
         if (connectionStatusActionsIdsToRemove.length) {
           await database
             .delete()
-            .from('proposal_workflow_connection_has_actions')
+            .from('workflow_connection_has_actions')
             .whereIn('action_id', connectionStatusActionsIdsToRemove)
             .where('connection_id', connectionStatusActionsInput.connectionId)
             .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
+            .andWhere('entity_type', 'proposal')
             .transacting(trx);
         }
-        await database('proposal_workflow_connection_has_actions')
+        await database('workflow_connection_has_actions')
           .insert<
             ProposalWorkflowConnectionHasActionsRecord[]
           >(connectionStatusActionsToInsert)
@@ -244,14 +252,13 @@ export default class PostgresStatusActionsDataSource
 
         const insertedStatusActions = await database
           .select('*')
-          .from('proposal_workflow_connection_has_actions as pwca')
-          .join('proposal_status_actions as psa', {
-            'pwca.action_id': 'psa.proposal_status_action_id ',
+          .from('workflow_connection_has_actions as wca')
+          .join('status_actions as sa', {
+            'wca.action_id': 'sa.status_action_id ',
           })
-          .where(
-            'pwca.connection_id',
-            connectionStatusActionsInput.connectionId
-          )
+          .where('wca.connection_id', connectionStatusActionsInput.connectionId)
+          .andWhere('wca.entity_type', 'proposal')
+          .andWhere('sa.entity_type', 'proposal')
           .transacting(trx);
 
         return await trx.commit(insertedStatusActions);

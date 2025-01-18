@@ -4,8 +4,8 @@ mutation addProposalWorkflowStatus(
   $droppableGroupId: String!
   $parentDroppableGroupId: String
   $proposalStatusId: Int!
-  $nextProposalStatusId: Int
-  $prevProposalStatusId: Int
+  $nextStatusId: Int
+  $prevStatusId: Int
 ) {
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: {
@@ -14,8 +14,8 @@ mutation addProposalWorkflowStatus(
       droppableGroupId: $droppableGroupId
       parentDroppableGroupId: $parentDroppableGroupId
       proposalStatusId: $proposalStatusId
-      nextProposalStatusId: $nextProposalStatusId
-      prevProposalStatusId: $prevProposalStatusId
+      nextStatusId: $nextStatusId
+      prevStatusId: $prevStatusId
     }
   ) {
     id

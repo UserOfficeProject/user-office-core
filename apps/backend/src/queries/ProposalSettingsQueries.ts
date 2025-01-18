@@ -9,7 +9,10 @@ import { MailService } from '../eventHandlers/MailService/MailService';
 import { EXCHANGE_NAME } from '../eventHandlers/messageBroker';
 import { Event, EventLabel } from '../events/event.enum';
 import { ProposalStatusActionType } from '../models/ProposalStatusAction';
-import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import {
+  ProposalWorkflowConnection,
+  WorkflowConnection,
+} from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ProposalStatusAction } from '../resolvers/types/ProposalStatusAction';
@@ -52,10 +55,13 @@ export default class ProposalSettingsQueries {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getAllProposalWorkflows(agent: UserWithRole | null) {
-    const proposalWorkflows = await this.dataSource.getAllProposalWorkflows();
+  async getAllWorkflows(
+    agent: UserWithRole | null,
+    entityType: 'proposal' | 'experiment'
+  ) {
+    const workflows = await this.dataSource.getAllWorkflows(entityType);
 
-    return proposalWorkflows;
+    return workflows;
   }
 
   getUniqueDroppableGroupIds(list: ProposalWorkflowConnection[]) {
@@ -65,7 +71,7 @@ export default class ProposalSettingsQueries {
       list
         .map((item) => ({
           droppableGroupId: item.droppableGroupId,
-          prevProposalStatusId: item.prevProposalStatusId,
+          prevStatusId: item.prevStatusId,
         }))
         // remove duplicates
         .filter((item) => {
@@ -88,7 +94,7 @@ export default class ProposalSettingsQueries {
       groupId: item.droppableGroupId,
       parentGroupId:
         proposalWorkflowConnections.find(
-          (element) => element.proposalStatusId === item.prevProposalStatusId
+          (element) => element.proposalStatusId === item.prevStatusId
         )?.droppableGroupId || null,
       connections: proposalWorkflowConnections.filter(
         (proposalWorkflowConnection) =>
@@ -99,20 +105,40 @@ export default class ProposalSettingsQueries {
     return groupedProposalWorkflowConnections;
   }
 
-  @Authorized()
-  async proposalWorkflowConnectionGroups(
-    agent: UserWithRole | null,
-    proposalWorkflowId: number
+  groupWorkflowConnectionsByDroppableArea(
+    workflowConnections: WorkflowConnection[]
   ) {
-    const proposalWorkflowConnections =
-      await this.dataSource.getProposalWorkflowConnections(proposalWorkflowId);
+    const groupedWorkflowConnections = this.getUniqueDroppableGroupIds(
+      workflowConnections
+    ).map((item) => ({
+      groupId: item.droppableGroupId,
+      parentGroupId:
+        workflowConnections.find(
+          (element) => element.statusId === item.prevStatusId
+        )?.droppableGroupId || null,
+      connections: workflowConnections.filter(
+        (workflowConnection) =>
+          workflowConnection.droppableGroupId === item.droppableGroupId
+      ),
+    }));
 
-    const groupedProposalWorkflowConnections =
-      this.groupProposalWorkflowConnectionsByDroppableArea(
-        proposalWorkflowConnections
-      );
+    return groupedWorkflowConnections;
+  }
 
-    return groupedProposalWorkflowConnections;
+  @Authorized()
+  async workflowConnectionGroups(
+    agent: UserWithRole | null,
+    workflowId: number,
+    entityType: 'proposal' | 'experiment'
+  ) {
+    const workflowConnections = await this.dataSource.getWorkflowConnections(
+      workflowId,
+      entityType
+    );
+    const groupedWorkflowConnections =
+      this.groupWorkflowConnectionsByDroppableArea(workflowConnections);
+
+    return groupedWorkflowConnections;
   }
 
   @Authorized([Roles.USER_OFFICER])

@@ -14,6 +14,16 @@ export enum ProposalStatusDefaultShortCodes {
   FAP_AND_FEASIBILITY_REVIEW = 'FAP_AND_FEASIBILITY_REVIEW',
 }
 
+export class Status {
+  constructor(
+    public id: number,
+    public shortCode: string,
+    public name: string,
+    public description: string,
+    public isDefault: boolean,
+    public entityType: 'proposal' | 'experiment'
+  ) {}
+}
 export class ProposalStatus {
   constructor(
     public id: number,

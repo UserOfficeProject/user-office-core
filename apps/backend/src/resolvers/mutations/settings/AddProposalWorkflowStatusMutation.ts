@@ -31,10 +31,10 @@ export class AddProposalWorkflowStatusInput
   public proposalStatusId: number;
 
   @Field(() => Int, { nullable: true })
-  public nextProposalStatusId: number | null;
+  public nextStatusId: number | null;
 
   @Field(() => Int, { nullable: true })
-  public prevProposalStatusId: number | null;
+  public prevStatusId: number | null;
 }
 
 @Resolver()

@@ -1,8 +1,9 @@
 import { ProposalStatus } from '../../models/ProposalStatus';
-import { ProposalWorkflow } from '../../models/ProposalWorkflow';
+import { ProposalWorkflow, Workflow } from '../../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
   ProposalWorkflowConnection,
+  WorkflowConnection,
 } from '../../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
@@ -18,6 +19,13 @@ export const dummyProposalWorkflow = new ProposalWorkflow(
   1,
   'Test workflow',
   'This is description'
+);
+
+export const dummyWorkflow = new Workflow(
+  1,
+  'Test workflow',
+  'This is description',
+  'proposal'
 );
 
 export const dummyProposalWorkflowConnection = new ProposalWorkflowConnection(
@@ -117,8 +125,10 @@ export class ProposalSettingsDataSourceMock
     return dummyProposalWorkflow;
   }
 
-  async getAllProposalWorkflows(): Promise<ProposalWorkflow[]> {
-    return [dummyProposalWorkflow];
+  async getAllWorkflows(
+    entityType: 'proposal' | 'experiment'
+  ): Promise<Workflow[]> {
+    return [dummyWorkflow];
   }
 
   async updateProposalWorkflow(
@@ -142,14 +152,20 @@ export class ProposalSettingsDataSourceMock
     ];
   }
 
+  async getWorkflowConnections(
+    workflowId: number,
+    entityType: 'proposal' | 'experiment'
+  ): Promise<WorkflowConnection[]> {
+    return [
+      dummyProposalWorkflowConnection,
+      anotherDummyProposalWorkflowConnection,
+    ];
+  }
+
   async getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
     proposalWorkflowConnectionId: number,
-    {
-      nextProposalStatusId,
-      prevProposalStatusId,
-      sortOrder,
-    }: NextAndPreviousProposalStatuses
+    { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]> {
     return [dummyProposalWorkflowConnection];
   }

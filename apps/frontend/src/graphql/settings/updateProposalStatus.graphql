@@ -12,6 +12,6 @@ mutation updateProposalStatus(
       description: $description
     }
   ) {
-    ...proposalStatus
+    ...status
   }
 }

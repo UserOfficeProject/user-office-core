@@ -44,14 +44,18 @@ describe('Test Proposal Statuses Queries', () => {
 describe('Test Proposal Workflows Queries', () => {
   test('A user cannot query all Proposal Workflows', () => {
     return expect(
-      ProposalSettingsQueriesInstance.getAllProposalWorkflows(dummyUserWithRole)
+      ProposalSettingsQueriesInstance.getAllWorkflows(
+        dummyUserWithRole,
+        'proposal'
+      )
     ).resolves.toBe(null);
   });
 
   test('A userofficer can get all Proposal Workflows', () => {
     return expect(
-      ProposalSettingsQueriesInstance.getAllProposalWorkflows(
-        dummyUserOfficerWithRole
+      ProposalSettingsQueriesInstance.getAllWorkflows(
+        dummyUserOfficerWithRole,
+        'proposal'
       )
     ).resolves.toStrictEqual([dummyProposalWorkflow]);
   });
@@ -67,9 +71,10 @@ describe('Test Proposal Workflows Queries', () => {
 
   test('A userofficer can get Proposal Workflow connections', () => {
     return expect(
-      ProposalSettingsQueriesInstance.proposalWorkflowConnectionGroups(
+      ProposalSettingsQueriesInstance.workflowConnectionGroups(
         dummyUserOfficerWithRole,
-        1
+        1,
+        'proposal'
       )
     ).resolves.toStrictEqual([
       {

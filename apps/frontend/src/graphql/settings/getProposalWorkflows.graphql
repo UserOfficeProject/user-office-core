@@ -5,7 +5,7 @@ query getProposalWorkflows {
     description
     proposalWorkflowConnectionGroups {
       connections {
-        proposalStatus {
+        status {
           shortCode
         }
       }

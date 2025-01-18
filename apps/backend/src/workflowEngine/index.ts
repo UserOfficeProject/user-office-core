@@ -25,7 +25,7 @@ const getProposalWorkflowByCallId = (callId: number) => {
 export const getProposalWorkflowConnectionByStatusId = (
   proposalWorkflowId: number,
   proposalStatusId: number,
-  prevProposalStatusId?: number
+  prevStatusId?: number
 ) => {
   const proposalSettingsDataSource =
     container.resolve<ProposalSettingsDataSource>(
@@ -35,7 +35,7 @@ export const getProposalWorkflowConnectionByStatusId = (
   return proposalSettingsDataSource.getProposalWorkflowConnectionsById(
     proposalWorkflowId,
     proposalStatusId,
-    { prevProposalStatusId }
+    { prevStatusId }
   );
 };
 
@@ -75,14 +75,14 @@ const checkIfConditionsForNextStatusAreMet = async ({
   };
 }) => {
   for (const nextWorkflowConnection of nextWorkflowConnections) {
-    if (!nextWorkflowConnection.nextProposalStatusId) {
+    if (!nextWorkflowConnection.nextStatusId) {
       continue;
     }
 
     const nextNextWorkflowConnections =
       await getProposalWorkflowConnectionByStatusId(
         proposalWorkflow.id,
-        nextWorkflowConnection.nextProposalStatusId
+        nextWorkflowConnection.nextStatusId
       );
     const newStatusChangingEvents =
       await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
@@ -122,7 +122,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
 
 export type WorkflowEngineProposalType = Proposal & {
   workflowId: number;
-  prevProposalStatusId: number;
+  prevStatusId: number;
   callShortCode: string;
 };
 
@@ -182,12 +182,12 @@ export const workflowEngine = async (
          * This is the way how we store the connection that has multiple next connections.
          * We have multiple separate connection records pointing to each next connection.
          * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: FAP_SELECTION and NOT_FEASIBLE.
-         * We store one record of FEASIBILITY_REVIEW with nextProposalStatusId = FAP_SELECTION and another one with nextProposalStatusId = NOT_FEASIBLE.
+         * We store one record of FEASIBILITY_REVIEW with nextStatusId = FAP_SELECTION and another one with nextStatusId = NOT_FEASIBLE.
          * We go through each record and based on the currentEvent we move the proposal into the right direction
          */
         return Promise.all(
           currentWorkflowConnections.map(async (currentWorkflowConnection) => {
-            if (!currentWorkflowConnection.nextProposalStatusId) {
+            if (!currentWorkflowConnection.nextStatusId) {
               return;
             }
 
@@ -198,7 +198,7 @@ export const workflowEngine = async (
             const nextWorkflowConnections =
               await getProposalWorkflowConnectionByStatusId(
                 proposalWorkflow.id,
-                currentWorkflowConnection.nextProposalStatusId,
+                currentWorkflowConnection.nextStatusId,
                 currentWorkflowConnection.proposalStatusId
               );
 
@@ -240,7 +240,7 @@ export const workflowEngine = async (
               const updatedProposal =
                 await proposalDataSource.updateProposalStatus(
                   proposalWithEvents.proposalPk,
-                  currentWorkflowConnection.nextProposalStatusId
+                  currentWorkflowConnection.nextStatusId
                 );
 
               if (updatedProposal) {
@@ -254,8 +254,7 @@ export const workflowEngine = async (
                 return {
                   ...updatedProposal,
                   workflowId: proposalWorkflow.id,
-                  prevProposalStatusId:
-                    currentWorkflowConnection.proposalStatusId,
+                  prevStatusId: currentWorkflowConnection.proposalStatusId,
                   callShortCode: call.shortCode,
                 };
               }

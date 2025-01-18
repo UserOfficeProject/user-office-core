@@ -1,8 +1,9 @@
 import { ProposalStatus } from '../models/ProposalStatus';
-import { ProposalWorkflow } from '../models/ProposalWorkflow';
+import { ProposalWorkflow, Workflow } from '../models/ProposalWorkflow';
 import {
   NextAndPreviousProposalStatuses,
   ProposalWorkflowConnection,
+  WorkflowConnection,
 } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { AddProposalWorkflowStatusInput } from '../resolvers/mutations/settings/AddProposalWorkflowStatusMutation';
@@ -24,7 +25,7 @@ export interface ProposalSettingsDataSource {
     proposalWorkflowId: number
   ): Promise<ProposalWorkflow | null>;
   getProposalWorkflowByCall(callId: number): Promise<ProposalWorkflow | null>;
-  getAllProposalWorkflows(): Promise<ProposalWorkflow[]>;
+  getAllWorkflows(entityType: 'proposal' | 'experiment'): Promise<Workflow[]>;
   updateProposalWorkflow(
     proposalWorkflow: ProposalWorkflow
   ): Promise<ProposalWorkflow>;
@@ -34,14 +35,16 @@ export interface ProposalSettingsDataSource {
     droppableGroupId?: string | undefined,
     byParentGroupId?: boolean | undefined
   ): Promise<ProposalWorkflowConnection[]>;
+  getWorkflowConnections(
+    workflowId: number,
+    entityType: 'proposal' | 'experiment',
+    droppableGroupId?: string | undefined,
+    byParentGroupId?: boolean | undefined
+  ): Promise<WorkflowConnection[]>;
   getProposalWorkflowConnectionsById(
     proposalWorkflowId: number,
     proposalWorkflowConnectionId: number,
-    {
-      nextProposalStatusId,
-      prevProposalStatusId,
-      sortOrder,
-    }: NextAndPreviousProposalStatuses
+    { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousProposalStatuses
   ): Promise<ProposalWorkflowConnection[]>;
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: AddProposalWorkflowStatusInput
