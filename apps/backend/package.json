@@ -16,7 +16,7 @@
     "test:windows": "powershell \"$Env:NODE_ENV='test'; $Env:secret='qMyLZALzs229ybdQXNyzYRdju7X784TH'; $Env:tokenLife='7d'; jest --config ./jest.unit.config.js --color\"",
     "test:windows:integration": "powershell \"$Env:DATABASE_URL='postgres://duouser:duopassword@127.0.0.1:5432/duo'; jest --config ./jest.integration.config.js --runInBand --testTimeout=15000",
     "tsc": "tsc",
-    "build": "rm -rf ./build && tsc",
+    "build": "npm run generate:uows && rm -rf ./build && tsc",
     "dev": "docker compose up -d --remove-orphans && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:e2e": "docker compose -f docker-compose.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:e2e:stfc": "docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
