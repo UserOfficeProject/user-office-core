@@ -19,7 +19,7 @@
     "build": "npm run generate:uows && rm -rf ./build && tsc",
     "dev": "docker compose up -d --remove-orphans && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:e2e": "docker compose -f docker-compose.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
-    "dev:e2e:stfc": "docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
+    "dev:e2e:stfc": "npm run generate:uows && docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:docker": "npm install && ts-node-dev --inspect=0.0.0.0:9229 --respawn -T ./index.ts",
     "prod": "tsc && node ./build/index.js",
     "lint": "npm run generate:uows && tsc --noEmit && eslint . --ext .js,.ts --quiet",
