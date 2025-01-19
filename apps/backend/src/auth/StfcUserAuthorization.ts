@@ -176,7 +176,7 @@ export class StfcUserAuthorization extends UserAuthorization {
       await UOWSClient.sessions.getLoginBySessionId(token);
     if (!loginBySession) {
       const rethrowMessage =
-        'Failed to fetch user details for STFC external authentication';
+        'Failed to fetch user details for STFC external authentication using getLoginBySessionId';
       logger.logWarn(rethrowMessage, {
         token: token,
       });
@@ -189,7 +189,7 @@ export class StfcUserAuthorization extends UserAuthorization {
         .then((rawStfcUser) => rawStfcUser)
         .catch((error) => {
           const rethrowMessage =
-            'Failed to fetch user details for STFC external authentication';
+            'Failed to fetch user details for STFC external authentication using getLoginBySessionId';
           logger.logWarn(rethrowMessage, {
             cause: error,
             token: token,
@@ -219,6 +219,9 @@ export class StfcUserAuthorization extends UserAuthorization {
       userNumber = parseInt(stfcUser!.userNumber);
       dummyUser = await this.userDataSource.ensureDummyUserExists(userNumber);
     } else {
+      logger.logError('There has been an error creating a dummy user', {
+        error,
+      });
       throw error;
     }
 
@@ -326,6 +329,14 @@ export class StfcUserAuthorization extends UserAuthorization {
       .validateToken(stfcToken)
       .then((response) => {
         return response.identifier !== undefined;
+      })
+      .catch((error) => {
+        logger.logError(
+          'An error occurred while validating the token using validateToken',
+          error
+        );
+
+        return false;
       });
 
     this.uowsTokenCache.put(token, tokenRequest);

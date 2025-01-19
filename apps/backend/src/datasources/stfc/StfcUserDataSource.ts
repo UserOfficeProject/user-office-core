@@ -1,3 +1,5 @@
+import { logger } from '@user-office-software/duo-logger';
+
 import { BasicPersonDetailsDTO } from '../../generated/models/BasicPersonDetailsDTO';
 import { RoleDTO } from '../../generated/models/RoleDTO';
 import { Country } from '../../models/Country';
@@ -194,17 +196,26 @@ export class StfcUserDataSource implements UserDataSource {
 
     if (cacheMisses.length > 0) {
       const uowsRequestTemp: BasicPersonDetailsDTO[] | null = searchableOnly
-        ? await UOWSClient.basicPersonDetails.getSearchableBasicPersonDetails(
-            undefined,
-            undefined,
-            cacheMisses
-          )
-        : await UOWSClient.basicPersonDetails.getBasicPersonDetails(
-            undefined,
-            undefined,
-            undefined,
-            cacheMisses
-          );
+        ? await UOWSClient.basicPersonDetails
+            .getSearchableBasicPersonDetails(undefined, undefined, cacheMisses)
+            .catch((error) => {
+              logger.logError(
+                'An error occurred while fetching searchable person details using getSearchableBasicPersonDetails',
+                error
+              );
+
+              return null;
+            })
+        : await UOWSClient.basicPersonDetails
+            .getBasicPersonDetails(undefined, undefined, undefined, cacheMisses)
+            .catch((error) => {
+              logger.logError(
+                'An error occurred while fetching searchable person details using getBasicPersonDetails',
+                error
+              );
+
+              return null;
+            });
 
       const uowsRequest = uowsRequestTemp
         ? uowsRequestTemp.map(toStfcBasicPersonDetails)
@@ -280,6 +291,14 @@ export class StfcUserDataSource implements UserDataSource {
         return this.ensureDummyUserExists(parseInt(stfcUser.userNumber)).then(
           () => stfcUser
         );
+      })
+      .catch((error) => {
+        logger.logError(
+          'An error occurred while fetching and processing user details using getBasicPersonDetails or getSearchableBasicPersonDetails',
+          error
+        );
+
+        return undefined;
       });
 
     cache.put(email, uowsRequest);
@@ -341,11 +360,11 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getByEmail(email: string): Promise<User | null> {
-    const dd = this.getStfcBasicPersonByEmail(email).then((stfcUser) =>
-      stfcUser ? toEssUser(stfcUser) : null
+    const convertedStfcUser = this.getStfcBasicPersonByEmail(email).then(
+      (stfcUser) => (stfcUser ? toEssUser(stfcUser) : null)
     );
 
-    return dd;
+    return convertedStfcUser;
   }
 
   async getByUsername(username: string): Promise<User | null> {
@@ -362,11 +381,19 @@ export class StfcUserDataSource implements UserDataSource {
       return cachedRoles;
     }
 
-    const stfcRawRolesRequest = UOWSClient.role.getRolesForUser(id.toString());
+    let stfcRawRolesRequest;
+    try {
+      stfcRawRolesRequest = UOWSClient.role.getRolesForUser(id.toString());
+    } catch (error) {
+      logger.logError(
+        'An error occurred while fetching roles using getRolesForUser',
+        { error }
+      );
+    }
 
-    this.stfcRolesCache.put(String(id), stfcRawRolesRequest);
+    this.stfcRolesCache.put(String(id), stfcRawRolesRequest!);
 
-    return stfcRawRolesRequest;
+    return stfcRawRolesRequest!;
   }
 
   async getUserRoles(id: number): Promise<Role[]> {
@@ -480,12 +507,18 @@ export class StfcUserDataSource implements UserDataSource {
     if (filter) {
       userDetails = [];
 
-      const BasicPeopleByLastName: BasicPersonDetailsDTO[] =
-        await UOWSClient.basicPersonDetails.getBasicPersonDetails(
-          undefined,
-          filter,
-          undefined
-        );
+      const BasicPeopleByLastName: BasicPersonDetailsDTO[] | null =
+        await UOWSClient.basicPersonDetails
+          .getBasicPersonDetails(undefined, filter, undefined)
+          .catch((error) => {
+            logger.logError(
+              'An error occurred while fetching searchable person details using getBasicPersonDetails',
+              error
+            );
+
+            return null;
+          });
+
       if (!BasicPeopleByLastName) return { totalCount: 0, users: [] };
 
       const stfcBasicPeopleByLastName: StfcBasicPersonDetails[] =
