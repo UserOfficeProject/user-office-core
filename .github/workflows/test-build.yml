@@ -305,7 +305,6 @@ jobs:
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: 
           npm run install:backend
-          npm run generate:stfc:uows
           npm run install:e2e
 
       - name: Download required repositories
