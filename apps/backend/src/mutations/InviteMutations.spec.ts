@@ -40,7 +40,7 @@ describe('Test Invite Mutations', () => {
         email: email,
         note: 'Test note',
         claims: {
-          roleIds: [UserRole.USER],
+          roleIds: [UserRole.FAP_REVIEWER],
         },
       })
     ).resolves.toHaveProperty('email', email);
