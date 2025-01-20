@@ -304,8 +304,8 @@ jobs:
           CYPRESS_CACHE_FOLDER: .cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: 
-          npm run install:e2e
           npm run generate:stfc:uows
+          npm run install:e2e
 
       - name: Download required repositories
         run: |
@@ -353,9 +353,7 @@ jobs:
           PROFILE_PAGE_LINK: http://localhost:9003/auth/ManageDetails.aspx
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
-
-          npm run generate:stfc:uows
-
+          
           npm run e2e:after:dev:stfc
 
       - name: Run e2e tests
