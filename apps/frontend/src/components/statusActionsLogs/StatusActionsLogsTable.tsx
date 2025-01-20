@@ -59,7 +59,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
         return rowData.proposals.map((proposal) => (
           <ReactRouterLink
             key={proposal.primaryKey}
-            to={`/Proposals?reviewModal=${proposal.primaryKey}`}
+            to={`/?proposalId=${proposal.proposalId}`}
             onClick={() => setSearchParams({})}
           >
             {proposal.proposalId}
