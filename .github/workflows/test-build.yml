@@ -303,8 +303,9 @@ jobs:
         env:
           CYPRESS_CACHE_FOLDER: .cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
-        run: npm run install:e2e
-        run: npm run generate:stfc:uows
+        run: 
+          npm run install:e2e
+          npm run generate:stfc:uows
 
       - name: Download required repositories
         run: |
