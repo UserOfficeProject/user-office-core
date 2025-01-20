@@ -20,7 +20,7 @@
     "build": "concurrently \"npm run build:backend\" \"npm run build:frontend\"",
     "build:backend": "cd apps/backend && npm run build",
     "build:frontend": "cd apps/frontend && npm run build",
-    "install:backend": "cd apps/backend && npm install && openapi --output ./src/generated --name UOWS --input ./openapi.yaml",
+    "install:backend": "cd apps/backend && npm install",
     "install:frontend": "cd apps/frontend && npm install",
     "install:e2e": "cd apps/e2e && npm install",
     "install:libs:shared-types": "cd libs/shared-types && npm install",
