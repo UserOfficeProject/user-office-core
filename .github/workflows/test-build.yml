@@ -108,6 +108,11 @@ jobs:
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
         run: npm run install:backend
 
+      - name: Generate backend UOWS
+        run: |
+          cp apps/backend
+          npm run generate:uows
+
       - name: Cache frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v4
