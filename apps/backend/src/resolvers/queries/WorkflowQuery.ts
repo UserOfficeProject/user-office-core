@@ -1,7 +1,7 @@
 import { Query, Ctx, Resolver, Int, ArgsType, Field, Args } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Workflow } from '../types/ProposalWorkflow';
+import { Workflow } from '../types/Workflow';
 
 @ArgsType()
 export class WorkflowArgs {

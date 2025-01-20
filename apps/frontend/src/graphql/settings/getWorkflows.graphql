@@ -1,9 +1,9 @@
-query getProposalWorkflows {
-  proposalWorkflows {
+query getWorkflows($entityType: String!) {
+  workflows(entityType: $entityType) {
     id
     name
     description
-    proposalWorkflowConnectionGroups {
+    workflowConnectionGroups {
       connections {
         status {
           shortCode

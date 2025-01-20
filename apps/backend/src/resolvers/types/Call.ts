@@ -15,8 +15,8 @@ import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
-import { ProposalWorkflow } from './ProposalWorkflow';
 import { Template } from './Template';
+import { Workflow } from './Workflow';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -117,8 +117,8 @@ export class CallInstrumentsResolver {
     return context.queries.fap.dataSource.getFapsByCallId(call.id);
   }
 
-  @FieldResolver(() => ProposalWorkflow, { nullable: true })
-  async proposalWorkflow(@Root() call: Call, @Ctx() context: ResolverContext) {
+  @FieldResolver(() => Workflow, { nullable: true })
+  async workflow(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.workflow.dataSource.getWorkflow(
       call.proposalWorkflowId,
       'proposal'

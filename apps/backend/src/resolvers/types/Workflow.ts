@@ -14,7 +14,7 @@ import {
   Workflow as WorkflowOrigin,
 } from '../../models/ProposalWorkflow';
 import { isRejection } from '../../models/Rejection';
-import { ProposalWorkflowConnectionGroup } from './ProposalWorkflowConnection';
+import { WorkflowConnectionGroup } from './ProposalWorkflowConnection';
 
 @ObjectType()
 export class Workflow implements Partial<WorkflowOrigin> {
@@ -41,16 +41,16 @@ export class ProposalWorkflow implements Partial<ProposalWorkflowOrigin> {
   @Field(() => String)
   public description: string;
 }
-@Resolver(() => ProposalWorkflow)
-export class ProposalWorkflowResolver {
-  @FieldResolver(() => [ProposalWorkflowConnectionGroup])
-  async proposalWorkflowConnectionGroups(
-    @Root() proposalWorkflow: ProposalWorkflow,
+@Resolver(() => Workflow)
+export class WorkflowResolver {
+  @FieldResolver(() => [WorkflowConnectionGroup])
+  async workflowConnectionGroups(
+    @Root() workflow: Workflow,
     @Ctx() context: ResolverContext
-  ): Promise<ProposalWorkflowConnectionGroup[]> {
+  ): Promise<WorkflowConnectionGroup[]> {
     const connections = await context.queries.workflow.workflowConnectionGroups(
       context.user,
-      proposalWorkflow.id,
+      workflow.id,
       'proposal'
     );
 

@@ -64,7 +64,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return statuses.map((status) => this.createStatusObject(status));
   }
-  async updateStatus(status: Status): Promise<Status> {
+  async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
     // TODO: To test
     const [updatedStatus]: StatusRecord[] = await database
       .update(

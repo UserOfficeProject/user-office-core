@@ -1,7 +1,7 @@
 import { Arg, Ctx, Int, Mutation, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { Workflow } from '../../types/ProposalWorkflow';
+import { Workflow } from '../../types/Workflow';
 
 @Resolver()
 export class DeleteWorkflowMutation {

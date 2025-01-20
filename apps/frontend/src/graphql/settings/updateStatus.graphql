@@ -1,11 +1,11 @@
-mutation updateProposalStatus(
+mutation updateStatus(
   $id: Int!
   $shortCode: String!
   $name: String!
   $description: String!
 ) {
-  updateProposalStatus(
-    updatedProposalStatusInput: {
+  updateStatus(
+    updatedStatusInput: {
       id: $id
       shortCode: $shortCode
       name: $name

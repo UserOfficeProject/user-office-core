@@ -581,8 +581,7 @@ export default class WorkflowMutations {
     connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null> {
     return this.statusActionsDataSource.addConnectionStatusActions(
-      connectionStatusActionsInput,
-      connectionStatusActionsInput.entityType
+      connectionStatusActionsInput
     );
   }
 }

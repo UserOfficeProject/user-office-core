@@ -9,11 +9,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Status } from '../../models/ProposalStatus';
 import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/ProposalWorkflowConnections';
 import { isRejection } from '../../models/Rejection';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
-import { ProposalStatus } from './ProposalStatus';
+import { Status } from './Status';
 import { StatusChangingEvent } from './StatusChangingEvent';
 
 @ObjectType()
@@ -32,7 +31,7 @@ export class ProposalWorkflowConnection
   @Field(() => Int)
   public statusId: number;
 
-  @Field(() => ProposalStatus)
+  @Field(() => Status)
   public status: Status;
 
   @Field(() => Int, { nullable: true })
@@ -61,7 +60,7 @@ export class WorkflowConnection
   @Field(() => Int)
   public statusId: number;
 
-  @Field(() => ProposalStatus)
+  @Field(() => Status)
   public status: Status;
 
   @Field(() => Int, { nullable: true })
@@ -72,10 +71,25 @@ export class WorkflowConnection
 
   @Field()
   public droppableGroupId: string;
+
+  @Field(() => String)
+  public entityType: 'proposal' | 'experiment';
 }
 
 @ObjectType()
 export class ProposalWorkflowConnectionGroup {
+  @Field(() => String)
+  public groupId: string;
+
+  @Field(() => String, { nullable: true })
+  public parentGroupId: string | null;
+
+  @Field(() => [ProposalWorkflowConnection])
+  public connections: ProposalWorkflowConnection[];
+}
+
+@ObjectType()
+export class WorkflowConnectionGroup {
   @Field(() => String)
   public groupId: string;
 

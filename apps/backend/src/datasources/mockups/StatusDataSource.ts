@@ -14,7 +14,7 @@ export class StatusDataSourceMock implements StatusDataSource {
   getAllStatuses(): Promise<Status[]> {
     throw new Error('Method not implemented.');
   }
-  updateStatus(proposalStatus: Status): Promise<Status> {
+  updateStatus(proposalStatus: Omit<Status, 'entityType'>): Promise<Status> {
     throw new Error('Method not implemented.');
   }
   deleteStatus(statusId: number): Promise<Status> {

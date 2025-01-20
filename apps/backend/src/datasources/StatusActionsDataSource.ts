@@ -21,7 +21,6 @@ export interface StatusActionsDataSource {
   getStatusAction(actionId: number): Promise<StatusAction>;
   getStatusActions(): Promise<StatusAction[]>;
   addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput,
-    entityType: ConnectionHasStatusAction['entityType']
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null>;
 }

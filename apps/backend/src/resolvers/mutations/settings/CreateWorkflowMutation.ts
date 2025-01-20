@@ -1,7 +1,7 @@
 import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { Workflow } from '../../types/ProposalWorkflow';
+import { Workflow } from '../../types/Workflow';
 
 @InputType()
 export class CreateWorkflowInput implements Partial<Workflow> {

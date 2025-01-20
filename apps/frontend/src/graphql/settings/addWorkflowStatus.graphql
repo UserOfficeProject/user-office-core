@@ -1,22 +1,22 @@
 mutation addWorkflowStatus(
-  $proposalWorkflowId: Int!
+  $workflowId: Int!
   $sortOrder: Int!
   $droppableGroupId: String!
   $parentDroppableGroupId: String
-  $proposalStatusId: Int!
-  $nextStatusId: Int
-  $prevStatusId: Int
-  entityType: String
+  $statusId: Int!
+  $nextStatusId: Int!
+  $prevStatusId: Int!
+  $entityType: String!
 ) {
-  addProposalWorkflowStatus(
-    newProposalWorkflowStatusInput: {
-      proposalWorkflowId: $proposalWorkflowId
+  addWorkflowStatus(
+    newWorkflowStatusInput: {
+      workflowId: $workflowId
       sortOrder: $sortOrder
       droppableGroupId: $droppableGroupId
       parentDroppableGroupId: $parentDroppableGroupId
-      proposalStatusId: $proposalStatusId
+      statusId: $statusId
       nextStatusId: $nextStatusId
-      prevStatusId: $prevStatusId,
+      prevStatusId: $prevStatusId
       entityType: $entityType
     }
   ) {

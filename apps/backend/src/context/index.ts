@@ -43,6 +43,7 @@ import PdfTemplateQueries from '../queries/PdfTemplateQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalEsiQueries from '../queries/ProposalEsiQueries';
 import ProposalQueries from '../queries/ProposalQueries';
+import ProposalSettingsQueries from '../queries/ProposalSettingsQueries';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SampleEsiQueries from '../queries/SampleEsiQueries';
@@ -88,6 +89,7 @@ interface ResolverContextQueries {
   internalReview: InternalReviewQueries;
   statusActionsLogs: StatusActionsLogsQueries;
   status: StatusQueries;
+  proposalSettings: ProposalSettingsQueries;
   workflow: WorkflowQueries;
   statusAction: StatusActionQueries;
 }

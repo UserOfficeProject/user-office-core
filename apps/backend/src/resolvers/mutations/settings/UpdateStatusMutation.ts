@@ -9,11 +9,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { Status } from '../../../models/ProposalStatus';
-import { ProposalStatus } from '../../types/ProposalStatus';
+import { Status } from '../../types/Status';
 
 @InputType()
-export class UpdateStatusInput implements Status {
+export class UpdateStatusInput implements Omit<Status, 'entityType'> {
   @Field(() => Int)
   public id: number;
 
@@ -28,14 +27,11 @@ export class UpdateStatusInput implements Status {
 
   @Field(() => Boolean, { nullable: true })
   public isDefault: boolean;
-
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
 }
 
 @Resolver()
 export class UpdateStatusMutation {
-  @Mutation(() => ProposalStatus)
+  @Mutation(() => Status)
   async updateStatus(
     @Ctx() context: ResolverContext,
     @Arg('updatedStatusInput')

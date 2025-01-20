@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { Workflow } from '../../types/ProposalWorkflow';
+import { Workflow } from '../../types/Workflow';
 
 @InputType()
 export class UpdateWorkflowInput implements Omit<Workflow, 'entityType'> {

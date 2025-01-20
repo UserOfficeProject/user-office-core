@@ -1,9 +1,9 @@
-query getProposalWorkflow($proposalWorkflowId: Int!) {
-  proposalWorkflow(proposalWorkflowId: $proposalWorkflowId) {
+query getWorkflow($workflowId: Int!, $entityType: String!) {
+  workflow(workflowId: $workflowId, entityType: $entityType) {
     id
     name
     description
-    proposalWorkflowConnectionGroups {
+    workflowConnectionGroups {
       groupId
       parentGroupId
       connections {
@@ -19,7 +19,7 @@ query getProposalWorkflow($proposalWorkflowId: Int!) {
         droppableGroupId
         statusChangingEvents {
           statusChangingEventId
-          proposalWorkflowConnectionId
+          workflowConnectionId
           statusChangingEvent
         }
         statusActions {
@@ -27,5 +27,6 @@ query getProposalWorkflow($proposalWorkflowId: Int!) {
         }
       }
     }
+    entityType
   }
 }

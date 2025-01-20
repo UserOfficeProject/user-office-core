@@ -180,8 +180,7 @@ export default class PostgresStatusActionsDataSource
   }
 
   async addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput,
-    entityType: ConnectionHasStatusAction['entityType']
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null> {
     const connectionStatusActionsToInsert =
       connectionStatusActionsInput.actions.map((item) => ({
@@ -189,7 +188,7 @@ export default class PostgresStatusActionsDataSource
         action_id: item.actionId,
         workflow_id: connectionStatusActionsInput.workflowId,
         config: item.config,
-        entity_type: entityType,
+        entity_type: connectionStatusActionsInput.entityType,
       }));
     const connectionHasStatusActions:
       | (WorkflowConnectionHasActionsRecord &

@@ -9,6 +9,6 @@ export interface StatusDataSource {
     entityType: Status['entityType']
   ): Promise<Status | null>;
   getAllStatuses(entityType: Status['entityType']): Promise<Status[]>;
-  updateStatus(proposalStatus: Status): Promise<Status>;
+  updateStatus(proposalStatus: Omit<Status, 'entityType'>): Promise<Status>;
   deleteStatus(statusId: number): Promise<Status>;
 }

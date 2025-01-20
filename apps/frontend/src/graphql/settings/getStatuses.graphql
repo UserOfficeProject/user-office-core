@@ -1,0 +1,5 @@
+query getStatuses($entityType: String!) {
+  statuses(entityType: $entityType) {
+    ...status
+  }
+}

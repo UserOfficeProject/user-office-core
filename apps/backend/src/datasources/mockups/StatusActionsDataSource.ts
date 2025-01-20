@@ -71,8 +71,7 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
   }
 
   async addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput,
-    entityType: ConnectionHasStatusAction['entityType']
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }

@@ -1,5 +1,0 @@
-mutation deleteProposalStatus($id: Int!) {
-  deleteProposalStatus(id: $id) {
-    ...status
-  }
-}

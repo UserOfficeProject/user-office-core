@@ -1,19 +1,19 @@
-mutation updateProposalWorkflow(
-  $id: Int!
+mutation createWorkflow(
   $name: String!
   $description: String!
+  $entityType: String!
 ) {
-  updateProposalWorkflow(
-    updatedProposalWorkflowInput: {
-      id: $id
+  createWorkflow(
+    newWorkflowInput: {
       name: $name
       description: $description
+      entityType: $entityType
     }
   ) {
     id
     name
     description
-    proposalWorkflowConnectionGroups {
+    workflowConnectionGroups {
       groupId
       parentGroupId
       connections {
@@ -22,17 +22,18 @@ mutation updateProposalWorkflow(
         workflowId
         statusId
         status {
-          id
-          name
-          description
+          ...status
         }
         nextStatusId
         prevStatusId
         droppableGroupId
         statusChangingEvents {
           statusChangingEventId
-          proposalWorkflowConnectionId
+          workflowConnectionId
           statusChangingEvent
+        }
+        statusActions {
+          ...connectionStatusAction
         }
       }
     }

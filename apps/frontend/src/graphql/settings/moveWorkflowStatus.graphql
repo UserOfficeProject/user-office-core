@@ -1,0 +1,17 @@
+mutation moveWorkflowStatus(
+  $from: IndexWithGroupId!
+  $to: IndexWithGroupId!
+  $workflowId: Int!
+  $entityType: String!
+) {
+  moveWorkflowStatus(
+    moveWorkflowStatusInput: {
+      from: $from
+      to: $to
+      workflowId: $workflowId
+      entityType: $entityType
+    }
+  ) {
+    id
+  }
+}
