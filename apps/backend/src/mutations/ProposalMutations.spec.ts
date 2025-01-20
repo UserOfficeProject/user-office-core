@@ -10,6 +10,7 @@ import {
   dummyProposal,
 } from '../datasources/mockups/ProposalDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
+import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
   dummyInstrumentScientist,
   dummyPrincipalInvestigatorWithRole,
@@ -19,7 +20,7 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { ProposalStatus } from '../models/ProposalStatus';
+import { Status } from '../models/ProposalStatus';
 import { isRejection, Rejection } from '../models/Rejection';
 import ProposalMutations from './ProposalMutations';
 
@@ -27,6 +28,7 @@ const proposalMutations = container.resolve(ProposalMutations);
 
 let proposalDataSource: ProposalDataSourceMock;
 let proposalSettingsDataSource: ProposalSettingsDataSourceMock;
+let statusDataSource: StatusDataSourceMock;
 let instrumentDataSource: InstrumentDataSourceMock;
 
 beforeEach(() => {
@@ -39,6 +41,10 @@ beforeEach(() => {
     container.resolve<ProposalSettingsDataSourceMock>(
       Tokens.ProposalSettingsDataSource
     );
+
+  statusDataSource = container.resolve<StatusDataSourceMock>(
+    Tokens.StatusDataSource
+  );
 
   instrumentDataSource = container.resolve<InstrumentDataSourceMock>(
     Tokens.ProposalSettingsDataSource
@@ -420,39 +426,49 @@ describe('Test Xpress change status', () => {
   const expiredId = 7;
 
   const dummyProposalStatuses = [
-    new ProposalStatus(draftId, 'DRAFT', 'Draft', '', true),
-    new ProposalStatus(
+    new Status(draftId, 'DRAFT', 'Draft', '', true, 'proposal'),
+    new Status(
       submittedId,
       'SUBMITTED_LOCKED',
       'Submitted (locked)',
       '',
-      true
+      true,
+      'proposal'
     ),
-    new ProposalStatus(underReviewId, 'UNDER_REVIEW', 'Under review', '', true),
-    new ProposalStatus(approvedId, 'APPROVED', 'Approved', '', true),
-    new ProposalStatus(
+    new Status(
+      underReviewId,
+      'UNDER_REVIEW',
+      'Under review',
+      '',
+      true,
+      'proposal'
+    ),
+    new Status(approvedId, 'APPROVED', 'Approved', '', true, 'proposal'),
+    new Status(
       unsuccessfulId,
       'UNSUCCESSFUL',
       'Unsuccessful',
       '',
-      true
+      true,
+      'proposal'
     ),
-    new ProposalStatus(finishedId, 'FINISHED', 'Finished', '', true),
-    new ProposalStatus(
+    new Status(finishedId, 'FINISHED', 'Finished', '', true, 'proposal'),
+    new Status(
       nonXpressId,
       'NON-XPRESS',
       'A non-xpress status',
       '',
-      true
+      true,
+      'proposal'
     ),
-    new ProposalStatus(expiredId, 'EXPIRED', 'Expired', '', true),
+    new Status(expiredId, 'EXPIRED', 'Expired', '', true, 'proposal'),
   ];
 
   beforeEach(() => {
     jest.restoreAllMocks();
 
     jest
-      .spyOn(proposalSettingsDataSource, 'getAllProposalStatuses')
+      .spyOn(statusDataSource, 'getAllStatuses')
       .mockResolvedValue(dummyProposalStatuses);
   });
 

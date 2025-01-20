@@ -9,7 +9,8 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalWorkflowConnection as ProposalWorkflowConnectionOrigin } from '../../models/ProposalWorkflowConnections';
+import { Status } from '../../models/ProposalStatus';
+import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/ProposalWorkflowConnections';
 import { isRejection } from '../../models/Rejection';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { ProposalStatus } from './ProposalStatus';
@@ -17,7 +18,7 @@ import { StatusChangingEvent } from './StatusChangingEvent';
 
 @ObjectType()
 export class ProposalWorkflowConnection
-  implements Partial<ProposalWorkflowConnectionOrigin>
+  implements Partial<WorkflowConnectionWithStatusOrigin>
 {
   @Field(() => Int)
   public id: number;
@@ -32,7 +33,36 @@ export class ProposalWorkflowConnection
   public statusId: number;
 
   @Field(() => ProposalStatus)
-  public status: ProposalStatus;
+  public status: Status;
+
+  @Field(() => Int, { nullable: true })
+  public nextStatusId: number | null;
+
+  @Field(() => Int, { nullable: true })
+  public prevStatusId: number | null;
+
+  @Field()
+  public droppableGroupId: string;
+}
+
+@ObjectType()
+export class WorkflowConnection
+  implements Partial<WorkflowConnectionWithStatusOrigin>
+{
+  @Field(() => Int)
+  public id: number;
+
+  @Field(() => Int)
+  public sortOrder: number;
+
+  @Field(() => Int)
+  public workflowId: number;
+
+  @Field(() => Int)
+  public statusId: number;
+
+  @Field(() => ProposalStatus)
+  public status: Status;
 
   @Field(() => Int, { nullable: true })
   public nextStatusId: number | null;
@@ -64,9 +94,10 @@ export class ProposalWorkflowConnectionResolver {
     @Ctx() context: ResolverContext
   ): Promise<StatusChangingEvent[]> {
     const statusChangingEvents =
-      await context.queries.proposalSettings.getStatusChangingEventsByConnectionId(
+      await context.queries.workflow.getStatusChangingEventsByConnectionId(
         context.user,
-        proposalWorkflowConnection.id
+        proposalWorkflowConnection.id,
+        'proposal'
       );
 
     return isRejection(statusChangingEvents) ? [] : statusChangingEvents;
@@ -78,12 +109,13 @@ export class ProposalWorkflowConnectionResolver {
     @Ctx() context: ResolverContext
   ): Promise<ConnectionStatusAction[]> {
     const statusActions =
-      await context.queries.proposalSettings.getConnectionStatusActions(
+      await context.queries.statusAction.getConnectionStatusActions(
         context.user,
         {
           connectionId: proposalWorkflowConnection.id,
-          workflowId: proposalWorkflowConnection.proposalWorkflowId,
-        }
+          workflowId: proposalWorkflowConnection.workflowId,
+        },
+        'proposal'
       );
 
     return isRejection(statusActions) ? [] : statusActions;

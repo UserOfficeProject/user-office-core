@@ -119,8 +119,9 @@ export class CallInstrumentsResolver {
 
   @FieldResolver(() => ProposalWorkflow, { nullable: true })
   async proposalWorkflow(@Root() call: Call, @Ctx() context: ResolverContext) {
-    return context.queries.proposalSettings.dataSource.getProposalWorkflow(
-      call.proposalWorkflowId
+    return context.queries.workflow.dataSource.getWorkflow(
+      call.proposalWorkflowId,
+      'proposal'
     );
   }
 

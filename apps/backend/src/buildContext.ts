@@ -16,19 +16,21 @@ import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
 import ProposalMutations from './mutations/ProposalMutations';
-import ProposalSettingsMutations from './mutations/ProposalSettingsMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import RedeemCodesMutations from './mutations/RedeemCodesMutations';
 import ReviewMutations from './mutations/ReviewMutations';
 import SampleEsiMutations from './mutations/SampleEsiMutations';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
+import StatusActionMutations from './mutations/StatusActionMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
+import StatusMutations from './mutations/StatusMutations';
 import TechniqueMutations from './mutations/TechniqueMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UnitMutations from './mutations/UnitMutations';
 import UserMutations from './mutations/UserMutations';
 import VisitMutations from './mutations/VisitMutations';
+import WorkflowMutations from './mutations/WorkflowMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
@@ -42,20 +44,22 @@ import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
 import ProposalQueries from './queries/ProposalQueries';
-import ProposalSettingsQueries from './queries/ProposalSettingsQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SampleEsiQueries from './queries/SampleEsiQueries';
 import SampleQueries from './queries/SampleQueries';
 import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
+import StatusActionQueries from './queries/StatusActionQueries';
 import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
+import StatusQueries from './queries/StatusQueries';
 import SystemQueries from './queries/SystemQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UnitQueries from './queries/UnitQueries';
 import UserQueries from './queries/UserQueries';
 import VisitQueries from './queries/VisitQueries';
+import WorkflowQueries from './queries/WorkflowQueries';
 
 const context: BasicResolverContext = {
   queries: {
@@ -69,7 +73,6 @@ const context: BasicResolverContext = {
     pdfTemplate: container.resolve(PdfTemplateQueries),
     proposal: container.resolve(ProposalQueries),
     proposalEsi: container.resolve(ProposalEsiQueries),
-    proposalSettings: container.resolve(ProposalSettingsQueries),
     questionary: container.resolve(QuestionaryQueries),
     review: container.resolve(ReviewQueries),
     sample: container.resolve(SampleQueries),
@@ -86,6 +89,9 @@ const context: BasicResolverContext = {
     internalReview: container.resolve(InternalReviewQueries),
     technique: container.resolve(TechniqueQueries),
     statusActionsLogs: container.resolve(StatusActionsLogsQueries),
+    status: container.resolve(StatusQueries),
+    workflow: container.resolve(WorkflowQueries),
+    statusAction: container.resolve(StatusActionQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -98,7 +104,6 @@ const context: BasicResolverContext = {
     pdfTemplate: container.resolve(PdfTemplateMutations),
     proposal: container.resolve(ProposalMutations),
     proposalEsi: container.resolve(ProposalEsiMutations),
-    proposalSettings: container.resolve(ProposalSettingsMutations),
     questionary: container.resolve(QuestionaryMutations),
     redeemCodes: container.resolve(RedeemCodesMutations),
     review: container.resolve(ReviewMutations),
@@ -114,6 +119,9 @@ const context: BasicResolverContext = {
     internalReview: container.resolve(InternalReviewMutations),
     technique: container.resolve(TechniqueMutations),
     statusActionsLogs: container.resolve(StatusActionsLogsMutations),
+    status: container.resolve(StatusMutations),
+    workflow: container.resolve(WorkflowMutations),
+    statusAction: container.resolve(StatusActionMutations),
   },
   clients: {
     scheduler: async () => {

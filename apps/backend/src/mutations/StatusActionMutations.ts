@@ -3,10 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { Authorized } from '../decorators';
-import {
-  ConnectionHasStatusAction,
-  StatusAction,
-} from '../models/ProposalStatusAction';
+import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
@@ -32,7 +29,7 @@ export default class StatusActionMutations {
   async addConnectionStatusActions(
     agent: UserWithRole | null,
     connectionStatusActionsInput: AddConnectionStatusActionsInput,
-    entityType: StatusAction['entityType']
+    entityType: ConnectionHasStatusAction['entityType']
   ): Promise<ConnectionHasStatusAction[] | null> {
     return this.dataSource.addConnectionStatusActions(
       connectionStatusActionsInput,

@@ -11,11 +11,11 @@ import CallDataSource from '../datasources/postgres/CallDataSource';
 import FapDataSource from '../datasources/postgres/FapDataSource';
 import InstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
-import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import QuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import UserDataSource from '../datasources/postgres/UserDataSource';
+import WorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { AllocationTimeUnits } from '../models/Call';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
@@ -43,9 +43,7 @@ const adminDataSource = container.resolve(AdminDataSource);
 const callDataSource = container.resolve(CallDataSource);
 const instrumentDataSource = container.resolve(InstrumentDataSource);
 const proposalDataSource = container.resolve(ProposalDataSource);
-const proposalSettingsDataSource = container.resolve(
-  ProposalSettingsDataSource
-);
+const workflowDataSource = container.resolve(WorkflowDataSource);
 const questionaryDataSource = container.resolve(QuestionaryDataSource);
 const reviewDataSource = container.resolve(ReviewDataSource);
 const fapDataSource = container.resolve(FapDataSource);
@@ -118,9 +116,10 @@ const createUsers = async () => {
 
 const createWorkflows = async () => {
   await execute(() => {
-    return proposalSettingsDataSource.createProposalWorkflow({
+    return workflowDataSource.createWorkflow({
       name: faker.lorem.word(),
       description: faker.lorem.words(5),
+      entityType: 'proposal',
     });
   }, MAX_WORKFLOWS);
 };

@@ -2,8 +2,8 @@ import { GraphQLError } from 'graphql';
 
 import {
   ConnectionHasStatusAction,
-  ProposalStatusAction,
-  ProposalStatusActionType,
+  StatusAction,
+  StatusActionType,
 } from '../../models/ProposalStatusAction';
 import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
@@ -13,22 +13,23 @@ export const dummyConnectionHasStatusAction = new ConnectionHasStatusAction(
   1,
   1,
   'Dummy action',
-  ProposalStatusActionType.EMAIL,
-  {}
+  StatusActionType.EMAIL,
+  {},
+  'proposal'
 );
 
-export const dummyStatusAction = new ProposalStatusAction(
+export const dummyStatusAction = new StatusAction(
   1,
   'Dummy action',
   'Dummy action description',
-  ProposalStatusActionType.EMAIL
+  StatusActionType.EMAIL
 );
 
-export const anotherDummyStatusAction = new ProposalStatusAction(
+export const anotherDummyStatusAction = new StatusAction(
   2,
   'Dummy action 2',
   'Dummy action 2 description',
-  ProposalStatusActionType.RABBITMQ
+  StatusActionType.RABBITMQ
 );
 
 export const dummyStatusActions = [dummyStatusAction, anotherDummyStatusAction];
@@ -53,7 +54,7 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return dummyConnectionHasStatusAction;
   }
 
-  async getStatusAction(actionId: number): Promise<ProposalStatusAction> {
+  async getStatusAction(actionId: number): Promise<StatusAction> {
     const foundStatusAction = dummyStatusActions.find(
       (statusAction) => statusAction.id === actionId
     );
@@ -65,7 +66,7 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return foundStatusAction;
   }
 
-  async getStatusActions(): Promise<ProposalStatusAction[]> {
+  async getStatusActions(): Promise<StatusAction[]> {
     return dummyStatusActions;
   }
 

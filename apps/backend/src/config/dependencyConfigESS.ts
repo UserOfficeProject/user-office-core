@@ -29,12 +29,14 @@ import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledE
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
+import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SparkPostMailService } from '../eventHandlers/MailService/SparkPostMailService';
 import {
@@ -94,6 +96,9 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
+
+mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
+mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);

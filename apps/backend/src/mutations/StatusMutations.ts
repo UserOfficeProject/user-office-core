@@ -7,7 +7,7 @@ import { Status } from '../models/ProposalStatus';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { CreateStatusInput } from '../resolvers/mutations/settings/CreateProposalStatusMutation';
+import { CreateStatusInput } from '../resolvers/mutations/settings/CreateStatusMutation';
 import { UpdateStatusInput } from '../resolvers/mutations/settings/UpdateStatusMutation';
 
 @injectable()

@@ -48,12 +48,11 @@ export class ProposalWorkflowResolver {
     @Root() proposalWorkflow: ProposalWorkflow,
     @Ctx() context: ResolverContext
   ): Promise<ProposalWorkflowConnectionGroup[]> {
-    const connections =
-      await context.queries.proposalSettings.workflowConnectionGroups(
-        context.user,
-        proposalWorkflow.id,
-        'proposal'
-      );
+    const connections = await context.queries.workflow.workflowConnectionGroups(
+      context.user,
+      proposalWorkflow.id,
+      'proposal'
+    );
 
     return isRejection(connections) ? [] : connections;
   }

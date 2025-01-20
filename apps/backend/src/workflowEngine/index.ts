@@ -6,10 +6,11 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
-import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
+import { WorkflowConnectionWithStatus } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { statusActionEngine } from '../statusActionEngine';
 
@@ -27,14 +28,14 @@ export const getProposalWorkflowConnectionByStatusId = (
   proposalStatusId: number,
   prevStatusId?: number
 ) => {
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+  const workflowDataSource = container.resolve<WorkflowDataSource>(
+    Tokens.WorkflowDataSource
+  );
 
-  return proposalSettingsDataSource.getProposalWorkflowConnectionsById(
+  return workflowDataSource.getWorkflowConnectionsById(
     proposalWorkflowId,
     proposalStatusId,
+    'proposal',
     { prevStatusId }
   );
 };
@@ -62,12 +63,12 @@ const shouldMoveToNextStatus = (
 const checkIfConditionsForNextStatusAreMet = async ({
   nextWorkflowConnections,
   proposalWorkflow,
-  proposalSettingsDataSource,
+  workflowDataSource,
   proposalWithEvents,
 }: {
-  nextWorkflowConnections: ProposalWorkflowConnection[];
+  nextWorkflowConnections: WorkflowConnectionWithStatus[];
   proposalWorkflow: ProposalWorkflow;
-  proposalSettingsDataSource: ProposalSettingsDataSource;
+  workflowDataSource: WorkflowDataSource;
   proposalWithEvents: {
     proposalPk: number;
     proposalEvents?: ProposalEventsRecord;
@@ -85,8 +86,9 @@ const checkIfConditionsForNextStatusAreMet = async ({
         nextWorkflowConnection.nextStatusId
       );
     const newStatusChangingEvents =
-      await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
-        nextNextWorkflowConnections.map((connection) => connection.id)
+      await workflowDataSource.getStatusChangingEventsByConnectionIds(
+        nextNextWorkflowConnections.map((connection) => connection.id),
+        'proposal'
       );
 
     if (!proposalWithEvents.proposalEvents) {
@@ -199,7 +201,7 @@ export const workflowEngine = async (
               await getProposalWorkflowConnectionByStatusId(
                 proposalWorkflow.id,
                 currentWorkflowConnection.nextStatusId,
-                currentWorkflowConnection.proposalStatusId
+                currentWorkflowConnection.statusId
               );
 
             if (!nextWorkflowConnections?.length) {
@@ -211,9 +213,14 @@ export const workflowEngine = async (
                 Tokens.ProposalSettingsDataSource
               );
 
+            const workflowDataSource = container.resolve<WorkflowDataSource>(
+              Tokens.WorkflowDataSource
+            );
+
             const statusChangingEvents =
-              await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
-                nextWorkflowConnections.map((connection) => connection.id)
+              await workflowDataSource.getStatusChangingEventsByConnectionIds(
+                nextWorkflowConnections.map((connection) => connection.id),
+                'proposal'
               );
 
             if (!statusChangingEvents) {
@@ -247,14 +254,14 @@ export const workflowEngine = async (
                 await checkIfConditionsForNextStatusAreMet({
                   nextWorkflowConnections,
                   proposalWorkflow,
-                  proposalSettingsDataSource,
+                  workflowDataSource,
                   proposalWithEvents,
                 });
 
                 return {
                   ...updatedProposal,
                   workflowId: proposalWorkflow.id,
-                  prevStatusId: currentWorkflowConnection.proposalStatusId,
+                  prevStatusId: currentWorkflowConnection.statusId,
                   callShortCode: call.shortCode,
                 };
               }

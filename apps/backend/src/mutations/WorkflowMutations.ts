@@ -6,7 +6,10 @@ import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized } from '../decorators';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import { Workflow } from '../models/ProposalWorkflow';
-import { WorkflowConnection } from '../models/ProposalWorkflowConnections';
+import {
+  WorkflowConnection,
+  WorkflowConnectionWithStatus,
+} from '../models/ProposalWorkflowConnections';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
@@ -241,7 +244,7 @@ export default class WorkflowMutations {
   async insertNewAndUpdateExistingWorkflowStatuses(
     args: AddWorkflowStatusInput
   ) {
-    const newWorkflowConnection = args as WorkflowConnection;
+    const newWorkflowConnection = args as WorkflowConnectionWithStatus;
     const allWorkflowGroupConnections =
       await this.dataSource.getWorkflowConnections(
         args.workflowId,
@@ -289,7 +292,7 @@ export default class WorkflowMutations {
   async addWorkflowStatus(
     agent: UserWithRole | null,
     args: AddWorkflowStatusInput
-  ): Promise<WorkflowConnection | Rejection> {
+  ): Promise<WorkflowConnectionWithStatus | Rejection> {
     const isVeryFirstConnection = !args.nextStatusId && !args.prevStatusId;
     try {
       if (isVeryFirstConnection) {

@@ -3,6 +3,7 @@ import { Workflow } from '../../models/ProposalWorkflow';
 import {
   WorkflowConnection,
   NextAndPreviousStatuses,
+  WorkflowConnectionWithStatus,
 } from '../../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { WorkflowDataSource } from '../WorkflowDataSource';
@@ -26,10 +27,10 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
   }
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId'],
+    entityType: WorkflowConnection['entityType'],
     droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: WorkflowConnection['parentDroppableGroupId'],
-    entityType?: WorkflowConnection['entityType']
-  ): Promise<WorkflowConnection[]> {
+    byParentGroupId?: boolean | undefined
+  ): Promise<WorkflowConnectionWithStatus[]> {
     throw new Error('Method not implemented.');
   }
   getWorkflowConnectionsById(
@@ -37,24 +38,24 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     statusId: Status['id'],
     entityType: WorkflowConnection['entityType'],
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
-  ): Promise<WorkflowConnection[]> {
+  ): Promise<WorkflowConnectionWithStatus[]> {
     throw new Error('Method not implemented.');
   }
   addWorkflowStatus(
     newWorkflowStatusInput: Omit<WorkflowConnection, 'id'>
-  ): Promise<WorkflowConnection> {
+  ): Promise<WorkflowConnectionWithStatus> {
     throw new Error('Method not implemented.');
   }
   updateWorkflowStatuses(
     workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnection[]> {
+  ): Promise<WorkflowConnectionWithStatus[]> {
     throw new Error('Method not implemented.');
   }
   deleteWorkflowStatus(
     statusId: number,
     workflowId: number,
     sortOrder: number
-  ): Promise<WorkflowConnection> {
+  ): Promise<WorkflowConnectionWithStatus> {
     throw new Error('Method not implemented.');
   }
   addStatusChangingEventsToConnection(

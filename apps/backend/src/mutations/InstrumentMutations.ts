@@ -13,8 +13,8 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -47,8 +47,8 @@ export default class InstrumentMutations {
     @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.StatusDataSource)
+    private statusDataSource: StatusDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource,
@@ -477,8 +477,7 @@ export default class InstrumentMutations {
         );
       }
 
-      const statuses =
-        await this.proposalSettingsDataSource.getAllProposalStatuses();
+      const statuses = await this.statusDataSource.getAllStatuses('proposal');
 
       const currentStatus = statuses.find((s) => s.id === proposal.statusId);
 

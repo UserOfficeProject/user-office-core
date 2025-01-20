@@ -22,6 +22,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -51,6 +52,8 @@ export default class ProposalMutations {
   constructor(
     @inject(Tokens.ProposalDataSource)
     public proposalDataSource: ProposalDataSource,
+    @inject(Tokens.StatusDataSource)
+    private statusDataSource: StatusDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
     public proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.QuestionaryDataSource)
@@ -637,8 +640,7 @@ export default class ProposalMutations {
       );
     }
 
-    const allStatuses =
-      await this.proposalSettingsDataSource.getAllProposalStatuses();
+    const allStatuses = await this.statusDataSource.getAllStatuses('proposal');
 
     for (const proposal of proposals) {
       const currentStatus = allStatuses.find(

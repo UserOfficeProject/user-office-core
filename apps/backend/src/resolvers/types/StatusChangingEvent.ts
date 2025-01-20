@@ -9,10 +9,13 @@ export class StatusChangingEvent implements StatusChangingEventOrigin {
   public statusChangingEventId: number;
 
   @Field(() => Int)
-  public proposalWorkflowConnectionId: number;
+  public workflowConnectionId: number;
 
   @Field(() => String)
   public statusChangingEvent: string;
+
+  @Field(() => String)
+  public entityType: 'proposal' | 'experiment';
 }
 
 @ObjectType()

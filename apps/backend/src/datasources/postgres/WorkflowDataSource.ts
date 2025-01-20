@@ -156,8 +156,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     workflowId: WorkflowConnection['workflowId'],
     entityType: WorkflowConnection['entityType'],
     droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: WorkflowConnection['parentDroppableGroupId']
-  ): Promise<WorkflowConnection[]> {
+    byParentGroupId?: boolean | undefined
+  ): Promise<WorkflowConnectionWithStatus[]> {
     // TODO: To test
     const andConditionIfDroppableGroupIdDefined = `AND droppable_group_id = '${droppableGroupId}'`;
     const andConditionIfParentDroppableGroupIdDefined =
@@ -205,7 +205,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     statusId: Status['id'],
     entityType: WorkflowConnection['entityType'],
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
-  ): Promise<WorkflowConnection[]> {
+  ): Promise<WorkflowConnectionWithStatus[]> {
     // TODO: To test
     const workflowConnectionRecords: (WorkflowConnectionRecord &
       StatusRecord)[] = await database
@@ -245,7 +245,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   }
   async addWorkflowStatus(
     newWorkflowStatusInput: Omit<WorkflowConnection, 'id'>
-  ): Promise<WorkflowConnection> {
+  ): Promise<WorkflowConnectionWithStatus> {
     // TODO: To test
     const [workflowConnectionRecord]: (WorkflowConnectionRecord &
       StatusRecord)[] = await database
@@ -303,7 +303,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
   async updateWorkflowStatuses(
     workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnection[]> {
+  ): Promise<WorkflowConnectionWithStatus[]> {
     // TODO: To test
     const connectionsResult =
       await this.upsertProposalWorkflowStatuses(workflowStatuses);
@@ -328,7 +328,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     statusId: number,
     workflowId: number,
     sortOrder: number
-  ): Promise<WorkflowConnection> {
+  ): Promise<WorkflowConnectionWithStatus> {
     // TODO: To test
     const removeWorkflowConnectionQuery = database('workflow_connections')
       .where('workflow_id', workflowId)

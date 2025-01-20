@@ -4,7 +4,10 @@ import { Tokens } from '../config/Tokens';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
-import { WorkflowConnection } from '../models/ProposalWorkflowConnections';
+import {
+  WorkflowConnection,
+  WorkflowConnectionWithStatus,
+} from '../models/ProposalWorkflowConnections';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
@@ -60,7 +63,7 @@ export default class WorkflowQueries {
   }
 
   groupWorkflowConnectionsByDroppableArea(
-    workflowConnections: WorkflowConnection[]
+    workflowConnections: WorkflowConnectionWithStatus[]
   ) {
     const groupedWorkflowConnections = this.getUniqueDroppableGroupIds(
       workflowConnections

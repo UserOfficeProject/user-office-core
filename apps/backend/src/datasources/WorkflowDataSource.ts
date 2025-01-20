@@ -3,6 +3,7 @@ import { Workflow } from '../models/ProposalWorkflow';
 import {
   NextAndPreviousStatuses,
   WorkflowConnection,
+  WorkflowConnectionWithStatus,
 } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 
@@ -20,24 +21,24 @@ export interface WorkflowDataSource {
     entityType: WorkflowConnection['entityType'],
     droppableGroupId?: WorkflowConnection['droppableGroupId'],
     byParentGroupId?: boolean | undefined
-  ): Promise<WorkflowConnection[]>;
+  ): Promise<WorkflowConnectionWithStatus[]>;
   getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
     statusId: Status['id'],
     entityType: WorkflowConnection['entityType'],
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
-  ): Promise<WorkflowConnection[]>;
+  ): Promise<WorkflowConnectionWithStatus[]>;
   addWorkflowStatus(
     newWorkflowStatusInput: Omit<WorkflowConnection, 'id'>
-  ): Promise<WorkflowConnection>;
+  ): Promise<WorkflowConnectionWithStatus>;
   updateWorkflowStatuses(
     workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnection[]>;
+  ): Promise<WorkflowConnectionWithStatus[]>;
   deleteWorkflowStatus(
     statusId: number,
     workflowId: number,
     sortOrder: number
-  ): Promise<WorkflowConnection>;
+  ): Promise<WorkflowConnectionWithStatus>;
   addStatusChangingEventsToConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]

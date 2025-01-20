@@ -7,6 +7,7 @@ import {
   dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
+import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import {
   dummyInstrumentScientist,
@@ -16,6 +17,7 @@ import {
 import InstrumentMutations from './InstrumentMutations';
 
 let proposalSettingsDataSource: ProposalSettingsDataSourceMock;
+let statusDataSource: StatusDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;
 
 const instrumentMutations = container.resolve(InstrumentMutations);
@@ -25,6 +27,9 @@ beforeEach(() => {
     container.resolve<ProposalSettingsDataSourceMock>(
       Tokens.ProposalSettingsDataSource
     );
+  statusDataSource = container.resolve<StatusDataSourceMock>(
+    Tokens.StatusDataSource
+  );
   techniqueDataSource = container.resolve<TechniqueDataSourceMock>(
     Tokens.TechniqueDataSource
   );
@@ -197,17 +202,16 @@ describe('Test Instrument Mutations', () => {
     test('A user officer can change the instrument of an Xpress proposal from any status', () => {
       const proposal = { statusId: 1 };
 
-      jest
-        .spyOn(proposalSettingsDataSource, 'getAllProposalStatuses')
-        .mockResolvedValue([
-          {
-            id: proposal.statusId,
-            shortCode: 'EXPIRED',
-            name: 'Expired',
-            description: '',
-            isDefault: true,
-          },
-        ]);
+      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
+        {
+          id: proposal.statusId,
+          shortCode: 'EXPIRED',
+          name: 'Expired',
+          description: '',
+          isDefault: true,
+          entityType: 'proposal',
+        },
+      ]);
 
       return expect(
         instrumentMutations.assignXpressProposalsToInstruments(
@@ -228,17 +232,16 @@ describe('Test Instrument Mutations', () => {
     test('A scientist cannot change the instrument of an Xpress proposal from any status', () => {
       const proposal = { statusId: 1 };
 
-      jest
-        .spyOn(proposalSettingsDataSource, 'getAllProposalStatuses')
-        .mockResolvedValue([
-          {
-            id: proposal.statusId,
-            shortCode: 'EXPIRED',
-            name: 'Expired',
-            description: '',
-            isDefault: true,
-          },
-        ]);
+      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
+        {
+          id: proposal.statusId,
+          shortCode: 'EXPIRED',
+          name: 'Expired',
+          description: '',
+          isDefault: true,
+          entityType: 'proposal',
+        },
+      ]);
 
       return expect(
         instrumentMutations.assignXpressProposalsToInstruments(
@@ -258,17 +261,16 @@ describe('Test Instrument Mutations', () => {
     test('A scientist can change the instrument of an Xpress proposal when the status is under review', () => {
       const proposal = { statusId: 1 };
 
-      jest
-        .spyOn(proposalSettingsDataSource, 'getAllProposalStatuses')
-        .mockResolvedValue([
-          {
-            id: proposal.statusId,
-            shortCode: 'UNDER_REVIEW',
-            name: 'Under review',
-            description: '',
-            isDefault: true,
-          },
-        ]);
+      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
+        {
+          id: proposal.statusId,
+          shortCode: 'UNDER_REVIEW',
+          name: 'Under review',
+          description: '',
+          isDefault: true,
+          entityType: 'proposal',
+        },
+      ]);
 
       return expect(
         instrumentMutations.assignXpressProposalsToInstruments(

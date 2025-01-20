@@ -124,9 +124,10 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<ProposalStatus | null> {
-    return await context.queries.proposalSettings.getProposalStatus(
+    return await context.queries.status.getStatus(
       context.user,
-      proposal.statusId
+      proposal.statusId,
+      'proposal'
     );
   }
 
