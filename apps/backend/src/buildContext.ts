@@ -44,6 +44,7 @@ import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
 import ProposalQueries from './queries/ProposalQueries';
+import ProposalSettingsQueries from './queries/ProposalSettingsQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SampleEsiQueries from './queries/SampleEsiQueries';
@@ -92,6 +93,7 @@ const context: BasicResolverContext = {
     status: container.resolve(StatusQueries),
     workflow: container.resolve(WorkflowQueries),
     statusAction: container.resolve(StatusActionQueries),
+    proposalSettings: container.resolve(ProposalSettingsQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),

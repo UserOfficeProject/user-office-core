@@ -73,7 +73,6 @@ describe('Test Proposal settings mutations', () => {
         name: 'update',
         description: 'update',
         isDefault: false,
-        entityType: 'proposal' as const,
       }
     )) as Rejection;
 

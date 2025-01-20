@@ -28,12 +28,10 @@ export default class StatusActionMutations {
   @Authorized([Roles.USER_OFFICER])
   async addConnectionStatusActions(
     agent: UserWithRole | null,
-    connectionStatusActionsInput: AddConnectionStatusActionsInput,
-    entityType: ConnectionHasStatusAction['entityType']
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null> {
     return this.dataSource.addConnectionStatusActions(
-      connectionStatusActionsInput,
-      entityType
+      connectionStatusActionsInput
     );
   }
 }
