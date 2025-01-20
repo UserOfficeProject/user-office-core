@@ -110,7 +110,7 @@ jobs:
 
       - name: Generate backend UOWS
         run: |
-          cp apps/backend
+          cd apps/backend
           npm run generate:uows
 
       - name: Cache frontend node_modules
