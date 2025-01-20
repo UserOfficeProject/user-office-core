@@ -748,5 +748,25 @@ context('Status actions tests', () => {
         .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
     });
+
+    it.only('User Officer should be able to access the proposal from the link in status actions logs', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal;
+        if (proposal) {
+          cy.submitProposal({ proposalPk: proposal.primaryKey }).then(() => {
+            cy.login('officer');
+            cy.visit('/');
+
+            cy.contains('Status Actions Logs').click();
+
+            cy.contains(proposal.proposalId).click();
+
+            cy.get('h1')
+              .should('contain.text', 'View proposal')
+              .should('contain.text', proposal.proposalId);
+          });
+        }
+      });
+    });
   });
 });
