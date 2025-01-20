@@ -14,6 +14,7 @@ export class InviteAuthorization {
     agent: UserWithRole | null,
     roleIds?: number[]
   ) => {
+    // If no roleIds are provided, the invite is authorized
     if (roleIds === undefined || roleIds.length === 0) return true;
 
     const onlyUserRole = roleIds.length === 1 && roleIds[0] === UserRole.USER;
