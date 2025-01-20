@@ -203,7 +203,7 @@ export default class PostgresStatusActionsDataSource
             .from('workflow_connection_has_actions')
             .where('connection_id', connectionStatusActionsInput.connectionId)
             .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
-            .andWhere('entity_type', entityType)
+            .andWhere('entity_type', connectionStatusActionsInput.entityType)
             .transacting(trx);
 
           return await trx.commit(removedActions);
@@ -212,7 +212,7 @@ export default class PostgresStatusActionsDataSource
           .select('*')
           .from('workflow_connection_has_actions')
           .where('connection_id', connectionStatusActionsInput.connectionId) //TODO: ADD .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
-          .andWhere('entity_type', entityType)
+          .andWhere('entity_type', connectionStatusActionsInput.entityType)
           .transacting(trx)
           .then((results: WorkflowConnectionHasActionsRecord[]) => {
             return results.map((result) => result.action_id);
@@ -232,7 +232,7 @@ export default class PostgresStatusActionsDataSource
             .whereIn('action_id', connectionStatusActionsIdsToRemove)
             .where('connection_id', connectionStatusActionsInput.connectionId)
             .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
-            .andWhere('entity_type', entityType)
+            .andWhere('entity_type', connectionStatusActionsInput.entityType)
             .transacting(trx);
         }
         await database('workflow_connection_has_actions')
@@ -251,8 +251,8 @@ export default class PostgresStatusActionsDataSource
             'wca.action_id': 'sa.status_action_id ',
           })
           .where('wca.connection_id', connectionStatusActionsInput.connectionId)
-          .andWhere('wca.entity_type', entityType)
-          .andWhere('sa.entity_type', entityType)
+          .andWhere('wca.entity_type', connectionStatusActionsInput.entityType)
+          .andWhere('sa.entity_type', connectionStatusActionsInput.entityType)
           .transacting(trx);
 
         return await trx.commit(insertedStatusActions);
