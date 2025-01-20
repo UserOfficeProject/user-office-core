@@ -9,7 +9,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "npm run generate:uows && env NODE_ENV=test jest --config ./jest.unit.config.js --colors",
+    "test": "env NODE_ENV=test jest --config ./jest.unit.config.js --colors",
     "test:integration": "env DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo jest --config ./jest.integration.config.js --runInBand --testTimeout=15000 --colors",
     "test:clear": "jest --clearCache",
     "test:debug": "env NODE_ENV=test node node_modules/.bin/jest --config ./jest.unit.config.js --runInBand",
