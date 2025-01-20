@@ -10,7 +10,8 @@ export class TechnicalReviewSubmissionState extends QuestionarySubmissionState {
   constructor(
     public technicalReview: TechnicalReviewWithQuestionary,
     public isPreviewMode: boolean | undefined,
-    public reviewerId: number
+    public reviewerId: number,
+    public files: string
   ) {
     super(TemplateGroupId.TECHNICAL_REVIEW, technicalReview, isPreviewMode);
     this.stepIndex = this.getInitialStepIndex();

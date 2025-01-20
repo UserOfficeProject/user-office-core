@@ -122,7 +122,12 @@ export default function TechnicalReviewQuestionary(
   const { user } = useContext(UserContext);
 
   const [initialState] = useState(
-    new TechnicalReviewSubmissionState(technicalReview!, previewMode, user.id)
+    new TechnicalReviewSubmissionState(
+      technicalReview!,
+      previewMode,
+      user.id,
+      ''
+    )
   );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.TECHNICAL_REVIEW);

@@ -68,13 +68,11 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
     state?.technicalReview.publicComment || ''
   );
 
-  const [localFiles, setLocalFiles] = useState<FileIdWithCaptionAndFigure[]>(
-    []
-  );
+  const [, setLocalFileList] = useState<FileIdWithCaptionAndFigure[]>([]);
 
   useEffect(() => {
     if (state?.technicalReview.files) {
-      setLocalFiles(JSON.parse(state?.technicalReview.files));
+      setLocalFileList(JSON.parse(state?.technicalReview.files));
     }
   }, [state?.technicalReview.files]);
 
@@ -236,16 +234,20 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
                     const newStateValue = fileMetaDataList.map((file) => ({
                       ...file,
                     }));
-                    setLocalFiles(newStateValue);
+                    setLocalFileList(newStateValue);
                     formikProps.setFieldValue('pdfUpload', newStateValue);
                     dispatch({
                       type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                       itemWithQuestionary: {
-                        files: newStateValue,
+                        files: JSON.stringify(newStateValue),
                       },
                     });
                   }}
-                  value={localFiles}
+                  value={
+                    state?.technicalReview.files
+                      ? JSON.parse(state?.technicalReview.files) || []
+                      : []
+                  }
                 />
               </Grid>
             )}
@@ -304,8 +306,8 @@ const technicalReviewBasisPreSubmit =
       submitted,
       questionaryId,
       timeAllocation,
-      proposalPk,
       files,
+      proposalPk,
       instrumentId,
     } = technicalReview;
 

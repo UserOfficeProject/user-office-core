@@ -150,25 +150,6 @@ const ProposalReviewContent = ({
               }}
             />
           )}
-          {/* <ProposalTechnicalReview
-            proposal={proposalData as Proposal}
-            data={technicalReview}
-            setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
-              setProposalData({
-                ...proposalData,
-                technicalReviews:
-                  proposalData.technicalReviews.map((technicalReview) => {
-                    if (technicalReview.id === data?.id) {
-                      return { ...technicalReview, ...data };
-                    } else {
-                      return {
-                        ...technicalReview,
-                      };
-                    }
-                  }) || null,
-              })
-            }
-          /> */}
           <Paper
             elevation={1}
             sx={(theme) => ({
@@ -200,6 +181,27 @@ const ProposalReviewContent = ({
                 })
               }
             ></TechnicalReviewContainer>
+            {/* <ProposalTechnicalReview
+              proposal={proposalData as Proposal}
+              data={technicalReview}
+              setReview={(
+                data: CoreTechnicalReviewFragment | null | undefined
+              ) =>
+                setProposalData({
+                  ...proposalData,
+                  technicalReviews:
+                    proposalData.technicalReviews.map((technicalReview) => {
+                      if (technicalReview.id === data?.id) {
+                        return { ...technicalReview, ...data };
+                      } else {
+                        return {
+                          ...technicalReview,
+                        };
+                      }
+                    }) || null,
+                })
+              }
+            /> */}
           </Paper>
         </Fragment>
       ) : (
