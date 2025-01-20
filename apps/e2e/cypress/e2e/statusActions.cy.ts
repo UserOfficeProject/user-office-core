@@ -749,7 +749,7 @@ context('Status actions tests', () => {
         .should('have.length', 2);
     });
 
-    it.only('User Officer should be able to access the proposal from the link in status actions logs', () => {
+    it('User Officer should be able to access the proposal from the link in status actions logs', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
