@@ -9,7 +9,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "env NODE_ENV=test jest --config ./jest.unit.config.js --colors",
+    "test": "npm run generate:uows && env NODE_ENV=test jest --config ./jest.unit.config.js --colors",
     "test:integration": "env DATABASE_URL=postgres://duouser:duopassword@127.0.0.1:5432/duo jest --config ./jest.integration.config.js --runInBand --testTimeout=15000 --colors",
     "test:clear": "jest --clearCache",
     "test:debug": "env NODE_ENV=test node node_modules/.bin/jest --config ./jest.unit.config.js --runInBand",
@@ -19,7 +19,7 @@
     "build": "npm run generate:uows && rm -rf ./build && tsc",
     "dev": "docker compose up -d --remove-orphans && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:e2e": "docker compose -f docker-compose.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
-    "dev:e2e:stfc": "npm run generate:uows && docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
+    "dev:e2e:stfc": "docker compose -f docker-compose-stfc.e2e.yml up -d --remove-orphans && wait-on --verbose --interval 5000 --delay 15000 --timeout 300000 tcp:5432 && ts-node-dev -r tsconfig-paths/register --respawn -T ./index.ts",
     "dev:docker": "npm install && ts-node-dev --inspect=0.0.0.0:9229 --respawn -T ./index.ts",
     "prod": "tsc && node ./build/index.js",
     "lint": "npm run generate:uows && tsc --noEmit && eslint . --ext .js,.ts --quiet",
