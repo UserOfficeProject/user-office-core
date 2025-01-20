@@ -25,6 +25,7 @@
     "install:e2e": "cd apps/e2e && npm install",
     "install:libs:shared-types": "cd libs/shared-types && npm install",
     "install:libs:validation": "cd libs/validation && npm install",
+    "generate:stfc:uows": "cd apps/backend && openapi --output ./src/generated --name UOWS --input ./openapi.yaml",
     "postinstall": "concurrently \"npm run install:backend\" \"npm run install:frontend\" \"npm run install:e2e\"",
     "dev": "concurrently \"npm run dev:backend\" \"wait-on --interval 1000 --timeout 300000 http://127.0.0.1:4000/readiness && npm run dev:frontend\"",
     "dev:e2e": "concurrently \"npm run dev:backend:e2e\" \"npm run dev:frontend\"",

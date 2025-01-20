@@ -219,8 +219,6 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
-          npm run generate:uows
-
           npm run test:backend
   e2e:
     runs-on: ubuntu-latest
@@ -306,6 +304,7 @@ jobs:
           CYPRESS_CACHE_FOLDER: .cache/Cypress
         if: steps.cached-node-modules-e2e.outputs.cache-hit != 'true'
         run: npm run install:e2e
+        run: npm run generate:stfc:uows
 
       - name: Download required repositories
         run: |
