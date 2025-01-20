@@ -354,6 +354,8 @@ jobs:
         run: |
           REPO_DIR_NAME=$(basename $GITHUB_WORKSPACE)
 
+          npm run generate:stfc:uows
+
           npm run e2e:after:dev:stfc
 
       - name: Run e2e tests
