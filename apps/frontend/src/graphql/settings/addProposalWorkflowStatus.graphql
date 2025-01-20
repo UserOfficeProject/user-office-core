@@ -1,4 +1,4 @@
-mutation addProposalWorkflowStatus(
+mutation addWorkflowStatus(
   $proposalWorkflowId: Int!
   $sortOrder: Int!
   $droppableGroupId: String!
@@ -6,6 +6,7 @@ mutation addProposalWorkflowStatus(
   $proposalStatusId: Int!
   $nextStatusId: Int
   $prevStatusId: Int
+  entityType: String
 ) {
   addProposalWorkflowStatus(
     newProposalWorkflowStatusInput: {
@@ -15,7 +16,8 @@ mutation addProposalWorkflowStatus(
       parentDroppableGroupId: $parentDroppableGroupId
       proposalStatusId: $proposalStatusId
       nextStatusId: $nextStatusId
-      prevStatusId: $prevStatusId
+      prevStatusId: $prevStatusId,
+      entityType: $entityType
     }
   ) {
     id
