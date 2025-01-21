@@ -158,7 +158,12 @@ const ProposalReviewContent = ({
               marginBottom: theme.spacing(2),
             })}
           >
-            <Typography variant="h6" component="h2" gutterBottom>
+            <Typography
+              variant="h6"
+              data-cy="reviewed-by-info"
+              component="h2"
+              gutterBottom
+            >
               {`Reviewed by ${getFullUserName(technicalReview.technicalReviewAssignee)}`}
             </Typography>
             <TechnicalReviewContainer

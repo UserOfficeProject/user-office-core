@@ -136,7 +136,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                 Label={{
                   label: 'Submitted',
                 }}
-                data-cy="is-grade-submitted"
+                data-cy="is-review-submitted"
               />
             )}
             <NavigButton

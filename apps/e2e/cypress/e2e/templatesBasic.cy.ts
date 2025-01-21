@@ -394,6 +394,8 @@ const newCall = {
   templateId: initialDBData.template.id,
   fapReviewTemplateName: initialDBData.fapReviewTemplate.name,
   fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+  technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
+  technicalReviewTemplateName: initialDBData.technicalReviewTemplate.name,
   allocationTimeUnit: AllocationTimeUnits.DAY,
   cycleComment: faker.lorem.word(10),
   surveyComment: faker.lorem.word(10),

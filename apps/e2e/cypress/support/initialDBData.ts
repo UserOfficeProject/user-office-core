@@ -66,6 +66,14 @@ export default {
       title: 'Topic title',
     },
   },
+  technicalReviewTemplate: {
+    id: 3,
+    name: 'default technical review template',
+    topic: {
+      id: 6,
+      title: 'Topic title',
+    },
+  },
   questions: {
     boolean: {
       id: 'boolean_question',
@@ -196,6 +204,9 @@ export default {
     title: 'Test proposal',
     questionaryId: 2,
     shortCode: '999999',
+  },
+  technicalReview: {
+    questionaryId: 3,
   },
   instrument1: {
     id: 1,

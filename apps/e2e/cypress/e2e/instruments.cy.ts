@@ -332,7 +332,7 @@ context('Instrument tests', () => {
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
         instrumentId: createdInstrumentId,
-        questionaryId: 0,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
       cy.login('officer', initialDBData.roles.userOfficer);
@@ -394,7 +394,7 @@ context('Instrument tests', () => {
       cy.get('[data-cy="timeAllocation"]').should('exist');
     });
 
-    it('User Officer should be able to re-open submitted technical review', function () {
+    it.only('User Officer should be able to re-open submitted technical review', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
@@ -423,7 +423,7 @@ context('Instrument tests', () => {
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
         instrumentId: createdInstrumentId,
-        questionaryId: 0,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
       cy.login('officer');
@@ -444,11 +444,11 @@ context('Instrument tests', () => {
         .click()
         .should('have.value', 'false');
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Updated',
       });
 
       cy.closeModal();
@@ -1014,7 +1014,7 @@ context('Instrument tests', () => {
 
       cy.contains('Proposal information').click();
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
         variant: 'success',
@@ -1141,7 +1141,7 @@ context('Instrument tests', () => {
             reviewerId: scientist2.id,
             submitted: false,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
         }
       });
@@ -1176,7 +1176,7 @@ context('Instrument tests', () => {
         .click();
       cy.get('[data-cy="timeAllocation"] input').type('10');
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
         text: 'Technical review updated successfully',

@@ -350,6 +350,7 @@ context('Fap reviews tests', () => {
     });
     initializationBeforeTests();
     cy.getAndStoreAppSettings();
+    cy.get;
   });
 
   describe('User officer role', () => {
@@ -1317,7 +1318,7 @@ context('Fap reviews tests', () => {
         submitted: true,
         reviewerId: 6,
         instrumentId: newlyCreatedInstrumentId,
-        questionaryId: 0,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
       cy.assignFapReviewersToProposals({
@@ -1673,7 +1674,7 @@ context('Fap meeting components tests', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: newlyCreatedInstrumentId,
-        questionaryId: 0,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
@@ -1706,7 +1707,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.setInstrumentAvailabilityTime({
@@ -1875,7 +1876,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -1968,7 +1969,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -2133,7 +2134,7 @@ context('Fap meeting components tests', () => {
               submitted: true,
               reviewerId: 0,
               instrumentId: createdInstrumentId,
-              questionaryId: 0,
+              questionaryId: initialDBData.technicalReview.questionaryId,
             });
             cy.createFap({
               code: fap2.code,
@@ -2205,7 +2206,7 @@ context('Fap meeting components tests', () => {
               submitted: true,
               reviewerId: 0,
               instrumentId: createdInstrumentId,
-              questionaryId: 0,
+              questionaryId: initialDBData.technicalReview.questionaryId,
             });
             cy.createFap({
               code: fap2.code,
@@ -2249,7 +2250,7 @@ context('Fap meeting components tests', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: createdInstrumentId,
-        questionaryId: 0,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
       cy.assignProposalsToFaps({
@@ -2546,7 +2547,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -3138,7 +3139,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -3372,7 +3373,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -3787,7 +3788,7 @@ context.only('Fap meeting exports test', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: newlyCreatedInstrumentId,
-        questionaryId: 0,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
@@ -3817,7 +3818,7 @@ context.only('Fap meeting exports test', () => {
             reviewerId: 0,
             instrumentId: createdInstrumentId,
             publicComment: comment1,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.setInstrumentAvailabilityTime({
@@ -3871,7 +3872,7 @@ context.only('Fap meeting exports test', () => {
           reviewerId: 0,
           instrumentId: createdInstrumentId,
           publicComment: comment2,
-          questionaryId: 0,
+          questionaryId: initialDBData.technicalReview.questionaryId,
         });
 
         cy.assignProposalsToFaps({

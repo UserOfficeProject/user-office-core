@@ -949,7 +949,7 @@ context('Settings tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
         }
       });
@@ -1091,7 +1091,7 @@ context('Settings tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: initialDBData.instrument1.id,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -1200,7 +1200,7 @@ context('Settings tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: initialDBData.instrument1.id,
-            questionaryId: 0,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
