@@ -284,6 +284,115 @@ export const emailStatusActionRecipient = async (
       break;
     }
 
+    case EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS: {
+      const adminDataSource = container.resolve<AdminDataSource>(
+        Tokens.AdminDataSource
+      );
+
+      const techniqueScientistsEmail = (
+        await adminDataSource.getSetting(SettingsId.TECHNIQUE_SCIENTISTS_EMAIL)
+      )?.settingsValue;
+
+      if (!techniqueScientistsEmail) {
+        logger.logError(
+          'Could not send email(s) to the Technique Scientists as the setting (TECHNIQUE_SCIENTISTS_EMAIL) is not set.',
+          { proposalEmailsSkipped: proposals }
+        );
+
+        break;
+      }
+
+      let tsRecipient: EmailReadyType[];
+
+      if (recipientWithTemplate.combineEmails) {
+        tsRecipient = [
+          {
+            id: recipientWithTemplate.recipient.name,
+            email: techniqueScientistsEmail,
+            proposals: proposals,
+            template: recipientWithTemplate.emailTemplate.id,
+          },
+        ];
+      } else {
+        tsRecipient = await getOtherAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate,
+          techniqueScientistsEmail
+        );
+      }
+
+      await sendMail(
+        tsRecipient,
+        statusActionLogger({
+          connectionId: proposalStatusAction.connectionId,
+          actionId: proposalStatusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient:
+            EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
+    case EmailStatusActionRecipients.SAMPLE_SAFETY: {
+      const adminDataSource = container.resolve<AdminDataSource>(
+        Tokens.AdminDataSource
+      );
+
+      const sampleSafetyEmail = (
+        await adminDataSource.getSetting(SettingsId.SAMPLE_SAFETY_EMAIL)
+      )?.settingsValue;
+
+      if (!sampleSafetyEmail) {
+        logger.logError(
+          'Could not send email(s) to the Sample Safety team as the setting (SAMPLE_SAFETY_EMAIL) is not set.',
+          { proposalEmailsSkipped: proposals }
+        );
+
+        break;
+      }
+
+      let ssRecipient: EmailReadyType[];
+
+      if (recipientWithTemplate.combineEmails) {
+        ssRecipient = [
+          {
+            id: recipientWithTemplate.recipient.name,
+            email: sampleSafetyEmail,
+            proposals: proposals,
+            template: recipientWithTemplate.emailTemplate.id,
+          },
+        ];
+      } else {
+        ssRecipient = await getOtherAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate,
+          sampleSafetyEmail
+        );
+      }
+
+      await sendMail(
+        ssRecipient,
+        statusActionLogger({
+          connectionId: proposalStatusAction.connectionId,
+          actionId: proposalStatusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient: EmailStatusActionRecipients.SAMPLE_SAFETY,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
     case EmailStatusActionRecipients.OTHER: {
       if (!recipientWithTemplate.otherRecipientEmails?.length) {
         logger.logError(
