@@ -108,6 +108,13 @@ jobs:
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
         run: npm run install:backend
 
+      - name: Cache UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/src/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
+
       - name: Generate backend UOWS
         run: |
           cd apps/backend
@@ -164,6 +171,13 @@ jobs:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/src/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
+
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v4
@@ -208,6 +222,13 @@ jobs:
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+      
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/src/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Run backend unit tests
         env:
@@ -273,6 +294,13 @@ jobs:
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+      
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/src/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
