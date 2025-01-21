@@ -4,7 +4,7 @@ name: E2E and build testing.
 # events but only for the develop and master branches
 on:
   pull_request:
-    branches: [rest-migration]
+    branches: [develop]
 
 env:
   NODE_VERSION: 18.x
