@@ -394,7 +394,7 @@ context('Instrument tests', () => {
       cy.get('[data-cy="timeAllocation"]').should('exist');
     });
 
-    it.only('User Officer should be able to re-open submitted technical review', function () {
+    it('User Officer should be able to re-open submitted technical review', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
@@ -423,7 +423,7 @@ context('Instrument tests', () => {
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
         instrumentId: createdInstrumentId,
-        questionaryId: initialDBData.technicalReview.questionaryId,
+        questionaryId: 4,
       });
 
       cy.login('officer');
@@ -475,8 +475,8 @@ context('Instrument tests', () => {
         .click();
       cy.get('[role="dialog"]').contains('Technical review').click();
 
-      cy.get('[data-cy="save-technical-review"]').should('not.be.disabled');
-      cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
+      cy.get('[data-cy="save-and-continue-button"]').should('not.be.disabled');
+      //cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] label').should(
         'include.text',
@@ -963,7 +963,7 @@ context('Instrument tests', () => {
       );
     });
 
-    it('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
+    it.only('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       cy.contains('Proposals');
@@ -1018,7 +1018,7 @@ context('Instrument tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Saved',
       });
 
       cy.setTinyMceContent('comment', internalComment);
@@ -1032,13 +1032,19 @@ context('Instrument tests', () => {
         expect(content).to.have.string(publicComment)
       );
 
-      cy.get('[data-cy="submit-technical-review"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.get('[data-cy="button-submit-technical-review"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="button-submit-technical-review"]').should(
+        'be.disabled'
+      );
 
       cy.notification({ text: 'successfully', variant: 'success' });
 
-      cy.get('[data-cy="save-technical-review"]').should('be.disabled');
-      cy.get('[data-cy="submit-technical-review"]').should('be.disabled');
+      cy.get('[data-cy="back-button"]').click();
+
+      //cy.get('[data-cy="save-technical-review"]').should('be.disabled');
+      //cy.get('[data-cy="submit-technical-review"]').should('be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('be.disabled');
 
       cy.closeModal();
@@ -1179,7 +1185,7 @@ context('Instrument tests', () => {
       cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
-        text: 'Technical review updated successfully',
+        text: 'Saved',
         variant: 'success',
       });
 

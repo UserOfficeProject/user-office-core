@@ -11,7 +11,8 @@ export const createTechnicalReviewBasisValidationSchema: QuestionaryComponentDef
     const statusSchema = Yup.string().required('Status is required');
 
     const timeAllocationSchema = Yup.number()
-      .min(0, 'Value must be greater than or equal to 0')
+      .min(0, 'Must be greater than or equal to 0')
+      .max(100000, 'Must be less than or equal to 100000')
       .nullable();
 
     let commentSchema = Yup.string().transform(function (value: string) {

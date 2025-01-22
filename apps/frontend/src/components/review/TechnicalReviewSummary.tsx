@@ -10,8 +10,13 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { SubmitTechnicalReviewInput, UserRole } from 'generated/sdk';
+import {
+  SettingsId,
+  SubmitTechnicalReviewInput,
+  UserRole,
+} from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { isCallEnded } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -36,6 +41,11 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
   const { api } = useDataApiWithFeedback();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
+  const isFapChairOrSec = useCheckAccess([
+    UserRole.FAP_CHAIR,
+    UserRole.FAP_SECRETARY,
+  ]);
+  const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
   const { isInternalUser } = useContext(UserContext);
   const { user } = useContext(UserContext);
   const callHasEnded = isCallEnded(
@@ -47,6 +57,8 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
   const [loadingSubmitMessage, setLoadingSubmitMessage] =
     useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { settingsMap } = useContext(SettingsContext);
+
   const [submitButtonMessage, setSubmitButtonMessage] = useState<string>(
     'I am aware that no further edits can be made after review submission.'
   );
@@ -56,6 +68,11 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
   const allStepsComplete =
     technicalReview.questionary &&
     technicalReview.questionary.steps.every((step) => step.isCompleted);
+
+  const fapSecOrChairCanEdit =
+    isFapChairOrSec &&
+    settingsMap.get(SettingsId.FAP_SECS_EDIT_TECH_REVIEWS)?.settingsValue ===
+      'true';
 
   const [submitDisabled, setSubmitDisabled] = useState(() => {
     let submissionDisabled =
@@ -81,9 +98,6 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
     return submissionDisabled;
   });
 
-  const isDisabled = (isSubmitting: boolean) =>
-    isSubmitting || (technicalReview.submitted && !isUserOfficer);
-
   useEffect(() => {
     async function initializeSubmissionMessage() {
       if (!technicalReview.proposal?.callId || submitDisabled) {
@@ -108,6 +122,11 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
     submitted: technicalReview.submitted,
   };
 
+  const shouldDisableForm = (isSubmitting: boolean) =>
+    ((isSubmitting || technicalReview.submitted) &&
+      !(isUserOfficer || fapSecOrChairCanEdit)) ||
+    isInternalReviewer;
+
   return (
     <>
       <Formik
@@ -118,7 +137,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
         <Form>
           <TechnicalReviewQuestionaryReview data={technicalReview} />
           <NavigationFragment isLoading={isSubmitting}>
-            {isUserOfficer && (
+            {(isUserOfficer || isFapChairOrSec) && (
               <Field
                 id="submitted"
                 name="submitted"
@@ -150,8 +169,15 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
             {isUserOfficer && (
               <NavigButton
                 data-cy="save-button"
-                disabled={isDisabled(isSubmitting)}
-                color="secondary"
+                disabled={
+                  shouldDisableForm(isSubmitting) ||
+                  ((isUserOfficer || fapSecOrChairCanEdit) && isSubmitting)
+                }
+                color={
+                  isUserOfficer || fapSecOrChairCanEdit
+                    ? 'primary'
+                    : 'secondary'
+                }
                 type="submit"
                 onClick={async () => {
                   setIsSubmitting(true);
@@ -189,7 +215,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                 Save
               </NavigButton>
             )}
-            {!isUserOfficer && (
+            {!(isUserOfficer || fapSecOrChairCanEdit) && (
               <NavigButton
                 onClick={() => {
                   confirm(
@@ -204,8 +230,8 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                           comment: state?.technicalReview.comment,
                           publicComment: state?.technicalReview.publicComment,
                           status: state?.technicalReview.status,
-                          submitted: state?.technicalReview.submitted,
-                          reviewerId: state?.technicalReview.reviewerId,
+                          submitted: true,
+                          reviewerId: user.id,
                           files: state?.technicalReview.files,
                           instrumentId: state?.technicalReview.instrumentId,
                           questionaryId: state?.technicalReview.questionaryId,
@@ -243,11 +269,15 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                     }
                   )();
                 }}
-                disabled={submitDisabled}
+                disabled={
+                  isSubmitting ||
+                  technicalReview.submitted ||
+                  isInternalReviewer
+                }
                 isBusy={isSubmitting}
-                data-cy="button-submit-proposal"
+                data-cy="button-submit-technical-review"
               >
-                {technicalReview.status ? '✔ Submitted' : 'Submit'}
+                {technicalReview.submitted ? '✔ Submitted' : 'Submit'}
               </NavigButton>
             )}
           </NavigationFragment>

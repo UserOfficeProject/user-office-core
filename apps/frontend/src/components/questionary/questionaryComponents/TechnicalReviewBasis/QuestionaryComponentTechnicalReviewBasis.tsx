@@ -8,7 +8,6 @@ import {
 } from 'components/common/FileUploadComponent';
 import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
-import PromptIfDirty from 'components/common/PromptIfDirty';
 import Editor from 'components/common/TinyEditor';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
@@ -101,7 +100,9 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
   ];
 
   const shouldDisableForm =
-    !(isUserOfficer || fapSecOrChairCanEdit) || isInternalReviewer;
+    (state?.technicalReview.submitted &&
+      !(isUserOfficer || fapSecOrChairCanEdit)) ||
+    isInternalReviewer;
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
@@ -117,7 +118,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
       <div>
         <Box sx={{ margin: theme.spacing(2, 0) }}>
           <CssBaseline />
-          <PromptIfDirty />
           <Grid container spacing={2}>
             <Grid item sm={6} xs={12}>
               <Field
