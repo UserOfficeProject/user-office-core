@@ -524,7 +524,7 @@ context('Proposal tests', () => {
         .contains('Feasible')
         .click();
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').focus().click();
 
       cy.closeModal();
 

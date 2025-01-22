@@ -963,7 +963,7 @@ context('Instrument tests', () => {
       );
     });
 
-    it.only('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
+    it('Instrument scientists should be able to save and submit technical review only on their own proposals', () => {
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
       cy.contains('Proposals');
@@ -1147,7 +1147,7 @@ context('Instrument tests', () => {
             reviewerId: scientist2.id,
             submitted: false,
             instrumentId: createdInstrumentId,
-            questionaryId: initialDBData.technicalReview.questionaryId,
+            questionaryId: 4,
           });
         }
       });
@@ -1200,7 +1200,7 @@ context('Instrument tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
-        text: 'Proposals technical review submitted successfully',
+        text: 'Saved',
         variant: 'success',
       });
 

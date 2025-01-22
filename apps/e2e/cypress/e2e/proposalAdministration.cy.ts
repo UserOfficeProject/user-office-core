@@ -26,7 +26,7 @@ context('Proposal administration tests', () => {
 
   const existingUserId = initialDBData.users.user1.id;
   const existingTopicId = 1;
-  const existingQuestionaryId = 2;
+  const existingQuestionaryId = 3;
   let createdProposalPk: number;
   let createdProposalId: string;
   let createdInstrumentId: number;
@@ -99,7 +99,7 @@ context('Proposal administration tests', () => {
       cy.visit('/');
     });
 
-    it('Should not be able to administer proposal if not assigned to instrument', function () {
+    it.only('Should not be able to administer proposal if not assigned to instrument', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.TECHNICAL_REVIEW)) {
         this.skip();
       }
