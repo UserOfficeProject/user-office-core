@@ -41,6 +41,8 @@ const categorizeSelectedItems = (items: UserOrEmail[]) => ({
   invites: items.filter((item): item is ValidEmail => typeof item === 'string'),
 });
 
+const MIN_SEARCH_LENGTH = 3;
+
 function NoOptionsText({
   query,
   onAddEmail,
@@ -67,6 +69,10 @@ function NoOptionsText({
         ))}
       </>
     );
+  }
+
+  if ((query as string).length < MIN_SEARCH_LENGTH) {
+    return <>Please type at least {MIN_SEARCH_LENGTH} characters</>;
   }
 
   if (isValidEmail(query)) {
@@ -128,7 +134,7 @@ export default function InviteUser({
   }, [api, excludeUserIds]);
 
   const fetchResults = useCallback(async () => {
-    if (!query.trim()) {
+    if (!query.trim().length || query.length < MIN_SEARCH_LENGTH) {
       setOptions([]);
       setLoading(false);
 
