@@ -14,6 +14,10 @@ export class CoProposerInviteDataSourceMock
     ];
   }
 
+  async findByProposalPk(proposalPk: number): Promise<CoProposerInvite[]> {
+    return this.invites.filter((invite) => invite.proposalPk === proposalPk);
+  }
+
   async findByInviteCodeId(inviteCodeId: number): Promise<CoProposerInvite[]> {
     return this.invites.filter(
       (invite) => invite.inviteCodeId === inviteCodeId

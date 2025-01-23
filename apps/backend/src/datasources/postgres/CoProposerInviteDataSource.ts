@@ -5,6 +5,21 @@ import database from './database';
 export default class PostgresCoProposerInviteDataSource
   implements CoProposerInviteDataSource
 {
+  async findByProposalPk(proposalPk: number): Promise<CoProposerInvite[]> {
+    return database('co_proposer_invites')
+      .where({ proposal_pk: proposalPk })
+      .select('*')
+      .then((rows) => {
+        return rows.map(
+          (row) =>
+            new CoProposerInvite(
+              row.co_proposer_invite_id,
+              row.invite_code_id,
+              row.proposal_pk
+            )
+        );
+      });
+  }
   async findByInviteCodeId(inviteCodeId: number): Promise<CoProposerInvite[]> {
     return database('co_proposer_invites')
       .where({ invite_code_id: inviteCodeId })
