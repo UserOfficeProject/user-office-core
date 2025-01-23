@@ -50,23 +50,23 @@ export default class InviteMutations {
   ): Promise<InviteCode | Rejection> {
     const { roleIds, coProposerProposalPk } = args.claims;
 
-    const isRoleClaimAuthorized = await this.inviteAuth.isRoleInviteAuthorized(
+    const isRoleInviteAuthorized = await this.inviteAuth.isRoleInviteAuthorized(
       agent,
       roleIds
     );
-    if (isRoleClaimAuthorized === false) {
+    if (isRoleInviteAuthorized === false) {
       return rejection(
         'User is not authorized to create invites to this user type',
         { userId: agent?.id, roleIds }
       );
     }
 
-    const isCoProposerClaimAuthorized =
+    const isCoProposerInviteAuthorized =
       coProposerProposalPk === undefined ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.proposalAuth.isMemberOfProposal(agent, coProposerProposalPk));
 
-    if (isCoProposerClaimAuthorized === false) {
+    if (isCoProposerInviteAuthorized === false) {
       return rejection(
         'User is not authorized to create invites to this proposal',
         { userId: agent?.id, proposalPk: coProposerProposalPk }
