@@ -83,8 +83,7 @@ const EmailActionConfig = ({
       const updatedRecipient = {
         ...recipientsWithEmailTemplate[foundRecipientIndex],
         combineEmails:
-          !recipientsWithEmailTemplate[foundRecipientIndex].combineEmails ??
-          true,
+          !recipientsWithEmailTemplate[foundRecipientIndex].combineEmails,
       };
       arrayHelpers.replace(foundRecipientIndex, updatedRecipient);
     }

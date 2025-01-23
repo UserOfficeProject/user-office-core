@@ -7,8 +7,8 @@ import {
 import {
   ConnectionHasActionsInput,
   IndexWithGroupId,
-  ProposalWorkflow,
   ProposalWorkflowConnection,
+  Workflow,
 } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
@@ -27,12 +27,12 @@ export function usePersistProposalWorkflowEditorModel() {
     return api({
       toastSuccessMessage: 'Proposal workflow updated successfully!',
     })
-      .updateProposalWorkflow({
+      .updateWorkflow({
         id,
         name,
         description,
       })
-      .then((data) => data.updateProposalWorkflow);
+      .then((data) => data.updateWorkflow);
   };
 
   type MonitorableServiceCall = () => Promise<unknown>;
@@ -40,7 +40,7 @@ export function usePersistProposalWorkflowEditorModel() {
   const persistModel = ({
     getState,
     dispatch,
-  }: MiddlewareInputParams<ProposalWorkflow, Event>) => {
+  }: MiddlewareInputParams<Workflow, Event>) => {
     const executeAndMonitorCall = (call: MonitorableServiceCall) => {
       setIsLoading(true);
       call()
@@ -53,68 +53,71 @@ export function usePersistProposalWorkflowEditorModel() {
     };
 
     const insertNewStatusInProposalWorkflow = async (
-      proposalWorkflowId: number,
+      workflowId: number,
       sortOrder: number,
       droppableGroupId: string,
       parentDroppableGroupId: string,
-      proposalStatusId: number,
-      nextProposalStatusId: number,
-      prevProposalStatusId: number
+      statusId: number,
+      nextStatusId: number,
+      prevStatusId: number
     ) => {
       return api({ toastSuccessMessage: 'Workflow status added successfully' })
-        .addProposalWorkflowStatus({
-          proposalWorkflowId,
+        .addWorkflowStatus({
+          workflowId,
           sortOrder,
           droppableGroupId,
           parentDroppableGroupId,
-          proposalStatusId,
-          nextProposalStatusId,
-          prevProposalStatusId,
+          statusId,
+          nextStatusId,
+          prevStatusId,
+          entityType: 'proposal',
         })
-        .then((data) => data.addProposalWorkflowStatus);
+        .then((data) => data.addWorkflowStatus);
     };
 
     const reorderStatusesInProposalWorkflow = async (
       from: IndexWithGroupId,
       to: IndexWithGroupId,
-      proposalWorkflowId: number
+      workflowId: number
     ) => {
       return api({
         toastSuccessMessage: 'Workflow statuses reordered successfully',
       })
-        .moveProposalWorkflowStatus({
+        .moveWorkflowStatus({
           from,
           to,
-          proposalWorkflowId,
+          workflowId,
+          entityType: 'proposal',
         })
-        .then((data) => data.moveProposalWorkflowStatus);
+        .then((data) => data.moveWorkflowStatus);
     };
 
     const deleteProposalWorkflowStatus = async (
-      proposalStatusId: number,
-      proposalWorkflowId: number,
+      statusId: number,
+      workflowId: number,
       sortOrder: number
     ) => {
       return api({
         toastSuccessMessage: 'Workflow status removed successfully',
       })
-        .deleteProposalWorkflowStatus({
-          proposalStatusId,
-          proposalWorkflowId,
+        .deleteWorkflowStatus({
+          statusId,
+          workflowId,
           sortOrder,
+          entityType: 'proposal',
         })
-        .then((data) => data.deleteProposalWorkflowStatus);
+        .then((data) => data.deleteWorkflowStatus);
     };
 
     const addStatusChangingEventsToConnection = async (
-      proposalWorkflowConnectionId: number,
+      workflowConnectionId: number,
       statusChangingEvents: string[]
     ) => {
       return api({
         toastSuccessMessage: 'Status changing events added successfully!',
       })
         .addStatusChangingEventsToConnection({
-          proposalWorkflowConnectionId,
+          workflowConnectionId,
           statusChangingEvents,
         })
         .then((data) => data.addStatusChangingEventsToConnection);
@@ -131,8 +134,9 @@ export function usePersistProposalWorkflowEditorModel() {
       })
         .addConnectionStatusActions({
           actions: statusActions,
-          workflowId: workflowConnection.proposalWorkflowId,
+          workflowId: workflowConnection.workflowId,
           connectionId: workflowConnection.id,
+          entityType: 'proposal',
         })
         .then((data) => data.addConnectionStatusActions);
     };
@@ -190,7 +194,7 @@ export function usePersistProposalWorkflowEditorModel() {
             payload: action.payload,
           });
 
-          const groupToRemoveFrom = state.proposalWorkflowConnectionGroups.find(
+          const groupToRemoveFrom = state.workflowConnectionGroups.find(
             (proposalWorkflowConnectionGroup) =>
               proposalWorkflowConnectionGroup.groupId ===
               action.payload.source.droppableId
@@ -202,8 +206,8 @@ export function usePersistProposalWorkflowEditorModel() {
             return executeAndMonitorCall(async () => {
               try {
                 const result = await deleteProposalWorkflowStatus(
-                  proposalWorkflowConnectionToRemove.proposalStatusId,
-                  proposalWorkflowConnectionToRemove.proposalWorkflowId,
+                  proposalWorkflowConnectionToRemove.statusId,
+                  proposalWorkflowConnectionToRemove.workflowId,
                   proposalWorkflowConnectionToRemove.sortOrder
                 );
 
@@ -227,7 +231,7 @@ export function usePersistProposalWorkflowEditorModel() {
             sortOrder,
             proposalStatusId,
             nextProposalStatusId,
-            prevProposalStatusId,
+            prevStatusId,
             parentDroppableGroupId,
             droppableGroupId,
           } = action.payload;
@@ -248,7 +252,7 @@ export function usePersistProposalWorkflowEditorModel() {
                 parentDroppableGroupId,
                 proposalStatusId,
                 nextProposalStatusId,
-                prevProposalStatusId
+                prevStatusId
               );
 
               dispatch({

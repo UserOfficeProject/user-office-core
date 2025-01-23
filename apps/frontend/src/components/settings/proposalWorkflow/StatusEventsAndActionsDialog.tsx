@@ -77,7 +77,7 @@ const StatusEventsAndActionsDialog = ({
                 (statusChangingEvent) => statusChangingEvent.statusChangingEvent
               ) as ProposalEvent[]
             }
-            statusName={workflowConnection?.proposalStatus.name}
+            statusName={workflowConnection?.status.name}
             addStatusChangingEventsToConnection={(
               statusChangingEvents: string[]
             ) =>
@@ -102,7 +102,7 @@ const StatusEventsAndActionsDialog = ({
               });
             }}
             connectionStatusActions={workflowConnection?.statusActions}
-            statusName={workflowConnection?.proposalStatus.name}
+            statusName={workflowConnection?.status.name}
             isLoading={isLoading}
           />
         </SimpleTabs>

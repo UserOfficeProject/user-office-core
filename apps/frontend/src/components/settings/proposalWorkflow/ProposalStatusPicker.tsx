@@ -10,12 +10,12 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import React from 'react';
 
-import { ProposalStatus } from 'generated/sdk';
+import { Status } from 'generated/sdk';
 
 const ProposalStatusPicker = ({
   proposalStatuses,
 }: {
-  proposalStatuses: ProposalStatus[];
+  proposalStatuses: Status[];
 }) => {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));

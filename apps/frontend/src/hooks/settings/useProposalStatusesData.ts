@@ -1,23 +1,19 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { ProposalStatus } from 'generated/sdk';
+import { Status } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalStatusesData(): {
   loadingProposalStatuses: boolean;
-  proposalStatuses: ProposalStatus[];
-  setProposalStatusesWithLoading: Dispatch<SetStateAction<ProposalStatus[]>>;
+  proposalStatuses: Status[];
+  setProposalStatusesWithLoading: Dispatch<SetStateAction<Status[]>>;
 } {
-  const [proposalStatuses, setProposalStatuses] = useState<ProposalStatus[]>(
-    []
-  );
+  const [proposalStatuses, setProposalStatuses] = useState<Status[]>([]);
   const [loadingProposalStatuses, setLoadingProposalStatuses] = useState(true);
 
   const api = useDataApi();
 
-  const setProposalStatusesWithLoading = (
-    data: SetStateAction<ProposalStatus[]>
-  ) => {
+  const setProposalStatusesWithLoading = (data: SetStateAction<Status[]>) => {
     setLoadingProposalStatuses(true);
     setProposalStatuses(data);
     setLoadingProposalStatuses(false);
@@ -28,14 +24,14 @@ export function useProposalStatusesData(): {
 
     setLoadingProposalStatuses(true);
     api()
-      .getProposalStatuses()
+      .getStatuses({ entityType: 'proposal' })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.proposalStatuses) {
-          setProposalStatuses(data.proposalStatuses as ProposalStatus[]);
+        if (data.statuses) {
+          setProposalStatuses(data.statuses as Status[]);
         }
         setLoadingProposalStatuses(false);
       });

@@ -70,6 +70,7 @@ export function createFapReviewStub(
         description: '',
         name: '',
         isDefault: true,
+        entityType: 'proposal',
       },
       submitted: false,
       users: [],

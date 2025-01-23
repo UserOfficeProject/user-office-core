@@ -5,10 +5,10 @@ import { useParams } from 'react-router-dom';
 
 import {
   StatusChangingEvent,
-  ProposalWorkflow,
   ProposalWorkflowConnection,
-  ProposalWorkflowConnectionGroup,
   ConnectionStatusAction,
+  Workflow,
+  WorkflowConnectionGroup,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
@@ -40,18 +40,19 @@ export interface Event {
 }
 
 const ProposalWorkflowEditorModel = (
-  middlewares?: Array<ReducerMiddleware<ProposalWorkflow, Event>>
+  middlewares?: Array<ReducerMiddleware<Workflow, Event>>
 ) => {
   const { workflowId } = useParams<{ workflowId: string }>();
-  const blankInitTemplate: ProposalWorkflow = {
+  const blankInitTemplate: Workflow = {
     id: 0,
     name: '',
     description: '',
-    proposalWorkflowConnectionGroups: [],
+    workflowConnectionGroups: [],
+    entityType: 'proposal',
   };
 
   const findGroupIndexByGroupId = (
-    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    workflowConnectionGroups: WorkflowConnectionGroup[],
     groupId: string
   ) =>
     workflowConnectionGroups.findIndex(
@@ -59,7 +60,7 @@ const ProposalWorkflowEditorModel = (
     );
 
   const findGroupAndAddNewStatusConnection = (
-    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    workflowConnectionGroups: WorkflowConnectionGroup[],
     newConnection: ProposalWorkflowConnection
   ) => {
     const groupIndexWhereStatusShouldBeAdded = findGroupIndexByGroupId(
@@ -77,15 +78,14 @@ const ProposalWorkflowEditorModel = (
       ];
 
     if (previousConnectionInTheGroup) {
-      previousConnectionInTheGroup.nextProposalStatusId =
-        newConnection.proposalStatusId;
+      previousConnectionInTheGroup.nextStatusId = newConnection.statusId;
     }
 
     return workflowConnectionGroups;
   };
 
   const moveStatusConnectionInsideWorkflow = (
-    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    workflowConnectionGroups: WorkflowConnectionGroup[],
     from: { droppableId: string; index: number },
     to: { droppableId: string; index: number }
   ) => {
@@ -121,7 +121,7 @@ const ProposalWorkflowEditorModel = (
   };
 
   const addStatusChangingEventsToConnection = (
-    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    workflowConnectionGroups: WorkflowConnectionGroup[],
     workflowConnection: ProposalWorkflowConnection,
     statusChangingEvents: StatusChangingEvent[]
   ) => {
@@ -142,7 +142,7 @@ const ProposalWorkflowEditorModel = (
   };
 
   const addStatusActionsToConnection = (
-    workflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    workflowConnectionGroups: WorkflowConnectionGroup[],
     workflowConnection: ProposalWorkflowConnection,
     statusActions: ConnectionStatusAction[]
   ) => {
@@ -162,33 +162,33 @@ const ProposalWorkflowEditorModel = (
     return workflowConnectionGroups;
   };
 
-  function reducer(state: ProposalWorkflow, action: Event): ProposalWorkflow {
+  function reducer(state: Workflow, action: Event): Workflow {
     return produce(state, (draft) => {
       switch (action.type) {
         case EventType.READY:
           return action.payload;
         case EventType.WORKFLOW_STATUS_ADDED: {
-          const { proposalWorkflowConnectionGroups } = draft;
+          console.log({ draft, action });
+          const { workflowConnectionGroups } = draft;
           const newConnectionToAdd = action.payload;
 
-          draft.proposalWorkflowConnectionGroups =
-            findGroupAndAddNewStatusConnection(
-              proposalWorkflowConnectionGroups,
-              newConnectionToAdd
-            );
+          draft.workflowConnectionGroups = findGroupAndAddNewStatusConnection(
+            workflowConnectionGroups,
+            newConnectionToAdd
+          );
 
           return draft;
         }
         case EventType.WORKFLOW_STATUS_UPDATED: {
-          const { proposalWorkflowConnectionGroups } = draft;
+          const { workflowConnectionGroups } = draft;
           const connectionToUpdate = action.payload;
 
           const groupIndexWhereStatusShouldBeAdded = findGroupIndexByGroupId(
-            proposalWorkflowConnectionGroups,
+            workflowConnectionGroups,
             connectionToUpdate.droppableGroupId
           );
 
-          proposalWorkflowConnectionGroups[
+          workflowConnectionGroups[
             groupIndexWhereStatusShouldBeAdded
           ].connections[action.payload.sortOrder].id = action.payload.id;
 
@@ -197,12 +197,11 @@ const ProposalWorkflowEditorModel = (
         case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
           const { source, destination } = action.payload;
 
-          draft.proposalWorkflowConnectionGroups =
-            moveStatusConnectionInsideWorkflow(
-              draft.proposalWorkflowConnectionGroups,
-              source,
-              destination
-            );
+          draft.workflowConnectionGroups = moveStatusConnectionInsideWorkflow(
+            draft.workflowConnectionGroups,
+            source,
+            destination
+          );
 
           return draft;
         case EventType.REORDER_WORKFLOW_STATUS_FAILED:
@@ -215,21 +214,20 @@ const ProposalWorkflowEditorModel = (
           return draft;
         case EventType.WORKFLOW_STATUS_DELETED:
           const removingGroupIndex = findGroupIndexByGroupId(
-            draft.proposalWorkflowConnectionGroups,
+            draft.workflowConnectionGroups,
             action.payload.source.droppableId
           );
 
           const removingGroupConnections =
-            draft.proposalWorkflowConnectionGroups[removingGroupIndex]
-              .connections;
+            draft.workflowConnectionGroups[removingGroupIndex].connections;
 
           const previousConnection =
             removingGroupConnections[action.payload.source.index - 1];
           if (previousConnection) {
-            previousConnection.nextProposalStatusId =
+            previousConnection.nextStatusId =
               removingGroupConnections[
                 action.payload.source.index
-              ].nextProposalStatusId;
+              ].nextStatusId;
           }
 
           removingGroupConnections.splice(action.payload.source.index, 1);
@@ -239,24 +237,23 @@ const ProposalWorkflowEditorModel = (
           return { ...draft, ...action.payload };
         }
         case EventType.NEXT_STATUS_EVENTS_ADDED: {
-          const { proposalWorkflowConnectionGroups } = draft;
+          const { workflowConnectionGroups } = draft;
           const { workflowConnection, statusChangingEvents } = action.payload;
 
-          draft.proposalWorkflowConnectionGroups =
-            addStatusChangingEventsToConnection(
-              proposalWorkflowConnectionGroups,
-              workflowConnection,
-              statusChangingEvents
-            );
+          draft.workflowConnectionGroups = addStatusChangingEventsToConnection(
+            workflowConnectionGroups,
+            workflowConnection,
+            statusChangingEvents
+          );
 
           return draft;
         }
         case EventType.STATUS_ACTION_ADDED: {
-          const { proposalWorkflowConnectionGroups } = draft;
+          const { workflowConnectionGroups } = draft;
           const { workflowConnection, statusActions } = action.payload;
 
-          draft.proposalWorkflowConnectionGroups = addStatusActionsToConnection(
-            proposalWorkflowConnectionGroups,
+          draft.workflowConnectionGroups = addStatusActionsToConnection(
+            workflowConnectionGroups,
             workflowConnection,
             statusActions
           );
@@ -264,10 +261,10 @@ const ProposalWorkflowEditorModel = (
           return draft;
         }
         case EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS: {
-          const groupsToAdd: ProposalWorkflowConnectionGroup[] = [];
+          const groupsToAdd: WorkflowConnectionGroup[] = [];
           const lastGroupId = parseInt(
-            draft.proposalWorkflowConnectionGroups[
-              draft.proposalWorkflowConnectionGroups.length - 1
+            draft.workflowConnectionGroups[
+              draft.workflowConnectionGroups.length - 1
             ].groupId.split('_')[1]
           );
 
@@ -279,7 +276,7 @@ const ProposalWorkflowEditorModel = (
             });
           }
 
-          draft.proposalWorkflowConnectionGroups.push(...groupsToAdd);
+          draft.workflowConnectionGroups.push(...groupsToAdd);
 
           return draft;
         }
@@ -287,9 +284,11 @@ const ProposalWorkflowEditorModel = (
     });
   }
 
-  const [state, dispatch] = useReducerWithMiddleWares<
-    Reducer<ProposalWorkflow, Event>
-  >(reducer, blankInitTemplate, middlewares || []);
+  const [state, dispatch] = useReducerWithMiddleWares<Reducer<Workflow, Event>>(
+    reducer,
+    blankInitTemplate,
+    middlewares || []
+  );
 
   // NOTE: required to avoid infinite re-render because dispatch function is recreated
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,13 +301,14 @@ const ProposalWorkflowEditorModel = (
     }
 
     api()
-      .getProposalWorkflow({ proposalWorkflowId: parseInt(workflowId) })
+      .getWorkflow({
+        workflowId: parseInt(workflowId),
+        entityType: 'proposal',
+      })
       .then((data) => {
         // NOTE: Push at least one group to have initial droppable if new proposal workflow
-        if (
-          data.proposalWorkflow?.proposalWorkflowConnectionGroups.length === 0
-        ) {
-          data.proposalWorkflow.proposalWorkflowConnectionGroups.push({
+        if (data.workflow?.workflowConnectionGroups.length === 0) {
+          data.workflow.workflowConnectionGroups.push({
             groupId: 'proposalWorkflowConnections_0',
             parentGroupId: null,
             connections: [],
@@ -316,7 +316,7 @@ const ProposalWorkflowEditorModel = (
         }
         memoizedDispatch({
           type: EventType.READY,
-          payload: data.proposalWorkflow,
+          payload: data.workflow,
         });
       });
   }, [api, memoizedDispatch, workflowId]);

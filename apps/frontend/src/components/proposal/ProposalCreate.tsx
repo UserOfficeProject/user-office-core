@@ -40,6 +40,7 @@ export function createProposalStub(
       description: '',
       name: '',
       isDefault: true,
+      entityType: 'proposal',
     },
     submitted: false,
     users: [],

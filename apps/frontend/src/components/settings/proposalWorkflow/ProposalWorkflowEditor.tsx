@@ -9,9 +9,9 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import {
-  ProposalStatus,
   ProposalWorkflowConnection,
-  ProposalWorkflowConnectionGroup,
+  Status,
+  WorkflowConnectionGroup,
 } from 'generated/sdk';
 import { usePersistProposalWorkflowEditorModel } from 'hooks/settings/usePersistProposalWorkflowEditorModel';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
@@ -44,20 +44,20 @@ const ProposalWorkflowEditor = () => {
   const proposalWorkflowConnectionsPartOfWorkflow: ProposalWorkflowConnection[] =
     [];
 
-  state.proposalWorkflowConnectionGroups.forEach(
-    (proposalWorkflowConnectionGroup) =>
-      proposalWorkflowConnectionsPartOfWorkflow.push(
-        ...proposalWorkflowConnectionGroup.connections
-      )
+  state.workflowConnectionGroups.forEach((proposalWorkflowConnectionGroup) =>
+    proposalWorkflowConnectionsPartOfWorkflow.push(
+      ...proposalWorkflowConnectionGroup.connections
+    )
   );
+  console.log({ state, proposalStatuses });
 
   const proposalStatusesInThePicker = state.id ? proposalStatuses : [];
 
   const getPreviousWorkflowStatus = (
     destinationIndex: number,
-    currentDroppableGroup: ProposalWorkflowConnectionGroup
+    currentDroppableGroup: WorkflowConnectionGroup
   ) => {
-    const parentDroppableGroup = state.proposalWorkflowConnectionGroups.find(
+    const parentDroppableGroup = state.workflowConnectionGroups.find(
       (proposalWorkflowConnectionGroup) =>
         proposalWorkflowConnectionGroup.groupId ===
         currentDroppableGroup.parentGroupId
@@ -69,10 +69,10 @@ const ProposalWorkflowEditor = () => {
     const lastWorkflowStatusInParentGroup =
       parentDroppableGroup?.connections[
         parentDroppableGroup?.connections.length - 1
-      ]?.proposalStatus;
+      ]?.status;
 
     const previousWorkflowStatusInCurrentGroup =
-      currentDroppableGroup.connections[destinationIndex - 1]?.proposalStatus;
+      currentDroppableGroup.connections[destinationIndex - 1]?.status;
 
     return isFirstInTheGroupAndHasParentGroup
       ? lastWorkflowStatusInParentGroup || null
@@ -82,11 +82,11 @@ const ProposalWorkflowEditor = () => {
   // TODO: Check this about getting next status in the workflow. It should be similar to getting previous.
   const getNextWorkflowStatuses = (
     destination: DraggableLocation,
-    currentDroppableGroup: ProposalWorkflowConnectionGroup
-  ): ProposalStatus[] => {
+    currentDroppableGroup: WorkflowConnectionGroup
+  ): Status[] => {
     const isLastInTheCurrentGroup =
       destination.index === currentDroppableGroup.connections.length;
-    const childGroups = state.proposalWorkflowConnectionGroups.filter(
+    const childGroups = state.workflowConnectionGroups.filter(
       (proposalWorkflowConnectionGroup) =>
         proposalWorkflowConnectionGroup.parentGroupId ===
         currentDroppableGroup.groupId
@@ -94,19 +94,21 @@ const ProposalWorkflowEditor = () => {
 
     const isLastInTheGroupAndHasChildGroup =
       isLastInTheCurrentGroup && childGroups?.length > 0;
+    console.log(currentDroppableGroup);
+    console.log(destination);
+    console.log('1==================');
+    console.log(isLastInTheGroupAndHasChildGroup);
 
     return isLastInTheGroupAndHasChildGroup
       ? childGroups.flatMap((childGroup) =>
-          childGroup.connections.map((connection) => connection.proposalStatus)
+          childGroup.connections.map((connection) => connection.status)
         ) || []
-      : [
-          currentDroppableGroup.connections[destination.index]?.proposalStatus,
-        ] || [];
+      : [currentDroppableGroup.connections[destination.index].status];
   };
 
   const onDragEnd = (result: DropResult): void => {
     const { source, destination } = result;
-
+    console.log({ source, destination });
     const isWrongDrop =
       destination?.droppableId === source?.droppableId &&
       source.index === destination.index;
@@ -128,7 +130,7 @@ const ProposalWorkflowEditor = () => {
       destination?.droppableId === 'proposalStatusPicker';
 
     if (isDragAndDropFromStatusPickerToWorkflowEditor) {
-      const currentDroppableGroup = state.proposalWorkflowConnectionGroups.find(
+      const currentDroppableGroup = state.workflowConnectionGroups.find(
         (proposalWorkflowConnectionGroup) =>
           proposalWorkflowConnectionGroup.groupId === destination.droppableId
       );
@@ -148,20 +150,22 @@ const ProposalWorkflowEditor = () => {
       }
 
       const proposalStatusId = proposalStatusesInThePicker[source.index].id;
+      console.log({ proposalStatusId, destination, currentDroppableGroup });
       const nextProposalStatusesId = getNextWorkflowStatuses(
         destination,
-        currentDroppableGroup as ProposalWorkflowConnectionGroup
+        currentDroppableGroup as WorkflowConnectionGroup
       ).map((status) => status?.id);
-      const prevProposalStatusId = getPreviousWorkflowStatus(
+      console.log('2==================');
+      const prevStatusId = getPreviousWorkflowStatus(
         destination.index,
-        currentDroppableGroup as ProposalWorkflowConnectionGroup
+        currentDroppableGroup as WorkflowConnectionGroup
       )?.id;
       const [firstNextProposalStatusId] = nextProposalStatusesId;
 
       const isRepeatingTheSameStatus =
         nextProposalStatusesId?.some(
           (statusId) => statusId === proposalStatusId
-        ) || proposalStatusId === prevProposalStatusId;
+        ) || proposalStatusId === prevStatusId;
 
       if (isRepeatingTheSameStatus) {
         enqueueSnackbar('Repeating same status is not allowed', {
@@ -184,7 +188,7 @@ const ProposalWorkflowEditor = () => {
             ...proposalStatusesInThePicker[source.index],
           },
           nextProposalStatusId: firstNextProposalStatusId,
-          prevProposalStatusId,
+          prevStatusId,
           proposalWorkflowId: state.id,
         },
       });
@@ -239,7 +243,7 @@ const ProposalWorkflowEditor = () => {
                 dispatch={dispatch}
                 isLoading={isLoading}
                 proposalWorkflowStatusConnectionGroups={
-                  state.proposalWorkflowConnectionGroups
+                  state.workflowConnectionGroups
                 }
               />
             </Grid>

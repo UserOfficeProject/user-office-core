@@ -113,7 +113,7 @@ context('Calls tests', () => {
             initialDBData.proposalStatuses.editableSubmittedInternal.id,
           proposalWorkflowId: workflow.id,
           sortOrder: 1,
-          prevProposalStatusId:
+          prevStatusId:
             workflow.proposalWorkflowConnectionGroups[0].connections[0].id,
         }).then((result) => {
           if (result.addProposalWorkflowStatus) {

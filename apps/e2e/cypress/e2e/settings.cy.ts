@@ -146,7 +146,7 @@ context('Settings tests', () => {
     };
     let workflowDroppableGroupId: string;
     let createdWorkflowId: number;
-    let prevProposalStatusId: number;
+    let prevStatusId: number;
     let createdEsiTemplateId: number;
     let createdInstrumentId: number;
 
@@ -169,7 +169,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
+        prevStatusId: prevStatusId,
       }).then((result) => {
         const connection = result.addProposalWorkflowStatus;
         if (connection) {
@@ -184,8 +184,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 2,
-        prevProposalStatusId:
-          initialDBData.proposalStatuses.feasibilityReview.id,
+        prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -202,7 +201,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.fapReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 3,
-        prevProposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
+        prevStatusId: initialDBData.proposalStatuses.fapSelection.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -216,7 +215,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.fapMeeting.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 4,
-        prevProposalStatusId: initialDBData.proposalStatuses.fapReview.id,
+        prevStatusId: initialDBData.proposalStatuses.fapReview.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -234,7 +233,7 @@ context('Settings tests', () => {
           proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 1,
-          prevProposalStatusId: prevProposalStatusId,
+          prevStatusId: prevStatusId,
         }).then((result) => {
           const connection = result.addProposalWorkflowStatus;
           if (connection) {
@@ -249,8 +248,7 @@ context('Settings tests', () => {
           proposalStatusId: initialDBData.proposalStatuses.fapSelection.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 0,
-          prevProposalStatusId:
-            initialDBData.proposalStatuses.feasibilityReview.id,
+          prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
           parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
           if (result.addProposalWorkflowStatus) {
@@ -267,8 +265,7 @@ context('Settings tests', () => {
           proposalStatusId: initialDBData.proposalStatuses.notFeasible.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 0,
-          prevProposalStatusId:
-            initialDBData.proposalStatuses.feasibilityReview.id,
+          prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
           parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
           if (result.addProposalWorkflowStatus) {
@@ -292,7 +289,7 @@ context('Settings tests', () => {
         const workflow = result.createProposalWorkflow;
         if (workflow) {
           createdWorkflowId = workflow.id;
-          prevProposalStatusId =
+          prevStatusId =
             workflow.proposalWorkflowConnectionGroups[0].connections[0].id;
           workflowDroppableGroupId =
             workflow.proposalWorkflowConnectionGroups[0].groupId;
@@ -326,7 +323,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
+        prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -412,7 +409,7 @@ context('Settings tests', () => {
           initialDBData.proposalStatuses.editableSubmittedInternal.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
+        prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -506,7 +503,7 @@ context('Settings tests', () => {
           initialDBData.proposalStatuses.editableSubmittedInternal.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
+        prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -591,7 +588,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
+        prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -606,8 +603,7 @@ context('Settings tests', () => {
           initialDBData.proposalStatuses.editableSubmittedInternal.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 2,
-        prevProposalStatusId:
-          initialDBData.proposalStatuses.editableSubmitted.id,
+        prevStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
@@ -756,7 +752,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
+        prevStatusId: prevStatusId,
       });
       cy.login('officer');
       cy.visit('/');
@@ -1506,7 +1502,7 @@ context('Settings tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: createdWorkflowId,
         sortOrder: 1,
-        prevProposalStatusId: prevProposalStatusId,
+        prevStatusId: prevStatusId,
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({

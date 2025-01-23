@@ -6,19 +6,17 @@ import {
   useReducer,
 } from 'react';
 
-import { ProposalWorkflow } from 'generated/sdk';
+import { Workflow } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useProposalWorkflowsData(): {
   loadingProposalWorkflows: boolean;
-  proposalWorkflows: ProposalWorkflow[];
-  setProposalWorkflowsWithLoading: Dispatch<SetStateAction<ProposalWorkflow[]>>;
+  proposalWorkflows: Workflow[];
+  setProposalWorkflowsWithLoading: Dispatch<SetStateAction<Workflow[]>>;
   refreshProposalWorkflows: () => void;
 } {
   const [update, forceUpdate] = useReducer((x: number) => x + 1, 0);
-  const [proposalWorkflows, setProposalWorkflows] = useState<
-    ProposalWorkflow[]
-  >([]);
+  const [proposalWorkflows, setProposalWorkflows] = useState<Workflow[]>([]);
   const [loadingProposalWorkflows, setLoadingProposalWorkflows] =
     useState(true);
 
@@ -27,7 +25,7 @@ export function useProposalWorkflowsData(): {
   const refreshProposalWorkflows = () => forceUpdate();
 
   const setProposalWorkflowsWithLoading = (
-    data: SetStateAction<ProposalWorkflow[]>
+    data: SetStateAction<Workflow[]>
   ) => {
     setLoadingProposalWorkflows(true);
     setProposalWorkflows(data);
@@ -39,14 +37,14 @@ export function useProposalWorkflowsData(): {
 
     setLoadingProposalWorkflows(true);
     api()
-      .getProposalWorkflows()
+      .getWorkflows({ entityType: 'proposal' })
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.proposalWorkflows) {
-          setProposalWorkflows(data.proposalWorkflows as ProposalWorkflow[]);
+        if (data.workflows) {
+          setProposalWorkflows(data.workflows as Workflow[]);
         }
         setLoadingProposalWorkflows(false);
       });

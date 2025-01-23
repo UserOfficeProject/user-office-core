@@ -26,7 +26,7 @@ import { omit } from '../utils/helperFunctions';
 @injectable()
 export default class WorkflowMutations {
   constructor(
-    @inject(Tokens.StatusDataSource)
+    @inject(Tokens.WorkflowDataSource)
     private dataSource: WorkflowDataSource,
 
     @inject(Tokens.StatusDataSource)

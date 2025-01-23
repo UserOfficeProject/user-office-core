@@ -70,7 +70,7 @@ const addFeasibilityReviewToDefaultWorkflow =
       proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
       proposalWorkflowId: 1,
       sortOrder: 1,
-      prevProposalStatusId: 1,
+      prevStatusId: 1,
     });
   };
 

@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import { ProposalStatus } from 'generated/sdk';
+import { Status } from 'generated/sdk';
 import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
 
 const changeProposalStatusValidationSchema = yup.object().shape({
@@ -19,7 +19,7 @@ const changeProposalStatusValidationSchema = yup.object().shape({
 
 type ChangeProposalStatusProps = {
   close: () => void;
-  changeStatusOnProposals: (status: ProposalStatus) => Promise<void>;
+  changeStatusOnProposals: (status: Status) => Promise<void>;
   allSelectedProposalsHaveInstrument: boolean;
   selectedProposalStatuses: number[];
 };

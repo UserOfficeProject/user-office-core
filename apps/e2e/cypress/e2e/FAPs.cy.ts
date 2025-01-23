@@ -219,7 +219,7 @@ function createWorkflowAndEsiTemplate() {
           proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
           proposalWorkflowId: createdWorkflowId,
           sortOrder: 1,
-          prevProposalStatusId: 1,
+          prevStatusId: 1,
         });
       }
 

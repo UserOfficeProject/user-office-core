@@ -11,14 +11,14 @@ import {
   InstrumentMinimalFragment,
   TechniqueMinimalFragment,
   ProposalsFilter,
-  ProposalStatus,
+  Status,
 } from 'generated/sdk';
 
 type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
   instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
   techniques?: { data: TechniqueMinimalFragment[]; isLoading: boolean };
-  proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
+  proposalStatuses?: { data: Status[]; isLoading: boolean };
   handleFilterChange: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
 };

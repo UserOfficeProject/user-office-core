@@ -10,12 +10,12 @@ import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { ProposalStatus } from 'generated/sdk';
+import { Status } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type CreateUpdateProposalStatusProps = {
-  close: (proposalStatusAdded: ProposalStatus | null) => void;
-  proposalStatus: ProposalStatus | null;
+  close: (proposalStatusAdded: Status | null) => void;
+  proposalStatus: Status | null;
 };
 
 const CreateUpdateProposalStatus = ({
@@ -38,24 +38,24 @@ const CreateUpdateProposalStatus = ({
       onSubmit={async (values): Promise<void> => {
         if (proposalStatus) {
           try {
-            const { updateProposalStatus } = await api({
+            const { updateStatus } = await api({
               toastSuccessMessage: 'Proposal status updated successfully',
-            }).updateProposalStatus({
+            }).updateStatus({
               id: proposalStatus.id,
               ...values,
             });
 
-            close(updateProposalStatus);
+            close(updateStatus);
           } catch (error) {
             close(null);
           }
         } else {
           try {
-            const { createProposalStatus } = await api({
+            const { createStatus } = await api({
               toastSuccessMessage: 'Proposal status created successfully',
-            }).createProposalStatus(values);
+            }).createStatus({ ...values, entityType: 'proposal' });
 
-            close(createProposalStatus);
+            close(createStatus);
           } catch (error) {
             close(null);
           }

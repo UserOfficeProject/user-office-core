@@ -4,7 +4,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { UserRole, ProposalWorkflow } from 'generated/sdk';
+import { UserRole, Workflow } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -29,15 +29,15 @@ const ProposalWorkflowsTable = () => {
   const navigate = useNavigate();
 
   const createModal = (
-    onUpdate: FunctionType<void, [ProposalWorkflow | null]>,
-    onCreate: FunctionType<void, [ProposalWorkflow | null]>
+    onUpdate: FunctionType<void, [Workflow | null]>,
+    onCreate: FunctionType<void, [Workflow | null]>
   ) => (
     <CreateProposalWorkflow
-      close={(proposalWorkflow: ProposalWorkflow | null) => {
+      close={(proposalWorkflow: Workflow | null) => {
         onCreate(proposalWorkflow);
 
         navigate(
-          `/ProposalWorkflowEditor/${(proposalWorkflow as ProposalWorkflow).id}`
+          `/ProposalWorkflowEditor/${(proposalWorkflow as Workflow).id}`
         );
       }}
     />
@@ -47,7 +47,7 @@ const ProposalWorkflowsTable = () => {
     try {
       await api({
         toastSuccessMessage: 'Proposal workflow deleted successfully',
-      }).deleteProposalWorkflow({
+      }).deleteWorkflow({
         id: id as number,
       });
 
@@ -88,9 +88,7 @@ const ProposalWorkflowsTable = () => {
             icon: EditIcon,
             tooltip: 'Edit',
             onClick: (event, rowData): void =>
-              navigate(
-                `/ProposalWorkflowEditor/${(rowData as ProposalWorkflow).id}`
-              ),
+              navigate(`/ProposalWorkflowEditor/${(rowData as Workflow).id}`),
             position: 'row',
           },
         ]}

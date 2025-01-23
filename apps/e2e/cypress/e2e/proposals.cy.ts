@@ -130,7 +130,7 @@ context('Proposal tests', () => {
               initialDBData.proposalStatuses.feasibilityReview.id,
             proposalWorkflowId: result.createProposalWorkflow.id,
             sortOrder: 1,
-            prevProposalStatusId: 1,
+            prevStatusId: 1,
           });
           createdWorkflowId = result.createProposalWorkflow.id;
         }

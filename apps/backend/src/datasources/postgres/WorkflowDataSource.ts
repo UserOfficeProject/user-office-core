@@ -180,7 +180,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         ON
           s.status_id = wc.status_id
         WHERE workflow_id = ${workflowId}
-        AND entity_type = '${entityType}'
+        AND s.entity_type = '${entityType}'
+        AND wc.entity_type = '${entityType}'
         ${andWhereCondition}
       ) t
       ORDER BY

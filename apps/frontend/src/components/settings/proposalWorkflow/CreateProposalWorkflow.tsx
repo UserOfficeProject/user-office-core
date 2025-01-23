@@ -7,11 +7,11 @@ import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { ProposalWorkflow } from 'generated/sdk';
+import { Workflow } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type CreateProposalWorkflowProps = {
-  close: (proposalWorkflowAdded: ProposalWorkflow | null) => void;
+  close: (proposalWorkflowAdded: Workflow | null) => void;
 };
 
 const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
@@ -30,9 +30,9 @@ const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
         try {
           const data = await api({
             toastSuccessMessage: 'Proposal workflow created successfully',
-          }).createProposalWorkflow(values);
+          }).createWorkflow({ ...values, entityType: 'proposal' });
 
-          close(data.createProposalWorkflow as ProposalWorkflow);
+          close(data.createWorkflow as Workflow);
         } catch (error) {
           close(null);
         }

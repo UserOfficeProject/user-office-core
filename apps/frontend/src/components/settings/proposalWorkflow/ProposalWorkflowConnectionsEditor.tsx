@@ -20,7 +20,7 @@ import React, { useState } from 'react';
 
 import {
   ProposalWorkflowConnection,
-  ProposalWorkflowConnectionGroup,
+  WorkflowConnectionGroup,
 } from 'generated/sdk';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -29,16 +29,15 @@ import { Event, EventType } from './ProposalWorkflowEditorModel';
 import StatusEventsAndActionsDialog from './StatusEventsAndActionsDialog';
 
 type ProposalWorkflowConnectionsEditorProps = {
-  proposalWorkflowStatusConnectionGroups: ProposalWorkflowConnectionGroup[];
+  proposalWorkflowStatusConnectionGroups: WorkflowConnectionGroup[];
   dispatch: React.Dispatch<Event>;
   isLoading: boolean;
   confirm: WithConfirmType;
 };
 
-type ProposalWorkflowConnectionGroupWithSubGroups =
-  ProposalWorkflowConnectionGroup & {
-    subGroups: ProposalWorkflowConnectionGroupWithSubGroups[];
-  };
+type ProposalWorkflowConnectionGroupWithSubGroups = WorkflowConnectionGroup & {
+  subGroups: ProposalWorkflowConnectionGroupWithSubGroups[];
+};
 
 const ProposalWorkflowConnectionsEditor = ({
   proposalWorkflowStatusConnectionGroups,
@@ -75,14 +74,14 @@ const ProposalWorkflowConnectionsEditor = ({
    * The function calls itself recursively to find children of children.
    */
   const buildWorkflowTree = (
-    proposalWorkflowConnectionGroups: ProposalWorkflowConnectionGroup[],
+    proposalWorkflowConnectionGroups: WorkflowConnectionGroup[],
     parentId: string | null = null
   ) => {
     const result: ProposalWorkflowConnectionGroupWithSubGroups[] = [];
 
     proposalWorkflowConnectionGroups.forEach(
       (
-        proposalWorkflowConnectionGroup: ProposalWorkflowConnectionGroup,
+        proposalWorkflowConnectionGroup: WorkflowConnectionGroup,
         index: number
       ) => {
         const newElement: ProposalWorkflowConnectionGroupWithSubGroups = {
@@ -136,8 +135,8 @@ const ProposalWorkflowConnectionsEditor = ({
   const isVeryFirstDraftStatus = (
     proposalWorkflowConnection: ProposalWorkflowConnection
   ) =>
-    proposalWorkflowConnection.proposalStatus.id === 1 &&
-    proposalWorkflowConnection.proposalStatus.shortCode === 'DRAFT' &&
+    proposalWorkflowConnection.status.id === 1 &&
+    proposalWorkflowConnection.status.shortCode === 'DRAFT' &&
     proposalWorkflowConnection.sortOrder === 0 &&
     proposalWorkflowConnection.droppableGroupId ===
       'proposalWorkflowConnections_0';
@@ -145,9 +144,9 @@ const ProposalWorkflowConnectionsEditor = ({
   const getUniqueKey = (
     proposalWorkflowConnection: ProposalWorkflowConnection
   ) => {
-    return `${proposalWorkflowConnection.proposalStatus.shortCode}_${
-      proposalWorkflowConnection.proposalStatus.id
-    }_${proposalWorkflowConnection.prevProposalStatusId || ''}`;
+    return `${proposalWorkflowConnection.status.shortCode}_${
+      proposalWorkflowConnection.status.id
+    }_${proposalWorkflowConnection.prevStatusId || ''}`;
   };
 
   const getConnectionGroupItems = (
@@ -204,7 +203,7 @@ const ProposalWorkflowConnectionsEditor = ({
                   },
                 }}
                 onClick={() => {
-                  if (proposalWorkflowConnection.prevProposalStatusId) {
+                  if (proposalWorkflowConnection.prevStatusId) {
                     setWorkflowConnection(proposalWorkflowConnection);
                   }
                 }}
@@ -237,10 +236,7 @@ const ProposalWorkflowConnectionsEditor = ({
                                 <>
                                   Are you sure you want to remove{' '}
                                   <b>
-                                    {
-                                      proposalWorkflowConnection.proposalStatus
-                                        .name
-                                    }
+                                    {proposalWorkflowConnection.status.name}
                                   </b>{' '}
                                   workflow connection?
                                 </>
@@ -270,10 +266,10 @@ const ProposalWorkflowConnectionsEditor = ({
                   </DialogActions>
                 )}
                 <Box fontSize="1rem">
-                  {proposalWorkflowConnection.proposalStatus.name}
+                  {proposalWorkflowConnection.status.name}
                 </Box>
                 <Box fontSize="small" mt={1} color={theme.palette.grey[400]}>
-                  {proposalWorkflowConnection.proposalStatus.description}
+                  {proposalWorkflowConnection.status.description}
                 </Box>
               </Grid>
             </>

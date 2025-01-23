@@ -19,7 +19,7 @@ context('Status actions tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
-        prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
       });
       cy.login('officer');
       cy.visit('/ProposalWorkflowEditor/1');
@@ -103,7 +103,7 @@ context('Status actions tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
-        prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -193,7 +193,7 @@ context('Status actions tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
-        prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -256,7 +256,7 @@ context('Status actions tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
-        prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -405,7 +405,7 @@ context('Status actions tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
-        prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -514,7 +514,7 @@ context('Status actions tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
         proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
-        prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -633,7 +633,7 @@ context('Status actions tests', () => {
         proposalStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
         proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
-        prevProposalStatusId: initialDBData.proposalStatuses.draft.id,
+        prevStatusId: initialDBData.proposalStatuses.draft.id,
       }).then((result) => {
         const connection = result.addProposalWorkflowStatus;
         if (connection) {

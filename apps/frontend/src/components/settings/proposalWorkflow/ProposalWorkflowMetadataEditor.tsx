@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import TextField from 'components/common/FormikUITextField';
-import { ProposalWorkflow } from 'generated/sdk';
+import { Workflow } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 
 import { Event, EventType } from './ProposalWorkflowEditorModel';
@@ -17,7 +17,7 @@ const ProposalWorkflowMetadataEditor = ({
   proposalWorkflow,
   dispatch,
 }: {
-  proposalWorkflow: ProposalWorkflow;
+  proposalWorkflow: Workflow;
   dispatch: React.Dispatch<Event>;
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
