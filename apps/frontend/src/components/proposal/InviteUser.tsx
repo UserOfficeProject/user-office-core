@@ -175,7 +175,12 @@ export default function InviteUser({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && isValidEmail(query)) {
+    if (
+      event.key === 'Enter' ||
+      event.key === ' ' ||
+      (event.key === ',' && isValidEmail(query))
+    ) {
+      event.preventDefault();
       addValidEmailToSelection();
     }
   };
