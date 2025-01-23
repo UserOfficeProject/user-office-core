@@ -23,6 +23,7 @@ import {
   publishMessageToTheEventBus,
   getFapChairSecretariesAndFormatOutputForEmailSending,
   statusActionLogger,
+  getOtherAndFormatOutputForEmailSending,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -144,7 +145,6 @@ export const emailStatusActionRecipient = async (
         proposals,
         recipientWithTemplate
       );
-
       await sendMail(
         ISs,
         statusActionLogger({
@@ -293,28 +293,26 @@ export const emailStatusActionRecipient = async (
         break;
       }
 
-      const otherRecipients: EmailReadyType[] =
-        recipientWithTemplate.otherRecipientEmails.map((email) => ({
-          id: recipientWithTemplate.recipient.name,
-          email: email,
-          proposals: proposals,
-          template: recipientWithTemplate.emailTemplate.id,
-        }));
-
-      await sendMail(
-        otherRecipients,
-        statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
-          emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
-          proposalPks,
-          statusActionsLogId,
-        }),
-        successfulMessage,
-        failMessage,
-        loggedInUserId
-      );
-
+      for (const email of recipientWithTemplate.otherRecipientEmails) {
+        const oRecipients = await getOtherAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate,
+          email
+        );
+        await sendMail(
+          oRecipients,
+          statusActionLogger({
+            connectionId: proposalStatusAction.connectionId,
+            actionId: proposalStatusAction.actionId,
+            statusActionsLogId,
+            emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
+            proposalPks,
+          }),
+          successfulMessage,
+          failMessage,
+          loggedInUserId
+        );
+      }
       break;
     }
 
@@ -357,6 +355,9 @@ const sendMail = async (
               firstName: recipientWithData.firstName,
               lastName: recipientWithData.lastName,
               preferredName: recipientWithData.preferredName,
+              techniques: recipientWithData.techniques,
+              samples: recipientWithData.samples,
+              hazards: recipientWithData.hazards,
             },
             recipients: [{ address: recipientWithData.email }],
           });
