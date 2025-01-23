@@ -28,7 +28,7 @@ export class AddWorkflowStatusInput implements Partial<WorkflowConnection> {
   @Field(() => Int)
   public statusId: number;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   public nextStatusId: number | null;
 
   @Field(() => Int, { nullable: true })

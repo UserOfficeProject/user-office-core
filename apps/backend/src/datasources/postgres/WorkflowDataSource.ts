@@ -266,7 +266,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       .join('statuses as s', {
         's.status_id': newWorkflowStatusInput.statusId,
       });
-
     if (!workflowConnectionRecord) {
       throw new GraphQLError('Could not create proposal workflow status');
     }
@@ -284,6 +283,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       sort_order: connection.sortOrder,
       droppable_group_id: connection.droppableGroupId,
       parent_droppable_group_id: connection.parentDroppableGroupId,
+      entity_type: connection.entityType,
     }));
 
     const result = await database.raw(
@@ -308,7 +308,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     // TODO: To test
     const connectionsResult =
       await this.upsertProposalWorkflowStatuses(workflowStatuses);
-
     if (connectionsResult) {
       // NOTE: Return result as ProposalWorkflowConnection[] but do not care about name and description.
       return connectionsResult.map((connection) =>

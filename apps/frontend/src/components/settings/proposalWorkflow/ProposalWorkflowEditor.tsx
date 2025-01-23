@@ -49,7 +49,6 @@ const ProposalWorkflowEditor = () => {
       ...proposalWorkflowConnectionGroup.connections
     )
   );
-  console.log({ state, proposalStatuses });
 
   const proposalStatusesInThePicker = state.id ? proposalStatuses : [];
 
@@ -94,16 +93,12 @@ const ProposalWorkflowEditor = () => {
 
     const isLastInTheGroupAndHasChildGroup =
       isLastInTheCurrentGroup && childGroups?.length > 0;
-    console.log(currentDroppableGroup);
-    console.log(destination);
-    console.log('1==================');
-    console.log(isLastInTheGroupAndHasChildGroup);
 
     return isLastInTheGroupAndHasChildGroup
       ? childGroups.flatMap((childGroup) =>
           childGroup.connections.map((connection) => connection.status)
         ) || []
-      : [currentDroppableGroup.connections[destination.index].status];
+      : [currentDroppableGroup.connections[destination.index]?.status];
   };
 
   const onDragEnd = (result: DropResult): void => {
@@ -155,7 +150,6 @@ const ProposalWorkflowEditor = () => {
         destination,
         currentDroppableGroup as WorkflowConnectionGroup
       ).map((status) => status?.id);
-      console.log('2==================');
       const prevStatusId = getPreviousWorkflowStatus(
         destination.index,
         currentDroppableGroup as WorkflowConnectionGroup
@@ -183,13 +177,13 @@ const ProposalWorkflowEditor = () => {
           sortOrder: destination.index,
           droppableGroupId: destination.droppableId,
           parentDroppableGroupId: currentDroppableGroup?.parentGroupId || null,
-          proposalStatusId,
-          proposalStatus: {
+          statusId: proposalStatusId,
+          status: {
             ...proposalStatusesInThePicker[source.index],
           },
-          nextProposalStatusId: firstNextProposalStatusId,
+          nextStatusId: firstNextProposalStatusId,
           prevStatusId,
-          proposalWorkflowId: state.id,
+          workflowId: state.id,
         },
       });
     } else if (isReorderingConnectionsInsideWorkflowEditor) {

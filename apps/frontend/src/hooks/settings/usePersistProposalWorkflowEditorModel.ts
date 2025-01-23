@@ -227,10 +227,10 @@ export function usePersistProposalWorkflowEditorModel() {
           break;
         case EventType.ADD_WORKFLOW_STATUS_REQUESTED: {
           const {
-            proposalWorkflowId,
+            workflowId,
             sortOrder,
-            proposalStatusId,
-            nextProposalStatusId,
+            statusId,
+            nextStatusId,
             prevStatusId,
             parentDroppableGroupId,
             droppableGroupId,
@@ -246,12 +246,12 @@ export function usePersistProposalWorkflowEditorModel() {
           return executeAndMonitorCall(async () => {
             try {
               const result = await insertNewStatusInProposalWorkflow(
-                proposalWorkflowId,
+                workflowId,
                 sortOrder,
                 droppableGroupId,
                 parentDroppableGroupId,
-                proposalStatusId,
-                nextProposalStatusId,
+                statusId,
+                nextStatusId,
                 prevStatusId
               );
 

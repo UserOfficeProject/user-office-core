@@ -4,8 +4,8 @@ mutation addWorkflowStatus(
   $droppableGroupId: String!
   $parentDroppableGroupId: String
   $statusId: Int!
-  $nextStatusId: Int!
-  $prevStatusId: Int!
+  $nextStatusId: Int
+  $prevStatusId: Int
   $entityType: String!
 ) {
   addWorkflowStatus(

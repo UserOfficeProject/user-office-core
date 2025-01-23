@@ -252,7 +252,6 @@ export default class PostgresStatusActionsDataSource
           })
           .where('wca.connection_id', connectionStatusActionsInput.connectionId)
           .andWhere('wca.entity_type', connectionStatusActionsInput.entityType)
-          .andWhere('sa.entity_type', connectionStatusActionsInput.entityType)
           .transacting(trx);
 
         return await trx.commit(insertedStatusActions);

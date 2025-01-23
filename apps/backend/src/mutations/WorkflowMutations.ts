@@ -29,7 +29,7 @@ export default class WorkflowMutations {
     @inject(Tokens.WorkflowDataSource)
     private dataSource: WorkflowDataSource,
 
-    @inject(Tokens.StatusDataSource)
+    @inject(Tokens.StatusActionsDataSource)
     private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
@@ -271,7 +271,6 @@ export default class WorkflowMutations {
     const isInTheMiddleOfAGroup =
       newWorkflowConnection.sortOrder > 0 &&
       newWorkflowConnection.sortOrder < allWorkflowGroupConnections.length - 1;
-
     const insertedWorkflowConnection = (
       await this.updateWorkflowConnectionStatuses(
         allWorkflowGroupConnections,
