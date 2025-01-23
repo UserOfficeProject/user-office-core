@@ -40,7 +40,7 @@ export default class WorkflowMutations {
     args: CreateWorkflowInput
   ): Promise<Workflow | Rejection> {
     return this.dataSource.createWorkflow(args).catch((error) => {
-      return rejection('Could not create workflow', { agent, args }, error);
+      return rejection('Could not create workflows', { agent, args }, error);
     });
   }
 
