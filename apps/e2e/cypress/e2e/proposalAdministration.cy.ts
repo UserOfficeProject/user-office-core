@@ -26,7 +26,7 @@ context('Proposal administration tests', () => {
 
   const existingUserId = initialDBData.users.user1.id;
   const existingTopicId = 1;
-  const existingQuestionaryId = 2;
+  const existingQuestionaryId = 3;
   let createdProposalPk: number;
   let createdProposalId: string;
   let createdInstrumentId: number;
@@ -948,7 +948,7 @@ context('Proposal administration tests', () => {
     it('Should be able to search Boolean question', () => {
       // If answer true, find when search for Yes
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [
           {
@@ -973,7 +973,7 @@ context('Proposal administration tests', () => {
 
       // If answer false, find when search for No
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [
           {
@@ -998,7 +998,7 @@ context('Proposal administration tests', () => {
 
       // If missing answer, do not find the result for both, Yes and No
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [],
       });
