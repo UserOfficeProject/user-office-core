@@ -326,10 +326,10 @@ export const emailStatusActionRecipient = async (
         break;
       }
 
-      let ssRecipient: EmailReadyType[];
+      let sampleSafetyRecipients: EmailReadyType[];
 
       if (recipientWithTemplate.combineEmails) {
-        ssRecipient = [
+        sampleSafetyRecipients = [
           {
             id: recipientWithTemplate.recipient.name,
             email: sampleSafetyEmail,
@@ -338,7 +338,7 @@ export const emailStatusActionRecipient = async (
           },
         ];
       } else {
-        ssRecipient = await getOtherAndFormatOutputForEmailSending(
+        sampleSafetyRecipients = await getOtherAndFormatOutputForEmailSending(
           proposals,
           recipientWithTemplate,
           sampleSafetyEmail
@@ -346,7 +346,7 @@ export const emailStatusActionRecipient = async (
       }
 
       await sendMail(
-        ssRecipient,
+        sampleSafetyRecipients,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,

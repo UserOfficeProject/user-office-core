@@ -404,13 +404,13 @@ export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
     Tokens.TechniqueDataSource
   );
 
-  const TSs: EmailReadyType[] = [];
+  const techniqueScientists: EmailReadyType[] = [];
   for (const proposal of proposals) {
     const proposalTechiques =
       await techniqueDataSource.getTechniquesByProposalPk(proposal.primaryKey);
 
     if (!proposalTechiques?.length) {
-      return TSs;
+      return techniqueScientists;
     }
 
     const techniquePeople = await Promise.all(
@@ -434,14 +434,14 @@ export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
       );
 
     await getEmailReadyArrayOfUsersAndProposals(
-      TSs,
+      techniqueScientists,
       filteredTechiquePeople,
       proposal,
       recipientWithTemplate
     );
   }
 
-  return TSs;
+  return techniqueScientists;
 };
 
 export const getOtherAndFormatOutputForEmailSending = async (
