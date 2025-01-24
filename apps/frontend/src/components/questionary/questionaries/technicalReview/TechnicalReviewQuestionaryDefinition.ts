@@ -20,11 +20,6 @@ export const technicalReviewQuestionaryDefinition: QuestionaryDefinition = {
       const technicalReviewSubmissionState =
         state as TechnicalReviewSubmissionState;
 
-      console.log(
-        'submitted',
-        technicalReviewSubmissionState.technicalReview.submitted
-      );
-
       return technicalReviewSubmissionState.technicalReview.submitted === true;
     })
   ),

@@ -1,4 +1,0 @@
-'''FOR t_i IN SELECT * FROM technical_review LOOP
-				UPDATE technical_review SET instrument_id = (SELECT instrument_id FROM instrument_has_proposals WHERE technical_review.proposal_pk = instrument_has_proposals.proposal_pk AND technical_review.technical_review_id = t_i.technical_review_id);
-				RETURN NEXT t_i;
-			END LOOP;'''
