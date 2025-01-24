@@ -161,13 +161,6 @@ export default class InstrumentMutations {
       }
     );
 
-    if (!agent) {
-      return rejection('Cannot find the creator of the technical review', {
-        agent,
-        args,
-      });
-    }
-
     const instrumentHasProposalIds: number[] = [];
 
     // TODO: Cleanup this part because it is quite ugly
@@ -264,7 +257,7 @@ export default class InstrumentMutations {
 
             const technicalReviewQuestionary =
               await this.questionaryDataSource.create(
-                agent.id,
+                proposal.proposerId,
                 call.technicalReviewTemplateId
               );
 
