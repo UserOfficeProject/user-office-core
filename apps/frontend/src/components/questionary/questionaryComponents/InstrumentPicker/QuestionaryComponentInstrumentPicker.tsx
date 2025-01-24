@@ -200,7 +200,8 @@ export function QuestionaryComponentInstrumentPicker(
   };
 
   const SelectMenuItem = config.isMultipleSelect ? MultiMenuItem : MenuItem;
-
+  const instrumentSort = [...config.instruments];
+  const data = instrumentSort.sort((a, b) => (a.name > b.name ? 1 : -1));
   switch (config.variant) {
     case 'dropdown':
       return (
@@ -230,13 +231,10 @@ export function QuestionaryComponentInstrumentPicker(
             data-natural-key={naturalKey}
             data-cy="dropdown-ul"
           >
-            {config.instruments.map((instrument) => {
+            {data.map((data) => {
               return (
-                <SelectMenuItem
-                  value={instrument.id.toString()}
-                  key={instrument.id}
-                >
-                  {instrument.name}
+                <SelectMenuItem value={data.id.toString()} key={data.id}>
+                  {data.name}
                 </SelectMenuItem>
               );
             })}
