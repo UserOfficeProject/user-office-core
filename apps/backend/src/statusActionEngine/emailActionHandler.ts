@@ -24,6 +24,7 @@ import {
   getFapChairSecretariesAndFormatOutputForEmailSending,
   statusActionLogger,
   getOtherAndFormatOutputForEmailSending,
+  getTechniqueScientistsAndFormatOutputForEmailSending,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -285,44 +286,12 @@ export const emailStatusActionRecipient = async (
     }
 
     case EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS: {
-      const adminDataSource = container.resolve<AdminDataSource>(
-        Tokens.AdminDataSource
+      const TSs = await getTechniqueScientistsAndFormatOutputForEmailSending(
+        proposals,
+        recipientWithTemplate
       );
-
-      const techniqueScientistsEmail = (
-        await adminDataSource.getSetting(SettingsId.TECHNIQUE_SCIENTISTS_EMAIL)
-      )?.settingsValue;
-
-      if (!techniqueScientistsEmail) {
-        logger.logError(
-          'Could not send email(s) to the Technique Scientists as the setting (TECHNIQUE_SCIENTISTS_EMAIL) is not set.',
-          { proposalEmailsSkipped: proposals }
-        );
-
-        break;
-      }
-
-      let tsRecipient: EmailReadyType[];
-
-      if (recipientWithTemplate.combineEmails) {
-        tsRecipient = [
-          {
-            id: recipientWithTemplate.recipient.name,
-            email: techniqueScientistsEmail,
-            proposals: proposals,
-            template: recipientWithTemplate.emailTemplate.id,
-          },
-        ];
-      } else {
-        tsRecipient = await getOtherAndFormatOutputForEmailSending(
-          proposals,
-          recipientWithTemplate,
-          techniqueScientistsEmail
-        );
-      }
-
       await sendMail(
-        tsRecipient,
+        TSs,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,

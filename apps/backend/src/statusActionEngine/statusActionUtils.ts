@@ -396,6 +396,54 @@ export const getInstrumentScientistsAndFormatOutputForEmailSending = async (
   return ISs;
 };
 
+export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
+  proposals: WorkflowEngineProposalType[],
+  recipientWithTemplate: EmailStatusActionRecipientsWithTemplate
+) => {
+  const techniqueDataSource: TechniqueDataSource = container.resolve(
+    Tokens.TechniqueDataSource
+  );
+
+  const TSs: EmailReadyType[] = [];
+  for (const proposal of proposals) {
+    const proposalTechiques =
+      await techniqueDataSource.getTechniquesByProposalPk(proposal.primaryKey);
+
+    if (!proposalTechiques?.length) {
+      return TSs;
+    }
+
+    const techniquePeople = await Promise.all(
+      proposalTechiques.map(async (proposalTechique) => {
+        const techniqueContact =
+          await techniqueDataSource.getTechniqueScientists(proposalTechique.id);
+
+        if (techniqueContact.length === 0) {
+          return;
+        }
+
+        return techniqueContact;
+      })
+    );
+
+    const filteredTechiquePeople = techniquePeople
+      .flat()
+      .filter(
+        (user, i, array): user is BasicUserDetails =>
+          !!user && array.findIndex((v2) => v2?.id === user?.id) === i
+      );
+
+    await getEmailReadyArrayOfUsersAndProposals(
+      TSs,
+      filteredTechiquePeople,
+      proposal,
+      recipientWithTemplate
+    );
+  }
+
+  return TSs;
+};
+
 export const getOtherAndFormatOutputForEmailSending = async (
   proposals: WorkflowEngineProposalType[],
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate,
