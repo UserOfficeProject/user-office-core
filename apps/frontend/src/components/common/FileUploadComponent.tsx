@@ -365,7 +365,6 @@ export function FileUploadComponent(props: {
   onChange: (files: FileIdWithCaptionAndFigure[]) => void;
   deleteAllOption?: boolean;
 }) {
-  console.log(props);
   const fileIds = props.value.map((fileItem) => fileItem.id);
   const { files, setFiles } = useFilesMetadata({ fileIds });
 
