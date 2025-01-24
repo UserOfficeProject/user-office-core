@@ -171,13 +171,9 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                 data-cy="save-button"
                 disabled={
                   shouldDisableForm(isSubmitting) ||
-                  ((isUserOfficer || fapSecOrChairCanEdit) && isSubmitting)
+                  (fapSecOrChairCanEdit && isSubmitting)
                 }
-                color={
-                  isUserOfficer || fapSecOrChairCanEdit
-                    ? 'primary'
-                    : 'secondary'
-                }
+                color={'primary'}
                 type="submit"
                 onClick={async () => {
                   setIsSubmitting(true);

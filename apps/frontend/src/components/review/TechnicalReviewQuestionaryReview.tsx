@@ -31,7 +31,7 @@ export default function TechnicalReviewQuestionaryReview(
       value: data.status || '',
     },
     {
-      label: `Time allocation(${data?.proposal?.call?.allocationTimeUnit}s)`,
+      label: `Time allocation(${data.proposal?.call?.allocationTimeUnit}s)`,
       value: data.timeAllocation?.toString() || '',
     },
     {
