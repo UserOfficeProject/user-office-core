@@ -2,15 +2,15 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { CoProposerInviteDataSourceMock } from '../datasources/mockups/CoProposerInviteDataSource';
-import { InviteCodesDataSourceMock } from '../datasources/mockups/InviteCodesDataSource';
-import { RoleInviteDataSourceMock } from '../datasources/mockups/RoleInviteDataSource';
+import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
+import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
 import {
   dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { InviteCode } from '../models/InviteCode';
+import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
 import { UserRole } from '../models/User';
 import InviteMutations from './InviteMutations';
@@ -19,16 +19,12 @@ const inviteMutations = container.resolve(InviteMutations);
 
 describe('Test Invite Mutations', () => {
   beforeEach(() => {
+    container.resolve<InviteDataSourceMock>(Tokens.InviteDataSource).init();
     container
-      .resolve<InviteCodesDataSourceMock>(Tokens.InviteCodeDataSource)
+      .resolve<RoleClaimDataSourceMock>(Tokens.RoleClaimDataSource)
       .init();
     container
-      .resolve<RoleInviteDataSourceMock>(Tokens.RoleInviteDataSource)
-      .init();
-    container
-      .resolve<CoProposerInviteDataSourceMock>(
-        Tokens.CoProposerInviteDataSource
-      )
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
       .init();
   });
 
@@ -100,12 +96,12 @@ describe('Test Invite Mutations', () => {
       claims: { roleIds },
     });
 
-    const roleInvite = await container
-      .resolve<RoleInviteDataSourceMock>(Tokens.RoleInviteDataSource)
-      .findByInviteCodeId(1);
+    const roleClaim = await container
+      .resolve<RoleClaimDataSourceMock>(Tokens.RoleClaimDataSource)
+      .findByInviteId(1);
 
-    expect(roleInvite).toBeDefined();
-    expect(roleInvite.map((roleInvite) => roleInvite.roleId)).toEqual(roleIds);
+    expect(roleClaim).toBeDefined();
+    expect(roleClaim.map((roleClaim) => roleClaim.roleId)).toEqual(roleIds);
   });
 
   test('A user can not update invite', async () => {
@@ -130,16 +126,14 @@ describe('Test Invite Mutations', () => {
         roleIds: [1],
         coProposerProposalPk: proposalPk,
       },
-    })) as InviteCode;
+    })) as Invite;
 
-    const coProposerInvite = await container
-      .resolve<CoProposerInviteDataSourceMock>(
-        Tokens.CoProposerInviteDataSource
-      )
-      .findByInviteCodeId(invite.id);
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .findByInviteId(invite.id);
 
-    expect(coProposerInvite).toMatchObject({
-      inviteCodeId: invite.id,
+    expect(coProposerClaim).toMatchObject({
+      inviteId: invite.id,
       proposalPk,
     });
   });
@@ -158,15 +152,13 @@ describe('Test Invite Mutations', () => {
 
     expect(response).not.toBeInstanceOf(Rejection);
 
-    const invite = response as InviteCode;
-    const coProposerInvite = await container
-      .resolve<CoProposerInviteDataSourceMock>(
-        Tokens.CoProposerInviteDataSource
-      )
-      .findByInviteCodeId(invite.id);
+    const invite = response as Invite;
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .findByInviteId(invite.id);
 
-    expect(coProposerInvite).toMatchObject({
-      inviteCodeId: invite.id,
+    expect(coProposerClaim).toMatchObject({
+      inviteId: invite.id,
       proposalPk,
     });
   });
@@ -185,16 +177,14 @@ describe('Test Invite Mutations', () => {
 
     expect(response).not.toBeInstanceOf(Rejection);
 
-    const invite = response as InviteCode;
+    const invite = response as Invite;
 
-    const coProposerInvite = await container
-      .resolve<CoProposerInviteDataSourceMock>(
-        Tokens.CoProposerInviteDataSource
-      )
-      .findByInviteCodeId(invite.id);
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .findByInviteId(invite.id);
 
-    expect(coProposerInvite).toMatchObject({
-      inviteCodeId: invite.id,
+    expect(coProposerClaim).toMatchObject({
+      inviteId: invite.id,
       proposalPk,
     });
   });
@@ -225,12 +215,12 @@ describe('Test Invite Mutations', () => {
       claims: { roleIds },
     });
 
-    const roleInvite = await container
-      .resolve<RoleInviteDataSourceMock>(Tokens.RoleInviteDataSource)
-      .findByInviteCodeId(1);
+    const roleClaim = await container
+      .resolve<RoleClaimDataSourceMock>(Tokens.RoleClaimDataSource)
+      .findByInviteId(1);
 
-    expect(roleInvite).toBeDefined();
-    expect(roleInvite.map((roleInvite) => roleInvite.roleId)).toEqual(roleIds);
+    expect(roleClaim).toBeDefined();
+    expect(roleClaim.map((roleClaim) => roleClaim.roleId)).toEqual(roleIds);
   });
 
   test('A user can not update invite with role claims if role is User.USER_OFFICER', async () => {
@@ -252,12 +242,10 @@ describe('Test Invite Mutations', () => {
       claims: { coProposerProposalPk: proposalPk },
     });
 
-    const coProposerInvite = await container
-      .resolve<CoProposerInviteDataSourceMock>(
-        Tokens.CoProposerInviteDataSource
-      )
-      .findByInviteCodeId(1);
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .findByInviteId(1);
 
-    expect(coProposerInvite).toMatchObject({ inviteCodeId: 1, proposalPk });
+    expect(coProposerClaim).toMatchObject({ inviteId: 1, proposalPk });
   });
 });

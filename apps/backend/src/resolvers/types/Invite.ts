@@ -1,9 +1,9 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { InviteCode as InviteCodeOrigin } from '../../models/InviteCode';
+import { Invite as InviteOrigin } from '../../models/Invite';
 
 @ObjectType()
-export class InviteCode implements Partial<InviteCodeOrigin> {
+export class Invite implements Partial<InviteOrigin> {
   @Field(() => Int)
   public id: number;
 

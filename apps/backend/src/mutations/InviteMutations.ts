@@ -8,13 +8,13 @@ import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { CoProposerInviteDataSource } from '../datasources/CoProposerInviteDataSource';
-import { InviteCodeDataSource } from '../datasources/InviteCodeDataSource';
+import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { InviteDataSource } from '../datasources/InviteDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { RoleInviteDataSource } from '../datasources/RoleInviteDataSource';
+import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
-import { InviteCode } from '../models/InviteCode';
+import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -24,16 +24,16 @@ import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
 @injectable()
 export default class InviteMutations {
   constructor(
-    @inject(Tokens.InviteCodeDataSource)
-    private inviteDataSource: InviteCodeDataSource,
+    @inject(Tokens.InviteDataSource)
+    private inviteDataSource: InviteDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
-    @inject(Tokens.RoleInviteDataSource)
-    private roleInviteDataSource: RoleInviteDataSource,
-    @inject(Tokens.CoProposerInviteDataSource)
-    private coProposerInviteDataSource: CoProposerInviteDataSource,
+    @inject(Tokens.RoleClaimDataSource)
+    private roleClaimDataSource: RoleClaimDataSource,
+    @inject(Tokens.CoProposerClaimDataSource)
+    private coProposerClaimDataSource: CoProposerClaimDataSource,
     @inject(Tokens.UserAuthorization)
     private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
@@ -47,10 +47,10 @@ export default class InviteMutations {
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
-  ): Promise<InviteCode | Rejection> {
+  ): Promise<Invite | Rejection> {
     const { roleIds, coProposerProposalPk } = args.claims;
 
-    const isRoleInviteAuthorized = await this.inviteAuth.isRoleInviteAuthorized(
+    const isRoleClaimAuthorized = await this.inviteAuth.isRoleClaimAuthorized(
       agent,
       roleIds
     );
@@ -81,10 +81,10 @@ export default class InviteMutations {
     );
 
     if (roleIds) {
-      await this.setRoleInvites(newInvite.id, roleIds);
+      await this.setRoleClaims(newInvite.id, roleIds);
     }
     if (coProposerProposalPk) {
-      await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
+      await this.setCoProposerClaims(newInvite.id, coProposerProposalPk);
     }
 
     return newInvite;
@@ -95,20 +95,20 @@ export default class InviteMutations {
     agent: UserWithRole | null,
     code: string
   ): Promise<boolean | Rejection> {
-    const inviteCode = await this.inviteDataSource.findByCode(code);
-    if (inviteCode === null) {
-      return rejection('Invite code not found', { inviteCode: code });
+    const invite = await this.inviteDataSource.findByCode(code);
+    if (invite === null) {
+      return rejection('Invite code not found', { invite: code });
     }
 
-    if (inviteCode.claimedByUserId !== null) {
-      return rejection('Invite code already claimed', { inviteCode: code });
+    if (invite.claimedByUserId !== null) {
+      return rejection('Invite code already claimed', { invite: code });
     }
 
-    await this.acceptRoleInvites(agent!.id, inviteCode.id);
-    await this.acceptCoProposerInvites(agent!.id, inviteCode.id);
+    await this.processRoleClaims(agent!.id, invite.id);
+    await this.processCoProposerClaims(agent!.id, invite.id);
 
     await this.inviteDataSource.update({
-      id: inviteCode.id,
+      id: invite.id,
       claimedAt: new Date(),
       claimedByUserId: agent!.id,
     });
@@ -121,7 +121,7 @@ export default class InviteMutations {
   async update(agent: UserWithRole | null, args: UpdateInviteInput) {
     const { roleIds, coProposerProposalPk } = args.claims ?? {};
 
-    const isRoleClaimAuthorized = await this.inviteAuth.isRoleInviteAuthorized(
+    const isRoleClaimAuthorized = await this.inviteAuth.isRoleClaimAuthorized(
       agent,
       roleIds
     );
@@ -145,10 +145,10 @@ export default class InviteMutations {
 
     const updatedInvite = await this.inviteDataSource.update(args);
     if (args.claims?.roleIds) {
-      await this.setRoleInvites(updatedInvite.id, args.claims?.roleIds);
+      await this.setRoleClaims(updatedInvite.id, args.claims?.roleIds);
     }
     if (args.claims?.coProposerProposalPk) {
-      await this.setCoProposerInvites(
+      await this.setCoProposerClaims(
         updatedInvite.id,
         args.claims.coProposerProposalPk
       );
@@ -157,60 +157,59 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
-  private async setRoleInvites(inviteCodeId: number, roleIds: number[]) {
-    await this.roleInviteDataSource.deleteByInviteCodeId(inviteCodeId);
+  private async setRoleClaims(inviteId: number, roleIds: number[]) {
+    await this.roleClaimDataSource.deleteByInviteId(inviteId);
 
     if (!roleIds) return;
 
     if (roleIds.length > 0) {
       await Promise.all(
         roleIds.map((roleId) =>
-          this.roleInviteDataSource.create(inviteCodeId, roleId)
+          this.roleClaimDataSource.create(inviteId, roleId)
         )
       );
     }
   }
 
-  private async setCoProposerInvites(invCodeId: number, proposalPk: number) {
+  private async setCoProposerClaims(invCodeId: number, proposalPk: number) {
     if (!proposalPk) return;
 
-    return this.coProposerInviteDataSource.create(invCodeId, proposalPk);
+    return this.coProposerClaimDataSource.create(invCodeId, proposalPk);
   }
 
-  private async acceptRoleInvites(claimerUserId: number, inviteCodeId: number) {
-    const roleInvites =
-      await this.roleInviteDataSource.findByInviteCodeId(inviteCodeId);
+  private async processRoleClaims(claimerUserId: number, inviteId: number) {
+    const roleClaims = await this.roleClaimDataSource.findByInviteId(inviteId);
 
-    if (roleInvites.length > 0) {
-      for await (const roleInvite of roleInvites) {
+    if (roleClaims.length > 0) {
+      for await (const roleClaim of roleClaims) {
         const existingUserRoles: Role[] =
           await this.userDataSource.getUserRoles(claimerUserId);
 
-        if (existingUserRoles.find((role) => role.id === roleInvite.roleId)) {
+        if (existingUserRoles.find((role) => role.id === roleClaim.roleId)) {
           continue;
         }
 
         await this.userDataSource.addUserRole({
           userID: claimerUserId,
-          roleID: roleInvite.roleId,
+          roleID: roleClaim.roleId,
         });
       }
     }
   }
 
-  private async acceptCoProposerInvites(
+  private async processCoProposerClaims(
     claimerUserId: number,
-    inviteCodeId: number
+    inviteId: number
   ) {
-    const coProposerInvite =
-      await this.coProposerInviteDataSource.findByInviteCodeId(inviteCodeId);
+    const coProposerClaim =
+      await this.coProposerClaimDataSource.findByInviteId(inviteId);
 
-    if (coProposerInvite === null) {
+    if (coProposerClaim === null) {
       return;
     }
 
     const proposalHasUser = await this.proposalHasUser(
-      coProposerInvite.proposalPk,
+      coProposerClaim.proposalPk,
       claimerUserId
     );
     // already a co-proposer
@@ -219,7 +218,7 @@ export default class InviteMutations {
     }
 
     await this.proposalDataSource.addProposalUser(
-      coProposerInvite.proposalPk,
+      coProposerClaim.proposalPk,
       claimerUserId
     );
   }
