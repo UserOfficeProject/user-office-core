@@ -157,8 +157,12 @@ export default class InviteMutations {
 
     if (!roleIds) return;
 
-    for await (const roleId of roleIds) {
-      await this.roleInviteDataSource.create(inviteCodeId, roleId);
+    if (roleIds.length > 0) {
+      await Promise.all(
+        roleIds.map((roleId) =>
+          this.roleInviteDataSource.create(inviteCodeId, roleId)
+        )
+      );
     }
   }
 
