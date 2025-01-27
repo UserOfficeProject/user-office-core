@@ -11,28 +11,23 @@ export default class PostgresCoProposerInviteDataSource
       .select('*')
       .then((rows) => {
         return rows.map(
-          (row) =>
-            new CoProposerInvite(
-              row.co_proposer_invite_id,
-              row.invite_code_id,
-              row.proposal_pk
-            )
+          (row) => new CoProposerInvite(row.invite_code_id, row.proposal_pk)
         );
       });
   }
-  async findByInviteCodeId(inviteCodeId: number): Promise<CoProposerInvite[]> {
+  async findByInviteCodeId(
+    inviteCodeId: number
+  ): Promise<CoProposerInvite | null> {
     return database('co_proposer_invites')
       .where({ invite_code_id: inviteCodeId })
       .select('*')
-      .then((rows) => {
-        return rows.map(
-          (row) =>
-            new CoProposerInvite(
-              row.co_proposer_invite_id,
-              row.invite_code_id,
-              row.proposal_pk
-            )
-        );
+      .first()
+      .then((row) => {
+        if (!row) {
+          return null;
+        }
+
+        return new CoProposerInvite(row.invite_code_id, row.proposal_pk);
       });
   }
   async create(
@@ -45,11 +40,7 @@ export default class PostgresCoProposerInviteDataSource
       .then((rows) => {
         const row = rows[0];
 
-        return new CoProposerInvite(
-          row.co_proposer_invite_id,
-          row.invite_code_id,
-          row.proposal_pk
-        );
+        return new CoProposerInvite(row.invite_code_id, row.proposal_pk);
       });
   }
 }

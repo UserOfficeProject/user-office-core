@@ -80,8 +80,12 @@ export default class InviteMutations {
       args.email
     );
 
-    await this.setRoleInvites(newInvite.id, roleIds);
-    await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
+    if (roleIds) {
+      await this.setRoleInvites(newInvite.id, roleIds);
+    }
+    if (coProposerProposalPk) {
+      await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
+    }
 
     return newInvite;
   }
@@ -140,29 +144,34 @@ export default class InviteMutations {
     }
 
     const updatedInvite = await this.inviteDataSource.update(args);
-    await this.setRoleInvites(updatedInvite.id, args.claims?.roleIds);
-    await this.setCoProposerInvites(
-      updatedInvite.id,
-      args.claims?.coProposerProposalPk
-    );
+    if (args.claims?.roleIds) {
+      await this.setRoleInvites(updatedInvite.id, args.claims?.roleIds);
+    }
+    if (args.claims?.coProposerProposalPk) {
+      await this.setCoProposerInvites(
+        updatedInvite.id,
+        args.claims.coProposerProposalPk
+      );
+    }
 
     return updatedInvite;
   }
 
-  private async setRoleInvites(
-    inviteCodeId: number,
-    roleIds: number[] | undefined
-  ) {
+  private async setRoleInvites(inviteCodeId: number, roleIds: number[]) {
     await this.roleInviteDataSource.deleteByInviteCodeId(inviteCodeId);
 
     if (!roleIds) return;
 
-    for await (const roleId of roleIds) {
-      await this.roleInviteDataSource.create(inviteCodeId, roleId);
+    if (roleIds.length > 0) {
+      await Promise.all(
+        roleIds.map((roleId) =>
+          this.roleInviteDataSource.create(inviteCodeId, roleId)
+        )
+      );
     }
   }
 
-  private async setCoProposerInvites(invCodeId: number, proposalPk?: number) {
+  private async setCoProposerInvites(invCodeId: number, proposalPk: number) {
     if (!proposalPk) return;
 
     return this.coProposerInviteDataSource.create(invCodeId, proposalPk);
@@ -193,27 +202,26 @@ export default class InviteMutations {
     claimerUserId: number,
     inviteCodeId: number
   ) {
-    const coProposerInvites =
+    const coProposerInvite =
       await this.coProposerInviteDataSource.findByInviteCodeId(inviteCodeId);
 
-    if (coProposerInvites.length === 0) {
+    if (coProposerInvite === null) {
       return;
     }
 
-    for await (const coProposerInvite of coProposerInvites) {
-      const proposalHasUser = await this.proposalHasUser(
-        coProposerInvite.proposalPk,
-        claimerUserId
-      );
-      if (proposalHasUser) {
-        continue;
-      }
-
-      await this.proposalDataSource.addProposalUser(
-        coProposerInvite.proposalPk,
-        claimerUserId
-      );
+    const proposalHasUser = await this.proposalHasUser(
+      coProposerInvite.proposalPk,
+      claimerUserId
+    );
+    // already a co-proposer
+    if (proposalHasUser) {
+      return;
     }
+
+    await this.proposalDataSource.addProposalUser(
+      coProposerInvite.proposalPk,
+      claimerUserId
+    );
   }
 
   private async proposalHasUser(proposalPk: number, userId: number) {

@@ -1455,14 +1455,9 @@ export const createRoleInviteObject = (invite: RoleInviteRecord) =>
   new RoleInvite(invite.role_invite_id, invite.invite_code_id, invite.role_id);
 
 export interface CoProposerInviteRecord {
-  readonly co_proposer_invite_id: number;
   readonly invite_code_id: number;
   readonly proposal_pk: number;
 }
 
 export const createCoProposerInviteRecord = (invite: CoProposerInviteRecord) =>
-  new CoProposerInvite(
-    invite.co_proposer_invite_id,
-    invite.invite_code_id,
-    invite.proposal_pk
-  );
+  new CoProposerInvite(invite.invite_code_id, invite.proposal_pk);

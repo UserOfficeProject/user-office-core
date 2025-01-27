@@ -138,9 +138,10 @@ describe('Test Invite Mutations', () => {
       )
       .findByInviteCodeId(invite.id);
 
-    expect(coProposerInvite).toMatchObject([
-      { inviteCodeId: invite.id, proposalPk },
-    ]);
+    expect(coProposerInvite).toMatchObject({
+      inviteCodeId: invite.id,
+      proposalPk,
+    });
   });
 
   test('A user officer can create an invite with coProposer claims', async () => {
@@ -164,9 +165,10 @@ describe('Test Invite Mutations', () => {
       )
       .findByInviteCodeId(invite.id);
 
-    expect(coProposerInvite).toMatchObject([
-      { inviteCodeId: invite.id, proposalPk },
-    ]);
+    expect(coProposerInvite).toMatchObject({
+      inviteCodeId: invite.id,
+      proposalPk,
+    });
   });
 
   test('A user on proposal can create an invite with coProposer claims', async () => {
@@ -191,9 +193,10 @@ describe('Test Invite Mutations', () => {
       )
       .findByInviteCodeId(invite.id);
 
-    expect(coProposerInvite).toMatchObject([
-      { inviteCodeId: invite.id, proposalPk },
-    ]);
+    expect(coProposerInvite).toMatchObject({
+      inviteCodeId: invite.id,
+      proposalPk,
+    });
   });
 
   test('A user not on proposal can no create an invite with coProposer claims', async () => {
@@ -255,6 +258,6 @@ describe('Test Invite Mutations', () => {
       )
       .findByInviteCodeId(1);
 
-    expect(coProposerInvite).toMatchObject([{ inviteCodeId: 1, proposalPk }]);
+    expect(coProposerInvite).toMatchObject({ inviteCodeId: 1, proposalPk });
   });
 });
