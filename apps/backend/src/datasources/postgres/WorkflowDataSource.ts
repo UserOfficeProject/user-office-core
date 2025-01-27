@@ -56,6 +56,45 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   async createWorkflow(
     newWorkflowInput: Omit<Workflow, 'id'>
   ): Promise<Workflow> {
+    let defaultStatusId: number | null = null;
+    let droppableGroupId: string | null = null;
+
+    if (newWorkflowInput.entityType === 'proposal') {
+      //TODO: Make this as Enum
+      const defaultProposalStatus = await database()
+        .select('status_id')
+        .from('statuses')
+        .where('is_default', true)
+        .andWhere('entity_type', 'proposal')
+        .first();
+
+      defaultStatusId = defaultProposalStatus?.status_id;
+      droppableGroupId = 'proposalWorkflowConnections_0';
+    } else if (newWorkflowInput.entityType === 'experiment') {
+      //TODO: Make this as Enum
+      const defaultExperimentStatus = await database()
+        .select('status_id')
+        .from('statuses')
+        .where('is_default', true)
+        .andWhere('entity_type', 'experiment')
+        .first();
+
+      defaultStatusId = defaultExperimentStatus?.status_id;
+      droppableGroupId = 'experimentWorkflowConnections_0';
+    }
+
+    if (!defaultStatusId) {
+      throw new GraphQLError(
+        `Could not find default status for ${newWorkflowInput.entityType}`
+      );
+    }
+
+    if (!droppableGroupId) {
+      throw new GraphQLError(
+        `Could not find droppable group id for ${newWorkflowInput.entityType}`
+      );
+    }
+
     // TODO: To test
     const [workflowRecord]: WorkflowRecord[] = await database
       .insert({
@@ -73,11 +112,11 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     // NOTE: Add default DRAFT status to proposal workflow when it is created.
     await this.addWorkflowStatus({
       sortOrder: 0,
-      droppableGroupId: 'proposalWorkflowConnections_0', //TODO: This needs to be generalised for proposal and experiment
+      droppableGroupId: droppableGroupId,
       nextStatusId: null,
       prevStatusId: null,
       parentDroppableGroupId: null,
-      statusId: 1, //TODO: Implement Eum
+      statusId: defaultStatusId,
       workflowId: workflowRecord.workflow_id,
       entityType: workflowRecord.entity_type,
     });
@@ -139,7 +178,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     // TODO: To test
     return database('workflows')
       .where('workflow_id', workflowId)
-      .andWhere('entity_type', 'proposal')
       .del()
       .returning('*')
       .then((workflows: WorkflowRecord[]) => {
@@ -259,7 +297,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         droppable_group_id: newWorkflowStatusInput.droppableGroupId,
         parent_droppable_group_id:
           newWorkflowStatusInput.parentDroppableGroupId,
-        entity_type: 'proposal',
+        entity_type: newWorkflowStatusInput.entityType,
       })
       .into('workflow_connections as wc')
       .returning('*')

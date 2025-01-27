@@ -6,25 +6,29 @@ import { useNavigate } from 'react-router-dom';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, Workflow } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useProposalWorkflowsData } from 'hooks/settings/useProposalWorkflowsData';
+import { useWorkflowsData } from 'hooks/settings/useWorkflowsData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 
-import CreateProposalWorkflow from './CreateProposalWorkflow';
+import CreateWorkflow from './CreateWorkflow';
 
 const columns = [
   { title: 'Name', field: 'name' },
   { title: 'Description', field: 'description' },
 ];
 
-const ProposalWorkflowsTable = () => {
+const WorkflowsTable = ({
+  entityType,
+}: {
+  entityType: 'proposal' | 'experiment';
+}) => {
   const { api } = useDataApiWithFeedback();
   const {
-    loadingProposalWorkflows,
-    proposalWorkflows,
-    setProposalWorkflowsWithLoading: setProposalWorkflows,
-  } = useProposalWorkflowsData();
+    loadingWorkflows,
+    workflows,
+    setWorkflowsWithLoading: setWorkflows,
+  } = useWorkflowsData(entityType);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const navigate = useNavigate();
 
@@ -32,21 +36,20 @@ const ProposalWorkflowsTable = () => {
     onUpdate: FunctionType<void, [Workflow | null]>,
     onCreate: FunctionType<void, [Workflow | null]>
   ) => (
-    <CreateProposalWorkflow
-      close={(proposalWorkflow: Workflow | null) => {
-        onCreate(proposalWorkflow);
+    <CreateWorkflow
+      close={(workflow: Workflow | null) => {
+        onCreate(workflow);
 
-        navigate(
-          `/ProposalWorkflowEditor/${(proposalWorkflow as Workflow).id}`
-        );
+        navigate(`/ProposalWorkflowEditor/${(workflow as Workflow).id}`);
       }}
+      entityType={entityType}
     />
   );
 
-  const deleteProposalWorkflow = async (id: number | string) => {
+  const deleteWorkflow = async (id: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Proposal workflow deleted successfully',
+        toastSuccessMessage: 'Workflow deleted successfully',
       }).deleteWorkflow({
         id: id as number,
       });
@@ -60,25 +63,25 @@ const ProposalWorkflowsTable = () => {
   const EditIcon = (): JSX.Element => <Edit />;
 
   return (
-    <div data-cy="proposal-workflows-table">
+    <div data-cy="workflows-table">
       <SuperMaterialTable
-        delete={deleteProposalWorkflow}
+        delete={deleteWorkflow}
         createModal={createModal}
         hasAccess={{
           update: false,
           create: isUserOfficer,
           remove: isUserOfficer,
         }}
-        setData={setProposalWorkflows}
+        setData={setWorkflows}
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            Proposal workflows
+            Workflows
           </Typography>
         }
         columns={columns}
-        data={proposalWorkflows}
-        isLoading={loadingProposalWorkflows}
+        data={workflows}
+        isLoading={loadingWorkflows}
         options={{
           search: true,
           debounceInterval: 400,
@@ -98,4 +101,4 @@ const ProposalWorkflowsTable = () => {
   );
 };
 
-export default ProposalWorkflowsTable;
+export default WorkflowsTable;

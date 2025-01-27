@@ -49,9 +49,19 @@ BEGIN
 
     BEGIN
       /* Adding unique constraint for entity_type and status_id in statuses table */
+      ALTER TABLE statuses ADD CONSTRAINT statuses_short_code_entity_type_uniq_key UNIQUE (short_code, entity_type);
       ALTER TABLE statuses ADD CONSTRAINT statuses_status_id_entity_type_uniq_key UNIQUE (status_id, entity_type);
       ALTER TABLE workflows ADD CONSTRAINT workflows_workflow_id_entity_type_uniq_key UNIQUE (workflow_id, entity_type);
       ALTER TABLE workflow_connections ADD CONSTRAINT workflow_connections_workflow_connection_id_entity_type_uniq_key UNIQUE (workflow_connection_id, entity_type);
+    END;
+
+    BEGIN
+      -- Insert the Workflow Statuses
+      INSERT INTO statuses (name, short_code, description, entity_type, is_default) VALUES ('AWAITING ESF', 'AWAITING_ESF', 'When an Experiment is created, the default status will be AWAITING_ESF. This means that the experimenter needs to submit the ESF(Experiment Safety Form).', 'experiment', true);
+      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF IS REVIEW', 'ESF_IS_REVIEW', 'IS(Instrument Scientist) needs to review the ESF.', 'experiment');
+      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF ESR REVIEW', 'ESF_ESR_REVIEW', 'ESR(Experiment Safety Reviewer) needs to review the ESF.', 'experiment');
+      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF REJECTED', 'ESF_REJECTED', 'ESF rejected.', 'experiment');
+      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF APROVED', 'ESF_APROVED', 'ESF approved.', 'experiment');
     END;
 
     BEGIN

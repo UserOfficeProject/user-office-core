@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { createProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow';
+import { createProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow'; //TODO: This needs to be updated.
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -10,17 +10,18 @@ import UOLoader from 'components/common/UOLoader';
 import { Workflow } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-type CreateProposalWorkflowProps = {
-  close: (proposalWorkflowAdded: Workflow | null) => void;
+type CreateWorkflowProps = {
+  close: (workflowAdded: Workflow | null) => void;
+  entityType: 'proposal' | 'experiment';
 };
 
-const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
+const CreateWorkflow = ({ close, entityType }: CreateWorkflowProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = {
     name: '',
     description: '',
-    proposalWorkflowConnections: [],
+    workflowConnections: [],
   };
 
   return (
@@ -29,8 +30,8 @@ const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
       onSubmit={async (values): Promise<void> => {
         try {
           const data = await api({
-            toastSuccessMessage: 'Proposal workflow created successfully',
-          }).createWorkflow({ ...values, entityType: 'proposal' });
+            toastSuccessMessage: 'Workflow created successfully',
+          }).createWorkflow({ ...values, entityType: entityType });
 
           close(data.createWorkflow as Workflow);
         } catch (error) {
@@ -42,7 +43,7 @@ const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
       {() => (
         <Form>
           <Typography variant="h6" component="h1">
-            Create new proposal workflow
+            Create new workflow
           </Typography>
           <Field
             name="name"
@@ -86,8 +87,8 @@ const CreateProposalWorkflow = ({ close }: CreateProposalWorkflowProps) => {
   );
 };
 
-CreateProposalWorkflow.propTypes = {
+CreateWorkflow.propTypes = {
   close: PropTypes.func.isRequired,
 };
 
-export default CreateProposalWorkflow;
+export default CreateWorkflow;

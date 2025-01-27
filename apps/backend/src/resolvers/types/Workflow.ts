@@ -51,7 +51,7 @@ export class WorkflowResolver {
     const connections = await context.queries.workflow.workflowConnectionGroups(
       context.user,
       workflow.id,
-      'proposal'
+      workflow.entityType
     );
 
     return isRejection(connections) ? [] : connections;

@@ -63,6 +63,12 @@ const ProposalWorkflowEditor = lazy(
 const ProposalWorkflowsPage = lazy(
   () => import('./settings/proposalWorkflow/ProposalWorkflowsPage')
 );
+const ExperimentWorkflowEditor = lazy(
+  () => import('./settings/experimentWorkflow/ExperimentWorkflowEditor')
+);
+const ExperimentWorkflowsPage = lazy(
+  () => import('./settings/experimentWorkflow/ExperimentWorkflowsPage')
+);
 const UnitTablePage = lazy(() => import('./settings/unitList/UnitTablePage'));
 const DeclareShipmentsPage = lazy(
   () => import('./shipments/DeclareShipmentsPage')
@@ -443,11 +449,33 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
+            path="/ExperimentWorkflows"
+            element={
+              <TitledRoute
+                title="Experiment Workflows"
+                element={<ExperimentWorkflowsPage />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
             path="/ProposalWorkflowEditor/:workflowId"
             element={
               <TitledRoute
                 title="Proposal Workflow Editor"
                 element={<ProposalWorkflowEditor />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/ExperimentWorkflowEditor/:workflowId"
+            element={
+              <TitledRoute
+                title="Experiment Workflow Editor"
+                element={<ExperimentWorkflowEditor />}
               />
             }
           />

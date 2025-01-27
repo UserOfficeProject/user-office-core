@@ -2,16 +2,16 @@ import React from 'react';
 
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import WorkflowsTable from './workflowsTable';
+import WorkflowsTable from '../proposalWorkflow/workflowsTable';
 
-const ProposalWorkflowsPage = () => {
+const ExperimentWorkflowsPage = () => {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        <WorkflowsTable entityType="proposal" />
+        <WorkflowsTable entityType="experiment" />
       </StyledPaper>
     </StyledContainer>
   );
 };
 
-export default ProposalWorkflowsPage;
+export default ExperimentWorkflowsPage;
