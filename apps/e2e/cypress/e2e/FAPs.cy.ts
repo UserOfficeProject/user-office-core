@@ -1299,7 +1299,7 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
     });
 
-    it.only('Fap Secretary should be able to edit only comments of technical reviews', function () {
+    it('Fap Secretary should be able to edit only comments of technical reviews', function () {
       if (
         settings
           .getEnabledSettings()
@@ -1352,7 +1352,7 @@ context('Fap reviews tests', () => {
       cy.setTinyMceContent('comment', internalComment);
       cy.setTinyMceContent('publicComment', publicComment);
 
-      cy.get('[data-cy="save-button"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'success',
