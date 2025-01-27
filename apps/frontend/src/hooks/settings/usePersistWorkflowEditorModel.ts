@@ -3,29 +3,29 @@ import { useState } from 'react';
 import {
   Event,
   EventType,
-} from 'components/settings/proposalWorkflow/ProposalWorkflowEditorModel';
+} from 'components/settings/proposalWorkflow/WorkflowEditorModel';
 import {
   ConnectionHasActionsInput,
   IndexWithGroupId,
-  ProposalWorkflowConnection,
+  WorkflowConnection,
   Workflow,
 } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { MiddlewareInputParams } from 'utils/useReducerWithMiddleWares';
 import { FunctionType } from 'utils/utilTypes';
 
-export function usePersistProposalWorkflowEditorModel() {
+export function usePersistWorkflowEditorModel() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { api } = useDataApiWithFeedback();
 
-  const updateProposalWorkflowMetadata = async (
+  const updateWorkflowMetadata = async (
     id: number,
     name: string,
     description: string
   ) => {
     return api({
-      toastSuccessMessage: 'Proposal workflow updated successfully!',
+      toastSuccessMessage: 'Workflow updated successfully!',
     })
       .updateWorkflow({
         id,
@@ -52,7 +52,7 @@ export function usePersistProposalWorkflowEditorModel() {
         });
     };
 
-    const insertNewStatusInProposalWorkflow = async (
+    const insertNewStatusInWorkflow = async (
       workflowId: number,
       sortOrder: number,
       droppableGroupId: string,
@@ -75,7 +75,7 @@ export function usePersistProposalWorkflowEditorModel() {
         .then((data) => data.addWorkflowStatus);
     };
 
-    const reorderStatusesInProposalWorkflow = async (
+    const reorderStatusesInWorkflow = async (
       from: IndexWithGroupId,
       to: IndexWithGroupId,
       workflowId: number
@@ -92,7 +92,7 @@ export function usePersistProposalWorkflowEditorModel() {
         .then((data) => data.moveWorkflowStatus);
     };
 
-    const deleteProposalWorkflowStatus = async (
+    const deleteWorkflowStatus = async (
       statusId: number,
       workflowId: number,
       sortOrder: number
@@ -125,7 +125,7 @@ export function usePersistProposalWorkflowEditorModel() {
 
     const addStatusActionToConnection = async (
       statusActions: ConnectionHasActionsInput[],
-      workflowConnection: ProposalWorkflowConnection
+      workflowConnection: WorkflowConnection
     ) => {
       return api({
         toastSuccessMessage: `Status actions ${
@@ -150,11 +150,7 @@ export function usePersistProposalWorkflowEditorModel() {
           const { id, name, description } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await updateProposalWorkflowMetadata(
-              id,
-              name,
-              description
-            );
+            const result = await updateWorkflowMetadata(id, name, description);
 
             if (result) {
               dispatch({
@@ -171,7 +167,7 @@ export function usePersistProposalWorkflowEditorModel() {
 
           return executeAndMonitorCall(async () => {
             try {
-              const result = await reorderStatusesInProposalWorkflow(
+              const result = await reorderStatusesInWorkflow(
                 source,
                 destination,
                 state.id
@@ -195,20 +191,20 @@ export function usePersistProposalWorkflowEditorModel() {
           });
 
           const groupToRemoveFrom = state.workflowConnectionGroups.find(
-            (proposalWorkflowConnectionGroup) =>
-              proposalWorkflowConnectionGroup.groupId ===
+            (workflowConnectionGroup) =>
+              workflowConnectionGroup.groupId ===
               action.payload.source.droppableId
           );
-          const proposalWorkflowConnectionToRemove =
+          const workflowConnectionToRemove =
             groupToRemoveFrom?.connections[action.payload.source.index];
 
-          if (proposalWorkflowConnectionToRemove) {
+          if (workflowConnectionToRemove) {
             return executeAndMonitorCall(async () => {
               try {
-                const result = await deleteProposalWorkflowStatus(
-                  proposalWorkflowConnectionToRemove.statusId,
-                  proposalWorkflowConnectionToRemove.workflowId,
-                  proposalWorkflowConnectionToRemove.sortOrder
+                const result = await deleteWorkflowStatus(
+                  workflowConnectionToRemove.statusId,
+                  workflowConnectionToRemove.workflowId,
+                  workflowConnectionToRemove.sortOrder
                 );
 
                 return result;
@@ -216,7 +212,7 @@ export function usePersistProposalWorkflowEditorModel() {
                 dispatch({
                   type: EventType.WORKFLOW_STATUS_ADDED,
                   payload: {
-                    ...proposalWorkflowConnectionToRemove,
+                    ...workflowConnectionToRemove,
                     source: action.payload.source,
                   },
                 });
@@ -245,7 +241,7 @@ export function usePersistProposalWorkflowEditorModel() {
 
           return executeAndMonitorCall(async () => {
             try {
-              const result = await insertNewStatusInProposalWorkflow(
+              const result = await insertNewStatusInWorkflow(
                 workflowId,
                 sortOrder,
                 droppableGroupId,

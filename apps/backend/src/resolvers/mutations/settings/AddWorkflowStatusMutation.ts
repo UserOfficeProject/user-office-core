@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { WorkflowConnection } from '../../types/ProposalWorkflowConnection';
+import { WorkflowConnection } from '../../types/WorkflowConnection';
 
 @InputType()
 export class AddWorkflowStatusInput implements Partial<WorkflowConnection> {

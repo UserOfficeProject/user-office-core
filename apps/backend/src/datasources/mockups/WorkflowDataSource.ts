@@ -1,11 +1,11 @@
 import { Status } from '../../models/ProposalStatus';
 import { Workflow } from '../../models/ProposalWorkflow';
+import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import {
   WorkflowConnection,
   NextAndPreviousStatuses,
   WorkflowConnectionWithStatus,
-} from '../../models/ProposalWorkflowConnections';
-import { StatusChangingEvent } from '../../models/StatusChangingEvent';
+} from '../../models/WorkflowConnections';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 
 export class WorkflowDataSourceMock implements WorkflowDataSource {

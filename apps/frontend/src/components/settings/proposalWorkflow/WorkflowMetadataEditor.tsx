@@ -11,24 +11,24 @@ import TextField from 'components/common/FormikUITextField';
 import { Workflow } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 
-import { Event, EventType } from './ProposalWorkflowEditorModel';
+import { Event, EventType } from './WorkflowEditorModel';
 
-const ProposalWorkflowMetadataEditor = ({
-  proposalWorkflow,
+const WorkflowMetadataEditor = ({
+  workflow,
   dispatch,
 }: {
-  proposalWorkflow: Workflow;
+  workflow: Workflow;
   dispatch: React.Dispatch<Event>;
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const staticJSX = (
-    <div data-cy="proposal-workflow-metadata-container">
+    <div data-cy="workflow-metadata-container">
       <Box sx={{ fontSize: '24px', fontWeight: 'bold', paddingBottom: '5px' }}>
-        {proposalWorkflow.name}
+        {workflow.name}
       </Box>
       <Box sx={{ fontSize: '16px', whiteSpace: 'pre-wrap' }}>
-        {proposalWorkflow.description}
+        {workflow.description}
       </Box>
       <StyledButtonContainer>
         <Button
@@ -52,12 +52,12 @@ const ProposalWorkflowMetadataEditor = ({
   );
   const inputJSX = (
     <Formik
-      initialValues={proposalWorkflow}
+      initialValues={workflow}
       validationSchema={updateProposalWorkflowValidationSchema}
       onSubmit={async (values): Promise<void> => {
         dispatch({
           type: EventType.UPDATE_WORKFLOW_METADATA_REQUESTED,
-          payload: { ...values, id: proposalWorkflow.id },
+          payload: { ...values, id: workflow.id },
         });
         setIsEditMode(false);
       }}
@@ -142,4 +142,4 @@ const ProposalWorkflowMetadataEditor = ({
   );
 };
 
-export default ProposalWorkflowMetadataEditor;
+export default WorkflowMetadataEditor;

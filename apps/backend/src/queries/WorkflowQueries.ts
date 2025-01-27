@@ -4,12 +4,12 @@ import { Tokens } from '../config/Tokens';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
+import { Roles } from '../models/Role';
+import { UserWithRole } from '../models/User';
 import {
   WorkflowConnection,
   WorkflowConnectionWithStatus,
-} from '../models/ProposalWorkflowConnections';
-import { Roles } from '../models/Role';
-import { UserWithRole } from '../models/User';
+} from '../models/WorkflowConnections';
 
 @injectable()
 export default class WorkflowQueries {

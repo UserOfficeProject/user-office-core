@@ -14,7 +14,7 @@ import {
   Workflow as WorkflowOrigin,
 } from '../../models/ProposalWorkflow';
 import { isRejection } from '../../models/Rejection';
-import { WorkflowConnectionGroup } from './ProposalWorkflowConnection';
+import { WorkflowConnectionGroup } from './WorkflowConnection';
 
 @ObjectType()
 export class Workflow implements Partial<WorkflowOrigin> {

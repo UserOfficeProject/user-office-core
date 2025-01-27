@@ -7,20 +7,15 @@ import { useTheme } from '@mui/material/styles';
 import React, { Dispatch, SetStateAction } from 'react';
 
 import SimpleTabs from 'components/common/SimpleTabs';
-import {
-  Event as ProposalEvent,
-  ProposalWorkflowConnection,
-} from 'generated/sdk';
+import { Event as ProposalEvent, WorkflowConnection } from 'generated/sdk';
 
 import AddStatusActionsToConnection from './AddStatusActionsToConnection';
 import AddStatusChangingEventsToConnection from './AddStatusChangingEventsToConnection';
-import { EventType, Event } from './ProposalWorkflowEditorModel';
+import { EventType, Event } from './WorkflowEditorModel';
 
 type StatusEventsAndActionsDialogProps = {
-  workflowConnection: ProposalWorkflowConnection | null;
-  setWorkflowConnection: Dispatch<
-    SetStateAction<ProposalWorkflowConnection | null>
-  >;
+  workflowConnection: WorkflowConnection | null;
+  setWorkflowConnection: Dispatch<SetStateAction<WorkflowConnection | null>>;
   dispatch: Dispatch<Event>;
   isLoading: boolean;
 };

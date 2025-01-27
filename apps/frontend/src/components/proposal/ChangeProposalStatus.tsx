@@ -11,7 +11,7 @@ import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import { Status } from 'generated/sdk';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 
 const changeProposalStatusValidationSchema = yup.object().shape({
   selectedStatusId: yup.string().required('You must select proposal status'),
@@ -31,8 +31,10 @@ const ChangeProposalStatus = ({
   selectedProposalStatuses,
 }: ChangeProposalStatusProps) => {
   const { t } = useTranslation();
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const {
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+  } = useStatusesData('proposal');
 
   const allSelectedProposalsHaveSameStatus = selectedProposalStatuses.every(
     (item) => item === selectedProposalStatuses[0]

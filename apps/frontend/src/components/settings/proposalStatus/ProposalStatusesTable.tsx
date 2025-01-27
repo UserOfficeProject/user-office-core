@@ -5,7 +5,7 @@ import React from 'react';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, Status } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -21,11 +21,12 @@ const columns = [
 
 const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { api } = useDataApiWithFeedback();
+
   const {
-    loadingProposalStatuses,
-    proposalStatuses,
-    setProposalStatusesWithLoading: setProposalStatuses,
-  } = useProposalStatusesData();
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+    setStatusesWithLoading: setProposalStatuses,
+  } = useStatusesData('proposal');
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const createModal = (

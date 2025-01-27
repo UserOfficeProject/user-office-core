@@ -174,7 +174,7 @@ context('Settings tests', () => {
         const connection = result.addProposalWorkflowStatus;
         if (connection) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: connection.id,
+            workflowConnectionId: connection.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
@@ -188,7 +188,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [
               Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
               Event.PROPOSAL_INSTRUMENTS_SELECTED,
@@ -205,7 +205,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_FAPS_SELECTED],
           });
         }
@@ -219,7 +219,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_ALL_FAP_REVIEWS_SUBMITTED],
           });
         }
@@ -238,7 +238,7 @@ context('Settings tests', () => {
           const connection = result.addProposalWorkflowStatus;
           if (connection) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId: connection.id,
+              workflowConnectionId: connection.id,
               statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
             });
           }
@@ -253,7 +253,7 @@ context('Settings tests', () => {
         }).then((result) => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+              workflowConnectionId: result.addProposalWorkflowStatus.id,
               statusChangingEvents: [
                 Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE,
               ],
@@ -270,7 +270,7 @@ context('Settings tests', () => {
         }).then((result) => {
           if (result.addProposalWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+              workflowConnectionId: result.addProposalWorkflowStatus.id,
               statusChangingEvents: [
                 Event.PROPOSAL_FEASIBILITY_REVIEW_UNFEASIBLE,
               ],
@@ -327,7 +327,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
@@ -413,7 +413,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
@@ -507,7 +507,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
@@ -592,7 +592,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }
@@ -607,7 +607,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.CALL_ENDED],
           });
         }
@@ -712,7 +712,7 @@ context('Settings tests', () => {
 
       cy.notification({ variant: 'success', text: 'updated successfully' });
 
-      cy.get('[data-cy="proposal-workflow-metadata-container"]')
+      cy.get('[data-cy="workflow-metadata-container"]')
         .should('contain.text', updatedWorkflowName)
         .should('contain.text', updatedWorkflowDescription);
     });
@@ -1506,7 +1506,7 @@ context('Settings tests', () => {
       }).then((result) => {
         if (result.addProposalWorkflowStatus) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+            workflowConnectionId: result.addProposalWorkflowStatus.id,
             statusChangingEvents: [Event.PROPOSAL_SUBMITTED],
           });
         }

@@ -10,8 +10,8 @@ import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
 import { ProposalWorkflow } from '../models/ProposalWorkflow';
-import { WorkflowConnectionWithStatus } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { WorkflowConnectionWithStatus } from '../models/WorkflowConnections';
 import { statusActionEngine } from '../statusActionEngine';
 
 const getProposalWorkflowByCallId = (callId: number) => {

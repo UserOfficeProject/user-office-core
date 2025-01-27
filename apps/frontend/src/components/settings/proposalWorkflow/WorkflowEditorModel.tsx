@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 
 import {
   StatusChangingEvent,
-  ProposalWorkflowConnection,
+  WorkflowConnection,
   ConnectionStatusAction,
   Workflow,
   WorkflowConnectionGroup,
@@ -39,7 +39,7 @@ export interface Event {
   payload: any;
 }
 
-const ProposalWorkflowEditorModel = (
+const WorkflowEditorModel = (
   middlewares?: Array<ReducerMiddleware<Workflow, Event>>
 ) => {
   const { workflowId } = useParams<{ workflowId: string }>();
@@ -48,7 +48,7 @@ const ProposalWorkflowEditorModel = (
     name: '',
     description: '',
     workflowConnectionGroups: [],
-    entityType: 'proposal',
+    entityType: 'proposal', // NOTE: This is hardcoded for now
   };
 
   const findGroupIndexByGroupId = (
@@ -61,7 +61,7 @@ const ProposalWorkflowEditorModel = (
 
   const findGroupAndAddNewStatusConnection = (
     workflowConnectionGroups: WorkflowConnectionGroup[],
-    newConnection: ProposalWorkflowConnection
+    newConnection: WorkflowConnection
   ) => {
     const groupIndexWhereStatusShouldBeAdded = findGroupIndexByGroupId(
       workflowConnectionGroups,
@@ -98,7 +98,7 @@ const ProposalWorkflowEditorModel = (
       from.droppableId === to.droppableId
         ? sourceWorkflowConnectionsGroupIndex
         : findGroupIndexByGroupId(workflowConnectionGroups, to.droppableId);
-    const proposalWorkflowConnectionToMove =
+    const workflowConnectionToMove =
       workflowConnectionGroups[sourceWorkflowConnectionsGroupIndex]
         ?.connections[from.index];
 
@@ -106,7 +106,7 @@ const ProposalWorkflowEditorModel = (
       sourceWorkflowConnectionsGroupIndex
     ]?.connections.splice(from.index, 1);
 
-    proposalWorkflowConnectionToMove.droppableGroupId =
+    workflowConnectionToMove.droppableGroupId =
       workflowConnectionGroups[destinationWorkflowConnectionGroupIndex].groupId;
 
     workflowConnectionGroups[
@@ -114,7 +114,7 @@ const ProposalWorkflowEditorModel = (
     ]?.connections.splice(
       to.index,
       0,
-      proposalWorkflowConnectionToMove as ProposalWorkflowConnection
+      workflowConnectionToMove as WorkflowConnection
     );
 
     return workflowConnectionGroups;
@@ -122,7 +122,7 @@ const ProposalWorkflowEditorModel = (
 
   const addStatusChangingEventsToConnection = (
     workflowConnectionGroups: WorkflowConnectionGroup[],
-    workflowConnection: ProposalWorkflowConnection,
+    workflowConnection: WorkflowConnection,
     statusChangingEvents: StatusChangingEvent[]
   ) => {
     const groupIndexWhereConnectionShouldBeUpdated = findGroupIndexByGroupId(
@@ -143,7 +143,7 @@ const ProposalWorkflowEditorModel = (
 
   const addStatusActionsToConnection = (
     workflowConnectionGroups: WorkflowConnectionGroup[],
-    workflowConnection: ProposalWorkflowConnection,
+    workflowConnection: WorkflowConnection,
     statusActions: ConnectionStatusAction[]
   ) => {
     const groupIndexWhereConnectionShouldBeUpdated = findGroupIndexByGroupId(
@@ -168,7 +168,6 @@ const ProposalWorkflowEditorModel = (
         case EventType.READY:
           return action.payload;
         case EventType.WORKFLOW_STATUS_ADDED: {
-          console.log({ draft, action });
           const { workflowConnectionGroups } = draft;
           const newConnectionToAdd = action.payload;
 
@@ -303,7 +302,7 @@ const ProposalWorkflowEditorModel = (
     api()
       .getWorkflow({
         workflowId: parseInt(workflowId),
-        entityType: 'proposal',
+        entityType: 'proposal', // NOTE: This is hardcoded for now
       })
       .then((data) => {
         // NOTE: Push at least one group to have initial droppable if new proposal workflow
@@ -324,4 +323,4 @@ const ProposalWorkflowEditorModel = (
   return { state, dispatch };
 };
 
-export default ProposalWorkflowEditorModel;
+export default WorkflowEditorModel;

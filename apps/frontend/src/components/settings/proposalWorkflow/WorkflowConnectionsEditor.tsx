@@ -15,40 +15,36 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
-import {
-  ProposalWorkflowConnection,
-  WorkflowConnectionGroup,
-} from 'generated/sdk';
+import { WorkflowConnection, WorkflowConnectionGroup } from 'generated/sdk';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
-import { Event, EventType } from './ProposalWorkflowEditorModel';
 import StatusEventsAndActionsDialog from './StatusEventsAndActionsDialog';
+import { Event, EventType } from './WorkflowEditorModel';
 
-type ProposalWorkflowConnectionsEditorProps = {
-  proposalWorkflowStatusConnectionGroups: WorkflowConnectionGroup[];
+type WorkflowConnectionsEditorProps = {
+  workflowStatusConnectionGroups: WorkflowConnectionGroup[];
   dispatch: React.Dispatch<Event>;
   isLoading: boolean;
   confirm: WithConfirmType;
 };
 
-type ProposalWorkflowConnectionGroupWithSubGroups = WorkflowConnectionGroup & {
-  subGroups: ProposalWorkflowConnectionGroupWithSubGroups[];
+type WorkflowConnectionGroupWithSubGroups = WorkflowConnectionGroup & {
+  subGroups: WorkflowConnectionGroupWithSubGroups[];
 };
 
-const ProposalWorkflowConnectionsEditor = ({
-  proposalWorkflowStatusConnectionGroups,
+const WorkflowConnectionsEditor = ({
+  workflowStatusConnectionGroups,
   dispatch,
   isLoading,
   confirm,
-}: ProposalWorkflowConnectionsEditorProps) => {
+}: WorkflowConnectionsEditorProps) => {
   const theme = useTheme();
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
   const [workflowConnection, setWorkflowConnection] =
-    useState<ProposalWorkflowConnection | null>(null);
+    useState<WorkflowConnection | null>(null);
 
   const getItemStyle = (
     isDragging: boolean,
@@ -63,8 +59,8 @@ const ProposalWorkflowConnectionsEditor = ({
     ...draggableStyle,
   });
 
-  const allWorkflowGroupIds = proposalWorkflowStatusConnectionGroups.map(
-    (proposalWorkflowConnectionGroup) => proposalWorkflowConnectionGroup.groupId
+  const allWorkflowGroupIds = workflowStatusConnectionGroups.map(
+    (workflowConnectionGroup) => workflowConnectionGroup.groupId
   );
 
   /**
@@ -74,24 +70,21 @@ const ProposalWorkflowConnectionsEditor = ({
    * The function calls itself recursively to find children of children.
    */
   const buildWorkflowTree = (
-    proposalWorkflowConnectionGroups: WorkflowConnectionGroup[],
+    workflowConnectionGroups: WorkflowConnectionGroup[],
     parentId: string | null = null
   ) => {
-    const result: ProposalWorkflowConnectionGroupWithSubGroups[] = [];
+    const result: WorkflowConnectionGroupWithSubGroups[] = [];
 
-    proposalWorkflowConnectionGroups.forEach(
-      (
-        proposalWorkflowConnectionGroup: WorkflowConnectionGroup,
-        index: number
-      ) => {
-        const newElement: ProposalWorkflowConnectionGroupWithSubGroups = {
-          ...proposalWorkflowConnectionGroup,
+    workflowConnectionGroups.forEach(
+      (workflowConnectionGroup: WorkflowConnectionGroup, index: number) => {
+        const newElement: WorkflowConnectionGroupWithSubGroups = {
+          ...workflowConnectionGroup,
           subGroups: [],
         };
 
-        if (proposalWorkflowConnectionGroup.parentGroupId === parentId) {
+        if (workflowConnectionGroup.parentGroupId === parentId) {
           const children = buildWorkflowTree(
-            proposalWorkflowConnectionGroups,
+            workflowConnectionGroups,
             newElement.groupId
           );
 
@@ -107,9 +100,7 @@ const ProposalWorkflowConnectionsEditor = ({
     return result;
   };
 
-  const workflowTree = buildWorkflowTree(
-    proposalWorkflowStatusConnectionGroups
-  );
+  const workflowTree = buildWorkflowTree(workflowStatusConnectionGroups);
 
   const getListStyle = (isDraggingOver: boolean) => ({
     background: isDraggingOver ? theme.palette.primary.light : 'transparent',
@@ -132,40 +123,32 @@ const ProposalWorkflowConnectionsEditor = ({
     }
   };
 
-  const isVeryFirstDraftStatus = (
-    proposalWorkflowConnection: ProposalWorkflowConnection
-  ) =>
-    proposalWorkflowConnection.status.id === 1 &&
-    proposalWorkflowConnection.status.shortCode === 'DRAFT' &&
-    proposalWorkflowConnection.sortOrder === 0 &&
-    proposalWorkflowConnection.droppableGroupId ===
-      'proposalWorkflowConnections_0';
+  const isVeryFirstDraftStatus = (workflowConnection: WorkflowConnection) =>
+    workflowConnection.status.id === 1 &&
+    workflowConnection.status.shortCode === 'DRAFT' &&
+    workflowConnection.sortOrder === 0 &&
+    workflowConnection.droppableGroupId === 'proposalWorkflowConnections_0'; //TODO: This needs to be generalized
 
-  const getUniqueKey = (
-    proposalWorkflowConnection: ProposalWorkflowConnection
-  ) => {
-    return `${proposalWorkflowConnection.status.shortCode}_${
-      proposalWorkflowConnection.status.id
-    }_${proposalWorkflowConnection.prevStatusId || ''}`;
+  const getUniqueKey = (workflowConnection: WorkflowConnection) => {
+    return `${workflowConnection.status.shortCode}_${
+      workflowConnection.status.id
+    }_${workflowConnection.prevStatusId || ''}`;
   };
 
-  const getConnectionGroupItems = (
-    connections: ProposalWorkflowConnection[]
-  ) => {
-    return connections.map((proposalWorkflowConnection, index) => {
-      const connectionHasActions =
-        !!proposalWorkflowConnection.statusActions?.length;
+  const getConnectionGroupItems = (connections: WorkflowConnection[]) => {
+    return connections.map((workflowConnection, index) => {
+      const connectionHasActions = !!workflowConnection.statusActions?.length;
 
       return (
         <Draggable
-          key={getUniqueKey(proposalWorkflowConnection)}
-          draggableId={getUniqueKey(proposalWorkflowConnection)}
+          key={getUniqueKey(workflowConnection)}
+          draggableId={getUniqueKey(workflowConnection)}
           index={index}
           isDragDisabled={true}
         >
           {(provided, snapshot) => (
             <>
-              {!!proposalWorkflowConnection.statusChangingEvents?.length && (
+              {!!workflowConnection.statusChangingEvents?.length && (
                 <Box
                   component="small"
                   sx={{
@@ -175,7 +158,7 @@ const ProposalWorkflowConnectionsEditor = ({
                     color: theme.palette.grey[500],
                   }}
                 >
-                  {proposalWorkflowConnection.statusChangingEvents
+                  {workflowConnection.statusChangingEvents
                     .map(
                       (statusChangingEvent) =>
                         statusChangingEvent.statusChangingEvent
@@ -186,9 +169,7 @@ const ProposalWorkflowConnectionsEditor = ({
               <Grid
                 item
                 xs={12}
-                data-cy={`connection_${getUniqueKey(
-                  proposalWorkflowConnection
-                )}`}
+                data-cy={`connection_${getUniqueKey(workflowConnection)}`}
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
@@ -203,12 +184,12 @@ const ProposalWorkflowConnectionsEditor = ({
                   },
                 }}
                 onClick={() => {
-                  if (proposalWorkflowConnection.prevStatusId) {
-                    setWorkflowConnection(proposalWorkflowConnection);
+                  if (workflowConnection.prevStatusId) {
+                    setWorkflowConnection(workflowConnection);
                   }
                 }}
               >
-                {!isVeryFirstDraftStatus(proposalWorkflowConnection) && (
+                {!isVeryFirstDraftStatus(workflowConnection) && (
                   <DialogActions sx={{ padding: 0 }}>
                     <Tooltip title="Remove workflow connection">
                       <IconButton
@@ -225,7 +206,7 @@ const ProposalWorkflowConnectionsEditor = ({
                                   source: {
                                     index,
                                     droppableId:
-                                      proposalWorkflowConnection.droppableGroupId,
+                                      workflowConnection.droppableGroupId,
                                   },
                                 },
                               });
@@ -235,9 +216,7 @@ const ProposalWorkflowConnectionsEditor = ({
                               description: (
                                 <>
                                   Are you sure you want to remove{' '}
-                                  <b>
-                                    {proposalWorkflowConnection.status.name}
-                                  </b>{' '}
+                                  <b>{workflowConnection.status.name}</b>{' '}
                                   workflow connection?
                                 </>
                               ),
@@ -250,7 +229,7 @@ const ProposalWorkflowConnectionsEditor = ({
                     </Tooltip>
                     {connectionHasActions && (
                       <Tooltip
-                        title={`Status actions: ${proposalWorkflowConnection.statusActions?.map(
+                        title={`Status actions: ${workflowConnection.statusActions?.map(
                           (item) => item.action.name
                         )}`}
                         sx={{
@@ -265,11 +244,9 @@ const ProposalWorkflowConnectionsEditor = ({
                     )}
                   </DialogActions>
                 )}
-                <Box fontSize="1rem">
-                  {proposalWorkflowConnection.status.name}
-                </Box>
+                <Box fontSize="1rem">{workflowConnection.status.name}</Box>
                 <Box fontSize="small" mt={1} color={theme.palette.grey[400]}>
-                  {proposalWorkflowConnection.status.description}
+                  {workflowConnection.status.description}
                 </Box>
               </Grid>
             </>
@@ -280,7 +257,7 @@ const ProposalWorkflowConnectionsEditor = ({
   };
 
   const getConnectionGroupSubGroups = (
-    subGroups: ProposalWorkflowConnectionGroupWithSubGroups[]
+    subGroups: WorkflowConnectionGroupWithSubGroups[]
   ) => {
     return subGroups.map((subGroup) => (
       <Grid item xs={getGridListCols(subGroups.length)} key={subGroup.groupId}>
@@ -318,7 +295,7 @@ const ProposalWorkflowConnectionsEditor = ({
   };
 
   const getConnectionGroup = (
-    connectionGroup: ProposalWorkflowConnectionGroupWithSubGroups
+    connectionGroup: WorkflowConnectionGroupWithSubGroups
   ) => {
     return (
       <Grid container key={`${connectionGroup.groupId}_container`}>
@@ -374,7 +351,7 @@ const ProposalWorkflowConnectionsEditor = ({
         backgroundColor: theme.palette.grey[200],
         boxShadow: theme.shadows[3],
       }}
-      data-cy="proposal-workflow-connections"
+      data-cy="workflow-connections"
     >
       <Dialog
         aria-labelledby="simple-modal-title"
@@ -414,7 +391,7 @@ const ProposalWorkflowConnectionsEditor = ({
           padding: theme.spacing(1),
         }}
       >
-        Proposal workflow
+        Workflow
         <Button
           sx={{ float: 'right' }}
           onClick={() => setOpenNewRowDialog(true)}
@@ -428,9 +405,4 @@ const ProposalWorkflowConnectionsEditor = ({
   );
 };
 
-ProposalWorkflowConnectionsEditor.propTypes = {
-  proposalWorkflowStatusConnectionGroups: PropTypes.array.isRequired,
-  dispatch: PropTypes.func.isRequired,
-};
-
-export default withConfirm(ProposalWorkflowConnectionsEditor);
+export default withConfirm(WorkflowConnectionsEditor);

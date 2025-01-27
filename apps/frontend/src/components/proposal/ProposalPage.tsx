@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ProposalsFilter } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import ProposalFilterBar, {
@@ -55,8 +55,10 @@ export default function ProposalPage() {
   });
   const { calls, loadingCalls } = useCallsData();
   const { instruments, loadingInstruments } = useInstrumentsMinimalData();
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const {
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+  } = useStatusesData('proposal');
 
   return (
     <StyledContainer maxWidth={false}>

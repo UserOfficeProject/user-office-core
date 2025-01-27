@@ -35,7 +35,7 @@ import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { useXpressTechniquesData } from 'hooks/technique/useXpressTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import {
@@ -60,8 +60,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const {
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+  } = useStatusesData('proposal');
 
   // Only show calls that use the quick review workflow status
   const { calls, loadingCalls } = useCallsData(

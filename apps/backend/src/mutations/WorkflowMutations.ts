@@ -6,14 +6,14 @@ import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized } from '../decorators';
 import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import { Workflow } from '../models/ProposalWorkflow';
-import {
-  WorkflowConnection,
-  WorkflowConnectionWithStatus,
-} from '../models/ProposalWorkflowConnections';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
+import {
+  WorkflowConnection,
+  WorkflowConnectionWithStatus,
+} from '../models/WorkflowConnections';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations/settings/AddStatusChangingEventsToConnectionMutation';
 import { AddWorkflowStatusInput } from '../resolvers/mutations/settings/AddWorkflowStatusMutation';

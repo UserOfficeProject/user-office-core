@@ -48,7 +48,7 @@ import {
   ProposalViewData,
   useProposalsCoreData,
 } from 'hooks/proposal/useProposalsCoreData';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import {
   addColumns,
   fromArrayToCommaSeparated,
@@ -334,8 +334,10 @@ const ProposalTableInstrumentScientist = ({
   });
   const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const {
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+  } = useStatusesData('proposal');
 
   const { loading, proposalsData, totalCount, setProposalsData } =
     useProposalsCoreData(

@@ -12,11 +12,7 @@ import React from 'react';
 
 import { Status } from 'generated/sdk';
 
-const ProposalStatusPicker = ({
-  proposalStatuses,
-}: {
-  proposalStatuses: Status[];
-}) => {
+const StatusPicker = ({ statuses }: { statuses: Status[] }) => {
   const theme = useTheme();
   const isExtraLargeScreen = useMediaQuery(theme.breakpoints.up('xl'));
 
@@ -35,17 +31,17 @@ const ProposalStatusPicker = ({
   });
 
   const getItems = () =>
-    proposalStatuses.map((proposalStatus, index) => (
+    statuses.map((status, index) => (
       <Draggable
-        key={`${proposalStatus.shortCode}_${proposalStatus.id}`}
-        draggableId={`${proposalStatus.shortCode}_${proposalStatus.id}`}
+        key={`${status.shortCode}_${status.id}`}
+        draggableId={`${status.shortCode}_${status.id}`}
         index={index}
       >
         {(provided, snapshot) => (
           <Grid
             item
             xs={12}
-            data-cy={`status_${proposalStatus.shortCode}_${proposalStatus.id}`}
+            data-cy={`status_${status.shortCode}_${status.id}`}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
@@ -59,9 +55,9 @@ const ProposalStatusPicker = ({
               },
             }}
           >
-            <Box fontSize="1rem">{proposalStatus.name}</Box>
+            <Box fontSize="1rem">{status.name}</Box>
             <Box fontSize="small" mt={1} color={theme.palette.grey[800]}>
-              {proposalStatus.description}
+              {status.description}
             </Box>
           </Grid>
         )}
@@ -90,7 +86,7 @@ const ProposalStatusPicker = ({
         boxShadow: theme.shadows[3],
       }}
       className="tinyScroll"
-      data-cy="proposal-status-picker"
+      data-cy="status-picker"
     >
       <Grid
         item
@@ -102,10 +98,10 @@ const ProposalStatusPicker = ({
           padding: theme.spacing(1),
         }}
       >
-        Proposal statuses
+        Statuses
       </Grid>
-      {proposalStatuses && !!proposalStatuses.length && (
-        <Droppable droppableId="proposalStatusPicker">
+      {statuses && !!statuses.length && (
+        <Droppable droppableId="statusPicker">
           {(provided, snapshot) => (
             <Grid
               item
@@ -125,4 +121,4 @@ const ProposalStatusPicker = ({
   );
 };
 
-export default ProposalStatusPicker;
+export default StatusPicker;

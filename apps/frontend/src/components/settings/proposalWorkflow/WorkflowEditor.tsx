@@ -9,57 +9,54 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 
 import {
-  ProposalWorkflowConnection,
+  WorkflowConnection,
   Status,
   WorkflowConnectionGroup,
 } from 'generated/sdk';
-import { usePersistProposalWorkflowEditorModel } from 'hooks/settings/usePersistProposalWorkflowEditorModel';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { usePersistWorkflowEditorModel } from 'hooks/settings/usePersistWorkflowEditorModel';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { FunctionType } from 'utils/utilTypes';
 
-import ProposalStatusPicker from './ProposalStatusPicker';
-import ProposalWorkflowConnectionsEditor from './ProposalWorkflowConnectionsEditor';
-import ProposalWorkflowEditorModel, {
-  Event,
-  EventType,
-} from './ProposalWorkflowEditorModel';
-import ProposalWorkflowMetadataEditor from './ProposalWorkflowMetadataEditor';
+import StatusPicker from './StatusPicker';
+import WorkflowConnectionsEditor from './WorkflowConnectionsEditor';
+import WorkflowEditorModel, { Event, EventType } from './WorkflowEditorModel';
+import WorkflowMetadataEditor from './WorkflowMetadataEditor';
 
-const ProposalWorkflowEditor = () => {
+const WorkflowEditor = ({
+  entityType,
+}: {
+  entityType: 'proposal' | 'experiment';
+}) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const { statuses, loadingStatuses } = useStatusesData(entityType);
   const reducerMiddleware = () => {
     return (next: FunctionType) => (action: Event) => {
       next(action);
     };
   };
-  const { persistModel, isLoading } = usePersistProposalWorkflowEditorModel();
-  const { state, dispatch } = ProposalWorkflowEditorModel([
+  const { persistModel, isLoading } = usePersistWorkflowEditorModel();
+  const { state, dispatch } = WorkflowEditorModel([
     persistModel,
     reducerMiddleware,
   ]);
 
-  const proposalWorkflowConnectionsPartOfWorkflow: ProposalWorkflowConnection[] =
-    [];
+  const workflowConnectionsPartOfWorkflow: WorkflowConnection[] = [];
 
-  state.workflowConnectionGroups.forEach((proposalWorkflowConnectionGroup) =>
-    proposalWorkflowConnectionsPartOfWorkflow.push(
-      ...proposalWorkflowConnectionGroup.connections
+  state.workflowConnectionGroups.forEach((workflowConnectionGroup) =>
+    workflowConnectionsPartOfWorkflow.push(
+      ...workflowConnectionGroup.connections
     )
   );
-
-  const proposalStatusesInThePicker = state.id ? proposalStatuses : [];
+  const statusesInThePicker = state.id ? statuses : [];
 
   const getPreviousWorkflowStatus = (
     destinationIndex: number,
     currentDroppableGroup: WorkflowConnectionGroup
   ) => {
     const parentDroppableGroup = state.workflowConnectionGroups.find(
-      (proposalWorkflowConnectionGroup) =>
-        proposalWorkflowConnectionGroup.groupId ===
-        currentDroppableGroup.parentGroupId
+      (workflowConnectionGroup) =>
+        workflowConnectionGroup.groupId === currentDroppableGroup.parentGroupId
     );
 
     const isFirstInTheGroupAndHasParentGroup =
@@ -85,10 +82,10 @@ const ProposalWorkflowEditor = () => {
   ): Status[] => {
     const isLastInTheCurrentGroup =
       destination.index === currentDroppableGroup.connections.length;
+
     const childGroups = state.workflowConnectionGroups.filter(
-      (proposalWorkflowConnectionGroup) =>
-        proposalWorkflowConnectionGroup.parentGroupId ===
-        currentDroppableGroup.groupId
+      (workflowConnectionGroup) =>
+        workflowConnectionGroup.parentGroupId === currentDroppableGroup.groupId
     );
 
     const isLastInTheGroupAndHasChildGroup =
@@ -111,30 +108,30 @@ const ProposalWorkflowEditor = () => {
     if (!destination || isWrongDrop) {
       return;
     }
-
+    console.log('=2============');
     const isDragAndDropFromStatusPickerToWorkflowEditor =
-      source.droppableId === 'proposalStatusPicker' &&
-      destination.droppableId.startsWith('proposalWorkflowConnections');
+      source.droppableId === 'statusPicker' &&
+      destination.droppableId.includes('WorkflowConnections');
 
     const isReorderingConnectionsInsideWorkflowEditor =
-      source.droppableId.startsWith('proposalWorkflowConnections') &&
-      destination?.droppableId.startsWith('proposalWorkflowConnections');
+      source.droppableId.includes('WorkflowConnections') &&
+      destination?.droppableId.includes('WorkflowConnections');
 
     const isDragAndDropFromWorkflowEditorToStatusPicker =
-      source.droppableId.startsWith('proposalWorkflowConnections') &&
-      destination?.droppableId === 'proposalStatusPicker';
-
+      source.droppableId.includes('WorkflowConnections') &&
+      destination?.droppableId === 'statusPicker';
+    console.log('=3============');
     if (isDragAndDropFromStatusPickerToWorkflowEditor) {
       const currentDroppableGroup = state.workflowConnectionGroups.find(
-        (proposalWorkflowConnectionGroup) =>
-          proposalWorkflowConnectionGroup.groupId === destination.droppableId
+        (workflowConnectionGroup) =>
+          workflowConnectionGroup.groupId === destination.droppableId
       );
 
       const isDroppedBeforeVeryFirstStatus =
-        currentDroppableGroup?.groupId === 'proposalWorkflowConnections_0' &&
+        currentDroppableGroup?.groupId.endsWith('WorkflowConnections_0') &&
         destination.index === 0 &&
         currentDroppableGroup.connections.length > 0;
-
+      console.log('===4==========');
       if (isDroppedBeforeVeryFirstStatus) {
         enqueueSnackbar('Adding before first status is not allowed', {
           variant: 'info',
@@ -143,10 +140,9 @@ const ProposalWorkflowEditor = () => {
 
         return;
       }
-
-      const proposalStatusId = proposalStatusesInThePicker[source.index].id;
-      console.log({ proposalStatusId, destination, currentDroppableGroup });
-      const nextProposalStatusesId = getNextWorkflowStatuses(
+      console.log('===5==========');
+      const statusId = statusesInThePicker[source.index].id;
+      const nextStatusesId = getNextWorkflowStatuses(
         destination,
         currentDroppableGroup as WorkflowConnectionGroup
       ).map((status) => status?.id);
@@ -154,13 +150,11 @@ const ProposalWorkflowEditor = () => {
         destination.index,
         currentDroppableGroup as WorkflowConnectionGroup
       )?.id;
-      const [firstNextProposalStatusId] = nextProposalStatusesId;
 
+      const [firstNextStatusId] = nextStatusesId;
       const isRepeatingTheSameStatus =
-        nextProposalStatusesId?.some(
-          (statusId) => statusId === proposalStatusId
-        ) || proposalStatusId === prevStatusId;
-
+        nextStatusesId?.some((nextStatusId) => nextStatusId === statusId) ||
+        statusId === prevStatusId;
       if (isRepeatingTheSameStatus) {
         enqueueSnackbar('Repeating same status is not allowed', {
           variant: 'info',
@@ -169,7 +163,19 @@ const ProposalWorkflowEditor = () => {
 
         return;
       }
-
+      console.log({
+        source,
+        sortOrder: destination.index,
+        droppableGroupId: destination.droppableId,
+        parentDroppableGroupId: currentDroppableGroup?.parentGroupId || null,
+        statusId: statusId,
+        status: {
+          ...statusesInThePicker[source.index],
+        },
+        nextStatusId: firstNextStatusId,
+        prevStatusId,
+        workflowId: state.id,
+      });
       dispatch({
         type: EventType.ADD_WORKFLOW_STATUS_REQUESTED,
         payload: {
@@ -177,11 +183,11 @@ const ProposalWorkflowEditor = () => {
           sortOrder: destination.index,
           droppableGroupId: destination.droppableId,
           parentDroppableGroupId: currentDroppableGroup?.parentGroupId || null,
-          statusId: proposalStatusId,
+          statusId: statusId,
           status: {
-            ...proposalStatusesInThePicker[source.index],
+            ...statusesInThePicker[source.index],
           },
-          nextStatusId: firstNextProposalStatusId,
+          nextStatusId: firstNextStatusId,
           prevStatusId,
           workflowId: state.id,
         },
@@ -206,8 +212,8 @@ const ProposalWorkflowEditor = () => {
       });
     }
   };
-
-  const dataLoaded = !isLoading && !loadingProposalStatuses && state.id;
+  console.log({ state });
+  const dataLoaded = !isLoading && !loadingStatuses && state.id;
 
   const getContainerStyle = (): React.CSSProperties => {
     return !dataLoaded
@@ -224,27 +230,20 @@ const ProposalWorkflowEditor = () => {
 
   return (
     <StyledContainer>
-      <ProposalWorkflowMetadataEditor
-        dispatch={dispatch}
-        proposalWorkflow={state}
-      />
+      <WorkflowMetadataEditor dispatch={dispatch} workflow={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
         <DragDropContext onDragEnd={onDragEnd}>
           <Grid container>
             <Grid item xs={9}>
-              <ProposalWorkflowConnectionsEditor
+              <WorkflowConnectionsEditor
                 dispatch={dispatch}
                 isLoading={isLoading}
-                proposalWorkflowStatusConnectionGroups={
-                  state.workflowConnectionGroups
-                }
+                workflowStatusConnectionGroups={state.workflowConnectionGroups}
               />
             </Grid>
             <Grid item xs={3}>
-              <ProposalStatusPicker
-                proposalStatuses={proposalStatusesInThePicker}
-              />
+              <StatusPicker statuses={statusesInThePicker} />
             </Grid>
           </Grid>
         </DragDropContext>
@@ -253,4 +252,4 @@ const ProposalWorkflowEditor = () => {
   );
 };
 
-export default ProposalWorkflowEditor;
+export default WorkflowEditor;

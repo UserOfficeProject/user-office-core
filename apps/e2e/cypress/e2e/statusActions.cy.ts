@@ -115,6 +115,7 @@ context('Status actions tests', () => {
           ],
           connectionId: result.addProposalWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
+          entityType: 'proposal',
         });
       });
 
@@ -205,6 +206,7 @@ context('Status actions tests', () => {
           ],
           connectionId: result.addProposalWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
+          entityType: 'proposal',
         });
       });
 
@@ -268,6 +270,7 @@ context('Status actions tests', () => {
           ],
           connectionId: result.addProposalWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
+          entityType: 'proposal',
         });
       });
 
@@ -417,6 +420,7 @@ context('Status actions tests', () => {
           ],
           connectionId: result.addProposalWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
+          entityType: 'proposal',
         });
       });
 
@@ -531,6 +535,7 @@ context('Status actions tests', () => {
           ],
           connectionId: result.addProposalWorkflowStatus.id,
           workflowId: initialDBData.workflows.defaultWorkflow.id,
+          entityType: 'proposal',
         });
       });
 
@@ -638,7 +643,7 @@ context('Status actions tests', () => {
         const connection = result.addProposalWorkflowStatus;
         if (connection) {
           cy.addStatusChangingEventsToConnection({
-            proposalWorkflowConnectionId: connection.id,
+            workflowConnectionId: connection.id,
             statusChangingEvents: [PROPOSAL_EVENTS.PROPOSAL_SUBMITTED],
           });
           cy.addConnectionStatusActions({
@@ -656,6 +661,7 @@ context('Status actions tests', () => {
             ],
             connectionId: connection.id,
             workflowId: initialDBData.workflows.defaultWorkflow.id,
+            entityType: 'proposal',
           });
         }
       });

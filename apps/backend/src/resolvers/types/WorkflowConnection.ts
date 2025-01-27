@@ -9,40 +9,11 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/ProposalWorkflowConnections';
 import { isRejection } from '../../models/Rejection';
+import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/WorkflowConnections';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { Status } from './Status';
 import { StatusChangingEvent } from './StatusChangingEvent';
-
-@ObjectType()
-export class ProposalWorkflowConnection
-  implements Partial<WorkflowConnectionWithStatusOrigin>
-{
-  @Field(() => Int)
-  public id: number;
-
-  @Field(() => Int)
-  public sortOrder: number;
-
-  @Field(() => Int)
-  public workflowId: number;
-
-  @Field(() => Int)
-  public statusId: number;
-
-  @Field(() => Status)
-  public status: Status;
-
-  @Field(() => Int, { nullable: true })
-  public nextStatusId: number | null;
-
-  @Field(() => Int, { nullable: true })
-  public prevStatusId: number | null;
-
-  @Field()
-  public droppableGroupId: string;
-}
 
 @ObjectType()
 export class WorkflowConnection
@@ -77,18 +48,6 @@ export class WorkflowConnection
 }
 
 @ObjectType()
-export class ProposalWorkflowConnectionGroup {
-  @Field(() => String)
-  public groupId: string;
-
-  @Field(() => String, { nullable: true })
-  public parentGroupId: string | null;
-
-  @Field(() => [ProposalWorkflowConnection])
-  public connections: ProposalWorkflowConnection[];
-}
-
-@ObjectType()
 export class WorkflowConnectionGroup {
   @Field(() => String)
   public groupId: string;
@@ -96,22 +55,22 @@ export class WorkflowConnectionGroup {
   @Field(() => String, { nullable: true })
   public parentGroupId: string | null;
 
-  @Field(() => [ProposalWorkflowConnection])
-  public connections: ProposalWorkflowConnection[];
+  @Field(() => [WorkflowConnection])
+  public connections: WorkflowConnection[];
 }
 
-@Resolver(() => ProposalWorkflowConnection)
-export class ProposalWorkflowConnectionResolver {
+@Resolver(() => WorkflowConnection)
+export class WorkflowConnectionResolver {
   @FieldResolver(() => [StatusChangingEvent], { nullable: true })
   async statusChangingEvents(
-    @Root() proposalWorkflowConnection: ProposalWorkflowConnection,
+    @Root() workflowConnection: WorkflowConnection,
     @Ctx() context: ResolverContext
   ): Promise<StatusChangingEvent[]> {
     const statusChangingEvents =
       await context.queries.workflow.getStatusChangingEventsByConnectionId(
         context.user,
-        proposalWorkflowConnection.id,
-        'proposal'
+        workflowConnection.id,
+        workflowConnection.entityType
       );
 
     return isRejection(statusChangingEvents) ? [] : statusChangingEvents;
@@ -119,17 +78,17 @@ export class ProposalWorkflowConnectionResolver {
 
   @FieldResolver(() => [ConnectionStatusAction], { nullable: true })
   async statusActions(
-    @Root() proposalWorkflowConnection: ProposalWorkflowConnection,
+    @Root() workflowConnection: WorkflowConnection,
     @Ctx() context: ResolverContext
   ): Promise<ConnectionStatusAction[]> {
     const statusActions =
       await context.queries.statusAction.getConnectionStatusActions(
         context.user,
         {
-          connectionId: proposalWorkflowConnection.id,
-          workflowId: proposalWorkflowConnection.workflowId,
+          connectionId: workflowConnection.id,
+          workflowId: workflowConnection.workflowId,
         },
-        'proposal'
+        workflowConnection.entityType
       );
 
     return isRejection(statusActions) ? [] : statusActions;

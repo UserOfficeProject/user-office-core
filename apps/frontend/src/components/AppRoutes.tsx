@@ -57,15 +57,13 @@ const FeaturesPage = lazy(() => import('./settings/features/FeaturesPage'));
 const ProposalStatusesPage = lazy(
   () => import('./settings/proposalStatus/ProposalStatusesPage')
 );
-const ProposalWorkflowEditor = lazy(
-  () => import('./settings/proposalWorkflow/ProposalWorkflowEditor')
+const WorkflowEditor = lazy(
+  () => import('./settings/proposalWorkflow/WorkflowEditor')
 );
 const ProposalWorkflowsPage = lazy(
   () => import('./settings/proposalWorkflow/ProposalWorkflowsPage')
 );
-const ExperimentWorkflowEditor = lazy(
-  () => import('./settings/experimentWorkflow/ExperimentWorkflowEditor')
-);
+
 const ExperimentWorkflowsPage = lazy(
   () => import('./settings/experimentWorkflow/ExperimentWorkflowsPage')
 );
@@ -464,7 +462,7 @@ const AppRoutes = () => {
             element={
               <TitledRoute
                 title="Proposal Workflow Editor"
-                element={<ProposalWorkflowEditor />}
+                element={<WorkflowEditor entityType="proposal" />}
               />
             }
           />
@@ -475,7 +473,7 @@ const AppRoutes = () => {
             element={
               <TitledRoute
                 title="Experiment Workflow Editor"
-                element={<ExperimentWorkflowEditor />}
+                element={<WorkflowEditor entityType="experiment" />}
               />
             }
           />

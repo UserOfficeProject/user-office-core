@@ -3,7 +3,7 @@ import { ProposalWorkflow, Workflow } from '../../models/ProposalWorkflow';
 import {
   ProposalWorkflowConnection,
   WorkflowConnectionWithStatus,
-} from '../../models/ProposalWorkflowConnections';
+} from '../../models/WorkflowConnections';
 import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
 
 export const dummyProposalStatuses = [
