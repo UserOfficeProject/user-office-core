@@ -8,7 +8,7 @@ export function createUOWSClient() {
   return new UOWS({
     BASE: process.env.EXTERNAL_UOWS_API_URL,
     HEADERS: {
-      Authorization: `Api-key ${process.env.API_KEY}`,
+      Authorization: `Api-key ${process.env.EXTERNAL_UOWS_API_KEY}`,
     },
   });
 }
