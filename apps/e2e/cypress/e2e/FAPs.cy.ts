@@ -1349,11 +1349,11 @@ context('Fap reviews tests', () => {
       cy.setTinyMceContent('comment', internalComment);
       cy.setTinyMceContent('publicComment', publicComment);
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review submitted successfully',
+        text: 'Updated',
       });
     });
   });
