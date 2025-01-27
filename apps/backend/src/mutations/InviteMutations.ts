@@ -80,8 +80,12 @@ export default class InviteMutations {
       args.email
     );
 
-    await this.setRoleInvites(newInvite.id, roleIds);
-    await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
+    if (roleIds) {
+      await this.setRoleInvites(newInvite.id, roleIds);
+    }
+    if (coProposerProposalPk) {
+      await this.setCoProposerInvites(newInvite.id, coProposerProposalPk);
+    }
 
     return newInvite;
   }
@@ -140,19 +144,20 @@ export default class InviteMutations {
     }
 
     const updatedInvite = await this.inviteDataSource.update(args);
-    await this.setRoleInvites(updatedInvite.id, args.claims?.roleIds);
-    await this.setCoProposerInvites(
-      updatedInvite.id,
-      args.claims?.coProposerProposalPk
-    );
+    if (args.claims?.roleIds) {
+      await this.setRoleInvites(updatedInvite.id, args.claims?.roleIds);
+    }
+    if (args.claims?.coProposerProposalPk) {
+      await this.setCoProposerInvites(
+        updatedInvite.id,
+        args.claims.coProposerProposalPk
+      );
+    }
 
     return updatedInvite;
   }
 
-  private async setRoleInvites(
-    inviteCodeId: number,
-    roleIds: number[] | undefined
-  ) {
+  private async setRoleInvites(inviteCodeId: number, roleIds: number[]) {
     await this.roleInviteDataSource.deleteByInviteCodeId(inviteCodeId);
 
     if (!roleIds) return;
@@ -166,7 +171,7 @@ export default class InviteMutations {
     }
   }
 
-  private async setCoProposerInvites(invCodeId: number, proposalPk?: number) {
+  private async setCoProposerInvites(invCodeId: number, proposalPk: number) {
     if (!proposalPk) return;
 
     return this.coProposerInviteDataSource.create(invCodeId, proposalPk);
