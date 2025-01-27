@@ -8,15 +8,18 @@ export class CoProposerInviteDataSourceMock
 
   init() {
     this.invites = [
-      new CoProposerInvite(1, 1, 1),
-      new CoProposerInvite(2, 2, 2),
-      new CoProposerInvite(3, 3, 3),
+      new CoProposerInvite(1, 1),
+      new CoProposerInvite(2, 2),
+      new CoProposerInvite(3, 3),
     ];
   }
 
-  async findByInviteCodeId(inviteCodeId: number): Promise<CoProposerInvite[]> {
-    return this.invites.filter(
-      (invite) => invite.inviteCodeId === inviteCodeId
+  async findByInviteCodeId(
+    inviteCodeId: number
+  ): Promise<CoProposerInvite | null> {
+    return (
+      this.invites.find((invite) => invite.inviteCodeId === inviteCodeId) ||
+      null
     );
   }
 
@@ -24,11 +27,7 @@ export class CoProposerInviteDataSourceMock
     inviteCodeId: number,
     proposalPk: number
   ): Promise<CoProposerInvite> {
-    const newInvite = new CoProposerInvite(
-      this.invites.length + 1,
-      inviteCodeId,
-      proposalPk
-    );
+    const newInvite = new CoProposerInvite(inviteCodeId, proposalPk);
 
     this.invites.push(newInvite);
 

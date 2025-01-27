@@ -193,27 +193,26 @@ export default class InviteMutations {
     claimerUserId: number,
     inviteCodeId: number
   ) {
-    const coProposerInvites =
+    const coProposerInvite =
       await this.coProposerInviteDataSource.findByInviteCodeId(inviteCodeId);
 
-    if (coProposerInvites.length === 0) {
+    if (coProposerInvite === null) {
       return;
     }
 
-    for await (const coProposerInvite of coProposerInvites) {
-      const proposalHasUser = await this.proposalHasUser(
-        coProposerInvite.proposalPk,
-        claimerUserId
-      );
-      if (proposalHasUser) {
-        continue;
-      }
-
-      await this.proposalDataSource.addProposalUser(
-        coProposerInvite.proposalPk,
-        claimerUserId
-      );
+    const proposalHasUser = await this.proposalHasUser(
+      coProposerInvite.proposalPk,
+      claimerUserId
+    );
+    // already a co-proposer
+    if (proposalHasUser) {
+      return;
     }
+
+    await this.proposalDataSource.addProposalUser(
+      coProposerInvite.proposalPk,
+      claimerUserId
+    );
   }
 
   private async proposalHasUser(proposalPk: number, userId: number) {
