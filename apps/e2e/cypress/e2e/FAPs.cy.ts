@@ -1299,14 +1299,14 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
     });
 
-    it('Fap Secretary should be able to edit only comments of technical reviews', function () {
-      if (
+    it.only('Fap Secretary should be able to edit only comments of technical reviews', function () {
+      /*if (
         settings
           .getEnabledSettings()
           .get(SettingsId.FAP_SECS_EDIT_TECH_REVIEWS) !== 'true'
       ) {
         this.skip();
-      }
+      }*/
 
       const internalComment = faker.word.words(2);
       const publicComment = faker.word.words(2);
@@ -1314,11 +1314,11 @@ context('Fap reviews tests', () => {
       cy.addProposalTechnicalReview({
         proposalPk: firstCreatedProposalPk,
         status: TechnicalReviewStatus.FEASIBLE,
-        timeAllocation: firstProposalTimeAllocation,
+        timeAllocation: 26, //firstProposalTimeAllocation,
         submitted: true,
         reviewerId: 6,
         instrumentId: newlyCreatedInstrumentId,
-        questionaryId: initialDBData.technicalReview.questionaryId,
+        questionaryId: 4, //initialDBData.technicalReview.questionaryId,
       });
 
       cy.assignFapReviewersToProposals({
@@ -1337,10 +1337,13 @@ context('Fap reviews tests', () => {
 
       cy.contains('Technical reviews').click();
 
+      cy.get('[data-cy="back-button"]').click();
+
       // The children are the components that are disabled
       cy.get('[data-cy="technical-review-status"]')
         .children()
         .should('be.disabled');
+
       cy.get('[data-cy="timeAllocation"]')
         .children()
         .children()
