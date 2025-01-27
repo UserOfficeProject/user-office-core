@@ -9,7 +9,7 @@ import { createInviteCodeObject, InviteCodeRecord } from './records';
 export default class PostgresInviteCodesDataSource
   implements InviteCodeDataSource
 {
-  findByCode(code: string): Promise<InviteCode | null> {
+  async findByCode(code: string): Promise<InviteCode | null> {
     return database
       .select('*')
       .from('invite_codes')
