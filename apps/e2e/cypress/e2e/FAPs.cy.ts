@@ -1314,11 +1314,11 @@ context('Fap reviews tests', () => {
       cy.addProposalTechnicalReview({
         proposalPk: firstCreatedProposalPk,
         status: TechnicalReviewStatus.FEASIBLE,
-        timeAllocation: 26, //firstProposalTimeAllocation,
+        timeAllocation: firstProposalTimeAllocation,
         submitted: true,
         reviewerId: 6,
         instrumentId: newlyCreatedInstrumentId,
-        questionaryId: 4, //initialDBData.technicalReview.questionaryId,
+        questionaryId: 4,
       });
 
       cy.assignFapReviewersToProposals({
