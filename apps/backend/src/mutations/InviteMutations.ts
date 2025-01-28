@@ -235,6 +235,8 @@ export default class InviteMutations {
     proposalPk: number,
     emails: string[]
   ): Promise<Invite[]> {
+    // Add authorization
+
     const existingClaims =
       await this.coProposerClaimDataSource.getByProposalPk(proposalPk);
     const existingInvites = (await Promise.all(
@@ -259,6 +261,11 @@ export default class InviteMutations {
     const newInvites = await Promise.all(
       newEmails.map((email) =>
         this.inviteDataSource.create(user!.id, this.createInviteCode(), email)
+      )
+    );
+    await Promise.all(
+      newInvites.map((invite) =>
+        this.coProposerClaimDataSource.create(invite.id, proposalPk)
       )
     );
 
