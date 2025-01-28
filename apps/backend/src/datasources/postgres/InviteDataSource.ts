@@ -10,7 +10,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
   findByCode(code: string): Promise<Invite | null> {
     return database
       .select('*')
-      .from('invite_codes')
+      .from('invites')
       .where('code', code)
       .catch((error: Error) => {
         throw new Error(`Could not find invite: ${error.message}`);
@@ -35,14 +35,12 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         email: email,
         created_by: createdByUserId,
       })
-      .into('invite_codes')
+      .into('invites')
       .returning('*')
       .catch((error: Error) => {
         throw new Error(`Could not create invite: ${error.message}`);
       })
-      .then((invites: InviteRecord[]) =>
-        createInviteObject(invites[0])
-      );
+      .then((invites: InviteRecord[]) => createInviteObject(invites[0]));
   }
 
   async update(
@@ -56,18 +54,16 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         claimed_at: args.claimedAt,
         claimed_by: args.claimedByUserId,
       })
-      .from('invite_codes')
+      .from('invites')
       .where('invite_code_id', args.id)
       .returning('*')
-      .then((invites: InviteRecord[]) =>
-        createInviteObject(invites[0])
-      );
+      .then((invites: InviteRecord[]) => createInviteObject(invites[0]));
   }
 
   async findById(id: number): Promise<Invite | null> {
     return database
       .select('*')
-      .from('invite_codes')
+      .from('invites')
       .where('invite_code_id', id)
       .catch((error: Error) => {
         throw new Error(`Could not find invite: ${error.message}`);
