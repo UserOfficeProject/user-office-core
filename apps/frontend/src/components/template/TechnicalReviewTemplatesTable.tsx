@@ -66,7 +66,7 @@ function TechnicalReviewsList(props: { filterTemplateId: number }) {
       field: 'reviewId',
       render: (technicalReview: TechnicalReview) => (
         <ReactRouterLink
-          to={`/TechnicalReviews?reviewModal=${technicalReview.id}`}
+          to={`/?reviewModal=${technicalReview.proposalPk}&modalTab=1`}
         >
           {technicalReview.id}
         </ReactRouterLink>

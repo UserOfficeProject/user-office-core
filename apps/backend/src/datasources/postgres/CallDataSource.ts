@@ -63,6 +63,13 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('fap_review_template_id', filter.fapReviewTemplateIds);
     }
 
+    if (filter?.technicalReviewTemplateIds) {
+      query.whereIn(
+        'technical_review_template_id',
+        filter.technicalReviewTemplateIds
+      );
+    }
+
     if (filter?.esiTemplateIds) {
       query.whereIn('esi_template_id', filter.esiTemplateIds);
     }
