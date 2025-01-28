@@ -20,8 +20,14 @@ const columns = [
 
 const WorkflowsTable = ({
   entityType,
+  editorPath,
+  title,
+  createTitle,
 }: {
   entityType: 'proposal' | 'experiment';
+  editorPath: 'ProposalWorkflowEditor' | 'ExperimentWorkflowEditor';
+  title: string;
+  createTitle: string;
 }) => {
   const { api } = useDataApiWithFeedback();
   const {
@@ -40,9 +46,10 @@ const WorkflowsTable = ({
       close={(workflow: Workflow | null) => {
         onCreate(workflow);
 
-        navigate(`/ProposalWorkflowEditor/${(workflow as Workflow).id}`);
+        navigate(`/${editorPath}/${(workflow as Workflow).id}`);
       }}
       entityType={entityType}
+      title={createTitle}
     />
   );
 
@@ -76,7 +83,7 @@ const WorkflowsTable = ({
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            Workflows
+            {title}
           </Typography>
         }
         columns={columns}
@@ -91,7 +98,7 @@ const WorkflowsTable = ({
             icon: EditIcon,
             tooltip: 'Edit',
             onClick: (event, rowData): void =>
-              navigate(`/ProposalWorkflowEditor/${(rowData as Workflow).id}`),
+              navigate(`/${editorPath}/${(rowData as Workflow).id}`),
             position: 'row',
           },
         ]}

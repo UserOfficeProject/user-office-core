@@ -120,8 +120,7 @@ export class CallInstrumentsResolver {
   @FieldResolver(() => Workflow, { nullable: true })
   async workflow(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.workflow.dataSource.getWorkflow(
-      call.proposalWorkflowId,
-      'proposal'
+      call.proposalWorkflowId
     );
   }
 

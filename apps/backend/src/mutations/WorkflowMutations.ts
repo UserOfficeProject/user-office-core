@@ -1,10 +1,22 @@
+import {
+  addStatusActionsToConnectionValidationSchema,
+  addWorkflowStatusValidationSchema,
+  createWorkflowValidationSchema,
+  deleteWorkflowStatusValidationSchema,
+  deleteWorkflowValidationSchema,
+  moveWorkflowStatusValidationSchema,
+  updateWorkflowValidationSchema,
+} from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
-import { Authorized } from '../decorators';
-import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
+import { Authorized, ValidateArgs } from '../decorators';
+import {
+  ConnectionHasStatusAction,
+  StatusActionType,
+} from '../models/ProposalStatusAction';
 import { Workflow } from '../models/ProposalWorkflow';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -21,6 +33,7 @@ import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkf
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
 import { MoveWorkflowStatusInput } from '../resolvers/mutations/settings/MoveWorkflowStatusMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
+import { EmailStatusActionRecipients } from '../resolvers/types/ProposalStatusActionConfig';
 import { omit } from '../utils/helperFunctions';
 
 @injectable()
@@ -33,7 +46,7 @@ export default class WorkflowMutations {
     private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
-  // @ValidateArgs(createProposalWorkflowValidationSchema) //TODO: To be done
+  @ValidateArgs(createWorkflowValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async createWorkflow(
     agent: UserWithRole | null,
@@ -44,7 +57,7 @@ export default class WorkflowMutations {
     });
   }
 
-  // @ValidateArgs(updateProposalWorkflowValidationSchema) //TODO: To be done
+  @ValidateArgs(updateWorkflowValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async updateWorkflow(
     agent: UserWithRole | null,
@@ -55,7 +68,7 @@ export default class WorkflowMutations {
     });
   }
 
-  // @ValidateArgs(deleteProposalWorkflowValidationSchema)//TODO: To be done
+  @ValidateArgs(deleteWorkflowValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async deleteWorkflow(
     agent: UserWithRole | null,
@@ -124,8 +137,7 @@ export default class WorkflowMutations {
       isInTheMiddleOfAGroup = false,
       isLastConnectionInParentGroup = false,
       isFirstConnectionInChildGroup = false,
-    },
-    entityType: WorkflowConnection['entityType']
+    }
   ) {
     const updatedWorkflowConnections =
       this.orderAndConnectAllWorkflowStatusesInSameDroppableGroup(
@@ -141,7 +153,6 @@ export default class WorkflowMutations {
         await this.dataSource.getWorkflowConnectionsById(
           workflowConnections[0].workflowId,
           workflowConnections[0].prevStatusId as number,
-          entityType,
           {
             nextStatusId:
               secondConnection && isFirstConnectionInChildGroup
@@ -206,7 +217,6 @@ export default class WorkflowMutations {
       const allFirstChildrenGroupConnections = (
         await this.dataSource.getWorkflowConnections(
           lastConnection.workflowId,
-          entityType,
           lastConnection.droppableGroupId,
           findAllConnectionsByParentGroup
         )
@@ -248,7 +258,6 @@ export default class WorkflowMutations {
     const allWorkflowGroupConnections =
       await this.dataSource.getWorkflowConnections(
         args.workflowId,
-        args.entityType,
         args.droppableGroupId,
         false
       );
@@ -272,26 +281,22 @@ export default class WorkflowMutations {
       newWorkflowConnection.sortOrder > 0 &&
       newWorkflowConnection.sortOrder < allWorkflowGroupConnections.length - 1;
     const insertedWorkflowConnection = (
-      await this.updateWorkflowConnectionStatuses(
-        allWorkflowGroupConnections,
-        {
-          isInTheMiddleOfAGroup,
-          isFirstConnectionInChildGroup,
-          isLastConnectionInParentGroup,
-        },
-        args.entityType
-      )
+      await this.updateWorkflowConnectionStatuses(allWorkflowGroupConnections, {
+        isInTheMiddleOfAGroup,
+        isFirstConnectionInChildGroup,
+        isLastConnectionInParentGroup,
+      })
     )[newWorkflowConnection.sortOrder];
 
     return insertedWorkflowConnection;
   }
 
-  // @ValidateArgs(addProposalWorkflowStatusValidationSchema)//TODO: To be done
+  @ValidateArgs(addWorkflowStatusValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async addWorkflowStatus(
     agent: UserWithRole | null,
     args: AddWorkflowStatusInput
-  ): Promise<WorkflowConnectionWithStatus | Rejection> {
+  ): Promise<WorkflowConnection | Rejection> {
     const isVeryFirstConnection = !args.nextStatusId && !args.prevStatusId;
     try {
       if (isVeryFirstConnection) {
@@ -343,7 +348,7 @@ export default class WorkflowMutations {
   }
 
   // NOTE: Moving statuses inside workflow is not enabled at the moment so this is not used at all. I keep it if we deceide to use this feature later.
-  // @ValidateArgs(moveProposalWorkflowStatusValidationSchema)//TODO: To be done
+  @ValidateArgs(moveWorkflowStatusValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async moveWorkflowStatus(
     agent: UserWithRole | null,
@@ -353,7 +358,6 @@ export default class WorkflowMutations {
       const allSourceGroupWorkflowConnections =
         await this.dataSource.getWorkflowConnections(
           args.workflowId,
-          args.entityType,
           args.from.droppableId
         );
 
@@ -371,8 +375,7 @@ export default class WorkflowMutations {
 
       await this.updateWorkflowConnectionStatuses(
         reorderedWorkflowConnections,
-        { isFirstConnectionInChildGroup },
-        args.entityType
+        { isFirstConnectionInChildGroup }
       );
 
       return reorderedWorkflowConnections[args.to.index];
@@ -395,14 +398,12 @@ export default class WorkflowMutations {
       currentStatusId: number;
       previousStatusId: number | null;
       nextStatusId: number | null;
-    },
-    entityType: WorkflowConnection['entityType']
+    }
   ) {
     const [previousConnection] = previousStatusId
       ? await this.dataSource.getWorkflowConnectionsById(
           workflowId,
           previousStatusId,
-          entityType,
           {
             nextStatusId: currentStatusId,
           }
@@ -413,7 +414,6 @@ export default class WorkflowMutations {
       ? await this.dataSource.getWorkflowConnectionsById(
           workflowId,
           nextStatusId,
-          entityType,
           {
             prevStatusId: currentStatusId,
           }
@@ -423,7 +423,7 @@ export default class WorkflowMutations {
     return [previousConnection, nextConnection];
   }
 
-  // @ValidateArgs(deleteProposalWorkflowStatusValidationSchema) //TODO: To be done
+  @ValidateArgs(deleteWorkflowStatusValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async deleteWorkflowStatus(
     agent: UserWithRole | null,
@@ -435,7 +435,6 @@ export default class WorkflowMutations {
         await this.dataSource.getWorkflowConnectionsById(
           args.workflowId,
           args.statusId,
-          args.entityType,
           { sortOrder: args.sortOrder }
         );
 
@@ -451,7 +450,6 @@ export default class WorkflowMutations {
       const allGroupWorkflowConnections =
         await this.dataSource.getWorkflowConnections(
           args.workflowId,
-          args.entityType,
           firstWorkflowConnectionToRemove.droppableGroupId
         );
 
@@ -468,7 +466,6 @@ export default class WorkflowMutations {
           await this.dataSource.getWorkflowConnectionsById(
             firstWorkflowConnectionToRemove.workflowId,
             firstWorkflowConnectionToRemove.prevStatusId as number,
-            args.entityType,
             {}
           );
 
@@ -487,7 +484,6 @@ export default class WorkflowMutations {
               await this.dataSource.getWorkflowConnectionsById(
                 connection.workflowId,
                 connection.nextStatusId as number,
-                args.entityType,
                 {}
               );
 
@@ -524,15 +520,11 @@ export default class WorkflowMutations {
         );
 
         const [previousConnection, nextConnection] =
-          await this.findPreviousAndNextConnections(
-            args.workflowId,
-            {
-              currentStatusId: result.statusId,
-              previousStatusId: result.prevStatusId,
-              nextStatusId: result.nextStatusId,
-            },
-            args.entityType
-          );
+          await this.findPreviousAndNextConnections(args.workflowId, {
+            currentStatusId: result.statusId,
+            previousStatusId: result.prevStatusId,
+            nextStatusId: result.nextStatusId,
+          });
 
         const connectionsToUpdate = [];
 
@@ -563,17 +555,17 @@ export default class WorkflowMutations {
     }
   }
 
-  // @ValidateArgs(
-  //   addStatusActionsToConnectionValidationSchema<
-  //     ProposalStatusActionType,
-  //     EmailStatusActionRecipients
-  //   >(
-  //     ProposalStatusActionType.EMAIL,
-  //     ProposalStatusActionType.RABBITMQ,
-  //     Object.values(ProposalStatusActionType),
-  //     EmailStatusActionRecipients.OTHER
-  //   )
-  // )//TODO: To be done
+  @ValidateArgs(
+    addStatusActionsToConnectionValidationSchema<
+      StatusActionType,
+      EmailStatusActionRecipients
+    >(
+      StatusActionType.EMAIL,
+      StatusActionType.RABBITMQ,
+      Object.values(StatusActionType),
+      EmailStatusActionRecipients.OTHER
+    )
+  ) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async addConnectionStatusActions(
     agent: UserWithRole | null,

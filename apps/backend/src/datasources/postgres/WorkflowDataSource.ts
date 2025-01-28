@@ -31,6 +31,21 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   }
 
   private createWorkflowConnectionObject(
+    workflowConnection: WorkflowConnectionRecord
+  ) {
+    return new WorkflowConnection(
+      workflowConnection.workflow_connection_id,
+      workflowConnection.sort_order,
+      workflowConnection.workflow_id,
+      workflowConnection.status_id,
+      workflowConnection.next_status_id,
+      workflowConnection.prev_status_id,
+      workflowConnection.droppable_group_id,
+      workflowConnection.parent_droppable_group_id
+    );
+  }
+
+  private createWorkflowConnectionWithStatusObject(
     workflowConnection: WorkflowConnectionRecord & StatusRecord
   ) {
     return new WorkflowConnectionWithStatus(
@@ -49,8 +64,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.next_status_id,
       workflowConnection.prev_status_id,
       workflowConnection.droppable_group_id,
-      workflowConnection.parent_droppable_group_id,
-      workflowConnection.entity_type
+      workflowConnection.parent_droppable_group_id
     );
   }
   async createWorkflow(
@@ -118,21 +132,16 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       parentDroppableGroupId: null,
       statusId: defaultStatusId,
       workflowId: workflowRecord.workflow_id,
-      entityType: workflowRecord.entity_type,
     });
 
     return this.createWorkflowObject(workflowRecord);
   }
-  async getWorkflow(
-    workflowId: number,
-    entityType: Workflow['entityType']
-  ): Promise<Workflow | null> {
+  async getWorkflow(workflowId: number): Promise<Workflow | null> {
     // TODO: To test
     return database
       .select()
       .from('workflows')
       .where('workflow_id', workflowId)
-      .andWhere('entity_type', entityType)
       .first()
       .then((proposalWorkflow: WorkflowRecord | null) =>
         proposalWorkflow ? this.createWorkflowObject(proposalWorkflow) : null
@@ -192,7 +201,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   }
   async getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId'],
-    entityType: WorkflowConnection['entityType'],
     droppableGroupId?: WorkflowConnection['droppableGroupId'],
     byParentGroupId?: boolean | undefined
   ): Promise<WorkflowConnectionWithStatus[]> {
@@ -218,8 +226,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         ON
           s.status_id = wc.status_id
         WHERE workflow_id = ${workflowId}
-        AND s.entity_type = '${entityType}'
-        AND wc.entity_type = '${entityType}'
         ${andWhereCondition}
       ) t
       ORDER BY
@@ -235,14 +241,13 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
     return workflowConnections
       ? workflowConnections.map((workflowConnection) =>
-          this.createWorkflowConnectionObject(workflowConnection)
+          this.createWorkflowConnectionWithStatusObject(workflowConnection)
         )
       : [];
   }
   async getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
     statusId: Status['id'],
-    entityType: WorkflowConnection['entityType'],
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]> {
     // TODO: To test
@@ -277,14 +282,23 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
     const proposalWorkflowConnections = workflowConnectionRecords.map(
       (proposalWorkflowConnectionRecord) =>
-        this.createWorkflowConnectionObject(proposalWorkflowConnectionRecord)
+        this.createWorkflowConnectionWithStatusObject(
+          proposalWorkflowConnectionRecord
+        )
     );
 
     return proposalWorkflowConnections;
   }
   async addWorkflowStatus(
-    newWorkflowStatusInput: Omit<WorkflowConnection, 'id'>
+    newWorkflowStatusInput: Omit<WorkflowConnection, 'id' | 'entityType'>
   ): Promise<WorkflowConnectionWithStatus> {
+    const workflow = await this.getWorkflow(newWorkflowStatusInput.workflowId);
+
+    if (!workflow) {
+      throw new GraphQLError(
+        `Could not find workflow with id: ${newWorkflowStatusInput.workflowId}`
+      );
+    }
     // TODO: To test
     const [workflowConnectionRecord]: (WorkflowConnectionRecord &
       StatusRecord)[] = await database
@@ -297,7 +311,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         droppable_group_id: newWorkflowStatusInput.droppableGroupId,
         parent_droppable_group_id:
           newWorkflowStatusInput.parentDroppableGroupId,
-        entity_type: newWorkflowStatusInput.entityType,
       })
       .into('workflow_connections as wc')
       .returning('*')
@@ -308,7 +321,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       throw new GraphQLError('Could not create proposal workflow status');
     }
 
-    return this.createWorkflowConnectionObject(workflowConnectionRecord);
+    return this.createWorkflowConnectionWithStatusObject(
+      workflowConnectionRecord
+    );
   }
 
   async upsertProposalWorkflowStatuses(connections: WorkflowConnection[]) {
@@ -321,7 +336,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       sort_order: connection.sortOrder,
       droppable_group_id: connection.droppableGroupId,
       parent_droppable_group_id: connection.parentDroppableGroupId,
-      entity_type: connection.entityType,
     }));
 
     const result = await database.raw(
@@ -342,7 +356,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
   async updateWorkflowStatuses(
     workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnectionWithStatus[]> {
+  ): Promise<WorkflowConnection[]> {
     // TODO: To test
     const connectionsResult =
       await this.upsertProposalWorkflowStatuses(workflowStatuses);
@@ -351,11 +365,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       return connectionsResult.map((connection) =>
         this.createWorkflowConnectionObject({
           ...connection,
-          short_code: '',
-          name: '',
-          description: '',
-          is_default: true,
-          full_count: connectionsResult.length,
         })
       );
     } else {
@@ -366,7 +375,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     statusId: number,
     workflowId: number,
     sortOrder: number
-  ): Promise<WorkflowConnectionWithStatus> {
+  ): Promise<WorkflowConnection> {
     // TODO: To test
     const removeWorkflowConnectionQuery = database('workflow_connections')
       .where('workflow_id', workflowId)
@@ -386,11 +395,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         // NOTE: I need this object only to be able to reorder and update other statuses in the logic layer.
         return this.createWorkflowConnectionObject({
           ...workflowStatus[0],
-          short_code: '',
-          name: '',
-          description: '',
-          is_default: true,
-          full_count: 1,
         });
       }
     );
@@ -402,8 +406,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     return new StatusChangingEvent(
       statusChangingEvent.status_changing_event_id,
       statusChangingEvent.workflow_connection_id,
-      statusChangingEvent.status_changing_event,
-      statusChangingEvent.entity_type
+      statusChangingEvent.status_changing_event
     );
   }
 
@@ -412,11 +415,26 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]> {
     // TODO: To test
+    const workflowConnection = await database
+      .select()
+      .from('workflow_connections')
+      .where('workflow_connection_id', workflowConnectionId)
+      .first()
+      .then((workflowConnection: WorkflowConnectionRecord | null) =>
+        workflowConnection
+          ? this.createWorkflowConnectionObject(workflowConnection)
+          : null
+      );
+
+    if (!workflowConnection) {
+      throw new GraphQLError(
+        `Could not find workflow connection with id: ${workflowConnectionId}`
+      );
+    }
 
     const eventsToInsert = statusChangingEvents.map((statusChangingEvent) => ({
       workflow_connection_id: workflowConnectionId,
       status_changing_event: statusChangingEvent,
-      entity_type: 'proposal', //TODO: This needs to be generalised for proposal and experiment. Fetch the Entity type from the workflow connection and use it
     }));
 
     await database('status_changing_events')
@@ -434,16 +452,15 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       ) || []
     );
   }
+
   async getStatusChangingEventsByConnectionIds(
-    workflowConnectionIds: number[],
-    entityType: StatusChangingEvent['entityType']
+    workflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
     // TODO: To test
     return database
       .select('*')
       .from('status_changing_events')
       .whereIn('workflow_connection_id', workflowConnectionIds)
-      .andWhere('entity_type', entityType)
       .then((statusChangingEvents: StatusChangingEventRecord[]) => {
         return statusChangingEvents.map((statusChangingEvent) =>
           this.createStatusChangingEventObject(statusChangingEvent)

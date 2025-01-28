@@ -6,7 +6,6 @@ mutation addWorkflowStatus(
   $statusId: Int!
   $nextStatusId: Int
   $prevStatusId: Int
-  $entityType: String!
 ) {
   addWorkflowStatus(
     newWorkflowStatusInput: {
@@ -17,7 +16,6 @@ mutation addWorkflowStatus(
       statusId: $statusId
       nextStatusId: $nextStatusId
       prevStatusId: $prevStatusId
-      entityType: $entityType
     }
   ) {
     id

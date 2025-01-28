@@ -35,7 +35,6 @@ export const getProposalWorkflowConnectionByStatusId = (
   return workflowDataSource.getWorkflowConnectionsById(
     proposalWorkflowId,
     proposalStatusId,
-    'proposal',
     { prevStatusId }
   );
 };
@@ -87,8 +86,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
       );
     const newStatusChangingEvents =
       await workflowDataSource.getStatusChangingEventsByConnectionIds(
-        nextNextWorkflowConnections.map((connection) => connection.id),
-        'proposal'
+        nextNextWorkflowConnections.map((connection) => connection.id)
       );
 
     if (!proposalWithEvents.proposalEvents) {
@@ -219,8 +217,7 @@ export const workflowEngine = async (
 
             const statusChangingEvents =
               await workflowDataSource.getStatusChangingEventsByConnectionIds(
-                nextWorkflowConnections.map((connection) => connection.id),
-                'proposal'
+                nextWorkflowConnections.map((connection) => connection.id)
               );
 
             if (!statusChangingEvents) {

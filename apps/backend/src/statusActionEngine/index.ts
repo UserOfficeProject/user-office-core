@@ -41,8 +41,7 @@ export const statusActionEngine = async (
       const proposalStatusActions =
         await statusActionsDataSource.getConnectionStatusActions(
           currentConnection.id,
-          currentConnection.workflowId,
-          'proposal'
+          currentConnection.workflowId
         );
 
       if (!proposalStatusActions?.length) {

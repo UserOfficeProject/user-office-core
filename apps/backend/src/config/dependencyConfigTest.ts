@@ -28,11 +28,13 @@ import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventD
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
 import { StatusActionsLogsDataSourceMock } from '../datasources/mockups/StatusActionsLogsDataSource';
+import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
@@ -66,6 +68,8 @@ mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSourceMock
 );
+mapClass(Tokens.WorkflowDataSource, WorkflowDataSourceMock);
+mapClass(Tokens.StatusDataSource, StatusDataSourceMock);
 mapClass(Tokens.StatusActionsDataSource, StatusActionsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
 mapClass(Tokens.RedeemCodesDataSource, RedeemDataSourceMock);

@@ -28,7 +28,6 @@ export default class PostgresProposalSettingsDataSource
         'w.workflow_id': 'c.proposal_workflow_id',
       })
       .where('c.call_id', callId)
-      .andWhere('w.entity_type', 'proposal')
       .first()
       .then((proposalWorkflow: WorkflowRecord | null) =>
         proposalWorkflow

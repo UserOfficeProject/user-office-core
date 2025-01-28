@@ -119,20 +119,20 @@ context('Proposal tests', () => {
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
       });
-      cy.createProposalWorkflow({
+      cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
+        entityType: 'proposal',
       }).then((result) => {
-        if (result.createProposalWorkflow) {
-          cy.addProposalWorkflowStatus({
+        if (result.createWorkflow) {
+          cy.addWorkflowStatus({
             droppableGroupId: 'proposalWorkflowConnections_0',
-            proposalStatusId:
-              initialDBData.proposalStatuses.feasibilityReview.id,
-            proposalWorkflowId: result.createProposalWorkflow.id,
+            statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+            workflowId: result.createWorkflow.id,
             sortOrder: 1,
             prevStatusId: 1,
           });
-          createdWorkflowId = result.createProposalWorkflow.id;
+          createdWorkflowId = result.createWorkflow.id;
         }
       });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
@@ -1018,12 +1018,13 @@ context('Proposal tests', () => {
         groupId: TemplateGroupId.PROPOSAL_ESI,
       });
 
-      cy.createProposalWorkflow({
+      cy.createWorkflow({
         name: proposalInternalWorkflow.name,
         description: proposalInternalWorkflow.description,
+        entityType: 'proposal',
       }).then((result) => {
-        if (result.createProposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.id;
+        if (result.createWorkflow) {
+          createdWorkflowId = result.createWorkflow.id;
         }
       });
     });
@@ -1430,12 +1431,13 @@ context('Proposal tests', () => {
         name: 'Proposal Template with Instrument Picker',
         groupId: TemplateGroupId.PROPOSAL_ESI,
       });
-      cy.createProposalWorkflow({
+      cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
+        entityType: 'proposal',
       }).then((result) => {
-        if (result.createProposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.id;
+        if (result.createWorkflow) {
+          createdWorkflowId = result.createWorkflow.id;
         }
       });
       cy.createInstrument(instrument).then((result) => {

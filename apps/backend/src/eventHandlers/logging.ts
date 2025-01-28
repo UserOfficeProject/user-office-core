@@ -131,8 +131,7 @@ export default function createHandler() {
           await Promise.all(
             event.proposals.proposals.map(async (proposal) => {
               const proposalStatus = await statusDataSource.getStatus(
-                proposal.statusId,
-                'proposal'
+                proposal.statusId
               );
 
               const description = `Status changed to: ${proposalStatus?.name}`;

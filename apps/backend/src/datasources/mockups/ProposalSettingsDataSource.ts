@@ -10,11 +10,6 @@ export const dummyProposalStatuses = [
   new ProposalStatus(1, 'DRAFT', 'Draft', '', true),
   new ProposalStatus(2, 'FEASIBILITY_REVIEW', 'Feasibility review', '', true),
 ];
-export const dummyProposalWorkflow = new ProposalWorkflow(
-  1,
-  'Test workflow',
-  'This is description'
-);
 
 export const dummyWorkflow = new Workflow(
   1,
@@ -23,7 +18,7 @@ export const dummyWorkflow = new Workflow(
   'proposal'
 );
 
-export const dummyProposalWorkflowConnection = new WorkflowConnectionWithStatus(
+export const dummyWorkflowConnection = new WorkflowConnectionWithStatus(
   1,
   1,
   1,
@@ -39,28 +34,26 @@ export const dummyProposalWorkflowConnection = new WorkflowConnectionWithStatus(
   null,
   null,
   'proposalWorkflowConnections_0',
-  null,
-  'proposal'
+  null
 );
 
-export const anotherDummyProposalWorkflowConnection =
-  new ProposalWorkflowConnection(
-    2,
-    2,
-    1,
-    2,
-    {
-      id: 2,
-      shortCode: 'TEST_STATUS_2',
-      name: 'Test status 2',
-      description: 'Test status 2',
-      isDefault: false,
-    },
-    null,
-    1,
-    'proposalWorkflowConnections_0',
-    null
-  );
+export const anotherProposalWorkflowConnection = new ProposalWorkflowConnection(
+  2,
+  2,
+  1,
+  2,
+  {
+    id: 2,
+    shortCode: 'TEST_STATUS_2',
+    name: 'Test status 2',
+    description: 'Test status 2',
+    isDefault: false,
+  },
+  null,
+  1,
+  'proposalWorkflowConnections_0',
+  null
+);
 
 export class ProposalSettingsDataSourceMock
   implements ProposalSettingsDataSource
@@ -68,6 +61,6 @@ export class ProposalSettingsDataSourceMock
   async getProposalWorkflowByCall(
     callId: number
   ): Promise<ProposalWorkflow | null> {
-    return dummyProposalWorkflow;
+    return dummyWorkflow;
   }
 }

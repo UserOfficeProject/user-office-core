@@ -33,9 +33,6 @@ export class AddWorkflowStatusInput implements Partial<WorkflowConnection> {
 
   @Field(() => Int, { nullable: true })
   public prevStatusId: number | null;
-
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
 }
 
 @Resolver()

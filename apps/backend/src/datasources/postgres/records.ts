@@ -618,14 +618,12 @@ export interface WorkflowConnectionRecord {
   readonly prev_status_id: number | null;
   readonly droppable_group_id: string;
   readonly parent_droppable_group_id: string;
-  readonly entity_type: 'proposal' | 'experiment';
 }
 
 export interface StatusChangingEventRecord {
   readonly status_changing_event_id: number;
   readonly workflow_connection_id: number;
   readonly status_changing_event: string;
-  readonly entity_type: 'proposal' | 'experiment';
 }
 
 export interface FapMeetingDecisionRecord {
@@ -791,7 +789,6 @@ export interface WorkflowConnectionHasActionsRecord {
   readonly action_id: number;
   readonly workflow_id: number;
   readonly config: string;
-  readonly entity_type: 'proposal' | 'experiment';
 }
 
 export interface ProposalInternalCommentRecord {

@@ -42,9 +42,6 @@ export class WorkflowConnection
 
   @Field()
   public droppableGroupId: string;
-
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
 }
 
 @ObjectType()
@@ -69,8 +66,7 @@ export class WorkflowConnectionResolver {
     const statusChangingEvents =
       await context.queries.workflow.getStatusChangingEventsByConnectionId(
         context.user,
-        workflowConnection.id,
-        workflowConnection.entityType
+        workflowConnection.id
       );
 
     return isRejection(statusChangingEvents) ? [] : statusChangingEvents;
@@ -87,8 +83,7 @@ export class WorkflowConnectionResolver {
         {
           connectionId: workflowConnection.id,
           workflowId: workflowConnection.workflowId,
-        },
-        workflowConnection.entityType
+        }
       );
 
     return isRejection(statusActions) ? [] : statusActions;

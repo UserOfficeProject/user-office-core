@@ -70,7 +70,6 @@ export function usePersistWorkflowEditorModel() {
           statusId,
           nextStatusId,
           prevStatusId,
-          entityType: 'proposal',
         })
         .then((data) => data.addWorkflowStatus);
     };
@@ -87,7 +86,6 @@ export function usePersistWorkflowEditorModel() {
           from,
           to,
           workflowId,
-          entityType: 'proposal',
         })
         .then((data) => data.moveWorkflowStatus);
     };
@@ -104,7 +102,6 @@ export function usePersistWorkflowEditorModel() {
           statusId,
           workflowId,
           sortOrder,
-          entityType: 'proposal',
         })
         .then((data) => data.deleteWorkflowStatus);
     };
@@ -136,7 +133,6 @@ export function usePersistWorkflowEditorModel() {
           actions: statusActions,
           workflowId: workflowConnection.workflowId,
           connectionId: workflowConnection.id,
-          entityType: 'proposal',
         })
         .then((data) => data.addConnectionStatusActions);
     };

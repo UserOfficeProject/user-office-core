@@ -12,7 +12,7 @@ import * as yup from 'yup';
 import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
 import { Event } from 'generated/sdk';
-import { useProposalEventsData } from 'hooks/settings/useProposalEventsData';
+import { useEventsData } from 'hooks/settings/useEventsData';
 import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
 const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
@@ -28,6 +28,7 @@ type AddStatusChangingEventsToConnectionProps = {
   statusChangingEvents?: Event[];
   statusName?: string;
   isLoading: boolean;
+  entityType: 'proposal' | 'experiment';
 };
 
 const AddStatusChangingEventsToConnection = ({
@@ -35,9 +36,10 @@ const AddStatusChangingEventsToConnection = ({
   addStatusChangingEventsToConnection,
   statusName,
   isLoading,
+  entityType,
 }: AddStatusChangingEventsToConnectionProps) => {
   const theme = useTheme();
-  const { proposalEvents, loadingProposalEvents } = useProposalEventsData();
+  const { events, loadingEvents } = useEventsData(entityType);
 
   const initialValues: {
     selectedStatusChangingEvents: Event[];
@@ -85,32 +87,32 @@ const AddStatusChangingEventsToConnection = ({
               marginTop: '10px',
             }}
           >
-            {loadingProposalEvents ? (
+            {loadingEvents ? (
               <UOLoader style={{ marginLeft: '50%', marginTop: '100px' }} />
             ) : (
               <FieldArray
                 name="selectedStatusChangingEvents"
                 render={(arrayHelpers) => (
                   <>
-                    {proposalEvents.map((proposalEvent, index) => (
+                    {events.map((event, index) => (
                       <Grid key={index} item sm={6}>
                         <FormControlLabel
                           control={
                             <Checkbox
-                              id={proposalEvent.name}
+                              id={event.name}
                               name="selectedStatusChangingEvents"
-                              value={proposalEvent.name}
+                              value={event.name}
                               checked={values.selectedStatusChangingEvents.includes(
-                                proposalEvent.name
+                                event.name
                               )}
                               data-cy="status-changing-event"
                               onChange={(e) => {
                                 if (e.target.checked)
-                                  arrayHelpers.push(proposalEvent.name);
+                                  arrayHelpers.push(event.name);
                                 else {
                                   const idx =
                                     values.selectedStatusChangingEvents.indexOf(
-                                      proposalEvent.name
+                                      event.name
                                     );
                                   arrayHelpers.remove(idx);
                                 }
@@ -120,7 +122,7 @@ const AddStatusChangingEventsToConnection = ({
                               }}
                             />
                           }
-                          label={proposalEvent.name}
+                          label={event.name}
                         />
                         <Box
                           component="p"
@@ -130,7 +132,7 @@ const AddStatusChangingEventsToConnection = ({
                             color: theme.palette.grey[400],
                           }}
                         >
-                          {proposalEvent.description}
+                          {event.description}
                         </Box>
                       </Grid>
                     ))}
@@ -146,7 +148,7 @@ const AddStatusChangingEventsToConnection = ({
             <Grid item>
               <Button
                 type="submit"
-                disabled={isSubmitting || loadingProposalEvents || isLoading}
+                disabled={isSubmitting || loadingEvents || isLoading}
                 data-cy="submit"
               >
                 {isLoading && <UOLoader size={20} />}

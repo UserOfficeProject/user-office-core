@@ -7,13 +7,11 @@ import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings
 export interface StatusActionsDataSource {
   getConnectionStatusActions(
     proposalWorkflowConnectionId: number,
-    proposalWorkflowId: number,
-    entityType: ConnectionHasStatusAction['entityType']
+    proposalWorkflowId: number
   ): Promise<ConnectionHasStatusAction[]>;
   getConnectionStatusAction(
     proposalWorkflowConnectionId: number,
-    proposalStatusActionId: number,
-    entityType: ConnectionHasStatusAction['entityType']
+    proposalStatusActionId: number
   ): Promise<ConnectionHasStatusAction>;
   updateConnectionStatusAction(
     data: ConnectionHasStatusAction

@@ -22,8 +22,7 @@ export class WorkflowConnection {
     public nextStatusId: number | null,
     public prevStatusId: number | null,
     public droppableGroupId: string,
-    public parentDroppableGroupId: string | null,
-    public entityType: 'proposal' | 'experiment'
+    public parentDroppableGroupId: string | null
   ) {}
 }
 
@@ -38,8 +37,7 @@ export class WorkflowConnectionWithStatus {
     public nextStatusId: number | null,
     public prevStatusId: number | null,
     public droppableGroupId: string,
-    public parentDroppableGroupId: string | null,
-    public entityType: 'proposal' | 'experiment'
+    public parentDroppableGroupId: string | null
   ) {}
 }
 

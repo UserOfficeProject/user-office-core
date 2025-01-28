@@ -14,29 +14,29 @@ import {
 import initialDBData from './initialDBData';
 import { getE2EApi } from './utils';
 
-const createProposalWorkflow = (
-  createProposalWorkflowInput: CreateWorkflowMutationVariables
+const createWorkflow = (
+  createWorkflowInput: CreateWorkflowMutationVariables
 ): Cypress.Chainable<CreateWorkflowMutation> => {
   const api = getE2EApi();
-  const request = api.createWorkflow(createProposalWorkflowInput);
+  const request = api.createWorkflow(createWorkflowInput);
 
   return cy.wrap(request);
 };
 
-const createProposalStatus = (
-  createProposalStatusInput: CreateStatusMutationVariables
+const createStatus = (
+  createStatusInput: CreateStatusMutationVariables
 ): Cypress.Chainable<CreateStatusMutation> => {
   const api = getE2EApi();
-  const request = api.createStatus(createProposalStatusInput);
+  const request = api.createStatus(createStatusInput);
 
   return cy.wrap(request);
 };
 
-const addProposalWorkflowStatus = (
-  addProposalWorkflowStatusInput: AddWorkflowStatusMutationVariables
+const addWorkflowStatus = (
+  addWorkflowStatusInput: AddWorkflowStatusMutationVariables
 ): Cypress.Chainable<AddWorkflowStatusMutation> => {
   const api = getE2EApi();
-  const request = api.addWorkflowStatus(addProposalWorkflowStatusInput);
+  const request = api.addWorkflowStatus(addWorkflowStatusInput);
 
   return cy.wrap(request);
 };
@@ -65,18 +65,18 @@ const addConnectionStatusActions = (
 
 const addFeasibilityReviewToDefaultWorkflow =
   (): Cypress.Chainable<AddWorkflowStatusMutation> => {
-    return cy.addProposalWorkflowStatus({
+    return cy.addWorkflowStatus({
       droppableGroupId: 'proposalWorkflowConnections_0',
-      proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-      proposalWorkflowId: 1,
+      statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      workflowId: 1,
       sortOrder: 1,
       prevStatusId: 1,
     });
   };
 
-Cypress.Commands.add('createProposalWorkflow', createProposalWorkflow);
-Cypress.Commands.add('createProposalStatus', createProposalStatus);
-Cypress.Commands.add('addProposalWorkflowStatus', addProposalWorkflowStatus);
+Cypress.Commands.add('createWorkflow', createWorkflow);
+Cypress.Commands.add('createStatus', createStatus);
+Cypress.Commands.add('addWorkflowStatus', addWorkflowStatus);
 Cypress.Commands.add(
   'addStatusChangingEventsToConnection',
   addStatusChangingEventsToConnection

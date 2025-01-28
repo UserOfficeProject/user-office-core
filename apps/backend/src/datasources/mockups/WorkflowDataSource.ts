@@ -2,88 +2,144 @@ import { Status } from '../../models/ProposalStatus';
 import { Workflow } from '../../models/ProposalWorkflow';
 import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import {
-  WorkflowConnection,
   NextAndPreviousStatuses,
   WorkflowConnectionWithStatus,
 } from '../../models/WorkflowConnections';
+import { AddWorkflowStatusInput } from '../../resolvers/mutations/settings/AddWorkflowStatusMutation';
+import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 
+export const dummyStatuses = [
+  new Status(1, 'DRAFT', 'Draft', '', true, 'proposal'),
+  new Status(
+    2,
+    'FEASIBILITY_REVIEW',
+    'Feasibility review',
+    '',
+    true,
+    'proposal'
+  ),
+];
+export const dummyWorkflow = new Workflow(
+  1,
+  'Test workflow',
+  'This is description',
+  'proposal'
+);
+
+export const dummyWorkflowConnection = new WorkflowConnectionWithStatus(
+  1,
+  1,
+  1,
+  1,
+  {
+    id: 1,
+    shortCode: 'TEST_STATUS',
+    name: 'Test status',
+    description: 'Test status',
+    isDefault: false,
+    entityType: 'proposal',
+  },
+  null,
+  null,
+  'proposalWorkflowConnections_0',
+  null
+);
+
+export const anotherDummyWorkflowConnection = new WorkflowConnectionWithStatus(
+  2,
+  2,
+  1,
+  2,
+  {
+    id: 2,
+    shortCode: 'TEST_STATUS_2',
+    name: 'Test status 2',
+    description: 'Test status 2',
+    isDefault: false,
+    entityType: 'proposal',
+  },
+  null,
+  1,
+  'proposalWorkflowConnections_0',
+  null
+);
+
+export const dummyStatusChangingEvent = new StatusChangingEvent(
+  1,
+  1,
+  'PROPOSAL_SUBMITTED'
+);
+
 export class WorkflowDataSourceMock implements WorkflowDataSource {
-  //TODO: This needs to be implemented
-  createWorkflow(newWorkflowInput: Omit<Workflow, 'id'>): Promise<Workflow> {
-    throw new Error('Method not implemented.');
+  async createWorkflow(args: CreateWorkflowInput): Promise<Workflow> {
+    return dummyWorkflow;
   }
-  getWorkflow(workflowId: number): Promise<Workflow | null> {
-    throw new Error('Method not implemented.');
+
+  async getWorkflow(proposalWorkflowId: number): Promise<Workflow | null> {
+    return dummyWorkflow;
   }
-  getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]> {
-    throw new Error('Method not implemented.');
+
+  async getWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return dummyWorkflow;
   }
-  updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow> {
-    throw new Error('Method not implemented.');
+
+  async getAllWorkflows(): Promise<Workflow[]> {
+    return [dummyWorkflow];
   }
-  deleteWorkflow(workflowId: number): Promise<Workflow> {
-    throw new Error('Method not implemented.');
+
+  async updateWorkflow(proposalWorkflow: Workflow): Promise<Workflow> {
+    return dummyWorkflow;
   }
-  getWorkflowConnections(
-    workflowId: WorkflowConnection['workflowId'],
-    entityType: WorkflowConnection['entityType'],
-    droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: boolean | undefined
+
+  async deleteWorkflow(proposalWorkflowId: number): Promise<Workflow> {
+    return dummyWorkflow;
+  }
+
+  async getWorkflowConnections(
+    proposalWorkflowId: number
   ): Promise<WorkflowConnectionWithStatus[]> {
-    throw new Error('Method not implemented.');
+    return [dummyWorkflowConnection, anotherDummyWorkflowConnection];
   }
-  getWorkflowConnectionsById(
-    workflowId: WorkflowConnection['workflowId'],
-    statusId: Status['id'],
-    entityType: WorkflowConnection['entityType'],
+
+  async getWorkflowConnectionsById(
+    proposalWorkflowId: number,
+    proposalWorkflowConnectionId: number,
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]> {
-    throw new Error('Method not implemented.');
+    return [dummyWorkflowConnection];
   }
-  addWorkflowStatus(
-    newWorkflowStatusInput: Omit<WorkflowConnection, 'id'>
+
+  async addWorkflowStatus(
+    newWorkflowStatusInput: AddWorkflowStatusInput
   ): Promise<WorkflowConnectionWithStatus> {
-    throw new Error('Method not implemented.');
+    return dummyWorkflowConnection;
   }
-  updateWorkflowStatuses(
-    workflowStatuses: WorkflowConnection[]
+
+  async updateWorkflowStatuses(
+    proposalWorkflowStatuses: WorkflowConnectionWithStatus[]
   ): Promise<WorkflowConnectionWithStatus[]> {
-    throw new Error('Method not implemented.');
+    return [dummyWorkflowConnection];
   }
-  deleteWorkflowStatus(
-    statusId: number,
-    workflowId: number,
+
+  async deleteWorkflowStatus(
+    proposalStatusId: number,
+    proposalWorkflowId: number,
     sortOrder: number
   ): Promise<WorkflowConnectionWithStatus> {
-    throw new Error('Method not implemented.');
+    return dummyWorkflowConnection;
   }
-  addStatusChangingEventsToConnection(
-    workflowConnectionId: number,
+
+  async addStatusChangingEventsToConnection(
+    proposalWorkflowConnectionId: number,
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]> {
-    throw new Error('Method not implemented.');
+    return [dummyStatusChangingEvent];
   }
-  getStatusChangingEventsByConnectionIds(
-    workflowConnectionIds: number[]
+
+  async getStatusChangingEventsByConnectionIds(
+    proposalWorkflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]> {
-    throw new Error('Method not implemented.');
-  }
-  createStatus(
-    newStatusInput: Omit<Status, 'id' | 'is_default'>
-  ): Promise<Status> {
-    throw new Error('Method not implemented.');
-  }
-  getStatus(statusId: number): Promise<Status | null> {
-    throw new Error('Method not implemented.');
-  }
-  getAllStatuses(): Promise<Status[]> {
-    throw new Error('Method not implemented.');
-  }
-  updateStatus(proposalStatus: Status): Promise<Status> {
-    throw new Error('Method not implemented.');
-  }
-  deleteProposalStatus(statusId: number): Promise<Status> {
-    throw new Error('Method not implemented.');
+    return [dummyStatusChangingEvent];
   }
 }

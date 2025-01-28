@@ -20,7 +20,7 @@ import {
   EmailActionConfig as EmailActionConfigType,
   EmailActionDefaultConfig,
   ProposalStatusAction,
-  ProposalStatusActionType,
+  StatusActionType,
   RabbitMqActionDefaultConfig,
 } from 'generated/sdk';
 import { useStatusActionsData } from 'hooks/settings/useStatusActionsData';
@@ -48,7 +48,7 @@ const AddStatusActionsToConnection = ({
   const { statusActions, loadingStatusActions } = useStatusActionsData();
 
   const emailStatusActionConfig = connectionStatusActions?.find(
-    (item) => item.action.type === ProposalStatusActionType.EMAIL
+    (item) => item.action.type === StatusActionType.EMAIL
   )?.config as EmailActionConfigType;
 
   const initialValues: {
@@ -80,7 +80,7 @@ const AddStatusActionsToConnection = ({
     values: typeof initialValues
   ) => {
     switch (statusAction.type) {
-      case ProposalStatusActionType.EMAIL: {
+      case StatusActionType.EMAIL: {
         return (
           <EmailActionConfig
             emailStatusActionConfig={values.emailStatusActionConfig}
@@ -94,7 +94,7 @@ const AddStatusActionsToConnection = ({
             }
             isRecipientRequired={
               !!values.selectedStatusActions.find(
-                (item) => item.type === ProposalStatusActionType.EMAIL
+                (item) => item.type === StatusActionType.EMAIL
               ) &&
               values.emailStatusActionConfig.recipientsWithEmailTemplate
                 .length === 0
@@ -107,7 +107,7 @@ const AddStatusActionsToConnection = ({
         );
       }
 
-      case ProposalStatusActionType.RABBITMQ: {
+      case StatusActionType.RABBITMQ: {
         return (
           <RabbitMQActionConfig
             exchanges={
@@ -128,7 +128,7 @@ const AddStatusActionsToConnection = ({
       onSubmit={async (values): Promise<void> => {
         const connectionActions = values.selectedStatusActions.map((action) => {
           switch (action.type) {
-            case ProposalStatusActionType.EMAIL: {
+            case StatusActionType.EMAIL: {
               const emailStatusActionConfig = {
                 recipientsWithEmailTemplate:
                   values.emailStatusActionConfig.recipientsWithEmailTemplate,
@@ -140,7 +140,7 @@ const AddStatusActionsToConnection = ({
                 config: JSON.stringify(emailStatusActionConfig),
               };
             }
-            case ProposalStatusActionType.RABBITMQ: {
+            case StatusActionType.RABBITMQ: {
               const rabbitMQStatusActionConfig = {
                 exchanges:
                   (

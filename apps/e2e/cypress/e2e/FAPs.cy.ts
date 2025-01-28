@@ -201,11 +201,12 @@ function createWorkflowAndEsiTemplate() {
   const workflowName = faker.lorem.words(2);
   const workflowDescription = faker.lorem.words(5);
 
-  cy.createProposalWorkflow({
+  cy.createWorkflow({
     name: workflowName,
     description: workflowDescription,
+    entityType: 'proposal',
   }).then((result) => {
-    const workflow = result.createProposalWorkflow;
+    const workflow = result.createWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
       if (
@@ -214,10 +215,10 @@ function createWorkflowAndEsiTemplate() {
           .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
         'FEASIBILITY'
       ) {
-        cy.addProposalWorkflowStatus({
+        cy.addWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_0',
-          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-          proposalWorkflowId: createdWorkflowId,
+          statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+          workflowId: createdWorkflowId,
           sortOrder: 1,
           prevStatusId: 1,
         });

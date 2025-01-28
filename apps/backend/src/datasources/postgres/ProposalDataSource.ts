@@ -876,12 +876,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           FROM workflow_connections
           WHERE workflow_id = ${proposalWorkflowId}
           AND status_id = ${statusId}
-          AND 
-          entity_type = 'proposal'
         )
         AND wc.workflow_id = ${proposalWorkflowId};
-        AND wc.entity_type = 'proposal'
-        AND sce.entity_type = 'proposal'
       `
             )
             .transacting(trx)
@@ -1145,10 +1141,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .then((value) => value.proposal_workflow_id);
 
     const proposalStatus: WorkflowConnectionWithStatus[] =
-      await this.workflowDataSource.getWorkflowConnections(
-        proposalWorkflowId,
-        'proposal'
-      );
+      await this.workflowDataSource.getWorkflowConnections(proposalWorkflowId);
 
     return !!proposalStatus.find((status) =>
       status.status.shortCode.match(workflowStatus)

@@ -30,9 +30,6 @@ export class MoveWorkflowStatusInput {
 
   @Field(() => Int)
   public workflowId: number;
-
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
 }
 
 @Resolver()

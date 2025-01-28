@@ -260,7 +260,7 @@ export class ProposalAuthorization {
       checkIfInternalEditable
     );
     const proposalStatus = (
-      await this.statusDataSource.getStatus(proposal.statusId, 'proposal')
+      await this.statusDataSource.getStatus(proposal.statusId)
     )?.shortCode;
     if (
       proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||

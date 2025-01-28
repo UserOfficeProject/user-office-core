@@ -77,8 +77,7 @@ export default class StatusActionsLogsMutations {
     const statusAction =
       await this.statusActionsDataSource.getConnectionStatusAction(
         statusActionsLog.connectionId,
-        statusActionsLog.actionId,
-        'proposal'
+        statusActionsLog.actionId
       );
     if (!statusAction) {
       return rejection(

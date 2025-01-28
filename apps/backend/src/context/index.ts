@@ -21,7 +21,6 @@ import ReviewMutations from '../mutations/ReviewMutations';
 import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
-import StatusActionMutations from '../mutations/StatusActionMutations';
 import StatusActionsLogsMutations from '../mutations/StatusActionsLogsMutations';
 import StatusMutations from '../mutations/StatusMutations';
 import TechniqueMutations from '../mutations/TechniqueMutations';
@@ -43,12 +42,12 @@ import PdfTemplateQueries from '../queries/PdfTemplateQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalEsiQueries from '../queries/ProposalEsiQueries';
 import ProposalQueries from '../queries/ProposalQueries';
-import ProposalSettingsQueries from '../queries/ProposalSettingsQueries';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
 import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
 import ScheduledEventQueries from '../queries/ScheduledEventQueries';
+import SettingsQueries from '../queries/SettingsQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
 import StatusActionQueries from '../queries/StatusActionQueries';
 import StatusActionsLogsQueries from '../queries/StatusActionsLogsQueries';
@@ -89,7 +88,7 @@ interface ResolverContextQueries {
   internalReview: InternalReviewQueries;
   statusActionsLogs: StatusActionsLogsQueries;
   status: StatusQueries;
-  proposalSettings: ProposalSettingsQueries;
+  settings: SettingsQueries;
   workflow: WorkflowQueries;
   statusAction: StatusActionQueries;
 }
@@ -122,7 +121,6 @@ interface ResolverContextMutations {
   statusActionsLogs: StatusActionsLogsMutations;
   status: StatusMutations;
   workflow: WorkflowMutations;
-  statusAction: StatusActionMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

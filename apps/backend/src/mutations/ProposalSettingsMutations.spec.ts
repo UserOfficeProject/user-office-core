@@ -2,8 +2,8 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import {
-  dummyProposalWorkflow,
-  dummyProposalWorkflowConnection,
+  dummyWorkflow,
+  dummyWorkflowConnection,
 } from '../datasources/mockups/ProposalSettingsDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -21,8 +21,7 @@ const workflowMutationsInstance = container.resolve(WorkflowMutations);
 const dummyStatusChangingEvent = new StatusChangingEvent(
   1,
   1,
-  'PROPOSAL_SUBMITTED',
-  'proposal'
+  'PROPOSAL_SUBMITTED'
 );
 
 describe('Test Proposal settings mutations', () => {
@@ -86,7 +85,6 @@ describe('Test Proposal settings mutations', () => {
       name: 'update',
       description: 'update',
       isDefault: false,
-      entityType: 'proposal' as const,
     };
 
     return expect(
@@ -94,7 +92,7 @@ describe('Test Proposal settings mutations', () => {
         dummyUserOfficerWithRole,
         updatedStatus
       )
-    ).resolves.toMatchObject(updatedStatus);
+    ).resolves.toMatchObject({ ...updatedStatus, entityType: 'proposal' });
   });
 
   test('A userofficer can remove proposal status', () => {
@@ -110,7 +108,7 @@ describe('Test Proposal settings mutations', () => {
   test('A user can not create proposal workflow', async () => {
     const result = (await workflowMutationsInstance.createWorkflow(
       dummyUserWithRole,
-      dummyProposalWorkflow
+      dummyWorkflow
     )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
@@ -130,15 +128,15 @@ describe('Test Proposal settings mutations', () => {
     return expect(
       workflowMutationsInstance.createWorkflow(
         dummyUserOfficerWithRole,
-        dummyProposalWorkflow
+        dummyWorkflow
       )
-    ).resolves.toStrictEqual(dummyProposalWorkflow);
+    ).resolves.toStrictEqual(dummyWorkflow);
   });
 
   test('A user cannot update proposal workflow', async () => {
     const result = (await workflowMutationsInstance.updateWorkflow(
       dummyUserWithRole,
-      dummyProposalWorkflow
+      dummyWorkflow
     )) as Rejection;
 
     return expect(result.reason).toBe('INSUFFICIENT_PERMISSIONS');
@@ -148,9 +146,9 @@ describe('Test Proposal settings mutations', () => {
     return expect(
       workflowMutationsInstance.updateWorkflow(
         dummyUserOfficerWithRole,
-        dummyProposalWorkflow
+        dummyWorkflow
       )
-    ).resolves.toStrictEqual(dummyProposalWorkflow);
+    ).resolves.toStrictEqual(dummyWorkflow);
   });
 
   test('A userofficer can remove proposal workflow', () => {
@@ -158,16 +156,16 @@ describe('Test Proposal settings mutations', () => {
       workflowMutationsInstance.deleteWorkflow(dummyUserOfficerWithRole, {
         id: 1,
       })
-    ).resolves.toStrictEqual(dummyProposalWorkflow);
+    ).resolves.toStrictEqual(dummyWorkflow);
   });
 
   test('A userofficer can create new proposal workflow connection', () => {
     return expect(
       workflowMutationsInstance.addWorkflowStatus(
         dummyUserOfficerWithRole,
-        dummyProposalWorkflowConnection
+        dummyWorkflowConnection
       )
-    ).resolves.toStrictEqual(dummyProposalWorkflowConnection);
+    ).resolves.toStrictEqual(dummyWorkflowConnection);
   });
 
   test('A userofficer can add next status event/s to workflow connection', () => {
@@ -188,7 +186,6 @@ describe('Test Proposal settings mutations', () => {
         statusId: 1,
         workflowId: 1,
         sortOrder: 0,
-        entityType: 'proposal',
       })
     ).resolves.toStrictEqual(true);
   });

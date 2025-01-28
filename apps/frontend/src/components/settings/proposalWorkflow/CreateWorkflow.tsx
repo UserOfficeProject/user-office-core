@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { createProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow'; //TODO: This needs to be updated.
+import { createWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/Workflow'; //TODO: This needs to be updated.
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -13,15 +13,17 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 type CreateWorkflowProps = {
   close: (workflowAdded: Workflow | null) => void;
   entityType: 'proposal' | 'experiment';
+  title: string;
 };
 
-const CreateWorkflow = ({ close, entityType }: CreateWorkflowProps) => {
+const CreateWorkflow = ({ close, entityType, title }: CreateWorkflowProps) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const initialValues = {
     name: '',
     description: '',
     workflowConnections: [],
+    entityType,
   };
 
   return (
@@ -38,12 +40,12 @@ const CreateWorkflow = ({ close, entityType }: CreateWorkflowProps) => {
           close(null);
         }
       }}
-      validationSchema={createProposalWorkflowValidationSchema}
+      validationSchema={createWorkflowValidationSchema}
     >
       {() => (
         <Form>
           <Typography variant="h6" component="h1">
-            Create new workflow
+            {title}
           </Typography>
           <Field
             name="name"

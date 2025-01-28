@@ -20,9 +20,6 @@ export class DeleteWorkflowStatusInput {
 
   @Field(() => Int)
   public sortOrder: number;
-
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
 }
 
 @Resolver()

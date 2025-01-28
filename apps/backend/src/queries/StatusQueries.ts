@@ -16,12 +16,8 @@ export default class StatusQueries {
   ) {}
 
   @Authorized()
-  async getStatus(
-    agent: UserWithRole | null,
-    id: number,
-    entityType: 'proposal' | 'experiment' // TODO: This needs to be optimised
-  ) {
-    const proposalStatus = await this.dataSource.getStatus(id, entityType);
+  async getStatus(agent: UserWithRole | null, id: number) {
+    const proposalStatus = await this.dataSource.getStatus(id);
 
     return proposalStatus;
   }

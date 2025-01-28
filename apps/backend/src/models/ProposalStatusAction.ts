@@ -20,7 +20,6 @@ export class ConnectionHasStatusAction {
     public workflowId: number,
     public name: string,
     public type: StatusActionType,
-    public config: typeof ProposalStatusActionConfig | null, //TODO: This needs to be made generic
-    public entityType: 'proposal' | 'experiment'
+    public config: typeof ProposalStatusActionConfig | null //TODO: This needs to be made generic
   ) {}
 }

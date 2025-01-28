@@ -26,10 +26,12 @@ import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledE
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
+import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import StfcFapDataSource from '../datasources/stfc/StfcFapDataSource';
 import StfcInstrumentDataSource from '../datasources/stfc/StfcInstrumentDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
@@ -92,6 +94,8 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
+mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
+mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
 

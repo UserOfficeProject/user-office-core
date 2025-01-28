@@ -9,6 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { Event } from '../../events/event.enum';
 import {
   ProposalWorkflow as ProposalWorkflowOrigin,
   Workflow as WorkflowOrigin,
@@ -50,10 +51,17 @@ export class WorkflowResolver {
   ): Promise<WorkflowConnectionGroup[]> {
     const connections = await context.queries.workflow.workflowConnectionGroups(
       context.user,
-      workflow.id,
-      workflow.entityType
+      workflow.id
     );
 
     return isRejection(connections) ? [] : connections;
   }
+}
+@ObjectType()
+export class WorkflowEvent {
+  @Field(() => Event)
+  public name: Event;
+
+  @Field(() => String, { nullable: true })
+  public description: string;
 }

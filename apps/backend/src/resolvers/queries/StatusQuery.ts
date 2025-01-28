@@ -7,9 +7,6 @@ import { Status } from '../types/Status';
 export class StatusArgs {
   @Field(() => Int)
   statusId: number;
-
-  @Field(() => String)
-  entityType: 'proposal' | 'experiment';
 }
 
 @ArgsType()
@@ -22,11 +19,7 @@ export class StatusesArgs {
 export class StatusQuery {
   @Query(() => Status, { nullable: true })
   status(@Args() args: StatusArgs, @Ctx() context: ResolverContext) {
-    return context.queries.status.getStatus(
-      context.user,
-      args.statusId,
-      args.entityType
-    );
+    return context.queries.status.getStatus(context.user, args.statusId);
   }
 
   @Query(() => [Status], { nullable: true })

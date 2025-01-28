@@ -8,7 +8,12 @@ const ExperimentWorkflowsPage = () => {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        <WorkflowsTable entityType="experiment" />
+        <WorkflowsTable
+          entityType="experiment"
+          editorPath="ExperimentWorkflowEditor"
+          title="Experiment workflows"
+          createTitle="Create Experiment Workflow"
+        />
       </StyledPaper>
     </StyledContainer>
   );

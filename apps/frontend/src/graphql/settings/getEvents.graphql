@@ -1,0 +1,6 @@
+query getEvents($entityType: String!) {
+  events(entityType: $entityType) {
+    name
+    description
+  }
+}

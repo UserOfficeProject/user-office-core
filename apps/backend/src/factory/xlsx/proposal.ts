@@ -142,8 +142,7 @@ export const collectTechniqueProposalXLSXData = async (
 
   const status = await baseContext.queries.status.getStatus(
     user,
-    proposal.statusId,
-    'proposal'
+    proposal.statusId
   );
 
   return [

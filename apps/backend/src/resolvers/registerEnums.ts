@@ -99,6 +99,6 @@ export const registerEnums = () => {
     name: 'EmailStatusActionRecipients',
   });
   registerEnumType(StatusActionType, {
-    name: 'ProposalStatusActionType',
+    name: 'StatusActionType',
   });
 };

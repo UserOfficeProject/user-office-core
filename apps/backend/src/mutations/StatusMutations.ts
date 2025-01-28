@@ -1,8 +1,13 @@
+import {
+  createStatusValidationSchema,
+  deleteStatusValidationSchema,
+  updateStatusValidationSchema,
+} from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { StatusDataSource } from '../datasources/StatusDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, ValidateArgs } from '../decorators';
 import { Status } from '../models/ProposalStatus';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -17,7 +22,7 @@ export default class StatusMutations {
     private dataSource: StatusDataSource
   ) {}
 
-  // @ValidateArgs(createProposalStatusValidationSchema) //TODO: To be done
+  @ValidateArgs(createStatusValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async createStatus(
     agent: UserWithRole | null,
@@ -32,7 +37,7 @@ export default class StatusMutations {
     });
   }
 
-  // @ValidateArgs(updateProposalStatusValidationSchema) //TODO: To be done
+  @ValidateArgs(updateStatusValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async updateStatus(
     agent: UserWithRole | null,
@@ -47,7 +52,7 @@ export default class StatusMutations {
     });
   }
 
-  // @ValidateArgs(deleteProposalStatusValidationSchema) //TODO: To be done
+  @ValidateArgs(deleteStatusValidationSchema) //TODO: To be done
   @Authorized([Roles.USER_OFFICER])
   async deleteStatus(
     agent: UserWithRole | null,

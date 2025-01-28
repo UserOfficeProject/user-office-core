@@ -1,5 +1,5 @@
-query getWorkflow($workflowId: Int!, $entityType: String!) {
-  workflow(workflowId: $workflowId, entityType: $entityType) {
+query getWorkflow($workflowId: Int!) {
+  workflow(workflowId: $workflowId) {
     id
     name
     description
@@ -27,6 +27,5 @@ query getWorkflow($workflowId: Int!, $entityType: String!) {
         }
       }
     }
-    entityType
   }
 }

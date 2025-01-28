@@ -1,9 +1,9 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import {
-  createProposalStatusValidationSchema,
-  updateProposalStatusValidationSchema,
-} from '@user-office-software/duo-validation/lib/ProposalStatuses';
+  createStatusValidationSchema,
+  updateStatusValidationSchema,
+} from '@user-office-software/duo-validation/lib/Statuses';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -30,12 +30,14 @@ const CreateUpdateProposalStatus = ({
         shortCode: '',
         name: '',
         description: '',
+        entityType: 'proposal',
       };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
+        console.log('values', values);
         if (proposalStatus) {
           try {
             const { updateStatus } = await api({
@@ -53,7 +55,7 @@ const CreateUpdateProposalStatus = ({
           try {
             const { createStatus } = await api({
               toastSuccessMessage: 'Proposal status created successfully',
-            }).createStatus({ ...values, entityType: 'proposal' });
+            }).createStatus(values);
 
             close(createStatus);
           } catch (error) {
@@ -63,8 +65,8 @@ const CreateUpdateProposalStatus = ({
       }}
       validationSchema={
         proposalStatus
-          ? updateProposalStatusValidationSchema
-          : createProposalStatusValidationSchema
+          ? updateStatusValidationSchema
+          : createStatusValidationSchema
       }
     >
       {() => (

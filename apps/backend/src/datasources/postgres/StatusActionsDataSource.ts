@@ -1,6 +1,8 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
 import {
   ConnectionHasStatusAction,
   StatusAction,
@@ -14,15 +16,21 @@ import {
   RabbitMQActionConfig,
 } from '../../resolvers/types/ProposalStatusActionConfig';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
+import { WorkflowDataSource } from '../WorkflowDataSource';
 import database from './database';
 import {
   StatusActionRecord,
   WorkflowConnectionHasActionsRecord,
 } from './records';
 
+@injectable()
 export default class PostgresStatusActionsDataSource
   implements StatusActionsDataSource
 {
+  constructor(
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource
+  ) {}
   private createStatusActionConfig(
     type: StatusActionType,
     config: typeof ProposalStatusActionConfig
@@ -60,8 +68,7 @@ export default class PostgresStatusActionsDataSource
       this.createStatusActionConfig(
         actionStatusRecord.type,
         actionStatusRecord.config
-      ),
-      actionStatusRecord.entity_type
+      )
     );
   }
 
@@ -76,8 +83,7 @@ export default class PostgresStatusActionsDataSource
 
   async getConnectionStatusActions(
     workflowConnectionId: number,
-    workflowId: number,
-    entityType: ConnectionHasStatusAction['entityType']
+    workflowId: number
   ): Promise<ConnectionHasStatusAction[]> {
     const statusActionRecords: (StatusActionRecord &
       WorkflowConnectionHasActionsRecord & {
@@ -89,8 +95,7 @@ export default class PostgresStatusActionsDataSource
         'wca.action_id': 'sa.status_action_id',
       })
       .where('wca.workflow_id', workflowId)
-      .andWhere('wca.connection_id', workflowConnectionId)
-      .andWhere('wca.entity_type', entityType); //TODO: This needs to be retrieved from the Workflow connection or Workflow
+      .andWhere('wca.connection_id', workflowConnectionId);
 
     const statusActions = statusActionRecords.map((statusActionRecord) =>
       this.createConnectionStatusActionObject(statusActionRecord)
@@ -101,8 +106,7 @@ export default class PostgresStatusActionsDataSource
 
   async getConnectionStatusAction(
     workflowConnectionId: number,
-    statusActionId: number,
-    entityType: ConnectionHasStatusAction['entityType']
+    statusActionId: number
   ): Promise<ConnectionHasStatusAction> {
     const statusActionRecord: StatusActionRecord &
       WorkflowConnectionHasActionsRecord & {
@@ -115,7 +119,6 @@ export default class PostgresStatusActionsDataSource
       })
       .where('wca.action_id', statusActionId)
       .andWhere('wca.connection_id', workflowConnectionId)
-      .andWhere('wca.entity_type', entityType)
       .first();
 
     if (!statusActionRecord) {
@@ -182,13 +185,22 @@ export default class PostgresStatusActionsDataSource
   async addConnectionStatusActions(
     connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null> {
+    const workflow = await this.workflowDataSource.getWorkflow(
+      connectionStatusActionsInput.workflowId
+    );
+
+    if (!workflow) {
+      throw new Rejection('Workflow not found', {
+        connectionStatusActionsInput,
+      });
+    }
+
     const connectionStatusActionsToInsert =
       connectionStatusActionsInput.actions.map((item) => ({
         connection_id: connectionStatusActionsInput.connectionId,
         action_id: item.actionId,
         workflow_id: connectionStatusActionsInput.workflowId,
         config: item.config,
-        entity_type: connectionStatusActionsInput.entityType,
       }));
     const connectionHasStatusActions:
       | (WorkflowConnectionHasActionsRecord &
@@ -203,7 +215,6 @@ export default class PostgresStatusActionsDataSource
             .from('workflow_connection_has_actions')
             .where('connection_id', connectionStatusActionsInput.connectionId)
             .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
-            .andWhere('entity_type', connectionStatusActionsInput.entityType)
             .transacting(trx);
 
           return await trx.commit(removedActions);
@@ -212,7 +223,6 @@ export default class PostgresStatusActionsDataSource
           .select('*')
           .from('workflow_connection_has_actions')
           .where('connection_id', connectionStatusActionsInput.connectionId) //TODO: ADD .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
-          .andWhere('entity_type', connectionStatusActionsInput.entityType)
           .transacting(trx)
           .then((results: WorkflowConnectionHasActionsRecord[]) => {
             return results.map((result) => result.action_id);
@@ -232,7 +242,6 @@ export default class PostgresStatusActionsDataSource
             .whereIn('action_id', connectionStatusActionsIdsToRemove)
             .where('connection_id', connectionStatusActionsInput.connectionId)
             .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
-            .andWhere('entity_type', connectionStatusActionsInput.entityType)
             .transacting(trx);
         }
         await database('workflow_connection_has_actions')
@@ -251,7 +260,6 @@ export default class PostgresStatusActionsDataSource
             'wca.action_id': 'sa.status_action_id ',
           })
           .where('wca.connection_id', connectionStatusActionsInput.connectionId)
-          .andWhere('wca.entity_type', connectionStatusActionsInput.entityType)
           .transacting(trx);
 
         return await trx.commit(insertedStatusActions);

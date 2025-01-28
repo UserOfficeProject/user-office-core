@@ -1,15 +1,12 @@
 import { Query, Ctx, Resolver, Int, ArgsType, Field, Args } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Workflow } from '../types/Workflow';
+import { Workflow, WorkflowEvent } from '../types/Workflow';
 
 @ArgsType()
 export class WorkflowArgs {
   @Field(() => Int)
   workflowId: number;
-
-  @Field(() => String)
-  entityType: 'proposal' | 'experiment';
 }
 
 @ArgsType()
@@ -22,11 +19,7 @@ export class WorkflowsArgs {
 export class WorkflowQuery {
   @Query(() => Workflow, { nullable: true })
   workflow(@Args() args: WorkflowArgs, @Ctx() context: ResolverContext) {
-    return context.queries.workflow.getWorkflow(
-      context.user,
-      args.workflowId,
-      args.entityType
-    );
+    return context.queries.workflow.getWorkflow(context.user, args.workflowId);
   }
 
   @Query(() => [Workflow], { nullable: true })
@@ -35,5 +28,12 @@ export class WorkflowQuery {
       context.user,
       args.entityType
     );
+  }
+
+  @Query(() => [WorkflowEvent], {
+    nullable: true,
+  })
+  events(@Args() args: WorkflowsArgs, @Ctx() context: ResolverContext) {
+    return context.queries.settings.getAllEvents(context.user, args.entityType);
   }
 }

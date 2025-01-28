@@ -36,13 +36,12 @@ const WorkflowEditor = ({
     };
   };
   const { persistModel, isLoading } = usePersistWorkflowEditorModel();
-  const { state, dispatch } = WorkflowEditorModel([
+  const { state, dispatch } = WorkflowEditorModel(entityType, [
     persistModel,
     reducerMiddleware,
   ]);
-
+  console.log({ state });
   const workflowConnectionsPartOfWorkflow: WorkflowConnection[] = [];
-
   state.workflowConnectionGroups.forEach((workflowConnectionGroup) =>
     workflowConnectionsPartOfWorkflow.push(
       ...workflowConnectionGroup.connections
@@ -240,6 +239,7 @@ const WorkflowEditor = ({
                 dispatch={dispatch}
                 isLoading={isLoading}
                 workflowStatusConnectionGroups={state.workflowConnectionGroups}
+                entityType={entityType}
               />
             </Grid>
             <Grid item xs={3}>

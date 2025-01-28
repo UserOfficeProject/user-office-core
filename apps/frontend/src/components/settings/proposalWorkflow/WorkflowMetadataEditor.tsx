@@ -2,7 +2,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import { updateProposalWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/ProposalWorkflow';
+import { updateWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/Workflow';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
 
@@ -53,7 +53,7 @@ const WorkflowMetadataEditor = ({
   const inputJSX = (
     <Formik
       initialValues={workflow}
-      validationSchema={updateProposalWorkflowValidationSchema}
+      validationSchema={updateWorkflowValidationSchema}
       onSubmit={async (values): Promise<void> => {
         dispatch({
           type: EventType.UPDATE_WORKFLOW_METADATA_REQUESTED,

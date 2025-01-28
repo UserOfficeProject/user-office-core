@@ -126,8 +126,7 @@ export class ProposalResolver {
   ): Promise<Status | null> {
     return await context.queries.status.getStatus(
       context.user,
-      proposal.statusId,
-      'proposal'
+      proposal.statusId
     );
   }
 

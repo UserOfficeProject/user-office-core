@@ -2,14 +2,12 @@ mutation addConnectionStatusActions(
   $connectionId: Int!
   $workflowId: Int!
   $actions: [ConnectionHasActionsInput!]!
-  $entityType: String!
 ) {
   addConnectionStatusActions(
     newConnectionStatusActionsInput: {
       connectionId: $connectionId
       workflowId: $workflowId
       actions: $actions
-      entityType: $entityType
     }
   ) {
     ...connectionStatusAction

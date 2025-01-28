@@ -40,6 +40,7 @@ export interface Event {
 }
 
 const WorkflowEditorModel = (
+  entityType: 'proposal' | 'experiment',
   middlewares?: Array<ReducerMiddleware<Workflow, Event>>
 ) => {
   const { workflowId } = useParams<{ workflowId: string }>();
@@ -48,7 +49,7 @@ const WorkflowEditorModel = (
     name: '',
     description: '',
     workflowConnectionGroups: [],
-    entityType: 'proposal', // NOTE: This is hardcoded for now
+    entityType: entityType, // NOTE: This is hardcoded for now
   };
 
   const findGroupIndexByGroupId = (
@@ -269,7 +270,7 @@ const WorkflowEditorModel = (
 
           for (let index = 0; index < action.payload.numberOfColumns; index++) {
             groupsToAdd.push({
-              groupId: `proposalWorkflowConnections_${lastGroupId + index + 1}`,
+              groupId: `${entityType}WorkflowConnections_${lastGroupId + index + 1}`,
               parentGroupId: action.payload.parentDroppableId,
               connections: [],
             });
@@ -302,13 +303,12 @@ const WorkflowEditorModel = (
     api()
       .getWorkflow({
         workflowId: parseInt(workflowId),
-        entityType: 'proposal', // NOTE: This is hardcoded for now
       })
       .then((data) => {
         // NOTE: Push at least one group to have initial droppable if new proposal workflow
         if (data.workflow?.workflowConnectionGroups.length === 0) {
           data.workflow.workflowConnectionGroups.push({
-            groupId: 'proposalWorkflowConnections_0',
+            groupId: `${entityType}WorkflowConnections_0`,
             parentGroupId: null,
             connections: [],
           });

@@ -40,16 +40,12 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return this.createStatusObject(addedStatus);
   }
-  async getStatus(
-    statusId: number,
-    entityType: Status['entityType']
-  ): Promise<Status | null> {
+  async getStatus(statusId: number): Promise<Status | null> {
     // TODO: To test
     const status: StatusRecord = await database
       .select()
       .from('statuses')
       .where('status_id', statusId)
-      .andWhere('entity_type', entityType) // TODO: This where condition is rendundant everywhere. Check if there is a way to set it one time
       .first();
 
     return status ? this.createStatusObject(status) : null;

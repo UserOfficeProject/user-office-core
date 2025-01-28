@@ -39,9 +39,6 @@ export class AddConnectionStatusActionsInput
 
   @Field(() => [ConnectionHasActionsInput])
   public actions: ConnectionHasActionsInput[];
-
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
 }
 
 @Resolver()

@@ -22,7 +22,6 @@ import ReviewMutations from './mutations/ReviewMutations';
 import SampleEsiMutations from './mutations/SampleEsiMutations';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
-import StatusActionMutations from './mutations/StatusActionMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
 import StatusMutations from './mutations/StatusMutations';
 import TechniqueMutations from './mutations/TechniqueMutations';
@@ -44,12 +43,12 @@ import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
 import ProposalQueries from './queries/ProposalQueries';
-import ProposalSettingsQueries from './queries/ProposalSettingsQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
 import SampleEsiQueries from './queries/SampleEsiQueries';
 import SampleQueries from './queries/SampleQueries';
 import ScheduledEventQueries from './queries/ScheduledEventQueries';
+import SettingsQueries from './queries/SettingsQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import StatusActionQueries from './queries/StatusActionQueries';
 import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
@@ -93,7 +92,7 @@ const context: BasicResolverContext = {
     status: container.resolve(StatusQueries),
     workflow: container.resolve(WorkflowQueries),
     statusAction: container.resolve(StatusActionQueries),
-    proposalSettings: container.resolve(ProposalSettingsQueries),
+    settings: container.resolve(SettingsQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -123,7 +122,6 @@ const context: BasicResolverContext = {
     statusActionsLogs: container.resolve(StatusActionsLogsMutations),
     status: container.resolve(StatusMutations),
     workflow: container.resolve(WorkflowMutations),
-    statusAction: container.resolve(StatusActionMutations),
   },
   clients: {
     scheduler: async () => {

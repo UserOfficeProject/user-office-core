@@ -29,6 +29,7 @@ type WorkflowConnectionsEditorProps = {
   dispatch: React.Dispatch<Event>;
   isLoading: boolean;
   confirm: WithConfirmType;
+  entityType: 'proposal' | 'experiment';
 };
 
 type WorkflowConnectionGroupWithSubGroups = WorkflowConnectionGroup & {
@@ -40,6 +41,7 @@ const WorkflowConnectionsEditor = ({
   dispatch,
   isLoading,
   confirm,
+  entityType,
 }: WorkflowConnectionsEditorProps) => {
   const theme = useTheme();
   const [openNewRowDialog, setOpenNewRowDialog] = useState(false);
@@ -124,10 +126,9 @@ const WorkflowConnectionsEditor = ({
   };
 
   const isVeryFirstDraftStatus = (workflowConnection: WorkflowConnection) =>
-    workflowConnection.status.id === 1 &&
-    workflowConnection.status.shortCode === 'DRAFT' &&
     workflowConnection.sortOrder === 0 &&
-    workflowConnection.droppableGroupId === 'proposalWorkflowConnections_0'; //TODO: This needs to be generalized
+    workflowConnection.droppableGroupId ===
+      `${entityType}WorkflowConnections_0`;
 
   const getUniqueKey = (workflowConnection: WorkflowConnection) => {
     return `${workflowConnection.status.shortCode}_${
@@ -380,6 +381,7 @@ const WorkflowConnectionsEditor = ({
         setWorkflowConnection={setWorkflowConnection}
         dispatch={dispatch}
         isLoading={isLoading}
+        entityType={entityType}
       />
       <Grid
         item

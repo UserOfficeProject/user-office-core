@@ -1,6 +1,0 @@
-query getProposalEvents {
-  proposalEvents {
-    name
-    description
-  }
-}

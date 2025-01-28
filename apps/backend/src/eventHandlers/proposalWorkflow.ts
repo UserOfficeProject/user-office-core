@@ -33,12 +33,10 @@ const publishProposalStatusChange = async (
   updatedProposals.map(async (updatedProposal) => {
     if (updatedProposal) {
       const proposalStatus = await statusDataSource.getStatus(
-        updatedProposal.statusId,
-        'proposal'
+        updatedProposal.statusId
       );
       const previousProposalStatus = await statusDataSource.getStatus(
-        updatedProposal.prevStatusId,
-        'proposal'
+        updatedProposal.prevStatusId
       );
 
       return eventBus.publish({

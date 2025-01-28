@@ -2,14 +2,12 @@ mutation deleteWorkflowStatus(
   $statusId: Int!
   $workflowId: Int!
   $sortOrder: Int!
-  $entityType: String!
 ) {
   deleteWorkflowStatus(
     deleteWorkflowStatusInput: {
       statusId: $statusId
       workflowId: $workflowId
       sortOrder: $sortOrder
-      entityType: $entityType
     }
   )
 }

@@ -4,10 +4,7 @@ export interface StatusDataSource {
   createStatus(
     newStatusInput: Omit<Status, 'id' | 'isDefault'>
   ): Promise<Status>;
-  getStatus(
-    statusId: number,
-    entityType: Status['entityType']
-  ): Promise<Status | null>;
+  getStatus(statusId: number): Promise<Status | null>;
   getAllStatuses(entityType: Status['entityType']): Promise<Status[]>;
   updateStatus(proposalStatus: Omit<Status, 'entityType'>): Promise<Status>;
   deleteStatus(statusId: number): Promise<Status>;

@@ -288,9 +288,10 @@ context('Technique tests', () => {
         groupId: TemplateGroupId.PROPOSAL,
       });
 
-      cy.createProposalWorkflow({
+      cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
+        entityType: 'proposal',
       });
 
       cy.createTechnique(technique1).then((result) => {
