@@ -95,8 +95,6 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
       !(isUserOfficer || fapSecOrChairCanEdit)) ||
     isInternalReviewer;
 
-  //console.log('ShouldDisableForm: ', shouldDisableForm);
-
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
