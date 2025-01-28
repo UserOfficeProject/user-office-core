@@ -4,6 +4,8 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
 import { Tokens } from '../config/Tokens';
+import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, EventBus } from '../decorators';
@@ -15,10 +17,15 @@ import {
 import { AnswerBasic } from '../models/Questionary';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { rejection } from '../models/Rejection';
+import { DataType } from '../models/Template';
 import { UserJWT, UserWithRole } from '../models/User';
-import { AnswerTopicArgs } from '../resolvers/mutations/AnswerTopicMutation';
+import {
+  AnswerInput,
+  AnswerTopicArgs,
+} from '../resolvers/mutations/AnswerTopicMutation';
 import { CreateQuestionaryArgs } from '../resolvers/mutations/CreateQuestionaryMutation';
 import { UpdateAnswerArgs } from '../resolvers/mutations/UpdateAnswerMutation';
+import { SubTemplateConfig } from '../resolvers/types/FieldConfig';
 
 @injectable()
 export default class QuestionaryMutations {
@@ -28,13 +35,19 @@ export default class QuestionaryMutations {
     @inject(Tokens.QuestionaryDataSource)
     private dataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    private templateDataSource: TemplateDataSource
+    private templateDataSource: TemplateDataSource,
+    @inject(Tokens.GenericTemplateDataSource)
+    private genericTemplateDataSource: GenericTemplateDataSource,
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource
   ) {}
 
   async deleteOldAnswers(
     templateId: number,
     questionaryId: number,
-    topicId: number
+    topicId: number,
+    answers: AnswerInput[],
+    agent: UserWithRole | null
   ) {
     const templateSteps =
       await this.templateDataSource.getTemplateSteps(templateId);
@@ -53,7 +66,107 @@ export default class QuestionaryMutations {
     const questionIds: string[] = stepQuestions.map(
       (question) => question.question.id
     );
+
+    const genericTemplateQuestions = stepQuestions.filter(
+      (step) => step.question.dataType == DataType.GENERIC_TEMPLATE
+    );
+
+    if (genericTemplateQuestions) {
+      // Confirm dependency with dependency condition
+      const unsatisfiedDependencyQues = genericTemplateQuestions.filter(
+        (genericTemplateQues) => {
+          const notSatisfiedQuestions = genericTemplateQues.dependencies.filter(
+            (dependency) => {
+              const answer = answers.find(
+                (answer) => answer.questionId === dependency.dependencyId
+              );
+
+              if (answer) {
+                const { value } = JSON.parse(answer.value);
+                if (value[0] !== dependency.condition.params) {
+                  return true;
+                }
+              }
+            }
+          );
+
+          if (notSatisfiedQuestions.length != 0) {
+            return true;
+          }
+        }
+      );
+
+      unsatisfiedDependencyQues.forEach((subTemplateQues) => {
+        const config = subTemplateQues.config as SubTemplateConfig;
+        this.deleteSubTemplatesAnswers(
+          subTemplateQues.question.id,
+          config.templateId,
+          questionaryId,
+          agent
+        );
+      });
+    }
+
     await this.dataSource.deleteAnswers(questionaryId, questionIds);
+  }
+
+  async deleteSubTemplatesAnswers(
+    questionId: string,
+    genericTemplateId: number | null,
+    questionaryId: number,
+    agent: UserWithRole | null
+  ): Promise<void> {
+    const proposal = (
+      await this.proposalDataSource.getProposals({
+        questionaryIds: [questionaryId],
+      })
+    ).proposals[0];
+
+    const genericTemplates =
+      await this.genericTemplateDataSource.getGenericTemplates(
+        {
+          filter: {
+            questionId: questionId,
+            proposalPk: proposal?.primaryKey,
+          },
+        },
+        agent
+      );
+
+    if (!genericTemplates || !genericTemplateId) {
+      return;
+    }
+
+    const templateSteps =
+      await this.templateDataSource.getTemplateSteps(genericTemplateId);
+    const genericTemplateStepQuestions = templateSteps.flatMap(
+      (step) => step.fields
+    );
+
+    if (genericTemplateStepQuestions === undefined) {
+      logger.logError('Expected to find sub template step, but was not found', {
+        genericTemplateId,
+        questionaryId,
+      });
+      throw new GraphQLError(
+        'Expected to find sub template step, but was not found'
+      );
+    }
+
+    const genericTemplateQuestionIds: string[] | undefined =
+      genericTemplateStepQuestions?.map((question) => question.question.id);
+
+    if (!genericTemplateQuestionIds) {
+      return;
+    }
+
+    genericTemplates.forEach(async (genericTemplate) => {
+      await this.dataSource.deleteAnswers(
+        genericTemplate.questionaryId,
+        genericTemplateQuestionIds
+      );
+      await this.genericTemplateDataSource.delete(genericTemplate.id);
+    });
   }
 
   @Authorized()
@@ -89,7 +202,13 @@ export default class QuestionaryMutations {
       );
     }
 
-    await this.deleteOldAnswers(template.templateId, questionaryId, topicId);
+    await this.deleteOldAnswers(
+      template.templateId,
+      questionaryId,
+      topicId,
+      answers,
+      agent
+    );
 
     const updatedAnswers: AnswerBasic[] = [];
     for (const answer of answers) {
