@@ -15,8 +15,7 @@ import {
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { TechnicalReviewContextType } from 'components/review/TechnicalReviewQuestionary';
-import { SettingsContext } from 'context/SettingsContextProvider';
-import { SettingsId, TechnicalReviewStatus, UserRole } from 'generated/sdk';
+import { TechnicalReviewStatus, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { TechnicalReviewSubmissionState } from 'models/questionary/technicalReview/TechnicalReviewSubmissionState';
@@ -36,18 +35,10 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
   ) as TechnicalReviewContextType;
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
-  const isFapChairOrSec = useCheckAccess([
-    UserRole.FAP_CHAIR,
-    UserRole.FAP_SECRETARY,
-  ]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const { settingsMap } = useContext(SettingsContext);
 
-  const fapSecOrChairCanEdit =
-    isFapChairOrSec &&
-    settingsMap.get(SettingsId.FAP_SECS_EDIT_TECH_REVIEWS)?.settingsValue ===
-      'true';
+  const fapSecOrChairCanEdit = state?.fapChairOrSecCanEdit;
 
   const [localStatus, setLocalStatus] = useState(
     state?.technicalReview.status || ''
@@ -104,13 +95,13 @@ function QuestionaryComponentTechnicalReviewBasis(props: BasicComponentProps) {
       !(isUserOfficer || fapSecOrChairCanEdit)) ||
     isInternalReviewer;
 
+  //console.log('ShouldDisableForm: ', shouldDisableForm);
+
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
   const statusFieldId = `${id}.status`;
-  //const publicCommentFieldId = `${id}.publicComment`;
-  //const commentFieldId = `${id}.comment`;
   const timeAllocationFieldId = `${id}.timeAllocation`;
 
   return (

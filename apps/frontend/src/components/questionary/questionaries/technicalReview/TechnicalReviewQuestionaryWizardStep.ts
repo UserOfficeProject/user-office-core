@@ -5,8 +5,12 @@ import { QuestionaryWizardStep } from '../../DefaultWizardStepFactory';
 
 export class TechnicalReviewQuestionaryWizardStep extends QuestionaryWizardStep {
   isItemWithQuestionaryEditable(state: QuestionarySubmissionState) {
-    const { technicalReview } = state as TechnicalReviewSubmissionState;
+    const { technicalReview, fapChairOrSecCanEdit } =
+      state as TechnicalReviewSubmissionState;
 
-    return technicalReview.submitted === false;
+    return (
+      (state.stepIndex == 0 && fapChairOrSecCanEdit) ||
+      technicalReview.submitted === false
+    );
   }
 }

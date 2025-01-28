@@ -7,16 +7,20 @@ import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
   BasicUserDetails,
   ProposalEndStatus,
   ProposalPublicStatus,
   QuestionaryStep,
+  SettingsId,
   TechnicalReview,
   TechnicalReviewStatus,
   TemplateGroupId,
+  UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import createCustomEventHandlers from 'models/questionary/createCustomEventHandlers';
 import {
   Event,
@@ -120,13 +124,25 @@ export default function TechnicalReviewQuestionary(
   const { technicalReview, technicalReviewUpdated, previewMode } = props;
 
   const { user } = useContext(UserContext);
+  const isFapChairOrSec = useCheckAccess([
+    UserRole.FAP_CHAIR,
+    UserRole.FAP_SECRETARY,
+  ]);
+
+  const { settingsMap } = useContext(SettingsContext);
+
+  const fapSecOrChairCanEdit =
+    isFapChairOrSec &&
+    settingsMap.get(SettingsId.FAP_SECS_EDIT_TECH_REVIEWS)?.settingsValue ===
+      'true';
 
   const [initialState] = useState(
     new TechnicalReviewSubmissionState(
       technicalReview!,
       previewMode,
       user.id,
-      ''
+      '',
+      fapSecOrChairCanEdit
     )
   );
 
@@ -157,13 +173,7 @@ export default function TechnicalReviewQuestionary(
   return (
     <>
       <QuestionaryContext.Provider value={{ state, dispatch }}>
-        {/* <StyledContainer maxWidth={false}>
-          <StyledPaper elevation={elevation}> */}
-
         <Questionary title="Technical Review" previewMode={previewMode} />
-
-        {/* </StyledPaper>
-        </StyledContainer> */}
       </QuestionaryContext.Provider>
     </>
   );

@@ -27,7 +27,7 @@ BEGIN
                 , 'Technical review basic information'
                 , '{"required":false,"small_label":"","tooltip":""}'
                 , 'technical_review_basis'
-                , 10
+                , 11
             );
 
     ALTER TABLE technical_review ADD COLUMN questionary_id INTEGER REFERENCES questionaries (questionary_id);
