@@ -10,11 +10,16 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getCurrentUser } from 'context/UserContextProvider';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import {
+  BasicUserDetails,
+  GetPreviousCollaboratorsQueryVariables,
+  Invite,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
+import { usePreviousCollaborators } from 'hooks/user/usePreviousCollaborators';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
 type ValidEmail = string;
@@ -112,26 +117,20 @@ export default function InviteUser({
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<BasicUserDetails[]>([]);
   const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>([]);
-  const [previousCollaborators, setPreviousCollaborators] = useState<
-    BasicUserDetails[]
-  >([]);
+
+  const previousCollaboratorsArgs: GetPreviousCollaboratorsQueryVariables =
+    useMemo(
+      () => ({
+        userId: getCurrentUser()?.user.id as number,
+        subtractUsers: excludeUserIds || [],
+      }),
+      [excludeUserIds]
+    );
+  const previousCollaborators = usePreviousCollaborators(
+    previousCollaboratorsArgs
+  );
 
   const api = useDataApi();
-
-  useEffect(() => {
-    const userId = getCurrentUser()?.user.id as number;
-
-    api()
-      .getPreviousCollaborators({
-        userId: userId,
-        first: 0,
-        offset: 0,
-        subtractUsers: excludeUserIds,
-      })
-      .then((data) => {
-        setPreviousCollaborators(data.previousCollaborators?.users ?? []);
-      });
-  }, [api, excludeUserIds]);
 
   const fetchResults = useCallback(async () => {
     if (!query.trim().length || query.length < MIN_SEARCH_LENGTH) {
@@ -143,7 +142,10 @@ export default function InviteUser({
 
     setLoading(true);
     try {
-      const { users } = await api().getUsers({ filter: query });
+      const { users } = await api().getUsers({
+        filter: query,
+        subtractUsers: excludeUserIds,
+      });
       setOptions(users?.users || []);
     } catch (error) {
       console.error('Error fetching results:', error);
@@ -151,7 +153,7 @@ export default function InviteUser({
     } finally {
       setLoading(false);
     }
-  }, [api, query]);
+  }, [api, query, excludeUserIds]);
 
   // Debounce effect for search queries
   useEffect(() => {
@@ -162,7 +164,8 @@ export default function InviteUser({
 
   const addValidEmailToSelection = () => {
     if (isValidEmail(query)) {
-      setSelectedItems((prev) => [...prev, query]);
+      const lowerCaseEmail = query.toLowerCase();
+      setSelectedItems((prev) => [...prev, lowerCaseEmail]);
       setQuery('');
     }
   };
@@ -250,7 +253,7 @@ export default function InviteUser({
             <NoOptionsText
               query={query}
               onAddEmail={addValidEmailToSelection}
-              previousCollaborators={previousCollaborators}
+              previousCollaborators={previousCollaborators?.users ?? []}
               onAddUser={(user) => setSelectedItems((prev) => [...prev, user])}
               excludeEmails={excludeEmails}
             />

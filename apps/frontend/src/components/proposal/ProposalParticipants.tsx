@@ -68,33 +68,20 @@ const Participants = ({
 
   return (
     <Box sx={sx}>
-      {/* <ParticipantModal
-        show={modalOpen}
-        close={() => setOpen(false)}
-        addParticipants={addUsers}
-        selectedUsers={
-          !!principalInvestigator // add principal investigator if one exists
-            ? users.map((user) => user.id).concat([principalInvestigator.id])
-            : users.map((user) => user.id)
-        }
-        title={title}
-        selection={true}
-        userRole={UserRole.USER}
-        participant={true}
-        setPrincipalInvestigator={setPrincipalInvestigator}
-      /> */}
 
-      <InviteUser
-        modalOpen={modalOpen}
-        onClose={() => setOpen(false)}
-        onAddParticipants={handleAddParticipants}
-        excludeUserIds={
-          !!principalInvestigator // add principal investigator if one exists
-            ? users.map((user) => user.id).concat([principalInvestigator.id])
-            : users.map((user) => user.id)
-        }
-        excludeEmails={invites.map((invite) => invite.email)}
-      />
+      {modalOpen && (
+        <InviteUser
+          modalOpen={modalOpen}
+          onClose={() => setOpen(false)}
+          onAddParticipants={handleAddParticipants}
+          excludeUserIds={
+            !!principalInvestigator // add principal investigator if one exists
+              ? users.map((user) => user.id).concat([principalInvestigator.id])
+              : users.map((user) => user.id)
+          }
+          excludeEmails={invites.map((invite) => invite.email)}
+        />
+      )}
       <FormControl margin="dense" fullWidth>
         <Typography
           sx={{
