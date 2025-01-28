@@ -1,4 +1,4 @@
-fragment invite on InviteCode {
+fragment invite on Invite {
   id
   code
   email
