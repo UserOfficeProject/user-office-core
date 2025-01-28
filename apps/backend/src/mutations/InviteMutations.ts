@@ -54,7 +54,7 @@ export default class InviteMutations {
       agent,
       roleIds
     );
-    if (isRoleInviteAuthorized === false) {
+    if (isRoleClaimAuthorized === false) {
       return rejection(
         'User is not authorized to create invites to this user type',
         { userId: agent?.id, roleIds }
@@ -73,7 +73,7 @@ export default class InviteMutations {
       );
     }
 
-    const newCode = Math.random().toString(36).substring(2, 12).toUpperCase();
+    const newCode = this.createInviteCode();
     const newInvite = await this.inviteDataSource.create(
       agent!.id,
       newCode,
@@ -228,5 +228,47 @@ export default class InviteMutations {
       await this.userDataSource.getProposalUsers(proposalPk);
 
     return proposalUsers.some((user) => user.id === userId);
+  }
+
+  public async setCoProposerInvites(
+    user: UserWithRole | null,
+    proposalPk: number,
+    emails: string[]
+  ): Promise<Invite[]> {
+    const existingClaims =
+      await this.coProposerClaimDataSource.getByProposalPk(proposalPk);
+    const existingInvites = (await Promise.all(
+      existingClaims.map((claim) =>
+        this.inviteDataSource.findById(claim.inviteId)
+      )
+    )) as Invite[];
+    const existingEmails = existingInvites.map((invite) => invite.email);
+
+    const deletedEmails = existingEmails.filter(
+      (email) => !emails.includes(email)
+    );
+    const newEmails = emails.filter((email) => !existingEmails.includes(email));
+
+    const deletedInvites = existingInvites.filter((invite) =>
+      deletedEmails.includes(invite.email)
+    );
+
+    await Promise.all(
+      deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
+    );
+    const newInvites = await Promise.all(
+      newEmails.map((email) =>
+        this.inviteDataSource.create(user!.id, this.createInviteCode(), email)
+      )
+    );
+
+    return [
+      ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
+      ...newInvites,
+    ];
+  }
+
+  private createInviteCode() {
+    return Math.random().toString(36).substring(2, 12).toUpperCase();
   }
 }

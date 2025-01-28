@@ -11,4 +11,6 @@ export interface InviteDataSource {
     args: UpdateInviteInput &
       Partial<Pick<Invite, 'claimedAt' | 'claimedByUserId'>>
   ): Promise<Invite>;
+
+  delete(id: number): Promise<void>;
 }

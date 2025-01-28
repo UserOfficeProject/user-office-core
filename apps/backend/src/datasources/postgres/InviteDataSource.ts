@@ -76,4 +76,13 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         return createInviteObject(invites[0]);
       });
   }
+
+  async delete(id: number): Promise<void> {
+    await database('invites')
+      .where('invite_id', id)
+      .delete()
+      .catch((error: Error) => {
+        throw new Error(`Could not delete invite: ${error.message}`);
+      });
+  }
 }

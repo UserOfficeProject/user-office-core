@@ -181,11 +181,19 @@ const proposalBasisPreSubmit =
         proposerId: proposer?.id,
       });
 
+      const invites = await api.setCoProposerInvites({
+        input: {
+          proposalPk: primaryKey,
+          emails: proposal.coProposerInvites.map((invite) => invite.email),
+        },
+      });
+
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_LOADED',
         itemWithQuestionary: {
           ...proposal,
           ...result.updateProposal,
+          ...{ coProposerInvites: invites.setCoProposerInvites },
         },
       });
     } else {
@@ -199,12 +207,20 @@ const proposalBasisPreSubmit =
         users: users.map((user) => user.id),
         proposerId: proposer?.id,
       });
+
+      const invites = await api.setCoProposerInvites({
+        input: {
+          proposalPk: primaryKey,
+          emails: proposal.coProposerInvites.map((invite) => invite.email),
+        },
+      });
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_CREATED',
         itemWithQuestionary: {
           ...proposal,
           ...createProposal,
           ...updateProposal,
+          ...{ coProposerInvites: invites.setCoProposerInvites },
         },
       });
       returnValue = createProposal.questionaryId;

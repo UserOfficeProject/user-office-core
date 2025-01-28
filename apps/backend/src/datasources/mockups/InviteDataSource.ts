@@ -8,6 +8,9 @@ export class InviteDataSourceMock implements InviteDataSource {
   constructor() {
     this.init();
   }
+  async delete(id: number): Promise<void> {
+    this.invites = this.invites.filter((invite) => invite.id !== id);
+  }
 
   async findById(id: number): Promise<Invite | null> {
     return this.invites.find((invite) => invite.id === id) || null;
