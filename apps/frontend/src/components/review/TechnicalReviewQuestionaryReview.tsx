@@ -38,7 +38,7 @@ export default function TechnicalReviewQuestionaryReview(
       label: 'Comment',
       value: stripHtml(data.comment || ''),
     },
-    { label: 'Public Comment', value: stripHtml(data.comment || '') },
+    { label: 'Public Comment', value: stripHtml(data.publicComment || '') },
   ];
 
   return (

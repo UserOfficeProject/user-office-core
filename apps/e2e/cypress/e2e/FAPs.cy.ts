@@ -1356,7 +1356,7 @@ context('Fap reviews tests', () => {
 
       cy.notification({
         variant: 'success',
-        text: 'Updated',
+        text: 'Saved',
       });
     });
   });
