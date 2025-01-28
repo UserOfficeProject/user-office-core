@@ -13,7 +13,7 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { getCurrentUser } from 'context/UserContextProvider';
-import { BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
@@ -25,7 +25,7 @@ interface InviteUserProps {
   onClose?: () => void;
   onAddParticipants?: (data: {
     users: BasicUserDetails[];
-    invites: ValidEmail[];
+    invites: Invite[];
   }) => void;
   excludeUserIds?: number[];
   excludeEmails?: string[];
@@ -167,11 +167,25 @@ export default function InviteUser({
     }
   };
 
+  // Because we do not create Invite until the user submits the form, we need to construct an empty Invite object
+  const constructInviteObject = (email: string): Invite => {
+    return {
+      email: email,
+      claimedAt: null,
+      createdAt: null,
+      claimedByUserId: null,
+      code: '',
+      id: 0,
+      createdByUserId: 0,
+      note: '',
+    };
+  };
   const handleSubmit = () => {
     const { users, invites } = categorizeSelectedItems(selectedItems);
     setQuery('');
     setSelectedItems([]);
-    onAddParticipants?.({ users, invites });
+
+    onAddParticipants?.({ users, invites: invites.map(constructInviteObject) });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {

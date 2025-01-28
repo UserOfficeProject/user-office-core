@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
-import { BasicUserDetails, UserRole } from 'generated/sdk';
+import { BasicUserDetails, Invite, UserRole } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
 
 import InviteUser from './InviteUser';
@@ -20,6 +20,8 @@ type ParticipantsProps = {
   users: BasicUserDetails[];
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
+  invites: Invite[];
+  setInvites: (invites: Invite[]) => void;
   principalInvestigator?: BasicUserData | null;
   setPrincipalInvestigator?: (user: BasicUserDetails) => void;
   sx?: SxProps<Theme>;
@@ -31,6 +33,8 @@ type ParticipantsProps = {
 const Participants = ({
   users,
   setUsers,
+  invites,
+  setInvites,
   principalInvestigator,
   setPrincipalInvestigator,
   sx,
@@ -39,7 +43,6 @@ const Participants = ({
   loadingPrincipalInvestigator,
 }: ParticipantsProps) => {
   const [modalOpen, setOpen] = useState(false);
-  const [invites, setInvites] = useState<string[]>([]);
 
   const removeUser = (user: BasicUserDetails) => {
     const newUsers = users.filter((u) => u.id !== user.id);
@@ -52,15 +55,15 @@ const Participants = ({
 
   const handleAddParticipants = (props: {
     users: BasicUserDetails[];
-    invites: string[];
+    invites: Invite[];
   }) => {
     setUsers([...users, ...props.users]);
     setInvites([...invites, ...props.invites]);
     setOpen(false);
   };
 
-  const handleDeleteInvite = (invite: string) => {
-    setInvites(invites.filter((i) => i !== invite));
+  const handleDeleteInvite = (invite: Invite) => {
+    setInvites(invites.filter((i) => i.email !== invite.email));
   };
 
   return (
@@ -90,7 +93,7 @@ const Participants = ({
             ? users.map((user) => user.id).concat([principalInvestigator.id])
             : users.map((user) => user.id)
         }
-        excludeEmails={invites}
+        excludeEmails={invites.map((invite) => invite.email)}
       />
       <FormControl margin="dense" fullWidth>
         <Typography
@@ -148,8 +151,8 @@ const Participants = ({
                   color="secondary"
                   icon={<SendIcon />}
                   size="small"
-                  label={invite}
-                  key={invite}
+                  label={invite.email}
+                  key={invite.email}
                   onDelete={() => handleDeleteInvite(invite)}
                 />
               ))}

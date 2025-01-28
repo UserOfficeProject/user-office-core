@@ -14,7 +14,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
@@ -41,7 +41,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposer, users } = state.proposal;
+  const { proposer, users, coProposerInvites } = state.proposal;
   const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
   const [piData, setPIData] = useState<BasicUserDetails | null>(null);
 
@@ -59,6 +59,14 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     dispatch({
       type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
       itemWithQuestionary: { users: users },
+    });
+  };
+
+  const invitesChanged = (invites: Invite[]) => {
+    formikProps.setFieldValue(`${id}.coProposerInvites`, { ...invites });
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: { coProposerInvites: invites },
     });
   };
 
@@ -147,6 +155,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
+        invites={coProposerInvites}
+        setInvites={invitesChanged}
         loadingPrincipalInvestigator={loading}
       />
       <ErrorMessage name={`${id}.users`} />
