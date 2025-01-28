@@ -202,7 +202,7 @@ export default class InviteMutations {
     inviteId: number
   ) {
     const coProposerClaim =
-      await this.coProposerClaimDataSource.findByInviteId(inviteId);
+      await this.coProposerClaimDataSource.getByInviteId(inviteId);
 
     if (coProposerClaim === null) {
       return;
