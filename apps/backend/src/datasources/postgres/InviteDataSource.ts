@@ -55,7 +55,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         claimed_by: args.claimedByUserId,
       })
       .from('invites')
-      .where('invite_code_id', args.id)
+      .where('invite_id', args.id)
       .returning('*')
       .then((invites: InviteRecord[]) => createInviteObject(invites[0]));
   }
@@ -64,7 +64,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     return database
       .select('*')
       .from('invites')
-      .where('invite_code_id', id)
+      .where('invite_id', id)
       .catch((error: Error) => {
         throw new Error(`Could not find invite: ${error.message}`);
       })

@@ -130,7 +130,7 @@ describe('Test Invite Mutations', () => {
 
     const coProposerClaim = await container
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
-      .findByInviteId(invite.id);
+      .getByInviteId(invite.id);
 
     expect(coProposerClaim).toMatchObject({
       inviteId: invite.id,
@@ -155,7 +155,7 @@ describe('Test Invite Mutations', () => {
     const invite = response as Invite;
     const coProposerClaim = await container
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
-      .findByInviteId(invite.id);
+      .getByInviteId(invite.id);
 
     expect(coProposerClaim).toMatchObject({
       inviteId: invite.id,
@@ -181,7 +181,7 @@ describe('Test Invite Mutations', () => {
 
     const coProposerClaim = await container
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
-      .findByInviteId(invite.id);
+      .getByInviteId(invite.id);
 
     expect(coProposerClaim).toMatchObject({
       inviteId: invite.id,
@@ -244,7 +244,7 @@ describe('Test Invite Mutations', () => {
 
     const coProposerClaim = await container
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
-      .findByInviteId(1);
+      .getByInviteId(1);
 
     expect(coProposerClaim).toMatchObject({ inviteId: 1, proposalPk });
   });

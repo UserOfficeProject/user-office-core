@@ -1,11 +1,22 @@
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
 import database from './database';
+import { CoProposerClaimRecord } from './records';
 
 export default class PostgresCoProposerClaimDataSource
   implements CoProposerClaimDataSource
 {
-  async findByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
+  async getByProposalPk(proposalPk: number): Promise<CoProposerClaim[]> {
+    return database('co_proposer_claims')
+      .where({ proposal_pk: proposalPk })
+      .select('*')
+      .then((rows: CoProposerClaimRecord[]) => {
+        return rows.map((row) => {
+          return new CoProposerClaim(row.invite_id, row.proposal_pk);
+        });
+      });
+  }
+  async getByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
     return database('co_proposer_claims')
       .where({ invite_code_id: inviteId })
       .select('*')
