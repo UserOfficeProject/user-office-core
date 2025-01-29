@@ -14,12 +14,13 @@ export class InviteAuthorization {
     agent: UserWithRole | null,
     roleIds?: number[]
   ) => {
-    // If no roleIds are provided, the invite is authorized
+    // If no roleIds are provided, the invite is considered as authorized
     if (roleIds === undefined || roleIds.length === 0) return true;
 
-    const onlyUserRole = roleIds.length === 1 && roleIds[0] === UserRole.USER;
-    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    if (this.userAuth.isUserOfficer(agent)) return true;
 
-    return isUserOfficer || onlyUserRole;
+    const onlyUserRole = roleIds.length === 1 && roleIds[0] === UserRole.USER;
+
+    return onlyUserRole;
   };
 }
