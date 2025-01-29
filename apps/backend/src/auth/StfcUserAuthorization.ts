@@ -4,6 +4,12 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable, container } from 'tsyringe';
 
+import {
+  BasicPersonDetailsDTO,
+  LoginDTO,
+  RoleDTO,
+  TokenWrapperDTO,
+} from '../../generated';
 import { Tokens } from '../config/Tokens';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
@@ -11,12 +17,6 @@ import {
   toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
 import { createUOWSClient } from '../datasources/stfc/UOWSClient';
-import {
-  BasicPersonDetailsDTO,
-  LoginDTO,
-  RoleDTO,
-  TokenWrapperDTO,
-} from '../../generated';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
