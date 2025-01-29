@@ -406,15 +406,15 @@ export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
 
   const techniqueScientists: EmailReadyType[] = [];
   for (const proposal of proposals) {
-    const proposalTechiques =
+    const proposalTechniques =
       await techniqueDataSource.getTechniquesByProposalPk(proposal.primaryKey);
 
-    if (!proposalTechiques?.length) {
+    if (!proposalTechniques?.length) {
       return techniqueScientists;
     }
 
     const techniquePeople = await Promise.all(
-      proposalTechiques.map(async (proposalTechique) => {
+      proposalTechniques.map(async (proposalTechique) => {
         const techniqueContact =
           await techniqueDataSource.getTechniqueScientists(proposalTechique.id);
 
