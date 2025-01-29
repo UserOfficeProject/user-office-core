@@ -142,10 +142,16 @@ export default function InviteUser({
 
     setLoading(true);
     try {
+      const excludedUserIds = [
+        ...(excludeUserIds ?? []),
+        ...categorizeSelectedItems(selectedItems).users.map((user) => user.id),
+      ];
+
       const { users } = await api().getUsers({
         filter: query,
-        subtractUsers: excludeUserIds,
+        subtractUsers: excludedUserIds,
       });
+
       setOptions(users?.users || []);
     } catch (error) {
       console.error('Error fetching results:', error);
@@ -255,7 +261,11 @@ export default function InviteUser({
               onAddEmail={addValidEmailToSelection}
               previousCollaborators={previousCollaborators?.users ?? []}
               onAddUser={(user) => setSelectedItems((prev) => [...prev, user])}
-              excludeEmails={excludeEmails}
+              excludeEmails={
+                excludeEmails?.concat(
+                  categorizeSelectedItems(selectedItems).invites
+                ) || []
+              }
             />
           }
         />
