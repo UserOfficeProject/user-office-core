@@ -135,7 +135,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v4
         with:
-          path: apps/frontend/generated
+          path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
 
       - name: Generate frontend SDK
@@ -189,7 +189,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v4
         with:
-          path: apps/frontend/generated
+          path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
             ${{ env.FRONTEND_SDK_KEY }}
@@ -313,7 +313,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v4
         with:
-          path: apps/frontend/generated
+          path: apps/frontend/src/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
             ${{ env.FRONTEND_SDK_KEY }}
