@@ -3736,7 +3736,7 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 });
 
-context.only('Fap meeting exports test', () => {
+context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
   let proposalPK: number;
 
