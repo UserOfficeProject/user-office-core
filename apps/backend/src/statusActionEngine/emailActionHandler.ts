@@ -286,12 +286,13 @@ export const emailStatusActionRecipient = async (
     }
 
     case EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS: {
-      const TSs = await getTechniqueScientistsAndFormatOutputForEmailSending(
-        proposals,
-        recipientWithTemplate
-      );
+      const techniqueScientists =
+        await getTechniqueScientistsAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate
+        );
       await sendMail(
-        TSs,
+        techniqueScientists,
         statusActionLogger({
           connectionId: proposalStatusAction.connectionId,
           actionId: proposalStatusAction.actionId,
