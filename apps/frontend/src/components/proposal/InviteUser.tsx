@@ -21,6 +21,7 @@ import {
 import { useDataApi } from 'hooks/common/useDataApi';
 import { usePreviousCollaborators } from 'hooks/user/usePreviousCollaborators';
 import { getFullUserNameWithInstitution } from 'utils/user';
+import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 type ValidEmail = string;
 type UserOrEmail = BasicUserDetails | ValidEmail;
@@ -106,13 +107,14 @@ function NoOptionsText({
   );
 }
 
-export default function InviteUser({
+function InviteUser({
   modalOpen,
   onClose,
   onAddParticipants,
   excludeUserIds,
   excludeEmails,
-}: InviteUserProps) {
+  confirm,
+}: InviteUserProps & WithConfirmProps) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState<BasicUserDetails[]>([]);
@@ -209,6 +211,23 @@ export default function InviteUser({
   };
 
   const handleClose = () => {
+    if (selectedItems.length > 0) {
+      confirm(
+        async () => {
+          onClose?.();
+
+          return;
+        },
+        {
+          title: 'Please confirm',
+          description:
+            'User(s) have not yet been added to the proposal. Are you sure you want to close the dialog?',
+        }
+      )();
+
+      return;
+    }
+
     setQuery('');
     setSelectedItems([]);
     onClose?.();
@@ -283,3 +302,5 @@ export default function InviteUser({
     </Dialog>
   );
 }
+
+export default withConfirm(InviteUser);
