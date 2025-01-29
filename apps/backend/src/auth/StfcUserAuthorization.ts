@@ -16,7 +16,7 @@ import {
   LoginDTO,
   RoleDTO,
   TokenWrapperDTO,
-} from '../generated';
+} from '../../generated';
 import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';

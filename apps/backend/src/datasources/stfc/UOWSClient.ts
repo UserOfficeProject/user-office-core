@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 
-import { UOWS } from '../../generated';
+import { UOWS } from '../../../generated';
 
 dotenv.config({ path: process.env.CONFIG_PATH });
 

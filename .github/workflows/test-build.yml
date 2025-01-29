@@ -112,7 +112,7 @@ jobs:
         id: cached-UOWS
         uses: actions/cache@v4
         with:
-          path: apps/backend/src/generated
+          path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Generate backend UOWS
@@ -135,7 +135,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v4
         with:
-          path: apps/frontend/src/generated
+          path: apps/frontend/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
 
       - name: Generate frontend SDK
@@ -175,7 +175,7 @@ jobs:
         id: cached-UOWS
         uses: actions/cache@v4
         with:
-          path: apps/backend/src/generated
+          path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
@@ -189,7 +189,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v4
         with:
-          path: apps/frontend/src/generated
+          path: apps/frontend/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
             ${{ env.FRONTEND_SDK_KEY }}
@@ -227,7 +227,7 @@ jobs:
         id: cached-UOWS
         uses: actions/cache@v4
         with:
-          path: apps/backend/src/generated
+          path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Run backend unit tests
@@ -299,7 +299,7 @@ jobs:
         id: cached-UOWS
         uses: actions/cache@v4
         with:
-          path: apps/backend/src/generated
+          path: apps/backend/generated
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
@@ -313,7 +313,7 @@ jobs:
         id: cached-sdk-frontend
         uses: actions/cache@v4
         with:
-          path: apps/frontend/src/generated
+          path: apps/frontend/generated
           key: ${{ env.FRONTEND_SDK_KEY }}
           restore-keys: |
             ${{ env.FRONTEND_SDK_KEY }}

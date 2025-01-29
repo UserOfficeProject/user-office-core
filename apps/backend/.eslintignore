@@ -10,4 +10,4 @@ coverage/*
 /src/types/
 # auto-generated REST client for the STFC UserOfficeWebService
 openapi.yaml
-/src/generated/
+/generated/

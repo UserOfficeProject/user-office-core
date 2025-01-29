@@ -1,7 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import { BasicPersonDetailsDTO } from '../../generated/models/BasicPersonDetailsDTO';
-import { RoleDTO } from '../../generated/models/RoleDTO';
+import { BasicPersonDetailsDTO } from '../../../generated/models/BasicPersonDetailsDTO';
+import { RoleDTO } from '../../../generated/models/RoleDTO';
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';

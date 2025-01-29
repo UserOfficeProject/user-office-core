@@ -28,7 +28,7 @@
     "apitest": "newman run api_tests/tests.json --environment api_tests/environment.json",
     "debug": "ts-node-dev --inspect --respawn -T ./index.ts",
     "populate": "ts-node-dev --respawn -T ./src/populate/index.ts",
-    "generate:uows": "openapi --output ./src/generated --name UOWS --input ./openapi.yaml"
+    "generate:uows": "openapi --output ./generated --name UOWS --input ./openapi.yaml"
   },
   "author": "",
   "license": "ISC",
