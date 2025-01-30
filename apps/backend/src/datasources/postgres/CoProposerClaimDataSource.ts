@@ -7,7 +7,7 @@ export default class PostgresCoProposerClaimDataSource
 {
   async findByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
     return database('co_proposer_claims')
-      .where({ invite_code_id: inviteId })
+      .where({ invite_id: inviteId })
       .select('*')
       .first()
       .then((row) => {
@@ -15,7 +15,7 @@ export default class PostgresCoProposerClaimDataSource
           return null;
         }
 
-        return new CoProposerClaim(row.invite_code_id, row.proposal_pk);
+        return new CoProposerClaim(row.invite_id, row.proposal_pk);
       });
   }
   async create(inviteId: number, proposalPk: number): Promise<CoProposerClaim> {
@@ -25,7 +25,7 @@ export default class PostgresCoProposerClaimDataSource
       .then((rows) => {
         const row = rows[0];
 
-        return new CoProposerClaim(row.invite_code_id, row.proposal_pk);
+        return new CoProposerClaim(row.invite_id, row.proposal_pk);
       });
   }
 }
