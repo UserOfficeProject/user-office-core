@@ -25,7 +25,7 @@ export class InviteAuthorization {
     if (roleIds !== undefined) {
       const onlyUserRole = roleIds.length === 1 && roleIds[0] === UserRole.USER;
 
-      if (onlyUserRole) return false;
+      if (!onlyUserRole) return false;
     }
 
     if (coProposerProposalPk !== undefined) {
