@@ -116,6 +116,7 @@ jobs:
           key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Generate backend UOWS
+        if: steps.cached-UOWS.outputs.cache-hit != 'true'
         run: |
           cd apps/backend
           npm run generate:uows
