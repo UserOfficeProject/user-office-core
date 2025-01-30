@@ -47,7 +47,10 @@ export default class InviteMutations {
   ): Promise<Invite | Rejection> {
     const claims = args.claims;
 
-    const hasCreateRights = await this.inviteAuth.hasCreateRights(agent, claims);
+    const hasCreateRights = await this.inviteAuth.hasCreateRights(
+      agent,
+      claims
+    );
     if (hasCreateRights === false) {
       return rejection(
         'User is not authorized to create invites with these claims'

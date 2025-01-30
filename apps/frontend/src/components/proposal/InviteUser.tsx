@@ -253,6 +253,7 @@ function InviteUser({
           filterSelectedOptions
           onInputChange={(_, newValue) => setQuery(newValue)}
           onKeyDown={handleKeyDown}
+          data-cy="invite-user-autocomplete"
           renderInput={(params) => (
             <TextField
               {...params}
@@ -295,6 +296,7 @@ function InviteUser({
           sx={{ margin: '16px 0 8px 0' }}
           startIcon={<AddIcon />}
           disabled={!selectedItems.length}
+          data-cy="invite-user-submit-button"
         >
           Add
         </Button>

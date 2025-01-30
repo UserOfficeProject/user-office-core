@@ -121,6 +121,7 @@ const Participants = ({
                 gap: 1,
                 alignItems: 'center',
               }}
+              data-cy="invites-chips"
             >
               <Typography
                 sx={{

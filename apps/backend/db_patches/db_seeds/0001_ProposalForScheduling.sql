@@ -63,6 +63,8 @@ BEGIN
      , true               -- submitted
     );
 
+  INSERT INTO proposal_user(proposal_pk, user_id) VALUES(1, 4);
+
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (1, 1);
 
   INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id) VALUES (1, 1, '', 2, 0, '', 0, 0, 1);

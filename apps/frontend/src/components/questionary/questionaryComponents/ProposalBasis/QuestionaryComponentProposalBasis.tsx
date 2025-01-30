@@ -183,7 +183,7 @@ const proposalBasisPreSubmit =
 
       const invites = await api.setCoProposerInvites({
         input: {
-          proposalPk: primaryKey,
+          proposalPk: result.updateProposal.primaryKey,
           emails: proposal.coProposerInvites.map((invite) => invite.email),
         },
       });
@@ -210,7 +210,7 @@ const proposalBasisPreSubmit =
 
       const invites = await api.setCoProposerInvites({
         input: {
-          proposalPk: primaryKey,
+          proposalPk: updateProposal.primaryKey,
           emails: proposal.coProposerInvites.map((invite) => invite.email),
         },
       });
