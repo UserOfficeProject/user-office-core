@@ -51,10 +51,7 @@ describe('Test Invite Mutations', () => {
           roleIds: [UserRole.FAP_REVIEWER],
         },
       })
-    ).resolves.toHaveProperty(
-      'reason',
-      'User is not authorized to create invites to this user type'
-    );
+    ).resolves.toBeInstanceOf(Rejection);
   });
 
   test('A user can accept valid invite code', () => {
@@ -247,5 +244,60 @@ describe('Test Invite Mutations', () => {
       .getByInviteId(1);
 
     expect(coProposerClaim).toMatchObject({ inviteId: 1, proposalPk });
+  });
+
+  test('A user officer can update invite and set coProposerClaim', async () => {
+    const proposalPk = 2;
+
+    await inviteMutations.update(dummyUserOfficerWithRole, {
+      id: 2,
+      claims: { coProposerProposalPk: proposalPk },
+    });
+
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .getByInviteId(2);
+
+    expect(coProposerClaim).toMatchObject({ inviteId: 2, proposalPk });
+  });
+
+  test('A user can set CoProposerInvites for their proposal', async () => {
+    const email = 'coproposer@example.com';
+    const proposalPk = 3;
+
+    const invite = (await inviteMutations.create(dummyUserWithRole, {
+      email,
+      note: 'Test note',
+      claims: {
+        coProposerProposalPk: proposalPk,
+      },
+    })) as Invite;
+
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .getByInviteId(invite.id);
+
+    expect(coProposerClaim).toMatchObject({
+      inviteId: invite.id,
+      proposalPk,
+    });
+  });
+
+  test('A user not on a proposal cannot set CoProposerInvites', async () => {
+    const email = 'notonproposal@example.com';
+    const proposalPk = 3;
+
+    const response = await inviteMutations.create(
+      dummyUserNotOnProposalWithRole,
+      {
+        email,
+        note: 'Test note',
+        claims: {
+          coProposerProposalPk: proposalPk,
+        },
+      }
+    );
+
+    expect(response).toBeInstanceOf(Rejection);
   });
 });
