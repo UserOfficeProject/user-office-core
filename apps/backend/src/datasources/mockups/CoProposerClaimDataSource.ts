@@ -15,7 +15,7 @@ export class CoProposerClaimDataSourceMock
   }
 
   async getByProposalPk(proposalPk: number): Promise<CoProposerClaim[]> {
-    throw new Error('Method not implemented.');
+    return this.invites.filter((invite) => invite.proposalPk === proposalPk);
   }
 
   async getByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
