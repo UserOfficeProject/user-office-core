@@ -109,11 +109,11 @@ export class ProposalResolver {
     return isRejection(users) ? [] : users;
   }
 
-  @FieldResolver(() => [Invite])
+  @FieldResolver(() => [Invite], { nullable: true })
   async coProposerInvites(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<Invite[]> {
+  ): Promise<Invite[] | null> {
     const invites = await context.queries.invite.getCoProposerInvites(
       context.user,
       proposal.primaryKey

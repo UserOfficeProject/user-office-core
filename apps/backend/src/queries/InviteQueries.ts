@@ -7,7 +7,6 @@ import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSou
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import { Authorized } from '../decorators';
 import { Invite } from '../models/Invite';
-import { rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 
 @injectable()
@@ -32,7 +31,7 @@ export default class InviteQueries {
     );
 
     if (!isUserOfficer && !isMemberOfProposal) {
-      return rejection('User is not authorized to view these invites');
+      return null;
     }
 
     const coProposerClaims =
