@@ -410,7 +410,7 @@ export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
       await techniqueDataSource.getTechniquesByProposalPk(proposal.primaryKey);
 
     if (!proposalTechniques?.length) {
-      return techniqueScientists;
+      continue;
     }
 
     const techniquePeople = await Promise.all(
@@ -426,7 +426,7 @@ export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
       })
     );
 
-    const filteredTechiquePeople = techniquePeople
+    const filteredTechniquePeople = techniquePeople
       .flat()
       .filter(
         (user, i, array): user is BasicUserDetails =>
@@ -435,7 +435,7 @@ export const getTechniqueScientistsAndFormatOutputForEmailSending = async (
 
     await getEmailReadyArrayOfUsersAndProposals(
       techniqueScientists,
-      filteredTechiquePeople,
+      filteredTechniquePeople,
       proposal,
       recipientWithTemplate
     );
