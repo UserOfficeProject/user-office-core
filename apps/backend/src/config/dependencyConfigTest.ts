@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
+import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
-import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import 'reflect-metadata';
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
+import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
+import { CoProposerInviteDataSourceMock } from '../datasources/mockups/CoProposerInviteDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
@@ -50,6 +52,7 @@ import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
+mapClass(Tokens.CoProposerInviteDataSource, CoProposerInviteDataSourceMock);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);
 mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);
@@ -58,6 +61,7 @@ mapClass(Tokens.GenericTemplateDataSource, GenericTemplateDataSourceMock);
 mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.InviteCodeDataSource, InviteCodesDataSourceMock);
 mapClass(Tokens.RoleInviteDataSource, RoleInviteDataSourceMock);
+mapClass(Tokens.InviteAuthorization, InviteAuthorization);
 mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
 mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);

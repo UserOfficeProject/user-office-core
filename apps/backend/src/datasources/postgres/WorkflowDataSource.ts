@@ -81,7 +81,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         .first();
 
       defaultStatusId = defaultProposalStatus?.status_id;
-      droppableGroupId = 'workflowConnections_0';
+      droppableGroupId = 'proposalWorkflowConnections_0';
     } else if (newWorkflowInput.entityType === WorkflowType.EXPERIMENT) {
       const defaultExperimentStatus = await database()
         .select('status_id')

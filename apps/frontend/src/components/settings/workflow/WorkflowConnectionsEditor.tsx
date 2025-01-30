@@ -129,10 +129,13 @@ const WorkflowConnectionsEditor = ({
     }
   };
 
-  const isVeryFirstDraftStatus = (workflowConnection: WorkflowConnection) =>
-    workflowConnection.sortOrder === 0 &&
-    workflowConnection.droppableGroupId ===
-      `${entityType}WorkflowConnections_0`;
+  const isVeryFirstDraftStatus = (workflowConnection: WorkflowConnection) => {
+    return (
+      workflowConnection.sortOrder === 0 &&
+      workflowConnection.droppableGroupId ===
+        `${entityType.toLowerCase()}WorkflowConnections_0`
+    );
+  };
 
   const getUniqueKey = (workflowConnection: WorkflowConnection) => {
     return `${workflowConnection.status.shortCode}_${

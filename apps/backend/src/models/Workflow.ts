@@ -1,6 +1,6 @@
 export enum WorkflowType {
-  PROPOSAL = 'proposal',
-  EXPERIMENT = 'experiment',
+  PROPOSAL = 'PROPOSAL',
+  EXPERIMENT = 'EXPERIMENT',
 }
 
 export class Workflow {
