@@ -1,8 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
-//TODO: Create a new file for the Status model
-import { Status } from '../../models/ProposalStatus';
+import { Status } from '../../models/Status';
 import { StatusDataSource } from '../StatusDataSource';
 import database from './database';
 import { StatusRecord } from './records';
@@ -23,7 +22,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   async createStatus(
     newStatusInput: Omit<Status, 'id' | 'is_default'>
   ): Promise<Status> {
-    // TODO: To test
     const [addedStatus]: StatusRecord[] = await database
       .insert({
         short_code: newStatusInput.shortCode,
@@ -41,7 +39,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return this.createStatusObject(addedStatus);
   }
   async getStatus(statusId: number): Promise<Status | null> {
-    // TODO: To test
     const status: StatusRecord = await database
       .select()
       .from('statuses')
@@ -51,7 +48,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return status ? this.createStatusObject(status) : null;
   }
   async getAllStatuses(entityType: Status['entityType']): Promise<Status[]> {
-    // TODO: To test
     const statuses: StatusRecord[] = await database
       .select('*')
       .from('statuses')
@@ -61,7 +57,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return statuses.map((status) => this.createStatusObject(status));
   }
   async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
-    // TODO: To test
     const [updatedStatus]: StatusRecord[] = await database
       .update(
         {
@@ -80,7 +75,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     return this.createStatusObject(updatedStatus);
   }
   async deleteStatus(statusId: number): Promise<Status> {
-    // TODO: To test
     const [removedStatus]: StatusRecord[] = await database('statuses')
       .where('status_id', statusId)
       .andWhere('is_default', false)

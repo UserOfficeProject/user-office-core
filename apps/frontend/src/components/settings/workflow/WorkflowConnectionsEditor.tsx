@@ -17,7 +17,11 @@ import { useTheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useState } from 'react';
 
-import { WorkflowConnection, WorkflowConnectionGroup } from 'generated/sdk';
+import {
+  WorkflowConnection,
+  WorkflowConnectionGroup,
+  WorkflowType,
+} from 'generated/sdk';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import AddNewWorkflowConnectionsRow from './AddNewWorkflowConnectionsRow';
@@ -29,7 +33,7 @@ type WorkflowConnectionsEditorProps = {
   dispatch: React.Dispatch<Event>;
   isLoading: boolean;
   confirm: WithConfirmType;
-  entityType: 'proposal' | 'experiment';
+  entityType: WorkflowType;
 };
 
 type WorkflowConnectionGroupWithSubGroups = WorkflowConnectionGroup & {

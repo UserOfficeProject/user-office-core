@@ -14,6 +14,7 @@ import {
   UpdateCallInput,
   TemplateGroupId,
   CreateCallInput,
+  WorkflowType,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
@@ -51,7 +52,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
     workflows: proposalWorkflows,
     loadingWorkflows: loadingProposalWorkflows,
     refreshWorkflows: reloadProposalWorkflows,
-  } = useWorkflowsData('proposal');
+  } = useWorkflowsData(WorkflowType.PROPOSAL);
 
   const currentDayStart = DateTime.now()
     .setZone(timezone || undefined)

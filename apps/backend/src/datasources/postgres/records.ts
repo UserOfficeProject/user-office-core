@@ -22,7 +22,6 @@ import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
-import { StatusActionType } from '../../models/ProposalStatusAction';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -40,6 +39,7 @@ import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafety
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
+import { StatusActionType } from '../../models/StatusAction';
 import { StatusActionsLog } from '../../models/StatusActionsLog';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
@@ -59,6 +59,7 @@ import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
+import { WorkflowType } from '../../models/Workflow';
 import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
@@ -580,7 +581,7 @@ export interface StatusRecord {
   readonly description: string;
   readonly is_default: boolean;
   readonly full_count: number;
-  readonly entity_type: 'proposal' | 'experiment';
+  readonly entity_type: WorkflowType;
 }
 
 export interface ProposalWorkflowRecord {
@@ -595,7 +596,7 @@ export interface WorkflowRecord {
   readonly name: string;
   readonly description: string;
   readonly full_count: number;
-  readonly entity_type: 'proposal' | 'experiment';
+  readonly entity_type: WorkflowType;
 }
 
 export interface ProposalWorkflowConnectionRecord {

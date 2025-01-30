@@ -2,14 +2,12 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import {
   ProposalDataSourceMock,
   dummyProposalWithNotActiveCall,
   dummyProposalSubmitted,
   dummyProposal,
 } from '../datasources/mockups/ProposalDataSource';
-import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
   dummyInstrumentScientist,
@@ -20,16 +18,15 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { Status } from '../models/ProposalStatus';
 import { isRejection, Rejection } from '../models/Rejection';
+import { Status } from '../models/Status';
+import { WorkflowType } from '../models/Workflow';
 import ProposalMutations from './ProposalMutations';
 
 const proposalMutations = container.resolve(ProposalMutations);
 
 let proposalDataSource: ProposalDataSourceMock;
-let proposalSettingsDataSource: ProposalSettingsDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
-let instrumentDataSource: InstrumentDataSourceMock;
 
 beforeEach(() => {
   proposalDataSource = container.resolve<ProposalDataSourceMock>(
@@ -37,17 +34,8 @@ beforeEach(() => {
   );
   proposalDataSource.init();
 
-  proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSourceMock>(
-      Tokens.ProposalSettingsDataSource
-    );
-
   statusDataSource = container.resolve<StatusDataSourceMock>(
     Tokens.StatusDataSource
-  );
-
-  instrumentDataSource = container.resolve<InstrumentDataSourceMock>(
-    Tokens.ProposalSettingsDataSource
   );
 });
 
@@ -426,14 +414,14 @@ describe('Test Xpress change status', () => {
   const expiredId = 7;
 
   const dummyProposalStatuses = [
-    new Status(draftId, 'DRAFT', 'Draft', '', true, 'proposal'),
+    new Status(draftId, 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
     new Status(
       submittedId,
       'SUBMITTED_LOCKED',
       'Submitted (locked)',
       '',
       true,
-      'proposal'
+      WorkflowType.PROPOSAL
     ),
     new Status(
       underReviewId,
@@ -441,27 +429,48 @@ describe('Test Xpress change status', () => {
       'Under review',
       '',
       true,
-      'proposal'
+      WorkflowType.PROPOSAL
     ),
-    new Status(approvedId, 'APPROVED', 'Approved', '', true, 'proposal'),
+    new Status(
+      approvedId,
+      'APPROVED',
+      'Approved',
+      '',
+      true,
+      WorkflowType.PROPOSAL
+    ),
     new Status(
       unsuccessfulId,
       'UNSUCCESSFUL',
       'Unsuccessful',
       '',
       true,
-      'proposal'
+      WorkflowType.PROPOSAL
     ),
-    new Status(finishedId, 'FINISHED', 'Finished', '', true, 'proposal'),
+    new Status(
+      finishedId,
+      'FINISHED',
+      'Finished',
+      '',
+      true,
+      WorkflowType.PROPOSAL
+    ),
     new Status(
       nonXpressId,
       'NON-XPRESS',
       'A non-xpress status',
       '',
       true,
-      'proposal'
+      WorkflowType.PROPOSAL
     ),
-    new Status(expiredId, 'EXPIRED', 'Expired', '', true, 'proposal'),
+    new Status(
+      expiredId,
+      'EXPIRED',
+      'Expired',
+      '',
+      true,
+      WorkflowType.PROPOSAL
+    ),
   ];
 
   beforeEach(() => {

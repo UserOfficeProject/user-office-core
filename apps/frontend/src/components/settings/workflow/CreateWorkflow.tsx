@@ -7,12 +7,12 @@ import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { Workflow } from 'generated/sdk';
+import { Workflow, WorkflowType } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type CreateWorkflowProps = {
   close: (workflowAdded: Workflow | null) => void;
-  entityType: 'proposal' | 'experiment';
+  entityType: WorkflowType;
   title: string;
 };
 

@@ -1,4 +1,4 @@
-query getStatuses($entityType: String!) {
+query getStatuses($entityType: WorkflowType!) {
   statuses(entityType: $entityType) {
     ...status
   }

@@ -1,4 +1,4 @@
-import { ProposalStatus, Status } from './ProposalStatus';
+import { Status } from './Status';
 
 export type NextAndPreviousProposalStatuses = {
   //TODO: Needs to be removed
@@ -34,20 +34,6 @@ export class WorkflowConnectionWithStatus {
     public workflowId: number,
     public statusId: number,
     public status: Status,
-    public nextStatusId: number | null,
-    public prevStatusId: number | null,
-    public droppableGroupId: string,
-    public parentDroppableGroupId: string | null
-  ) {}
-}
-
-export class ProposalWorkflowConnection {
-  constructor(
-    public id: number,
-    public sortOrder: number,
-    public workflowId: number,
-    public statusId: number,
-    public status: ProposalStatus,
     public nextStatusId: number | null,
     public prevStatusId: number | null,
     public droppableGroupId: string,

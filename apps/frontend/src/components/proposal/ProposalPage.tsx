@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { ProposalsFilter } from 'generated/sdk';
+import { ProposalsFilter, WorkflowType } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
@@ -58,7 +58,7 @@ export default function ProposalPage() {
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
-  } = useStatusesData('proposal');
+  } = useStatusesData(WorkflowType.PROPOSAL);
 
   return (
     <StyledContainer maxWidth={false}>

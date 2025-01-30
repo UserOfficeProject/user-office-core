@@ -1,9 +1,9 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { Status } from 'generated/sdk';
+import { Status, WorkflowType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useStatusesData(entityType: 'proposal' | 'experiment'): {
+export function useStatusesData(entityType: WorkflowType): {
   loadingStatuses: boolean;
   statuses: Status[];
   setStatusesWithLoading: Dispatch<SetStateAction<Status[]>>;

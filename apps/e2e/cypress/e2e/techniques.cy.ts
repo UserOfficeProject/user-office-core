@@ -4,6 +4,7 @@ import {
   FeatureId,
   TemplateCategoryId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -291,7 +292,7 @@ context('Technique tests', () => {
       cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       });
 
       cy.createTechnique(technique1).then((result) => {

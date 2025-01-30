@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { UserRole, Status } from 'generated/sdk';
+import { UserRole, Status, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { tableIcons } from 'utils/materialIcons';
@@ -26,7 +26,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
     setStatusesWithLoading: setProposalStatuses,
-  } = useStatusesData('proposal');
+  } = useStatusesData(WorkflowType.PROPOSAL);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const createModal = (

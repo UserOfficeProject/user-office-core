@@ -6,6 +6,7 @@ import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 import {
   WorkflowConnection,
   WorkflowConnectionWithStatus,
@@ -20,18 +21,15 @@ export default class WorkflowQueries {
     public emailService: MailService
   ) {}
 
+  @Authorized([Roles.USER_OFFICER])
   async getWorkflow(agent: UserWithRole | null, id: number) {
-    //TODO: Why is this not authenticated?
     const workflow = await this.dataSource.getWorkflow(id);
 
     return workflow;
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async getAllWorkflows(
-    agent: UserWithRole | null,
-    entityType: 'proposal' | 'experiment'
-  ) {
+  async getAllWorkflows(agent: UserWithRole | null, entityType: WorkflowType) {
     const workflows = await this.dataSource.getAllWorkflows(entityType);
 
     return workflows;

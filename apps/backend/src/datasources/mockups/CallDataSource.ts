@@ -1,5 +1,6 @@
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { CallHasInstrument } from '../../models/CallHasInstrument';
+import { Workflow, WorkflowType } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -9,6 +10,13 @@ import {
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
+
+export const dummyWorkflow = new Workflow(
+  1,
+  'Test workflow',
+  'This is description',
+  WorkflowType.PROPOSAL
+);
 
 export const dummyCallFactory = (values?: Partial<Call>) => {
   return new Call(
@@ -183,7 +191,12 @@ export class CallDataSourceMock implements CallDataSource {
   async isCallEnded(callId: number): Promise<boolean> {
     return callId !== 1;
   }
+
   async getCallByAnswerIdProposal(answer_id: number) {
     return dummyCall;
+  }
+
+  async getProposalWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return dummyWorkflow;
   }
 }

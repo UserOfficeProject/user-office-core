@@ -3,12 +3,12 @@ import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { Rejection } from '../../models/Rejection';
 import {
   ConnectionHasStatusAction,
   StatusAction,
   StatusActionType,
-} from '../../models/ProposalStatusAction';
-import { Rejection } from '../../models/Rejection';
+} from '../../models/StatusAction';
 import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import {
   EmailActionConfig,

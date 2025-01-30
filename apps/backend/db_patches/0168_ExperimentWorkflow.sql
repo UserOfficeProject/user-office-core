@@ -44,11 +44,12 @@ BEGIN
     BEGIN
       -- Insert the Workflow Statuses
       INSERT INTO statuses (name, short_code, description, entity_type, is_default) VALUES ('AWAITING ESF', 'AWAITING_ESF', 'When an Experiment is created, the default status will be AWAITING_ESF. This means that the experimenter needs to submit the ESF(Experiment Safety Form).', 'experiment', true);
-      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF IS REVIEW', 'ESF_IS_REVIEW', 'IS(Instrument Scientist) needs to review the ESF.', 'experiment');
-      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF ESR REVIEW', 'ESF_ESR_REVIEW', 'ESR(Experiment Safety Reviewer) needs to review the ESF.', 'experiment');
-      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF REJECTED', 'ESF_REJECTED', 'ESF rejected.', 'experiment');
-      INSERT INTO statuses (name, short_code, description, entity_type) VALUES ('ESF APROVED', 'ESF_APROVED', 'ESF approved.', 'experiment');
+      INSERT INTO statuses (name, short_code, description, entity_type, is_default) VALUES ('ESF IS REVIEW', 'ESF_IS_REVIEW', 'IS(Instrument Scientist) needs to review the ESF.', 'experiment', true);
+      INSERT INTO statuses (name, short_code, description, entity_type, is_default) VALUES ('ESF ESR REVIEW', 'ESF_ESR_REVIEW', 'ESR(Experiment Safety Reviewer) needs to review the ESF.', 'experiment', true);
+      INSERT INTO statuses (name, short_code, description, entity_type, is_default) VALUES ('ESF REJECTED', 'ESF_REJECTED', 'ESF rejected.', 'experiment', true);
+      INSERT INTO statuses (name, short_code, description, entity_type, is_default) VALUES ('ESF APROVED', 'ESF_APROVED', 'ESF approved.', 'experiment', true);
     END;
+
   END IF;
 END;
 $$

@@ -12,6 +12,7 @@ import {
   WorkflowConnection,
   Status,
   WorkflowConnectionGroup,
+  WorkflowType,
 } from 'generated/sdk';
 import { usePersistWorkflowEditorModel } from 'hooks/settings/usePersistWorkflowEditorModel';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
@@ -23,11 +24,7 @@ import WorkflowConnectionsEditor from './WorkflowConnectionsEditor';
 import WorkflowEditorModel, { Event, EventType } from './WorkflowEditorModel';
 import WorkflowMetadataEditor from './WorkflowMetadataEditor';
 
-const WorkflowEditor = ({
-  entityType,
-}: {
-  entityType: 'proposal' | 'experiment';
-}) => {
+const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { statuses, loadingStatuses } = useStatusesData(entityType);
   const reducerMiddleware = () => {
@@ -40,7 +37,6 @@ const WorkflowEditor = ({
     persistModel,
     reducerMiddleware,
   ]);
-  console.log({ state });
   const workflowConnectionsPartOfWorkflow: WorkflowConnection[] = [];
   state.workflowConnectionGroups.forEach((workflowConnectionGroup) =>
     workflowConnectionsPartOfWorkflow.push(
@@ -99,7 +95,6 @@ const WorkflowEditor = ({
 
   const onDragEnd = (result: DropResult): void => {
     const { source, destination } = result;
-    console.log({ source, destination });
     const isWrongDrop =
       destination?.droppableId === source?.droppableId &&
       source.index === destination.index;
@@ -107,7 +102,6 @@ const WorkflowEditor = ({
     if (!destination || isWrongDrop) {
       return;
     }
-    console.log('=2============');
     const isDragAndDropFromStatusPickerToWorkflowEditor =
       source.droppableId === 'statusPicker' &&
       destination.droppableId.includes('WorkflowConnections');
@@ -119,7 +113,6 @@ const WorkflowEditor = ({
     const isDragAndDropFromWorkflowEditorToStatusPicker =
       source.droppableId.includes('WorkflowConnections') &&
       destination?.droppableId === 'statusPicker';
-    console.log('=3============');
     if (isDragAndDropFromStatusPickerToWorkflowEditor) {
       const currentDroppableGroup = state.workflowConnectionGroups.find(
         (workflowConnectionGroup) =>
@@ -130,7 +123,6 @@ const WorkflowEditor = ({
         currentDroppableGroup?.groupId.endsWith('WorkflowConnections_0') &&
         destination.index === 0 &&
         currentDroppableGroup.connections.length > 0;
-      console.log('===4==========');
       if (isDroppedBeforeVeryFirstStatus) {
         enqueueSnackbar('Adding before first status is not allowed', {
           variant: 'info',
@@ -139,7 +131,6 @@ const WorkflowEditor = ({
 
         return;
       }
-      console.log('===5==========');
       const statusId = statusesInThePicker[source.index].id;
       const nextStatusesId = getNextWorkflowStatuses(
         destination,
@@ -162,19 +153,7 @@ const WorkflowEditor = ({
 
         return;
       }
-      console.log({
-        source,
-        sortOrder: destination.index,
-        droppableGroupId: destination.droppableId,
-        parentDroppableGroupId: currentDroppableGroup?.parentGroupId || null,
-        statusId: statusId,
-        status: {
-          ...statusesInThePicker[source.index],
-        },
-        nextStatusId: firstNextStatusId,
-        prevStatusId,
-        workflowId: state.id,
-      });
+
       dispatch({
         type: EventType.ADD_WORKFLOW_STATUS_REQUESTED,
         payload: {
@@ -211,7 +190,6 @@ const WorkflowEditor = ({
       });
     }
   };
-  console.log({ state });
   const dataLoaded = !isLoading && !loadingStatuses && state.id;
 
   const getContainerStyle = (): React.CSSProperties => {

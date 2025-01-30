@@ -5,6 +5,7 @@ import { StatusDataSource } from '../datasources/StatusDataSource';
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { UserWithRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 
 @injectable()
 export default class StatusQueries {
@@ -17,18 +18,15 @@ export default class StatusQueries {
 
   @Authorized()
   async getStatus(agent: UserWithRole | null, id: number) {
-    const proposalStatus = await this.dataSource.getStatus(id);
+    const status = await this.dataSource.getStatus(id);
 
-    return proposalStatus;
+    return status;
   }
 
   @Authorized()
-  async getAllStatuses(
-    agent: UserWithRole | null,
-    entityType: 'proposal' | 'experiment' // TODO: This needs to be optimised
-  ) {
-    const proposalStatuses = await this.dataSource.getAllStatuses(entityType);
+  async getAllStatuses(agent: UserWithRole | null, entityType: WorkflowType) {
+    const statuses = await this.dataSource.getAllStatuses(entityType);
 
-    return proposalStatuses;
+    return statuses;
   }
 }

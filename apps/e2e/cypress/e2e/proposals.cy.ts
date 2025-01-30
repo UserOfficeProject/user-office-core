@@ -6,6 +6,7 @@ import {
   TemplateGroupId,
   FeatureId,
   SettingsId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 import PdfParse from 'pdf-parse';
@@ -122,7 +123,7 @@ context('Proposal tests', () => {
       cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       }).then((result) => {
         if (result.createWorkflow) {
           cy.addWorkflowStatus({
@@ -1021,7 +1022,7 @@ context('Proposal tests', () => {
       cy.createWorkflow({
         name: proposalInternalWorkflow.name,
         description: proposalInternalWorkflow.description,
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       }).then((result) => {
         if (result.createWorkflow) {
           createdWorkflowId = result.createWorkflow.id;
@@ -1434,7 +1435,7 @@ context('Proposal tests', () => {
       cy.createWorkflow({
         name: proposalWorkflow.name,
         description: proposalWorkflow.description,
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       }).then((result) => {
         if (result.createWorkflow) {
           createdWorkflowId = result.createWorkflow.id;

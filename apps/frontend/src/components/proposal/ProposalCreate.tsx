@@ -4,7 +4,12 @@ import { useParams } from 'react-router-dom';
 import NotFound from 'components/common/NotFound';
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import { BasicUserDetails, Call, QuestionaryStep } from 'generated/sdk';
+import {
+  BasicUserDetails,
+  Call,
+  QuestionaryStep,
+  WorkflowType,
+} from 'generated/sdk';
 import { useCallCloseData } from 'hooks/call/useCallCloseData';
 import { useBlankQuestionaryStepsDataByCallId } from 'hooks/questionary/useBlankQuestionaryStepsDataByCallId';
 import { useBasicUserData } from 'hooks/user/useUserData';
@@ -40,7 +45,7 @@ export function createProposalStub(
       description: '',
       name: '',
       isDefault: true,
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     },
     submitted: false,
     users: [],

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   Event,
   EventType,
-} from 'components/settings/proposalWorkflow/WorkflowEditorModel';
+} from 'components/settings/workflow/WorkflowEditorModel';
 import {
   ConnectionHasActionsInput,
   IndexWithGroupId,

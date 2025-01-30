@@ -1,6 +1,7 @@
 import { Query, Ctx, Resolver, Int, ArgsType, Field, Args } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { WorkflowType } from '../../models/Workflow';
 import { Status } from '../types/Status';
 
 @ArgsType()
@@ -11,8 +12,8 @@ export class StatusArgs {
 
 @ArgsType()
 export class StatusesArgs {
-  @Field(() => String)
-  entityType: 'proposal' | 'experiment';
+  @Field(() => WorkflowType)
+  entityType: WorkflowType;
 }
 
 @Resolver()

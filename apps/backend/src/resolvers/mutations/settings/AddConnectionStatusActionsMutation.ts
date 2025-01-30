@@ -12,7 +12,7 @@ import { ResolverContext } from '../../../context';
 import {
   ConnectionHasStatusAction,
   StatusActionType,
-} from '../../../models/ProposalStatusAction';
+} from '../../../models/StatusAction';
 import { ConnectionStatusAction } from '../../types/ConnectionStatusAction';
 
 @InputType()

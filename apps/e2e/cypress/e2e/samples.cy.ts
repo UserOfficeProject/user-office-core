@@ -4,6 +4,7 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
   FeatureId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -24,7 +25,7 @@ context('Samples tests', () => {
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
-    entityType: 'proposal',
+    entityType: WorkflowType.PROPOSAL,
   };
 
   let createdWorkflowId: number;

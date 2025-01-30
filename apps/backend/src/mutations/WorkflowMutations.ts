@@ -13,15 +13,15 @@ import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
+import { rejection, Rejection } from '../models/Rejection';
+import { Roles } from '../models/Role';
 import {
   ConnectionHasStatusAction,
   StatusActionType,
-} from '../models/ProposalStatusAction';
-import { Workflow } from '../models/ProposalWorkflow';
-import { rejection, Rejection } from '../models/Rejection';
-import { Roles } from '../models/Role';
+} from '../models/StatusAction';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
 import { UserWithRole } from '../models/User';
+import { Workflow } from '../models/Workflow';
 import {
   WorkflowConnection,
   WorkflowConnectionWithStatus,
@@ -46,7 +46,7 @@ export default class WorkflowMutations {
     private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
-  @ValidateArgs(createWorkflowValidationSchema) //TODO: To be done
+  @ValidateArgs(createWorkflowValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async createWorkflow(
     agent: UserWithRole | null,
@@ -57,7 +57,7 @@ export default class WorkflowMutations {
     });
   }
 
-  @ValidateArgs(updateWorkflowValidationSchema) //TODO: To be done
+  @ValidateArgs(updateWorkflowValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async updateWorkflow(
     agent: UserWithRole | null,
@@ -68,7 +68,7 @@ export default class WorkflowMutations {
     });
   }
 
-  @ValidateArgs(deleteWorkflowValidationSchema) //TODO: To be done
+  @ValidateArgs(deleteWorkflowValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteWorkflow(
     agent: UserWithRole | null,
@@ -291,7 +291,7 @@ export default class WorkflowMutations {
     return insertedWorkflowConnection;
   }
 
-  @ValidateArgs(addWorkflowStatusValidationSchema) //TODO: To be done
+  @ValidateArgs(addWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addWorkflowStatus(
     agent: UserWithRole | null,
@@ -309,7 +309,7 @@ export default class WorkflowMutations {
     }
   }
 
-  // @ValidateArgs(addNextStatusEventsValidationSchema) //TODO: To be done
+  // @ValidateArgs(addNextStatusEventsValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addStatusChangingEventsToConnection(
     agent: UserWithRole | null,
@@ -348,7 +348,7 @@ export default class WorkflowMutations {
   }
 
   // NOTE: Moving statuses inside workflow is not enabled at the moment so this is not used at all. I keep it if we deceide to use this feature later.
-  @ValidateArgs(moveWorkflowStatusValidationSchema) //TODO: To be done
+  @ValidateArgs(moveWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async moveWorkflowStatus(
     agent: UserWithRole | null,
@@ -423,7 +423,7 @@ export default class WorkflowMutations {
     return [previousConnection, nextConnection];
   }
 
-  @ValidateArgs(deleteWorkflowStatusValidationSchema) //TODO: To be done
+  @ValidateArgs(deleteWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async deleteWorkflowStatus(
     agent: UserWithRole | null,
@@ -565,7 +565,7 @@ export default class WorkflowMutations {
       Object.values(StatusActionType),
       EmailStatusActionRecipients.OTHER
     )
-  ) //TODO: To be done
+  )
   @Authorized([Roles.USER_OFFICER])
   async addConnectionStatusActions(
     agent: UserWithRole | null,

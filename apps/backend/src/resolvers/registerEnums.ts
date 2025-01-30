@@ -10,12 +10,12 @@ import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
-import { StatusActionType } from '../models/ProposalStatusAction';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewerFilter, ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { SettingsId } from '../models/Settings';
 import { ShipmentStatus } from '../models/Shipment';
+import { StatusActionType } from '../models/StatusAction';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
   ConflictResolutionStrategy,
@@ -27,6 +27,7 @@ import {
 import { UserRole } from '../models/User';
 import { VisitStatus } from '../models/Visit';
 import { TrainingStatus } from '../models/VisitRegistration';
+import { WorkflowType } from '../models/Workflow';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
@@ -101,4 +102,5 @@ export const registerEnums = () => {
   registerEnumType(StatusActionType, {
     name: 'StatusActionType',
   });
+  registerEnumType(WorkflowType, { name: 'WorkflowType' });
 };

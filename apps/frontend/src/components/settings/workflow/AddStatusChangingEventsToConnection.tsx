@@ -11,7 +11,7 @@ import * as yup from 'yup';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import UOLoader from 'components/common/UOLoader';
-import { Event } from 'generated/sdk';
+import { Event, WorkflowType } from 'generated/sdk';
 import { useEventsData } from 'hooks/settings/useEventsData';
 import { BOLD_TEXT_STYLE } from 'utils/helperFunctions';
 
@@ -28,7 +28,7 @@ type AddStatusChangingEventsToConnectionProps = {
   statusChangingEvents?: Event[];
   statusName?: string;
   isLoading: boolean;
-  entityType: 'proposal' | 'experiment';
+  entityType: WorkflowType;
 };
 
 const AddStatusChangingEventsToConnection = ({

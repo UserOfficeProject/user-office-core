@@ -37,6 +37,7 @@ import {
   SettingsId,
   UserRole,
   ProposalViewTechnicalReviewAssignee,
+  WorkflowType,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -337,7 +338,7 @@ const ProposalTableInstrumentScientist = ({
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
-  } = useStatusesData('proposal');
+  } = useStatusesData(WorkflowType.PROPOSAL);
 
   const { loading, proposalsData, totalCount, setProposalsData } =
     useProposalsCoreData(

@@ -1,15 +1,16 @@
-import { Status } from '../../models/ProposalStatus';
+import { Status } from '../../models/Status';
+import { WorkflowType } from '../../models/Workflow';
 import { StatusDataSource } from '../StatusDataSource';
 
 export const dummyStatuses = [
-  new Status(1, 'DRAFT', 'Draft', '', true, 'proposal'),
+  new Status(1, 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
   new Status(
     2,
     'FEASIBILITY_REVIEW',
     'Feasibility review',
     '',
     true,
-    'proposal'
+    WorkflowType.PROPOSAL
   ),
 ];
 
@@ -27,7 +28,7 @@ export class StatusDataSourceMock implements StatusDataSource {
     return dummyStatuses;
   }
   async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
-    return { ...status, entityType: 'proposal' };
+    return { ...status, entityType: WorkflowType.PROPOSAL };
   }
   async deleteStatus(statusId: number): Promise<Status> {
     return dummyStatuses.splice(

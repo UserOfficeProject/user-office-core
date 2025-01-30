@@ -5,6 +5,7 @@ import {
   FeatureId,
   TemplateGroupId,
   UpdateCallInput,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -70,12 +71,12 @@ context('Calls tests', () => {
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
-    entityType: 'proposal',
+    entityType: WorkflowType.PROPOSAL,
   };
   const proposalInternalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
-    entityType: 'proposal',
+    entityType: WorkflowType.PROPOSAL,
   };
   const instrumentAssignedToCall: CreateInstrumentMutationVariables = {
     name: faker.random.words(2),

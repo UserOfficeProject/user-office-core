@@ -1,6 +1,6 @@
-import { Status } from '../models/ProposalStatus';
-import { Workflow } from '../models/ProposalWorkflow';
+import { Status } from '../models/Status';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { Workflow } from '../models/Workflow';
 import {
   NextAndPreviousStatuses,
   WorkflowConnection,

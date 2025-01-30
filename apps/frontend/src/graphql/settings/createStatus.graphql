@@ -2,7 +2,7 @@ mutation createStatus(
   $shortCode: String!
   $name: String!
   $description: String!
-  $entityType: String!
+  $entityType: WorkflowType!
 ) {
   createStatus(
     newStatusInput: {

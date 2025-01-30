@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
-import { StatusActionType } from '../models/ProposalStatusAction';
+import { StatusActionType } from '../models/StatusAction';
 import {
   WorkflowEngineProposalType,
   getProposalWorkflowConnectionByStatusId,

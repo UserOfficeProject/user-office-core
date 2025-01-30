@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
 import { CallHasInstrument } from '../../models/CallHasInstrument';
+import { Workflow } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -20,6 +21,7 @@ import {
   createCallHasInstrumentObject,
   createCallObject,
   ProposalRecord,
+  WorkflowRecord,
 } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
@@ -528,5 +530,30 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     throw new GraphQLError(`Call not found for answerId: ${answerId}`);
+  }
+
+  private createProposalWorkflowObject(proposalWorkflow: WorkflowRecord) {
+    return new Workflow(
+      proposalWorkflow.workflow_id,
+      proposalWorkflow.name,
+      proposalWorkflow.description,
+      proposalWorkflow.entity_type
+    );
+  }
+
+  async getProposalWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return database
+      .select()
+      .from('call as c')
+      .join('workflows as w', {
+        'w.workflow_id': 'c.proposal_workflow_id',
+      })
+      .where('c.call_id', callId)
+      .first()
+      .then((proposalWorkflow: WorkflowRecord | null) =>
+        proposalWorkflow
+          ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
   }
 }

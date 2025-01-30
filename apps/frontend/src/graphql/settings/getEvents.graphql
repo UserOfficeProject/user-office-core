@@ -1,4 +1,4 @@
-query getEvents($entityType: String!) {
+query getEvents($entityType: WorkflowType!) {
   events(entityType: $entityType) {
     name
     description

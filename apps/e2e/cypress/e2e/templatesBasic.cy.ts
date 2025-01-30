@@ -8,6 +8,7 @@ import {
   ProposalEndStatus,
   TemplateCategoryId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -403,7 +404,7 @@ const newCall = {
 const proposalWorkflow = {
   name: faker.random.words(2),
   description: faker.random.words(5),
-  entityType: 'proposal',
+  entityType: WorkflowType.PROPOSAL,
 };
 
 context('Template Basic tests', () => {

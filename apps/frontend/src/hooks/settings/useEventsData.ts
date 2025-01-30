@@ -1,9 +1,9 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { WorkflowEvent } from 'generated/sdk';
+import { WorkflowEvent, WorkflowType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useEventsData(entityType: 'proposal' | 'experiment'): {
+export function useEventsData(entityType: WorkflowType): {
   loadingEvents: boolean;
   events: WorkflowEvent[];
   setEventsWithLoading: Dispatch<SetStateAction<WorkflowEvent[]>>;

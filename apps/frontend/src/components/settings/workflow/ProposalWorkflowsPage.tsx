@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { WorkflowType } from 'generated/sdk';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import WorkflowsTable from './workflowsTable';
@@ -9,7 +10,7 @@ const ProposalWorkflowsPage = () => {
     <StyledContainer maxWidth={false}>
       <StyledPaper>
         <WorkflowsTable
-          entityType="proposal"
+          entityType={WorkflowType.PROPOSAL}
           title="Proposal Workflows"
           createTitle="Create Proposal Workflow"
           editorPath={'ProposalWorkflowEditor'}

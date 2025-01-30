@@ -9,6 +9,7 @@ import {
   ConnectionStatusAction,
   Workflow,
   WorkflowConnectionGroup,
+  WorkflowType,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
@@ -40,7 +41,7 @@ export interface Event {
 }
 
 const WorkflowEditorModel = (
-  entityType: 'proposal' | 'experiment',
+  entityType: WorkflowType,
   middlewares?: Array<ReducerMiddleware<Workflow, Event>>
 ) => {
   const { workflowId } = useParams<{ workflowId: string }>();

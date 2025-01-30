@@ -1,4 +1,4 @@
-query getWorkflows($entityType: String!) {
+query getWorkflows($entityType: WorkflowType!) {
   workflows(entityType: $entityType) {
     id
     name

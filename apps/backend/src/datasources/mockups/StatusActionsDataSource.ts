@@ -4,7 +4,7 @@ import {
   ConnectionHasStatusAction,
   StatusAction,
   StatusActionType,
-} from '../../models/ProposalStatusAction';
+} from '../../models/StatusAction';
 import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
 
@@ -35,20 +35,20 @@ export const dummyStatusActions = [dummyStatusAction, anotherDummyStatusAction];
 
 export class StatusActionsDataSourceMock implements StatusActionsDataSource {
   async getConnectionStatusAction(
-    proposalWorkflowConnectionId: number,
-    proposalStatusActionId: number
+    workflowConnectionId: number,
+    statusActionId: number
   ): Promise<ConnectionHasStatusAction> {
     return dummyConnectionHasStatusAction;
   }
   async getConnectionStatusActions(
-    proposalWorkflowConnectionId: number,
-    proposalWorkflowId: number
+    workflowConnectionId: number,
+    workflowId: number
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }
 
   async updateConnectionStatusAction(
-    proposalStatusAction: ConnectionHasStatusAction
+    statusAction: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction> {
     return dummyConnectionHasStatusAction;
   }

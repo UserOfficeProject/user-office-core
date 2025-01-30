@@ -12,7 +12,7 @@ import { ResolverContext } from '../../context';
 import {
   StatusAction as ProposalStatusActionOrigin,
   StatusActionType,
-} from '../../models/ProposalStatusAction';
+} from '../../models/StatusAction';
 import {
   EmailActionDefaultConfig,
   ProposalStatusActionDefaultConfig,

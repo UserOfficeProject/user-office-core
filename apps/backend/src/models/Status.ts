@@ -1,3 +1,5 @@
+import { WorkflowType } from './Workflow';
+
 // Default proposal status short codes that are available
 export enum ProposalStatusDefaultShortCodes {
   DRAFT = 'DRAFT',
@@ -21,15 +23,6 @@ export class Status {
     public name: string,
     public description: string,
     public isDefault: boolean,
-    public entityType: 'proposal' | 'experiment'
-  ) {}
-}
-export class ProposalStatus {
-  constructor(
-    public id: number,
-    public shortCode: string,
-    public name: string,
-    public description: string,
-    public isDefault: boolean
+    public entityType: WorkflowType
   ) {}
 }

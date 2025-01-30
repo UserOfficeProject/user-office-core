@@ -6,6 +6,7 @@ import {
   TechnicalReviewStatus,
   TemplateGroupId,
   UserRole,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -106,7 +107,7 @@ context('Settings tests', () => {
         name,
         description,
         shortCode,
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       });
       cy.login('officer');
       cy.visit('/');
@@ -290,7 +291,7 @@ context('Settings tests', () => {
       cy.createWorkflow({
         name: workflowName,
         description: workflowDescription,
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       }).then((result) => {
         const workflow = result.createWorkflow;
         if (workflow) {
@@ -1571,7 +1572,7 @@ context('Settings tests', () => {
       cy.createWorkflow({
         name: workflowName,
         description: workflowDescription,
-        entityType: 'experiment',
+        entityType: WorkflowType.EXPERIMENT,
       }).then((result) => {
         const workflow = result.createWorkflow;
         if (workflow) {

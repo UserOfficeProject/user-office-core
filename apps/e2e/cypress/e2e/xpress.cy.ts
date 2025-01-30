@@ -3,6 +3,7 @@ import {
   AllocationTimeUnits,
   FeatureId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -39,7 +40,7 @@ context('Xpress tests', () => {
   const proposalWorkflow = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(5),
-    entityType: 'proposal',
+    entityType: WorkflowType.PROPOSAL,
   };
 
   const draftStatus: {
@@ -245,7 +246,7 @@ context('Xpress tests', () => {
       name: underReviewStatus.name,
       shortCode: underReviewStatus.shortCode,
       description: underReviewStatus.description,
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
       if (result.createStatus) {
         underReviewStatus.id = result.createStatus.id;
@@ -256,7 +257,7 @@ context('Xpress tests', () => {
       name: approvedStatus.name,
       shortCode: approvedStatus.shortCode,
       description: approvedStatus.description,
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
       if (result.createStatus) {
         approvedStatus.id = result.createStatus.id;
@@ -267,7 +268,7 @@ context('Xpress tests', () => {
       name: unsuccessfulStatus.name,
       shortCode: unsuccessfulStatus.shortCode,
       description: unsuccessfulStatus.description,
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
       if (result.createStatus) {
         unsuccessfulStatus.id = result.createStatus.id;
@@ -278,7 +279,7 @@ context('Xpress tests', () => {
       name: finishedStatus.name,
       shortCode: finishedStatus.shortCode,
       description: finishedStatus.description,
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
       if (result.createStatus) {
         finishedStatus.id = result.createStatus.id;
@@ -289,7 +290,7 @@ context('Xpress tests', () => {
       name: submittedStatus.name,
       shortCode: submittedStatus.shortCode,
       description: submittedStatus.description,
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
       if (result.createStatus) {
         submittedStatus.id = result.createStatus.id;
@@ -300,7 +301,7 @@ context('Xpress tests', () => {
       name: quickReviewStatus.name,
       shortCode: quickReviewStatus.shortCode,
       description: quickReviewStatus.description,
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
       if (result.createStatus) {
         quickReviewStatus.id = result.createStatus.id;

@@ -6,7 +6,6 @@ import {
   dummyInstrument,
   dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
-import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import {
@@ -14,19 +13,15 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { WorkflowType } from '../models/Workflow';
 import InstrumentMutations from './InstrumentMutations';
 
-let proposalSettingsDataSource: ProposalSettingsDataSourceMock;
 let statusDataSource: StatusDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;
 
 const instrumentMutations = container.resolve(InstrumentMutations);
 
 beforeEach(() => {
-  proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSourceMock>(
-      Tokens.ProposalSettingsDataSource
-    );
   statusDataSource = container.resolve<StatusDataSourceMock>(
     Tokens.StatusDataSource
   );
@@ -209,7 +204,7 @@ describe('Test Instrument Mutations', () => {
           name: 'Expired',
           description: '',
           isDefault: true,
-          entityType: 'proposal',
+          entityType: WorkflowType.PROPOSAL,
         },
       ]);
 
@@ -239,7 +234,7 @@ describe('Test Instrument Mutations', () => {
           name: 'Expired',
           description: '',
           isDefault: true,
-          entityType: 'proposal',
+          entityType: WorkflowType.PROPOSAL,
         },
       ]);
 
@@ -268,7 +263,7 @@ describe('Test Instrument Mutations', () => {
           name: 'Under review',
           description: '',
           isDefault: true,
-          entityType: 'proposal',
+          entityType: WorkflowType.PROPOSAL,
         },
       ]);
 

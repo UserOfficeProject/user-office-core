@@ -19,7 +19,6 @@ import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSou
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import ProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
@@ -32,6 +31,7 @@ import { Proposal, ProposalEndStatus, Proposals } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 import { AdministrationProposalArgs } from '../resolvers/mutations/AdministrationProposalMutation';
 import { ChangeProposalsStatusInput } from '../resolvers/mutations/ChangeProposalsStatusMutation';
 import { CloneProposalsInput } from '../resolvers/mutations/CloneProposalMutation';
@@ -54,8 +54,6 @@ export default class ProposalMutations {
     public proposalDataSource: ProposalDataSource,
     @inject(Tokens.StatusDataSource)
     private statusDataSource: StatusDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    public proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource,
@@ -556,7 +554,7 @@ export default class ProposalMutations {
           );
 
           const proposalWorkflow =
-            await this.proposalSettingsDataSource.getProposalWorkflowByCall(
+            await this.callDataSource.getProposalWorkflowByCall(
               fullProposal.callId
             );
 
@@ -640,7 +638,9 @@ export default class ProposalMutations {
       );
     }
 
-    const allStatuses = await this.statusDataSource.getAllStatuses('proposal');
+    const allStatuses = await this.statusDataSource.getAllStatuses(
+      WorkflowType.PROPOSAL
+    );
 
     for (const proposal of proposals) {
       const currentStatus = allStatuses.find(

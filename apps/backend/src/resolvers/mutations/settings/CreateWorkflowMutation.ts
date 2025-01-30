@@ -1,6 +1,7 @@
 import { Ctx, Mutation, Resolver, Field, InputType, Arg } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
+import { WorkflowType } from '../../../models/Workflow';
 import { Workflow } from '../../types/Workflow';
 
 @InputType()
@@ -11,8 +12,8 @@ export class CreateWorkflowInput implements Partial<Workflow> {
   @Field(() => String)
   public description: string;
 
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
+  @Field(() => WorkflowType)
+  public entityType: WorkflowType;
 }
 
 @Resolver()

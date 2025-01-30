@@ -14,6 +14,7 @@ import {
   QuestionaryStep,
   ReviewStatus,
   TemplateGroupId,
+  WorkflowType,
 } from 'generated/sdk';
 import createCustomEventHandlers from 'models/questionary/createCustomEventHandlers';
 import { FapReviewSubmissionState } from 'models/questionary/fapReview/FapReviewSubmissionState';
@@ -70,7 +71,7 @@ export function createFapReviewStub(
         description: '',
         name: '',
         isDefault: true,
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       },
       submitted: false,
       users: [],

@@ -4,7 +4,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { UserRole, Workflow } from 'generated/sdk';
+import { UserRole, Workflow, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useWorkflowsData } from 'hooks/settings/useWorkflowsData';
 import { tableIcons } from 'utils/materialIcons';
@@ -24,7 +24,7 @@ const WorkflowsTable = ({
   title,
   createTitle,
 }: {
-  entityType: 'proposal' | 'experiment';
+  entityType: WorkflowType;
   editorPath: 'ProposalWorkflowEditor' | 'ExperimentWorkflowEditor';
   title: string;
   createTitle: string;

@@ -10,6 +10,7 @@ import {
   UserJwt,
   SettingsId,
   Event,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -204,7 +205,7 @@ function createWorkflowAndEsiTemplate() {
   cy.createWorkflow({
     name: workflowName,
     description: workflowDescription,
-    entityType: 'proposal',
+    entityType: WorkflowType.PROPOSAL,
   }).then((result) => {
     const workflow = result.createWorkflow;
     if (workflow) {
@@ -3737,7 +3738,7 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 });
 
-context.only('Fap meeting exports test', () => {
+context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
   let proposalPK: number;
 

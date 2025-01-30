@@ -5,22 +5,20 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
 import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
-import { ProposalWorkflow } from '../models/ProposalWorkflow';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { Workflow } from '../models/Workflow';
 import { WorkflowConnectionWithStatus } from '../models/WorkflowConnections';
 import { statusActionEngine } from '../statusActionEngine';
 
 const getProposalWorkflowByCallId = (callId: number) => {
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
 
-  return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
+  return callDataSource.getProposalWorkflowByCall(callId);
 };
 
 export const getProposalWorkflowConnectionByStatusId = (
@@ -66,7 +64,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
   proposalWithEvents,
 }: {
   nextWorkflowConnections: WorkflowConnectionWithStatus[];
-  proposalWorkflow: ProposalWorkflow;
+  proposalWorkflow: Workflow;
   workflowDataSource: WorkflowDataSource;
   proposalWithEvents: {
     proposalPk: number;
@@ -205,11 +203,6 @@ export const workflowEngine = async (
             if (!nextWorkflowConnections?.length) {
               return;
             }
-
-            const proposalSettingsDataSource =
-              container.resolve<ProposalSettingsDataSource>(
-                Tokens.ProposalSettingsDataSource
-              );
 
             const workflowDataSource = container.resolve<WorkflowDataSource>(
               Tokens.WorkflowDataSource

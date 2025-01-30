@@ -25,6 +25,7 @@ import {
   TemplatesHasQuestions,
 } from '../models/Template';
 import { UserRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 import { TemplateGroupId } from './../models/Template';
 import * as dummy from './dummy';
 import { execute } from './executor';
@@ -119,7 +120,7 @@ const createWorkflows = async () => {
     return workflowDataSource.createWorkflow({
       name: faker.lorem.word(),
       description: faker.lorem.words(5),
-      entityType: 'proposal',
+      entityType: WorkflowType.PROPOSAL,
     });
   }, MAX_WORKFLOWS);
 };

@@ -5,18 +5,16 @@ import { Authorized } from '../decorators';
 import { Event, EventLabel } from '../events/event.enum';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 
 @injectable()
 export default class SettingsQueries {
   constructor() {}
   @Authorized([Roles.USER_OFFICER])
-  async getAllEvents(
-    agent: UserWithRole | null,
-    entityType: 'proposal' | 'experiment'
-  ) {
+  async getAllEvents(agent: UserWithRole | null, entityType: WorkflowType) {
     const allEventsArray = Object.values(Event);
 
-    if (entityType === 'proposal') {
+    if (entityType === WorkflowType.PROPOSAL) {
       const allProposalEvents = allEventsArray
         .filter(
           (eventItem) =>
@@ -28,7 +26,7 @@ export default class SettingsQueries {
         }));
 
       return allProposalEvents;
-    } else if (entityType === 'experiment') {
+    } else if (entityType === WorkflowType.EXPERIMENT) {
       const allExperimentEvents = allEventsArray
         .filter((eventItem) => eventItem.startsWith('EXPERIMENT_'))
         .map((eventItem) => ({

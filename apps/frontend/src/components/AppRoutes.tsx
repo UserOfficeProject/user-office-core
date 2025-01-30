@@ -5,7 +5,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { FeatureId, UserRole } from 'generated/sdk';
+import { FeatureId, UserRole, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
@@ -57,11 +57,9 @@ const FeaturesPage = lazy(() => import('./settings/features/FeaturesPage'));
 const ProposalStatusesPage = lazy(
   () => import('./settings/proposalStatus/ProposalStatusesPage')
 );
-const WorkflowEditor = lazy(
-  () => import('./settings/proposalWorkflow/WorkflowEditor')
-);
+const WorkflowEditor = lazy(() => import('./settings/workflow/WorkflowEditor'));
 const ProposalWorkflowsPage = lazy(
-  () => import('./settings/proposalWorkflow/ProposalWorkflowsPage')
+  () => import('./settings/workflow/ProposalWorkflowsPage')
 );
 
 const ExperimentWorkflowsPage = lazy(
@@ -462,7 +460,7 @@ const AppRoutes = () => {
             element={
               <TitledRoute
                 title="Proposal Workflow Editor"
-                element={<WorkflowEditor entityType="proposal" />}
+                element={<WorkflowEditor entityType={WorkflowType.PROPOSAL} />}
               />
             }
           />
@@ -473,7 +471,9 @@ const AppRoutes = () => {
             element={
               <TitledRoute
                 title="Experiment Workflow Editor"
-                element={<WorkflowEditor entityType="experiment" />}
+                element={
+                  <WorkflowEditor entityType={WorkflowType.EXPERIMENT} />
+                }
               />
             }
           />

@@ -29,7 +29,12 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
-import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
+import {
+  ProposalsFilter,
+  SettingsId,
+  UserRole,
+  WorkflowType,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -63,7 +68,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
-  } = useStatusesData('proposal');
+  } = useStatusesData(WorkflowType.PROPOSAL);
 
   // Only show calls that use the quick review workflow status
   const { calls, loadingCalls } = useCallsData(

@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ConnectionHasStatusAction } from '../../models/ProposalStatusAction';
+import { ConnectionHasStatusAction } from '../../models/StatusAction';
 import { ProposalStatusAction } from './ProposalStatusAction';
 import { ProposalStatusActionConfig } from './ProposalStatusActionConfig';
 

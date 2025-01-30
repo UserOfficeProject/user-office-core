@@ -3,6 +3,7 @@ import {
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import initialDBData from '../support/initialDBData';
@@ -32,7 +33,7 @@ context('GenericTemplates tests', () => {
   const proposalWorkflow = {
     name: faker.random.words(3),
     description: faker.random.words(5),
-    entityType: 'proposal',
+    entityType: WorkflowType.PROPOSAL,
   };
 
   let createdTemplateId: number;

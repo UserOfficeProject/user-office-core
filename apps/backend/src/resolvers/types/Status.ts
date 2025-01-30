@@ -1,6 +1,7 @@
 import { ObjectType, Field, Int } from 'type-graphql';
 
-import { Status as StatusOrigin } from '../../models/ProposalStatus';
+import { Status as StatusOrigin } from '../../models/Status';
+import { WorkflowType } from '../../models/Workflow';
 
 @ObjectType()
 export class Status implements Partial<StatusOrigin> {
@@ -19,6 +20,6 @@ export class Status implements Partial<StatusOrigin> {
   @Field(() => Boolean)
   public isDefault: boolean;
 
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
+  @Field(() => WorkflowType)
+  public entityType: WorkflowType;
 }

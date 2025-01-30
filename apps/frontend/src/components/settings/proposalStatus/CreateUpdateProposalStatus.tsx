@@ -10,7 +10,7 @@ import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { Status } from 'generated/sdk';
+import { Status, WorkflowType } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type CreateUpdateProposalStatusProps = {
@@ -30,7 +30,7 @@ const CreateUpdateProposalStatus = ({
         shortCode: '',
         name: '',
         description: '',
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       };
 
   return (

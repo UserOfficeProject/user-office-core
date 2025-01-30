@@ -2,15 +2,16 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import {
-  dummyWorkflow,
-  dummyWorkflowConnection,
-} from '../datasources/mockups/ProposalSettingsDataSource';
-import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import {
+  dummyWorkflow,
+  dummyWorkflowConnection,
+} from '../datasources/mockups/WorkflowDataSource';
 import { Rejection } from '../models/Rejection';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { WorkflowType } from '../models/Workflow';
 import StatusMutations from './StatusMutations';
 import WorkflowMutations from './WorkflowMutations';
 
@@ -32,7 +33,7 @@ describe('Test Proposal settings mutations', () => {
         shortCode: 'NEW',
         name: 'new',
         description: 'new',
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       }
     )) as Rejection;
 
@@ -45,7 +46,7 @@ describe('Test Proposal settings mutations', () => {
         shortCode: 'Test',
         name: 'Test',
         description: 'This is some small description',
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       })
     ).resolves.toHaveProperty('reason', 'Input validation errors');
   });
@@ -55,7 +56,7 @@ describe('Test Proposal settings mutations', () => {
       shortCode: 'NEW',
       name: 'NEW',
       description: 'NEW',
-      entityType: 'proposal' as const,
+      entityType: WorkflowType.PROPOSAL as const,
     };
 
     return expect(
@@ -92,7 +93,10 @@ describe('Test Proposal settings mutations', () => {
         dummyUserOfficerWithRole,
         updatedStatus
       )
-    ).resolves.toMatchObject({ ...updatedStatus, entityType: 'proposal' });
+    ).resolves.toMatchObject({
+      ...updatedStatus,
+      entityType: WorkflowType.PROPOSAL,
+    });
   });
 
   test('A userofficer can remove proposal status', () => {
@@ -119,7 +123,7 @@ describe('Test Proposal settings mutations', () => {
       workflowMutationsInstance.createWorkflow(dummyUserOfficerWithRole, {
         name: '',
         description: 'This is some small description',
-        entityType: 'proposal',
+        entityType: WorkflowType.PROPOSAL,
       })
     ).resolves.toHaveProperty('reason', 'Input validation errors');
   });

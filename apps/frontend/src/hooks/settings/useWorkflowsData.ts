@@ -6,10 +6,10 @@ import {
   useReducer,
 } from 'react';
 
-import { Workflow } from 'generated/sdk';
+import { Workflow, WorkflowType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useWorkflowsData(entityType: 'proposal' | 'experiment'): {
+export function useWorkflowsData(entityType: WorkflowType): {
   //TODO: Entity Type should be extraced from the sdk
   loadingWorkflows: boolean;
   workflows: Workflow[];

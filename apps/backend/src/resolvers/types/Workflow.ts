@@ -10,11 +10,11 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Event } from '../../events/event.enum';
-import {
-  ProposalWorkflow as ProposalWorkflowOrigin,
-  Workflow as WorkflowOrigin,
-} from '../../models/ProposalWorkflow';
 import { isRejection } from '../../models/Rejection';
+import {
+  Workflow as WorkflowOrigin,
+  WorkflowType,
+} from '../../models/Workflow';
 import { WorkflowConnectionGroup } from './WorkflowConnection';
 
 @ObjectType()
@@ -28,20 +28,10 @@ export class Workflow implements Partial<WorkflowOrigin> {
   @Field(() => String)
   public description: string;
 
-  @Field(() => String)
-  public entityType: 'proposal' | 'experiment';
+  @Field(() => WorkflowType)
+  public entityType: WorkflowType;
 }
-@ObjectType()
-export class ProposalWorkflow implements Partial<ProposalWorkflowOrigin> {
-  @Field(() => Int)
-  public id: number;
 
-  @Field(() => String)
-  public name: string;
-
-  @Field(() => String)
-  public description: string;
-}
 @Resolver(() => Workflow)
 export class WorkflowResolver {
   @FieldResolver(() => [WorkflowConnectionGroup])

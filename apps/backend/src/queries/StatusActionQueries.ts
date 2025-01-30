@@ -5,8 +5,8 @@ import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource'
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { EXCHANGE_NAME } from '../eventHandlers/messageBroker';
-import { StatusAction, StatusActionType } from '../models/ProposalStatusAction';
 import { Roles } from '../models/Role';
+import { StatusAction, StatusActionType } from '../models/StatusAction';
 import { UserWithRole } from '../models/User';
 import {
   EmailActionDefaultConfig,
