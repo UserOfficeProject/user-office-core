@@ -3,6 +3,7 @@ import { InputType, Field } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { Invite } from '../types/Invite';
+import { Rejection } from '../types/Rejection';
 
 @InputType()
 class SetCoProposerInvitesInput {
@@ -19,7 +20,7 @@ export class SetCoProposerInvites {
   setCoProposerInvites(
     @Arg('input') input: SetCoProposerInvitesInput,
     @Ctx() context: ResolverContext
-  ): Promise<Invite[]> {
+  ): Promise<Invite[] | Rejection> {
     const { proposalPk, emails } = input;
 
     return context.mutations.invite.setCoProposerInvites(
