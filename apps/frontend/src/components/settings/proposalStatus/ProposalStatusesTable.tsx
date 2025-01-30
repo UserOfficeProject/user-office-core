@@ -3,9 +3,9 @@ import { Typography } from '@mui/material';
 import React from 'react';
 
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import { UserRole, ProposalStatus } from 'generated/sdk';
+import { UserRole, Status, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -21,21 +21,22 @@ const columns = [
 
 const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { api } = useDataApiWithFeedback();
+
   const {
-    loadingProposalStatuses,
-    proposalStatuses,
-    setProposalStatusesWithLoading: setProposalStatuses,
-  } = useProposalStatusesData();
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+    setStatusesWithLoading: setProposalStatuses,
+  } = useStatusesData(WorkflowType.PROPOSAL);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const createModal = (
-    onUpdate: FunctionType<void, [ProposalStatus | null]>,
-    onCreate: FunctionType<void, [ProposalStatus | null]>,
-    editProposalStatus: ProposalStatus | null
+    onUpdate: FunctionType<void, [Status | null]>,
+    onCreate: FunctionType<void, [Status | null]>,
+    editProposalStatus: Status | null
   ) => (
     <CreateUpdateProposalStatus
       proposalStatus={editProposalStatus}
-      close={(proposalStatus: ProposalStatus | null) =>
+      close={(proposalStatus: Status | null) =>
         !!editProposalStatus
           ? onUpdate(proposalStatus)
           : onCreate(proposalStatus)
@@ -47,7 +48,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
     return await api({
       toastSuccessMessage: 'Proposal status deleted successfully',
     })
-      .deleteProposalStatus({
+      .deleteStatus({
         id: id,
       })
       .then(() => {
@@ -89,7 +90,7 @@ const ProposalStatusesTable = ({ confirm }: { confirm: WithConfirmType }) => {
               onClick: (event, rowData) =>
                 confirm(
                   async () => {
-                    await deleteProposalStatus((rowData as ProposalStatus).id);
+                    await deleteProposalStatus((rowData as Status).id);
                   },
                   {
                     title: 'Remove proposal status',

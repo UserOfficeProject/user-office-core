@@ -1,35 +1,31 @@
-import { Status } from '../models/ProposalStatus';
-import { Workflow } from '../models/ProposalWorkflow';
+import { Status } from '../models/Status';
+import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { Workflow } from '../models/Workflow';
 import {
   NextAndPreviousStatuses,
   WorkflowConnection,
-} from '../models/ProposalWorkflowConnections';
-import { StatusChangingEvent } from '../models/StatusChangingEvent';
+  WorkflowConnectionWithStatus,
+} from '../models/WorkflowConnections';
 
 export interface WorkflowDataSource {
   createWorkflow(newWorkflowInput: Omit<Workflow, 'id'>): Promise<Workflow>;
-  getWorkflow(
-    workflowId: number,
-    entityType: Workflow['entityType']
-  ): Promise<Workflow | null>;
+  getWorkflow(workflowId: number): Promise<Workflow | null>;
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]>;
-  updateWorkflow(workflow: Workflow): Promise<Workflow>;
+  updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId'],
-    entityType: WorkflowConnection['entityType'],
     droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: WorkflowConnection['parentDroppableGroupId']
-  ): Promise<WorkflowConnection[]>;
+    byParentGroupId?: boolean | undefined
+  ): Promise<WorkflowConnectionWithStatus[]>;
   getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
     statusId: Status['id'],
-    entityType: WorkflowConnection['entityType'],
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
-  ): Promise<WorkflowConnection[]>;
+  ): Promise<WorkflowConnectionWithStatus[]>;
   addWorkflowStatus(
-    newWorkflowStatusInput: Omit<WorkflowConnection, 'id'>
-  ): Promise<WorkflowConnection>;
+    newWorkflowStatusInput: Omit<WorkflowConnection, 'id' | 'entityType'>
+  ): Promise<WorkflowConnectionWithStatus>;
   updateWorkflowStatuses(
     workflowStatuses: WorkflowConnection[]
   ): Promise<WorkflowConnection[]>;
@@ -43,7 +39,6 @@ export interface WorkflowDataSource {
     statusChangingEvents: string[]
   ): Promise<StatusChangingEvent[]>;
   getStatusChangingEventsByConnectionIds(
-    workflowConnectionIds: number[],
-    entityType: StatusChangingEvent['entityType']
+    workflowConnectionIds: number[]
   ): Promise<StatusChangingEvent[]>;
 }

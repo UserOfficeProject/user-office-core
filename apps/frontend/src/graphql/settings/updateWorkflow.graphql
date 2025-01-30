@@ -1,0 +1,32 @@
+mutation updateWorkflow($id: Int!, $name: String!, $description: String!) {
+  updateWorkflow(
+    updatedWorkflowInput: { id: $id, name: $name, description: $description }
+  ) {
+    id
+    name
+    description
+    workflowConnectionGroups {
+      groupId
+      parentGroupId
+      connections {
+        id
+        sortOrder
+        workflowId
+        statusId
+        status {
+          id
+          name
+          description
+        }
+        nextStatusId
+        prevStatusId
+        droppableGroupId
+        statusChangingEvents {
+          statusChangingEventId
+          workflowConnectionId
+          statusChangingEvent
+        }
+      }
+    }
+  }
+}

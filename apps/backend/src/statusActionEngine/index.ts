@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
-import { ProposalStatusActionType } from '../models/ProposalStatusAction';
+import { StatusActionType } from '../models/StatusAction';
 import {
   WorkflowEngineProposalType,
   getProposalWorkflowConnectionByStatusId,
@@ -41,7 +41,7 @@ export const statusActionEngine = async (
       const proposalStatusActions =
         await statusActionsDataSource.getConnectionStatusActions(
           currentConnection.id,
-          currentConnection.proposalWorkflowId
+          currentConnection.workflowId
         );
 
       if (!proposalStatusActions?.length) {
@@ -55,11 +55,11 @@ export const statusActionEngine = async (
           }
 
           switch (proposalStatusAction.type) {
-            case ProposalStatusActionType.EMAIL:
+            case StatusActionType.EMAIL:
               emailActionHandler(proposalStatusAction, groupedProposals);
               break;
 
-            case ProposalStatusActionType.RABBITMQ:
+            case StatusActionType.RABBITMQ:
               rabbitMQActionHandler(proposalStatusAction, groupedProposals);
               break;
 

@@ -1,0 +1,6 @@
+query getEvents($entityType: WorkflowType!) {
+  events(entityType: $entityType) {
+    name
+    description
+  }
+}

@@ -5,12 +5,12 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
-import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { Roles } from '../models/Role';
+import { ProposalStatusDefaultShortCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
-import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { UserDataSource } from './../datasources/UserDataSource';
 import { UserJWT } from './../models/User';
 import { UserAuthorization } from './UserAuthorization';
@@ -30,8 +30,8 @@ export class ProposalAuthorization {
     private visitDataSource: VisitDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.StatusDataSource)
+    private statusDataSource: StatusDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
@@ -260,7 +260,7 @@ export class ProposalAuthorization {
       checkIfInternalEditable
     );
     const proposalStatus = (
-      await this.proposalSettingsDataSource.getProposalStatus(proposal.statusId)
+      await this.statusDataSource.getStatus(proposal.statusId)
     )?.shortCode;
     if (
       proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||

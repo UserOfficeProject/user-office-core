@@ -1,8 +1,7 @@
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
-//TODO: Create a new file for the Status model
-import { Status } from '../../models/ProposalStatus';
+import { Status } from '../../models/Status';
 import { StatusDataSource } from '../StatusDataSource';
 import database from './database';
 import { StatusRecord } from './records';
@@ -23,7 +22,6 @@ export default class PostgresStatusDataSource implements StatusDataSource {
   async createStatus(
     newStatusInput: Omit<Status, 'id' | 'is_default'>
   ): Promise<Status> {
-    // TODO: To test
     const [addedStatus]: StatusRecord[] = await database
       .insert({
         short_code: newStatusInput.shortCode,
@@ -35,39 +33,30 @@ export default class PostgresStatusDataSource implements StatusDataSource {
       .returning(['*']);
 
     if (!addedStatus) {
-      throw new GraphQLError('Could not create proposal status');
+      throw new GraphQLError('Could not create status');
     }
 
     return this.createStatusObject(addedStatus);
   }
-  async getStatus(
-    statusId: number,
-    entityType: Status['entityType']
-  ): Promise<Status | null> {
-    // TODO: To test
+  async getStatus(statusId: number): Promise<Status | null> {
     const status: StatusRecord = await database
       .select()
       .from('statuses')
       .where('status_id', statusId)
-      .andWhere('entity_type', entityType) // TODO: This where condition is rendundant everywhere. Check if there is a way to set it one time
       .first();
 
     return status ? this.createStatusObject(status) : null;
   }
   async getAllStatuses(entityType: Status['entityType']): Promise<Status[]> {
-    // TODO: To test
-    const proposalStatuses: StatusRecord[] = await database
+    const statuses: StatusRecord[] = await database
       .select('*')
       .from('statuses')
       .where('entity_type', entityType)
       .orderBy('status_id', 'asc');
 
-    return proposalStatuses.map((proposalStatus) =>
-      this.createStatusObject(proposalStatus)
-    );
+    return statuses.map((status) => this.createStatusObject(status));
   }
-  async updateStatus(status: Status): Promise<Status> {
-    // TODO: To test
+  async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
     const [updatedStatus]: StatusRecord[] = await database
       .update(
         {
@@ -85,20 +74,17 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return this.createStatusObject(updatedStatus);
   }
-  async deleteProposalStatus(statusId: number): Promise<Status> {
-    // TODO: To test
-    const [removedProposalStatus]: StatusRecord[] = await database('statuses')
+  async deleteStatus(statusId: number): Promise<Status> {
+    const [removedStatus]: StatusRecord[] = await database('statuses')
       .where('status_id', statusId)
       .andWhere('is_default', false)
       .del()
       .returning('*');
 
-    if (!removedProposalStatus) {
-      throw new GraphQLError(
-        `Could not delete proposalStatus with id: ${statusId} `
-      );
+    if (!removedStatus) {
+      throw new GraphQLError(`Could not delete status with id: ${statusId} `);
     }
 
-    return this.createStatusObject(removedProposalStatus);
+    return this.createStatusObject(removedStatus);
   }
 }

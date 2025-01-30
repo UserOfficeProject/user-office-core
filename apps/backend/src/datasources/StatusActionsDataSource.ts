@@ -1,19 +1,17 @@
 import {
   ConnectionHasStatusAction,
   StatusAction,
-} from '../models/ProposalStatusAction';
+} from '../models/StatusAction';
 import { AddConnectionStatusActionsInput } from '../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 
 export interface StatusActionsDataSource {
   getConnectionStatusActions(
-    proposalWorkflowConnectionId: number,
-    proposalWorkflowId: number,
-    entityType: ConnectionHasStatusAction['entityType']
+    workflowConnectionId: number,
+    workflowId: number
   ): Promise<ConnectionHasStatusAction[]>;
   getConnectionStatusAction(
-    proposalWorkflowConnectionId: number,
-    proposalStatusActionId: number,
-    entityType: ConnectionHasStatusAction['entityType']
+    workflowConnectionId: number,
+    statusActionId: number
   ): Promise<ConnectionHasStatusAction>;
   updateConnectionStatusAction(
     data: ConnectionHasStatusAction
@@ -21,7 +19,6 @@ export interface StatusActionsDataSource {
   getStatusAction(actionId: number): Promise<StatusAction>;
   getStatusActions(): Promise<StatusAction[]>;
   addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput,
-    entityType: ConnectionHasStatusAction['entityType']
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[] | null>;
 }

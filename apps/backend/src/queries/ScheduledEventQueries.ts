@@ -6,7 +6,7 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ScheduledEventsCoreArgs } from '../resolvers/queries/ScheduledEventsCoreQuery';
-import { ScheduledEventCore } from './../resolvers/types/ScheduledEvent';
+import { ScheduledEventCore } from '../resolvers/types/ScheduledEvent';
 
 @injectable()
 export default class ScheduledEventQueries {

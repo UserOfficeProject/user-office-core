@@ -317,10 +317,7 @@ export default class PostgresFapDataSource implements FapDataSource {
             'p.status_id': 's.status_id',
           })
           .where(function () {
-            this.where('ps.name', 'ilike', 'FAP_%');
-          })
-          .where(function () {
-            this.where('s.entity_type', 'proposal');
+            this.where('s.name', 'ilike', 'FAP_%');
           });
 
         if (callId) {
@@ -517,7 +514,6 @@ export default class PostgresFapDataSource implements FapDataSource {
         'p.status_id': 's.status_id',
       })
       .where('fp.instrument_id', instrumentId)
-      .andWhere('s.entity_type', 'proposal')
       .modify((query) => {
         if (fapId) {
           query.andWhere('fp.fap_id', fapId);

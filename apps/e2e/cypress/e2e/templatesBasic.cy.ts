@@ -8,6 +8,7 @@ import {
   ProposalEndStatus,
   TemplateCategoryId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -403,6 +404,7 @@ const newCall = {
 const proposalWorkflow = {
   name: faker.random.words(2),
   description: faker.random.words(5),
+  entityType: WorkflowType.PROPOSAL,
 };
 
 context('Template Basic tests', () => {
@@ -2183,9 +2185,9 @@ context('Template Delete, Archive, Unarchive', () => {
     cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
 
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow) {
-        workflowId = result.createProposalWorkflow.id;
+    cy.createWorkflow(proposalWorkflow).then((result) => {
+      if (result.createWorkflow) {
+        workflowId = result.createWorkflow.id;
       } else {
         throw new Error('Workflow creation failed');
       }

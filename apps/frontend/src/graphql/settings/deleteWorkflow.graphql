@@ -1,0 +1,7 @@
+mutation deleteWorkflow($id: Int!) {
+  deleteWorkflow(id: $id) {
+    id
+    name
+    description
+  }
+}

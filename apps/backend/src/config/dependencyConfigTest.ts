@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
+import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
-import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import 'reflect-metadata';
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
+import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
+import { CoProposerInviteDataSourceMock } from '../datasources/mockups/CoProposerInviteDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
@@ -18,7 +20,6 @@ import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDat
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
 import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
-import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
@@ -28,11 +29,13 @@ import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventD
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
 import { StatusActionsLogsDataSourceMock } from '../datasources/mockups/StatusActionsLogsDataSource';
+import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
@@ -49,6 +52,7 @@ import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
+mapClass(Tokens.CoProposerInviteDataSource, CoProposerInviteDataSourceMock);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);
 mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);
@@ -57,15 +61,17 @@ mapClass(Tokens.GenericTemplateDataSource, GenericTemplateDataSourceMock);
 mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.InviteCodeDataSource, InviteCodesDataSourceMock);
 mapClass(Tokens.RoleInviteDataSource, RoleInviteDataSourceMock);
+mapClass(Tokens.InviteAuthorization, InviteAuthorization);
 mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
 mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);
-mapClass(Tokens.ProposalSettingsDataSource, ProposalSettingsDataSourceMock);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSourceMock
 );
+mapClass(Tokens.WorkflowDataSource, WorkflowDataSourceMock);
+mapClass(Tokens.StatusDataSource, StatusDataSourceMock);
 mapClass(Tokens.StatusActionsDataSource, StatusActionsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
 mapClass(Tokens.RedeemCodesDataSource, RedeemDataSourceMock);

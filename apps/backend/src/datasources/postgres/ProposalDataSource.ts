@@ -9,7 +9,6 @@ import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
-import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
@@ -17,6 +16,7 @@ import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
+import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
@@ -26,7 +26,7 @@ import { UserProposalsFilter } from '../../resolvers/types/User';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
+import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
   QuestionFilterInput,
@@ -102,8 +102,8 @@ export async function calculateReferenceNumber(
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
   constructor(
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
     private AdminDataSource: AdminDataSource
   ) {}
@@ -230,6 +230,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         return createProposalObject(proposal[0]);
       });
+  }
+
+  async addProposalUser(proposalPk: number, userId: number): Promise<void> {
+    return database
+      .insert({ proposal_pk: proposalPk, user_id: userId })
+      .into('proposal_user');
   }
 
   async setProposalUsers(proposalPk: number, userIds: number[]): Promise<void> {
@@ -876,12 +882,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           FROM workflow_connections
           WHERE workflow_id = ${proposalWorkflowId}
           AND status_id = ${statusId}
-          AND 
-          entity_type = 'proposal'
         )
         AND wc.workflow_id = ${proposalWorkflowId};
-        AND wc.entity_type = 'proposal'
-        AND sce.entity_type = 'proposal'
       `
             )
             .transacting(trx)
@@ -1144,10 +1146,8 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .first()
       .then((value) => value.proposal_workflow_id);
 
-    const proposalStatus: ProposalWorkflowConnection[] =
-      await this.proposalSettingsDataSource.getProposalWorkflowConnections(
-        proposalWorkflowId
-      );
+    const proposalStatus: WorkflowConnectionWithStatus[] =
+      await this.workflowDataSource.getWorkflowConnections(proposalWorkflowId);
 
     return !!proposalStatus.find((status) =>
       status.status.shortCode.match(workflowStatus)

@@ -2,9 +2,9 @@ import { GraphQLError } from 'graphql';
 
 import {
   ConnectionHasStatusAction,
-  ProposalStatusAction,
-  ProposalStatusActionType,
-} from '../../models/ProposalStatusAction';
+  StatusAction,
+  StatusActionType,
+} from '../../models/StatusAction';
 import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
 
@@ -13,47 +13,47 @@ export const dummyConnectionHasStatusAction = new ConnectionHasStatusAction(
   1,
   1,
   'Dummy action',
-  ProposalStatusActionType.EMAIL,
+  StatusActionType.EMAIL,
   {}
 );
 
-export const dummyStatusAction = new ProposalStatusAction(
+export const dummyStatusAction = new StatusAction(
   1,
   'Dummy action',
   'Dummy action description',
-  ProposalStatusActionType.EMAIL
+  StatusActionType.EMAIL
 );
 
-export const anotherDummyStatusAction = new ProposalStatusAction(
+export const anotherDummyStatusAction = new StatusAction(
   2,
   'Dummy action 2',
   'Dummy action 2 description',
-  ProposalStatusActionType.RABBITMQ
+  StatusActionType.RABBITMQ
 );
 
 export const dummyStatusActions = [dummyStatusAction, anotherDummyStatusAction];
 
 export class StatusActionsDataSourceMock implements StatusActionsDataSource {
   async getConnectionStatusAction(
-    proposalWorkflowConnectionId: number,
-    proposalStatusActionId: number
+    workflowConnectionId: number,
+    statusActionId: number
   ): Promise<ConnectionHasStatusAction> {
     return dummyConnectionHasStatusAction;
   }
   async getConnectionStatusActions(
-    proposalWorkflowConnectionId: number,
-    proposalWorkflowId: number
+    workflowConnectionId: number,
+    workflowId: number
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }
 
   async updateConnectionStatusAction(
-    proposalStatusAction: ConnectionHasStatusAction
+    statusAction: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction> {
     return dummyConnectionHasStatusAction;
   }
 
-  async getStatusAction(actionId: number): Promise<ProposalStatusAction> {
+  async getStatusAction(actionId: number): Promise<StatusAction> {
     const foundStatusAction = dummyStatusActions.find(
       (statusAction) => statusAction.id === actionId
     );
@@ -65,13 +65,12 @@ export class StatusActionsDataSourceMock implements StatusActionsDataSource {
     return foundStatusAction;
   }
 
-  async getStatusActions(): Promise<ProposalStatusAction[]> {
+  async getStatusActions(): Promise<StatusAction[]> {
     return dummyStatusActions;
   }
 
   async addConnectionStatusActions(
-    connectionStatusActionsInput: AddConnectionStatusActionsInput,
-    entityType: ConnectionHasStatusAction['entityType']
+    connectionStatusActionsInput: AddConnectionStatusActionsInput
   ): Promise<ConnectionHasStatusAction[]> {
     return [dummyConnectionHasStatusAction];
   }

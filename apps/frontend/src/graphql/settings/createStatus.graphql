@@ -1,0 +1,17 @@
+mutation createStatus(
+  $shortCode: String!
+  $name: String!
+  $description: String!
+  $entityType: WorkflowType!
+) {
+  createStatus(
+    newStatusInput: {
+      shortCode: $shortCode
+      name: $name
+      description: $description
+      entityType: $entityType
+    }
+  ) {
+    ...status
+  }
+}

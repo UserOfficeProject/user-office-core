@@ -1,0 +1,41 @@
+mutation createWorkflow(
+  $name: String!
+  $description: String!
+  $entityType: WorkflowType!
+) {
+  createWorkflow(
+    newWorkflowInput: {
+      name: $name
+      description: $description
+      entityType: $entityType
+    }
+  ) {
+    id
+    name
+    description
+    workflowConnectionGroups {
+      groupId
+      parentGroupId
+      connections {
+        id
+        sortOrder
+        workflowId
+        statusId
+        status {
+          ...status
+        }
+        nextStatusId
+        prevStatusId
+        droppableGroupId
+        statusChangingEvents {
+          statusChangingEventId
+          workflowConnectionId
+          statusChangingEvent
+        }
+        statusActions {
+          ...connectionStatusAction
+        }
+      }
+    }
+  }
+}

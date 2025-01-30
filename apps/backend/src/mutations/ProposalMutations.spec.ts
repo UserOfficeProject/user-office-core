@@ -2,14 +2,13 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import {
   ProposalDataSourceMock,
   dummyProposalWithNotActiveCall,
   dummyProposalSubmitted,
   dummyProposal,
 } from '../datasources/mockups/ProposalDataSource';
-import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
+import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import {
   dummyInstrumentScientist,
   dummyPrincipalInvestigatorWithRole,
@@ -19,15 +18,15 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Proposal } from '../models/Proposal';
-import { ProposalStatus } from '../models/ProposalStatus';
 import { isRejection, Rejection } from '../models/Rejection';
+import { Status } from '../models/Status';
+import { WorkflowType } from '../models/Workflow';
 import ProposalMutations from './ProposalMutations';
 
 const proposalMutations = container.resolve(ProposalMutations);
 
 let proposalDataSource: ProposalDataSourceMock;
-let proposalSettingsDataSource: ProposalSettingsDataSourceMock;
-let instrumentDataSource: InstrumentDataSourceMock;
+let statusDataSource: StatusDataSourceMock;
 
 beforeEach(() => {
   proposalDataSource = container.resolve<ProposalDataSourceMock>(
@@ -35,13 +34,8 @@ beforeEach(() => {
   );
   proposalDataSource.init();
 
-  proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSourceMock>(
-      Tokens.ProposalSettingsDataSource
-    );
-
-  instrumentDataSource = container.resolve<InstrumentDataSourceMock>(
-    Tokens.ProposalSettingsDataSource
+  statusDataSource = container.resolve<StatusDataSourceMock>(
+    Tokens.StatusDataSource
   );
 });
 
@@ -420,39 +414,70 @@ describe('Test Xpress change status', () => {
   const expiredId = 7;
 
   const dummyProposalStatuses = [
-    new ProposalStatus(draftId, 'DRAFT', 'Draft', '', true),
-    new ProposalStatus(
+    new Status(draftId, 'DRAFT', 'Draft', '', true, WorkflowType.PROPOSAL),
+    new Status(
       submittedId,
       'SUBMITTED_LOCKED',
       'Submitted (locked)',
       '',
-      true
+      true,
+      WorkflowType.PROPOSAL
     ),
-    new ProposalStatus(underReviewId, 'UNDER_REVIEW', 'Under review', '', true),
-    new ProposalStatus(approvedId, 'APPROVED', 'Approved', '', true),
-    new ProposalStatus(
+    new Status(
+      underReviewId,
+      'UNDER_REVIEW',
+      'Under review',
+      '',
+      true,
+      WorkflowType.PROPOSAL
+    ),
+    new Status(
+      approvedId,
+      'APPROVED',
+      'Approved',
+      '',
+      true,
+      WorkflowType.PROPOSAL
+    ),
+    new Status(
       unsuccessfulId,
       'UNSUCCESSFUL',
       'Unsuccessful',
       '',
-      true
+      true,
+      WorkflowType.PROPOSAL
     ),
-    new ProposalStatus(finishedId, 'FINISHED', 'Finished', '', true),
-    new ProposalStatus(
+    new Status(
+      finishedId,
+      'FINISHED',
+      'Finished',
+      '',
+      true,
+      WorkflowType.PROPOSAL
+    ),
+    new Status(
       nonXpressId,
       'NON-XPRESS',
       'A non-xpress status',
       '',
-      true
+      true,
+      WorkflowType.PROPOSAL
     ),
-    new ProposalStatus(expiredId, 'EXPIRED', 'Expired', '', true),
+    new Status(
+      expiredId,
+      'EXPIRED',
+      'Expired',
+      '',
+      true,
+      WorkflowType.PROPOSAL
+    ),
   ];
 
   beforeEach(() => {
     jest.restoreAllMocks();
 
     jest
-      .spyOn(proposalSettingsDataSource, 'getAllProposalStatuses')
+      .spyOn(statusDataSource, 'getAllStatuses')
       .mockResolvedValue(dummyProposalStatuses);
   });
 

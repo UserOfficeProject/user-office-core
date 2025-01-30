@@ -1,3 +1,4 @@
+import { Science } from '@mui/icons-material';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -21,6 +22,7 @@ const menuMap = {
   Units: '/Units',
   ProposalStatuses: '/ProposalStatuses',
   ProposalWorkflows: '/ProposalWorkflows',
+  ExperimentWorkflows: '/ExperimentWorkflows',
   ApiAccessTokens: '/ApiAccessTokens',
   Features: '/Features',
   Settings: '/Settings',
@@ -97,6 +99,22 @@ const SettingsMenuListItem = () => {
               <ProposalWorkflowIcon />
             </ListItemIcon>
             <ListItemText primary="Proposal workflows" />
+          </ListItemButton>
+        </Tooltip>
+
+        <Tooltip title="Experiment workflows">
+          <ListItemButton
+            component={NavLink}
+            selected={
+              location.pathname.includes('/ExperimentWorkflows') ||
+              location.pathname.includes('ExperimentWorkflowEditor')
+            }
+            to={menuMap['ExperimentWorkflows']}
+          >
+            <ListItemIcon>
+              <Science />
+            </ListItemIcon>
+            <ListItemText primary="Experiment workflows" />
           </ListItemButton>
         </Tooltip>
 

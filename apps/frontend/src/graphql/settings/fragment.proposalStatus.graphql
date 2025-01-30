@@ -1,7 +1,8 @@
-fragment status on ProposalStatus {
+fragment status on Status {
   id
   shortCode
   name
   description
   isDefault
+  entityType
 }

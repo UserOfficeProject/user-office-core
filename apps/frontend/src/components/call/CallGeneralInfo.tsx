@@ -37,8 +37,8 @@ import {
   CreateCallMutationVariables,
   FeatureId,
   GetTemplatesQuery,
-  ProposalWorkflow,
   UpdateCallMutationVariables,
+  Workflow,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
@@ -84,7 +84,7 @@ const CallGeneralInfo = ({
   pdfTemplates: GetTemplatesQuery['templates'];
   fapReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
-  proposalWorkflows: ProposalWorkflow[];
+  proposalWorkflows: Workflow[];
   loadingProposalWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
@@ -147,17 +147,16 @@ const CallGeneralInfo = ({
       (value) => value.id === proposalWorkflowId
     );
     if (selectedProposalWorkFlow) {
-      const result =
-        selectedProposalWorkFlow.proposalWorkflowConnectionGroups.some(
-          (workGroup) => {
-            return workGroup.connections.some((connectionStatus) => {
-              return (
-                connectionStatus.proposalStatus.shortCode ===
-                ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
-              );
-            });
-          }
-        );
+      const result = selectedProposalWorkFlow.workflowConnectionGroups.some(
+        (workGroup) => {
+          return workGroup.connections.some((connectionStatus) => {
+            return (
+              connectionStatus.status.shortCode ===
+              ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+            );
+          });
+        }
+      );
       setInternalCallDate({ showField: result, isValueSet: true });
     }
   }, [proposalWorkflowId, proposalWorkflows]);

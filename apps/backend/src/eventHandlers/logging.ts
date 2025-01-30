@@ -7,7 +7,7 @@ import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -16,10 +16,10 @@ export default function createHandler() {
   const eventLogsDataSource = container.resolve<EventLogsDataSource>(
     Tokens.EventLogsDataSource
   );
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+
+  const statusDataSource = container.resolve<StatusDataSource>(
+    Tokens.StatusDataSource
+  );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
@@ -130,10 +130,9 @@ export default function createHandler() {
         case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
           await Promise.all(
             event.proposals.proposals.map(async (proposal) => {
-              const proposalStatus =
-                await proposalSettingsDataSource.getProposalStatus(
-                  proposal.statusId
-                );
+              const proposalStatus = await statusDataSource.getStatus(
+                proposal.statusId
+              );
 
               const description = `Status changed to: ${proposalStatus?.name}`;
 

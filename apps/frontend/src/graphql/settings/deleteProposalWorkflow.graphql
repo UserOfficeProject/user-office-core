@@ -1,7 +1,0 @@
-mutation deleteProposalWorkflow($id: Int!) {
-  deleteProposalWorkflow(id: $id) {
-    id
-    name
-    description
-  }
-}

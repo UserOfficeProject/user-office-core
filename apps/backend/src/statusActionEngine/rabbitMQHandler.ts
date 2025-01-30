@@ -1,4 +1,4 @@
-import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
+import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { RabbitMQActionConfig } from '../resolvers/types/ProposalStatusActionConfig';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import { publishMessageToTheEventBus } from './statusActionUtils';

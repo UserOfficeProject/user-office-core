@@ -5,6 +5,7 @@ export const Tokens = {
   CallDataSource: Symbol('CallDataSource'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
+  CoProposerInviteDataSource: Symbol('CoProposerInviteDataSource'),
   EmailEventHandler: Symbol('EmailEventHandler'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
@@ -13,6 +14,7 @@ export const Tokens = {
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
   InstrumentDataSource: Symbol('InstrumentDataSource'),
   InviteCodeDataSource: Symbol('InviteCodeDataSource'),
+  InviteAuthorization: Symbol('InviteAuthorization'),
   TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   MailService: Symbol('MailService'),
@@ -49,4 +51,6 @@ export const Tokens = {
   ProposalInternalCommentsDataSource: Symbol(
     'ProposalInternalCommentsDataSource'
   ),
+  WorkflowDataSource: Symbol('WorkflowDataSource'),
+  StatusDataSource: Symbol('StatusDataSource'),
 };

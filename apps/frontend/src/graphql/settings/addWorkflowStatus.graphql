@@ -1,0 +1,23 @@
+mutation addWorkflowStatus(
+  $workflowId: Int!
+  $sortOrder: Int!
+  $droppableGroupId: String!
+  $parentDroppableGroupId: String
+  $statusId: Int!
+  $nextStatusId: Int
+  $prevStatusId: Int
+) {
+  addWorkflowStatus(
+    newWorkflowStatusInput: {
+      workflowId: $workflowId
+      sortOrder: $sortOrder
+      droppableGroupId: $droppableGroupId
+      parentDroppableGroupId: $parentDroppableGroupId
+      statusId: $statusId
+      nextStatusId: $nextStatusId
+      prevStatusId: $prevStatusId
+    }
+  ) {
+    id
+  }
+}

@@ -12,7 +12,7 @@ import { ResolverContext } from '../../../context';
 import {
   ConnectionHasStatusAction,
   StatusActionType,
-} from '../../../models/ProposalStatusAction';
+} from '../../../models/StatusAction';
 import { ConnectionStatusAction } from '../../types/ConnectionStatusAction';
 
 @InputType()
@@ -49,7 +49,7 @@ export class AddConnectionStatusActionsMutation {
     @Arg('newConnectionStatusActionsInput')
     newConnectionStatusActionsInput: AddConnectionStatusActionsInput
   ) {
-    return context.mutations.proposalSettings.addConnectionStatusActions(
+    return context.mutations.workflow.addConnectionStatusActions(
       context.user,
       newConnectionStatusActionsInput
     );

@@ -1,21 +1,21 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import {
-  createProposalStatusValidationSchema,
-  updateProposalStatusValidationSchema,
-} from '@user-office-software/duo-validation/lib/ProposalStatuses';
+  createStatusValidationSchema,
+  updateStatusValidationSchema,
+} from '@user-office-software/duo-validation/lib/Statuses';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
-import { ProposalStatus } from 'generated/sdk';
+import { Status, WorkflowType } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type CreateUpdateProposalStatusProps = {
-  close: (proposalStatusAdded: ProposalStatus | null) => void;
-  proposalStatus: ProposalStatus | null;
+  close: (proposalStatusAdded: Status | null) => void;
+  proposalStatus: Status | null;
 };
 
 const CreateUpdateProposalStatus = ({
@@ -30,32 +30,34 @@ const CreateUpdateProposalStatus = ({
         shortCode: '',
         name: '',
         description: '',
+        entityType: WorkflowType.PROPOSAL,
       };
 
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
+        console.log('values', values);
         if (proposalStatus) {
           try {
-            const { updateProposalStatus } = await api({
+            const { updateStatus } = await api({
               toastSuccessMessage: 'Proposal status updated successfully',
-            }).updateProposalStatus({
+            }).updateStatus({
               id: proposalStatus.id,
               ...values,
             });
 
-            close(updateProposalStatus);
+            close(updateStatus);
           } catch (error) {
             close(null);
           }
         } else {
           try {
-            const { createProposalStatus } = await api({
+            const { createStatus } = await api({
               toastSuccessMessage: 'Proposal status created successfully',
-            }).createProposalStatus(values);
+            }).createStatus(values);
 
-            close(createProposalStatus);
+            close(createStatus);
           } catch (error) {
             close(null);
           }
@@ -63,8 +65,8 @@ const CreateUpdateProposalStatus = ({
       }}
       validationSchema={
         proposalStatus
-          ? updateProposalStatusValidationSchema
-          : createProposalStatusValidationSchema
+          ? updateStatusValidationSchema
+          : createStatusValidationSchema
       }
     >
       {() => (
