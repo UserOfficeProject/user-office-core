@@ -109,7 +109,7 @@ export class ProposalResolver {
     return isRejection(users) ? [] : users;
   }
 
-  @FieldResolver(() => [Invite], { nullable: true })
+  @FieldResolver(() => [Invite])
   async coProposerInvites(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext

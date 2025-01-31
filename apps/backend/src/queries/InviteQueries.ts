@@ -31,7 +31,7 @@ export default class InviteQueries {
     );
 
     if (!isUserOfficer && !isMemberOfProposal) {
-      return null;
+      return [];
     }
 
     const coProposerClaims =
