@@ -232,6 +232,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
 
+  async addProposalUser(proposalPk: number, userId: number): Promise<void> {
+    return database
+      .insert({ proposal_pk: proposalPk, user_id: userId })
+      .into('proposal_user');
+  }
+
   async setProposalUsers(proposalPk: number, userIds: number[]): Promise<void> {
     return database.transaction(async (trx) => {
       return database

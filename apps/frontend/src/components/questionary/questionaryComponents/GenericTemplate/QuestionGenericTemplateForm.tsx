@@ -148,6 +148,16 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
           </TitledContainer>
           <TitledContainer label="Constraints">
             <Field
+              name="config.required"
+              id="Is-Required-Input"
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
+              data-cy="required"
+            />
+            <Field
               name="config.minEntries"
               id="Min-Input"
               label="Min entries"

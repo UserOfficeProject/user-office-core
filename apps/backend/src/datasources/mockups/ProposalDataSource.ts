@@ -273,7 +273,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return proposal;
   }
 
-  async setProposalUsers(proposalPk: number, users: number[]): Promise<void> {
+  async setProposalUsers(
+    proposalPk: number,
+    usersIds: number[]
+  ): Promise<void> {
+    throw new Error('Not implemented');
+  }
+
+  async addProposalUser(proposalPk: number, userId: number): Promise<void> {
     throw new Error('Not implemented');
   }
 
