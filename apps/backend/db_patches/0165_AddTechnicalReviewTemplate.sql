@@ -6,7 +6,7 @@ DECLARE
     questionary_id_var int;
     technical_review_loop_var proposals%rowType;
 BEGIN
-    IF register_patch('AddTechnicalReviewTemplate.sql', 'Gergely Nyiri', 'Add Technical review template', '2024-10-15') THEN
+    IF register_patch('0165_AddTechnicalReviewTemplate.sql', 'Gergely Nyiri', 'Add Technical review template', '2024-10-15') THEN
 
     INSERT INTO template_categories(template_category_id, name) VALUES(11, 'Technical Review');
 	
@@ -54,11 +54,20 @@ BEGIN
 
     UPDATE call set technical_review_template_id = technical_review_template_id_var;
 
+    CREATE OR REPLACE FUNCTION CreateTechnicalReviewQuestionary(p_template_id int)
+	RETURNS integer AS $func$
+	DECLARE
+		q_id integer;
+	BEGIN
+	    INSERT INTO questionaries(template_id) VALUES(p_template_id) RETURNING questionary_id INTO q_id;
+	    RETURN q_id;
+	END;
+	$func$ LANGUAGE plpgsql;
+
     FOR technical_review_loop_var IN
         SELECT * FROM technical_review
     LOOP
-        INSERT INTO questionaries(template_id) VALUES (technical_review_template_id_var) RETURNING questionary_id INTO questionary_id_var;
-        UPDATE technical_review SET questionary_id = 1 WHERE technical_review_id = technical_review_loop_var.technical_review_id;
+        UPDATE technical_review SET questionary_id = CreateTechnicalReviewQuestionary(technical_review_template_id_var) WHERE technical_review_id = technical_review_loop_var.technical_review_id;
     END LOOP;
 
     END IF;
