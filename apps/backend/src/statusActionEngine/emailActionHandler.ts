@@ -24,6 +24,7 @@ import {
   getFapChairSecretariesAndFormatOutputForEmailSending,
   statusActionLogger,
   getOtherAndFormatOutputForEmailSending,
+  getTechniqueScientistsAndFormatOutputForEmailSending,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -274,6 +275,84 @@ export const emailStatusActionRecipient = async (
           actionId: proposalStatusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.USER_OFFICE,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
+    case EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS: {
+      const techniqueScientists =
+        await getTechniqueScientistsAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate
+        );
+      await sendMail(
+        techniqueScientists,
+        statusActionLogger({
+          connectionId: proposalStatusAction.connectionId,
+          actionId: proposalStatusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient:
+            EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
+    case EmailStatusActionRecipients.SAMPLE_SAFETY: {
+      const adminDataSource = container.resolve<AdminDataSource>(
+        Tokens.AdminDataSource
+      );
+
+      const sampleSafetyEmail = (
+        await adminDataSource.getSetting(SettingsId.SAMPLE_SAFETY_EMAIL)
+      )?.settingsValue;
+
+      if (!sampleSafetyEmail) {
+        logger.logError(
+          'Could not send email(s) to the Sample Safety team as the setting (SAMPLE_SAFETY_EMAIL) is not set.',
+          { proposalEmailsSkipped: proposals }
+        );
+
+        break;
+      }
+
+      let sampleSafetyRecipients: EmailReadyType[];
+
+      if (recipientWithTemplate.combineEmails) {
+        sampleSafetyRecipients = [
+          {
+            id: recipientWithTemplate.recipient.name,
+            email: sampleSafetyEmail,
+            proposals: proposals,
+            template: recipientWithTemplate.emailTemplate.id,
+          },
+        ];
+      } else {
+        sampleSafetyRecipients = await getOtherAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate,
+          sampleSafetyEmail
+        );
+      }
+
+      await sendMail(
+        sampleSafetyRecipients,
+        statusActionLogger({
+          connectionId: proposalStatusAction.connectionId,
+          actionId: proposalStatusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient: EmailStatusActionRecipients.SAMPLE_SAFETY,
           proposalPks,
         }),
         successfulMessage,
