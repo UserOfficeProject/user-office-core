@@ -31,9 +31,11 @@ BEGIN
   WHERE template_id = 1;
 
   SELECT templates.template_id 
-      INTO technical_review_template_id_var
-      FROM templates 
-      WHERE name='default technical review template';
+  INTO technical_review_template_id_var
+  FROM templates
+  WHERE name = 'default technical review template';
+
+  INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (technical_review_template_id_var, NOW(), 1);
 
   SELECT questionaries.questionary_id
   INTO technical_review_questionary_id_var
