@@ -4,7 +4,7 @@ DECLARE
     technical_review_template_id_var int;
     technical_review_topic_id_var int;
     questionary_id_var int;
-    technical_review_loop_var proposals%rowType;
+    technical_review_loop_var int;
 BEGIN
     IF register_patch('0165_AddTechnicalReviewTemplate.sql', 'Gergely Nyiri', 'Add Technical review template', '2024-10-15') THEN
 
@@ -65,9 +65,9 @@ BEGIN
 	$func$ LANGUAGE plpgsql;
 
     FOR technical_review_loop_var IN
-        SELECT * FROM technical_review
+        SELECT technical_review_id FROM technical_review
     LOOP
-        UPDATE technical_review SET questionary_id = CreateTechnicalReviewQuestionary(technical_review_template_id_var) WHERE technical_review_id = technical_review_loop_var.technical_review_id;
+        UPDATE technical_review SET questionary_id = CreateTechnicalReviewQuestionary(technical_review_template_id_var) WHERE technical_review_id = technical_review_loop_var;
     END LOOP;
 
     END IF;
