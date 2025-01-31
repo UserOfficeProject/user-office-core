@@ -76,7 +76,7 @@ const addProposalAttachments = (
 const getQuestionIdsData = async (
   getTemplates: GetTemplates,
   questionIds?: string[]
-): Promise<string[]> => {
+): Promise<{ ids: string[]; naturalKeys: string[] }> => {
   if (!questionIds) {
     throw new Error('Could not get attachments question ids not set');
   }
@@ -87,21 +87,28 @@ const getQuestionIdsData = async (
       throw new Error('Could not fetch questions');
     }
 
-    return questions.map((question) => question.id);
+    const ids = questions.map((question) => question.id);
+    const naturalKey = questions.map((question) => question.naturalKey);
+
+    return [ids, naturalKey];
   });
 
+  const questionsIds = questionIdsData[0];
+  const questionNaturalKeys = questionIdsData[1];
+  const questionData = { ids: questionsIds, naturalKeys: questionNaturalKeys };
   questionIds.forEach((questionId) => {
-    if (!questionIdsData.includes(questionId)) {
+    if (!questionsIds.includes(questionId)) {
       throw new Error(`Could not fetch question ${questionId}`);
     }
   });
 
-  return questionIdsData;
+  return questionData;
 };
 
 async function getGenericTemplateAttachments(
   templates: GenericTemplate[] | Sample[],
   questionIds: string[],
+  questionNaturalKey: string[],
   getQuestionarySteps: (
     questionaryId: number
   ) => Promise<QuestionaryStep[] | null>
@@ -124,11 +131,11 @@ async function getGenericTemplateAttachments(
         const completedFields = (
           getAllFields(questionarySteps) as Answer[]
         ).filter((field) =>
-          areDependenciesSatisfied(questionarySteps, field.question.id)
+          areDependenciesSatisfied(questionarySteps, field.question.naturalKey)
         );
 
         completedFields.forEach((fieldAnswer) => {
-          if (questionIds.includes(fieldAnswer.question.id)) {
+          if (questionNaturalKey?.includes(fieldAnswer.question.naturalKey)) {
             attachments.push(...getFileAttachments(fieldAnswer));
           }
         });
@@ -243,7 +250,7 @@ export const collectProposalAttachmentData = async (
     throw new Error('Proposal not found');
   }
 
-  const questionIds = await getQuestionIdsData(
+  const questionData = await getQuestionIdsData(
     getQuestions,
     options?.questionIds
   );
@@ -263,7 +270,8 @@ export const collectProposalAttachmentData = async (
 
   const genericTemplatesAttachments = await getGenericTemplateAttachments(
     genericTemplates,
-    questionIds,
+    questionData.ids,
+    questionData.naturalKeys,
     getQuestionarySteps
   );
 
@@ -273,7 +281,8 @@ export const collectProposalAttachmentData = async (
 
   const samplesAttachments = await getGenericTemplateAttachments(
     samples,
-    questionIds,
+    questionData.ids,
+    questionData.naturalKeys,
     getQuestionarySteps
   );
   const proposalAttachmentData: ProposalAttachmentData = addProposalAttachments(
@@ -282,7 +291,7 @@ export const collectProposalAttachmentData = async (
       attachments: [...genericTemplatesAttachments, ...samplesAttachments],
     },
     questionarySteps,
-    questionIds
+    questionData.ids
   );
 
   return proposalAttachmentData;

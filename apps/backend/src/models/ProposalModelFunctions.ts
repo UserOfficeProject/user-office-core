@@ -1,4 +1,3 @@
-import { FileUploadConfig } from '../resolvers/types/FieldConfig';
 import {
   ConditionEvaluator,
   DependenciesLogicOperator,
@@ -51,11 +50,7 @@ export function getAllFields(collection: AbstractCollection) {
 function applyPdfFilters(allFields: AbstractField[]): AbstractField[] {
   let fields = new Array<AbstractField>();
   fields = allFields.filter(
-    (field) =>
-      !(
-        field.question.dataType === DataType.FILE_UPLOAD &&
-        (field.config as FileUploadConfig).omitFromPdf === true
-      )
+    (field) => !(field.question.dataType === DataType.FILE_UPLOAD)
   );
 
   return fields;
