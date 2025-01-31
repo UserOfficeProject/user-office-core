@@ -2,6 +2,7 @@ import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';

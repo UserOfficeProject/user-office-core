@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
+import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
+import 'reflect-metadata';
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import 'reflect-metadata';
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';

@@ -7,6 +7,7 @@ import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
 import {
   dummyUserNotOnProposalWithRole,
+  dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -37,6 +38,7 @@ describe('Test Invite Mutations', () => {
         note: 'Test note',
         claims: {
           roleIds: [UserRole.FAP_REVIEWER],
+          roleIds: [UserRole.FAP_REVIEWER],
         },
       })
     ).resolves.toHaveProperty('email', email);
@@ -49,8 +51,13 @@ describe('Test Invite Mutations', () => {
         note: 'Test note',
         claims: {
           roleIds: [UserRole.FAP_REVIEWER],
+          roleIds: [UserRole.FAP_REVIEWER],
         },
       })
+    ).resolves.toHaveProperty(
+      'reason',
+      'User is not authorized to create invites to this user type'
+    );
     ).resolves.toHaveProperty(
       'reason',
       'User is not authorized to create invites to this user type'

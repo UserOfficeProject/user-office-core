@@ -2,8 +2,15 @@ import {
   createInviteValidationSchema,
   updateInviteValidationSchema,
 } from '@user-office-software/duo-validation';
+import {
+  createInviteValidationSchema,
+  updateInviteValidationSchema,
+} from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -20,6 +27,7 @@ import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
 import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
+
 
 @injectable()
 export default class InviteMutations {
@@ -42,6 +50,8 @@ export default class InviteMutations {
     private inviteAuth: InviteAuthorization
   ) {}
 
+  @Authorized()
+  @ValidateArgs(createInviteValidationSchema)
   @Authorized()
   @ValidateArgs(createInviteValidationSchema)
   async create(
@@ -89,6 +99,7 @@ export default class InviteMutations {
 
     return newInvite;
   }
+
 
   @Authorized()
   async accept(
