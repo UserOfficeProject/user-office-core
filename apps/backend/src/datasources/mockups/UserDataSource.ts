@@ -128,8 +128,8 @@ export const dummySampleReviewer: UserWithRole = {
   ...dummyUser,
   currentRole: {
     id: 9,
-    title: 'Sample Reviewer',
-    shortCode: 'sample_safety_reviewer',
+    title: 'Experiment Safety Reviewer',
+    shortCode: 'experiment_safety_reviewer',
   },
 };
 
