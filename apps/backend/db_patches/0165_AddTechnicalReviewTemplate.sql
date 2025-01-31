@@ -55,12 +55,10 @@ BEGIN
     UPDATE call set technical_review_template_id = technical_review_template_id_var;
 
     FOR technical_review_loop_var IN
-        SELECT * FROM technical_reviews
+        SELECT * FROM technical_review
     LOOP
         INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (technical_review_template_id_var, NOW(), 0) RETURNING questionary_id INTO questionary_id_var;
-        UPDATE technical_reviews SET questionary_id = questionary_id_var WHERE technical_review_id = technical_review_loop_var.technical_review_id;
-
-        RETURN NEXT technical_review_loop_var;
+        UPDATE technical_review SET questionary_id = questionary_id_var WHERE technical_review_id = technical_review_loop_var.technical_review_id;
     END LOOP;
 
     END IF;
