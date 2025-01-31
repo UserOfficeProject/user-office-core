@@ -3,6 +3,7 @@ import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { InternalReview } from '../models/InternalReview';
+import { Invite } from '../models/Invite';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { AnswerBasic } from '../models/Questionary';
 import { Review } from '../models/Review';
@@ -229,13 +230,28 @@ interface UserDeletedEvent extends GeneralEvent {
   user: User;
 }
 
-interface EmailInvite extends GeneralEvent {
-  type: Event.EMAIL_INVITE;
+interface EmailInviteOld extends GeneralEvent {
+  type: Event.EMAIL_INVITE_OLD;
   emailinviteresponse: {
     userId: number;
     inviterId: number;
     role: UserRole;
   };
+}
+
+type InviteResponse = Pick<
+  Invite,
+  'id' | 'code' | 'email' | 'note' | 'createdByUserId'
+>;
+
+interface EmailInvite extends GeneralEvent {
+  type: Event.EMAIL_INVITE;
+  invite: InviteResponse;
+}
+
+interface EmailInvites extends GeneralEvent {
+  type: Event.EMAIL_INVITES;
+  array: InviteResponse[];
 }
 
 interface FapCreatedEvent extends GeneralEvent {
@@ -385,7 +401,9 @@ export type ApplicationEvent =
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
+  | EmailInviteOld
   | EmailInvite
+  | EmailInvites
   | UserUpdateEvent
   | UserRoleUpdateEvent
   | FapCreatedEvent

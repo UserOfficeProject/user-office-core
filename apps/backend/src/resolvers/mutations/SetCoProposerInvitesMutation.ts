@@ -5,7 +5,7 @@ import { ResolverContext } from '../../context';
 import { Invite } from '../types/Invite';
 
 @InputType()
-class SetCoProposerInvitesInput {
+export class SetCoProposerInvitesInput {
   @Field(() => Int)
   proposalPk: number;
 
@@ -20,12 +20,6 @@ export class SetCoProposerInvites {
     @Arg('input') input: SetCoProposerInvitesInput,
     @Ctx() context: ResolverContext
   ) {
-    const { proposalPk, emails } = input;
-
-    return context.mutations.invite.setCoProposerInvites(
-      context.user,
-      proposalPk,
-      emails
-    );
+    return context.mutations.invite.setCoProposerInvites(context.user, input);
   }
 }

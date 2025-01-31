@@ -6,6 +6,7 @@ import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
+import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -23,6 +24,11 @@ export async function essEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
+
+  const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
+    Tokens.RoleClaimDataSource
+  );
+
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
     Tokens.RedeemCodesDataSource
   );
@@ -35,7 +41,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.EMAIL_INVITE: {
+    case Event.EMAIL_INVITE_OLD: {
       const user = await userDataSource.getUser(
         event.emailinviteresponse.userId
       );
@@ -88,6 +94,59 @@ export async function essEmailHandler(event: ApplicationEvent) {
         .catch((err: string) => {
           logger.logException('Failed email transmission', err);
         });
+
+      return;
+    }
+    case Event.EMAIL_INVITE:
+    case Event.EMAIL_INVITES: {
+      let invites;
+      if ('invite' in event) {
+        // single invite in response
+        invites = [event.invite];
+      } else {
+        // multiple invites in response
+        invites = event.array;
+      }
+
+      for (const invite of invites) {
+        const inviter = await userDataSource.getBasicUserInfo(
+          invite.createdByUserId
+        );
+
+        if (!inviter) {
+          logger.logError('Failed email invite', { inviter, event });
+
+          return;
+        }
+
+        const roleInviteClaim = await roleClaimDataSource.findByInviteId(
+          invite.id
+        );
+        const inviteRoleIds = roleInviteClaim.map((role) => role.roleId);
+
+        mailService
+          .sendMail({
+            content: {
+              template_id: inviteRoleIds.includes(UserRole.USER)
+                ? 'user-office-registration-invitation'
+                : 'user-office-registration-invitation-reviewer',
+            },
+            substitution_data: {
+              email: invite.email,
+              inviterName: inviter.firstname,
+              inviterLastname: inviter.lastname,
+              inviterOrg: inviter.institution,
+              redeemCode: invite.code,
+            },
+            recipients: [{ address: invite.email }],
+          })
+          .then((res) => {
+            logger.logInfo('Successful email transmission', { res });
+          })
+          .catch((err: string) => {
+            logger.logException('Failed email transmission', err);
+          });
+      }
 
       return;
     }

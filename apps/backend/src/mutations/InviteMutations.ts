@@ -12,12 +12,14 @@ import { InviteDataSource } from '../datasources/InviteDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized, ValidateArgs } from '../decorators';
+import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
+import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
 import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
 
 @injectable()
@@ -41,6 +43,7 @@ export default class InviteMutations {
 
   @Authorized()
   @ValidateArgs(createInviteValidationSchema)
+  @EventBus(Event.EMAIL_INVITE)
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
@@ -126,6 +129,62 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
+  @Authorized()
+  @EventBus(Event.EMAIL_INVITES)
+  public async setCoProposerInvites(
+    user: UserWithRole | null,
+    args: SetCoProposerInvitesInput
+  ): Promise<Invite[] | Rejection> {
+    const { proposalPk, emails } = args;
+    const isAuthorizedToCreateInvites = await this.proposalAuth.hasWriteRights(
+      user,
+      proposalPk
+    );
+
+    if (!isAuthorizedToCreateInvites) {
+      return rejection(
+        'User is not authorized to create invites for this proposal'
+      );
+    }
+
+    const existingClaims =
+      await this.coProposerClaimDataSource.getByProposalPk(proposalPk);
+    const existingInvites = (await Promise.all(
+      existingClaims.map((claim) =>
+        this.inviteDataSource.findById(claim.inviteId)
+      )
+    )) as Invite[];
+    const existingEmails = existingInvites.map((invite) => invite.email);
+
+    const deletedEmails = existingEmails.filter(
+      (email) => !emails.includes(email)
+    );
+    const newEmails = emails.filter((email) => !existingEmails.includes(email));
+
+    const deletedInvites = existingInvites.filter((invite) =>
+      deletedEmails.includes(invite.email)
+    );
+
+    await Promise.all(
+      deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
+    );
+    const newInvites = await Promise.all(
+      newEmails.map((email) =>
+        this.inviteDataSource.create(user!.id, this.createInviteCode(), email)
+      )
+    );
+    await Promise.all(
+      newInvites.map((invite) =>
+        this.coProposerClaimDataSource.create(invite.id, proposalPk)
+      )
+    );
+
+    return [
+      ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
+      ...newInvites,
+    ];
+  }
+
   private async setRoleClaims(inviteId: number, roleIds: number[]) {
     await this.roleClaimDataSource.deleteByInviteId(inviteId);
 
@@ -195,60 +254,6 @@ export default class InviteMutations {
       await this.userDataSource.getProposalUsers(proposalPk);
 
     return proposalUsers.some((user) => user.id === userId);
-  }
-
-  public async setCoProposerInvites(
-    user: UserWithRole | null,
-    proposalPk: number,
-    emails: string[]
-  ): Promise<Invite[] | Rejection> {
-    const isAuthorizedToCreateInvites = await this.proposalAuth.hasWriteRights(
-      user,
-      proposalPk
-    );
-
-    if (!isAuthorizedToCreateInvites) {
-      return rejection(
-        'User is not authorized to create invites for this proposal'
-      );
-    }
-
-    const existingClaims =
-      await this.coProposerClaimDataSource.getByProposalPk(proposalPk);
-    const existingInvites = (await Promise.all(
-      existingClaims.map((claim) =>
-        this.inviteDataSource.findById(claim.inviteId)
-      )
-    )) as Invite[];
-    const existingEmails = existingInvites.map((invite) => invite.email);
-
-    const deletedEmails = existingEmails.filter(
-      (email) => !emails.includes(email)
-    );
-    const newEmails = emails.filter((email) => !existingEmails.includes(email));
-
-    const deletedInvites = existingInvites.filter((invite) =>
-      deletedEmails.includes(invite.email)
-    );
-
-    await Promise.all(
-      deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
-    );
-    const newInvites = await Promise.all(
-      newEmails.map((email) =>
-        this.inviteDataSource.create(user!.id, this.createInviteCode(), email)
-      )
-    );
-    await Promise.all(
-      newInvites.map((invite) =>
-        this.coProposerClaimDataSource.create(invite.id, proposalPk)
-      )
-    );
-
-    return [
-      ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
-      ...newInvites,
-    ];
   }
 
   private createInviteCode() {
