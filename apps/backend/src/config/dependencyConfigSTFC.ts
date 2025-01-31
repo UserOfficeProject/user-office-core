@@ -1,4 +1,4 @@
-import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
+import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
