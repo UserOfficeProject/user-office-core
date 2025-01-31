@@ -4,6 +4,7 @@ DECLARE
     technical_review_template_id_var int;
     technical_review_topic_id_var int;
     questionary_id_var int;
+    technical_review_loop_var proposals%rowType;
 BEGIN
     IF register_patch('AddTechnicalReviewTemplate.sql', 'Gergely Nyiri', 'Add Technical review template', '2024-10-15') THEN
 
@@ -42,8 +43,6 @@ BEGIN
       FROM templates 
       WHERE name='default technical review template';
 
-    INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (technical_review_template_id_var, NOW(), 0);
-
     INSERT INTO topics(topic_title, is_enabled, sort_order, template_id) VALUES('New technical review', TRUE, 0, technical_review_template_id_var);
 
     SELECT topics.topic_id
@@ -53,14 +52,16 @@ BEGIN
 
     INSERT INTO templates_has_questions (question_id, template_id, topic_id, sort_order, config) VALUES('technical_review_basis', technical_review_template_id_var, technical_review_topic_id_var, 0, '{"required":false,"small_label":"","tooltip":""}');
 
-    SELECT questionaries.questionary_id
-    INTO questionary_id_var
-    FROM questionaries
-    WHERE template_id = technical_review_template_id_var;
-
-    UPDATE technical_review SET questionary_id = questionary_id_var;
-
     UPDATE call set technical_review_template_id = technical_review_template_id_var;
+
+    FOR technical_review_loop_var IN
+        SELECT * FROM technical_reviews
+    LOOP
+        INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (technical_review_template_id_var, NOW(), 0) RETURNING questionary_id INTO questionary_id_var;
+        UPDATE technical_reviews SET questionary_id = questionary_id_var WHERE technical_review_id = technical_review_loop_var.technical_review_id;
+
+        RETURN NEXT technical_review_loop_var;
+    END LOOP;
 
     END IF;
 END;
