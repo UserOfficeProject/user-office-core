@@ -248,7 +248,7 @@ jobs:
 
           npm run test:backend
   e2e:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.pattern.files }}
     needs: [resolve_dep, build]
 
     strategy:
@@ -257,22 +257,31 @@ jobs:
         pattern:
           - id: ae
             files: cypress/e2e/[a-e]*.ts
+            runner: ubuntu-latest
           - id: fh
             files: cypress/e2e/[f-h]*.ts
+            runner: ubuntu-latest
           - id: io
             files: cypress/e2e/[i-o]*.ts
+            runner: ubuntu-latest
           - id: p-am
             files: cypress/e2e/p[a-m]*.ts
+            runner: ubuntu-latest
           - id: p-nz
             files: cypress/e2e/p[n-z]*.ts
+            runner: ubuntu-latest
           - id: rs
             files: cypress/e2e/[r-s]*.ts
+            runner: ubuntu-latest
           - id: t
             files: cypress/e2e/t*.ts
+            runner: self-hosted
           - id: uz
             files: cypress/e2e/[u-z]*.ts
+            runner: ubuntu-latest
           - id: AZ
             files: cypress/e2e/[A-Z]*.ts
+            runner: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
