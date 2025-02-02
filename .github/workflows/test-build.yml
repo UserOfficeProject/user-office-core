@@ -248,9 +248,6 @@ jobs:
 
           npm run test:backend
   e2e:
-    runs-on: ${{ matrix.pattern.files }}
-    needs: [resolve_dep, build]
-
     strategy:
       fail-fast: false
       matrix:
@@ -282,6 +279,9 @@ jobs:
           - id: AZ
             files: cypress/e2e/[A-Z]*.ts
             runner: ubuntu-latest
+
+    runs-on: ${{ matrix.pattern.runner }}
+    needs: [resolve_dep, build]
 
     steps:
       - uses: actions/checkout@v4
