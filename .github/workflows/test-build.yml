@@ -351,6 +351,7 @@ jobs:
       - name: Download required repositories
         run: |
           cd "$GITHUB_WORKSPACE/.."
+          rm -rf user-office-factory
           git clone --depth 1 --branch "${{ needs.resolve_dep.outputs.FACTORY_TAG }}" https://github.com/UserOfficeProject/user-office-factory.git
 
       - name: Run e2e tests stfc
