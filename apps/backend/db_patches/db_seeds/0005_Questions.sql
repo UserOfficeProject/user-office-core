@@ -40,7 +40,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'boolean_question', '{"value": true }'
+    2, 'boolean_question', '{"value": true }'
   );
 -- Date
 INSERT INTO questions(
@@ -73,7 +73,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'date_question', '{"value": "2030-01-01" }'
+    2, 'date_question', '{"value": "2030-01-01" }'
   );
 -- Embellishment
 INSERT INTO questions(
@@ -104,7 +104,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'embellishment_question', '{"value": "<h1>Embellishment value<h1>" }'
+    2, 'embellishment_question', '{"value": "<h1>Embellishment value<h1>" }'
   );
 -- File upload
 INSERT INTO questions(
@@ -134,7 +134,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'file_upload_question', '{
+    2, 'file_upload_question', '{
     "value": [{"id": "1c4b2ca8-f849-42db-b5d6-35aba2b26f8b"}]}'
   );
 -- INTERVAL
@@ -191,7 +191,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'interval_question', '{
+    2, 'interval_question', '{
     "value": {
         "max": 100,
         "min": 1,
@@ -268,7 +268,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'number_question', '{
+    2, 'number_question', '{
     "value": {
         "unit": {
             "id": "centimeter",
@@ -311,7 +311,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'rich_text_input_question', '{"value": "<b>Rich text input value</b>" }'
+    2, 'rich_text_input_question', '{"value": "<b>Rich text input value</b>" }'
   );
 -- Selection from options
 INSERT INTO questions(
@@ -343,7 +343,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'selection_from_options_question', 
+    2, 'selection_from_options_question', 
     '{"value": ["One"] }'
   );
 
@@ -377,7 +377,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'dynamic_multiple_choice_question', 
+    2, 'dynamic_multiple_choice_question', 
     '{"value": ["One"] }'
   );
 
@@ -409,7 +409,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'text_input_question', '{"value": "Text input answer from seeds" }'
+    2, 'text_input_question', '{"value": "Text input answer from seeds" }'
   );
 
 
@@ -444,7 +444,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'instrument_picker_question', 
+    2, 'instrument_picker_question', 
     '{"value": 1 }'
   );
 
@@ -479,7 +479,7 @@ INSERT INTO answers(
 ) 
 VALUES 
   (
-    3, 'technique_picker_question', 
+    2, 'technique_picker_question', 
     '{"value": 1 }'
   );
 
