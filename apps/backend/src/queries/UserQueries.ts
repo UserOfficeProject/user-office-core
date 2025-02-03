@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
+import context from '../buildContext';
 import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
@@ -53,7 +54,7 @@ export default class UserQueries {
 
   @Authorized()
   async getBasic(agent: UserWithRole | null, id: number) {
-    const user = await this.dataSource.getBasicUserInfo(id);
+    const user = await context.loaders.basicUser.batchLoader.load(id);
     const hasPermissions = await this.userAuth.canReadUser(agent, id);
     if (hasPermissions && user) {
       return new BasicUserDetails(

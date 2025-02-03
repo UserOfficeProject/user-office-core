@@ -195,6 +195,7 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     if (cacheMisses.length > 0) {
+      logger.logInfo('Fetching users by un', { count: cacheMisses.length });
       const uowsRequestTemp: BasicPersonDetailsDTO[] | null = searchableOnly
         ? await UOWSClient.basicPersonDetails
             .getSearchableBasicPersonDetails(undefined, undefined, cacheMisses)
@@ -340,6 +341,13 @@ export class StfcUserDataSource implements UserDataSource {
     return this.getStfcBasicPersonByUserNumber(String(id)).then(
       (stfcBasicPerson) =>
         stfcBasicPerson ? toEssBasicUserDetails(stfcBasicPerson) : null
+    );
+  }
+
+  getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
+    return this.getStfcBasicPeopleByUserNumbers(ids.map(String)).then(
+      (stfcBasicPeople) =>
+        stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
     );
   }
 

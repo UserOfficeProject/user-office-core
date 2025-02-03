@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 
 import { BasicResolverContext } from './context';
+import BasicUserDetailsLoader from './loaders/BasicUserDetailsLoader';
 import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
@@ -125,6 +126,7 @@ const context: BasicResolverContext = {
   },
   loaders: {
     user: container.resolve(UsersLoader),
+    basicUser: container.resolve(BasicUserDetailsLoader),
   },
 };
 
