@@ -2,10 +2,10 @@ import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
-import context from '../buildContext';
 import { Tokens } from '../config/Tokens';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized } from '../decorators';
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { Roles } from '../models/Role';
 import {
   BasicUserDetails,
@@ -20,8 +20,12 @@ import { verifyToken } from '../utils/jwt';
 @injectable()
 export default class UserQueries {
   constructor(
-    @inject(Tokens.UserDataSource) public dataSource: UserDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserDataSource)
+    public dataSource: UserDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization,
+    @inject(Tokens.BasicUserDetailsLoader)
+    private basicLoader: BasicUserDetailsLoader
   ) {}
 
   async getAgent(id: number) {
@@ -54,7 +58,7 @@ export default class UserQueries {
 
   @Authorized()
   async getBasic(agent: UserWithRole | null, id: number) {
-    const user = await context.loaders.basicUser.batchLoader.load(id);
+    const user = await this.basicLoader.batchLoader.load(id);
     const hasPermissions = await this.userAuth.canReadUser(agent, id);
     if (hasPermissions && user) {
       return new BasicUserDetails(

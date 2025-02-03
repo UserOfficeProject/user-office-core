@@ -44,6 +44,7 @@ import {
 } from '../eventHandlers/messageBroker';
 import { EventBus } from '../events/eventBus';
 import { DefaultDownloadService } from '../factory/DefaultDownloadService';
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { SampleEsiDataSourceMock } from './../datasources/mockups/SampleEsiDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
@@ -108,6 +109,8 @@ mapValue(Tokens.ConfigureEnvironment, () => {});
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.DownloadService, DefaultDownloadService);
+
+mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 
 jest.mock('../decorators/EventBus', () => {
   return () => jest.fn();
