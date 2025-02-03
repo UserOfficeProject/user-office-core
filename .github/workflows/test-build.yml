@@ -73,8 +73,10 @@ jobs:
   install-and-cache:
     name: Run install and cache
     needs: resolve_dep
-    runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, self-hosted]
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
