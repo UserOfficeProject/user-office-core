@@ -6,3 +6,4 @@
 !package*
 !tsconfig.json
 !index.ts
+!openapi.yaml
