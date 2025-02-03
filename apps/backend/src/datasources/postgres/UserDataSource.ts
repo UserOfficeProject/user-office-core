@@ -244,7 +244,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .whereIn('users.user_id', ids)
+      .whereIn('u.user_id', ids)
       .then(
         (usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
           usersRecord.map((user) => createBasicUserObject(user))
