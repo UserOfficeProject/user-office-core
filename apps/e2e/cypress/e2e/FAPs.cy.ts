@@ -578,7 +578,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="rank-submit"]').click();
 
       cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
-      cy.contains(fapMembers.reviewer2.lastName).parent().contains('1');
+      cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
 
       cy.get('[index="1"]').children().contains(fapMembers.reviewer2.lastName);
       cy.get('[index="0"]').children().contains(fapMembers.reviewer.lastName);
