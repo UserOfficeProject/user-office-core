@@ -44,7 +44,8 @@ export default class PostgresInviteDataSource implements InviteDataSource {
   }
 
   async update(
-    args: UpdateInviteInput & Pick<Invite, 'claimedAt' | 'claimedByUserId'>
+    args: UpdateInviteInput &
+      Pick<Invite, 'claimedAt' | 'claimedByUserId' | 'isEmailSent'>
   ): Promise<Invite> {
     return database
       .update({
@@ -53,6 +54,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         note: args.note,
         claimed_at: args.claimedAt,
         claimed_by: args.claimedByUserId,
+        is_email_sent: args.isEmailSent,
       })
       .from('invites')
       .where('invite_id', args.id)

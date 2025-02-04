@@ -26,7 +26,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         new Date(),
         1,
         null,
-        null
+        null,
+        true
       ),
       new Invite(
         2,
@@ -36,7 +37,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         new Date(),
         2,
         null,
-        null
+        null,
+        true
       ),
       new Invite(
         3,
@@ -46,7 +48,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         new Date(),
         3,
         new Date(),
-        1001
+        1001,
+        false
       ),
     ];
   }
@@ -68,7 +71,8 @@ export class InviteDataSourceMock implements InviteDataSource {
       new Date(),
       createdByUserId,
       null,
-      null
+      null,
+      false
     );
 
     this.invites.push(newInvite);

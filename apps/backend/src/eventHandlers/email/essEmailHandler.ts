@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
+import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
@@ -27,6 +28,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
   const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
     Tokens.RoleClaimDataSource
+  );
+
+  const inviteDataSource = container.resolve<InviteDataSource>(
+    Tokens.InviteDataSource
   );
 
   const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
@@ -109,6 +114,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
       }
 
       for (const invite of invites) {
+        if (invite.isEmailSent) {
+          continue;
+        }
         const inviter = await userDataSource.getBasicUserInfo(
           invite.createdByUserId
         );
@@ -140,7 +148,11 @@ export async function essEmailHandler(event: ApplicationEvent) {
             },
             recipients: [{ address: invite.email }],
           })
-          .then((res) => {
+          .then(async (res) => {
+            await inviteDataSource.update({
+              id: invite.id,
+              isEmailSent: true,
+            });
             logger.logInfo('Successful email transmission', { res });
           })
           .catch((err: string) => {

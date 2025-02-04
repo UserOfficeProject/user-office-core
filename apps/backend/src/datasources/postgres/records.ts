@@ -1431,6 +1431,7 @@ export interface InviteRecord {
   readonly created_at: Date;
   readonly claimed_by: number | null;
   readonly claimed_at: Date | null;
+  readonly is_email_sent: boolean;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>
@@ -1442,7 +1443,8 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.created_at,
     invite.created_by,
     invite.claimed_at,
-    invite.claimed_by
+    invite.claimed_by,
+    invite.is_email_sent
   );
 
 export interface RoleClaimRecord {

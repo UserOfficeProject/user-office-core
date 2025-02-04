@@ -9,7 +9,7 @@ export interface InviteDataSource {
 
   update(
     args: UpdateInviteInput &
-      Partial<Pick<Invite, 'claimedAt' | 'claimedByUserId'>>
+      Partial<Pick<Invite, 'claimedAt' | 'claimedByUserId' | 'isEmailSent'>>
   ): Promise<Invite>;
 
   delete(id: number): Promise<void>;

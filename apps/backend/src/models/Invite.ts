@@ -7,6 +7,7 @@ export class Invite {
     public createdAt: Date,
     public createdByUserId: number,
     public claimedAt: Date | null,
-    public claimedByUserId: number | null
+    public claimedByUserId: number | null,
+    public isEmailSent: boolean
   ) {}
 }

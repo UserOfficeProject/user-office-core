@@ -27,4 +27,7 @@ export class Invite implements Partial<InviteOrigin> {
 
   @Field(() => Int, { nullable: true })
   public claimedByUserId: number | null;
+
+  @Field(() => Int)
+  public isEmailSent: boolean;
 }
