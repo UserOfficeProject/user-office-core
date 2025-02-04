@@ -43,8 +43,6 @@ export default class InviteMutations {
 
   @Authorized()
   @ValidateArgs(createInviteValidationSchema)
-  @Authorized()
-  @ValidateArgs(createInviteValidationSchema)
   @EventBus(Event.EMAIL_INVITE)
   async create(
     agent: UserWithRole | null,
