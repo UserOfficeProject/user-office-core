@@ -80,13 +80,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
+      const templateId = getTemplateIdForRole(event.emailinviteresponse.role);
+
       mailService
         .sendMail({
           content: {
-            template_id:
-              event.emailinviteresponse.role === UserRole.USER
-                ? 'user-office-registration-invitation'
-                : 'user-office-registration-invitation-reviewer',
+            template_id: templateId,
           },
           substitution_data: {
             firstname: user.preferredname,
@@ -139,14 +138,13 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         const roleInviteClaim = await roleClaimDataSource.findByInviteId(
           invite.id
         );
-        const inviteRoleIds = roleInviteClaim.map((role) => role.roleId);
+
+        const templateId = getTemplateIdForRole(roleInviteClaim[0].roleId);
 
         mailService
           .sendMail({
             content: {
-              template_id: inviteRoleIds.includes(UserRole.USER)
-                ? 'user-office-registration-invitation'
-                : 'user-office-registration-invitation-reviewer',
+              template_id: templateId,
             },
             substitution_data: {
               // firstname: user.preferredname,
@@ -449,5 +447,17 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           });
         });
     }
+  }
+}
+
+function getTemplateIdForRole(role: UserRole): string {
+  switch (role) {
+    case UserRole.USER:
+      return 'user-office-registration-invitation';
+    case UserRole.INTERNAL_REVIEWER:
+    case UserRole.SAMPLE_SAFETY_REVIEWER:
+      return 'user-office-registration-invitation-reviewer';
+    default:
+      throw new Error('No valid user role set for email invitation');
   }
 }

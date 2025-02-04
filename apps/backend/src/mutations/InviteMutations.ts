@@ -17,7 +17,7 @@ import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
-import { UserWithRole } from '../models/User';
+import { UserRole, UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
 import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
 import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
@@ -174,9 +174,10 @@ export default class InviteMutations {
       )
     );
     await Promise.all(
-      newInvites.map((invite) =>
-        this.coProposerClaimDataSource.create(invite.id, proposalPk)
-      )
+      newInvites.map((newInvite) => {
+        this.coProposerClaimDataSource.create(newInvite.id, proposalPk);
+        this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
+      })
     );
 
     return [
