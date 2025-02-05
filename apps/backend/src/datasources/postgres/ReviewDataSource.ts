@@ -143,16 +143,22 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
           query.offset(offset);
         }
       })
-      .then((technicalReviews: TechnicalReviewRecord[]) => {
-        const revs = technicalReviews.map((technicalReview) =>
-          createTechnicalReviewObject(technicalReview)
-        );
+      .then(
+        (
+          technicalReviews: (TechnicalReviewRecord & { full_count: number })[]
+        ) => {
+          const revs = technicalReviews.map((technicalReview) =>
+            createTechnicalReviewObject(technicalReview)
+          );
 
-        return {
-          totalCount: technicalReviews[0] ? technicalReviews[0].full_count : 0,
-          technicalReviews: revs,
-        };
-      });
+          return {
+            totalCount: technicalReviews[0]
+              ? technicalReviews[0].full_count
+              : 0,
+            technicalReviews: revs,
+          };
+        }
+      );
   }
 
   async getProposalInstrumentTechnicalReview(

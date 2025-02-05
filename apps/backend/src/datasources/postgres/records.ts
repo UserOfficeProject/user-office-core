@@ -305,7 +305,6 @@ export interface TechnicalReviewRecord {
   readonly technical_review_assignee_id: number | null;
   readonly instrument_id: number;
   readonly questionary_id: number;
-  readonly full_count: number;
 }
 
 export interface InternalReviewRecord {

@@ -3,7 +3,6 @@ $$
 DECLARE
     technical_review_template_id_var int;
     technical_review_topic_id_var int;
-    questionary_id_var int;
     technical_review_loop_var int;
 BEGIN
     IF register_patch('0165_AddTechnicalReviewTemplate.sql', 'Gergely Nyiri', 'Add Technical review template', '2024-10-15') THEN

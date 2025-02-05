@@ -18,7 +18,6 @@ import {
   CoreTechnicalReviewFragment,
   InstrumentWithManagementTime,
   Review,
-  TechnicalReview,
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -26,12 +25,13 @@ import {
   ProposalDataTechnicalReview,
   useProposalData,
 } from 'hooks/proposal/useProposalData';
+import { TechnicalReviewWithQuestionary } from 'models/questionary/technicalReview/TechnicalReviewWithQuestionary';
 import { getFullUserName } from 'utils/user';
 
 import ProposalReviewContainer from './ProposalReviewContainer';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
 import TechnicalReviewContainer from './TechnicalReviewContainer';
-import TechnicalReviewInformation from './TechnicalReviewInformation';
+import TechnicalReviewQuestionaryReview from './TechnicalReviewQuestionaryReview';
 import InternalReviews from '../internalReview/InternalReviews';
 
 export enum PROPOSAL_MODAL_TAB_NAMES {
@@ -186,31 +186,12 @@ const ProposalReviewContent = ({
                 })
               }
             ></TechnicalReviewContainer>
-            {/* <ProposalTechnicalReview
-              proposal={proposalData as Proposal}
-              data={technicalReview}
-              setReview={(
-                data: CoreTechnicalReviewFragment | null | undefined
-              ) =>
-                setProposalData({
-                  ...proposalData,
-                  technicalReviews:
-                    proposalData.technicalReviews.map((technicalReview) => {
-                      if (technicalReview.id === data?.id) {
-                        return { ...technicalReview, ...data };
-                      } else {
-                        return {
-                          ...technicalReview,
-                        };
-                      }
-                    }) || null,
-                })
-              }
-            /> */}
           </Paper>
         </Fragment>
       ) : (
-        <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
+        <TechnicalReviewQuestionaryReview
+          data={technicalReview as TechnicalReviewWithQuestionary}
+        />
       );
     }
   );
