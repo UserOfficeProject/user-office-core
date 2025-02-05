@@ -489,6 +489,23 @@ export default class InstrumentMutations {
     args: AssignProposalsToInstrumentsArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
     /*
+    Ensure that the instrument is not a retired instrument.
+    */
+    const instruments = await this.dataSource.getInstrumentsByIds(
+      args.instrumentIds
+    );
+
+    if (
+      instruments.some((instrument) =>
+        instrument.description?.toLowerCase().includes('retired')
+      )
+    ) {
+      return new Rejection(
+        'Could not assign instrument: instrument is retired'
+      );
+    }
+
+    /*
     If the user is not a User Officer, ensure
     the status is currently Under Review.
     */
