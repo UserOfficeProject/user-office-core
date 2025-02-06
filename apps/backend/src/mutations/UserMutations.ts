@@ -79,7 +79,7 @@ export default class UserMutations {
 
   @ValidateArgs(createUserByEmailInviteValidationSchema(UserRole))
   @Authorized()
-  @EventBus(Event.EMAIL_INVITE_OLD)
+  @EventBus(Event.EMAIL_INVITE_LEGACY)
   async createUserByEmailInvite(
     agent: UserWithRole | null,
     args: CreateUserByEmailInviteArgs

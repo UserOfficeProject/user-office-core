@@ -42,7 +42,7 @@ export enum Event {
   USER_ROLE_UPDATED = 'USER_ROLE_UPDATED',
   USER_DELETED = 'USER_DELETED',
   USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
-  EMAIL_INVITE_OLD = 'EMAIL_INVITE_OLD',
+  EMAIL_INVITE_LEGACY = 'EMAIL_INVITE_LEGACY',
   EMAIL_INVITE = 'EMAIL_INVITE',
   EMAIL_INVITES = 'EMAIL_INVITES',
   FAP_CREATED = 'FAP_CREATED',
@@ -223,7 +223,7 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when user password is reset by email',
   ],
   [
-    Event.EMAIL_INVITE_OLD,
+    Event.EMAIL_INVITE_LEGACY,
     '[Deprecated] Event occurs when user is created using email invite',
   ],
   [Event.EMAIL_INVITE, 'Event occurs when user is invited by email'],

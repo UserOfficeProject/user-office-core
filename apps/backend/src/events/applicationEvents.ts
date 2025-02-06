@@ -231,7 +231,7 @@ interface UserDeletedEvent extends GeneralEvent {
 }
 
 interface EmailInviteOld extends GeneralEvent {
-  type: Event.EMAIL_INVITE_OLD;
+  type: Event.EMAIL_INVITE_LEGACY;
   emailinviteresponse: {
     userId: number;
     inviterId: number;

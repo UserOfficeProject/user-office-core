@@ -53,7 +53,7 @@ export default function createHandler() {
     // NOTE: We need to have custom checks for events where response is not standard one.
     try {
       switch (event.type) {
-        case Event.EMAIL_INVITE_OLD:
+        case Event.EMAIL_INVITE_LEGACY:
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,

@@ -46,7 +46,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.EMAIL_INVITE_OLD: {
+    case Event.EMAIL_INVITE_LEGACY: {
       const user = await userDataSource.getUser(
         event.emailinviteresponse.userId
       );
