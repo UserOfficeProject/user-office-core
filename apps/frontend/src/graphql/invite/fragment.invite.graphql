@@ -7,4 +7,5 @@ fragment invite on Invite {
   createdByUserId
   claimedAt
   claimedByUserId
+  isEmailSent
 }

@@ -6,14 +6,16 @@ import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import { SxProps, Theme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
-import { BasicUserDetails, Invite, UserRole } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId, Invite, UserRole } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
 
 import InviteUser from './InviteUser';
+import ParticipantModal from './ParticipantModal';
 
 type ParticipantsProps = {
   /** Basic user details array to be shown in the modal. */
@@ -43,7 +45,10 @@ const Participants = ({
   loadingPrincipalInvestigator,
 }: ParticipantsProps) => {
   const [modalOpen, setOpen] = useState(false);
-
+  const { featuresMap } = useContext(FeatureContext);
+  const isLegacyInviteFlow = featuresMap.get(
+    FeatureId.EMAIL_INVITE_LEGACY
+  )?.isEnabled;
   const removeUser = (user: BasicUserDetails) => {
     const newUsers = users.filter((u) => u.id !== user.id);
     setUsers(newUsers);
@@ -51,6 +56,11 @@ const Participants = ({
 
   const openModal = () => {
     setOpen(true);
+  };
+
+  const addUsers = (addedUsers: BasicUserDetails[]) => {
+    setUsers([...users, ...addedUsers]);
+    setOpen(false);
   };
 
   const handleAddParticipants = (props: {
@@ -66,22 +76,42 @@ const Participants = ({
     setInvites(invites.filter((i) => i.email !== invite.email));
   };
 
+  const InviteComponent = (
+    <InviteUser
+      modalOpen={modalOpen}
+      onClose={() => setOpen(false)}
+      onAddParticipants={handleAddParticipants}
+      excludeUserIds={
+        !!principalInvestigator // add principal investigator if one exists
+          ? users.map((user) => user.id).concat([principalInvestigator.id])
+          : users.map((user) => user.id)
+      }
+      excludeEmails={invites.map((invite) => invite.email)}
+    />
+  );
+
+  const LegacyInviteComponent = (
+    <ParticipantModal
+      show={modalOpen}
+      close={() => setOpen(false)}
+      addParticipants={addUsers}
+      selectedUsers={
+        !!principalInvestigator // add principal investigator if one exists
+          ? users.map((user) => user.id).concat([principalInvestigator.id])
+          : users.map((user) => user.id)
+      }
+      title={title}
+      selection={true}
+      userRole={UserRole.USER}
+      participant={true}
+      setPrincipalInvestigator={setPrincipalInvestigator}
+    />
+  );
+
   return (
     <Box sx={sx}>
-
-      {modalOpen && (
-        <InviteUser
-          modalOpen={modalOpen}
-          onClose={() => setOpen(false)}
-          onAddParticipants={handleAddParticipants}
-          excludeUserIds={
-            !!principalInvestigator // add principal investigator if one exists
-              ? users.map((user) => user.id).concat([principalInvestigator.id])
-              : users.map((user) => user.id)
-          }
-          excludeEmails={invites.map((invite) => invite.email)}
-        />
-      )}
+      {modalOpen &&
+        (isLegacyInviteFlow ? LegacyInviteComponent : InviteComponent)}
       <FormControl margin="dense" fullWidth>
         <Typography
           sx={{

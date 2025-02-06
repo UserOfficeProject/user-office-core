@@ -189,6 +189,7 @@ function InviteUser({
       id: 0,
       createdByUserId: 0,
       note: '',
+      isEmailSent: false,
     };
   };
   const handleSubmit = () => {

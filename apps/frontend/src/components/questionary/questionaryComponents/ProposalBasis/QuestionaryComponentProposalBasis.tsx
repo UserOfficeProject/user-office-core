@@ -187,7 +187,7 @@ const proposalBasisPreSubmit =
           emails: proposal.coProposerInvites.map((invite) => invite.email),
         },
       });
-
+ 
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_LOADED',
         itemWithQuestionary: {
