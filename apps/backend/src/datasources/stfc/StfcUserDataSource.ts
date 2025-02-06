@@ -195,7 +195,6 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     if (cacheMisses.length > 0) {
-      logger.logInfo('Fetching users by un', { count: cacheMisses.length });
       const uowsRequestTemp: BasicPersonDetailsDTO[] | null = searchableOnly
         ? await UOWSClient.basicPersonDetails
             .getSearchableBasicPersonDetails(undefined, undefined, cacheMisses)
