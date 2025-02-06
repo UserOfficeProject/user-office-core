@@ -60,7 +60,7 @@ export default class InviteMutations {
       );
     }
 
-    const newCode = this.createInviteCode();
+    const newCode = await this.createInviteCode();
     const newInvite = await this.inviteDataSource.create(
       agent!.id,
       newCode,
@@ -169,8 +169,12 @@ export default class InviteMutations {
       deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
     );
     const newInvites = await Promise.all(
-      newEmails.map((email) =>
-        this.inviteDataSource.create(user!.id, this.createInviteCode(), email)
+      newEmails.map(async (email) =>
+        this.inviteDataSource.create(
+          user!.id,
+          await this.createInviteCode(),
+          email
+        )
       )
     );
     await Promise.all(
@@ -257,7 +261,18 @@ export default class InviteMutations {
     return proposalUsers.some((user) => user.id === userId);
   }
 
-  private createInviteCode() {
-    return Math.random().toString(36).substring(2, 12).toUpperCase();
+  private async createInviteCode(): Promise<string> {
+    let code = '';
+    let isUnique = false;
+
+    while (!isUnique) {
+      code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const existingInvite = await this.inviteDataSource.findByCode(code);
+      if (!existingInvite) {
+        isUnique = true;
+      }
+    }
+
+    return code;
   }
 }
