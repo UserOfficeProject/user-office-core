@@ -106,7 +106,9 @@ mapClass(Tokens.MailService, SkipSendMailService);
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.ConfigureEnvironment, () => {});
-mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+mapValue(Tokens.ConfigureLogger, () =>
+  setLogger(new ConsoleLogger({ colorize: true }))
+);
 
 mapClass(Tokens.DownloadService, DefaultDownloadService);
 

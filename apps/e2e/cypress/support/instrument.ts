@@ -15,6 +15,8 @@ import {
   SetInstrumentAvailabilityTimeMutationVariables,
   SubmitInstrumentInFapMutation,
   SubmitInstrumentInFapMutationVariables,
+  UpdateInstrumentMutation,
+  UpdateInstrumentMutationVariables,
   UpdateTechnicalReviewAssigneeMutation,
   UpdateTechnicalReviewAssigneeMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -114,6 +116,15 @@ const submitInstrumentInFap = (
   return cy.wrap(request);
 };
 
+const updateInstrument = (
+  updateInstrumentInput: UpdateInstrumentMutationVariables
+): Cypress.Chainable<UpdateInstrumentMutation> => {
+  const api = getE2EApi();
+  const request = api.updateInstrument(updateInstrumentInput);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createInstrument', createInstrument);
 Cypress.Commands.add(
   'assignScientistsToInstrument',
@@ -140,3 +151,4 @@ Cypress.Commands.add(
   setInstrumentAvailabilityTime
 );
 Cypress.Commands.add('submitInstrumentInFap', submitInstrumentInFap);
+Cypress.Commands.add('updateInstrument', updateInstrument);
