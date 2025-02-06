@@ -82,7 +82,7 @@ export default class InviteMutations {
   async accept(
     agent: UserWithRole | null,
     code: string
-  ): Promise<boolean | Rejection> {
+  ): Promise<Invite | Rejection> {
     const invite = await this.inviteDataSource.findByCode(code);
     if (invite === null) {
       return rejection('Invite code not found', { invite: code });
@@ -95,13 +95,13 @@ export default class InviteMutations {
     await this.processRoleClaims(agent!.id, invite.id);
     await this.processCoProposerClaims(agent!.id, invite.id);
 
-    await this.inviteDataSource.update({
+    const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
       claimedAt: new Date(),
       claimedByUserId: agent!.id,
     });
 
-    return true;
+    return updatedInvite;
   }
 
   @Authorized([Roles.USER_OFFICER])
