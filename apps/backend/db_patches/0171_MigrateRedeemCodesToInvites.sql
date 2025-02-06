@@ -15,8 +15,8 @@ BEGIN
        '2025-02-04'
      ) THEN
 
-    -- Loop through each redeem code record
-    FOR rec IN SELECT * FROM redeem_codes LOOP
+    -- Loop only through redeem code records that have not been redeemed (claimed_by is NULL)
+    FOR rec IN SELECT * FROM redeem_codes WHERE claimed_by IS NULL LOOP
       BEGIN
         -- Retrieve email from the users table using placeholder_user_id
         SELECT email
