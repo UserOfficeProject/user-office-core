@@ -1,3 +1,4 @@
+import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
 import { Chip } from '@mui/material';
@@ -167,7 +168,7 @@ const Participants = ({
                 <Chip
                   sx={{ gap: '2px', padding: '6px' }}
                   color="secondary"
-                  icon={<SendIcon />}
+                  icon={invite.isEmailSent ? <SendIcon /> : <ScheduleSend />}
                   size="small"
                   label={invite.email}
                   key={invite.email}
