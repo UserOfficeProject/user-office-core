@@ -1,13 +1,15 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Authorized, Field, Int, ObjectType } from 'type-graphql';
 
 import { Invite as InviteOrigin } from '../../models/Invite';
+import { Roles } from '../../models/Role';
 
 @ObjectType()
 export class Invite implements Partial<InviteOrigin> {
   @Field(() => Int)
   public id: number;
 
-  @Field()
+  @Field(() => String, { nullable: true })
+  @Authorized([Roles.USER_OFFICER])
   public code: string;
 
   @Field()
