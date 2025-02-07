@@ -20,36 +20,39 @@ export class InviteDataSourceMock implements InviteDataSource {
     this.invites = [
       new Invite(
         1,
-        'code1',
+        'invite-code',
         'test1@example.com',
         'note1',
         new Date(),
         1,
         null,
         null,
-        true
+        true,
+        null
       ),
       new Invite(
         2,
-        'code2',
+        'claimed-invite-code',
         'test2@example.com',
         'note2',
         new Date(),
         2,
         null,
-        null,
-        true
+        1,
+        true,
+        null
       ),
       new Invite(
         3,
-        'code3',
+        'expired-invite-code',
         'test3@example.com',
         'note3',
         new Date(),
         3,
         new Date(),
-        1001,
-        false
+        null,
+        false,
+        new Date('2022-01-01')
       ),
     ];
   }
@@ -72,7 +75,8 @@ export class InviteDataSourceMock implements InviteDataSource {
       createdByUserId,
       null,
       null,
-      false
+      false,
+      null
     );
 
     this.invites.push(newInvite);

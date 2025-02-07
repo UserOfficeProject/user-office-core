@@ -92,6 +92,10 @@ export default class InviteMutations {
       return rejection('Invite code already claimed', { invite: code });
     }
 
+    if (invite.expiresAt && invite.expiresAt < new Date()) {
+      return rejection('Invite code has expired', { invite: code });
+    }
+
     await this.processRoleClaims(agent!.id, invite.id);
     await this.processCoProposerClaims(agent!.id, invite.id);
 

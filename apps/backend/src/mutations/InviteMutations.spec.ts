@@ -56,22 +56,28 @@ describe('Test Invite Mutations', () => {
 
   test('A user can accept valid invite code', () => {
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'code1')
-    ).resolves.toBeTruthy();
+      inviteMutations.accept(dummyUserWithRole, 'invite-code')
+    ).resolves.toBeInstanceOf(Invite);
   });
 
   test('A user can not accept invalid code', () => {
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'invalid-code')
+      inviteMutations.accept(dummyUserWithRole, 'invalid-invite-code')
     ).resolves.toHaveProperty('reason', 'Invite code not found');
   });
 
   test('A user can not accept code twice', async () => {
-    await inviteMutations.accept(dummyUserWithRole, 'code1');
+    await inviteMutations.accept(dummyUserWithRole, 'invite-code');
 
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'code1')
+      inviteMutations.accept(dummyUserWithRole, 'invite-code')
     ).resolves.toHaveProperty('reason', 'Invite code already claimed');
+  });
+
+  test('A user can not accept expired code', async () => {
+    return expect(
+      inviteMutations.accept(dummyUserWithRole, 'expired-invite-code')
+    ).resolves.toHaveProperty('reason', 'Invite code has expired');
   });
 
   test('A user officer can update invite', async () => {

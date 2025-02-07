@@ -32,4 +32,7 @@ export class Invite implements Partial<InviteOrigin> {
 
   @Field(() => Boolean)
   public isEmailSent: boolean;
+
+  @Field(() => Date, { nullable: true })
+  public expiresAt: Date | null;
 }
