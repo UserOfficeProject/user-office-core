@@ -60,12 +60,14 @@ export default class InviteMutations {
       );
     }
 
-    const newCode = await this.createInviteCode();
-    const newInvite = await this.inviteDataSource.create(
-      agent!.id,
-      newCode,
-      args.email
-    );
+    const newCode = await this.generateInviteCode();
+    const newInvite = await this.inviteDataSource.create({
+      createdByUserId: agent!.id,
+      code: newCode,
+      email: args.email,
+      expiresAt: null,
+      note: args.note ?? '',
+    });
 
     if (claims.roleIds) {
       await this.setRoleClaims(newInvite.id, claims.roleIds);
@@ -174,11 +176,13 @@ export default class InviteMutations {
     );
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
-        this.inviteDataSource.create(
-          user!.id,
-          await this.createInviteCode(),
-          email
-        )
+        this.inviteDataSource.create({
+          createdByUserId: user!.id,
+          code: await this.generateInviteCode(),
+          email: email,
+          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          note: '',
+        })
       )
     );
     await Promise.all(
@@ -265,7 +269,7 @@ export default class InviteMutations {
     return proposalUsers.some((user) => user.id === userId);
   }
 
-  private async createInviteCode(): Promise<string> {
+  private async generateInviteCode(): Promise<string> {
     let code = '';
     let isUnique = false;
 

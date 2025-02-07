@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Invite } from '../../models/Invite';
-import { UpdateInviteInput } from '../../resolvers/mutations/UpdateInviteMutation';
 import { InviteDataSource } from '../InviteDataSource';
 import database from './database';
 import { createInviteObject, InviteRecord } from './records';
@@ -24,16 +23,21 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       });
   }
 
-  async create(
-    createdByUserId: number,
-    code: string,
-    email: string
-  ): Promise<Invite> {
+  async create(args: {
+    code: string;
+    email: string;
+    note: string;
+    createdByUserId: number;
+    expiresAt: Date | null;
+  }): Promise<Invite> {
+    const { code, email, createdByUserId, expiresAt } = args;
+
     return database
       .insert({
         code: code,
         email: email,
         created_by: createdByUserId,
+        expires_at: expiresAt,
       })
       .into('invites')
       .returning('*')
@@ -43,10 +47,16 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       .then((invites: InviteRecord[]) => createInviteObject(invites[0]));
   }
 
-  async update(
-    args: UpdateInviteInput &
-      Pick<Invite, 'claimedAt' | 'claimedByUserId' | 'isEmailSent'>
-  ): Promise<Invite> {
+  async update(args: {
+    id: number;
+    code?: string;
+    email?: string;
+    note?: string;
+    claimedAt?: Date | null;
+    claimedByUserId?: number | null;
+    isEmailSent?: boolean;
+    expiresAt?: Date | null;
+  }): Promise<Invite> {
     return database
       .update({
         code: args.code,
@@ -55,6 +65,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         claimed_at: args.claimedAt,
         claimed_by: args.claimedByUserId,
         is_email_sent: args.isEmailSent,
+        expires_at: args.expiresAt,
       })
       .from('invites')
       .where('invite_id', args.id)
