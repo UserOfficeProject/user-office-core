@@ -16,6 +16,9 @@ import { SampleDeclarationContainer } from 'components/questionary/questionaryCo
 import ReviewQuestionary, {
   createFapReviewStub,
 } from 'components/review/ReviewQuestionary';
+import TechnicalReviewQuestionary, {
+  createTechnicalReviewStub,
+} from 'components/review/TechnicalReviewQuestionary';
 import ShipmentContainer from 'components/shipments/ShipmentContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails } from 'generated/sdk';
@@ -105,6 +108,18 @@ const PreviewTemplateModal = ({
             review={createFapReviewStub(
               templateId,
               questionarySteps,
+              user as unknown as BasicUserDetails
+            )}
+            previewMode={true}
+          />
+        );
+      case TemplateGroupId.TECHNICAL_REVIEW:
+        return (
+          <TechnicalReviewQuestionary
+            technicalReview={createTechnicalReviewStub(
+              templateId,
+              questionarySteps,
+              user as unknown as BasicUserDetails,
               user as unknown as BasicUserDetails
             )}
             previewMode={true}

@@ -1,0 +1,8 @@
+query getTechnicalReviews($filter: TechnicalReviewsFilter) {
+  technicalReviews(filter: $filter) {
+    technicalReviews {
+      ...coreTechnicalReview
+    }
+    totalCount
+  }
+}
