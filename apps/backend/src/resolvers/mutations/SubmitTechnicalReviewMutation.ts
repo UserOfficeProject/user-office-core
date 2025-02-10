@@ -41,6 +41,9 @@ export class SubmitTechnicalReviewInput implements Partial<TechnicalReview> {
 
   @Field(() => Int)
   public instrumentId: number;
+
+  @Field(() => Int, { nullable: true })
+  public questionaryId: number;
 }
 
 @InputType()
