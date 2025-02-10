@@ -886,10 +886,11 @@ const ProposalTableOfficer = ({
         components={{
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}
-        onPageChange={(page, pageSize) => {
-          setSearchParams({
-            page: page.toString(),
-            pageSize: pageSize.toString(),
+        onPageChange={(page) => {
+          setSearchParams((searchParams) => {
+            searchParams.set('page', page.toString());
+
+            return searchParams;
           });
         }}
         onSearchChange={(searchText) => {

@@ -335,6 +335,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             techniques
               .filter((technique) => techIds?.includes(technique.id))
               .flatMap((technique) => technique.instruments)
+              .filter(
+                (instrument) =>
+                  !instrument.description.toLowerCase().includes('retired')
+              )
               .map((instrument) => [instrument.id, instrument])
           ).values()
         );
