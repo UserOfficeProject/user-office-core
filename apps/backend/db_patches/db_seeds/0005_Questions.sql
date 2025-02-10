@@ -29,7 +29,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'boolean_question', 1, 6, 3, '{
+    'boolean_question', 1, 7, 3, '{
             "tooltip": "",
             "required": false,
             "small_label": ""
@@ -66,7 +66,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'date_question', 1, 6, 5, '{ "tooltip": "","required": false,"small_label": "" }'
+    'date_question', 1, 7, 5, '{ "tooltip": "","required": false,"small_label": "" }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -96,7 +96,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'embellishment_question', 1, 6, 9, 
+    'embellishment_question', 1, 7, 9, 
     '{ "tooltip": "", "required": false, "small_label": "" }'
   );
 INSERT INTO answers(
@@ -127,7 +127,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'file_upload_question', 1, 6, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}'
+    'file_upload_question', 1, 7, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -171,7 +171,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'interval_question', 1, 6, 4, '{
+    'interval_question', 1, 7, 4, '{
         "units": [
             {
                 "id": "meter",
@@ -240,7 +240,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'number_question', 1, 6, 2, '{
+    'number_question', 1, 7, 2, '{
         "units": [
             {
                 "id": "meter",
@@ -303,7 +303,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'rich_text_input_question', 1, 6, 
+    'rich_text_input_question', 1, 7, 
     8, '{ "tooltip": "", "required": false, "small_label": "" }'
   );
 INSERT INTO answers(
@@ -336,7 +336,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'selection_from_options_question', 
-    1, 6, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+    1, 7, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -370,7 +370,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'dynamic_multiple_choice_question', 
-    1, 6, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}'
+    1, 7, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -402,7 +402,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'text_input_question', 1, 6, 7, '{ "tooltip": "", "required": false, "small_label": "" }'
+    'text_input_question', 1, 7, 7, '{ "tooltip": "", "required": false, "small_label": "" }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -437,7 +437,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'instrument_picker_question', 
-    1, 6, 6, '{"variant":"dropdown","options":[1, 2]}'
+    1, 7, 6, '{"variant":"dropdown","options":[1, 2]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -472,7 +472,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'technique_picker_question', 
-    1, 6, 6, '{"variant":"dropdown","options":[1, 2]}'
+    1, 7, 6, '{"variant":"dropdown","options":[1, 2]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer

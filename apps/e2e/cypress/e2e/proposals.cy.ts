@@ -68,6 +68,7 @@ context('Proposal tests', () => {
     templateName: initialDBData.template.name,
     templateId: initialDBData.template.id,
     fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+    technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -523,7 +524,7 @@ context('Proposal tests', () => {
         .contains('Feasible')
         .click();
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').focus().click();
 
       cy.closeModal();
 
