@@ -73,7 +73,6 @@ export function createFapReviewStub(
       },
       submitted: false,
       users: [],
-      coProposerInvites: [],
       samples: [],
       genericTemplates: [],
       commentForManagement: '',
