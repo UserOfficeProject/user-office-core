@@ -851,6 +851,7 @@ context('Proposal administration tests', () => {
             submitted: true,
             reviewerId: initialDBData.users.officer.id,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
         }
       });
@@ -875,6 +876,7 @@ context('Proposal administration tests', () => {
             submitted: true,
             reviewerId: initialDBData.users.officer.id,
             instrumentId: instrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
         }
       });
@@ -946,7 +948,7 @@ context('Proposal administration tests', () => {
     it('Should be able to search Boolean question', () => {
       // If answer true, find when search for Yes
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [
           {
@@ -971,7 +973,7 @@ context('Proposal administration tests', () => {
 
       // If answer false, find when search for No
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [
           {
@@ -996,7 +998,7 @@ context('Proposal administration tests', () => {
 
       // If missing answer, do not find the result for both, Yes and No
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [],
       });
