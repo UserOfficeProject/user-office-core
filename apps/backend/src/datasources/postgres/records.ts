@@ -304,6 +304,7 @@ export interface TechnicalReviewRecord {
   readonly files: string;
   readonly technical_review_assignee_id: number | null;
   readonly instrument_id: number;
+  readonly questionary_id: number;
 }
 
 export interface InternalReviewRecord {
@@ -348,6 +349,7 @@ export interface CallRecord {
   readonly description: string;
   readonly pdf_template_id: number;
   readonly fap_review_template_id: number;
+  readonly technical_review_template_id: number;
   readonly is_active: boolean;
 }
 
@@ -860,7 +862,8 @@ export const createTechnicalReviewObject = (
     technicalReview.reviewer_id,
     technicalReview.files ? JSON.stringify(technicalReview.files) : null,
     technicalReview.technical_review_assignee_id,
-    technicalReview.instrument_id
+    technicalReview.instrument_id,
+    technicalReview.questionary_id
   );
 };
 
@@ -1042,6 +1045,7 @@ export const createCallObject = (call: CallRecord) => {
     call.description,
     call.pdf_template_id,
     call.fap_review_template_id,
+    call.technical_review_template_id,
     call.is_active
   );
 };

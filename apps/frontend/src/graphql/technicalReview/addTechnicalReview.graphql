@@ -8,6 +8,7 @@ mutation addTechnicalReview(
   $reviewerId: Int!
   $files: String
   $instrumentId: Int!
+  $questionaryId: Int!
 ) {
   addTechnicalReview(
     addTechnicalReviewInput: {
@@ -20,6 +21,7 @@ mutation addTechnicalReview(
       reviewerId: $reviewerId
       files: $files
       instrumentId: $instrumentId
+      questionaryId: $questionaryId
     }
   ) {
     id

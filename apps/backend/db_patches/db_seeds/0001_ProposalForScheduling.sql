@@ -2,6 +2,8 @@ DO
 $DO$
 DECLARE  
   questionary_id_var int;
+  technical_review_template_id_var int;
+  technical_review_questionary_id_var int;
 BEGIN
 
   INSERT INTO instruments (instrument_id, name, short_code, description, manager_user_id) VALUES (1, 'Instrument 1', 'INSTR1', 'Test instrument 1', 0);
@@ -27,6 +29,18 @@ BEGIN
   INTO questionary_id_var
   FROM questionaries
   WHERE template_id = 1;
+
+  SELECT templates.template_id 
+  INTO technical_review_template_id_var
+  FROM templates
+  WHERE name = 'default technical review template';
+
+  INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (technical_review_template_id_var, NOW(), 1);
+
+  SELECT questionaries.questionary_id
+  INTO technical_review_questionary_id_var
+  FROM questionaries
+  WHERE template_id = technical_review_template_id_var; 
 
   INSERT INTO proposals 
     (
@@ -67,7 +81,8 @@ BEGIN
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (1, 1);
 
-  INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id) VALUES (1, 1, '', 2, 0, '', 0, 0, 1);
+  INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id, questionary_id) 
+  VALUES (1, 1, '', 2, 0, '', 0, 0, 1, technical_review_questionary_id_var);
 
 END;
 $DO$

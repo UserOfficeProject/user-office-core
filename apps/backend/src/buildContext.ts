@@ -52,6 +52,7 @@ import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
 import SystemQueries from './queries/SystemQueries';
+import TechnicalReviewQueries from './queries/TechnicalReviewQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UnitQueries from './queries/UnitQueries';
@@ -80,6 +81,7 @@ const context: BasicResolverContext = {
     fap: container.resolve(FapQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
+    technicalReview: container.resolve(TechnicalReviewQueries),
     template: container.resolve(TemplateQueries),
     unit: container.resolve(UnitQueries),
     user: container.resolve(UserQueries),

@@ -11,9 +11,11 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
@@ -52,6 +54,10 @@ export default class InstrumentMutations {
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.CallDataSource)
+    private callDataSource: CallDataSource,
+    @inject(Tokens.QuestionaryDataSource)
+    private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TechniqueDataSource)
     private techniqueDataSource: TechniqueDataSource
   ) {}
@@ -154,6 +160,7 @@ export default class InstrumentMutations {
         args,
       }
     );
+
     const instrumentHasProposalIds: number[] = [];
 
     // TODO: Cleanup this part because it is quite ugly
@@ -230,6 +237,30 @@ export default class InstrumentMutations {
               instrumentId: instrument.id,
             });
           } else {
+            const proposal = await this.proposalDataSource.get(proposalPk);
+
+            if (!proposal) {
+              return rejection(
+                'Cannot find the proposal for the technical review to be created',
+                { agent, args }
+              );
+            }
+
+            const call = await this.callDataSource.getCall(proposal.callId);
+
+            if (!call) {
+              return rejection(
+                'Cannot find the call for proposal of the technical review to be created',
+                { agent, args }
+              );
+            }
+
+            const technicalReviewQuestionary =
+              await this.questionaryDataSource.create(
+                proposal.proposerId,
+                call.technicalReviewTemplateId
+              );
+
             await this.reviewDataSource.setTechnicalReview(
               {
                 proposalPk: proposalPk,
@@ -241,6 +272,7 @@ export default class InstrumentMutations {
                 files: null,
                 submitted: false,
                 instrumentId: instrument.id,
+                questionaryId: technicalReviewQuestionary.questionaryId,
               },
               false
             );
