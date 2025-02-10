@@ -4,6 +4,7 @@ import { genericTemplateBasisPreSubmit } from 'components/questionary/questionar
 import { proposalBasisPreSubmit } from 'components/questionary/questionaryComponents/ProposalBasis/QuestionaryComponentProposalBasis';
 import { sampleBasisPreSubmit } from 'components/questionary/questionaryComponents/SampleBasis/QuestionaryComponentSampleBasis';
 import { shipmentBasisPreSubmit } from 'components/questionary/questionaryComponents/ShipmentBasis/QuestionaryComponentShipmentBasis';
+import { technicalReviewBasisPreSubmit } from 'components/questionary/questionaryComponents/TechnicalReviewBasis/QuestionaryComponentTechnicalReviewBasis';
 import { visitBasisPreSubmit } from 'components/questionary/questionaryComponents/VisitBasis/QuestionaryComponentVisitBasis';
 import { Answer, DataType, Sdk } from 'generated/sdk';
 import {
@@ -38,6 +39,8 @@ export function usePreSubmitActions() {
           return feedbackBasisPreSubmit();
         case DataType.FAP_REVIEW_BASIS:
           return fapReviewBasisPreSubmit();
+        case DataType.TECHNICAL_REVIEW_BASIS:
+          return technicalReviewBasisPreSubmit();
       }
 
       return [];

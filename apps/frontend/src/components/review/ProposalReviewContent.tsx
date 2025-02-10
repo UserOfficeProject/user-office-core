@@ -1,3 +1,4 @@
+import { Paper, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import React, { Fragment, useContext } from 'react';
@@ -16,9 +17,7 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   CoreTechnicalReviewFragment,
   InstrumentWithManagementTime,
-  Proposal,
   Review,
-  TechnicalReview,
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -26,11 +25,13 @@ import {
   ProposalDataTechnicalReview,
   useProposalData,
 } from 'hooks/proposal/useProposalData';
+import { TechnicalReviewWithQuestionary } from 'models/questionary/technicalReview/TechnicalReviewWithQuestionary';
+import { getFullUserName } from 'utils/user';
 
 import ProposalReviewContainer from './ProposalReviewContainer';
-import ProposalTechnicalReview from './ProposalTechnicalReview';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
-import TechnicalReviewInformation from './TechnicalReviewInformation';
+import TechnicalReviewContainer from './TechnicalReviewContainer';
+import TechnicalReviewQuestionaryReview from './TechnicalReviewQuestionaryReview';
 import InternalReviews from '../internalReview/InternalReviews';
 
 export enum PROPOSAL_MODAL_TAB_NAMES {
@@ -149,28 +150,48 @@ const ProposalReviewContent = ({
               }}
             />
           )}
-          <ProposalTechnicalReview
-            proposal={proposalData as Proposal}
-            data={technicalReview}
-            setReview={(data: CoreTechnicalReviewFragment | null | undefined) =>
-              setProposalData({
-                ...proposalData,
-                technicalReviews:
-                  proposalData.technicalReviews.map((technicalReview) => {
-                    if (technicalReview.id === data?.id) {
-                      return { ...technicalReview, ...data };
-                    } else {
-                      return {
-                        ...technicalReview,
-                      };
-                    }
-                  }) || null,
-              })
-            }
-          />
+          <Paper
+            elevation={1}
+            sx={(theme) => ({
+              padding: theme.spacing(2),
+              marginTop: 0,
+              marginBottom: theme.spacing(2),
+            })}
+          >
+            <Typography
+              variant="h6"
+              data-cy="reviewed-by-info"
+              component="h2"
+              gutterBottom
+            >
+              {`Reviewed by ${getFullUserName(technicalReview.technicalReviewAssignee)}`}
+            </Typography>
+            <TechnicalReviewContainer
+              technicalReview={technicalReview}
+              technicalReviewUpdated={(
+                data: CoreTechnicalReviewFragment | null | undefined
+              ) =>
+                setProposalData({
+                  ...proposalData,
+                  technicalReviews:
+                    proposalData.technicalReviews.map((technicalReview) => {
+                      if (technicalReview.id === data?.id) {
+                        return { ...technicalReview, ...data };
+                      } else {
+                        return {
+                          ...technicalReview,
+                        };
+                      }
+                    }) || null,
+                })
+              }
+            ></TechnicalReviewContainer>
+          </Paper>
         </Fragment>
       ) : (
-        <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
+        <TechnicalReviewQuestionaryReview
+          data={technicalReview as TechnicalReviewWithQuestionary}
+        />
       );
     }
   );
