@@ -1,12 +1,10 @@
 import { inject, injectable } from 'tsyringe';
 
-import { ProposalAuthorization } from '../auth/ProposalAuthorization';
-import { UserAuthorization } from '../auth/UserAuthorization';
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { Tokens } from '../config/Tokens';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import { Authorized } from '../decorators';
-import { Invite } from '../models/Invite';
 import { UserWithRole } from '../models/User';
 
 @injectable()
@@ -15,33 +13,22 @@ export default class InviteQueries {
     @inject(Tokens.CoProposerClaimDataSource)
     public coProposerClaimDataSource: CoProposerClaimDataSource,
     @inject(Tokens.InviteDataSource)
-    public inviteDataSource: InviteDataSource,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization,
-    @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    public dataSource: InviteDataSource,
+    @inject(Tokens.InviteAuthorization)
+    private inviteAuth: InviteAuthorization
   ) {}
 
   @Authorized()
   async getCoProposerInvites(agent: UserWithRole | null, proposalPk: number) {
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
-    const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
-      agent,
-      proposalPk
-    );
+    const hasReadRights = this.inviteAuth.hasReadRights(agent, proposalPk);
 
-    if (!isUserOfficer && !isMemberOfProposal) {
+    if (!hasReadRights) {
       return [];
     }
 
-    const coProposerClaims =
-      await this.coProposerClaimDataSource.getByProposalPk(proposalPk);
-    const invites = await Promise.all(
-      coProposerClaims.map(async (claim) => {
-        const invite = await this.inviteDataSource.findById(claim.inviteId);
-
-        return invite as Invite;
-      })
+    const invites = await this.dataSource.findCoProposerInvites(
+      proposalPk,
+      false
     );
 
     return invites;

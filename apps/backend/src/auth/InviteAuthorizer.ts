@@ -39,4 +39,14 @@ export class InviteAuthorization {
 
     return true;
   }
+
+  public async hasReadRights(agent: UserWithRole | null, proposalPk: number) {
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+      agent,
+      proposalPk
+    );
+
+    if (!isUserOfficer && !isMemberOfProposal) return false;
+  }
 }
