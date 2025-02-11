@@ -10,7 +10,7 @@ export class InviteAuthorization {
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  public isRoleInviteAuthorized = async (
+  public isRoleClaimAuthorized = async (
     agent: UserWithRole | null,
     roleIds?: number[]
   ) => {
