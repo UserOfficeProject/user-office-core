@@ -1,0 +1,7 @@
+mutation createProposalScientistComment($proposalPk: Int!, $comment: String!) {
+  createProposalScientistComment(proposalPk: $proposalPk, comment: $comment) {
+    commentId
+    proposalPk
+    comment
+  }
+}

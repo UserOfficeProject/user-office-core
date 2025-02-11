@@ -1,12 +1,14 @@
 import { logger } from '@user-office-software/duo-logger';
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
+import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
@@ -19,12 +21,14 @@ import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 @injectable()
 export default class ProposalQueries {
-  private proposalAuth = container.resolve(ProposalAuthorization);
-
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
     @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.ProposalInternalCommentsDataSource)
+    public proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
   ) {}
 
   @Authorized()
@@ -191,5 +195,21 @@ export default class ProposalQueries {
     } else {
       return null;
     }
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST, Roles.USER_OFFICER])
+  async getProposalScientistComment(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ) {
+    return await this.proposalInternalCommentsDataSource
+      .getProposalInternalComment(proposalPk)
+      .catch((error) => {
+        return rejection(
+          `Could not get proposal scientist comment proposal: '${proposalPk}'`,
+          { agent, args: proposalPk },
+          error
+        );
+      });
   }
 }

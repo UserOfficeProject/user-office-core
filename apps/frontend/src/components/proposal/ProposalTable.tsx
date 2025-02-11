@@ -70,7 +70,11 @@ const columns: Column<PartialProposalsDataType>[] = [
     field: 'call.shortCode',
     emptyValue: '-',
   },
-  { title: 'Created', field: 'created' },
+  {
+    title: 'Created',
+    field: 'created',
+    render: (rawData) => timeAgo(rawData.created),
+  },
 ];
 
 const ProposalTable = ({
@@ -174,7 +178,7 @@ const ProposalTable = ({
         publicStatus: resultProposal.publicStatus,
         submitted: resultProposal.submitted,
         proposalId: resultProposal.proposalId,
-        created: timeAgo(resultProposal.created),
+        created: resultProposal.created,
         notified: resultProposal.notified,
         proposerId: resultProposal.proposer?.id,
         call: resultProposal.call,
@@ -242,7 +246,7 @@ const ProposalTable = ({
             tooltip: 'Clone proposal',
             onClick: (_event, rowData) => {
               api()
-                .getProposal({
+                .getProposalToClone({
                   primaryKey: (rowData as PartialProposalsDataType).primaryKey,
                 })
                 .then((result) => {

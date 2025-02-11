@@ -56,11 +56,17 @@ export interface ProposalDataSource {
   updateProposalTechnicalReviewer(
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<TechnicalReview[]>;
-  setProposalUsers(proposalPk: number, users: number[]): Promise<void>;
+  setProposalUsers(proposalPk: number, usersIds: number[]): Promise<void>;
+  addProposalUser(proposalPk: number, userId: number): Promise<void>;
   submitProposal(
     primaryKey: number,
     referenceNumber?: string
   ): Promise<Proposal>;
+  submitImportedProposal(
+    primaryKey: number,
+    referenceNumber: string,
+    submittedDate: Date
+  ): Promise<Proposal | null>;
   deleteProposal(primaryKey: number): Promise<Proposal>;
   markEventAsDoneOnProposals(
     event: Event,

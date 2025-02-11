@@ -29,7 +29,10 @@ import { DeleteQuestionTemplateRelationArgs } from '../../resolvers/mutations/te
 import { SetActiveTemplateArgs } from '../../resolvers/mutations/template/SetActiveTemplateMutation';
 import { UpdateQuestionTemplateRelationSettingsArgs } from '../../resolvers/mutations/template/UpdateQuestionTemplateRelationSettingsMutation';
 import { UpdateTemplateArgs } from '../../resolvers/mutations/template/UpdateTemplateMutation';
-import { QuestionsFilter } from '../../resolvers/queries/QuestionsQuery';
+import {
+  AllQuestionsFilterArgs,
+  QuestionsFilter,
+} from '../../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../../resolvers/queries/TemplatesQuery';
 import { ConflictResolution } from '../../resolvers/types/ConflictResolution';
 import {
@@ -122,6 +125,91 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
       })
       .then((rows: QuestionRecord[]) => {
         return rows.map((row) => createQuestionObject(row));
+      });
+  }
+
+  fieldMap: { [key: string]: string } = {
+    question: 'questions.question',
+    naturalKey: 'questions.natural_key',
+    dataType: 'questions.data_type',
+    answers: 'answers_count',
+    templates: 'templates_count',
+    categoryId: 'template_categories.name',
+  };
+
+  async getAllQuestions(args: AllQuestionsFilterArgs): Promise<{
+    totalCount: number;
+    questions: Question[];
+  }> {
+    const { filter, first, offset, sortField, sortDirection, searchText } =
+      args;
+
+    return database('questions')
+      .select([
+        'questions.*',
+        'template_categories.*',
+        database.raw('count(distinct answers.question_id) as answers_count'),
+        database.raw('count(distinct tq.question_id) as templates_count'),
+        database.raw('count(*) OVER() AS full_count'),
+      ])
+      .from('questions')
+      .leftJoin('answers', 'questions.question_id', 'answers.question_id')
+      .leftJoin(
+        'templates_has_questions as tq',
+        'questions.question_id',
+        'tq.question_id'
+      )
+      .leftJoin(
+        'template_categories',
+        'questions.category_id',
+        'template_categories.template_category_id'
+      )
+      .modify((query) => {
+        if (filter?.category !== undefined) {
+          query.where('questions.category_id', filter.category);
+        }
+        if (filter?.dataType !== undefined) {
+          query.whereIn('questions.data_type', filter.dataType);
+        }
+        if (filter?.excludeDataType !== undefined) {
+          query.whereNotIn('questions.data_type', filter.excludeDataType);
+        }
+        if (searchText) {
+          query.andWhere((qb) =>
+            qb
+              .orWhere('questions.question', 'ilike', `%${searchText.trim()}%`)
+              .orWhere(
+                'questions.question_id',
+                'ilike',
+                `%${searchText.trim()}%`
+              )
+          );
+        }
+
+        if (sortField && sortDirection) {
+          if (!this.fieldMap.hasOwnProperty(sortField)) {
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
+          }
+
+          query.orderByRaw(`${this.fieldMap[sortField]} ${sortDirection}`);
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .groupBy([
+        'questions.question_id',
+        'template_categories.template_category_id',
+      ])
+      .then((rows: QuestionRecord[]) => {
+        return {
+          totalCount: rows[0] ? rows[0].full_count : 0,
+          questions: rows.map((row) => createQuestionObject(row)),
+        };
       });
   }
 

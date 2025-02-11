@@ -95,6 +95,7 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   1,
   '',
   1,
+  1,
   1
 );
 
@@ -272,7 +273,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return proposal;
   }
 
-  async setProposalUsers(proposalPk: number, users: number[]): Promise<void> {
+  async setProposalUsers(
+    proposalPk: number,
+    usersIds: number[]
+  ): Promise<void> {
+    throw new Error('Not implemented');
+  }
+
+  async addProposalUser(proposalPk: number, userId: number): Promise<void> {
     throw new Error('Not implemented');
   }
 
@@ -293,6 +301,20 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     if (referenceNumber !== undefined) {
       newObj.proposalId = referenceNumber;
     }
+
+    Object.setPrototypeOf(newObj, Proposal.prototype);
+
+    return newObj;
+  }
+
+  async submitImportedProposal(
+    primaryKey: number,
+    referenceNumber: string,
+    submittedDate: Date
+  ): Promise<Proposal> {
+    const submitted = await this.submitProposal(primaryKey, referenceNumber);
+
+    const newObj = { ...submitted, submittedDate };
 
     Object.setPrototypeOf(newObj, Proposal.prototype);
 

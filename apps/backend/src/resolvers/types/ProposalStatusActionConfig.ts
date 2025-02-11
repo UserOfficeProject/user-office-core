@@ -7,6 +7,8 @@ export enum EmailStatusActionRecipients {
   FAP_REVIEWERS = 'FAP_REVIEWERS',
   FAP_CHAIR_AND_SECRETARY = 'FAP_CHAIR_AND_SECRETARY',
   USER_OFFICE = 'USER_OFFICE',
+  TECHNIQUE_SCIENTISTS = 'TECHNIQUE_SCIENTISTS',
+  SAMPLE_SAFETY = 'SAMPLE_SAFETY',
   OTHER = 'OTHER',
 }
 
@@ -29,6 +31,14 @@ export const EmailStatusActionRecipientsWithDescription = new Map<
     'The Chair and Secretaries of the FAP this proposal is associated with',
   ],
   [EmailStatusActionRecipients.USER_OFFICE, 'The User Office email address'],
+  [
+    EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS,
+    'The Technique Scentists email address',
+  ],
+  [
+    EmailStatusActionRecipients.SAMPLE_SAFETY,
+    'The Sample Safety email address',
+  ],
   [
     EmailStatusActionRecipients.OTHER,
     'Other email recipients manually added by their email',

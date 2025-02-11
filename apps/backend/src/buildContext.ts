@@ -11,6 +11,7 @@ import FileMutations from './mutations/FileMutations';
 import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import InternalReviewMutations from './mutations/InternalReviewMutations';
+import InviteMutations from './mutations/InviteMutations';
 import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalEsiMutations from './mutations/ProposalEsiMutations';
@@ -50,6 +51,7 @@ import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
 import SystemQueries from './queries/SystemQueries';
+import TechnicalReviewQueries from './queries/TechnicalReviewQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UnitQueries from './queries/UnitQueries';
@@ -77,6 +79,7 @@ const context: BasicResolverContext = {
     fap: container.resolve(FapQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
+    technicalReview: container.resolve(TechnicalReviewQueries),
     template: container.resolve(TemplateQueries),
     unit: container.resolve(UnitQueries),
     user: container.resolve(UserQueries),
@@ -93,6 +96,7 @@ const context: BasicResolverContext = {
     file: container.resolve(FileMutations),
     genericTemplate: container.resolve(GenericTemplateMutations),
     instrument: container.resolve(InstrumentMutations),
+    invite: container.resolve(InviteMutations),
     pdfTemplate: container.resolve(PdfTemplateMutations),
     proposal: container.resolve(ProposalMutations),
     proposalEsi: container.resolve(ProposalEsiMutations),

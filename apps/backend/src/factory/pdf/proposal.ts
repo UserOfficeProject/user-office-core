@@ -239,6 +239,10 @@ export const collectProposalPDFData = async (
 
   const call = await baseContext.queries.call.get(user, proposal.callId);
 
+  if (call === null) {
+    throw new Error('Call not found for the proposal');
+  }
+
   /*
    * Because naming things is hard, the PDF template ID is the templateId for
    * for the PdfTemplate and not the pdfTemplateId.
@@ -386,10 +390,7 @@ export const collectProposalPDFData = async (
           : [Number(answer.value?.instrumentId || '0')];
         const instruments =
           await baseContext.queries.instrument.getInstrumentsByIds(user, ids);
-        const call = await baseContext.queries.call.getCallOfAnswersProposal(
-          user,
-          answer.answerId
-        );
+
         answer.value = instrumentPickerAnswer(answer, instruments, call);
       } else if (answer.question.dataType === DataType.TECHNIQUE_PICKER) {
         const techniqueIds = Array.isArray(answer.value)
@@ -416,7 +417,7 @@ export const collectProposalPDFData = async (
   }
 
   const technicalReviews =
-    await baseContext.queries.review.technicalReviewsForProposal(
+    await baseContext.queries.technicalReview.reviewsForProposal(
       user,
       proposal.primaryKey
     );
@@ -562,9 +563,12 @@ export const collectProposalPDFDataTokenAccess = async (
       Tokens.GenericTemplateDataSource
     );
 
-  const genericTemplates = await genericTemplateDataSource.getGenericTemplates({
-    filter: { proposalPk: proposal.primaryKey },
-  });
+  const genericTemplates = await genericTemplateDataSource.getGenericTemplates(
+    {
+      filter: { proposalPk: proposal.primaryKey },
+    },
+    user
+  );
 
   const genericTemplatePDFData = (
     await Promise.all(

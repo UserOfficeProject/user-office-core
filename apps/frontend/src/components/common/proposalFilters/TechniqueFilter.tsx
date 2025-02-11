@@ -9,7 +9,7 @@ import React, { Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
-import { TechniqueFilterInput, TechniqueFragment } from 'generated/sdk';
+import { TechniqueMinimalFragment, TechniqueFilterInput } from 'generated/sdk';
 
 export enum TechniqueFilterEnum {
   ALL = 'all',
@@ -17,7 +17,7 @@ export enum TechniqueFilterEnum {
 }
 
 type TechniqueFilterProps = {
-  techniques?: TechniqueFragment[];
+  techniques?: TechniqueMinimalFragment[];
   isLoading?: boolean;
   onChange?: Dispatch<TechniqueFilterInput>;
   shouldShowAll?: boolean;

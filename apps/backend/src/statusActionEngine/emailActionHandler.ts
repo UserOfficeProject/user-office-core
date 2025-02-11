@@ -23,6 +23,8 @@ import {
   publishMessageToTheEventBus,
   getFapChairSecretariesAndFormatOutputForEmailSending,
   statusActionLogger,
+  getOtherAndFormatOutputForEmailSending,
+  getTechniqueScientistsAndFormatOutputForEmailSending,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -144,7 +146,6 @@ export const emailStatusActionRecipient = async (
         proposals,
         recipientWithTemplate
       );
-
       await sendMail(
         ISs,
         statusActionLogger({
@@ -284,6 +285,84 @@ export const emailStatusActionRecipient = async (
       break;
     }
 
+    case EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS: {
+      const techniqueScientists =
+        await getTechniqueScientistsAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate
+        );
+      await sendMail(
+        techniqueScientists,
+        statusActionLogger({
+          connectionId: proposalStatusAction.connectionId,
+          actionId: proposalStatusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient:
+            EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
+    case EmailStatusActionRecipients.SAMPLE_SAFETY: {
+      const adminDataSource = container.resolve<AdminDataSource>(
+        Tokens.AdminDataSource
+      );
+
+      const sampleSafetyEmail = (
+        await adminDataSource.getSetting(SettingsId.SAMPLE_SAFETY_EMAIL)
+      )?.settingsValue;
+
+      if (!sampleSafetyEmail) {
+        logger.logError(
+          'Could not send email(s) to the Sample Safety team as the setting (SAMPLE_SAFETY_EMAIL) is not set.',
+          { proposalEmailsSkipped: proposals }
+        );
+
+        break;
+      }
+
+      let sampleSafetyRecipients: EmailReadyType[];
+
+      if (recipientWithTemplate.combineEmails) {
+        sampleSafetyRecipients = [
+          {
+            id: recipientWithTemplate.recipient.name,
+            email: sampleSafetyEmail,
+            proposals: proposals,
+            template: recipientWithTemplate.emailTemplate.id,
+          },
+        ];
+      } else {
+        sampleSafetyRecipients = await getOtherAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate,
+          sampleSafetyEmail
+        );
+      }
+
+      await sendMail(
+        sampleSafetyRecipients,
+        statusActionLogger({
+          connectionId: proposalStatusAction.connectionId,
+          actionId: proposalStatusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient: EmailStatusActionRecipients.SAMPLE_SAFETY,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
     case EmailStatusActionRecipients.OTHER: {
       if (!recipientWithTemplate.otherRecipientEmails?.length) {
         logger.logError(
@@ -293,28 +372,26 @@ export const emailStatusActionRecipient = async (
         break;
       }
 
-      const otherRecipients: EmailReadyType[] =
-        recipientWithTemplate.otherRecipientEmails.map((email) => ({
-          id: recipientWithTemplate.recipient.name,
-          email: email,
-          proposals: proposals,
-          template: recipientWithTemplate.emailTemplate.id,
-        }));
-
-      await sendMail(
-        otherRecipients,
-        statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
-          emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
-          proposalPks,
-          statusActionsLogId,
-        }),
-        successfulMessage,
-        failMessage,
-        loggedInUserId
-      );
-
+      for (const email of recipientWithTemplate.otherRecipientEmails) {
+        const oRecipients = await getOtherAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate,
+          email
+        );
+        await sendMail(
+          oRecipients,
+          statusActionLogger({
+            connectionId: proposalStatusAction.connectionId,
+            actionId: proposalStatusAction.actionId,
+            statusActionsLogId,
+            emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
+            proposalPks,
+          }),
+          successfulMessage,
+          failMessage,
+          loggedInUserId
+        );
+      }
       break;
     }
 
@@ -357,6 +434,9 @@ const sendMail = async (
               firstName: recipientWithData.firstName,
               lastName: recipientWithData.lastName,
               preferredName: recipientWithData.preferredName,
+              techniques: recipientWithData.techniques,
+              samples: recipientWithData.samples,
+              hazards: recipientWithData.hazards,
             },
             recipients: [{ address: recipientWithData.email }],
           });
