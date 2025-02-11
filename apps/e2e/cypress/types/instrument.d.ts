@@ -18,8 +18,6 @@ import {
   SubmitInstrumentInFapMutation,
   RemoveProposalsFromInstrumentMutationVariables,
   RemoveProposalsFromInstrumentMutation,
-  UpdateInstrumentMutationVariables,
-  UpdateInstrumentMutation,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -150,18 +148,6 @@ declare global {
       submitInstrumentInFap: (
         submitInstrumentInFapInput: SubmitInstrumentInFapMutationVariables
       ) => Cypress.Chainable<SubmitInstrumentInFapMutation>;
-
-      /**
-       * Update an instrument.
-       *
-       * @returns {typeof UpdateInstrument}
-       * @memberof Chainable
-       * @example
-       *    cy.updateInstrument(updateInstrumentInput: UpdateInstrumentMutationVariables);
-       */
-      updateInstrument: (
-        updateInstrumentInput: UpdateInstrumentMutationVariables
-      ) => Cypress.Chainable<UpdateInstrumentMutation>;
     }
   }
 }

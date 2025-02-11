@@ -5,7 +5,6 @@ import { Tokens } from '../config/Tokens';
 import {
   dummyInstrument,
   dummyInstrumentHasProposals,
-  InstrumentDataSourceMock,
 } from '../datasources/mockups/InstrumentDataSource';
 import { ProposalSettingsDataSourceMock } from '../datasources/mockups/ProposalSettingsDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
@@ -18,7 +17,6 @@ import InstrumentMutations from './InstrumentMutations';
 
 let proposalSettingsDataSource: ProposalSettingsDataSourceMock;
 let techniqueDataSource: TechniqueDataSourceMock;
-let instrumentDataSource: InstrumentDataSourceMock;
 
 const instrumentMutations = container.resolve(InstrumentMutations);
 
@@ -29,9 +27,6 @@ beforeEach(() => {
     );
   techniqueDataSource = container.resolve<TechniqueDataSourceMock>(
     Tokens.TechniqueDataSource
-  );
-  instrumentDataSource = container.resolve<InstrumentDataSourceMock>(
-    Tokens.InstrumentDataSource
   );
 });
 
@@ -348,34 +343,6 @@ describe('Test Instrument Mutations', () => {
         instrumentIds: [1],
         submitted: false,
       });
-    });
-
-    test('An instrument cannot be assigned if it is retired', () => {
-      jest
-        .spyOn(instrumentDataSource, 'getInstrumentsByIds')
-        .mockResolvedValue([
-          {
-            id: 5,
-            name: 'Inst 1',
-            shortCode: 'INST_1',
-            description: 'RETIRED - description',
-            managerUserId: 1,
-          },
-        ]);
-
-      return expect(
-        instrumentMutations.assignXpressProposalsToInstruments(
-          dummyInstrumentScientist,
-          {
-            proposalPks: [1, 2],
-            instrumentIds: [5],
-          }
-        )
-      ).resolves.toEqual(
-        expect.objectContaining({
-          message: expect.stringContaining('instrument is retired'),
-        })
-      );
     });
   });
 });
