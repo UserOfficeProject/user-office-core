@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useState,
-  SetStateAction,
-  Dispatch,
-  useContext,
-} from 'react';
+import { useEffect, useState, useContext } from 'react';
 
 import { UserContext } from 'context/UserContextProvider';
 import {
@@ -18,12 +12,15 @@ export function useXpressInstrumentsData(
   techniques?: TechniqueMinimalFragment[]
 ): {
   loadingInstruments: boolean;
-  instruments: InstrumentMinimalFragment[];
-  setInstruments: Dispatch<SetStateAction<InstrumentMinimalFragment[]>>;
+  allInstruments: InstrumentMinimalFragment[];
+  techniqueInstruments: InstrumentMinimalFragment[];
 } {
-  const [instruments, setInstruments] = useState<InstrumentMinimalFragment[]>(
-    []
-  );
+  const [allInstruments, setAllInstruments] = useState<
+    InstrumentMinimalFragment[]
+  >([]);
+  const [techniqueInstruments, setTechniqueInstruments] = useState<
+    InstrumentMinimalFragment[]
+  >([]);
   const [loadingInstruments, setLoadingInstruments] = useState(true);
   const { currentRole } = useContext(UserContext);
 
@@ -57,6 +54,8 @@ export function useXpressInstrumentsData(
           }
 
           if (data.instruments) {
+            setAllInstruments(data.instruments.instruments);
+
             const techniqueInstrumentIds = new Set(
               techniques?.flatMap((technique) =>
                 technique.instruments.map((instrument) => instrument.id)
@@ -69,7 +68,7 @@ export function useXpressInstrumentsData(
 
             filteredInstruments.sort((a, b) => a.name.localeCompare(b.name));
 
-            setInstruments(filteredInstruments);
+            setTechniqueInstruments(filteredInstruments);
           }
           setLoadingInstruments(false);
         });
@@ -83,7 +82,7 @@ export function useXpressInstrumentsData(
 
   return {
     loadingInstruments,
-    instruments,
-    setInstruments,
+    allInstruments,
+    techniqueInstruments,
   };
 }

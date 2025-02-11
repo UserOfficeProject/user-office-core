@@ -1261,41 +1261,6 @@ context('Xpress tests', () => {
       cy.contains(instrument1.name);
     });
 
-    it('Instrument scientist is not able to select a retired instrument for a proposal', function () {
-      cy.changeProposalsStatus({
-        proposalPks: createdProposalPk1,
-        statusId: underReviewStatus.id as number,
-      });
-
-      // Update the instrument to make it retired
-      cy.updateInstrument({
-        id: createdInstrumentId1,
-        shortCode: instrument1.shortCode,
-        name: instrument1.name,
-        description: 'RETIRED - '.concat(instrument1.description),
-        managerUserId: instrument1.managerUserId,
-      });
-
-      // Scientist 1 belongs to technique 1, which only has proposal 1
-      cy.login(scientist1);
-      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
-      cy.visit('/');
-      cy.finishedLoading();
-
-      cy.contains('Xpress').click();
-      cy.finishedLoading();
-
-      // Check that only instrument 2 is available to be selected for proposal 1
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[data-cy="instrument-dropdown"]')
-        .click();
-      cy.get('[role="listbox"]').contains(instrument2.name);
-      cy.get('[role="listbox"]').should('not.contain', instrument1.name); // The retired instrument
-      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
-      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
-    });
-
     it('Instrument scientist must be able to add update and remove comment on an xpress proposal', function () {
       cy.login(scientist1);
       cy.changeActiveRole(initialDBData.roles.instrumentScientist);
@@ -1791,5 +1756,75 @@ context('Xpress tests', () => {
         .contains(expiredStatus.name)
         .should('not.exist');
     });
+  });
+
+  it('Instrument scientist is not able to select a retired instrument for a proposal', function () {
+    cy.changeProposalsStatus({
+      proposalPks: createdProposalPk1,
+      statusId: underReviewStatus.id as number,
+    });
+
+    // Proposal 1 is assigned to instrument 1
+    cy.assignProposalsToInstruments({
+      proposalPks: createdProposalPk1,
+      instrumentIds: createdInstrumentId1,
+    });
+
+    // Scientist 1 belongs to technique 1, which only has proposal 1
+    cy.login(scientist1);
+    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+    cy.visit('/');
+    cy.finishedLoading();
+
+    cy.contains('Xpress').click();
+    cy.finishedLoading();
+
+    // Initially, instrument 1 and instrument 2 are displayed
+    cy.contains(proposal1.title)
+      .parent()
+      .find('[data-cy="instrument-dropdown"]')
+      .click();
+    cy.get('[role="listbox"]').contains(instrument1.name);
+    cy.get('[role="listbox"]').contains(instrument2.name);
+    cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+    cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+    // Instrument 1 is removed from technique 1 (e.g. retired)
+    cy.removeInstrumentsFromTechnique({
+      instrumentIds: createdInstrumentId1,
+      techniqueId: createdTechniquePk1,
+    });
+
+    cy.reload();
+    cy.finishedLoading();
+
+    // Instrument 1 is still displayed because it is the assigned instrument
+    cy.contains(proposal1.title)
+      .parent()
+      .find('[data-cy="instrument-dropdown"]')
+      .click();
+    cy.get('[role="listbox"]').contains(instrument1.name);
+    cy.get('[role="listbox"]').contains(instrument2.name);
+    cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+    cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+    // Proposal 1 is assigned to instrument 2
+    cy.assignProposalsToInstruments({
+      proposalPks: createdProposalPk1,
+      instrumentIds: createdInstrumentId2,
+    });
+
+    cy.reload();
+    cy.finishedLoading();
+
+    // Instrument no longer shows as available for selection
+    cy.contains(proposal1.title)
+      .parent()
+      .find('[data-cy="instrument-dropdown"]')
+      .click();
+    cy.get('[role="listbox"]').contains(instrument2.name);
+    cy.get('[role="listbox"]').should('not.contain', instrument1.name);
+    cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+    cy.get('[role="listbox"]').should('not.contain', instrument4.name);
   });
 });
