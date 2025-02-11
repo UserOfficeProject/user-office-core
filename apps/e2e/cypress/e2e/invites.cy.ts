@@ -1,15 +1,23 @@
 import { faker } from '@faker-js/faker';
-import { FeatureId } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  FeatureUpdateAction,
+} from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
 context('Invites tests', () => {
-  beforeEach(() => {
-    cy.resetDB();
-    cy.getAndStoreFeaturesEnabled();
-  });
   describe('Creating invites', () => {
+    beforeEach(() => {
+      cy.resetDB();
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
+      cy.getAndStoreFeaturesEnabled();
+    });
+
     it('Should be able to delete invite', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
@@ -154,6 +162,45 @@ context('Invites tests', () => {
       );
 
       cy.contains(`No results found`).should('exist');
+    });
+  });
+
+  describe('Accepting invites', () => {
+    beforeEach(() => {
+      cy.resetDB(true);
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
+      cy.getAndStoreFeaturesEnabled();
+    });
+
+    it('Should be able to accept invite', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+        this.skip();
+      }
+      cy.createInvite({
+        input: {
+          email: faker.internet.email(),
+          note: faker.lorem.words(3),
+          claims: {
+            roleIds: [1],
+            coProposerProposalPk: 1,
+          },
+        },
+      }).then((invite) => {
+        cy.login('user3', initialDBData.roles.user);
+        cy.visit('/');
+        cy.get('[data-cy=join-proposal-btn]').click();
+        cy.get('#code').type(invite.createInvite.code ?? '');
+        cy.get('[data-cy="invitation-submit"]').click();
+        cy.get('[data-testid="VisibilityIcon"]').click();
+        cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
+        cy.get('[data-cy=questionary-details-view]').should(
+          'contain.text',
+          initialDBData.users.user3.lastName
+        );
+      });
     });
   });
 });
