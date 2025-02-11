@@ -809,7 +809,7 @@ context('GenericTemplates tests', () => {
 
       cy.updateQuestionTemplateRelationSettings({
         questionId: createdQuestion1Id,
-        templateId: 4,
+        templateId: 5,
         config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":false,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
         dependencies: [],
       });

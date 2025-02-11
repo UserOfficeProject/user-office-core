@@ -37,6 +37,8 @@ context('Calls tests', () => {
     templateId: initialDBData.template.id,
     fapReviewTemplateName: initialDBData.fapReviewTemplate.name,
     fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+    technicalReviewTemplateName: initialDBData.technicalReviewTemplate.name,
+    technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -57,6 +59,7 @@ context('Calls tests', () => {
     endCycle: currentDayStart,
     templateId: initialDBData.template.id,
     fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+    technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -215,6 +218,11 @@ context('Calls tests', () => {
         .contains(initialDBData.fapReviewTemplate.name)
         .click();
 
+      cy.get('[data-cy="call-technical-review-template"]').click();
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.technicalReviewTemplate.name)
+        .click();
+
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
         cy.get('[role="presentation"]').contains(esiTemplateName).click();
@@ -346,6 +354,7 @@ context('Calls tests', () => {
         endCall,
         templateName,
         fapReviewTemplateName,
+        technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
@@ -381,6 +390,11 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="call-fap-review-template"]').click();
       cy.get('[role="presentation"]').contains(fapReviewTemplateName).click();
+
+      cy.get('[data-cy="call-technical-review-template"]').click();
+      cy.get('[role="presentation"]')
+        .contains(technicalReviewTemplateName)
+        .click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
@@ -424,6 +438,7 @@ context('Calls tests', () => {
         endCall,
         templateName,
         fapReviewTemplateName,
+        technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
@@ -464,6 +479,11 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="call-fap-review-template"]').click();
       cy.get('[role="presentation"]').contains(fapReviewTemplateName).click();
+
+      cy.get('[data-cy="call-technical-review-template"]').click();
+      cy.get('[role="presentation"]')
+        .contains(technicalReviewTemplateName)
+        .click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
@@ -527,6 +547,11 @@ context('Calls tests', () => {
       cy.get('[data-cy="call-fap-review-template"] input').should(
         'have.value',
         initialDBData.fapReviewTemplate.name
+      );
+
+      cy.get('[data-cy="call-technical-review-template"] input').should(
+        'have.value',
+        initialDBData.technicalReviewTemplate.name
       );
 
       cy.get('.MuiStep-root').contains('Reviews').click();

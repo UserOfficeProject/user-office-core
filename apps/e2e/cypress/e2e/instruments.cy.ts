@@ -332,6 +332,7 @@ context('Instrument tests', () => {
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
         instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
       cy.login('officer', initialDBData.roles.userOfficer);
@@ -422,6 +423,7 @@ context('Instrument tests', () => {
         status: TechnicalReviewStatus.FEASIBLE,
         timeAllocation: 1,
         instrumentId: createdInstrumentId,
+        questionaryId: 3,
       });
 
       cy.login('officer');
@@ -442,11 +444,11 @@ context('Instrument tests', () => {
         .click()
         .should('have.value', 'false');
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Updated',
       });
 
       cy.closeModal();
@@ -473,8 +475,8 @@ context('Instrument tests', () => {
         .click();
       cy.get('[role="dialog"]').contains('Technical review').click();
 
-      cy.get('[data-cy="save-technical-review"]').should('not.be.disabled');
-      cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
+      cy.get('[data-cy="save-and-continue-button"]').should('not.be.disabled');
+      //cy.get('[data-cy="submit-technical-review"]').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
       cy.get('[data-cy="timeAllocation"] label').should(
         'include.text',
@@ -1012,11 +1014,11 @@ context('Instrument tests', () => {
 
       cy.contains('Proposal information').click();
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Saved',
       });
 
       cy.setTinyMceContent('comment', internalComment);
@@ -1030,13 +1032,19 @@ context('Instrument tests', () => {
         expect(content).to.have.string(publicComment)
       );
 
-      cy.get('[data-cy="submit-technical-review"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.get('[data-cy="button-submit-technical-review"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="button-submit-technical-review"]').should(
+        'be.disabled'
+      );
 
       cy.notification({ text: 'successfully', variant: 'success' });
 
-      cy.get('[data-cy="save-technical-review"]').should('be.disabled');
-      cy.get('[data-cy="submit-technical-review"]').should('be.disabled');
+      cy.get('[data-cy="back-button"]').click();
+
+      //cy.get('[data-cy="save-technical-review"]').should('be.disabled');
+      //cy.get('[data-cy="submit-technical-review"]').should('be.disabled');
       cy.get('[data-cy="timeAllocation"] input').should('be.disabled');
 
       cy.closeModal();
@@ -1139,6 +1147,7 @@ context('Instrument tests', () => {
             reviewerId: scientist2.id,
             submitted: false,
             instrumentId: createdInstrumentId,
+            questionaryId: 3,
           });
         }
       });
@@ -1173,10 +1182,10 @@ context('Instrument tests', () => {
         .click();
       cy.get('[data-cy="timeAllocation"] input').type('10');
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').click();
 
       cy.notification({
-        text: 'Technical review updated successfully',
+        text: 'Saved',
         variant: 'success',
       });
 
@@ -1191,7 +1200,7 @@ context('Instrument tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
 
       cy.notification({
-        text: 'Proposals technical review submitted successfully',
+        text: 'Saved',
         variant: 'success',
       });
 

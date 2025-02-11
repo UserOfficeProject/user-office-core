@@ -65,6 +65,13 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('fap_review_template_id', filter.fapReviewTemplateIds);
     }
 
+    if (filter?.technicalReviewTemplateIds) {
+      query.whereIn(
+        'technical_review_template_id',
+        filter.technicalReviewTemplateIds
+      );
+    }
+
     if (filter?.esiTemplateIds) {
       query.whereIn('esi_template_id', filter.esiTemplateIds);
     }
@@ -202,6 +209,7 @@ export default class PostgresCallDataSource implements CallDataSource {
             esi_template_id: args.esiTemplateId,
             pdf_template_id: args.pdfTemplateId,
             fap_review_template_id: args.fapReviewTemplateId,
+            technical_review_template_id: args.technicalReviewTemplateId,
             allocation_time_unit: args.allocationTimeUnit,
             title: args.title,
             description: args.description,
@@ -381,6 +389,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               esi_template_id: args.esiTemplateId,
               pdf_template_id: args.pdfTemplateId,
               fap_review_template_id: args.fapReviewTemplateId,
+              technical_review_template_id: args.technicalReviewTemplateId,
               allocation_time_unit: args.allocationTimeUnit,
               title: args.title,
               description: args.description,

@@ -93,6 +93,9 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public technicalReviewTemplateId?: number;
+
   @Field({ nullable: true })
   public title: string;
 

@@ -109,6 +109,14 @@ export default class TemplateMutations {
           'fap_review_basis'
         );
         break;
+      case TemplateGroupId.TECHNICAL_REVIEW:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New technical review',
+          'technical_review_basis'
+        );
+        break;
       case TemplateGroupId.PROPOSAL_ESI:
         await this.createInitialTopic(
           newTemplate.templateId,

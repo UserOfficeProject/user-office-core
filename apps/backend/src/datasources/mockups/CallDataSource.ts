@@ -50,6 +50,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.description || 'Description',
     values?.pdfTemplateId || 1,
     values?.fapReviewTemplateId || 1,
+    values?.technicalReviewTemplateId || 1,
     values?.isActive || true
   );
 };
@@ -85,6 +86,7 @@ export const dummyCall = new Call(
   '',
   1,
   1,
+  1,
   true
 );
 
@@ -117,6 +119,7 @@ export const anotherDummyCall = new Call(
   AllocationTimeUnits.Day,
   '',
   '',
+  1,
   1,
   1,
   true

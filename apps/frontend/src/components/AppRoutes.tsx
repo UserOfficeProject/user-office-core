@@ -87,6 +87,9 @@ const ProposalTemplatesPage = lazy(
 const FapReviewTemplatesPage = lazy(
   () => import('./template/FapReviewTemplatesPage')
 );
+const TechnicalReviewTemplatesPage = lazy(
+  () => import('./template/TechnicalReviewTemplatesPage')
+);
 const QuestionsPage = lazy(() => import('./template/QuestionsPage'));
 const SampleEsiPage = lazy(() => import('./template/SampleEsiPage'));
 const SampleTemplatesPage = lazy(
@@ -338,6 +341,15 @@ const AppRoutes = () => {
             <TitledRoute
               title={i18n.format(t('FAP Review Template'), 'plural')}
               element={<FapReviewTemplatesPage />}
+            />
+          }
+        />
+        <Route
+          path="/TechnicalReviewTemplates"
+          element={
+            <TitledRoute
+              title="Technical Review Templates"
+              element={<TechnicalReviewTemplatesPage />}
             />
           }
         />
