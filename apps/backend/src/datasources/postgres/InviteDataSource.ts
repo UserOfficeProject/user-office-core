@@ -6,6 +6,30 @@ import database from './database';
 import { createInviteObject, InviteRecord } from './records';
 
 export default class PostgresInviteDataSource implements InviteDataSource {
+  findCoProposerInvites(
+    proposalPk: number,
+    isClaimed?: boolean
+  ): Promise<Invite[]> {
+    return database
+      .select('*')
+      .from('co_proposer_claims')
+      .where('proposal_pk', proposalPk)
+      .modify((query) => {
+        if (isClaimed !== undefined) {
+          if (isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+      })
+
+      .leftJoin('invites', 'co_proposer_claims.invite_id', 'invites.invite_id')
+      .catch((error: Error) => {
+        throw new Error(`Could not find invites: ${error.message}`);
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  }
   findByCode(code: string): Promise<Invite | null> {
     return database
       .select('*')

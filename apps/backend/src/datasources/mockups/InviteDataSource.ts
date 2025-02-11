@@ -7,6 +7,9 @@ export class InviteDataSourceMock implements InviteDataSource {
   constructor() {
     this.init();
   }
+  findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    throw new Error('Method not implemented.');
+  }
   async delete(id: number): Promise<void> {
     this.invites = this.invites.filter((invite) => invite.id !== id);
   }

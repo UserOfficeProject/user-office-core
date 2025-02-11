@@ -11,6 +11,10 @@ export interface InviteDataSource {
 
   findByCode(code: string): Promise<Invite | null>;
   findById(id: number): Promise<Invite | null>;
+  findCoProposerInvites(
+    proposalPk: number,
+    isClaimed?: boolean
+  ): Promise<Invite[]>;
 
   update(args: {
     id: number;
