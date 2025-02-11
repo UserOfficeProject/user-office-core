@@ -8,6 +8,7 @@ import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerInviteDataSource from '../datasources/postgres/CoProposerInviteDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
+import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
@@ -98,6 +99,7 @@ mapClass(
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
+mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 
