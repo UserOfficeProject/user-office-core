@@ -7,8 +7,10 @@ RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 
 COPY --chown=node:node package*.json ./
+COPY openapi.yaml openapi.yaml
 
 RUN npm ci --loglevel error --no-fund
+RUN npm run generate:uows
 
 COPY --chown=node:node . .
 

@@ -108,6 +108,19 @@ jobs:
         if: steps.cached-node-modules-backend.outputs.cache-hit != 'true'
         run: npm run install:backend
 
+      - name: Cache UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
+
+      - name: Generate backend UOWS
+        if: steps.cached-UOWS.outputs.cache-hit != 'true'
+        run: |
+          cd apps/backend
+          npm run generate:uows
+
       - name: Cache frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v4
@@ -159,6 +172,13 @@ jobs:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
 
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
+
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
         uses: actions/cache@v4
@@ -177,7 +197,7 @@ jobs:
             sdk-frontend-
 
       - run: npm ci
-
+      
       - run: npm run build
         env:
           NODE_ENV: development
@@ -203,6 +223,13 @@ jobs:
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+      
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Run backend unit tests
         env:
@@ -241,7 +268,9 @@ jobs:
           - id: rs
             files: cypress/e2e/[r-s]*.ts
           - id: t
-            files: cypress/e2e/t*.ts
+            files: cypress/e2e/t!(emplateDeleteAndArchive).ts
+          - id: templateDelete
+            files: cypress/e2e/templateDeleteAndArchive*.ts
           - id: uz
             files: cypress/e2e/[u-z]*.ts
           - id: AZ
@@ -268,6 +297,13 @@ jobs:
         with:
           path: apps/backend/node_modules
           key: node-modules-backend-${{ hashFiles('apps/backend/package-lock.json') }}-${{ env.NODE_VERSION }}
+      
+      - name: Restore backend UOWS
+        id: cached-UOWS
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/generated
+          key: uows-client-${{ hashFiles('apps/backend/openapi.yaml') }}-${{ env.NODE_VERSION }}
 
       - name: Restore frontend node_modules
         id: cached-node-modules-frontend
@@ -343,7 +379,7 @@ jobs:
           EMAIL_FOOTER_IMAGE_PATH: /config/logos/STFC-Logo-small.png
           EXTERNAL_AUTH_LOGIN_URL: http://localhost:9003/auth/Login.aspx
           EXTERNAL_AUTH_LOGOUT_URL: http://localhost:9003/auth/Login.aspx
-          EXTERNAL_AUTH_SERVICE_URL: http://localhost:1080/ws/UserOfficeWebService?wsdl
+          EXTERNAL_UOWS_API_URL: http://localhost:1080/users-service
           ANTIVIRUS_HOST: clam-antivirus
           ANTIVIRUS_PORT: 3310
           ISIS_UO_EMAIL: isisuo@stfc.ac.uk
