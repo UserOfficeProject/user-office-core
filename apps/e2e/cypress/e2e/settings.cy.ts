@@ -908,13 +908,13 @@ context('Settings tests', () => {
         expect(content).to.have.string(publicComment)
       );
 
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="is-review-submitted"]').click();
-
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').focus().click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Updated',
       });
 
       cy.closeModal();
@@ -949,6 +949,7 @@ context('Settings tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
         }
       });
@@ -1046,13 +1047,13 @@ context('Settings tests', () => {
         .contains('Feasible')
         .click();
 
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="is-review-submitted"]').click();
-
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').focus().click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Updated',
       });
 
       cy.closeNotification();
@@ -1090,6 +1091,7 @@ context('Settings tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: initialDBData.instrument1.id,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -1198,6 +1200,7 @@ context('Settings tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: initialDBData.instrument1.id,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -1434,13 +1437,13 @@ context('Settings tests', () => {
       cy.setTinyMceContent('comment', internalComment);
       cy.setTinyMceContent('publicComment', publicComment);
 
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="is-review-submitted"]').click();
-
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').focus().click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Updated',
       });
 
       cy.closeModal();
@@ -1460,13 +1463,13 @@ context('Settings tests', () => {
         .contains('Unfeasible')
         .click();
 
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
       cy.get('[data-cy="is-review-submitted"]').click();
-
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-button"]').focus().click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review updated successfully',
+        text: 'Updated',
       });
 
       cy.closeModal();

@@ -9,14 +9,15 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { InviteCode } from '../types/Invite';
+import { Invite } from '../types/Invite';
 
 @InputType()
 export class ClaimsInput {
-  @Field(() => [Int!])
+  @Field(() => [Int!], { nullable: true })
   roleIds?: number[];
 
-  // TODO: Add more fields here such as co-proposer proposal id
+  @Field(() => Int, { nullable: true })
+  coProposerProposalPk?: number;
 }
 
 @InputType()
@@ -24,8 +25,8 @@ export class CreateInviteInput {
   @Field(() => String)
   email: string;
 
-  @Field(() => String)
-  note: string;
+  @Field(() => String, { nullable: true })
+  note?: string;
 
   @Field(() => ClaimsInput)
   claims: ClaimsInput;
@@ -33,7 +34,7 @@ export class CreateInviteInput {
 
 @Resolver()
 export class CreateInvite {
-  @Mutation(() => InviteCode)
+  @Mutation(() => Invite)
   createInvite(
     @Arg('input') input: CreateInviteInput,
     @Ctx() context: ResolverContext

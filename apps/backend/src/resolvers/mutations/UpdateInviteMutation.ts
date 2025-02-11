@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { InviteCode } from '../types/Invite';
+import { Invite } from '../types/Invite';
 import { ClaimsInput } from './CreateInviteMutation';
 
 @InputType()
@@ -32,7 +32,7 @@ export class UpdateInviteInput {
 
 @Resolver()
 export class UpdateInvite {
-  @Mutation(() => InviteCode)
+  @Mutation(() => Invite)
   updateInvite(
     @Arg('input') input: UpdateInviteInput,
     @Ctx() context: ResolverContext

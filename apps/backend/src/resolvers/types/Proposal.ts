@@ -156,7 +156,7 @@ export class ProposalResolver {
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
   ): Promise<TechnicalReview[]> {
-    return await context.queries.review.technicalReviewsForProposal(
+    return await context.queries.technicalReview.reviewsForProposal(
       context.user,
       proposal.primaryKey
     );

@@ -1,64 +1,114 @@
+import {
+  createInviteValidationSchema,
+  updateInviteValidationSchema,
+} from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
+import { InviteAuthorization } from '../auth/InviteAuthorizer';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
-import { InviteCodeDataSource } from '../datasources/InviteCodeDataSource';
-import { RoleInviteDataSource } from '../datasources/RoleInviteDataSource';
+import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { InviteDataSource } from '../datasources/InviteDataSource';
+import { ProposalDataSource } from '../datasources/ProposalDataSource';
+import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized } from '../decorators';
-import { InviteCode } from '../models/InviteCode';
+import { Authorized, ValidateArgs } from '../decorators';
+import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
 import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
+
 @injectable()
 export default class InviteMutations {
   constructor(
-    @inject(Tokens.InviteCodeDataSource)
-    private inviteDataSource: InviteCodeDataSource,
+    @inject(Tokens.InviteDataSource)
+    private inviteDataSource: InviteDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
-    @inject(Tokens.RoleInviteDataSource)
-    private roleInviteDataSource: RoleInviteDataSource
+    @inject(Tokens.ProposalDataSource)
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.RoleClaimDataSource)
+    private roleClaimDataSource: RoleClaimDataSource,
+    @inject(Tokens.CoProposerClaimDataSource)
+    private coProposerClaimDataSource: CoProposerClaimDataSource,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.InviteAuthorization)
+    private inviteAuth: InviteAuthorization
   ) {}
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized()
+  @ValidateArgs(createInviteValidationSchema)
   async create(
     agent: UserWithRole | null,
     args: CreateInviteInput
-  ): Promise<InviteCode | Rejection> {
-    // Create Code
-    const newCode = Math.random().toString(36).substr(2, 10).toUpperCase();
+  ): Promise<Invite | Rejection> {
+    const { roleIds, coProposerProposalPk } = args.claims;
+
+    const isRoleClaimAuthorized = await this.inviteAuth.isRoleClaimAuthorized(
+      agent,
+      roleIds
+    );
+    if (isRoleClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to create invites to this user type',
+        { userId: agent?.id, roleIds }
+      );
+    }
+
+    const isCoProposerClaimAuthorized =
+      coProposerProposalPk === undefined ||
+      this.userAuth.isUserOfficer(agent) ||
+      (await this.proposalAuth.isMemberOfProposal(agent, coProposerProposalPk));
+
+    if (isCoProposerClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to create invites to this proposal',
+        { userId: agent?.id, proposalPk: coProposerProposalPk }
+      );
+    }
+
+    const newCode = Math.random().toString(36).substring(2, 12).toUpperCase();
     const newInvite = await this.inviteDataSource.create(
       agent!.id,
       newCode,
       args.email
     );
 
-    await this.replaceRoleInvites(newInvite.id, args.claims.roleIds);
-    // TODO: add more claims to the invite such as "co-proposer"
+    if (roleIds) {
+      await this.setRoleClaims(newInvite.id, roleIds);
+    }
+    if (coProposerProposalPk) {
+      await this.setCoProposerClaims(newInvite.id, coProposerProposalPk);
+    }
 
     return newInvite;
   }
+
   @Authorized()
   async accept(
     agent: UserWithRole | null,
     code: string
   ): Promise<boolean | Rejection> {
-    const inviteCode = await this.inviteDataSource.findByCode(code);
-    if (inviteCode === null) {
-      return rejection('Invite code not found', { inviteCode: code });
+    const invite = await this.inviteDataSource.findByCode(code);
+    if (invite === null) {
+      return rejection('Invite code not found', { invite: code });
     }
 
-    if (inviteCode.claimedByUserId !== null) {
-      return rejection('Invite code already claimed', { inviteCode: code });
+    if (invite.claimedByUserId !== null) {
+      return rejection('Invite code already claimed', { invite: code });
     }
 
-    await this.acceptRoleInvites(agent!.id, inviteCode.id);
-    // TODO: accept more claims in the invite such as "co-proposer"
+    await this.processRoleClaims(agent!.id, invite.id);
+    await this.processCoProposerClaims(agent!.id, invite.id);
 
     await this.inviteDataSource.update({
-      id: inviteCode.id,
+      id: invite.id,
       claimedAt: new Date(),
       claimedByUserId: agent!.id,
     });
@@ -67,44 +117,116 @@ export default class InviteMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async update(user: UserWithRole | null, input: UpdateInviteInput) {
-    const updatedInvite = await this.inviteDataSource.update(input);
-    await this.replaceRoleInvites(updatedInvite.id, input.claims?.roleIds);
+  @ValidateArgs(updateInviteValidationSchema)
+  async update(agent: UserWithRole | null, args: UpdateInviteInput) {
+    const { roleIds, coProposerProposalPk } = args.claims ?? {};
+
+    const isRoleClaimAuthorized = await this.inviteAuth.isRoleClaimAuthorized(
+      agent,
+      roleIds
+    );
+    if (isRoleClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to update invites to this user type',
+        { userId: agent?.id, roleIds }
+      );
+    }
+
+    const isCoProposerClaimAuthorized =
+      coProposerProposalPk === undefined ||
+      (await this.proposalAuth.isMemberOfProposal(agent, coProposerProposalPk));
+
+    if (isCoProposerClaimAuthorized === false) {
+      return rejection(
+        'User is not authorized to update invites to this proposal',
+        { userId: agent?.id, proposalPk: coProposerProposalPk }
+      );
+    }
+
+    const updatedInvite = await this.inviteDataSource.update(args);
+    if (args.claims?.roleIds) {
+      await this.setRoleClaims(updatedInvite.id, args.claims?.roleIds);
+    }
+    if (args.claims?.coProposerProposalPk) {
+      await this.setCoProposerClaims(
+        updatedInvite.id,
+        args.claims.coProposerProposalPk
+      );
+    }
 
     return updatedInvite;
   }
 
-  private async replaceRoleInvites(
-    inviteCodeId: number,
-    roleIds: number[] | undefined
-  ) {
-    await this.roleInviteDataSource.deleteByInviteCodeId(inviteCodeId);
+  private async setRoleClaims(inviteId: number, roleIds: number[]) {
+    await this.roleClaimDataSource.deleteByInviteId(inviteId);
 
     if (!roleIds) return;
 
-    for await (const roleId of roleIds) {
-      await this.roleInviteDataSource.create(inviteCodeId, roleId);
+    if (roleIds.length > 0) {
+      await Promise.all(
+        roleIds.map((roleId) =>
+          this.roleClaimDataSource.create(inviteId, roleId)
+        )
+      );
     }
   }
 
-  private async acceptRoleInvites(claimerUserId: number, inviteCodeId: number) {
-    const roleInvites =
-      await this.roleInviteDataSource.findByInviteCodeId(inviteCodeId);
+  private async setCoProposerClaims(invCodeId: number, proposalPk: number) {
+    if (!proposalPk) return;
 
-    if (roleInvites.length > 0) {
-      for await (const roleInvite of roleInvites) {
+    return this.coProposerClaimDataSource.create(invCodeId, proposalPk);
+  }
+
+  private async processRoleClaims(claimerUserId: number, inviteId: number) {
+    const roleClaims = await this.roleClaimDataSource.findByInviteId(inviteId);
+
+    if (roleClaims.length > 0) {
+      for await (const roleClaim of roleClaims) {
         const existingUserRoles: Role[] =
           await this.userDataSource.getUserRoles(claimerUserId);
 
-        if (existingUserRoles.find((role) => role.id === roleInvite.roleId)) {
+        if (existingUserRoles.find((role) => role.id === roleClaim.roleId)) {
           continue;
         }
 
         await this.userDataSource.addUserRole({
           userID: claimerUserId,
-          roleID: roleInvite.roleId,
+          roleID: roleClaim.roleId,
         });
       }
     }
+  }
+
+  private async processCoProposerClaims(
+    claimerUserId: number,
+    inviteId: number
+  ) {
+    const coProposerClaim =
+      await this.coProposerClaimDataSource.findByInviteId(inviteId);
+
+    if (coProposerClaim === null) {
+      return;
+    }
+
+    const proposalHasUser = await this.proposalHasUser(
+      coProposerClaim.proposalPk,
+      claimerUserId
+    );
+    // already a co-proposer
+    if (proposalHasUser) {
+      return;
+    }
+
+    await this.proposalDataSource.addProposalUser(
+      coProposerClaim.proposalPk,
+      claimerUserId
+    );
+  }
+
+  private async proposalHasUser(proposalPk: number, userId: number) {
+    const proposalUsers =
+      await this.userDataSource.getProposalUsers(proposalPk);
+
+    return proposalUsers.some((user) => user.id === userId);
   }
 }

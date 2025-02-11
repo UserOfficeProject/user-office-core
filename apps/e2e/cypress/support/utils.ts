@@ -41,6 +41,7 @@ export const updatedCall = {
   surveyComment: faker.lorem.word(10),
   templateId: initialDBData.template.id,
   fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+  technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
 };
 
 export const closedCall = {
@@ -60,6 +61,7 @@ export const closedCall = {
   surveyComment: faker.lorem.word(10),
   templateId: initialDBData.template.id,
   fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+  technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
   callFapReviewEnded: false,
 };
 

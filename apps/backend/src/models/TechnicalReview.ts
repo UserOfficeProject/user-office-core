@@ -10,7 +10,8 @@ export class TechnicalReview {
     public reviewerId: number,
     public files: string | null,
     public technicalReviewAssigneeId: number | null,
-    public instrumentId: number
+    public instrumentId: number,
+    public questionaryId: number
   ) {}
 }
 
