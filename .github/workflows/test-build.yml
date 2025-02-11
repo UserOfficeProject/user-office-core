@@ -212,6 +212,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Log runner name
+        run: echo "Running on ${{ runner.name }}"
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -278,6 +281,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Log runner name
+        run: echo "Running on ${{ runner.name }}"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
