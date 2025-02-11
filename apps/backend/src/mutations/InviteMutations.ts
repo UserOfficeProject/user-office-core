@@ -186,9 +186,9 @@ export default class InviteMutations {
       )
     );
     await Promise.all(
-      newInvites.map((newInvite) => {
-        this.coProposerClaimDataSource.create(newInvite.id, proposalPk);
-        this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
+      newInvites.map(async (newInvite) => {
+        await this.coProposerClaimDataSource.create(newInvite.id, proposalPk);
+        await this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
       })
     );
 

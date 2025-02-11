@@ -190,6 +190,7 @@ function InviteUser({
       createdByUserId: 0,
       note: '',
       isEmailSent: false,
+      expiresAt: null,
     };
   };
   const handleSubmit = () => {

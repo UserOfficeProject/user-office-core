@@ -105,6 +105,8 @@ describe('Test Invite Mutations', () => {
 
     expect(roleClaim).toBeDefined();
     expect(roleClaim.map((roleClaim) => roleClaim.roleId)).toEqual(roleIds);
+    expect(roleClaim).toBeDefined();
+    expect(roleClaim.map((roleClaim) => roleClaim.roleId)).toEqual(roleIds);
   });
 
   test('A user can not update invite', async () => {
@@ -222,6 +224,8 @@ describe('Test Invite Mutations', () => {
       .resolve<RoleClaimDataSourceMock>(Tokens.RoleClaimDataSource)
       .findByInviteId(1);
 
+    expect(roleClaim).toBeDefined();
+    expect(roleClaim.map((roleClaim) => roleClaim.roleId)).toEqual(roleIds);
     expect(roleClaim).toBeDefined();
     expect(roleClaim.map((roleClaim) => roleClaim.roleId)).toEqual(roleIds);
   });

@@ -8,4 +8,5 @@ fragment invite on Invite {
   claimedAt
   claimedByUserId
   isEmailSent
+  expiresAt
 }
