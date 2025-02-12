@@ -3,49 +3,25 @@ $DO$
 BEGIN
 	IF register_patch('init.sql', 'unknown', 'init', '2019-10-01 00:00:00.000000+00') THEN
     	BEGIN
-        SET statement_timeout = 0;
-        SET lock_timeout = 0;
-        SET idle_in_transaction_session_timeout = 0;
-        SET client_encoding = 'UTF8';
-        SET standard_conforming_strings = on;
-        SET check_function_bodies = false;
-        SET xmloption = content;
-        SET client_min_messages = warning;
-        SET row_security = off;
 
-        --
-        -- Name: public; Type: SCHEMA; Schema: -; Owner: duouser
-        --
 
         -- *not* creating schema, since initdb creates it
 
 
         ALTER SCHEMA public OWNER TO duouser;
 
-        --
-        -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: duouser
-        --
 
         COMMENT ON SCHEMA public IS '';
 
 
-        --
-        -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
-        --
 
         CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
-        --
-        -- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
-        --
 
         COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
-        --
-        -- Name: after_esi_delete(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.after_esi_delete() RETURNS trigger
             LANGUAGE plpgsql
@@ -62,9 +38,6 @@ BEGIN
 
         ALTER FUNCTION public.after_esi_delete() OWNER TO duouser;
 
-        --
-        -- Name: after_generic_template_delete(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.after_generic_template_delete() RETURNS trigger
             LANGUAGE plpgsql
@@ -81,9 +54,6 @@ BEGIN
 
         ALTER FUNCTION public.after_generic_template_delete() OWNER TO duouser;
 
-        --
-        -- Name: after_proposal_delete(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.after_proposal_delete() RETURNS trigger
             LANGUAGE plpgsql
@@ -100,9 +70,6 @@ BEGIN
 
         ALTER FUNCTION public.after_proposal_delete() OWNER TO duouser;
 
-        --
-        -- Name: after_risk_assesment_delete(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.after_risk_assesment_delete() RETURNS trigger
             LANGUAGE plpgsql
@@ -119,9 +86,6 @@ BEGIN
 
         ALTER FUNCTION public.after_risk_assesment_delete() OWNER TO duouser;
 
-        --
-        -- Name: after_sample_delete(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.after_sample_delete() RETURNS trigger
             LANGUAGE plpgsql
@@ -138,9 +102,6 @@ BEGIN
 
         ALTER FUNCTION public.after_sample_delete() OWNER TO duouser;
 
-        --
-        -- Name: after_shipment_delete(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.after_shipment_delete() RETURNS trigger
             LANGUAGE plpgsql
@@ -157,9 +118,6 @@ BEGIN
 
         ALTER FUNCTION public.after_shipment_delete() OWNER TO duouser;
 
-        --
-        -- Name: createquestionary(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.createquestionary() RETURNS integer
             LANGUAGE plpgsql
@@ -175,9 +133,6 @@ BEGIN
 
         ALTER FUNCTION public.createquestionary() OWNER TO duouser;
 
-        --
-        -- Name: file_id_pseudo_encrypt(bigint); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.file_id_pseudo_encrypt(value bigint) RETURNS bigint
             LANGUAGE plpgsql IMMUTABLE STRICT
@@ -205,9 +160,6 @@ BEGIN
 
         ALTER FUNCTION public.file_id_pseudo_encrypt(value bigint) OWNER TO duouser;
 
-        --
-        -- Name: generate_proposal_shortcode(bigint); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.generate_proposal_shortcode(id bigint) RETURNS text
             LANGUAGE plpgsql
@@ -232,9 +184,6 @@ BEGIN
         ALTER FUNCTION public.generate_proposal_shortcode(id bigint) OWNER TO duouser;
 
 
-        --
-        -- Name: replace_old_user_id_with_new(bigint, bigint); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.replace_old_user_id_with_new(INOUT p_old_user_id bigint, INOUT p_new_user_id bigint) RETURNS record
             LANGUAGE plpgsql
@@ -347,9 +296,6 @@ BEGIN
 
         ALTER FUNCTION public.replace_old_user_id_with_new(INOUT p_old_user_id bigint, INOUT p_new_user_id bigint) OWNER TO duouser;
 
-        --
-        -- Name: trigger_set_timestamp(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.trigger_set_timestamp() RETURNS trigger
             LANGUAGE plpgsql
@@ -363,9 +309,6 @@ BEGIN
 
         ALTER FUNCTION public.trigger_set_timestamp() OWNER TO duouser;
 
-        --
-        -- Name: answers; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.answers (
             answer_id integer NOT NULL,
@@ -378,9 +321,6 @@ BEGIN
 
         ALTER TABLE public.answers OWNER TO duouser;
 
-        --
-        -- Name: update_answers(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.update_answers() RETURNS SETOF public.answers
             LANGUAGE plpgsql
@@ -406,9 +346,6 @@ BEGIN
 
         ALTER FUNCTION public.update_answers() OWNER TO duouser;
 
-        --
-        -- Name: updateanswers(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.updateanswers() RETURNS void
             LANGUAGE plpgsql
@@ -428,9 +365,6 @@ BEGIN
 
         ALTER FUNCTION public.updateanswers() OWNER TO duouser;
 
-        --
-        -- Name: updatecompletenesses(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.updatecompletenesses() RETURNS void
             LANGUAGE plpgsql
@@ -451,9 +385,6 @@ BEGIN
 
         ALTER FUNCTION public.updatecompletenesses() OWNER TO duouser;
 
-        --
-        -- Name: updateproposalstable(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.updateproposalstable() RETURNS void
             LANGUAGE plpgsql
@@ -472,9 +403,6 @@ BEGIN
 
         ALTER FUNCTION public.updateproposalstable() OWNER TO duouser;
 
-        --
-        -- Name: active_templates; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.active_templates (
             template_id integer NOT NULL,
@@ -484,9 +412,6 @@ BEGIN
 
         ALTER TABLE public.active_templates OWNER TO duouser;
 
-        --
-        -- Name: api_permissions; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.api_permissions (
             access_token_id character varying(64) NOT NULL,
@@ -498,9 +423,6 @@ BEGIN
 
         ALTER TABLE public.api_permissions OWNER TO duouser;
 
-        --
-        -- Name: call; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.call (
             call_id integer NOT NULL,
@@ -540,9 +462,6 @@ BEGIN
 
         ALTER TABLE public.call OWNER TO duouser;
 
-        --
-        -- Name: call_call_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.call_call_id_seq
             AS integer
@@ -555,16 +474,10 @@ BEGIN
 
         ALTER SEQUENCE public.call_call_id_seq OWNER TO duouser;
 
-        --
-        -- Name: call_call_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.call_call_id_seq OWNED BY public.call.call_id;
 
 
-        --
-        -- Name: call_has_faps; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.call_has_faps (
             call_id integer NOT NULL,
@@ -574,9 +487,6 @@ BEGIN
 
         ALTER TABLE public.call_has_faps OWNER TO duouser;
 
-        --
-        -- Name: call_has_instruments; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.call_has_instruments (
             call_id integer NOT NULL,
@@ -588,9 +498,6 @@ BEGIN
 
         ALTER TABLE public.call_has_instruments OWNER TO duouser;
 
-        --
-        -- Name: countries; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.countries (
             country_id integer NOT NULL,
@@ -600,9 +507,6 @@ BEGIN
 
         ALTER TABLE public.countries OWNER TO duouser;
 
-        --
-        -- Name: countries_country_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.countries_country_id_seq
             AS integer
@@ -615,17 +519,11 @@ BEGIN
 
         ALTER SEQUENCE public.countries_country_id_seq OWNER TO duouser;
 
-        --
-        -- Name: countries_country_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.countries_country_id_seq OWNED BY public.countries.country_id;
 
 
 
-        --
-        -- Name: event_logs; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.event_logs (
             id integer NOT NULL,
@@ -640,9 +538,6 @@ BEGIN
 
         ALTER TABLE public.event_logs OWNER TO duouser;
 
-        --
-        -- Name: event_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.event_logs_id_seq
             AS integer
@@ -655,16 +550,10 @@ BEGIN
 
         ALTER SEQUENCE public.event_logs_id_seq OWNER TO duouser;
 
-        --
-        -- Name: event_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.event_logs_id_seq OWNED BY public.event_logs.id;
 
 
-        --
-        -- Name: experiment_safety_inputs; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.experiment_safety_inputs (
             esi_id integer NOT NULL,
@@ -678,9 +567,6 @@ BEGIN
 
         ALTER TABLE public.experiment_safety_inputs OWNER TO duouser;
 
-        --
-        -- Name: experiment_safety_inputs_esi_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.experiment_safety_inputs_esi_id_seq
             AS integer
@@ -693,16 +579,10 @@ BEGIN
 
         ALTER SEQUENCE public.experiment_safety_inputs_esi_id_seq OWNER TO duouser;
 
-        --
-        -- Name: experiment_safety_inputs_esi_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.experiment_safety_inputs_esi_id_seq OWNED BY public.experiment_safety_inputs.esi_id;
 
 
-        --
-        -- Name: fap_assignments; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.fap_assignments (
             proposal_pk integer NOT NULL,
@@ -719,9 +599,6 @@ BEGIN
 
         ALTER TABLE public.fap_assignments OWNER TO duouser;
 
-        --
-        -- Name: fap_chairs; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.fap_chairs (
             user_id integer NOT NULL,
@@ -731,9 +608,6 @@ BEGIN
 
         ALTER TABLE public.fap_chairs OWNER TO duouser;
 
-        --
-        -- Name: fap_meeting_decisions; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.fap_meeting_decisions (
             proposal_pk integer NOT NULL,
@@ -750,9 +624,6 @@ BEGIN
 
         ALTER TABLE public.fap_meeting_decisions OWNER TO duouser;
 
-        --
-        -- Name: fap_proposals; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.fap_proposals (
             proposal_pk integer NOT NULL,
@@ -769,9 +640,6 @@ BEGIN
 
         ALTER TABLE public.fap_proposals OWNER TO duouser;
 
-        --
-        -- Name: fap_proposals_fap_proposal_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.fap_proposals_fap_proposal_id_seq
             AS integer
@@ -784,16 +652,10 @@ BEGIN
 
         ALTER SEQUENCE public.fap_proposals_fap_proposal_id_seq OWNER TO duouser;
 
-        --
-        -- Name: fap_proposals_fap_proposal_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.fap_proposals_fap_proposal_id_seq OWNED BY public.fap_proposals.fap_proposal_id;
 
 
-        --
-        -- Name: fap_reviewers; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.fap_reviewers (
             user_id integer NOT NULL,
@@ -803,9 +665,6 @@ BEGIN
 
         ALTER TABLE public.fap_reviewers OWNER TO duouser;
 
-        --
-        -- Name: fap_reviews; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.fap_reviews (
             review_id integer NOT NULL,
@@ -825,9 +684,6 @@ BEGIN
 
         ALTER TABLE public.fap_reviews OWNER TO duouser;
 
-        --
-        -- Name: fap_secretaries; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.fap_secretaries (
             user_id integer NOT NULL,
@@ -837,9 +693,6 @@ BEGIN
 
         ALTER TABLE public.fap_secretaries OWNER TO duouser;
 
-        --
-        -- Name: faps; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.faps (
             fap_id integer NOT NULL,
@@ -855,9 +708,6 @@ BEGIN
 
         ALTER TABLE public.faps OWNER TO duouser;
 
-        --
-        -- Name: faps_fap_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.faps_fap_id_seq
             AS integer
@@ -870,16 +720,10 @@ BEGIN
 
         ALTER SEQUENCE public.faps_fap_id_seq OWNER TO duouser;
 
-        --
-        -- Name: faps_fap_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.faps_fap_id_seq OWNED BY public.faps.fap_id;
 
 
-        --
-        -- Name: features; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.features (
             feature_id character varying(128) NOT NULL,
@@ -890,9 +734,6 @@ BEGIN
 
         ALTER TABLE public.features OWNER TO duouser;
 
-        --
-        -- Name: feedback_requests; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.feedback_requests (
             feedback_request_id integer NOT NULL,
@@ -903,9 +744,6 @@ BEGIN
 
         ALTER TABLE public.feedback_requests OWNER TO duouser;
 
-        --
-        -- Name: feedback_requests_feedback_request_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.feedback_requests_feedback_request_id_seq
             AS integer
@@ -918,16 +756,10 @@ BEGIN
 
         ALTER SEQUENCE public.feedback_requests_feedback_request_id_seq OWNER TO duouser;
 
-        --
-        -- Name: feedback_requests_feedback_request_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.feedback_requests_feedback_request_id_seq OWNED BY public.feedback_requests.feedback_request_id;
 
 
-        --
-        -- Name: feedbacks; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.feedbacks (
             feedback_id integer NOT NULL,
@@ -943,9 +775,6 @@ BEGIN
 
         ALTER TABLE public.feedbacks OWNER TO duouser;
 
-        --
-        -- Name: feedbacks_feedback_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.feedbacks_feedback_id_seq
             AS integer
@@ -958,16 +787,10 @@ BEGIN
 
         ALTER SEQUENCE public.feedbacks_feedback_id_seq OWNER TO duouser;
 
-        --
-        -- Name: feedbacks_feedback_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.feedbacks_feedback_id_seq OWNED BY public.feedbacks.feedback_id;
 
 
-        --
-        -- Name: files; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.files (
             file_id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
@@ -981,9 +804,6 @@ BEGIN
 
         ALTER TABLE public.files OWNER TO duouser;
 
-        --
-        -- Name: files_file_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.files_file_id_seq
             START WITH 1
@@ -995,9 +815,6 @@ BEGIN
 
         ALTER SEQUENCE public.files_file_id_seq OWNER TO duouser;
 
-        --
-        -- Name: generic_templates; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.generic_templates (
             generic_template_id integer NOT NULL,
@@ -1012,9 +829,6 @@ BEGIN
 
         ALTER TABLE public.generic_templates OWNER TO duouser;
 
-        --
-        -- Name: generic_templates_generic_template_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.generic_templates_generic_template_id_seq
             AS integer
@@ -1027,16 +841,10 @@ BEGIN
 
         ALTER SEQUENCE public.generic_templates_generic_template_id_seq OWNER TO duouser;
 
-        --
-        -- Name: generic_templates_generic_template_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.generic_templates_generic_template_id_seq OWNED BY public.generic_templates.generic_template_id;
 
 
-        --
-        -- Name: institutions; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.institutions (
             institution_id integer NOT NULL,
@@ -1048,9 +856,6 @@ BEGIN
 
         ALTER TABLE public.institutions OWNER TO duouser;
 
-        --
-        -- Name: institutions_institution_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.institutions_institution_id_seq
             AS integer
@@ -1063,16 +868,10 @@ BEGIN
 
         ALTER SEQUENCE public.institutions_institution_id_seq OWNER TO duouser;
 
-        --
-        -- Name: institutions_institution_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.institutions_institution_id_seq OWNED BY public.institutions.institution_id;
 
 
-        --
-        -- Name: instrument_has_proposals; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.instrument_has_proposals (
             instrument_id integer NOT NULL,
@@ -1084,9 +883,6 @@ BEGIN
 
         ALTER TABLE public.instrument_has_proposals OWNER TO duouser;
 
-        --
-        -- Name: instrument_has_proposals_instrument_has_proposals_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.instrument_has_proposals_instrument_has_proposals_id_seq
             AS integer
@@ -1099,16 +895,10 @@ BEGIN
 
         ALTER SEQUENCE public.instrument_has_proposals_instrument_has_proposals_id_seq OWNER TO duouser;
 
-        --
-        -- Name: instrument_has_proposals_instrument_has_proposals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.instrument_has_proposals_instrument_has_proposals_id_seq OWNED BY public.instrument_has_proposals.instrument_has_proposals_id;
 
 
-        --
-        -- Name: instrument_has_scientists; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.instrument_has_scientists (
             instrument_id integer NOT NULL,
@@ -1118,9 +908,6 @@ BEGIN
 
         ALTER TABLE public.instrument_has_scientists OWNER TO duouser;
 
-        --
-        -- Name: instruments; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.instruments (
             instrument_id integer NOT NULL,
@@ -1133,9 +920,6 @@ BEGIN
 
         ALTER TABLE public.instruments OWNER TO duouser;
 
-        --
-        -- Name: instruments_instrument_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.instruments_instrument_id_seq
             AS integer
@@ -1148,16 +932,10 @@ BEGIN
 
         ALTER SEQUENCE public.instruments_instrument_id_seq OWNER TO duouser;
 
-        --
-        -- Name: instruments_instrument_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.instruments_instrument_id_seq OWNED BY public.instruments.instrument_id;
 
 
-        --
-        -- Name: internal_reviews; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.internal_reviews (
             internal_review_id integer NOT NULL,
@@ -1173,9 +951,6 @@ BEGIN
 
         ALTER TABLE public.internal_reviews OWNER TO duouser;
 
-        --
-        -- Name: internal_reviews_internal_review_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.internal_reviews_internal_review_id_seq
             AS integer
@@ -1188,16 +963,10 @@ BEGIN
 
         ALTER SEQUENCE public.internal_reviews_internal_review_id_seq OWNER TO duouser;
 
-        --
-        -- Name: internal_reviews_internal_review_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.internal_reviews_internal_review_id_seq OWNED BY public.internal_reviews.internal_review_id;
 
 
-        --
-        -- Name: merging_table_registry; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.merging_table_registry (
             table_name character varying(100) NOT NULL,
@@ -1208,9 +977,6 @@ BEGIN
 
         ALTER TABLE public.merging_table_registry OWNER TO duouser;
 
-        --
-        -- Name: nationalities; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.nationalities (
             nationality_id integer NOT NULL,
@@ -1220,9 +986,6 @@ BEGIN
 
         ALTER TABLE public.nationalities OWNER TO duouser;
 
-        --
-        -- Name: nationalities_nationality_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.nationalities_nationality_id_seq
             AS integer
@@ -1235,16 +998,10 @@ BEGIN
 
         ALTER SEQUENCE public.nationalities_nationality_id_seq OWNER TO duouser;
 
-        --
-        -- Name: nationalities_nationality_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.nationalities_nationality_id_seq OWNED BY public.nationalities.nationality_id;
 
 
-        --
-        -- Name: status_changing_events; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.status_changing_events (
             status_changing_event_id integer NOT NULL,
@@ -1255,9 +1012,6 @@ BEGIN
 
         ALTER TABLE public.status_changing_events OWNER TO duouser;
 
-        --
-        -- Name: next_status_events_next_status_event_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.next_status_events_next_status_event_id_seq
             AS integer
@@ -1270,16 +1024,10 @@ BEGIN
 
         ALTER SEQUENCE public.next_status_events_next_status_event_id_seq OWNER TO duouser;
 
-        --
-        -- Name: next_status_events_next_status_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.next_status_events_next_status_event_id_seq OWNED BY public.status_changing_events.status_changing_event_id;
 
 
-        --
-        -- Name: old_files; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.old_files (
             file_id bigint DEFAULT public.file_id_pseudo_encrypt(nextval('public.files_file_id_seq'::regclass)) NOT NULL,
@@ -1294,9 +1042,6 @@ BEGIN
 
         ALTER TABLE public.old_files OWNER TO duouser;
 
-        --
-        -- Name: pagetext; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.pagetext (
             pagetext_id integer NOT NULL,
@@ -1306,9 +1051,6 @@ BEGIN
 
         ALTER TABLE public.pagetext OWNER TO duouser;
 
-        --
-        -- Name: pagetext_pagetext_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.pagetext_pagetext_id_seq
             AS integer
@@ -1321,16 +1063,10 @@ BEGIN
 
         ALTER SEQUENCE public.pagetext_pagetext_id_seq OWNER TO duouser;
 
-        --
-        -- Name: pagetext_pagetext_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.pagetext_pagetext_id_seq OWNED BY public.pagetext.pagetext_id;
 
 
-        --
-        -- Name: pdf_templates; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.pdf_templates (
             pdf_template_id integer NOT NULL,
@@ -1347,9 +1083,6 @@ BEGIN
 
         ALTER TABLE public.pdf_templates OWNER TO duouser;
 
-        --
-        -- Name: pdf_templates_pdf_template_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.pdf_templates_pdf_template_id_seq
             AS integer
@@ -1362,16 +1095,10 @@ BEGIN
 
         ALTER SEQUENCE public.pdf_templates_pdf_template_id_seq OWNER TO duouser;
 
-        --
-        -- Name: pdf_templates_pdf_template_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.pdf_templates_pdf_template_id_seq OWNED BY public.pdf_templates.pdf_template_id;
 
 
-        --
-        -- Name: predefined_messages; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.predefined_messages (
             predefined_message_id integer NOT NULL,
@@ -1385,9 +1112,6 @@ BEGIN
 
         ALTER TABLE public.predefined_messages OWNER TO duouser;
 
-        --
-        -- Name: predefined_messages_predefined_message_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.predefined_messages_predefined_message_id_seq
             AS integer
@@ -1400,16 +1124,10 @@ BEGIN
 
         ALTER SEQUENCE public.predefined_messages_predefined_message_id_seq OWNER TO duouser;
 
-        --
-        -- Name: predefined_messages_predefined_message_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.predefined_messages_predefined_message_id_seq OWNED BY public.predefined_messages.predefined_message_id;
 
 
-        --
-        -- Name: proposals_short_code_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposals_short_code_seq
             START WITH 1
@@ -1421,9 +1139,6 @@ BEGIN
 
         ALTER SEQUENCE public.proposals_short_code_seq OWNER TO duouser;
 
-        --
-        -- Name: proposals; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposals (
             proposal_pk integer NOT NULL,
@@ -1448,9 +1163,6 @@ BEGIN
 
         ALTER TABLE public.proposals OWNER TO duouser;
 
-        --
-        -- Name: questions; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.questions (
             question_id character varying(64) NOT NULL,
@@ -1466,9 +1178,6 @@ BEGIN
 
         ALTER TABLE public.questions OWNER TO duouser;
 
-        --
-        -- Name: proposal_answers; Type: VIEW; Schema: public; Owner: duouser
-        --
 
         CREATE VIEW public.proposal_answers AS
         SELECT prop.proposal_pk,
@@ -1502,9 +1211,6 @@ BEGIN
 
         ALTER VIEW public.proposal_answers OWNER TO duouser;
 
-        --
-        -- Name: proposal_answers_answer_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_answers_answer_id_seq
             AS integer
@@ -1517,16 +1223,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_answers_answer_id_seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_answers_answer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_answers_answer_id_seq OWNED BY public.answers.answer_id;
 
 
-        --
-        -- Name: proposal_events; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposal_events (
             proposal_pk integer NOT NULL,
@@ -1584,9 +1284,6 @@ BEGIN
 
         ALTER TABLE public.proposal_events OWNER TO duouser;
 
-        --
-        -- Name: proposal_status_actions; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposal_status_actions (
             proposal_status_action_id integer NOT NULL,
@@ -1598,9 +1295,6 @@ BEGIN
 
         ALTER TABLE public.proposal_status_actions OWNER TO duouser;
 
-        --
-        -- Name: proposal_status_actions_proposal_status_action_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_status_actions_proposal_status_action_id_seq
             AS integer
@@ -1613,16 +1307,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_status_actions_proposal_status_action_id_seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_status_actions_proposal_status_action_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_status_actions_proposal_status_action_id_seq OWNED BY public.proposal_status_actions.proposal_status_action_id;
 
 
-        --
-        -- Name: proposal_statuses; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposal_statuses (
             proposal_status_id integer NOT NULL,
@@ -1635,9 +1323,6 @@ BEGIN
 
         ALTER TABLE public.proposal_statuses OWNER TO duouser;
 
-        --
-        -- Name: proposal_statuses_proposal_status_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_statuses_proposal_status_id_seq
             AS integer
@@ -1650,16 +1335,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_statuses_proposal_status_id_seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_statuses_proposal_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_statuses_proposal_status_id_seq OWNED BY public.proposal_statuses.proposal_status_id;
 
 
-        --
-        -- Name: technical_review; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.technical_review (
             technical_review_id integer NOT NULL,
@@ -1679,9 +1358,6 @@ BEGIN
 
         ALTER TABLE public.technical_review OWNER TO duouser;
 
-        --
-        -- Name: users; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.users (
             user_id integer NOT NULL,
@@ -1711,9 +1387,6 @@ BEGIN
 
         ALTER TABLE public.users OWNER TO duouser;
 
-        --
-        -- Name: proposal_table_view; Type: VIEW; Schema: public; Owner: duouser
-        --
 
         CREATE VIEW public.proposal_table_view AS
         SELECT p.proposal_pk,
@@ -1764,9 +1437,6 @@ BEGIN
 
         ALTER VIEW public.proposal_table_view OWNER TO duouser;
 
-        --
-        -- Name: templates; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.templates (
             template_id integer NOT NULL,
@@ -1779,9 +1449,6 @@ BEGIN
 
         ALTER TABLE public.templates OWNER TO duouser;
 
-        --
-        -- Name: proposal_templates_template_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_templates_template_id_seq
             AS integer
@@ -1794,16 +1461,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_templates_template_id_seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_templates_template_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_templates_template_id_seq OWNED BY public.templates.template_id;
 
 
-        --
-        -- Name: topics; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.topics (
             topic_id integer NOT NULL,
@@ -1816,9 +1477,6 @@ BEGIN
 
         ALTER TABLE public.topics OWNER TO duouser;
 
-        --
-        -- Name: proposal_topics_sort_order_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_topics_sort_order_seq
             AS integer
@@ -1831,16 +1489,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_topics_sort_order_seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_topics_sort_order_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_topics_sort_order_seq OWNED BY public.topics.sort_order;
 
 
-        --
-        -- Name: proposal_topics_topic_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_topics_topic_id_seq
             AS integer
@@ -1853,16 +1505,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_topics_topic_id_seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_topics_topic_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_topics_topic_id_seq OWNED BY public.topics.topic_id;
 
 
-        --
-        -- Name: proposal_user; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposal_user (
             proposal_pk integer NOT NULL,
@@ -1872,9 +1518,6 @@ BEGIN
 
         ALTER TABLE public.proposal_user OWNER TO duouser;
 
-        --
-        -- Name: proposal_workflow_connection_has_actions; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposal_workflow_connection_has_actions (
             connection_id integer NOT NULL,
@@ -1886,9 +1529,6 @@ BEGIN
 
         ALTER TABLE public.proposal_workflow_connection_has_actions OWNER TO duouser;
 
-        --
-        -- Name: proposal_workflow_connections; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposal_workflow_connections (
             proposal_workflow_connection_id integer NOT NULL,
@@ -1904,9 +1544,6 @@ BEGIN
 
         ALTER TABLE public.proposal_workflow_connections OWNER TO duouser;
 
-        --
-        -- Name: proposal_workflow_connections_proposal_workflow_connection__seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_workflow_connections_proposal_workflow_connection__seq
             AS integer
@@ -1919,16 +1556,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_workflow_connections_proposal_workflow_connection__seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_workflow_connections_proposal_workflow_connection__seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_workflow_connections_proposal_workflow_connection__seq OWNED BY public.proposal_workflow_connections.proposal_workflow_connection_id;
 
 
-        --
-        -- Name: proposal_workflows; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.proposal_workflows (
             proposal_workflow_id integer NOT NULL,
@@ -1939,9 +1570,6 @@ BEGIN
 
         ALTER TABLE public.proposal_workflows OWNER TO duouser;
 
-        --
-        -- Name: proposal_workflows_proposal_workflow_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposal_workflows_proposal_workflow_id_seq
             AS integer
@@ -1954,16 +1582,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposal_workflows_proposal_workflow_id_seq OWNER TO duouser;
 
-        --
-        -- Name: proposal_workflows_proposal_workflow_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposal_workflows_proposal_workflow_id_seq OWNED BY public.proposal_workflows.proposal_workflow_id;
 
 
-        --
-        -- Name: proposals_proposal_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.proposals_proposal_id_seq
             AS integer
@@ -1976,16 +1598,10 @@ BEGIN
 
         ALTER SEQUENCE public.proposals_proposal_id_seq OWNER TO duouser;
 
-        --
-        -- Name: proposals_proposal_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.proposals_proposal_id_seq OWNED BY public.proposals.proposal_pk;
 
 
-        --
-        -- Name: quantities; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.quantities (
             quantity_id character varying(255) NOT NULL
@@ -1994,9 +1610,6 @@ BEGIN
 
         ALTER TABLE public.quantities OWNER TO duouser;
 
-        --
-        -- Name: question_datatypes; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.question_datatypes (
             question_datatype_id character varying(64) NOT NULL
@@ -2005,9 +1618,6 @@ BEGIN
 
         ALTER TABLE public.question_datatypes OWNER TO duouser;
 
-        --
-        -- Name: question_dependencies; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.question_dependencies (
             question_dependency_id integer NOT NULL,
@@ -2020,9 +1630,6 @@ BEGIN
 
         ALTER TABLE public.question_dependencies OWNER TO duouser;
 
-        --
-        -- Name: question_dependencies_question_dependency_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.question_dependencies_question_dependency_id_seq
             AS integer
@@ -2035,16 +1642,10 @@ BEGIN
 
         ALTER SEQUENCE public.question_dependencies_question_dependency_id_seq OWNER TO duouser;
 
-        --
-        -- Name: question_dependencies_question_dependency_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.question_dependencies_question_dependency_id_seq OWNED BY public.question_dependencies.question_dependency_id;
 
 
-        --
-        -- Name: questionaries; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.questionaries (
             questionary_id integer NOT NULL,
@@ -2056,9 +1657,6 @@ BEGIN
 
         ALTER TABLE public.questionaries OWNER TO duouser;
 
-        --
-        -- Name: questionaries_questionary_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.questionaries_questionary_id_seq
             AS integer
@@ -2071,16 +1669,10 @@ BEGIN
 
         ALTER SEQUENCE public.questionaries_questionary_id_seq OWNER TO duouser;
 
-        --
-        -- Name: questionaries_questionary_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.questionaries_questionary_id_seq OWNED BY public.questionaries.questionary_id;
 
 
-        --
-        -- Name: questions_has_template; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.questions_has_template (
             template_id integer NOT NULL,
@@ -2090,9 +1682,6 @@ BEGIN
 
         ALTER TABLE public.questions_has_template OWNER TO duouser;
 
-        --
-        -- Name: redeem_codes; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.redeem_codes (
             code character varying(12) NOT NULL,
@@ -2106,9 +1695,6 @@ BEGIN
 
         ALTER TABLE public.redeem_codes OWNER TO duouser;
 
-        --
-        -- Name: review_data; Type: VIEW; Schema: public; Owner: duouser
-        --
 
         CREATE VIEW public.review_data AS
         SELECT proposal.proposal_pk,
@@ -2155,9 +1741,6 @@ BEGIN
 
         ALTER VIEW public.review_data OWNER TO duouser;
 
-        --
-        -- Name: reviews_review_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.reviews_review_id_seq
             AS integer
@@ -2170,16 +1753,10 @@ BEGIN
 
         ALTER SEQUENCE public.reviews_review_id_seq OWNER TO duouser;
 
-        --
-        -- Name: reviews_review_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.reviews_review_id_seq OWNED BY public.fap_reviews.review_id;
 
 
-        --
-        -- Name: role_user; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.role_user (
             role_id integer NOT NULL,
@@ -2190,9 +1767,6 @@ BEGIN
 
         ALTER TABLE public.role_user OWNER TO duouser;
 
-        --
-        -- Name: role_user_role_user_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.role_user_role_user_id_seq
             AS integer
@@ -2205,16 +1779,10 @@ BEGIN
 
         ALTER SEQUENCE public.role_user_role_user_id_seq OWNER TO duouser;
 
-        --
-        -- Name: role_user_role_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.role_user_role_user_id_seq OWNED BY public.role_user.role_user_id;
 
 
-        --
-        -- Name: roles; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.roles (
             role_id integer NOT NULL,
@@ -2225,9 +1793,6 @@ BEGIN
 
         ALTER TABLE public.roles OWNER TO duouser;
 
-        --
-        -- Name: roles_role_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.roles_role_id_seq
             AS integer
@@ -2240,16 +1805,10 @@ BEGIN
 
         ALTER SEQUENCE public.roles_role_id_seq OWNER TO duouser;
 
-        --
-        -- Name: roles_role_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.roles_role_id_seq OWNED BY public.roles.role_id;
 
 
-        --
-        -- Name: sample_experiment_safety_inputs; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.sample_experiment_safety_inputs (
             esi_id integer NOT NULL,
@@ -2261,9 +1820,6 @@ BEGIN
 
         ALTER TABLE public.sample_experiment_safety_inputs OWNER TO duouser;
 
-        --
-        -- Name: samples; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.samples (
             sample_id integer NOT NULL,
@@ -2282,9 +1838,6 @@ BEGIN
 
         ALTER TABLE public.samples OWNER TO duouser;
 
-        --
-        -- Name: samples_sample_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.samples_sample_id_seq
             AS integer
@@ -2297,16 +1850,10 @@ BEGIN
 
         ALTER SEQUENCE public.samples_sample_id_seq OWNER TO duouser;
 
-        --
-        -- Name: samples_sample_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.samples_sample_id_seq OWNED BY public.samples.sample_id;
 
 
-        --
-        -- Name: scheduled_events; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.scheduled_events (
             scheduled_event_id integer NOT NULL,
@@ -2323,9 +1870,6 @@ BEGIN
 
         ALTER TABLE public.scheduled_events OWNER TO duouser;
 
-        --
-        -- Name: settings; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.settings (
             settings_id character varying(128) NOT NULL,
@@ -2336,9 +1880,6 @@ BEGIN
 
         ALTER TABLE public.settings OWNER TO duouser;
 
-        --
-        -- Name: shipments; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.shipments (
             shipment_id integer NOT NULL,
@@ -2356,9 +1897,6 @@ BEGIN
 
         ALTER TABLE public.shipments OWNER TO duouser;
 
-        --
-        -- Name: shipments_has_samples; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.shipments_has_samples (
             shipment_id integer NOT NULL,
@@ -2368,9 +1906,6 @@ BEGIN
 
         ALTER TABLE public.shipments_has_samples OWNER TO duouser;
 
-        --
-        -- Name: shipments_shipment_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.shipments_shipment_id_seq
             AS integer
@@ -2383,16 +1918,10 @@ BEGIN
 
         ALTER SEQUENCE public.shipments_shipment_id_seq OWNER TO duouser;
 
-        --
-        -- Name: shipments_shipment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.shipments_shipment_id_seq OWNED BY public.shipments.shipment_id;
 
 
-        --
-        -- Name: technical_review_technical_review_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.technical_review_technical_review_id_seq
             AS integer
@@ -2405,16 +1934,10 @@ BEGIN
 
         ALTER SEQUENCE public.technical_review_technical_review_id_seq OWNER TO duouser;
 
-        --
-        -- Name: technical_review_technical_review_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.technical_review_technical_review_id_seq OWNED BY public.technical_review.technical_review_id;
 
 
-        --
-        -- Name: technique_has_instruments; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.technique_has_instruments (
             technique_id integer NOT NULL,
@@ -2424,9 +1947,6 @@ BEGIN
 
         ALTER TABLE public.technique_has_instruments OWNER TO duouser;
 
-        --
-        -- Name: technique_has_scientists; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.technique_has_scientists (
             technique_id integer NOT NULL,
@@ -2436,9 +1956,6 @@ BEGIN
 
         ALTER TABLE public.technique_has_scientists OWNER TO duouser;
 
-        --
-        -- Name: techniques; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.techniques (
             technique_id integer NOT NULL,
@@ -2450,9 +1967,6 @@ BEGIN
 
         ALTER TABLE public.techniques OWNER TO duouser;
 
-        --
-        -- Name: techniques_technique_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.techniques_technique_id_seq
             AS integer
@@ -2465,16 +1979,10 @@ BEGIN
 
         ALTER SEQUENCE public.techniques_technique_id_seq OWNER TO duouser;
 
-        --
-        -- Name: techniques_technique_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.techniques_technique_id_seq OWNED BY public.techniques.technique_id;
 
 
-        --
-        -- Name: template_categories; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.template_categories (
             template_category_id integer NOT NULL,
@@ -2484,9 +1992,6 @@ BEGIN
 
         ALTER TABLE public.template_categories OWNER TO duouser;
 
-        --
-        -- Name: template_categories_template_category_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.template_categories_template_category_id_seq
             AS integer
@@ -2499,16 +2004,10 @@ BEGIN
 
         ALTER SEQUENCE public.template_categories_template_category_id_seq OWNER TO duouser;
 
-        --
-        -- Name: template_categories_template_category_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.template_categories_template_category_id_seq OWNED BY public.template_categories.template_category_id;
 
 
-        --
-        -- Name: template_groups; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.template_groups (
             template_group_id character varying(30) NOT NULL,
@@ -2518,9 +2017,6 @@ BEGIN
 
         ALTER TABLE public.template_groups OWNER TO duouser;
 
-        --
-        -- Name: templates_has_questions; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.templates_has_questions (
             question_id character varying(64) NOT NULL,
@@ -2534,9 +2030,6 @@ BEGIN
 
         ALTER TABLE public.templates_has_questions OWNER TO duouser;
 
-        --
-        -- Name: topic_completenesses; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.topic_completenesses (
             questionary_id integer NOT NULL,
@@ -2547,9 +2040,6 @@ BEGIN
 
         ALTER TABLE public.topic_completenesses OWNER TO duouser;
 
-        --
-        -- Name: units; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.units (
             unit_id character varying(255) NOT NULL,
@@ -2562,9 +2052,6 @@ BEGIN
 
         ALTER TABLE public.units OWNER TO duouser;
 
-        --
-        -- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.users_user_id_seq
             AS integer
@@ -2577,16 +2064,10 @@ BEGIN
 
         ALTER SEQUENCE public.users_user_id_seq OWNER TO duouser;
 
-        --
-        -- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
 
 
-        --
-        -- Name: visits; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.visits (
             visit_id integer NOT NULL,
@@ -2602,9 +2083,6 @@ BEGIN
 
         ALTER TABLE public.visits OWNER TO duouser;
 
-        --
-        -- Name: visitations_visitation_id_seq; Type: SEQUENCE; Schema: public; Owner: duouser
-        --
 
         CREATE SEQUENCE public.visitations_visitation_id_seq
             AS integer
@@ -2617,16 +2095,10 @@ BEGIN
 
         ALTER SEQUENCE public.visitations_visitation_id_seq OWNER TO duouser;
 
-        --
-        -- Name: visitations_visitation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: duouser
-        --
 
         ALTER SEQUENCE public.visitations_visitation_id_seq OWNED BY public.visits.visit_id;
 
 
-        --
-        -- Name: visits_has_users; Type: TABLE; Schema: public; Owner: duouser
-        --
 
         CREATE TABLE public.visits_has_users (
             visit_id integer NOT NULL,
@@ -2641,319 +2113,181 @@ BEGIN
 
         ALTER TABLE public.visits_has_users OWNER TO duouser;
 
-        --
-        -- Name: answers answer_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.answers ALTER COLUMN answer_id SET DEFAULT nextval('public.proposal_answers_answer_id_seq'::regclass);
 
 
-        --
-        -- Name: call call_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call ALTER COLUMN call_id SET DEFAULT nextval('public.call_call_id_seq'::regclass);
 
 
-        --
-        -- Name: countries country_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.countries ALTER COLUMN country_id SET DEFAULT nextval('public.countries_country_id_seq'::regclass);
 
 
-        --
-        -- Name: event_logs id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.event_logs ALTER COLUMN id SET DEFAULT nextval('public.event_logs_id_seq'::regclass);
 
 
-        --
-        -- Name: experiment_safety_inputs esi_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.experiment_safety_inputs ALTER COLUMN esi_id SET DEFAULT nextval('public.experiment_safety_inputs_esi_id_seq'::regclass);
 
 
-        --
-        -- Name: fap_proposals fap_proposal_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_proposals ALTER COLUMN fap_proposal_id SET DEFAULT nextval('public.fap_proposals_fap_proposal_id_seq'::regclass);
 
 
-        --
-        -- Name: fap_reviews review_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviews ALTER COLUMN review_id SET DEFAULT nextval('public.reviews_review_id_seq'::regclass);
 
 
-        --
-        -- Name: faps fap_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.faps ALTER COLUMN fap_id SET DEFAULT nextval('public.faps_fap_id_seq'::regclass);
 
 
-        --
-        -- Name: feedback_requests feedback_request_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedback_requests ALTER COLUMN feedback_request_id SET DEFAULT nextval('public.feedback_requests_feedback_request_id_seq'::regclass);
 
 
-        --
-        -- Name: feedbacks feedback_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedbacks ALTER COLUMN feedback_id SET DEFAULT nextval('public.feedbacks_feedback_id_seq'::regclass);
 
 
-        --
-        -- Name: generic_templates generic_template_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.generic_templates ALTER COLUMN generic_template_id SET DEFAULT nextval('public.generic_templates_generic_template_id_seq'::regclass);
 
 
-        --
-        -- Name: institutions institution_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.institutions ALTER COLUMN institution_id SET DEFAULT nextval('public.institutions_institution_id_seq'::regclass);
 
 
-        --
-        -- Name: instrument_has_proposals instrument_has_proposals_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_proposals ALTER COLUMN instrument_has_proposals_id SET DEFAULT nextval('public.instrument_has_proposals_instrument_has_proposals_id_seq'::regclass);
 
 
-        --
-        -- Name: instruments instrument_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instruments ALTER COLUMN instrument_id SET DEFAULT nextval('public.instruments_instrument_id_seq'::regclass);
 
 
-        --
-        -- Name: internal_reviews internal_review_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.internal_reviews ALTER COLUMN internal_review_id SET DEFAULT nextval('public.internal_reviews_internal_review_id_seq'::regclass);
 
 
-        --
-        -- Name: nationalities nationality_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.nationalities ALTER COLUMN nationality_id SET DEFAULT nextval('public.nationalities_nationality_id_seq'::regclass);
 
 
-        --
-        -- Name: pagetext pagetext_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.pagetext ALTER COLUMN pagetext_id SET DEFAULT nextval('public.pagetext_pagetext_id_seq'::regclass);
 
 
-        --
-        -- Name: pdf_templates pdf_template_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.pdf_templates ALTER COLUMN pdf_template_id SET DEFAULT nextval('public.pdf_templates_pdf_template_id_seq'::regclass);
 
 
-        --
-        -- Name: predefined_messages predefined_message_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.predefined_messages ALTER COLUMN predefined_message_id SET DEFAULT nextval('public.predefined_messages_predefined_message_id_seq'::regclass);
 
 
-        --
-        -- Name: proposal_status_actions proposal_status_action_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_status_actions ALTER COLUMN proposal_status_action_id SET DEFAULT nextval('public.proposal_status_actions_proposal_status_action_id_seq'::regclass);
 
 
-        --
-        -- Name: proposal_statuses proposal_status_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_statuses ALTER COLUMN proposal_status_id SET DEFAULT nextval('public.proposal_statuses_proposal_status_id_seq'::regclass);
 
 
-        --
-        -- Name: proposal_workflow_connections proposal_workflow_connection_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connections ALTER COLUMN proposal_workflow_connection_id SET DEFAULT nextval('public.proposal_workflow_connections_proposal_workflow_connection__seq'::regclass);
 
 
-        --
-        -- Name: proposal_workflows proposal_workflow_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflows ALTER COLUMN proposal_workflow_id SET DEFAULT nextval('public.proposal_workflows_proposal_workflow_id_seq'::regclass);
 
 
-        --
-        -- Name: proposals proposal_pk; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposals ALTER COLUMN proposal_pk SET DEFAULT nextval('public.proposals_proposal_id_seq'::regclass);
 
 
-        --
-        -- Name: question_dependencies question_dependency_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.question_dependencies ALTER COLUMN question_dependency_id SET DEFAULT nextval('public.question_dependencies_question_dependency_id_seq'::regclass);
 
 
-        --
-        -- Name: questionaries questionary_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questionaries ALTER COLUMN questionary_id SET DEFAULT nextval('public.questionaries_questionary_id_seq'::regclass);
 
 
-        --
-        -- Name: role_user role_user_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.role_user ALTER COLUMN role_user_id SET DEFAULT nextval('public.role_user_role_user_id_seq'::regclass);
 
 
-        --
-        -- Name: roles role_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.roles ALTER COLUMN role_id SET DEFAULT nextval('public.roles_role_id_seq'::regclass);
 
 
-        --
-        -- Name: samples sample_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples ALTER COLUMN sample_id SET DEFAULT nextval('public.samples_sample_id_seq'::regclass);
 
 
-        --
-        -- Name: shipments shipment_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments ALTER COLUMN shipment_id SET DEFAULT nextval('public.shipments_shipment_id_seq'::regclass);
 
 
-        --
-        -- Name: status_changing_events status_changing_event_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.status_changing_events ALTER COLUMN status_changing_event_id SET DEFAULT nextval('public.next_status_events_next_status_event_id_seq'::regclass);
 
 
-        --
-        -- Name: technical_review technical_review_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technical_review ALTER COLUMN technical_review_id SET DEFAULT nextval('public.technical_review_technical_review_id_seq'::regclass);
 
 
-        --
-        -- Name: techniques technique_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.techniques ALTER COLUMN technique_id SET DEFAULT nextval('public.techniques_technique_id_seq'::regclass);
 
 
-        --
-        -- Name: template_categories template_category_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.template_categories ALTER COLUMN template_category_id SET DEFAULT nextval('public.template_categories_template_category_id_seq'::regclass);
 
 
-        --
-        -- Name: templates template_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.templates ALTER COLUMN template_id SET DEFAULT nextval('public.proposal_templates_template_id_seq'::regclass);
 
 
-        --
-        -- Name: topics topic_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.topics ALTER COLUMN topic_id SET DEFAULT nextval('public.proposal_topics_topic_id_seq'::regclass);
 
 
-        --
-        -- Name: topics sort_order; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.topics ALTER COLUMN sort_order SET DEFAULT nextval('public.proposal_topics_sort_order_seq'::regclass);
 
 
-        --
-        -- Name: users user_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.users_user_id_seq'::regclass);
 
 
-        --
-        -- Name: visits visit_id; Type: DEFAULT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits ALTER COLUMN visit_id SET DEFAULT nextval('public.visitations_visitation_id_seq'::regclass);
 
 
-        --
-        -- Data for Name: active_templates; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: answers; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: api_permissions; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: call; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.call VALUES (1, 'call 1', '2018-12-31 23:00:00+00', '2029-12-31 23:00:00+00', '2018-12-31 23:00:00+00', '2029-12-31 23:00:00+00', '2018-12-31 23:00:00+00', '2029-12-31 23:00:00+00', 'This is cycle comment', 'This is survey comment', 1, '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', 1, false, false, '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', false, NULL, NULL, 'day', NULL, NULL, NULL, NULL, true, NULL, '2029-12-31 23:00:00+00', true, 2);
 
 
-        --
-        -- Data for Name: call_has_faps; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: call_has_instruments; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.countries VALUES (1, 'Afghanistan');
         INSERT INTO public.countries VALUES (2, 'Albania');
@@ -3156,9 +2490,6 @@ BEGIN
         INSERT INTO public.countries VALUES (199, 'Zimbabwe');
 
 
-        --
-        -- Data for Name: db_patches; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.db_patches VALUES ('CreateTopicReadinessState.sql', 'jekabskarklins', 'Adding new table for keeping track which steps have been finished when submitting proposal', '2019-10-16 22:00:00+00', '2025-02-11 12:07:04.663875+00');
         INSERT INTO public.db_patches VALUES ('AlterProposals.sql', 'jekabskarklins', 'Implementing proposal shortcode', '2019-10-16 22:00:00+00', '2025-02-11 12:07:04.663875+00');
@@ -3407,70 +2738,37 @@ BEGIN
         INSERT INTO public.db_patches VALUES ('0160_OptionalTechReviewsSetting.sql', 'TCMeldrum', 'Optional Technical Reviews Setting', '2024-08-06 22:00:00+00', '2025-02-11 12:07:04.663875+00');
 
 
-        --
-        -- Data for Name: event_logs; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: experiment_safety_inputs; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: fap_assignments; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: fap_chairs; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: fap_meeting_decisions; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: fap_proposals; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: fap_reviewers; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: fap_reviews; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: fap_secretaries; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: faps; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.faps VALUES (1, 'DEMAX scientific evaluation panel', 'DEMAX', 2, true, NULL, NULL, NULL);
 
 
-        --
-        -- Data for Name: features; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.features VALUES ('EMAIL_SEARCH', false, 'Search by Email functionality');
         INSERT INTO public.features VALUES ('STFC_IDLE_TIMER', false, 'STFC idle warning popup');
@@ -3489,33 +2787,18 @@ BEGIN
         INSERT INTO public.features VALUES ('CONFLICT_OF_INTEREST_WARNING', true, 'Show the conflict of interest Warning when assigning reviewers');
 
 
-        --
-        -- Data for Name: feedback_requests; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: feedbacks; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: files; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: generic_templates; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: institutions; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.institutions VALUES (1, 'Other', 1, NULL);
         INSERT INTO public.institutions VALUES (2, 'A.A Baikov Institute of Metallurgy and Materials Science', 1, NULL);
@@ -4042,39 +3325,21 @@ BEGIN
         INSERT INTO public.institutions VALUES (80, 'Forschungszentrum Jülich', 69, 'https://ror.org/02nv7yv05');
 
 
-        --
-        -- Data for Name: instrument_has_proposals; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: instrument_has_scientists; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: instruments; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: internal_reviews; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: merging_table_registry; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: nationalities; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.nationalities VALUES (1, 'Afghan');
         INSERT INTO public.nationalities VALUES (2, 'Albanian');
@@ -4268,15 +3533,9 @@ BEGIN
         INSERT INTO public.nationalities VALUES (190, 'Zimbabwean');
 
 
-        --
-        -- Data for Name: old_files; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: pagetext; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.pagetext VALUES (1, 'HOMEPAGE');
         INSERT INTO public.pagetext VALUES (2, 'HELPPAGE');
@@ -4286,35 +3545,20 @@ BEGIN
         INSERT INTO public.pagetext VALUES (6, '');
 
 
-        --
-        -- Data for Name: pdf_templates; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: predefined_messages; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: proposal_events; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: proposal_status_actions; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.proposal_status_actions VALUES (1, 'Email action', 'This is an action for email sending. It can be configured to use different recipients and email templates.', 'EMAIL');
         INSERT INTO public.proposal_status_actions VALUES (2, 'RabbitMQ action', 'This is an action for sending messages to a specific exchange. It can be configured to use different exchange name recipients and data.', 'RABBITMQ');
 
 
-        --
-        -- Data for Name: proposal_statuses; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.proposal_statuses VALUES (1, 'DRAFT', 'When proposal is created it gets draft status before it is submitted.', true, 'DRAFT');
         INSERT INTO public.proposal_statuses VALUES (2, 'FEASIBILITY_REVIEW', 'Status that indicates that proposal feasibility review should be done.', true, 'FEASIBILITY_REVIEW');
@@ -4334,41 +3578,23 @@ BEGIN
         INSERT INTO public.proposal_statuses VALUES (16, 'FAP_AND_FEASIBILITY_REVIEW', 'Status that indicates that proposal feasibility review and Fap Review should be done.', true, 'FAP_AND_FEASIBILITY_REVIEW');
 
 
-        --
-        -- Data for Name: proposal_user; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: proposal_workflow_connection_has_actions; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: proposal_workflow_connections; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.proposal_workflow_connections VALUES (1, 1, 1, NULL, NULL, 0, 'proposalWorkflowConnections_0', NULL);
 
 
-        --
-        -- Data for Name: proposal_workflows; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.proposal_workflows VALUES (1, 'Default workflow', 'This is the default workflow');
 
 
-        --
-        -- Data for Name: proposals; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: quantities; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.quantities VALUES ('length');
         INSERT INTO public.quantities VALUES ('mass');
@@ -4426,9 +3652,6 @@ BEGIN
         INSERT INTO public.quantities VALUES ('catalytic (activity) concentration');
 
 
-        --
-        -- Data for Name: question_datatypes; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.question_datatypes VALUES ('TEXT_INPUT');
         INSERT INTO public.question_datatypes VALUES ('SELECTION_FROM_OPTIONS');
@@ -4454,22 +3677,13 @@ BEGIN
         INSERT INTO public.question_datatypes VALUES ('FAP_REVIEW_BASIS');
 
 
-        --
-        -- Data for Name: question_dependencies; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: questionaries; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.questionaries VALUES (1, 2, '2025-02-11 12:07:04.663875+00', 0);
 
 
-        --
-        -- Data for Name: questions; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.questions VALUES ('sample_basis', 'SAMPLE_BASIS', 'Sample basic information', '{"tooltip": "", "required": false, "small_label": "", "titlePlaceholder": "Title"}', '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', 'sample_basis', 2);
         INSERT INTO public.questions VALUES ('proposal_basis', 'PROPOSAL_BASIS', 'Proposal basic information', '{"tooltip": "", "required": false, "small_label": ""}', '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', 'proposal_basis', 1);
@@ -4482,21 +3696,12 @@ BEGIN
         INSERT INTO public.questions VALUES ('fap_review_basis', 'FAP_REVIEW_BASIS', 'FAP review basic information', '{"tooltip": "", "required": false, "small_label": ""}', '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', 'fap_review_basis', 10);
 
 
-        --
-        -- Data for Name: questions_has_template; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: redeem_codes; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: role_user; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.role_user VALUES (2, 0, 1);
         INSERT INTO public.role_user VALUES (1, 1, 2);
@@ -4507,9 +3712,6 @@ BEGIN
         INSERT INTO public.role_user VALUES (6, 3, 4);
 
 
-        --
-        -- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.roles VALUES (1, 'user', 'User');
         INSERT INTO public.roles VALUES (2, 'user_officer', 'User Officer');
@@ -4521,27 +3723,15 @@ BEGIN
         INSERT INTO public.roles VALUES (6, 'fap_reviewer', 'FAP Reviewer');
 
 
-        --
-        -- Data for Name: sample_experiment_safety_inputs; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: samples; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: scheduled_events; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: settings; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.settings VALUES ('PROFILE_PAGE_LINK', NULL, 'Link to external user profile');
         INSERT INTO public.settings VALUES ('IDLE_TIMEOUT', NULL, 'Timeout for Idle timer in milliseconds');
@@ -4572,51 +3762,27 @@ BEGIN
         INSERT INTO public.settings VALUES ('EXTERNAL_AUTH_LOGIN_URL', 'http://localhost:5000/auth?client_id=useroffice&scope=openid%20profile%20email&response_type=code', 'P&O Login URL');
 
 
-        --
-        -- Data for Name: shipments; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: shipments_has_samples; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: status_changing_events; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: technical_review; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: technique_has_instruments; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: technique_has_scientists; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: techniques; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: template_categories; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.template_categories VALUES (1, 'Proposal');
         INSERT INTO public.template_categories VALUES (2, 'Sample declaration');
@@ -4628,9 +3794,6 @@ BEGIN
         INSERT INTO public.template_categories VALUES (10, 'FAP Review');
 
 
-        --
-        -- Data for Name: template_groups; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.template_groups VALUES ('PROPOSAL', 1);
         INSERT INTO public.template_groups VALUES ('PROPOSAL_ESI', 1);
@@ -4644,39 +3807,24 @@ BEGIN
         INSERT INTO public.template_groups VALUES ('FAP_REVIEW_TEMPLATE', 10);
 
 
-        --
-        -- Data for Name: templates; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.templates VALUES (1, 'default template', 'original template', false, 'PROPOSAL');
         INSERT INTO public.templates VALUES (2, 'default fap review template', 'default fap review template', false, 'FAP_REVIEW_TEMPLATE');
 
 
-        --
-        -- Data for Name: templates_has_questions; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.templates_has_questions VALUES ('proposal_basis', 1, 1, 0, '{"tooltip": "", "required": false, "small_label": ""}', 'AND');
         INSERT INTO public.templates_has_questions VALUES ('fap_review_basis', 2, 2, 0, '{"tooltip": "", "required": false, "small_label": ""}', 'AND');
 
 
-        --
-        -- Data for Name: topic_completenesses; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: topics; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.topics VALUES (1, 'New proposal', true, 0, 1);
         INSERT INTO public.topics VALUES (2, 'New fap review', true, 0, 2);
 
 
-        --
-        -- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.units VALUES ('kelvin', 'kelvin', 'mass', '', 'x');
         INSERT INTO public.units VALUES ('celsius', 'celsius', 'mass', '', 'x');
@@ -4736,9 +3884,6 @@ BEGIN
         INSERT INTO public.units VALUES ('catalytic_concentration', 'katal per cubic meter', 'catalytic (activity) concentration', 'kat/m3', 'x');
 
 
-        --
-        -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
         INSERT INTO public.users VALUES (0, 'Mr.', '', 'Service account', '', 'service', 'Service account', '', '', 'male', '2000-04-02', '', '', 'service@useroffice.ess.eu', '', '', '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', 1, 1, false, NULL);
         INSERT INTO public.users VALUES (1, 'Mr.', 'Christian', 'Carl', 'Carlsson', 'testuser', 'Carl', 'Javon4.oauthsub', 'dummy-refresh-token', 'male', '2000-04-02', 'IT deparment', 'Strategist', 'Javon4@hotmail.com', '(288) 431-1443', '(370) 386-8976', '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', 1, 1, false, 'dummy-issuer');
@@ -4749,2237 +3894,1376 @@ BEGIN
         INSERT INTO public.users VALUES (5, 'Mr.', '', 'Unverified email', 'Placeholder', 'testuser3', '', NULL, NULL, 'male', '2000-04-02', 'IT deparment', 'Management', 'unverified-user@example.com', '(288) 221-4533', '(370) 555-4432', '2025-02-11 12:07:04.663875+00', '2025-02-11 12:07:04.663875+00', 1, 1, true, NULL);
 
 
-        --
-        -- Data for Name: visits; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Data for Name: visits_has_users; Type: TABLE DATA; Schema: public; Owner: duouser
-        --
 
 
 
-        --
-        -- Name: call_call_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.call_call_id_seq', 1, true);
 
 
-        --
-        -- Name: countries_country_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.countries_country_id_seq', 199, true);
 
 
-        --
-        -- Name: event_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.event_logs_id_seq', 1, false);
 
 
-        --
-        -- Name: experiment_safety_inputs_esi_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.experiment_safety_inputs_esi_id_seq', 1, false);
 
 
-        --
-        -- Name: fap_proposals_fap_proposal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.fap_proposals_fap_proposal_id_seq', 1, false);
 
 
-        --
-        -- Name: faps_fap_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.faps_fap_id_seq', 1, true);
 
 
-        --
-        -- Name: feedback_requests_feedback_request_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.feedback_requests_feedback_request_id_seq', 1, false);
 
 
-        --
-        -- Name: feedbacks_feedback_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.feedbacks_feedback_id_seq', 1, false);
 
 
-        --
-        -- Name: files_file_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.files_file_id_seq', 1, false);
 
 
-        --
-        -- Name: generic_templates_generic_template_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.generic_templates_generic_template_id_seq', 1, false);
 
 
-        --
-        -- Name: institutions_institution_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.institutions_institution_id_seq', 523, true);
 
 
-        --
-        -- Name: instrument_has_proposals_instrument_has_proposals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.instrument_has_proposals_instrument_has_proposals_id_seq', 1, false);
 
 
-        --
-        -- Name: instruments_instrument_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.instruments_instrument_id_seq', 1, false);
 
 
-        --
-        -- Name: internal_reviews_internal_review_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.internal_reviews_internal_review_id_seq', 1, false);
 
 
-        --
-        -- Name: nationalities_nationality_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.nationalities_nationality_id_seq', 190, true);
 
 
-        --
-        -- Name: next_status_events_next_status_event_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.next_status_events_next_status_event_id_seq', 1, false);
 
 
-        --
-        -- Name: pagetext_pagetext_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.pagetext_pagetext_id_seq', 5, true);
 
 
-        --
-        -- Name: pdf_templates_pdf_template_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.pdf_templates_pdf_template_id_seq', 1, false);
 
 
-        --
-        -- Name: predefined_messages_predefined_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.predefined_messages_predefined_message_id_seq', 1, false);
 
 
-        --
-        -- Name: proposal_answers_answer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_answers_answer_id_seq', 1, false);
 
 
-        --
-        -- Name: proposal_status_actions_proposal_status_action_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_status_actions_proposal_status_action_id_seq', 2, true);
 
 
-        --
-        -- Name: proposal_statuses_proposal_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_statuses_proposal_status_id_seq', 16, true);
 
 
-        --
-        -- Name: proposal_templates_template_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_templates_template_id_seq', 2, true);
 
 
-        --
-        -- Name: proposal_topics_sort_order_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_topics_sort_order_seq', 1, false);
 
 
-        --
-        -- Name: proposal_topics_topic_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_topics_topic_id_seq', 2, true);
 
 
-        --
-        -- Name: proposal_workflow_connections_proposal_workflow_connection__seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_workflow_connections_proposal_workflow_connection__seq', 1, true);
 
 
-        --
-        -- Name: proposal_workflows_proposal_workflow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposal_workflows_proposal_workflow_id_seq', 1, true);
 
 
-        --
-        -- Name: proposals_proposal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposals_proposal_id_seq', 1, false);
 
 
-        --
-        -- Name: proposals_short_code_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.proposals_short_code_seq', 1, false);
 
 
-        --
-        -- Name: question_dependencies_question_dependency_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.question_dependencies_question_dependency_id_seq', 1, false);
 
 
-        --
-        -- Name: questionaries_questionary_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.questionaries_questionary_id_seq', 1, true);
 
 
-        --
-        -- Name: reviews_review_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.reviews_review_id_seq', 1, false);
 
 
-        --
-        -- Name: role_user_role_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.role_user_role_user_id_seq', 7, true);
 
 
-        --
-        -- Name: roles_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.roles_role_id_seq', 9, true);
 
 
-        --
-        -- Name: samples_sample_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.samples_sample_id_seq', 1, false);
 
 
-        --
-        -- Name: shipments_shipment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.shipments_shipment_id_seq', 1, false);
 
 
-        --
-        -- Name: technical_review_technical_review_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.technical_review_technical_review_id_seq', 1, false);
 
 
-        --
-        -- Name: techniques_technique_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.techniques_technique_id_seq', 1, false);
 
 
-        --
-        -- Name: template_categories_template_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.template_categories_template_category_id_seq', 6, true);
 
 
-        --
-        -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.users_user_id_seq', 6, true);
 
 
-        --
-        -- Name: visitations_visitation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: duouser
-        --
 
         PERFORM pg_catalog.setval('public.visitations_visitation_id_seq', 1, false);
 
 
-        --
-        -- Name: active_templates active_templates_group_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.active_templates
             ADD CONSTRAINT active_templates_group_id_key UNIQUE (group_id);
 
 
-        --
-        -- Name: answers answers_answer_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.answers
             ADD CONSTRAINT answers_answer_id_key UNIQUE (answer_id);
 
 
-        --
-        -- Name: answers answers_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.answers
             ADD CONSTRAINT answers_pkey PRIMARY KEY (questionary_id, question_id);
 
 
-        --
-        -- Name: api_permissions api_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.api_permissions
             ADD CONSTRAINT api_permissions_pkey PRIMARY KEY (access_token_id);
 
 
-        --
-        -- Name: call_has_faps call_has_faps_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call_has_faps
             ADD CONSTRAINT call_has_faps_pkey PRIMARY KEY (call_id, fap_id);
 
 
-        --
-        -- Name: call_has_instruments call_has_instrument_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call_has_instruments
             ADD CONSTRAINT call_has_instrument_pkey PRIMARY KEY (call_id, instrument_id);
 
 
-        --
-        -- Name: call call_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call
             ADD CONSTRAINT call_pkey PRIMARY KEY (call_id);
 
 
-        --
-        -- Name: proposal_workflow_connection_has_actions connection_has_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connection_has_actions
             ADD CONSTRAINT connection_has_actions_pkey PRIMARY KEY (connection_id, action_id);
 
 
-        --
-        -- Name: countries countries_country_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.countries
             ADD CONSTRAINT countries_country_id_key UNIQUE (country_id);
 
 
-        --
-        -- Name: countries countries_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.countries
             ADD CONSTRAINT countries_pkey PRIMARY KEY (country_id);
 
 
 
-        --
-        -- Name: event_logs event_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.event_logs
             ADD CONSTRAINT event_logs_pkey PRIMARY KEY (id);
 
 
-        --
-        -- Name: experiment_safety_inputs experiment_safety_inputs_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.experiment_safety_inputs
             ADD CONSTRAINT experiment_safety_inputs_pkey PRIMARY KEY (esi_id);
 
 
-        --
-        -- Name: experiment_safety_inputs experiment_safety_inputs_questionary_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.experiment_safety_inputs
             ADD CONSTRAINT experiment_safety_inputs_questionary_id_key UNIQUE (questionary_id);
 
 
-        --
-        -- Name: fap_assignments fap_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_assignments
             ADD CONSTRAINT fap_assignments_pkey PRIMARY KEY (proposal_pk, fap_member_user_id, fap_id);
 
 
-        --
-        -- Name: fap_chairs fap_chairs_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_chairs
             ADD CONSTRAINT fap_chairs_pkey PRIMARY KEY (user_id, fap_id);
 
 
-        --
-        -- Name: fap_meeting_decisions fap_meeting_decisions_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_meeting_decisions
             ADD CONSTRAINT fap_meeting_decisions_pkey PRIMARY KEY (proposal_pk, instrument_id);
 
 
-        --
-        -- Name: fap_proposals fap_proposals_fap_proposal_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_proposals
             ADD CONSTRAINT fap_proposals_fap_proposal_id_key UNIQUE (fap_proposal_id);
 
 
-        --
-        -- Name: fap_proposals fap_proposals_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_proposals
             ADD CONSTRAINT fap_proposals_pkey PRIMARY KEY (fap_proposal_id);
 
 
-        --
-        -- Name: fap_reviewers fap_reviewers_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviewers
             ADD CONSTRAINT fap_reviewers_pkey PRIMARY KEY (user_id, fap_id);
 
 
-        --
-        -- Name: fap_reviews fap_reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviews
             ADD CONSTRAINT fap_reviews_pkey PRIMARY KEY (proposal_pk, user_id, fap_id);
 
 
-        --
-        -- Name: fap_secretaries fap_secretaries_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_secretaries
             ADD CONSTRAINT fap_secretaries_pkey PRIMARY KEY (user_id, fap_id);
 
 
-        --
-        -- Name: faps faps_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.faps
             ADD CONSTRAINT faps_pkey PRIMARY KEY (fap_id);
 
 
-        --
-        -- Name: features features_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.features
             ADD CONSTRAINT features_pkey PRIMARY KEY (feature_id);
 
 
-        --
-        -- Name: feedback_requests feedback_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedback_requests
             ADD CONSTRAINT feedback_requests_pkey PRIMARY KEY (feedback_request_id);
 
 
-        --
-        -- Name: feedbacks feedbacks_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedbacks
             ADD CONSTRAINT feedbacks_pkey PRIMARY KEY (feedback_id);
 
 
-        --
-        -- Name: files files_oid_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.files
             ADD CONSTRAINT files_oid_key UNIQUE (oid);
 
 
-        --
-        -- Name: files files_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.files
             ADD CONSTRAINT files_pkey PRIMARY KEY (file_id);
 
 
-        --
-        -- Name: generic_templates generic_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.generic_templates
             ADD CONSTRAINT generic_templates_pkey PRIMARY KEY (generic_template_id);
 
 
-        --
-        -- Name: institutions institutions_institution_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.institutions
             ADD CONSTRAINT institutions_institution_id_key UNIQUE (institution_id);
 
 
-        --
-        -- Name: institutions institutions_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.institutions
             ADD CONSTRAINT institutions_pkey PRIMARY KEY (institution_id);
 
 
-        --
-        -- Name: instrument_has_proposals instrument_has_proposals_instrument_has_proposals_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_proposals
             ADD CONSTRAINT instrument_has_proposals_instrument_has_proposals_id_key UNIQUE (instrument_has_proposals_id);
 
 
-        --
-        -- Name: instrument_has_proposals instrument_has_proposals_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_proposals
             ADD CONSTRAINT instrument_has_proposals_pkey PRIMARY KEY (instrument_id, proposal_pk);
 
 
-        --
-        -- Name: instrument_has_scientists instrument_has_scientists_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_scientists
             ADD CONSTRAINT instrument_has_scientists_pkey PRIMARY KEY (instrument_id, user_id);
 
 
-        --
-        -- Name: instruments instruments_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instruments
             ADD CONSTRAINT instruments_pkey PRIMARY KEY (instrument_id);
 
 
-        --
-        -- Name: internal_reviews internal_reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.internal_reviews
             ADD CONSTRAINT internal_reviews_pkey PRIMARY KEY (internal_review_id);
 
 
-        --
-        -- Name: merging_table_registry merging_table_registry_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.merging_table_registry
             ADD CONSTRAINT merging_table_registry_pkey PRIMARY KEY (table_name, column_name);
 
 
-        --
-        -- Name: nationalities nationalities_nationality_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.nationalities
             ADD CONSTRAINT nationalities_nationality_id_key UNIQUE (nationality_id);
 
 
-        --
-        -- Name: nationalities nationalities_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.nationalities
             ADD CONSTRAINT nationalities_pkey PRIMARY KEY (nationality_id);
 
 
-        --
-        -- Name: status_changing_events next_status_events_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.status_changing_events
             ADD CONSTRAINT next_status_events_pkey PRIMARY KEY (status_changing_event_id);
 
 
-        --
-        -- Name: old_files old_files_oid_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.old_files
             ADD CONSTRAINT old_files_oid_key UNIQUE (oid);
 
 
-        --
-        -- Name: old_files old_files_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.old_files
             ADD CONSTRAINT old_files_pkey PRIMARY KEY (file_id);
 
 
-        --
-        -- Name: pagetext pagetext_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.pagetext
             ADD CONSTRAINT pagetext_pkey PRIMARY KEY (pagetext_id);
 
 
-        --
-        -- Name: pdf_templates pdf_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.pdf_templates
             ADD CONSTRAINT pdf_templates_pkey PRIMARY KEY (pdf_template_id);
 
 
-        --
-        -- Name: pdf_templates pdf_templates_template_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.pdf_templates
             ADD CONSTRAINT pdf_templates_template_id_key UNIQUE (template_id);
 
 
-        --
-        -- Name: predefined_messages predefined_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.predefined_messages
             ADD CONSTRAINT predefined_messages_pkey PRIMARY KEY (predefined_message_id);
 
 
-        --
-        -- Name: proposal_events proposal_events_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_events
             ADD CONSTRAINT proposal_events_pkey PRIMARY KEY (proposal_pk);
 
 
-        --
-        -- Name: proposal_status_actions proposal_status_actions_proposal_status_action_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_status_actions
             ADD CONSTRAINT proposal_status_actions_proposal_status_action_id_key UNIQUE (proposal_status_action_id);
 
 
-        --
-        -- Name: proposal_statuses proposal_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_statuses
             ADD CONSTRAINT proposal_statuses_pkey PRIMARY KEY (proposal_status_id);
 
 
-        --
-        -- Name: proposal_user proposal_user_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_user
             ADD CONSTRAINT proposal_user_pkey PRIMARY KEY (proposal_pk, user_id);
 
 
-        --
-        -- Name: proposal_workflow_connections proposal_workflow_connections_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connections
             ADD CONSTRAINT proposal_workflow_connections_pkey PRIMARY KEY (proposal_workflow_connection_id);
 
 
-        --
-        -- Name: proposal_workflows proposal_workflows_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflows
             ADD CONSTRAINT proposal_workflows_pkey PRIMARY KEY (proposal_workflow_id);
 
 
-        --
-        -- Name: proposals proposals_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposals
             ADD CONSTRAINT proposals_pkey PRIMARY KEY (proposal_pk);
 
 
-        --
-        -- Name: proposals proposals_short_code_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposals
             ADD CONSTRAINT proposals_short_code_key UNIQUE (proposal_id);
 
 
-        --
-        -- Name: quantities quantities_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.quantities
             ADD CONSTRAINT quantities_pkey PRIMARY KEY (quantity_id);
 
 
-        --
-        -- Name: question_datatypes question_datatypes_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.question_datatypes
             ADD CONSTRAINT question_datatypes_pkey PRIMARY KEY (question_datatype_id);
 
 
-        --
-        -- Name: question_dependencies question_dependencies_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.question_dependencies
             ADD CONSTRAINT question_dependencies_pkey PRIMARY KEY (question_dependency_id);
 
 
-        --
-        -- Name: questionaries questionaries_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questionaries
             ADD CONSTRAINT questionaries_pkey PRIMARY KEY (questionary_id);
 
 
-        --
-        -- Name: questions_has_template questions_has_template_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questions_has_template
             ADD CONSTRAINT questions_has_template_pkey PRIMARY KEY (template_id, question_id);
 
 
-        --
-        -- Name: questions questions_natural_key_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questions
             ADD CONSTRAINT questions_natural_key_key UNIQUE (natural_key);
 
 
-        --
-        -- Name: questions questions_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questions
             ADD CONSTRAINT questions_pkey PRIMARY KEY (question_id);
 
 
-        --
-        -- Name: redeem_codes redeem_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.redeem_codes
             ADD CONSTRAINT redeem_codes_pkey PRIMARY KEY (code);
 
 
-        --
-        -- Name: redeem_codes redeem_codes_placeholder_user_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.redeem_codes
             ADD CONSTRAINT redeem_codes_placeholder_user_id_key UNIQUE (placeholder_user_id);
 
 
-        --
-        -- Name: role_user role_user_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.role_user
             ADD CONSTRAINT role_user_pkey PRIMARY KEY (role_user_id);
 
 
-        --
-        -- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.roles
             ADD CONSTRAINT roles_pkey PRIMARY KEY (role_id);
 
 
-        --
-        -- Name: sample_experiment_safety_inputs sample_experiment_safety_inputs_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.sample_experiment_safety_inputs
             ADD CONSTRAINT sample_experiment_safety_inputs_pkey PRIMARY KEY (esi_id, sample_id);
 
 
-        --
-        -- Name: sample_experiment_safety_inputs sample_experiment_safety_inputs_questionary_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.sample_experiment_safety_inputs
             ADD CONSTRAINT sample_experiment_safety_inputs_questionary_id_key UNIQUE (questionary_id);
 
 
-        --
-        -- Name: samples samples_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples
             ADD CONSTRAINT samples_pkey PRIMARY KEY (sample_id);
 
 
-        --
-        -- Name: samples samples_questionary_id_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples
             ADD CONSTRAINT samples_questionary_id_key UNIQUE (questionary_id);
 
 
-        --
-        -- Name: scheduled_events scheduled_events_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.scheduled_events
             ADD CONSTRAINT scheduled_events_pkey PRIMARY KEY (scheduled_event_id);
 
 
-        --
-        -- Name: settings settings_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.settings
             ADD CONSTRAINT settings_pkey PRIMARY KEY (settings_id);
 
 
-        --
-        -- Name: shipments_has_samples shipments_has_samples_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments_has_samples
             ADD CONSTRAINT shipments_has_samples_pkey PRIMARY KEY (shipment_id, sample_id);
 
 
-        --
-        -- Name: shipments shipments_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments
             ADD CONSTRAINT shipments_pkey PRIMARY KEY (shipment_id);
 
 
-        --
-        -- Name: technical_review technical_review_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technical_review
             ADD CONSTRAINT technical_review_pkey PRIMARY KEY (technical_review_id);
 
 
-        --
-        -- Name: technique_has_instruments technique_has_instruments_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technique_has_instruments
             ADD CONSTRAINT technique_has_instruments_pkey PRIMARY KEY (technique_id, instrument_id);
 
 
-        --
-        -- Name: technique_has_scientists technique_has_scientists_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technique_has_scientists
             ADD CONSTRAINT technique_has_scientists_pkey PRIMARY KEY (technique_id, user_id);
 
 
-        --
-        -- Name: techniques techniques_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.techniques
             ADD CONSTRAINT techniques_pkey PRIMARY KEY (technique_id);
 
 
-        --
-        -- Name: techniques techniques_short_code_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.techniques
             ADD CONSTRAINT techniques_short_code_key UNIQUE (short_code);
 
 
-        --
-        -- Name: template_categories template_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.template_categories
             ADD CONSTRAINT template_categories_pkey PRIMARY KEY (template_category_id);
 
 
-        --
-        -- Name: template_groups template_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.template_groups
             ADD CONSTRAINT template_groups_pkey PRIMARY KEY (template_group_id);
 
 
-        --
-        -- Name: templates_has_questions templates_has_questions_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.templates_has_questions
             ADD CONSTRAINT templates_has_questions_pkey PRIMARY KEY (template_id, question_id);
 
 
-        --
-        -- Name: templates templates_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.templates
             ADD CONSTRAINT templates_pkey PRIMARY KEY (template_id);
 
 
-        --
-        -- Name: topic_completenesses topic_completenesses_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.topic_completenesses
             ADD CONSTRAINT topic_completenesses_pkey PRIMARY KEY (questionary_id, topic_id);
 
 
-        --
-        -- Name: topics topics_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.topics
             ADD CONSTRAINT topics_pkey PRIMARY KEY (topic_id);
 
 
-        --
-        -- Name: status_changing_events unique_connection_event; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.status_changing_events
             ADD CONSTRAINT unique_connection_event UNIQUE (proposal_workflow_connection_id, status_changing_event);
 
 
-        --
-        -- Name: units units_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.units
             ADD CONSTRAINT units_pkey PRIMARY KEY (unit_id);
 
 
-        --
-        -- Name: role_user user_role_unique_idx; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.role_user
             ADD CONSTRAINT user_role_unique_idx UNIQUE (user_id, role_id);
 
 
-        --
-        -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.users
             ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
-        --
-        -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.users
             ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
 
 
-        --
-        -- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.users
             ADD CONSTRAINT users_username_key UNIQUE (username);
 
 
-        --
-        -- Name: visits visitations_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits
             ADD CONSTRAINT visitations_pkey PRIMARY KEY (visit_id);
 
 
-        --
-        -- Name: visits_has_users visits_has_users_pkey; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits_has_users
             ADD CONSTRAINT visits_has_users_pkey PRIMARY KEY (visit_id, user_id);
 
 
-        --
-        -- Name: visits visits_scheduled_event_id; Type: CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits
             ADD CONSTRAINT visits_scheduled_event_id UNIQUE (scheduled_event_id);
 
 
-        --
-        -- Name: answers_questionary_id_idx; Type: INDEX; Schema: public; Owner: duouser
-        --
 
         CREATE INDEX answers_questionary_id_idx ON public.answers USING btree (questionary_id);
 
 
-        --
-        -- Name: proposals_short_code_idx; Type: INDEX; Schema: public; Owner: duouser
-        --
 
         CREATE UNIQUE INDEX proposals_short_code_idx ON public.proposals USING btree (proposal_id);
 
 
-        --
-        -- Name: samples_proposal_id_question_id_mm_idx; Type: INDEX; Schema: public; Owner: duouser
-        --
 
         CREATE INDEX samples_proposal_id_question_id_mm_idx ON public.samples USING btree (proposal_pk, question_id);
 
 
-        --
-        -- Name: templates_has_questions_template_id_idx; Type: INDEX; Schema: public; Owner: duouser
-        --
 
         CREATE INDEX templates_has_questions_template_id_idx ON public.templates_has_questions USING btree (template_id);
 
 
-        --
-        -- Name: topic_completenesses_questionary_id_idx; Type: INDEX; Schema: public; Owner: duouser
-        --
 
         CREATE INDEX topic_completenesses_questionary_id_idx ON public.topic_completenesses USING btree (questionary_id);
 
 
-        --
-        -- Name: topics_template_id_idx; Type: INDEX; Schema: public; Owner: duouser
-        --
 
         CREATE INDEX topics_template_id_idx ON public.topics USING btree (template_id);
 
 
-        --
-        -- Name: ux_proposal_topic_completenesses_proposal_id; Type: INDEX; Schema: public; Owner: duouser
-        --
 
         CREATE INDEX ux_proposal_topic_completenesses_proposal_id ON public.topic_completenesses USING btree (questionary_id);
 
 
-        --
-        -- Name: experiment_safety_inputs after_experiment_safety_inputs_delete_trigger; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER after_experiment_safety_inputs_delete_trigger AFTER DELETE ON public.experiment_safety_inputs FOR EACH ROW EXECUTE FUNCTION public.after_esi_delete();
 
 
-        --
-        -- Name: sample_experiment_safety_inputs after_sample_experiment_safety_inputs_delete_trigger; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER after_sample_experiment_safety_inputs_delete_trigger AFTER DELETE ON public.sample_experiment_safety_inputs FOR EACH ROW EXECUTE FUNCTION public.after_esi_delete();
 
 
-        --
-        -- Name: generic_templates generic_templates_delete_trigger; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER generic_templates_delete_trigger AFTER DELETE ON public.generic_templates FOR EACH ROW EXECUTE FUNCTION public.after_generic_template_delete();
 
 
-        --
-        -- Name: proposals proposal_delete_trigger; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER proposal_delete_trigger AFTER DELETE ON public.proposals FOR EACH ROW EXECUTE FUNCTION public.after_proposal_delete();
 
 
-        --
-        -- Name: samples sample_delete_trigger; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER sample_delete_trigger AFTER DELETE ON public.samples FOR EACH ROW EXECUTE FUNCTION public.after_sample_delete();
 
 
-        --
-        -- Name: proposals set_timestamp; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.proposals FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
 
 
-        --
-        -- Name: questions set_timestamp; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.questions FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
 
 
-        --
-        -- Name: users set_timestamp; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.trigger_set_timestamp();
 
 
-        --
-        -- Name: shipments shipment_delete_trigger; Type: TRIGGER; Schema: public; Owner: duouser
-        --
 
         CREATE TRIGGER shipment_delete_trigger AFTER DELETE ON public.shipments FOR EACH ROW EXECUTE FUNCTION public.after_shipment_delete();
 
 
-        --
-        -- Name: active_templates active_templates_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.active_templates
             ADD CONSTRAINT active_templates_group_id_fkey FOREIGN KEY (group_id) REFERENCES public.template_groups(template_group_id);
 
 
-        --
-        -- Name: active_templates active_templates_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.active_templates
             ADD CONSTRAINT active_templates_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: answers answers_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.answers
             ADD CONSTRAINT answers_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(question_id);
 
 
-        --
-        -- Name: answers answers_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.answers
             ADD CONSTRAINT answers_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: call call_esi_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call
             ADD CONSTRAINT call_esi_template_id_fkey FOREIGN KEY (esi_template_id) REFERENCES public.templates(template_id);
 
 
-        --
-        -- Name: call call_fap_review_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call
             ADD CONSTRAINT call_fap_review_template_id_fkey FOREIGN KEY (fap_review_template_id) REFERENCES public.templates(template_id);
 
 
-        --
-        -- Name: call_has_faps call_has_faps_call_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call_has_faps
             ADD CONSTRAINT call_has_faps_call_id_fkey FOREIGN KEY (call_id) REFERENCES public.call(call_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: call_has_faps call_has_faps_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call_has_faps
             ADD CONSTRAINT call_has_faps_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: call_has_instruments call_has_instrument_call_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call_has_instruments
             ADD CONSTRAINT call_has_instrument_call_id_fkey FOREIGN KEY (call_id) REFERENCES public.call(call_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: call_has_instruments call_has_instrument_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call_has_instruments
             ADD CONSTRAINT call_has_instrument_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: call_has_instruments call_has_instruments_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call_has_instruments
             ADD CONSTRAINT call_has_instruments_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: call call_pdf_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call
             ADD CONSTRAINT call_pdf_template_id_fkey FOREIGN KEY (pdf_template_id) REFERENCES public.templates(template_id);
 
 
-        --
-        -- Name: call call_proposal_workflow_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call
             ADD CONSTRAINT call_proposal_workflow_id_fkey FOREIGN KEY (proposal_workflow_id) REFERENCES public.proposal_workflows(proposal_workflow_id);
 
 
-        --
-        -- Name: call call_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.call
             ADD CONSTRAINT call_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id);
 
 
-        --
-        -- Name: institutions country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.institutions
             ADD CONSTRAINT country_id_fkey FOREIGN KEY (country_id) REFERENCES public.countries(country_id);
 
 
-        --
-        -- Name: event_logs event_logs_changed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.event_logs
             ADD CONSTRAINT event_logs_changed_by_fkey FOREIGN KEY (changed_by) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: experiment_safety_inputs experiment_safety_inputs_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.experiment_safety_inputs
             ADD CONSTRAINT experiment_safety_inputs_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: experiment_safety_inputs experiment_safety_inputs_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.experiment_safety_inputs
             ADD CONSTRAINT experiment_safety_inputs_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: experiment_safety_inputs experiment_safety_inputs_scheduled_events_scheduled_event_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.experiment_safety_inputs
             ADD CONSTRAINT experiment_safety_inputs_scheduled_events_scheduled_event_id_fk FOREIGN KEY (scheduled_event_id) REFERENCES public.scheduled_events(scheduled_event_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_assignments fap_assignments_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_assignments
             ADD CONSTRAINT fap_assignments_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id);
 
 
-        --
-        -- Name: fap_assignments fap_assignments_fap_member_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_assignments
             ADD CONSTRAINT fap_assignments_fap_member_user_id_fkey FOREIGN KEY (fap_member_user_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: fap_assignments fap_assignments_fap_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_assignments
             ADD CONSTRAINT fap_assignments_fap_proposal_id_fkey FOREIGN KEY (fap_proposal_id) REFERENCES public.fap_proposals(fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_assignments fap_assignments_proposal_pk_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_assignments
             ADD CONSTRAINT fap_assignments_proposal_pk_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk);
 
 
-        --
-        -- Name: fap_chairs fap_chairs_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_chairs
             ADD CONSTRAINT fap_chairs_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_chairs fap_chairs_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_chairs
             ADD CONSTRAINT fap_chairs_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_meeting_decisions fap_meeting_decisions_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_meeting_decisions
             ADD CONSTRAINT fap_meeting_decisions_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_meeting_decisions fap_meeting_decisions_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_meeting_decisions
             ADD CONSTRAINT fap_meeting_decisions_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_meeting_decisions fap_meeting_decisions_proposal_pk_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_meeting_decisions
             ADD CONSTRAINT fap_meeting_decisions_proposal_pk_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_meeting_decisions fap_meeting_decisions_submitted_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_meeting_decisions
             ADD CONSTRAINT fap_meeting_decisions_submitted_by_fkey FOREIGN KEY (submitted_by) REFERENCES public.users(user_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: fap_proposals fap_proposals_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_proposals
             ADD CONSTRAINT fap_proposals_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id);
 
 
-        --
-        -- Name: fap_proposals fap_proposals_instrument_has_proposals_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_proposals
             ADD CONSTRAINT fap_proposals_instrument_has_proposals_id_fkey FOREIGN KEY (instrument_has_proposals_id) REFERENCES public.instrument_has_proposals(instrument_has_proposals_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_proposals fap_proposals_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_proposals
             ADD CONSTRAINT fap_proposals_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id);
 
 
-        --
-        -- Name: fap_proposals fap_proposals_proposal_pk_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_proposals
             ADD CONSTRAINT fap_proposals_proposal_pk_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_reviewers fap_reviewers_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviewers
             ADD CONSTRAINT fap_reviewers_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_reviewers fap_reviewers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviewers
             ADD CONSTRAINT fap_reviewers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_reviews fap_reviews_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviews
             ADD CONSTRAINT fap_reviews_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id);
 
 
-        --
-        -- Name: fap_reviews fap_reviews_fap_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviews
             ADD CONSTRAINT fap_reviews_fap_proposal_id_fkey FOREIGN KEY (fap_proposal_id) REFERENCES public.fap_proposals(fap_proposal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_reviews fap_reviews_proposal_pk_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviews
             ADD CONSTRAINT fap_reviews_proposal_pk_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: fap_reviews fap_reviews_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviews
             ADD CONSTRAINT fap_reviews_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id);
 
 
-        --
-        -- Name: fap_reviews fap_reviews_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_reviews
             ADD CONSTRAINT fap_reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: fap_secretaries fap_secretaries_fap_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_secretaries
             ADD CONSTRAINT fap_secretaries_fap_id_fkey FOREIGN KEY (fap_id) REFERENCES public.faps(fap_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: fap_secretaries fap_secretaries_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.fap_secretaries
             ADD CONSTRAINT fap_secretaries_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: feedback_requests feedback_requests_scheduled_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedback_requests
             ADD CONSTRAINT feedback_requests_scheduled_event_id_fkey FOREIGN KEY (scheduled_event_id) REFERENCES public.scheduled_events(scheduled_event_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: feedbacks feedbacks_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedbacks
             ADD CONSTRAINT feedbacks_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: feedbacks feedbacks_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedbacks
             ADD CONSTRAINT feedbacks_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id);
 
 
-        --
-        -- Name: feedbacks feedbacks_scheduled_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.feedbacks
             ADD CONSTRAINT feedbacks_scheduled_event_id_fkey FOREIGN KEY (scheduled_event_id) REFERENCES public.scheduled_events(scheduled_event_id);
 
 
-        --
-        -- Name: generic_templates generic_templates_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.generic_templates
             ADD CONSTRAINT generic_templates_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: generic_templates generic_templates_proposal_pk_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.generic_templates
             ADD CONSTRAINT generic_templates_proposal_pk_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: generic_templates generic_templates_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.generic_templates
             ADD CONSTRAINT generic_templates_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(question_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: generic_templates generic_templates_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.generic_templates
             ADD CONSTRAINT generic_templates_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: instrument_has_proposals instrument_has_proposals_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_proposals
             ADD CONSTRAINT instrument_has_proposals_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: instrument_has_proposals instrument_has_proposals_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_proposals
             ADD CONSTRAINT instrument_has_proposals_proposal_id_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: instrument_has_scientists instrument_has_scientists_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_scientists
             ADD CONSTRAINT instrument_has_scientists_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: instrument_has_scientists instrument_has_scientists_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instrument_has_scientists
             ADD CONSTRAINT instrument_has_scientists_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: instruments instruments_manager_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.instruments
             ADD CONSTRAINT instruments_manager_user_id_fkey FOREIGN KEY (manager_user_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: internal_reviews internal_reviews_assigned_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.internal_reviews
             ADD CONSTRAINT internal_reviews_assigned_by_fkey FOREIGN KEY (assigned_by) REFERENCES public.users(user_id) ON DELETE SET NULL;
 
 
-        --
-        -- Name: internal_reviews internal_reviews_reviewer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.internal_reviews
             ADD CONSTRAINT internal_reviews_reviewer_id_fkey FOREIGN KEY (reviewer_id) REFERENCES public.users(user_id) ON DELETE SET NULL;
 
 
-        --
-        -- Name: internal_reviews internal_reviews_technical_review_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.internal_reviews
             ADD CONSTRAINT internal_reviews_technical_review_id_fkey FOREIGN KEY (technical_review_id) REFERENCES public.technical_review(technical_review_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: status_changing_events next_status_events_proposal_workflow_connection_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.status_changing_events
             ADD CONSTRAINT next_status_events_proposal_workflow_connection_id_fkey FOREIGN KEY (proposal_workflow_connection_id) REFERENCES public.proposal_workflow_connections(proposal_workflow_connection_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: pdf_templates pdf_templates_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.pdf_templates
             ADD CONSTRAINT pdf_templates_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: pdf_templates pdf_templates_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.pdf_templates
             ADD CONSTRAINT pdf_templates_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id);
 
 
-        --
-        -- Name: predefined_messages predefined_messages_last_modified_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.predefined_messages
             ADD CONSTRAINT predefined_messages_last_modified_by_fkey FOREIGN KEY (last_modified_by) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: proposal_events proposal_events_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_events
             ADD CONSTRAINT proposal_events_proposal_id_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_user proposal_user_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_user
             ADD CONSTRAINT proposal_user_proposal_id_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_user proposal_user_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_user
             ADD CONSTRAINT proposal_user_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: proposal_workflow_connection_has_actions proposal_workflow_connection_has_actions_action_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connection_has_actions
             ADD CONSTRAINT proposal_workflow_connection_has_actions_action_id_fkey FOREIGN KEY (action_id) REFERENCES public.proposal_status_actions(proposal_status_action_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_workflow_connection_has_actions proposal_workflow_connection_has_actions_connection_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connection_has_actions
             ADD CONSTRAINT proposal_workflow_connection_has_actions_connection_id_fkey FOREIGN KEY (connection_id) REFERENCES public.proposal_workflow_connections(proposal_workflow_connection_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_workflow_connection_has_actions proposal_workflow_connection_has_actions_workflow_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connection_has_actions
             ADD CONSTRAINT proposal_workflow_connection_has_actions_workflow_id_fkey FOREIGN KEY (workflow_id) REFERENCES public.proposal_workflows(proposal_workflow_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_workflow_connections proposal_workflow_connections_next_proposal_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connections
             ADD CONSTRAINT proposal_workflow_connections_next_proposal_status_id_fkey FOREIGN KEY (next_proposal_status_id) REFERENCES public.proposal_statuses(proposal_status_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_workflow_connections proposal_workflow_connections_prev_proposal_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connections
             ADD CONSTRAINT proposal_workflow_connections_prev_proposal_status_id_fkey FOREIGN KEY (prev_proposal_status_id) REFERENCES public.proposal_statuses(proposal_status_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_workflow_connections proposal_workflow_connections_proposal_status_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connections
             ADD CONSTRAINT proposal_workflow_connections_proposal_status_id_fkey FOREIGN KEY (proposal_status_id) REFERENCES public.proposal_statuses(proposal_status_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposal_workflow_connections proposal_workflow_connections_proposal_workflow_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposal_workflow_connections
             ADD CONSTRAINT proposal_workflow_connections_proposal_workflow_id_fkey FOREIGN KEY (proposal_workflow_id) REFERENCES public.proposal_workflows(proposal_workflow_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposals proposals_call_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposals
             ADD CONSTRAINT proposals_call_id_fkey FOREIGN KEY (call_id) REFERENCES public.call(call_id);
 
 
-        --
-        -- Name: proposals proposals_proposal_statuses_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposals
             ADD CONSTRAINT proposals_proposal_statuses_id_fkey FOREIGN KEY (status_id) REFERENCES public.proposal_statuses(proposal_status_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: proposals proposals_proposer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposals
             ADD CONSTRAINT proposals_proposer_id_fkey FOREIGN KEY (proposer_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: proposals proposals_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.proposals
             ADD CONSTRAINT proposals_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id);
 
 
-        --
-        -- Name: question_dependencies question_dependencies_dependency_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.question_dependencies
             ADD CONSTRAINT question_dependencies_dependency_question_id_fkey FOREIGN KEY (dependency_question_id) REFERENCES public.questions(question_id);
 
 
-        --
-        -- Name: question_dependencies question_dependencies_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.question_dependencies
             ADD CONSTRAINT question_dependencies_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(question_id);
 
 
-        --
-        -- Name: question_dependencies question_dependencies_template_id_dependency_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.question_dependencies
             ADD CONSTRAINT question_dependencies_template_id_dependency_question_id_fkey FOREIGN KEY (template_id, dependency_question_id) REFERENCES public.templates_has_questions(template_id, question_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: question_dependencies question_dependencies_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.question_dependencies
             ADD CONSTRAINT question_dependencies_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: questionaries questionaries_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questionaries
             ADD CONSTRAINT questionaries_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: questionaries questionaries_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questionaries
             ADD CONSTRAINT questionaries_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id);
 
 
-        --
-        -- Name: questions questions_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questions
             ADD CONSTRAINT questions_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.template_categories(template_category_id);
 
 
-        --
-        -- Name: questions questions_data_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questions
             ADD CONSTRAINT questions_data_type_fkey FOREIGN KEY (data_type) REFERENCES public.question_datatypes(question_datatype_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: questions_has_template questions_has_template_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questions_has_template
             ADD CONSTRAINT questions_has_template_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(question_id);
 
 
-        --
-        -- Name: questions_has_template questions_has_template_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.questions_has_template
             ADD CONSTRAINT questions_has_template_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id);
 
 
-        --
-        -- Name: redeem_codes redeem_codes_claimed_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.redeem_codes
             ADD CONSTRAINT redeem_codes_claimed_by_fkey FOREIGN KEY (claimed_by) REFERENCES public.users(user_id) ON DELETE SET NULL;
 
 
-        --
-        -- Name: redeem_codes redeem_codes_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.redeem_codes
             ADD CONSTRAINT redeem_codes_created_by_fkey FOREIGN KEY (created_by) REFERENCES public.users(user_id) ON DELETE SET NULL;
 
 
-        --
-        -- Name: redeem_codes redeem_codes_placeholder_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.redeem_codes
             ADD CONSTRAINT redeem_codes_placeholder_user_id_fkey FOREIGN KEY (placeholder_user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: role_user role_user_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.role_user
             ADD CONSTRAINT role_user_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(role_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: role_user role_user_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.role_user
             ADD CONSTRAINT role_user_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: sample_experiment_safety_inputs sample_experiment_safety_inputs_esi_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.sample_experiment_safety_inputs
             ADD CONSTRAINT sample_experiment_safety_inputs_esi_id_fkey FOREIGN KEY (esi_id) REFERENCES public.experiment_safety_inputs(esi_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: sample_experiment_safety_inputs sample_experiment_safety_inputs_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.sample_experiment_safety_inputs
             ADD CONSTRAINT sample_experiment_safety_inputs_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: sample_experiment_safety_inputs sample_experiment_safety_inputs_sample_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.sample_experiment_safety_inputs
             ADD CONSTRAINT sample_experiment_safety_inputs_sample_id_fkey FOREIGN KEY (sample_id) REFERENCES public.samples(sample_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: samples samples_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples
             ADD CONSTRAINT samples_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: samples samples_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples
             ADD CONSTRAINT samples_proposal_id_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: samples samples_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples
             ADD CONSTRAINT samples_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(question_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: samples samples_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples
             ADD CONSTRAINT samples_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: samples samples_shipment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.samples
             ADD CONSTRAINT samples_shipment_id_fkey FOREIGN KEY (shipment_id) REFERENCES public.template_categories(template_category_id);
 
 
-        --
-        -- Name: scheduled_events scheduled_events_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.scheduled_events
             ADD CONSTRAINT scheduled_events_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id);
 
 
-        --
-        -- Name: scheduled_events scheduled_events_local_contact_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.scheduled_events
             ADD CONSTRAINT scheduled_events_local_contact_fkey FOREIGN KEY (local_contact) REFERENCES public.users(user_id) ON DELETE SET NULL;
 
 
-        --
-        -- Name: scheduled_events scheduled_events_proposal_pk_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.scheduled_events
             ADD CONSTRAINT scheduled_events_proposal_pk_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: shipments shipments_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments
             ADD CONSTRAINT shipments_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: shipments_has_samples shipments_has_samples_sample_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments_has_samples
             ADD CONSTRAINT shipments_has_samples_sample_id_fkey FOREIGN KEY (sample_id) REFERENCES public.samples(sample_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: shipments_has_samples shipments_has_samples_shipment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments_has_samples
             ADD CONSTRAINT shipments_has_samples_shipment_id_fkey FOREIGN KEY (shipment_id) REFERENCES public.shipments(shipment_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: shipments shipments_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments
             ADD CONSTRAINT shipments_proposal_id_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: shipments shipments_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments
             ADD CONSTRAINT shipments_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id);
 
 
-        --
-        -- Name: shipments shipments_scheduled_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.shipments
             ADD CONSTRAINT shipments_scheduled_event_id_fkey FOREIGN KEY (scheduled_event_id) REFERENCES public.scheduled_events(scheduled_event_id) ON DELETE SET NULL;
 
 
-        --
-        -- Name: technical_review technical_review_instrument_has_proposals_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technical_review
             ADD CONSTRAINT technical_review_instrument_has_proposals_id_fkey FOREIGN KEY (instrument_has_proposals_id) REFERENCES public.instrument_has_proposals(instrument_has_proposals_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: technical_review technical_review_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technical_review
             ADD CONSTRAINT technical_review_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: technical_review technical_review_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technical_review
             ADD CONSTRAINT technical_review_proposal_id_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: technical_review technical_review_reviewer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technical_review
             ADD CONSTRAINT technical_review_reviewer_id_fkey FOREIGN KEY (reviewer_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: technical_review technical_review_technical_review_assignee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technical_review
             ADD CONSTRAINT technical_review_technical_review_assignee_id_fkey FOREIGN KEY (technical_review_assignee_id) REFERENCES public.users(user_id) ON DELETE SET NULL;
 
 
-        --
-        -- Name: technique_has_instruments technique_has_instruments_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technique_has_instruments
             ADD CONSTRAINT technique_has_instruments_instrument_id_fkey FOREIGN KEY (instrument_id) REFERENCES public.instruments(instrument_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: technique_has_instruments technique_has_instruments_technique_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technique_has_instruments
             ADD CONSTRAINT technique_has_instruments_technique_id_fkey FOREIGN KEY (technique_id) REFERENCES public.techniques(technique_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: technique_has_scientists technique_has_scientists_technique_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technique_has_scientists
             ADD CONSTRAINT technique_has_scientists_technique_id_fkey FOREIGN KEY (technique_id) REFERENCES public.techniques(technique_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-        --
-        -- Name: technique_has_scientists technique_has_scientists_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.technique_has_scientists
             ADD CONSTRAINT technique_has_scientists_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: template_groups template_groups_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.template_groups
             ADD CONSTRAINT template_groups_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.template_categories(template_category_id);
 
 
-        --
-        -- Name: templates templates_group_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.templates
             ADD CONSTRAINT templates_group_id_fkey FOREIGN KEY (group_id) REFERENCES public.template_groups(template_group_id);
 
 
-        --
-        -- Name: templates_has_questions templates_has_questions_question_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.templates_has_questions
             ADD CONSTRAINT templates_has_questions_question_id_fkey FOREIGN KEY (question_id) REFERENCES public.questions(question_id) ON UPDATE CASCADE;
 
 
-        --
-        -- Name: templates_has_questions templates_has_questions_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.templates_has_questions
             ADD CONSTRAINT templates_has_questions_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: templates_has_questions templates_has_questions_topic_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.templates_has_questions
             ADD CONSTRAINT templates_has_questions_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES public.topics(topic_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: topic_completenesses topic_completenesses_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.topic_completenesses
             ADD CONSTRAINT topic_completenesses_questionary_id_fkey FOREIGN KEY (questionary_id) REFERENCES public.questionaries(questionary_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: topic_completenesses topic_completenesses_topic_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.topic_completenesses
             ADD CONSTRAINT topic_completenesses_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES public.topics(topic_id);
 
 
-        --
-        -- Name: topics topics_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.topics
             ADD CONSTRAINT topics_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(template_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: units units_quantity_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.units
             ADD CONSTRAINT units_quantity_fkey FOREIGN KEY (quantity) REFERENCES public.quantities(quantity_id);
 
 
-        --
-        -- Name: users users_nationality_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.users
             ADD CONSTRAINT users_nationality_fkey FOREIGN KEY (nationality) REFERENCES public.nationalities(nationality_id);
 
 
-        --
-        -- Name: users users_organisation_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.users
             ADD CONSTRAINT users_organisation_fkey FOREIGN KEY (institution_id) REFERENCES public.institutions(institution_id);
 
 
-        --
-        -- Name: visits_has_users visitations_has_users_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits_has_users
             ADD CONSTRAINT visitations_has_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: visits_has_users visitations_has_users_visitation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits_has_users
             ADD CONSTRAINT visitations_has_users_visitation_id_fkey FOREIGN KEY (visit_id) REFERENCES public.visits(visit_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: visits visitations_proposal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits
             ADD CONSTRAINT visitations_proposal_id_fkey FOREIGN KEY (proposal_pk) REFERENCES public.proposals(proposal_pk) ON DELETE CASCADE;
 
 
-        --
-        -- Name: visits visitations_visitor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits
             ADD CONSTRAINT visitations_visitor_id_fkey FOREIGN KEY (creator_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: visits_has_users visits_has_users_registration_questionary_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits_has_users
             ADD CONSTRAINT visits_has_users_registration_questionary_id_fkey FOREIGN KEY (registration_questionary_id) REFERENCES public.questionaries(questionary_id);
 
 
-        --
-        -- Name: visits visits_scheduled_events_scheduled_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits
             ADD CONSTRAINT visits_scheduled_events_scheduled_event_id_fkey FOREIGN KEY (scheduled_event_id) REFERENCES public.scheduled_events(scheduled_event_id) ON DELETE CASCADE;
 
 
-        --
-        -- Name: visits visits_team_lead_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: duouser
-        --
 
         ALTER TABLE ONLY public.visits
             ADD CONSTRAINT visits_team_lead_user_id_fkey FOREIGN KEY (team_lead_user_id) REFERENCES public.users(user_id);
 
 
-        --
-        -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: duouser
-        --
 
         REVOKE USAGE ON SCHEMA public FROM PUBLIC;
         GRANT ALL ON SCHEMA public TO PUBLIC;
