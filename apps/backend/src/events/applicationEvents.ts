@@ -313,6 +313,11 @@ interface CallFapReviewEndedEvent extends GeneralEvent {
   call: Call;
 }
 
+interface InviteAcceptedEvent extends GeneralEvent {
+  type: Event.INVITE_ACCEPTED;
+  invite: Invite;
+}
+
 interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
   type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED;
   scheduledEvent: ScheduledEventCore;
@@ -420,6 +425,7 @@ export type ApplicationEvent =
   | CallEndedInternalEvent
   | CallReviewEndedEvent
   | CallFapReviewEndedEvent
+  | InviteAcceptedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewSubmittedEvent

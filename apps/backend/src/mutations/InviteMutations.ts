@@ -81,6 +81,7 @@ export default class InviteMutations {
   }
 
   @Authorized()
+  @EventBus(Event.INVITE_ACCEPTED)
   async accept(
     agent: UserWithRole | null,
     code: string
