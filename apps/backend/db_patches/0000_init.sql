@@ -4,40 +4,13 @@ BEGIN
 	IF register_patch('init.sql', 'unknown', 'init', '2019-10-01 00:00:00.000000+00') THEN
     	BEGIN
 
-
-        --
-        -- Name: public; Type: SCHEMA; Schema: -; Owner: duouser
-        --
-
-        -- *not* creating schema, since initdb creates it
-
-
         ALTER SCHEMA public OWNER TO duouser;
-
-        --
-        -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: duouser
-        --
 
         COMMENT ON SCHEMA public IS '';
 
-
-        --
-        -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
-        --
-
         CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
-
-        --
-        -- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
-        --
-
         COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
-
-
-        --
-        -- Name: after_esi_delete(); Type: FUNCTION; Schema: public; Owner: duouser
-        --
 
         CREATE FUNCTION public.after_esi_delete() RETURNS trigger
             LANGUAGE plpgsql
