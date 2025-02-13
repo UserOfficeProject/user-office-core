@@ -343,6 +343,13 @@ export class StfcUserDataSource implements UserDataSource {
     );
   }
 
+  getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
+    return this.getStfcBasicPeopleByUserNumbers(ids.map(String)).then(
+      (stfcBasicPeople) =>
+        stfcBasicPeople.map((person) => toEssBasicUserDetails(person))
+    );
+  }
+
   async getBasicUserDetailsByEmail(
     email: string
   ): Promise<BasicUserDetails | null> {

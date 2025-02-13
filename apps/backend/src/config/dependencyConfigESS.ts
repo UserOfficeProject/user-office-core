@@ -51,6 +51,7 @@ import {
   getDataRow,
   populateRow,
 } from '../factory/xlsx/FapDataRow';
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { isDevelopment } from '../utils/helperFunctions';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
@@ -124,3 +125,5 @@ mapValue(
 mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.DownloadService, DefaultDownloadService);
+
+mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
