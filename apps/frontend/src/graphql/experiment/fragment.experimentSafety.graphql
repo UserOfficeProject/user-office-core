@@ -1,0 +1,11 @@
+fragment safety on ExperimentSafety {
+  experimentSafetyPk
+  experimentPk
+  esiQuestionaryId
+  createdBy
+  status
+  safetyReviewQuestionaryId
+  reviewedBy
+  createdAt
+  updatedAt
+}

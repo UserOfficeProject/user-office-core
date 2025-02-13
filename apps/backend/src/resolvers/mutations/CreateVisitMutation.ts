@@ -14,7 +14,7 @@ import { Visit } from '../types/Visit';
 @ArgsType()
 export class CreateVisitArgs {
   @Field(() => Int)
-  scheduledEventId: number;
+  experimentPk: number;
 
   @Field(() => [Int])
   team: number[];

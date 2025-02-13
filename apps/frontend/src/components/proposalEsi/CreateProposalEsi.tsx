@@ -7,21 +7,21 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import ProposalEsiContainer from './ProposalEsiContainer';
 
 interface CreateProposalEsiProps {
-  scheduledEventId: number;
+  experimentPk: number;
 }
-function CreateProposalEsi({ scheduledEventId }: CreateProposalEsiProps) {
+function CreateProposalEsi({ experimentPk }: CreateProposalEsiProps) {
   const { api } = useDataApiWithFeedback();
   const [esi, setEsi] = useState<CreateEsiMutation['createEsi'] | null>(null);
 
   useEffect(() => {
     api()
-      .createEsi({ scheduledEventId })
+      .createEsi({ experimentPk })
       .then((result) => {
         if (result.createEsi) {
           setEsi(result.createEsi);
         }
       });
-  }, [scheduledEventId, api]);
+  }, [experimentPk, api]);
 
   if (!esi) {
     return <UOLoader />;

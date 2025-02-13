@@ -1,13 +1,13 @@
 export class Experiment {
   constructor(
-    public experiment_pk: number,
+    public experimentPk: number,
     public experimentId: string,
     public startsAt: Date,
     public endsAt: Date,
     public scheduledEventId: number,
     public proposalPk: number,
     public status: string,
-    public localContact: number,
+    public localContactId: number | null,
     public instrumentId: number,
     public createdAt: Date,
     public updatedAt: Date
@@ -30,7 +30,7 @@ export class ExperimentSafety {
     public esiQuestionaryId: number,
     public createdBy: number,
     public status: string,
-    public saftyReviewQuestionaryId: number,
+    public safetyReviewQuestionaryId: number,
     public reviewedBy: number,
     public createdAt: Date,
     public updatedAt: Date

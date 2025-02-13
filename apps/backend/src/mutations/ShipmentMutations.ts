@@ -114,7 +114,7 @@ export default class ShipmentMutations {
           agent.id,
           args.proposalPk,
           questionary.questionaryId,
-          args.scheduledEventId
+          args.experimentPk
         );
       })
       .catch((error) => {

@@ -19,6 +19,7 @@ export interface VisitDataSource {
     filter: GetRegistrationsFilter
   ): Promise<VisitRegistration[]>;
   getVisitByScheduledEventId(eventId: number): Promise<Visit | null>;
+  getVisitByExperimentPk(experimentId: number): Promise<Visit | null>;
   getEsiByVisitId(visitId: any): Promise<ExperimentSafetyInput | null>;
   // Write
   createVisit(

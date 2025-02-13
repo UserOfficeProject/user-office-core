@@ -25,16 +25,6 @@ export default class ProposalEsiQueries {
   ) {}
 
   @Authorized()
-  async getEsi(
-    user: UserWithRole | null,
-    id: number
-  ): Promise<ExperimentSafetyInput | null> {
-    const esi = await this.dataSource.getEsi(id);
-
-    return this.hasReadRights(user, esi) ? esi : null;
-  }
-
-  @Authorized()
   async getEsis(
     user: UserWithRole | null,
     filter: GetProposalEsisFilter

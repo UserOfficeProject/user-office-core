@@ -70,10 +70,19 @@ export default class VisitQueries {
 
   @Authorized()
   async getVisitByScheduledEventId(
+    //todo: Remove this
     agent: UserWithRole | null,
     eventId: number
   ) {
     return this.dataSource.getVisitByScheduledEventId(eventId);
+  }
+
+  @Authorized()
+  async getVisitByExperimentPk(
+    agent: UserWithRole | null,
+    experimentId: number
+  ) {
+    return this.dataSource.getVisitByExperimentPk(experimentId);
   }
 
   getTrainingStatus(visit: VisitRegistration): TrainingStatus {

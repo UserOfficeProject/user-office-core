@@ -13,8 +13,6 @@ import { Country } from '../../models/Country';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
-import { Feedback } from '../../models/Feedback';
-import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
@@ -557,7 +555,7 @@ export interface SampleRecord {
 }
 
 export interface ShipmentRecord {
-  readonly scheduled_event_id: number;
+  readonly experiment_pk: number;
   readonly shipment_id: number;
   readonly title: string;
   readonly creator_id: number;
@@ -717,8 +715,8 @@ export interface VisitRecord {
   readonly questionary_id: number;
   readonly creator_id: number;
   readonly team_lead_user_id: number;
-  readonly scheduled_event_id: number;
   readonly created_at: Date;
+  readonly experiment_pk: number;
 }
 
 export interface EsiRecord {
@@ -754,7 +752,7 @@ export interface TemplateGroupRecord {
 
 export interface FeedbackRecord {
   readonly feedback_id: number;
-  readonly scheduled_event_id: number;
+  readonly experiment_pk: number;
   readonly status: FeedbackStatus;
   readonly questionary_id: number;
   readonly creator_id: number;
@@ -764,7 +762,7 @@ export interface FeedbackRecord {
 
 export interface FeedbackRequestRecord {
   readonly feedback_request_id: number;
-  readonly scheduled_event_id: number;
+  readonly experiment_pk: number;
   readonly requested_at: Date;
 }
 
@@ -1143,7 +1141,7 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.creator_id,
     shipment.proposal_pk,
     shipment.questionary_id,
-    shipment.scheduled_event_id,
+    shipment.experiment_pk,
     shipment.status as ShipmentStatus,
     shipment.external_ref,
     shipment.created_at
@@ -1239,8 +1237,8 @@ export const createVisitObject = (visit: VisitRecord) => {
     visit.status as any as VisitStatus,
     visit.creator_id,
     visit.team_lead_user_id,
-    visit.scheduled_event_id,
-    visit.created_at
+    visit.created_at,
+    visit.experiment_pk
   );
 };
 
@@ -1311,26 +1309,6 @@ export const createScheduledEventObject = (
     scheduledEvent.status,
     scheduledEvent.local_contact,
     scheduledEvent.instrument_id
-  );
-
-export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>
-  new Feedback(
-    scheduledEvent.feedback_id,
-    scheduledEvent.scheduled_event_id,
-    scheduledEvent.status,
-    scheduledEvent.questionary_id,
-    scheduledEvent.creator_id,
-    scheduledEvent.created_at,
-    scheduledEvent.submitted_at
-  );
-
-export const createFeedbackRequestObject = (
-  feedbackRequest: FeedbackRequestRecord
-) =>
-  new FeedbackRequest(
-    feedbackRequest.feedback_request_id,
-    feedbackRequest.scheduled_event_id,
-    feedbackRequest.requested_at
   );
 
 export const createUnitObject = (unit: UnitRecord) =>
@@ -1495,3 +1473,36 @@ export interface CoProposerInviteRecord {
 
 export const createCoProposerInviteRecord = (invite: CoProposerInviteRecord) =>
   new CoProposerInvite(invite.invite_code_id, invite.proposal_pk);
+
+export interface ExperimentRecord {
+  readonly experiment_pk: number;
+  readonly experiment_id: string;
+  readonly starts_at: Date;
+  readonly ends_at: Date;
+  readonly scheduled_event_id: number;
+  readonly proposal_pk: number;
+  readonly status: string;
+  readonly local_contact_id: number;
+  readonly instrument_id: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
+export interface ExperimentSafetyRecord {
+  readonly experiment_safety_pk: number;
+  readonly experiment_pk: number;
+  readonly esi_questionary_id: number;
+  readonly created_by: number;
+  readonly status: string;
+  readonly safty_review_questionary_id: number;
+  readonly reviewed_by: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
+export interface ExperimentHasSamplesRecord {
+  readonly experiment_pk: number;
+  readonly sample_id: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}

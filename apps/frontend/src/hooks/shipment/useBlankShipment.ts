@@ -15,7 +15,7 @@ export function createShipmentStub(
   creator: Pick<User, 'id'>,
   questionarySteps: QuestionaryStep[],
   templateId: number,
-  scheduledEventId: number,
+  experimentPk: number,
   proposalPk: number
 ): ShipmentWithQuestionary {
   return {
@@ -24,7 +24,7 @@ export function createShipmentStub(
     status: ShipmentStatus.DRAFT,
     externalRef: '',
     questionaryId: 0,
-    scheduledEventId,
+    experimentPk,
     created: new Date(),
     creatorId: creator.id,
     proposalPk: proposalPk,
@@ -43,7 +43,7 @@ export function createShipmentStub(
 }
 
 export function useBlankShipment(
-  scheduledEventId?: number | null,
+  experimentPk?: number | null,
   proposalPk?: number | null
 ) {
   const [blankShipment, setBlankShipment] = useState<
@@ -56,7 +56,7 @@ export function useBlankShipment(
   const api = useDataApi();
 
   useEffect(() => {
-    if (!scheduledEventId || !proposalPk) {
+    if (!experimentPk || !proposalPk) {
       return;
     }
     api()
@@ -73,7 +73,7 @@ export function useBlankShipment(
                   user,
                   result.blankQuestionarySteps,
                   activeTemplateId,
-                  scheduledEventId,
+                  experimentPk,
                   proposalPk!
                 );
                 setBlankShipment(blankShipment);
@@ -86,7 +86,7 @@ export function useBlankShipment(
           setError('There is no active shipment template');
         }
       });
-  }, [api, user, scheduledEventId, proposalPk]);
+  }, [api, user, experimentPk, proposalPk]);
 
   return { blankShipment, error };
 }

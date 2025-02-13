@@ -6,16 +6,16 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import DeclareShipments from './DeclareShipments';
 
 export default function DeclareShipmentsPage() {
-  const { scheduledEventId } = useParams<{ scheduledEventId: string }>();
+  const { experimentPk } = useParams<{ experimentPk: string }>();
 
-  if (!scheduledEventId) {
+  if (!experimentPk) {
     return <span>Missing query params</span>;
   }
 
   return (
     <StyledContainer>
       <StyledPaper>
-        <DeclareShipments scheduledEventId={+scheduledEventId} />
+        <DeclareShipments experimentPk={+experimentPk} />
       </StyledPaper>
     </StyledContainer>
   );

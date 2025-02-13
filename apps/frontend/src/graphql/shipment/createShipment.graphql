@@ -1,12 +1,12 @@
 mutation createShipment(
   $title: String!
   $proposalPk: Int!
-  $scheduledEventId: Int!
+  $experimentPk: Int!
 ) {
   createShipment(
     title: $title
     proposalPk: $proposalPk
-    scheduledEventId: $scheduledEventId
+    experimentPk: $experimentPk
   ) {
     ...shipment
     questionary {

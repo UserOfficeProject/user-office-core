@@ -8,7 +8,7 @@ export class FeedbackRequest implements Partial<FeedbackRequestOrigin> {
   public id: number;
 
   @Field(() => Int)
-  public scheduledEventId: number;
+  public experimentPk: number;
 
   @Field(() => Date)
   public requestedAt: Date;

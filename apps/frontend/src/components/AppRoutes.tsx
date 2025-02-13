@@ -578,7 +578,7 @@ const AppRoutes = () => {
           />
         )}
         <Route
-          path="/CreateEsi/:scheduledEventId"
+          path="/CreateEsi/:experimentPk"
           element={
             <TitledRoute
               title="Create ESI Proposal"
@@ -596,7 +596,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/CreateFeedback/:scheduledEventId"
+          path="/CreateFeedback/:experimentPk"
           element={
             <TitledRoute
               title="Create Feedback"
@@ -614,7 +614,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/DeclareShipments/:scheduledEventId"
+          path="/DeclareShipments/:experimentPk"
           element={
             <TitledRoute
               title="Declare Shipments"

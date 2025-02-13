@@ -1,0 +1,52 @@
+query getUserExperiments {
+  me {
+    upcomingExperiments {
+      experimentPk
+      experimentId
+      startsAt
+      endsAt
+      scheduledEventId
+      status
+      localContact {
+        ...basicUserDetails
+      }
+      proposal {
+        proposalId
+        primaryKey
+        title
+        finalStatus
+        managementDecisionSubmitted
+        proposer {
+          ...basicUserDetails
+        }
+        users {
+          ...basicUserDetails
+        }
+      }
+      instrument {
+        id
+        name
+      }
+      createdAt
+      updatedAt
+      visit {
+        ...visit
+        teamLead {
+          ...basicUserDetails
+        }
+        registrations {
+          ...visitRegistration
+          user {
+            ...basicUserDetails
+          }
+        }
+      }
+      safety {
+        ...safety
+      }
+      feedback {
+        ...feedback
+      }
+    }
+  }
+}

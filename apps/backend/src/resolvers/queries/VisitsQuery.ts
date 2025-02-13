@@ -12,7 +12,7 @@ export class VisitsFilter {
   public proposalPk?: number;
 
   @Field(() => Int, { nullable: true })
-  public scheduledEventId?: number;
+  public experimentPk?: number;
 }
 
 @Resolver()

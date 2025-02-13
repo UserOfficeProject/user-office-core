@@ -7,6 +7,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
@@ -17,6 +18,7 @@ import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
+import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
@@ -335,6 +337,10 @@ export async function createListenToRabbitMQHandler() {
     Tokens.ProposalDataSource
   );
 
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+
   const handleWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -360,26 +366,38 @@ export async function createListenToRabbitMQHandler() {
             }
           );
 
-          const scheduledEventToAdd = {
-            id: message.id,
-            bookingType: message.bookingType,
+          // const scheduledEventToAdd = {
+          //   id: message.id,
+          //   bookingType: message.bookingType,
+          //   startsAt: message.startsAt,
+          //   endsAt: message.endsAt,
+          //   proposalBookingId: message.proposalBookingId,
+          //   proposalPk: message.proposalPk,
+          //   status: message.status,
+          //   localContactId: message.localContact,
+          //   instrumentId: message.instrumentId,
+          // } as ScheduledEventCore;
+
+          // await proposalDataSource.addProposalBookingScheduledEvent(
+          //   scheduledEventToAdd
+          // );
+
+          const experimentToAdd = {
             startsAt: message.startsAt,
             endsAt: message.endsAt,
-            proposalBookingId: message.proposalBookingId,
+            scheduledEventId: message.id,
             proposalPk: message.proposalPk,
             status: message.status,
-            localContactId: message.localContact,
+            localContactId: message.localContactId,
             instrumentId: message.instrumentId,
-          } as ScheduledEventCore;
+          } as Omit<
+            Experiment,
+            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+          >;
 
-          await proposalDataSource.addProposalBookingScheduledEvent(
-            scheduledEventToAdd
-          );
+          await experimentDataSource.create(experimentToAdd);
 
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventToAdd.proposalPk
-          );
+          await handleWorkflowEngineChange(type, experimentToAdd.proposalPk);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -411,6 +429,12 @@ export async function createListenToRabbitMQHandler() {
           await proposalDataSource.removeProposalBookingScheduledEvents(
             scheduledEventsToRemove
           );
+
+          scheduledEventsToRemove.forEach(async (scheduledEvent) => {
+            await experimentDataSource.deleteByScheduledEventId(
+              scheduledEvent.id
+            );
+          });
 
           await handleWorkflowEngineChange(
             type,
@@ -448,6 +472,16 @@ export async function createListenToRabbitMQHandler() {
             scheduledEventToUpdate
           );
 
+          await experimentDataSource.updateByScheduledEventId({
+            startsAt: message.startsAt,
+            endsAt: message.endsAt,
+            status: message.status,
+            localContactId: message.localContactId,
+            scheduledEventId: message.id,
+          } as Omit<
+            Experiment,
+            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+          >);
           await handleWorkflowEngineChange(
             type,
             scheduledEventToUpdate.proposalPk

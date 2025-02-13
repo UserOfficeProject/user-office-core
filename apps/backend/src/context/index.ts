@@ -4,6 +4,7 @@ import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
+import ExperimentMutations from '../mutations/ExperimentMutation';
 import FapMutations from '../mutations/FapMutations';
 import FeedbackMutations from '../mutations/FeedbackMutations';
 import FileMutations from '../mutations/FileMutations';
@@ -13,7 +14,6 @@ import InternalReviewMutations from '../mutations/InternalReviewMutations';
 import InviteMutations from '../mutations/InviteMutations';
 import PdfTemplateMutations from '../mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations';
-import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
@@ -32,6 +32,7 @@ import WorkflowMutations from '../mutations/WorkflowMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
+import ExperimentQueries from '../queries/ExperimentQueries';
 import FapQueries from '../queries/FapQueries';
 import FeedbackQueries from '../queries/FeedbackQueries';
 import FileQueries from '../queries/FileQueries';
@@ -93,6 +94,7 @@ interface ResolverContextQueries {
   settings: SettingsQueries;
   workflow: WorkflowQueries;
   statusAction: StatusActionQueries;
+  experiment: ExperimentQueries;
 }
 
 interface ResolverContextMutations {
@@ -105,7 +107,6 @@ interface ResolverContextMutations {
   invite: InviteMutations;
   pdfTemplate: PdfTemplateMutations;
   proposal: ProposalMutations;
-  proposalEsi: ProposalEsiMutations;
   questionary: QuestionaryMutations;
   redeemCodes: RedeemCodesMutations;
   review: ReviewMutations;
@@ -123,6 +124,7 @@ interface ResolverContextMutations {
   statusActionsLogs: StatusActionsLogsMutations;
   status: StatusMutations;
   workflow: WorkflowMutations;
+  experiment: ExperimentMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

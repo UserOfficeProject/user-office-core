@@ -1,10 +1,10 @@
 mutation createVisit(
-  $scheduledEventId: Int!
+  $experimentPk: Int!
   $team: [Int!]!
   $teamLeadUserId: Int!
 ) {
   createVisit(
-    scheduledEventId: $scheduledEventId
+    experimentPk: $experimentPk
     team: $team
     teamLeadUserId: $teamLeadUserId
   ) {

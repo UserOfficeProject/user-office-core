@@ -29,8 +29,8 @@ class PostgresVisitDataSource implements VisitDataSource {
         if (filter?.proposalPk) {
           query.where('proposal_pk', filter.proposalPk);
         }
-        if (filter?.scheduledEventId) {
-          query.where('scheduled_event_id', filter.scheduledEventId);
+        if (filter?.experimentPk) {
+          query.where('experiment_pk', filter.experimentPk);
         }
       })
       .then((visits: VisitRecord[]) =>
@@ -73,9 +73,18 @@ class PostgresVisitDataSource implements VisitDataSource {
   }
 
   getVisitByScheduledEventId(eventId: number): Promise<Visit | null> {
+    //TODO: This needs to be changed
     return database('visits')
       .select('*')
-      .where({ scheduled_event_id: eventId })
+      .where({ experiment_id: eventId })
+      .first()
+      .then((visit) => (visit ? createVisitObject(visit) : null));
+  }
+
+  getVisitByExperimentPk(experimentPk: number): Promise<Visit | null> {
+    return database('visits')
+      .select('*')
+      .where({ experiment_pk: experimentPk })
       .first()
       .then((visit) => (visit ? createVisitObject(visit) : null));
   }
@@ -89,7 +98,7 @@ class PostgresVisitDataSource implements VisitDataSource {
   }
 
   createVisit(
-    { scheduledEventId: scheduledEventId, teamLeadUserId }: CreateVisitArgs,
+    { experimentPk, teamLeadUserId }: CreateVisitArgs,
     creatorId: number,
     proposalPk: number
   ): Promise<Visit> {
@@ -97,7 +106,7 @@ class PostgresVisitDataSource implements VisitDataSource {
       .insert({
         proposal_pk: proposalPk,
         creator_id: creatorId,
-        scheduled_event_id: scheduledEventId,
+        experiment_pk: experimentPk,
         team_lead_user_id: teamLeadUserId,
       })
       .returning('*')

@@ -19,7 +19,7 @@ export class Feedback implements Partial<FeedbackOrigin> {
   public id: number;
 
   @Field(() => Int)
-  public scheduledEventId: number;
+  public experimentPk: number;
 
   @Field(() => FeedbackStatus)
   public status: FeedbackStatus;

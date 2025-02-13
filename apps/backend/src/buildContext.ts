@@ -5,6 +5,7 @@ import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
+import ExperimentMutations from './mutations/ExperimentMutation';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
@@ -14,7 +15,6 @@ import InternalReviewMutations from './mutations/InternalReviewMutations';
 import InviteMutations from './mutations/InviteMutations';
 import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
-import ProposalEsiMutations from './mutations/ProposalEsiMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import RedeemCodesMutations from './mutations/RedeemCodesMutations';
@@ -33,6 +33,7 @@ import WorkflowMutations from './mutations/WorkflowMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
+import ExperimentQueries from './queries/ExperimentQueries';
 import FapQueries from './queries/FapQueries';
 import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
@@ -95,6 +96,7 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowQueries),
     statusAction: container.resolve(StatusActionQueries),
     settings: container.resolve(SettingsQueries),
+    experiment: container.resolve(ExperimentQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -106,7 +108,6 @@ const context: BasicResolverContext = {
     invite: container.resolve(InviteMutations),
     pdfTemplate: container.resolve(PdfTemplateMutations),
     proposal: container.resolve(ProposalMutations),
-    proposalEsi: container.resolve(ProposalEsiMutations),
     questionary: container.resolve(QuestionaryMutations),
     redeemCodes: container.resolve(RedeemCodesMutations),
     review: container.resolve(ReviewMutations),
@@ -124,6 +125,7 @@ const context: BasicResolverContext = {
     statusActionsLogs: container.resolve(StatusActionsLogsMutations),
     status: container.resolve(StatusMutations),
     workflow: container.resolve(WorkflowMutations),
+    experiment: container.resolve(ExperimentMutations),
   },
   clients: {
     scheduler: async () => {

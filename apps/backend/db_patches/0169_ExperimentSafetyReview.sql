@@ -4,13 +4,13 @@ BEGIN
   IF register_patch('0169_ExperimentSafetyReview', 'Yoganandan Pandiyan', 'Reconstructing Experiment Safety review in accordance with the new requirement', '2025-02-11') THEN
     CREATE TABLE IF NOT EXISTS "experiments" (
         "experiment_pk" SERIAL PRIMARY KEY
-      , "experiment_id" varchar(20) NOT NULL
+      , "experiment_id" varchar(20) NOT NULL UNIQUE
       , "starts_at" TIMESTAMP NOT NULL
       , "ends_at" TIMESTAMP NOT NULL
       , "scheduled_event_id" INT NOT NULL
       , "proposal_pk" INT NOT NULL REFERENCES proposals(proposal_pk) ON DELETE CASCADE
       , "status" varchar(30) NOT NULL
-      , "local_contact" INT NOT NULL REFERENCES users(user_id) ON DELETE SET NULL
+      , "local_contact_id" INT REFERENCES users(user_id) ON DELETE SET NULL
       , "instrument_id" INT NOT NULL REFERENCES instruments (instrument_id)
       , "created_at" TIMESTAMP NOT NULL DEFAULT NOW()
       , "updated_at" TIMESTAMP NOT NULL DEFAULT NOW()

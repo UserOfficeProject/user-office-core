@@ -37,7 +37,7 @@ class ShipmentsFilter {
   public shipmentIds?: number[];
 
   @Field(() => Int, { nullable: true })
-  public scheduledEventId?: number;
+  public experimentPk?: number;
 }
 
 @ArgsType()

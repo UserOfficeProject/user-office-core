@@ -1,7 +1,5 @@
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
-import { Rejection } from '../../models/Rejection';
 import { GetProposalEsisFilter } from '../../queries/ProposalEsiQueries';
-import { UpdateEsiArgs } from '../../resolvers/mutations/UpdateEsiMutation';
 import { ProposalEsiDataSource } from '../ProposalEsiDataSource';
 
 export class ProposalEsiDataSourceMock implements ProposalEsiDataSource {
@@ -12,25 +10,6 @@ export class ProposalEsiDataSourceMock implements ProposalEsiDataSource {
 
   public init() {
     this.esis = [new ExperimentSafetyInput(1, 1, 1, 1, false, new Date())];
-  }
-
-  // Create
-  async createEsi(
-    scheduledEventId: number,
-    questionaryId: number,
-    creatorId: number
-  ): Promise<ExperimentSafetyInput | Rejection> {
-    const newEsi = new ExperimentSafetyInput(
-      2,
-      scheduledEventId,
-      creatorId,
-      questionaryId,
-      false,
-      new Date()
-    );
-    this.esis.push(newEsi);
-
-    return newEsi;
   }
 
   // Read
@@ -50,15 +29,5 @@ export class ProposalEsiDataSourceMock implements ProposalEsiDataSource {
 
       return isVisitMatch && isQuestionaryMatch;
     });
-  }
-
-  // Update
-  async updateEsi(args: UpdateEsiArgs): Promise<ExperimentSafetyInput> {
-    const esiToUpdate = this.esis.find((esi) => esi.id === args.esiId)!;
-    if (args.isSubmitted !== undefined) {
-      esiToUpdate.isSubmitted = args.isSubmitted;
-    }
-
-    return esiToUpdate;
   }
 }

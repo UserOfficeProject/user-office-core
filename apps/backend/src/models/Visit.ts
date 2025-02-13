@@ -7,8 +7,8 @@ export class Visit {
     public status: VisitStatus,
     public creatorId: number,
     public teamLeadUserId: number,
-    public scheduledEventId: number,
-    public created: Date
+    public created: Date,
+    public experimentPk: number
   ) {}
 }
 

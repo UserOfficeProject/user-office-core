@@ -59,21 +59,15 @@ export class ScheduledEventResolver {
     @Root() event: ScheduledEventCore,
     @Ctx() context: ResolverContext
   ): Promise<Visit | null> {
-    return context.queries.visit.getVisitByScheduledEventId(
-      context.user,
-      event.id
-    );
+    return null;
   }
 
-  @FieldResolver(() => Feedback, { nullable: true })
+  @FieldResolver(() => Feedback, { nullable: true }) //todo: removed
   async feedback(
     @Root() event: ScheduledEventCore,
     @Ctx() context: ResolverContext
   ): Promise<Feedback | null> {
-    return context.queries.feedback.getFeedbackByScheduledEventId(
-      context.user,
-      event.id
-    );
+    return null;
   }
 
   @FieldResolver(() => [FeedbackRequest])
@@ -115,7 +109,7 @@ export class ScheduledEventResolver {
     @Ctx() context: ResolverContext
   ): Promise<Shipment[] | null> {
     return context.queries.shipment.getShipments(context.user, {
-      filter: { scheduledEventId: event.id },
+      filter: { experimentPk: event.id },
     });
   }
 

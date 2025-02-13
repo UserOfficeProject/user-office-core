@@ -14,7 +14,7 @@ import { Feedback } from '../types/Feedback';
 @ArgsType()
 export class CreateFeedbackArgs {
   @Field(() => Int)
-  scheduledEventId: number;
+  experimentPk: number;
 
   questionaryId: number;
   creatorId: number;

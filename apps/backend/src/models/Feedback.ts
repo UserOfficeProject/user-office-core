@@ -3,7 +3,7 @@ import 'reflect-metadata';
 export class Feedback {
   constructor(
     public id: number,
-    public scheduledEventId: number,
+    public experimentPk: number,
     public status: FeedbackStatus,
     public questionaryId: number,
     public creatorId: number,

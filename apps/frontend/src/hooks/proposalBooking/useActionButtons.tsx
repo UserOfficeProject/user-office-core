@@ -21,16 +21,15 @@ import {
   ProposalEndStatus,
   UserJwt,
 } from 'generated/sdk';
-
-import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
+import { UpcomingExperimentsType } from 'hooks/experiment/useUserExperiments';
 
 const getParticipationRole = (
   user: UserJwt,
-  event: ProposalScheduledEvent
+  event: UpcomingExperimentsType
 ): 'PI' | 'co-proposer' | 'visitor' | null => {
-  if (event.proposal.proposer?.id === user.id) {
+  if (event.proposal?.proposer?.id === user.id) {
     return 'PI';
-  } else if (event.proposal.users.map((user) => user.id).includes(user.id)) {
+  } else if (event.proposal?.users.map((user) => user.id).includes(user.id)) {
     return 'co-proposer';
   } else if (
     event.visit?.registrations
@@ -43,13 +42,13 @@ const getParticipationRole = (
   }
 };
 
-const isPiOrCoProposer = (user: UserJwt, event: ProposalScheduledEvent) => {
+const isPiOrCoProposer = (user: UserJwt, event: UpcomingExperimentsType) => {
   const role = getParticipationRole(user, event);
 
   return role === 'PI' || role === 'co-proposer';
 };
 
-const isTeamlead = (user: UserJwt, event: ProposalScheduledEvent) =>
+const isTeamlead = (user: UserJwt, event: UpcomingExperimentsType) =>
   event.visit && event.visit.teamLead.id === user.id;
 
 const createActionButton = (
@@ -57,7 +56,7 @@ const createActionButton = (
   icon: JSX.Element,
   state: ActionButtonState,
   onClick: () => void | undefined
-): Action<ProposalScheduledEvent> => ({
+): Action<UpcomingExperimentsType> => ({
   tooltip,
   // eslint-disable-next-line
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
@@ -71,18 +70,20 @@ const createActionButton = (
 interface UseActionButtonsArgs {
   openModal: (contents: ReactNode) => void;
   closeModal: () => void;
-  eventUpdated: (updatedEvent: ProposalScheduledEvent) => void;
+  eventUpdated: (updatedEvent: UpcomingExperimentsType) => void;
 }
 export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { openModal, closeModal, eventUpdated } = args;
 
-  const formTeamAction = (event: ProposalScheduledEvent) => {
+  const formTeamAction = (event: UpcomingExperimentsType) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
     if (isPiOrCoProposer(user, event)) {
+      console.log(event.proposal.finalStatus);
+      console.log(event.proposal.managementDecisionSubmitted);
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
@@ -119,7 +120,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const finishEsi = (event: ProposalScheduledEvent) => {
+  // TODO: This flow should be reworked completely
+  const finishEsi = (event: UpcomingExperimentsType) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
@@ -128,7 +130,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
       ) {
-        if (event.esi?.isSubmitted) {
+        if (event.safety) {
+          // TODO: This needs to be worked on. There is no is_submitted field unlike in experiment_safety_input. Instead we have status field in the new experiment_safety table. The status is not finalized yet. We will work on it, when we get in here
           buttonState = 'completed';
         } else {
           buttonState = 'active';
@@ -147,16 +150,16 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <EsiIcon data-cy="finish-safety-input-form-icon" />,
       buttonState,
       () => {
-        if (event?.esi) {
-          navigate(`/UpdateEsi/${event.esi.id}`);
+        if (event?.safety) {
+          navigate(`/UpdateEsi/${event.safety.experimentSafetyPk}`);
         } else {
-          navigate(`/CreateEsi/${event.id}`);
+          navigate(`/CreateEsi/${event.experimentPk}`);
         }
       }
     );
   };
 
-  const registerVisitAction = (event: ProposalScheduledEvent) => {
+  const registerVisitAction = (event: UpcomingExperimentsType) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
@@ -209,7 +212,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const individualTrainingAction = (event: ProposalScheduledEvent) => {
+  const individualTrainingAction = (event: UpcomingExperimentsType) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
@@ -250,7 +253,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const declareShipmentAction = (event: ProposalScheduledEvent) => {
+  const declareShipmentAction = (event: UpcomingExperimentsType) => {
     let buttonState: ActionButtonState;
 
     if (
@@ -267,16 +270,17 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
       () => {
-        navigate(`/DeclareShipments/${event.id}`);
+        navigate(`/DeclareShipments/${event.experimentPk}`);
       }
     );
   };
 
-  const giveFeedback = (event: ProposalScheduledEvent) => {
+  const giveFeedback = (event: UpcomingExperimentsType) => {
     let buttonState: ActionButtonState;
 
     if (isTeamlead(user, event)) {
       if (event.status === ProposalBookingStatusCore.COMPLETED) {
+        //todo: ProposalBookingStatusCore needs to be changed. Currently Experiment Status does not have enum
         if (event.feedback?.status === FeedbackStatus.SUBMITTED) {
           buttonState = 'completed';
         } else {
@@ -297,7 +301,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         if (event?.feedback) {
           navigate(`/UpdateFeedback/${event.feedback.id}`);
         } else {
-          navigate(`/CreateFeedback/${event.id}`);
+          navigate(`/CreateFeedback/${event.experimentPk}`);
         }
       }
     );

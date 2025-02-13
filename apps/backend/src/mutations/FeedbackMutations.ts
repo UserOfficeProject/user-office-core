@@ -57,7 +57,7 @@ export default class FeedbackMutations {
     const feedbackAlreadyExists =
       (
         await this.dataSource.getFeedbacks({
-          scheduledEventId: args.scheduledEventId,
+          experimentPk: args.experimentPk,
         })
       ).length > 0;
 
@@ -70,7 +70,7 @@ export default class FeedbackMutations {
 
     const scheduledEvent =
       await this.scheduledEventDataSource.getScheduledEventCore(
-        args.scheduledEventId
+        args.experimentPk
       );
     if (!scheduledEvent) {
       return rejection(
@@ -247,7 +247,7 @@ export default class FeedbackMutations {
    */
   async hasProvidedFeedback(scheduledEvent: ScheduledEventCore) {
     const feedbacks = await this.dataSource.getFeedbacks({
-      scheduledEventId: scheduledEvent.id,
+      experimentPk: scheduledEvent.id,
     });
 
     if (feedbacks.length === 0) {
@@ -260,29 +260,27 @@ export default class FeedbackMutations {
   @Authorized([Roles.USER_OFFICER])
   async requestFeedback(
     user: UserWithRole | null,
-    scheduledEventId: number
+    experimentPk: number
   ): Promise<FeedbackRequest | Rejection> {
     // Check if scheduled event exists
     const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEventCore(
-        scheduledEventId
-      );
+      await this.scheduledEventDataSource.getScheduledEventCore(experimentPk);
     if (!scheduledEvent) {
       return rejection(
         'Can not create feedback because scheduled event does not exist',
         {
-          args: { scheduledEventId },
+          args: { experimentPk },
         }
       );
     }
 
     // Check if visit exists
-    const visit = await this.visitDataSource.getVisitByScheduledEventId(
+    const visit = await this.visitDataSource.getVisitByExperimentPk(
       scheduledEvent.id
     );
     if (visit === null) {
       return rejection('Can not create feedback because visit does not exist', {
-        args: { scheduledEventId },
+        args: { experimentPk },
       });
     }
 
@@ -292,7 +290,7 @@ export default class FeedbackMutations {
       return rejection(
         'Can not create feedback because teamlead does not exist or it has no email',
         {
-          args: { scheduledEventId, teamLead },
+          args: { experimentPk, teamLead },
         }
       );
     }
@@ -301,14 +299,14 @@ export default class FeedbackMutations {
       return rejection(
         'Will not ask for feedback because already been provided',
         {
-          args: { scheduledEventId },
+          args: { experimentPk },
         }
       );
     }
 
     if (await this.isEventTooOld(scheduledEvent)) {
       return rejection('Will not ask for feedback because it is too old', {
-        args: { scheduledEventId, teamLead },
+        args: { experimentPk, teamLead },
       });
     }
 
@@ -316,7 +314,7 @@ export default class FeedbackMutations {
       return rejection(
         'Will not ask for feedback because already recently requested',
         {
-          args: { scheduledEventId, teamLead },
+          args: { experimentPk, teamLead },
         }
       );
     }
@@ -329,7 +327,7 @@ export default class FeedbackMutations {
         substitution_data: {
           teamleadPreferredname: teamLead.preferredname,
           teamleadLastname: teamLead.lastname,
-          feedbackurl: `${process.env.baseURL}/CreateFeedback/${scheduledEventId}`,
+          feedbackurl: `${process.env.baseURL}/CreateFeedback/${experimentPk}`,
         },
         recipients: [{ address: teamLead.email }],
       });
@@ -346,7 +344,7 @@ export default class FeedbackMutations {
 
       return rejection(
         'Could not create feedback request because of an error',
-        { args: { scheduledEventId } },
+        { args: { experimentPk } },
         error
       );
     }

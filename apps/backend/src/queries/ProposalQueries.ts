@@ -34,11 +34,10 @@ export default class ProposalQueries {
   @Authorized()
   async get(agent: UserWithRole | null, primaryKey: number) {
     let proposal = await this.dataSource.get(primaryKey);
-
     if (!proposal) {
       return null;
     }
-
+    console.log({ proposal });
     // If not a user officer or instrument scientist remove excellence, technical and safety score
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -51,7 +50,7 @@ export default class ProposalQueries {
     if (!this.userAuth.isUserOfficer(agent) && !proposal.notified) {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
-
+    console.log({ proposal });
     if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
     } else {
