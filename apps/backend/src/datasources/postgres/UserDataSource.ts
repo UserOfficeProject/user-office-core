@@ -239,6 +239,18 @@ export default class PostgresUserDataSource implements UserDataSource {
       );
   }
 
+  async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
+    return database
+      .select()
+      .from('users as u')
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .whereIn('u.user_id', ids)
+      .then(
+        (usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
+          usersRecord.map((user) => createBasicUserObject(user))
+      );
+  }
+
   async getBasicUserDetailsByEmail(
     email: string,
     role?: UserRole
