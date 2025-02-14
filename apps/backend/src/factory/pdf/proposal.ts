@@ -353,11 +353,9 @@ export const collectProposalPDFData = async (
     }
 
     const topic = step.topic;
-    const answers = structuredClone(
-      getTopicActiveAnswers(questionarySteps, topic.id).filter(
-        // skip `PROPOSAL_BASIS` types
-        (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
-      )
+    const answers = getTopicActiveAnswers(questionarySteps, topic.id).filter(
+      // skip `PROPOSAL_BASIS` types
+      (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
     );
 
     // if the questionary step has nothing else but `PROPOSAL_BASIS` question
@@ -367,23 +365,31 @@ export const collectProposalPDFData = async (
     }
 
     const questionaryAttachments: Attachment[] = [];
-
+    const updatedAnswers: Answer[] = [];
     for (let i = 0; i < answers.length; i++) {
       const answer = answers[i];
 
       questionaryAttachments.push(...getFileAttachments(answer));
 
       if (answer.question.dataType === DataType.SAMPLE_DECLARATION) {
-        answer.value = samples
+        const value = samples
           .filter((sample) => sample.questionId === answer.question.id)
           .map((sample) => sample);
+        updatedAnswers.push({
+          ...answer,
+          value,
+        });
       } else if (answer.question.dataType === DataType.GENERIC_TEMPLATE) {
-        answer.value = genericTemplates
+        const value = genericTemplates
           .filter(
             (genericTemplate) =>
               genericTemplate.questionId === answer.question.id
           )
           .map((genericTemplate) => genericTemplate);
+        updatedAnswers.push({
+          ...answer,
+          value,
+        });
       } else if (answer.question.dataType === DataType.INSTRUMENT_PICKER) {
         const ids = Array.isArray(answer.value)
           ? answer.value.map((v: { instrumentId: string }) =>
@@ -393,7 +399,11 @@ export const collectProposalPDFData = async (
         const instruments =
           await baseContext.queries.instrument.getInstrumentsByIds(user, ids);
 
-        answer.value = instrumentPickerAnswer(answer, instruments, call);
+        const value = instrumentPickerAnswer(answer, instruments, call);
+        updatedAnswers.push({
+          ...answer,
+          value,
+        });
       } else if (answer.question.dataType === DataType.TECHNIQUE_PICKER) {
         const techniqueIds = Array.isArray(answer.value)
           ? answer.value
@@ -403,15 +413,23 @@ export const collectProposalPDFData = async (
             user,
             techniqueIds
           );
-        answer.value = techniques?.length
+        const value = techniques?.length
           ? techniques.map((technique) => technique.name).join(', ')
           : '';
+        updatedAnswers.push({
+          ...answer,
+          value,
+        });
+      } else {
+        updatedAnswers.push({
+          ...answer,
+        });
       }
     }
 
     out.questionarySteps.push({
       ...step,
-      fields: answers,
+      fields: updatedAnswers,
     });
     out.attachments.push(...questionaryAttachments);
     out.attachments.push(...sampleAttachments);
