@@ -40,7 +40,7 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.esi_questionary_id,
     record.created_by,
     record.status,
-    record.safty_review_questionary_id,
+    record.safety_review_questionary_id,
     record.reviewed_by,
     record.created_at,
     record.updated_at
@@ -186,6 +186,22 @@ export default class PostgresExperimentDataSource
       });
   }
 
+  async getExperimentSafety(
+    experimentSafetyPk: number
+  ): Promise<ExperimentSafety | null> {
+    const result = await database
+      .select('*')
+      .from('experiment_safety')
+      .where('experiment_safety_pk', experimentSafetyPk)
+      .first();
+
+    if (!result) {
+      return null;
+    }
+
+    return createExperimentSafetyObject(result);
+  }
+
   async getExperimentSafetyByExperimentPk(
     experimentPk: number
   ): Promise<ExperimentSafety | null> {
@@ -211,9 +227,9 @@ export default class PostgresExperimentDataSource
       .insert({
         experiment_pk: experimentPk,
         esi_questionary_id: questionaryId,
-        creator_by: creatorId,
+        created_by: creatorId,
         status: '', //todo: add status
-        safty_review_questionary_id: questionaryId, //todo: add safty_review_questionary_id
+        safety_review_questionary_id: questionaryId, //todo: add safety_review_questionary_id
         reviewed_by: creatorId, //todo: add reviewed_by
       })
       .into('experiment_safety')

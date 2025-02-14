@@ -10,7 +10,7 @@ import { Authorized } from '../decorators';
 import { rejection, Rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 import { UpdateExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
-import { ExperimentSafety } from '../resolvers/types/Experiment';
+import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
@@ -76,7 +76,7 @@ export default class ExperimentMutations {
       newQuestionaryId
     );
 
-    return this.dataSource.createExperimentSafety(
+    return await this.dataSource.createExperimentSafety(
       experimentPk,
       newQuestionaryId,
       user!.id

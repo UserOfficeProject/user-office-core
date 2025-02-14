@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ExperimentSafety } from '../types/Experiment';
+import { ExperimentSafety } from '../types/ExperimentSafety';
 
 @ArgsType()
 export class UpdateExperimentSafetyArgs {

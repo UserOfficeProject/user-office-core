@@ -31,7 +31,7 @@ export class ExperimentSafety {
     public createdBy: number,
     public status: string,
     public safetyReviewQuestionaryId: number,
-    public reviewedBy: number,
+    public reviewedBy: number | null,
     public createdAt: Date,
     public updatedAt: Date
   ) {}

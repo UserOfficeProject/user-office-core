@@ -10,11 +10,9 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import {
-  Experiment as ExperimentOrigin,
-  ExperimentSafety as ExperimentSafetyOrigin,
-} from '../../models/Experiment';
+import { Experiment as ExperimentOrigin } from '../../models/Experiment';
 import { BasicUserDetails } from './BasicUserDetails';
+import { ExperimentSafety } from './ExperimentSafety';
 import { Feedback } from './Feedback';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
@@ -49,37 +47,6 @@ export class Experiment implements ExperimentOrigin {
 
   @Field(() => Number)
   public instrumentId: number;
-
-  @Field(() => Date)
-  public createdAt: Date;
-
-  @Field(() => Date)
-  public updatedAt: Date;
-}
-
-@ObjectType()
-@Directive('@key(fields: "experimentSafetyPk")')
-export class ExperimentSafety implements ExperimentSafetyOrigin {
-  @Field(() => Number)
-  public experimentSafetyPk: number;
-
-  @Field(() => Number)
-  public experimentPk: number;
-
-  @Field(() => Number)
-  public esiQuestionaryId: number;
-
-  @Field(() => Number)
-  public createdBy: number;
-
-  @Field(() => String)
-  public status: string;
-
-  @Field(() => Number)
-  public safetyReviewQuestionaryId: number;
-
-  @Field(() => Number)
-  public reviewedBy: number;
 
   @Field(() => Date)
   public createdAt: Date;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { CreateEsiMutation } from 'generated/sdk';
+import { CreateExperimentSafetyMutation } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ProposalEsiContainer from './ProposalEsiContainer';
@@ -11,23 +11,24 @@ interface CreateProposalEsiProps {
 }
 function CreateProposalEsi({ experimentPk }: CreateProposalEsiProps) {
   const { api } = useDataApiWithFeedback();
-  const [esi, setEsi] = useState<CreateEsiMutation['createEsi'] | null>(null);
-
+  const [experimentSafety, setExperimentSafety] = useState<
+    CreateExperimentSafetyMutation['createExperimentSafety'] | null
+  >(null);
   useEffect(() => {
     api()
-      .createEsi({ experimentPk })
+      .createExperimentSafety({ experimentPk })
       .then((result) => {
-        if (result.createEsi) {
-          setEsi(result.createEsi);
+        if (result.createExperimentSafety) {
+          setExperimentSafety(result.createExperimentSafety);
         }
       });
   }, [experimentPk, api]);
 
-  if (!esi) {
+  if (!experimentSafety) {
     return <UOLoader />;
   }
 
-  return <ProposalEsiContainer esi={esi} />;
+  return <ProposalEsiContainer esi={experimentSafety} />;
 }
 
 export default CreateProposalEsi;

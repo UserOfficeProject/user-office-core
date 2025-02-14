@@ -22,6 +22,7 @@ export interface ExperimentDataSource {
   getExperimentSafetyByExperimentPk(
     experimentPk: number
   ): Promise<ExperimentSafety | null>;
+  getExperimentSafety(experimentPk: number): Promise<ExperimentSafety | null>;
   createExperimentSafety(
     experimentPk: number,
     questionaryId: number,

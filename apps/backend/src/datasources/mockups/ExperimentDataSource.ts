@@ -3,6 +3,9 @@ import { Rejection } from '../../models/Rejection';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 
 export class ExperimentDataSourceMock implements ExperimentDataSource {
+  getExperimentSafety(experimentPk: number): Promise<ExperimentSafety | null> {
+    throw new Error('Method not implemented.');
+  }
   updateExperimentSafety(
     args: UpdateExperimentSafetyArgs
   ): Promise<ExperimentSafety> {

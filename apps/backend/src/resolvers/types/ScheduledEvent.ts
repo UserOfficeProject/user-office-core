@@ -13,7 +13,7 @@ import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { FeedbackDataSource } from './../../datasources/FeedbackDataSource';
 import { BasicUserDetails } from './BasicUserDetails';
-import { ExperimentSafetyInput } from './ExperimentSafetyInput';
+import { ExperimentSafety } from './ExperimentSafety';
 import { Feedback } from './Feedback';
 import { FeedbackRequest } from './FeedbackRequest';
 import { Instrument } from './Instrument';
@@ -81,16 +81,16 @@ export class ScheduledEventResolver {
     return feedbackDataSource.getFeedbackRequests(event.id);
   }
 
-  @FieldResolver(() => ExperimentSafetyInput, { nullable: true })
+  @FieldResolver(() => ExperimentSafety, { nullable: true })
   async esi(
     @Root() event: ScheduledEventCore,
     @Ctx() context: ResolverContext
-  ): Promise<ExperimentSafetyInput | null> {
+  ): Promise<ExperimentSafety | null> {
     const esi = await context.queries.proposalEsi.getEsis(context.user, {
       scheduledEventId: event.id,
     });
 
-    return esi ? esi[0] : null;
+    return null;
   }
 
   @FieldResolver(() => BasicUserDetails, { nullable: true })

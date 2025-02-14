@@ -1,7 +1,7 @@
 import { Arg, Ctx, Int, Query, Resolver } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ExperimentSafety } from '../types/Experiment';
+import { ExperimentSafety } from '../types/ExperimentSafety';
 
 @Resolver()
 export class ExperimentSafetyQuery {
@@ -10,7 +10,7 @@ export class ExperimentSafetyQuery {
     @Ctx() context: ResolverContext,
     @Arg('experimentSafetyPk', () => Int) experimentSafetyPk: number
   ) {
-    return context.queries.experiment.getExperimentSafetyByExperimentPk(
+    return context.queries.experiment.getExperimentSafety(
       context.user,
       experimentSafetyPk
     );

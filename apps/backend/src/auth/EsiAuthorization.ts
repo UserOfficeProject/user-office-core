@@ -1,13 +1,15 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
 import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { UserWithRole } from '../models/User';
-import { ExperimentSafetyInput } from './../resolvers/types/ExperimentSafetyInput';
+import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
+//todo: This entire file needs to be changed.
 @injectable()
 export class EsiAuthorization {
   constructor(
@@ -17,19 +19,24 @@ export class EsiAuthorization {
     private esiDataSource: ProposalEsiDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource
   ) {}
 
   getScheduledEvent = async (scheduledEventId: number) =>
     await this.scheduledEventDataSource.getScheduledEventCore(scheduledEventId);
 
   private async resolveEsi(
-    esiOrEsiId: ExperimentSafetyInput | number
-  ): Promise<ExperimentSafetyInput | null> {
+    esiOrEsiId: ExperimentSafety | number
+  ): Promise<ExperimentSafety | null> {
     let esi;
 
     if (typeof esiOrEsiId === 'number') {
-      esi = await this.esiDataSource.getEsi(esiOrEsiId);
+      esi =
+        await this.experimentDataSource.getExperimentSafetyByExperimentPk(
+          esiOrEsiId
+        );
     } else {
       esi = esiOrEsiId;
     }
@@ -50,7 +57,7 @@ export class EsiAuthorization {
 
   async hasReadRights(
     agent: UserWithRole | null,
-    esi: ExperimentSafetyInput
+    esi: ExperimentSafety
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
@@ -58,7 +65,7 @@ export class EsiAuthorization {
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
-    esiOrEsiId: ExperimentSafetyInput | number
+    esiOrEsiId: ExperimentSafety | number
   ): Promise<boolean> {
     if (!agent) {
       return false;
@@ -68,18 +75,20 @@ export class EsiAuthorization {
     if (!esi) {
       return false;
     }
-    const scheduledEvent = await this.getScheduledEvent(esi.scheduledEventId);
+    const experiment = await this.experimentDataSource.getExperiment(
+      esi.experimentPk
+    );
 
-    if (scheduledEvent === null || scheduledEvent.proposalPk === null) {
+    if (experiment === null || experiment.proposalPk === null) {
       return false;
     }
 
-    return this.canReadProposal(agent, scheduledEvent.proposalPk);
+    return this.canReadProposal(agent, experiment.proposalPk);
   }
 
   async hasWriteRights(
     agent: UserWithRole | null,
-    esi: ExperimentSafetyInput
+    esi: ExperimentSafety
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
@@ -87,7 +96,7 @@ export class EsiAuthorization {
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    esiOrEsiId: ExperimentSafetyInput | number
+    esiOrEsiId: ExperimentSafety | number
   ): Promise<boolean> {
     if (!agent) {
       return false;
@@ -97,19 +106,21 @@ export class EsiAuthorization {
     if (!esi) {
       return false;
     }
-    const scheduledEvent = await this.getScheduledEvent(esi.scheduledEventId);
+    const experiment = await this.experimentDataSource.getExperiment(
+      esi.experimentPk
+    );
 
-    if (scheduledEvent === null || scheduledEvent.proposalPk === null) {
+    if (experiment === null || experiment.proposalPk === null) {
       return false;
     }
 
     if (
-      esi.isSubmitted === true &&
+      // esi.isSubmitted === true && //todo: This needs to be taken care
       this.userAuth.isUserOfficer(agent) === false
     ) {
       return false;
     }
 
-    return this.canReadProposal(agent, scheduledEvent.proposalPk);
+    return this.canReadProposal(agent, experiment.proposalPk);
   }
 }
