@@ -353,9 +353,11 @@ export const collectProposalPDFData = async (
     }
 
     const topic = step.topic;
-    const answers = getTopicActiveAnswers(questionarySteps, topic.id).filter(
-      // skip `PROPOSAL_BASIS` types
-      (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
+    const answers = structuredClone(
+      getTopicActiveAnswers(questionarySteps, topic.id).filter(
+        // skip `PROPOSAL_BASIS` types
+        (answer) => answer.question.dataType !== DataType.PROPOSAL_BASIS
+      )
     );
 
     // if the questionary step has nothing else but `PROPOSAL_BASIS` question
