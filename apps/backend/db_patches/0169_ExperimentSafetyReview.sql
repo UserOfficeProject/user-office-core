@@ -31,6 +31,8 @@ BEGIN
     CREATE TABLE IF NOT EXISTS "experiment_has_samples" (
       "experiment_pk" INT NOT NULL REFERENCES experiments(experiment_pk) ON DELETE CASCADE
       , "sample_id" INT NOT NULL REFERENCES samples(sample_id) ON DELETE CASCADE
+      , "is_esi_submitted" BOOLEAN NOT NULL DEFAULT FALSE
+      , "sample_esi_questionary_id" INT NOT NULL REFERENCES questionaries(questionary_id)
       , "created_at" TIMESTAMP NOT NULL DEFAULT NOW()
       , "updated_at" TIMESTAMP NOT NULL DEFAULT NOW()
       , PRIMARY KEY (experiment_pk, sample_id)

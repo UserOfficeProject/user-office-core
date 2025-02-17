@@ -1500,9 +1500,11 @@ export interface ExperimentSafetyRecord {
   readonly updated_at: Date;
 }
 
-export interface ExperimentHasSamplesRecord {
+export interface ExperimentHasSampleRecord {
   readonly experiment_pk: number;
   readonly sample_id: number;
+  readonly is_esi_submitted: boolean;
+  readonly sample_esi_questionary_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
 }

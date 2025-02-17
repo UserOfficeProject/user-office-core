@@ -14,10 +14,12 @@ export class Experiment {
   ) {}
 }
 
-export class ExperimentHasSamples {
+export class ExperimentHasSample {
   constructor(
     public experimentPk: number,
     public sampleId: number,
+    public isEsiSubmitted: boolean,
+    public sampleEsiQuestionaryId: number,
     public createdAt: Date,
     public updatedAt: Date
   ) {}

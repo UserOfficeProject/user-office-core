@@ -252,4 +252,28 @@ export default class PostgresExperimentDataSource
         createExperimentSafetyObject(result[0])
       );
   }
+
+  async getSamples(experimentPk: number): Promise<ExperimentHasSamples[]> {
+    return database('experiment_has_samples')
+      .select('*')
+      .where('experiment_pk', experimentPk)
+      .then((records: ExperimentHasSamplesRecord[]) =>
+        records.map(createExperimentHasSamplesObject)
+      );
+  }
+
+  async attachSample(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSamples> {
+    return database('experiment_has_samples')
+      .insert({
+        experiment_pk: experimentPk,
+        sample_id: sampleId,
+      })
+      .returning('*')
+      .then((records: ExperimentHasSamplesRecord[]) => {
+        records.map(createExperimentHasSamplesObject);
+      });
+  }
 }
