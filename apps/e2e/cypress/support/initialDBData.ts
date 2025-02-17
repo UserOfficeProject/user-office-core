@@ -54,13 +54,21 @@ export default {
     id: 1,
     name: 'default template',
     topic: {
-      id: 6,
+      id: 7,
       title: 'Topic title',
     },
   },
   fapReviewTemplate: {
     id: 2,
     name: 'default fap review template',
+    topic: {
+      id: 6,
+      title: 'Topic title',
+    },
+  },
+  technicalReviewTemplate: {
+    id: 3,
+    name: 'default technical review template',
     topic: {
       id: 6,
       title: 'Topic title',
@@ -196,6 +204,9 @@ export default {
     title: 'Test proposal',
     questionaryId: 2,
     shortCode: '999999',
+  },
+  technicalReview: {
+    questionaryId: 3,
   },
   instrument1: {
     id: 1,

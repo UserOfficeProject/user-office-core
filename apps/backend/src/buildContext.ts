@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 
 import { BasicResolverContext } from './context';
+import BasicUserDetailsLoader from './loaders/BasicUserDetailsLoader';
 import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
@@ -51,6 +52,7 @@ import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
 import SystemQueries from './queries/SystemQueries';
+import TechnicalReviewQueries from './queries/TechnicalReviewQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
 import UnitQueries from './queries/UnitQueries';
@@ -78,6 +80,7 @@ const context: BasicResolverContext = {
     fap: container.resolve(FapQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
+    technicalReview: container.resolve(TechnicalReviewQueries),
     template: container.resolve(TemplateQueries),
     unit: container.resolve(UnitQueries),
     user: container.resolve(UserQueries),
@@ -125,6 +128,7 @@ const context: BasicResolverContext = {
   },
   loaders: {
     user: container.resolve(UsersLoader),
+    basicUser: container.resolve(BasicUserDetailsLoader),
   },
 };
 

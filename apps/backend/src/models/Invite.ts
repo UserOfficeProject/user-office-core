@@ -1,4 +1,4 @@
-export class InviteCode {
+export class Invite {
   constructor(
     public id: number,
     public code: string,

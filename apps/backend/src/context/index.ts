@@ -1,3 +1,4 @@
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import UsersLoader from '../loaders/UsersLoader';
 import PDFServices from '../middlewares/factory/factoryServices';
 import { Sdk } from '../middlewares/graphqlClient';
@@ -50,6 +51,7 @@ import ScheduledEventQueries from '../queries/ScheduledEventQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
 import StatusActionsLogsQueries from '../queries/StatusActionsLogsQueries';
 import SystemQueries from '../queries/SystemQueries';
+import TechnicalReviewQueries from '../queries/TechnicalReviewQueries';
 import TechniqueQueries from '../queries/TechniqueQueries';
 import TemplateQueries from '../queries/TemplateQueries';
 import UnitQueries from '../queries/UnitQueries';
@@ -77,6 +79,7 @@ interface ResolverContextQueries {
   fap: FapQueries;
   shipment: ShipmentQueries;
   system: SystemQueries;
+  technicalReview: TechnicalReviewQueries;
   template: TemplateQueries;
   unit: UnitQueries;
   user: UserQueries;
@@ -119,6 +122,7 @@ interface ResolverContextServices {
 }
 interface ResolverContextLoader {
   user: UsersLoader;
+  basicUser: BasicUserDetailsLoader;
 }
 
 export interface BasicResolverContext {
