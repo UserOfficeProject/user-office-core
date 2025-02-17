@@ -22,25 +22,25 @@ const EventBusDecorator = (eventType: Event) => {
 
       const result = await originalMethod?.apply(this, args);
 
-      // NOTE: Get the name of the object or class like: 'Fap', 'USER', 'Proposal' and lowercase it.
-      const resultKey = (result.constructor.name as string).toLowerCase();
-
       // NOTE: This needs to be checked because there are mutations where we don't have loggedIn user
       if (!loggedInUser) {
         loggedInUser = result.user;
       }
 
-      const event = {
-        type: eventType,
-        [resultKey]: result,
-        key: resultKey,
-        loggedInUserId: loggedInUser ? loggedInUser.id : null,
-        isRejection: isRejection(result),
-        inputArgs: JSON.stringify(restArgs),
-      } as ApplicationEvent;
-
       // NOTE: Do not log the event in testing environment.
       if (process.env.NODE_ENV !== 'test') {
+        // NOTE: Get the name of the object or class like: 'Fap', 'USER', 'Proposal' and lowercase it.
+        const resultKey = (result.constructor.name as string).toLowerCase();
+
+        const event = {
+          type: eventType,
+          [resultKey]: result,
+          key: resultKey,
+          loggedInUserId: loggedInUser ? loggedInUser.id : null,
+          isRejection: isRejection(result),
+          inputArgs: JSON.stringify(restArgs),
+        } as ApplicationEvent;
+
         const eventBus = resolveApplicationEventBus();
         eventBus
           .publish(event)
