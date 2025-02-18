@@ -41,7 +41,7 @@ import {
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
-  ProposalWorkflowConnectionRecord,
+  WorkflowConnectionRecord,
   ScheduledEventRecord,
   StatusChangingEventRecord,
   TechnicalReviewRecord,
@@ -869,7 +869,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         const proposalWorkflowId = proposalCall.proposal_workflow_id;
 
         const proposalEventsToReset: (StatusChangingEventRecord &
-          ProposalWorkflowConnectionRecord)[] = (
+          WorkflowConnectionRecord)[] = (
           await database
             .raw(
               `

@@ -3,7 +3,7 @@ import React from 'react';
 import { WorkflowType } from 'generated/sdk';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import WorkflowsTable from './workflowsTable';
+import WorkflowsTable from '../workflow/workflowsTable';
 
 const ProposalWorkflowsPage = () => {
   return (

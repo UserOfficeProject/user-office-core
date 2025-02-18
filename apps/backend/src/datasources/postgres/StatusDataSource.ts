@@ -38,6 +38,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return this.createStatusObject(addedStatus);
   }
+
   async getStatus(statusId: number): Promise<Status | null> {
     const status: StatusRecord = await database
       .select()
@@ -47,6 +48,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return status ? this.createStatusObject(status) : null;
   }
+
   async getAllStatuses(entityType: Status['entityType']): Promise<Status[]> {
     const statuses: StatusRecord[] = await database
       .select('*')

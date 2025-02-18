@@ -33,7 +33,7 @@ import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkf
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
 import { MoveWorkflowStatusInput } from '../resolvers/mutations/settings/MoveWorkflowStatusMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
-import { EmailStatusActionRecipients } from '../resolvers/types/ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 import { omit } from '../utils/helperFunctions';
 
 @injectable()

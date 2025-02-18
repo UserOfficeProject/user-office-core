@@ -1,16 +1,14 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { ProposalStatusAction } from 'generated/sdk';
+import { StatusAction } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useStatusActionsData(): {
   loadingStatusActions: boolean;
-  statusActions: ProposalStatusAction[];
-  setStatusActions: Dispatch<SetStateAction<ProposalStatusAction[]>>;
+  statusActions: StatusAction[];
+  setStatusActions: Dispatch<SetStateAction<StatusAction[]>>;
 } {
-  const [statusActions, setStatusActions] = useState<ProposalStatusAction[]>(
-    []
-  );
+  const [statusActions, setStatusActions] = useState<StatusAction[]>([]);
   const [loadingStatusActions, setLoadingStatusActions] = useState(true);
 
   const api = useDataApi();

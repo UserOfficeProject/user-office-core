@@ -8,7 +8,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
-import { CoProposerInvite } from '../../models/CoProposerInvite';
+import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
@@ -18,7 +18,7 @@ import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
-import { InviteCode } from '../../models/InviteCode';
+import { Invite } from '../../models/Invite';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
@@ -34,7 +34,7 @@ import {
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
-import { RoleInvite } from '../../models/RoleInvite';
+import { RoleClaim } from '../../models/RoleClaim';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
@@ -568,15 +568,6 @@ export interface ShipmentRecord {
   readonly created_at: Date;
 }
 
-export interface ProposalStatusRecord {
-  readonly status_id: number;
-  readonly short_code: string;
-  readonly name: string;
-  readonly description: string;
-  readonly is_default: boolean;
-  readonly full_count: number;
-}
-
 export interface StatusRecord {
   readonly status_id: number;
   readonly short_code: string;
@@ -587,30 +578,12 @@ export interface StatusRecord {
   readonly entity_type: WorkflowType;
 }
 
-export interface ProposalWorkflowRecord {
-  readonly workflow_id: number;
-  readonly name: string;
-  readonly description: string;
-  readonly full_count: number;
-}
-
 export interface WorkflowRecord {
   readonly workflow_id: number;
   readonly name: string;
   readonly description: string;
   readonly full_count: number;
   readonly entity_type: WorkflowType;
-}
-
-export interface ProposalWorkflowConnectionRecord {
-  readonly workflow_connection_id: number;
-  readonly sort_order: number;
-  readonly workflow_id: number;
-  readonly status_id: number;
-  readonly next_status_id: number | null;
-  readonly prev_status_id: number | null;
-  readonly droppable_group_id: string;
-  readonly parent_droppable_group_id: string;
 }
 
 export interface WorkflowConnectionRecord {
@@ -1456,8 +1429,8 @@ export const createProposalInternalCommentObject = (
   );
 };
 
-export interface InviteCodeRecord {
-  readonly invite_code_id: number;
+export interface InviteRecord {
+  readonly invite_id: number;
   readonly code: string;
   readonly email: string;
   readonly note: string;
@@ -1467,9 +1440,9 @@ export interface InviteCodeRecord {
   readonly claimed_at: Date | null;
 }
 
-export const createInviteCodeObject = (invite: InviteCodeRecord) =>
-  new InviteCode(
-    invite.invite_code_id,
+export const createInviteObject = (invite: InviteRecord) =>
+  new Invite(
+    invite.invite_id,
     invite.code,
     invite.email,
     invite.note,
@@ -1479,19 +1452,19 @@ export const createInviteCodeObject = (invite: InviteCodeRecord) =>
     invite.claimed_by
   );
 
-export interface RoleInviteRecord {
-  readonly role_invite_id: number;
-  readonly invite_code_id: number;
+export interface RoleClaimRecord {
+  readonly role_claim_id: number;
+  readonly invite_id: number;
   readonly role_id: number;
 }
 
-export const createRoleInviteObject = (invite: RoleInviteRecord) =>
-  new RoleInvite(invite.role_invite_id, invite.invite_code_id, invite.role_id);
+export const createRoleClaimObject = (invite: RoleClaimRecord) =>
+  new RoleClaim(invite.role_claim_id, invite.invite_id, invite.role_id);
 
-export interface CoProposerInviteRecord {
-  readonly invite_code_id: number;
+export interface CoProposerClaimRecord {
+  readonly invite_id: number;
   readonly proposal_pk: number;
 }
 
-export const createCoProposerInviteRecord = (invite: CoProposerInviteRecord) =>
-  new CoProposerInvite(invite.invite_code_id, invite.proposal_pk);
+export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
+  new CoProposerClaim(invite.invite_id, invite.proposal_pk);

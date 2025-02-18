@@ -59,7 +59,7 @@ const ProposalStatusesPage = lazy(
 );
 const WorkflowEditor = lazy(() => import('./settings/workflow/WorkflowEditor'));
 const ProposalWorkflowsPage = lazy(
-  () => import('./settings/workflow/ProposalWorkflowsPage')
+  () => import('./settings/proposalWorkflow/ProposalWorkflowsPage')
 );
 
 const ExperimentWorkflowsPage = lazy(

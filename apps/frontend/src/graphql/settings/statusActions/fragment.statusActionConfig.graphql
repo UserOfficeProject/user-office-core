@@ -1,4 +1,4 @@
-fragment statusActionDefaultConfig on ProposalStatusActionDefaultConfig {
+fragment statusActionDefaultConfig on StatusActionDefaultConfig {
   ... on EmailActionDefaultConfig {
     recipients {
       name

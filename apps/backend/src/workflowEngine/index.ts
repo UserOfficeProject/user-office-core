@@ -22,19 +22,17 @@ const getProposalWorkflowByCallId = (callId: number) => {
 };
 
 export const getProposalWorkflowConnectionByStatusId = (
-  proposalWorkflowId: number,
-  proposalStatusId: number,
+  workflowId: number,
+  statusId: number,
   prevStatusId?: number
 ) => {
   const workflowDataSource = container.resolve<WorkflowDataSource>(
     Tokens.WorkflowDataSource
   );
 
-  return workflowDataSource.getWorkflowConnectionsById(
-    proposalWorkflowId,
-    proposalStatusId,
-    { prevStatusId }
-  );
+  return workflowDataSource.getWorkflowConnectionsById(workflowId, statusId, {
+    prevStatusId,
+  });
 };
 
 const shouldMoveToNextStatus = (

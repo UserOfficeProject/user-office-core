@@ -1,12 +1,5 @@
 import { Status } from './Status';
 
-export type NextAndPreviousProposalStatuses = {
-  //TODO: Needs to be removed
-  nextStatusId?: number | null;
-  prevStatusId?: number | null;
-  sortOrder?: number | null;
-};
-
 export type NextAndPreviousStatuses = {
   nextStatusId?: number | null;
   prevStatusId?: number | null;
@@ -27,7 +20,6 @@ export class WorkflowConnection {
 }
 
 export class WorkflowConnectionWithStatus {
-  //TODO: This needs to be added in the appropriate place and tested
   constructor(
     public id: number,
     public sortOrder: number,

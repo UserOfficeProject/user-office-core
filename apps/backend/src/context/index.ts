@@ -1,3 +1,4 @@
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import UsersLoader from '../loaders/UsersLoader';
 import PDFServices from '../middlewares/factory/factoryServices';
 import { Sdk } from '../middlewares/graphqlClient';
@@ -129,6 +130,7 @@ interface ResolverContextServices {
 }
 interface ResolverContextLoader {
   user: UsersLoader;
+  basicUser: BasicUserDetailsLoader;
 }
 
 export interface BasicResolverContext {

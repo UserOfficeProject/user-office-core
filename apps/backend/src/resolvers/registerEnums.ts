@@ -35,7 +35,7 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from './types/ProposalBooking';
-import { EmailStatusActionRecipients } from './types/ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from './types/StatusActionConfig';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
