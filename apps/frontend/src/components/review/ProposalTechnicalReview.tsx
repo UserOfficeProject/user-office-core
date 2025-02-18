@@ -126,6 +126,7 @@ const ProposalTechnicalReview = ({
             reviewerId: user.id,
             files: fileList ? JSON.stringify(fileList) : null,
             instrumentId: data.instrumentId,
+            questionaryId: 0,
           },
         ],
       });
@@ -140,6 +141,7 @@ const ProposalTechnicalReview = ({
         reviewerId: user.id,
         files: fileList ? JSON.stringify(fileList) : null,
         instrumentId: data.instrumentId,
+        questionaryId: 0,
       });
     }
 

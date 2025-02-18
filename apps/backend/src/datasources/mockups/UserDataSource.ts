@@ -244,6 +244,9 @@ export class UserDataSourceMock implements UserDataSource {
   ): Promise<import('../../models/User').BasicUserDetails | null> {
     throw new Error('Method not implemented.');
   }
+  async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
+    throw new Error('Method not implemented.');
+  }
 
   async getBasicUserDetailsByEmail(
     email: string,

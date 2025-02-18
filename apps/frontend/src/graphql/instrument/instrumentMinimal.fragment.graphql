@@ -2,5 +2,4 @@ fragment instrumentMinimal on Instrument {
   id
   name
   shortCode
-  description
 }

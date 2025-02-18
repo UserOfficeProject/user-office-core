@@ -11,6 +11,7 @@ import { proposalQuestionaryDefinition } from './questionaries/proposal/Proposal
 import { sampleQuestionaryDefinition } from './questionaries/sample/SampleQuestionaryDefinition';
 import { sampleEsiQuestionaryDefinition } from './questionaries/sampleEsi/SampleEsiQuestionaryDefinition';
 import { shipmentQuestionaryDefinition } from './questionaries/shipment/ShipmentQuestionaryDefinition';
+import { technicalReviewQuestionaryDefinition } from './questionaries/technicalReview/TechnicalReviewQuestionaryDefinition';
 import { visitRegistrationQuestionaryDefinition } from './questionaries/visitRegistration/VisitRegistrationQuestionaryDefinition';
 import { WizardStepFactory } from './WizardStepFactory';
 
@@ -49,6 +50,7 @@ const registry = [
   sampleEsiQuestionaryDefinition,
   sampleQuestionaryDefinition,
   shipmentQuestionaryDefinition,
+  technicalReviewQuestionaryDefinition,
   visitRegistrationQuestionaryDefinition,
 ];
 

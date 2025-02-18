@@ -48,6 +48,14 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
   } = useActiveTemplates(TemplateGroupId.FAP_REVIEW, call?.fapReviewTemplateId);
 
   const {
+    templates: technicalReviewTemplates,
+    refreshTemplates: reloadTechnicalReviewTemplates,
+  } = useActiveTemplates(
+    TemplateGroupId.TECHNICAL_REVIEW,
+    call?.technicalReviewTemplateId
+  );
+
+  const {
     proposalWorkflows,
     loadingProposalWorkflows,
     refreshProposalWorkflows: reloadProposalWorkflows,
@@ -79,6 +87,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         esiTemplateId: call.esiTemplateId,
         pdfTemplateId: call.pdfTemplateId,
         fapReviewTemplateId: call.fapReviewTemplateId,
+        technicalReviewTemplateId: call.technicalReviewTemplateId,
         proposalWorkflowId: call.proposalWorkflowId,
         referenceNumberFormat: call.referenceNumberFormat || '',
         startCall: getDateTimeFromISO(call.startCall),
@@ -114,6 +123,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         esiTemplateId: null,
         pdfTemplateId: null,
         fapReviewTemplateId: null,
+        technicalReviewTemplateId: null,
         allocationTimeUnit: AllocationTimeUnits.DAY,
         title: '',
         description: '',
@@ -157,11 +167,13 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
             reloadEsi={reloadEsi}
             reloadPdfTemplates={reloadPdfTemplates}
             reloadFapReviewTemplates={reloadFapReviewTemplates}
+            reloadTechnicalReviewTemplates={reloadTechnicalReviewTemplates}
             reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
             pdfTemplates={pdfTemplates}
             fapReviewTemplates={fapReviewTemplates}
+            technicalReviewTemplates={technicalReviewTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}

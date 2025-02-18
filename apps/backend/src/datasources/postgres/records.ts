@@ -8,7 +8,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../../models/ConditionEvaluator';
-import { CoProposerInvite } from '../../models/CoProposerInvite';
+import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
@@ -18,7 +18,7 @@ import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
-import { InviteCode } from '../../models/InviteCode';
+import { Invite } from '../../models/Invite';
 import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
@@ -35,7 +35,7 @@ import {
 import { RedeemCode } from '../../models/RedeemCode';
 import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
-import { RoleInvite } from '../../models/RoleInvite';
+import { RoleClaim } from '../../models/RoleClaim';
 import { Sample } from '../../models/Sample';
 import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
 import { ScheduledEventCore } from '../../models/ScheduledEventCore';
@@ -304,6 +304,7 @@ export interface TechnicalReviewRecord {
   readonly files: string;
   readonly technical_review_assignee_id: number | null;
   readonly instrument_id: number;
+  readonly questionary_id: number;
 }
 
 export interface InternalReviewRecord {
@@ -348,6 +349,7 @@ export interface CallRecord {
   readonly description: string;
   readonly pdf_template_id: number;
   readonly fap_review_template_id: number;
+  readonly technical_review_template_id: number;
   readonly is_active: boolean;
 }
 
@@ -860,7 +862,8 @@ export const createTechnicalReviewObject = (
     technicalReview.reviewer_id,
     technicalReview.files ? JSON.stringify(technicalReview.files) : null,
     technicalReview.technical_review_assignee_id,
-    technicalReview.instrument_id
+    technicalReview.instrument_id,
+    technicalReview.questionary_id
   );
 };
 
@@ -1042,6 +1045,7 @@ export const createCallObject = (call: CallRecord) => {
     call.description,
     call.pdf_template_id,
     call.fap_review_template_id,
+    call.technical_review_template_id,
     call.is_active
   );
 };
@@ -1422,8 +1426,8 @@ export const createProposalInternalCommentObject = (
   );
 };
 
-export interface InviteCodeRecord {
-  readonly invite_code_id: number;
+export interface InviteRecord {
+  readonly invite_id: number;
   readonly code: string;
   readonly email: string;
   readonly note: string;
@@ -1433,9 +1437,9 @@ export interface InviteCodeRecord {
   readonly claimed_at: Date | null;
 }
 
-export const createInviteCodeObject = (invite: InviteCodeRecord) =>
-  new InviteCode(
-    invite.invite_code_id,
+export const createInviteObject = (invite: InviteRecord) =>
+  new Invite(
+    invite.invite_id,
     invite.code,
     invite.email,
     invite.note,
@@ -1445,19 +1449,19 @@ export const createInviteCodeObject = (invite: InviteCodeRecord) =>
     invite.claimed_by
   );
 
-export interface RoleInviteRecord {
-  readonly role_invite_id: number;
-  readonly invite_code_id: number;
+export interface RoleClaimRecord {
+  readonly role_claim_id: number;
+  readonly invite_id: number;
   readonly role_id: number;
 }
 
-export const createRoleInviteObject = (invite: RoleInviteRecord) =>
-  new RoleInvite(invite.role_invite_id, invite.invite_code_id, invite.role_id);
+export const createRoleClaimObject = (invite: RoleClaimRecord) =>
+  new RoleClaim(invite.role_claim_id, invite.invite_id, invite.role_id);
 
-export interface CoProposerInviteRecord {
-  readonly invite_code_id: number;
+export interface CoProposerClaimRecord {
+  readonly invite_id: number;
   readonly proposal_pk: number;
 }
 
-export const createCoProposerInviteRecord = (invite: CoProposerInviteRecord) =>
-  new CoProposerInvite(invite.invite_code_id, invite.proposal_pk);
+export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
+  new CoProposerClaim(invite.invite_id, invite.proposal_pk);
