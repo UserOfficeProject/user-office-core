@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS db_patches (
+CREATE TABLE IF NOT EXISTS public.db_patches (
 	patch_id  varchar(100) NOT NULL PRIMARY KEY
 	, author    varchar(50) NOT NULL
 	, purpose   varchar(600) NULL
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS db_patches (
 	, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 	);
 
-CREATE OR REPLACE FUNCTION register_patch(new_patch_id TEXT, author TEXT, purpose TEXT, created_at TIMESTAMPTZ) RETURNS boolean AS $$
+CREATE OR REPLACE FUNCTION public.register_patch(new_patch_id TEXT, author TEXT, purpose TEXT, created_at TIMESTAMPTZ) RETURNS boolean AS $$
     BEGIN
     IF EXISTS (SELECT 1 FROM db_patches WHERE patch_id=new_patch_id) THEN
 	RAISE WARNING 'Refusing to apply patch. Patch id % already present', new_patch_id;
@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION register_patch(new_patch_id TEXT, author TEXT, purpos
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION unregister_patch(new_patch_id TEXT) RETURNS boolean AS $$
+CREATE OR REPLACE FUNCTION public.unregister_patch(new_patch_id TEXT) RETURNS boolean AS $$
     BEGIN
     IF EXISTS (SELECT 1 FROM db_patches WHERE patch_id=new_patch_id) THEN
 	RAISE NOTICE 'Unergistering pathc %', new_patch_id;
