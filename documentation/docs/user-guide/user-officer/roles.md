@@ -1,13 +1,13 @@
 # Roles :material-account-supervisor-circle:
 
-_________________________________________________________________________________________________________
+---
 
-There are many roles within User Office: 
+There are many roles within User Office:
 
 ??? info "User"
-    
+
     The **Users** are the visiting scientists who are applying for beamtime through proposals.
-    
+
     **Main uses of User Office:**
 
     * Submitting Proposals
@@ -21,7 +21,7 @@ There are many roles within User Office:
     * Creating calls
     * Managing proposals
     * Coordinating review and selection
-    * Impersonating other users 
+    * Impersonating other users
 
 ??? info "Instrument Scientist"
 
@@ -34,14 +34,14 @@ There are many roles within User Office:
     * Ensuring instrument readiness and maintenance
     * Reviewing and approving experiment proposals
 
-??? info "Sample Safety Reviewer"
+??? info "Experiment Safety Reviewer"
 
-    The **Sample Safety Reviewer** is responsible for evaluating the safety aspects of the samples proposed for experiments. They ensure that all safety protocols are followed and that the samples do not pose any risk.
+    The **Experiment Safety Reviewer** is responsible for evaluating the safety aspects of the samples proposed for experiments. They ensure that all safety protocols are followed and that the samples do not pose any risk.
 
     **Main uses of User Office:**
 
-    * Reviewing sample safety information
-    * Approving or rejecting sample safety status
+    * Reviewing Experiment safety information
+    * Approving or rejecting Experiment safety status
     * Providing safety-related comments and feedback
     * Ensuring compliance with safety regulations
 
@@ -86,4 +86,4 @@ There are many roles within User Office:
     * Providing detailed feedback and evaluations
     * Submitting review grades and comments
 
-_________________________________________________________________________________________________________
+---

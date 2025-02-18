@@ -208,7 +208,7 @@ export default class ReviewMutations {
   }
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
-  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
+  @Authorized([Roles.USER_OFFICER, Roles.EXPERIMENT_SAFETY_REVIEWER])
   async submitSampleReview(
     agent: UserWithRole | null,
     args: SubmitSampleReviewArg

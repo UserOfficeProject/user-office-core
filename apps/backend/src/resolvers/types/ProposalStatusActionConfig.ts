@@ -8,7 +8,7 @@ export enum EmailStatusActionRecipients {
   FAP_CHAIR_AND_SECRETARY = 'FAP_CHAIR_AND_SECRETARY',
   USER_OFFICE = 'USER_OFFICE',
   TECHNIQUE_SCIENTISTS = 'TECHNIQUE_SCIENTISTS',
-  SAMPLE_SAFETY = 'SAMPLE_SAFETY',
+  EXPERIMENT_SAFETY_REVIEWERS = 'EXPERIMENT_SAFETY_REVIEWERS',
   OTHER = 'OTHER',
 }
 
@@ -36,8 +36,8 @@ export const EmailStatusActionRecipientsWithDescription = new Map<
     'The Technique Scentists email address',
   ],
   [
-    EmailStatusActionRecipients.SAMPLE_SAFETY,
-    'The Sample Safety email address',
+    EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS,
+    'The Experiment Safety email address',
   ],
   [
     EmailStatusActionRecipients.OTHER,

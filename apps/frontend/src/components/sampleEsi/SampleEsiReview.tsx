@@ -30,7 +30,7 @@ function SampleEsiReview() {
     <>
       <QuestionaryDetails
         questionaryId={state.esi.questionary.questionaryId}
-        title="Sample safety input"
+        title="Experiment safety input"
       />
 
       <NavigationFragment isLoading={isExecutingCall}>
