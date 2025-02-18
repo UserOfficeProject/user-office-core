@@ -33,11 +33,13 @@ context('GenericTemplates tests', () => {
     name: faker.random.words(3),
     description: faker.random.words(5),
   };
+  const selectQuestion = 'Select option';
 
   let createdTemplateId: number;
   let createdGenericTemplateId: number;
   let workflowId: number;
   let createdQuestion1Id: string;
+  let selectQuestionId: string;
 
   const createTemplateAndAllQuestions = () => {
     cy.createTemplate({
@@ -155,7 +157,7 @@ context('GenericTemplates tests', () => {
       }
     });
   };
-  const createGenericTemplates = (count: number) => {
+  const createGenericTemplates = (count: number, textMandactory?: string) => {
     const genericTemplates: number[] = [];
     for (let index = 0; index <= count; index++)
       cy.createTemplate({
@@ -177,7 +179,7 @@ context('GenericTemplates tests', () => {
                 id: createdQuestion.id,
                 question: faker.lorem.words(5),
                 naturalKey: faker.lorem.word(5),
-                config: `{"required":true,"multiline":false}`,
+                config: `{"required":${textMandactory ? textMandactory : true},"multiline":false}`,
               });
               cy.createQuestionTemplateRelation({
                 questionId: createdQuestion.id,
@@ -244,6 +246,86 @@ context('GenericTemplates tests', () => {
             });
           });
         }
+        cy.updateCall({
+          id: initialDBData.call.id,
+          ...updatedCall,
+          templateId: proposalTemplateId,
+          proposalWorkflowId: workflowId,
+        });
+      }
+    });
+  };
+
+  const createProposalTemplateWithSubTemplateAndSelectQues = (
+    genericSubTemplateIds: number[]
+  ) => {
+    cy.createTemplate({
+      name: proposalTemplateName,
+      groupId: TemplateGroupId.PROPOSAL,
+    }).then((result) => {
+      if (result.createTemplate) {
+        const proposalTemplateId = result.createTemplate.templateId;
+
+        cy.createTopic({
+          templateId: proposalTemplateId,
+          sortOrder: 1,
+        }).then((topicResult) => {
+          if (!topicResult.createTopic) {
+            throw new Error('Can not create topic');
+          }
+          const topicId =
+            topicResult.createTopic.steps[
+              topicResult.createTopic.steps.length - 1
+            ].topic.id;
+          cy.updateTopic({
+            title: faker.lorem.words(2),
+            templateId: proposalTemplateId,
+            sortOrder: 1,
+            topicId,
+          });
+
+          cy.createQuestion({
+            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+            dataType: DataType.SELECTION_FROM_OPTIONS,
+          }).then((result) => {
+            selectQuestionId = result.createQuestion.id;
+            cy.updateQuestion({
+              id: selectQuestionId,
+              question: selectQuestion,
+              config: `{"options": ["Yes","No"],"variant": "dropdown","required": true,"isMultipleSelect": false}`,
+            });
+
+            cy.createQuestionTemplateRelation({
+              questionId: selectQuestionId,
+              templateId: proposalTemplateId,
+              sortOrder: 0,
+              topicId: topicId,
+            });
+          });
+
+          cy.createQuestion({
+            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+            dataType: DataType.GENERIC_TEMPLATE,
+          }).then((questionResult) => {
+            if (questionResult.createQuestion) {
+              const createdQuestion1Id = questionResult.createQuestion.id;
+
+              cy.updateQuestion({
+                id: createdQuestion1Id,
+                question: genericTemplateQuestion[1],
+                config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","minEntries":"1","maxEntries":"2","templateId":${genericSubTemplateIds[0]},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+              });
+
+              cy.createQuestionTemplateRelation({
+                questionId: createdQuestion1Id,
+                templateId: proposalTemplateId,
+                sortOrder: 1,
+                topicId: topicId,
+              });
+            }
+          });
+        });
+
         cy.updateCall({
           id: initialDBData.call.id,
           ...updatedCall,
@@ -1025,6 +1107,134 @@ context('GenericTemplates tests', () => {
 
       cy.contains(genericTemplateTitleAnswers[2]);
       cy.contains(genericTemplateTitleAnswers[3]);
+    });
+  });
+
+  describe('Generic sub template tests', () => {
+    it.only('Sub template should be cleared if dependencies are not satisfied after clonning', () => {
+      let proposalPK: number;
+      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
+        if (result.createProposalWorkflow) {
+          workflowId = result.createProposalWorkflow.id;
+          const genericTemplates = createGenericTemplates(0, 'false');
+          createProposalTemplateWithSubTemplateAndSelectQues(genericTemplates);
+        } else {
+          throw new Error('Workflow creation failed');
+        }
+      });
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.navigateToTemplatesSubmenu('Proposal');
+      cy.contains(proposalTemplateName)
+        .parent()
+        .find("[aria-label='Edit']")
+        .first()
+        .click();
+      cy.contains(genericTemplateQuestion[1]).click();
+      cy.finishedLoading();
+      cy.get('[data-cy="add-dependency-button"]').click();
+      cy.get('[id="dependency-id"]').click();
+      cy.get('[role="presentation"]').contains(selectQuestion).click();
+      cy.get('[id="dependencyValue"]').click();
+      cy.finishedLoading();
+      cy.contains('Yes').click();
+      cy.get('[data-cy="dependencyValue"] input').should('have.value', 'Yes');
+      cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="question-relation-dialogue"]').should('not.exist');
+      cy.logout();
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          proposalPK = result.createProposal.primaryKey;
+          cy.updateProposal({
+            proposalPk: result.createProposal.primaryKey,
+            title: proposalTitle[1],
+            abstract: faker.lorem.words(3),
+            proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.login('user1', initialDBData.roles.user);
+          cy.visit('/');
+          cy.finishedLoading();
+
+          cy.contains(`${proposalTitle[1]}`)
+            .parent()
+            .find('[aria-label="Edit proposal"]')
+            .click();
+          cy.finishedLoading();
+
+          cy.contains('Save and continue').parent().click();
+          cy.finishedLoading();
+
+          cy.contains('Select option').parent().click();
+          cy.get('[role="listbox"]').contains('Yes').click();
+          cy.contains(addButtonLabel[0]).click();
+          cy.get('[data-cy=title-input] textarea').first().clear();
+          const longTitle = faker.lorem.paragraph(5);
+          cy.get('[data-cy=title-input] textarea')
+            .first()
+            .clear()
+            .type(longTitle)
+            .should('have.value', longTitle)
+            .blur();
+          cy.get(
+            '[data-cy=genericTemplate-declaration-modal] [data-cy=save-and-continue-button]'
+          ).click();
+          cy.finishedLoading();
+          cy.get('[data-cy="questionnaires-list-item"]').should(
+            'have.length',
+            1
+          );
+          cy.contains('Save and continue').click();
+          cy.finishedLoading();
+          cy.contains('Submit').click();
+          cy.get('[data-cy=confirm-ok]').click();
+
+          cy.cloneProposals({
+            callId: initialDBData.call.id,
+            proposalsToClonePk: [proposalPK],
+          });
+          cy.contains('Dashboard').click();
+          cy.finishedLoading();
+          cy.contains(`Copy of ${proposalTitle[1]}`)
+            .parent()
+            .find('[aria-label="Edit proposal"]')
+            .click();
+          cy.finishedLoading();
+          cy.contains('New proposal', { matchCase: true }).click();
+          cy.contains('Save and continue').click();
+          cy.finishedLoading();
+
+          cy.contains('Select option').parent().click();
+          cy.get('[role="listbox"]').contains('No').click();
+          cy.get('[data-cy="questionnaires-list-item"]').should(
+            'have.length',
+            0
+          );
+          cy.contains('Save and continue').click();
+          cy.finishedLoading();
+
+          cy.contains('Dashboard').click();
+          cy.finishedLoading();
+          cy.contains(`Copy of ${proposalTitle[1]}`)
+            .parent()
+            .find('[aria-label="Edit proposal"]')
+            .click();
+          cy.finishedLoading();
+          cy.contains('New proposal', { matchCase: true }).click();
+          cy.contains('Save and continue').click();
+          cy.finishedLoading();
+
+          cy.contains('Select option').parent().click();
+          cy.get('[role="listbox"]').contains('Yes').click();
+
+          cy.get('[data-cy="questionnaires-list-item"]').should(
+            'have.length',
+            0
+          );
+        }
+      });
     });
   });
 
