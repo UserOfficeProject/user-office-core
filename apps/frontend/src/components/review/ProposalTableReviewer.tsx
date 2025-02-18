@@ -78,7 +78,7 @@ const columns: (
     customSort: (a, b) => a.status.localeCompare(b.status),
   },
   { title: 'Call', field: 'callShortCode' },
-  { title: t('instrument') as string, field: 'instrumentShortCode' },
+  { title: t('instrument') as string, field: 'instrumentShortCodes' },
 ];
 
 const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
@@ -301,8 +301,13 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     const [orderBy] = orderByCollection;
 
     setSearchParams((searchParams) => {
-      searchParams.set('sortField', orderBy?.orderByField);
-      searchParams.set('sortDirection', orderBy?.orderDirection);
+      if (orderBy?.orderByField && orderBy?.orderDirection) {
+        searchParams.set('sortField', orderBy?.orderByField);
+        searchParams.set('sortDirection', orderBy?.orderDirection);
+      } else {
+        searchParams.delete('sortField');
+        searchParams.delete('sortDirection');
+      }
 
       return searchParams;
     });
@@ -407,6 +412,10 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       rowActions: RowActionButtons(proposal),
     }));
 
+  const hasAccessToReview = isFapReviewer
+    ? proposalToReview?.reviewerId === userData?.id
+    : true;
+
   return (
     <>
       <Grid container spacing={2}>
@@ -468,8 +477,12 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
       >
         <ProposalReviewContent
           proposalPk={proposalToReview?.proposalPk}
-          reviewId={reviewModal ? +reviewModal : undefined}
-          tabNames={reviewerProposalReviewTabs}
+          reviewId={reviewModal && hasAccessToReview ? +reviewModal : undefined}
+          tabNames={
+            hasAccessToReview
+              ? reviewerProposalReviewTabs
+              : reviewerProposalReviewTabs.slice(0, -1)
+          }
           fapId={
             userData?.reviews.find((review) => {
               return (
