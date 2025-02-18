@@ -14,7 +14,11 @@ export class CoProposerClaimDataSourceMock
     ];
   }
 
-  async findByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
+  async getByProposalPk(proposalPk: number): Promise<CoProposerClaim[]> {
+    return this.invites.filter((invite) => invite.proposalPk === proposalPk);
+  }
+
+  async getByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
     return this.invites.find((invite) => invite.inviteId === inviteId) || null;
   }
 

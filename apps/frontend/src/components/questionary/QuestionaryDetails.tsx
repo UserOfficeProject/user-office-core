@@ -95,11 +95,9 @@ function QuestionaryDetails(props: QuestionaryDetailsProps) {
     const stepContent = <AnswersTable rows={rows} />;
 
     return (
-      <StepView
-        title={step.topic.title}
-        content={stepContent}
-        key={step.topic.id}
-      />
+      <div data-cy="questionary-details-view" key={step.topic.id}>
+        <StepView title={step.topic.title} content={stepContent} />
+      </div>
     );
   });
 
