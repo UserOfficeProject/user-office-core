@@ -192,7 +192,10 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           );
           for (const step of await questionarySteps) {
             const stepFields = step.fields.map((field) => field);
-            if (step.topic.title.toUpperCase() === 'SAMPLES') {
+            if (
+              step.topic.title.toUpperCase() === 'SAMPLES' ||
+              step.topic.title.toUpperCase() === 'SAMPLE'
+            ) {
               const answers = await stepAnswers(
                 stepFields,
                 proposal.primaryKey
