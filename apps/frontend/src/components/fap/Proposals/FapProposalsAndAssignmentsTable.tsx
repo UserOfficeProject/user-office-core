@@ -163,6 +163,10 @@ const FapProposalColumns: Column<FapProposalType>[] = [
         getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
       ),
   },
+  {
+    title: 'Instrument',
+    field: 'instrument.name',
+  },
 ];
 
 const FapProposalsAndAssignmentsTable = ({

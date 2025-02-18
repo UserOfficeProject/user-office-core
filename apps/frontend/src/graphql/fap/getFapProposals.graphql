@@ -21,6 +21,11 @@ query getFapProposals($fapId: Int!, $callId: Int) {
         institutionId
       }
     }
+    instrument {
+      id
+      name
+      shortCode
+    }
     assignments {
       proposalPk
       fapMemberUserId
