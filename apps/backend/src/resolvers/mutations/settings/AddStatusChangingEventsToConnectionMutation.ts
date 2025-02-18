@@ -14,7 +14,7 @@ import { StatusChangingEvent } from '../../types/StatusChangingEvent';
 @InputType()
 export class AddStatusChangingEventsToConnectionInput {
   @Field(() => Int)
-  public proposalWorkflowConnectionId: number;
+  public workflowConnectionId: number;
 
   @Field(() => [String])
   public statusChangingEvents: string[];
@@ -28,7 +28,7 @@ export class AddStatusChangingEventsToConnectionMutation {
     @Arg('addStatusChangingEventsToConnectionInput')
     addStatusChangingEventsToConnectionInput: AddStatusChangingEventsToConnectionInput
   ) {
-    return context.mutations.proposalSettings.addStatusChangingEventsToConnection(
+    return context.mutations.workflow.addStatusChangingEventsToConnection(
       context.user,
       addStatusChangingEventsToConnectionInput
     );

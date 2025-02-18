@@ -3,6 +3,7 @@ import {
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import initialDBData from '../support/initialDBData';
@@ -32,6 +33,7 @@ context('GenericTemplates tests', () => {
   const proposalWorkflow = {
     name: faker.random.words(3),
     description: faker.random.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
 
   let createdTemplateId: number;
@@ -425,9 +427,9 @@ context('GenericTemplates tests', () => {
     beforeEach(() => {
       createTemplateAndAllQuestions();
 
-      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow) {
-          workflowId = result.createProposalWorkflow.id;
+      cy.createWorkflow(proposalWorkflow).then((result) => {
+        if (result.createWorkflow) {
+          workflowId = result.createWorkflow.id;
         } else {
           throw new Error('Workflow creation failed');
         }
@@ -890,9 +892,9 @@ context('GenericTemplates tests', () => {
 
   describe('Generic template cloning tests', () => {
     beforeEach(() => {
-      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow) {
-          workflowId = result.createProposalWorkflow.id;
+      cy.createWorkflow(proposalWorkflow).then((result) => {
+        if (result.createWorkflow) {
+          workflowId = result.createWorkflow.id;
           const genericTemplates = createGenericTemplates(2);
           createProposalTemplateWithSubTemplate(genericTemplates);
           cy.createProposal({ callId: initialDBData.call.id }).then(
@@ -1032,9 +1034,9 @@ context('GenericTemplates tests', () => {
     beforeEach(() => {
       createTemplateAndAllQuestions();
 
-      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow) {
-          workflowId = result.createProposalWorkflow.id;
+      cy.createWorkflow(proposalWorkflow).then((result) => {
+        if (result.createWorkflow) {
+          workflowId = result.createWorkflow.id;
         } else {
           throw new Error('Workflow creation failed');
         }

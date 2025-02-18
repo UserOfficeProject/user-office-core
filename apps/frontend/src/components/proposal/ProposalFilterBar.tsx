@@ -10,9 +10,9 @@ import {
   DataType,
   InstrumentMinimalFragment,
   ProposalsFilter,
-  ProposalStatus,
   QuestionFilterCompareOperator,
   QuestionFilterInput,
+  Status,
 } from 'generated/sdk';
 
 export const questionaryFilterFromUrlQuery = (urlQuery: {
@@ -42,7 +42,7 @@ type ProposalFilterBarProps = {
     isLoading: boolean;
   };
   instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
-  proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
+  proposalStatuses?: { data: Status[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
   hiddenStatuses: number[];

@@ -22,7 +22,7 @@ import { StatusActionsLogsArgs } from '../resolvers/queries/StatusActionsLogsQue
 import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
-} from '../resolvers/types/ProposalStatusActionConfig';
+} from '../resolvers/types/StatusActionConfig';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 
 interface GroupedObjectType {

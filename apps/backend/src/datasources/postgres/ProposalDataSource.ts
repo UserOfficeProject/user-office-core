@@ -9,7 +9,6 @@ import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
-import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
@@ -17,6 +16,7 @@ import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
+import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import {
   ProposalBookingFilter,
@@ -26,7 +26,7 @@ import { UserProposalsFilter } from '../../resolvers/types/User';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
+import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
   QuestionFilterInput,
@@ -41,7 +41,7 @@ import {
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
-  ProposalWorkflowConnectionRecord,
+  WorkflowConnectionRecord,
   ScheduledEventRecord,
   StatusChangingEventRecord,
   TechnicalReviewRecord,
@@ -102,8 +102,8 @@ export async function calculateReferenceNumber(
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
   constructor(
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
     private AdminDataSource: AdminDataSource
   ) {}
@@ -869,21 +869,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         const proposalWorkflowId = proposalCall.proposal_workflow_id;
 
         const proposalEventsToReset: (StatusChangingEventRecord &
-          ProposalWorkflowConnectionRecord)[] = (
+          WorkflowConnectionRecord)[] = (
           await database
             .raw(
               `
         SELECT *
-        FROM proposal_workflow_connections AS pwc
-        JOIN status_changing_events
-        ON status_changing_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
-        WHERE pwc.proposal_workflow_connection_id >= (
-          SELECT proposal_workflow_connection_id
-          FROM proposal_workflow_connections
-          WHERE proposal_workflow_id = ${proposalWorkflowId}
-          AND proposal_status_id = ${statusId}
+        FROM workflow_connections AS wc
+        JOIN status_changing_events sce
+        ON sce.workflow_connection_id = wc.workflow_connection_id
+        WHERE wc.workflow_connection_id >= (
+          SELECT workflow_connection_id
+          FROM workflow_connections
+          WHERE workflow_id = ${proposalWorkflowId}
+          AND status_id = ${statusId}
         )
-        AND pwc.proposal_workflow_id = ${proposalWorkflowId};
+        AND wc.workflow_id = ${proposalWorkflowId};
       `
             )
             .transacting(trx)
@@ -1146,13 +1146,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .first()
       .then((value) => value.proposal_workflow_id);
 
-    const proposalStatus: ProposalWorkflowConnection[] =
-      await this.proposalSettingsDataSource.getProposalWorkflowConnections(
-        proposalWorkflowId
-      );
+    const proposalStatus: WorkflowConnectionWithStatus[] =
+      await this.workflowDataSource.getWorkflowConnections(proposalWorkflowId);
 
     return !!proposalStatus.find((status) =>
-      status.proposalStatus.shortCode.match(workflowStatus)
+      status.status.shortCode.match(workflowStatus)
     );
   }
 

@@ -1,12 +1,12 @@
 import {
   AddStatusChangingEventsToConnectionMutationVariables,
   AddStatusChangingEventsToConnectionMutation,
-  CreateProposalWorkflowMutationVariables,
-  CreateProposalWorkflowMutation,
-  CreateProposalStatusMutationVariables,
-  CreateProposalStatusMutation,
-  AddProposalWorkflowStatusMutationVariables,
-  AddProposalWorkflowStatusMutation,
+  CreateWorkflowMutationVariables,
+  CreateWorkflowMutation,
+  CreateStatusMutationVariables,
+  CreateStatusMutation,
+  AddWorkflowStatusMutationVariables,
+  AddWorkflowStatusMutation,
   AddConnectionStatusActionsMutation,
   AddConnectionStatusActionsMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -20,11 +20,11 @@ declare global {
        * @returns {typeof createProposalWorkflow}
        * @memberof Chainable
        * @example
-       *    cy.createProposalWorkflow('Workflow name', 'Workflow description')
+       *    cy.createWorkflow('Workflow name', 'Workflow description')
        */
-      createProposalWorkflow: (
-        createProposalWorkflowInput: CreateProposalWorkflowMutationVariables
-      ) => Cypress.Chainable<CreateProposalWorkflowMutation>;
+      createWorkflow: (
+        createWorkflowInput: CreateWorkflowMutationVariables
+      ) => Cypress.Chainable<CreateWorkflowMutation>;
 
       /**
        * Creates new proposal status.
@@ -32,11 +32,11 @@ declare global {
        * @returns {typeof createProposalStatus}
        * @memberof Chainable
        * @example
-       *    cy.createProposalStatus(createProposalStatusInput: CreateProposalStatusMutationVariables)
+       *    cy.createStatus(createProposalStatusInput: CreateStatusMutationVariables)
        */
-      createProposalStatus: (
-        createProposalStatusInput: CreateProposalStatusMutationVariables
-      ) => Cypress.Chainable<CreateProposalStatusMutation>;
+      createStatus: (
+        createStatusInput: CreateStatusMutationVariables
+      ) => Cypress.Chainable<CreateStatusMutation>;
 
       /**
        * Adds status changing event/s to status. When those event/s are fired the the status will be changed to statusCode you pass.
@@ -53,14 +53,14 @@ declare global {
       /**
        * Add proposal status to workflow.
        *
-       * @returns {typeof addProposalWorkflowStatus}
+       * @returns {typeof addWorkflowStatus}
        * @memberof Chainable
        * @example
-       *    cy.addProposalWorkflowStatus(addProposalWorkflowStatusInput: AddProposalWorkflowStatusMutationVariables)
+       *    cy.addWorkflowStatus(addWorkflowStatusInput: AddWorkflowStatusMutationVariables)
        */
-      addProposalWorkflowStatus: (
-        addProposalWorkflowStatusInput: AddProposalWorkflowStatusMutationVariables
-      ) => Cypress.Chainable<AddProposalWorkflowStatusMutation>;
+      addWorkflowStatus: (
+        addWorkflowStatusInput: AddWorkflowStatusMutationVariables
+      ) => Cypress.Chainable<AddWorkflowStatusMutation>;
       /**
        * Add proposal status action to workflow connection.
        *
@@ -76,12 +76,12 @@ declare global {
       /**
        * Add feasibility review to default workflow.
        *
-       * @returns {typeof AddProposalWorkflowStatusMutation}
+       * @returns {typeof AddWorkflowStatusMutation}
        * @memberof Chainable
        * @example
        *    cy.addFeasibilityReviewToDefaultWorkflow()
        */
-      addFeasibilityReviewToDefaultWorkflow: () => Cypress.Chainable<AddProposalWorkflowStatusMutation>;
+      addFeasibilityReviewToDefaultWorkflow: () => Cypress.Chainable<AddWorkflowStatusMutation>;
     }
   }
 }

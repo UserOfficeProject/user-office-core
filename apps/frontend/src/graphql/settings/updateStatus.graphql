@@ -1,0 +1,17 @@
+mutation updateStatus(
+  $id: Int!
+  $shortCode: String!
+  $name: String!
+  $description: String!
+) {
+  updateStatus(
+    updatedStatusInput: {
+      id: $id
+      shortCode: $shortCode
+      name: $name
+      description: $description
+    }
+  ) {
+    ...status
+  }
+}

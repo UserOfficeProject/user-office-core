@@ -1,0 +1,11 @@
+mutation moveWorkflowStatus(
+  $from: IndexWithGroupId!
+  $to: IndexWithGroupId!
+  $workflowId: Int!
+) {
+  moveWorkflowStatus(
+    moveWorkflowStatusInput: { from: $from, to: $to, workflowId: $workflowId }
+  ) {
+    id
+  }
+}

@@ -94,8 +94,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
       const { call } = await api().getCallSubmissionDetails({
         callId: proposal.callId,
       });
-      const connections =
-        call?.proposalWorkflow?.proposalWorkflowConnectionGroups;
+      const connections = call?.workflow?.workflowConnectionGroups;
 
       const currentStatusId = proposal.status?.id;
 
@@ -109,12 +108,10 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           connections.some((group) =>
             group.connections.find(
               (conn) =>
-                conn.prevProposalStatusId &&
+                conn.prevStatusId &&
                 currentStatusId &&
-                conn.prevProposalStatusId === currentStatusId &&
-                editableStatusesShortCodes?.includes(
-                  conn.proposalStatus.shortCode
-                )
+                conn.prevStatusId === currentStatusId &&
+                editableStatusesShortCodes?.includes(conn.status.shortCode)
             )
           );
 
