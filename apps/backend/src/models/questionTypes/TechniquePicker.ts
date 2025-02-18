@@ -76,9 +76,12 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
 
       return {
         ...config,
-        techniques: uniqueTechniques.map(
-          (technique) => new TechniqueOptionClass(technique.id, technique.name)
-        ),
+        techniques: uniqueTechniques
+          .map(
+            (technique) =>
+              new TechniqueOptionClass(technique.id, technique.name)
+          )
+          .sort((a, b) => (a.name > b.name ? 1 : -1)),
       };
     } catch (err) {
       logger.logError('Techniques fetch failed', {
