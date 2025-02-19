@@ -6,14 +6,14 @@ import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
-import PostgresCoProposerInviteDataSource from '../datasources/postgres/CoProposerInviteDataSource';
+import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
 import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
-import PostgresInviteCodesDataSource from '../datasources/postgres/InviteCodesDataSource';
+import PostgresInviteDataSource from '../datasources/postgres/InviteDataSource';
 import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalEsiDataSource from '../datasources/postgres/ProposalEsiDataSource';
@@ -21,7 +21,7 @@ import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
-import PostgresRoleInviteDataSource from '../datasources/postgres/RoleInviteDataSource';
+import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
@@ -53,21 +53,22 @@ import {
   getStfcDataRow,
   populateStfcRow,
 } from '../factory/xlsx/stfc/StfcFapDataRow';
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
-mapClass(Tokens.CoProposerInviteDataSource, PostgresCoProposerInviteDataSource);
+mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);
 mapClass(Tokens.FileDataSource, PostgresFileDataSource);
 mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, StfcInstrumentDataSource);
-mapClass(Tokens.InviteCodeDataSource, PostgresInviteCodesDataSource);
-mapClass(Tokens.RoleInviteDataSource, PostgresRoleInviteDataSource);
+mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
+mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
 mapClass(Tokens.InviteAuthorization, InviteAuthorization);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, StfcProposalDataSource);
@@ -122,3 +123,5 @@ mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.DownloadService, StfcDownloadService);
+
+mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);

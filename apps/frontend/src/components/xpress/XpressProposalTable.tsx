@@ -82,7 +82,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { techniques, loadingTechniques } = useXpressTechniquesData();
 
   // Only show instruments in the user's techniques
-  const { instruments, loadingInstruments } =
+  const { allInstruments, techniqueInstruments, loadingInstruments } =
     useXpressInstrumentsData(techniques);
 
   const [searchParams, setSearchParams] = useSearchParams({});
@@ -330,15 +330,11 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = Array.from(
+        let instruments = Array.from(
           new Map(
             techniques
               .filter((technique) => techIds?.includes(technique.id))
               .flatMap((technique) => technique.instruments)
-              .filter(
-                (instrument) =>
-                  !instrument.description.toLowerCase().includes('retired')
-              )
               .map((instrument) => [instrument.id, instrument])
           ).values()
         );
@@ -355,16 +351,39 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         const shouldBeUneditable =
           !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
 
+        const currentInstrument = rowData.instruments?.[0];
+        const isCurrentInstrumentInList = instruments.some(
+          (inst) => inst.id === fieldValue
+        );
+
+        /*
+          When an instrument has been removed from a technique (i.e. it is
+          no longer available for selection), make sure that it still displays
+          as the current instrument on proposals that already have it assigned.
+        */
+        if (currentInstrument && !isCurrentInstrumentInList) {
+          const missingInst = allInstruments.find(
+            (inst) => inst.id === currentInstrument.id
+          ) || {
+            id: currentInstrument.id,
+            name: 'Unknown',
+            shortCode: '',
+            description: '',
+          };
+
+          instruments = [missingInst, ...instruments];
+        }
+
         // Always show the current instrument at the top of the dropdown
-        instrumentList.forEach(function (instrument, i) {
+        instruments.forEach(function (instrument, i) {
           if (fieldValue && instrument.id === fieldValue) {
-            instrumentList.splice(i, 1);
-            instrumentList.unshift(instrument);
+            instruments.splice(i, 1);
+            instruments.unshift(instrument);
           }
         });
 
         return shouldBeUneditable ? (
-          instrumentList.find((i) => i.id === fieldValue)?.name
+          instruments.find((i) => i.id === fieldValue)?.name
         ) : (
           <>
             <FormControl fullWidth>
@@ -393,8 +412,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 value={selectedValue}
                 data-cy="instrument-dropdown"
               >
-                {instrumentList &&
-                  instrumentList.map((instrument) => (
+                {instruments &&
+                  instruments.map((instrument) => (
                     <MenuItem key={instrument.id} value={instrument.id}>
                       {instrument.name}
                     </MenuItem>
@@ -824,7 +843,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           </ProposalReviewModal>
           <XpressProposalFilterBar
             calls={{ data: calls, isLoading: loadingCalls }}
-            instruments={{ data: instruments, isLoading: loadingInstruments }}
+            instruments={{
+              data: techniqueInstruments,
+              isLoading: loadingInstruments,
+            }}
             techniques={{
               data: techniques,
               isLoading: loadingTechniques,

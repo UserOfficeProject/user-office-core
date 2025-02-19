@@ -10,7 +10,7 @@ import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
-import PostgresCoProposerInviteDataSource from '../datasources/postgres/CoProposerInviteDataSource';
+import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
@@ -19,7 +19,7 @@ import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
-import PostgresInviteCodesDataSource from '../datasources/postgres/InviteCodesDataSource';
+import PostgresInviteDataSource from '../datasources/postgres/InviteDataSource';
 import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
@@ -28,7 +28,7 @@ import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
-import PostgresRoleInviteDataSource from '../datasources/postgres/RoleInviteDataSource';
+import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
 import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
 import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
@@ -57,6 +57,7 @@ import {
   getDataRow,
   populateRow,
 } from '../factory/xlsx/FapDataRow';
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureBaseEnvironment } from './base/configureBaseEnvironment';
 import { Tokens } from './Tokens';
@@ -67,15 +68,15 @@ async function skipEmailHandler(event: ApplicationEvent) {
 }
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
-mapClass(Tokens.CoProposerInviteDataSource, PostgresCoProposerInviteDataSource);
+mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);
 mapClass(Tokens.FileDataSource, PostgresFileDataSource);
 mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
-mapClass(Tokens.InviteCodeDataSource, PostgresInviteCodesDataSource);
-mapClass(Tokens.RoleInviteDataSource, PostgresRoleInviteDataSource);
+mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
+mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
 mapClass(Tokens.InviteAuthorization, InviteAuthorization);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
@@ -130,3 +131,5 @@ mapValue(Tokens.ConfigureEnvironment, configureBaseEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.DownloadService, DefaultDownloadService);
+
+mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);

@@ -1,28 +1,26 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { InviteCode } from '../../models/InviteCode';
+import { Invite } from '../../models/Invite';
 import { UpdateInviteInput } from '../../resolvers/mutations/UpdateInviteMutation';
-import { InviteCodeDataSource } from '../InviteCodeDataSource';
+import { InviteDataSource } from '../InviteDataSource';
 import database from './database';
-import { createInviteCodeObject, InviteCodeRecord } from './records';
+import { createInviteObject, InviteRecord } from './records';
 
-export default class PostgresInviteCodesDataSource
-  implements InviteCodeDataSource
-{
-  findByCode(code: string): Promise<InviteCode | null> {
+export default class PostgresInviteDataSource implements InviteDataSource {
+  findByCode(code: string): Promise<Invite | null> {
     return database
       .select('*')
-      .from('invite_codes')
+      .from('invites')
       .where('code', code)
       .catch((error: Error) => {
         throw new Error(`Could not find invite: ${error.message}`);
       })
-      .then((invites: InviteCodeRecord[]) => {
+      .then((invites: InviteRecord[]) => {
         if (invites.length === 0) {
           return null;
         }
 
-        return createInviteCodeObject(invites[0]);
+        return createInviteObject(invites[0]);
       });
   }
 
@@ -30,26 +28,24 @@ export default class PostgresInviteCodesDataSource
     createdByUserId: number,
     code: string,
     email: string
-  ): Promise<InviteCode> {
+  ): Promise<Invite> {
     return database
       .insert({
         code: code,
         email: email,
         created_by: createdByUserId,
       })
-      .into('invite_codes')
+      .into('invites')
       .returning('*')
       .catch((error: Error) => {
         throw new Error(`Could not create invite: ${error.message}`);
       })
-      .then((invites: InviteCodeRecord[]) =>
-        createInviteCodeObject(invites[0])
-      );
+      .then((invites: InviteRecord[]) => createInviteObject(invites[0]));
   }
 
   async update(
-    args: UpdateInviteInput & Pick<InviteCode, 'claimedAt' | 'claimedByUserId'>
-  ): Promise<InviteCode> {
+    args: UpdateInviteInput & Pick<Invite, 'claimedAt' | 'claimedByUserId'>
+  ): Promise<Invite> {
     return database
       .update({
         code: args.code,
@@ -58,28 +54,26 @@ export default class PostgresInviteCodesDataSource
         claimed_at: args.claimedAt,
         claimed_by: args.claimedByUserId,
       })
-      .from('invite_codes')
-      .where('invite_code_id', args.id)
+      .from('invites')
+      .where('invite_id', args.id)
       .returning('*')
-      .then((invites: InviteCodeRecord[]) =>
-        createInviteCodeObject(invites[0])
-      );
+      .then((invites: InviteRecord[]) => createInviteObject(invites[0]));
   }
 
-  async findById(id: number): Promise<InviteCode | null> {
+  async findById(id: number): Promise<Invite | null> {
     return database
       .select('*')
-      .from('invite_codes')
-      .where('invite_code_id', id)
+      .from('invites')
+      .where('invite_id', id)
       .catch((error: Error) => {
         throw new Error(`Could not find invite: ${error.message}`);
       })
-      .then((invites: InviteCodeRecord[]) => {
+      .then((invites: InviteRecord[]) => {
         if (invites.length === 0) {
           return null;
         }
 
-        return createInviteCodeObject(invites[0]);
+        return createInviteObject(invites[0]);
       });
   }
 }
