@@ -21,7 +21,6 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
-import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 export const EXCHANGE_NAME =
@@ -366,22 +365,6 @@ export async function createListenToRabbitMQHandler() {
             }
           );
 
-          // const scheduledEventToAdd = {
-          //   id: message.id,
-          //   bookingType: message.bookingType,
-          //   startsAt: message.startsAt,
-          //   endsAt: message.endsAt,
-          //   proposalBookingId: message.proposalBookingId,
-          //   proposalPk: message.proposalPk,
-          //   status: message.status,
-          //   localContactId: message.localContact,
-          //   instrumentId: message.instrumentId,
-          // } as ScheduledEventCore;
-
-          // await proposalDataSource.addProposalBookingScheduledEvent(
-          //   scheduledEventToAdd
-          // );
-
           const experimentToAdd = {
             startsAt: message.startsAt,
             endsAt: message.endsAt,
@@ -412,34 +395,18 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-          const scheduledEventsToRemove = (
-            message.scheduledevents as ScheduledEventCore[]
-          ).map((scheduledEvent) => ({
-            id: scheduledEvent.id,
-            bookingType: scheduledEvent.bookingType,
-            startsAt: scheduledEvent.startsAt,
-            endsAt: scheduledEvent.endsAt,
-            proposalBookingId: scheduledEvent.proposalBookingId,
-            proposalPk: scheduledEvent.proposalPk,
-            status: scheduledEvent.status,
-            localContactId: scheduledEvent.localContactId,
-            instrumentId: scheduledEvent.instrumentId,
-          }));
 
-          await proposalDataSource.removeProposalBookingScheduledEvents(
-            scheduledEventsToRemove
-          );
-
-          scheduledEventsToRemove.forEach(async (scheduledEvent) => {
+          const scheduledEvents = message.scheduledevents as {
+            id: number;
+            proposalPk: number;
+          }[];
+          scheduledEvents.forEach(async (scheduledEvent) => {
             await experimentDataSource.deleteByScheduledEventId(
               scheduledEvent.id
             );
           });
 
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventsToRemove[0].proposalPk
-          );
+          await handleWorkflowEngineChange(type, scheduledEvents[0].proposalPk);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -458,19 +425,6 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-          const scheduledEventToUpdate = {
-            id: message.id,
-            proposalBookingId: message.proposalBookingId,
-            startsAt: message.startsAt,
-            endsAt: message.endsAt,
-            status: message.status,
-            localContactId: message.localContactId,
-            proposalPk: message.proposalPk,
-          } as ScheduledEventCore;
-
-          await proposalDataSource.updateProposalBookingScheduledEvent(
-            scheduledEventToUpdate
-          );
 
           await experimentDataSource.updateByScheduledEventId({
             startsAt: message.startsAt,
@@ -482,10 +436,7 @@ export async function createListenToRabbitMQHandler() {
             Experiment,
             'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
           >);
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventToUpdate.proposalPk
-          );
+          await handleWorkflowEngineChange(type, message.proposalPk as number);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }

@@ -20,7 +20,6 @@ import ProposalMutations from './mutations/ProposalMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import RedeemCodesMutations from './mutations/RedeemCodesMutations';
 import ReviewMutations from './mutations/ReviewMutations';
-import SampleEsiMutations from './mutations/SampleEsiMutations';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
@@ -43,13 +42,10 @@ import InstrumentQueries from './queries/InstrumentQueries';
 import InternalReviewQueries from './queries/InternalReviewQueries';
 import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
-import ProposalEsiQueries from './queries/ProposalEsiQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
-import SampleEsiQueries from './queries/SampleEsiQueries';
 import SampleQueries from './queries/SampleQueries';
-import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import SettingsQueries from './queries/SettingsQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import StatusActionQueries from './queries/StatusActionQueries';
@@ -75,12 +71,9 @@ const context: BasicResolverContext = {
     instrument: container.resolve(InstrumentQueries),
     pdfTemplate: container.resolve(PdfTemplateQueries),
     proposal: container.resolve(ProposalQueries),
-    proposalEsi: container.resolve(ProposalEsiQueries),
     questionary: container.resolve(QuestionaryQueries),
     review: container.resolve(ReviewQueries),
     sample: container.resolve(SampleQueries),
-    sampleEsi: container.resolve(SampleEsiQueries),
-    scheduledEvent: container.resolve(ScheduledEventQueries),
     fap: container.resolve(FapQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
@@ -113,7 +106,6 @@ const context: BasicResolverContext = {
     redeemCodes: container.resolve(RedeemCodesMutations),
     review: container.resolve(ReviewMutations),
     sample: container.resolve(SampleMutations),
-    sampleEsi: container.resolve(SampleEsiMutations),
     fap: container.resolve(FapMutations),
     shipment: container.resolve(ShipmentMutations),
     template: container.resolve(TemplateMutations),

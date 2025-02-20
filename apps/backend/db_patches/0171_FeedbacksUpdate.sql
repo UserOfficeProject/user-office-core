@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('0170_VisitsUpdate', 'Yoganandan Pandiyan', 'Updating the Feedbacks to refer to the new Experiments table', '2025-02-13') THEN
+  IF register_patch('0171_FeedbacksUpdate', 'Yoganandan Pandiyan', 'Updating the Feedbacks to refer to the new Experiments table', '2025-02-13') THEN
     ALTER TABLE feedbacks
     ADD COLUMN experiment_pk INT NOT NULL REFERENCES experiments(experiment_pk);
 

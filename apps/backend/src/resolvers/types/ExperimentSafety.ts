@@ -15,8 +15,6 @@ import { ResolverContext } from '../../context';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { ExperimentSafety as ExperimentSafetyOrigin } from '../../models/Experiment';
 import { Proposal } from './Proposal';
-import { Questionary } from './Questionary';
-import { SampleExperimentSafetyInput } from './SampleExperimentSafetyInput';
 
 @ObjectType()
 @Directive('@key(fields: "experimentSafetyPk")')
@@ -29,6 +27,9 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
 
   @Field(() => Number)
   public esiQuestionaryId: number;
+
+  @Field(() => Date)
+  public esiQuestionarySubmittedAt: Date;
 
   @Field(() => Number)
   public createdBy: number;
@@ -51,27 +52,6 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
 
 @Resolver(() => ExperimentSafety)
 export class ExperimentSafetyResolver {
-  @FieldResolver(() => [SampleExperimentSafetyInput])
-  async sampleEsis(
-    @Root() experimentSafety: ExperimentSafety,
-    @Ctx() context: ResolverContext
-  ): Promise<SampleExperimentSafetyInput[]> {
-    return context.queries.sampleEsi.getSampleEsis(context.user, {
-      esiId: experimentSafety.experimentSafetyPk,
-    });
-  }
-
-  @FieldResolver(() => Questionary)
-  async questionary(
-    @Root() experimentSafety: ExperimentSafety,
-    @Ctx() context: ResolverContext
-  ): Promise<Questionary> {
-    return context.queries.proposalEsi.getQuestionary(
-      context.user,
-      experimentSafety.esiQuestionaryId
-    );
-  }
-
   @FieldResolver(() => Proposal)
   async proposal(
     @Root() experimentSafety: ExperimentSafety,

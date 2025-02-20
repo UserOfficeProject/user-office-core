@@ -24,7 +24,6 @@ import { Fap } from './Fap';
 import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
-import { ProposalBookingsCore, ProposalBookingFilter } from './ProposalBooking';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { Sample } from './Sample';
@@ -260,18 +259,6 @@ export class ProposalResolver {
   ): Promise<Visit[] | null> {
     return await context.queries.visit.getMyVisits(context.user, {
       proposalPk: proposal.primaryKey,
-    });
-  }
-  @FieldResolver(() => ProposalBookingsCore, { nullable: true })
-  proposalBookingsCore(
-    @Root() proposal: Proposal,
-    @Ctx() ctx: ResolverContext,
-    @Arg('filter', () => ProposalBookingFilter, { nullable: true })
-    filter?: ProposalBookingFilter
-  ) {
-    return ctx.queries.proposal.getProposalBookingsByProposalPk(ctx.user, {
-      proposalPk: proposal.primaryKey,
-      filter,
     });
   }
 }

@@ -1,6 +1,6 @@
 query getUserProposalBookingsWithEvents(
   $endsAfter: DateTime
-  $status: [ProposalBookingStatusCore!]
+  $status: [ExperimentStatus!]
   $instrumentId: Int
 ) {
   me {

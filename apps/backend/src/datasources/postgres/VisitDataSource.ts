@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 
-import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
@@ -15,7 +14,6 @@ import {
   createVisitObject,
   VisitRecord,
   VisitRegistrationRecord,
-  createEsiObject,
 } from './records';
 
 class PostgresVisitDataSource implements VisitDataSource {
@@ -72,29 +70,12 @@ class PostgresVisitDataSource implements VisitDataSource {
       );
   }
 
-  getVisitByScheduledEventId(eventId: number): Promise<Visit | null> {
-    //TODO: This needs to be changed
-    return database('visits')
-      .select('*')
-      .where({ experiment_id: eventId })
-      .first()
-      .then((visit) => (visit ? createVisitObject(visit) : null));
-  }
-
   getVisitByExperimentPk(experimentPk: number): Promise<Visit | null> {
     return database('visits')
       .select('*')
       .where({ experiment_pk: experimentPk })
       .first()
       .then((visit) => (visit ? createVisitObject(visit) : null));
-  }
-
-  getEsiByVisitId(visitId: number): Promise<ExperimentSafetyInput | null> {
-    return database('experiment_safety_inputs')
-      .select('*')
-      .where({ visit_id: visitId })
-      .first()
-      .then((esi) => (esi ? createEsiObject(esi) : null));
   }
 
   createVisit(

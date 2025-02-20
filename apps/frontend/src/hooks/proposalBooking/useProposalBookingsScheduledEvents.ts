@@ -8,7 +8,7 @@ import {
   Instrument,
   Maybe,
   Proposal,
-  ProposalBookingStatusCore,
+  ExperimentStatus,
   ScheduledEventCore,
   ShipmentFragment,
   Visit,
@@ -72,10 +72,7 @@ export function useProposalBookingsScheduledEvents({
             }
           : null),
         status: notDraft
-          ? [
-              ProposalBookingStatusCore.ACTIVE,
-              ProposalBookingStatusCore.COMPLETED,
-            ]
+          ? [ExperimentStatus.ACTIVE, ExperimentStatus.COMPLETED]
           : null,
         instrumentId,
       })

@@ -5,7 +5,6 @@ import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized } from '../decorators';
@@ -35,8 +34,6 @@ export default class VisitMutations {
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    @inject(Tokens.ScheduledEventDataSource)
-    private scheduledEventDataSource: ScheduledEventDataSource,
     @inject(Tokens.ExperimentDataSource)
     private experimentDataSource: ExperimentDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,

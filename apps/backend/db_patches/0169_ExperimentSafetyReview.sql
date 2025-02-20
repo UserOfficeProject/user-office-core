@@ -20,6 +20,7 @@ BEGIN
         "experiment_safety_pk" SERIAL PRIMARY KEY
       , "experiment_pk" INT NOT NULL REFERENCES experiments(experiment_pk) ON DELETE CASCADE
       , "esi_questionary_id" INT NOT NULL REFERENCES questionaries(questionary_id)
+      , "esi_questionary_submitted_at" TIMESTAMP
       , "created_by" INT NOT NULL REFERENCES users(user_id) ON DELETE SET NULL
       , "status" varchar(30) NOT NULL
       , "safety_review_questionary_id" INT NOT NULL REFERENCES questionaries(questionary_id)

@@ -1,12 +1,9 @@
-import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { SampleEsiDataSource } from '../datasources/SampleEsiDataSource';
 import { Sample } from '../models/Sample';
 import { Tokens } from './../config/Tokens';
 import { QuestionaryDataSource } from './../datasources/QuestionaryDataSource';
-import { SampleExperimentSafetyInput } from './../models/SampleExperimentSafetyInput';
 
 type SampleOverrides = Partial<
   Pick<
@@ -21,17 +18,11 @@ type SampleOverrides = Partial<
   >
 >;
 
-type SampleESIOverrides = Partial<
-  Pick<SampleExperimentSafetyInput, 'isSubmitted'>
->;
-
 @injectable()
 export class CloneUtils {
   constructor(
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
-    @inject(Tokens.SampleEsiDataSource)
-    private sampleEsiDataSource: SampleEsiDataSource,
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource
   ) {}
@@ -62,39 +53,5 @@ export class CloneUtils {
     }
 
     return newSample;
-  }
-
-  async cloneSampleEsi(
-    sourceSampleEsi: SampleExperimentSafetyInput,
-    overrides?: {
-      esi?: SampleESIOverrides;
-      sample?: SampleOverrides;
-    }
-  ) {
-    const sourceSample = await this.sampleDataSource.getSample(
-      sourceSampleEsi.sampleId
-    );
-    if (!sourceSample) {
-      throw new GraphQLError('Sample could not be found');
-    }
-
-    const newSample = await this.cloneSample(sourceSample, overrides?.sample);
-    const newQuestionary = await this.questionaryDataSource.clone(
-      sourceSampleEsi.questionaryId
-    );
-    let newSampleEsi = await this.sampleEsiDataSource.createSampleEsi({
-      esiId: sourceSampleEsi.esiId,
-      sampleId: newSample.id,
-      questionaryId: newQuestionary.questionaryId,
-    });
-    if (overrides?.esi?.isSubmitted !== undefined) {
-      newSampleEsi = await this.sampleEsiDataSource.updateSampleEsi({
-        sampleId: newSampleEsi.sampleId,
-        esiId: newSampleEsi.esiId,
-        isSubmitted: overrides.esi.isSubmitted,
-      });
-    }
-
-    return newSampleEsi;
   }
 }

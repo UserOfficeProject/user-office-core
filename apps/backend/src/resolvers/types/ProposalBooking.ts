@@ -1,17 +1,4 @@
-import {
-  Field,
-  Int,
-  ObjectType,
-  Resolver,
-  FieldResolver,
-  Root,
-  Ctx,
-  Arg,
-  InputType,
-} from 'type-graphql';
-
-import { ResolverContext } from '../../context';
-import { ScheduledEventCore } from './ScheduledEvent';
+import { Field, Int, ObjectType, InputType } from 'type-graphql';
 
 export function If(
   condition: boolean,
@@ -31,7 +18,7 @@ export enum ScheduledEventBookingType {
   EQUIPMENT = 'EQUIPMENT',
 }
 
-export enum ProposalBookingStatusCore {
+export enum ExperimentStatus {
   DRAFT = 'DRAFT',
   ACTIVE = 'ACTIVE',
   COMPLETED = 'COMPLETED',
@@ -60,34 +47,12 @@ export class ProposalBookingScheduledEventFilterCore {
   @Field({ nullable: true })
   endsBefore?: Date;
 
-  @Field(() => [ProposalBookingStatusCore], { nullable: true })
-  status?: ProposalBookingStatusCore[] | null;
+  @Field(() => [ExperimentStatus], { nullable: true })
+  status?: ExperimentStatus[] | null;
 }
 
 @InputType()
 export class ProposalBookingFilter {
-  @Field(() => [ProposalBookingStatusCore], { nullable: true })
-  status?: ProposalBookingStatusCore[] | null;
-}
-
-@Resolver(() => ProposalBookingsCore)
-export class ProposalBookingResolvers {
-  @FieldResolver(() => [ScheduledEventCore])
-  scheduledEvents(
-    @Ctx() ctx: ResolverContext,
-    @Root() proposalBookings: ProposalBookingsCore,
-    @Arg('filter') filter: ProposalBookingScheduledEventFilterCore
-  ): Promise<ScheduledEventCore[] | null> {
-    return ctx.queries.proposal.getAllProposalBookingsScheduledEvents(
-      ctx.user,
-      {
-        proposalBookingIds: proposalBookings.ids,
-        filter: {
-          ...filter,
-          bookingType:
-            filter.bookingType ?? ScheduledEventBookingType.USER_OPERATIONS,
-        },
-      }
-    );
-  }
+  @Field(() => [ExperimentStatus], { nullable: true })
+  status?: ExperimentStatus[] | null;
 }

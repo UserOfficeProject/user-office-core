@@ -1,4 +1,3 @@
-import { ExperimentSafetyInput } from '../models/ExperimentSafetyInput';
 import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../queries/VisitQueries';
@@ -18,9 +17,7 @@ export interface VisitDataSource {
   getRegistrations(
     filter: GetRegistrationsFilter
   ): Promise<VisitRegistration[]>;
-  getVisitByScheduledEventId(eventId: number): Promise<Visit | null>;
   getVisitByExperimentPk(experimentId: number): Promise<Visit | null>;
-  getEsiByVisitId(visitId: any): Promise<ExperimentSafetyInput | null>;
   // Write
   createVisit(
     args: CreateVisitArgs,

@@ -17,7 +17,7 @@ import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitReg
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
-  ProposalBookingStatusCore,
+  ExperimentStatus,
   ProposalEndStatus,
   UserJwt,
 } from 'generated/sdk';
@@ -279,8 +279,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
 
     if (isTeamlead(user, event)) {
-      if (event.status === ProposalBookingStatusCore.COMPLETED) {
-        //todo: ProposalBookingStatusCore needs to be changed. Currently Experiment Status does not have enum
+      if (event.status === ExperimentStatus.COMPLETED) {
+        //todo: ExperimentStatus needs to be changed. Currently Experiment Status does not have enum
         if (event.feedback?.status === FeedbackStatus.SUBMITTED) {
           buttonState = 'completed';
         } else {

@@ -18,14 +18,12 @@ import { InternalReviewDataSourceMock } from '../datasources/mockups/InternalRev
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
 import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
-import { ProposalEsiDataSourceMock } from '../datasources/mockups/ProposalEsiDataSource';
 import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
-import ScheduledEventDataSourceMock from '../datasources/mockups/ScheduledEventDataSource';
 import { ShipmentDataSourceMock } from '../datasources/mockups/ShipmentDataSource';
 import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusActionsDataSource';
 import { StatusActionsLogsDataSourceMock } from '../datasources/mockups/StatusActionsLogsDataSource';
@@ -47,7 +45,6 @@ import { EventBus } from '../events/eventBus';
 import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
-import { SampleEsiDataSourceMock } from './../datasources/mockups/SampleEsiDataSource';
 import { VisitDataSourceMock } from './../datasources/mockups/VisitDataSource';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
@@ -66,7 +63,6 @@ mapClass(Tokens.InviteAuthorization, InviteAuthorization);
 mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
 mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
-mapClass(Tokens.ProposalEsiDataSource, ProposalEsiDataSourceMock);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSourceMock
@@ -79,8 +75,6 @@ mapClass(Tokens.RedeemCodesDataSource, RedeemDataSourceMock);
 mapClass(Tokens.ReviewDataSource, ReviewDataSourceMock);
 mapClass(Tokens.FapDataSource, FapDataSourceMock);
 mapClass(Tokens.SampleDataSource, SampleDataSourceMock);
-mapClass(Tokens.SampleEsiDataSource, SampleEsiDataSourceMock);
-mapClass(Tokens.ScheduledEventDataSource, ScheduledEventDataSourceMock);
 mapClass(Tokens.ShipmentDataSource, ShipmentDataSourceMock);
 mapClass(Tokens.SystemDataSource, SystemDataSourceMock);
 mapClass(Tokens.TechniqueDataSource, TechniqueDataSourceMock);

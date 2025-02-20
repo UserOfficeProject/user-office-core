@@ -4,7 +4,7 @@ import { injectable } from 'tsyringe';
 
 import {
   Experiment,
-  ExperimentHasSamples,
+  ExperimentHasSample,
   ExperimentSafety,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
@@ -12,7 +12,7 @@ import { UpdateExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExpe
 import { ExperimentDataSource } from '../ExperimentDataSource';
 import database from './database';
 import {
-  ExperimentHasSamplesRecord,
+  ExperimentHasSampleRecord,
   ExperimentRecord,
   ExperimentSafetyRecord,
 } from './records';
@@ -38,6 +38,7 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.experiment_safety_pk,
     record.experiment_pk,
     record.esi_questionary_id,
+    record.esi_questionary_submitted_at,
     record.created_by,
     record.status,
     record.safety_review_questionary_id,
@@ -47,12 +48,14 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
   );
 }
 
-export function createExperimentHasSamplesObject(
-  record: ExperimentHasSamplesRecord
+export function createExperimentHasSampleObject(
+  record: ExperimentHasSampleRecord
 ) {
-  return new ExperimentHasSamples(
+  return new ExperimentHasSample(
     record.experiment_pk,
     record.sample_id,
+    record.is_esi_submitted,
+    record.sample_esi_questionary_id,
     record.created_at,
     record.updated_at
   );
@@ -253,27 +256,43 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  async getSamples(experimentPk: number): Promise<ExperimentHasSamples[]> {
+  async getSamples(experimentPk: number): Promise<ExperimentHasSample[]> {
     return database('experiment_has_samples')
       .select('*')
       .where('experiment_pk', experimentPk)
-      .then((records: ExperimentHasSamplesRecord[]) =>
-        records.map(createExperimentHasSamplesObject)
+      .then((records: ExperimentHasSampleRecord[]) =>
+        records.map(createExperimentHasSampleObject)
       );
   }
 
   async attachSample(
     experimentPk: number,
     sampleId: number
-  ): Promise<ExperimentHasSamples> {
+  ): Promise<ExperimentHasSample[]> {
     return database('experiment_has_samples')
       .insert({
         experiment_pk: experimentPk,
         sample_id: sampleId,
       })
       .returning('*')
-      .then((records: ExperimentHasSamplesRecord[]) => {
-        records.map(createExperimentHasSamplesObject);
+      .then((records: ExperimentHasSampleRecord[]) => {
+        return records.map(createExperimentHasSampleObject);
       });
+  }
+
+  async getExperimentSafetyByESIQuestionaryId(
+    esiQuestionaryId: number
+  ): Promise<ExperimentSafety | null> {
+    const result = await database
+      .select('*')
+      .from('experiment_safety')
+      .where('esi_questionary_id', esiQuestionaryId)
+      .first();
+
+    if (!result) {
+      return null;
+    }
+
+    return createExperimentSafetyObject(result);
   }
 }

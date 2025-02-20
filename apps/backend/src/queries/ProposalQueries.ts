@@ -13,10 +13,6 @@ import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
-import {
-  ProposalBookingFilter,
-  ProposalBookingScheduledEventFilterCore,
-} from '../resolvers/types/ProposalBooking';
 import { omit } from '../utils/helperFunctions';
 
 @injectable()
@@ -37,7 +33,6 @@ export default class ProposalQueries {
     if (!proposal) {
       return null;
     }
-    console.log({ proposal });
     // If not a user officer or instrument scientist remove excellence, technical and safety score
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -50,7 +45,6 @@ export default class ProposalQueries {
     if (!this.userAuth.isUserOfficer(agent) && !proposal.notified) {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
-    console.log({ proposal });
     if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
     } else {
@@ -146,42 +140,6 @@ export default class ProposalQueries {
       sortField,
       sortDirection,
       searchText
-    );
-  }
-
-  @Authorized()
-  async getProposalBookingsByProposalPk(
-    agent: UserWithRole | null,
-    {
-      proposalPk,
-      filter,
-    }: { proposalPk: number; filter?: ProposalBookingFilter }
-  ) {
-    const proposal = await this.get(agent, proposalPk);
-    if (!proposal) {
-      return null;
-    }
-
-    const proposalBookings =
-      await this.dataSource.getProposalBookingsByProposalPk(proposalPk, filter);
-
-    return proposalBookings;
-  }
-
-  @Authorized()
-  async getAllProposalBookingsScheduledEvents(
-    agent: UserWithRole | null,
-    {
-      proposalBookingIds,
-      filter,
-    }: {
-      proposalBookingIds: number[];
-      filter?: ProposalBookingScheduledEventFilterCore;
-    }
-  ) {
-    return await this.dataSource.getAllProposalBookingsScheduledEvents(
-      proposalBookingIds,
-      filter
     );
   }
 

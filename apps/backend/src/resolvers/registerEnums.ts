@@ -32,7 +32,7 @@ import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAnd
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
   EquipmentAssignmentStatus,
-  ProposalBookingStatusCore,
+  ExperimentStatus,
   ScheduledEventBookingType,
 } from './types/ProposalBooking';
 import { EmailStatusActionRecipients } from './types/ProposalStatusActionConfig';
@@ -72,8 +72,8 @@ export const registerEnums = () => {
   registerEnumType(ScheduledEventBookingType, {
     name: 'ScheduledEventBookingType',
   });
-  registerEnumType(ProposalBookingStatusCore, {
-    name: 'ProposalBookingStatusCore',
+  registerEnumType(ExperimentStatus, {
+    name: 'ExperimentStatus',
   });
   registerEnumType(EquipmentAssignmentStatus, {
     name: 'EquipmentAssignmentStatus',

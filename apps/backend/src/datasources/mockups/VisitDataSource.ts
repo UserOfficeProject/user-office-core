@@ -1,4 +1,3 @@
-import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
@@ -10,9 +9,6 @@ import { CreateVisitArgs } from './../../resolvers/mutations/CreateVisitMutation
 import { dummyUserWithRole } from './UserDataSource';
 
 export class VisitDataSourceMock implements VisitDataSource {
-  getEsiByVisitId(visitId: any): Promise<ExperimentSafetyInput | null> {
-    throw new Error('Method not implemented.');
-  }
   private visits: Visit[];
   private visitsHasVisitors: VisitRegistration[];
   init() {
@@ -81,10 +77,6 @@ export class VisitDataSourceMock implements VisitDataSource {
 
       return matchingVisits;
     }, new Array<Visit>());
-  }
-
-  async getVisitByScheduledEventId(eventId: number): Promise<Visit | null> {
-    return this.visits.find((visit) => visit.experimentPk === eventId) ?? null;
   }
 
   async getVisitByExperimentPk(experimentPk: number): Promise<Visit | null> {

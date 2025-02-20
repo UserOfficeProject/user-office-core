@@ -31,4 +31,7 @@ export interface ExperimentDataSource {
   updateExperimentSafety(
     args: UpdateExperimentSafetyArgs
   ): Promise<ExperimentSafety>;
+  getExperimentSafetyByESIQuestionaryId(
+    esiQuestionaryId: number
+  ): Promise<ExperimentSafety | null>;
 }

@@ -34,8 +34,6 @@ import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { RoleClaim } from '../../models/RoleClaim';
 import { Sample } from '../../models/Sample';
-import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
-import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { StatusActionType } from '../../models/StatusAction';
@@ -60,17 +58,12 @@ import { Visit, VisitStatus } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import { WorkflowType } from '../../models/Workflow';
 import {
-  ProposalBookingStatusCore,
-  ScheduledEventBookingType,
-} from '../../resolvers/types/ProposalBooking';
-import {
   FapInstrument,
   ProposalViewFap,
   ProposalViewInstrument,
   ProposalViewTechnicalReview,
   ProposalViewTechnique,
 } from '../../resolvers/types/ProposalView';
-import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
 
 // Adds types to datasources: https://knexjs.org/guide/#typescript
@@ -106,18 +99,6 @@ export interface QuestionaryRecord {
   readonly template_id: number;
   readonly creator_id: number;
   readonly created_at: Date;
-}
-
-export interface ScheduledEventRecord {
-  readonly scheduled_event_id: number;
-  readonly booking_type: ScheduledEventBookingType;
-  readonly starts_at: Date;
-  readonly ends_at: Date;
-  readonly proposal_booking_id: number;
-  readonly proposal_pk: number;
-  readonly status: ProposalBookingStatusCore;
-  readonly local_contact: number | null;
-  readonly instrument_id: number;
 }
 
 export interface ProposalRecord {
@@ -719,15 +700,6 @@ export interface VisitRecord {
   readonly experiment_pk: number;
 }
 
-export interface EsiRecord {
-  readonly esi_id: number;
-  readonly scheduled_event_id: number;
-  readonly creator_id: number;
-  readonly questionary_id: number;
-  readonly is_submitted: boolean;
-  readonly created_at: Date;
-}
-
 export interface GenericTemplateRecord {
   readonly generic_template_id: number;
   readonly title: string;
@@ -736,13 +708,6 @@ export interface GenericTemplateRecord {
   readonly questionary_id: number;
   readonly question_id: string;
   readonly created_at: Date;
-}
-
-export interface SampleEsiRecord {
-  readonly esi_id: number;
-  readonly sample_id: number;
-  readonly questionary_id: number;
-  readonly is_submitted: boolean;
 }
 
 export interface TemplateGroupRecord {
@@ -1242,17 +1207,6 @@ export const createVisitObject = (visit: VisitRecord) => {
   );
 };
 
-export const createEsiObject = (esi: EsiRecord) => {
-  return new ExperimentSafetyInput(
-    esi.esi_id,
-    esi.scheduled_event_id,
-    esi.creator_id,
-    esi.questionary_id,
-    esi.is_submitted,
-    esi.created_at
-  );
-};
-
 export const createGenericTemplateObject = (
   genericTemplate: GenericTemplateRecord
 ) => {
@@ -1264,15 +1218,6 @@ export const createGenericTemplateObject = (
     genericTemplate.questionary_id,
     genericTemplate.question_id,
     genericTemplate.created_at
-  );
-};
-
-export const createSampleEsiObject = (esi: SampleEsiRecord) => {
-  return new SampleExperimentSafetyInput(
-    esi.esi_id,
-    esi.sample_id,
-    esi.questionary_id,
-    esi.is_submitted
   );
 };
 
@@ -1295,21 +1240,6 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
 export const createCountryObject = (country: CountryRecord) => {
   return new Country(country.country_id, country.country);
 };
-
-export const createScheduledEventObject = (
-  scheduledEvent: ScheduledEventRecord
-) =>
-  new ScheduledEventCore(
-    scheduledEvent.scheduled_event_id,
-    scheduledEvent.booking_type,
-    scheduledEvent.starts_at,
-    scheduledEvent.ends_at,
-    scheduledEvent.proposal_pk,
-    scheduledEvent.proposal_booking_id,
-    scheduledEvent.status,
-    scheduledEvent.local_contact,
-    scheduledEvent.instrument_id
-  );
 
 export const createUnitObject = (unit: UnitRecord) =>
   new Unit(
@@ -1492,6 +1422,7 @@ export interface ExperimentSafetyRecord {
   readonly experiment_safety_pk: number;
   readonly experiment_pk: number;
   readonly esi_questionary_id: number;
+  readonly esi_questionary_submitted_at: Date;
   readonly created_by: number;
   readonly status: string;
   readonly safety_review_questionary_id: number;

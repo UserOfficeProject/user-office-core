@@ -1,8 +1,14 @@
 import { Experiment, ExperimentSafety } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
+import { UpdateExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 
 export class ExperimentDataSourceMock implements ExperimentDataSource {
+  getExperimentSafetyByESIQuestionaryId(
+    esiQuestionaryId: number
+  ): Promise<ExperimentSafety | null> {
+    throw new Error('Method not implemented.');
+  }
   getExperimentSafety(experimentPk: number): Promise<ExperimentSafety | null> {
     throw new Error('Method not implemented.');
   }

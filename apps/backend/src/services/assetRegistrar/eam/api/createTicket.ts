@@ -1,8 +1,8 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../../../config/Tokens';
+import { ExperimentDataSource } from '../../../../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../../../../datasources/ProposalDataSource';
-import { ScheduledEventDataSource } from '../../../../datasources/ScheduledEventDataSource';
 import { ShipmentDataSource } from '../../../../datasources/ShipmentDataSource';
 import { UserDataSource } from '../../../../datasources/UserDataSource';
 import getRequest from '../requests/AddCaseManagement';
@@ -18,12 +18,12 @@ export async function createTicket(shipmentId: number, containerId: string) {
     Tokens.ProposalDataSource
   );
 
-  const scheduledEventDataSource = container.resolve<ScheduledEventDataSource>(
-    Tokens.ScheduledEventDataSource
-  );
-
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
+  );
+
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
   );
 
   const shipment = await shipmentDataSource.getShipment(shipmentId);
@@ -40,26 +40,26 @@ export async function createTicket(shipmentId: number, containerId: string) {
     });
   }
 
-  const scheduledEvent = await scheduledEventDataSource.getScheduledEventCore(
-    shipment.scheduledEventId
+  const experiment = await experimentDataSource.getExperiment(
+    shipment.experimentPk
   );
-  if (!scheduledEvent) {
-    throw createAndLogError('Scheduled event for ticket not found', {
+  if (!experiment) {
+    throw createAndLogError('Experiment for ticket not found', {
       shipment,
     });
   }
 
   let localContact = null;
-  if (scheduledEvent.localContactId) {
-    localContact = await userDataSource.getUser(scheduledEvent.localContactId);
+  if (experiment.localContactId) {
+    localContact = await userDataSource.getUser(experiment.localContactId);
   }
   const request = getRequest(
     proposal.proposalId,
     proposal.title,
     containerId,
-    scheduledEvent.startsAt,
-    scheduledEvent.endsAt,
-    scheduledEvent.startsAt, // This is not correct, but we need a design decision to fix this
+    experiment.startsAt,
+    experiment.endsAt,
+    experiment.startsAt, // This is not correct, but we need a design decision to fix this
     localContact?.email ?? 'not set',
     'DEMAX'
   );

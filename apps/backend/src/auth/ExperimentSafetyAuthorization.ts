@@ -2,21 +2,14 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
-import { ProposalEsiDataSource } from '../datasources/ProposalEsiDataSource';
-import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { UserWithRole } from '../models/User';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
-//todo: This entire file needs to be changed.
 @injectable()
-export class EsiAuthorization {
+export class ExperimentSafetyAuthorization {
   constructor(
-    @inject(Tokens.ScheduledEventDataSource)
-    private scheduledEventDataSource: ScheduledEventDataSource,
-    @inject(Tokens.ProposalEsiDataSource)
-    private esiDataSource: ProposalEsiDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
@@ -24,21 +17,17 @@ export class EsiAuthorization {
     private experimentDataSource: ExperimentDataSource
   ) {}
 
-  getScheduledEvent = async (scheduledEventId: number) =>
-    await this.scheduledEventDataSource.getScheduledEventCore(scheduledEventId);
-
-  private async resolveEsi(
-    esiOrEsiId: ExperimentSafety | number
+  private async resolveExperimentSafety(
+    experimentSafetyOrexperimentSafetyPk: ExperimentSafety | number
   ): Promise<ExperimentSafety | null> {
     let esi;
 
-    if (typeof esiOrEsiId === 'number') {
-      esi =
-        await this.experimentDataSource.getExperimentSafetyByExperimentPk(
-          esiOrEsiId
-        );
+    if (typeof experimentSafetyOrexperimentSafetyPk === 'number') {
+      esi = await this.experimentDataSource.getExperimentSafetyByExperimentPk(
+        experimentSafetyOrexperimentSafetyPk
+      );
     } else {
-      esi = esiOrEsiId;
+      esi = experimentSafetyOrexperimentSafetyPk;
     }
 
     return esi;
@@ -65,18 +54,20 @@ export class EsiAuthorization {
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
-    esiOrEsiId: ExperimentSafety | number
+    experimentSafetyOrexperimentSafetyPk: ExperimentSafety | number
   ): Promise<boolean> {
     if (!agent) {
       return false;
     }
 
-    const esi = await this.resolveEsi(esiOrEsiId);
-    if (!esi) {
+    const experimentSafety = await this.resolveExperimentSafety(
+      experimentSafetyOrexperimentSafetyPk
+    );
+    if (!experimentSafety) {
       return false;
     }
     const experiment = await this.experimentDataSource.getExperiment(
-      esi.experimentPk
+      experimentSafety.experimentPk
     );
 
     if (experiment === null || experiment.proposalPk === null) {
@@ -96,18 +87,20 @@ export class EsiAuthorization {
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    esiOrEsiId: ExperimentSafety | number
+    experimentSafetyOrexperimentSafetyPk: ExperimentSafety | number
   ): Promise<boolean> {
     if (!agent) {
       return false;
     }
 
-    const esi = await this.resolveEsi(esiOrEsiId);
-    if (!esi) {
+    const experimentSafety = await this.resolveExperimentSafety(
+      experimentSafetyOrexperimentSafetyPk
+    );
+    if (!experimentSafety) {
       return false;
     }
     const experiment = await this.experimentDataSource.getExperiment(
-      esi.experimentPk
+      experimentSafety.experimentPk
     );
 
     if (experiment === null || experiment.proposalPk === null) {
@@ -115,7 +108,7 @@ export class EsiAuthorization {
     }
 
     if (
-      // esi.isSubmitted === true && //todo: This needs to be taken care
+      experimentSafety.esiQuestionarySubmittedAt == null &&
       this.userAuth.isUserOfficer(agent) === false
     ) {
       return false;
