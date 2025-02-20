@@ -1,5 +1,7 @@
 import { Field, Int, ObjectType, InputType } from 'type-graphql';
 
+import { ExperimentStatus } from '../../models/Experiment';
+
 export function If(
   condition: boolean,
   decorator: MethodDecorator
@@ -16,12 +18,6 @@ export enum ScheduledEventBookingType {
   MAINTENANCE = 'MAINTENANCE',
   SHUTDOWN = 'SHUTDOWN',
   EQUIPMENT = 'EQUIPMENT',
-}
-
-export enum ExperimentStatus {
-  DRAFT = 'DRAFT',
-  ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED',
 }
 
 export enum EquipmentAssignmentStatus {

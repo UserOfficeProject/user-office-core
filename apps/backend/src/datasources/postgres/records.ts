@@ -10,6 +10,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { ExperimentStatus } from '../../models/Experiment';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
@@ -1411,7 +1412,7 @@ export interface ExperimentRecord {
   readonly ends_at: Date;
   readonly scheduled_event_id: number;
   readonly proposal_pk: number;
-  readonly status: string;
+  readonly status: ExperimentStatus;
   readonly local_contact_id: number;
   readonly instrument_id: number;
   readonly created_at: Date;

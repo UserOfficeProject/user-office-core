@@ -10,7 +10,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { Experiment as ExperimentOrigin } from '../../models/Experiment';
+import {
+  Experiment as ExperimentOrigin,
+  ExperimentStatus,
+} from '../../models/Experiment';
 import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafety } from './ExperimentSafety';
 import { Feedback } from './Feedback';
@@ -40,7 +43,7 @@ export class Experiment implements ExperimentOrigin {
   public proposalPk: number;
 
   @Field(() => String)
-  public status: string;
+  public status: ExperimentStatus;
 
   @Field(() => Number, { nullable: true })
   public localContactId: number | null;

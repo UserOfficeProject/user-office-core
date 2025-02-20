@@ -15,12 +15,7 @@ import ActionButton, {
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
 import { UserContext } from 'context/UserContextProvider';
-import {
-  FeedbackStatus,
-  ExperimentStatus,
-  ProposalEndStatus,
-  UserJwt,
-} from 'generated/sdk';
+import { FeedbackStatus, ProposalEndStatus, UserJwt } from 'generated/sdk';
 import { UpcomingExperimentsType } from 'hooks/experiment/useUserExperiments';
 
 const getParticipationRole = (
@@ -279,8 +274,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let buttonState: ActionButtonState;
 
     if (isTeamlead(user, event)) {
-      if (event.status === ExperimentStatus.COMPLETED) {
-        //todo: ExperimentStatus needs to be changed. Currently Experiment Status does not have enum
+      if (event.status === 'COMPLETED') {
+        //todo: Needs to be changed to ExperimentStatus.COMPLETED
         if (event.feedback?.status === FeedbackStatus.SUBMITTED) {
           buttonState = 'completed';
         } else {

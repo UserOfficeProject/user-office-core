@@ -6,6 +6,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../models/ConditionEvaluator';
+import { ExperimentStatus } from '../models/Experiment';
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
@@ -32,7 +33,6 @@ import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAnd
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
   EquipmentAssignmentStatus,
-  ExperimentStatus,
   ScheduledEventBookingType,
 } from './types/ProposalBooking';
 import { EmailStatusActionRecipients } from './types/ProposalStatusActionConfig';

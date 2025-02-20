@@ -3,10 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
-import { useProposalBookingsScheduledEvents } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
-
-import ExperimentsTable from './ExperimentTimesTable';
 
 export default function InstrSciUpcomingExperimentTimesTable() {
   const [searchParams] = useSearchParams();
@@ -18,12 +15,12 @@ export default function InstrSciUpcomingExperimentTimesTable() {
     number | null | undefined
   >(instrumentId ? +instrumentId : null);
 
-  const { loading, proposalScheduledEvents } =
-    useProposalBookingsScheduledEvents({
-      onlyUpcoming: true,
-      notDraft: true,
-      instrumentId: selectedInstrumentId,
-    });
+  // const { loading, proposalScheduledEvents } =
+  //   useProposalBookingsScheduledEvents({
+  //     onlyUpcoming: true,
+  //     notDraft: true,
+  //     instrumentId: selectedInstrumentId,
+  //   });
 
   return (
     <StyledContainer maxWidth={false}>
@@ -37,7 +34,7 @@ export default function InstrSciUpcomingExperimentTimesTable() {
             setSelectedInstrumentId(instrumentFilter.instrumentId);
           }}
         />
-        <ExperimentsTable
+        {/* <ExperimentsTable
           isLoading={loading}
           proposalScheduledEvents={proposalScheduledEvents}
           title="Upcoming experiments"
@@ -47,7 +44,7 @@ export default function InstrSciUpcomingExperimentTimesTable() {
             emptyRowsWhenPaging: true,
             paging: true,
           }}
-        />
+        /> */}
       </StyledPaper>
     </StyledContainer>
   );

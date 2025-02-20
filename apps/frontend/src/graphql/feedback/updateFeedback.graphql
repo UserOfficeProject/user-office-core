@@ -1,9 +1,0 @@
-mutation updateFeedback($feedbackId: Int!, $status: FeedbackStatus) {
-  updateFeedback(feedbackId: $feedbackId, status: $status) {
-    ...feedback
-    questionary {
-      ...questionary
-      isCompleted
-    }
-  }
-}

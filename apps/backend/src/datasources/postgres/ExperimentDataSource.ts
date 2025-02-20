@@ -82,7 +82,7 @@ export default class PostgresExperimentDataSource
           scheduled_event_id: experiment.scheduledEventId,
           proposal_pk: experiment.proposalPk,
           status: experiment.status,
-          local_contact: experiment.localContactId,
+          local_contact_id: experiment.localContactId,
           instrument_id: experiment.instrumentId,
         },
         '*'
@@ -112,7 +112,7 @@ export default class PostgresExperimentDataSource
           starts_at: experiment.startsAt,
           ends_at: experiment.endsAt,
           status: experiment.status,
-          local_contact: experiment.localContactId,
+          local_contact_id: experiment.localContactId,
         },
         '*'
       )

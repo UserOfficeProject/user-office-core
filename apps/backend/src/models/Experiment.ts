@@ -1,3 +1,9 @@
+export enum ExperimentStatus {
+  DRAFT = 'DRAFT',
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+}
+
 export class Experiment {
   constructor(
     public experimentPk: number,
@@ -6,7 +12,7 @@ export class Experiment {
     public endsAt: Date,
     public scheduledEventId: number,
     public proposalPk: number,
-    public status: string,
+    public status: ExperimentStatus,
     public localContactId: number | null,
     public instrumentId: number,
     public createdAt: Date,
