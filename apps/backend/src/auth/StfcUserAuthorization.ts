@@ -300,12 +300,12 @@ export class StfcUserAuthorization extends UserAuthorization {
         return false;
       });
 
-    this.uowsTokenCache.put(token, tokenRequest);
-
     const isValid = await tokenRequest;
     // Only keep valid tokens cached to avoid locking out users for a long time
     if (!isValid) {
       this.uowsTokenCache.remove(token);
+    } else {
+      this.uowsTokenCache.put(token, tokenRequest);
     }
 
     return isValid;
