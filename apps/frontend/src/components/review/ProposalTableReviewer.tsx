@@ -160,6 +160,11 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
     PROPOSAL_MODAL_TAB_NAMES.GRADE,
   ];
 
+  const reviewerProposalViewTabs = [
+    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
+  ];
+
   const GetAppIconComponent = (): JSX.Element => <GetAppIcon />;
   const DoneAllIcon = (
     props: JSX.IntrinsicAttributes & {
@@ -481,7 +486,7 @@ const ProposalTableReviewer = ({ confirm }: { confirm: WithConfirmType }) => {
           tabNames={
             hasAccessToReview
               ? reviewerProposalReviewTabs
-              : reviewerProposalReviewTabs.slice(0, -1)
+              : reviewerProposalViewTabs
           }
           fapId={
             userData?.reviews.find((review) => {
