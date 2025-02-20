@@ -159,7 +159,9 @@ const AppRoutes = () => {
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
-
+  const isExperimentSafetyEnabled = featureContext.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
+  )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
   return (
@@ -455,7 +457,7 @@ const AppRoutes = () => {
             }
           />
         )}
-        {isUserOfficer && (
+        {isExperimentSafetyEnabled && isUserOfficer && (
           <Route
             path="/ExperimentWorkflows"
             element={
@@ -477,7 +479,7 @@ const AppRoutes = () => {
             }
           />
         )}
-        {isUserOfficer && (
+        {isExperimentSafetyEnabled && isUserOfficer && (
           <Route
             path="/ExperimentWorkflowEditor/:workflowId"
             element={

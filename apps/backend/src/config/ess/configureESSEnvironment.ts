@@ -83,6 +83,7 @@ async function enableDefaultEssFeatures() {
       FeatureId.SAMPLE_SAFETY,
       FeatureId.OAUTH,
       FeatureId.CONFLICT_OF_INTEREST_WARNING,
+      FeatureId.EXPERIMENT_SAFETY_REVIEW,
     ],
     true
   );
