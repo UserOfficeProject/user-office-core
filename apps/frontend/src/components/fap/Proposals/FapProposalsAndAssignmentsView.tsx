@@ -30,10 +30,6 @@ const FapProposalsAndAssignments = ({
   const [searchParams] = useSearchParams();
   const call = searchParams.get('call');
   const instrument = searchParams.get('instrument');
-  console.log('Selected Instrument ID:', instrument ? +instrument : null);
-
-  console.log('Instrument Number:', instrument);
-  console.log('Instruments List:', instruments);
 
   return (
     <>
@@ -45,6 +41,8 @@ const FapProposalsAndAssignments = ({
             shouldShowAll={true}
             callId={call ? +call : null}
           />
+        </Grid>
+        <Grid item sm={3} xs={12}>
           <InstrumentFilter
             instruments={instruments}
             isLoading={loadingInstruments}
