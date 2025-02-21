@@ -27,6 +27,7 @@ import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
@@ -91,6 +92,20 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
 
+  const calls = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+    },
+    CallsDataQuantity.MINIMAL
+  ).calls;
+
+  const openCall = calls?.find((call) => call.isActive);
+
+  const xpressUrl =
+    openCall && openCall.id
+      ? `/XpressProposals?call=${openCall?.id}`
+      : '/XpressProposals';
+
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
   const formattedDate = (value?: Date) =>
@@ -150,7 +165,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       </Tooltip>
       {isXpressRouteEnabled && (
         <Tooltip title="Xpress Proposals">
-          <ListItemButton component={NavLink} to="/XpressProposals">
+          <ListItemButton component={NavLink} to={xpressUrl}>
             <ListItemIcon>
               <Topic />
             </ListItemIcon>
@@ -285,7 +300,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <ListItemText primary="Proposals" />
       </ListItemButton>
       {isXpressRouteEnabled && (
-        <ListItemButton component={NavLink} to="/XpressProposals">
+        <ListItemButton component={NavLink} to={xpressUrl}>
           <ListItemIcon>
             <Topic />
           </ListItemIcon>
