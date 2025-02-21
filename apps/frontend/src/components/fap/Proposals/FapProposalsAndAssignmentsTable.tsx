@@ -67,6 +67,7 @@ type FapProposalsAndAssignmentsTableProps = {
   selectedCallId: number | null;
   /** Confirmation function that comes from withConfirm HOC */
   confirm: WithConfirmType;
+  selectedInstrumentId: number | null;
 };
 
 const getReviewsFromAssignments = (assignments: FapProposalAssignmentType[]) =>
@@ -174,12 +175,13 @@ const FapProposalsAndAssignmentsTable = ({
   onAssignmentsUpdate,
   selectedCallId,
   confirm,
+  selectedInstrumentId,
 }: FapProposalsAndAssignmentsTableProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
 
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
-    useFapProposalsData(data.id, selectedCallId);
+    useFapProposalsData(data.id, selectedCallId, selectedInstrumentId);
   const { api } = useDataApiWithFeedback();
   const [proposalPks, setProposalPks] = useState<number[]>([]);
   const downloadPDFProposal = useDownloadPDFProposal();

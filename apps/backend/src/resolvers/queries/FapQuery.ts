@@ -35,9 +35,15 @@ export class FapQuery {
   async fapProposals(
     @Arg('fapId', () => Int) fapId: number,
     @Arg('callId', () => Int, { nullable: true }) callId: number | null,
+    @Arg('instrumentId', () => Int, { nullable: true })
+    instrumentId: number | null,
     @Ctx() context: ResolverContext
   ): Promise<FapProposal[] | null> {
-    return context.queries.fap.getFapProposals(context.user, { fapId, callId });
+    return context.queries.fap.getFapProposals(context.user, {
+      fapId,
+      callId,
+      instrumentId,
+    });
   }
 
   @Query(() => FapProposal, { nullable: true })

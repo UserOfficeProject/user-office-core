@@ -324,7 +324,11 @@ export class FapDataSourceMock implements FapDataSource {
     return { totalCount: dummyFapsCopy.length, faps: dummyFapsCopy };
   }
 
-  async getFapProposals(fapId: number, callId: number | null) {
+  async getFapProposals(
+    fapId: number,
+    callId: number | null,
+    instrumentId: number | null
+  ) {
     return dummyFapProposals.filter((proposal) => proposal.fapId === fapId);
   }
 
