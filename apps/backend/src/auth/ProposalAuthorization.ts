@@ -240,7 +240,7 @@ export class ProposalAuthorization {
       case Roles.USER_OFFICER:
         hasAccess = true;
         break;
-      case Roles.SAMPLE_SAFETY_REVIEWER:
+      case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
       default:

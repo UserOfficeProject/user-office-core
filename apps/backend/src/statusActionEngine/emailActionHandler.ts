@@ -309,50 +309,54 @@ export const emailStatusActionRecipient = async (
       break;
     }
 
-    case EmailStatusActionRecipients.SAMPLE_SAFETY: {
+    case EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS: {
       const adminDataSource = container.resolve<AdminDataSource>(
         Tokens.AdminDataSource
       );
 
-      const sampleSafetyEmail = (
-        await adminDataSource.getSetting(SettingsId.SAMPLE_SAFETY_EMAIL)
+      const experimentSafetyEmail = (
+        await adminDataSource.getSetting(
+          SettingsId.EXPERIMENT_SAFETY_REVIEW_EMAIL
+        )
       )?.settingsValue;
 
-      if (!sampleSafetyEmail) {
+      if (!experimentSafetyEmail) {
         logger.logError(
-          'Could not send email(s) to the Sample Safety team as the setting (SAMPLE_SAFETY_EMAIL) is not set.',
+          'Could not send email(s) to the Experiment Safety team as the setting (EXPERIMENT_SAFETY_REVIEW_EMAIL) is not set.',
           { proposalEmailsSkipped: proposals }
         );
 
         break;
       }
 
-      let sampleSafetyRecipients: EmailReadyType[];
+      let experimentSafetyRecipients: EmailReadyType[];
 
       if (recipientWithTemplate.combineEmails) {
-        sampleSafetyRecipients = [
+        experimentSafetyRecipients = [
           {
             id: recipientWithTemplate.recipient.name,
-            email: sampleSafetyEmail,
+            email: experimentSafetyEmail,
             proposals: proposals,
             template: recipientWithTemplate.emailTemplate.id,
           },
         ];
       } else {
-        sampleSafetyRecipients = await getOtherAndFormatOutputForEmailSending(
-          proposals,
-          recipientWithTemplate,
-          sampleSafetyEmail
-        );
+        experimentSafetyRecipients =
+          await getOtherAndFormatOutputForEmailSending(
+            proposals,
+            recipientWithTemplate,
+            experimentSafetyEmail
+          );
       }
 
       await sendMail(
-        sampleSafetyRecipients,
+        experimentSafetyRecipients,
         statusActionLogger({
           connectionId: statusAction.connectionId,
           actionId: statusAction.actionId,
           statusActionsLogId,
-          emailStatusActionRecipient: EmailStatusActionRecipients.SAMPLE_SAFETY,
+          emailStatusActionRecipient:
+            EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS,
           proposalPks,
         }),
         successfulMessage,
