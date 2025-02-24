@@ -1,29 +1,35 @@
 mutation createExperimentSafety($experimentPk: Int!) {
   createExperimentSafety(experimentPk: $experimentPk) {
-    ...safety
-    # questionary {
-    #   isCompleted
-    #   ...questionary
-    # }
-    # sampleEsis {
-    #   sample {
-    #     ...sample
-    #   }
-    #   ...sampleEsi
-    #   questionary {
-    #     isCompleted
-    #   }
-    # }
-    # proposal {
-    #   primaryKey
-    #   proposalId
-    #   title
-    #   samples {
-    #     ...sample
-    #   }
-    #   questionary {
-    #     ...questionary
-    #   }
-    # }
+    ...experimentSafety
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    samples {
+      # sample {
+      #   ...sample
+      # }
+      # ...sampleEsi
+      # questionary {
+      #   isCompleted
+      # }
+      experimentPk
+      sampleId
+      isEsiSubmitted
+      sampleEsiQuestionaryId
+      createdAt
+      updatedAt
+    }
+    proposal {
+      primaryKey
+      proposalId
+      title
+      samples {
+        ...sample
+      }
+      questionary {
+        ...questionary
+      }
+    }
   }
 }

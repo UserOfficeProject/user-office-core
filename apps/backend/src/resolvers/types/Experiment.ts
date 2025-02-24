@@ -118,7 +118,7 @@ export class ExperimentResolver {
   }
 
   @FieldResolver(() => ExperimentSafety, { nullable: true })
-  async safety(
+  async experimentSafety(
     @Root() experiment: Experiment,
     @Ctx() context: ResolverContext
   ): Promise<ExperimentSafety | null> {

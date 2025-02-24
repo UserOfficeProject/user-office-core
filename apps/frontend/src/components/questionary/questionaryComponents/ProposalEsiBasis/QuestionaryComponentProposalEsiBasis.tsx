@@ -64,18 +64,21 @@ function QuestionaryComponentProposalEsiBasis(
       {({ field, form }: FieldProps<SampleEsiWithQuestionary[]>) => {
         const declareEsi = (sampleId: number) => {
           api()
-            .createSampleEsi({
-              esiId: state!.esi.id,
+            .addSampleToExperiment({
+              experimentPk: state!.esi.experimentPk,
               sampleId: sampleId,
             })
-            .then(({ createSampleEsi }) => {
-              if (createSampleEsi) {
+            .then(({ addSampleToExperiment }) => {
+              if (addSampleToExperiment) {
                 dispatch({
                   type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED',
-                  sampleEsi: createSampleEsi,
+                  sampleEsi: addSampleToExperiment,
                 });
-                setSelectedSampleEsi(createSampleEsi);
-                form.setFieldValue(answerId, [...field.value, createSampleEsi]);
+                setSelectedSampleEsi(addSampleToExperiment);
+                form.setFieldValue(answerId, [
+                  ...field.value,
+                  addSampleToExperiment,
+                ]);
               }
             });
         };

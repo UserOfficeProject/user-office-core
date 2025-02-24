@@ -1,4 +1,8 @@
-import { Experiment, ExperimentSafety } from '../models/Experiment';
+import {
+  Experiment,
+  ExperimentHasSample,
+  ExperimentSafety,
+} from '../models/Experiment';
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
 import { UpdateExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
@@ -22,7 +26,9 @@ export interface ExperimentDataSource {
   getExperimentSafetyByExperimentPk(
     experimentPk: number
   ): Promise<ExperimentSafety | null>;
-  getExperimentSafety(experimentPk: number): Promise<ExperimentSafety | null>;
+  getExperimentSafety(
+    experimentSafetyPk: number
+  ): Promise<ExperimentSafety | null>;
   createExperimentSafety(
     experimentPk: number,
     questionaryId: number,
@@ -34,4 +40,13 @@ export interface ExperimentDataSource {
   getExperimentSafetyByESIQuestionaryId(
     esiQuestionaryId: number
   ): Promise<ExperimentSafety | null>;
+  addSampleToExperiment(
+    experimentPk: number,
+    sampleId: number,
+    sampleEsiQuestionaryId: number
+  ): Promise<ExperimentHasSample>;
+  removeSampleFromExperiment(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSample>;
 }

@@ -1,4 +1,8 @@
-import { Experiment, ExperimentSafety } from '../../models/Experiment';
+import {
+  Experiment,
+  ExperimentHasSample,
+  ExperimentSafety,
+} from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { UpdateExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
 import { ExperimentDataSource } from '../ExperimentDataSource';
@@ -25,7 +29,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     throw new Error('Method not implemented.');
   }
   getExperimentSafetyByExperimentPk(
-    experimentPk: number
+    experimentSafetyPk: number
   ): Promise<ExperimentSafety | null> {
     throw new Error('Method not implemented.');
   }
@@ -56,6 +60,19 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   }
 
   getExperiment(experimentPk: number): Promise<Experiment | null> {
+    throw new Error('Method not implemented.');
+  }
+  addSampleToExperiment(
+    experimentPk: number,
+    sampleId: number,
+    sampleEsiQuestionaryId: number
+  ): Promise<ExperimentHasSample> {
+    throw new Error('Method not implemented.');
+  }
+  removeSampleFromExperiment(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSample> {
     throw new Error('Method not implemented.');
   }
 }

@@ -1,7 +1,8 @@
-fragment safety on ExperimentSafety {
+fragment experimentSafety on ExperimentSafety {
   experimentSafetyPk
   experimentPk
   esiQuestionaryId
+  esiQuestionarySubmittedAt
   createdBy
   status
   safetyReviewQuestionaryId

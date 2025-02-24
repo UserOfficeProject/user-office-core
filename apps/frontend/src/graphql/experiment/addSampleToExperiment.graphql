@@ -1,0 +1,12 @@
+mutation addSampleToExperiment($sampleId: Int!, $experimentPk: Int!) {
+  addSampleToExperiment(sampleId: $sampleId, experimentPk: $experimentPk) {
+    ...experimentSample
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sample {
+      ...sample
+    }
+  }
+}

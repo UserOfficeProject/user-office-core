@@ -14,7 +14,9 @@ import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { ExperimentSafety as ExperimentSafetyOrigin } from '../../models/Experiment';
+import { ExperimentHasSample } from './ExperimentHasSample';
 import { Proposal } from './Proposal';
+import { Questionary } from './Questionary';
 
 @ObjectType()
 @Directive('@key(fields: "experimentSafetyPk")')
@@ -28,8 +30,8 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
   @Field(() => Number)
   public esiQuestionaryId: number;
 
-  @Field(() => Date)
-  public esiQuestionarySubmittedAt: Date;
+  @Field(() => Date, { nullable: true })
+  public esiQuestionarySubmittedAt: Date | null;
 
   @Field(() => Number)
   public createdBy: number;
@@ -81,5 +83,32 @@ export class ExperimentSafetyResolver {
     }
 
     return proposal;
+  }
+
+  @FieldResolver(() => Questionary)
+  async questionary(
+    @Root() experimentSafety: ExperimentSafety,
+    @Ctx() context: ResolverContext
+  ): Promise<Questionary> {
+    const questionary = await context.queries.questionary.getQuestionary(
+      context.user,
+      experimentSafety.esiQuestionaryId
+    );
+
+    if (questionary === null) {
+      throw new GraphQLError(
+        'Unexpected error. Experiment safety questionary does not exist'
+      );
+    }
+
+    return questionary;
+  }
+
+  @FieldResolver(() => [ExperimentHasSample])
+  async samples(
+    @Root() experimentSafety: ExperimentSafety,
+    @Ctx() context: ResolverContext
+  ): Promise<ExperimentHasSample[]> {
+    return [];
   }
 }

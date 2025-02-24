@@ -23,9 +23,11 @@ export class ExperimentSafetyAuthorization {
     let esi;
 
     if (typeof experimentSafetyOrexperimentSafetyPk === 'number') {
-      esi = await this.experimentDataSource.getExperimentSafetyByExperimentPk(
+      console.log(experimentSafetyOrexperimentSafetyPk);
+      esi = await this.experimentDataSource.getExperimentSafety(
         experimentSafetyOrexperimentSafetyPk
       );
+      console.log({ esi });
     } else {
       esi = experimentSafetyOrexperimentSafetyPk;
     }
@@ -92,7 +94,6 @@ export class ExperimentSafetyAuthorization {
     if (!agent) {
       return false;
     }
-
     const experimentSafety = await this.resolveExperimentSafety(
       experimentSafetyOrexperimentSafetyPk
     );
@@ -102,13 +103,11 @@ export class ExperimentSafetyAuthorization {
     const experiment = await this.experimentDataSource.getExperiment(
       experimentSafety.experimentPk
     );
-
     if (experiment === null || experiment.proposalPk === null) {
       return false;
     }
-
     if (
-      experimentSafety.esiQuestionarySubmittedAt == null &&
+      experimentSafety.esiQuestionarySubmittedAt !== null &&
       this.userAuth.isUserOfficer(agent) === false
     ) {
       return false;

@@ -212,6 +212,7 @@ export default class PostgresExperimentDataSource
       .select('*')
       .from('experiment_safety')
       .where('experiment_pk', experimentPk)
+      .orderBy('created_at', 'desc')
       .first();
 
     if (!result) {
@@ -294,5 +295,29 @@ export default class PostgresExperimentDataSource
     }
 
     return createExperimentSafetyObject(result);
+  }
+
+  addSampleToExperiment(
+    experimentPk: number,
+    sampleId: number,
+    sampleEsiQuestionaryId: number
+  ): Promise<ExperimentHasSample> {
+    return database('experiment_has_samples')
+      .insert({
+        experiment_pk: experimentPk,
+        sample_id: sampleId,
+        is_esi_submitted: false,
+        sample_esi_questionary_id: sampleEsiQuestionaryId,
+      })
+      .returning('*')
+      .then((records: ExperimentHasSampleRecord[]) =>
+        createExperimentHasSampleObject(records[0])
+      );
+  }
+  removeSampleFromExperiment(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSample> {
+    throw new Error('Method not implemented.');
   }
 }

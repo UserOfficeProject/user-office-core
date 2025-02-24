@@ -40,11 +40,11 @@ const InstrSciUpcomingExperimentTimesTable = lazy(
 const UserExperimentTimesTable = lazy(
   () => import('./proposalBooking/UserExperimentsTable')
 );
-const CreateProposalEsiPage = lazy(
-  () => import('./proposalEsi/CreateProposalEsiPage')
+const CreateExperimentSafetyPage = lazy(
+  () => import('./experimentSafety/CreateExperimentSafetyPage')
 );
-const UpdateProposalEsiPage = lazy(
-  () => import('./proposalEsi/UpdateProposalEsiPage')
+const UpdateExperimentSafetyPage = lazy(
+  () => import('./experimentSafety/UpdateExperimentSafetyPage')
 );
 const SampleSafetyPage = lazy(() => import('./sample/SampleSafetyPage'));
 const ApiAccessTokensPage = lazy(
@@ -578,20 +578,20 @@ const AppRoutes = () => {
           />
         )}
         <Route
-          path="/CreateEsi/:experimentPk"
+          path="/CreateExperimentSafety/:experimentPk"
           element={
             <TitledRoute
-              title="Create ESI Proposal"
-              element={<CreateProposalEsiPage />}
+              title="Create Experiment Safety"
+              element={<CreateExperimentSafetyPage />}
             />
           }
         />
         <Route
-          path="/UpdateEsi/:esiId"
+          path="/UpdateExperimentSafety/:experimentSafetyPk"
           element={
             <TitledRoute
               title="Update ESI Proposal"
-              element={<UpdateProposalEsiPage />}
+              element={<UpdateExperimentSafetyPage />}
             />
           }
         />

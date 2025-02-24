@@ -125,7 +125,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
       ) {
-        if (event.safety) {
+        if (event.experimentSafety) {
           // TODO: This needs to be worked on. There is no is_submitted field unlike in experiment_safety_input. Instead we have status field in the new experiment_safety table. The status is not finalized yet. We will work on it, when we get in here
           buttonState = 'completed';
         } else {
@@ -141,14 +141,16 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Finish safety input form ${stateReason ? '(' + stateReason + ')' : ''}`,
-      <EsiIcon data-cy="finish-safety-input-form-icon" />,
+      `Finish experiment safety form ${stateReason ? '(' + stateReason + ')' : ''}`,
+      <EsiIcon data-cy="finish-experiment-safety-form-icon" />,
       buttonState,
       () => {
-        if (event?.safety) {
-          navigate(`/UpdateEsi/${event.safety.experimentSafetyPk}`);
+        if (event?.experimentSafety) {
+          navigate(
+            `/UpdateExperimentSafety/${event.experimentSafety.experimentSafetyPk}`
+          );
         } else {
-          navigate(`/CreateEsi/${event.experimentPk}`);
+          navigate(`/CreateExperimentSafety/${event.experimentPk}`);
         }
       }
     );

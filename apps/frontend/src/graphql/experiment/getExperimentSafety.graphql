@@ -26,6 +26,6 @@ query getExperimentSafety($experimentSafetyPk: Int!) {
     #     ...questionary
     #   }
     # }
-    ...safety
+    ...experimentSafety
   }
 }

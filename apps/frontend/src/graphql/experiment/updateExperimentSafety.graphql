@@ -6,7 +6,7 @@ mutation updateExperimentSafety(
     experimentSafetyPk: $experimentSafetyPk
     isSubmitted: $isSubmitted
   ) {
-    ...safety
+    ...experimentSafety
     # questionary {
     #   isCompleted
     #   ...questionary

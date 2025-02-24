@@ -1,0 +1,8 @@
+fragment experimentSample on ExperimentHasSample {
+  sampleId
+  experimentPk
+  isEsiSubmitted
+  sampleEsiQuestionaryId
+  createdAt
+  updatedAt
+}

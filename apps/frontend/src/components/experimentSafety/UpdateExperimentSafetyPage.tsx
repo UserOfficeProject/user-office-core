@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 import NotFound from 'components/common/NotFound';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import UpdateProposalEsi from './UpdateProposalEsi';
+import UpdateProposalEsi from '../proposalEsi/UpdateProposalEsi';
 
-export default function UpdateProposalEsiPage() {
+export default function UpdateExperimentSafetyPage() {
   const { esiId } = useParams<{ esiId: string }>();
 
   if (!esiId) {

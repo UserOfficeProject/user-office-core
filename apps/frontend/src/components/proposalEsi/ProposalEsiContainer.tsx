@@ -94,7 +94,6 @@ export interface ProposalEsiContainerProps {
 }
 export default function ProposalEsiContainer(props: ProposalEsiContainerProps) {
   const [initialState] = useState(new ProposalEsiSubmissionState(props.esi));
-
   const eventHandlers = useEventHandlers(TemplateGroupId.PROPOSAL_ESI);
 
   const { state, dispatch } = QuestionarySubmissionModel(

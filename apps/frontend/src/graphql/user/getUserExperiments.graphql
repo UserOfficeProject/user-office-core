@@ -41,8 +41,8 @@ query getUserExperiments {
           }
         }
       }
-      safety {
-        ...safety
+      experimentSafety {
+        ...experimentSafety
       }
       feedback {
         ...feedback

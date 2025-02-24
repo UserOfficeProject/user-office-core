@@ -36,7 +36,7 @@ export class ExperimentSafety {
     public experimentSafetyPk: number,
     public experimentPk: number,
     public esiQuestionaryId: number,
-    public esiQuestionarySubmittedAt: Date,
+    public esiQuestionarySubmittedAt: Date | null,
     public createdBy: number,
     public status: string,
     public safetyReviewQuestionaryId: number,
