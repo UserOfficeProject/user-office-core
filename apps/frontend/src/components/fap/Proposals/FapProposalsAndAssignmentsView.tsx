@@ -48,6 +48,7 @@ const FapProposalsAndAssignments = ({
             isLoading={loadingInstruments}
             shouldShowAll={true}
             instrumentId={instrument ? +instrument : null}
+            data-cy="instrument-filter"
           />
         </Grid>
       </Grid>

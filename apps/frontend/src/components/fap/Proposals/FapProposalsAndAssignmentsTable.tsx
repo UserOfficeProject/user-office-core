@@ -205,6 +205,12 @@ const FapProposalsAndAssignmentsTable = ({
   ]);
   const { t } = useTranslation();
 
+  const translatedColumns = FapProposalColumns.map((column) =>
+    column.title === 'Instrument'
+      ? { ...column, title: t('instrument') }
+      : column
+  );
+
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -760,7 +766,7 @@ const FapProposalsAndAssignmentsTable = ({
       <div data-cy="fap-assignments-table">
         <MaterialTable
           icons={tableIcons}
-          columns={FapProposalColumns}
+          columns={translatedColumns}
           title={
             <Typography variant="h6" component="h2">
               {`${data.code} - ${t('Fap')} Proposals`}
