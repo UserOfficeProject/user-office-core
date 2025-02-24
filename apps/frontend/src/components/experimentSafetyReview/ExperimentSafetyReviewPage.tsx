@@ -27,7 +27,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import SampleDetails from './SampleDetails';
 import SamplesTable from './SamplesTable';
 
-function SampleEvaluationDialog(props: {
+function ExperimentSafetyReviewDialog(props: {
   sample: SampleWithProposalData;
   onClose: (sample: Maybe<SampleWithProposalData>) => void;
 }) {
@@ -44,7 +44,7 @@ function SampleEvaluationDialog(props: {
       onClose={() => onClose(null)}
       fullWidth={true}
       maxWidth="lg"
-      title="Review sample"
+      title="Experiment Safety Review"
     >
       <DialogContent>
         <SampleDetails sampleId={sample.id} />
@@ -63,7 +63,7 @@ function SampleEvaluationDialog(props: {
               safetyComment,
               safetyStatus,
             });
-            onClose({ ...values, ...updatedSample } || null);
+            onClose({ ...values, ...updatedSample });
           }}
         >
           {({ isSubmitting, dirty }) => (
@@ -174,7 +174,7 @@ const columns = [
   { title: 'Created', field: 'created' },
 ];
 
-function SampleSafetyPage() {
+function ExperimentSafetyReviewPage() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { calls, loadingCalls } = useCallsData({ isActive: true });
   const [searchParam] = useSearchParams();
@@ -210,7 +210,7 @@ function SampleSafetyPage() {
   const downloadPDFSample = useDownloadPDFSample();
   const RowActionButtons = (rowData: SampleWithProposalData) => (
     <>
-      <Tooltip title="Review sample">
+      <Tooltip title="Experiment Safety Review">
         <IconButton onClick={() => setSelectedSample(rowData)}>
           <VisibilityIcon />
         </IconButton>
@@ -234,7 +234,7 @@ function SampleSafetyPage() {
   return (
     <>
       {selectedSample && (
-        <SampleEvaluationDialog
+        <ExperimentSafetyReviewDialog
           sample={selectedSample}
           onClose={(newSample) => {
             if (newSample) {
@@ -291,4 +291,4 @@ function SampleSafetyPage() {
   );
 }
 
-export default SampleSafetyPage;
+export default ExperimentSafetyReviewPage;
