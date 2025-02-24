@@ -39,14 +39,14 @@ type MenuItemsProps = {
   currentRole: UserRole | null;
 };
 
-const SamplesMenuListItem = () => {
+const ExperimentSafetyReviewMenuListItem = () => {
   return (
-    <Tooltip title="Sample safety">
-      <ListItemButton component={NavLink} to="/SampleSafety">
+    <Tooltip title="Experiment Safety Review">
+      <ListItemButton component={NavLink} to="/ExperimentSafetyReview">
         <ListItemIcon>
           <BoxIcon />
         </ListItemIcon>
-        <ListItemText primary="Sample safety" />
+        <ListItemText primary="Experiment Safety" />
       </ListItemButton>
     </Tooltip>
   );
@@ -82,8 +82,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isSampleSafetyEnabled = context.featuresMap.get(
-    FeatureId.SAMPLE_SAFETY
+  const isExperimentSafetyReviewEnabled = context.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
 
   const isXpressRouteEnabled = useXpressAccess([
@@ -252,7 +252,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Questions" />
         </ListItemButton>
       </Tooltip>
-      {isSampleSafetyEnabled && <SamplesMenuListItem />}
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
       <SettingsMenuListItem />
     </div>
   );
@@ -308,12 +310,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Upcoming experiments" />
         </ListItemButton>
       )}
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
     </div>
   );
 
-  const sampleSafetyReviewer = (
+  const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
-      <SamplesMenuListItem />
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
     </div>
   );
 
@@ -334,8 +341,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     case UserRole.FAP_SECRETARY:
     case UserRole.FAP_REVIEWER:
       return FapRoles;
-    case UserRole.SAMPLE_SAFETY_REVIEWER:
-      return sampleSafetyReviewer;
+    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
+      return ExperimentSafetyReviewPageReviewer;
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
     default:
