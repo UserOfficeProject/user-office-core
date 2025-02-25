@@ -95,6 +95,7 @@ export function createFapReviewStub(
       updated: new Date(),
       submittedDate: new Date(),
       techniques: [],
+      attachments: { questions: [] },
     },
   };
 }

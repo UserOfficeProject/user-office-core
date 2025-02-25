@@ -15,6 +15,7 @@ import {
 import {
   DataType,
   FieldDependency,
+  Question,
   Template,
   Topic,
 } from '../../models/Template';
@@ -36,6 +37,7 @@ import {
   TopicRecord,
   ProposalRecord,
   createProposalObject,
+  createQuestionObject,
 } from './records';
 
 type QuestionaryAnswerRecord<T extends DataType> = QuestionRecord &
@@ -601,5 +603,47 @@ export default class PostgresQuestionaryDataSource
 
         return null;
       });
+  }
+
+  async getProposalAttachments(proposalPk: number): Promise<Question[]> {
+    const proposalAttachments = await database('questions')
+      .select('questions.*')
+      .join('answers', 'questions.question_id', 'answers.question_id')
+      .join(
+        'questionaries',
+        'answers.questionary_id',
+        'questionaries.questionary_id'
+      )
+      .join(
+        'proposals',
+        'questionaries.questionary_id',
+        'proposals.questionary_id'
+      )
+      .where('proposals.proposal_pk', proposalPk)
+      .andWhere('questions.data_type', DataType.FILE_UPLOAD);
+
+    const genTemplateAttachments = await database('questions')
+      .select('questions.*')
+      .join('answers', 'questions.question_id', 'answers.question_id')
+      .join(
+        'generic_templates',
+        'answers.questionary_id',
+        'generic_templates.questionary_id'
+      )
+      .where('generic_templates.proposal_pk', proposalPk)
+      .andWhere('questions.data_type', DataType.FILE_UPLOAD);
+
+    const sampleAttachments = await database('questions')
+      .select('questions.*')
+      .join('answers', 'questions.question_id', 'answers.question_id')
+      .join('samples', 'answers.questionary_id', 'samples.questionary_id')
+      .where('samples.proposal_pk', proposalPk)
+      .andWhere('questions.data_type', DataType.FILE_UPLOAD);
+
+    return [
+      ...proposalAttachments,
+      ...genTemplateAttachments,
+      ...sampleAttachments,
+    ].map((record) => createQuestionObject(record));
   }
 }

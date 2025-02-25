@@ -24,6 +24,7 @@ import {
   BooleanConfig,
   EmbellishmentConfig,
   FieldConfigType,
+  FileUploadConfig,
   SelectionFromOptionsConfig,
   TextInputConfig,
 } from '../../resolvers/types/FieldConfig';
@@ -504,5 +505,23 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     targetQuestionaryId: number
   ): Promise<void> {
     return;
+  }
+
+  getProposalAttachments(proposalPk: number): Promise<Question[]> {
+    const attachments = [
+      dummyQuestionFactory({
+        id: 'file_upload_id',
+        naturalKey: 'file_upload_nk',
+        dataType: DataType.FILE_UPLOAD,
+        config: createConfig<FileUploadConfig>(DataType.FILE_UPLOAD, {
+          omitFromPdf: false,
+          file_type: ['pdf'],
+          max_files: 1,
+          pdf_page_limit: 0,
+        }),
+      }),
+    ];
+
+    return new Promise<Question[]>((resolve) => resolve(attachments));
   }
 }
