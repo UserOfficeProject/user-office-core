@@ -46,7 +46,9 @@ const CreateExperimentSafetyPage = lazy(
 const UpdateExperimentSafetyPage = lazy(
   () => import('./experimentSafety/UpdateExperimentSafetyPage')
 );
-const SampleSafetyPage = lazy(() => import('./sample/SampleSafetyPage'));
+const ExperimentSafetyReviewPage = lazy(
+  () => import('./experimentSafetyReview/ExperimentSafetyReviewPage')
+);
 const ApiAccessTokensPage = lazy(
   () => import('./settings/apiAccessTokens/ApiAccessTokensPage')
 );
@@ -131,8 +133,8 @@ const AppRoutes = () => {
   const { t } = useTranslation();
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isUser = useCheckAccess([UserRole.USER]);
-  const isSampleSafetyReviewer = useCheckAccess([
-    UserRole.SAMPLE_SAFETY_REVIEWER,
+  const isExperimentSafetyReviewer = useCheckAccess([
+    UserRole.EXPERIMENT_SAFETY_REVIEWER,
   ]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
 
@@ -152,8 +154,8 @@ const AppRoutes = () => {
   const isVisitManagementEnabled = featureContext.featuresMap.get(
     FeatureId.VISIT_MANAGEMENT
   )?.isEnabled;
-  const isSampleSafetyEnabled = featureContext.featuresMap.get(
-    FeatureId.SAMPLE_SAFETY
+  const isExperimentSafetyReviewEnabled = featureContext.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
   const isXpressRouteEnabled = useXpressAccess([
     UserRole.USER_OFFICER,
@@ -490,17 +492,20 @@ const AppRoutes = () => {
             }
           />
         )}
-        {isSampleSafetyEnabled && (isSampleSafetyReviewer || isUserOfficer) && (
-          <Route
-            path="/SampleSafety"
-            element={
-              <TitledRoute
-                title="Samples Safety"
-                element={<SampleSafetyPage />}
-              />
-            }
-          />
-        )}
+        {isExperimentSafetyReviewEnabled &&
+          (isExperimentSafetyReviewer ||
+            isUserOfficer ||
+            isInstrumentScientist) && (
+            <Route
+              path="/ExperimentSafetyReview"
+              element={
+                <TitledRoute
+                  title="Experiment Safety Review"
+                  element={<ExperimentSafetyReviewPage />}
+                />
+              }
+            />
+          )}
         {isUserOfficer && (
           <Route
             path="/ApiAccessTokens"
@@ -635,6 +640,13 @@ const AppRoutes = () => {
                 title=""
                 element={<OverviewPage userRole={UserRole.USER} />}
               />
+            }
+          />
+        ) : isExperimentSafetyReviewer ? (
+          <Route
+            path="/"
+            element={
+              <TitledRoute title="" element={<ExperimentSafetyReviewPage />} />
             }
           />
         ) : (

@@ -565,7 +565,11 @@ context('Samples tests', () => {
     });
 
     it('Officer should be able to evaluate sample', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+      if (
+        !featureFlags
+          .getEnabledFeatures()
+          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
+      ) {
         this.skip();
       }
       cy.createSample({
@@ -577,24 +581,31 @@ context('Samples tests', () => {
       cy.submitProposal({ proposalPk: createdProposalPk });
       cy.visit('/');
 
-      cy.contains('Sample safety').click();
+      cy.contains('Experiment Safety').click();
 
-      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+      cy.get('[data-cy=experiment-safety-forms-table]').contains(
+        createdProposalId
+      );
 
       cy.get('[placeholder=Search]').click().clear().type(createdProposalId);
 
-      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+      cy.get('[data-cy=experiment-safety-forms-table]').contains(
+        createdProposalId
+      );
 
-      cy.get('[data-cy=samples-table]').should('not.contain', '999999');
+      cy.get('[data-cy=experiment-safety-forms-table]').should(
+        'not.contain',
+        '999999'
+      );
 
       cy.get('[placeholder=Search]').click().clear();
 
-      cy.get('[data-cy=samples-table]').contains('999999');
+      cy.get('[data-cy=experiment-safety-forms-table]').contains('999999');
 
       cy.contains(createdProposalId)
         .last()
         .parent()
-        .find('[aria-label="Review sample"]')
+        .find('[aria-label="Experiment Safety Review"]')
         .click();
 
       cy.get('[data-cy="safety-status"]').click();
@@ -612,7 +623,7 @@ context('Samples tests', () => {
       cy.contains(createdProposalId)
         .last()
         .parent()
-        .find('[aria-label="Review sample"]')
+        .find('[aria-label="Experiment Safety Review"]')
         .last()
         .click();
 
@@ -627,8 +638,12 @@ context('Samples tests', () => {
       cy.contains('HIGH_RISK'); // test if status has changed
     });
 
-    it('Sample Safety Reviewer should be able to evaluate sample', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+    it('Experiment Safety Reviewer should be able to evaluate sample', function () {
+      if (
+        !featureFlags
+          .getEnabledFeatures()
+          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
+      ) {
         this.skip();
       }
       cy.createSample({
@@ -639,36 +654,43 @@ context('Samples tests', () => {
       });
       cy.submitProposal({ proposalPk: createdProposalPk });
 
-      const sampleSafetyReviewer = initialDBData.users.user1;
+      const experimentSafetyReviewer = initialDBData.users.user1;
 
       cy.updateUserRoles({
-        id: sampleSafetyReviewer.id,
+        id: experimentSafetyReviewer.id,
 
-        roles: [initialDBData.roles.sampleSafetyReviewer],
+        roles: [initialDBData.roles.experimentSafetyReviewer],
       });
 
-      cy.login(sampleSafetyReviewer);
+      cy.login(experimentSafetyReviewer);
 
       cy.visit('/');
 
-      cy.contains('Sample safety').click();
+      cy.contains('Experiment Safety').click();
 
-      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+      cy.get('[data-cy=experiment-safety-forms-table]').contains(
+        createdProposalId
+      );
 
       cy.get('[placeholder=Search]').click().clear().type(createdProposalId);
 
-      cy.get('[data-cy=samples-table]').contains(createdProposalId);
+      cy.get('[data-cy=experiment-safety-forms-table]').contains(
+        createdProposalId
+      );
 
-      cy.get('[data-cy=samples-table]').should('not.contain', '999999');
+      cy.get('[data-cy=experiment-safety-forms-table]').should(
+        'not.contain',
+        '999999'
+      );
 
       cy.get('[placeholder=Search]').click().clear();
 
-      cy.get('[data-cy=samples-table]').contains('999999');
+      cy.get('[data-cy=experiment-safety-forms-table]').contains('999999');
 
       cy.contains(createdProposalId)
         .last()
         .parent()
-        .find('[aria-label="Review sample"]')
+        .find('[aria-label="Experiment Safety Review"]')
         .click();
 
       cy.get('[data-cy="safety-status"]').click();
@@ -686,7 +708,7 @@ context('Samples tests', () => {
       cy.contains(createdProposalId)
         .last()
         .parent()
-        .find('[aria-label="Review sample"]')
+        .find('[aria-label="Experiment Safety Review"]')
         .last()
         .click();
 
@@ -702,7 +724,11 @@ context('Samples tests', () => {
     });
 
     it('Download samples is working with dialog window showing up', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+      if (
+        !featureFlags
+          .getEnabledFeatures()
+          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
+      ) {
         this.skip();
       }
       cy.createSample({
@@ -713,9 +739,9 @@ context('Samples tests', () => {
       });
       cy.visit('/');
 
-      cy.contains('Sample safety').click();
+      cy.contains('Experiment Safety').click();
 
-      cy.get('[data-cy=samples-table]')
+      cy.get('[data-cy=experiment-safety-forms-table]')
         .contains(sampleTitle)
         .first()
         .closest('tr')
@@ -729,7 +755,11 @@ context('Samples tests', () => {
     });
 
     it('Should be able to download sample pdf', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SAMPLE_SAFETY)) {
+      if (
+        !featureFlags
+          .getEnabledFeatures()
+          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
+      ) {
         this.skip();
       }
       cy.createSample({
@@ -740,7 +770,7 @@ context('Samples tests', () => {
       });
       cy.visit('/');
 
-      cy.contains('Sample safety').click();
+      cy.contains('Experiment Safety').click();
 
       const token = window.localStorage.getItem('token');
 
