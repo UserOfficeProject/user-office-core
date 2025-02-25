@@ -40,8 +40,8 @@ const InstrSciUpcomingExperimentTimesTable = lazy(
 const UserExperimentTimesTable = lazy(
   () => import('./proposalBooking/UserExperimentsTable')
 );
-const CreateExperimentSafetyPage = lazy(
-  () => import('./experimentSafety/CreateExperimentSafetyPage')
+const ExperimentSafetyPage = lazy(
+  () => import('./experimentSafety/ExperimentSafetyPage')
 );
 const UpdateExperimentSafetyPage = lazy(
   () => import('./experimentSafety/UpdateExperimentSafetyPage')
@@ -583,11 +583,11 @@ const AppRoutes = () => {
           />
         )}
         <Route
-          path="/CreateExperimentSafety/:experimentPk"
+          path="/ExperimentSafety/:experimentPk"
           element={
             <TitledRoute
-              title="Create Experiment Safety"
-              element={<CreateExperimentSafetyPage />}
+              title="Experiment Safety"
+              element={<ExperimentSafetyPage />}
             />
           }
         />

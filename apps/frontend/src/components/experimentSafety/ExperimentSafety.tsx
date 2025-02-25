@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { CreateExperimentSafetyMutation } from 'generated/sdk';
+import { CreateOrGetExperimentSafetyMutation } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ExperimentSafetyContainer from './ExperimentSafetyContainer';
 
-interface CreateExperimentSafetyProps {
+interface ExperimentSafetyProps {
   experimentPk: number;
 }
-function CreateExperimentSafety({ experimentPk }: CreateExperimentSafetyProps) {
+function ExperimentSafety({ experimentPk }: ExperimentSafetyProps) {
   const { api } = useDataApiWithFeedback();
   const [experimentSafety, setExperimentSafety] = useState<
-    CreateExperimentSafetyMutation['createExperimentSafety'] | null
+    CreateOrGetExperimentSafetyMutation['createExperimentSafety'] | null
   >(null);
 
   useEffect(() => {
     api()
-      .createExperimentSafety({ experimentPk })
+      .createOrGetExperimentSafety({ experimentPk })
       .then((result) => {
         if (result.createExperimentSafety) {
           setExperimentSafety(result.createExperimentSafety);
@@ -32,4 +32,4 @@ function CreateExperimentSafety({ experimentPk }: CreateExperimentSafetyProps) {
   return <ExperimentSafetyContainer experimentSafety={experimentSafety} />;
 }
 
-export default CreateExperimentSafety;
+export default ExperimentSafety;

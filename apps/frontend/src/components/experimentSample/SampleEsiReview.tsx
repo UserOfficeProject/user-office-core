@@ -11,7 +11,7 @@ import {
 import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import { SampleEsiContextType } from './SampleEsiContainer';
+import { ExperimentSampleContextType } from './ExperimentSampleContainer';
 
 function SampleEsiReview() {
   const { api, isExecutingCall } = useDataApiWithFeedback();
@@ -19,17 +19,17 @@ function SampleEsiReview() {
 
   const { state, dispatch } = useContext(
     QuestionaryContext
-  ) as SampleEsiContextType;
+  ) as ExperimentSampleContextType;
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const isSubmitted = state.esi.isSubmitted;
+  const isSubmitted = state.experimentSample.isEsiSubmitted;
 
   return (
     <>
       <QuestionaryDetails
-        questionaryId={state.esi.questionary.questionaryId}
+        questionaryId={state.experimentSample.questionary.questionaryId}
         title="Experiment safety input"
       />
 
@@ -54,18 +54,19 @@ function SampleEsiReview() {
         />
         <NavigButton
           onClick={async () => {
-            const { updateSampleEsi } = await api().updateSampleEsi({
-              esiId: state.esi.esiId,
-              sampleId: state.esi.sample.id,
-              isSubmitted: true,
-            });
+            const { updateExperimentSample } =
+              await api().updateExperimentSample({
+                experimentPk: state.experimentSample.experimentPk,
+                sampleId: state.experimentSample.sample.id,
+                isSubmitted: true,
+              });
             dispatch({
               type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-              itemWithQuestionary: updateSampleEsi,
+              itemWithQuestionary: updateExperimentSample,
             });
             dispatch({
               type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-              itemWithQuestionary: updateSampleEsi,
+              itemWithQuestionary: updateExperimentSample,
             });
           }}
           disabled={isSubmitted || !isAffirmChecked}

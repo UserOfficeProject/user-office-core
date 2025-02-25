@@ -14,11 +14,13 @@ import { ExperimentHasSample } from '../models/Experiment';
 import { rejection, Rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
+import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
 import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
 import { UpdateExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
 import { UpdateExperimentSampleInput } from '../resolvers/mutations/UpdateExperimentSampleMutation';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
+import { CloneUtils } from '../utils/CloneUtils';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
@@ -26,6 +28,8 @@ export default class ExperimentMutations {
   private experimentSafetyAuth = container.resolve(
     ExperimentSafetyAuthorization
   );
+  private cloneUtils = container.resolve(CloneUtils);
+
   constructor(
     @inject(Tokens.ExperimentDataSource)
     private dataSource: ExperimentDataSource,
@@ -45,7 +49,7 @@ export default class ExperimentMutations {
   ) {}
 
   @Authorized()
-  async createExperimentSafety(
+  async createOrGetExperimentSafety(
     user: UserWithRole | null,
     experimentPk: number
   ): Promise<ExperimentSafety | Rejection> {
@@ -55,6 +59,13 @@ export default class ExperimentMutations {
       return rejection(
         'Can not create Experiment Safety, because experiment does not exist'
       );
+    }
+
+    const experimentSafety =
+      await this.dataSource.getExperimentSafetyByExperimentPk(experimentPk);
+
+    if (experimentSafety) {
+      return experimentSafety;
     }
 
     const proposal = await this.proposalDataSource.get(experiment.proposalPk);
@@ -161,6 +172,7 @@ export default class ExperimentMutations {
     if (!templateId) {
       return rejection('Esi template is not defined');
     }
+
     const newQuestionary = await this.questionaryDataSource.create(
       user!.id,
       templateId!
@@ -253,5 +265,56 @@ export default class ExperimentMutations {
       args.sampleId,
       args.isSubmitted!
     );
+  }
+
+  @Authorized()
+  async cloneExperimentSample(
+    user: UserWithRole | null,
+    args: CloneExperimentSampleInput
+  ): Promise<ExperimentHasSample | Rejection> {
+    const experimentSample = await this.dataSource.getExperimentSample(
+      args.experimentPk,
+      args.sampleId
+    );
+    if (!experimentSample) {
+      return rejection('No experiment sample found');
+    }
+
+    const experiment = await this.dataSource.getExperiment(args.experimentPk);
+    if (!experiment) {
+      return rejection('No experiment found');
+    }
+
+    const experimentSafety =
+      await this.dataSource.getExperimentSafetyByExperimentPk(
+        args.experimentPk
+      );
+
+    if (!experimentSafety) {
+      return rejection('No experiment safety found');
+    }
+
+    const hasAccessRights = await this.experimentSafetyAuth.hasWriteRights(
+      user,
+      experimentSafety.experimentSafetyPk
+    );
+    if (hasAccessRights === false) {
+      return rejection(
+        'User does not have permission to clone samples in the experiment',
+        {
+          args,
+        }
+      );
+    }
+
+    return this.cloneUtils.cloneExperimentSample(experimentSample, {
+      experimentSafety: {
+        isEsiSubmitted: false,
+      },
+      sample: {
+        isPostProposalSubmission: true,
+        title: args.newSampleTitle,
+      },
+    });
   }
 }

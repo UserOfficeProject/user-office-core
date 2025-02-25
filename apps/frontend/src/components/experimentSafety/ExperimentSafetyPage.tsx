@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 import NotFound from 'components/common/NotFound';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import CreateExperimentSafety from './CreateExperimentSafety';
+import ExperimentSafety from './ExperimentSafety';
 
-function CreateExperimentSafetyPage() {
+function ExperimentSafetyPage() {
   const { experimentPk } = useParams<{ experimentPk: string }>();
 
   if (!experimentPk) {
@@ -16,10 +16,10 @@ function CreateExperimentSafetyPage() {
   return (
     <StyledContainer>
       <StyledPaper data-cy="create-proposal-esi-table">
-        <CreateExperimentSafety experimentPk={+experimentPk} />
+        <ExperimentSafety experimentPk={+experimentPk} />
       </StyledPaper>
     </StyledContainer>
   );
 }
 
-export default CreateExperimentSafetyPage;
+export default ExperimentSafetyPage;

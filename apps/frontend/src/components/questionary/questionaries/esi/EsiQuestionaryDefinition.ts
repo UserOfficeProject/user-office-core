@@ -3,7 +3,7 @@ import { DefaultReviewWizardStep } from 'components/questionary/DefaultReviewWiz
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import { Sdk, TemplateGroupId } from 'generated/sdk';
-import { ProposalEsiSubmissionState } from 'models/questionary/proposalEsi/ProposalEsiSubmissionState';
+import { ExperimentSafetySubmissionState } from 'models/questionary/experimentSafety/ExperimentSafetySubmissionState';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
 import { EsiWizardStep } from './EsiWizardStep';
@@ -19,13 +19,17 @@ export const esiQuestionaryDefinition: QuestionaryDefinition = {
   wizardStepFactory: new DefaultWizardStepFactory(
     EsiWizardStep,
     new DefaultReviewWizardStep(
-      (state) => (state as ProposalEsiSubmissionState).esi.isSubmitted
+      (state) =>
+        (state as ExperimentSafetySubmissionState).experimentSafety
+          .esiQuestionarySubmittedAt !== null
     )
   ),
   getItemWithQuestionary(
     api: Sdk,
-    esiId: number
+    experimentSafetyPk: number
   ): Promise<ItemWithQuestionary | null> {
-    return api.getEsi({ esiId }).then(({ esi }) => esi);
+    return api
+      .getExperimentSafety({ experimentSafetyPk })
+      .then(({ experimentSafety }) => experimentSafety);
   },
 };

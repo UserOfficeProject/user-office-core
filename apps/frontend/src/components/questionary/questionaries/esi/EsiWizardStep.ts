@@ -1,11 +1,13 @@
 import { QuestionaryWizardStep } from 'components/questionary/DefaultWizardStepFactory';
-import { ProposalEsiSubmissionState } from 'models/questionary/proposalEsi/ProposalEsiSubmissionState';
+import { ExperimentSafetySubmissionState } from 'models/questionary/experimentSafety/ExperimentSafetySubmissionState';
 import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 
 export class EsiWizardStep extends QuestionaryWizardStep {
   isItemWithQuestionaryEditable(state: QuestionarySubmissionState): boolean {
-    const registrationState = state as ProposalEsiSubmissionState;
+    const registrationState = state as ExperimentSafetySubmissionState;
 
-    return registrationState.esi.esiQuestionarySubmittedAt === null;
+    return (
+      registrationState.experimentSafety.esiQuestionarySubmittedAt === null
+    );
   }
 }

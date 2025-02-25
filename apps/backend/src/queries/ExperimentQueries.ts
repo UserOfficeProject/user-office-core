@@ -49,4 +49,15 @@ export default class ExperimentQueries {
 
     return experimentSample;
   }
+
+  @Authorized(Roles.USER)
+  async getExperimentSamples(
+    user: UserWithRole | null,
+    experimentPk: number
+  ): Promise<ExperimentHasSample[]> {
+    const experimentSamples =
+      await this.dataSource.getExperimentSamples(experimentPk);
+
+    return experimentSamples;
+  }
 }

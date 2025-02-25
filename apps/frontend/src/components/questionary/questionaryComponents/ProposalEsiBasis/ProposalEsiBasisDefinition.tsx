@@ -2,10 +2,10 @@ import React from 'react';
 
 import EsiIcon from 'components/common/icons/EsiIcon';
 import { DataType } from 'generated/sdk';
-import { ProposalEsiSubmissionState } from 'models/questionary/proposalEsi/ProposalEsiSubmissionState';
+import { ExperimentSafetySubmissionState } from 'models/questionary/experimentSafety/ExperimentSafetySubmissionState';
 
 import { createProposalEsiBasisValidationSchema } from './createProposalEsiValidationSchema';
-import QuestionaryComponentProposalEsiBasis from './QuestionaryComponentProposalEsiBasis';
+import QuestionaryComponentExperimentSafetyBasis from './QuestionaryComponentExperimentSafetyBasis';
 import { QuestionProposalEsiBasisForm } from './QuestionProposalEsiBasisForm';
 import { QuestionTemplateRelationProposalEsiBasisForm } from './QuestionTemplateRelationProposalEsiBasisForm';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -13,7 +13,7 @@ import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegist
 export const proposalEsiBasisDefinition: QuestionaryComponentDefinition = {
   dataType: DataType.PROPOSAL_ESI_BASIS,
   name: 'Proposal ESI Basis',
-  questionaryComponent: QuestionaryComponentProposalEsiBasis,
+  questionaryComponent: QuestionaryComponentExperimentSafetyBasis,
   questionForm: () => QuestionProposalEsiBasisForm,
   questionTemplateRelationForm: () =>
     QuestionTemplateRelationProposalEsiBasisForm,
@@ -22,8 +22,8 @@ export const proposalEsiBasisDefinition: QuestionaryComponentDefinition = {
   icon: <EsiIcon />,
   createYupValidationSchema: createProposalEsiBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
-    const esiState = state as ProposalEsiSubmissionState;
+    const esiState = state as ExperimentSafetySubmissionState;
 
-    return esiState.esi.sampleEsis;
+    return esiState.experimentSafety.samples;
   },
 };

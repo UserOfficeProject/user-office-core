@@ -297,7 +297,7 @@ export default class PostgresExperimentDataSource
     return createExperimentSafetyObject(result);
   }
 
-  addSampleToExperiment(
+  async addSampleToExperiment(
     experimentPk: number,
     sampleId: number,
     sampleEsiQuestionaryId: number
@@ -315,7 +315,7 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  removeSampleFromExperiment(
+  async removeSampleFromExperiment(
     experimentPk: number,
     sampleId: number
   ): Promise<ExperimentHasSample> {
@@ -329,7 +329,7 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  getExperimentSample(
+  async getExperimentSample(
     experimentPk: number,
     sampleId: number
   ): Promise<ExperimentHasSample | null> {
@@ -347,7 +347,7 @@ export default class PostgresExperimentDataSource
       });
   }
 
-  updateExperimentSample(
+  async updateExperimentSample(
     experimentPk: number,
     sampleId: number,
     isSubmitted: boolean
@@ -363,6 +363,17 @@ export default class PostgresExperimentDataSource
       )
       .then((records: ExperimentHasSampleRecord[]) =>
         createExperimentHasSampleObject(records[0])
+      );
+  }
+
+  async getExperimentSamples(
+    experimentPk: number
+  ): Promise<ExperimentHasSample[]> {
+    return database('experiment_has_samples')
+      .select('*')
+      .where('experiment_pk', experimentPk)
+      .then((records: ExperimentHasSampleRecord[]) =>
+        records.map(createExperimentHasSampleObject)
       );
   }
 }

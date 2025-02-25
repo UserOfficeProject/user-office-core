@@ -1,6 +1,9 @@
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
+import { ExperimentHasSample } from '../models/Experiment';
 import { Sample } from '../models/Sample';
 import { Tokens } from './../config/Tokens';
 import { QuestionaryDataSource } from './../datasources/QuestionaryDataSource';
@@ -18,13 +21,17 @@ type SampleOverrides = Partial<
   >
 >;
 
+type SampleESIOverrides = Partial<Pick<ExperimentHasSample, 'isEsiSubmitted'>>;
+
 @injectable()
 export class CloneUtils {
   constructor(
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.QuestionaryDataSource)
-    private questionaryDataSource: QuestionaryDataSource
+    private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource
   ) {}
 
   /**
@@ -53,5 +60,41 @@ export class CloneUtils {
     }
 
     return newSample;
+  }
+
+  async cloneExperimentSample(
+    sourceExperimentSample: ExperimentHasSample,
+    overrides?: {
+      experimentSafety?: SampleESIOverrides;
+      sample?: SampleOverrides;
+    }
+  ) {
+    const sourceSample = await this.sampleDataSource.getSample(
+      sourceExperimentSample.sampleId
+    );
+    if (!sourceSample) {
+      throw new GraphQLError('Sample could not be found');
+    }
+
+    const newSample = await this.cloneSample(sourceSample, overrides?.sample);
+    const newQuestionary = await this.questionaryDataSource.clone(
+      sourceExperimentSample.sampleEsiQuestionaryId
+    );
+
+    let newSampleEsi = await this.experimentDataSource.addSampleToExperiment(
+      newSample.id,
+      sourceExperimentSample.experimentPk,
+      newQuestionary.questionaryId
+    );
+
+    if (overrides?.experimentSafety?.isEsiSubmitted !== undefined) {
+      newSampleEsi = await this.experimentDataSource.updateExperimentSample(
+        newSampleEsi.experimentPk,
+        newSampleEsi.sampleId,
+        overrides.experimentSafety.isEsiSubmitted
+      );
+    }
+
+    return newSampleEsi;
   }
 }

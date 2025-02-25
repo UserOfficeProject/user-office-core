@@ -12,27 +12,27 @@ import { ResolverContext } from '../../context';
 import { ExperimentHasSample } from '../types/ExperimentHasSample';
 
 @ArgsType()
-export class UpdateExperimentSampleInput {
-  @Field(() => Int)
-  sampleId: number;
-
+export class CloneExperimentSampleInput {
   @Field(() => Int)
   experimentPk: number;
 
-  @Field(() => Boolean, { nullable: true })
-  isSubmitted?: boolean;
+  @Field(() => Int)
+  sampleId: number;
+
+  @Field(() => String, { nullable: true })
+  newSampleTitle?: string;
 }
 
 @Resolver()
-export class UpdateExperimentSampleMutation {
+export class CloneExperimentSampleMutation {
   @Mutation(() => ExperimentHasSample)
-  updateExperimentSample(
-    @Args() input: UpdateExperimentSampleInput,
+  cloneExperimentSample(
+    @Args() args: CloneExperimentSampleInput,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.experiment.updateExperimentSample(
+    return context.mutations.experiment.cloneExperimentSample(
       context.user,
-      input
+      args
     );
   }
 }

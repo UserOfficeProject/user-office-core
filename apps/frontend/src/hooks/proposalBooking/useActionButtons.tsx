@@ -77,8 +77,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     let stateReason: string | null = null;
 
     if (isPiOrCoProposer(user, event)) {
-      console.log(event.proposal.finalStatus);
-      console.log(event.proposal.managementDecisionSubmitted);
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
@@ -119,7 +117,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   const finishEsi = (event: UpcomingExperimentsType) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
-
     if (isPiOrCoProposer(user, event)) {
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
@@ -145,13 +142,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <EsiIcon data-cy="finish-experiment-safety-form-icon" />,
       buttonState,
       () => {
-        if (event?.experimentSafety) {
-          navigate(
-            `/UpdateExperimentSafety/${event.experimentSafety.experimentSafetyPk}`
-          );
-        } else {
-          navigate(`/CreateExperimentSafety/${event.experimentPk}`);
-        }
+        navigate(`/ExperimentSafety/${event.experimentPk}`);
       }
     );
   };

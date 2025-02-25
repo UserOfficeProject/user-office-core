@@ -109,6 +109,9 @@ export class ExperimentSafetyResolver {
     @Root() experimentSafety: ExperimentSafety,
     @Ctx() context: ResolverContext
   ): Promise<ExperimentHasSample[]> {
-    return [];
+    return context.queries.experiment.getExperimentSamples(
+      context.user,
+      experimentSafety.experimentPk
+    );
   }
 }

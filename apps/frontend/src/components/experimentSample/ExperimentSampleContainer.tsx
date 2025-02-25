@@ -8,37 +8,41 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { TemplateGroupId } from 'generated/sdk';
 import createCustomEventHandlers from 'models/questionary/createCustomEventHandlers';
+import { ExperimentSampleSubmissionState } from 'models/questionary/experimentSample/ExperimentSampleSubmissionState';
+import { ExperimentSampleWithQuestionary } from 'models/questionary/experimentSample/ExperimentSampleWithQuestionary';
 import {
   Event,
   QuestionarySubmissionModel,
 } from 'models/questionary/QuestionarySubmissionState';
-import { SampleEsiSubmissionState } from 'models/questionary/experimentSample/SampleEsiSubmissionState';
-import { SampleEsiWithQuestionary } from 'models/questionary/experimentSample/ExperimentSampleWithQuestionary';
 import useEventHandlers from 'models/questionary/useEventHandlers';
 
-export interface SampleEsiContextType extends QuestionaryContextType {
-  state: SampleEsiSubmissionState | null;
+export interface ExperimentSampleContextType extends QuestionaryContextType {
+  state: ExperimentSampleSubmissionState | null;
 }
 
-export interface SampleEsiContainerProps {
-  esi: SampleEsiWithQuestionary;
-  onUpdate?: (esi: SampleEsiWithQuestionary) => void;
-  onSubmitted?: (esi: SampleEsiWithQuestionary) => void;
+export interface ExperimentSampleContainerProps {
+  experimentSample: ExperimentSampleWithQuestionary;
+  onUpdate?: (experimentSample: ExperimentSampleWithQuestionary) => void;
+  onSubmitted?: (experimentSample: ExperimentSampleWithQuestionary) => void;
 }
-export default function SampleEsiContainer(props: SampleEsiContainerProps) {
-  const [initialState] = useState(new SampleEsiSubmissionState(props.esi));
+export default function ExperimentSampleContainer(
+  props: ExperimentSampleContainerProps
+) {
+  const [initialState] = useState(
+    new ExperimentSampleSubmissionState(props.experimentSample)
+  );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.SAMPLE_ESI);
 
   const customEventHandlers = createCustomEventHandlers(
-    (state: SampleEsiSubmissionState, action: Event) => {
+    (state: ExperimentSampleSubmissionState, action: Event) => {
       switch (action.type) {
         case 'ITEM_WITH_QUESTIONARY_MODIFIED':
-          props.onUpdate?.(state.esi);
+          props.onUpdate?.(state.experimentSample);
           break;
 
         case 'ITEM_WITH_QUESTIONARY_SUBMITTED':
-          props.onSubmitted?.(state.esi);
+          props.onSubmitted?.(state.experimentSample);
           break;
       }
     }
@@ -51,7 +55,7 @@ export default function SampleEsiContainer(props: SampleEsiContainerProps) {
 
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
-      <Questionary title={state.esi.sample.title} />
+      <Questionary title={state.experimentSample.sample.title} />
     </QuestionaryContext.Provider>
   );
 }
