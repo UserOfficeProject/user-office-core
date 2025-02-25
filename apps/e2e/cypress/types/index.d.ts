@@ -2,6 +2,7 @@ import './admin';
 import './call';
 import './instrument';
 import './internalReview';
+import './invite';
 import './predefinedMessage';
 import './proposal';
 import './template';

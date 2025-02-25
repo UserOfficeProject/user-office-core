@@ -1,4 +1,11 @@
-import { FeatureId, Feature } from '@user-office-software-libs/shared-types';
+import {
+  FeatureId,
+  Feature,
+  UpdateFeaturesInput,
+  UpdateFeaturesMutation,
+} from '@user-office-software-libs/shared-types';
+
+import { getE2EApi } from './utils';
 
 export default {
   getEnabledFeatures: () => {
@@ -18,3 +25,14 @@ export default {
     return featuresMap;
   },
 };
+
+const updateFeature = (
+  updateFeaturesInput: UpdateFeaturesInput
+): Cypress.Chainable<UpdateFeaturesMutation> => {
+  const api = getE2EApi();
+  const request = api.updateFeatures({ input: updateFeaturesInput });
+
+  return cy.wrap(request);
+};
+
+Cypress.Commands.add('updateFeature', updateFeature);

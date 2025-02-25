@@ -7,6 +7,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
@@ -199,6 +200,11 @@ export async function createPostToRabbitMQHandler() {
     Tokens.TemplateDataSource
   );
 
+  const coProposerClaimDataSource =
+    container.resolve<CoProposerClaimDataSource>(
+      Tokens.CoProposerClaimDataSource
+    );
+
   return async (event: ApplicationEvent) => {
     // if the original method failed
     // there is no point of publishing any event
@@ -218,6 +224,27 @@ export async function createPostToRabbitMQHandler() {
         await rabbitMQ.sendMessageToExchange(
           event.exchange || EXCHANGE_NAME,
           event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.INVITE_ACCEPTED: {
+        const invite = event.invite;
+
+        const claim = await coProposerClaimDataSource.getByInviteId(invite.id);
+        if (!claim) {
+          return;
+        }
+
+        const proposal = await proposalDataSource.get(claim.proposalPk);
+        if (!proposal) {
+          return;
+        }
+
+        const jsonMessage = await getProposalMessageData(proposal);
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          Event.PROPOSAL_UPDATED,
           jsonMessage
         );
         break;

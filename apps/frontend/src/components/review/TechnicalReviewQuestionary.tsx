@@ -86,6 +86,7 @@ export function createTechnicalReviewStub(
       },
       submitted: false,
       users: [],
+      coProposerInvites: [],
       samples: [],
       genericTemplates: [],
       commentForManagement: '',

@@ -18,6 +18,7 @@ import './admin';
 import './call';
 import './instrument';
 import './internalReview';
+import './invite';
 import './proposal';
 import './template';
 import './user';

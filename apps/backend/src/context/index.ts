@@ -38,6 +38,7 @@ import FileQueries from '../queries/FileQueries';
 import GenericTemplateQueries from '../queries/GenericTemplateQueries';
 import InstrumentQueries from '../queries/InstrumentQueries';
 import InternalReviewQueries from '../queries/InternalReviewQueries';
+import InviteQueries from '../queries/InviteQueries';
 import PdfTemplateQueries from '../queries/PdfTemplateQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
 import ProposalEsiQueries from '../queries/ProposalEsiQueries';
@@ -66,6 +67,7 @@ interface ResolverContextQueries {
   file: FileQueries;
   genericTemplate: GenericTemplateQueries;
   instrument: InstrumentQueries;
+  invite: InviteQueries;
   technique: TechniqueQueries;
   pdfTemplate: PdfTemplateQueries;
   proposal: ProposalQueries;
