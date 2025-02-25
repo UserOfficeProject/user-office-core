@@ -2,7 +2,7 @@ import React from 'react';
 
 import EsiIcon from 'components/common/icons/EsiIcon';
 import { DataType } from 'generated/sdk';
-import { SampleEsiSubmissionState } from 'models/questionary/sampleEsi/SampleEsiSubmissionState';
+import { SampleEsiSubmissionState } from 'models/questionary/experimentSample/SampleEsiSubmissionState';
 
 import { createSampleEsiBasisValidationSchema } from './createSampleEsiValidationSchema';
 import { QuestionSampleEsiBasisForm } from './QuestionSampleEsiBasisForm';

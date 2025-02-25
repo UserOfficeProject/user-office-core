@@ -10,7 +10,7 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import { ProposalEsiContextType } from './ProposalEsiContainer';
+import { ProposalEsiContextType } from '../experimentSafety/ExperimentSafetyContainer';
 import ProposalEsiDetails from './ProposalEsiDetails';
 
 type ProposalEsiReviewProps = {

@@ -15,8 +15,8 @@ import {
 import { WithConfirmType } from 'utils/withConfirm';
 
 import { SampleFragment } from './../../generated/sdk';
+import { ExperimentSampleWithQuestionary } from './experimentSample/ExperimentSampleWithQuestionary';
 import { getFieldById } from './QuestionaryFunctions';
-import { SampleEsiWithQuestionary } from './sampleEsi/SampleEsiWithQuestionary';
 import { StepType } from './StepType';
 
 export enum GENERIC_TEMPLATE_EVENT {
@@ -70,14 +70,17 @@ export type Event =
       itemWithQuestionary: Record<string, unknown>;
     }
   // sample
-  | { type: 'ESI_SAMPLE_CREATED'; sample: SampleFragment }
-  | { type: 'ESI_SAMPLE_DELETED'; sampleId: number }
+  | { type: 'SAMPLE_CREATED'; sample: SampleFragment }
+  | { type: 'SAMPLE_DELETED'; sampleId: number }
   | {
-      type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED';
-      sampleEsi: SampleEsiWithQuestionary;
+      type: 'SAMPLE_ADDED_TO_EXPERIMENT';
+      experimentSample: ExperimentSampleWithQuestionary;
     }
-  | { type: 'ESI_SAMPLE_ESI_UPDATED'; sampleEsi: SampleEsiWithQuestionary }
-  | { type: 'ESI_SAMPLE_ESI_DELETED'; sampleId: number }
+  | {
+      type: 'EXPERIMENT_SAMPLE_UPDATED';
+      experimentSample: ExperimentSampleWithQuestionary;
+    }
+  | { type: 'SAMPLE_REMOVED_FROM_EXPERIMENT'; sampleId: number }
   | {
       type: 'SAMPLE_DECLARATION_ITEMS_MODIFIED';
       id: string;

@@ -21,8 +21,8 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import BoxIcon from 'components/common/icons/BoxIcon';
 import StyledDialog from 'components/common/StyledDialog';
 import UOLoader from 'components/common/UOLoader';
+import { ExperimentSafetyContextType } from 'components/experimentSafety/ExperimentSafetyContainer';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { ProposalEsiContextType } from 'components/proposalEsi/ProposalEsiContainer';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -30,12 +30,12 @@ import {
 import SampleEsiContainer from 'components/sampleEsi/SampleEsiContainer';
 import {
   DataType,
-  GetSampleEsiQuery,
+  GetExperimentSampleQuery,
   SampleDeclarationConfig,
   SampleFragment,
 } from 'generated/sdk';
+import { ExperimentSampleWithQuestionary } from 'models/questionary/experimentSample/ExperimentSampleWithQuestionary';
 import { getQuestionsByType } from 'models/questionary/QuestionaryFunctions';
-import { SampleEsiWithQuestionary } from 'models/questionary/sampleEsi/SampleEsiWithQuestionary';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
@@ -50,9 +50,9 @@ function QuestionaryComponentProposalEsiBasis(
   const answerId = answer.question.id;
   const { state, dispatch } = useContext(
     QuestionaryContext
-  ) as ProposalEsiContextType;
-  const [selectedSampleEsi, setSelectedSampleEsi] =
-    useState<GetSampleEsiQuery['sampleEsi']>(null);
+  ) as ExperimentSafetyContextType;
+  const [selectedExperimentSample, setSelectedExperimentSample] =
+    useState<GetExperimentSampleQuery['experimentSample']>(null);
   const { api } = useDataApiWithFeedback();
 
   if (!state) {
@@ -61,20 +61,20 @@ function QuestionaryComponentProposalEsiBasis(
 
   return (
     <Field name={answerId}>
-      {({ field, form }: FieldProps<SampleEsiWithQuestionary[]>) => {
-        const declareEsi = (sampleId: number) => {
+      {({ field, form }: FieldProps<ExperimentSampleWithQuestionary[]>) => {
+        const addSampleToExperiment = (sampleId: number) => {
           api()
             .addSampleToExperiment({
-              experimentPk: state!.esi.experimentPk,
+              experimentPk: state!.experimentSafety.experimentPk,
               sampleId: sampleId,
             })
             .then(({ addSampleToExperiment }) => {
               if (addSampleToExperiment) {
                 dispatch({
-                  type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED',
-                  sampleEsi: addSampleToExperiment,
+                  type: 'SAMPLE_ADDED_TO_EXPERIMENT',
+                  experimentSample: addSampleToExperiment,
                 });
-                setSelectedSampleEsi(addSampleToExperiment);
+                setSelectedExperimentSample(addSampleToExperiment);
                 form.setFieldValue(answerId, [
                   ...field.value,
                   addSampleToExperiment,
@@ -83,32 +83,38 @@ function QuestionaryComponentProposalEsiBasis(
             });
         };
 
-        const revokeEsi = (sampleId: number) => {
+        const removeSampleFromExperiment = (sampleId: number) => {
           api()
-            .deleteSampleEsi({
-              esiId: state!.esi.id,
+            .removeSampleFromExperiment({
+              experimentPk: state!.experimentSafety.experimentPk,
               sampleId: sampleId,
             })
-            .then(({ deleteSampleEsi }) => {
-              if (deleteSampleEsi) {
+            .then(({ removeSampleFromExperiment }) => {
+              if (removeSampleFromExperiment) {
                 dispatch({
-                  type: 'ESI_SAMPLE_ESI_DELETED',
-                  sampleId: deleteSampleEsi.sampleId,
+                  type: 'SAMPLE_REMOVED_FROM_EXPERIMENT',
+                  sampleId: removeSampleFromExperiment.sampleId,
                 });
 
                 // Refresh ESI list
                 api()
-                  .getEsi({ esiId: state!.esi.id })
+                  .getExperimentSafety({
+                    experimentSafetyPk:
+                      state!.experimentSafety.experimentSafetyPk,
+                  })
                   .then((result) => {
-                    form.setFieldValue(answerId, result.esi?.sampleEsis);
+                    form.setFieldValue(
+                      answerId,
+                      result.experimentSafety?.samples
+                    );
                   });
               }
             });
         };
 
-        const addNewSample = async (title: string) => {
+        const createSample = async (title: string) => {
           const sampleQuestions = getQuestionsByType(
-            state.esi.proposal.questionary.steps,
+            state.experimentSafety.proposal.questionary.steps,
             DataType.SAMPLE_DECLARATION
           );
 
@@ -118,15 +124,15 @@ function QuestionaryComponentProposalEsiBasis(
             title: title,
             templateId: (sampleQuestion.config as SampleDeclarationConfig)
               .templateId!,
-            proposalPk: state.esi.proposal.primaryKey,
+            proposalPk: state.experimentSafety.proposal.primaryKey,
             questionId: sampleQuestion.question.id,
             isPostProposalSubmission: true,
           });
 
           const sample = result.createSample;
           if (sample !== null) {
-            dispatch({ type: 'ESI_SAMPLE_CREATED', sample: sample });
-            declareEsi(sample.id);
+            dispatch({ type: 'SAMPLE_CREATED', sample: sample });
+            addSampleToExperiment(sample.id);
           }
         };
 
@@ -142,11 +148,11 @@ function QuestionaryComponentProposalEsiBasis(
                   (esi) => esi.sampleId !== deletedSample.id
                 );
                 dispatch({
-                  type: 'ESI_SAMPLE_DELETED',
+                  type: 'SAMPLE_DELETED',
                   sampleId: deletedSample.id,
                 });
                 dispatch({
-                  type: 'ESI_SAMPLE_ESI_DELETED',
+                  type: 'SAMPLE_REMOVED_FROM_EXPERIMENT',
                   sampleId: deletedSample.id,
                 });
                 form.setFieldValue(answerId, newValue);
@@ -154,10 +160,12 @@ function QuestionaryComponentProposalEsiBasis(
             });
         };
 
-        const handleRevokeEsiClick = async (sampleId: number) => {
+        const removeSampleFromExperimentConfirmation = async (
+          sampleId: number
+        ) => {
           confirm(
             () => {
-              revokeEsi(sampleId);
+              removeSampleFromExperiment(sampleId);
             },
             {
               title: 'Are you sure?',
@@ -167,24 +175,24 @@ function QuestionaryComponentProposalEsiBasis(
           )();
         };
 
-        const handleEditEsiClick = async (id: number) => {
+        const handleEditExperimentSampleClick = async (id: number) => {
           await api()
-            .updateSampleEsi({
-              esiId: state!.esi.id,
+            .updateExperimentSample({
               sampleId: id,
+              experimentPk: state!.experimentSafety.experimentPk,
               isSubmitted: false,
             })
-            .then(({ updateSampleEsi }) => {
-              if (updateSampleEsi) {
-                setSelectedSampleEsi(updateSampleEsi);
+            .then(({ updateExperimentSample }) => {
+              if (updateExperimentSample) {
+                setSelectedExperimentSample(updateExperimentSample);
                 const newValue = field.value.map((esi) =>
-                  esi.sampleId === updateSampleEsi.sampleId
-                    ? updateSampleEsi
+                  esi.sampleId === updateExperimentSample.sampleId
+                    ? updateExperimentSample
                     : esi
                 );
                 dispatch({
-                  type: 'ESI_SAMPLE_ESI_UPDATED',
-                  sampleEsi: updateSampleEsi,
+                  type: 'EXPERIMENT_SAMPLE_UPDATED',
+                  experimentSample: updateExperimentSample,
                 });
                 form.setFieldValue(answerId, newValue);
               }
@@ -205,7 +213,7 @@ function QuestionaryComponentProposalEsiBasis(
                 .then((response) => {
                   const newSample = response.cloneSample;
                   if (newSample !== null) {
-                    dispatch({ type: 'ESI_SAMPLE_CREATED', sample: newSample });
+                    dispatch({ type: 'SAMPLE_CREATED', sample: newSample });
                   }
                 });
             },
@@ -234,7 +242,7 @@ function QuestionaryComponentProposalEsiBasis(
                       sample: cloneSampleEsi.sample,
                     });
                     dispatch({
-                      type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED',
+                      type: 'SAMPLE_ADDED_TO_EXPERIMENT',
                       sampleEsi: cloneSampleEsi,
                     });
                     form.setFieldValue(answerId, [
@@ -273,8 +281,8 @@ function QuestionaryComponentProposalEsiBasis(
                         checked={hasDeclaredEsi}
                         onChange={(e) =>
                           e.target.checked
-                            ? declareEsi(sample.id)
-                            : handleRevokeEsiClick(sample.id)
+                            ? addSampleToExperiment(sample.id)
+                            : removeSampleFromExperimentConfirmation(sample.id)
                         }
                         data-cy="select-sample-chk"
                       />
@@ -308,7 +316,7 @@ function QuestionaryComponentProposalEsiBasis(
                           title="Edit"
                           onClick={(e: MouseEvent) => {
                             e.stopPropagation();
-                            handleEditEsiClick(sample.id);
+                            handleEditExperimentSampleClick(sample.id);
                           }}
                           data-cy="edit-esi-btn"
                         >
@@ -368,7 +376,7 @@ function QuestionaryComponentProposalEsiBasis(
                 onClick={() =>
                   prompt(
                     async (title) => {
-                      addNewSample(title);
+                      createSample(title);
                     },
                     {
                       question: 'Name of the sample',
@@ -390,17 +398,17 @@ function QuestionaryComponentProposalEsiBasis(
               ${state?.esi?.proposal.samples?.length ?? 0} samples selected`}
             </Typography>
             <StyledDialog
-              onClose={() => setSelectedSampleEsi(null)}
-              open={selectedSampleEsi !== null}
+              onClose={() => setSelectedExperimentSample(null)}
+              open={selectedExperimentSample !== null}
               data-cy="sample-esi-modal"
               maxWidth="md"
               fullWidth
               title="Sample ESI"
             >
               <DialogContent>
-                {selectedSampleEsi ? (
+                {selectedExperimentSample ? (
                   <SampleEsiContainer
-                    esi={selectedSampleEsi}
+                    esi={selectedExperimentSample}
                     onUpdate={(updatedSampleEsi) => {
                       const newValue = field.value.map((sampleEsi) =>
                         sampleEsi.sampleId === updatedSampleEsi.sampleId
@@ -408,7 +416,7 @@ function QuestionaryComponentProposalEsiBasis(
                           : sampleEsi
                       );
                       dispatch({
-                        type: 'ESI_SAMPLE_ESI_UPDATED',
+                        type: 'EXPERIMENT_SAMPLE_UPDATED',
                         sampleEsi: updatedSampleEsi,
                       });
                       form.setFieldValue(answerId, newValue);
@@ -421,7 +429,7 @@ function QuestionaryComponentProposalEsiBasis(
                           form.setFieldValue(answerId, result.esi?.sampleEsis);
                         });
 
-                      setSelectedSampleEsi(null);
+                      setSelectedExperimentSample(null);
                     }}
                   ></SampleEsiContainer>
                 ) : (

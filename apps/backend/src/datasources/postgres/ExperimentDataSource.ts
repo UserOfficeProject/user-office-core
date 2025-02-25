@@ -314,10 +314,55 @@ export default class PostgresExperimentDataSource
         createExperimentHasSampleObject(records[0])
       );
   }
+
   removeSampleFromExperiment(
     experimentPk: number,
     sampleId: number
   ): Promise<ExperimentHasSample> {
-    throw new Error('Method not implemented.');
+    return database('experiment_has_samples')
+      .where('experiment_pk', experimentPk)
+      .andWhere('sample_id', sampleId)
+      .del()
+      .returning('*')
+      .then((records: ExperimentHasSampleRecord[]) =>
+        createExperimentHasSampleObject(records[0])
+      );
+  }
+
+  getExperimentSample(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSample | null> {
+    return database('experiment_has_samples')
+      .select('*')
+      .where('experiment_pk', experimentPk)
+      .andWhere('sample_id', sampleId)
+      .first()
+      .then((record: ExperimentHasSampleRecord | undefined) => {
+        if (!record) {
+          return null;
+        }
+
+        return createExperimentHasSampleObject(record);
+      });
+  }
+
+  updateExperimentSample(
+    experimentPk: number,
+    sampleId: number,
+    isSubmitted: boolean
+  ): Promise<ExperimentHasSample> {
+    return database('experiment_has_samples')
+      .where('experiment_pk', experimentPk)
+      .andWhere('sample_id', sampleId)
+      .update(
+        {
+          is_esi_submitted: isSubmitted,
+        },
+        '*'
+      )
+      .then((records: ExperimentHasSampleRecord[]) =>
+        createExperimentHasSampleObject(records[0])
+      );
   }
 }

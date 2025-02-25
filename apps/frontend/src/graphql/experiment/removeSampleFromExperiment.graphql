@@ -1,0 +1,5 @@
+mutation removeSampleFromExperiment($sampleId: Int!, $experimentPk: Int!) {
+  removeSampleFromExperiment(sampleId: $sampleId, experimentPk: $experimentPk) {
+    ...experimentSample
+  }
+}

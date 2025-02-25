@@ -49,4 +49,13 @@ export interface ExperimentDataSource {
     experimentPk: number,
     sampleId: number
   ): Promise<ExperimentHasSample>;
+  getExperimentSample(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSample | null>;
+  updateExperimentSample(
+    experimentPk: number,
+    sampleId: number,
+    isSubmitted: boolean
+  ): Promise<ExperimentHasSample>;
 }

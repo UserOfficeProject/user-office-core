@@ -3,7 +3,7 @@ import React from 'react';
 import UOLoader from 'components/common/UOLoader';
 import { useEsi } from 'hooks/esi/useEsi';
 
-import ProposalEsiContainer from './ProposalEsiContainer';
+import ProposalEsiContainer from '../experimentSafety/ExperimentSafetyContainer';
 
 interface UpdateProposalEsiProps {
   esiId: number;

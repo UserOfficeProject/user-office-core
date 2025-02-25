@@ -14,7 +14,9 @@ import { ExperimentHasSample } from '../models/Experiment';
 import { rejection, Rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
+import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
 import { UpdateExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { UpdateExperimentSampleInput } from '../resolvers/mutations/UpdateExperimentSampleMutation';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
@@ -134,9 +136,12 @@ export default class ExperimentMutations {
       experimentSafety.experimentSafetyPk
     );
     if (hasAccessRights === false) {
-      return rejection('User does not have permission to attach samples', {
-        args,
-      });
+      return rejection(
+        'User does not have permission to attach samples to the experiment',
+        {
+          args,
+        }
+      );
     }
 
     const sample = await this.sampleDataSource.getSample(args.sampleId);
@@ -170,6 +175,83 @@ export default class ExperimentMutations {
       args.experimentPk,
       args.sampleId,
       newQuestionary.questionaryId
+    );
+  }
+
+  @Authorized()
+  async removeSampleFromExperiment(
+    user: UserWithRole | null,
+    args: RemoveSampleFromExperimentInput
+  ): Promise<ExperimentHasSample | Rejection> {
+    const experiment = await this.dataSource.getExperiment(args.experimentPk);
+    if (!experiment) {
+      return rejection('No experiment found');
+    }
+
+    const experimentSafety =
+      await this.dataSource.getExperimentSafetyByExperimentPk(
+        args.experimentPk
+      );
+
+    if (!experimentSafety) {
+      return rejection('No experiment safety found');
+    }
+
+    const hasAccessRights = await this.experimentSafetyAuth.hasWriteRights(
+      user,
+      experimentSafety.experimentSafetyPk
+    );
+    if (hasAccessRights === false) {
+      return rejection(
+        'User does not have permission to remove samples from the experimemnt',
+        {
+          args,
+        }
+      );
+    }
+
+    return this.dataSource.removeSampleFromExperiment(
+      args.experimentPk,
+      args.sampleId
+    );
+  }
+
+  @Authorized()
+  async updateExperimentSample(
+    user: UserWithRole | null,
+    args: UpdateExperimentSampleInput
+  ): Promise<ExperimentHasSample | Rejection> {
+    const experiment = await this.dataSource.getExperiment(args.experimentPk);
+    if (!experiment) {
+      return rejection('No experiment found');
+    }
+
+    const experimentSafety =
+      await this.dataSource.getExperimentSafetyByExperimentPk(
+        args.experimentPk
+      );
+
+    if (!experimentSafety) {
+      return rejection('No experiment safety found');
+    }
+
+    const hasAccessRights = await this.experimentSafetyAuth.hasWriteRights(
+      user,
+      experimentSafety.experimentSafetyPk
+    );
+    if (hasAccessRights === false) {
+      return rejection(
+        'User does not have permission to update samples in the experiment',
+        {
+          args,
+        }
+      );
+    }
+
+    return this.dataSource.updateExperimentSample(
+      args.experimentPk,
+      args.sampleId,
+      args.isSubmitted!
     );
   }
 }

@@ -8,6 +8,12 @@ import { UpdateExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExpe
 import { ExperimentDataSource } from '../ExperimentDataSource';
 
 export class ExperimentDataSourceMock implements ExperimentDataSource {
+  getExperimentSample(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSample | null> {
+    throw new Error('Method not implemented.');
+  }
   getExperimentSafetyByESIQuestionaryId(
     esiQuestionaryId: number
   ): Promise<ExperimentSafety | null> {

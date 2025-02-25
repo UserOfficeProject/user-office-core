@@ -12,8 +12,8 @@ import {
   Event,
   QuestionarySubmissionModel,
 } from 'models/questionary/QuestionarySubmissionState';
-import { SampleEsiSubmissionState } from 'models/questionary/sampleEsi/SampleEsiSubmissionState';
-import { SampleEsiWithQuestionary } from 'models/questionary/sampleEsi/SampleEsiWithQuestionary';
+import { SampleEsiSubmissionState } from 'models/questionary/experimentSample/SampleEsiSubmissionState';
+import { SampleEsiWithQuestionary } from 'models/questionary/experimentSample/ExperimentSampleWithQuestionary';
 import useEventHandlers from 'models/questionary/useEventHandlers';
 
 export interface SampleEsiContextType extends QuestionaryContextType {

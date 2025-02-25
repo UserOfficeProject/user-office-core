@@ -4,7 +4,7 @@ import UOLoader from 'components/common/UOLoader';
 import { CreateExperimentSafetyMutation } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
-import ProposalEsiContainer from '../proposalEsi/ProposalEsiContainer';
+import ExperimentSafetyContainer from './ExperimentSafetyContainer';
 
 interface CreateExperimentSafetyProps {
   experimentPk: number;
@@ -14,6 +14,7 @@ function CreateExperimentSafety({ experimentPk }: CreateExperimentSafetyProps) {
   const [experimentSafety, setExperimentSafety] = useState<
     CreateExperimentSafetyMutation['createExperimentSafety'] | null
   >(null);
+
   useEffect(() => {
     api()
       .createExperimentSafety({ experimentPk })
@@ -28,7 +29,7 @@ function CreateExperimentSafety({ experimentPk }: CreateExperimentSafetyProps) {
     return <UOLoader />;
   }
 
-  return <ProposalEsiContainer esi={experimentSafety} />;
+  return <ExperimentSafetyContainer experimentSafety={experimentSafety} />;
 }
 
 export default CreateExperimentSafety;

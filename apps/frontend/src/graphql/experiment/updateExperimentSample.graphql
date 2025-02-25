@@ -1,0 +1,20 @@
+mutation updateExperimentSample(
+  $sampleId: Int!
+  $experimentPk: Int!
+  $isSubmitted: Boolean
+) {
+  updateExperimentSample(
+    sampleId: $sampleId
+    experimentPk: $experimentPk
+    isSubmitted: $isSubmitted
+  ) {
+    ...experimentSample
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sample {
+      ...sample
+    }
+  }
+}
