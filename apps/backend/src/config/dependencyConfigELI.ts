@@ -50,6 +50,7 @@ import {
   getDataRow,
   populateRow,
 } from '../factory/xlsx/FapDataRow';
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { EAMAssetRegistrar } from '../services/assetRegistrar/eam/EAMAssetRegistrar';
 import { configureELIDevelopmentEnvironment } from './eli/configureELIEnvironment';
 import { configureGraylogLogger } from './ess/configureGrayLogLogger';
@@ -124,3 +125,5 @@ mapValue(
 mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 
 mapClass(Tokens.DownloadService, DefaultDownloadService);
+
+mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);

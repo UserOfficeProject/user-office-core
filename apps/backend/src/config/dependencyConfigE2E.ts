@@ -51,6 +51,7 @@ import {
   getDataRow,
   populateRow,
 } from '../factory/xlsx/FapDataRow';
+import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureESSDevelopmentEnvironment } from './ess/configureESSEnvironment';
 import { Tokens } from './Tokens';
@@ -118,3 +119,5 @@ mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
 
 mapClass(Tokens.DownloadService, DefaultDownloadService);
+
+mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
