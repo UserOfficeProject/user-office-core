@@ -383,27 +383,27 @@ context('Proposal administration tests', () => {
     });
 
     it('Download proposal attachment(s) working with dialog window showing up', () => {
-      cy.createProposal({ callId: initialDBData.call.id })
-        .then((result) => {
-          if (result.createProposal) {
-            cy.updateProposal({
-              proposalPk: result.createProposal.primaryKey,
-              proposerId: existingUserId,
-              title: proposalFixedName,
-              abstract: proposalName2,
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          const primaryKey = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: primaryKey,
+            proposerId: existingUserId,
+            title: proposalFixedName,
+            abstract: proposalName2,
+          }).then(() => {
+            cy.assignProposalsToInstruments({
+              instrumentIds: [initialDBData.instrument1.id],
+              proposalPks: [primaryKey],
             });
-          }
-        })
-        .then((result) => {
-          cy.assignProposalsToInstruments({
-            instrumentIds: [initialDBData.instrument1.id],
-            proposalPks: [result.createProposal.primaryKey],
+            cy.assignScientistsToInstrument({
+              instrumentId: initialDBData.instrument1.id,
+              scientistIds: initialDBData.users.user1.id,
+            });
           });
-          cy.assignScientistsToInstrument({
-            instrumentId: initialDBData.instrument1.id,
-            scientistIds: initialDBData.users.user1.id,
-          });
-        });
+        }
+      });
       cy.createTopic({
         templateId: initialDBData.template.id,
         sortOrder: 1,
