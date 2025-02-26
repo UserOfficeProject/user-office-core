@@ -10,6 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { FapAssignment } from './FapAssignments';
+import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
 
 @ObjectType()
@@ -60,5 +61,15 @@ export class FapProposalResolver {
       fapProposal.proposalPk,
       fapProposal.instrumentId
     );
+  }
+
+  @FieldResolver(() => Instrument, { nullable: true })
+  async instrument(
+    @Root() fapProposal: FapProposal,
+    @Ctx() context: ResolverContext
+  ) {
+    return fapProposal.instrumentId
+      ? context.queries.instrument.get(context.user, fapProposal.instrumentId)
+      : null;
   }
 }
