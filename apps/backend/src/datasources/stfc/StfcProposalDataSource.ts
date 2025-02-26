@@ -190,7 +190,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         );
 
         const propsWithTechReviewerDetails =
-          await this.getTechReviewersDeatails(props);
+          await this.getTechReviewersDetails(props);
 
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
@@ -235,7 +235,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       stfcUserIds
     );
 
-    const propsWithTechReviewerDetails = await this.getTechReviewersDeatails(
+    const propsWithTechReviewerDetails = await this.getTechReviewersDetails(
       proposals.proposalViews
     );
 
@@ -499,7 +499,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     return result;
   }
 
-  async getTechReviewersDeatails(proposals: ProposalView[]) {
+  async getTechReviewersDetails(proposals: ProposalView[]) {
     const technicalReviewers = removeDuplicates(
       proposals
         .filter((proposal) => !!proposal.technicalReviews?.length)
