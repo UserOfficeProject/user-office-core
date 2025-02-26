@@ -606,19 +606,19 @@ export default class PostgresQuestionaryDataSource
   }
 
   async getProposalAttachments(proposalPk: number): Promise<Question[]> {
-    const proposalAttachments = await database('questions')
+    const proposalAttachments = await database('proposals')
       .select('questions.*')
-      .join('answers', 'questions.question_id', 'answers.question_id')
       .join(
         'questionaries',
-        'answers.questionary_id',
-        'questionaries.questionary_id'
-      )
-      .join(
-        'proposals',
         'questionaries.questionary_id',
         'proposals.questionary_id'
       )
+      .join(
+        'templates_has_questions as thq',
+        'thq.template_id',
+        'questionaries.template_id'
+      )
+      .join('questions', 'questions.question_id', 'thq.question_id')
       .where('proposals.proposal_pk', proposalPk)
       .andWhere('questions.data_type', DataType.FILE_UPLOAD);
 
