@@ -452,6 +452,24 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
+    it('Officer should be able to filter instrument', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk, secondCreatedProposalPk],
+      });
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=instrument-filter]').click();
+      cy.get('[role=presentation]').contains(instrument.name).click();
+
+      cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
+    });
+
     it('Officer should be able to assign Fap member to proposal in existing Fap', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
