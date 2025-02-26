@@ -9,11 +9,7 @@ import {
 import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
-import { DataType, Question } from 'generated/sdk';
-import {
-  ProposalsDataQuantity,
-  useProposalsData,
-} from 'hooks/proposal/useProposalsData';
+import { useProposalsAttachmentsData } from 'hooks/proposal/useProposalsAttachmentsData';
 
 type ProposalAttachmentDownloadProps = {
   close: () => void;
@@ -29,61 +25,16 @@ const ProposalAttachmentDownload = ({
   referenceNumbers,
   downloadProposalAttachment,
 }: ProposalAttachmentDownloadProps) => {
-  const { proposalsData, loading } = useProposalsData(
-    { referenceNumbers },
-    ProposalsDataQuantity.FULL
-  );
+  const { proposalsAttachmentsData, loading } = useProposalsAttachmentsData({
+    referenceNumbers,
+  });
   const { enqueueSnackbar } = useSnackbar();
   const [selectedAttachmentsQuestions, setSelectedAttachmentsQuestions] =
     useState<string[]>([]);
-  const attachmentQuestions: Question[] = [];
 
-  if (proposalsData) {
-    proposalsData
-      .map((proposal) => {
-        const genericTemplatesAttachmentQuestions =
-          proposal.genericTemplates?.map((genericTemplate) =>
-            genericTemplate.questionary.steps.map((step) => {
-              return step.fields
-                .filter(
-                  (field) => field.question.dataType === DataType.FILE_UPLOAD
-                )
-                .map((field) => field.question);
-            })
-          );
-        const proposalAttachmentQuestions = proposal.questionary.steps.map(
-          (step) => {
-            return step.fields
-              .filter(
-                (field) => field.question.dataType === DataType.FILE_UPLOAD
-              )
-              .map((field) => field.question);
-          }
-        );
-
-        const samplesAttachmentQuestions = proposal.samples?.map((sample) =>
-          sample.questionary.steps.map((step) => {
-            return step.fields
-              .filter(
-                (field) => field.question.dataType === DataType.FILE_UPLOAD
-              )
-              .map((field) => field.question);
-          })
-        );
-
-        return [
-          genericTemplatesAttachmentQuestions,
-          proposalAttachmentQuestions,
-          samplesAttachmentQuestions,
-        ];
-      })
-      .flat(4)
-      .forEach((question) => {
-        if (question && !attachmentQuestions.includes(question)) {
-          attachmentQuestions.push(question);
-        }
-      });
-  }
+  const attachmentQuestions = proposalsAttachmentsData.flatMap(
+    (proposal) => proposal?.attachments?.questions ?? []
+  );
 
   return (
     <Container
@@ -157,7 +108,7 @@ const ProposalAttachmentDownload = ({
             disabled={loading || selectedAttachmentsQuestions.length <= 0}
             data-cy="proposalAttachmentDownloadButton"
             onClick={() => {
-              const proposalIds = proposalsData.map(
+              const proposalIds = proposalsAttachmentsData.map(
                 (proposal) => proposal.primaryKey
               );
               if (

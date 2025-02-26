@@ -108,6 +108,7 @@ export function createTechnicalReviewStub(
       updated: new Date(),
       submittedDate: new Date(),
       techniques: [],
+      attachments: { questions: [] },
     },
   };
 }
