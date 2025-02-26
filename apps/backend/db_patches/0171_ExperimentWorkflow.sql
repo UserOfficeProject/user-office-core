@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('0168_ExperimentWorkflow', 'Yoganandan Pandiyan', 'Generalising Workflow and Statuses for supporting Experiments and Proposals', '2025-01-16') THEN
+  IF register_patch('0171_ExperimentWorkflow', 'Yoganandan Pandiyan', 'Generalising Workflow and Statuses for supporting Experiments and Proposals', '2025-02-27') THEN
     BEGIN
       /* altering table names*/
       ALTER TABLE proposal_statuses RENAME TO statuses;
