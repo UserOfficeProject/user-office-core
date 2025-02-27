@@ -1,11 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import {
-  Call,
-  Maybe,
-  ProposalPublicStatus,
-  ProposalStatus,
-} from 'generated/sdk';
+import { Call, Maybe, ProposalPublicStatus, Status } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import ProposalTable from './ProposalTable';
@@ -13,7 +8,7 @@ import ProposalTable from './ProposalTable';
 export type PartialProposalsDataType = {
   primaryKey: number;
   title: string;
-  status: Maybe<ProposalStatus>;
+  status: Maybe<Status>;
   publicStatus: ProposalPublicStatus;
   finalStatus?: string;
   notified?: boolean;

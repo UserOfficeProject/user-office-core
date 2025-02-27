@@ -44,7 +44,7 @@ export class StatusActionsLogResolver {
       return null;
     }
 
-    return context.queries.proposalSettings.statusActionsDataSource.getConnectionStatusAction(
+    return context.queries.statusAction.dataSource.getConnectionStatusAction(
       statusActionsLog.connectionId,
       statusActionsLog.actionId
     );

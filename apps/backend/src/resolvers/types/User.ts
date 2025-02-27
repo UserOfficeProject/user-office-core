@@ -16,6 +16,7 @@ import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
 import { User as UserOrigin } from '../../models/User';
+import { Experiment } from './Experiment';
 import { Fap } from './Fap';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
@@ -165,6 +166,16 @@ export class UserResolver {
     return context.queries.proposal.dataSource.getUserProposals(
       user.id,
       filter
+    );
+  }
+
+  @FieldResolver(() => [Experiment])
+  async upcomingExperiments(
+    @Root() user: User,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.experiment.dataSource.getUserUpcomingExperiments(
+      user.id
     );
   }
 

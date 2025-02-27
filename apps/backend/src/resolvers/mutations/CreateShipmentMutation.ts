@@ -20,7 +20,7 @@ export class CreateShipmentInput {
   proposalPk: number;
 
   @Field(() => Int)
-  scheduledEventId: number;
+  experimentPk: number;
 }
 
 @Resolver()

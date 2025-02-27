@@ -7,6 +7,6 @@ import { ProposalStatusAction } from '../types/ProposalStatusAction';
 export class StatusActionsQuery {
   @Query(() => [ProposalStatusAction], { nullable: true })
   statusActions(@Ctx() context: ResolverContext) {
-    return context.queries.proposalSettings.getStatusActions(context.user);
+    return context.queries.statusAction.getStatusActions(context.user);
   }
 }

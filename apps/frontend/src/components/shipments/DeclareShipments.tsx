@@ -24,7 +24,7 @@ import CreateUpdateShipment from './CreateUpdateShipment';
 import ShippingInstructions from './ShippingInstructions';
 
 interface DeclareShipmentsProps extends WithConfirmProps {
-  scheduledEventId: number;
+  experimentPk: number;
 }
 
 const shipmentToListRow = (
@@ -37,18 +37,15 @@ const shipmentToListRow = (
   };
 };
 
-function DeclareShipments({
-  scheduledEventId,
-  confirm,
-}: DeclareShipmentsProps) {
+function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
   const { api } = useDataApiWithFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { shipments, setShipments } = useShipments({
-    scheduledEventId: scheduledEventId,
+    experimentPk: experimentPk,
   });
 
-  const { scheduledEvent } = useScheduledEvent(scheduledEventId);
+  const { scheduledEvent } = useScheduledEvent(experimentPk);
 
   const [selectedShipment, setSelectedShipment] =
     useState<ShipmentFragment | null>(null);
@@ -157,7 +154,7 @@ function DeclareShipments({
           <CreateUpdateShipment
             onShipmentSubmitted={handleSubmitted}
             onShipmentCreated={handleCreated}
-            scheduledEventId={scheduledEventId}
+            experimentPk={experimentPk}
             shipment={selectedShipment}
           />
         </DialogContent>

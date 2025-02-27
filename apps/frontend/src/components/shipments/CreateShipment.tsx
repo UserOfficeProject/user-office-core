@@ -8,16 +8,16 @@ import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 import ShipmentContainer from './ShipmentContainer';
 
 interface CreateShipmentProps {
-  scheduledEventId: number;
+  experimentPk: number;
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
   onShipmentCreated?: (shipment: ShipmentCore) => void;
 }
 function CreateShipment({
-  scheduledEventId,
+  experimentPk,
   onShipmentSubmitted,
   onShipmentCreated,
 }: CreateShipmentProps) {
-  const { scheduledEvent } = useScheduledEvent(scheduledEventId);
+  const { scheduledEvent } = useScheduledEvent(experimentPk);
   const { blankShipment, error: blankShipmentError } = useBlankShipment(
     scheduledEvent?.id,
     scheduledEvent?.proposalPk

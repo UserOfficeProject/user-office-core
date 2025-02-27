@@ -1,5 +1,5 @@
-mutation createFeedback($scheduledEventId: Int!) {
-  createFeedback(scheduledEventId: $scheduledEventId) {
+mutation createFeedback($experimentPk: Int!) {
+  createFeedback(experimentPk: $experimentPk) {
     ...feedback
     questionary {
       ...questionary

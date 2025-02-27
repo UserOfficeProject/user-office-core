@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -11,13 +12,8 @@ import { Proposal } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import {
-  ProposalBookingFilter,
-  ProposalBookingScheduledEventFilterCore,
-} from '../resolvers/types/ProposalBooking';
+import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
 import { omit } from '../utils/helperFunctions';
-import { ProposalAuthorization } from './../auth/ProposalAuthorization';
-import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 @injectable()
 export default class ProposalQueries {
@@ -34,11 +30,9 @@ export default class ProposalQueries {
   @Authorized()
   async get(agent: UserWithRole | null, primaryKey: number) {
     let proposal = await this.dataSource.get(primaryKey);
-
     if (!proposal) {
       return null;
     }
-
     // If not a user officer or instrument scientist remove excellence, technical and safety score
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -51,7 +45,6 @@ export default class ProposalQueries {
     if (!this.userAuth.isUserOfficer(agent) && !proposal.notified) {
       proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
     }
-
     if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
     } else {
@@ -147,42 +140,6 @@ export default class ProposalQueries {
       sortField,
       sortDirection,
       searchText
-    );
-  }
-
-  @Authorized()
-  async getProposalBookingsByProposalPk(
-    agent: UserWithRole | null,
-    {
-      proposalPk,
-      filter,
-    }: { proposalPk: number; filter?: ProposalBookingFilter }
-  ) {
-    const proposal = await this.get(agent, proposalPk);
-    if (!proposal) {
-      return null;
-    }
-
-    const proposalBookings =
-      await this.dataSource.getProposalBookingsByProposalPk(proposalPk, filter);
-
-    return proposalBookings;
-  }
-
-  @Authorized()
-  async getAllProposalBookingsScheduledEvents(
-    agent: UserWithRole | null,
-    {
-      proposalBookingIds,
-      filter,
-    }: {
-      proposalBookingIds: number[];
-      filter?: ProposalBookingScheduledEventFilterCore;
-    }
-  ) {
-    return await this.dataSource.getAllProposalBookingsScheduledEvents(
-      proposalBookingIds,
-      filter
     );
   }
 

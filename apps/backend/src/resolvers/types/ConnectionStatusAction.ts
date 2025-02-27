@@ -9,7 +9,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ConnectionHasStatusAction } from '../../models/ProposalStatusAction';
+import { ConnectionHasStatusAction } from '../../models/StatusAction';
 import { ProposalStatusAction } from './ProposalStatusAction';
 import { ProposalStatusActionConfig } from './ProposalStatusActionConfig';
 
@@ -37,7 +37,7 @@ export class ConnectionStatusActionResolver {
     @Root() connectionStatusAction: ConnectionStatusAction,
     @Ctx() context: ResolverContext
   ): Promise<ProposalStatusAction> {
-    return context.queries.proposalSettings.getStatusAction(
+    return context.queries.statusAction.getStatusAction(
       context.user,
       connectionStatusAction.actionId
     );

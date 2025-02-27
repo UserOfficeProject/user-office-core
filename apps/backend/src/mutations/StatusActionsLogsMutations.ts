@@ -1,8 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
-import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import StatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import { Authorized } from '../decorators';
@@ -24,8 +24,8 @@ export default class StatusActionsLogsMutations {
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.StatusActionsDataSource)
     private statusActionsDataSource: StatusActionsDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource
+    @inject(Tokens.CallDataSource)
+    private callDataSource: CallDataSource
   ) {}
 
   private async getStatusEngineReadyProposals(
@@ -41,9 +41,7 @@ export default class StatusActionsLogsMutations {
         }
 
         const proposalWorkflow =
-          await this.proposalSettingsDataSource.getProposalWorkflowByCall(
-            proposal.callId
-          );
+          await this.callDataSource.getProposalWorkflowByCall(proposal.callId);
 
         if (!proposalWorkflow) {
           return null;

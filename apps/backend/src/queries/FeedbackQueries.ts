@@ -49,12 +49,12 @@ export default class FeedbackQueries {
   }
 
   @Authorized()
-  async getFeedbackByScheduledEventId(
+  async getFeedbackByExperimentPk(
     agent: UserWithRole | null,
-    eventId: number
+    experimentPk: number
   ) {
     const feedback =
-      await this.dataSource.getFeedbackByScheduledEventId(eventId);
+      await this.dataSource.getFeedbackByExperimentPk(experimentPk);
     if (!feedback) {
       return null;
     }

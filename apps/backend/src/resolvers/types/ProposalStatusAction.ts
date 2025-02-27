@@ -10,9 +10,9 @@ import {
 
 import { ResolverContext } from '../../context';
 import {
-  ProposalStatusAction as ProposalStatusActionOrigin,
-  ProposalStatusActionType,
-} from '../../models/ProposalStatusAction';
+  StatusAction as ProposalStatusActionOrigin,
+  StatusActionType,
+} from '../../models/StatusAction';
 import {
   EmailActionDefaultConfig,
   ProposalStatusActionDefaultConfig,
@@ -32,8 +32,8 @@ export class ProposalStatusAction
   @Field(() => String)
   public description: string;
 
-  @Field(() => ProposalStatusActionType)
-  public type: ProposalStatusActionType;
+  @Field(() => StatusActionType)
+  public type: StatusActionType;
 }
 
 @Resolver(() => ProposalStatusAction)
@@ -43,7 +43,7 @@ export class ProposalStatusActionResolver {
     @Root() statusAction: ProposalStatusAction,
     @Ctx() context: ResolverContext
   ): Promise<EmailActionDefaultConfig | RabbitMQActionDefaultConfig | null> {
-    return context.queries.proposalSettings.getStatusActionConfig(
+    return context.queries.statusAction.getStatusActionConfig(
       context.user,
       statusAction
     );

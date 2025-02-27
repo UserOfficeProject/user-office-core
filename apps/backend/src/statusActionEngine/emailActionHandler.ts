@@ -6,8 +6,8 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
-import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import { SettingsId } from '../models/Settings';
+import { ConnectionHasStatusAction } from '../models/StatusAction';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,

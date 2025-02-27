@@ -4,6 +4,7 @@ import {
   TemplateCategoryId,
   TemplateGroupId,
   FeatureId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -24,6 +25,7 @@ context('Samples tests', () => {
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
 
   let createdWorkflowId: number;
@@ -149,9 +151,9 @@ context('Samples tests', () => {
 
   describe('Samples basic tests', () => {
     beforeEach(() => {
-      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.id;
+      cy.createWorkflow(proposalWorkflow).then((result) => {
+        if (result.createWorkflow) {
+          createdWorkflowId = result.createWorkflow.id;
         }
       });
     });
@@ -417,9 +419,9 @@ context('Samples tests', () => {
     let createdProposalPk: number;
 
     beforeEach(() => {
-      cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-        if (result.createProposalWorkflow) {
-          createdWorkflowId = result.createProposalWorkflow.id;
+      cy.createWorkflow(proposalWorkflow).then((result) => {
+        if (result.createWorkflow) {
+          createdWorkflowId = result.createWorkflow.id;
         }
       });
 

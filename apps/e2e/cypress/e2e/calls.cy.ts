@@ -5,6 +5,7 @@ import {
   FeatureId,
   TemplateGroupId,
   UpdateCallInput,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -73,10 +74,12 @@ context('Calls tests', () => {
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
   const proposalInternalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
   const instrumentAssignedToCall: CreateInstrumentMutationVariables = {
     name: faker.random.words(2),
@@ -99,29 +102,26 @@ context('Calls tests', () => {
       }
     });
 
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow) {
-        workflowId = result.createProposalWorkflow.id;
+    cy.createWorkflow(proposalWorkflow).then((result) => {
+      if (result.createWorkflow) {
+        workflowId = result.createWorkflow.id;
       } else {
         throw new Error('Workflow creation failed');
       }
     });
-    cy.createProposalWorkflow(proposalInternalWorkflow).then((result) => {
-      const workflow = result.createProposalWorkflow;
+    cy.createWorkflow(proposalInternalWorkflow).then((result) => {
+      const workflow = result.createWorkflow;
       if (workflow) {
-        cy.addProposalWorkflowStatus({
-          droppableGroupId:
-            workflow.proposalWorkflowConnectionGroups[0].groupId,
-          proposalStatusId:
-            initialDBData.proposalStatuses.editableSubmittedInternal.id,
-          proposalWorkflowId: workflow.id,
+        cy.addWorkflowStatus({
+          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
+          statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
+          workflowId: workflow.id,
           sortOrder: 1,
-          prevProposalStatusId:
-            workflow.proposalWorkflowConnectionGroups[0].connections[0].id,
+          prevStatusId: workflow.workflowConnectionGroups[0].connections[0].id,
         }).then((result) => {
-          if (result.addProposalWorkflowStatus) {
+          if (result.addWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+              workflowConnectionId: result.addWorkflowStatus.id,
               statusChangingEvents: ['CALL_ENDED'],
             });
           }

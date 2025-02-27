@@ -173,18 +173,4 @@ export default class PostgresSampleDataSource implements SampleDataSource {
         return records.map((record) => createSampleObject(record)) || [];
       });
   }
-
-  getSamplesByEsiId(esiId: number): Promise<Sample[]> {
-    return database('sample_experiment_safety_inputs')
-      .leftJoin(
-        'samples',
-        'sample_experiment_safety_inputs.sample_id',
-        'samples.sample_id'
-      )
-      .select('samples.*')
-      .where('sample_experiment_safety_inputs.esi_id', esiId)
-      .then((records: SampleRecord[]) => {
-        return records.map((record) => createSampleObject(record)) || [];
-      });
-  }
 }

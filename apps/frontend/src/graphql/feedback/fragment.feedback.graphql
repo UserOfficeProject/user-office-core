@@ -1,6 +1,6 @@
 fragment feedback on Feedback {
   id
-  scheduledEventId
+  experimentPk
   status
   questionaryId
   creatorId
