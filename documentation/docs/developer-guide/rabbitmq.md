@@ -1,8 +1,8 @@
 # RabbitMQ
 
-_________________________________________________________________________________________________________
+---
 
-RabbitMQ is a message broker that enables applications to communicate with each other asynchronously by sending and receiving messages. It is used within User Office to handle communication between different components of the system, particularly for routing messages related to proposal status actions. 
+RabbitMQ is a message broker that enables applications to communicate with each other asynchronously by sending and receiving messages. It is used within User Office to handle communication between different components of the system, particularly for routing messages related to proposal status actions.
 
 This page provides an overview of how RabbitMQ is integrated into the project, including details on configuration, message handling, and frontend display.
 
@@ -12,31 +12,31 @@ When the status of a proposal changes, a message is sent to specific RabbitMQ ex
 
 Enable it in the [configuration](configuration.md).
 
-_________________________________________________________________________________________________________
+---
 
 ## Configuration of RabbitMQ Exchanges
 
 The RabbitMQ exchanges are configured using the `RabbitMQActionConfig` class. This class defines the exchanges to which messages will be sent when the status of a proposal changes.
 
     @ObjectType()
-    export class RabbitMQActionConfig extends ProposalStatusActionConfigBase {
+    export class RabbitMQActionConfig extends StatusActionConfigBase {
     @Field(() => [String], { nullable: true })
     exchanges?: string[] | null;
     }
 
 **Exchanges:** The exchanges' property is an array of strings, each representing the name of a RabbitMQ exchange. These exchanges are where messages related to proposal status changes are sent.
 
-_________________________________________________________________________________________________________
+---
 
 ## Backend Message Handling
 
 The `rabbitMQActionHandler` function in the backend is responsible for sending messages to RabbitMQ exchanges based on the configuration defined in `RabbitMQActionConfig`.
 
     export const rabbitMQActionHandler = async (
-      proposalStatusAction: ConnectionHasStatusAction,
+      statusAction: ConnectionHasStatusAction,
       proposals: WorkflowEngineProposalType[]
     ) => {
-      const config = proposalStatusAction.config as RabbitMQActionConfig;
+      const config = statusAction.config as RabbitMQActionConfig;
       if (!config.exchanges?.length) {
         return;
       }
@@ -51,11 +51,11 @@ The `rabbitMQActionHandler` function in the backend is responsible for sending m
      );
     };
 
-**Message Publishing:** This function takes in a `proposalStatusAction` and an array of proposals. It then publishes messages to each configured exchange by calling `publishMessageToTheEventBus`.
+**Message Publishing:** This function takes in a `statusAction` and an array of proposals. It then publishes messages to each configured exchange by calling `publishMessageToTheEventBus`.
 
 If no exchanges are configured, the function exits early without performing any actions.
 
-_________________________________________________________________________________________________________
+---
 
 ## Frontend display of RabbitMQ Exchanges
 
@@ -84,7 +84,7 @@ On the frontend, the `RabbitMQActionConfig` component is responsible for display
 
 The component renders a list of RabbitMQ exchanges, showing which exchanges are being used to route messages related to proposal data.
 
-_________________________________________________________________________________________________________
+---
 
 ## GraphQL Integration
 
@@ -93,9 +93,9 @@ The `RabbitMQActionConfig` class is integrated into the project’s GraphQL API,
 You can retrieve the RabbitMQ configuration using a GraphQL query:
 
     query {
-      proposalStatusActionConfig {
+      statusActionConfig {
         exchanges
       }
     }
 
-_________________________________________________________________________________________________________
+---

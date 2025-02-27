@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -11,13 +12,12 @@ import { Proposal } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
 import {
   ProposalBookingFilter,
   ProposalBookingScheduledEventFilterCore,
 } from '../resolvers/types/ProposalBooking';
 import { omit } from '../utils/helperFunctions';
-import { ProposalAuthorization } from './../auth/ProposalAuthorization';
-import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 
 @injectable()
 export default class ProposalQueries {

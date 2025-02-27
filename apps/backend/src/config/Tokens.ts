@@ -51,5 +51,7 @@ export const Tokens = {
   ProposalInternalCommentsDataSource: Symbol(
     'ProposalInternalCommentsDataSource'
   ),
+  WorkflowDataSource: Symbol('WorkflowDataSource'),
+  StatusDataSource: Symbol('StatusDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
 };

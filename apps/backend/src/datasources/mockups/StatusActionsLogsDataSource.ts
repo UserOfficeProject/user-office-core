@@ -6,7 +6,7 @@ import {
   StatusActionsLogsArgs,
   StatusActionsLogsFilterArgs,
 } from '../../resolvers/queries/StatusActionsLogsQuery';
-import { EmailStatusActionRecipients } from '../../resolvers/types/ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from '../../resolvers/types/StatusActionConfig';
 import { StatusActionsLogsDataSource } from '../StatusActionsLogsDataSource';
 
 export const dummyStatusActionsLog = new StatusActionsLog(
