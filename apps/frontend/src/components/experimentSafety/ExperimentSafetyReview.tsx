@@ -10,45 +10,47 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
-import { ProposalEsiContextType } from '../experimentSafety/ExperimentSafetyContainer';
-import ProposalEsiDetails from './ProposalEsiDetails';
+import { ExperimentSafetyContextType } from './ExperimentSafetyContainer';
+import ProposalEsiDetails from './ExperimentSafetyDetails';
 
-type ProposalEsiReviewProps = {
+type ExperimentSafetyReviewProps = {
   onComplete?: FunctionType<void>;
   confirm: WithConfirmType;
 };
 
-function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
+function ExperimentSafetyReview({ confirm }: ExperimentSafetyReviewProps) {
   const { api, isExecutingCall } = useDataApiWithFeedback();
 
   const { state, dispatch } = useContext(
     QuestionaryContext
-  ) as ProposalEsiContextType;
+  ) as ExperimentSafetyContextType;
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const isSubmitted = state.esi.isSubmitted;
+  const isSubmitted = state.experimentSafety.esiQuestionarySubmittedAt !== null;
 
   return (
     <>
-      <ProposalEsiDetails esiId={state.esi.id} />
+      <ProposalEsiDetails esiId={state.experimentSafety.experimentSafetyPk} />
       <NavigationFragment isLoading={isExecutingCall}>
         <NavigButton
           onClick={() =>
             confirm(
               async () => {
-                const { updateEsi } = await api().updateEsi({
-                  esiId: state.esi.id,
-                  isSubmitted: true,
-                });
+                const { submitExperimentSafety } =
+                  await api().submitExperimentSafety({
+                    experimentSafetyPk:
+                      state.experimentSafety.experimentSafetyPk,
+                    isSubmitted: true,
+                  });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: updateEsi,
+                  itemWithQuestionary: submitExperimentSafety,
                 });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: updateEsi,
+                  itemWithQuestionary: submitExperimentSafety,
                 });
               },
               {
@@ -68,4 +70,4 @@ function ProposalEsiReview({ confirm }: ProposalEsiReviewProps) {
   );
 }
 
-export default withConfirm(ProposalEsiReview);
+export default withConfirm(ExperimentSafetyReview);

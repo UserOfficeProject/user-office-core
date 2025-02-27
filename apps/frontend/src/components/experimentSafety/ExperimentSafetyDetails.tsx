@@ -6,22 +6,25 @@ import UOLoader from 'components/common/UOLoader';
 import QuestionaryDetails, {
   TableRowData,
 } from 'components/questionary/QuestionaryDetails';
-import { useEsi } from 'hooks/esi/useEsi';
+import { useExperimentSafety } from 'hooks/experimentSafety/useExperimentSafety';
 
-interface ProposalEsiDetailsProps {
+interface ExperimentSafetyDetailsProps {
   esiId: number;
 }
 
-function ProposalEsiDetails(props: ProposalEsiDetailsProps) {
-  const { esi } = useEsi(props.esiId);
+function ExperimentSafetyDetails(props: ExperimentSafetyDetailsProps) {
+  const { experimentSafety } = useExperimentSafety(props.esiId);
 
-  if (!esi) {
+  if (!experimentSafety) {
     return <UOLoader />;
   }
 
   const additionalDetails: TableRowData[] = [
-    { label: 'Proposal ID', value: esi?.proposal.proposalId || '' },
-    { label: 'Proposal Title', value: esi?.proposal.title || '' },
+    {
+      label: 'Proposal ID',
+      value: experimentSafety?.proposal.proposalId || '',
+    },
+    { label: 'Proposal Title', value: experimentSafety?.proposal.title || '' },
     {
       label: 'Samples for the experiment',
       value: (
@@ -31,8 +34,8 @@ function ProposalEsiDetails(props: ProposalEsiDetailsProps) {
             padding: 0,
           }}
         >
-          {esi.sampleEsis.map((esi) => (
-            <ListItem key={esi.sampleId}>{esi.sample.title}</ListItem>
+          {experimentSafety.samples.map((sample) => (
+            <ListItem key={sample.sampleId}>{sample.sample.title}</ListItem>
           ))}
         </List>
       ),
@@ -41,11 +44,11 @@ function ProposalEsiDetails(props: ProposalEsiDetailsProps) {
 
   return (
     <QuestionaryDetails
-      questionaryId={esi.questionary.questionaryId}
+      questionaryId={experimentSafety.questionary.questionaryId}
       additionalDetails={additionalDetails}
       title="Experiment safety input"
     />
   );
 }
 
-export default ProposalEsiDetails;
+export default ExperimentSafetyDetails;

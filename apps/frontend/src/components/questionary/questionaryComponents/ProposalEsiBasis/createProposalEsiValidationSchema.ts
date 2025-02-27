@@ -1,8 +1,7 @@
 import * as Yup from 'yup';
 
 import { CreateYupValidation } from 'components/questionary/QuestionaryComponentRegistry';
-
-import { SampleEsiWithQuestionary } from '../../../../models/questionary/experimentSample/ExperimentSampleWithQuestionary';
+import { ExperimentSampleWithQuestionary } from 'models/questionary/experimentSample/ExperimentSampleWithQuestionary';
 
 export const createProposalEsiBasisValidationSchema: CreateYupValidation =
   () => {
@@ -11,8 +10,12 @@ export const createProposalEsiBasisValidationSchema: CreateYupValidation =
     schema = schema.test(
       'allESIsCompleted',
       'All experiment safety inputs must be completed',
-      (value?: SampleEsiWithQuestionary[]) => {
-        return value?.every((esi) => esi?.isSubmitted) ?? false;
+      (value?: ExperimentSampleWithQuestionary[]) => {
+        return (
+          value?.every(
+            (experimentSample) => experimentSample?.isEsiSubmitted
+          ) ?? false
+        );
       }
     );
 

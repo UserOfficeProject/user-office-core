@@ -8,7 +8,7 @@ import {
   ExperimentSafety,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
-import { UpdateExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 import database from './database';
 import {
@@ -243,14 +243,14 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  async updateExperimentSafety(
-    args: UpdateExperimentSafetyArgs
+  async submitExperimentSafety(
+    args: SubmitExperimentSafetyArgs
   ): Promise<ExperimentSafety> {
     return database('experiment_safety')
       .update({
-        is_submitted: args.isSubmitted,
+        esi_questionary_submitted_at: new Date(),
       })
-      .where('esi_id', args.experimentSafetyPk)
+      .where('experiment_safety_pk', args.experimentSafetyPk)
       .returning('*')
       .then((result: ExperimentSafetyRecord[]) =>
         createExperimentSafetyObject(result[0])

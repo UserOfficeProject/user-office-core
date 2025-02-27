@@ -4,7 +4,7 @@ import {
   ExperimentSafety,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
-import { UpdateExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 
 export class ExperimentDataSourceMock implements ExperimentDataSource {
@@ -32,8 +32,8 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   getExperimentSafety(experimentPk: number): Promise<ExperimentSafety | null> {
     throw new Error('Method not implemented.');
   }
-  updateExperimentSafety(
-    args: UpdateExperimentSafetyArgs
+  submitExperimentSafety(
+    args: SubmitExperimentSafetyArgs
   ): Promise<ExperimentSafety> {
     throw new Error('Method not implemented.');
   }

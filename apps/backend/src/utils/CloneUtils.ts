@@ -77,16 +77,16 @@ export class CloneUtils {
     }
 
     const newSample = await this.cloneSample(sourceSample, overrides?.sample);
+
     const newQuestionary = await this.questionaryDataSource.clone(
       sourceExperimentSample.sampleEsiQuestionaryId
     );
 
     let newSampleEsi = await this.experimentDataSource.addSampleToExperiment(
-      newSample.id,
       sourceExperimentSample.experimentPk,
+      newSample.id,
       newQuestionary.questionaryId
     );
-
     if (overrides?.experimentSafety?.isEsiSubmitted !== undefined) {
       newSampleEsi = await this.experimentDataSource.updateExperimentSample(
         newSampleEsi.experimentPk,

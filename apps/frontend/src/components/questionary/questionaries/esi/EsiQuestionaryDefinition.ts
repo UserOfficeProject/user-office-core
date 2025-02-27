@@ -1,4 +1,4 @@
-import ProposalEsiReview from 'components/proposalEsi/ProposalEsiReview';
+import ExperimentSaftyReview from 'components/experimentSafety/ExperimentSafetyReview';
 import { DefaultReviewWizardStep } from 'components/questionary/DefaultReviewWizardStep';
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
@@ -13,7 +13,7 @@ export const esiQuestionaryDefinition: QuestionaryDefinition = {
   groupId: TemplateGroupId.PROPOSAL_ESI,
 
   displayElementFactory: new DefaultStepDisplayElementFactory(
-    ProposalEsiReview
+    ExperimentSaftyReview
   ),
 
   wizardStepFactory: new DefaultWizardStepFactory(

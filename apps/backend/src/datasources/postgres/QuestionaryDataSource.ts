@@ -144,8 +144,6 @@ export default class PostgresQuestionaryDataSource
   }
 
   async create(creator_id: number, template_id: number): Promise<Questionary> {
-    console.log({ creator_id, template_id });
-
     return database('questionaries')
       .insert({ template_id, creator_id }, '*')
       .then((rows: QuestionaryRecord[]) => {

@@ -23,11 +23,9 @@ export class ExperimentSafetyAuthorization {
     let esi;
 
     if (typeof experimentSafetyOrexperimentSafetyPk === 'number') {
-      console.log(experimentSafetyOrexperimentSafetyPk);
       esi = await this.experimentDataSource.getExperimentSafety(
         experimentSafetyOrexperimentSafetyPk
       );
-      console.log({ esi });
     } else {
       esi = experimentSafetyOrexperimentSafetyPk;
     }

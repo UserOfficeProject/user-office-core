@@ -43,9 +43,6 @@ const UserExperimentTimesTable = lazy(
 const ExperimentSafetyPage = lazy(
   () => import('./experimentSafety/ExperimentSafetyPage')
 );
-const UpdateExperimentSafetyPage = lazy(
-  () => import('./experimentSafety/UpdateExperimentSafetyPage')
-);
 const ExperimentSafetyReviewPage = lazy(
   () => import('./experimentSafetyReview/ExperimentSafetyReviewPage')
 );
@@ -588,15 +585,6 @@ const AppRoutes = () => {
             <TitledRoute
               title="Experiment Safety"
               element={<ExperimentSafetyPage />}
-            />
-          }
-        />
-        <Route
-          path="/UpdateExperimentSafety/:experimentSafetyPk"
-          element={
-            <TitledRoute
-              title="Update ESI Proposal"
-              element={<UpdateExperimentSafetyPage />}
             />
           }
         />

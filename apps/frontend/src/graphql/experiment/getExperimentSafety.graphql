@@ -6,9 +6,9 @@ query getExperimentSafety($experimentSafetyPk: Int!) {
       ...questionary
     }
     samples {
-      # sample {
-      #   ...sample
-      # }
+      sample {
+        ...sample
+      }
       # ...sampleEsi
       # questionary {
       #   isCompleted

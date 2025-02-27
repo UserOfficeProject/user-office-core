@@ -1,8 +1,8 @@
-mutation updateExperimentSafety(
+mutation submitExperimentSafety(
   $experimentSafetyPk: Int!
   $isSubmitted: Boolean
 ) {
-  updateExperimentSafety(
+  submitExperimentSafety(
     experimentSafetyPk: $experimentSafetyPk
     isSubmitted: $isSubmitted
   ) {

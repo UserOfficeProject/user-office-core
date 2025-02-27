@@ -5,7 +5,7 @@ import {
 } from '../models/Experiment';
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
-import { UpdateExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { SubmitExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
 
 export interface ExperimentDataSource {
   create(
@@ -34,8 +34,8 @@ export interface ExperimentDataSource {
     questionaryId: number,
     creatorId: number
   ): Promise<ExperimentSafety | Rejection>;
-  updateExperimentSafety(
-    args: UpdateExperimentSafetyArgs
+  submitExperimentSafety(
+    args: SubmitExperimentSafetyArgs
   ): Promise<ExperimentSafety>;
   getExperimentSafetyByESIQuestionaryId(
     esiQuestionaryId: number

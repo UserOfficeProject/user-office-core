@@ -16,7 +16,7 @@ import { UserWithRole } from '../models/User';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
 import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
 import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
-import { UpdateExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { SubmitExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
 import { UpdateExperimentSampleInput } from '../resolvers/mutations/UpdateExperimentSampleMutation';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
@@ -110,9 +110,9 @@ export default class ExperimentMutations {
   }
 
   @Authorized()
-  async updateExperimentSafety(
+  async submitExperimentSafety(
     user: UserWithRole | null,
-    args: UpdateExperimentSafetyArgs
+    args: SubmitExperimentSafetyArgs
   ): Promise<ExperimentSafety | Rejection> {
     if (args.isSubmitted === false && !this.userAuth.isUserOfficer(user)) {
       return rejection(
@@ -120,7 +120,7 @@ export default class ExperimentMutations {
       );
     }
 
-    return this.dataSource.updateExperimentSafety(args);
+    return this.dataSource.submitExperimentSafety(args);
   }
 
   @Authorized()
