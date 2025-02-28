@@ -210,6 +210,9 @@ export function NewFileEntry(props: {
 }) {
   const theme = useTheme();
   const { uploadFile, progress, state, setState, abort } = useFileUpload();
+  const [rejectionMessage, setRejectionMessage] = useState(
+    'Incorrect file type'
+  );
 
   const hasValidContentHeader = (file: File): boolean => {
     if (!props.filetype) {
@@ -243,6 +246,13 @@ export function NewFileEntry(props: {
     const selectedFile = e.target.files ? e.target.files[0] : null;
     if (!selectedFile) return;
 
+    if (selectedFile.size === 0) {
+      setState(UPLOAD_STATE.REJECTED);
+      setRejectionMessage('File size is 0 bytes');
+
+      return;
+    }
+
     if (hasExtension(selectedFile) && hasValidContentHeader(selectedFile)) {
       uploadFile(selectedFile, props.onUploadComplete);
     } else {
@@ -265,8 +275,8 @@ export function NewFileEntry(props: {
             </Avatar>
           </ListItemAvatar>
           <ListItemText
-            primary="Incorrect file type"
-            secondary="Ensure that the file is of the correct type and has an extension."
+            primary={rejectionMessage}
+            secondary="Ensure that the file is of the correct type, size and has an extension."
           />
           <ListItemSecondaryAction>
             <CancelIcon onClick={() => abort()} />

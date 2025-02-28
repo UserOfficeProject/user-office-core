@@ -18,6 +18,13 @@ export default class FileMutations {
     sizeImBytes: number,
     path: string
   ): Promise<FileMetadata | Rejection> {
+    if (sizeImBytes === 0) {
+      return rejection('Could not save file because its 0 bytes', {
+        fileName,
+        path,
+      });
+    }
+
     return this.dataSource
       .put(fileName, mimeType, sizeImBytes, path)
       .then((metadata) => metadata)
