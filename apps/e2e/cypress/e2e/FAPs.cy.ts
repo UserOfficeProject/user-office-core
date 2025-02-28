@@ -452,7 +452,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
-    it('Officer should be able to filter instrument', () => {
+    it('Officer should be able to filter proposals by instrument', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
           { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
@@ -468,6 +468,12 @@ context('Fap reviews tests', () => {
       cy.get('[role=presentation]').contains(instrument.name).click();
 
       cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="fap-assignments-table"] thead').contains(
+        'Experimental Area'
+      );
     });
 
     it('Officer should be able to assign Fap member to proposal in existing Fap', () => {
