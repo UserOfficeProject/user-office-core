@@ -1,4 +1,4 @@
-query getFapInstruments($fapId: Int!, $callId: Int) {
+query getInstrumentHasProposals($fapId: Int!, $callId: Int) {
   fapProposals(fapId: $fapId, callId: $callId) {
     instrument {
       ...instrumentMinimal

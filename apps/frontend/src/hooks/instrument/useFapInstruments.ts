@@ -32,7 +32,7 @@ export function useFapInstruments(
     setLoadingInstruments(true);
 
     api()
-      .getFapInstruments({ fapId, callId })
+      .getInstrumentHasProposals({ fapId, callId })
       .then((data) => {
         if (unmounted) {
           return;
