@@ -1,10 +1,12 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized } from '../decorators';
+import { ProposalAttachments } from '../models/ProposalAttachments';
 import { Questionary, QuestionaryStep } from '../models/Questionary';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
@@ -13,6 +15,7 @@ import { TemplateCategoryId } from './../models/Template';
 @injectable()
 export default class QuestionaryQueries {
   private questionaryAuth = container.resolve(QuestionaryAuthorization);
+  private proposalAuth = container.resolve(ProposalAuthorization);
 
   constructor(
     @inject(Tokens.QuestionaryDataSource)
@@ -146,5 +149,35 @@ export default class QuestionaryQueries {
     }
 
     return this.getBlankQuestionarySteps(agent, templateId);
+  }
+
+  async getProposalAttachments(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ): Promise<ProposalAttachments | null> {
+    let hasRights;
+
+    if (agent?.currentRole?.shortCode === Roles.USER_OFFICER) {
+      hasRights = true;
+    } else {
+      hasRights = await this.proposalAuth.hasReadRights(agent, proposalPk);
+    }
+
+    if (!hasRights) {
+      logger.logWarn(
+        'Permissions violated trying to access getProposalAttachments',
+        {
+          email: agent?.email,
+          userNumber: agent?.id,
+          proposalPk,
+        }
+      );
+
+      return null;
+    }
+
+    return new ProposalAttachments(
+      await this.dataSource.getProposalAttachments(proposalPk)
+    );
   }
 }

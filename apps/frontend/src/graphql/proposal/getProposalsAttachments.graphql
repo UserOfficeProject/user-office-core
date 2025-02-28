@@ -1,0 +1,13 @@
+query getProposalsAttachments($filter: ProposalsFilter) {
+  proposals(filter: $filter) {
+    proposals {
+      primaryKey
+      attachments {
+        questions {
+          id
+          question
+        }
+      }
+    }
+  }
+}
