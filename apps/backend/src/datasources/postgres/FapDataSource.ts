@@ -303,7 +303,8 @@ export default class PostgresFapDataSource implements FapDataSource {
 
   async getFapProposals(
     fapId: number,
-    callId: number | null
+    callId: number | null,
+    instrumentId: number | null
   ): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
@@ -322,6 +323,9 @@ export default class PostgresFapDataSource implements FapDataSource {
 
         if (callId) {
           query.andWhere('fp.call_id', callId);
+        }
+        if (instrumentId) {
+          query.andWhere('fp.instrument_id', instrumentId);
         }
       })
       .where('fp.fap_id', fapId)

@@ -64,14 +64,18 @@ export default class FapQueries {
   ])
   async getFapProposals(
     agent: UserWithRole | null,
-    { fapId, callId }: { fapId: number; callId: number | null }
+    {
+      fapId,
+      callId,
+      instrumentId,
+    }: { fapId: number; callId: number | null; instrumentId: number | null }
   ) {
     if (
       agent?.isApiAccessToken ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
-      return this.dataSource.getFapProposals(fapId, callId);
+      return this.dataSource.getFapProposals(fapId, callId, instrumentId);
     } else {
       return null;
     }
