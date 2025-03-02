@@ -62,7 +62,7 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
             confirm(
               async () => {
                 const { submitVisitRegistration } =
-                  await api().SubmitVisitRegistration({
+                  await api().submitVisitRegistration({
                     visitId: state.registration.visitId,
                     userId: state.registration.userId,
                   });

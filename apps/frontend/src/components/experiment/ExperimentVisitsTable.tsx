@@ -151,6 +151,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
                     onApproveVisitClick(rowData.visitId, rowData.userId)
                   }
                   component="button"
+                  data-cy="approve-visit-registration-button"
                 >
                   <Tooltip title="Approve visit registration">
                     <CheckCircleOutline />
@@ -172,7 +173,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <VisitStatusIcon status={rowData.status} />
-            {rowData.status}
+            <span data-cy="visit-status">{rowData.status}</span>
           </Box>
         );
       },
