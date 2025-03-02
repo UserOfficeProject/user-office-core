@@ -89,7 +89,7 @@ async function enableDefaultELIFeatures() {
       FeatureId.FAP_REVIEW,
       FeatureId.USER_MANAGEMENT,
       FeatureId.VISIT_MANAGEMENT,
-      FeatureId.SAMPLE_SAFETY,
+      FeatureId.EXPERIMENT_SAFETY_REVIEW,
       FeatureId.OAUTH,
     ],
     true
