@@ -11,6 +11,7 @@ import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
+import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
 interface GeneralEvent {
@@ -371,6 +372,11 @@ interface InternalReviewDeleted extends GeneralEvent {
   internalreview: InternalReview;
 }
 
+interface VisitRegistrationApprovedEvent extends GeneralEvent {
+  type: Event.VISIT_REGISTRATION_APPROVED;
+  visitregistration: VisitRegistration;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -440,4 +446,5 @@ export type ApplicationEvent =
   | ProposalAssignedToTechniquesEvent
   | InternalReviewCreated
   | InternalReviewUpdated
-  | InternalReviewDeleted;
+  | InternalReviewDeleted
+  | VisitRegistrationApprovedEvent;

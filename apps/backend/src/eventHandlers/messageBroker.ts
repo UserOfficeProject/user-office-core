@@ -307,6 +307,21 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.VISIT_REGISTRATION_APPROVED: {
+        const { visitregistration: visitRegistration } = event;
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: visitRegistration.userId,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          event.type,
+          jsonMessage
+        );
+        break;
+      }
     }
   };
 }

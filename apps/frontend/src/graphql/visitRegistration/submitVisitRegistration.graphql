@@ -1,0 +1,11 @@
+mutation SubmitVisitRegistration($userId: Int!, $visitId: Int!) {
+  submitVisitRegistration(userId: $userId, visitId: $visitId) {
+    ...visitRegistration
+    user {
+      ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+    }
+  }
+}

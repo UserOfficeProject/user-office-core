@@ -58,8 +58,11 @@ import {
 } from '../../models/Template';
 import { Unit } from '../../models/Unit';
 import { BasicUserDetails, User } from '../../models/User';
-import { Visit, VisitStatus } from '../../models/Visit';
-import { VisitRegistration } from '../../models/VisitRegistration';
+import { Visit } from '../../models/Visit';
+import {
+  VisitRegistration,
+  VisitRegistrationStatus,
+} from '../../models/VisitRegistration';
 import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
@@ -268,10 +271,10 @@ export interface VisitRegistrationRecord {
   user_id: number;
   visit_id: number;
   registration_questionary_id: number | null;
-  is_registration_submitted: boolean;
   training_expiry_date: Date | null;
   starts_at: Date | null;
   ends_at: Date | null;
+  status: string;
 }
 
 export interface RoleRecord {
@@ -683,7 +686,6 @@ export interface VisitRecord {
   readonly visit_id: number;
   readonly proposal_pk: number;
   readonly instrument_id: number;
-  readonly status: string;
   readonly questionary_id: number;
   readonly creator_id: number;
   readonly team_lead_user_id: number;
@@ -1006,10 +1008,10 @@ export const createVisitRegistrationObject = (
     record.user_id,
     record.visit_id,
     record.registration_questionary_id,
-    record.is_registration_submitted,
     record.starts_at,
     record.ends_at,
-    record.training_expiry_date
+    record.training_expiry_date,
+    record.status as VisitRegistrationStatus
   );
 };
 
@@ -1206,7 +1208,6 @@ export const createVisitObject = (visit: VisitRecord) => {
   return new Visit(
     visit.visit_id,
     visit.proposal_pk,
-    visit.status as any as VisitStatus,
     visit.creator_id,
     visit.team_lead_user_id,
     visit.scheduled_event_id,

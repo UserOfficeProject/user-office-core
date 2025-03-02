@@ -1,6 +1,9 @@
 import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
-import { Visit, VisitStatus } from '../../models/Visit';
-import { VisitRegistration } from '../../models/VisitRegistration';
+import { Visit } from '../../models/Visit';
+import {
+  VisitRegistration,
+  VisitRegistrationStatus,
+} from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
 import { UpdateVisitArgs } from '../../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../../resolvers/mutations/UpdateVisitRegistrationMutation';
@@ -17,33 +20,9 @@ export class VisitDataSourceMock implements VisitDataSource {
   private visitsHasVisitors: VisitRegistration[];
   init() {
     this.visits = [
-      new Visit(
-        1,
-        1,
-        VisitStatus.SUBMITTED,
-        1,
-        dummyUserWithRole.id,
-        1,
-        new Date()
-      ),
-      new Visit(
-        3,
-        3,
-        VisitStatus.SUBMITTED,
-        3,
-        dummyUserWithRole.id,
-        3,
-        new Date()
-      ),
-      new Visit(
-        4,
-        4,
-        VisitStatus.SUBMITTED,
-        4,
-        dummyUserWithRole.id,
-        4,
-        new Date()
-      ),
+      new Visit(1, 1, 1, dummyUserWithRole.id, 1, new Date()),
+      new Visit(3, 3, 3, dummyUserWithRole.id, 3, new Date()),
+      new Visit(4, 4, 4, dummyUserWithRole.id, 4, new Date()),
     ];
 
     this.visitsHasVisitors = [
@@ -51,10 +30,10 @@ export class VisitDataSourceMock implements VisitDataSource {
         1,
         1,
         1,
-        false,
         new Date(),
         new Date(),
-        new Date('2033-07-19T00:00:00.0000')
+        new Date('2033-07-19T00:00:00.0000'),
+        VisitRegistrationStatus.DRAFTED
       ),
     ];
   }
@@ -114,7 +93,6 @@ export class VisitDataSourceMock implements VisitDataSource {
     const newVisit = new Visit(
       this.visits.length,
       proposalPk,
-      VisitStatus.DRAFT,
       creatorId,
       teamLeadUserId,
       scheduledEventId,
@@ -129,7 +107,7 @@ export class VisitDataSourceMock implements VisitDataSource {
   async updateVisit(args: UpdateVisitArgs): Promise<Visit> {
     this.visits = this.visits.map((visit) => {
       if (visit && visit.id === args.visitId) {
-        args.status && (visit.status = args.status);
+        visit.teamLeadUserId = args.teamLeadUserId ?? visit.teamLeadUserId;
       }
 
       return visit;
@@ -138,7 +116,6 @@ export class VisitDataSourceMock implements VisitDataSource {
     return (await this.getVisit(args.visitId))!;
   }
   updateRegistration(
-    userId: number,
     args: UpdateVisitRegistrationArgs
   ): Promise<VisitRegistration> {
     throw new Error('Method not implemented');

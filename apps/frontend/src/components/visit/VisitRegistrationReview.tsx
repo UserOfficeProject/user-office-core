@@ -9,6 +9,7 @@ import {
 import QuestionaryDetails, {
   TableRowData,
 } from 'components/questionary/QuestionaryDetails';
+import { VisitRegistrationStatus } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -36,7 +37,7 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
   const additionalDetails: TableRowData[] = [
     {
       label: 'Status',
-      value: registration.isRegistrationSubmitted ? 'Submitted' : 'Draft',
+      value: registration.status,
     },
     {
       label: 'Start date',
@@ -60,18 +61,18 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
           onClick={() =>
             confirm(
               async () => {
-                const { updateVisitRegistration } =
-                  await api().updateVisitRegistration({
+                const { submitVisitRegistration } =
+                  await api().SubmitVisitRegistration({
                     visitId: state.registration.visitId,
-                    isRegistrationSubmitted: true,
+                    userId: state.registration.userId,
                   });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                  itemWithQuestionary: updateVisitRegistration,
+                  itemWithQuestionary: submitVisitRegistration,
                 });
                 dispatch({
                   type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                  itemWithQuestionary: updateVisitRegistration,
+                  itemWithQuestionary: submitVisitRegistration,
                 });
               },
               {
@@ -81,10 +82,12 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
               }
             )()
           }
-          disabled={registration.isRegistrationSubmitted}
+          disabled={registration.status !== VisitRegistrationStatus.DRAFTED}
           data-cy="submit-visit-registration-button"
         >
-          {registration.isRegistrationSubmitted ? '✔ Submitted' : 'Submit'}
+          {registration.status === VisitRegistrationStatus.DRAFTED
+            ? 'Submit'
+            : '✔ Submitted'}
         </NavigButton>
       </NavigationFragment>
     </div>

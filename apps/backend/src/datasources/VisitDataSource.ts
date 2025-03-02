@@ -28,7 +28,6 @@ export interface VisitDataSource {
   ): Promise<Visit>;
   updateVisit(args: UpdateVisitArgs): Promise<Visit>;
   updateRegistration(
-    userId: number,
     args: UpdateVisitRegistrationArgs
   ): Promise<VisitRegistration>;
   deleteVisit(visitId: number): Promise<Visit>;
