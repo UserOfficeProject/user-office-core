@@ -1,7 +1,7 @@
 export class VisitRegistration {
   constructor(
-    public userId: number,
     public visitId: number,
+    public userId: number,
     public registrationQuestionaryId: number | null,
     public startsAt: Date | null,
     public endsAt: Date | null,

@@ -1005,8 +1005,8 @@ export const createVisitRegistrationObject = (
   record: VisitRegistrationRecord
 ) => {
   return new VisitRegistration(
-    record.user_id,
     record.visit_id,
+    record.user_id,
     record.registration_questionary_id,
     record.starts_at,
     record.ends_at,

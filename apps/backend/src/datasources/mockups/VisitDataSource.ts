@@ -35,6 +35,15 @@ export class VisitDataSourceMock implements VisitDataSource {
         new Date('2033-07-19T00:00:00.0000'),
         VisitRegistrationStatus.DRAFTED
       ),
+      new VisitRegistration(
+        1,
+        2,
+        2,
+        new Date(),
+        new Date(),
+        new Date('2033-07-19T00:00:00.0000'),
+        VisitRegistrationStatus.DRAFTED
+      ),
     ];
   }
 
@@ -110,15 +119,45 @@ export class VisitDataSourceMock implements VisitDataSource {
         visit.teamLeadUserId = args.teamLeadUserId ?? visit.teamLeadUserId;
       }
 
+      this.visitsHasVisitors = this.visitsHasVisitors.filter(
+        (registration) => registration.visitId !== args.visitId
+      );
+
+      args.team?.forEach((userId) => {
+        this.visitsHasVisitors.push(
+          new VisitRegistration(
+            this.visitsHasVisitors.length,
+            userId,
+            args.visitId,
+            new Date(),
+            new Date(),
+            new Date('2033-07-19T00:00:00.0000'),
+            VisitRegistrationStatus.DRAFTED
+          )
+        );
+      });
+
       return visit;
     });
 
     return (await this.getVisit(args.visitId))!;
   }
-  updateRegistration(
+  async updateRegistration(
     args: UpdateVisitRegistrationArgs
   ): Promise<VisitRegistration> {
-    throw new Error('Method not implemented');
+    const registration = await this.getRegistration(args.userId, args.visitId);
+
+    if (registration) {
+      registration.startsAt = args.startsAt ?? registration.startsAt;
+      registration.endsAt = args.endsAt ?? registration.endsAt;
+      registration.trainingExpiryDate =
+        args.trainingExpiryDate ?? registration.trainingExpiryDate;
+      registration.status = args.status ?? registration.status;
+
+      return registration;
+    } else {
+      throw new Error('Registration not found');
+    }
   }
   async deleteVisit(visitId: number): Promise<Visit> {
     return this.visits.splice(

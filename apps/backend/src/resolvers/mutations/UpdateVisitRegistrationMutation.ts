@@ -21,13 +21,13 @@ export class UpdateVisitRegistrationArgs {
   visitId: number;
 
   @Field(() => Date, { nullable: true })
-  trainingExpiryDate?: Date;
+  trainingExpiryDate?: Date | null;
 
   @Field(() => Date, { nullable: true })
-  startsAt?: Date;
+  startsAt?: Date | null;
 
   @Field(() => Date, { nullable: true })
-  endsAt?: Date;
+  endsAt?: Date | null;
 
   status?: VisitRegistrationStatus;
   registrationQuestionaryId?: number;
