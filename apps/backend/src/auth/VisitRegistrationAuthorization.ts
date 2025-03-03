@@ -9,7 +9,7 @@ import {
 } from '../models/VisitRegistration';
 import { UserAuthorization } from './UserAuthorization';
 
-type VisitRegistrationCompositeKey = Pick<
+type VisitRegistrationPrimaryKey = Pick<
   VisitRegistration,
   'visitId' | 'userId'
 >;
@@ -25,7 +25,7 @@ export class VisitRegistrationAuthorization {
   private async resolveVisitRegistration({
     visitId,
     userId,
-  }: VisitRegistrationCompositeKey): Promise<VisitRegistration | null> {
+  }: VisitRegistrationPrimaryKey): Promise<VisitRegistration | null> {
     const registration = await this.visitDataSource.getRegistration(
       userId,
       visitId
@@ -40,11 +40,11 @@ export class VisitRegistrationAuthorization {
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
-    visitId: VisitRegistrationCompositeKey
+    visitId: VisitRegistrationPrimaryKey
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
-    visitOrVisitId: VisitRegistration | VisitRegistrationCompositeKey
+    visitOrVisitId: VisitRegistration | VisitRegistrationPrimaryKey
   ): Promise<boolean> {
     if (!agent) {
       return false;
@@ -74,11 +74,11 @@ export class VisitRegistrationAuthorization {
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    visitId: VisitRegistrationCompositeKey
+    visitId: VisitRegistrationPrimaryKey
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
-    visitOrVisitId: VisitRegistration | VisitRegistrationCompositeKey
+    visitOrVisitId: VisitRegistration | VisitRegistrationPrimaryKey
   ) {
     if (!agent) {
       return false;
