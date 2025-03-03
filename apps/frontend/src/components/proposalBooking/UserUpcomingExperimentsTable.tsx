@@ -53,7 +53,6 @@ export default function UserUpcomingExperimentsTable() {
     formTeamAction,
     finishEsi,
     registerVisitAction,
-    individualTrainingAction,
     declareShipmentAction,
     giveFeedback,
   } = useActionButtons({
@@ -91,7 +90,6 @@ export default function UserUpcomingExperimentsTable() {
             formTeamAction,
             finishEsi,
             registerVisitAction,
-            individualTrainingAction,
             declareShipmentAction,
             giveFeedback,
           ]}

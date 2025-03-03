@@ -5,7 +5,6 @@ import { UserContext } from 'context/UserContextProvider';
 import {
   QuestionaryStep,
   TemplateGroupId,
-  TrainingStatus,
   VisitRegistrationStatus,
 } from 'generated/sdk';
 import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
@@ -24,8 +23,6 @@ function createRegistrationStub(
     userId: userId,
     registrationQuestionaryId: 0,
     status: VisitRegistrationStatus.DRAFTED,
-    trainingStatus: TrainingStatus.NONE,
-    trainingExpiryDate: null,
     startsAt: null,
     endsAt: null,
     visitId: visitId,

@@ -129,18 +129,18 @@ context('Experiments tests', () => {
             {
               title: 'Actions',
               data: {
-                original: tableValue.filter((d, i) => i % 7 === 0),
-                asc: tableValue.filter((d, i) => i % 7 === 0),
-                desc: tableValue.filter((d, i) => i % 7 === 0),
+                original: tableValue.filter((d, i) => i % 6 === 0),
+                asc: tableValue.filter((d, i) => i % 6 === 0),
+                desc: tableValue.filter((d, i) => i % 6 === 0),
               },
             },
             {
               title: 'Status',
               data: {
-                original: tableValue.filter((d, i) => i % 7 === 1),
-                asc: tableValue.filter((d, i) => i % 7 === 1).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 1),
+                asc: tableValue.filter((d, i) => i % 6 === 1).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 7 === 1)
+                  .filter((d, i) => i % 6 === 1)
                   .sort()
                   .reverse(),
               },
@@ -148,10 +148,10 @@ context('Experiments tests', () => {
             {
               title: 'Visitor name',
               data: {
-                original: tableValue.filter((d, i) => i % 7 === 2),
-                asc: tableValue.filter((d, i) => i % 7 === 2).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 2),
+                asc: tableValue.filter((d, i) => i % 6 === 2).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 7 === 2)
+                  .filter((d, i) => i % 6 === 2)
                   .sort()
                   .reverse(),
               },
@@ -159,10 +159,10 @@ context('Experiments tests', () => {
             {
               title: 'Teamleader',
               data: {
-                original: tableValue.filter((d, i) => i % 7 === 3),
-                asc: tableValue.filter((d, i) => i % 7 === 3).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 3),
+                asc: tableValue.filter((d, i) => i % 6 === 3).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 7 === 3)
+                  .filter((d, i) => i % 6 === 3)
                   .sort()
                   .reverse(),
               },
@@ -170,10 +170,10 @@ context('Experiments tests', () => {
             {
               title: 'Visit start',
               data: {
-                original: tableValue.filter((d, i) => i % 7 === 4),
-                asc: tableValue.filter((d, i) => i % 7 === 4).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 4),
+                asc: tableValue.filter((d, i) => i % 6 === 4).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 7 === 4)
+                  .filter((d, i) => i % 6 === 4)
                   .sort()
                   .reverse(),
               },
@@ -181,21 +181,10 @@ context('Experiments tests', () => {
             {
               title: 'Visit end',
               data: {
-                original: tableValue.filter((d, i) => i % 7 === 5),
-                asc: tableValue.filter((d, i) => i % 7 === 5).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 5),
+                asc: tableValue.filter((d, i) => i % 6 === 5).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 7 === 5)
-                  .sort()
-                  .reverse(),
-              },
-            },
-            {
-              title: 'Training',
-              data: {
-                original: tableValue.filter((d, i) => i % 7 === 6),
-                asc: tableValue.filter((d, i) => i % 7 === 6).sort(),
-                desc: tableValue
-                  .filter((d, i) => i % 7 === 6)
+                  .filter((d, i) => i % 6 === 5)
                   .sort()
                   .reverse(),
               },
@@ -211,9 +200,9 @@ context('Experiments tests', () => {
             // Check if the table is sorted in ascending order
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 7 === i) {
+                if (index % 6 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.asc[Math.floor(index / 7)]
+                    tableColumns[i].data.asc[Math.floor(index / 6)]
                   );
                 }
               }
@@ -226,9 +215,9 @@ context('Experiments tests', () => {
 
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 7 === i) {
+                if (index % 6 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.desc[Math.floor(index / 7)]
+                    tableColumns[i].data.desc[Math.floor(index / 6)]
                   );
                 }
               }
@@ -241,9 +230,9 @@ context('Experiments tests', () => {
 
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 7 === i) {
+                if (index % 6 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.original[Math.floor(index / 7)]
+                    tableColumns[i].data.original[Math.floor(index / 6)]
                   );
                 }
               }

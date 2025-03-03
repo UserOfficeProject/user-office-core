@@ -2,8 +2,6 @@ fragment visitRegistration on VisitRegistration {
   userId
   visitId
   registrationQuestionaryId
-  trainingExpiryDate
-  trainingStatus
   startsAt
   endsAt
   status

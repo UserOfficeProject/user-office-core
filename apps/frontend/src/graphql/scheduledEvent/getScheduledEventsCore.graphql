@@ -19,7 +19,6 @@ query getScheduledEventsCore(
         ...visitRegistration
         startsAt
         endsAt
-        trainingStatus
         user {
           ...basicUserDetails
         }

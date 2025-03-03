@@ -21,9 +21,6 @@ export class UpdateVisitRegistrationArgs {
   visitId: number;
 
   @Field(() => Date, { nullable: true })
-  trainingExpiryDate?: Date | null;
-
-  @Field(() => Date, { nullable: true })
   startsAt?: Date | null;
 
   @Field(() => Date, { nullable: true })
