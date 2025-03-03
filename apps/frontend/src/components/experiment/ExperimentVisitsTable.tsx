@@ -120,6 +120,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
   const columns = [
     {
       title: 'Actions',
+      sorting: false,
       render: (rowData: RowType) => {
         const editButton = (
           <ButtonWithDialog
@@ -163,9 +164,6 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
             return null;
         }
       },
-      customSort: (a: RowType, b: RowType) => {
-        return a.trainingExpiryDate?.localeCompare(b.trainingExpiryDate) || 0;
-      },
     },
     {
       title: 'Status',
@@ -177,6 +175,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
           </Box>
         );
       },
+      field: 'status',
     },
     {
       title: 'Visitor name',
