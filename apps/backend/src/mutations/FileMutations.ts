@@ -19,7 +19,7 @@ export default class FileMutations {
     path: string
   ): Promise<FileMetadata | Rejection> {
     if (sizeImBytes === 0) {
-      return rejection('Could not save file because its 0 bytes', {
+      return rejection('Could not save file because it's 0 bytes', {
         fileName,
         path,
       });
