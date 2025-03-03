@@ -24,7 +24,6 @@ import { Fap } from './Fap';
 import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
-import { Invite } from './Invite';
 import { ProposalBookingsCore, ProposalBookingFilter } from './ProposalBooking';
 import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
@@ -107,19 +106,6 @@ export class ProposalResolver {
     );
 
     return isRejection(users) ? [] : users;
-  }
-
-  @FieldResolver(() => [Invite])
-  async coProposerInvites(
-    @Root() proposal: Proposal,
-    @Ctx() context: ResolverContext
-  ): Promise<Invite[] | null> {
-    const invites = await context.queries.invite.getCoProposerInvites(
-      context.user,
-      proposal.primaryKey
-    );
-
-    return invites;
   }
 
   @FieldResolver(() => BasicUserDetails, { nullable: true })
