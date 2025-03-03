@@ -39,6 +39,7 @@ import FileQueries from './queries/FileQueries';
 import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import InternalReviewQueries from './queries/InternalReviewQueries';
+import InviteQueries from './queries/InviteQueries';
 import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
 import ProposalEsiQueries from './queries/ProposalEsiQueries';
@@ -68,6 +69,7 @@ const context: BasicResolverContext = {
     file: container.resolve(FileQueries),
     genericTemplate: container.resolve(GenericTemplateQueries),
     instrument: container.resolve(InstrumentQueries),
+    invite: container.resolve(InviteQueries),
     pdfTemplate: container.resolve(PdfTemplateQueries),
     proposal: container.resolve(ProposalQueries),
     proposalEsi: container.resolve(ProposalEsiQueries),

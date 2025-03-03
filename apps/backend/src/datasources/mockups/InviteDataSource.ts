@@ -1,5 +1,4 @@
 import { Invite } from '../../models/Invite';
-import { UpdateInviteInput } from '../../resolvers/mutations/UpdateInviteMutation';
 import { InviteDataSource } from '../InviteDataSource';
 
 export class InviteDataSourceMock implements InviteDataSource {
@@ -7,6 +6,12 @@ export class InviteDataSourceMock implements InviteDataSource {
 
   constructor() {
     this.init();
+  }
+  findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    throw new Error('Method not implemented.');
+  }
+  async delete(id: number): Promise<void> {
+    this.invites = this.invites.filter((invite) => invite.id !== id);
   }
 
   async findById(id: number): Promise<Invite | null> {
@@ -17,33 +22,39 @@ export class InviteDataSourceMock implements InviteDataSource {
     this.invites = [
       new Invite(
         1,
-        'code1',
+        'invite-code',
         'test1@example.com',
         'note1',
         new Date(),
         1,
         null,
+        null,
+        true,
         null
       ),
       new Invite(
         2,
-        'code2',
+        'claimed-invite-code',
         'test2@example.com',
         'note2',
         new Date(),
         2,
         null,
+        1,
+        true,
         null
       ),
       new Invite(
         3,
-        'code3',
+        'expired-invite-code',
         'test3@example.com',
         'note3',
         new Date(),
         3,
         new Date(),
-        1001
+        null,
+        false,
+        new Date('2022-01-01')
       ),
     ];
   }
@@ -52,11 +63,15 @@ export class InviteDataSourceMock implements InviteDataSource {
     return this.invites.find((invite) => invite.code === code) || null;
   }
 
-  async create(
-    createdByUserId: number,
-    code: string,
-    email: string
-  ): Promise<Invite> {
+  async create(args: {
+    code: string;
+    email: string;
+    note: string;
+    createdByUserId: number;
+    expiresAt: Date | null;
+  }): Promise<Invite> {
+    const { code, email, createdByUserId, expiresAt } = args;
+
     const newInvite = new Invite(
       this.invites.length + 1, // Generate new ID
       code,
@@ -65,7 +80,9 @@ export class InviteDataSourceMock implements InviteDataSource {
       new Date(),
       createdByUserId,
       null,
-      null
+      null,
+      false,
+      expiresAt ?? null
     );
 
     this.invites.push(newInvite);
@@ -73,17 +90,22 @@ export class InviteDataSourceMock implements InviteDataSource {
     return newInvite;
   }
 
-  async update(
-    args: UpdateInviteInput & Pick<Invite, 'claimedAt' | 'claimedByUserId'>
-  ): Promise<Invite> {
+  async update(args: {
+    id: number;
+    code?: string;
+    email?: string;
+    note?: string;
+    claimedAt?: Date | null;
+    claimedByUserId?: number | null;
+    isEmailSent?: boolean;
+    expiresAt?: Date | null;
+  }): Promise<Invite> {
     const invite = await this.findById(args.id);
     if (!invite) {
       throw new Error('Invite code not found');
     }
 
-    invite.email = args.email || invite.email;
-    invite.claimedAt = args.claimedAt || invite.claimedAt;
-    invite.claimedByUserId = args.claimedByUserId || invite.claimedByUserId;
+    Object.assign(invite, { ...args });
 
     return invite;
   }

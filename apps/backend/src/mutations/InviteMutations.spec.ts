@@ -51,30 +51,33 @@ describe('Test Invite Mutations', () => {
           roleIds: [UserRole.FAP_REVIEWER],
         },
       })
-    ).resolves.toHaveProperty(
-      'reason',
-      'User is not authorized to create invites to this user type'
-    );
+    ).resolves.toBeInstanceOf(Rejection);
   });
 
   test('A user can accept valid invite code', () => {
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'code1')
-    ).resolves.toBeTruthy();
+      inviteMutations.accept(dummyUserWithRole, 'invite-code')
+    ).resolves.toBeInstanceOf(Invite);
   });
 
   test('A user can not accept invalid code', () => {
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'invalid-code')
+      inviteMutations.accept(dummyUserWithRole, 'invalid-invite-code')
     ).resolves.toHaveProperty('reason', 'Invite code not found');
   });
 
   test('A user can not accept code twice', async () => {
-    await inviteMutations.accept(dummyUserWithRole, 'code1');
+    await inviteMutations.accept(dummyUserWithRole, 'invite-code');
 
     return expect(
-      inviteMutations.accept(dummyUserWithRole, 'code1')
+      inviteMutations.accept(dummyUserWithRole, 'invite-code')
     ).resolves.toHaveProperty('reason', 'Invite code already claimed');
+  });
+
+  test('A user can not accept expired code', async () => {
+    return expect(
+      inviteMutations.accept(dummyUserWithRole, 'expired-invite-code')
+    ).resolves.toHaveProperty('reason', 'Invite code has expired');
   });
 
   test('A user officer can update invite', async () => {
@@ -247,5 +250,60 @@ describe('Test Invite Mutations', () => {
       .findByInviteId(1);
 
     expect(coProposerClaim).toMatchObject({ inviteId: 1, proposalPk });
+  });
+
+  test('A user officer can update invite and set coProposerClaim', async () => {
+    const proposalPk = 2;
+
+    await inviteMutations.update(dummyUserOfficerWithRole, {
+      id: 2,
+      claims: { coProposerProposalPk: proposalPk },
+    });
+
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .findByInviteId(2);
+
+    expect(coProposerClaim).toMatchObject({ inviteId: 2, proposalPk });
+  });
+
+  test('A user can set CoProposerInvites for their proposal', async () => {
+    const email = 'coproposer@example.com';
+    const proposalPk = 3;
+
+    const invite = (await inviteMutations.create(dummyUserWithRole, {
+      email,
+      note: 'Test note',
+      claims: {
+        coProposerProposalPk: proposalPk,
+      },
+    })) as Invite;
+
+    const coProposerClaim = await container
+      .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
+      .findByInviteId(invite.id);
+
+    expect(coProposerClaim).toMatchObject({
+      inviteId: invite.id,
+      proposalPk,
+    });
+  });
+
+  test('A user not on a proposal cannot set CoProposerInvites', async () => {
+    const email = 'notonproposal@example.com';
+    const proposalPk = 3;
+
+    const response = await inviteMutations.create(
+      dummyUserNotOnProposalWithRole,
+      {
+        email,
+        note: 'Test note',
+        claims: {
+          coProposerProposalPk: proposalPk,
+        },
+      }
+    );
+
+    expect(response).toBeInstanceOf(Rejection);
   });
 });

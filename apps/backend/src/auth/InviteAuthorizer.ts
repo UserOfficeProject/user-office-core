@@ -2,25 +2,51 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { UserRole, UserWithRole } from '../models/User';
+import { ClaimsInput } from '../resolvers/mutations/CreateInviteMutation';
+import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class InviteAuthorization {
   constructor(
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
-  public isRoleClaimAuthorized = async (
+  public async hasCreateRights(
     agent: UserWithRole | null,
-    roleIds?: number[]
-  ) => {
-    // If no roleIds are provided, the invite is considered as authorized
-    if (roleIds === undefined || roleIds.length === 0) return true;
-
+    claims: ClaimsInput
+  ): Promise<boolean> {
     if (this.userAuth.isUserOfficer(agent)) return true;
 
-    const onlyUserRole = roleIds.length === 1 && roleIds[0] === UserRole.USER;
+    const { roleIds, coProposerProposalPk } = claims;
 
-    return onlyUserRole;
-  };
+    if (roleIds !== undefined) {
+      const onlyUserRole = roleIds.length === 1 && roleIds[0] === UserRole.USER;
+
+      if (!onlyUserRole) return false;
+    }
+
+    if (coProposerProposalPk !== undefined) {
+      const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+        agent,
+        coProposerProposalPk
+      );
+
+      if (!isMemberOfProposal) return false;
+    }
+
+    return true;
+  }
+
+  public async hasReadRights(agent: UserWithRole | null, proposalPk: number) {
+    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
+    const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+      agent,
+      proposalPk
+    );
+
+    if (!isUserOfficer && !isMemberOfProposal) return false;
+  }
 }
