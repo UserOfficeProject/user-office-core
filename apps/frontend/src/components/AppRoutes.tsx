@@ -81,6 +81,10 @@ const ImportTemplatePage = lazy(
 );
 const PdfTemplateEditor = lazy(() => import('./template/PdfTemplateEditor'));
 const PdfTemplatesPage = lazy(() => import('./template/PdfTemplatesPage'));
+const ExperimentSafetyReviewTemplatesPage = lazy(
+  () => import('./template/ExperimentSafetyReviewTemplatesPage')
+);
+
 const ProposalTemplatesPage = lazy(
   () => import('./template/ProposalTemplatesPage')
 );
@@ -333,6 +337,15 @@ const AppRoutes = () => {
           path="/PdfTemplates"
           element={
             <TitledRoute title="PDF Templates" element={<PdfTemplatesPage />} />
+          }
+        />
+        <Route
+          path="/ExperimentSafetyReviewTemplates"
+          element={
+            <TitledRoute
+              title="Experiment Safety Review Templates"
+              element={<ExperimentSafetyReviewTemplatesPage />}
+            />
           }
         />
         <Route

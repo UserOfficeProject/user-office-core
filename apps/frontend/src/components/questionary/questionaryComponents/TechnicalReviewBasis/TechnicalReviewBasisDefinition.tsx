@@ -11,7 +11,7 @@ import { QuestionTemplateRelationTechnicalReviewBasisForm } from './QuestionTemp
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
 
 export const technicalReviewBasisDefinition: QuestionaryComponentDefinition = {
-  dataType: DataType.TECHNICAL_REVIEW_BASIS,
+  dataType: DataType.EXP_SAFETY_REVIEW_BASIS,
   name: 'Technical Review Basis',
   questionaryComponent: QuestionaryComponentTechnicalReviewBasis,
   questionForm: () => QuestionTechnicalReviewBasisForm,

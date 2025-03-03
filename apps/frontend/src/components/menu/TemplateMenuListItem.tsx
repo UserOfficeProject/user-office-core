@@ -134,6 +134,18 @@ export function TemplateMenuListItem() {
           </ListItemButton>
         </Tooltip>
 
+        <Tooltip title="Experiment Safety Review">
+          <ListItemButton
+            component={NavLink}
+            to="/ExperimentSafetyReviewTemplates"
+          >
+            <ListItemIcon>
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary="Experiment Safety Review" />
+          </ListItemButton>
+        </Tooltip>
+
         <Tooltip title="Proposal">
           <ListItemButton component={NavLink} to={menuMap['ProposalTemplates']}>
             <ListItemIcon>

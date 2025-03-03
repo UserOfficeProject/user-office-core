@@ -28,12 +28,14 @@ import {
   TechniquePickerConfig,
   TextInputConfig,
   VisitBasisConfig,
+  ExperimentSafetyReviewBasisConfig,
 } from '../../resolvers/types/FieldConfig';
 import { DataType, QuestionTemplateRelation } from '../Template';
 import { booleanDefinition } from './Boolean';
 import { dateDefinition } from './Date';
 import { dynamicMultipleChoiceDefinition } from './DynamicMultipleChoice';
 import { embellishmentDefinition } from './Embellishment';
+import { experimentSafetyReviewBasisDefinition } from './ExperimentSafetyReviewBasis';
 import { fapReviewBasisDefinition } from './FapReviewBasis';
 import { feedbackBasisDefinition } from './FeedbackBasis';
 import { fileUploadDefinition } from './FileUpload';
@@ -85,25 +87,27 @@ export type QuestionDataTypeConfigMapping<T> = T extends DataType.BOOLEAN
                             ? RichTextInputConfig
                             : T extends DataType.VISIT_BASIS
                               ? VisitBasisConfig
-                              : T extends DataType.FAP_REVIEW_BASIS
-                                ? FapReviewBasisConfig
-                                : T extends DataType.TECHNICAL_REVIEW_BASIS
-                                  ? TechnicalReviewBasisConfig
-                                  : T extends DataType.GENERIC_TEMPLATE_BASIS
-                                    ? GenericTemplateBasisConfig
-                                    : T extends DataType.PROPOSAL_ESI_BASIS
-                                      ? ProposalEsiBasisConfig
-                                      : T extends DataType.SAMPLE_ESI_BASIS
-                                        ? SampleEsiBasisConfig
-                                        : T extends DataType.FEEDBACK_BASIS
-                                          ? FeedbackBasisConfig
-                                          : T extends DataType.DYNAMIC_MULTIPLE_CHOICE
-                                            ? DynamicMultipleChoiceConfig
-                                            : T extends DataType.INSTRUMENT_PICKER
-                                              ? InstrumentPickerConfig
-                                              : T extends DataType.TECHNIQUE_PICKER
-                                                ? TechniquePickerConfig
-                                                : never;
+                              : T extends DataType.EXP_SAFETY_REVIEW_BASIS
+                                ? ExperimentSafetyReviewBasisConfig
+                                : T extends DataType.FAP_REVIEW_BASIS
+                                  ? FapReviewBasisConfig
+                                  : T extends DataType.TECHNICAL_REVIEW_BASIS
+                                    ? TechnicalReviewBasisConfig
+                                    : T extends DataType.GENERIC_TEMPLATE_BASIS
+                                      ? GenericTemplateBasisConfig
+                                      : T extends DataType.PROPOSAL_ESI_BASIS
+                                        ? ProposalEsiBasisConfig
+                                        : T extends DataType.SAMPLE_ESI_BASIS
+                                          ? SampleEsiBasisConfig
+                                          : T extends DataType.FEEDBACK_BASIS
+                                            ? FeedbackBasisConfig
+                                            : T extends DataType.DYNAMIC_MULTIPLE_CHOICE
+                                              ? DynamicMultipleChoiceConfig
+                                              : T extends DataType.INSTRUMENT_PICKER
+                                                ? InstrumentPickerConfig
+                                                : T extends DataType.TECHNIQUE_PICKER
+                                                  ? TechniquePickerConfig
+                                                  : never;
 
 export interface Question<T extends DataType> {
   /**
@@ -189,6 +193,7 @@ const registry = [
   technicalReviewBasisDefinition,
   instrumentPickerDefinition,
   techniquePickerDefinition,
+  experimentSafetyReviewBasisDefinition,
 ];
 
 Object.freeze(registry);
