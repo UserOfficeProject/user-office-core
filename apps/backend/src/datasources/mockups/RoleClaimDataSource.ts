@@ -10,9 +10,9 @@ export class RoleClaimDataSourceMock implements RoleClaimDataSource {
 
   public init() {
     this.roleClaims = [
-      new RoleClaim(1, 101, 201),
-      new RoleClaim(2, 102, 202),
-      new RoleClaim(3, 103, 203),
+      new RoleClaim(1, 1, 1),
+      new RoleClaim(2, 2, 1),
+      new RoleClaim(3, 3, 1),
     ];
   }
 
