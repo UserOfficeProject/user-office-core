@@ -1,7 +1,4 @@
-import {
-  createInviteValidationSchema,
-  updateInviteValidationSchema,
-} from '@user-office-software/duo-validation';
+import { createInviteValidationSchema } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
@@ -16,11 +13,10 @@ import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
-import { Role, Roles } from '../models/Role';
+import { Role } from '../models/Role';
 import { UserRole, UserWithRole } from '../models/User';
 import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
 import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
-import { UpdateInviteInput } from '../resolvers/mutations/UpdateInviteMutation';
 
 @injectable()
 export default class InviteMutations {
@@ -107,31 +103,6 @@ export default class InviteMutations {
       claimedAt: new Date(),
       claimedByUserId: agent!.id,
     });
-
-    return updatedInvite;
-  }
-
-  @Authorized([Roles.USER_OFFICER])
-  @ValidateArgs(updateInviteValidationSchema)
-  async update(
-    agent: UserWithRole | null,
-    args: UpdateInviteInput
-  ): Promise<Invite | Rejection> {
-    // Update is only allowed for user officers
-    const updatedInvite = await this.inviteDataSource.update(args);
-
-    if (args.claims) {
-      if (args.claims.roleIds) {
-        await this.setRoleClaims(args.id, args.claims.roleIds);
-      }
-
-      if (args.claims.coProposerProposalPk) {
-        await this.setCoProposerClaims(
-          args.id,
-          args.claims.coProposerProposalPk
-        );
-      }
-    }
 
     return updatedInvite;
   }
