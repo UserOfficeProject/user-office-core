@@ -177,6 +177,7 @@ context('Instrument tests', () => {
 
   describe('Advanced instruments tests as user officer role', () => {
     let createdInstrumentId: number;
+    let createdInstrument2Id: number;
     let createdProposalPk: number;
 
     beforeEach(() => {
@@ -536,6 +537,150 @@ context('Instrument tests', () => {
 
       cy.closeModal();
       // TODO: Extend here when technical reviewer is added to the table.
+    });
+
+    it.only('Technical review assignee should be able to bulk reassigne rechnical reviews', function () {
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: [createdProposalPk],
+        userId: scientist2.id,
+        instrumentId: createdInstrumentId,
+      });
+      cy.createInstrument(instrument2).then((result) => {
+        if (result.createInstrument) {
+          createdInstrument2Id = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createdInstrument2Id }],
+          });
+
+          cy.assignScientistsToInstrument({
+            instrumentId: createdInstrument2Id,
+            scientistIds: [scientist2.id],
+          });
+        }
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          const createdProposal2Pk = result.createProposal.primaryKey;
+          cy.wrap(result.createProposal.proposalId).as('createdProposal2Id');
+
+          cy.updateProposal({
+            proposalPk: createdProposal2Pk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposal2Pk],
+            instrumentIds: [createdInstrumentId, createdInstrument2Id],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Pk],
+            userId: scientist2.id,
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Pk],
+            userId: scientist2.id,
+            instrumentId: createdInstrument2Id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrumentId,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview1Id')
+          );
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrument2Id,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview2Id')
+          );
+        }
+      });
+      cy.visit('/');
+
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(proposal2.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="bulk-reassign-reviews"]').click();
+
+      cy.get('@createdProposal2Id').then((proposalId) => {
+        cy.get('[data-cy="multi-instrument-alert"]').contains(`${proposalId}`);
+      });
+
+      // The expand button does not allow for data cy tags
+      cy.get('[data-cy="bulk-reassigne-modal"]')
+        .contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="bulk-reassigne-modal"]')
+        .contains(instrument2.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
+      cy.get('@technicalReview1Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('exist');
+      });
+
+      cy.get('@technicalReview2Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).click();
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('not.exist');
+      });
+
+      cy.get('[data-cy="bulk-reassigne-modal"]').should(
+        'not.contain',
+        instrument2.name
+      );
+      cy.get(`[data-cy="user-list-${createdInstrumentId}"]`).click();
+
+      cy.contains(scientist1.lastName).click();
+
+      // I could not find a better way of doing this
+      // cy.get('#user-list-1-option-1').click();
+
+      cy.get('[data-cy="bulk-update"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal2.title);
+      cy.should('not.contain', proposal1.title);
     });
 
     it('User Officer should be able to remove assigned scientist from instrument', () => {
@@ -1212,6 +1357,122 @@ context('Instrument tests', () => {
         .parent()
         .find('[data-cy="view-proposal-and-technical-review"]')
         .should('exist');
+    });
+
+    it('Technical review assignee should be able to bulk reassigne rechnical reviews', function () {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          const createdProposal2Pk = result.createProposal.primaryKey;
+          cy.wrap(result.createProposal.proposalId).as('createdProposal2Id');
+
+          cy.updateProposal({
+            proposalPk: createdProposal2Pk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposal2Pk],
+            instrumentIds: [createdInstrumentId, createdInstrument2Id],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Pk],
+            userId: scientist2.id,
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Pk],
+            userId: scientist2.id,
+            instrumentId: createdInstrument2Id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrumentId,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview1Id')
+          );
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrument2Id,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview2Id')
+          );
+        }
+      });
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(proposal2.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="bulk-reassign-reviews"]').click();
+
+      cy.get('@createdProposal2Id').then((proposalId) => {
+        cy.get('[data-cy="multi-instrument-alert"]').contains(`${proposalId}`);
+      });
+
+      // The expand button does not allow for data cy tags
+      cy.get('[data-cy="bulk-reassigne-modal"]')
+        .contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="bulk-reassigne-modal"]')
+        .contains(instrument2.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
+      cy.get('@technicalReview1Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('exist');
+      });
+
+      cy.get('@technicalReview2Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).click();
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('not.exist');
+      });
+
+      cy.get('[data-cy="bulk-reassigne-modal"]').should(
+        'not.contain',
+        instrument2.name
+      );
+      cy.get(`[data-cy="user-list-${createdInstrumentId}"]`).click();
+
+      cy.contains(scientist1.lastName).click();
+
+      // I could not find a better way of doing this
+      // cy.get('#user-list-1-option-1').click();
+
+      cy.get('[data-cy="bulk-update"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal2.title);
+      cy.should('not.contain', proposal1.title);
     });
   });
 });

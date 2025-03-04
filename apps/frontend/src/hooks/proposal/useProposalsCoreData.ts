@@ -14,6 +14,7 @@ type QueryParameters = {
   sortField?: string | undefined;
   sortDirection?: string | undefined;
   searchText?: string | undefined;
+  refetch?: boolean;
 };
 
 export function useProposalsCoreData(

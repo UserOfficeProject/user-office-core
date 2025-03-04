@@ -92,6 +92,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
         status: getTranslation(tr.status as ResourceId),
         submitted: tr.submitted,
         timeAllocation: tr.timeAllocation,
+        instrumentId: tr.instrumentId,
         technicalReviewAssignee: {
           id: tr.technicalReviewAssignee?.id,
           firstname: tr.technicalReviewAssignee?.firstname,

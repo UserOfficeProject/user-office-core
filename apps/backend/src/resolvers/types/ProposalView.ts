@@ -96,6 +96,9 @@ export class ProposalViewTechnicalReview {
 
   @Field(() => ProposalViewTechnicalReviewAssignee, { nullable: true })
   technicalReviewAssignee: ProposalViewTechnicalReviewAssignee;
+
+  @Field(() => Int)
+  instrumentId: number;
 }
 @ObjectType()
 export class ProposalScientistComment extends ProposalInternalComment {}

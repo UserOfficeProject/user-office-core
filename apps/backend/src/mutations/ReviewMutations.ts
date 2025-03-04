@@ -272,7 +272,11 @@ export default class ReviewMutations {
       );
     const shouldUpdateReview = technicalReview !== null;
 
-    if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
+    if (
+      agent.currentRole?.shortCode !== Roles.USER_OFFICER &&
+      args.reviewerId !== undefined &&
+      args.reviewerId !== agent?.id
+    ) {
       return rejection('Request is impersonating another user', {
         args,
         agent,

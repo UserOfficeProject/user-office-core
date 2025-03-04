@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
 import { InstrumentPickerConfig } from 'generated/sdk';
 import { useAnswerCallData } from 'hooks/call/useQuestionCallData';
-import { useInstrumentsByIdsData } from 'hooks/instrument/useInstrumentsByIdsData';
+import { useInstrumentsByIdsData } from 'hooks/instrument/useInstrumentsByIdsDataMinimal';
 import { toArray } from 'utils/helperFunctions';
 
 const InstrumentPickerAnswerRenderer: AnswerRenderer = ({

@@ -13,6 +13,7 @@ import FileCopy from '@mui/icons-material/FileCopy';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import GroupWork from '@mui/icons-material/GroupWork';
+import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 import { IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -41,6 +42,10 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
+import {
+  ReviewData,
+  TechnicalBulkReassignModal,
+} from 'components/review/TechnicalBulkReassignModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
@@ -346,6 +351,7 @@ const ProposalTableOfficer = ({
   >('proposalColumnsOfficer', null);
   const featureContext = useContext(FeatureContext);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
 
   const handleDownloadActionClick = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -369,6 +375,9 @@ const ProposalTableOfficer = ({
     <ListStatusIcon data-cy="change-proposal-status" />
   );
   const ExportIcon = (): JSX.Element => <GridOnIcon />;
+  const ReduceCapacityIconComponent = (): JSX.Element => (
+    <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -585,6 +594,37 @@ const ProposalTableOfficer = ({
     }
   };
 
+  const handleBulkTechnicalReviewsReassign = () => {
+    const currentUserAssignedSelectTechReviews: ReviewData[] = [];
+
+    const selectedProposals = getSelectedProposalsData();
+
+    for (const proposal of selectedProposals) {
+      const { technicalReviews } = proposal;
+      if (technicalReviews?.length) {
+        for (const techReview of technicalReviews) {
+          const instrument = proposal.instruments?.find(
+            (inst) => inst.id === techReview.instrumentId
+          );
+
+          if (instrument) {
+            currentUserAssignedSelectTechReviews.push({
+              review: techReview,
+              instrument: instrument,
+              proposal: {
+                proposalPk: proposal.primaryKey,
+                proposalId: proposal.proposalId,
+                title: proposal.title,
+              },
+            });
+          }
+        }
+      }
+    }
+    setBulkReassignData(currentUserAssignedSelectTechReviews);
+    console.log(bulkReassignData);
+  };
+
   columns = setSortDirectionOnSortField(
     columns,
     searchParams.get('sortField'),
@@ -736,6 +776,164 @@ const ProposalTableOfficer = ({
     .filter((item) => !!item.instruments)
     .map((selectedProposal) => selectedProposal.instruments);
 
+  const tableActions: Action<ProposalViewData>[] = [
+    {
+      icon: FileCopy,
+      tooltip: 'Clone proposals to call',
+      onClick: () => {
+        setOpenCallSelection(true);
+      },
+      position: 'toolbarOnSelect',
+    },
+    {
+      icon: GetAppIconComponent,
+      tooltip: 'Download proposals',
+      onClick: (event): void => {
+        handleDownloadActionClick(event);
+      },
+      position: 'toolbarOnSelect',
+    },
+    {
+      icon: ExportIcon,
+      tooltip: 'Export proposals in Excel',
+      onClick: (): void => {
+        downloadXLSXProposal(
+          searchParams
+            .getAll('selection')
+            .filter((item): item is string => !!item)
+            .map((item) => +item),
+          selectedProposalsData?.[0].title
+        );
+      },
+      position: 'toolbarOnSelect',
+    },
+    {
+      icon: DeleteIcon,
+      tooltip: 'Delete proposals',
+      onClick: () => {
+        confirm(
+          () => {
+            deleteProposals();
+          },
+          {
+            title: 'Delete proposals',
+            description:
+              'This action will delete proposals and all data associated with them.',
+          }
+        )();
+      },
+      position: 'toolbarOnSelect',
+    },
+    {
+      icon: ChangeProposalStatusIcon,
+      tooltip: 'Change proposal status',
+      onClick: () => {
+        setOpenChangeProposalStatus(true);
+      },
+      position: 'toolbarOnSelect',
+    },
+    {
+      icon: EmailIcon,
+      tooltip: 'Notify users final result',
+      onClick: () => {
+        confirm(
+          () => {
+            emailProposals();
+          },
+          {
+            title: 'Notify results',
+            description:
+              'This action will trigger emails to be sent to principal investigators.',
+          }
+        )();
+      },
+      position: 'toolbarOnSelect',
+    },
+    {
+      tooltip: shouldShowSelectAllAction,
+      icon: DoneAllIcon,
+      hidden: false,
+      iconProps: {
+        hidden: allPrefetchedProposalsSelected,
+        defaultValue: totalCount,
+        className: allProposalSelectionLoading ? 'loading' : '',
+      },
+      onClick: async () => {
+        setAllProposalSelectionLoading(true);
+        if (allPrefetchedProposalsSelected) {
+          setSearchParams((searchParams) => {
+            searchParams.delete('selection');
+
+            return searchParams;
+          });
+          refreshTableData();
+        } else {
+          const selectedProposalsData = await fetchProposalCoreBasicData();
+
+          if (!selectedProposalsData) {
+            return;
+          }
+
+          // NOTE: Adding the missing data in the tableData state variable because some proposal group actions use additional data than primaryKey.
+          const newTableData = selectedProposalsData?.map((sp) => {
+            const foundProposalData = tableData.find(
+              (td) => td.primaryKey === sp.primaryKey
+            );
+
+            if (foundProposalData) {
+              return foundProposalData;
+            } else {
+              return sp as ProposalViewData;
+            }
+          });
+
+          setTableData(newTableData);
+
+          setSearchParams((searchParams) => {
+            searchParams.delete('selection');
+            selectedProposalsData.forEach((proposal) => {
+              searchParams.append('selection', proposal.primaryKey.toString());
+            });
+
+            return searchParams;
+          });
+          refreshTableData();
+        }
+
+        setAllProposalSelectionLoading(false);
+      },
+      position: 'toolbarOnSelect',
+    },
+  ];
+
+  isInstrumentManagementEnabled &&
+    tableActions.push({
+      icon: ScienceIconComponent,
+      tooltip: `Assign/Remove ${i18n.format(t('instrument'), 'lowercase')}`,
+      onClick: () => {
+        setOpenInstrumentAssignment(true);
+      },
+      position: 'toolbarOnSelect',
+    });
+
+  isTechnicalReviewEnabled &&
+    tableActions.push({
+      icon: ReduceCapacityIconComponent,
+      tooltip: 'Reassign selected Techniqual Reviews',
+      onClick: handleBulkTechnicalReviewsReassign,
+      position: 'toolbarOnSelect',
+    });
+
+  isFapEnabled &&
+    tableActions.push({
+      icon: GroupWorkIcon,
+      tooltip: 'Assign proposals to FAP',
+      onClick: () => {
+        setOpenAssignment(true);
+      },
+      position: 'toolbarOnSelect',
+    });
+
   return (
     <>
       <Dialog
@@ -837,6 +1035,29 @@ const ProposalTableOfficer = ({
           />
         </DialogContent>
       </Dialog>
+      {!!bulkReassignData.length && (
+        <TechnicalBulkReassignModal
+          reviews={bulkReassignData}
+          setReviews={(refetch, resetSelection) => {
+            setBulkReassignData([]);
+            refetch && refreshTableData();
+            resetSelection &&
+              setSearchParams((searchParam) => {
+                searchParam.delete('selection');
+
+                return searchParam;
+              });
+          }}
+          instrumentIds={[
+            ...new Set(bulkReassignData.map((rev) => rev.instrument.id)),
+          ]}
+          removeReview={(reviewId) =>
+            setBulkReassignData(
+              bulkReassignData.filter((rev) => rev.review.id !== reviewId)
+            )
+          }
+        ></TechnicalBulkReassignModal>
+      )}
       <TableActionsDropdownMenu
         event={actionsMenuAnchorElement}
         handleClose={handleClose}
@@ -932,158 +1153,7 @@ const ProposalTableOfficer = ({
           pageSize: pageSize ? +pageSize : undefined,
           initialPage: search ? 0 : page ? +page : 0,
         }}
-        actions={[
-          {
-            icon: FileCopy,
-            tooltip: 'Clone proposals to call',
-            onClick: () => {
-              setOpenCallSelection(true);
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: GetAppIconComponent,
-            tooltip: 'Download proposals',
-            onClick: (event): void => {
-              handleDownloadActionClick(event);
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: ExportIcon,
-            tooltip: 'Export proposals in Excel',
-            onClick: (): void => {
-              downloadXLSXProposal(
-                searchParams
-                  .getAll('selection')
-                  .filter((item): item is string => !!item)
-                  .map((item) => +item),
-                selectedProposalsData?.[0].title
-              );
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: DeleteIcon,
-            tooltip: 'Delete proposals',
-            onClick: () => {
-              confirm(
-                () => {
-                  deleteProposals();
-                },
-                {
-                  title: 'Delete proposals',
-                  description:
-                    'This action will delete proposals and all data associated with them.',
-                }
-              )();
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: GroupWorkIcon,
-            tooltip: 'Assign proposals to FAP',
-            onClick: () => {
-              setOpenAssignment(true);
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: ScienceIconComponent,
-            tooltip: `Assign/Remove ${i18n.format(
-              t('instrument'),
-              'lowercase'
-            )}`,
-            onClick: () => {
-              setOpenInstrumentAssignment(true);
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: ChangeProposalStatusIcon,
-            tooltip: 'Change proposal status',
-            onClick: () => {
-              setOpenChangeProposalStatus(true);
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            icon: EmailIcon,
-            tooltip: 'Notify users final result',
-            onClick: () => {
-              confirm(
-                () => {
-                  emailProposals();
-                },
-                {
-                  title: 'Notify results',
-                  description:
-                    'This action will trigger emails to be sent to principal investigators.',
-                }
-              )();
-            },
-            position: 'toolbarOnSelect',
-          },
-          {
-            tooltip: shouldShowSelectAllAction,
-            icon: DoneAllIcon,
-            hidden: false,
-            iconProps: {
-              hidden: allPrefetchedProposalsSelected,
-              defaultValue: totalCount,
-              className: allProposalSelectionLoading ? 'loading' : '',
-            },
-            onClick: async () => {
-              setAllProposalSelectionLoading(true);
-              if (allPrefetchedProposalsSelected) {
-                setSearchParams((searchParams) => {
-                  searchParams.delete('selection');
-
-                  return searchParams;
-                });
-                refreshTableData();
-              } else {
-                const selectedProposalsData =
-                  await fetchProposalCoreBasicData();
-
-                if (!selectedProposalsData) {
-                  return;
-                }
-
-                // NOTE: Adding the missing data in the tableData state variable because some proposal group actions use additional data than primaryKey.
-                const newTableData = selectedProposalsData?.map((sp) => {
-                  const foundProposalData = tableData.find(
-                    (td) => td.primaryKey === sp.primaryKey
-                  );
-
-                  if (foundProposalData) {
-                    return foundProposalData;
-                  } else {
-                    return sp as ProposalViewData;
-                  }
-                });
-
-                setTableData(newTableData);
-
-                setSearchParams((searchParams) => {
-                  searchParams.delete('selection');
-                  selectedProposalsData.forEach((proposal) => {
-                    searchParams.append(
-                      'selection',
-                      proposal.primaryKey.toString()
-                    );
-                  });
-
-                  return searchParams;
-                });
-                refreshTableData();
-              }
-
-              setAllProposalSelectionLoading(false);
-            },
-            position: 'toolbarOnSelect',
-          },
-        ]}
+        actions={tableActions}
         onChangeColumnHidden={(columnChange) => {
           const proposalColumns = columns.map(
             (proposalColumn: Column<ProposalViewData>) => ({
