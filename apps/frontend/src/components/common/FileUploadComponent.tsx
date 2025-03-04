@@ -276,7 +276,7 @@ export function NewFileEntry(props: {
           </ListItemAvatar>
           <ListItemText
             primary={rejectionMessage}
-            secondary="Ensure that the file is of the correct type, size and has an extension."
+            secondary="Please make sure your file is of correct type, has an extension and not zero bytes."
           />
           <ListItemSecondaryAction>
             <CancelIcon onClick={() => abort()} />
