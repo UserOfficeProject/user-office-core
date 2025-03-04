@@ -43,6 +43,7 @@ export function createProposalStub(
     },
     submitted: false,
     users: [],
+    coProposerInvites: [],
     samples: [],
     genericTemplates: [],
     call: call,
