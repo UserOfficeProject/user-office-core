@@ -301,11 +301,11 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
-  async getFapProposals(
-    fapId: number,
-    callId: number | null,
-    instrumentId: number | null
-  ): Promise<FapProposal[]> {
+  async getFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
@@ -321,14 +321,14 @@ export default class PostgresFapDataSource implements FapDataSource {
             this.where('ps.short_code', 'ilike', 'FAP_%');
           });
 
-        if (callId) {
-          query.andWhere('fp.call_id', callId);
+        if (filter.callId) {
+          query.andWhere('fp.call_id', filter.callId);
         }
-        if (instrumentId) {
-          query.andWhere('fp.instrument_id', instrumentId);
+        if (filter.instrumentId) {
+          query.andWhere('fp.instrument_id', filter.instrumentId);
         }
       })
-      .where('fp.fap_id', fapId)
+      .where('fp.fap_id', filter.fapId)
       .distinctOn('fp.proposal_pk');
 
     return fapProposals.map((fapProposal) =>
