@@ -6,24 +6,14 @@ import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
-export class CoProposerInviteAuthorization {
+export class CoProposerClaimAuthorization {
   constructor(
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization
   ) {}
 
-  public async hasReadRights(agent: UserWithRole | null, proposalPk: number) {
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
-    const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
-      agent,
-      proposalPk
-    );
-
-    return isUserOfficer || isMemberOfProposal;
-  }
-
-  public async hasWriteRights(agent: UserWithRole | null, proposalPk: number) {
+  public async hasCreateRights(agent: UserWithRole | null, proposalPk: number) {
     const isUserOfficer = await this.userAuth.isUserOfficer(agent);
     const hasProposalWriteRights = await this.proposalAuth.hasWriteRights(
       agent,

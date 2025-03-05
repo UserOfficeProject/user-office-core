@@ -1,8 +1,9 @@
 import 'reflect-metadata';
 
-import { CoProposerInviteAuthorization } from '../auth/CoProposerInviteAuthorization';
+import { CoProposerClaimAuthorization } from '../auth/CoProposerClaimAuthorization';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { RoleClaimAuthorization } from '../auth/RoleClaimAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -69,7 +70,8 @@ mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
 mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
 mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
-mapClass(Tokens.CoProposerInviteAuthorization, CoProposerInviteAuthorization);
+mapClass(Tokens.RoleClaimAuthorization, RoleClaimAuthorization);
+mapClass(Tokens.CoProposerClaimAuthorization, CoProposerClaimAuthorization);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
