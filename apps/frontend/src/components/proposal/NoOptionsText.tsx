@@ -9,7 +9,6 @@ interface NoOptionsTextProps {
   query: string;
   onAddEmail: (email: string) => void;
   onAddUser: (user: BasicUserDetails) => void;
-  previousCollaborators: BasicUserDetails[];
   exactEmailMatch?: BasicUserDetails;
   excludeEmails?: string[];
   minSearchLength?: number;
@@ -19,7 +18,6 @@ function NoOptionsText({
   query,
   onAddEmail,
   onAddUser,
-  previousCollaborators,
   exactEmailMatch,
   excludeEmails = [],
   minSearchLength = 3,
@@ -29,21 +27,6 @@ function NoOptionsText({
       <MenuItem onClick={() => onAddUser(exactEmailMatch)}>
         {getFullUserNameWithInstitution(exactEmailMatch)}
       </MenuItem>
-    );
-  }
-
-  if (!query) {
-    return (
-      <>
-        {previousCollaborators.map((collaborator) => (
-          <MenuItem
-            key={collaborator.id}
-            onClick={() => onAddUser(collaborator)}
-          >
-            {getFullUserNameWithInstitution(collaborator)}
-          </MenuItem>
-        ))}
-      </>
     );
   }
 

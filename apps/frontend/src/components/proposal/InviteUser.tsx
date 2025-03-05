@@ -7,17 +7,12 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
 import { getCurrentUser } from 'context/UserContextProvider';
-import {
-  BasicUserDetails,
-  GetPreviousCollaboratorsQueryVariables,
-  Invite,
-} from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { usePreviousCollaborators } from 'hooks/user/usePreviousCollaborators';
 import { isValidEmail, ValidEmailAddress } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
@@ -65,20 +60,27 @@ function InviteUser({
   >();
   const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>([]);
 
-  const previousCollaboratorsArgs: GetPreviousCollaboratorsQueryVariables =
-    useMemo(
-      () => ({
-        userId: getCurrentUser()?.user.id as number,
-        subtractUsers: excludeUserIds || [],
-      }),
-      [excludeUserIds]
-    );
-  const previousCollaborators = usePreviousCollaborators(
-    previousCollaboratorsArgs
-  );
-
   const fetchUserSearchResults = useCallback(async () => {
-    if (!query.trim().length || query.length < MIN_SEARCH_LENGTH) {
+    setExactEmailMatch(undefined);
+
+    if (!query.trim().length) {
+      const excludedUserIds = [
+        ...(excludeUserIds ?? []),
+        ...categorizeSelectedItems(selectedItems).users.map((user) => user.id),
+      ];
+
+      const { previousCollaborators } = await api().getPreviousCollaborators({
+        userId: getCurrentUser()?.user.id as number,
+        subtractUsers: excludedUserIds,
+      });
+
+      console.log(previousCollaborators);
+      setOptions(previousCollaborators?.users || []);
+
+      return;
+    }
+
+    if (query.length < MIN_SEARCH_LENGTH) {
       setOptions([]);
       setLoading(false);
 
@@ -95,7 +97,10 @@ function InviteUser({
 
         const userAlreadyExists =
           basicUserDetailsByEmail &&
-          selectedUsers.some((user) => user.id === basicUserDetailsByEmail.id);
+          selectedUsers
+            .map((user) => user.id)
+            .concat(excludeUserIds ?? [])
+            .includes(basicUserDetailsByEmail.id);
 
         if (userAlreadyExists === false) {
           setExactEmailMatch(
@@ -190,19 +195,13 @@ function InviteUser({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (query === '' && event.key === 'Enter') {
-      event.preventDefault();
-      handleSubmit();
-      onClose?.();
-
-      return;
-    }
-
     if (event.key === 'Enter' || event.key === ' ' || event.key === ',') {
       event.preventDefault();
       if (exactEmailMatch) {
         addToSelectedItems(exactEmailMatch);
         setExactEmailMatch(undefined);
+      } else if (options.length === 1) {
+        addToSelectedItems(options[0]);
       } else if (isValidEmail(query)) {
         addValidEmailToSelection(query);
       }
@@ -266,7 +265,6 @@ function InviteUser({
             <NoOptionsText
               query={query}
               onAddEmail={(email) => addValidEmailToSelection(email)}
-              previousCollaborators={previousCollaborators?.users ?? []}
               exactEmailMatch={exactEmailMatch}
               onAddUser={(user) => {
                 addToSelectedItems(user);
