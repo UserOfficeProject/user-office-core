@@ -242,7 +242,7 @@ export default {
     fapSecretary: 5,
     fapReviewer: 6,
     instrumentScientist: 7,
-    sampleSafetyReviewer: 8,
+    experimentSafetyReviewer: 8,
     internalReviewer: 9,
   },
   users: {

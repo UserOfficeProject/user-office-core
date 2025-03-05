@@ -56,7 +56,8 @@ const ProposalScientistComment = (props: ProposalScientistCommentProps) => {
                   <p>Tips: </p>
                   <p>1. Comments are managed by only instrument scientists.</p>
                   <p>
-                    2. Comments are not be accessible to users or sample safety.
+                    2. Comments are not be accessible to users or experiment
+                    safety reviewers.
                   </p>
                   <p>
                     3. Comments will be available for editing in all proposal

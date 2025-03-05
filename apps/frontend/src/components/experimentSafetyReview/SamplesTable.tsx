@@ -15,7 +15,7 @@ const defaultColumns: Column<SampleWithProposalData>[] = [
   { title: 'Created', field: 'created' },
 ];
 
-const SamplesTable = (
+const ExperimentSafetyFormsTable = (
   props: Omit<MaterialTableProps<SampleWithProposalData>, 'columns'> & {
     columns?: Column<SampleWithProposalData>[];
   }
@@ -24,13 +24,13 @@ const SamplesTable = (
   const search = searchParam.get('search');
 
   return (
-    <div data-cy="samples-table">
+    <div data-cy="experiment-safety-forms-table">
       <MaterialTable
         columns={props.columns ? props.columns : defaultColumns}
         icons={tableIcons}
         title={
           <Typography variant="h6" component="h2">
-            Samples
+            Experiment Safety Forms
           </Typography>
         }
         onSearchChange={(searchText) => {
@@ -51,7 +51,7 @@ const SamplesTable = (
 };
 
 export default React.memo(
-  SamplesTable,
+  ExperimentSafetyFormsTable,
   (prevProps, nextProps) =>
     prevProps.isLoading === nextProps.isLoading &&
     prevProps.data === nextProps.data

@@ -50,7 +50,7 @@ test('User should be able to update title of the sample', () => {
   ).resolves.toHaveProperty('title', newTitle);
 });
 
-test('User should not be able to update the sample safety status and comment', async () => {
+test('User should not be able to update the experiment safety status and comment', async () => {
   const newComment = 'Updated comment';
 
   return expect(
@@ -62,7 +62,7 @@ test('User should not be able to update the sample safety status and comment', a
   ).resolves.not.toHaveProperty('safetyStatus', SampleStatus.HIGH_RISK);
 });
 
-test('Sample safety reviewer should be able to update the sample safety status and comment', async () => {
+test('Experiment safety reviewer should be able to update the experiment safety status and comment', async () => {
   const newComment = 'Updated comment';
 
   return expect(

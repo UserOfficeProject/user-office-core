@@ -27,6 +27,7 @@ import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
@@ -39,14 +40,14 @@ type MenuItemsProps = {
   currentRole: UserRole | null;
 };
 
-const SamplesMenuListItem = () => {
+const ExperimentSafetyReviewMenuListItem = () => {
   return (
-    <Tooltip title="Sample safety">
-      <ListItemButton component={NavLink} to="/SampleSafety">
+    <Tooltip title="Experiment Safety Review">
+      <ListItemButton component={NavLink} to="/ExperimentSafetyReview">
         <ListItemIcon>
           <BoxIcon />
         </ListItemIcon>
-        <ListItemText primary="Sample safety" />
+        <ListItemText primary="Experiment Safety" />
       </ListItemButton>
     </Tooltip>
   );
@@ -82,14 +83,28 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isSampleSafetyEnabled = context.featuresMap.get(
-    FeatureId.SAMPLE_SAFETY
+  const isExperimentSafetyReviewEnabled = context.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
 
   const isXpressRouteEnabled = useXpressAccess([
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
+
+  const calls = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+    },
+    CallsDataQuantity.MINIMAL
+  ).calls;
+
+  const openCall = calls?.find((call) => call.isActive);
+
+  const xpressUrl =
+    openCall && openCall.id
+      ? `/XpressProposals?call=${openCall?.id}`
+      : '/XpressProposals';
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
@@ -150,7 +165,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       </Tooltip>
       {isXpressRouteEnabled && (
         <Tooltip title="Xpress Proposals">
-          <ListItemButton component={NavLink} to="/XpressProposals">
+          <ListItemButton component={NavLink} to={xpressUrl}>
             <ListItemIcon>
               <Topic />
             </ListItemIcon>
@@ -252,7 +267,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Questions" />
         </ListItemButton>
       </Tooltip>
-      {isSampleSafetyEnabled && <SamplesMenuListItem />}
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
       <SettingsMenuListItem />
     </div>
   );
@@ -285,7 +302,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         <ListItemText primary="Proposals" />
       </ListItemButton>
       {isXpressRouteEnabled && (
-        <ListItemButton component={NavLink} to="/XpressProposals">
+        <ListItemButton component={NavLink} to={xpressUrl}>
           <ListItemIcon>
             <Topic />
           </ListItemIcon>
@@ -308,12 +325,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Upcoming experiments" />
         </ListItemButton>
       )}
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
     </div>
   );
 
-  const sampleSafetyReviewer = (
+  const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
-      <SamplesMenuListItem />
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
     </div>
   );
 
@@ -334,8 +356,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     case UserRole.FAP_SECRETARY:
     case UserRole.FAP_REVIEWER:
       return FapRoles;
-    case UserRole.SAMPLE_SAFETY_REVIEWER:
-      return sampleSafetyReviewer;
+    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
+      return ExperimentSafetyReviewPageReviewer;
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
     default:

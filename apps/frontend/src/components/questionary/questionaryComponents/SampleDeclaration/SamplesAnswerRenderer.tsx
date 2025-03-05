@@ -6,7 +6,7 @@ import ListItem from '@mui/material/ListItem';
 import React, { useState } from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
-import SampleDetails from 'components/sample/SampleDetails';
+import SampleDetails from 'components/experimentSafetyReview/SampleDetails';
 import { Answer } from 'generated/sdk';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { SampleCore } from 'models/questionary/sample/SampleCore';

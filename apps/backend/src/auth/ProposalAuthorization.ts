@@ -5,6 +5,7 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { Roles } from '../models/Role';
@@ -30,6 +31,8 @@ export class ProposalAuthorization {
     private visitDataSource: VisitDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
+    @inject(Tokens.TechniqueDataSource)
+    private techniqueDataSource: TechniqueDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
@@ -156,6 +159,26 @@ export class ProposalAuthorization {
       });
   }
 
+  async isScientistToProposalTechnique(
+    agent: UserJWT | null,
+    proposalPk: number
+  ) {
+    if (agent == null || !agent.id) {
+      return false;
+    }
+
+    const scientistTechniques =
+      await this.techniqueDataSource.getTechniquesByScientist(agent.id);
+    const proposalTechniques =
+      await this.techniqueDataSource.getTechniquesByProposalPk(proposalPk);
+
+    return proposalTechniques.some((technique) =>
+      scientistTechniques.some(
+        (scientistTechnique) => scientistTechnique.id === technique.id
+      )
+    );
+  }
+
   async isVisitorOfProposal(agent: UserWithRole, proposalPk: number) {
     return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
@@ -224,7 +247,12 @@ export class ProposalAuthorization {
           (await this.isInstrumentManagerToProposal(
             agent,
             proposal.primaryKey
-          )) || (await this.isScientistToProposal(agent, proposal.primaryKey));
+          )) ||
+          (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
+          (await this.isScientistToProposalTechnique(
+            agent,
+            proposal.primaryKey
+          ));
         break;
       case Roles.INTERNAL_REVIEWER:
         hasAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
@@ -240,7 +268,7 @@ export class ProposalAuthorization {
       case Roles.USER_OFFICER:
         hasAccess = true;
         break;
-      case Roles.SAMPLE_SAFETY_REVIEWER:
+      case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
       default:

@@ -41,7 +41,7 @@ export default class ShipmentQueries {
     return shipments;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
+  @Authorized([Roles.USER_OFFICER, Roles.EXPERIMENT_SAFETY_REVIEWER])
   async getShipmentsByCallId(user: UserWithRole | null, callId: number) {
     return await this.dataSource.getShipmentsByCallId(callId);
   }
