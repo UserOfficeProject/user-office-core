@@ -1,7 +1,8 @@
 import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
-import { CoProposerInviteAuthorization } from '../auth/CoProposerInviteAuthorization';
+import { CoProposerClaimAuthorization } from '../auth/CoProposerClaimAuthorization';
+import { RoleClaimAuthorization } from '../auth/RoleClaimAuthorization';
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
@@ -67,7 +68,8 @@ mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, StfcInstrumentDataSource);
 mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
 mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
-mapClass(Tokens.CoProposerInviteAuthorization, CoProposerInviteAuthorization);
+mapClass(Tokens.RoleClaimAuthorization, RoleClaimAuthorization);
+mapClass(Tokens.CoProposerClaimAuthorization, CoProposerClaimAuthorization);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, StfcProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
