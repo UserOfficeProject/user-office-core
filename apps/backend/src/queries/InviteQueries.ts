@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
-import { CoProposerInviteAuthorization } from '../auth/CoProposerInviteAuthorization';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
@@ -14,16 +14,13 @@ export default class InviteQueries {
     public coProposerClaimDataSource: CoProposerClaimDataSource,
     @inject(Tokens.InviteDataSource)
     public dataSource: InviteDataSource,
-    @inject(Tokens.CoProposerInviteAuthorization)
-    private coProposerInviteAuth: CoProposerInviteAuthorization
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @Authorized()
   async getCoProposerInvites(agent: UserWithRole | null, proposalPk: number) {
-    const hasReadRights = this.coProposerInviteAuth.hasReadRights(
-      agent,
-      proposalPk
-    );
+    const hasReadRights = this.proposalAuth.hasReadRights(agent, proposalPk);
 
     if (!hasReadRights) {
       return [];
