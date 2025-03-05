@@ -1,7 +1,8 @@
 import { MenuItem, Typography } from '@mui/material';
-import React from 'react';
+import React, { useContext } from 'react';
 
-import { BasicUserDetails } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId } from 'generated/sdk';
 import { isValidEmail } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
@@ -22,6 +23,11 @@ function NoOptionsText({
   excludeEmails = [],
   minSearchLength = 3,
 }: NoOptionsTextProps) {
+  const featureContext = useContext(FeatureContext);
+  const isEmailInviteEnabled = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
+
   if (exactEmailMatch) {
     return (
       <MenuItem onClick={() => onAddUser(exactEmailMatch)}>
@@ -39,14 +45,18 @@ function NoOptionsText({
       return <>{query} has already been invited</>;
     }
 
-    return (
-      <Typography
-        sx={{ marginTop: 1, color: 'primary.main', cursor: 'pointer' }}
-        onClick={() => onAddEmail(query)}
-      >
-        Invite {query} via email
-      </Typography>
-    );
+    if (isEmailInviteEnabled) {
+      return (
+        <Typography
+          sx={{ marginTop: 1, color: 'primary.main', cursor: 'pointer' }}
+          onClick={() => onAddEmail(query)}
+        >
+          Invite {query} via email
+        </Typography>
+      );
+    } else {
+      return <>No results found for &quot;{query}&quot;</>;
+    }
   }
 
   if ((query as string).includes('@')) {
