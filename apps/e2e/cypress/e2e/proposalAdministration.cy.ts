@@ -1256,13 +1256,6 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to download proposal pdf with valid API token', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-        /*temporarily skipping, until issue is fixed on github stfc actions (no such file or directory, open '/config/logos)
-        This test is passing when you run it in local environment.
-       */
-        this.skip();
-      }
-
       const accessTokenName = faker.lorem.words(2);
       cy.createApiAccessToken({
         name: accessTokenName,
