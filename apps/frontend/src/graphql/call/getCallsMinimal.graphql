@@ -10,5 +10,6 @@ query getCallsMinimal($filter: CallsFilter) {
     description
     cycleComment
     allocationTimeUnit
+    isActive
   }
 }
