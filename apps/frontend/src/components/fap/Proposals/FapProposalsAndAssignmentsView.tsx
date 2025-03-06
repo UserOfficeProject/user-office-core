@@ -6,6 +6,7 @@ import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import { Fap } from 'generated/sdk';
 import { useCallsData } from 'hooks/call/useCallsData';
+import { FapProposals } from 'hooks/fap/useFapProposalsData';
 import { useFapInstruments } from 'hooks/instrument/useFapInstruments';
 
 import FapProposalsAndAssignmentsTable from './FapProposalsAndAssignmentsTable';
@@ -14,11 +15,13 @@ type FapProposalsAndAssignmentsProps = {
   /** Id of the Fap we are assigning members to */
   data: Fap;
   onFapUpdate: (fap: Fap) => void;
+  fapProposals: FapProposals;
 };
 
 const FapProposalsAndAssignments = ({
   data: fapData,
   onFapUpdate,
+  fapProposals,
 }: FapProposalsAndAssignmentsProps) => {
   const { loadingCalls, calls } = useCallsData({ fapIds: [fapData.id] });
   // NOTE: Default null means load all calls if nothing is selected
@@ -57,6 +60,7 @@ const FapProposalsAndAssignments = ({
         onAssignmentsUpdate={onFapUpdate}
         selectedCallId={call ? +call : null}
         selectedInstrumentId={instrument ? +instrument : null}
+        fapProposals={fapProposals}
       />
     </>
   );

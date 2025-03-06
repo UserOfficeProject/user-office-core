@@ -12,15 +12,17 @@ export type FapProposalAssignmentType = Unpacked<
   NonNullable<FapProposalType['assignments']>
 >;
 
+export type FapProposals = {
+  loadingFapProposals: boolean;
+  FapProposalsData: FapProposalType[];
+  setFapProposalsData: Dispatch<SetStateAction<FapProposalType[]>>;
+};
+
 export function useFapProposalsData(
   fapId: number,
   callId: number | null,
   instrumentId: number | null
-): {
-  loadingFapProposals: boolean;
-  FapProposalsData: FapProposalType[];
-  setFapProposalsData: Dispatch<SetStateAction<FapProposalType[]>>;
-} {
+): FapProposals {
   const api = useDataApi();
   const [FapProposalsData, setFapProposalsData] = useState<FapProposalType[]>(
     []
