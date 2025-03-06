@@ -200,6 +200,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
             return (
               <ActionDiv>
                 {approveButton}
+                {cancelButton}
                 {editButton}
               </ActionDiv>
             );
