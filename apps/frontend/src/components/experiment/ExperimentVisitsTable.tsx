@@ -1,5 +1,6 @@
 import MaterialTable from '@material-table/core';
-import { CheckCircleOutline } from '@mui/icons-material';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import { IconButton, styled, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -33,6 +34,10 @@ interface ScheduledEventDetailsTableProps extends WithConfirmProps {
 const VisitorName = styled(Link)(({ theme }) => ({
   color: theme.palette.primary.main,
 }));
+
+const ActionDiv = styled('div')({
+  display: 'flex',
+});
 
 function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
   const { confirm } = params;
@@ -77,6 +82,43 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
     });
   };
 
+  const replaceVisitRegistration = (
+    newRegistration: NonNullable<ScheduledEvent['visit']>['registrations'][0]
+  ): void => {
+    setScheduledEvent((prev) => {
+      if (!prev.visit) {
+        return prev;
+      }
+
+      const next = {
+        ...prev,
+        visit: {
+          ...prev.visit,
+          registrations: prev.visit.registrations.map((registration) =>
+            registration.userId === newRegistration.userId
+              ? newRegistration
+              : registration
+          ),
+        },
+      };
+
+      return next;
+    });
+  };
+
+  const cancelVisit = async (visitId: number, userId: number) => {
+    const cancelledRegistration = (
+      await api().cancelVisitRegistration({
+        visitRegistration: {
+          visitId,
+          userId,
+        },
+      })
+    ).cancelVisitRegistration;
+
+    replaceVisitRegistration(cancelledRegistration);
+  };
+
   const approveVisit = async (visitId: number, userId: number) => {
     const approvedRegistration = (
       await api().approveVisitRegistrations({
@@ -89,31 +131,20 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
       })
     ).approveVisitRegistrations[0];
 
-    setScheduledEvent((prev) => {
-      if (!prev.visit) {
-        return prev;
-      }
-
-      const next = {
-        ...prev,
-        visit: {
-          ...prev.visit,
-          registrations: prev.visit.registrations.map((registration) =>
-            registration.userId === approvedRegistration.userId
-              ? approvedRegistration
-              : registration
-          ),
-        },
-      };
-
-      return next;
-    });
+    replaceVisitRegistration(approvedRegistration);
   };
 
   const onApproveVisitClick = async (visitId: number, userId: number) => {
     confirm(async () => approveVisit(visitId, userId), {
       title: 'Approve visit registration',
       description: 'Are you sure you want to approve this visit registration?',
+    })();
+  };
+
+  const onCancelVisitClick = async (visitId: number, userId: number) => {
+    confirm(async () => cancelVisit(visitId, userId), {
+      title: 'Cancel visit registration',
+      description: 'Are you sure you want to cancel this visit registration?',
     })();
   };
 
@@ -138,29 +169,46 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
           </ButtonWithDialog>
         );
 
+        const approveButton = (
+          <IconButton
+            onClick={() => onApproveVisitClick(rowData.visitId, rowData.userId)}
+            component="button"
+            data-cy="approve-visit-registration-button"
+          >
+            <Tooltip title="Approve visit registration">
+              <CheckIcon />
+            </Tooltip>
+          </IconButton>
+        );
+
+        const cancelButton = (
+          <IconButton
+            onClick={() => onCancelVisitClick(rowData.visitId, rowData.userId)}
+            component="button"
+            data-cy="cancel-visit-registration-button"
+          >
+            <Tooltip title="Cancel visit registration">
+              <ClearIcon />
+            </Tooltip>
+          </IconButton>
+        );
+
         switch (rowData.status) {
           case VisitRegistrationStatus.DRAFTED:
-          case VisitRegistrationStatus.APPROVED:
-          case VisitRegistrationStatus.CANCELLED_BY_USER:
-          case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
             return editButton;
           case VisitRegistrationStatus.SUBMITTED:
             return (
-              <>
+              <ActionDiv>
+                {approveButton}
                 {editButton}
-                <IconButton
-                  onClick={() =>
-                    onApproveVisitClick(rowData.visitId, rowData.userId)
-                  }
-                  component="button"
-                  data-cy="approve-visit-registration-button"
-                >
-                  <Tooltip title="Approve visit registration">
-                    <CheckCircleOutline />
-                  </Tooltip>
-                </IconButton>
-              </>
+              </ActionDiv>
             );
+          case VisitRegistrationStatus.APPROVED:
+            return cancelButton;
+          case VisitRegistrationStatus.CANCELLED_BY_USER:
+          case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
+            return null;
+
           default:
             return null;
         }

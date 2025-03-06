@@ -1,6 +1,6 @@
-import BrowserNotSupportedIcon from '@mui/icons-material/BrowserNotSupported';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 import { TimeIcon } from '@mui/x-date-pickers';
 import React from 'react';
 
@@ -20,7 +20,7 @@ export default function VisitStatusIcon(props: IVisitStatusIconProps) {
       return <CheckBoxIcon style={{ color: 'green' }} />;
     case VisitRegistrationStatus.CANCELLED_BY_USER:
     case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-      return <BrowserNotSupportedIcon style={{ color: 'green' }} />;
+      return <DisabledByDefaultIcon style={{ color: 'black' }} />;
     default:
       return null;
   }

@@ -22,7 +22,7 @@ import {
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
 import { ApproveVisitRegistrationInput } from '../resolvers/mutations/ApproveVisitRegistrationMutations';
-import { CancelVisitRegistrationArgs } from '../resolvers/mutations/CancelVisitRegistration';
+import { CancelVisitRegistrationInput } from '../resolvers/mutations/CancelVisitRegistrationMutation';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
 import { SubmitVisitRegistrationArgs } from '../resolvers/mutations/SubmitVisitRegistration';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
@@ -345,27 +345,27 @@ export default class VisitMutations {
   @EventBus(Event.VISIT_REGISTRATION_CANCELLED)
   async cancelVisitRegistration(
     user: UserWithRole | null,
-    args: CancelVisitRegistrationArgs
+    input: CancelVisitRegistrationInput
   ) {
     const hasWriteRights = await this.registrationAuth.hasWriteRights(
       user,
-      args
+      input
     );
     if (hasWriteRights === false) {
       return rejection(
         'Chould not cancel Visit Registration due to insufficient permissions',
-        { args, user }
+        { args: input, user }
       );
     }
 
     const newStatus =
-      args.userId === user!.id
+      input.userId === user!.id
         ? VisitRegistrationStatus.CANCELLED_BY_USER
         : VisitRegistrationStatus.CANCELLED_BY_FACILITY;
 
     return this.dataSource.updateRegistration({
-      userId: args.userId,
-      visitId: args.visitId,
+      userId: input.userId,
+      visitId: input.visitId,
       status: newStatus,
     });
   }
