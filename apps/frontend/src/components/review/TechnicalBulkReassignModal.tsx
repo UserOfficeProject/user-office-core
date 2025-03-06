@@ -143,7 +143,7 @@ export const TechnicalBulkReassignModal = ({
       render: (data) => data.instrumentName,
     },
     {
-      title: 'Technial Reviewer',
+      title: 'New Technial Reviewer',
       sorting: false,
       render: (data) => {
         const instrument = instruments?.find(

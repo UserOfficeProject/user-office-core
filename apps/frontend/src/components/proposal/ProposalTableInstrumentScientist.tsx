@@ -668,7 +668,6 @@ const ProposalTableInstrumentScientist = ({
   };
 
   const handleBulkTechnicalReviewsReassign = () => {
-    console.log(selectedProposals);
     const currentUserAssignedSelectTechReviews: ReviewData[] = [];
 
     for (const proposal of selectedProposals) {
@@ -920,9 +919,9 @@ const ProposalTableInstrumentScientist = ({
                 return searchParam;
               });
           }}
-          instrumentIds={[
-            ...new Set(bulkReassignData.map((rev) => rev.instrument.id)),
-          ]}
+          instrumentIds={Array.from(
+            new Set(bulkReassignData.map((rev) => rev.instrument.id))
+          )}
           removeReview={(reviewId) =>
             setBulkReassignData(
               bulkReassignData.filter((rev) => rev.review.id !== reviewId)

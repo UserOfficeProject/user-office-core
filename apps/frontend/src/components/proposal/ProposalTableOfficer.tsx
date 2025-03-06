@@ -622,7 +622,6 @@ const ProposalTableOfficer = ({
       }
     }
     setBulkReassignData(currentUserAssignedSelectTechReviews);
-    console.log(bulkReassignData);
   };
 
   columns = setSortDirectionOnSortField(
@@ -1048,9 +1047,9 @@ const ProposalTableOfficer = ({
                 return searchParam;
               });
           }}
-          instrumentIds={[
-            ...new Set(bulkReassignData.map((rev) => rev.instrument.id)),
-          ]}
+          instrumentIds={Array.from(
+            new Set(bulkReassignData.map((rev) => rev.instrument.id))
+          )}
           removeReview={(reviewId) =>
             setBulkReassignData(
               bulkReassignData.filter((rev) => rev.review.id !== reviewId)
