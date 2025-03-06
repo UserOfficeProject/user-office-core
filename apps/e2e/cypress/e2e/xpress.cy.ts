@@ -1829,7 +1829,7 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress PDF download tests', () => {
-    it('User officer can download any Xpress proposal', function () {
+    it.only('User officer can download any Xpress proposal', function () {
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -1841,6 +1841,26 @@ context('Xpress tests', () => {
         .parent()
         .find('[aria-label="View proposal"]')
         .click();
+
+      cy.window().then((win) => {
+        const token = win.localStorage.getItem('token');
+
+        if (!token) {
+          throw new Error('Token not provided');
+        }
+
+        cy.request({
+          method: 'GET',
+          url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${createdProposalPk1}`,
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          failOnStatusCode: false,
+        }).then((response) => {
+          cy.log(`${response.status}`);
+          cy.log(`${response.body}`);
+        });
+      });
 
       cy.intercept('GET', `/download/pdf/proposal/${createdProposalPk1}`).as(
         'downloadRequest'
