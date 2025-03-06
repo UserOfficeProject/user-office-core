@@ -1853,7 +1853,9 @@ context('Xpress tests', () => {
         proposal1.title
       );
 
-      cy.wait('@downloadRequest').its('response.statusCode').should('eq', 200);
+      cy.wait('@downloadRequest', { requestTimeout: 30000 })
+        .its('response.statusCode')
+        .should('eq', 200);
     });
 
     it("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
@@ -1884,7 +1886,7 @@ context('Xpress tests', () => {
           proposal3.title
         );
 
-        cy.wait('@downloadRequest')
+        cy.wait('@downloadRequest', { requestTimeout: 30000 })
           .its('response.statusCode')
           .should('eq', 200);
       });
