@@ -96,12 +96,10 @@ export class VisitRegistrationAuthorization {
       return false;
     }
 
-    /*
-     * User can modify is own visitregistration if it is in Draft
-     */
     return (
       visitregistration.userId === agent.id &&
-      visitregistration.status === VisitRegistrationStatus.DRAFTED
+      (visitregistration.status === VisitRegistrationStatus.DRAFTED ||
+        visitregistration.status === VisitRegistrationStatus.CHANGE_REQUESTED)
     );
   }
 }

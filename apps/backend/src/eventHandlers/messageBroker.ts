@@ -327,6 +327,22 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+
+      case Event.VISIT_REGISTRATION_CANCELLED: {
+        const { visitregistration: visitRegistration } = event;
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: visitRegistration.userId,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          jsonMessage
+        );
+        break;
+      }
     }
   };
 }
