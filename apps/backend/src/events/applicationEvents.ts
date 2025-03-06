@@ -377,6 +377,11 @@ interface VisitRegistrationApprovedEvent extends GeneralEvent {
   visitregistration: VisitRegistration;
 }
 
+interface VisitRegistrationCancelledEvent extends GeneralEvent {
+  type: Event.VISIT_REGISTRATION_CANCELLED;
+  visitregistration: VisitRegistration;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -447,4 +452,5 @@ export type ApplicationEvent =
   | InternalReviewCreated
   | InternalReviewUpdated
   | InternalReviewDeleted
-  | VisitRegistrationApprovedEvent;
+  | VisitRegistrationApprovedEvent
+  | VisitRegistrationCancelledEvent;

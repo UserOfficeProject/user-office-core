@@ -80,6 +80,7 @@ export enum Event {
   INSTRUMENTS_REMOVED_FROM_TECHNIQUE = 'INSTRUMENTS_REMOVED_FROM_TECHNIQUE',
   PROPOSAL_ASSIGNED_TO_TECHNIQUES = 'PROPOSAL_ASSIGNED_TO_TECHNIQUES',
   VISIT_REGISTRATION_APPROVED = 'VISIT_REGISTRATION_APPROVED',
+  VISIT_REGISTRATION_CANCELLED = 'VISIT_REGISTRATION_CANCELLED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -330,5 +331,9 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.VISIT_REGISTRATION_APPROVED,
     'Event occurs when visit registration is approved',
+  ],
+  [
+    Event.VISIT_REGISTRATION_CANCELLED,
+    'Event occurs when visit registration is cancelled',
   ],
 ]);
