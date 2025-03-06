@@ -85,7 +85,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const callId = searchParams.get('callId');
+  const callId = searchParams.get('call');
   const instrument = searchParams.get('instrument');
   const technique = searchParams.get('technique');
   const proposalId = searchParams.get('proposalId');
