@@ -10,7 +10,6 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Visit as VisitOrigin } from '../../models/Visit';
-import { VisitStatus } from '../../models/Visit';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Proposal } from './Proposal';
 import { Sample } from './Sample';
@@ -23,9 +22,6 @@ export class Visit implements Partial<VisitOrigin> {
 
   @Field(() => Int)
   public proposalPk: number;
-
-  @Field(() => VisitStatus)
-  public status: VisitStatus;
 
   @Field(() => Int)
   public creatorId: number;

@@ -8,11 +8,13 @@ export class CreateVisitRegistrationMutation {
   @Mutation(() => VisitRegistration)
   createVisitRegistration(
     @Arg('visitId', () => Int) visitId: number,
+    @Arg('userId', () => Int) userId: number,
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.visit.createVisitRegistration(
       context.user,
-      visitId
+      visitId,
+      userId
     );
   }
 }

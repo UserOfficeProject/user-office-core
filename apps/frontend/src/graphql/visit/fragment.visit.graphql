@@ -1,6 +1,5 @@
 fragment visit on Visit {
   id
   proposalPk
-  status
   creatorId
 }

@@ -218,7 +218,7 @@ const ProposalReviewContent = ({
     <div>No technical reviews found for the selected proposal</div>
   );
 
-  const GradeTab = (
+  const GradeTab = reviewId && (
     <ProposalReviewContainer fapId={fapId} reviewId={reviewId} />
   );
 
