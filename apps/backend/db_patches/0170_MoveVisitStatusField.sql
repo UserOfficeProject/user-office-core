@@ -7,7 +7,7 @@ BEGIN
       ALTER TABLE visits_has_users DROP COLUMN is_registration_submitted;
 
       ALTER TABLE visits_has_users 
-        ADD COLUMN status VARCHAR(20) DEFAULT 'DRAFTED' NOT NULL;
+        ADD COLUMN status VARCHAR(50) DEFAULT 'DRAFTED' NOT NULL;
 
       ALTER TABLE visits_has_users 
         ADD CONSTRAINT chk_status 
