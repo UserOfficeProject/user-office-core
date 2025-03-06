@@ -30,6 +30,11 @@ enum RABBITMQ_VISIT_EVENT_TYPE {
   VISIT_DELETED = 'VISIT_DELETED',
 }
 
+enum RABBITMQ_VISIT_EVENT_TYPE {
+  VISIT_CREATED = 'VISIT_CREATED',
+  VISIT_DELETED = 'VISIT_DELETED',
+}
+
 type Member = {
   id: string;
   firstName: string;
