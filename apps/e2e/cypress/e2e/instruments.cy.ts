@@ -539,7 +539,7 @@ context('Instrument tests', () => {
       // TODO: Extend here when technical reviewer is added to the table.
     });
 
-    it.only('Technical review assignee should be able to bulk reassigne rechnical reviews', function () {
+    it('Technical review assignee should be able to bulk reassigne rechnical reviews', function () {
       cy.assignProposalsToInstruments({
         proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
@@ -670,7 +670,7 @@ context('Instrument tests', () => {
       );
       cy.get(`[data-cy="user-list-${createdInstrumentId}"]`).click();
 
-      cy.contains(scientist1.lastName).click();
+      cy.get('#user-list-1-option-0').click();
 
       cy.get('[data-cy="bulk-update"]').click();
 
@@ -1356,7 +1356,7 @@ context('Instrument tests', () => {
         .should('exist');
     });
 
-    it('Technical review assignee should be able to bulk reassigne rechnical reviews', function () {
+    it('Technical review assignee should be able to bulk reassign technical reviews', function () {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           const createdProposal2Pk = result.createProposal.primaryKey;
@@ -1459,7 +1459,7 @@ context('Instrument tests', () => {
       );
       cy.get(`[data-cy="user-list-${createdInstrumentId}"]`).click();
 
-      cy.contains(scientist1.lastName).click();
+      cy.get('#user-list-1-option-1').click();
 
       cy.get('[data-cy="bulk-update"]').click();
 
