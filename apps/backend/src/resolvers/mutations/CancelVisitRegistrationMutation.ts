@@ -1,8 +1,8 @@
 import {
-  Args,
-  ArgsType,
+  Arg,
   Ctx,
   Field,
+  InputType,
   Int,
   Mutation,
   Resolver,
@@ -11,22 +11,28 @@ import {
 import { ResolverContext } from '../../context';
 import { VisitRegistration } from '../types/VisitRegistration';
 
-@ArgsType()
-export class CancelVisitRegistrationArgs {
+@InputType()
+export class CancelVisitRegistrationInput
+  implements Partial<VisitRegistration>
+{
   @Field(() => Int!)
-  userId: number;
+  public visitId: number;
 
   @Field(() => Int!)
-  visitId: number;
+  public userId: number;
 }
 
 @Resolver()
 export class CancelVisitRegistrationMutation {
   @Mutation(() => VisitRegistration)
   cancelVisitRegistration(
-    @Args() args: CancelVisitRegistrationArgs,
+    @Arg('visitRegistration', () => CancelVisitRegistrationInput)
+    visitRegistration: CancelVisitRegistrationInput,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.visit.cancelVisitRegistration(context.user, args);
+    return context.mutations.visit.cancelVisitRegistration(
+      context.user,
+      visitRegistration
+    );
   }
 }
