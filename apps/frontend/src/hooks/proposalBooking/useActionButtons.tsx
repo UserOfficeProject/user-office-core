@@ -170,6 +170,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       } else {
         switch (registration.status) {
           case VisitRegistrationStatus.DRAFTED:
+          case VisitRegistrationStatus.CHANGE_REQUESTED:
             buttonState = 'active';
             break;
           case VisitRegistrationStatus.SUBMITTED:
@@ -179,7 +180,8 @@ export function useActionButtons(args: UseActionButtonsArgs) {
           case VisitRegistrationStatus.APPROVED:
             buttonState = 'completed';
             break;
-          case VisitRegistrationStatus.DISAPPROVED:
+          case VisitRegistrationStatus.CANCELLED_BY_USER:
+          case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
             buttonState = 'inactive';
             stateReason =
               'This action is disabled because registration is cancelled';

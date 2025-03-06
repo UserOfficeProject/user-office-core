@@ -141,7 +141,8 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
         switch (rowData.status) {
           case VisitRegistrationStatus.DRAFTED:
           case VisitRegistrationStatus.APPROVED:
-          case VisitRegistrationStatus.DISAPPROVED:
+          case VisitRegistrationStatus.CANCELLED_BY_USER:
+          case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
             return editButton;
           case VisitRegistrationStatus.SUBMITTED:
             return (

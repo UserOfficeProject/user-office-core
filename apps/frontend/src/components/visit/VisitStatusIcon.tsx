@@ -18,7 +18,8 @@ export default function VisitStatusIcon(props: IVisitStatusIconProps) {
       return <CheckBoxOutlineBlankIcon style={{ color: 'gray' }} />;
     case VisitRegistrationStatus.APPROVED:
       return <CheckBoxIcon style={{ color: 'green' }} />;
-    case VisitRegistrationStatus.DISAPPROVED:
+    case VisitRegistrationStatus.CANCELLED_BY_USER:
+    case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
       return <BrowserNotSupportedIcon style={{ color: 'green' }} />;
     default:
       return null;
