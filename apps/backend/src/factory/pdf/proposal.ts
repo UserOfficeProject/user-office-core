@@ -153,7 +153,7 @@ const addTopicInformation = async (
     if (!step) {
       logger.logError('step not found', { ...questionarySteps }); // TODO: fix type of the second param in the lib (don't use Record<string, unknown>)
 
-      throw 'Could not download generated PDF because of no steps when adding topic info';
+      throw 'Could not download generated PDF';
     }
 
     const topic = step.topic;
@@ -365,7 +365,7 @@ export const collectProposalPDFData = async (
     if (!step) {
       logger.logError('step not found', { ...questionarySteps }); // TODO: fix type of the second param in the lib (don't use Record<string, unknown>)
 
-      throw 'Could not download generated PDF because of no steps when collecting proposal PDF data';
+      throw 'Could not download generated PDF';
     }
 
     const topic = step.topic;

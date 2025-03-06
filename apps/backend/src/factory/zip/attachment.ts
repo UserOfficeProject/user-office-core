@@ -45,7 +45,7 @@ const addProposalAttachments = (
     if (!step) {
       logger.logError('step not found', { ...questionarySteps });
 
-      throw 'Could not download generated PDF because there were no steps found when adding attachments';
+      throw 'Could not download generated PDF';
     }
 
     const topic = step.topic;
