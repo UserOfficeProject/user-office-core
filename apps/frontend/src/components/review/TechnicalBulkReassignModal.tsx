@@ -166,12 +166,7 @@ export const TechnicalBulkReassignModal = ({
             id={`user-list-${data.instrumentId}`}
             options={userList}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Technical reviewer"
-                margin="none"
-                data-cy="tech-reviewer-" //need?
-              />
+              <TextField {...params} label="Technical reviewer" margin="none" />
             )}
             getOptionLabel={(option) => getFullUserName(option)}
             onChange={(_event, newValue) => {
@@ -181,10 +176,8 @@ export const TechnicalBulkReassignModal = ({
                 );
               }
             }}
-            // value={userIdToUser(selectedUser)}
             disableClearable
             data-cy={`user-list-${data.instrumentId}`}
-            // ListboxProps={{ title: 'user-list-options' }}
           />
         );
       },
@@ -194,7 +187,6 @@ export const TechnicalBulkReassignModal = ({
   const proposalColumns: Column<ReviewData>[] = [
     {
       title: 'Actions',
-      // cellStyle: { padding: 0, width: 60 },
       width: '10%',
       sorting: false,
       removable: false,
