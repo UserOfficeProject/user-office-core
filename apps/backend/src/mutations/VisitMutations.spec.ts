@@ -143,3 +143,91 @@ test('Not authorized user can not create visit registartion', async () => {
     mutations.createVisitRegistration(null, 1, 2)
   ).resolves.toBeInstanceOf(Rejection);
 });
+
+test('User officer can cancel the visit registartion', async () => {
+  const registration = (await mutations.createVisitRegistration(
+    dummyUserWithRole,
+    1,
+    2
+  )) as VisitRegistration;
+
+  expect(registration.status).toEqual(VisitRegistrationStatus.DRAFTED);
+
+  const cancelResult = (await mutations.cancelVisitRegistration(
+    dummyUserOfficerWithRole,
+    {
+      visitId: 1,
+      userId: 2,
+    }
+  )) as VisitRegistration;
+
+  expect(cancelResult.status).toEqual(
+    VisitRegistrationStatus.CANCELLED_BY_FACILITY
+  );
+});
+
+test('User can cancel his submitted visit registration', async () => {
+  const registration = (await mutations.createVisitRegistration(
+    dummyUserWithRole,
+    1,
+    2
+  )) as VisitRegistration;
+
+  expect(registration.status).toEqual(VisitRegistrationStatus.DRAFTED);
+
+  const submitResult = (await mutations.submitVisitRegistration(
+    dummyUserWithRole,
+    {
+      visitId: 1,
+      userId: 2,
+    }
+  )) as VisitRegistration;
+
+  expect(submitResult.status).toEqual(VisitRegistrationStatus.SUBMITTED);
+
+  const cancelResult = (await mutations.cancelVisitRegistration(
+    dummyUserWithRole,
+    {
+      visitId: 1,
+      userId: 2,
+    }
+  )) as VisitRegistration;
+
+  expect(cancelResult.status).toEqual(
+    VisitRegistrationStatus.CANCELLED_BY_USER
+  );
+});
+
+test('User can not submit visit registartion that has been cancelled by facility', async () => {
+  const registration = (await mutations.createVisitRegistration(
+    dummyUserWithRole,
+    1,
+    2
+  )) as VisitRegistration;
+
+  expect(registration.status).toEqual(VisitRegistrationStatus.DRAFTED);
+
+  const cancelResult = (await mutations.cancelVisitRegistration(
+    dummyUserOfficerWithRole,
+    {
+      visitId: 1,
+      userId: 2,
+    }
+  )) as VisitRegistration;
+
+  expect(cancelResult.status).toEqual(
+    VisitRegistrationStatus.CANCELLED_BY_FACILITY
+  );
+
+  const submitResult = (await mutations.submitVisitRegistration(
+    dummyUserWithRole,
+    {
+      visitId: 1,
+      userId: 2,
+    }
+  )) as VisitRegistration;
+  expect(submitResult).toHaveProperty(
+    'reason',
+    'Chould not submit Visit Registration due to insufficient permissions'
+  );
+});

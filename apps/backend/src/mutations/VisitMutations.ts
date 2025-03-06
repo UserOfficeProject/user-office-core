@@ -347,11 +347,11 @@ export default class VisitMutations {
     user: UserWithRole | null,
     input: CancelVisitRegistrationInput
   ) {
-    const hasWriteRights = await this.registrationAuth.hasWriteRights(
+    const hasCancelRights = await this.registrationAuth.hasCancelRights(
       user,
       input
     );
-    if (hasWriteRights === false) {
+    if (hasCancelRights === false) {
       return rejection(
         'Chould not cancel Visit Registration due to insufficient permissions',
         { args: input, user }
