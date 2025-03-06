@@ -687,13 +687,12 @@ context('Instrument tests', () => {
     let createdProposalId: string;
 
     beforeEach(function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-        this.skip();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        cy.updateUserRoles({
+          id: scientist2.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
       }
-      cy.updateUserRoles({
-        id: scientist2.id,
-        roles: [initialDBData.roles.instrumentScientist],
-      });
 
       cy.createInstrument(instrument1).then((result) => {
         if (result.createInstrument) {
@@ -868,7 +867,10 @@ context('Instrument tests', () => {
       // cy.contains(proposal1.title).should('exist');
     });
 
-    it('Instrument scientists should be able to filter only their own proposals', () => {
+    it('Instrument scientists should be able to filter only their own proposals', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.STFC_IDLE_TIMER)) {
+        this.skip();
+      }
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           createdProposalPk = result.createProposal.primaryKey;

@@ -1111,7 +1111,7 @@ context('GenericTemplates tests', () => {
   });
 
   describe('Generic sub template tests', () => {
-    it.only('Sub template should be cleared if dependencies are not satisfied after clonning', () => {
+    it('Sub template should be cleared if dependencies are not satisfied after clonning', () => {
       let proposalPK: number;
       cy.createProposalWorkflow(proposalWorkflow).then((result) => {
         if (result.createProposalWorkflow) {
