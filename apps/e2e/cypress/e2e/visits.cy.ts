@@ -57,8 +57,8 @@ context('visits tests', () => {
     description: faker.lorem.words(3),
   };
 
-  describe('Visits basic tests', () => {
-    it('User officer should be able to approve visit registration', () => {
+  describe('Visits registration tests', () => {
+    beforeEach(() => {
       cy.createTemplate({
         groupId: TemplateGroupId.VISIT_REGISTRATION,
         name: visitTemplate.name,
@@ -85,6 +85,28 @@ context('visits tests', () => {
           userId: visitor.id,
         });
       });
+    });
+
+    it('User officer should be able to cancel visit registration', () => {
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+
+      cy.get(
+        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
+      ).click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
+      cy.get('[data-cy="cancel-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="visit-status"]').should(
+        'have.text',
+        'CANCELLED_BY_FACILITY'
+      );
+    });
+
+    it('User officer should be able to approve visit registration', () => {
       cy.login('officer');
       cy.visit('/ExperimentPage');
 
@@ -99,6 +121,9 @@ context('visits tests', () => {
       cy.get('[data-cy="confirm-ok"]').click();
       cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
     });
+  });
+
+  describe('Visits basic tests', () => {
     it('Should be able to create visits template', () => {
       cy.login('officer');
       cy.visit('/');
