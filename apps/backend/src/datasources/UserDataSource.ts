@@ -91,6 +91,10 @@ export interface UserDataSource {
     userId: number,
     proposalPk: number
   ): Promise<boolean>;
+  checkTechniqueScientistToProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean>;
   getRoleByShortCode(roleShortCode: Roles): Promise<Role>;
   mergeUsers(fromUserId: number, intoUserId: number): Promise<void>;
 }

@@ -691,4 +691,14 @@ export class StfcUserDataSource implements UserDataSource {
 
     return usersWithRoles;
   }
+
+  async checkTechniqueScientistToProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    return await postgresUserDataSource.checkTechniqueScientistToProposal(
+      userId,
+      proposalPk
+    );
+  }
 }

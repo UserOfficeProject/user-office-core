@@ -5,7 +5,6 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
-import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { Roles } from '../models/Role';
@@ -31,8 +30,6 @@ export class ProposalAuthorization {
     private visitDataSource: VisitDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
-    @inject(Tokens.TechniqueDataSource)
-    private techniqueDataSource: TechniqueDataSource,
     @inject(Tokens.ProposalSettingsDataSource)
     private proposalSettingsDataSource: ProposalSettingsDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
@@ -167,16 +164,11 @@ export class ProposalAuthorization {
       return false;
     }
 
-    const scientistTechniques =
-      await this.techniqueDataSource.getTechniquesByScientist(agent.id);
-    const proposalTechniques =
-      await this.techniqueDataSource.getTechniquesByProposalPk(proposalPk);
-
-    return proposalTechniques.some((technique) =>
-      scientistTechniques.some(
-        (scientistTechnique) => scientistTechnique.id === technique.id
-      )
-    );
+    return this.userDataSource
+      .checkTechniqueScientistToProposal(agent.id, proposalPk)
+      .then((result) => {
+        return result;
+      });
   }
 
   async isVisitorOfProposal(agent: UserWithRole, proposalPk: number) {

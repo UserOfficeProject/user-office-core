@@ -105,10 +105,6 @@ test('A instrument sci can access proposals they are on', async () => {
 });
 
 test('A instrument sci cannot access proposals they are not on', async () => {
-  jest
-    .spyOn(proposalAuthorization, 'isScientistToProposalTechnique')
-    .mockResolvedValue(false);
-
   return expect(
     proposalAuthorization.hasReadRights(
       {
