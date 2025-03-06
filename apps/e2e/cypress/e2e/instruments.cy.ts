@@ -672,9 +672,6 @@ context('Instrument tests', () => {
 
       cy.contains(scientist1.lastName).click();
 
-      // I could not find a better way of doing this
-      // cy.get('#user-list-1-option-1').click();
-
       cy.get('[data-cy="bulk-update"]').click();
 
       cy.finishedLoading();
@@ -1463,9 +1460,6 @@ context('Instrument tests', () => {
       cy.get(`[data-cy="user-list-${createdInstrumentId}"]`).click();
 
       cy.contains(scientist1.lastName).click();
-
-      // I could not find a better way of doing this
-      // cy.get('#user-list-1-option-1').click();
 
       cy.get('[data-cy="bulk-update"]').click();
 
