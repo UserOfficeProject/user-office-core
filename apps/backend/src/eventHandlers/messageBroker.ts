@@ -204,6 +204,10 @@ export async function createPostToRabbitMQHandler() {
     Tokens.TemplateDataSource
   );
 
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+
   return async (event: ApplicationEvent) => {
     // if the original method failed
     // there is no point of publishing any event
@@ -314,10 +318,11 @@ export async function createPostToRabbitMQHandler() {
       }
       case Event.VISIT_REGISTRATION_APPROVED: {
         const { visitregistration: visitRegistration } = event;
+        const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
           startAt: visitRegistration.startsAt,
           endAt: visitRegistration.endsAt,
-          visitorId: visitRegistration.userId,
+          visitorId: user!.oidcSub,
         });
 
         await rabbitMQ.sendMessageToExchange(
