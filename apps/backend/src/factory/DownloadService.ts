@@ -95,7 +95,7 @@ export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
     readableStream.on('error', (err) => {
       next({
         error: err.toString(),
-        message: `Could not download generated ${downloadType}/${type}`,
+        message: `Could not download generated ${downloadType}/${type} because of ${err.toString()}`,
       });
     });
 
@@ -116,7 +116,7 @@ export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
   } catch (error) {
     next({
       error,
-      message: `Could not download generated ${downloadType}/${type}`,
+      message: `Could not download generated ${downloadType}/${type} because of an error`,
     });
   }
 }
