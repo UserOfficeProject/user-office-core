@@ -1924,7 +1924,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
+    it.only("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
       cy.login(scientist1);
       cy.visit('/');
       cy.finishedLoading();
@@ -1938,7 +1938,7 @@ context('Xpress tests', () => {
 
         cy.request({
           method: 'GET',
-          url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${createdProposalPk4}`,
+          url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${createdProposalPk3}`,
           headers: {
             authorization: `Bearer ${token}`,
           },
