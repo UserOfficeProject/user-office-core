@@ -143,7 +143,6 @@ export default class ReviewMutations {
   @Authorized([
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
-    Roles.FAP_CHAIR,
     Roles.FAP_SECRETARY,
   ])
   async submitTechnicalReview(
@@ -239,7 +238,6 @@ export default class ReviewMutations {
   @Authorized([
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
-    Roles.FAP_CHAIR,
     Roles.FAP_SECRETARY,
   ])
   async setTechnicalReview(

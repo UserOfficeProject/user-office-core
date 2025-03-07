@@ -48,7 +48,7 @@ type ProposalReviewContentProps = {
   proposalPk?: number | null;
   reviewId?: number | null;
   fapId?: number | null;
-  fapSecAndChair?: number[] | null;
+  fapSec?: number[] | null;
   isInsideModal?: boolean;
 };
 
@@ -57,17 +57,14 @@ const ProposalReviewContent = ({
   tabNames,
   reviewId,
   fapId,
-  fapSecAndChair: fapChairAndSecs,
+  fapSec: fapSecs,
   isInsideModal,
 }: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const isFapChairOrSec = useCheckAccess([
-    UserRole.FAP_CHAIR,
-    UserRole.FAP_SECRETARY,
-  ]);
+  const isFapSec = useCheckAccess([UserRole.FAP_SECRETARY]);
   const { proposalData, setProposalData, loading } =
     useProposalData(proposalPk);
   const { t } = useTranslation();
@@ -105,11 +102,11 @@ const ProposalReviewContent = ({
       (instrument) => instrument?.id === instrumentId
     );
 
-  const canEditAsFapChairOrSec =
-    isFapChairOrSec &&
-    fapChairAndSecs &&
-    fapChairAndSecs.find((userId) => userId === user.id);
-
+  const canEditAsFapSec =
+    isFapSec && fapSecs && fapSecs.find((userId) => userId === user.id);
+  console.log('isFapSec:', isFapSec);
+  console.log('canEditAsFapSec:', canEditAsFapSec);
+  console.log('fapSecs:', fapSecs, 'User ID:', user.id);
   const technicalReviewsContent = proposalData.technicalReviews.map(
     (technicalReview) => {
       const technicalReviewInstrument = getTechnicalReviewInstrument(
@@ -121,7 +118,7 @@ const ProposalReviewContent = ({
         technicalReview?.technicalReviewAssigneeId === user.id;
 
       return isUserOfficer ||
-        canEditAsFapChairOrSec ||
+        canEditAsFapSec ||
         canEditAsInstrumentSci ||
         isInternalReviewer ? (
         <Fragment key={technicalReview.id}>
@@ -131,7 +128,7 @@ const ProposalReviewContent = ({
               technicalReviewSubmitted={technicalReview.submitted}
             />
           )}
-          {!!technicalReviewInstrument && !canEditAsFapChairOrSec && (
+          {!!technicalReviewInstrument && !canEditAsFapSec && (
             <ProposalTechnicalReviewerAssignment
               technicalReview={technicalReview}
               instrument={technicalReviewInstrument}
@@ -158,14 +155,16 @@ const ProposalReviewContent = ({
               marginBottom: theme.spacing(2),
             })}
           >
-            <Typography
-              variant="h6"
-              data-cy="reviewed-by-info"
-              component="h2"
-              gutterBottom
-            >
-              {`Reviewed by ${getFullUserName(technicalReview.technicalReviewAssignee)}`}
-            </Typography>
+            {(isUserOfficer || isFapSec) && (
+              <Typography
+                variant="h6"
+                data-cy="reviewed-by-info"
+                component="h2"
+                gutterBottom
+              >
+                {`Reviewed by ${getFullUserName(technicalReview.technicalReviewAssignee)}`}
+              </Typography>
+            )}
             <TechnicalReviewContainer
               technicalReview={technicalReview}
               technicalReviewUpdated={(

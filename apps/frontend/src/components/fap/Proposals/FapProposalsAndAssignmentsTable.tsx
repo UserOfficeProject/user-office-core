@@ -696,9 +696,7 @@ const FapProposalsAndAssignmentsTable = ({
       return (
         <FapAssignedReviewersTable
           fapProposal={rowData}
-          fapChairAndSecs={data.fapChairs
-            .map((user) => user.id)
-            .concat(data.fapSecretaries.map((user) => user.id))}
+          fapSecs={data.fapSecretaries.map((user) => user.id)}
           removeAssignedReviewer={removeAssignedReviewer}
           updateView={updateFapProposalAssignmentsView}
         />
@@ -740,9 +738,7 @@ const FapProposalsAndAssignmentsTable = ({
             PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
             PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
           ]}
-          fapSecAndChair={data.fapChairs
-            .map((user) => user.id)
-            .concat(data.fapSecretaries.map((user) => user.id))}
+          fapSec={data.fapSecretaries.map((user) => user.id)}
         />
       </ProposalReviewModal>
       <AssignFapMemberToProposalModal
