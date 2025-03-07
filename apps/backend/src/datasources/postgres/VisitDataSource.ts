@@ -148,7 +148,6 @@ class PostgresVisitDataSource implements VisitDataSource {
   updateRegistration({
     userId,
     visitId,
-    trainingExpiryDate,
     registrationQuestionaryId,
     startsAt,
     endsAt,
@@ -156,7 +155,6 @@ class PostgresVisitDataSource implements VisitDataSource {
   }: UpdateVisitRegistrationArgs): Promise<VisitRegistration> {
     return database('visits_has_users')
       .update({
-        training_expiry_date: trainingExpiryDate,
         status: status,
         registration_questionary_id: registrationQuestionaryId,
         starts_at: startsAt,
