@@ -1,5 +1,5 @@
 query getProposalsWithAttachments($filter: ProposalsFilter) {
-  proposalsWithAttachments(filter: $filter) {
+  proposals(filter: $filter) {
     proposals {
       primaryKey
       attachments {
