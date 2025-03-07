@@ -26,6 +26,11 @@ import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine
 export const EXCHANGE_NAME =
   process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
 
+enum RABBITMQ_VISIT_EVENT_TYPE {
+  VISIT_CREATED = 'VISIT_CREATED',
+  VISIT_DELETED = 'VISIT_DELETED',
+}
+
 type Member = {
   id: string;
   firstName: string;
@@ -330,6 +335,21 @@ export async function createPostToRabbitMQHandler() {
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.VISIT_REGISTRATION_APPROVED: {
+        const { visitregistration: visitRegistration } = event;
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: visitRegistration.userId,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED,
           jsonMessage
         );
         break;

@@ -133,6 +133,7 @@ const FapGeneralInfo = ({ data, onFapUpdate }: FapPageProps) => {
                   label: 'Custom Grade Guide',
                 }}
                 data-cy="custom-grade-guide"
+                disabled={!hasAccessRights || isExecutingCall}
               />
             </Grid>
             <Grid item sm={6} xs={12}>

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import {
+  CreateVisitMutation,
   FeatureId,
   ProposalEndStatus,
   TemplateGroupId,
@@ -57,6 +58,47 @@ context('visits tests', () => {
   };
 
   describe('Visits basic tests', () => {
+    it('User officer should be able to approve visit registration', () => {
+      cy.createTemplate({
+        groupId: TemplateGroupId.VISIT_REGISTRATION,
+        name: visitTemplate.name,
+        description: visitTemplate.description,
+      }).then(({ createTemplate: newTemplate }) => {
+        cy.setActiveTemplate({
+          templateGroupId: TemplateGroupId.VISIT_REGISTRATION,
+          templateId: newTemplate.templateId,
+        });
+      });
+
+      cy.createVisit({
+        team: [visitor.id],
+        teamLeadUserId: visitor.id,
+        scheduledEventId: existingScheduledEventId,
+      }).then(({ createVisit: visit }: CreateVisitMutation) => {
+        cy.createVisitRegistration({
+          visitId: visit.id,
+          userId: visitor.id,
+        });
+
+        cy.submitVisitRegistration({
+          visitId: visit.id,
+          userId: visitor.id,
+        });
+      });
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+
+      cy.get(
+        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
+      ).click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
+      cy.get('[data-cy="approve-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
+    });
     it('Should be able to create visits template', () => {
       cy.login('officer');
       cy.visit('/');
