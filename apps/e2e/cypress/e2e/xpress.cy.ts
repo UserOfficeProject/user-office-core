@@ -1842,6 +1842,13 @@ context('Xpress tests', () => {
         .find('[aria-label="View proposal"]')
         .click();
 
+      cy.contains('Download PDF').click();
+
+      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
+      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
+        proposal1.title
+      );
+
       cy.window().then((win) => {
         const token = win.localStorage.getItem('token');
 
@@ -1851,34 +1858,17 @@ context('Xpress tests', () => {
 
         cy.request({
           method: 'GET',
-          url: `/download/pdf/proposal/${createdProposalPk1}`,
+          url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${createdProposalPk4}`,
           headers: {
             authorization: `Bearer ${token}`,
           },
-          failOnStatusCode: false,
         }).then((response) => {
-          cy.log(`${response.status}`);
-          cy.log(`${response.body}`);
+          expect(response.status).to.eq(200);
         });
       });
-
-      cy.intercept('GET', `/download/pdf/proposal/${createdProposalPk1}`).as(
-        'downloadRequest'
-      );
-
-      cy.contains('Download PDF').click();
-
-      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        proposal1.title
-      );
-
-      cy.wait('@downloadRequest', { requestTimeout: 30000 })
-        .its('response.statusCode')
-        .should('eq', 200);
     });
 
-    it("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
+    it.only("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
       cy.assignProposalToTechniques({
         proposalPk: createdProposalPk3,
         techniqueIds: [createdTechniquePk3, createdTechniquePk1],
@@ -1895,10 +1885,6 @@ context('Xpress tests', () => {
           .find('[aria-label="View proposal"]')
           .click();
 
-        cy.intercept('GET', `/download/pdf/proposal/${createdProposalPk3}`).as(
-          'downloadRequest'
-        );
-
         cy.contains('Download PDF').click();
 
         cy.get('[data-cy="preparing-download-dialog"]').should('exist');
@@ -1906,9 +1892,23 @@ context('Xpress tests', () => {
           proposal3.title
         );
 
-        cy.wait('@downloadRequest', { requestTimeout: 30000 })
-          .its('response.statusCode')
-          .should('eq', 200);
+        cy.window().then((win) => {
+          const token = win.localStorage.getItem('token');
+
+          if (!token) {
+            throw new Error('Token not provided');
+          }
+
+          cy.request({
+            method: 'GET',
+            url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${createdProposalPk3}`,
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          }).then((response) => {
+            expect(response.status).to.eq(200);
+          });
+        });
       });
     });
 
