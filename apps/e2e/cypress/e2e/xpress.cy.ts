@@ -1871,7 +1871,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it.only('User officer can download any Xpress proposal', function () {
+    it('User officer can download any Xpress proposal', function () {
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -1895,7 +1895,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it.only("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
+    it("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
       cy.assignProposalToTechniques({
         proposalPk: createdProposalPk3,
         techniqueIds: [createdTechniquePk3, createdTechniquePk1],
