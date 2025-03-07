@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import {
-  GetProposalsAttachmentsQuery,
+  GetProposalsWithAttachmentsQuery,
   Proposal,
   ProposalsFilter,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export type ProposalsAttachmentsData = NonNullable<
-  GetProposalsAttachmentsQuery['proposals']
+  GetProposalsWithAttachmentsQuery['proposals']
 >;
 
 export function useProposalsAttachmentsData(filter: ProposalsFilter) {
@@ -25,7 +25,7 @@ export function useProposalsAttachmentsData(filter: ProposalsFilter) {
     let unmounted = false;
 
     api()
-      .getProposalsAttachments({
+      .getProposalsWithAttachments({
         filter: {
           referenceNumbers,
         },
