@@ -123,16 +123,35 @@ context('Experiments tests', () => {
           tableValue = [...tableValue, $el.text().toString()];
         })
         .then(() => {
-          // Explanation: The table has 5 columns. We will sort each column in ascending and descending order and check if the table is sorted correctly.
+          // Explanation: The table has 7 columns. We will sort each column in ascending and descending order and check if the table is sorted correctly.
           // tableColumns: Array of objects. Each object contains the title of the column and the data of the column in original, ascending and descending order.
           const tableColumns = [
             {
+              title: 'Actions',
+              data: {
+                original: tableValue.filter((d, i) => i % 7 === 0),
+                asc: tableValue.filter((d, i) => i % 7 === 0),
+                desc: tableValue.filter((d, i) => i % 7 === 0),
+              },
+            },
+            {
+              title: 'Status',
+              data: {
+                original: tableValue.filter((d, i) => i % 7 === 1),
+                asc: tableValue.filter((d, i) => i % 7 === 1).sort(),
+                desc: tableValue
+                  .filter((d, i) => i % 7 === 1)
+                  .sort()
+                  .reverse(),
+              },
+            },
+            {
               title: 'Visitor name',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 0),
-                asc: tableValue.filter((d, i) => i % 5 === 0).sort(),
+                original: tableValue.filter((d, i) => i % 7 === 2),
+                asc: tableValue.filter((d, i) => i % 7 === 2).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 0)
+                  .filter((d, i) => i % 7 === 2)
                   .sort()
                   .reverse(),
               },
@@ -140,32 +159,32 @@ context('Experiments tests', () => {
             {
               title: 'Teamleader',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 1),
-                asc: tableValue.filter((d, i) => i % 5 === 1).sort(),
+                original: tableValue.filter((d, i) => i % 7 === 3),
+                asc: tableValue.filter((d, i) => i % 7 === 3).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 1)
+                  .filter((d, i) => i % 7 === 3)
                   .sort()
                   .reverse(),
               },
             },
             {
-              title: 'Starts at',
+              title: 'Visit start',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 2),
-                asc: tableValue.filter((d, i) => i % 5 === 2).sort(),
+                original: tableValue.filter((d, i) => i % 7 === 4),
+                asc: tableValue.filter((d, i) => i % 7 === 4).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 2)
+                  .filter((d, i) => i % 7 === 4)
                   .sort()
                   .reverse(),
               },
             },
             {
-              title: 'Ends at',
+              title: 'Visit end',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 3),
-                asc: tableValue.filter((d, i) => i % 5 === 3).sort(),
+                original: tableValue.filter((d, i) => i % 7 === 5),
+                asc: tableValue.filter((d, i) => i % 7 === 5).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 3)
+                  .filter((d, i) => i % 7 === 5)
                   .sort()
                   .reverse(),
               },
@@ -173,10 +192,10 @@ context('Experiments tests', () => {
             {
               title: 'Training',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 4),
-                asc: tableValue.filter((d, i) => i % 5 === 4).sort(),
+                original: tableValue.filter((d, i) => i % 7 === 6),
+                asc: tableValue.filter((d, i) => i % 7 === 6).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 4)
+                  .filter((d, i) => i % 7 === 6)
                   .sort()
                   .reverse(),
               },
@@ -192,9 +211,9 @@ context('Experiments tests', () => {
             // Check if the table is sorted in ascending order
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 5 === i) {
+                if (index % 7 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.asc[Math.floor(index / 5)]
+                    tableColumns[i].data.asc[Math.floor(index / 7)]
                   );
                 }
               }
@@ -207,9 +226,9 @@ context('Experiments tests', () => {
 
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 5 === i) {
+                if (index % 7 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.desc[Math.floor(index / 5)]
+                    tableColumns[i].data.desc[Math.floor(index / 7)]
                   );
                 }
               }
@@ -222,9 +241,9 @@ context('Experiments tests', () => {
 
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 5 === i) {
+                if (index % 7 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.original[Math.floor(index / 5)]
+                    tableColumns[i].data.original[Math.floor(index / 7)]
                   );
                 }
               }

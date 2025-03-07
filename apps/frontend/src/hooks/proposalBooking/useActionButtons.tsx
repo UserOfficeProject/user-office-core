@@ -20,6 +20,7 @@ import {
   ProposalBookingStatusCore,
   ProposalEndStatus,
   UserJwt,
+  VisitRegistrationStatus,
 } from 'generated/sdk';
 
 import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
@@ -63,7 +64,7 @@ const createActionButton = (
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
   hidden: state === 'invisible',
   disabled: state === 'inactive',
-  onClick: ['completed', 'active', 'neutral'].includes(state)
+  onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
     ? onClick
     : () => {},
 });
@@ -167,10 +168,24 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       if (!registration) {
         buttonState = 'invisible';
       } else {
-        if (registration.isRegistrationSubmitted) {
-          buttonState = 'completed';
-        } else {
-          buttonState = 'active';
+        switch (registration.status) {
+          case VisitRegistrationStatus.DRAFTED:
+          case VisitRegistrationStatus.CHANGE_REQUESTED:
+            buttonState = 'active';
+            break;
+          case VisitRegistrationStatus.SUBMITTED:
+            buttonState = 'pending';
+            stateReason = 'The registration is pending approval';
+            break;
+          case VisitRegistrationStatus.APPROVED:
+            buttonState = 'completed';
+            break;
+          case VisitRegistrationStatus.CANCELLED_BY_USER:
+          case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
+            buttonState = 'inactive';
+            stateReason =
+              'This action is disabled because registration is cancelled';
+            break;
         }
       }
     } else {
