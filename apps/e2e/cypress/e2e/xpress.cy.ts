@@ -1945,7 +1945,6 @@ context('Xpress tests', () => {
           failOnStatusCode: false,
         }).then((response) => {
           expect(response.status).to.eq(500);
-          expect(response.body).to.eq('User was not allowed to download PDF');
         });
       });
     });
