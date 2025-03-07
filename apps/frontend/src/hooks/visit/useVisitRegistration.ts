@@ -4,7 +4,7 @@ import { useDataApi } from 'hooks/common/useDataApi';
 
 import { GetVisitRegistrationQuery } from './../../generated/sdk';
 
-export function useVisitRegistration(visitId: number) {
+export function useVisitRegistration(visitId: number, userId: number) {
   const [registration, setRegistration] = useState<
     GetVisitRegistrationQuery['visitRegistration'] | null
   >(null);
@@ -15,7 +15,7 @@ export function useVisitRegistration(visitId: number) {
     let unmounted = false;
 
     api()
-      .getVisitRegistration({ visitId })
+      .getVisitRegistration({ visitId, userId })
       .then((data) => {
         if (unmounted) {
           return;

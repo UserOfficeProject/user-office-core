@@ -10,7 +10,10 @@ import {
 
 import { ResolverContext } from '../../context';
 import { TemplateCategoryId } from '../../models/Template';
-import { VisitRegistration as VisitRegistrationOrig } from '../../models/VisitRegistration';
+import {
+  VisitRegistration as VisitRegistrationOrig,
+  VisitRegistrationStatus,
+} from '../../models/VisitRegistration';
 import { TrainingStatus } from './../../models/VisitRegistration';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Questionary } from './Questionary';
@@ -26,8 +29,8 @@ export class VisitRegistration implements Partial<VisitRegistrationOrig> {
   @Field(() => Int, { nullable: true })
   public registrationQuestionaryId: number | null;
 
-  @Field(() => Boolean)
-  public isRegistrationSubmitted: boolean;
+  @Field(() => VisitRegistrationStatus)
+  public status: VisitRegistrationStatus;
 
   @Field(() => Date, { nullable: true })
   public trainingExpiryDate: Date | null;

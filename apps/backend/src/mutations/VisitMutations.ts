@@ -1,29 +1,37 @@
 import { container, inject, injectable } from 'tsyringe';
 
 import { VisitAuthorization } from '../auth/VisitAuthorization';
+import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, EventBus } from '../decorators';
+import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
 import { Rejection } from '../models/Rejection';
+import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { Visit, VisitStatus } from '../models/Visit';
-import { VisitRegistration } from '../models/VisitRegistration';
+import { Visit } from '../models/Visit';
+import {
+  VisitRegistration,
+  VisitRegistrationStatus,
+} from '../models/VisitRegistration';
+import { ApproveVisitRegistrationInput } from '../resolvers/mutations/ApproveVisitRegistrationMutations';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
+import { SubmitVisitRegistrationArgs } from '../resolvers/mutations/SubmitVisitRegistration';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistrationMutation';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { UserAuthorization } from './../auth/UserAuthorization';
-
 @injectable()
 export default class VisitMutations {
   private visitAuth = container.resolve(VisitAuthorization);
+  private registrationAuth = container.resolve(VisitRegistrationAuthorization);
 
   constructor(
     @inject(Tokens.VisitDataSource)
@@ -181,13 +189,6 @@ export default class VisitMutations {
     }
 
     const hasRights = await this.visitAuth.hasWriteRights(user, visit);
-
-    if (this.userAuth.isUser(user) && args.status === VisitStatus.ACCEPTED) {
-      return rejection(
-        'Can not update visit status because of insufficient permissions'
-      );
-    }
-
     if (hasRights === false) {
       return rejection(
         'Can not update visit because of insufficient permissions',
@@ -216,7 +217,8 @@ export default class VisitMutations {
   @Authorized()
   async createVisitRegistration(
     user: UserWithRole | null,
-    visitId: number
+    visitId: number,
+    userId: number
   ): Promise<VisitRegistration | Rejection> {
     if (!user) {
       return rejection(
@@ -224,9 +226,9 @@ export default class VisitMutations {
       );
     }
 
-    if (!visitId) {
+    if (!this.userAuth.isUserOfficer(user) && user.id !== userId) {
       return rejection(
-        'Can not create visit registration, visit id not specified'
+        'Can not create visit registration, because the request is not authorized'
       );
     }
 
@@ -240,11 +242,12 @@ export default class VisitMutations {
       );
     }
     const questionary = await this.questionaryDataSource.create(
-      user.id,
+      userId,
       activeTemplate
     );
 
-    return this.dataSource.updateRegistration(user.id, {
+    return this.dataSource.updateRegistration({
+      userId: userId,
       visitId: visitId,
       registrationQuestionaryId: questionary.questionaryId,
     });
@@ -254,19 +257,85 @@ export default class VisitMutations {
   async updateVisitRegistration(
     user: UserWithRole | null,
     args: UpdateVisitRegistrationArgs
-  ): Promise<VisitRegistration | null> {
-    if (!user) {
-      return null;
+  ): Promise<VisitRegistration | Rejection> {
+    const visitRegistration = await this.dataSource.getRegistration(
+      args.userId,
+      args.visitId
+    );
+    if (!visitRegistration) {
+      return rejection(
+        'Could not update Visit Registration because specified registration does not exist',
+        { args }
+      );
     }
 
-    // TODO implement visitRegistrationAuth and perform checks there
+    const hasWriteRights = await this.registrationAuth.hasWriteRights(
+      user,
+      args
+    );
+    if (hasWriteRights === false) {
+      return rejection(
+        'Chould not update Visit Registration due to insufficient permissions',
+        { args, user }
+      );
+    }
     if (this.userAuth.isUserOfficer(user) !== true) {
-      delete args.trainingExpiryDate;
-      if (args.isRegistrationSubmitted === false) {
-        delete args.isRegistrationSubmitted;
-      }
+      delete args.trainingExpiryDate; // user shall not set training expiry date
     }
 
-    return this.dataSource.updateRegistration(user.id, args);
+    return this.dataSource.updateRegistration(args);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.VISIT_REGISTRATION_APPROVED)
+  async approveVisitRegistration(
+    user: UserWithRole | null,
+    input: ApproveVisitRegistrationInput
+  ) {
+    const visitRegistration = await this.dataSource.getRegistration(
+      input.userId,
+      input.visitId
+    );
+    if (!visitRegistration) {
+      return rejection(
+        'Could not approve Visit Registration because specified registration does not exist',
+        { visitRegistration: input }
+      );
+    }
+
+    if (visitRegistration.status === VisitRegistrationStatus.DRAFTED) {
+      return rejection(
+        'Could not approve Visit Registration because registration is not submitted',
+        { visitRegistration: input }
+      );
+    }
+
+    return this.dataSource.updateRegistration({
+      userId: input.userId,
+      visitId: input.visitId,
+      status: VisitRegistrationStatus.APPROVED,
+    });
+  }
+  @Authorized()
+  async submitVisitRegistration(
+    user: UserWithRole | null,
+    args: SubmitVisitRegistrationArgs
+  ) {
+    const hasWriteRights = await this.registrationAuth.hasWriteRights(
+      user,
+      args
+    );
+    if (hasWriteRights === false) {
+      return rejection(
+        'Chould not submit Visit Registration due to insufficient permissions',
+        { args, user }
+      );
+    }
+
+    return this.dataSource.updateRegistration({
+      userId: args.userId,
+      visitId: args.visitId,
+      status: VisitRegistrationStatus.SUBMITTED,
+    });
   }
 }
