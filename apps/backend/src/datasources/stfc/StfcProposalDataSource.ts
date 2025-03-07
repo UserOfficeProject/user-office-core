@@ -138,13 +138,16 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (filter?.callId) {
           query.where('call_id', filter.callId);
         }
-        if (filter?.instrumentFilter?.instrumentId) {
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
           // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
             { instrumentId: filter?.instrumentFilter?.instrumentId }
           );
         }
+
         if (filter?.proposalStatusId) {
           query.where('proposal_status_id', filter?.proposalStatusId);
         }
