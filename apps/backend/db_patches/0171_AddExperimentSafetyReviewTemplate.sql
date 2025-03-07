@@ -38,8 +38,6 @@ BEGIN
         FROM templates 
         WHERE name='default experiment safety review template';
 
-        INSERT INTO questionaries(template_id, created_at, creator_id) VALUES (exp_safety_review_template_id_var, NOW(), 0);
-
         INSERT INTO topics(topic_title, is_enabled, sort_order, template_id) VALUES('New experiment safety review', TRUE, 0, exp_safety_review_template_id_var);
 
         SELECT topics.topic_id
