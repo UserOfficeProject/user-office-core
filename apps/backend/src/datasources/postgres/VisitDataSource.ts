@@ -64,6 +64,7 @@ class PostgresVisitDataSource implements VisitDataSource {
         if (filter.visitId) {
           query.where({ visit_id: filter.visitId });
         }
+        query.orderBy('user_id');
       })
       .then((registrations: VisitRegistrationRecord[]) =>
         registrations.map((registration) =>
@@ -125,10 +126,9 @@ class PostgresVisitDataSource implements VisitDataSource {
             .ignore()
             .transacting(trx);
         }
-        if (args.status || args.teamLeadUserId) {
+        if (args.teamLeadUserId) {
           await database('visits')
             .update({
-              status: args.status,
               team_lead_user_id: args.teamLeadUserId,
             })
             .where({ visit_id: args.visitId })
@@ -145,21 +145,19 @@ class PostgresVisitDataSource implements VisitDataSource {
       });
   }
 
-  updateRegistration(
-    userId: number,
-    {
-      visitId,
-      trainingExpiryDate,
-      isRegistrationSubmitted,
-      registrationQuestionaryId,
-      startsAt,
-      endsAt,
-    }: UpdateVisitRegistrationArgs
-  ): Promise<VisitRegistration> {
+  updateRegistration({
+    userId,
+    visitId,
+    trainingExpiryDate,
+    registrationQuestionaryId,
+    startsAt,
+    endsAt,
+    status,
+  }: UpdateVisitRegistrationArgs): Promise<VisitRegistration> {
     return database('visits_has_users')
       .update({
         training_expiry_date: trainingExpiryDate,
-        is_registration_submitted: isRegistrationSubmitted,
+        status: status,
         registration_questionary_id: registrationQuestionaryId,
         starts_at: startsAt,
         ends_at: endsAt,

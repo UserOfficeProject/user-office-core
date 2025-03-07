@@ -5,31 +5,44 @@ import React from 'react';
 import StyledDialog from 'components/common/StyledDialog';
 
 interface ButtonWithDialogProps extends ButtonProps {
-  children: JSX.Element & { onClose?: () => void };
-  label: string;
+  children: React.ReactElement<{ onClose?: () => void }>;
+  button?: React.ReactElement<ButtonProps>;
+  label?: string;
   disabled?: boolean;
   title: string;
 }
 
 function ButtonWithDialog(props: ButtonWithDialogProps) {
-  const { children, label, ...rest } = props;
+  const { children, label, button, ...rest } = props;
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+
+  const handleOpen = () => setIsDialogOpen(true);
+  const handleClose = () => setIsDialogOpen(false);
+
+  const renderedButton = button ? (
+    React.cloneElement(button, {
+      onClick: handleOpen,
+      ...rest,
+    })
+  ) : (
+    <Button variant="text" onClick={handleOpen} {...rest}>
+      {label}
+    </Button>
+  );
 
   return (
     <>
-      <Button variant="text" onClick={() => setIsDialogOpen(true)} {...rest}>
-        {label}
-      </Button>
+      {renderedButton}
       <StyledDialog
         open={isDialogOpen}
         fullWidth
         maxWidth="md"
-        onClose={() => setIsDialogOpen(false)}
+        onClose={handleClose}
         title={props.title}
       >
         <DialogContent dividers>
           {React.cloneElement(children, {
-            onClose: () => setIsDialogOpen(false),
+            onClose: handleClose,
           })}
         </DialogContent>
       </StyledDialog>
