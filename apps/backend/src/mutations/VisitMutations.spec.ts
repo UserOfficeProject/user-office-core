@@ -3,12 +3,16 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import {
-  dummyUserWithRole,
   dummyUserOfficerWithRole,
+  dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
 import { Rejection } from '../models/Rejection';
-import { Visit, VisitStatus } from '../models/Visit';
+import { Visit } from '../models/Visit';
+import {
+  VisitRegistration,
+  VisitRegistrationStatus,
+} from '../models/VisitRegistration';
 import VisitMutations from './VisitMutations';
 
 const mutations = container.resolve(VisitMutations);
@@ -54,76 +58,88 @@ test('User can update visit', async () => {
     team: [dummyUserWithRole.id],
   })) as Visit;
 
-  expect(visit.status).toEqual(VisitStatus.DRAFT);
-
   await mutations.updateVisit(dummyUserWithRole, {
     visitId: visit.id,
-    status: VisitStatus.SUBMITTED,
+    teamLeadUserId: 1,
   });
 
-  expect(visit.status).toEqual(VisitStatus.SUBMITTED);
+  expect(visit.teamLeadUserId).toEqual(1);
 });
 
-test('User can not update visit that is already accepted', async () => {
-  await mutations.updateVisit(dummyUserOfficerWithRole, {
-    visitId: 1,
-    status: VisitStatus.ACCEPTED,
-  });
+test('User can not himself approve visit registration', async () => {
+  const visit = (await mutations.createVisit(dummyUserWithRole, {
+    scheduledEventId: 2,
+    teamLeadUserId: dummyUserWithRole.id,
+    team: [dummyUserWithRole.id],
+  })) as Visit;
 
   await expect(
-    mutations.updateVisit(dummyUserWithRole, {
-      visitId: 1,
-      status: VisitStatus.DRAFT,
+    mutations.approveVisitRegistration(dummyUserWithRole, {
+      visitId: visit.id,
+      userId: dummyUserWithRole.id,
     })
-  ).resolves.toBeInstanceOf(Rejection);
-});
-test('User can not delete visit that is already accepted', async () => {
-  await mutations.updateVisit(dummyUserWithRole, {
-    visitId: 1,
-    status: VisitStatus.SUBMITTED,
-  });
-
-  await expect(
-    mutations.deleteVisit(dummyUserWithRole, 1)
-  ).resolves.not.toBeInstanceOf(Rejection);
+  ).resolves.toMatchObject({ message: 'INSUFFICIENT_PERMISSIONS' });
 });
 
-test('User can not set the state to ACCEPTED', async () => {
-  await expect(
-    mutations.updateVisit(dummyUserWithRole, {
+test('User can not update visit registration that is already submitted', async () => {
+  const registration = (await mutations.submitVisitRegistration(
+    dummyUserWithRole,
+    {
       visitId: 1,
-      status: VisitStatus.ACCEPTED,
-    })
-  ).resolves.toBeInstanceOf(Rejection);
-});
+      userId: 2,
+    }
+  )) as VisitRegistration;
 
-test('User officer can set the state to ACCEPTED', async () => {
-  await expect(
-    mutations.updateVisit(dummyUserOfficerWithRole, {
+  expect(registration.status).toEqual(VisitRegistrationStatus.SUBMITTED);
+
+  const updateResult = await mutations.updateVisitRegistration(
+    dummyUserWithRole,
+    {
       visitId: 1,
-      status: VisitStatus.ACCEPTED,
-    })
-  ).resolves.not.toBeInstanceOf(Rejection);
+      userId: 2,
+      startsAt: new Date(),
+      endsAt: new Date(),
+      trainingExpiryDate: new Date(),
+    }
+  );
+
+  expect(updateResult).toBeInstanceOf(Rejection);
 });
 
-test('User can not delete accepted visit', async () => {
-  await mutations.updateVisit(dummyUserOfficerWithRole, {
-    visitId: 1,
-    status: VisitStatus.ACCEPTED,
-  });
+test('User office can approve visit registration', async () => {
+  const registration = (await mutations.submitVisitRegistration(
+    dummyUserWithRole,
+    {
+      visitId: 1,
+      userId: 2,
+    }
+  )) as VisitRegistration;
 
+  expect(registration.status).toEqual(VisitRegistrationStatus.SUBMITTED);
+
+  const updateResult = (await mutations.approveVisitRegistration(
+    dummyUserOfficerWithRole,
+    {
+      visitId: 1,
+      userId: 2,
+    }
+  )) as VisitRegistration;
+
+  expect(updateResult.status).toEqual(VisitRegistrationStatus.APPROVED);
+});
+
+test('User can create visit registration', async () => {
+  const registration = (await mutations.createVisitRegistration(
+    dummyUserWithRole,
+    1,
+    2
+  )) as VisitRegistration;
+
+  expect(registration).toBeInstanceOf(VisitRegistration);
+});
+
+test('Not authorized user can not create visit registartion', async () => {
   await expect(
-    mutations.deleteVisit(dummyUserWithRole, 1)
+    mutations.createVisitRegistration(null, 1, 2)
   ).resolves.toBeInstanceOf(Rejection);
-});
-
-test('User officer can delete visit', async () => {
-  await mutations.updateVisit(dummyUserOfficerWithRole, {
-    visitId: 1,
-    status: VisitStatus.ACCEPTED,
-  });
-
-  await expect(
-    mutations.deleteVisit(dummyUserOfficerWithRole, 1)
-  ).resolves.not.toBeInstanceOf(Rejection);
 });

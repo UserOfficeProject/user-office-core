@@ -1,0 +1,8 @@
+mutation approveVisitRegistrations($visitRegistrations: [ApproveVisitRegistrationInput!]!) {
+  approveVisitRegistrations(visitRegistrations: $visitRegistrations) {
+    ...visitRegistration
+    user {
+      ...basicUserDetails
+    }
+  }
+}

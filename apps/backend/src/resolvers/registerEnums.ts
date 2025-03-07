@@ -25,8 +25,10 @@ import {
   TemplateGroupId,
 } from '../models/Template';
 import { UserRole } from '../models/User';
-import { VisitStatus } from '../models/Visit';
-import { TrainingStatus } from '../models/VisitRegistration';
+import {
+  TrainingStatus,
+  VisitRegistrationStatus,
+} from '../models/VisitRegistration';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
@@ -59,9 +61,6 @@ export const registerEnums = () => {
   registerEnumType(QuestionFilterCompareOperator, {
     name: 'QuestionFilterCompareOperator',
   });
-  registerEnumType(VisitStatus, {
-    name: 'VisitStatus',
-  });
   registerEnumType(AllocationTimeUnits, {
     name: 'AllocationTimeUnits',
   });
@@ -88,6 +87,9 @@ export const registerEnums = () => {
   });
   registerEnumType(TrainingStatus, {
     name: 'TrainingStatus',
+  });
+  registerEnumType(VisitRegistrationStatus, {
+    name: 'VisitRegistrationStatus',
   });
   registerEnumType(FeatureUpdateAction, {
     name: 'FeatureUpdateAction',
