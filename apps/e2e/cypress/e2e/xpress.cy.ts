@@ -1858,7 +1858,7 @@ context('Xpress tests', () => {
 
         cy.request({
           method: 'GET',
-          url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${createdProposalPk4}`,
+          url: `/download/pdf/proposal/${createdProposalPk4}`,
           headers: {
             authorization: `Bearer ${token}`,
           },
@@ -1901,7 +1901,7 @@ context('Xpress tests', () => {
 
           cy.request({
             method: 'GET',
-            url: `${Cypress.config('baseUrl')}/download/pdf/proposal/${createdProposalPk3}`,
+            url: `/download/pdf/proposal/${createdProposalPk3}`,
             headers: {
               authorization: `Bearer ${token}`,
             },
