@@ -99,7 +99,6 @@ test('User can not update visit registration that is already submitted', async (
       userId: 2,
       startsAt: new Date(),
       endsAt: new Date(),
-      trainingExpiryDate: new Date(),
     }
   );
 
