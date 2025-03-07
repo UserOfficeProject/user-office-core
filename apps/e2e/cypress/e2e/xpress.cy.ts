@@ -1863,6 +1863,14 @@ context('Xpress tests', () => {
     because of an existing issue with STFC mode cannot communicate
     with the factory.
     */
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+          this.skip();
+        }
+      });
+    });
+
     it.only('User officer can download any Xpress proposal', function () {
       cy.login('officer');
       cy.visit('/');
