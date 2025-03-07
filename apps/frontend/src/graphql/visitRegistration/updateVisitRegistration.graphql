@@ -1,14 +1,14 @@
 mutation updateVisitRegistration(
   $visitId: Int!
+  $userId: Int!
   $trainingExpiryDate: DateTime
-  $isRegistrationSubmitted: Boolean
   $startsAt: DateTime
   $endsAt: DateTime
 ) {
   updateVisitRegistration(
     visitId: $visitId
+    userId: $userId
     trainingExpiryDate: $trainingExpiryDate
-    isRegistrationSubmitted: $isRegistrationSubmitted
     startsAt: $startsAt
     endsAt: $endsAt
   ) {

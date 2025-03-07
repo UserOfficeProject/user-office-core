@@ -21,6 +21,7 @@ import {
   UpdateQuestionTemplateRelationSettingsMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
   UpdateTopicMutationVariables,
+  SetActiveTemplateMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import { getE2EApi } from './utils';
@@ -59,6 +60,15 @@ const answerTopic = (
 ): Cypress.Chainable<AnswerTopicMutation> => {
   const api = getE2EApi();
   const request = api.answerTopic(answerTopicInput);
+
+  return cy.wrap(request);
+};
+
+const setActiveTemplate = (
+  setActiveTemplateInput: SetActiveTemplateMutationVariables
+) => {
+  const api = getE2EApi();
+  const request = api.setActiveTemplate(setActiveTemplateInput);
 
   return cy.wrap(request);
 };
@@ -761,3 +771,5 @@ Cypress.Commands.add(
   'createGenericTemplateQuestion',
   createGenericTemplateQuestion
 );
+
+Cypress.Commands.add('setActiveTemplate', setActiveTemplate);
