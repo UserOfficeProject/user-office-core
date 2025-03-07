@@ -2,6 +2,7 @@ import MaterialTable from '@material-table/core';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
+import MailIcon from '@mui/icons-material/Mail';
 import { IconButton, styled, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import React, { useState } from 'react';
@@ -193,23 +194,51 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
           </IconButton>
         );
 
+        const sendEmailButton = (
+          <IconButton
+            component="a"
+            href={`
+              mailto:${rowData.user?.email || ''}?subject=Important information regarding your experiment at ESS&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${
+                params.scheduledEvent.proposal.title
+              }" with proposal ID ${
+                params.scheduledEvent.proposal.proposalId
+              }.%0D%0A%0D%0A.%0D%0A%0D%0AKind regards`}
+            data-cy="send-email-button"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MailIcon />
+          </IconButton>
+        );
+
         switch (rowData.status) {
           case VisitRegistrationStatus.DRAFTED:
-            return editButton;
+            return (
+              <ActionDiv>
+                {sendEmailButton}
+                {editButton}
+              </ActionDiv>
+            );
           case VisitRegistrationStatus.SUBMITTED:
             return (
               <ActionDiv>
+                {sendEmailButton}
                 {approveButton}
                 {cancelButton}
                 {editButton}
               </ActionDiv>
             );
           case VisitRegistrationStatus.APPROVED:
-            return cancelButton;
+            return (
+              <ActionDiv>
+                {sendEmailButton}
+                {cancelButton}
+              </ActionDiv>
+            );
           case VisitRegistrationStatus.CANCELLED_BY_USER:
+            return <ActionDiv>{sendEmailButton}</ActionDiv>;
           case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-            return null;
-
+            return <ActionDiv>{sendEmailButton}</ActionDiv>;
           default:
             return null;
         }
