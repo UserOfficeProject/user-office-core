@@ -7,6 +7,7 @@ import { FapDataSource } from '../../datasources/FapDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
+import { VisitDataSource } from '../../datasources/VisitDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { ProposalEndStatus } from '../../models/Proposal';
@@ -28,6 +29,9 @@ export async function essEmailHandler(event: ApplicationEvent) {
   );
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
+  );
+  const visitDataSource = container.resolve<VisitDataSource>(
+    Tokens.VisitDataSource
   );
 
   if (event.isRejection) {
@@ -262,6 +266,77 @@ export async function essEmailHandler(event: ApplicationEvent) {
             error: err,
             event,
           });
+        });
+
+      return;
+    }
+    case Event.VISIT_REGISTRATION_APPROVED: {
+      const visitRegistration = await visitDataSource.getRegistration(
+        event.visitregistration.userId,
+        event.visitregistration.visitId
+      );
+      if (!visitRegistration) {
+        return;
+      }
+
+      const user = await userDataSource.getUser(visitRegistration.userId);
+      if (!user) {
+        return;
+      }
+
+      const visit = await visitDataSource.getVisit(
+        event.visitregistration.visitId
+      );
+      if (!visit) {
+        return;
+      }
+
+      const proposal = await proposalDataSource.get(visit.proposalPk);
+      if (!proposal) {
+        return;
+      }
+
+      const call = await callDataSource.getCall(proposal.callId);
+      if (!call) {
+        return;
+      }
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: 'visit-registration-approved',
+          },
+          substitution_data: {
+            preferredname: user.preferredname,
+            startsAt: visitRegistration.startsAt,
+            endsAt: visitRegistration.endsAt,
+            proposalTitle: proposal.title,
+            callShortCode: call.shortCode,
+          },
+          recipients: [
+            { address: user.email },
+            {
+              address: {
+                email: 'useroffice@esss.se',
+                header_to: user.email,
+              },
+            },
+          ],
+        })
+        .then((res) => {
+          logger.logInfo('Email sent on visit registration approval', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError(
+            'Could not send email on visit registration approval',
+            {
+              error: err,
+              event,
+            }
+          );
         });
 
       return;
