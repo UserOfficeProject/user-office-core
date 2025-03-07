@@ -1,5 +1,5 @@
-query getVisitRegistration($visitId: Int!) {
-  visitRegistration(visitId: $visitId) {
+query getVisitRegistration($visitId: Int!, $userId: Int!) {
+  visitRegistration(visitId: $visitId, userId: $userId) {
     ...visitRegistration
     user {
       ...basicUserDetails

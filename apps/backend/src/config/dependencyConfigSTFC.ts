@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
+import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -90,6 +91,7 @@ mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, StfcUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
+mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
 mapClass(Tokens.TechniqueDataSource, StfcTechniqueDataSource);
 mapClass(

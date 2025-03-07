@@ -95,9 +95,14 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
   );
 }
 
-const createVisitRegistration = async (api: Sdk, visitId: number) => {
+const createVisitRegistration = async (
+  api: Sdk,
+  visitId: number,
+  userId: number
+) => {
   const { createVisitRegistration } = await api.createVisitRegistration({
     visitId,
+    userId,
   });
 
   return createVisitRegistration;
@@ -120,7 +125,11 @@ const visitBasisPreSubmit =
     const isStarted = !!registration.questionary.questionaryId;
 
     if (isStarted === false) {
-      await createVisitRegistration(api, registration.visitId);
+      await createVisitRegistration(
+        api,
+        registration.visitId,
+        registration.userId
+      );
       const newRegistration = await updateVisitRegistration(api, registration);
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_CREATED',

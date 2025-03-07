@@ -4,7 +4,6 @@ import { Tokens } from '../config/Tokens';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
 import { Feedback } from '../models/Feedback';
 import { UserWithRole } from '../models/User';
-import { VisitStatus } from '../models/Visit';
 import { VisitDataSource } from './../datasources/VisitDataSource';
 import { UserAuthorization } from './UserAuthorization';
 
@@ -114,10 +113,8 @@ export class FeedbackAuthorization {
     }
 
     /*
-     * Teamlead can change the feedback if it is in draft status
+     * Teamlead can change the feedback
      */
-    return (
-      visit.teamLeadUserId === agent.id && visit.status === VisitStatus.DRAFT
-    );
+    return visit.teamLeadUserId === agent.id;
   }
 }
