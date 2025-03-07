@@ -2,7 +2,6 @@ import querystring from 'querystring';
 import { Readable } from 'stream';
 import { ReadableStream } from 'stream/web';
 
-import { logger } from '@user-office-software/duo-logger';
 import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
 
@@ -81,14 +80,11 @@ export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
     });
 
     if (!factoryResp.ok) {
-      logger.logError('Factory response was not ok :(', {});
       throw new Error(await factoryResp.text());
     }
 
     const factoryRespBody = factoryResp.body;
     if (!factoryRespBody) {
-      logger.logError('Factory body was null :(', {});
-
       return;
     }
 
@@ -99,7 +95,7 @@ export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
     readableStream.on('error', (err) => {
       next({
         error: err.toString(),
-        message: `Could not download generated ${downloadType}/${type}`,
+        message: `Could not download generated ${downloadType}/${type} because of ${err.toString()}`,
       });
     });
 
@@ -120,7 +116,7 @@ export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
   } catch (error) {
     next({
       error,
-      message: `Could not download generated ${downloadType}/${type}`,
+      message: `Could not download generated ${downloadType}/${type} because of an error`,
     });
   }
 }
