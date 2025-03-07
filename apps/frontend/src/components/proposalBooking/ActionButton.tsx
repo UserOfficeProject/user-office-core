@@ -8,6 +8,7 @@ export type ActionButtonState =
   | 'active'
   | 'inactive'
   | 'neutral'
+  | 'pending'
   | 'invisible';
 
 interface ActionButtonProps {
@@ -68,6 +69,22 @@ const ActionButton = ({ children, variant: state }: ActionButtonProps) => {
         >
           {children}
         </DotBadge>
+      );
+    case 'pending':
+      return (
+        <CheckBadge
+          sx={{
+            color: '#000',
+            marginRight: '2px',
+            '& .MuiBadge-badge': {
+              fontSize: '17px',
+              color: '#4ba322',
+              textShadow: '-1px 2px 0 white',
+            },
+          }}
+        >
+          {children}
+        </CheckBadge>
       );
     case 'invisible':
       return <DotBadge />;

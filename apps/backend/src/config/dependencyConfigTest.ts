@@ -5,6 +5,7 @@ import 'reflect-metadata';
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
@@ -88,6 +89,7 @@ mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
+mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource
