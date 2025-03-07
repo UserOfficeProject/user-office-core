@@ -104,9 +104,7 @@ const ProposalReviewContent = ({
 
   const canEditAsFapSec =
     isFapSec && fapSecs && fapSecs.find((userId) => userId === user.id);
-  console.log('isFapSec:', isFapSec);
-  console.log('canEditAsFapSec:', canEditAsFapSec);
-  console.log('fapSecs:', fapSecs, 'User ID:', user.id);
+
   const technicalReviewsContent = proposalData.technicalReviews.map(
     (technicalReview) => {
       const technicalReviewInstrument = getTechnicalReviewInstrument(
@@ -118,17 +116,18 @@ const ProposalReviewContent = ({
         technicalReview?.technicalReviewAssigneeId === user.id;
 
       return isUserOfficer ||
+        isFapSec ||
         canEditAsFapSec ||
         canEditAsInstrumentSci ||
         isInternalReviewer ? (
         <Fragment key={technicalReview.id}>
-          {!!technicalReview && (
+          {!!technicalReview && !isFapSec && (
             <InternalReviews
               technicalReviewId={technicalReview.id}
               technicalReviewSubmitted={technicalReview.submitted}
             />
           )}
-          {!!technicalReviewInstrument && !canEditAsFapSec && (
+          {!!technicalReviewInstrument && !canEditAsFapSec && !isFapSec && (
             <ProposalTechnicalReviewerAssignment
               technicalReview={technicalReview}
               instrument={technicalReviewInstrument}
@@ -155,7 +154,7 @@ const ProposalReviewContent = ({
               marginBottom: theme.spacing(2),
             })}
           >
-            {(isUserOfficer || isFapSec) && (
+            {!isFapSec && (
               <Typography
                 variant="h6"
                 data-cy="reviewed-by-info"
