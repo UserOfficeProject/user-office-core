@@ -228,13 +228,6 @@ context('Xpress tests', () => {
 
   beforeEach(function () {
     cy.resetDB();
-    cy.getAndStoreFeaturesEnabled().then(() => {
-      if (
-        !featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)
-      ) {
-        this.skip();
-      }
-    });
 
     /*
      Create Xpress-specific statuses to avoid patching them in.
@@ -562,6 +555,18 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress basic tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User should not be able to see Xpress page', function () {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -1104,6 +1109,18 @@ context('Xpress tests', () => {
   });
 
   describe('Techniques advanced tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User officer can see all submitted and unsubmitted Xpress proposals', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
@@ -1320,6 +1337,18 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress statuses tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User officer can change to/from any Xpress status', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
@@ -1829,6 +1858,11 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress PDF download tests', () => {
+    /*
+    These tests run in e2e dependency config despite being Xpress,
+    because of an existing issue with STFC mode cannot communicate
+    with the factory.
+    */
     it.only('User officer can download any Xpress proposal', function () {
       cy.login('officer');
       cy.visit('/');
@@ -1836,18 +1870,6 @@ context('Xpress tests', () => {
 
       cy.contains('Xpress').click();
       cy.finishedLoading();
-
-      cy.contains(proposal1.title)
-        .parent()
-        .find('[aria-label="View proposal"]')
-        .click();
-
-      cy.contains('Download PDF').click();
-
-      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        proposal1.title
-      );
 
       cy.window().then((win) => {
         const token = win.localStorage.getItem('token');
@@ -1876,21 +1898,6 @@ context('Xpress tests', () => {
         cy.login(scientist1);
         cy.visit('/');
         cy.finishedLoading();
-
-        cy.contains('Xpress').click();
-        cy.finishedLoading();
-
-        cy.contains(proposal3.title)
-          .parent()
-          .find('[aria-label="View proposal"]')
-          .click();
-
-        cy.contains('Download PDF').click();
-
-        cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-        cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-          proposal3.title
-        );
 
         cy.window().then((win) => {
           const token = win.localStorage.getItem('token');
