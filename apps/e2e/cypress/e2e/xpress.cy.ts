@@ -1876,9 +1876,6 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
-      cy.finishedLoading();
-
       cy.window().then((win) => {
         const token = win.localStorage.getItem('token');
 
