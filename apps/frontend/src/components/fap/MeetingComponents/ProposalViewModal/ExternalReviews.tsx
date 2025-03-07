@@ -35,15 +35,9 @@ const ExternalReviews = ({ reviews, faps }: ExternalReviewsProps) => (
         <Table sx={{ minWidth: 500 }}>
           <TableBody>
             <TableRow key="externalReviewsHeading">
-              <TableCell width="50%" sx={BOLD_TEXT_STYLE}>
-                Name
-              </TableCell>
-              <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
-                Score
-              </TableCell>
-              <TableCell width="25%" sx={BOLD_TEXT_STYLE}>
-                Review Summary
-              </TableCell>
+              <TableCell sx={BOLD_TEXT_STYLE}>Name</TableCell>
+              <TableCell sx={BOLD_TEXT_STYLE}>Score</TableCell>
+              <TableCell sx={BOLD_TEXT_STYLE}>Review Summary</TableCell>
               <TableCell sx={BOLD_TEXT_STYLE}>Comment</TableCell>
             </TableRow>
             {reviews?.map((review) => (

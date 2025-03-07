@@ -9,25 +9,27 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { VisitRegistrationStatus } from '../../models/VisitRegistration';
 import { VisitRegistration } from '../types/VisitRegistration';
 
 @ArgsType()
 export class UpdateVisitRegistrationArgs {
-  @Field(() => Int)
+  @Field(() => Int!)
+  userId: number;
+
+  @Field(() => Int!)
   visitId: number;
 
   @Field(() => Date, { nullable: true })
-  trainingExpiryDate?: Date;
-
-  @Field(() => Boolean, { nullable: true })
-  isRegistrationSubmitted?: boolean;
+  trainingExpiryDate?: Date | null;
 
   @Field(() => Date, { nullable: true })
-  startsAt?: boolean;
+  startsAt?: Date | null;
 
   @Field(() => Date, { nullable: true })
-  endsAt?: boolean;
+  endsAt?: Date | null;
 
+  status?: VisitRegistrationStatus;
   registrationQuestionaryId?: number;
 }
 

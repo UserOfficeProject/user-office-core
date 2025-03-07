@@ -1,6 +1,7 @@
 import { container, inject, injectable } from 'tsyringe';
 
 import { VisitAuthorization } from '../auth/VisitAuthorization';
+import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -18,6 +19,9 @@ export interface GetRegistrationsFilter {
 @injectable()
 export default class VisitQueries {
   private visitAuth = container.resolve(VisitAuthorization);
+  private visitRegistrationAuth = container.resolve(
+    VisitRegistrationAuthorization
+  );
 
   constructor(
     @inject(Tokens.VisitDataSource)
@@ -63,9 +67,19 @@ export default class VisitQueries {
   @Authorized()
   async getRegistration(
     user: UserWithRole | null,
-    visitId: number
+    visitId: number,
+    userId: number
   ): Promise<VisitRegistration | null> {
-    return this.dataSource.getRegistration(user!.id, visitId);
+    const hasReadRights = await this.visitRegistrationAuth.hasReadRights(user, {
+      visitId,
+      userId,
+    });
+
+    if (!hasReadRights) {
+      return null;
+    }
+
+    return this.dataSource.getRegistration(userId, visitId);
   }
 
   @Authorized()
