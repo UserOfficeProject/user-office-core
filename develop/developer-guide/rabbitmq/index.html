@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
     
     
       
@@ -1630,7 +1630,7 @@
 
 <h1 id="rabbitmq">RabbitMQ</h1>
 <hr />
-<p>RabbitMQ is a message broker that enables applications to communicate with each other asynchronously by sending and receiving messages. It is used within User Office to handle communication between different components of the system, particularly for routing messages related to proposal status actions. </p>
+<p>RabbitMQ is a message broker that enables applications to communicate with each other asynchronously by sending and receiving messages. It is used within User Office to handle communication between different components of the system, particularly for routing messages related to proposal status actions.</p>
 <p>This page provides an overview of how RabbitMQ is integrated into the project, including details on configuration, message handling, and frontend display.</p>
 <h2 id="rabbitmq-in-user-office-core">RabbitMQ in User Office Core</h2>
 <p>When the status of a proposal changes, a message is sent to specific RabbitMQ exchanges, which then route the message to the appropriate services or components for further processing.</p>
@@ -1639,7 +1639,7 @@
 <h2 id="configuration-of-rabbitmq-exchanges">Configuration of RabbitMQ Exchanges</h2>
 <p>The RabbitMQ exchanges are configured using the <code>RabbitMQActionConfig</code> class. This class defines the exchanges to which messages will be sent when the status of a proposal changes.</p>
 <pre><code>@ObjectType()
-export class RabbitMQActionConfig extends ProposalStatusActionConfigBase {
+export class RabbitMQActionConfig extends StatusActionConfigBase {
 @Field(() =&gt; [String], { nullable: true })
 exchanges?: string[] | null;
 }
@@ -1649,10 +1649,10 @@ exchanges?: string[] | null;
 <h2 id="backend-message-handling">Backend Message Handling</h2>
 <p>The <code>rabbitMQActionHandler</code> function in the backend is responsible for sending messages to RabbitMQ exchanges based on the configuration defined in <code>RabbitMQActionConfig</code>.</p>
 <pre><code>export const rabbitMQActionHandler = async (
-  proposalStatusAction: ConnectionHasStatusAction,
+  statusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[]
 ) =&gt; {
-  const config = proposalStatusAction.config as RabbitMQActionConfig;
+  const config = statusAction.config as RabbitMQActionConfig;
   if (!config.exchanges?.length) {
     return;
   }
@@ -1667,7 +1667,7 @@ exchanges?: string[] | null;
  );
 };
 </code></pre>
-<p><strong>Message Publishing:</strong> This function takes in a <code>proposalStatusAction</code> and an array of proposals. It then publishes messages to each configured exchange by calling <code>publishMessageToTheEventBus</code>.</p>
+<p><strong>Message Publishing:</strong> This function takes in a <code>statusAction</code> and an array of proposals. It then publishes messages to each configured exchange by calling <code>publishMessageToTheEventBus</code>.</p>
 <p>If no exchanges are configured, the function exits early without performing any actions.</p>
 <hr />
 <h2 id="frontend-display-of-rabbitmq-exchanges">Frontend display of RabbitMQ Exchanges</h2>
@@ -1699,7 +1699,7 @@ export default RabbitMQActionConfig;
 <p>The <code>RabbitMQActionConfig</code> class is integrated into the project’s GraphQL API, allowing for dynamic configuration and querying of RabbitMQ settings.</p>
 <p>You can retrieve the RabbitMQ configuration using a GraphQL query:</p>
 <pre><code>query {
-  proposalStatusActionConfig {
+  statusActionConfig {
     exchanges
   }
 }
@@ -1755,7 +1755,7 @@ export default RabbitMQActionConfig;
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.top", "navigation.tabs", "navigation.tabs.sticky", "content.tooltips"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.f1b6f286.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
       
     
   </body>
