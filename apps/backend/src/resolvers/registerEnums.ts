@@ -25,10 +25,7 @@ import {
   TemplateGroupId,
 } from '../models/Template';
 import { UserRole } from '../models/User';
-import {
-  TrainingStatus,
-  VisitRegistrationStatus,
-} from '../models/VisitRegistration';
+import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { WorkflowType } from '../models/Workflow';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
@@ -85,9 +82,6 @@ export const registerEnums = () => {
   });
   registerEnumType(ConflictResolutionStrategy, {
     name: 'ConflictResolutionStrategy',
-  });
-  registerEnumType(TrainingStatus, {
-    name: 'TrainingStatus',
   });
   registerEnumType(VisitRegistrationStatus, {
     name: 'VisitRegistrationStatus',

@@ -272,7 +272,6 @@ export interface VisitRegistrationRecord {
   user_id: number;
   visit_id: number;
   registration_questionary_id: number | null;
-  training_expiry_date: Date | null;
   starts_at: Date | null;
   ends_at: Date | null;
   status: string;
@@ -1013,7 +1012,6 @@ export const createVisitRegistrationObject = (
     record.registration_questionary_id,
     record.starts_at,
     record.ends_at,
-    record.training_expiry_date,
     record.status as VisitRegistrationStatus
   );
 };
