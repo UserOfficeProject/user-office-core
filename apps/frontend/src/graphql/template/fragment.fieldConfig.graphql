@@ -166,6 +166,12 @@ fragment fieldConfig on FieldConfig {
     tooltip
   }
 
+  ... on ExperimentSafetyReviewBasisConfig {
+    small_label
+    required
+    tooltip
+  }
+
   ... on InstrumentPickerConfig {
     variant
     small_label

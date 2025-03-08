@@ -142,7 +142,7 @@ export function TemplateMenuListItem() {
             <ListItemIcon>
               <DescriptionIcon />
             </ListItemIcon>
-            <ListItemText primary="Experiment Safety Review" />
+            <ListItemText primary="Exp Safety Review" />
           </ListItemButton>
         </Tooltip>
 

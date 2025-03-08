@@ -351,6 +351,7 @@ export const FieldConfigType = createUnionType({
     TechnicalReviewBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
+    ExperimentSafetyReviewBasisConfig,
     InstrumentPickerConfig,
     TechniquePickerConfig,
   ], // function that returns array of object types classes

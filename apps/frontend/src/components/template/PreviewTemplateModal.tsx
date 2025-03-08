@@ -125,6 +125,8 @@ const PreviewTemplateModal = ({
             previewMode={true}
           />
         );
+      case TemplateGroupId.EXP_SAFETY_REVIEW:
+        return <>asd</>;
     }
   };
 
