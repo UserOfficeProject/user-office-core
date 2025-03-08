@@ -5,7 +5,7 @@ query getUserProposals {
       proposalId
       title
       status {
-        ...proposalStatus
+        ...status
       }
       publicStatus
       statusId

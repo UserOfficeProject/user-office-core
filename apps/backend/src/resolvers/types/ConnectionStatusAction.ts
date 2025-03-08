@@ -9,9 +9,9 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ConnectionHasStatusAction } from '../../models/ProposalStatusAction';
-import { ProposalStatusAction } from './ProposalStatusAction';
-import { ProposalStatusActionConfig } from './ProposalStatusActionConfig';
+import { ConnectionHasStatusAction } from '../../models/StatusAction';
+import { StatusAction } from './StatusAction';
+import { StatusActionConfig } from './StatusActionConfig';
 
 @ObjectType()
 export class ConnectionStatusAction
@@ -26,18 +26,18 @@ export class ConnectionStatusAction
   @Field(() => Int)
   public workflowId: number;
 
-  @Field(() => ProposalStatusActionConfig, { nullable: true })
-  public config: typeof ProposalStatusActionConfig | null;
+  @Field(() => StatusActionConfig, { nullable: true })
+  public config: typeof StatusActionConfig | null;
 }
 
 @Resolver(() => ConnectionStatusAction)
 export class ConnectionStatusActionResolver {
-  @FieldResolver(() => ProposalStatusAction)
+  @FieldResolver(() => StatusAction)
   async action(
     @Root() connectionStatusAction: ConnectionStatusAction,
     @Ctx() context: ResolverContext
-  ): Promise<ProposalStatusAction> {
-    return context.queries.proposalSettings.getStatusAction(
+  ): Promise<StatusAction> {
+    return context.queries.statusAction.getStatusAction(
       context.user,
       connectionStatusAction.actionId
     );
