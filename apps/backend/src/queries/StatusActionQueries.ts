@@ -13,7 +13,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithDescription,
   RabbitMQActionDefaultConfig,
-} from '../resolvers/types/ProposalStatusActionConfig';
+} from '../resolvers/types/StatusActionConfig';
 
 @injectable()
 export default class StatusActionQueries {

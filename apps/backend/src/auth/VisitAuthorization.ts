@@ -5,7 +5,6 @@ import { Tokens } from '../config/Tokens';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { UserWithRole } from '../models/User';
-import { VisitStatus } from '../models/Visit';
 import { Visit } from '../models/Visit';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
@@ -102,29 +101,20 @@ export class VisitAuthorization {
     }
 
     const proposal = await this.proposalDataSource.get(visit.proposalPk);
+    const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
+      agent,
+      proposal
+    );
 
-    /*
-     * User can modify the visit if he is a participant of a proposal
-     * and the visit is not yet accepted
-     */
-    if (await this.proposalAuth.isMemberOfProposal(agent, proposal)) {
-      if (visit.status === VisitStatus.ACCEPTED) {
-        logger.logError('User tried to change accepted visit', {
-          agent,
-          visit,
-        });
+    if (isMemberOfProposal === false) {
+      logger.logWarn('User tried to update visit without having write rights', {
+        agent,
+        visit,
+      });
 
-        return false;
-      }
-
-      return true;
+      return false;
     }
 
-    logger.logError('User tried to change visit that he is not a member of', {
-      agent,
-      visit,
-    });
-
-    return false;
+    return true;
   }
 }

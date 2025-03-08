@@ -138,13 +138,16 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         if (filter?.callId) {
           query.where('call_id', filter.callId);
         }
-        if (filter?.instrumentFilter?.instrumentId) {
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
           // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
           query.whereRaw(
             'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
             { instrumentId: filter?.instrumentFilter?.instrumentId }
           );
         }
+
         if (filter?.proposalStatusId) {
           query.where('proposal_status_id', filter?.proposalStatusId);
         }
@@ -184,14 +187,17 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
           query.offset(offset);
         }
       })
-      .then((proposals: ProposalViewRecord[]) => {
+      .then(async (proposals: ProposalViewRecord[]) => {
         const props = proposals.map((proposal) =>
           createProposalViewObject(proposal)
         );
 
+        const propsWithTechReviewerDetails =
+          await this.getTechReviewersDetails(props);
+
         return {
           totalCount: proposals[0] ? proposals[0].full_count : 0,
-          proposals: props,
+          proposals: propsWithTechReviewerDetails,
         };
       });
 
@@ -232,58 +238,8 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       stfcUserIds
     );
 
-    const technicalReviewers = removeDuplicates(
+    const propsWithTechReviewerDetails = await this.getTechReviewersDetails(
       proposals.proposalViews
-        .filter((proposal) => !!proposal.technicalReviews?.length)
-        .map(({ technicalReviews }) =>
-          (technicalReviews as ProposalViewTechnicalReview[]).map(
-            (techicalReview) =>
-              techicalReview.technicalReviewAssignee.id.toString()
-          )
-        )
-        .flat()
-    );
-
-    const technicalReviewersDetails =
-      await this.stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
-        technicalReviewers,
-        false
-      );
-
-    const propsWithTechReviewerDetails = proposals.proposalViews.map(
-      (proposal) => {
-        let proposalTechnicalReviews: ProposalViewTechnicalReview[] = [];
-        const { technicalReviews } = proposal;
-
-        if (technicalReviews?.length) {
-          proposalTechnicalReviews = technicalReviews.map((technicalReview) => {
-            const userDetails = technicalReviewersDetails.find(
-              (trd) =>
-                trd.userNumber ===
-                technicalReview.technicalReviewAssignee.id.toString()
-            );
-
-            const firstName = userDetails?.firstNameKnownAs
-              ? userDetails.firstNameKnownAs
-              : userDetails?.givenName ?? '';
-            const lastName = userDetails?.familyName ?? '';
-
-            return {
-              ...technicalReview,
-              technicalReviewAssignee: {
-                id: technicalReview.technicalReviewAssignee.id,
-                firstname: firstName,
-                lastname: lastName,
-              },
-            };
-          });
-        }
-
-        return {
-          ...proposal,
-          technicalReviews: proposalTechnicalReviews,
-        };
-      }
     );
 
     return {
@@ -544,5 +500,59 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       });
 
     return result;
+  }
+
+  async getTechReviewersDetails(proposals: ProposalView[]) {
+    const technicalReviewers = removeDuplicates(
+      proposals
+        .filter((proposal) => !!proposal.technicalReviews?.length)
+        .map(({ technicalReviews }) =>
+          (technicalReviews as ProposalViewTechnicalReview[]).map(
+            (techicalReview) =>
+              techicalReview.technicalReviewAssignee.id.toString()
+          )
+        )
+        .flat()
+    );
+
+    const technicalReviewersDetails =
+      await this.stfcUserDataSource.getStfcBasicPeopleByUserNumbers(
+        technicalReviewers,
+        false
+      );
+
+    return proposals.map((proposal) => {
+      let proposalTechnicalReviews: ProposalViewTechnicalReview[] = [];
+      const { technicalReviews } = proposal;
+
+      if (technicalReviews?.length) {
+        proposalTechnicalReviews = technicalReviews.map((technicalReview) => {
+          const userDetails = technicalReviewersDetails.find(
+            (trd) =>
+              trd.userNumber ===
+              technicalReview.technicalReviewAssignee.id.toString()
+          );
+
+          const firstName = userDetails?.firstNameKnownAs
+            ? userDetails.firstNameKnownAs
+            : userDetails?.givenName ?? '';
+          const lastName = userDetails?.familyName ?? '';
+
+          return {
+            ...technicalReview,
+            technicalReviewAssignee: {
+              id: technicalReview.technicalReviewAssignee.id,
+              firstname: firstName,
+              lastname: lastName,
+            },
+          };
+        });
+      }
+
+      return {
+        ...proposal,
+        technicalReviews: proposalTechnicalReviews,
+      };
+    });
   }
 }

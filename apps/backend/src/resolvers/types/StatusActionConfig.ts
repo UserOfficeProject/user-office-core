@@ -78,28 +78,28 @@ export class EmailStatusActionRecipientsWithTemplate {
 }
 
 @ObjectType()
-export class ProposalStatusActionConfigBase {}
+export class StatusActionConfigBase {}
 
 @ObjectType()
-export class EmailActionConfig extends ProposalStatusActionConfigBase {
+export class EmailActionConfig extends StatusActionConfigBase {
   @Field(() => [EmailStatusActionRecipientsWithTemplate])
   recipientsWithEmailTemplate: EmailStatusActionRecipientsWithTemplate[];
 }
 
 @ObjectType()
-export class RabbitMQActionConfig extends ProposalStatusActionConfigBase {
+export class RabbitMQActionConfig extends StatusActionConfigBase {
   @Field(() => [String], { nullable: true })
   exchanges?: string[] | null;
 }
 
-export const ProposalStatusActionConfig = createUnionType({
-  name: 'ProposalStatusActionConfig', // the name of the GraphQL union
+export const StatusActionConfig = createUnionType({
+  name: 'StatusActionConfig', // the name of the GraphQL union
   types: () => [EmailActionConfig, RabbitMQActionConfig], // function that returns array of object types classes
 });
 
 // NOTE: Default config starts here
 @ObjectType()
-export class EmailActionDefaultConfig extends ProposalStatusActionConfigBase {
+export class EmailActionDefaultConfig extends StatusActionConfigBase {
   constructor(
     recipients: EmailStatusActionRecipient[],
     emailTemplates: EmailStatusActionEmailTemplate[]
@@ -117,7 +117,7 @@ export class EmailActionDefaultConfig extends ProposalStatusActionConfigBase {
 }
 
 @ObjectType()
-export class RabbitMQActionDefaultConfig extends ProposalStatusActionConfigBase {
+export class RabbitMQActionDefaultConfig extends StatusActionConfigBase {
   constructor(exchanges: string[] | null) {
     super();
     this.exchanges = exchanges;
@@ -127,7 +127,7 @@ export class RabbitMQActionDefaultConfig extends ProposalStatusActionConfigBase 
   exchanges?: string[] | null;
 }
 
-export const ProposalStatusActionDefaultConfig = createUnionType({
-  name: 'ProposalStatusActionDefaultConfig', // the name of the GraphQL union
+export const StatusActionDefaultConfig = createUnionType({
+  name: 'StatusActionDefaultConfig', // the name of the GraphQL union
   types: () => [EmailActionDefaultConfig, RabbitMQActionDefaultConfig], // function that returns array of object types classes
 });

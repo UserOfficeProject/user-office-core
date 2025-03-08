@@ -12,9 +12,9 @@ import {
 import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import {
   EmailActionConfig,
-  ProposalStatusActionConfig,
+  StatusActionConfig,
   RabbitMQActionConfig,
-} from '../../resolvers/types/ProposalStatusActionConfig';
+} from '../../resolvers/types/StatusActionConfig';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import database from './database';
@@ -33,7 +33,7 @@ export default class PostgresStatusActionsDataSource
   ) {}
   private createStatusActionConfig(
     type: StatusActionType,
-    config: typeof ProposalStatusActionConfig
+    config: typeof StatusActionConfig
   ) {
     switch (type) {
       case StatusActionType.EMAIL: {
@@ -56,7 +56,7 @@ export default class PostgresStatusActionsDataSource
       status_action_id: number;
       name: string;
       type: StatusActionType;
-      config: typeof ProposalStatusActionConfig; // TODO: Proposal Needs to be removed
+      config: typeof StatusActionConfig;
     }
   ) {
     return new ConnectionHasStatusAction(
@@ -87,7 +87,7 @@ export default class PostgresStatusActionsDataSource
   ): Promise<ConnectionHasStatusAction[]> {
     const statusActionRecords: (StatusActionRecord &
       WorkflowConnectionHasActionsRecord & {
-        config: typeof ProposalStatusActionConfig;
+        config: typeof StatusActionConfig;
       })[] = await database
       .select()
       .from('status_actions as sa')
@@ -110,7 +110,7 @@ export default class PostgresStatusActionsDataSource
   ): Promise<ConnectionHasStatusAction> {
     const statusActionRecord: StatusActionRecord &
       WorkflowConnectionHasActionsRecord & {
-        config: typeof ProposalStatusActionConfig;
+        config: typeof StatusActionConfig;
       } = await database
       .select()
       .from('status_actions as sa')
@@ -134,7 +134,7 @@ export default class PostgresStatusActionsDataSource
     statusAction: ConnectionHasStatusAction
   ): Promise<ConnectionHasStatusAction> {
     const [updatedStatusAction]: (WorkflowConnectionHasActionsRecord & {
-      config: typeof ProposalStatusActionConfig;
+      config: typeof StatusActionConfig;
     })[] = await database
       .update(
         {
@@ -205,7 +205,7 @@ export default class PostgresStatusActionsDataSource
     const connectionHasStatusActions:
       | (WorkflowConnectionHasActionsRecord &
           StatusActionRecord & {
-            config: typeof ProposalStatusActionConfig;
+            config: typeof StatusActionConfig;
           })[]
       | undefined = await database.transaction(async (trx) => {
       try {
@@ -222,7 +222,7 @@ export default class PostgresStatusActionsDataSource
         const currentConnectionStatusActionsIds: number[] = await database
           .select('*')
           .from('workflow_connection_has_actions')
-          .where('connection_id', connectionStatusActionsInput.connectionId) //TODO: ADD .andWhere('workflow_id', connectionStatusActionsInput.workflowId)
+          .where('connection_id', connectionStatusActionsInput.connectionId)
           .transacting(trx)
           .then((results: WorkflowConnectionHasActionsRecord[]) => {
             return results.map((result) => result.action_id);

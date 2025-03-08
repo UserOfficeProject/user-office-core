@@ -7,6 +7,7 @@ import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import { UserRole, Workflow, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useWorkflowsData } from 'hooks/settings/useWorkflowsData';
+import { capitalize } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
@@ -56,7 +57,7 @@ const WorkflowsTable = ({
   const deleteWorkflow = async (id: number | string) => {
     try {
       await api({
-        toastSuccessMessage: 'Workflow deleted successfully',
+        toastSuccessMessage: `${capitalize(entityType)} workflow deleted successfully`,
       }).deleteWorkflow({
         id: id as number,
       });

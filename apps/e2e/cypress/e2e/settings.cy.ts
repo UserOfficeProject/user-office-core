@@ -1569,7 +1569,16 @@ context('Settings tests', () => {
     const updatedWorkflowName = faker.lorem.words(2);
     const updatedWorkflowDescription = faker.lorem.words(5);
     let createdWorkflowId: number;
-    beforeEach(() => {
+
+    beforeEach(function () {
+      if (
+        !featureFlags
+          .getEnabledFeatures()
+          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
+      ) {
+        this.skip();
+      }
+
       // NOTE: Cypress scrolls automatically to the status position and dragging element is problematic when the droppable area is out of the view. For now this solution to extend the height of the view is the fastest
       cy.viewport(1920, 2000);
       cy.createWorkflow({
@@ -1584,7 +1593,8 @@ context('Settings tests', () => {
       });
       cy.getAndStoreAppSettings();
     });
-    it('User Officer should be able to create Experiment Workflow and it should contain default AWAITING_ESF status', () => {
+
+    it('User Officer should be able to create Experiment Workflow and it should contain default AWAITING_ESF status', function () {
       cy.login('officer');
       cy.visit('/ExperimentWorkflows');
 
@@ -1605,7 +1615,8 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
     });
-    it('User Officer should be able to update Experiment workflow', () => {
+
+    it('User Officer should be able to update Experiment workflow', function () {
       cy.login('officer');
       cy.visit('/');
 
@@ -1625,7 +1636,8 @@ context('Settings tests', () => {
         .should('contain.text', updatedWorkflowName)
         .should('contain.text', updatedWorkflowDescription);
     });
-    it('User Officer should be able to add more statuses in experiment workflow', () => {
+
+    it('User Officer should be able to add more statuses in experiment workflow', function () {
       cy.login('officer');
       cy.visit('/');
 
@@ -1650,6 +1662,7 @@ context('Settings tests', () => {
 
       cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('exist');
     });
+
     it('User Officer should be able to select events that are triggering change to workflow status', () => {
       cy.login('officer');
       cy.visit('/');

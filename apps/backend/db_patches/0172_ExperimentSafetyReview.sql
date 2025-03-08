@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('0169_ExperimentSafetyReview', 'Yoganandan Pandiyan', 'Reconstructing Experiment Safety review in accordance with the new requirement', '2025-02-11') THEN
+  IF register_patch('0172_ExperimentSafetyReview', 'Yoganandan Pandiyan', 'Reconstructing Experiment Safety review in accordance with the new requirement', '2025-03-08') THEN
     CREATE TABLE IF NOT EXISTS "experiments" (
         "experiment_pk" SERIAL PRIMARY KEY
       , "experiment_id" varchar(20) NOT NULL UNIQUE

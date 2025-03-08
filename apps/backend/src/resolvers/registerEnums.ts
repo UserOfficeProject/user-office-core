@@ -26,8 +26,7 @@ import {
   TemplateGroupId,
 } from '../models/Template';
 import { UserRole } from '../models/User';
-import { VisitStatus } from '../models/Visit';
-import { TrainingStatus } from '../models/VisitRegistration';
+import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { WorkflowType } from '../models/Workflow';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
@@ -35,7 +34,7 @@ import {
   EquipmentAssignmentStatus,
   ScheduledEventBookingType,
 } from './types/ProposalBooking';
-import { EmailStatusActionRecipients } from './types/ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from './types/StatusActionConfig';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
@@ -59,9 +58,6 @@ export const registerEnums = () => {
   registerEnumType(NumberValueConstraint, { name: 'NumberValueConstraint' });
   registerEnumType(QuestionFilterCompareOperator, {
     name: 'QuestionFilterCompareOperator',
-  });
-  registerEnumType(VisitStatus, {
-    name: 'VisitStatus',
   });
   registerEnumType(AllocationTimeUnits, {
     name: 'AllocationTimeUnits',
@@ -87,8 +83,8 @@ export const registerEnums = () => {
   registerEnumType(ConflictResolutionStrategy, {
     name: 'ConflictResolutionStrategy',
   });
-  registerEnumType(TrainingStatus, {
-    name: 'TrainingStatus',
+  registerEnumType(VisitRegistrationStatus, {
+    name: 'VisitRegistrationStatus',
   });
   registerEnumType(FeatureUpdateAction, {
     name: 'FeatureUpdateAction',

@@ -11,7 +11,7 @@ import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { StatusActionsLog } from '../models/StatusActionsLog';
 import { UserWithRole } from '../models/User';
-import { EmailStatusActionRecipients } from '../resolvers/types/ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 import { emailActionHandler } from '../statusActionEngine/emailActionHandler';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 

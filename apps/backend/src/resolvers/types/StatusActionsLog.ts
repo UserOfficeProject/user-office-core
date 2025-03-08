@@ -13,7 +13,7 @@ import { ResolverContext } from '../../context';
 import { StatusActionsLog as StatusActionsLogOrigin } from '../../models/StatusActionsLog';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { Proposal } from './Proposal';
-import { EmailStatusActionRecipients } from './ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from './StatusActionConfig';
 
 @ObjectType()
 @Directive('@key(fields: "statusActionsLogId")')

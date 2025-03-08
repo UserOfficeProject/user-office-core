@@ -1,13 +1,13 @@
 import { ConnectionHasStatusAction } from '../models/StatusAction';
-import { RabbitMQActionConfig } from '../resolvers/types/ProposalStatusActionConfig';
+import { RabbitMQActionConfig } from '../resolvers/types/StatusActionConfig';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import { publishMessageToTheEventBus } from './statusActionUtils';
 
 export const rabbitMQActionHandler = async (
-  proposalStatusAction: ConnectionHasStatusAction,
+  statusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[]
 ) => {
-  const config = proposalStatusAction.config as RabbitMQActionConfig;
+  const config = statusAction.config as RabbitMQActionConfig;
   if (!config.exchanges?.length) {
     return;
   }

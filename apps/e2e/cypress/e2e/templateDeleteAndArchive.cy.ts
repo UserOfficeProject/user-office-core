@@ -711,7 +711,7 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id, PI.id],
         teamLeadUserId: PI.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingScheduledEventId,
       });
     });
 
@@ -1156,7 +1156,7 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingScheduledEventId,
       });
 
       cy.login(visitor);

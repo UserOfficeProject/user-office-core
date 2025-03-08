@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { createWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/Workflow'; //TODO: This needs to be updated.
+import { createWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/Workflow';
 import { Field, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 import React from 'react';

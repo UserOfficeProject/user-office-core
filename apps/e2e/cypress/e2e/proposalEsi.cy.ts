@@ -52,7 +52,7 @@ context('visits tests', () => {
     cy.createVisit({
       team: [coProposer.id, visitor.id],
       teamLeadUserId: coProposer.id,
-      scheduledEventId: existingScheduledEventId,
+      experimentPk: existingScheduledEventId,
     });
   });
 

@@ -10,19 +10,17 @@ import {
 
 import { ResolverContext } from '../../context';
 import {
-  StatusAction as ProposalStatusActionOrigin,
+  StatusAction as StatusActionOrigin,
   StatusActionType,
 } from '../../models/StatusAction';
 import {
   EmailActionDefaultConfig,
-  ProposalStatusActionDefaultConfig,
+  StatusActionDefaultConfig,
   RabbitMQActionDefaultConfig,
-} from './ProposalStatusActionConfig';
+} from './StatusActionConfig';
 
 @ObjectType()
-export class ProposalStatusAction
-  implements Partial<ProposalStatusActionOrigin>
-{
+export class StatusAction implements Partial<StatusActionOrigin> {
   @Field(() => Int)
   public id: number;
 
@@ -36,11 +34,11 @@ export class ProposalStatusAction
   public type: StatusActionType;
 }
 
-@Resolver(() => ProposalStatusAction)
-export class ProposalStatusActionResolver {
-  @FieldResolver(() => ProposalStatusActionDefaultConfig)
+@Resolver(() => StatusAction)
+export class StatusActionResolver {
+  @FieldResolver(() => StatusActionDefaultConfig)
   async defaultConfig(
-    @Root() statusAction: ProposalStatusAction,
+    @Root() statusAction: StatusAction,
     @Ctx() context: ResolverContext
   ): Promise<EmailActionDefaultConfig | RabbitMQActionDefaultConfig | null> {
     return context.queries.statusAction.getStatusActionConfig(

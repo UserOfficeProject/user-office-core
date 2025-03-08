@@ -1,4 +1,4 @@
-import { ProposalStatusActionConfig } from '../resolvers/types/ProposalStatusActionConfig';
+import { StatusActionConfig } from '../resolvers/types/StatusActionConfig';
 
 export enum StatusActionType {
   EMAIL = 'EMAIL',
@@ -20,6 +20,6 @@ export class ConnectionHasStatusAction {
     public workflowId: number,
     public name: string,
     public type: StatusActionType,
-    public config: typeof ProposalStatusActionConfig | null //TODO: This needs to be made generic
+    public config: typeof StatusActionConfig | null
   ) {}
 }

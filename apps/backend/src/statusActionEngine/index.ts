@@ -38,29 +38,29 @@ export const statusActionEngine = async (
         return;
       }
 
-      const proposalStatusActions =
+      const statusActions =
         await statusActionsDataSource.getConnectionStatusActions(
           currentConnection.id,
           currentConnection.workflowId
         );
 
-      if (!proposalStatusActions?.length) {
+      if (!statusActions?.length) {
         return;
       }
 
       Promise.all(
-        proposalStatusActions.map(async (proposalStatusAction) => {
-          if (!proposalStatusAction.actionId || !proposalStatusAction.type) {
+        statusActions.map(async (statusAction) => {
+          if (!statusAction.actionId || !statusAction.type) {
             return;
           }
 
-          switch (proposalStatusAction.type) {
+          switch (statusAction.type) {
             case StatusActionType.EMAIL:
-              emailActionHandler(proposalStatusAction, groupedProposals);
+              emailActionHandler(statusAction, groupedProposals);
               break;
 
             case StatusActionType.RABBITMQ:
-              rabbitMQActionHandler(proposalStatusAction, groupedProposals);
+              rabbitMQActionHandler(statusAction, groupedProposals);
               break;
 
             default:

@@ -291,6 +291,21 @@ export default function createHandler() {
             }
           }
           break;
+
+        case Event.VISIT_REGISTRATION_APPROVED:
+          {
+            if (event.visitregistration) {
+              const description = 'Visit registration approved';
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                event.visitregistration.visitId.toString(),
+                description
+              );
+            }
+          }
+          break;
         default: {
           let changedObjectId: number;
           if (typeof (event as any)[event.key].primaryKey === 'number') {

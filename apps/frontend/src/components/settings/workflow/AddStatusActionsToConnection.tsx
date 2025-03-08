@@ -19,7 +19,7 @@ import {
   ConnectionStatusAction,
   EmailActionConfig as EmailActionConfigType,
   EmailActionDefaultConfig,
-  ProposalStatusAction,
+  StatusAction,
   StatusActionType,
   RabbitMqActionDefaultConfig,
 } from 'generated/sdk';
@@ -52,7 +52,7 @@ const AddStatusActionsToConnection = ({
   )?.config as EmailActionConfigType;
 
   const initialValues: {
-    selectedStatusActions: ProposalStatusAction[];
+    selectedStatusActions: StatusAction[];
     emailStatusActionConfig: EmailActionConfigType;
   } = {
     selectedStatusActions:
@@ -76,7 +76,7 @@ const AddStatusActionsToConnection = ({
   };
 
   const renderActionsConfig = (
-    statusAction: ProposalStatusAction,
+    statusAction: StatusAction,
     values: typeof initialValues
   ) => {
     switch (statusAction.type) {
