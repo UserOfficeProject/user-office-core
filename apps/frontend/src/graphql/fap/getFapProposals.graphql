@@ -14,7 +14,7 @@ query getFapProposals($fapId: Int!, $callId: Int) {
         institutionId
       }
       status {
-        ...proposalStatus
+        ...status
       }
       users {
         id

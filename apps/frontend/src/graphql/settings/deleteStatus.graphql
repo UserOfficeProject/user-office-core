@@ -1,0 +1,5 @@
+mutation deleteStatus($id: Int!) {
+  deleteStatus(id: $id) {
+    ...status
+  }
+}

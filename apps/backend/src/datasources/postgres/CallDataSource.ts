@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
 import { CallHasInstrument } from '../../models/CallHasInstrument';
+import { Workflow } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -20,6 +21,7 @@ import {
   createCallHasInstrumentObject,
   createCallObject,
   ProposalRecord,
+  WorkflowRecord,
 } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
@@ -152,15 +154,11 @@ export default class PostgresCallDataSource implements CallDataSource {
     if (filter?.proposalStatusShortCode) {
       query
         .join(
-          'proposal_workflow_connections as w',
+          'workflow_connections as w',
           'call.proposal_workflow_id',
-          'w.proposal_workflow_id'
+          'w.workflow_id'
         )
-        .leftJoin(
-          'proposal_statuses as s',
-          'w.proposal_status_id',
-          's.proposal_status_id'
-        )
+        .leftJoin('statuses as s', 'w.status_id', 's.status_id')
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
     }
@@ -541,5 +539,30 @@ export default class PostgresCallDataSource implements CallDataSource {
     }
 
     throw new GraphQLError(`Call not found for answerId: ${answerId}`);
+  }
+
+  private createProposalWorkflowObject(proposalWorkflow: WorkflowRecord) {
+    return new Workflow(
+      proposalWorkflow.workflow_id,
+      proposalWorkflow.name,
+      proposalWorkflow.description,
+      proposalWorkflow.entity_type
+    );
+  }
+
+  async getProposalWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return database
+      .select()
+      .from('call as c')
+      .join('workflows as w', {
+        'w.workflow_id': 'c.proposal_workflow_id',
+      })
+      .where('c.call_id', callId)
+      .first()
+      .then((proposalWorkflow: WorkflowRecord | null) =>
+        proposalWorkflow
+          ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
   }
 }
