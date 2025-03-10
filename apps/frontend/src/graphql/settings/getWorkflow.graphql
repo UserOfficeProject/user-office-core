@@ -1,0 +1,31 @@
+query getWorkflow($workflowId: Int!) {
+  workflow(workflowId: $workflowId) {
+    id
+    name
+    description
+    workflowConnectionGroups {
+      groupId
+      parentGroupId
+      connections {
+        id
+        sortOrder
+        workflowId
+        statusId
+        status {
+          ...status
+        }
+        nextStatusId
+        prevStatusId
+        droppableGroupId
+        statusChangingEvents {
+          statusChangingEventId
+          workflowConnectionId
+          statusChangingEvent
+        }
+        statusActions {
+          ...connectionStatusAction
+        }
+      }
+    }
+  }
+}
