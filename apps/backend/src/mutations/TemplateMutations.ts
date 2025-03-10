@@ -151,6 +151,14 @@ export default class TemplateMutations {
           dummyData: '',
           creatorId: (agent as UserWithRole).id,
         });
+      case TemplateGroupId.EXP_SAFETY_REVIEW:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New experiment safety review',
+          'exp_safety_review_basis'
+        );
+        break;
     }
 
     const activeTemplateTypes = [
