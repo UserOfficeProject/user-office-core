@@ -5,38 +5,34 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { ProposalEventsRecord } from '../datasources/postgres/records';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { WorkflowDataSource } from '../datasources/WorkflowDataSource';
 import { Event } from '../events/event.enum';
 import { Proposal } from '../models/Proposal';
-import { ProposalWorkflow } from '../models/ProposalWorkflow';
-import { ProposalWorkflowConnection } from '../models/ProposalWorkflowConnections';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
+import { Workflow } from '../models/Workflow';
+import { WorkflowConnectionWithStatus } from '../models/WorkflowConnections';
 import { statusActionEngine } from '../statusActionEngine';
 
 const getProposalWorkflowByCallId = (callId: number) => {
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+  const callDataSource = container.resolve<CallDataSource>(
+    Tokens.CallDataSource
+  );
 
-  return proposalSettingsDataSource.getProposalWorkflowByCall(callId);
+  return callDataSource.getProposalWorkflowByCall(callId);
 };
 
 export const getProposalWorkflowConnectionByStatusId = (
-  proposalWorkflowId: number,
-  proposalStatusId: number,
-  prevProposalStatusId?: number
+  workflowId: number,
+  statusId: number,
+  prevStatusId?: number
 ) => {
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
-
-  return proposalSettingsDataSource.getProposalWorkflowConnectionsById(
-    proposalWorkflowId,
-    proposalStatusId,
-    { prevProposalStatusId }
+  const workflowDataSource = container.resolve<WorkflowDataSource>(
+    Tokens.WorkflowDataSource
   );
+
+  return workflowDataSource.getWorkflowConnectionsById(workflowId, statusId, {
+    prevStatusId,
+  });
 };
 
 const shouldMoveToNextStatus = (
@@ -62,12 +58,12 @@ const shouldMoveToNextStatus = (
 const checkIfConditionsForNextStatusAreMet = async ({
   nextWorkflowConnections,
   proposalWorkflow,
-  proposalSettingsDataSource,
+  workflowDataSource,
   proposalWithEvents,
 }: {
-  nextWorkflowConnections: ProposalWorkflowConnection[];
-  proposalWorkflow: ProposalWorkflow;
-  proposalSettingsDataSource: ProposalSettingsDataSource;
+  nextWorkflowConnections: WorkflowConnectionWithStatus[];
+  proposalWorkflow: Workflow;
+  workflowDataSource: WorkflowDataSource;
   proposalWithEvents: {
     proposalPk: number;
     proposalEvents?: ProposalEventsRecord;
@@ -75,17 +71,17 @@ const checkIfConditionsForNextStatusAreMet = async ({
   };
 }) => {
   for (const nextWorkflowConnection of nextWorkflowConnections) {
-    if (!nextWorkflowConnection.nextProposalStatusId) {
+    if (!nextWorkflowConnection.nextStatusId) {
       continue;
     }
 
     const nextNextWorkflowConnections =
       await getProposalWorkflowConnectionByStatusId(
         proposalWorkflow.id,
-        nextWorkflowConnection.nextProposalStatusId
+        nextWorkflowConnection.nextStatusId
       );
     const newStatusChangingEvents =
-      await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
+      await workflowDataSource.getStatusChangingEventsByConnectionIds(
         nextNextWorkflowConnections.map((connection) => connection.id)
       );
 
@@ -122,7 +118,7 @@ const checkIfConditionsForNextStatusAreMet = async ({
 
 export type WorkflowEngineProposalType = Proposal & {
   workflowId: number;
-  prevProposalStatusId: number;
+  prevStatusId: number;
   callShortCode: string;
 };
 
@@ -182,12 +178,12 @@ export const workflowEngine = async (
          * This is the way how we store the connection that has multiple next connections.
          * We have multiple separate connection records pointing to each next connection.
          * For example if we have status: FEASIBILITY_REVIEW which has multiple next statuses like: FAP_SELECTION and NOT_FEASIBLE.
-         * We store one record of FEASIBILITY_REVIEW with nextProposalStatusId = FAP_SELECTION and another one with nextProposalStatusId = NOT_FEASIBLE.
+         * We store one record of FEASIBILITY_REVIEW with nextStatusId = FAP_SELECTION and another one with nextStatusId = NOT_FEASIBLE.
          * We go through each record and based on the currentEvent we move the proposal into the right direction
          */
         return Promise.all(
           currentWorkflowConnections.map(async (currentWorkflowConnection) => {
-            if (!currentWorkflowConnection.nextProposalStatusId) {
+            if (!currentWorkflowConnection.nextStatusId) {
               return;
             }
 
@@ -198,21 +194,20 @@ export const workflowEngine = async (
             const nextWorkflowConnections =
               await getProposalWorkflowConnectionByStatusId(
                 proposalWorkflow.id,
-                currentWorkflowConnection.nextProposalStatusId,
-                currentWorkflowConnection.proposalStatusId
+                currentWorkflowConnection.nextStatusId,
+                currentWorkflowConnection.statusId
               );
 
             if (!nextWorkflowConnections?.length) {
               return;
             }
 
-            const proposalSettingsDataSource =
-              container.resolve<ProposalSettingsDataSource>(
-                Tokens.ProposalSettingsDataSource
-              );
+            const workflowDataSource = container.resolve<WorkflowDataSource>(
+              Tokens.WorkflowDataSource
+            );
 
             const statusChangingEvents =
-              await proposalSettingsDataSource.getStatusChangingEventsByConnectionIds(
+              await workflowDataSource.getStatusChangingEventsByConnectionIds(
                 nextWorkflowConnections.map((connection) => connection.id)
               );
 
@@ -240,22 +235,21 @@ export const workflowEngine = async (
               const updatedProposal =
                 await proposalDataSource.updateProposalStatus(
                   proposalWithEvents.proposalPk,
-                  currentWorkflowConnection.nextProposalStatusId
+                  currentWorkflowConnection.nextStatusId
                 );
 
               if (updatedProposal) {
                 await checkIfConditionsForNextStatusAreMet({
                   nextWorkflowConnections,
                   proposalWorkflow,
-                  proposalSettingsDataSource,
+                  workflowDataSource,
                   proposalWithEvents,
                 });
 
                 return {
                   ...updatedProposal,
                   workflowId: proposalWorkflow.id,
-                  prevProposalStatusId:
-                    currentWorkflowConnection.proposalStatusId,
+                  prevStatusId: currentWorkflowConnection.statusId,
                   callShortCode: call.shortCode,
                 };
               }
