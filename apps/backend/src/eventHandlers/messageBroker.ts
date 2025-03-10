@@ -9,7 +9,7 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -100,10 +100,10 @@ export const getProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+
+  const statusDataSource = container.resolve<StatusDataSource>(
+    Tokens.StatusDataSource
+  );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
@@ -112,9 +112,7 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.CallDataSource
   );
 
-  const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
-    proposal.statusId
-  );
+  const proposalStatus = await statusDataSource.getStatus(proposal.statusId);
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);

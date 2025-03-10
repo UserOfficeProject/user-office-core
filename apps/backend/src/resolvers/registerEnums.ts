@@ -10,12 +10,12 @@ import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
 import { ProposalEndStatus, ProposalPublicStatus } from '../models/Proposal';
-import { ProposalStatusActionType } from '../models/ProposalStatusAction';
 import { QuestionFilterCompareOperator } from '../models/Questionary';
 import { ReviewerFilter, ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
 import { SettingsId } from '../models/Settings';
 import { ShipmentStatus } from '../models/Shipment';
+import { StatusActionType } from '../models/StatusAction';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
 import {
   ConflictResolutionStrategy,
@@ -26,6 +26,7 @@ import {
 } from '../models/Template';
 import { UserRole } from '../models/User';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
+import { WorkflowType } from '../models/Workflow';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
 import {
@@ -33,7 +34,7 @@ import {
   ProposalBookingStatusCore,
   ScheduledEventBookingType,
 } from './types/ProposalBooking';
-import { EmailStatusActionRecipients } from './types/ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from './types/StatusActionConfig';
 
 export const registerEnums = () => {
   registerEnumType(TemplateCategoryId, { name: 'TemplateCategoryId' });
@@ -94,7 +95,8 @@ export const registerEnums = () => {
   registerEnumType(EmailStatusActionRecipients, {
     name: 'EmailStatusActionRecipients',
   });
-  registerEnumType(ProposalStatusActionType, {
-    name: 'ProposalStatusActionType',
+  registerEnumType(StatusActionType, {
+    name: 'StatusActionType',
   });
+  registerEnumType(WorkflowType, { name: 'WorkflowType' });
 };
