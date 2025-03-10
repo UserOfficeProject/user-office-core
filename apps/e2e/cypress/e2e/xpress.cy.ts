@@ -3,6 +3,7 @@ import {
   AllocationTimeUnits,
   FeatureId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -39,6 +40,7 @@ context('Xpress tests', () => {
   const proposalWorkflow = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
 
   const draftStatus: {
@@ -240,79 +242,84 @@ context('Xpress tests', () => {
      Create Xpress-specific statuses to avoid patching them in.
      Others in the Xpress workflow are already created.
     */
-    cy.createProposalStatus({
+    cy.createStatus({
       name: underReviewStatus.name,
       shortCode: underReviewStatus.shortCode,
       description: underReviewStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        underReviewStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        underReviewStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: approvedStatus.name,
       shortCode: approvedStatus.shortCode,
       description: approvedStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        approvedStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        approvedStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: unsuccessfulStatus.name,
       shortCode: unsuccessfulStatus.shortCode,
       description: unsuccessfulStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        unsuccessfulStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        unsuccessfulStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: finishedStatus.name,
       shortCode: finishedStatus.shortCode,
       description: finishedStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        finishedStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        finishedStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: submittedStatus.name,
       shortCode: submittedStatus.shortCode,
       description: submittedStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        submittedStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        submittedStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: quickReviewStatus.name,
       shortCode: quickReviewStatus.shortCode,
       description: quickReviewStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        quickReviewStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        quickReviewStatus.id = result.createStatus.id;
       }
     });
 
     /*
     Create the workflow with the QUICK_REVIEW status needed for Xpress calls
     */
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      const workflow = result.createProposalWorkflow;
+    cy.createWorkflow(proposalWorkflow).then((result) => {
+      const workflow = result.createWorkflow;
       callWorkflowId = workflow.id;
 
-      if (result.createProposalWorkflow) {
-        cy.addProposalWorkflowStatus({
-          droppableGroupId:
-            workflow.proposalWorkflowConnectionGroups[0].groupId,
-          proposalStatusId: quickReviewStatus.id as number,
-          proposalWorkflowId: callWorkflowId,
+      if (result.createWorkflow) {
+        cy.addWorkflowStatus({
+          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
+          statusId: quickReviewStatus.id as number,
+          workflowId: callWorkflowId,
           sortOrder: 1,
         });
       }

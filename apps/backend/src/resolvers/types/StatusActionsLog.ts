@@ -13,7 +13,7 @@ import { ResolverContext } from '../../context';
 import { StatusActionsLog as StatusActionsLogOrigin } from '../../models/StatusActionsLog';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
 import { Proposal } from './Proposal';
-import { EmailStatusActionRecipients } from './ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from './StatusActionConfig';
 
 @ObjectType()
 @Directive('@key(fields: "statusActionsLogId")')
@@ -44,7 +44,7 @@ export class StatusActionsLogResolver {
       return null;
     }
 
-    return context.queries.proposalSettings.statusActionsDataSource.getConnectionStatusAction(
+    return context.queries.statusAction.dataSource.getConnectionStatusAction(
       statusActionsLog.connectionId,
       statusActionsLog.actionId
     );
