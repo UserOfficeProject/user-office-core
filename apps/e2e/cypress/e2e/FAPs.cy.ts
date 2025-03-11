@@ -1057,6 +1057,17 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer.id],
       });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: newlyCreatedInstrumentId,
+        comment: comment1,
+        publicComment: comment2,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
 
       cy.login(fapMembers.chair);
       cy.changeActiveRole(initialDBData.roles.fapChair);
@@ -1176,6 +1187,23 @@ context('Fap reviews tests', () => {
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
       cy.finishedLoading();
       cy.contains('1 / 1').should('be.visible');
+    });
+
+    it('Fap Chair should not be able to see private technical comments', () => {
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.get(comment1).should('not.exist');
     });
   });
 
@@ -1359,6 +1387,30 @@ context('Fap reviews tests', () => {
         text: 'Saved',
       });
     });
+
+    it('Fap Secretary should be able to see private internal comments', () => {
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 6,
+        comment: comment1,
+        publicComment: comment2,
+        instrumentId: newlyCreatedInstrumentId,
+        questionaryId: 4,
+      });
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="view-proposal"]').click();
+
+      cy.contains('Technical reviews').click();
+
+      cy.contains(comment1).should('exist');
+    });
   });
 
   describe('Fap Reviewer role', () => {
@@ -1440,6 +1492,18 @@ context('Fap reviews tests', () => {
             title: proposal3.title,
             abstract: proposal3.abstract,
             proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: firstCreatedProposalPk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: firstProposalTimeAllocation,
+            submitted: true,
+            reviewerId: 0,
+            instrumentId: newlyCreatedInstrumentId,
+            comment: comment1,
+            publicComment: comment2,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToInstruments({
@@ -1634,6 +1698,17 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('SUBMITTED');
+    });
+
+    it('Fap Reviewer should not be able to see private technical comments', () => {
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
+
+      cy.contains('Technical reviews').click();
+
+      cy.get(comment1).should('not.exist');
     });
   });
 });
