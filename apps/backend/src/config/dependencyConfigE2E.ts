@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
@@ -20,7 +21,6 @@ import PostgresPredefinedMessageDataSource from '../datasources/postgres/Predefi
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import PostgresProposalEsiDataSource from '../datasources/postgres/ProposalEsiDataSource';
 import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
-import PostgresProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
@@ -31,12 +31,14 @@ import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledE
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
+import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
@@ -72,7 +74,6 @@ mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
-mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSource
@@ -91,12 +92,15 @@ mapClass(Tokens.TemplateDataSource, PostgresTemplateDataSource);
 mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
+mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(Tokens.TechniqueDataSource, PostgresTechniqueDataSource);
 mapClass(
   Tokens.PredefinedMessageDataSource,
   PostgresPredefinedMessageDataSource
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
+mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
+mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 

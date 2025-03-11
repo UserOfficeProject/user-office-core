@@ -2,8 +2,6 @@ import { Action } from '@material-table/core';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import GroupIcon from '@mui/icons-material/Group';
-import SchoolIcon from '@mui/icons-material/School';
-import { DateTime } from 'luxon';
 import React, { ReactNode, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,6 +18,7 @@ import {
   ProposalBookingStatusCore,
   ProposalEndStatus,
   UserJwt,
+  VisitRegistrationStatus,
 } from 'generated/sdk';
 
 import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
@@ -63,7 +62,7 @@ const createActionButton = (
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
   hidden: state === 'invisible',
   disabled: state === 'inactive',
-  onClick: ['completed', 'active', 'neutral'].includes(state)
+  onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
     ? onClick
     : () => {},
 });
@@ -167,10 +166,24 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       if (!registration) {
         buttonState = 'invisible';
       } else {
-        if (registration.isRegistrationSubmitted) {
-          buttonState = 'completed';
-        } else {
-          buttonState = 'active';
+        switch (registration.status) {
+          case VisitRegistrationStatus.DRAFTED:
+          case VisitRegistrationStatus.CHANGE_REQUESTED:
+            buttonState = 'active';
+            break;
+          case VisitRegistrationStatus.SUBMITTED:
+            buttonState = 'pending';
+            stateReason = 'The registration is pending approval';
+            break;
+          case VisitRegistrationStatus.APPROVED:
+            buttonState = 'completed';
+            break;
+          case VisitRegistrationStatus.CANCELLED_BY_USER:
+          case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
+            buttonState = 'inactive';
+            stateReason =
+              'This action is disabled because registration is cancelled';
+            break;
         }
       }
     } else {
@@ -205,47 +218,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             }}
           />
         );
-      }
-    );
-  };
-
-  const individualTrainingAction = (event: ProposalScheduledEvent) => {
-    let buttonState: ActionButtonState;
-    let stateReason: string | null = null;
-
-    if (event.visit !== null) {
-      const registration = event.visit.registrations.find(
-        (reg) => reg.userId === user.id
-      );
-      if (registration) {
-        const trainingExpiryDate: string | null =
-          registration.trainingExpiryDate || null;
-
-        if (
-          trainingExpiryDate &&
-          DateTime.fromISO(trainingExpiryDate) >
-            DateTime.fromISO(event.startsAt)
-        ) {
-          buttonState = 'completed';
-        } else {
-          buttonState = 'active';
-        }
-      } else {
-        buttonState = 'invisible';
-      }
-    } else {
-      buttonState = 'inactive';
-      stateReason = 'This action is disabled because visit is not defined';
-    }
-
-    return createActionButton(
-      `Finish individual training ${
-        stateReason ? '(' + stateReason + ')' : ''
-      }`,
-      <SchoolIcon data-cy="finish-training-icon" />,
-      buttonState,
-      () => {
-        navigate('/training');
       }
     );
   };
@@ -307,7 +279,6 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     formTeamAction,
     finishEsi,
     registerVisitAction,
-    individualTrainingAction,
     declareShipmentAction,
     giveFeedback,
   };

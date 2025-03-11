@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import { ProposalStatus } from 'generated/sdk';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { Status, WorkflowType } from 'generated/sdk';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 
 const changeProposalStatusValidationSchema = yup.object().shape({
   selectedStatusId: yup.string().required('You must select proposal status'),
@@ -19,7 +19,7 @@ const changeProposalStatusValidationSchema = yup.object().shape({
 
 type ChangeProposalStatusProps = {
   close: () => void;
-  changeStatusOnProposals: (status: ProposalStatus) => Promise<void>;
+  changeStatusOnProposals: (status: Status) => Promise<void>;
   allSelectedProposalsHaveInstrument: boolean;
   selectedProposalStatuses: number[];
 };
@@ -31,8 +31,10 @@ const ChangeProposalStatus = ({
   selectedProposalStatuses,
 }: ChangeProposalStatusProps) => {
   const { t } = useTranslation();
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const {
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+  } = useStatusesData(WorkflowType.PROPOSAL);
 
   const allSelectedProposalsHaveSameStatus = selectedProposalStatuses.every(
     (item) => item === selectedProposalStatuses[0]

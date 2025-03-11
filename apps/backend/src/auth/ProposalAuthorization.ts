@@ -5,12 +5,13 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
+import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
-import { ProposalStatusDefaultShortCodes } from '../models/ProposalStatus';
 import { Roles } from '../models/Role';
+import { ProposalStatusDefaultShortCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
-import { ProposalSettingsDataSource } from './../datasources/ProposalSettingsDataSource';
 import { UserDataSource } from './../datasources/UserDataSource';
 import { UserJWT } from './../models/User';
 import { UserAuthorization } from './UserAuthorization';
@@ -30,8 +31,10 @@ export class ProposalAuthorization {
     private visitDataSource: VisitDataSource,
     @inject(Tokens.CallDataSource)
     private callDataSource: CallDataSource,
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.StatusDataSource)
+    private statusDataSource: StatusDataSource,
+    @inject(Tokens.TechniqueDataSource)
+    private techniqueDataSource: TechniqueDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
@@ -156,6 +159,26 @@ export class ProposalAuthorization {
       });
   }
 
+  async isScientistToProposalTechnique(
+    agent: UserJWT | null,
+    proposalPk: number
+  ) {
+    if (agent == null || !agent.id) {
+      return false;
+    }
+
+    const scientistTechniques =
+      await this.techniqueDataSource.getTechniquesByScientist(agent.id);
+    const proposalTechniques =
+      await this.techniqueDataSource.getTechniquesByProposalPk(proposalPk);
+
+    return proposalTechniques.some((technique) =>
+      scientistTechniques.some(
+        (scientistTechnique) => scientistTechnique.id === technique.id
+      )
+    );
+  }
+
   async isVisitorOfProposal(agent: UserWithRole, proposalPk: number) {
     return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
@@ -224,7 +247,12 @@ export class ProposalAuthorization {
           (await this.isInstrumentManagerToProposal(
             agent,
             proposal.primaryKey
-          )) || (await this.isScientistToProposal(agent, proposal.primaryKey));
+          )) ||
+          (await this.isScientistToProposal(agent, proposal.primaryKey)) ||
+          (await this.isScientistToProposalTechnique(
+            agent,
+            proposal.primaryKey
+          ));
         break;
       case Roles.INTERNAL_REVIEWER:
         hasAccess = await this.isInternalReviewer(agent, proposal.primaryKey);
@@ -260,7 +288,7 @@ export class ProposalAuthorization {
       checkIfInternalEditable
     );
     const proposalStatus = (
-      await this.proposalSettingsDataSource.getProposalStatus(proposal.statusId)
+      await this.statusDataSource.getStatus(proposal.statusId)
     )?.shortCode;
     if (
       proposalStatus === ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED ||

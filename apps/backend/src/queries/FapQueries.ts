@@ -75,7 +75,7 @@ export default class FapQueries {
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
-      return this.dataSource.getFapProposals(fapId, callId, instrumentId);
+      return this.dataSource.getFapProposals({ fapId, callId, instrumentId });
     } else {
       return null;
     }
