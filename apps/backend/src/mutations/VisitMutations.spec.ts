@@ -137,13 +137,13 @@ test('User can create visit registration', async () => {
   expect(registration).toBeInstanceOf(VisitRegistration);
 });
 
-test('Not authorized user can not create visit registartion', async () => {
+test('Not authorized user can not create visit registration', async () => {
   await expect(
     mutations.createVisitRegistration(null, 1, 2)
   ).resolves.toBeInstanceOf(Rejection);
 });
 
-test('User officer can cancel the visit registartion', async () => {
+test('User officer can cancel the visit registration', async () => {
   const registration = (await mutations.createVisitRegistration(
     dummyUserWithRole,
     1,
@@ -165,7 +165,7 @@ test('User officer can cancel the visit registartion', async () => {
   );
 });
 
-test('User can cancel his submitted visit registration', async () => {
+test('User can cancel their submitted visit registration', async () => {
   const registration = (await mutations.createVisitRegistration(
     dummyUserWithRole,
     1,
@@ -197,7 +197,7 @@ test('User can cancel his submitted visit registration', async () => {
   );
 });
 
-test('User can not submit visit registartion that has been cancelled by facility', async () => {
+test('User can not submit visit registration that has been cancelled by facility', async () => {
   const registration = (await mutations.createVisitRegistration(
     dummyUserWithRole,
     1,

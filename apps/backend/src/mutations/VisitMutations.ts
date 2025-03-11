@@ -348,7 +348,7 @@ export default class VisitMutations {
       user,
       input
     );
-    if (hasCancelRights === false) {
+    if (!hasCancelRights) {
       return rejection(
         'Chould not cancel Visit Registration due to insufficient permissions',
         { args: input, user }
