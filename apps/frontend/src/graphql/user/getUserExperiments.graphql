@@ -1,6 +1,6 @@
-query getUserExperiments {
+query getUserExperiments($filter: UserExperimentsFilter) {
   me {
-    upcomingExperiments {
+    experiments(filter: $filter) {
       experimentPk
       experimentId
       startsAt

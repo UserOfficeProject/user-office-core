@@ -9,6 +9,10 @@ import {
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
+import {
+  ExperimentsArgs,
+  UserExperimentsFilter,
+} from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 import database from './database';
 import {
@@ -147,7 +151,10 @@ export default class PostgresExperimentDataSource
       });
   }
 
-  async getUserUpcomingExperiments(userId: number): Promise<Experiment[]> {
+  async getUserExperiments(
+    userId: number,
+    filter: UserExperimentsFilter
+  ): Promise<Experiment[]> {
     return database
       .union([
         // First query: Experiments where the user is in proposal_user
@@ -160,16 +167,34 @@ export default class PostgresExperimentDataSource
             'proposal_user.proposal_pk'
           )
           .where('proposal_user.user_id', userId)
-          .andWhere('experiments.status', 'ACTIVE')
-          .andWhere('experiments.ends_at', '>', new Date()),
+          .modify((query) => {
+            if (filter?.endsAfter) {
+              query.where('ends_at', '>', filter.endsAfter);
+            }
+            if (filter?.instrumentId) {
+              query.where('instrument_id', filter.instrumentId);
+            }
+            if (filter?.status) {
+              query.whereIn('status', filter.status);
+            }
+          }),
 
         // Second query: Experiments where the user is the proposer in proposals
         database('experiments')
           .select('experiments.*')
           .join('proposals', 'experiments.proposal_pk', 'proposals.proposal_pk')
           .where('proposals.proposer_id', userId)
-          .andWhere('experiments.status', 'ACTIVE')
-          .andWhere('experiments.ends_at', '>', new Date()),
+          .modify((query) => {
+            if (filter?.endsAfter) {
+              query.where('ends_at', '>', filter.endsAfter);
+            }
+            if (filter?.instrumentId) {
+              query.where('instrument_id', filter.instrumentId);
+            }
+            if (filter?.status) {
+              query.whereIn('status', filter.status);
+            }
+          }),
       ])
       .then((records: ExperimentRecord[]) => {
         return records.map(createExperimentObject);
@@ -374,6 +399,78 @@ export default class PostgresExperimentDataSource
       .where('experiment_pk', experimentPk)
       .then((records: ExperimentHasSampleRecord[]) =>
         records.map(createExperimentHasSampleObject)
+      );
+  }
+
+  async getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
+    return database('experiments')
+      .select('*')
+      .modify((query) => {
+        if (filter?.endsBefore) {
+          query.where('ends_at', '<', filter.endsBefore);
+        }
+        if (filter?.endsAfter) {
+          query.where('ends_at', '>', filter.endsAfter);
+        }
+        if (filter?.startsBefore) {
+          query.where('starts_at', '<', filter.startsBefore);
+        }
+        if (filter?.startsAfter) {
+          query.where('starts_at', '>', filter.startsAfter);
+        }
+        if (filter?.instrumentId) {
+          query.where('instrument_id', filter.instrumentId);
+        }
+        if (filter?.status) {
+          query.whereIn('status', filter.status);
+        }
+        if (filter?.callId) {
+          query
+            .leftJoin(
+              'proposals',
+              'proposals.proposal_pk',
+              'experiments.proposal_pk'
+            )
+            .where('proposals.call_id', filter.callId);
+        }
+        const { from, to } = filter?.overlaps || {};
+        if (from && to) {
+          query.where((builder) =>
+            builder
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.starts_at', '>=', from)
+                  .andWhere('experiments.starts_at', '<=', to)
+              )
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.ends_at', '>=', from)
+                  .andWhere('experiments.ends_at', '<=', to)
+              )
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.starts_at', '<=', from)
+                  .andWhere('experiments.ends_at', '>=', from)
+              )
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.starts_at', '<=', to)
+                  .andWhere('experiments.ends_at', '>=', to)
+              )
+          );
+        }
+      })
+      .then((rows: ExperimentRecord[]) =>
+        rows.map((row) => createExperimentObject(row))
+      );
+  }
+
+  async getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]> {
+    return database('experiments')
+      .select('*')
+      .where('proposal_pk', proposalPk)
+      .then((rows: ExperimentRecord[]) =>
+        rows.map((row) => createExperimentObject(row))
       );
   }
 }

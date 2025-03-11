@@ -4,6 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
@@ -19,6 +20,8 @@ import { omit } from '../utils/helperFunctions';
 export default class ProposalQueries {
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    public experimentDataSource: ExperimentDataSource,
     @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
@@ -168,5 +171,20 @@ export default class ProposalQueries {
           error
         );
       });
+  }
+
+  @Authorized()
+  async getExperimentsByProposalPk(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ) {
+    const proposal = await this.get(agent, proposalPk);
+    if (!proposal) {
+      return null;
+    }
+
+    return await this.experimentDataSource.getExperimentsByProposalPk(
+      proposalPk
+    );
   }
 }

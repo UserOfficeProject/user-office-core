@@ -19,11 +19,11 @@ import {
   UserJwt,
   VisitRegistrationStatus,
 } from 'generated/sdk';
-import { UpcomingExperimentsType } from 'hooks/experiment/useUserExperiments';
+import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 
 const getParticipationRole = (
   user: UserJwt,
-  event: UpcomingExperimentsType
+  event: UserExperiment
 ): 'PI' | 'co-proposer' | 'visitor' | null => {
   if (event.proposal?.proposer?.id === user.id) {
     return 'PI';
@@ -40,13 +40,13 @@ const getParticipationRole = (
   }
 };
 
-const isPiOrCoProposer = (user: UserJwt, event: UpcomingExperimentsType) => {
+const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) => {
   const role = getParticipationRole(user, event);
 
   return role === 'PI' || role === 'co-proposer';
 };
 
-const isTeamlead = (user: UserJwt, event: UpcomingExperimentsType) =>
+const isTeamlead = (user: UserJwt, event: UserExperiment) =>
   event.visit && event.visit.teamLead.id === user.id;
 
 const createActionButton = (
@@ -54,7 +54,7 @@ const createActionButton = (
   icon: JSX.Element,
   state: ActionButtonState,
   onClick: () => void | undefined
-): Action<UpcomingExperimentsType> => ({
+): Action<UserExperiment> => ({
   tooltip,
   // eslint-disable-next-line
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
@@ -68,14 +68,14 @@ const createActionButton = (
 interface UseActionButtonsArgs {
   openModal: (contents: ReactNode) => void;
   closeModal: () => void;
-  eventUpdated: (updatedEvent: UpcomingExperimentsType) => void;
+  eventUpdated: (updatedEvent: UserExperiment) => void;
 }
 export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const { openModal, closeModal, eventUpdated } = args;
 
-  const formTeamAction = (event: UpcomingExperimentsType) => {
+  const formTeamAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
@@ -117,7 +117,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
   };
 
   // TODO: This flow should be reworked completely
-  const finishEsi = (event: UpcomingExperimentsType) => {
+  const finishEsi = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
     if (isPiOrCoProposer(user, event)) {
@@ -150,7 +150,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const registerVisitAction = (event: UpcomingExperimentsType) => {
+  const registerVisitAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
@@ -217,7 +217,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const declareShipmentAction = (event: UpcomingExperimentsType) => {
+  const declareShipmentAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
 
     if (
@@ -239,7 +239,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const giveFeedback = (event: UpcomingExperimentsType) => {
+  const giveFeedback = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
 
     if (isTeamlead(user, event)) {

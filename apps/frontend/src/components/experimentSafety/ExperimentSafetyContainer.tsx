@@ -19,7 +19,7 @@ export interface ExperimentSafetyContextType extends QuestionaryContextType {
   state: ExperimentSafetySubmissionState | null;
 }
 
-export function createESIStub(
+export function createExperimentSafetyStub(
   templateId: number,
   questionarySteps: QuestionaryStep[]
 ): ExperimentSafetyWithQuestionary {

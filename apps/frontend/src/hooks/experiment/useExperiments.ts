@@ -3,16 +3,14 @@ import { useEffect, useState } from 'react';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 import {
-  GetScheduledEventsCoreQuery,
-  GetScheduledEventsCoreQueryVariables,
+  GetExperimentsQuery,
+  GetExperimentsQueryVariables,
 } from '../../generated/sdk';
 
-export function useScheduledEvents(
-  queryArgs: GetScheduledEventsCoreQueryVariables
-) {
+export function useExperiments(queryArgs: GetExperimentsQueryVariables) {
   const [args, setArgs] = useState(queryArgs);
-  const [scheduledEvents, setScheduledEvents] = useState<
-    GetScheduledEventsCoreQuery['scheduledEventsCore']
+  const [experiments, setExperiments] = useState<
+    GetExperimentsQuery['experiments']
   >([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
 
@@ -23,13 +21,13 @@ export function useScheduledEvents(
 
     setLoadingEvents(true);
     api()
-      .getScheduledEventsCore(args)
-      .then(({ scheduledEventsCore }) => {
+      .getExperiments(args)
+      .then(({ experiments }) => {
         if (unmounted) {
           return;
         }
-        if (scheduledEventsCore) {
-          setScheduledEvents(scheduledEventsCore);
+        if (experiments) {
+          setExperiments(experiments);
         }
         setLoadingEvents(false);
       });
@@ -39,5 +37,5 @@ export function useScheduledEvents(
     };
   }, [api, args]);
 
-  return { scheduledEvents, setScheduledEvents, setArgs, loadingEvents };
+  return { experiments, setExperiments, setArgs, loadingEvents };
 }

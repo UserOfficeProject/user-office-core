@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql';
+import { container } from 'tsyringe';
 import {
   Ctx,
   Directive,
@@ -9,7 +10,9 @@ import {
   Root,
 } from 'type-graphql';
 
+import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
+import { FeedbackDataSource } from '../../datasources/FeedbackDataSource';
 import {
   Experiment as ExperimentOrigin,
   ExperimentStatus,
@@ -17,8 +20,10 @@ import {
 import { BasicUserDetails } from './BasicUserDetails';
 import { ExperimentSafety } from './ExperimentSafety';
 import { Feedback } from './Feedback';
+import { FeedbackRequest } from './FeedbackRequest';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
+import { Shipment } from './Shipment';
 import { Visit } from './Visit';
 
 @ObjectType()
@@ -137,5 +142,26 @@ export class ExperimentResolver {
       context.user,
       experiment.experimentPk
     );
+  }
+
+  @FieldResolver(() => [FeedbackRequest])
+  async feedbackRequests(
+    @Root() experiment: Experiment
+  ): Promise<FeedbackRequest[]> {
+    const feedbackDataSource = container.resolve<FeedbackDataSource>(
+      Tokens.FeedbackDataSource
+    );
+
+    return feedbackDataSource.getFeedbackRequests(experiment.experimentPk);
+  }
+
+  @FieldResolver(() => [Shipment])
+  async shipments(
+    @Root() experiment: Experiment,
+    @Ctx() context: ResolverContext
+  ): Promise<Shipment[] | null> {
+    return context.queries.shipment.getShipments(context.user, {
+      filter: { experimentPk: experiment.experimentPk },
+    });
   }
 }

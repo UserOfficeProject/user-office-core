@@ -10,9 +10,9 @@ query getExperimentSafety($experimentSafetyPk: Int!) {
         ...sample
       }
       # ...sampleEsi
-      # questionary {
-      #   isCompleted
-      # }
+      questionary {
+        isCompleted
+      }
       experimentPk
       sampleId
       isEsiSubmitted

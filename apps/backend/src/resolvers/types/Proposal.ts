@@ -20,6 +20,7 @@ import { isRejection } from '../../models/Rejection';
 import { TemplateCategoryId } from '../../models/Template';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Call } from './Call';
+import { Experiment } from './Experiment';
 import { Fap } from './Fap';
 import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
@@ -260,6 +261,17 @@ export class ProposalResolver {
     return await context.queries.visit.getMyVisits(context.user, {
       proposalPk: proposal.primaryKey,
     });
+  }
+
+  @FieldResolver(() => [Experiment], { nullable: true })
+  async experiments(
+    @Root() proposal: Proposal,
+    @Ctx() context: ResolverContext
+  ): Promise<Experiment[] | null> {
+    return await context.queries.proposal.getExperimentsByProposalPk(
+      context.user,
+      proposal.primaryKey
+    );
   }
 }
 

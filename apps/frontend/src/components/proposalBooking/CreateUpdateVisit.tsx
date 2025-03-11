@@ -8,13 +8,13 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import Participants from 'components/proposal/ProposalParticipants';
 import { BasicUserDetails } from 'generated/sdk';
-import { UpcomingExperimentsType } from 'hooks/experiment/useUserExperiments';
+import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 
 interface CreateUpdateVisitProps {
-  event: UpcomingExperimentsType;
-  close: (updatedEvent: UpcomingExperimentsType) => void;
+  event: UserExperiment;
+  close: (updatedEvent: UserExperiment) => void;
 }
 function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
   const { api } = useDataApiWithFeedback();

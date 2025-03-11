@@ -6,6 +6,10 @@ import {
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
 import { SubmitExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
+import {
+  ExperimentsArgs,
+  UserExperimentsFilter,
+} from '../resolvers/queries/ExperimentsQuery';
 
 export interface ExperimentDataSource {
   create(
@@ -21,7 +25,10 @@ export interface ExperimentDataSource {
     >
   ): Promise<Experiment>;
   deleteByScheduledEventId(experimentId: number): Promise<Experiment>;
-  getUserUpcomingExperiments(userId: User['id']): Promise<Experiment[]>;
+  getUserExperiments(
+    userId: User['id'],
+    args: UserExperimentsFilter
+  ): Promise<Experiment[]>;
   getExperiment(experimentPk: number): Promise<Experiment | null>;
   getExperimentSafetyByExperimentPk(
     experimentPk: number
@@ -59,4 +66,6 @@ export interface ExperimentDataSource {
     sampleId: number,
     isSubmitted: boolean
   ): Promise<ExperimentHasSample>;
+  getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]>;
+  getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]>;
 }

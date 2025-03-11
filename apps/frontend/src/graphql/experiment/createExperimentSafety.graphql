@@ -6,13 +6,13 @@ mutation createOrGetExperimentSafety($experimentPk: Int!) {
       ...questionary
     }
     samples {
-      # sample {
-      #   ...sample
-      # }
+      sample {
+        ...sample
+      }
       # ...sampleEsi
-      # questionary {
-      #   isCompleted
-      # }
+      questionary {
+        isCompleted
+      }
       experimentPk
       sampleId
       isEsiSubmitted

@@ -15,7 +15,7 @@ import {
   QuestionnairesListRow,
 } from 'components/questionary/questionaryComponents/QuestionnairesList';
 import { ShipmentFragment, ShipmentStatus } from 'generated/sdk';
-import { useScheduledEvent } from 'hooks/scheduledEvent/useScheduledEvent';
+import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useShipments } from 'hooks/shipment/useShipments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
@@ -45,12 +45,12 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
     experimentPk: experimentPk,
   });
 
-  const { scheduledEvent } = useScheduledEvent(experimentPk);
+  const { experiment } = useExperiment(experimentPk);
 
   const [selectedShipment, setSelectedShipment] =
     useState<ShipmentFragment | null>(null);
 
-  if (!shipments || !scheduledEvent) {
+  if (!shipments || !experiment) {
     return <UOLoader />;
   }
 
@@ -97,7 +97,7 @@ function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
     setIsModalOpen(true);
   };
 
-  const hasLocalContact = scheduledEvent.localContactId !== null;
+  const hasLocalContact = experiment.localContactId !== null;
 
   return (
     <>

@@ -5,9 +5,16 @@ import {
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { ExperimentsArgs } from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 
 export class ExperimentDataSourceMock implements ExperimentDataSource {
+  getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]> {
+    throw new Error('Method not implemented.');
+  }
+  getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
+    throw new Error('Method not implemented.');
+  }
   getExperimentSamples(experimentPk: number): Promise<ExperimentHasSample[]> {
     throw new Error('Method not implemented.');
   }
@@ -71,7 +78,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     throw new Error('Method not implemented.');
   }
 
-  getUserUpcomingExperiments(userId: number): Promise<Experiment[]> {
+  getUserExperiments(userId: number): Promise<Experiment[]> {
     throw new Error('Method not implemented.');
   }
 

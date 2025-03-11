@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 
-import { GetUserExperimentsQuery } from 'generated/sdk';
+import {
+  GetUserExperimentsQuery,
+  GetUserExperimentsQueryVariables,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 type MeType = NonNullable<GetUserExperimentsQuery['me']>;
-export type UpcomingExperimentsType = MeType['upcomingExperiments'][number];
+export type UserExperiment = MeType['experiments'][number];
 
-export function useUserUpcomingExperiments() {
-  const [userUpcomingExperiments, setUserUpcomingExperiments] = useState<
-    UpcomingExperimentsType[]
+export function useUserExperiments(args?: GetUserExperimentsQueryVariables) {
+  const [userExperiments, setUserUpcomingExperiments] = useState<
+    UserExperiment[]
   >([]);
 
   const [loading, setLoading] = useState(true);
@@ -21,14 +24,14 @@ export function useUserUpcomingExperiments() {
     setLoading(true);
 
     api()
-      .getUserExperiments()
+      .getUserExperiments(args)
       .then((data) => {
         if (unmounted) {
           return;
         }
 
-        if (data.me?.upcomingExperiments) {
-          setUserUpcomingExperiments(data.me?.upcomingExperiments);
+        if (data.me?.experiments) {
+          setUserUpcomingExperiments(data.me?.experiments);
           setLoading(false);
         }
       });
@@ -36,7 +39,7 @@ export function useUserUpcomingExperiments() {
     return () => {
       unmounted = true;
     };
-  }, [api]);
+  }, [api, args]);
 
-  return { userUpcomingExperiments, loading };
+  return { userExperiments, setUserUpcomingExperiments, loading };
 }

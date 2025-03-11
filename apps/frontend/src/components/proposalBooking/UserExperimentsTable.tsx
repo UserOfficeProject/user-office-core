@@ -1,19 +1,22 @@
 import React from 'react';
 
+import { ExperimentStatus } from 'generated/sdk';
+import { useUserExperiments } from 'hooks/experiment/useUserExperiments';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
+import ExperimentsTimesTable from './ExperimentTimesTable';
+
 export default function UserExperimentTimesTable() {
-  // const { loading, proposalScheduledEvents } =
-  //   useProposalBookingsScheduledEvents({
-  //     notDraft: true,
-  //   });
+  const { loading, userExperiments } = useUserExperiments({
+    filter: { status: [ExperimentStatus.ACTIVE, ExperimentStatus.COMPLETED] },
+  });
 
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        {/* <ExperimentsTable
+        <ExperimentsTimesTable
           isLoading={loading}
-          proposalScheduledEvents={proposalScheduledEvents}
+          experiments={userExperiments}
           title="Experiment Times"
           options={{
             search: true,
@@ -21,7 +24,7 @@ export default function UserExperimentTimesTable() {
             emptyRowsWhenPaging: true,
             paging: true,
           }}
-        /> */}
+        />
       </StyledPaper>
     </StyledContainer>
   );

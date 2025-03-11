@@ -1,0 +1,24 @@
+fragment experiment on Experiment {
+  experimentPk
+  experimentId
+  startsAt
+  endsAt
+  scheduledEventId
+  proposalPk
+  status
+  localContactId
+  instrumentId
+  createdAt
+  updatedAt
+
+  instrument {
+    id
+    name
+    shortCode
+    description
+    managerUserId
+    scientists {
+      ...basicUserDetails
+    }
+  }
+}

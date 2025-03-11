@@ -8,8 +8,8 @@ import { useTranslation } from 'react-i18next';
 
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import {
-  UpcomingExperimentsType,
-  useUserUpcomingExperiments,
+  UserExperiment,
+  useUserExperiments,
 } from 'hooks/experiment/useUserExperiments';
 import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import { StyledPaper } from 'styles/StyledComponents';
@@ -18,7 +18,7 @@ import { getFullUserName } from 'utils/user';
 
 const columns: (
   t: TFunction<'translation', undefined>
-) => Column<UpcomingExperimentsType>[] = (t) => [
+) => Column<UserExperiment>[] = (t) => [
   { title: 'Experiment Number', field: 'experimentId' },
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
@@ -38,8 +38,11 @@ const columns: (
 ];
 
 export default function UserUpcomingExperimentsTable() {
-  const { loading: upcomingExperimentsLoading, userUpcomingExperiments } =
-    useUserUpcomingExperiments();
+  const {
+    loading: experimentsLoading,
+    userExperiments,
+    setUserUpcomingExperiments,
+  } = useUserExperiments();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -58,21 +61,23 @@ export default function UserUpcomingExperimentsTable() {
     closeModal: () => {
       setModalContents(null);
     },
-    eventUpdated: (updatedEvent) => {
-      // const updatedEvents = proposalScheduledEvents.map((event) =>
-      //   event?.id === updatedEvent?.id ? updatedEvent : event
-      // );
-      // setProposalScheduledEvents(updatedEvents);
+    eventUpdated: (updatedExperiment) => {
+      const updatedExperiments = userExperiments.map((experiment) =>
+        experiment?.experimentPk === updatedExperiment?.experimentPk
+          ? updatedExperiment
+          : experiment
+      );
+      setUserUpcomingExperiments(updatedExperiments);
     },
   });
 
   // if there are no upcoming experiments
   // just hide the whole table altogether
-  if (userUpcomingExperiments.length === 0) {
+  if (userExperiments.length === 0) {
     return null;
   }
 
-  const userUpcomingExperimentsWithFormattedDates = userUpcomingExperiments.map(
+  const userExperimentsWithFormattedDates = userExperiments.map(
     (experiment) => ({
       ...experiment,
       startsAtFormatted: toFormattedDateTime(experiment.startsAt),
@@ -80,7 +85,7 @@ export default function UserUpcomingExperimentsTable() {
     })
   );
 
-  console.log({ userUpcomingExperimentsWithFormattedDates });
+  console.log({ userExperimentsWithFormattedDates });
 
   return (
     <Grid item xs={12} data-cy="upcoming-experiments">
@@ -95,9 +100,9 @@ export default function UserUpcomingExperimentsTable() {
           ]}
           icons={tableIcons}
           title="Upcoming experiments"
-          isLoading={upcomingExperimentsLoading}
+          isLoading={experimentsLoading}
           columns={columns(t)}
-          data={userUpcomingExperimentsWithFormattedDates}
+          data={userExperimentsWithFormattedDates}
           options={{
             search: false,
             padding: 'dense',
