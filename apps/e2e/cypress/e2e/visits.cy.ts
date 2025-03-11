@@ -50,7 +50,6 @@ context('visits tests', () => {
 
   const cyTagDefineVisit = 'define-visit-icon';
   const cyTagRegisterVisit = 'register-visit-icon';
-  const cyTagFinishTraining = 'finish-training-icon';
   const cyTagDeclareShipment = 'declare-shipment-icon';
   const visitTemplate = {
     name: faker.lorem.words(2),
@@ -154,7 +153,6 @@ context('visits tests', () => {
 
       cy.testActionButton(cyTagDefineVisit, 'active');
       cy.testActionButton(cyTagRegisterVisit, 'inactive');
-      cy.testActionButton(cyTagFinishTraining, 'inactive');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -178,7 +176,6 @@ context('visits tests', () => {
       // test that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'active');
       cy.testActionButton(cyTagRegisterVisit, 'inactive');
-      cy.testActionButton(cyTagFinishTraining, 'inactive');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
 
       // create visit
@@ -215,7 +212,6 @@ context('visits tests', () => {
       // test again that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'completed');
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -234,7 +230,6 @@ context('visits tests', () => {
 
       cy.testActionButton(cyTagDefineVisit, 'invisible');
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -312,7 +307,6 @@ context('visits tests', () => {
       cy.contains(/Upcoming experiments/i).should('exist');
 
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
 
       cy.get(`[data-cy="${cyTagDefineVisit}"]`)
         .closest('button')
@@ -336,7 +330,6 @@ context('visits tests', () => {
       cy.get('body').type('{esc}');
 
       cy.testActionButton(cyTagRegisterVisit, 'invisible');
-      cy.testActionButton(cyTagFinishTraining, 'invisible');
     });
   });
 });

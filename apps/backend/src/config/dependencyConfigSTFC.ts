@@ -18,7 +18,6 @@ import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDa
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalEsiDataSource from '../datasources/postgres/ProposalEsiDataSource';
 import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
-import PostgresProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
@@ -29,10 +28,12 @@ import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledE
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
+import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
+import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import StfcFapDataSource from '../datasources/stfc/StfcFapDataSource';
 import StfcInstrumentDataSource from '../datasources/stfc/StfcInstrumentDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
@@ -72,7 +73,6 @@ mapClass(Tokens.InviteAuthorization, InviteAuthorization);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
 mapClass(Tokens.ProposalDataSource, StfcProposalDataSource);
 mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
-mapClass(Tokens.ProposalSettingsDataSource, PostgresProposalSettingsDataSource);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSource
@@ -99,6 +99,8 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
+mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
+mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
 

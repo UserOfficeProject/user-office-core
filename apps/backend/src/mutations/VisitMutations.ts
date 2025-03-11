@@ -280,9 +280,6 @@ export default class VisitMutations {
         { args, user }
       );
     }
-    if (this.userAuth.isUserOfficer(user) !== true) {
-      delete args.trainingExpiryDate; // user shall not set training expiry date
-    }
 
     return this.dataSource.updateRegistration(args);
   }
