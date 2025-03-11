@@ -1,15 +1,15 @@
 mutation addStatusChangingEventsToConnection(
-  $proposalWorkflowConnectionId: Int!
+  $workflowConnectionId: Int!
   $statusChangingEvents: [String!]!
 ) {
   addStatusChangingEventsToConnection(
     addStatusChangingEventsToConnectionInput: {
-      proposalWorkflowConnectionId: $proposalWorkflowConnectionId
+      workflowConnectionId: $workflowConnectionId
       statusChangingEvents: $statusChangingEvents
     }
   ) {
     statusChangingEventId
-    proposalWorkflowConnectionId
+    workflowConnectionId
     statusChangingEvent
   }
 }
