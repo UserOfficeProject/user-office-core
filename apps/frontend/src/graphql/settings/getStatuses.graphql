@@ -1,0 +1,5 @@
+query getStatuses($entityType: WorkflowType!) {
+  statuses(entityType: $entityType) {
+    ...status
+  }
+}
