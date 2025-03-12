@@ -9,7 +9,7 @@ import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { TrainingStatus, VisitRegistration } from '../models/VisitRegistration';
+import { VisitRegistration } from '../models/VisitRegistration';
 import { VisitsFilter } from '../resolvers/queries/VisitsQuery';
 export interface GetRegistrationsFilter {
   questionaryIds?: number[];
@@ -88,17 +88,5 @@ export default class VisitQueries {
     eventId: number
   ) {
     return this.dataSource.getVisitByScheduledEventId(eventId);
-  }
-
-  getTrainingStatus(visit: VisitRegistration): TrainingStatus {
-    if (!visit.trainingExpiryDate) {
-      return TrainingStatus.NONE;
-    }
-
-    if (visit.trainingExpiryDate < new Date()) {
-      return TrainingStatus.EXPIRED;
-    }
-
-    return TrainingStatus.ACTIVE;
   }
 }

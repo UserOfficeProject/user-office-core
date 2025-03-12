@@ -1,3 +1,4 @@
+import { Science } from '@mui/icons-material';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -9,10 +10,12 @@ import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { FeatureId } from 'generated/sdk';
 
 import ProposalSettingsIcon from '../common/icons/ProposalSettingsIcon';
 import ProposalWorkflowIcon from '../common/icons/ProposalWorkflowIcon';
@@ -21,6 +24,7 @@ const menuMap = {
   Units: '/Units',
   ProposalStatuses: '/ProposalStatuses',
   ProposalWorkflows: '/ProposalWorkflows',
+  ExperimentWorkflows: '/ExperimentWorkflows',
   ApiAccessTokens: '/ApiAccessTokens',
   Features: '/Features',
   Settings: '/Settings',
@@ -29,8 +33,13 @@ const menuMap = {
 
 const SettingsMenuListItem = () => {
   const location = useLocation();
+  const featureContext = useContext(FeatureContext);
 
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const isExperimentSafetyEnabled = featureContext.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
+  )?.isEnabled;
 
   React.useEffect(() => {
     setIsExpanded(Object.values(menuMap).includes(location.pathname));
@@ -99,6 +108,24 @@ const SettingsMenuListItem = () => {
             <ListItemText primary="Proposal workflows" />
           </ListItemButton>
         </Tooltip>
+
+        {isExperimentSafetyEnabled && (
+          <Tooltip title="Experiment workflows">
+            <ListItemButton
+              component={NavLink}
+              selected={
+                location.pathname.includes('/ExperimentWorkflows') ||
+                location.pathname.includes('ExperimentWorkflowEditor')
+              }
+              to={menuMap['ExperimentWorkflows']}
+            >
+              <ListItemIcon>
+                <Science />
+              </ListItemIcon>
+              <ListItemText primary="Experiment workflows" />
+            </ListItemButton>
+          </Tooltip>
+        )}
 
         <Tooltip title="API access tokens">
           <ListItemButton component={NavLink} to={menuMap['ApiAccessTokens']}>

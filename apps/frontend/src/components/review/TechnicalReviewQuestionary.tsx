@@ -19,6 +19,7 @@ import {
   TechnicalReviewStatus,
   TemplateGroupId,
   UserRole,
+  WorkflowType,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import createCustomEventHandlers from 'models/questionary/createCustomEventHandlers';
@@ -83,6 +84,7 @@ export function createTechnicalReviewStub(
         description: '',
         name: '',
         isDefault: true,
+        entityType: WorkflowType.PROPOSAL,
       },
       submitted: false,
       users: [],
