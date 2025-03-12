@@ -3,6 +3,7 @@ import {
   AllocationTimeUnits,
   FeatureId,
   TemplateGroupId,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -39,6 +40,7 @@ context('Xpress tests', () => {
   const proposalWorkflow = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
 
   const draftStatus: {
@@ -228,91 +230,89 @@ context('Xpress tests', () => {
 
   beforeEach(function () {
     cy.resetDB();
-    cy.getAndStoreFeaturesEnabled().then(() => {
-      if (
-        !featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)
-      ) {
-        this.skip();
-      }
-    });
 
     /*
      Create Xpress-specific statuses to avoid patching them in.
      Others in the Xpress workflow are already created.
     */
-    cy.createProposalStatus({
+    cy.createStatus({
       name: underReviewStatus.name,
       shortCode: underReviewStatus.shortCode,
       description: underReviewStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        underReviewStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        underReviewStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: approvedStatus.name,
       shortCode: approvedStatus.shortCode,
       description: approvedStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        approvedStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        approvedStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: unsuccessfulStatus.name,
       shortCode: unsuccessfulStatus.shortCode,
       description: unsuccessfulStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        unsuccessfulStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        unsuccessfulStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: finishedStatus.name,
       shortCode: finishedStatus.shortCode,
       description: finishedStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        finishedStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        finishedStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: submittedStatus.name,
       shortCode: submittedStatus.shortCode,
       description: submittedStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        submittedStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        submittedStatus.id = result.createStatus.id;
       }
     });
 
-    cy.createProposalStatus({
+    cy.createStatus({
       name: quickReviewStatus.name,
       shortCode: quickReviewStatus.shortCode,
       description: quickReviewStatus.description,
+      entityType: WorkflowType.PROPOSAL,
     }).then((result) => {
-      if (result.createProposalStatus) {
-        quickReviewStatus.id = result.createProposalStatus.id;
+      if (result.createStatus) {
+        quickReviewStatus.id = result.createStatus.id;
       }
     });
 
     /*
     Create the workflow with the QUICK_REVIEW status needed for Xpress calls
     */
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      const workflow = result.createProposalWorkflow;
+    cy.createWorkflow(proposalWorkflow).then((result) => {
+      const workflow = result.createWorkflow;
       callWorkflowId = workflow.id;
 
-      if (result.createProposalWorkflow) {
-        cy.addProposalWorkflowStatus({
-          droppableGroupId:
-            workflow.proposalWorkflowConnectionGroups[0].groupId,
-          proposalStatusId: quickReviewStatus.id as number,
-          proposalWorkflowId: callWorkflowId,
+      if (result.createWorkflow) {
+        cy.addWorkflowStatus({
+          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
+          statusId: quickReviewStatus.id as number,
+          workflowId: callWorkflowId,
           sortOrder: 1,
         });
       }
@@ -562,6 +562,18 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress basic tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User should not be able to see Xpress page', function () {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -1104,6 +1116,18 @@ context('Xpress tests', () => {
   });
 
   describe('Techniques advanced tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User officer can see all submitted and unsubmitted Xpress proposals', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
@@ -1320,6 +1344,18 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress statuses tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User officer can change to/from any Xpress status', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
@@ -1755,6 +1791,169 @@ context('Xpress tests', () => {
       cy.get('[role="listbox"]')
         .contains(expiredStatus.name)
         .should('not.exist');
+    });
+
+    it('Instrument scientist is not able to select a retired instrument for a proposal', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: underReviewStatus.id as number,
+      });
+
+      // Proposal 1 is assigned to instrument 1
+      cy.assignProposalsToInstruments({
+        proposalPks: createdProposalPk1,
+        instrumentIds: createdInstrumentId1,
+      });
+
+      // Scientist 1 belongs to technique 1, which only has proposal 1
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      // Initially, instrument 1 and instrument 2 are displayed
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+      // Instrument 1 is removed from technique 1 (e.g. retired)
+      cy.removeInstrumentsFromTechnique({
+        instrumentIds: createdInstrumentId1,
+        techniqueId: createdTechniquePk1,
+      });
+
+      cy.reload();
+      cy.finishedLoading();
+
+      // Instrument 1 is still displayed because it is the assigned instrument
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+      // Proposal 1 is assigned to instrument 2
+      cy.assignProposalsToInstruments({
+        proposalPks: createdProposalPk1,
+        instrumentIds: createdInstrumentId2,
+      });
+
+      cy.reload();
+      cy.finishedLoading();
+
+      // Instrument no longer shows as available for selection
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument1.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+    });
+  });
+
+  describe('Xpress PDF download tests', () => {
+    /*
+    These tests run in e2e dependency config despite being Xpress,
+    because of an existing issue with STFC mode cannot communicate
+    with the factory.
+    */
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+          this.skip();
+        }
+      });
+    });
+
+    it('User officer can download any Xpress proposal', function () {
+      cy.login('officer');
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.window().then((win) => {
+        const token = win.localStorage.getItem('token');
+
+        if (!token) {
+          throw new Error('Token not provided');
+        }
+
+        cy.request({
+          method: 'GET',
+          url: `/download/pdf/proposal/${createdProposalPk4}`,
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+        });
+      });
+    });
+
+    it("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
+      cy.assignProposalToTechniques({
+        proposalPk: createdProposalPk3,
+        techniqueIds: [createdTechniquePk3, createdTechniquePk1],
+      }).then(() => {
+        cy.login(scientist1);
+        cy.visit('/');
+        cy.finishedLoading();
+
+        cy.window().then((win) => {
+          const token = win.localStorage.getItem('token');
+
+          if (!token) {
+            throw new Error('Token not provided');
+          }
+
+          cy.request({
+            method: 'GET',
+            url: `/download/pdf/proposal/${createdProposalPk3}`,
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          }).then((response) => {
+            expect(response.status).to.eq(200);
+          });
+        });
+      });
+    });
+
+    it.only("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.window().then((win) => {
+        const token = win.localStorage.getItem('token');
+
+        if (!token) {
+          throw new Error('Token not provided');
+        }
+
+        cy.request({
+          method: 'GET',
+          url: `/download/pdf/proposal/${createdProposalPk3}`,
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          failOnStatusCode: false,
+        }).then((response) => {
+          expect(response.status).to.eq(500);
+        });
+      });
     });
   });
 });

@@ -20,6 +20,7 @@ import {
   CloneTemplateMutation,
   UpdateQuestionTemplateRelationSettingsMutationVariables,
   UpdateQuestionTemplateRelationSettingsMutation,
+  SetActiveTemplateMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -374,6 +375,18 @@ declare global {
       createSample: (
         createSampleInput: CreateSampleMutationVariables
       ) => Cypress.Chainable<CreateSampleMutation>;
+
+      /**
+       * Sets active template
+       *
+       * @returns {typeof setActiveTemplate}
+       * @memberof Chainable
+       * @example
+       *    cy.setActiveTemplate(setActiveTemplateInput: SetActiveTemplateMutationVariables)
+       */
+      setActiveTemplate: (
+        setActiveTemplateInput: SetActiveTemplateMutationVariables
+      ) => Cypress.Chainable<SetActiveTemplateMutation>;
     }
   }
 }

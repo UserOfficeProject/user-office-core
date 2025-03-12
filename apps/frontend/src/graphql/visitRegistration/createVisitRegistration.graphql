@@ -1,5 +1,5 @@
-mutation createVisitRegistration($visitId: Int!) {
-  createVisitRegistration(visitId: $visitId) {
+mutation createVisitRegistration($visitId: Int!, $userId: Int!) {
+  createVisitRegistration(visitId: $visitId, userId: $userId) {
     ...visitRegistration
     user {
       ...basicUserDetails

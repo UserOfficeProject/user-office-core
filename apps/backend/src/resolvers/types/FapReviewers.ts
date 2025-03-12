@@ -34,7 +34,7 @@ export class FapUserResolver {
 
   @FieldResolver(() => BasicUserDetails)
   async user(@Root() fapMember: FapReviewer, @Ctx() context: ResolverContext) {
-    return context.queries.user.dataSource.getBasicUserInfo(fapMember.userId);
+    return context.loaders.basicUser.batchLoader.load(fapMember.userId);
   }
 
   @FieldResolver(() => Int)

@@ -7,8 +7,8 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized } from '../decorators';
 import { Questionary, QuestionaryStep } from '../models/Questionary';
 import { Roles } from '../models/Role';
+import { TemplateCategoryId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { TemplateCategoryId } from './../models/Template';
 
 @injectable()
 export default class QuestionaryQueries {

@@ -163,6 +163,7 @@ export default class FapMutations {
     args: AssignReviewersToFapArgs
   ): Promise<Fap | Rejection> {
     if (
+      !agent?.isApiAccessToken &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -195,7 +196,11 @@ export default class FapMutations {
     );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
-    if (!isUserOfficer && !isChairOrSecretaryOfFap) {
+    if (
+      !agent?.isApiAccessToken &&
+      !isUserOfficer &&
+      !isChairOrSecretaryOfFap
+    ) {
       return rejection(
         'Could not remove member from Fap because of insufficient permissions',
         { agent, args }
@@ -430,6 +435,7 @@ export default class FapMutations {
     args: AssignFapReviewersToProposalsArgs
   ): Promise<Fap | Rejection> {
     if (
+      !agent?.isApiAccessToken &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -534,6 +540,7 @@ export default class FapMutations {
     args: RemoveFapReviewerFromProposalArgs
   ): Promise<Fap | Rejection> {
     if (
+      !agent?.isApiAccessToken &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {

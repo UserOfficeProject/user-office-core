@@ -14,7 +14,7 @@ const existingProposalId = initialDBData.proposal.id;
 const acceptedStatus = ProposalEndStatus.ACCEPTED;
 const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
 
-const proposalEsiIconCyTag = 'finish-safety-input-form-icon';
+const proposalEsiIconCyTag = 'finish-experiment-safety-form-icon';
 
 const sampleTitle = /My sample title/i;
 const newSampleTitle = faker.lorem.words(2);
@@ -52,7 +52,7 @@ context('visits tests', () => {
     cy.createVisit({
       team: [coProposer.id, visitor.id],
       teamLeadUserId: coProposer.id,
-      scheduledEventId: existingScheduledEventId,
+      experimentPk: existingScheduledEventId,
     });
   });
 

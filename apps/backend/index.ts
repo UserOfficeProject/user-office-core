@@ -32,7 +32,7 @@ async function bootstrap() {
     .use(healthCheck())
     .use(readinessCheck())
     .use(exceptionHandler())
-    .use(express.json({ limit: '5mb' }));
+    .use(express.json({ limit: '5mb' })); //todo: Is it redundant?
 
   await apolloServer(app);
 
@@ -47,7 +47,7 @@ async function bootstrap() {
     {}
   );
 
-  startAsyncJobs();
+  startAsyncJobs(); // TODO: Should we do this here? Or those jobs should be started in a separate process?
   container.resolve<(() => void) | undefined>(Tokens.ConfigureLogger)?.();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }

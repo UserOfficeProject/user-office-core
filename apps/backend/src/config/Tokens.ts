@@ -5,6 +5,7 @@ export const Tokens = {
   CallDataSource: Symbol('CallDataSource'),
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
+  CoProposerClaimDataSource: Symbol('CoProposerClaimDataSource'),
   EmailEventHandler: Symbol('EmailEventHandler'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
@@ -12,7 +13,8 @@ export const Tokens = {
   FileDataSource: Symbol('FileDataSource'),
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
   InstrumentDataSource: Symbol('InstrumentDataSource'),
-  InviteCodeDataSource: Symbol('InviteCodeDataSource'),
+  InviteDataSource: Symbol('InviteDataSource'),
+  InviteAuthorization: Symbol('InviteAuthorization'),
   TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   MailService: Symbol('MailService'),
@@ -24,7 +26,7 @@ export const Tokens = {
   StatusActionsDataSource: Symbol('StatusActionsDataSource'),
   QuestionaryDataSource: Symbol('QuestionaryDataSource'),
   RedeemCodesDataSource: Symbol('RedeemCodesDataSource'),
-  RoleInviteDataSource: Symbol('RoleInviteDataSource'),
+  RoleClaimDataSource: Symbol('RoleClaimDataSource'),
   ReviewDataSource: Symbol('ReviewDataSource'),
   FapDataSource: Symbol('FapDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),
@@ -36,6 +38,7 @@ export const Tokens = {
   UnitDataSource: Symbol('UnitDataSource'),
   UserAuthorization: Symbol('UserAuthorization'),
   ProposalAuthorization: Symbol('ProposalAuthorization'),
+  VisitRegistrationAuthorization: Symbol('VisitRegistrationAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
@@ -49,4 +52,8 @@ export const Tokens = {
   ProposalInternalCommentsDataSource: Symbol(
     'ProposalInternalCommentsDataSource'
   ),
+  WorkflowDataSource: Symbol('WorkflowDataSource'),
+  StatusDataSource: Symbol('StatusDataSource'),
+  ExperimentDataSource: Symbol('ExperimentDataSource'),
+  BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
 };

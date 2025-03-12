@@ -37,8 +37,8 @@ import {
   CreateCallMutationVariables,
   FeatureId,
   GetTemplatesQuery,
-  ProposalWorkflow,
   UpdateCallMutationVariables,
+  Workflow,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 
@@ -67,24 +67,28 @@ const CallGeneralInfo = ({
   esiTemplates,
   pdfTemplates,
   fapReviewTemplates,
+  technicalReviewTemplates,
   loadingTemplates,
   reloadTemplates,
   reloadEsi,
   reloadPdfTemplates,
   reloadFapReviewTemplates,
+  reloadTechnicalReviewTemplates,
   reloadProposalWorkflows,
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
   reloadPdfTemplates: () => void;
   reloadFapReviewTemplates: () => void;
+  reloadTechnicalReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
   fapReviewTemplates: GetTemplatesQuery['templates'];
+  technicalReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
-  proposalWorkflows: ProposalWorkflow[];
+  proposalWorkflows: Workflow[];
   loadingProposalWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
@@ -121,6 +125,12 @@ const CallGeneralInfo = ({
       value: template.templateId,
     })) || [];
 
+  const technicalReviewTemplateOptions =
+    technicalReviewTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
   const proposalWorkflowOptions =
     proposalWorkflows.map((proposalWorkflow) => ({
       text: proposalWorkflow.name,
@@ -147,17 +157,16 @@ const CallGeneralInfo = ({
       (value) => value.id === proposalWorkflowId
     );
     if (selectedProposalWorkFlow) {
-      const result =
-        selectedProposalWorkFlow.proposalWorkflowConnectionGroups.some(
-          (workGroup) => {
-            return workGroup.connections.some((connectionStatus) => {
-              return (
-                connectionStatus.proposalStatus.shortCode ===
-                ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
-              );
-            });
-          }
-        );
+      const result = selectedProposalWorkFlow.workflowConnectionGroups.some(
+        (workGroup) => {
+          return workGroup.connections.some((connectionStatus) => {
+            return (
+              connectionStatus.status.shortCode ===
+              ProposalStatusDefaultShortCodes.EDITABLE_SUBMITTED_INTERNAL
+            );
+          });
+        }
+      );
       setInternalCallDate({ showField: result, isValueSet: true });
     }
   }, [proposalWorkflowId, proposalWorkflows]);
@@ -429,6 +438,20 @@ const CallGeneralInfo = ({
         InputProps={{
           'data-cy': 'call-fap-review-template',
           endAdornment: <RefreshListIcon onClick={reloadFapReviewTemplates} />,
+        }}
+        required
+      />
+      <FormikUIAutocomplete
+        name="technicalReviewTemplateId"
+        label="Technical Review template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={technicalReviewTemplateOptions}
+        InputProps={{
+          'data-cy': 'call-technical-review-template',
+          endAdornment: (
+            <RefreshListIcon onClick={reloadTechnicalReviewTemplates} />
+          ),
         }}
         required
       />

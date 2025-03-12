@@ -137,14 +137,6 @@ export default class PostgresGenericTemplateDataSource
     questionId: string,
     sourceQuestionaryId: number
   ): Promise<GenericTemplate> {
-    const newGenericTemplate = await this.create(
-      title,
-      creatorId,
-      proposalPk,
-      questionaryId,
-      questionId
-    );
-
     const proposalCallId = (await this.proposalDataSource.get(proposalPk))
       ?.callId;
 
@@ -161,7 +153,7 @@ export default class PostgresGenericTemplateDataSource
     const subTemplate = await database('templates_has_questions')
       .select('*')
       .first()
-      .where('question_id', newGenericTemplate.questionId)
+      .where('question_id', questionId)
       .andWhere('template_id', proposalTemplateId)
       .then((result) => {
         if (!result) {
@@ -187,6 +179,15 @@ export default class PostgresGenericTemplateDataSource
         `Can not create generic template because topic does not exist ID: ${templateId}`
       );
     }
+
+    const newGenericTemplate = await this.create(
+      title,
+      creatorId,
+      proposalPk,
+      questionaryId,
+      questionId
+    );
+
     await this.questionaryDataSource.copyAnswers(
       sourceQuestionaryId,
       newGenericTemplate.questionaryId,

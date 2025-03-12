@@ -10,6 +10,7 @@ import {
   UserJwt,
   SettingsId,
   Event,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -201,11 +202,12 @@ function createWorkflowAndEsiTemplate() {
   const workflowName = faker.lorem.words(2);
   const workflowDescription = faker.lorem.words(5);
 
-  cy.createProposalWorkflow({
+  cy.createWorkflow({
     name: workflowName,
     description: workflowDescription,
+    entityType: WorkflowType.PROPOSAL,
   }).then((result) => {
-    const workflow = result.createProposalWorkflow;
+    const workflow = result.createWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
       if (
@@ -214,12 +216,12 @@ function createWorkflowAndEsiTemplate() {
           .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
         'FEASIBILITY'
       ) {
-        cy.addProposalWorkflowStatus({
+        cy.addWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_0',
-          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-          proposalWorkflowId: createdWorkflowId,
+          statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+          workflowId: createdWorkflowId,
           sortOrder: 1,
-          prevProposalStatusId: 1,
+          prevStatusId: 1,
         });
       }
 
@@ -350,6 +352,7 @@ context('Fap reviews tests', () => {
     });
     initializationBeforeTests();
     cy.getAndStoreAppSettings();
+    cy.get;
   });
 
   describe('User officer role', () => {
@@ -449,6 +452,27 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
+    });
+
+    it('Officer should be able to filter instrument', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk, secondCreatedProposalPk],
+      });
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=instrument-filter]').click();
+      cy.get('[role=presentation]').contains(instrument.name).click();
+
+      cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
+      cy.get('[data-cy="fap-assignments-table"]').contains(
+        firstCreatedProposalPk
+      );
     });
 
     it('Officer should be able to assign Fap member to proposal in existing Fap', () => {
@@ -578,7 +602,7 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="rank-submit"]').click();
 
       cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
-      cy.contains(fapMembers.reviewer2.lastName).parent().contains('1');
+      cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
 
       cy.get('[index="1"]').children().contains(fapMembers.reviewer2.lastName);
       cy.get('[index="0"]').children().contains(fapMembers.reviewer.lastName);
@@ -1317,6 +1341,7 @@ context('Fap reviews tests', () => {
         submitted: true,
         reviewerId: 6,
         instrumentId: newlyCreatedInstrumentId,
+        questionaryId: 4,
       });
 
       cy.assignFapReviewersToProposals({
@@ -1335,10 +1360,13 @@ context('Fap reviews tests', () => {
 
       cy.contains('Technical reviews').click();
 
+      cy.get('[data-cy="back-button"]').click();
+
       // The children are the components that are disabled
       cy.get('[data-cy="technical-review-status"]')
         .children()
         .should('be.disabled');
+
       cy.get('[data-cy="timeAllocation"]')
         .children()
         .children()
@@ -1347,11 +1375,11 @@ context('Fap reviews tests', () => {
       cy.setTinyMceContent('comment', internalComment);
       cy.setTinyMceContent('publicComment', publicComment);
 
-      cy.get('[data-cy="save-technical-review"]').click();
+      cy.get('[data-cy="save-and-continue-button"]').click();
 
       cy.notification({
         variant: 'success',
-        text: 'Technical review submitted successfully',
+        text: 'Saved',
       });
     });
   });
@@ -1574,9 +1602,10 @@ context('Fap reviews tests', () => {
         .parent()
         .find('[data-cy="view-proposal-details-icon"]')
         .click();
-      cy.get('[role="presentation"] [role="tab"]').contains('Grade').click();
-      cy.contains('button', 'Review').click();
-      cy.get('[data-cy="button-submit-proposal"]').should('be.disabled');
+      cy.get('[role="presentation"] [role="tab"]').should(
+        'not.contain',
+        'Grade'
+      );
     });
 
     it('FAP review should be removed if proposal is removed from instrument', () => {
@@ -1672,6 +1701,7 @@ context('Fap meeting components tests', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: newlyCreatedInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
@@ -1704,6 +1734,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.setInstrumentAvailabilityTime({
@@ -1872,6 +1903,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -1964,6 +1996,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -2128,6 +2161,7 @@ context('Fap meeting components tests', () => {
               submitted: true,
               reviewerId: 0,
               instrumentId: createdInstrumentId,
+              questionaryId: initialDBData.technicalReview.questionaryId,
             });
             cy.createFap({
               code: fap2.code,
@@ -2199,6 +2233,7 @@ context('Fap meeting components tests', () => {
               submitted: true,
               reviewerId: 0,
               instrumentId: createdInstrumentId,
+              questionaryId: initialDBData.technicalReview.questionaryId,
             });
             cy.createFap({
               code: fap2.code,
@@ -2242,6 +2277,7 @@ context('Fap meeting components tests', () => {
         submitted: true,
         reviewerId: 0,
         instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
       cy.assignProposalsToFaps({
@@ -2538,6 +2574,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -3129,6 +3166,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -3362,6 +3400,7 @@ context('Fap meeting components tests', () => {
             submitted: true,
             reviewerId: 0,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToFaps({
@@ -3736,7 +3775,7 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 });
 
-context.only('Fap meeting exports test', () => {
+context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
   let proposalPK: number;
 
@@ -3769,6 +3808,15 @@ context.only('Fap meeting exports test', () => {
         }
       });
 
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: newlyCreatedInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
       cy.createInstrument(instrument1).then((result) => {
         const createdInstrument = result.createInstrument;
         if (createdInstrument) {
@@ -3797,6 +3845,7 @@ context.only('Fap meeting exports test', () => {
             reviewerId: 0,
             instrumentId: createdInstrumentId,
             publicComment: comment1,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.setInstrumentAvailabilityTime({
@@ -3850,6 +3899,7 @@ context.only('Fap meeting exports test', () => {
           reviewerId: 0,
           instrumentId: createdInstrumentId,
           publicComment: comment2,
+          questionaryId: initialDBData.technicalReview.questionaryId,
         });
 
         cy.assignProposalsToFaps({

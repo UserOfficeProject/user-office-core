@@ -13,14 +13,14 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import FeedbackContainer from './FeedbackContainer';
 
 function createFeedbackStub(
-  scheduledEventId: number,
+  experimentPk: number,
   templateId: number,
   creatorId: number,
   questionarySteps: QuestionaryStep[]
 ): FeedbackWithQuestionary {
   return {
     id: 0,
-    scheduledEventId: scheduledEventId,
+    experimentPk: experimentPk,
     status: FeedbackStatus.DRAFT,
     questionaryId: 0,
     creatorId: creatorId,
@@ -35,9 +35,9 @@ function createFeedbackStub(
 }
 
 interface CreateFeedbackProps {
-  scheduledEventId: number;
+  experimentPk: number;
 }
-function CreateFeedback({ scheduledEventId }: CreateFeedbackProps) {
+function CreateFeedback({ experimentPk }: CreateFeedbackProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankFeedback, setBlankFeedback] = useState<FeedbackWithQuestionary>();
@@ -54,7 +54,7 @@ function CreateFeedback({ scheduledEventId }: CreateFeedbackProps) {
             .then((result) => {
               if (result.blankQuestionarySteps) {
                 const blankFeedback = createFeedbackStub(
-                  scheduledEventId,
+                  experimentPk,
                   activeTemplateId,
                   user.id,
                   result.blankQuestionarySteps
@@ -64,7 +64,7 @@ function CreateFeedback({ scheduledEventId }: CreateFeedbackProps) {
             });
         }
       });
-  }, [setBlankFeedback, api, user, scheduledEventId]);
+  }, [setBlankFeedback, api, user, experimentPk]);
 
   if (!blankFeedback) {
     return <UOLoader />;

@@ -14,6 +14,7 @@ import { ProposalQuestionaryAuthorizer } from './questionary/ProposalQuestionary
 import { SampleDeclarationQuestionaryAuthorizer } from './questionary/SampleDeclarationQuestionaryAuthorizer';
 import { SampleEsiQuestionaryAuthorizer } from './questionary/SampleEsiQuestionaryAuthorizer';
 import { ShipmentDeclarationQuestionaryAuthorizer } from './questionary/ShipmentDeclarationQuestionaryAuthorizer';
+import { TechnicalReviewQuestionaryAuthorizer } from './questionary/TechnicalReviewQuestionaryAuthorizer';
 import { VisitQuestionaryAuthorizer } from './questionary/VisitQuestionaryAuthorizer';
 
 export interface QuestionaryAuthorizer {
@@ -70,6 +71,10 @@ export class QuestionaryAuthorization {
     this.authorizers.set(
       TemplateGroupId.FEEDBACK,
       container.resolve(FeedbackQuestionaryAuthorizer)
+    );
+    this.authorizers.set(
+      TemplateGroupId.TECHNICAL_REVIEW,
+      container.resolve(TechnicalReviewQuestionaryAuthorizer)
     );
   }
 

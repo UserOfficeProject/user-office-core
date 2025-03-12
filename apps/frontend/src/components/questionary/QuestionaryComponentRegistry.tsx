@@ -36,6 +36,7 @@ import { sampleBasisDefinition } from './questionaryComponents/SampleBasis/Sampl
 import { sampleDeclarationDefinition } from './questionaryComponents/SampleDeclaration/SampleDeclaratonDefinition';
 import { sampleEsiBasisDefinition } from './questionaryComponents/SampleEsiBasis/SampleEsiBasisDefinition';
 import { shipmentBasisDefinition } from './questionaryComponents/ShipmentBasis/ShipmentBasisDefinition';
+import { technicalReviewBasisDefinition } from './questionaryComponents/TechnicalReviewBasis/TechnicalReviewBasisDefinition';
 import { techniquePickerDefinition } from './questionaryComponents/TechniquePicker/TechniquePickerDefinition';
 import { textInputDefinition } from './questionaryComponents/TextInput/TextInputDefinition';
 import { visitBasisDefinition } from './questionaryComponents/VisitBasis/VisitBasisDefinition';
@@ -180,6 +181,7 @@ const registry = [
   fapReviewBasisDefinition,
   instrumentPickerDefinition,
   techniquePickerDefinition,
+  technicalReviewBasisDefinition,
 ];
 
 Object.freeze(registry);

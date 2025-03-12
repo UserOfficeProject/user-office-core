@@ -6,13 +6,13 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
-import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
 import { SettingsId } from '../models/Settings';
+import { ConnectionHasStatusAction } from '../models/StatusAction';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
-} from '../resolvers/types/ProposalStatusActionConfig';
+} from '../resolvers/types/StatusActionConfig';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import {
   EmailReadyType,
@@ -24,10 +24,11 @@ import {
   getFapChairSecretariesAndFormatOutputForEmailSending,
   statusActionLogger,
   getOtherAndFormatOutputForEmailSending,
+  getTechniqueScientistsAndFormatOutputForEmailSending,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
-  proposalStatusAction: ConnectionHasStatusAction,
+  statusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[],
   options?: {
     statusActionsLogId?: number;
@@ -41,7 +42,7 @@ export const emailActionHandler = async (
     statusActionRecipients: null,
     ...options,
   };
-  const config = proposalStatusAction.config as EmailActionConfig;
+  const config = statusAction.config as EmailActionConfig;
   if (!config.recipientsWithEmailTemplate?.length) {
     return;
   }
@@ -59,7 +60,7 @@ export const emailActionHandler = async (
     }
     emailStatusActionRecipient(
       recipientWithTemplate,
-      proposalStatusAction,
+      statusAction,
       proposals,
       statusActionsLogId,
       loggedInUserId
@@ -71,7 +72,7 @@ export const emailActionHandler = async (
     config.recipientsWithEmailTemplate.map(async (recipientWithTemplate) =>
       emailStatusActionRecipient(
         recipientWithTemplate,
-        proposalStatusAction,
+        statusAction,
         proposals,
         statusActionsLogId,
         loggedInUserId
@@ -82,7 +83,7 @@ export const emailActionHandler = async (
 
 export const emailStatusActionRecipient = async (
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate,
-  proposalStatusAction: ConnectionHasStatusAction,
+  statusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[],
   statusActionsLogId?: number | null,
   loggedInUserId?: number | null
@@ -104,8 +105,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         PIs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.PI,
           proposalPks,
@@ -126,8 +127,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         CPs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
           proposalPks,
@@ -148,8 +149,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         ISs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
@@ -172,8 +173,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         FRs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.FAP_REVIEWERS,
           proposalPks,
@@ -195,8 +196,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         FCSs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
@@ -270,10 +271,92 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         uoRecipient,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.USER_OFFICE,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
+    case EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS: {
+      const techniqueScientists =
+        await getTechniqueScientistsAndFormatOutputForEmailSending(
+          proposals,
+          recipientWithTemplate
+        );
+      await sendMail(
+        techniqueScientists,
+        statusActionLogger({
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient:
+            EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS,
+          proposalPks,
+        }),
+        successfulMessage,
+        failMessage,
+        loggedInUserId
+      );
+
+      break;
+    }
+
+    case EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS: {
+      const adminDataSource = container.resolve<AdminDataSource>(
+        Tokens.AdminDataSource
+      );
+
+      const experimentSafetyEmail = (
+        await adminDataSource.getSetting(
+          SettingsId.EXPERIMENT_SAFETY_REVIEW_EMAIL
+        )
+      )?.settingsValue;
+
+      if (!experimentSafetyEmail) {
+        logger.logError(
+          'Could not send email(s) to the Experiment Safety team as the setting (EXPERIMENT_SAFETY_REVIEW_EMAIL) is not set.',
+          { proposalEmailsSkipped: proposals }
+        );
+
+        break;
+      }
+
+      let experimentSafetyRecipients: EmailReadyType[];
+
+      if (recipientWithTemplate.combineEmails) {
+        experimentSafetyRecipients = [
+          {
+            id: recipientWithTemplate.recipient.name,
+            email: experimentSafetyEmail,
+            proposals: proposals,
+            template: recipientWithTemplate.emailTemplate.id,
+          },
+        ];
+      } else {
+        experimentSafetyRecipients =
+          await getOtherAndFormatOutputForEmailSending(
+            proposals,
+            recipientWithTemplate,
+            experimentSafetyEmail
+          );
+      }
+
+      await sendMail(
+        experimentSafetyRecipients,
+        statusActionLogger({
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
+          statusActionsLogId,
+          emailStatusActionRecipient:
+            EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS,
           proposalPks,
         }),
         successfulMessage,
@@ -302,8 +385,8 @@ export const emailStatusActionRecipient = async (
         await sendMail(
           oRecipients,
           statusActionLogger({
-            connectionId: proposalStatusAction.connectionId,
-            actionId: proposalStatusAction.actionId,
+            connectionId: statusAction.connectionId,
+            actionId: statusAction.actionId,
             statusActionsLogId,
             emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
             proposalPks,

@@ -39,6 +39,9 @@ export class AddTechnicalReviewInput implements Partial<TechnicalReview> {
 
   @Field(() => Int)
   public instrumentId: number;
+
+  @Field(() => Int)
+  public questionaryId: number;
 }
 
 @Resolver()

@@ -4,6 +4,7 @@ import 'reflect-metadata';
 
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
+import { WorkflowType } from '../../models/Workflow';
 import { dummyCallFactory } from '../mockups/CallDataSource';
 import CallDataSource from './CallDataSource';
 import database from './database';
@@ -111,7 +112,7 @@ async function setup() {
     workflow_id: -999,
     name: '[IT] workflow',
     description: 'Integration test workflow',
-    entity_type: 'proposal',
+    entity_type: WorkflowType.PROPOSAL,
   });
 }
 
@@ -128,7 +129,7 @@ async function teardown() {
 
   await database('workflows')
     .where('proposal_id', -999)
-    .andWhere('entity_type', 'proposal')
+    .andWhere('entity_type', WorkflowType.PROPOSAL)
     .del();
 }
 

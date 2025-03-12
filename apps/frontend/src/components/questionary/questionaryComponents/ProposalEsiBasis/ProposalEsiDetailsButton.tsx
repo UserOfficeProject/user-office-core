@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ProposalEsiDetails from 'components/proposalEsi/ProposalEsiDetails';
+import ProposalEsiDetails from 'components/experimentSafety/ExperimentSafetyDetails';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 
 interface ProposalEsiDetailsButtonProps {

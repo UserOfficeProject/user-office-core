@@ -53,7 +53,7 @@ export const collectProposalXLSXData = async (
   }
 
   const technicalReviews =
-    await baseContext.queries.review.technicalReviewsForProposal(
+    await baseContext.queries.technicalReview.reviewsForProposal(
       user,
       proposal.primaryKey
     );
@@ -140,7 +140,7 @@ export const collectTechniqueProposalXLSXData = async (
     ? proposal.submittedDate.toLocaleString()
     : '';
 
-  const status = await baseContext.queries.proposalSettings.getProposalStatus(
+  const status = await baseContext.queries.status.getStatus(
     user,
     proposal.statusId
   );

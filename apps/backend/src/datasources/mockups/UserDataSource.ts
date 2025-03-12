@@ -128,8 +128,8 @@ export const dummySampleReviewer: UserWithRole = {
   ...dummyUser,
   currentRole: {
     id: 9,
-    title: 'Sample Reviewer',
-    shortCode: 'sample_safety_reviewer',
+    title: 'Experiment Safety Reviewer',
+    shortCode: 'experiment_safety_reviewer',
   },
 };
 
@@ -242,6 +242,9 @@ export class UserDataSourceMock implements UserDataSource {
   async getBasicUserInfo(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails | null> {
+    throw new Error('Method not implemented.');
+  }
+  async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
     throw new Error('Method not implemented.');
   }
 
@@ -387,11 +390,23 @@ export class UserDataSourceMock implements UserDataSource {
 
     return true;
   }
+
   async checkInstrumentManagerToProposal(
     scientsitId: number,
     proposalPk: number
   ): Promise<boolean> {
     if (scientsitId === dummyUserNotOnProposalWithRole.id) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async checkTechniqueScientistToProposal(
+    scientistId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    if (scientistId === dummyUserNotOnProposalWithRole.id) {
       return false;
     }
 

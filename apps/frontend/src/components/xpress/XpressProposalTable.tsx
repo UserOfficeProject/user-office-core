@@ -29,13 +29,18 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { UserContext } from 'context/UserContextProvider';
-import { ProposalsFilter, SettingsId, UserRole } from 'generated/sdk';
+import {
+  ProposalsFilter,
+  SettingsId,
+  UserRole,
+  WorkflowType,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { useXpressTechniquesData } from 'hooks/technique/useXpressTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import {
@@ -60,8 +65,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
 
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const {
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+  } = useStatusesData(WorkflowType.PROPOSAL);
 
   // Only show calls that use the quick review workflow status
   const { calls, loadingCalls } = useCallsData(
@@ -75,7 +82,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const { techniques, loadingTechniques } = useXpressTechniquesData();
 
   // Only show instruments in the user's techniques
-  const { instruments, loadingInstruments } =
+  const { allInstruments, techniqueInstruments, loadingInstruments } =
     useXpressInstrumentsData(techniques);
 
   const [searchParams, setSearchParams] = useSearchParams({});
@@ -85,7 +92,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
-  const callId = searchParams.get('callId');
+  const callId = searchParams.get('call');
   const instrument = searchParams.get('instrument');
   const technique = searchParams.get('technique');
   const proposalId = searchParams.get('proposalId');
@@ -323,7 +330,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         }
 
         const techIds = rowData.techniques?.map((technique) => technique.id);
-        const instrumentList = Array.from(
+        let instruments = Array.from(
           new Map(
             techniques
               .filter((technique) => techIds?.includes(technique.id))
@@ -344,16 +351,39 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         const shouldBeUneditable =
           !isUserOfficer && selectedStatus !== StatusCode.UNDER_REVIEW;
 
+        const currentInstrument = rowData.instruments?.[0];
+        const isCurrentInstrumentInList = instruments.some(
+          (inst) => inst.id === fieldValue
+        );
+
+        /*
+          When an instrument has been removed from a technique (i.e. it is
+          no longer available for selection), make sure that it still displays
+          as the current instrument on proposals that already have it assigned.
+        */
+        if (currentInstrument && !isCurrentInstrumentInList) {
+          const missingInst = allInstruments.find(
+            (inst) => inst.id === currentInstrument.id
+          ) || {
+            id: currentInstrument.id,
+            name: 'Unknown',
+            shortCode: '',
+            description: '',
+          };
+
+          instruments = [missingInst, ...instruments];
+        }
+
         // Always show the current instrument at the top of the dropdown
-        instrumentList.forEach(function (instrument, i) {
+        instruments.forEach(function (instrument, i) {
           if (fieldValue && instrument.id === fieldValue) {
-            instrumentList.splice(i, 1);
-            instrumentList.unshift(instrument);
+            instruments.splice(i, 1);
+            instruments.unshift(instrument);
           }
         });
 
         return shouldBeUneditable ? (
-          instrumentList.find((i) => i.id === fieldValue)?.name
+          instruments.find((i) => i.id === fieldValue)?.name
         ) : (
           <>
             <FormControl fullWidth>
@@ -382,8 +412,8 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
                 value={selectedValue}
                 data-cy="instrument-dropdown"
               >
-                {instrumentList &&
-                  instrumentList.map((instrument) => (
+                {instruments &&
+                  instruments.map((instrument) => (
                     <MenuItem key={instrument.id} value={instrument.id}>
                       {instrument.name}
                     </MenuItem>
@@ -813,7 +843,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           </ProposalReviewModal>
           <XpressProposalFilterBar
             calls={{ data: calls, isLoading: loadingCalls }}
-            instruments={{ data: instruments, isLoading: loadingInstruments }}
+            instruments={{
+              data: techniqueInstruments,
+              isLoading: loadingInstruments,
+            }}
             techniques={{
               data: techniques,
               isLoading: loadingTechniques,

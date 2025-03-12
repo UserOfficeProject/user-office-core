@@ -7,10 +7,10 @@ import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { AnswerBasic } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
-import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
+import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
 interface GeneralEvent {
@@ -297,16 +297,6 @@ interface CallFapReviewEndedEvent extends GeneralEvent {
   call: Call;
 }
 
-interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED;
-  scheduledEvent: ScheduledEventCore;
-}
-
-interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED;
-  scheduledEvents: ScheduledEventCore[];
-}
-
 interface InstrumentCreatedEvent extends GeneralEvent {
   type: Event.INSTRUMENT_CREATED;
   instrument: Instrument;
@@ -371,6 +361,11 @@ interface InternalReviewDeleted extends GeneralEvent {
   internalreview: InternalReview;
 }
 
+interface VisitRegistrationApprovedEvent extends GeneralEvent {
+  type: Event.VISIT_REGISTRATION_APPROVED;
+  visitregistration: VisitRegistration;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -421,8 +416,6 @@ export type ApplicationEvent =
   | ProposalFapMeetingRankingOverwrittenEvent
   | ProposalFapMeetingReorderEvent
   | ProposalTopicAnsweredEvent
-  | ProposalBookingTimeSlotAddedEvent
-  | ProposalBookingTimeSlotsRemovedEvent
   | FapAllMeetingsSubmittedEvent
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent
@@ -440,4 +433,5 @@ export type ApplicationEvent =
   | ProposalAssignedToTechniquesEvent
   | InternalReviewCreated
   | InternalReviewUpdated
-  | InternalReviewDeleted;
+  | InternalReviewDeleted
+  | VisitRegistrationApprovedEvent;

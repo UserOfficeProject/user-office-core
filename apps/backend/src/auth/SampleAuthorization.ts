@@ -85,7 +85,7 @@ export class SampleAuthorization {
     return (
       canEditProposal ||
       (isMemberOfProposal && isPostProposalSubmission) ||
-      this.userAuth.isSampleSafetyReviewer(agent)
+      this.userAuth.isExperimentSafetyReviewer(agent)
     );
   }
 }

@@ -43,7 +43,7 @@ export default class SampleQueries {
     return samples;
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
+  @Authorized([Roles.USER_OFFICER, Roles.EXPERIMENT_SAFETY_REVIEWER])
   async getSamplesByCallId(user: UserWithRole | null, callId: number) {
     return await this.dataSource.getSamplesByCallId(callId);
   }

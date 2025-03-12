@@ -851,6 +851,7 @@ context('Proposal administration tests', () => {
             submitted: true,
             reviewerId: initialDBData.users.officer.id,
             instrumentId: createdInstrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
         }
       });
@@ -875,6 +876,7 @@ context('Proposal administration tests', () => {
             submitted: true,
             reviewerId: initialDBData.users.officer.id,
             instrumentId: instrumentId,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
         }
       });
@@ -946,7 +948,7 @@ context('Proposal administration tests', () => {
     it('Should be able to search Boolean question', () => {
       // If answer true, find when search for Yes
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [
           {
@@ -971,7 +973,7 @@ context('Proposal administration tests', () => {
 
       // If answer false, find when search for No
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [
           {
@@ -996,7 +998,7 @@ context('Proposal administration tests', () => {
 
       // If missing answer, do not find the result for both, Yes and No
       cy.answerTopic({
-        questionaryId: initialDBData.proposal.questionaryId,
+        questionaryId: existingQuestionaryId,
         topicId: initialDBData.template.topic.id,
         answers: [],
       });
@@ -1254,13 +1256,6 @@ context('Proposal administration tests', () => {
     });
 
     it('Should be able to download proposal pdf with valid API token', function () {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-        /*temporarily skipping, until issue is fixed on github stfc actions (no such file or directory, open '/config/logos)
-        This test is passing when you run it in local environment.
-       */
-        this.skip();
-      }
-
       const accessTokenName = faker.lorem.words(2);
       cy.createApiAccessToken({
         name: accessTokenName,

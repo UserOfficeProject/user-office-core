@@ -31,6 +31,7 @@ function PresetDateSelector({ value, setValue }: PresetDateSelectorProps) {
       value={value}
       exclusive
       onChange={(_e, val) => setValue(val)}
+      data-cy="preset-date-selector"
     >
       <ToggleButton value={TimeSpan.TODAY}>Today</ToggleButton>
       <ToggleButton value={TimeSpan.NEXT_7_DAYS}>Next 7 days</ToggleButton>

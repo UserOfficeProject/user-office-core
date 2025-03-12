@@ -54,13 +54,21 @@ export default {
     id: 1,
     name: 'default template',
     topic: {
-      id: 6,
+      id: 7,
       title: 'Topic title',
     },
   },
   fapReviewTemplate: {
     id: 2,
     name: 'default fap review template',
+    topic: {
+      id: 6,
+      title: 'Topic title',
+    },
+  },
+  technicalReviewTemplate: {
+    id: 3,
+    name: 'default technical review template',
     topic: {
       id: 6,
       title: 'Topic title',
@@ -197,6 +205,9 @@ export default {
     questionaryId: 2,
     shortCode: '999999',
   },
+  technicalReview: {
+    questionaryId: 3,
+  },
   instrument1: {
     id: 1,
     name: 'Instrument 1',
@@ -231,7 +242,7 @@ export default {
     fapSecretary: 5,
     fapReviewer: 6,
     instrumentScientist: 7,
-    sampleSafetyReviewer: 8,
+    experimentSafetyReviewer: 8,
     internalReviewer: 9,
   },
   users: {

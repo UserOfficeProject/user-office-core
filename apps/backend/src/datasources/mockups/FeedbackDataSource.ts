@@ -48,8 +48,8 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
       }
 
       if (
-        filter?.scheduledEventId &&
-        currentFeedback.scheduledEventId === filter.scheduledEventId
+        filter?.experimentPk &&
+        currentFeedback.experimentPk === filter.experimentPk
       ) {
         matchingFeedbacks.push(currentFeedback);
       }
@@ -58,13 +58,10 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
     }, new Array<Feedback>());
   }
 
-  async getFeedbackByScheduledEventId(
-    eventId: number
-  ): Promise<Feedback | null> {
+  async getFeedbackByExperimentPk(eventId: number): Promise<Feedback | null> {
     return (
-      this.feedbacks.find(
-        (feedback) => feedback.scheduledEventId === eventId
-      ) ?? null
+      this.feedbacks.find((feedback) => feedback.experimentPk === eventId) ??
+      null
     );
   }
 
@@ -73,7 +70,7 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
   ): Promise<FeedbackRequest[]> {
     return this.feedbackRequests.reduce(
       (matchingFeedbackRequests, currentFeedbackRequest) => {
-        if (currentFeedbackRequest.scheduledEventId === scheduledEventId) {
+        if (currentFeedbackRequest.experimentPk === scheduledEventId) {
           matchingFeedbackRequests.push(currentFeedbackRequest);
         }
 
@@ -98,13 +95,13 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
   }
 
   async createFeedback({
-    scheduledEventId,
+    experimentPk,
     creatorId,
     questionaryId,
   }: CreateFeedbackArgs): Promise<Feedback> {
     const newFeedback = new Feedback(
       this.feedbacks.length,
-      scheduledEventId,
+      experimentPk,
       FeedbackStatus.DRAFT,
       questionaryId,
       creatorId,

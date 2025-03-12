@@ -91,6 +91,9 @@ export class CreateCallInput {
 
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public technicalReviewTemplateId?: number;
 }
 
 @Resolver()
