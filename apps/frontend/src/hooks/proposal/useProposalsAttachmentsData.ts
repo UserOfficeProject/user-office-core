@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 import {
   GetProposalsWithAttachmentsQuery,
-  Proposal,
   ProposalsFilter,
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -13,7 +12,7 @@ export type ProposalsAttachmentsData = NonNullable<
 
 export function useProposalsAttachmentsData(filter: ProposalsFilter) {
   const [proposalsAttachmentsData, setProposalsAttachmentsData] = useState<
-    Proposal[]
+    ProposalsAttachmentsData['proposals']
   >([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +35,7 @@ export function useProposalsAttachmentsData(filter: ProposalsFilter) {
         }
 
         if (data.proposals) {
-          setProposalsAttachmentsData(data.proposals.proposals as Proposal[]);
+          setProposalsAttachmentsData(data.proposals.proposals);
         }
         setLoading(false);
       });
