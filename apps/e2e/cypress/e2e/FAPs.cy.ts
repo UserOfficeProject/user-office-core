@@ -10,6 +10,7 @@ import {
   UserJwt,
   SettingsId,
   Event,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -201,11 +202,12 @@ function createWorkflowAndEsiTemplate() {
   const workflowName = faker.lorem.words(2);
   const workflowDescription = faker.lorem.words(5);
 
-  cy.createProposalWorkflow({
+  cy.createWorkflow({
     name: workflowName,
     description: workflowDescription,
+    entityType: WorkflowType.PROPOSAL,
   }).then((result) => {
-    const workflow = result.createProposalWorkflow;
+    const workflow = result.createWorkflow;
     if (workflow) {
       createdWorkflowId = workflow.id;
       if (
@@ -214,12 +216,12 @@ function createWorkflowAndEsiTemplate() {
           .get(SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS) !==
         'FEASIBILITY'
       ) {
-        cy.addProposalWorkflowStatus({
+        cy.addWorkflowStatus({
           droppableGroupId: 'proposalWorkflowConnections_0',
-          proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-          proposalWorkflowId: createdWorkflowId,
+          statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+          workflowId: createdWorkflowId,
           sortOrder: 1,
-          prevProposalStatusId: 1,
+          prevStatusId: 1,
         });
       }
 
@@ -450,6 +452,27 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
+    });
+
+    it('Officer should be able to filter instrument', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk, secondCreatedProposalPk],
+      });
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy=instrument-filter]').click();
+      cy.get('[role=presentation]').contains(instrument.name).click();
+
+      cy.get('[data-cy="fap-assignments-table"]').contains(instrument.name);
+      cy.get('[data-cy="fap-assignments-table"]').contains(
+        firstCreatedProposalPk
+      );
     });
 
     it('Officer should be able to assign Fap member to proposal in existing Fap', () => {

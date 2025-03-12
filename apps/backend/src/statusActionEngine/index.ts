@@ -2,7 +2,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
-import { ProposalStatusActionType } from '../models/ProposalStatusAction';
+import { StatusActionType } from '../models/StatusAction';
 import {
   WorkflowEngineProposalType,
   getProposalWorkflowConnectionByStatusId,
@@ -26,41 +26,41 @@ export const statusActionEngine = async (
   Promise.all(
     groupResult.map(async (groupedProposals) => {
       // NOTE: We get the needed ids from the first proposal in the group.
-      const [{ workflowId, statusId, prevProposalStatusId }] = groupedProposals;
+      const [{ workflowId, statusId, prevStatusId }] = groupedProposals;
 
       const [currentConnection] = await getProposalWorkflowConnectionByStatusId(
         workflowId,
         statusId,
-        prevProposalStatusId
+        prevStatusId
       );
 
       if (!currentConnection) {
         return;
       }
 
-      const proposalStatusActions =
+      const statusActions =
         await statusActionsDataSource.getConnectionStatusActions(
           currentConnection.id,
-          currentConnection.proposalWorkflowId
+          currentConnection.workflowId
         );
 
-      if (!proposalStatusActions?.length) {
+      if (!statusActions?.length) {
         return;
       }
 
       Promise.all(
-        proposalStatusActions.map(async (proposalStatusAction) => {
-          if (!proposalStatusAction.actionId || !proposalStatusAction.type) {
+        statusActions.map(async (statusAction) => {
+          if (!statusAction.actionId || !statusAction.type) {
             return;
           }
 
-          switch (proposalStatusAction.type) {
-            case ProposalStatusActionType.EMAIL:
-              emailActionHandler(proposalStatusAction, groupedProposals);
+          switch (statusAction.type) {
+            case StatusActionType.EMAIL:
+              emailActionHandler(statusAction, groupedProposals);
               break;
 
-            case ProposalStatusActionType.RABBITMQ:
-              rabbitMQActionHandler(proposalStatusAction, groupedProposals);
+            case StatusActionType.RABBITMQ:
+              rabbitMQActionHandler(statusAction, groupedProposals);
               break;
 
             default:

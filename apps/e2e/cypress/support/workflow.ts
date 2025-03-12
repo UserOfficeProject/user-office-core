@@ -1,42 +1,42 @@
 import {
   AddConnectionStatusActionsMutation,
   AddConnectionStatusActionsMutationVariables,
-  AddProposalWorkflowStatusMutation,
-  AddProposalWorkflowStatusMutationVariables,
+  AddWorkflowStatusMutation,
+  AddWorkflowStatusMutationVariables,
   AddStatusChangingEventsToConnectionMutation,
   AddStatusChangingEventsToConnectionMutationVariables,
-  CreateProposalStatusMutation,
-  CreateProposalStatusMutationVariables,
-  CreateProposalWorkflowMutation,
-  CreateProposalWorkflowMutationVariables,
+  CreateStatusMutation,
+  CreateStatusMutationVariables,
+  CreateWorkflowMutation,
+  CreateWorkflowMutationVariables,
 } from '@user-office-software-libs/shared-types';
 
 import initialDBData from './initialDBData';
 import { getE2EApi } from './utils';
 
-const createProposalWorkflow = (
-  createProposalWorkflowInput: CreateProposalWorkflowMutationVariables
-): Cypress.Chainable<CreateProposalWorkflowMutation> => {
+const createWorkflow = (
+  createWorkflowInput: CreateWorkflowMutationVariables
+): Cypress.Chainable<CreateWorkflowMutation> => {
   const api = getE2EApi();
-  const request = api.createProposalWorkflow(createProposalWorkflowInput);
+  const request = api.createWorkflow(createWorkflowInput);
 
   return cy.wrap(request);
 };
 
-const createProposalStatus = (
-  createProposalStatusInput: CreateProposalStatusMutationVariables
-): Cypress.Chainable<CreateProposalStatusMutation> => {
+const createStatus = (
+  createStatusInput: CreateStatusMutationVariables
+): Cypress.Chainable<CreateStatusMutation> => {
   const api = getE2EApi();
-  const request = api.createProposalStatus(createProposalStatusInput);
+  const request = api.createStatus(createStatusInput);
 
   return cy.wrap(request);
 };
 
-const addProposalWorkflowStatus = (
-  addProposalWorkflowStatusInput: AddProposalWorkflowStatusMutationVariables
-): Cypress.Chainable<AddProposalWorkflowStatusMutation> => {
+const addWorkflowStatus = (
+  addWorkflowStatusInput: AddWorkflowStatusMutationVariables
+): Cypress.Chainable<AddWorkflowStatusMutation> => {
   const api = getE2EApi();
-  const request = api.addProposalWorkflowStatus(addProposalWorkflowStatusInput);
+  const request = api.addWorkflowStatus(addWorkflowStatusInput);
 
   return cy.wrap(request);
 };
@@ -64,19 +64,19 @@ const addConnectionStatusActions = (
 };
 
 const addFeasibilityReviewToDefaultWorkflow =
-  (): Cypress.Chainable<AddProposalWorkflowStatusMutation> => {
-    return cy.addProposalWorkflowStatus({
+  (): Cypress.Chainable<AddWorkflowStatusMutation> => {
+    return cy.addWorkflowStatus({
       droppableGroupId: 'proposalWorkflowConnections_0',
-      proposalStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-      proposalWorkflowId: 1,
+      statusId: initialDBData.proposalStatuses.feasibilityReview.id,
+      workflowId: 1,
       sortOrder: 1,
-      prevProposalStatusId: 1,
+      prevStatusId: 1,
     });
   };
 
-Cypress.Commands.add('createProposalWorkflow', createProposalWorkflow);
-Cypress.Commands.add('createProposalStatus', createProposalStatus);
-Cypress.Commands.add('addProposalWorkflowStatus', addProposalWorkflowStatus);
+Cypress.Commands.add('createWorkflow', createWorkflow);
+Cypress.Commands.add('createStatus', createStatus);
+Cypress.Commands.add('addWorkflowStatus', addWorkflowStatus);
 Cypress.Commands.add(
   'addStatusChangingEventsToConnection',
   addStatusChangingEventsToConnection
