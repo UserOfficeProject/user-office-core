@@ -107,15 +107,13 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
 
   const approveVisit = async (visitId: number, userId: number) => {
     const approvedRegistration = (
-      await api().approveVisitRegistrations({
-        visitRegistrations: [
-          {
-            visitId,
-            userId,
-          },
-        ],
+      await api().approveVisitRegistration({
+        visitRegistration: {
+          visitId,
+          userId,
+        },
       })
-    ).approveVisitRegistrations[0];
+    ).approveVisitRegistration;
 
     replaceVisitRegistration(approvedRegistration);
   };
