@@ -1203,7 +1203,7 @@ context('Fap reviews tests', () => {
 
       cy.get('[role="dialog"]').contains('Technical review').click();
 
-      cy.get(comment1).should('not.exist');
+      cy.contains(comment1).should('not.exist');
     });
   });
 
@@ -1406,9 +1406,41 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="view-proposal"]').click();
+      cy.contains('Technical reviews').click();
+      cy.contains(comment1).should('exist');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[type="checkbox"]').first().check();
+      cy.get('[data-cy="assign-fap-members"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.secretary.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+      cy.contains('1 user(s) selected');
+      cy.contains('Update').click();
+
+      clickConfirmOk();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Member assigned',
+      });
+
+      cy.contains('Review Proposals').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
 
       cy.contains('Technical reviews').click();
-
       cy.contains(comment1).should('exist');
     });
   });
@@ -1708,7 +1740,7 @@ context('Fap reviews tests', () => {
 
       cy.contains('Technical reviews').click();
 
-      cy.get(comment1).should('not.exist');
+      cy.contains(comment1).should('not.exist');
     });
   });
 });
