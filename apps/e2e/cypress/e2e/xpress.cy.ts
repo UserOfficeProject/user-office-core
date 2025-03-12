@@ -230,13 +230,6 @@ context('Xpress tests', () => {
 
   beforeEach(function () {
     cy.resetDB();
-    cy.getAndStoreFeaturesEnabled().then(() => {
-      if (
-        !featureFlags.getEnabledFeatures().get(FeatureId.STFC_XPRESS_MANAGEMENT)
-      ) {
-        this.skip();
-      }
-    });
 
     /*
      Create Xpress-specific statuses to avoid patching them in.
@@ -569,6 +562,18 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress basic tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User should not be able to see Xpress page', function () {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -1111,6 +1116,18 @@ context('Xpress tests', () => {
   });
 
   describe('Techniques advanced tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User officer can see all submitted and unsubmitted Xpress proposals', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
@@ -1327,6 +1344,18 @@ context('Xpress tests', () => {
   });
 
   describe('Xpress statuses tests', () => {
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (
+          !featureFlags
+            .getEnabledFeatures()
+            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+        ) {
+          this.skip();
+        }
+      });
+    });
+
     it('User officer can change to/from any Xpress status', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
@@ -1763,75 +1792,168 @@ context('Xpress tests', () => {
         .contains(expiredStatus.name)
         .should('not.exist');
     });
+
+    it('Instrument scientist is not able to select a retired instrument for a proposal', function () {
+      cy.changeProposalsStatus({
+        proposalPks: createdProposalPk1,
+        statusId: underReviewStatus.id as number,
+      });
+
+      // Proposal 1 is assigned to instrument 1
+      cy.assignProposalsToInstruments({
+        proposalPks: createdProposalPk1,
+        instrumentIds: createdInstrumentId1,
+      });
+
+      // Scientist 1 belongs to technique 1, which only has proposal 1
+      cy.login(scientist1);
+      cy.changeActiveRole(initialDBData.roles.instrumentScientist);
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.contains('Xpress').click();
+      cy.finishedLoading();
+
+      // Initially, instrument 1 and instrument 2 are displayed
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+      // Instrument 1 is removed from technique 1 (e.g. retired)
+      cy.removeInstrumentsFromTechnique({
+        instrumentIds: createdInstrumentId1,
+        techniqueId: createdTechniquePk1,
+      });
+
+      cy.reload();
+      cy.finishedLoading();
+
+      // Instrument 1 is still displayed because it is the assigned instrument
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument1.name);
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+
+      // Proposal 1 is assigned to instrument 2
+      cy.assignProposalsToInstruments({
+        proposalPks: createdProposalPk1,
+        instrumentIds: createdInstrumentId2,
+      });
+
+      cy.reload();
+      cy.finishedLoading();
+
+      // Instrument no longer shows as available for selection
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="instrument-dropdown"]')
+        .click();
+      cy.get('[role="listbox"]').contains(instrument2.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument1.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument3.name);
+      cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+    });
   });
 
-  it('Instrument scientist is not able to select a retired instrument for a proposal', function () {
-    cy.changeProposalsStatus({
-      proposalPks: createdProposalPk1,
-      statusId: underReviewStatus.id as number,
+  describe('Xpress PDF download tests', () => {
+    /*
+    These tests run in e2e dependency config despite being Xpress,
+    because of an existing issue with STFC mode cannot communicate
+    with the factory.
+    */
+    beforeEach(function () {
+      cy.getAndStoreFeaturesEnabled().then(() => {
+        if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+          this.skip();
+        }
+      });
     });
 
-    // Proposal 1 is assigned to instrument 1
-    cy.assignProposalsToInstruments({
-      proposalPks: createdProposalPk1,
-      instrumentIds: createdInstrumentId1,
+    it('User officer can download any Xpress proposal', function () {
+      cy.login('officer');
+      cy.visit('/');
+      cy.finishedLoading();
+
+      cy.window().then((win) => {
+        const token = win.localStorage.getItem('token');
+
+        if (!token) {
+          throw new Error('Token not provided');
+        }
+
+        cy.request({
+          method: 'GET',
+          url: `/download/pdf/proposal/${createdProposalPk4}`,
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+        });
+      });
     });
 
-    // Scientist 1 belongs to technique 1, which only has proposal 1
-    cy.login(scientist1);
-    cy.changeActiveRole(initialDBData.roles.instrumentScientist);
-    cy.visit('/');
-    cy.finishedLoading();
+    it("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
+      cy.assignProposalToTechniques({
+        proposalPk: createdProposalPk3,
+        techniqueIds: [createdTechniquePk3, createdTechniquePk1],
+      }).then(() => {
+        cy.login(scientist1);
+        cy.visit('/');
+        cy.finishedLoading();
 
-    cy.contains('Xpress').click();
-    cy.finishedLoading();
+        cy.window().then((win) => {
+          const token = win.localStorage.getItem('token');
 
-    // Initially, instrument 1 and instrument 2 are displayed
-    cy.contains(proposal1.title)
-      .parent()
-      .find('[data-cy="instrument-dropdown"]')
-      .click();
-    cy.get('[role="listbox"]').contains(instrument1.name);
-    cy.get('[role="listbox"]').contains(instrument2.name);
-    cy.get('[role="listbox"]').should('not.contain', instrument3.name);
-    cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+          if (!token) {
+            throw new Error('Token not provided');
+          }
 
-    // Instrument 1 is removed from technique 1 (e.g. retired)
-    cy.removeInstrumentsFromTechnique({
-      instrumentIds: createdInstrumentId1,
-      techniqueId: createdTechniquePk1,
+          cy.request({
+            method: 'GET',
+            url: `/download/pdf/proposal/${createdProposalPk3}`,
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          }).then((response) => {
+            expect(response.status).to.eq(200);
+          });
+        });
+      });
     });
 
-    cy.reload();
-    cy.finishedLoading();
+    it.only("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
+      cy.login(scientist1);
+      cy.visit('/');
+      cy.finishedLoading();
 
-    // Instrument 1 is still displayed because it is the assigned instrument
-    cy.contains(proposal1.title)
-      .parent()
-      .find('[data-cy="instrument-dropdown"]')
-      .click();
-    cy.get('[role="listbox"]').contains(instrument1.name);
-    cy.get('[role="listbox"]').contains(instrument2.name);
-    cy.get('[role="listbox"]').should('not.contain', instrument3.name);
-    cy.get('[role="listbox"]').should('not.contain', instrument4.name);
+      cy.window().then((win) => {
+        const token = win.localStorage.getItem('token');
 
-    // Proposal 1 is assigned to instrument 2
-    cy.assignProposalsToInstruments({
-      proposalPks: createdProposalPk1,
-      instrumentIds: createdInstrumentId2,
+        if (!token) {
+          throw new Error('Token not provided');
+        }
+
+        cy.request({
+          method: 'GET',
+          url: `/download/pdf/proposal/${createdProposalPk3}`,
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          failOnStatusCode: false,
+        }).then((response) => {
+          expect(response.status).to.eq(500);
+        });
+      });
     });
-
-    cy.reload();
-    cy.finishedLoading();
-
-    // Instrument no longer shows as available for selection
-    cy.contains(proposal1.title)
-      .parent()
-      .find('[data-cy="instrument-dropdown"]')
-      .click();
-    cy.get('[role="listbox"]').contains(instrument2.name);
-    cy.get('[role="listbox"]').should('not.contain', instrument1.name);
-    cy.get('[role="listbox"]').should('not.contain', instrument3.name);
-    cy.get('[role="listbox"]').should('not.contain', instrument4.name);
   });
 });

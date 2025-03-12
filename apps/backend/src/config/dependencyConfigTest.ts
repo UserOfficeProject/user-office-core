@@ -10,6 +10,7 @@ import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
+import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
@@ -70,6 +71,7 @@ mapClass(
 );
 mapClass(Tokens.WorkflowDataSource, WorkflowDataSourceMock);
 mapClass(Tokens.StatusDataSource, StatusDataSourceMock);
+mapClass(Tokens.ExperimentDataSource, ExperimentDataSourceMock);
 mapClass(Tokens.StatusActionsDataSource, StatusActionsDataSourceMock);
 mapClass(Tokens.QuestionaryDataSource, QuestionaryDataSourceMock);
 mapClass(Tokens.RedeemCodesDataSource, RedeemDataSourceMock);
