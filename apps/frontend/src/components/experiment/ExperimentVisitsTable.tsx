@@ -12,7 +12,6 @@ import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitReg
 import VisitStatusIcon from 'components/visit/VisitStatusIcon';
 import {
   GetScheduledEventsCoreQuery,
-  TrainingStatus,
   VisitRegistrationStatus,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -47,19 +46,6 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
-
-  const getHumanReadableStatus = (rowData: RowType) => {
-    switch (rowData.trainingStatus) {
-      case TrainingStatus.ACTIVE:
-        return `Valid until ${toFormattedDateTime(rowData.trainingExpiryDate)}`;
-      case TrainingStatus.EXPIRED:
-        return `Expired ${toFormattedDateTime(rowData.trainingExpiryDate)}`;
-      case TrainingStatus.NONE:
-        return 'Not started';
-      default:
-        return 'Unknown';
-    }
-  };
 
   const onVisitRegistrationSubmitted = (submittedRegistration: RowType) => {
     setScheduledEvent((prev) => {
@@ -122,15 +108,13 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
 
   const approveVisit = async (visitId: number, userId: number) => {
     const approvedRegistration = (
-      await api().approveVisitRegistrations({
-        visitRegistrations: [
-          {
-            visitId,
-            userId,
-          },
-        ],
+      await api().approveVisitRegistration({
+        visitRegistration: {
+          visitId,
+          userId,
+        },
       })
-    ).approveVisitRegistrations[0];
+    ).approveVisitRegistration;
 
     replaceVisitRegistration(approvedRegistration);
   };
@@ -317,14 +301,6 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
         }
 
         return aIsUnfinished ? (bIsUnfinished ? 0 : 1) : bIsUnfinished ? -1 : 0;
-      },
-    },
-    {
-      title: 'Training',
-      field: 'rowData.trainingStatus',
-      render: (rowData: RowType) => getHumanReadableStatus(rowData),
-      customSort: (a: RowType, b: RowType) => {
-        return a.trainingExpiryDate?.localeCompare(b.trainingExpiryDate) || 0;
       },
     },
   ];

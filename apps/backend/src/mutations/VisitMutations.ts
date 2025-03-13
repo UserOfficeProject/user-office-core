@@ -280,9 +280,6 @@ export default class VisitMutations {
         { args, user }
       );
     }
-    if (this.userAuth.isUserOfficer(user) !== true) {
-      delete args.trainingExpiryDate; // user shall not set training expiry date
-    }
 
     return this.dataSource.updateRegistration(args);
   }
@@ -351,7 +348,7 @@ export default class VisitMutations {
       user,
       input
     );
-    if (hasCancelRights === false) {
+    if (!hasCancelRights) {
       return rejection(
         'Chould not cancel Visit Registration due to insufficient permissions',
         { args: input, user }
