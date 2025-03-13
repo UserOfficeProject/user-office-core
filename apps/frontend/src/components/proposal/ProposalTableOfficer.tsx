@@ -901,11 +901,15 @@ const ProposalTableOfficer = ({
         }}
         onSelectionChange={(selectedItems) => {
           if (selectedItems.length) {
-            setSearchParams({
-              ...searchParams,
-              selection: selectedItems.map((selectedItem) =>
-                selectedItem.primaryKey.toString()
-              ),
+            setSearchParams((searchParams) => {
+              selectedItems.map((selectedItem) =>
+                searchParams.append(
+                  'selection',
+                  selectedItem.primaryKey.toString()
+                )
+              );
+
+              return searchParams;
             });
           } else {
             setSearchParams((searchParams) => {

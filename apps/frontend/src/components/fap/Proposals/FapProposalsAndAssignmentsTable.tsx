@@ -211,6 +211,9 @@ const FapProposalsAndAssignmentsTable = ({
       : column
   );
 
+  const page = searchParams.get('page');
+  const pageSize = searchParams.get('pageSize');
+  const selection = searchParams.getAll('selection');
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -724,6 +727,9 @@ const FapProposalsAndAssignmentsTable = ({
       id: fapProposal.proposalPk,
       rowActionButtons: RowActionButtons(fapProposal),
       dateAssignedFormatted: toFormattedDateTime(fapProposal.dateAssigned),
+      tableData: {
+        checked: selection.includes(fapProposal.proposalPk.toString()),
+      },
     })
   );
 
@@ -789,7 +795,8 @@ const FapProposalsAndAssignmentsTable = ({
           options={{
             search: true,
             selection: true,
-            pageSize: Math.min(10, maxPageLength),
+            pageSize: pageSize ? +pageSize : Math.min(10, maxPageLength),
+            initialPage: page ? +page : 0,
             pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
               inputProps: {
@@ -797,6 +804,34 @@ const FapProposalsAndAssignmentsTable = ({
                 id: 'select-all-table-rows',
               },
             },
+          }}
+          onPageChange={(page) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('page', page.toString());
+
+              return searchParams;
+            });
+          }}
+          onRowsPerPageChange={(pageSize) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('pageSize', pageSize.toString());
+
+              return searchParams;
+            });
+          }}
+          onSelectionChange={(selectedItems) => {
+            const selectedProposalPks = selectedItems.map(
+              (item) => item.proposalPk
+            );
+
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+              selectedProposalPks.forEach((pk) =>
+                searchParams.append('selection', pk.toString())
+              );
+
+              return searchParams;
+            });
           }}
         />
       </div>
