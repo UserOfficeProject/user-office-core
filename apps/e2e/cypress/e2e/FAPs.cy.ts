@@ -454,6 +454,28 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
+    it('Table selection and parameters should be saved between tab navigation', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+      cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
+
+      cy.contains('Documents').click();
+
+      cy.contains('Proposals and Assignments').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[type="checkbox"]')
+        .should('be.checked');
+    });
+
     it('Officer should be able to filter instrument', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
