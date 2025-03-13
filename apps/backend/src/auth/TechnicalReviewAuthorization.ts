@@ -128,6 +128,14 @@ export class TechnicalReviewAuthorization {
       return true;
     }
 
+    const isSecretaryOfProposal = await this.proposalAuth.isSecretaryOfProposal(
+      agent,
+      technicalreview.proposalPk
+    );
+    if (isSecretaryOfProposal) {
+      return true;
+    }
+
     const isReviewerOfProposal = await this.proposalAuth.isReviewerOfProposal(
       agent,
       technicalreview.proposalPk
@@ -159,7 +167,7 @@ export class TechnicalReviewAuthorization {
         : technicalReviewOrProposalPk.proposalPk;
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    const isFapSec = await this.proposalAuth.isChairOrSecretaryOfProposal(
+    const isFapSec = await this.proposalAuth.isSecretaryOfProposal(
       agent,
       proposalPk
     );
@@ -182,6 +190,14 @@ export class TechnicalReviewAuthorization {
     const isChairOrSecretaryOfProposal =
       await this.proposalAuth.isChairOrSecretaryOfProposal(agent, proposalPk);
     if (isChairOrSecretaryOfProposal) {
+      return true;
+    }
+
+    const isSecretaryOfProposal = await this.proposalAuth.isSecretaryOfProposal(
+      agent,
+      proposalPk
+    );
+    if (isSecretaryOfProposal) {
       return true;
     }
 

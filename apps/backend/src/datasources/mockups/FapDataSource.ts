@@ -215,6 +215,13 @@ export class FapDataSourceMock implements FapDataSource {
     return false;
   }
 
+  async isSecretaryOfProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    return false;
+  }
+
   async getFapProposal(
     fapId: number,
     proposalPk: number,

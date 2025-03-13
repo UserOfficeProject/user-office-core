@@ -121,7 +121,7 @@ const ProposalReviewContent = ({
         canEditAsInstrumentSci ||
         isInternalReviewer ? (
         <Fragment key={technicalReview.id}>
-          {!!technicalReview && !isFapSec && (
+          {!!technicalReview && (
             <InternalReviews
               technicalReviewId={technicalReview.id}
               technicalReviewSubmitted={technicalReview.submitted}
@@ -154,16 +154,14 @@ const ProposalReviewContent = ({
               marginBottom: theme.spacing(2),
             })}
           >
-            {!isFapSec && (
-              <Typography
-                variant="h6"
-                data-cy="reviewed-by-info"
-                component="h2"
-                gutterBottom
-              >
-                {`Reviewed by ${getFullUserName(technicalReview.technicalReviewAssignee)}`}
-              </Typography>
-            )}
+            <Typography
+              variant="h6"
+              data-cy="reviewed-by-info"
+              component="h2"
+              gutterBottom
+            >
+              {`Reviewed by ${getFullUserName(technicalReview.technicalReviewAssignee)}`}
+            </Typography>
             <TechnicalReviewContainer
               technicalReview={technicalReview}
               technicalReviewUpdated={(

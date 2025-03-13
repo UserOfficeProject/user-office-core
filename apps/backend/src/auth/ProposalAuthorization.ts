@@ -197,6 +197,14 @@ export class ProposalAuthorization {
     );
   }
 
+  async isSecretaryOfProposal(agent: UserJWT | null, proposalPk: number) {
+    if (!agent?.id || !proposalPk) {
+      return false;
+    }
+
+    return this.fapDataSource.isSecretaryOfProposal(agent.id, proposalPk);
+  }
+
   async isInternalReviewer(agent: UserWithRole, proposalPk: number) {
     const technicalReviews =
       await this.reviewDataSource.getTechnicalReviews(proposalPk);

@@ -1018,6 +1018,21 @@ export default class PostgresFapDataSource implements FapDataSource {
     return record !== undefined;
   }
 
+  async isSecretaryOfProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const record = await database<FapRecord>('faps')
+      .select<FapRecord>(['faps.*'])
+      .join('fap_proposals', 'fap_proposals.fap_id', '=', 'faps.fap_id')
+      .leftJoin('fap_secretaries', 'fap_secretaries.fap_id', '=', 'faps.fap_id')
+      .where('fap_proposals.proposal_pk', proposalPk)
+      .where('fap_secretaries.user_id', userId)
+      .first();
+
+    return record !== undefined;
+  }
+
   async saveFapMeetingDecision(
     saveFapMeetingDecisionInput: SaveFapMeetingDecisionInput,
     submittedBy?: number | null
