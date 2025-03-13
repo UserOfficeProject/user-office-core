@@ -406,16 +406,9 @@ export default class ProposalMutations {
     } = args;
     const isChairOrSecretaryOfProposal =
       await this.proposalAuth.isChairOrSecretaryOfProposal(agent, primaryKey);
-    const isSecretaryOfProposal = await this.proposalAuth.isSecretaryOfProposal(
-      agent,
-      primaryKey
-    );
+
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    if (
-      !isChairOrSecretaryOfProposal &&
-      !isUserOfficer &&
-      !isSecretaryOfProposal
-    ) {
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
       return rejection(
         'Can not administer proposal because of insufficient permissions',
         { args, agent }
