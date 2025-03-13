@@ -333,10 +333,11 @@ export async function createPostToRabbitMQHandler() {
 
       case Event.VISIT_REGISTRATION_CANCELLED: {
         const { visitregistration: visitRegistration } = event;
+        const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
           startAt: visitRegistration.startsAt,
           endAt: visitRegistration.endsAt,
-          visitorId: visitRegistration.userId,
+          visitorId: user!.oidcSub,
         });
 
         await rabbitMQ.sendMessageToExchange(
