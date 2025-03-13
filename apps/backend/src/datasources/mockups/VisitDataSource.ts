@@ -32,7 +32,6 @@ export class VisitDataSourceMock implements VisitDataSource {
         1,
         new Date(),
         new Date(),
-        new Date('2033-07-19T00:00:00.0000'),
         VisitRegistrationStatus.DRAFTED
       ),
       new VisitRegistration(
@@ -41,7 +40,6 @@ export class VisitDataSourceMock implements VisitDataSource {
         2,
         new Date(),
         new Date(),
-        new Date('2033-07-19T00:00:00.0000'),
         VisitRegistrationStatus.DRAFTED
       ),
     ];
@@ -131,7 +129,6 @@ export class VisitDataSourceMock implements VisitDataSource {
             args.visitId,
             new Date(),
             new Date(),
-            new Date('2033-07-19T00:00:00.0000'),
             VisitRegistrationStatus.DRAFTED
           )
         );
@@ -150,8 +147,6 @@ export class VisitDataSourceMock implements VisitDataSource {
     if (registration) {
       registration.startsAt = args.startsAt ?? registration.startsAt;
       registration.endsAt = args.endsAt ?? registration.endsAt;
-      registration.trainingExpiryDate =
-        args.trainingExpiryDate ?? registration.trainingExpiryDate;
       registration.status = args.status ?? registration.status;
 
       return registration;

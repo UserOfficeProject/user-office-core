@@ -67,6 +67,7 @@ type FapProposalsAndAssignmentsTableProps = {
   selectedCallId: number | null;
   /** Confirmation function that comes from withConfirm HOC */
   confirm: WithConfirmType;
+  selectedInstrumentId: number | null;
 };
 
 const getReviewsFromAssignments = (assignments: FapProposalAssignmentType[]) =>
@@ -163,6 +164,10 @@ const FapProposalColumns: Column<FapProposalType>[] = [
         getGradesFromReviews(getReviewsFromAssignments(b.assignments ?? []))
       ),
   },
+  {
+    title: 'Instrument',
+    field: 'instrument.name',
+  },
 ];
 
 const FapProposalsAndAssignmentsTable = ({
@@ -170,12 +175,13 @@ const FapProposalsAndAssignmentsTable = ({
   onAssignmentsUpdate,
   selectedCallId,
   confirm,
+  selectedInstrumentId,
 }: FapProposalsAndAssignmentsTableProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
 
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
-    useFapProposalsData(data.id, selectedCallId);
+    useFapProposalsData(data.id, selectedCallId, selectedInstrumentId);
   const { api } = useDataApiWithFeedback();
   const [proposalPks, setProposalPks] = useState<number[]>([]);
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -198,6 +204,12 @@ const FapProposalsAndAssignmentsTable = ({
     UserRole.USER_OFFICER,
   ]);
   const { t } = useTranslation();
+
+  const translatedColumns = FapProposalColumns.map((column) =>
+    column.title === 'Instrument'
+      ? { ...column, title: t('instrument') }
+      : column
+  );
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -750,7 +762,7 @@ const FapProposalsAndAssignmentsTable = ({
       <div data-cy="fap-assignments-table">
         <MaterialTable
           icons={tableIcons}
-          columns={FapProposalColumns}
+          columns={translatedColumns}
           title={
             <Typography variant="h6" component="h2">
               {`${data.code} - ${t('Fap')} Proposals`}
