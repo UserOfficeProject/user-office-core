@@ -97,7 +97,7 @@ export class ProposalViewTechnicalReview {
   @Field(() => ProposalViewTechnicalReviewAssignee, { nullable: true })
   technicalReviewAssignee: ProposalViewTechnicalReviewAssignee;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   instrumentId: number;
 }
 @ObjectType()

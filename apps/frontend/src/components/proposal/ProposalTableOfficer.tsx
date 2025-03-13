@@ -42,9 +42,8 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import {
+import TechnicalBulkReassignModal, {
   ReviewData,
-  TechnicalBulkReassignModal,
 } from 'components/review/TechnicalBulkReassignModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {

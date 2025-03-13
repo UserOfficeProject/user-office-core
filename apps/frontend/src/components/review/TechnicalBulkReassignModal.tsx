@@ -20,10 +20,13 @@ import StyledDialog from 'components/common/StyledDialog';
 import {
   ProposalViewInstrument,
   ProposalViewTechnicalReview,
+  UserRole,
 } from 'generated/sdk';
+import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useInstrumentsByIdsData } from 'hooks/instrument/useInstrumentsByIdsData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type GroupedReviews = {
   instrumentId: number;
@@ -37,16 +40,18 @@ export type ReviewData = {
   proposal: { proposalPk: number; proposalId: string; title: string };
 };
 
-export const TechnicalBulkReassignModal = ({
+const TechnicalBulkReassignModal = ({
   reviews,
   setReviews,
   removeReview,
   instrumentIds,
+  confirm,
 }: {
   reviews: ReviewData[];
   instrumentIds: number[];
   setReviews: (refetch?: boolean, resetSelection?: boolean) => void;
   removeReview: (reviewId: number) => void;
+  confirm: WithConfirmType;
 }) => {
   const { t } = useTranslation();
   const { instruments, loadingInstruments } =
@@ -54,9 +59,11 @@ export const TechnicalBulkReassignModal = ({
 
   const { api } = useDataApiWithFeedback();
 
-  const [newReviwersMap, setNewReviwersMap] = useState<Map<number, number>>(
+  const [newReviewersMap, setNewReviewersMap] = useState<Map<number, number>>(
     new Map<number, number>()
   );
+
+  const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const RowActionButtons = (review: ReviewData) => {
     const iconButtonStyle = { padding: '7px' };
@@ -81,7 +88,7 @@ export const TechnicalBulkReassignModal = ({
 
   const reviewsSortedByInstrument: GroupedReviews[] = reviews.reduce(
     (acc: GroupedReviews[], review) => {
-      const instrumentId = review.review.instrumentId;
+      const instrumentId = review.review.instrumentId as number;
       const instrumentName = review.instrument?.name;
 
       proposalCount.set(
@@ -124,12 +131,12 @@ export const TechnicalBulkReassignModal = ({
         .find((group) => group.instrumentId === inst.id)
         ?.reviews.map((rev) => rev.proposal.proposalPk);
 
-      newReviwersMap.get(inst.id) &&
+      newReviewersMap.get(inst.id) &&
         proposals &&
         api().updateTechnicalReviewAssignee({
           instrumentId: inst.id,
           proposalPks: proposals,
-          userId: newReviwersMap.get(inst.id) as number,
+          userId: newReviewersMap.get(inst.id) as number,
         });
     });
     setReviews(true, true);
@@ -171,8 +178,8 @@ export const TechnicalBulkReassignModal = ({
             getOptionLabel={(option) => getFullUserName(option)}
             onChange={(_event, newValue) => {
               if (instrument && newValue) {
-                setNewReviwersMap(
-                  newReviwersMap.set(instrument.id, newValue.id)
+                setNewReviewersMap(
+                  newReviewersMap.set(instrument.id, newValue.id)
                 );
               }
             }}
@@ -219,20 +226,20 @@ export const TechnicalBulkReassignModal = ({
         maxWidth="lg"
         fullWidth
         title={`Bulk Reassign Proposals Techniqual reviews`}
-        data-cy="bulk-reassigne-modal"
+        data-cy="bulk-reassign-modal"
       >
         <DialogContent>
           <FormHelperText error></FormHelperText>
           {!!proposalsWithMultipleInstrument.length && (
             <Alert severity="warning" data-cy="multi-instrument-alert">
               {`Warning you have selected proposal(s) with multiple ${t('instrument')}s then
-              both there reviews will apear here: ${proposalsWithMultipleInstrument.toString().replaceAll(',', ', ')}`}
+              both there reviews will appear here: ${proposalsWithMultipleInstrument.toString().replaceAll(',', ', ')}`}
             </Alert>
           )}
           <MaterialTable
             title={
               <Typography variant="h6" component="h1">
-                Techniqual Reviews
+                Technical Reviews
               </Typography>
             }
             columns={instrumentColumns}
@@ -268,6 +275,7 @@ export const TechnicalBulkReassignModal = ({
                       data-cy={`reassign-proposals-table-${rowData.rowData.instrumentId}`}
                     >
                       <MaterialTable
+                        title={rowData.rowData.instrumentName}
                         data={rowData.rowData.reviews}
                         columns={proposalColumns}
                         options={{
@@ -287,11 +295,20 @@ export const TechnicalBulkReassignModal = ({
           <Button
             type="button"
             onClick={() => setReviews()}
-            data-cy="uodate-bulk"
+            data-cy="close-bulk"
           >
             Close
           </Button>
-          <Button type="button" onClick={updateReviews} data-cy="bulk-update">
+          <Button
+            type="button"
+            onClick={confirm(updateReviews, {
+              title: 'Update Reviewers',
+              description: isUserOfficer
+                ? `Please ensure you have reviewed which proposals you reassigning, current reviewers will lose access to complete these reviews.`
+                : 'Please ensure you have reviewed which proposals you reassigning. You will lose access to complete and reassign these reviews.',
+            })}
+            data-cy="bulk-update"
+          >
             Update Reviewers
           </Button>
         </DialogActions>
@@ -299,3 +316,5 @@ export const TechnicalBulkReassignModal = ({
     </>
   );
 };
+
+export default withConfirm(TechnicalBulkReassignModal);

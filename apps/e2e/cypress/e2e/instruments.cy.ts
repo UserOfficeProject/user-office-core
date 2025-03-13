@@ -539,7 +539,7 @@ context('Instrument tests', () => {
       // TODO: Extend here when technical reviewer is added to the table.
     });
 
-    it('Technical review assignee should be able to bulk reassigne rechnical reviews', function () {
+    it('Technical review assignee should be able to bulk reassign Technical reviews', function () {
       cy.assignProposalsToInstruments({
         proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
@@ -644,12 +644,12 @@ context('Instrument tests', () => {
       });
 
       // The expand button does not allow for data cy tags
-      cy.get('[data-cy="bulk-reassigne-modal"]')
+      cy.get('[data-cy="bulk-reassign-modal"]')
         .contains(instrument1.name)
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
-      cy.get('[data-cy="bulk-reassigne-modal"]')
+      cy.get('[data-cy="bulk-reassign-modal"]')
         .contains(instrument2.name)
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
@@ -664,7 +664,7 @@ context('Instrument tests', () => {
         cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('not.exist');
       });
 
-      cy.get('[data-cy="bulk-reassigne-modal"]').should(
+      cy.get('[data-cy="bulk-reassign-modal"]').should(
         'not.contain',
         instrument2.name
       );
@@ -1433,12 +1433,12 @@ context('Instrument tests', () => {
       });
 
       // The expand button does not allow for data cy tags
-      cy.get('[data-cy="bulk-reassigne-modal"]')
+      cy.get('[data-cy="bulk-reassign-modal"]')
         .contains(instrument1.name)
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
         .click();
-      cy.get('[data-cy="bulk-reassigne-modal"]')
+      cy.get('[data-cy="bulk-reassign-modal"]')
         .contains(instrument2.name)
         .parent()
         .find('[aria-label="Detail panel visibility toggle"]')
@@ -1453,7 +1453,7 @@ context('Instrument tests', () => {
         cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('not.exist');
       });
 
-      cy.get('[data-cy="bulk-reassigne-modal"]').should(
+      cy.get('[data-cy="bulk-reassign-modal"]').should(
         'not.contain',
         instrument2.name
       );

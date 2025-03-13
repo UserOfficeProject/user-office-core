@@ -26,9 +26,8 @@ import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import ReviewerFilterComponent, {
   reviewFilter,
 } from 'components/review/ReviewerFilter';
-import {
+import TechnicalBulkReassignModal, {
   ReviewData,
-  TechnicalBulkReassignModal,
 } from 'components/review/TechnicalBulkReassignModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
