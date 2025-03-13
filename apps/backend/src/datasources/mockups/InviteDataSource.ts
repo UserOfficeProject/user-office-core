@@ -1,14 +1,29 @@
+import { inject, injectable } from 'tsyringe';
+
+import { Tokens } from '../../config/Tokens';
 import { Invite } from '../../models/Invite';
+import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
 import { InviteDataSource } from '../InviteDataSource';
 
+@injectable()
 export class InviteDataSourceMock implements InviteDataSource {
   private invites: Invite[];
 
-  constructor() {
+  constructor(
+    @inject(Tokens.CoProposerClaimDataSource)
+    private coProposerDataSource: CoProposerClaimDataSource
+  ) {
     this.init();
   }
-  findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
-    throw new Error('Method not implemented.');
+  async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    const coProposerClaims =
+      await this.coProposerDataSource.findByProposalPk(proposalPk);
+
+    const invites = await Promise.all(
+      coProposerClaims.map((claim) => this.findById(claim.inviteId))
+    );
+
+    return invites.filter((invite) => invite !== null) as Invite[];
   }
   async delete(id: number): Promise<void> {
     this.invites = this.invites.filter((invite) => invite.id !== id);
@@ -70,13 +85,13 @@ export class InviteDataSourceMock implements InviteDataSource {
     createdByUserId: number;
     expiresAt: Date | null;
   }): Promise<Invite> {
-    const { code, email, createdByUserId, expiresAt } = args;
+    const { code, email, note, createdByUserId, expiresAt } = args;
 
     const newInvite = new Invite(
       this.invites.length + 1, // Generate new ID
       code,
       email,
-      '', // Default note to an empty string
+      note ?? '', // Default note to an empty string
       new Date(),
       createdByUserId,
       null,

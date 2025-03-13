@@ -51,7 +51,7 @@ export default class InviteMutations {
         agent,
         roleIds
       );
-      if (hasCreateRights === false) {
+      if (!hasCreateRights) {
         return rejection(
           'User is not authorized to create invites with these claims'
         );
@@ -63,7 +63,7 @@ export default class InviteMutations {
         agent,
         coProposerProposalPk
       );
-      if (hasCreateRights === false) {
+      if (!hasCreateRights) {
         return rejection(
           'User is not authorized to create invites with these claims'
         );
@@ -165,13 +165,15 @@ export default class InviteMutations {
     await Promise.all(
       deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
     );
+
+    const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
         this.inviteDataSource.create({
           createdByUserId: user!.id,
           code: await this.generateInviteCode(),
           email: email,
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          expiresAt: new Date(Date.now() + ONE_YEAR),
           note: '',
         })
       )
