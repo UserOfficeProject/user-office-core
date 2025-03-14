@@ -10,7 +10,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { ExperimentHasSample } from '../models/Experiment';
+import { ExperimentHasSample, ExperimentStatus } from '../models/Experiment';
 import { rejection, Rejection } from '../models/Rejection';
 import { UserWithRole } from '../models/User';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
@@ -61,6 +61,39 @@ export default class ExperimentMutations {
       );
     }
 
+    // Check if the Proposal exists
+    const proposal = await this.proposalDataSource.get(experiment.proposalPk);
+    if (!proposal) {
+      return rejection(
+        'Can not create Experiment Safety for an experiment that is not connected to a valid Proposal'
+      );
+    }
+
+    // Check the authenticity of the User
+    const canReadProposal = await this.proposalAuth.hasReadRights(
+      user,
+      proposal
+    );
+    if (canReadProposal === false) {
+      return rejection(
+        'User is not authorized to create Experiment Safety for this experiment'
+      );
+    }
+
+    // Check if the Experiment is completed
+    if (experiment.status !== ExperimentStatus.ACTIVE) {
+      return rejection(
+        'Can not create Experiment Safety, because the experiment is not active'
+      );
+    }
+
+    // Cannot create Experiment Safety if the Experiment is Active, but already started
+    if (experiment.startsAt < new Date()) {
+      return rejection(
+        'Can not create Experiment Safety, because the experiment has already started'
+      );
+    }
+
     const experimentSafety =
       await this.dataSource.getExperimentSafetyByExperimentPk(experimentPk);
 
@@ -68,35 +101,17 @@ export default class ExperimentMutations {
       return experimentSafety;
     }
 
-    const proposal = await this.proposalDataSource.get(experiment.proposalPk);
-    if (!proposal) {
-      return rejection('Can not create ESI, because proposal does not exist');
-    }
-
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      user,
-      proposal
-    );
-    if (canReadProposal === false) {
-      return rejection(
-        'User is not authorized to create ESI for this proposal'
-      );
-    }
-
     const call = (await this.callDataSource.getCall(proposal.callId))!;
-
     if (!call.esiTemplateId) {
       return rejection(
-        'Can not create ESI, because system has no ESI template configured'
+        'Can not create Experiment Safety, because system has no Experiment Safety template configured'
       );
     }
-
     const newQuestionary = await this.questionaryDataSource.create(
       user!.id,
       call.esiTemplateId
     );
     const newQuestionaryId = newQuestionary.questionaryId;
-
     await this.questionaryDataSource.copyAnswers(
       proposal.questionaryId,
       newQuestionaryId
@@ -116,7 +131,7 @@ export default class ExperimentMutations {
   ): Promise<ExperimentSafety | Rejection> {
     if (args.isSubmitted === false && !this.userAuth.isUserOfficer(user)) {
       return rejection(
-        'Can not update ESI, it is not allowed to change ESI once it has been submitted'
+        'Can not update Experiment Safety, it is not allowed to change Experiment Safety once it has been submitted'
       );
     }
 

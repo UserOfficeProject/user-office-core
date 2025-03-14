@@ -1,61 +1,123 @@
 import {
   Experiment,
-  ExperimentHasSample,
   ExperimentSafety,
+  ExperimentHasSample,
+  ExperimentStatus,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
+import { User } from '../../models/User';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
-import { ExperimentsArgs } from '../../resolvers/queries/ExperimentsQuery';
+import {
+  UserExperimentsFilter,
+  ExperimentsArgs,
+} from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 
+const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
+  return new Experiment(
+    values?.experimentPk ?? 1, // experimentPk
+    values?.experimentId ?? 'dummy', // experimentId
+    values?.startsAt ?? new Date(Date.now() + 86400000), // startsAt (default: 1 day from now)
+    values?.endsAt ?? new Date(Date.now() + 86400000 * 2), // endsAt (default: 2 days from now)
+    values?.scheduledEventId ?? 1, // scheduledEventId
+    values?.proposalPk ?? 1, // proposalPk
+    values?.status ?? ExperimentStatus.DRAFT, // status
+    values?.localContactId ?? null, // localContactId
+    values?.instrumentId ?? 1, // instrumentId
+    values?.createdAt ?? new Date(), // createdAt
+    values?.updatedAt ?? new Date() // updatedAt
+  );
+};
+
+const dummyExperimentSafetyFactory = (
+  values?: Partial<ExperimentSafety>
+): ExperimentSafety => {
+  return new ExperimentSafety(
+    values?.experimentSafetyPk ?? 1, // experimentSafetyPk
+    values?.experimentPk ?? 1, // experimentPk
+    values?.esiQuestionaryId ?? 1, // esiQuestionaryId
+    values?.esiQuestionarySubmittedAt ?? null, // esiQuestionarySubmittedAt
+    values?.createdBy ?? 1, // createdBy
+    values?.status ?? 'PENDING', // status
+    values?.safetyReviewQuestionaryId ?? 1, // safetyReviewQuestionaryId
+    values?.reviewedBy ?? null, // reviewedBy
+    values?.createdAt ?? new Date(), // createdAt
+    values?.updatedAt ?? new Date() // updatedAt
+  );
+};
+
+const dummyExperimentHasSampleFactory = (
+  values?: Partial<ExperimentHasSample>
+): ExperimentHasSample => {
+  return new ExperimentHasSample(
+    values?.experimentPk ?? 1, // experimentPk
+    values?.sampleId ?? 1, // sampleId
+    values?.isEsiSubmitted ?? false, // isEsiSubmitted
+    values?.sampleEsiQuestionaryId ?? 1, // sampleEsiQuestionaryId
+    values?.createdAt ?? new Date(), // createdAt
+    values?.updatedAt ?? new Date() // updatedAt
+  );
+};
+
+export const UpcomingExperimentWithExperiment = dummyExperimentFactory({
+  experimentPk: 1,
+  status: ExperimentStatus.ACTIVE,
+});
+
+export const CompletedExperiment = dummyExperimentFactory({
+  experimentPk: 2,
+  status: ExperimentStatus.COMPLETED,
+});
+
+export const OngoingExperiment = dummyExperimentFactory({
+  experimentPk: 3,
+  status: ExperimentStatus.ACTIVE,
+  startsAt: new Date(Date.now() - 86400000), // startsAt (1 day ago)
+  endsAt: new Date(Date.now() + 86400000), // endsAt (1 day from now)
+});
+
+export const DummyExperimentSample1 = dummyExperimentHasSampleFactory({
+  experimentPk: 1,
+  sampleId: 1,
+});
+
+export const ExperimentWithNonExistingProposalPk = dummyExperimentFactory({
+  experimentPk: 4,
+  proposalPk: 9999,
+});
+
 export class ExperimentDataSourceMock implements ExperimentDataSource {
-  getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]> {
-    throw new Error('Method not implemented.');
+  private experiments: Experiment[] = [];
+  private experimentsSafety: ExperimentSafety[] = [];
+  // Added property for storing samples
+  private experimentSamples: ExperimentHasSample[] = [];
+
+  constructor() {
+    this.init();
   }
-  getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
-    throw new Error('Method not implemented.');
+
+  init(): void {
+    this.experiments = [];
+    this.experimentsSafety = [];
+
+    this.experiments = [
+      UpcomingExperimentWithExperiment,
+      CompletedExperiment,
+      OngoingExperiment,
+      ExperimentWithNonExistingProposalPk,
+    ];
+
+    this.experimentsSafety = [
+      // dummyExperimentSafetyFactory({
+      //   experimentSafetyPk: 1,
+      //   experimentPk: UpcomingExperimentWithExperiment.experimentPk,
+      // }),
+    ];
+
+    // Initialize experimentSamples with dummy sample data
+    this.experimentSamples = [DummyExperimentSample1];
   }
-  getExperimentSamples(experimentPk: number): Promise<ExperimentHasSample[]> {
-    throw new Error('Method not implemented.');
-  }
-  updateExperimentSample(
-    experimentPk: number,
-    sampleId: number,
-    isSubmitted: boolean
-  ): Promise<ExperimentHasSample> {
-    throw new Error('Method not implemented.');
-  }
-  getExperimentSample(
-    experimentPk: number,
-    sampleId: number
-  ): Promise<ExperimentHasSample | null> {
-    throw new Error('Method not implemented.');
-  }
-  getExperimentSafetyByESIQuestionaryId(
-    esiQuestionaryId: number
-  ): Promise<ExperimentSafety | null> {
-    throw new Error('Method not implemented.');
-  }
-  getExperimentSafety(experimentPk: number): Promise<ExperimentSafety | null> {
-    throw new Error('Method not implemented.');
-  }
-  submitExperimentSafety(
-    args: SubmitExperimentSafetyArgs
-  ): Promise<ExperimentSafety> {
-    throw new Error('Method not implemented.');
-  }
-  createExperimentSafety(
-    experimentPk: number,
-    questionaryId: number,
-    creatorId: number
-  ): Promise<ExperimentSafety | Rejection> {
-    throw new Error('Method not implemented.');
-  }
-  getExperimentSafetyByExperimentPk(
-    experimentSafetyPk: number
-  ): Promise<ExperimentSafety | null> {
-    throw new Error('Method not implemented.');
-  }
+
   create(
     experiment: Omit<
       Experiment,
@@ -64,7 +126,6 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   ): Promise<Experiment> {
     throw new Error('Method not implemented.');
   }
-
   updateByScheduledEventId(
     experiment: Omit<
       Experiment,
@@ -73,16 +134,86 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   ): Promise<Experiment> {
     throw new Error('Method not implemented.');
   }
-
   deleteByScheduledEventId(experimentId: number): Promise<Experiment> {
     throw new Error('Method not implemented.');
   }
-
-  getUserExperiments(userId: number): Promise<Experiment[]> {
+  getUserExperiments(
+    userId: User['id'],
+    args: UserExperimentsFilter
+  ): Promise<Experiment[]> {
     throw new Error('Method not implemented.');
   }
-
   getExperiment(experimentPk: number): Promise<Experiment | null> {
+    return new Promise((resolve) => {
+      const experiment = this.experiments.find(
+        (experiment) => experiment.experimentPk === experimentPk
+      );
+
+      if (experiment) {
+        resolve(experiment);
+      } else {
+        resolve(null);
+      }
+    });
+  }
+  getExperimentSafetyByExperimentPk(
+    experimentPk: number
+  ): Promise<ExperimentSafety | null> {
+    return new Promise((resolve) => {
+      const safety = this.experimentsSafety.find(
+        (safety) => safety.experimentPk === experimentPk
+      );
+      if (safety) {
+        resolve(safety);
+      } else {
+        resolve(null);
+      }
+    });
+  }
+
+  getExperimentSafety(
+    experimentSafetyPk: number
+  ): Promise<ExperimentSafety | null> {
+    return new Promise((resolve) => {
+      const safety = this.experimentsSafety.find(
+        (safety) => safety.experimentSafetyPk === experimentSafetyPk
+      );
+
+      if (safety) {
+        resolve(safety);
+      } else {
+        resolve(null);
+      }
+    });
+  }
+
+  createExperimentSafety(
+    experimentPk: number,
+    questionaryId: number,
+    creatorId: number
+  ): Promise<ExperimentSafety | Rejection> {
+    // Simple implementation: create a new ExperimentSafety instance using the factory
+    return new Promise((resolve) => {
+      const safety = dummyExperimentSafetyFactory({
+        experimentPk, // experimentPk
+        esiQuestionaryId: questionaryId, // esiQuestionaryId
+        createdBy: creatorId, // createdBy
+      });
+
+      this.experimentsSafety.push(safety);
+
+      resolve(safety);
+    });
+  }
+
+  submitExperimentSafety(
+    args: SubmitExperimentSafetyArgs
+  ): Promise<ExperimentSafety> {
+    throw new Error('Method not implemented.');
+  }
+  getExperimentSafetyByESIQuestionaryId(
+    esiQuestionaryId: number
+  ): Promise<ExperimentSafety | null> {
     throw new Error('Method not implemented.');
   }
   addSampleToExperiment(
@@ -90,12 +221,71 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     sampleId: number,
     sampleEsiQuestionaryId: number
   ): Promise<ExperimentHasSample> {
-    throw new Error('Method not implemented.');
+    return new Promise((resolve) => {
+      const sample = dummyExperimentHasSampleFactory({
+        experimentPk, // experimentPk
+        sampleId, // sampleId
+        sampleEsiQuestionaryId, // sampleEsiQuestionaryId
+      });
+
+      resolve(sample);
+    });
   }
   removeSampleFromExperiment(
     experimentPk: number,
     sampleId: number
   ): Promise<ExperimentHasSample> {
-    throw new Error('Method not implemented.');
+    return new Promise((resolve) => {
+      const sample = dummyExperimentHasSampleFactory({
+        experimentPk, // experimentPk
+        sampleId, // sampleId
+      });
+
+      resolve(sample);
+    });
+  }
+  getExperimentSample(
+    experimentPk: number,
+    sampleId: number
+  ): Promise<ExperimentHasSample | null> {
+    const sample = this.experimentSamples.find(
+      (s) => s.experimentPk === experimentPk && s.sampleId === sampleId
+    );
+
+    return Promise.resolve(sample || null);
+  }
+
+  getExperimentSamples(experimentPk: number): Promise<ExperimentHasSample[]> {
+    const samples = this.experimentSamples.filter(
+      (s) => s.experimentPk === experimentPk
+    );
+
+    return Promise.resolve(samples);
+  }
+
+  getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
+    // For simplicity, ignoring filter and returning all experiments
+    return Promise.resolve(this.experiments);
+  }
+
+  updateExperimentSample(
+    experimentPk: number,
+    sampleId: number,
+    isSubmitted: boolean
+  ): Promise<ExperimentHasSample> {
+    return new Promise((resolve) => {
+      const updatedSample = dummyExperimentHasSampleFactory({
+        experimentPk, // experimentPk
+        sampleId, // sampleId
+        isEsiSubmitted: isSubmitted, // update isSubmitted status
+      });
+      resolve(updatedSample);
+    });
+  }
+
+  getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]> {
+    return Promise.resolve(
+      this.experiments.filter((exp) => exp.proposalPk === proposalPk)
+    );
   }
 }
