@@ -21,7 +21,7 @@
     "@cypress/webpack-preprocessor": "^6.0.0",
     "@types/eslint": "^8.56.9",
     "@types/luxon": "^3.4.2",
-    "@types/node": "^16.0.0",
+    "@types/node": "^20.17.24",
     "@types/pdf-parse": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
@@ -36,8 +36,8 @@
     "webpack": "^5.94.0"
   },
   "engines": {
-    "npm": ">=9.0.0",
-    "node": ">=18.0.0"
+    "npm": ">=10.8.2",
+    "node": ">=20.0.0"
   },
   "scripts": {
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
