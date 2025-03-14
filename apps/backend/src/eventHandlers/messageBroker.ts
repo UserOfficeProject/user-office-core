@@ -3,6 +3,7 @@ import {
   Queue,
   RabbitMQMessageBroker,
 } from '@user-office-software/duo-message-broker';
+import { DateTime } from 'luxon';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -318,8 +319,8 @@ export async function createPostToRabbitMQHandler() {
         const { visitregistration: visitRegistration } = event;
         const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
-          startAt: visitRegistration.startsAt,
-          endAt: visitRegistration.endsAt,
+          startAt: dateToIsoStringWithTimeZone(visitRegistration.startsAt),
+          endAt: dateToIsoStringWithTimeZone(visitRegistration.endsAt),
           visitorId: user!.oidcSub,
         });
 
@@ -335,8 +336,8 @@ export async function createPostToRabbitMQHandler() {
         const { visitregistration: visitRegistration } = event;
         const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
-          startAt: visitRegistration.startsAt,
-          endAt: visitRegistration.endsAt,
+          startAt: dateToIsoStringWithTimeZone(visitRegistration.startsAt),
+          endAt: dateToIsoStringWithTimeZone(visitRegistration.endsAt),
           visitorId: user!.oidcSub,
         });
 
@@ -517,4 +518,14 @@ export function createSkipListeningHandler() {
   return async () => {
     // no op
   };
+}
+
+function dateToIsoStringWithTimeZone(date: Date | null) {
+  if (!date) {
+    return null;
+  }
+
+  const localIso = DateTime.fromJSDate(date).toISO();
+
+  return localIso;
 }
