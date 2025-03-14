@@ -159,7 +159,7 @@ export class TechnicalReviewAuthorization {
         : technicalReviewOrProposalPk.proposalPk;
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    const isFapSec = await this.proposalAuth.isSecretaryOfProposal(
+    const isFapSec = await this.proposalAuth.isSecretaryForFapProposal(
       agent,
       proposalPk
     );

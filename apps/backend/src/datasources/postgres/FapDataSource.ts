@@ -1022,7 +1022,7 @@ export default class PostgresFapDataSource implements FapDataSource {
     return record !== undefined;
   }
 
-  async isSecretaryOfProposal(
+  async isSecretaryForFapProposal(
     userId: number,
     proposalPk: number
   ): Promise<boolean> {

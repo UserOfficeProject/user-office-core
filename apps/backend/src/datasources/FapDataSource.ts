@@ -131,7 +131,10 @@ export interface FapDataSource {
     userId: number,
     proposalPk: number
   ): Promise<boolean>;
-  isSecretaryOfProposal(userId: number, proposalPk: number): Promise<boolean>;
+  isSecretaryForFapProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean>;
   saveFapMeetingDecision(
     saveFapMeetingDecisionInput: SaveFapMeetingDecisionInput,
     submittedBy?: number | null

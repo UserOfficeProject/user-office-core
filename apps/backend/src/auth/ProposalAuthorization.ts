@@ -192,12 +192,12 @@ export class ProposalAuthorization {
     );
   }
 
-  async isSecretaryOfProposal(agent: UserJWT | null, proposalPk: number) {
+  async isSecretaryForFapProposal(agent: UserJWT | null, proposalPk: number) {
     if (!agent?.id || !proposalPk) {
       return false;
     }
 
-    return this.fapDataSource.isSecretaryOfProposal(agent.id, proposalPk);
+    return this.fapDataSource.isSecretaryForFapProposal(agent.id, proposalPk);
   }
 
   async isInternalReviewer(agent: UserWithRole, proposalPk: number) {
