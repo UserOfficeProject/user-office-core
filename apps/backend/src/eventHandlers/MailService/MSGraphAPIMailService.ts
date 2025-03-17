@@ -1,4 +1,5 @@
 import * as msal from '@azure/msal-node';
+import { logger } from '@user-office-software/duo-logger';
 import { NodeMailerTransportOptions } from 'email-templates';
 import * as nodemailer from 'nodemailer';
 import { SentMessageInfo, Transport, TransportOptions } from 'nodemailer';
@@ -7,6 +8,7 @@ import MailMessage from 'nodemailer/lib/mailer/mail-message';
 import { NodeMailerMailService } from './NodeMailerMailService';
 
 interface MSGraphTransportOptions extends TransportOptions {
+  authority: string | undefined;
   apiUrl: string | undefined;
   clientId: string | undefined;
   clientSecret: string | undefined;
@@ -22,13 +24,14 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 
   constructor(private config: MSGraphTransportOptions) {
     if (
+      !this.config.authority ||
       !this.config.apiUrl ||
       !this.config.clientId ||
       !this.config.clientSecret ||
       !this.config.tenantId
     ) {
       throw new Error(
-        'api url, client id, client secret and tenant id must be defined to be able to use the MS Graph API client'
+        'authority, api url, client id, client secret and tenant id must be defined to be able to use the MS Graph API client'
       );
     }
 
@@ -39,7 +42,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
       auth: {
         clientId: this.config.clientId,
         clientSecret: this.config.clientSecret,
-        authority: `https://login.microsoftonline.com/${this.config.tenantId}`,
+        authority: `${this.config.authority}/${this.config.tenantId}`,
       },
     });
   }
@@ -96,7 +99,9 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
           },
           toRecipients: [
             {
-              emailAddress: to,
+              emailAddress: {
+                address: to,
+              },
             },
           ],
           from: {
@@ -127,6 +132,10 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
       );
 
       if (!response.ok) {
+        logger.logError('Unable to send email to user', {
+          error: response.statusText,
+        });
+
         throw new Error(
           `Failed to send email. Status: ${response.status} - ${response.statusText}`
         );
@@ -151,6 +160,7 @@ export class MSGraphAPIMailService extends NodeMailerMailService {
   protected createTransport(): NodeMailerTransportOptions {
     return nodemailer.createTransport(
       new MSGraphTransport({
+        authority: process.env.MS_GRAPH_API_AUTHORITY,
         apiUrl: process.env.MS_GRAPH_API_URL,
         clientId: process.env.MS_GRAPH_API_CLIENT_ID,
         clientSecret: process.env.MS_GRAPH_API_CLIENT_SECRET,
