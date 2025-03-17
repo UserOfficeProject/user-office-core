@@ -35,6 +35,7 @@
   "dependencies": {
     "@apollo/server": "^4.10.0",
     "@apollo/subgraph": "^2.7.1",
+    "@azure/msal-node": "^3.3.0",
     "@graphql-tools/utils": "^10.1.0",
     "@isaacs/ttlcache": "^1.4.1",
     "@user-office-software/duo-localisation": "^1.2.0",
