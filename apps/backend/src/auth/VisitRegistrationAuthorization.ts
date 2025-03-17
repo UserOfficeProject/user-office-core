@@ -96,12 +96,47 @@ export class VisitRegistrationAuthorization {
       return false;
     }
 
-    /*
-     * User can modify is own visitregistration if it is in Draft
-     */
     return (
       visitregistration.userId === agent.id &&
-      visitregistration.status === VisitRegistrationStatus.DRAFTED
+      (visitregistration.status === VisitRegistrationStatus.DRAFTED ||
+        visitregistration.status === VisitRegistrationStatus.CHANGE_REQUESTED)
+    );
+  }
+
+  async hasCancelRights(
+    agent: UserWithRole | null,
+    visitregistration: VisitRegistration
+  ): Promise<boolean>;
+  async hasCancelRights(
+    agent: UserWithRole | null,
+    visitId: VisitRegistrationPrimaryKey
+  ): Promise<boolean>;
+  async hasCancelRights(
+    agent: UserWithRole | null,
+    visitOrVisitId: VisitRegistration | VisitRegistrationPrimaryKey
+  ) {
+    if (!agent) {
+      return false;
+    }
+
+    // User officer has access
+    if (this.userAuth.isUserOfficer(agent)) {
+      return true;
+    }
+
+    const visitregistration =
+      await this.resolveVisitRegistration(visitOrVisitId);
+
+    if (!visitregistration) {
+      return false;
+    }
+
+    return (
+      visitregistration.userId === agent.id &&
+      (visitregistration.status === VisitRegistrationStatus.DRAFTED ||
+        visitregistration.status === VisitRegistrationStatus.CHANGE_REQUESTED ||
+        visitregistration.status === VisitRegistrationStatus.SUBMITTED ||
+        visitregistration.status === VisitRegistrationStatus.APPROVED)
     );
   }
 }
