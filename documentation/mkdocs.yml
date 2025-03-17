@@ -63,6 +63,7 @@ nav:
           - Settings:
               - Proposal workflows: user-guide/user-officer/settings/proposal_workflow.md
               - Features: user-guide/user-officer/settings/features.md
+      - Scheduler: user-guide/scheduler.md
   - Developer Guide:
       - Contributing: developer-guide/CONTRIBUTING.md
       - Architecture: developer-guide/architecture.md
