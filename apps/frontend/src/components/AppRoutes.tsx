@@ -10,6 +10,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import ChangeRole from './common/ChangeRole';
+import FacilityPage from './facility/FacilityPage';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
 import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
@@ -232,6 +233,14 @@ const AppRoutes = () => {
             path="/ExperimentPage"
             element={
               <TitledRoute title="Experiments" element={<ExperimentPage />} />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/Facility"
+            element={
+              <TitledRoute title="Facility" element={<FacilityPage />} />
             }
           />
         )}

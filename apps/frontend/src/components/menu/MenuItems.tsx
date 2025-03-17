@@ -1,4 +1,4 @@
-import { Science, Topic, History } from '@mui/icons-material';
+import { Science, Topic, History, Apartment } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -228,6 +228,14 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <Science />
           </ListItemIcon>
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
+        </ListItemButton>
+      </Tooltip>
+      <Tooltip title="Facility">
+        <ListItemButton component={NavLink} to="/Facility">
+          <ListItemIcon>
+            <Apartment />
+          </ListItemIcon>
+          <ListItemText primary={'Facility'} />
         </ListItemButton>
       </Tooltip>
       {isFapEnabled && (

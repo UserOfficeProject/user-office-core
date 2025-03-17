@@ -1,0 +1,9 @@
+mutation removeUserFromFacility(
+  $userId: Int!
+  $facilityId: Int!
+) {
+  removeUserFromFacility(
+    userId: $userId
+    facilityId: $facilityId
+  )
+}
