@@ -67,6 +67,7 @@ export const UpcomingExperimentWithExperiment = dummyExperimentFactory({
 export const CompletedExperiment = dummyExperimentFactory({
   experimentPk: 2,
   status: ExperimentStatus.COMPLETED,
+  proposalPk: 2,
 });
 
 export const OngoingExperiment = dummyExperimentFactory({
