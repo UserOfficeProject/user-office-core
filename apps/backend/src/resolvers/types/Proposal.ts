@@ -25,6 +25,7 @@ import { Fap } from './Fap';
 import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
+import { ProposalAttachments } from './ProposalAttachments';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { Sample } from './Sample';
@@ -270,6 +271,14 @@ export class ProposalResolver {
   ): Promise<Experiment[] | null> {
     return await context.queries.proposal.getExperimentsByProposalPk(
       context.user,
+      proposal.primaryKey
+    );
+  }
+
+  @FieldResolver(() => ProposalAttachments, { nullable: true })
+  attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
+    return ctx.queries.questionary.getProposalAttachments(
+      ctx.user,
       proposal.primaryKey
     );
   }
