@@ -82,14 +82,14 @@ context('Experiments tests', () => {
       cy.contains('1-4 of 4');
     });
 
-    it('Can view ESI', () => {
+    it('Can view Experiment Safety', () => {
       cy.login('officer');
       cy.visit('/');
       cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
       cy.get('[value=NONE]').click();
 
       cy.get('[data-cy=officer-scheduled-events-table]')
-        .contains('View ESI')
+        .contains('View Experiment Safety')
         .click();
       cy.get('[role=dialog]').contains(initialDBData.proposal.title);
     });
