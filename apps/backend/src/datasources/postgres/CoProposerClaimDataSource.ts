@@ -16,18 +16,13 @@ export default class PostgresCoProposerClaimDataSource
         });
       });
   }
-  async findByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
+  async findByInviteId(inviteId: number): Promise<CoProposerClaim[]> {
     return database('co_proposer_claims')
       .where({ invite_id: inviteId })
       .select('*')
-      .first()
-      .then((row) => {
-        if (!row) {
-          return null;
-        }
-
-        return new CoProposerClaim(row.invite_id, row.proposal_pk);
-      });
+      .then((rows) =>
+        rows.map((row) => new CoProposerClaim(row.invite_id, row.proposal_pk))
+      );
   }
   async create(inviteId: number, proposalPk: number): Promise<CoProposerClaim> {
     return database('co_proposer_claims')
