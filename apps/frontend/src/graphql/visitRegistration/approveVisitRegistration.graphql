@@ -1,5 +1,5 @@
-mutation approveVisitRegistrations($visitRegistrations: [ApproveVisitRegistrationInput!]!) {
-  approveVisitRegistrations(visitRegistrations: $visitRegistrations) {
+mutation approveVisitRegistration($visitRegistration: ApproveVisitRegistrationInput!) {
+  approveVisitRegistration(visitRegistration: $visitRegistration) {
     ...visitRegistration
     user {
       ...basicUserDetails

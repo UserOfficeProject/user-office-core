@@ -1,0 +1,8 @@
+mutation cancelVisitRegistration($visitRegistration: CancelVisitRegistrationInput!) {
+  cancelVisitRegistration(visitRegistration: $visitRegistration) {
+    ...visitRegistration
+    user {
+      ...basicUserDetails
+    }
+  }
+}
