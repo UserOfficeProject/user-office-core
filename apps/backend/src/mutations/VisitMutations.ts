@@ -9,6 +9,7 @@ import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSourc
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized, EventBus } from '../decorators';
+import { resolveApplicationEventBus } from '../events';
 import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
@@ -22,6 +23,7 @@ import {
   VisitRegistrationStatus,
 } from '../models/VisitRegistration';
 import { ApproveVisitRegistrationInput } from '../resolvers/mutations/ApproveVisitRegistrationMutations';
+import { CancelVisitRegistrationInput } from '../resolvers/mutations/CancelVisitRegistrationMutation';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
 import { SubmitVisitRegistrationArgs } from '../resolvers/mutations/SubmitVisitRegistration';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
@@ -313,6 +315,7 @@ export default class VisitMutations {
       status: VisitRegistrationStatus.APPROVED,
     });
   }
+
   @Authorized()
   async submitVisitRegistration(
     user: UserWithRole | null,
@@ -333,6 +336,60 @@ export default class VisitMutations {
       userId: args.userId,
       visitId: args.visitId,
       status: VisitRegistrationStatus.SUBMITTED,
+    });
+  }
+
+  @Authorized()
+  async cancelVisitRegistration(
+    user: UserWithRole | null,
+    input: CancelVisitRegistrationInput
+  ) {
+    const hasCancelRights = await this.registrationAuth.hasCancelRights(
+      user,
+      input
+    );
+    if (!hasCancelRights) {
+      return rejection(
+        'Chould not cancel Visit Registration due to insufficient permissions',
+        { args: input, user }
+      );
+    }
+
+    const registration = await this.dataSource.getRegistration(
+      input.userId,
+      input.visitId
+    );
+
+    if (!registration) {
+      return rejection(
+        'Could not cancel Visit Registration because specified registration does not exist',
+        { input }
+      );
+    }
+
+    const oldStatus = registration.status;
+    const newStatus =
+      input.userId === user!.id
+        ? VisitRegistrationStatus.CANCELLED_BY_USER
+        : VisitRegistrationStatus.CANCELLED_BY_FACILITY;
+
+    if (oldStatus === VisitRegistrationStatus.APPROVED) {
+      // we are publishing cancellation message only if the registration was previously approved
+      const eventBus = resolveApplicationEventBus();
+
+      await eventBus.publish({
+        type: Event.VISIT_REGISTRATION_CANCELLED,
+        visitregistration: registration,
+        key: 'visitregistration',
+        loggedInUserId: user ? user.id : null,
+        isRejection: false,
+      });
+    }
+
+    return this.dataSource.updateRegistration({
+      userId: input.userId,
+      visitId: input.visitId,
+      status: newStatus,
     });
   }
 }
