@@ -85,8 +85,6 @@ export default function UserUpcomingExperimentsTable() {
     })
   );
 
-  console.log({ userExperimentsWithFormattedDates });
-
   return (
     <Grid item xs={12} data-cy="upcoming-experiments">
       <StyledPaper>

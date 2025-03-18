@@ -37,7 +37,6 @@ const CreateUpdateProposalStatus = ({
     <Formik
       initialValues={initialValues}
       onSubmit={async (values): Promise<void> => {
-        console.log('values', values);
         if (proposalStatus) {
           try {
             const { updateStatus } = await api({
