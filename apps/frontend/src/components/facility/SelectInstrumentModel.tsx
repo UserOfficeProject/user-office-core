@@ -22,7 +22,7 @@ export const SelectInstrumentModel = ({
   close,
 }: {
   facilityId: number;
-  preSelectedInstruments: number[] | null;
+  preSelectedInstruments: number[] | undefined;
   open: boolean;
   addInstruments: (instruments: InstrumentMinimalFragment[]) => void;
   close: () => void;
