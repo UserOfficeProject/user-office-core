@@ -20,17 +20,17 @@ export class ExperimentSafetyAuthorization {
   private async resolveExperimentSafety(
     experimentSafetyOrexperimentSafetyPk: ExperimentSafety | number
   ): Promise<ExperimentSafety | null> {
-    let esi;
+    let experimentSafety;
 
     if (typeof experimentSafetyOrexperimentSafetyPk === 'number') {
-      esi = await this.experimentDataSource.getExperimentSafety(
+      experimentSafety = await this.experimentDataSource.getExperimentSafety(
         experimentSafetyOrexperimentSafetyPk
       );
     } else {
-      esi = experimentSafetyOrexperimentSafetyPk;
+      experimentSafety = experimentSafetyOrexperimentSafetyPk;
     }
 
-    return esi;
+    return experimentSafety;
   }
 
   async canReadProposal(
@@ -46,7 +46,7 @@ export class ExperimentSafetyAuthorization {
 
   async hasReadRights(
     agent: UserWithRole | null,
-    esi: ExperimentSafety
+    experimentSafety: ExperimentSafety
   ): Promise<boolean>;
   async hasReadRights(
     agent: UserWithRole | null,
@@ -79,7 +79,7 @@ export class ExperimentSafetyAuthorization {
 
   async hasWriteRights(
     agent: UserWithRole | null,
-    esi: ExperimentSafety
+    experimentSafety: ExperimentSafety
   ): Promise<boolean>;
   async hasWriteRights(
     agent: UserWithRole | null,
