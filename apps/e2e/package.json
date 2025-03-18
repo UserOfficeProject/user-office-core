@@ -21,7 +21,7 @@
     "@cypress/webpack-preprocessor": "^6.0.0",
     "@types/eslint": "^8.56.9",
     "@types/luxon": "^3.4.2",
-    "@types/node": "^20.17.24",
+    "@types/node": "^22.13.10",
     "@types/pdf-parse": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",

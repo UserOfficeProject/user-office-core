@@ -82,7 +82,7 @@
     "@types/eslint": "^8.2.1",
     "@types/luxon": "^3.4.2",
     "@types/mime": "^2.0.3",
-    "@types/node": "^20.17.24",
+    "@types/node": "^22.13.10",
     "@types/react": "^18.3.3",
     "@types/react-test-renderer": "^18.3.0",
     "@types/yup": "^0.29.13",
