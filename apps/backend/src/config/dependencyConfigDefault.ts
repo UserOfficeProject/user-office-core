@@ -5,10 +5,8 @@ import {
 } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
-import { CoProposerClaimAuthorization } from '../auth/CoProposerClaimAuthorization';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
-import { RoleClaimAuthorization } from '../auth/RoleClaimAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -111,8 +109,6 @@ mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
-mapClass(Tokens.RoleClaimAuthorization, RoleClaimAuthorization);
-mapClass(Tokens.CoProposerClaimAuthorization, CoProposerClaimAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

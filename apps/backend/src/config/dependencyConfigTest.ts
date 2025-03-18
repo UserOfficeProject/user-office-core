@@ -2,10 +2,8 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
-import { CoProposerClaimAuthorization } from '../auth/CoProposerClaimAuthorization';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
-import { RoleClaimAuthorization } from '../auth/RoleClaimAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
@@ -64,8 +62,6 @@ mapClass(Tokens.GenericTemplateDataSource, GenericTemplateDataSourceMock);
 mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.InviteDataSource, InviteDataSourceMock);
 mapClass(Tokens.RoleClaimDataSource, RoleClaimDataSourceMock);
-mapClass(Tokens.RoleClaimAuthorization, RoleClaimAuthorization);
-mapClass(Tokens.CoProposerClaimAuthorization, CoProposerClaimAuthorization);
 mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
 mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);

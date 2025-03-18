@@ -1,10 +1,8 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
-import { CoProposerClaimAuthorization } from '../auth/CoProposerClaimAuthorization';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
-import { RoleClaimAuthorization } from '../auth/RoleClaimAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import PostgresAdminDataSource from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
@@ -69,8 +67,6 @@ mapClass(Tokens.FileDataSource, PostgresFileDataSource);
 mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
 mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
-mapClass(Tokens.RoleClaimAuthorization, RoleClaimAuthorization);
-mapClass(Tokens.CoProposerClaimAuthorization, CoProposerClaimAuthorization);
 mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
 mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);

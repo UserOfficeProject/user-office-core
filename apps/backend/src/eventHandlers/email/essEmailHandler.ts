@@ -129,7 +129,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
         );
 
         if (!inviter) {
-          logger.logError('Failed email invite', { inviter, event });
+          logger.logError('No inviter found when trying to send email', {
+            inviter,
+            event,
+          });
 
           return;
         }

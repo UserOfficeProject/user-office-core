@@ -167,16 +167,11 @@ export class ProposalAuthorization {
       return false;
     }
 
-    const scientistTechniques =
-      await this.techniqueDataSource.getTechniquesByScientist(agent.id);
-    const proposalTechniques =
-      await this.techniqueDataSource.getTechniquesByProposalPk(proposalPk);
-
-    return proposalTechniques.some((technique) =>
-      scientistTechniques.some(
-        (scientistTechnique) => scientistTechnique.id === technique.id
-      )
-    );
+    return this.userDataSource
+      .checkTechniqueScientistToProposal(agent.id, proposalPk)
+      .then((result) => {
+        return result;
+      });
   }
 
   async isVisitorOfProposal(agent: UserWithRole, proposalPk: number) {
