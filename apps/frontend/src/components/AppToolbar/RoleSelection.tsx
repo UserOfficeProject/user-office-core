@@ -19,6 +19,10 @@ const columns: Column<Role>[] = [
     title: 'Role',
     field: 'title',
   },
+  {
+    title: 'Description',
+    field: 'description',
+  },
 ];
 
 const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
@@ -93,6 +97,8 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
       )}
     </>
   );
+
+  // const RoleInfo = ()
 
   const rolesWithRoleAction = roles.map((role) => ({
     ...role,

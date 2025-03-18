@@ -13,6 +13,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useContext, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import ImpersonateButton from 'components/common/ImpersonateButton';
 import StyledDialog from 'components/common/StyledDialog';
@@ -23,13 +24,23 @@ import { getUniqueArrayBy } from 'utils/helperFunctions';
 import RoleSelection from './RoleSelection';
 
 const AccountActionButton = () => {
-  // const classes = useStyles();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [show, setShow] = useState(false);
   const { roles, handleLogout, impersonatingUserId } = useContext(UserContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const hasMultipleRoles = getUniqueArrayBy(roles, 'id').length > 1;
+
+  if (searchParams.get('roleSelectionOpen')) {
+    setShow(hasMultipleRoles);
+    setSearchParams((searchParams) => {
+      searchParams.delete('roleSelectionOpen');
+
+      return searchParams;
+    });
+  }
 
   const isUserImpersonated = typeof impersonatingUserId === 'number';
 
@@ -94,7 +105,11 @@ const AccountActionButton = () => {
             aria-label="Account"
             onClick={handleClick}
             data-cy="profile-page-btn"
+            sx={{
+              fontSize: '1rem',
+            }}
           >
+            Change Roles:
             <AccountCircle />
           </IconButton>
         </Badge>

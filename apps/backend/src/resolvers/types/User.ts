@@ -111,6 +111,8 @@ export class User implements Partial<UserOrigin> {
 export class UserResolver {
   @FieldResolver(() => [Role])
   async roles(@Root() user: User, @Ctx() context: ResolverContext) {
+    const temp = await context.queries.user.dataSource.getUserRoles(user.id);
+
     return context.queries.user.dataSource.getUserRoles(user.id);
   }
 

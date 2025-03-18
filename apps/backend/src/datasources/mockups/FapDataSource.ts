@@ -418,7 +418,12 @@ export class FapDataSourceMock implements FapDataSource {
       return null;
     }
 
-    return { id: 4, shortCode: 'fap_chair', title: 'Fap Chair' };
+    return {
+      id: 4,
+      shortCode: 'fap_chair',
+      title: 'Fap Chair',
+      description: '',
+    };
   }
 
   async assignProposalsToFaps(data: AssignProposalsToFapsInput[]) {
