@@ -186,7 +186,11 @@ const ProposalReviewContent = ({
         </Fragment>
       ) : (
         <TechnicalReviewQuestionaryReview
-          data={technicalReview as TechnicalReviewWithQuestionary}
+          data={
+            (!isUserOfficer && !isFapSec
+              ? { ...technicalReview, comment: null }
+              : technicalReview) as TechnicalReviewWithQuestionary
+          }
         />
       );
     }
