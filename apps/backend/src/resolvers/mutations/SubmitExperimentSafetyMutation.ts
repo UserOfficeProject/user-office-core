@@ -21,7 +21,7 @@ export class SubmitExperimentSafetyArgs {
 }
 
 @Resolver()
-export class UpdateExperimentSafetyMutation {
+export class SubmitExperimentSafetyMutation {
   @Mutation(() => ExperimentSafety)
   submitExperimentSafety(
     @Args() args: SubmitExperimentSafetyArgs,

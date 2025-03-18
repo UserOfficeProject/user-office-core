@@ -30,10 +30,6 @@ import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { WorkflowType } from '../models/Workflow';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
-import {
-  EquipmentAssignmentStatus,
-  ScheduledEventBookingType,
-} from './types/ProposalBooking';
 import { EmailStatusActionRecipients } from './types/StatusActionConfig';
 
 export const registerEnums = () => {
@@ -65,14 +61,8 @@ export const registerEnums = () => {
   registerEnumType(TemplateGroupId, {
     name: 'TemplateGroupId',
   });
-  registerEnumType(ScheduledEventBookingType, {
-    name: 'ScheduledEventBookingType',
-  });
   registerEnumType(ExperimentStatus, {
     name: 'ExperimentStatus',
-  });
-  registerEnumType(EquipmentAssignmentStatus, {
-    name: 'EquipmentAssignmentStatus',
   });
   registerEnumType(FeedbackStatus, {
     name: 'FeedbackStatus',

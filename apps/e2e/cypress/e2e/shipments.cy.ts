@@ -17,7 +17,7 @@ const sampleTitle = /My sample title/i;
 const visitor = initialDBData.users.user3;
 const PI = initialDBData.users.user1;
 const coProposer = initialDBData.users.user2;
-const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
 
 const shipmentTitle = faker.lorem.words(2);
 
@@ -40,7 +40,7 @@ context('Shipments tests', () => {
     cy.createVisit({
       team: [coProposer.id, visitor.id, PI.id],
       teamLeadUserId: PI.id,
-      experimentPk: existingScheduledEventId,
+      experimentPk: existingExperimentPk,
     });
   });
 

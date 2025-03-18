@@ -65,12 +65,10 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
     );
   }
 
-  async getFeedbackRequests(
-    scheduledEventId: number
-  ): Promise<FeedbackRequest[]> {
+  async getFeedbackRequests(experimentPk: number): Promise<FeedbackRequest[]> {
     return this.feedbackRequests.reduce(
       (matchingFeedbackRequests, currentFeedbackRequest) => {
-        if (currentFeedbackRequest.experimentPk === scheduledEventId) {
+        if (currentFeedbackRequest.experimentPk === experimentPk) {
           matchingFeedbackRequests.push(currentFeedbackRequest);
         }
 
@@ -80,12 +78,10 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
     );
   }
 
-  async createFeedbackRequest(
-    scheduledEventId: number
-  ): Promise<FeedbackRequest> {
+  async createFeedbackRequest(experimentPk: number): Promise<FeedbackRequest> {
     const newFeedbackRequest = new FeedbackRequest(
       this.feedbacks.length,
-      scheduledEventId,
+      experimentPk,
       new Date()
     );
 

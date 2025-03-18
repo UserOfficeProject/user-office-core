@@ -8,7 +8,7 @@ import {
   ExperimentSafety,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
-import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   ExperimentsArgs,
   UserExperimentsFilter,

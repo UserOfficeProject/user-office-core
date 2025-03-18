@@ -9,15 +9,15 @@ import { FeedbackDataSource } from '../FeedbackDataSource';
 import database from './database';
 import { FeedbackRecord, FeedbackRequestRecord } from './records';
 
-export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>
+export const createFeedbackObject = (experiment: FeedbackRecord) =>
   new Feedback(
-    scheduledEvent.feedback_id,
-    scheduledEvent.experiment_pk,
-    scheduledEvent.status,
-    scheduledEvent.questionary_id,
-    scheduledEvent.creator_id,
-    scheduledEvent.created_at,
-    scheduledEvent.submitted_at
+    experiment.feedback_id,
+    experiment.experiment_pk,
+    experiment.status,
+    experiment.questionary_id,
+    experiment.creator_id,
+    experiment.created_at,
+    experiment.submitted_at
   );
 
 export const createFeedbackRequestObject = (

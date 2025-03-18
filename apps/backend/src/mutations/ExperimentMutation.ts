@@ -16,7 +16,7 @@ import { UserWithRole } from '../models/User';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
 import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
 import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
-import { SubmitExperimentSafetyArgs } from '../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { SubmitExperimentSafetyArgs } from '../resolvers/mutations/SubmitExperimentSafetyMutation';
 import { UpdateExperimentSampleInput } from '../resolvers/mutations/UpdateExperimentSampleMutation';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';

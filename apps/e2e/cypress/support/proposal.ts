@@ -73,20 +73,22 @@ const updateProposalManagementDecision = (
   return cy.wrap(request);
 };
 
-const createEsi = (
-  createEsiInput: CreateOrGetExperimentSafetyMutationVariables
+const createOrGetExperimentSafety = (
+  createOrGetExperimentSafetyInput: CreateOrGetExperimentSafetyMutationVariables
 ): Cypress.Chainable<CreateOrGetExperimentSafetyMutation> => {
   const api = getE2EApi();
-  const request = api.createOrGetExperimentSafety(createEsiInput);
+  const request = api.createOrGetExperimentSafety(
+    createOrGetExperimentSafetyInput
+  );
 
   return cy.wrap(request);
 };
 
-const updateEsi = (
-  updateEsiInput: SubmitExperimentSafetyMutationVariables
+const submitExperimentSafety = (
+  submitExperimentSafetyInput: SubmitExperimentSafetyMutationVariables
 ): Cypress.Chainable<SubmitExperimentSafetyMutation> => {
   const api = getE2EApi();
-  const request = api.submitExperimentSafety(updateEsiInput);
+  const request = api.submitExperimentSafety(submitExperimentSafetyInput);
 
   return cy.wrap(request);
 };
@@ -101,5 +103,8 @@ Cypress.Commands.add(
   updateProposalManagementDecision
 );
 
-Cypress.Commands.add('createEsi', createEsi);
-Cypress.Commands.add('updateEsi', updateEsi);
+Cypress.Commands.add(
+  'createOrGetExperimentSafety',
+  createOrGetExperimentSafety
+);
+Cypress.Commands.add('submitExperimentSafety', submitExperimentSafety);

@@ -5,10 +5,10 @@ import initialDBData from '../support/initialDBData';
 
 context('Scheduler tests', () => {
   // NOTE: We use fixed dates because we populate the database with a seeder. This is because message broker is not running in test environment.
-  const upcoming = initialDBData.scheduledEvents.upcoming;
-  const upcomingDraft = initialDBData.scheduledEvents.upcomingDraft;
-  const ended = initialDBData.scheduledEvents.ended;
-  const completed = initialDBData.scheduledEvents.completed;
+  const upcoming = initialDBData.experiments.upcoming;
+  const upcomingDraft = initialDBData.experiments.upcomingDraft;
+  const ended = initialDBData.experiments.ended;
+  const completed = initialDBData.experiments.completed;
   const scientist = initialDBData.users.user1;
 
   beforeEach(function () {

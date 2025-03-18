@@ -1661,13 +1661,13 @@ context('Fap reviews tests', () => {
   });
 });
 
-context('Fap meeting components tests', () => {
+context.only('Fap meeting components tests', () => {
   let createdInstrumentId: number;
 
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled().then(() => {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         this.skip();
       }
     });

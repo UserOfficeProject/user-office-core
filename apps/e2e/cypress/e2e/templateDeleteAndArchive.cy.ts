@@ -694,7 +694,8 @@ context('Template Delete, Archive, Unarchive', () => {
     const shipmentTitle = faker.lorem.words(2);
     const sampleTitle = /My sample title/i;
     const coProposer = initialDBData.users.user2;
-    const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+    const existingExperimentPk =
+      initialDBData.experiments.upcoming.experimentPk;
     const visitor = initialDBData.users.user3;
     const PI = initialDBData.users.user1;
 
@@ -711,7 +712,7 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id, PI.id],
         teamLeadUserId: PI.id,
-        experimentPk: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
     });
 
@@ -1120,7 +1121,8 @@ context('Template Delete, Archive, Unarchive', () => {
     const PI = initialDBData.users.user1;
     const acceptedStatus = ProposalEndStatus.ACCEPTED;
     const existingProposalId = initialDBData.proposal.id;
-    const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+    const existingExperimentPk =
+      initialDBData.experiments.upcoming.experimentPk;
     const startQuestion = 'Visit start';
     const endQuestion = 'Visit end';
 
@@ -1156,7 +1158,7 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        experimentPk: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
 
       cy.login(visitor);

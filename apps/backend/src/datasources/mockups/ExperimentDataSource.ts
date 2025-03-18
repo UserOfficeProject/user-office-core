@@ -6,7 +6,7 @@ import {
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { User } from '../../models/User';
-import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/UpdateExperimentSafetyMutation';
+import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   UserExperimentsFilter,
   ExperimentsArgs,
