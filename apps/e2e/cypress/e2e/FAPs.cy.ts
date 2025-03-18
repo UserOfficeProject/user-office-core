@@ -499,7 +499,7 @@ context('Fap reviews tests', () => {
 
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=3&page=1&pageSize=5`);
-      //should go straught to the second page
+      //should go straight to the second page
       cy.contains(proposal1.title).should('not.exist');
       cy.contains('5 rows');
       cy.contains('Documents').click();
