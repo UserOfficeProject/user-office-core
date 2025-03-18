@@ -1,8 +1,8 @@
 import { createInviteValidationSchema } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
-import { CoProposerClaimAuthorization } from '../auth/CoProposerClaimAuthorization';
-import { RoleClaimAuthorization } from '../auth/RoleClaimAuthorization';
+import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
@@ -31,10 +31,10 @@ export default class InviteMutations {
     private roleClaimDataSource: RoleClaimDataSource,
     @inject(Tokens.CoProposerClaimDataSource)
     private coProposerClaimDataSource: CoProposerClaimDataSource,
-    @inject(Tokens.CoProposerClaimAuthorization)
-    private coProposerClaimAuth: CoProposerClaimAuthorization,
-    @inject(Tokens.RoleClaimAuthorization)
-    private roleClaimAuth: RoleClaimAuthorization
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -47,11 +47,10 @@ export default class InviteMutations {
     const { roleIds, coProposerProposalPk } = args.claims;
 
     if (roleIds) {
-      const hasCreateRights = await this.roleClaimAuth.hasCreateRights(
-        agent,
-        roleIds
-      );
-      if (!hasCreateRights) {
+      const isUserRoleOnly =
+        roleIds.length === 1 && roleIds[0] === UserRole.USER;
+
+      if (!isUserRoleOnly && !this.userAuth.isUserOfficer(agent)) {
         return rejection(
           'User is not authorized to create invites with these claims'
         );
@@ -59,11 +58,11 @@ export default class InviteMutations {
     }
 
     if (coProposerProposalPk) {
-      const hasCreateRights = await this.coProposerClaimAuth.hasCreateRights(
+      const hasWriteRights = await this.proposalAuth.hasWriteRights(
         agent,
         coProposerProposalPk
       );
-      if (!hasCreateRights) {
+      if (!hasWriteRights) {
         return rejection(
           'User is not authorized to create invites with these claims'
         );
@@ -135,10 +134,12 @@ export default class InviteMutations {
     args: SetCoProposerInvitesInput
   ): Promise<Invite[] | Rejection> {
     const { proposalPk, emails } = args;
-    const isAuthorizedToCreateInvites =
-      await this.coProposerClaimAuth.hasCreateRights(user, proposalPk);
+    const hasWriteRights = await this.proposalAuth.hasWriteRights(
+      user,
+      proposalPk
+    );
 
-    if (!isAuthorizedToCreateInvites) {
+    if (!hasWriteRights) {
       return rejection(
         'User is not authorized to create invites for this proposal'
       );
