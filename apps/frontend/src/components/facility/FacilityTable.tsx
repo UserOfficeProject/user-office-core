@@ -33,11 +33,8 @@ const facilitiesColumns = [
 ];
 
 const FacilityTable = () => {
-  const {
-    facilities,
-    loadingFacilities: loadingFacilities,
-    setFacilitiesWithLoading: setFacilitiesWithLoading,
-  } = useFacilitiesData();
+  const { facilities, loadingFacilities, setFacilitiesWithLoading } =
+    useFacilitiesData();
   const [assigningUserFacilityId, setAssigningUserFacilityId] = useState<
     number | null
   >(null);
@@ -104,6 +101,34 @@ const FacilityTable = () => {
     (facility) => facility.id === assigningInstrumentFacilityId
   );
 
+  const removeUser = (userId: number, facilityId: number) => {
+    setFacilitiesWithLoading(
+      facilities.map((facility) =>
+        facility.id === facilityId
+          ? {
+              ...facility,
+              users: facility.users.filter((u) => u.id !== userId),
+            }
+          : facility
+      )
+    );
+  };
+
+  const removeInstrument = (instrumentId: number, facilityId: number) => {
+    setFacilitiesWithLoading(
+      facilities.map((facility) =>
+        facility.id === facilityId
+          ? {
+              ...facility,
+              instruments: facility.instruments.filter(
+                (i) => i.id !== instrumentId
+              ),
+            }
+          : facility
+      )
+    );
+  };
+
   return (
     <>
       <ParticipantModal
@@ -139,7 +164,13 @@ const FacilityTable = () => {
           isLoading={loadingFacilities || isExecutingCall}
           setData={setFacilitiesWithLoading}
           detailPanel={(rowData) => {
-            return <FacilityDetailsPanel facility={rowData.rowData} />;
+            return (
+              <FacilityDetailsPanel
+                facility={rowData.rowData}
+                removeUser={removeUser}
+                removeInstrument={removeInstrument}
+              />
+            );
           }}
           actions={[
             {
