@@ -617,11 +617,20 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: SaveFapMeetingDecisionInput
   ): Promise<FapMeetingDecision | Rejection> {
+    const isChairOrSecretaryOfProposal =
+      await this.proposalAuth.isChairOrSecretaryOfProposal(
+        agent,
+        args.proposalPk
+      );
     const isSecretaryForFapProposal =
       await this.proposalAuth.isSecretaryForFapProposal(agent, args.proposalPk);
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
-    if (!isUserOfficer && !isSecretaryForFapProposal) {
+    if (
+      !isChairOrSecretaryOfProposal &&
+      !isUserOfficer &&
+      !isSecretaryForFapProposal
+    ) {
       return rejection(
         'Can not save Fap meeting decision because of insufficient permissions',
         { agent, args }
