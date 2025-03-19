@@ -25,32 +25,26 @@ export class ApproveVisitRegistrationInput
 }
 
 @Resolver()
-export class ApproveVisitRegistrationsMutation {
-  @Mutation(() => [VisitRegistration])
-  async approveVisitRegistrations(
-    @Arg('visitRegistrations', () => [ApproveVisitRegistrationInput])
-    visitRegistrations: [ApproveVisitRegistrationInput],
+export class ApproveVisitRegistrationMutation {
+  @Mutation(() => VisitRegistration)
+  async approveVisitRegistration(
+    @Arg('visitRegistration', () => ApproveVisitRegistrationInput)
+    visitRegistration: ApproveVisitRegistrationInput,
     @Ctx() context: ResolverContext
   ) {
-    const approveResults = await Promise.all(
-      visitRegistrations.map((visitRegistration) =>
-        context.mutations.visit.approveVisitRegistration(
-          context.user,
-          visitRegistration
-        )
-      )
+    const approveResult = context.mutations.visit.approveVisitRegistration(
+      context.user,
+      visitRegistration
     );
 
-    const rejections = approveResults.filter((result) => isRejection(result));
-
-    if (rejections.length > 0) {
+    if (isRejection(approveResult)) {
       logger.logWarn('Approve visit registration failed', {
-        rejections,
+        approveResult,
       });
 
       return rejection('APPROVE_VISIT_REGISTRATION_FAILED');
     }
 
-    return approveResults as VisitRegistration[];
+    return approveResult;
   }
 }
