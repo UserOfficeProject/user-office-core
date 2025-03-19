@@ -11,6 +11,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/system';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { InstrumentMinimalFragment } from 'generated/sdk';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
@@ -33,6 +34,7 @@ export const SelectInstrumentModel = ({
   >([]);
 
   const { instruments, loadingInstruments } = useInstrumentsMinimalData();
+  const { t } = useTranslation();
 
   const onClickHandlerUpdateBtn = () => {
     addInstruments(selectedInstruments);
@@ -107,7 +109,7 @@ export const SelectInstrumentModel = ({
             paddingRight: theme.spacing(1),
           }}
         >
-          {selectedInstruments.length} TODO(s) selected
+          {`${selectedInstruments.length} ${t('instrument')}(s) selected`}
         </Box>
         <Button
           type="button"

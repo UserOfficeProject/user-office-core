@@ -1,6 +1,6 @@
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
-import { t } from 'i18next';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
@@ -41,6 +41,7 @@ const FacilityTable = () => {
   const [assigningInstrumentFacilityId, setAssigningInstrumentFacilityId] =
     useState<number | null>(null);
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { t } = useTranslation();
 
   const createModal = (
     onUpdate: FunctionType<void, [FacilityData | null]>,
@@ -182,7 +183,7 @@ const FacilityTable = () => {
             },
             {
               icon: AssignInstrumentIcon,
-              tooltip: 'Assign TODO',
+              tooltip: `Assign ${t('instrument')}`,
               onClick: (_event, rowdata) => {
                 setAssigningInstrumentFacilityId((rowdata as FacilityData).id);
               },

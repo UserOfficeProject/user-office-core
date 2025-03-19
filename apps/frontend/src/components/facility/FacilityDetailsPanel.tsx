@@ -1,6 +1,7 @@
 import MaterialTable from '@material-table/core';
 import { Delete } from '@mui/icons-material';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { BasicUserDetails, InstrumentMinimalFragment } from 'generated/sdk';
 import { FacilityData } from 'hooks/facility/useFacilitiesData';
@@ -16,6 +17,7 @@ export const FacilityDetailsPanel = ({
   removeInstrument: (instrumentId: number, facilityId: number) => void;
 }) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
+  const { t } = useTranslation();
 
   const userRowActions = [
     {
@@ -40,7 +42,7 @@ export const FacilityDetailsPanel = ({
   const instrumentRowActions = [
     {
       icon: () => <Delete />,
-      tooltip: 'Remove TODO',
+      tooltip: `Remove ${t('instrument')}`,
       onClick: (
         event: React.MouseEvent<JSX.Element>,
         rowData: InstrumentMinimalFragment | InstrumentMinimalFragment[]
