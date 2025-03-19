@@ -723,6 +723,25 @@ export default class PostgresUserDataSource implements UserDataSource {
     return !!proposal;
   }
 
+  async checkTechniqueScientistToProposal(
+    scientistId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const proposal = await database
+      .select('*')
+      .from('proposals as p')
+      .join('technique_has_scientists as ths', {
+        'ths.user_id': scientistId,
+      })
+      .join('technique_has_proposals as thp', {
+        'thp.technique_id': 'ths.technique_id',
+      })
+      .where('thp.proposal_id', proposalPk)
+      .first();
+
+    return !!proposal;
+  }
+
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
     return database
       .select()
