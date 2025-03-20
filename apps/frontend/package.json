@@ -26,7 +26,7 @@
     "@types/yup": "^0.29.13",
     "@uiw/react-codemirror": "^4.22.1",
     "@user-office-software/duo-localisation": "^1.2.0",
-    "@user-office-software/duo-validation": "^5.1.9",
+    "@user-office-software/duo-validation": "^5.1.13",
     "formik": "^2.4.6",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
@@ -82,7 +82,7 @@
     "@types/eslint": "^8.2.1",
     "@types/luxon": "^3.4.2",
     "@types/mime": "^2.0.3",
-    "@types/node": "^18.0.0",
+    "@types/node": "^22.13.10",
     "@types/react": "^18.3.3",
     "@types/react-test-renderer": "^18.3.0",
     "@types/yup": "^0.29.13",
@@ -102,7 +102,7 @@
     "vite": "^5.4.14"
   },
   "engines": {
-    "npm": ">=9.0.0",
-    "node": ">=18.0.0"
+    "npm": ">=10.9.2",
+    "node": ">=20.0.0"
   }
 }

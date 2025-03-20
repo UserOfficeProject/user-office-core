@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import {
+  CreateVisitMutation,
   FeatureId,
   ProposalEndStatus,
   TemplateGroupId,
@@ -49,12 +50,77 @@ context('visits tests', () => {
 
   const cyTagDefineVisit = 'define-visit-icon';
   const cyTagRegisterVisit = 'register-visit-icon';
-  const cyTagFinishTraining = 'finish-training-icon';
   const cyTagDeclareShipment = 'declare-shipment-icon';
   const visitTemplate = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(3),
   };
+
+  describe('Visits registration tests', () => {
+    beforeEach(() => {
+      cy.createTemplate({
+        groupId: TemplateGroupId.VISIT_REGISTRATION,
+        name: visitTemplate.name,
+        description: visitTemplate.description,
+      }).then(({ createTemplate: newTemplate }) => {
+        cy.setActiveTemplate({
+          templateGroupId: TemplateGroupId.VISIT_REGISTRATION,
+          templateId: newTemplate.templateId,
+        });
+      });
+
+      cy.createVisit({
+        team: [visitor.id],
+        teamLeadUserId: visitor.id,
+        scheduledEventId: existingScheduledEventId,
+      }).then(({ createVisit: visit }: CreateVisitMutation) => {
+        cy.createVisitRegistration({
+          visitId: visit.id,
+          userId: visitor.id,
+        });
+
+        cy.submitVisitRegistration({
+          visitId: visit.id,
+          userId: visitor.id,
+        });
+      });
+    });
+
+    it('User officer should be able to cancel visit registration', () => {
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+
+      cy.get(
+        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
+      ).click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
+      cy.get('[data-cy="cancel-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="visit-status"]').should(
+        'have.text',
+        'CANCELLED_BY_FACILITY'
+      );
+    });
+
+    it('User officer should be able to approve visit registration', () => {
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+
+      cy.get(
+        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
+      ).click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
+      cy.get('[data-cy="approve-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
+    });
+  });
 
   describe('Visits basic tests', () => {
     it('Should be able to create visits template', () => {
@@ -87,7 +153,6 @@ context('visits tests', () => {
 
       cy.testActionButton(cyTagDefineVisit, 'active');
       cy.testActionButton(cyTagRegisterVisit, 'inactive');
-      cy.testActionButton(cyTagFinishTraining, 'inactive');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -111,7 +176,6 @@ context('visits tests', () => {
       // test that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'active');
       cy.testActionButton(cyTagRegisterVisit, 'inactive');
-      cy.testActionButton(cyTagFinishTraining, 'inactive');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
 
       // create visit
@@ -148,7 +212,6 @@ context('visits tests', () => {
       // test again that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'completed');
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -167,7 +230,6 @@ context('visits tests', () => {
 
       cy.testActionButton(cyTagDefineVisit, 'invisible');
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -245,7 +307,6 @@ context('visits tests', () => {
       cy.contains(/Upcoming experiments/i).should('exist');
 
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
 
       cy.get(`[data-cy="${cyTagDefineVisit}"]`)
         .closest('button')
@@ -269,7 +330,6 @@ context('visits tests', () => {
       cy.get('body').type('{esc}');
 
       cy.testActionButton(cyTagRegisterVisit, 'invisible');
-      cy.testActionButton(cyTagFinishTraining, 'invisible');
     });
   });
 });

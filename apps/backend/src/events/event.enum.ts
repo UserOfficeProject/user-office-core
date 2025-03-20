@@ -79,6 +79,13 @@ export enum Event {
   INSTRUMENTS_ASSIGNED_TO_TECHNIQUE = 'INSTRUMENTS_ASSIGNED_TO_TECHNIQUE',
   INSTRUMENTS_REMOVED_FROM_TECHNIQUE = 'INSTRUMENTS_REMOVED_FROM_TECHNIQUE',
   PROPOSAL_ASSIGNED_TO_TECHNIQUES = 'PROPOSAL_ASSIGNED_TO_TECHNIQUES',
+  VISIT_REGISTRATION_APPROVED = 'VISIT_REGISTRATION_APPROVED',
+  VISIT_REGISTRATION_CANCELLED = 'VISIT_REGISTRATION_CANCELLED',
+  EXPERIMENT_ESF_SUBMITTED = 'EXPERIMENT_ESF_SUBMITTED',
+  EXPERIMENT_ESF_APPROVED_BY_IS = 'EXPERIMENT_ESF_APPROVED_BY_IS',
+  EXPERIMENT_ESF_REJECTED_BY_IS = 'EXPERIMENT_ESF_REJECTED_BY_IS',
+  EXPERIMENT_ESF_APPROVED_BY_ESR = 'EXPERIMENT_ESF_APPROVED_BY_ESR',
+  EXPERIMENT_ESF_REJECTED_BY_ESR = 'EXPERIMENT_ESF_REJECTED_BY_ESR',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -325,5 +332,33 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
     'Event occurs when a proposal is assigned to techniques',
+  ],
+  [
+    Event.VISIT_REGISTRATION_APPROVED,
+    'Event occurs when visit registration is approved',
+  ],
+  [
+    Event.VISIT_REGISTRATION_CANCELLED,
+    'Event occurs when visit registration is cancelled',
+  ],
+  [
+    Event.EXPERIMENT_ESF_SUBMITTED,
+    'Event occurs when experiment ESF is submitted',
+  ],
+  [
+    Event.EXPERIMENT_ESF_APPROVED_BY_IS,
+    'Event occurs when experiment ESF is approved by IS',
+  ],
+  [
+    Event.EXPERIMENT_ESF_REJECTED_BY_IS,
+    'Event occurs when experiment ESF is rejected by IS',
+  ],
+  [
+    Event.EXPERIMENT_ESF_APPROVED_BY_ESR,
+    'Event occurs when experiment ESF is approved by ESR',
+  ],
+  [
+    Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
+    'Event occurs when experiment ESF is rejected by ESR',
   ],
 ]);

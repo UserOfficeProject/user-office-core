@@ -38,6 +38,7 @@ export const Tokens = {
   UnitDataSource: Symbol('UnitDataSource'),
   UserAuthorization: Symbol('UserAuthorization'),
   ProposalAuthorization: Symbol('ProposalAuthorization'),
+  VisitRegistrationAuthorization: Symbol('VisitRegistrationAuthorization'),
   UserDataSource: Symbol('UserDataSource'),
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
@@ -51,5 +52,7 @@ export const Tokens = {
   ProposalInternalCommentsDataSource: Symbol(
     'ProposalInternalCommentsDataSource'
   ),
+  WorkflowDataSource: Symbol('WorkflowDataSource'),
+  StatusDataSource: Symbol('StatusDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
 };

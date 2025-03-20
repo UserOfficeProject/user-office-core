@@ -9,7 +9,7 @@ import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -24,6 +24,11 @@ import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine
 
 export const EXCHANGE_NAME =
   process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
+
+enum RABBITMQ_VISIT_EVENT_TYPE {
+  VISIT_CREATED = 'VISIT_CREATED',
+  VISIT_DELETED = 'VISIT_DELETED',
+}
 
 type Member = {
   id: string;
@@ -95,10 +100,10 @@ export const getProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+
+  const statusDataSource = container.resolve<StatusDataSource>(
+    Tokens.StatusDataSource
+  );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
@@ -107,9 +112,7 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.CallDataSource
   );
 
-  const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
-    proposal.statusId
-  );
+  const proposalStatus = await statusDataSource.getStatus(proposal.statusId);
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
@@ -197,6 +200,10 @@ export async function createPostToRabbitMQHandler() {
 
   const templateDataSource = container.resolve<TemplateDataSource>(
     Tokens.TemplateDataSource
+  );
+
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
   );
 
   return async (event: ApplicationEvent) => {
@@ -303,6 +310,39 @@ export async function createPostToRabbitMQHandler() {
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           event.type,
+          jsonMessage
+        );
+        break;
+      }
+      case Event.VISIT_REGISTRATION_APPROVED: {
+        const { visitregistration: visitRegistration } = event;
+        const user = await userDataSource.getUser(visitRegistration.userId);
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: user!.oidcSub,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED,
+          jsonMessage
+        );
+        break;
+      }
+
+      case Event.VISIT_REGISTRATION_CANCELLED: {
+        const { visitregistration: visitRegistration } = event;
+        const user = await userDataSource.getUser(visitRegistration.userId);
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: user!.oidcSub,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
           jsonMessage
         );
         break;

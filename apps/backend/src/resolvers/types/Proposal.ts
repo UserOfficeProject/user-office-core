@@ -24,11 +24,12 @@ import { Fap } from './Fap';
 import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
+import { ProposalAttachments } from './ProposalAttachments';
 import { ProposalBookingsCore, ProposalBookingFilter } from './ProposalBooking';
-import { ProposalStatus } from './ProposalStatus';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
 import { Sample } from './Sample';
+import { Status } from './Status';
 import { TechnicalReview } from './TechnicalReview';
 import { Technique } from './Technique';
 import { Visit } from './Visit';
@@ -119,12 +120,12 @@ export class ProposalResolver {
     );
   }
 
-  @FieldResolver(() => ProposalStatus, { nullable: true })
+  @FieldResolver(() => Status, { nullable: true })
   async status(
     @Root() proposal: Proposal,
     @Ctx() context: ResolverContext
-  ): Promise<ProposalStatus | null> {
-    return await context.queries.proposalSettings.getProposalStatus(
+  ): Promise<Status | null> {
+    return await context.queries.status.getStatus(
       context.user,
       proposal.statusId
     );
@@ -262,6 +263,7 @@ export class ProposalResolver {
       proposalPk: proposal.primaryKey,
     });
   }
+
   @FieldResolver(() => ProposalBookingsCore, { nullable: true })
   proposalBookingsCore(
     @Root() proposal: Proposal,
@@ -273,6 +275,14 @@ export class ProposalResolver {
       proposalPk: proposal.primaryKey,
       filter,
     });
+  }
+
+  @FieldResolver(() => ProposalAttachments, { nullable: true })
+  attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
+    return ctx.queries.questionary.getProposalAttachments(
+      ctx.user,
+      proposal.primaryKey
+    );
   }
 }
 

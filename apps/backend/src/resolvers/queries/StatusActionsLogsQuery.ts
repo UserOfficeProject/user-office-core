@@ -11,7 +11,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { EmailStatusActionRecipients } from '../types/ProposalStatusActionConfig';
+import { EmailStatusActionRecipients } from '../types/StatusActionConfig';
 import { StatusActionsLog } from '../types/StatusActionsLog';
 
 @InputType()

@@ -40,7 +40,7 @@
     "@user-office-software/duo-localisation": "^1.2.0",
     "@user-office-software/duo-logger": "^2.3.1",
     "@user-office-software/duo-message-broker": "^1.6.0",
-    "@user-office-software/duo-validation": "^5.1.11",
+    "@user-office-software/duo-validation": "^5.1.13",
     "@user-office-software/openid": "^1.4.0",
     "await-to-js": "^2.1.1",
     "bcryptjs": "^2.4.3",
@@ -95,7 +95,7 @@
     "@types/lodash.merge": "^4.6.7",
     "@types/luxon": "^3.4.2",
     "@types/multer": "^1.4.7",
-    "@types/node": "^18.0.0",
+    "@types/node": "^22.13.10",
     "@types/pg": "^8.11.5",
     "@types/pg-large-object": "^2.0.7",
     "@types/sanitize-html": "^2.6.2",
@@ -123,7 +123,7 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "npm": ">=9.0.0",
-    "node": ">=18.0.0"
+    "npm": ">=10.9.2",
+    "node": ">=22.0.0"
   }
 }

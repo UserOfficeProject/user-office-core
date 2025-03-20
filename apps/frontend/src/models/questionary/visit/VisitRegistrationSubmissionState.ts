@@ -12,8 +12,8 @@ export class VisitRegistrationSubmissionState extends QuestionarySubmissionState
     this.stepIndex = this.getInitialStepIndex();
   }
 
-  getItemId(): number {
-    return this.registration.visitId;
+  getItemId(): [number, number] {
+    return [this.registration.visitId, this.registration.userId];
   }
 
   get itemWithQuestionary() {
