@@ -39,7 +39,7 @@ import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { eliEmailHandler } from '../eventHandlers/email/eliEmailHandler';
-import { MSGraphAPIMailService } from '../eventHandlers/MailService/MSGraphAPIMailService';
+import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
@@ -109,7 +109,7 @@ mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
-mapClass(Tokens.MailService, MSGraphAPIMailService);
+mapClass(Tokens.MailService, SMTPMailService);
 
 mapValue(Tokens.FapDataColumns, FapDataColumns);
 mapValue(Tokens.FapDataRow, getDataRow);

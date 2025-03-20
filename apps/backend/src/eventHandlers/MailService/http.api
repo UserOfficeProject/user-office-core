@@ -1,0 +1,29 @@
+POST https://graph.microsoft.com/v1.0/users/no-reply-uos@eli-laser.eu/sendMail HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJub25jZSI6InNPcTNRZ1JDYk9VNXpLcnJMVXREd1VyUGRoSGNiMXpya25HRWFvMC1NQmciLCJhbGciOiJSUzI1NiIsIng1dCI6IkpETmFfNGk0cjdGZ2lnTDNzSElsSTN4Vi1JVSIsImtpZCI6IkpETmFfNGk0cjdGZ2lnTDNzSElsSTN4Vi1JVSJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8yYWQwZDJiYS03ZjE1LTRmZDItODRkNi00ZjhmODEwMjI4MjMvIiwiaWF0IjoxNzQyMjI0OTM5LCJuYmYiOjE3NDIyMjQ5MzksImV4cCI6MTc0MjIyODgzOSwiYWlvIjoiazJSZ1lNam1yRXJaekhxMDlleFMxWC9GeTVPTEFBPT0iLCJhcHBfZGlzcGxheW5hbWUiOiJVc2VyIFJlZ2lzdHJhdGlvbiIsImFwcGlkIjoiMGZkNmVjNmYtODY2Ni00N2FlLThkZjItYWQ0ZDQwMmFiNzY1IiwiYXBwaWRhY3IiOiIxIiwiaWRwIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvMmFkMGQyYmEtN2YxNS00ZmQyLTg0ZDYtNGY4ZjgxMDIyODIzLyIsImlkdHlwIjoiYXBwIiwib2lkIjoiYTg5YzI1NzEtYTdjYS00YzM3LTk2ODgtZjM5YWMzNDBjOTc5IiwicmgiOiIxLkFVNEF1dExRS2hWXzBrLUUxay1QZ1FJb0l3TUFBQUFBQUFBQXdBQUFBQUFBQUFBT0FRQk9BQS4iLCJyb2xlcyI6WyJNYWlsLlJlYWRXcml0ZSIsIk1haWwuU2VuZCJdLCJzdWIiOiJhODljMjU3MS1hN2NhLTRjMzctOTY4OC1mMzlhYzM0MGM5NzkiLCJ0ZW5hbnRfcmVnaW9uX3Njb3BlIjoiRVUiLCJ0aWQiOiIyYWQwZDJiYS03ZjE1LTRmZDItODRkNi00ZjhmODEwMjI4MjMiLCJ1dGkiOiJlUk1FdXhaM2RrLXBaODR0NW9aQkFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyIwOTk3YTFkMC0wZDFkLTRhY2ItYjQwOC1kNWNhNzMxMjFlOTAiXSwieG1zX2lkcmVsIjoiNyAxNCIsInhtc190Y2R0IjoxNjM3NzQyNDM1LCJ4bXNfdGRiciI6IkVVIn0.hVsz9bw4E1EPg5TQaoOZ0ojBDOzcxkylbcdt0LM5msparhr_3M-SqyPh645rlV5k6NvNOopKcdVmHcFisGLA4JiblZxaPchCBB3TGV51DIWJUbsbclU0Z2_OZAvoIw0hxE-NJGwpdJBCR-bMr23AJKMh-paXSTgZCRsUCKBthsuTD8T8BvVyXjbQIZYZgrBkTVMBF0JaUgELK_lCvhwz0kiUKop82TQDsUasbnoNJPF87VVQMak0WoN9GaTDPhGvoI-FYjqi2xHP0YOxe7rdaeEJLXGb-lNwrNWGtvDKWRtj4fId_RTbMpOuqRzBu4nvg1BUenD5JmVcVgwckxydWg 
+
+{
+  message: {
+    subject: "ELI ERIC User Office - Proposal Created",
+    body: {
+      contentType: "HTML",
+      content: "\n<p>Dear Applicant,</p>\n<p> </p>\n<p>We are pleased that you have started the application process for call 1. Please note that you can revisit and edit your proposal until final submission (ELI ERIC User Office System https://uos.eli-laser.eu Dashboard/My proposals). To finalize your proposal please click on SAVE and SUBMIT button.</p>\n<p></p>\n<p>Please submit the proposal no lather than 23:59 CET on 29th of October, 2024, the deadline for submission.</p>\n<p> </p>\n<p>Kind regards,</p>\n<p></p>\n<p>ELI ERIC User Office</p>",
+    },
+    toRecipients: [
+      {
+        emailAddress: 
+        {
+            address: "gergely.nyiri@eli-alps.hu",
+        },
+      },
+    ],
+    from: {
+      emailAddress: {
+        address: "no-reply-uos@eli-laser.eu",
+      },
+    },
+    attachments: [
+    ],
+  },
+  saveToSentItems: true,
+}

@@ -8,6 +8,8 @@ import MailMessage from 'nodemailer/lib/mailer/mail-message';
 import { NodeMailerMailService } from './NodeMailerMailService';
 
 interface MSGraphTransportOptions extends TransportOptions {
+  usePool: boolean;
+  maxConnections: number;
   authority: string | undefined;
   apiUrl: string | undefined;
   clientId: string | undefined;
@@ -133,7 +135,7 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
 
       if (!response.ok) {
         logger.logError('Unable to send email to user', {
-          error: response.statusText,
+          error: response.statusText + ' : ' + response.status,
         });
 
         throw new Error(
@@ -142,8 +144,22 @@ class MSGraphTransport implements Transport<SentMessageInfo> {
       }
 
       const responseData = await response.text();
-      callback(null, responseData as unknown as SentMessageInfo);
+      callback(null, {
+        envelope: {
+          from: from,
+          to: [to],
+        },
+        messageId: '',
+        accepted: [],
+        rejected: [],
+        pending: [],
+        response: responseData,
+      });
     } catch (error: any) {
+      logger.logError('Unable to send email to user', {
+        error: error,
+      });
+
       callback(error, null);
     }
   }
@@ -160,6 +176,10 @@ export class MSGraphAPIMailService extends NodeMailerMailService {
   protected createTransport(): NodeMailerTransportOptions {
     return nodemailer.createTransport(
       new MSGraphTransport({
+        usePool: process.env.MS_GRAPH_API_USE_POOL ? true : false,
+        maxConnections: parseInt(
+          process.env.MS_GRAPH_API_MAX_CONNECTIONS || '5'
+        ),
         authority: process.env.MS_GRAPH_API_AUTHORITY,
         apiUrl: process.env.MS_GRAPH_API_URL,
         clientId: process.env.MS_GRAPH_API_CLIENT_ID,

@@ -9,6 +9,16 @@ export class SMTPMailService extends NodeMailerMailService {
   }
 
   protected createTransport(): EmailTemplates.NodeMailerTransportOptions {
+    if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
+      return nodemailer.createTransport({
+        pool: true,
+        maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+        ...this.getSmtpAuthOptions(),
+      });
+    }
+
     return nodemailer.createTransport({
       host: process.env.EMAIL_AUTH_HOST,
       port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),

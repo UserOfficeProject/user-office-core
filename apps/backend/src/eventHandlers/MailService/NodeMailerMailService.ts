@@ -38,7 +38,6 @@ export abstract class NodeMailerMailService extends MailService {
     this.emailTemplates = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
-        attachments: this.attachments,
       },
       send: true,
       transport: this.createTransport(),
@@ -101,6 +100,7 @@ export abstract class NodeMailerMailService extends MailService {
         this.emailTemplates.send({
           template: options.content.template_id,
           message: {
+            attachments: this.attachments,
             ...(typeof participant.address !== 'string'
               ? {
                   to: {
@@ -125,6 +125,8 @@ export abstract class NodeMailerMailService extends MailService {
 
     return Promise.allSettled(emailPromises).then((results) => {
       results.forEach((result) => {
+        logger.logInfo('Email result', { result });
+
         if (result.status === 'rejected') {
           logger.logError('Unable to send email to user', {
             error: result.reason,

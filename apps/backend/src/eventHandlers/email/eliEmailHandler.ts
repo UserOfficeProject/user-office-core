@@ -217,6 +217,10 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
+      logger.logInfo('Sending email to PI', {
+        principalInvestigator,
+      });
+
       mailService
         .sendMail({
           content: {
