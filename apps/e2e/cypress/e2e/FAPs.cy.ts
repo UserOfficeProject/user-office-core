@@ -454,6 +454,77 @@ context('Fap reviews tests', () => {
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
     });
 
+    it('Table selection and parameters should be saved between tab navigation', () => {
+      for (let index = 0; index < 6; index++) {
+        cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+          const createdProposal = result.createProposal;
+          cy.wrap(createdProposal.proposalId).as(`proposal${index}Id`);
+          if (createdProposal) {
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: faker.lorem.words(3),
+              abstract: faker.lorem.words(3),
+              proposerId: initialDBData.users.user1.id,
+            });
+
+            cy.submitProposal({ proposalPk: createdProposal.primaryKey });
+
+            // Manually changing the proposal status to be shown in the Faps. -------->
+            cy.changeProposalsStatus({
+              statusId: initialDBData.proposalStatuses.fapReview.id,
+              proposalPks: [createdProposal.primaryKey],
+            });
+
+            cy.assignProposalsToInstruments({
+              instrumentIds: [newlyCreatedInstrumentId],
+              proposalPks: [createdProposal.primaryKey],
+            });
+
+            cy.assignProposalsToFaps({
+              fapInstruments: [
+                { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+              ],
+              proposalPks: [createdProposal.primaryKey],
+            });
+          }
+        });
+      }
+
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3&page=1&pageSize=5`);
+      //should go straight to the second page
+      cy.contains(proposal1.title).should('not.exist');
+      cy.contains('5 rows');
+      cy.contains('Documents').click();
+      cy.contains('Proposals and Assignments').click();
+
+      //should go straught to the second page on navigating back
+      cy.contains(proposal1.title).should('not.exist');
+      cy.contains('5 rows');
+
+      //Table page navigation buttons dont have good selectors so just remove them from query parameters
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.contains('7 rows');
+      cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
+
+      cy.contains('Documents').click();
+
+      cy.contains('Proposals and Assignments').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[type="checkbox"]')
+        .should('be.checked');
+    });
+
     it('Officer should be able to filter instrument', () => {
       cy.assignProposalsToFaps({
         fapInstruments: [
