@@ -15,17 +15,17 @@ import { ExperimentDataSource } from '../ExperimentDataSource';
 
 const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
   return new Experiment(
-    values?.experimentPk ?? 1, // experimentPk
-    values?.experimentId ?? 'dummy', // experimentId
+    values?.experimentPk ?? 1,
+    values?.experimentId ?? 'dummy',
     values?.startsAt ?? new Date(Date.now() + 86400000), // startsAt (default: 1 day from now)
     values?.endsAt ?? new Date(Date.now() + 86400000 * 2), // endsAt (default: 2 days from now)
-    values?.scheduledEventId ?? 1, // scheduledEventId
-    values?.proposalPk ?? 1, // proposalPk
-    values?.status ?? ExperimentStatus.DRAFT, // status
-    values?.localContactId ?? null, // localContactId
-    values?.instrumentId ?? 1, // instrumentId
-    values?.createdAt ?? new Date(), // createdAt
-    values?.updatedAt ?? new Date() // updatedAt
+    values?.scheduledEventId ?? 1,
+    values?.proposalPk ?? 1,
+    values?.status ?? ExperimentStatus.DRAFT,
+    values?.localContactId ?? null,
+    values?.instrumentId ?? 1,
+    values?.createdAt ?? new Date(),
+    values?.updatedAt ?? new Date()
   );
 };
 
@@ -33,16 +33,16 @@ const dummyExperimentSafetyFactory = (
   values?: Partial<ExperimentSafety>
 ): ExperimentSafety => {
   return new ExperimentSafety(
-    values?.experimentSafetyPk ?? 1, // experimentSafetyPk
-    values?.experimentPk ?? 1, // experimentPk
-    values?.esiQuestionaryId ?? 1, // esiQuestionaryId
-    values?.esiQuestionarySubmittedAt ?? null, // esiQuestionarySubmittedAt
-    values?.createdBy ?? 1, // createdBy
-    values?.status ?? 'PENDING', // status
-    values?.safetyReviewQuestionaryId ?? 1, // safetyReviewQuestionaryId
-    values?.reviewedBy ?? null, // reviewedBy
-    values?.createdAt ?? new Date(), // createdAt
-    values?.updatedAt ?? new Date() // updatedAt
+    values?.experimentSafetyPk ?? 1,
+    values?.experimentPk ?? 1,
+    values?.esiQuestionaryId ?? 1,
+    values?.esiQuestionarySubmittedAt ?? null,
+    values?.createdBy ?? 1,
+    values?.status ?? 'PENDING',
+    values?.safetyReviewQuestionaryId ?? 1,
+    values?.reviewedBy ?? null,
+    values?.createdAt ?? new Date(),
+    values?.updatedAt ?? new Date()
   );
 };
 
@@ -50,12 +50,12 @@ const dummyExperimentHasSampleFactory = (
   values?: Partial<ExperimentHasSample>
 ): ExperimentHasSample => {
   return new ExperimentHasSample(
-    values?.experimentPk ?? 1, // experimentPk
-    values?.sampleId ?? 1, // sampleId
-    values?.isEsiSubmitted ?? false, // isEsiSubmitted
-    values?.sampleEsiQuestionaryId ?? 1, // sampleEsiQuestionaryId
-    values?.createdAt ?? new Date(), // createdAt
-    values?.updatedAt ?? new Date() // updatedAt
+    values?.experimentPk ?? 1,
+    values?.sampleId ?? 1,
+    values?.isEsiSubmitted ?? false,
+    values?.sampleEsiQuestionaryId ?? 1,
+    values?.createdAt ?? new Date(),
+    values?.updatedAt ?? new Date()
   );
 };
 
