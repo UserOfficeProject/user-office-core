@@ -56,7 +56,7 @@ const checkCallsFapReviewEnded = async (dataSource: CallDataSource) => {
 
     const callsThatShouldEndFapReview = fapReviewNotEndedCalls.filter(
       (fapReviewNotEndedCall) =>
-          fapReviewNotEndedCall.endFapReview?.getTime() <= currentDate.toMillis()
+        fapReviewNotEndedCall.endFapReview?.getTime() <= currentDate.toMillis()
     );
 
     // NOTE: Check if there is any Fap review that is not submitted 2 days before the Fap review ends on a call.
