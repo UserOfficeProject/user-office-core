@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
 import { RoleClaimDataSourceMock } from '../datasources/mockups/RoleClaimDataSource';
@@ -26,6 +27,7 @@ describe('Test Invite Mutations', () => {
     container
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
       .init();
+    container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
   });
 
   test('A user can accept valid invite code', () => {

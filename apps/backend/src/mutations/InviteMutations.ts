@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -12,6 +13,7 @@ import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role } from '../models/Role';
+import { SettingsId } from '../models/Settings';
 import { UserRole, UserWithRole } from '../models/User';
 import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
 
@@ -29,7 +31,9 @@ export default class InviteMutations {
     @inject(Tokens.CoProposerClaimDataSource)
     private coProposerClaimDataSource: CoProposerClaimDataSource,
     @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.AdminDataSource)
+    private adminDataSource: AdminDataSource
   ) {}
 
   @Authorized()
@@ -103,14 +107,33 @@ export default class InviteMutations {
       deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
     );
 
-    const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
+    // Get invite validity period from settings
+    const inviteValidityPeriodSetting = await this.adminDataSource.getSetting(
+      SettingsId.INVITE_VALIDITY_PERIOD_DAYS
+    );
+    if (!inviteValidityPeriodSetting?.settingsValue) {
+      return rejection('Invite validity period setting not found');
+    }
+
+    const validityPeriodDays = parseInt(
+      inviteValidityPeriodSetting.settingsValue
+    );
+    if (isNaN(validityPeriodDays) || validityPeriodDays <= 0) {
+      return rejection('Invalid invite validity period value');
+    }
+
+    const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+    const expirationDate = new Date(
+      Date.now() + validityPeriodDays * MILLISECONDS_PER_DAY
+    );
+
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
         this.inviteDataSource.create({
           createdByUserId: user!.id,
           code: await this.generateInviteCode(),
           email: email,
-          expiresAt: new Date(Date.now() + ONE_YEAR),
+          expiresAt: expirationDate,
           note: '',
         })
       )
