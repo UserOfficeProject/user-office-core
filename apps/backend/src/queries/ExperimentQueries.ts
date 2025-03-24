@@ -17,7 +17,7 @@ export default class ExperimentQueries {
     @inject(Tokens.ExperimentDataSource) public dataSource: ExperimentDataSource
   ) {}
 
-  @Authorized(Roles.USER)
+  @Authorized(Roles.USER_OFFICER, Roles.USER)
   async getExperimentSafetyByExperimentPk(
     user: UserWithRole | null,
     experimentPk: number
@@ -28,7 +28,7 @@ export default class ExperimentQueries {
     return experimentSafety;
   }
 
-  @Authorized(Roles.USER)
+  @Authorized(Roles.USER_OFFICER, Roles.USER)
   async getExperimentSafety(
     user: UserWithRole | null,
     experimentSafetyPk: number
@@ -39,7 +39,7 @@ export default class ExperimentQueries {
     return experimentSafety;
   }
 
-  @Authorized(Roles.USER)
+  @Authorized(Roles.USER_OFFICER, Roles.USER)
   async getExperimentSample(
     user: UserWithRole | null,
     args: ExperimentSampleArgs
@@ -52,7 +52,7 @@ export default class ExperimentQueries {
     return experimentSample;
   }
 
-  @Authorized(Roles.USER)
+  @Authorized(Roles.USER_OFFICER, Roles.USER)
   async getExperimentSamples(
     user: UserWithRole | null,
     experimentPk: number
