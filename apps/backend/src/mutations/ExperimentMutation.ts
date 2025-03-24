@@ -278,7 +278,7 @@ export default class ExperimentMutations {
     return this.dataSource.updateExperimentSample(
       args.experimentPk,
       args.sampleId,
-      args.isSubmitted!
+      !!args.isSubmitted
     );
   }
 
