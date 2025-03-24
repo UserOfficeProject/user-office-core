@@ -374,10 +374,6 @@ export async function createListenToRabbitMQHandler() {
     SCHEDULER_EXCHANGE_NAME
   );
 
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
-  );
-
   const experimentDataSource = container.resolve<ExperimentDataSource>(
     Tokens.ExperimentDataSource
   );
