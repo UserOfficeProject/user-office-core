@@ -21,7 +21,7 @@ const checkAndNotifyFapReviewersBeforeReviewEnds = async (
   const eventBus = resolveApplicationEventBus();
   const callsThatShouldSendEmailsToFapReviewers = fapReviewNotEndedCalls.filter(
     (fapReviewNotEndedCall) =>
-      fapReviewNotEndedCall.endFapReview.getTime() <=
+      fapReviewNotEndedCall.endFapReview?.getTime() <=
       currentDate
         .plus({ days: DAYS_BEFORE_SENDING_NOTIFICATION_EMAILS })
         .toMillis()
@@ -56,7 +56,7 @@ const checkCallsFapReviewEnded = async (dataSource: CallDataSource) => {
 
     const callsThatShouldEndFapReview = fapReviewNotEndedCalls.filter(
       (fapReviewNotEndedCall) =>
-        fapReviewNotEndedCall.endFapReview.getTime() <= currentDate.toMillis()
+          fapReviewNotEndedCall.endFapReview?.getTime() <= currentDate.toMillis()
     );
 
     // NOTE: Check if there is any Fap review that is not submitted 2 days before the Fap review ends on a call.

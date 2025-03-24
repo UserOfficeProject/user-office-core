@@ -16,7 +16,7 @@ const checkCallsEnded = async (dataSource: CallDataSource) => {
     const currentDate = new Date();
 
     const callsThatShouldEnd = notEndedCalls.filter(
-      (notEndedCall) => notEndedCall.endCall.getTime() <= currentDate.getTime()
+      (notEndedCall) => notEndedCall.endCall?.getTime() <= currentDate.getTime()
     );
 
     for (const callThatShouldEnd of callsThatShouldEnd) {
@@ -53,7 +53,7 @@ const checkCallsEndedInternal = async (dataSource: CallDataSource) => {
 
     const callsThatShouldEndInternal = notEndedInternalCalls.filter(
       (notEndedCall) =>
-        notEndedCall.endCallInternal.getTime() <= currentDate.getTime()
+        notEndedCall.endCallInternal?.getTime() <= currentDate.getTime()
     );
 
     for (const callThatShouldEndInternal of callsThatShouldEndInternal) {
