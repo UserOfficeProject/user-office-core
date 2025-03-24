@@ -18,8 +18,8 @@ export class CoProposerClaimDataSourceMock
     return this.invites.filter((invite) => invite.proposalPk === proposalPk);
   }
 
-  async findByInviteId(inviteId: number): Promise<CoProposerClaim | null> {
-    return this.invites.find((invite) => invite.inviteId === inviteId) || null;
+  async findByInviteId(inviteId: number): Promise<CoProposerClaim[]> {
+    return this.invites.filter((invite) => invite.inviteId === inviteId);
   }
 
   async create(inviteId: number, proposalPk: number): Promise<CoProposerClaim> {

@@ -1,5 +1,3 @@
-import { CreateInviteMutation } from '../../../frontend/src/generated/sdk';
-
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -19,9 +17,9 @@ declare global {
        *   });
        *    });
        */
-      createInvite: ({
-        input: CreateInviteInput,
-      }) => Cypress.Chainable<CreateInviteMutation>;
+      setCoProposerInvites: (
+        input: SetCoProposerInvitesInput
+      ) => Cypress.Chainable<SetCoProposerInvitesMutation>;
     }
   }
 }

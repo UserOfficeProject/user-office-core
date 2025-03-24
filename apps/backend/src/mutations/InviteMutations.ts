@@ -1,21 +1,20 @@
-import { createInviteValidationSchema } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
-import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized, EventBus, ValidateArgs } from '../decorators';
+import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
 import { Role } from '../models/Role';
+import { SettingsId } from '../models/Settings';
 import { UserRole, UserWithRole } from '../models/User';
-import { CreateInviteInput } from '../resolvers/mutations/CreateInviteMutation';
 import { SetCoProposerInvitesInput } from '../resolvers/mutations/SetCoProposerInvitesMutation';
 
 @injectable()
@@ -33,68 +32,9 @@ export default class InviteMutations {
     private coProposerClaimDataSource: CoProposerClaimDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
-    @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization
+    @inject(Tokens.AdminDataSource)
+    private adminDataSource: AdminDataSource
   ) {}
-
-  @Authorized()
-  @ValidateArgs(createInviteValidationSchema)
-  @EventBus(Event.EMAIL_INVITE)
-  async create(
-    agent: UserWithRole | null,
-    args: CreateInviteInput
-  ): Promise<Invite | Rejection> {
-    const { roleIds, coProposerProposalPk } = args.claims;
-
-    if (roleIds) {
-      const isUserRoleOnly =
-        roleIds.length === 1 && roleIds[0] === UserRole.USER;
-
-      if (!isUserRoleOnly && !this.userAuth.isUserOfficer(agent)) {
-        return rejection(
-          'User is not authorized to create invites with these claims'
-        );
-      }
-    }
-
-    if (coProposerProposalPk) {
-      const hasWriteRights = await this.proposalAuth.hasWriteRights(
-        agent,
-        coProposerProposalPk
-      );
-      if (!hasWriteRights) {
-        return rejection(
-          'User is not authorized to create invites with these claims'
-        );
-      }
-    }
-
-    const newCode = await this.generateInviteCode();
-    const newInvite = await this.inviteDataSource.create({
-      createdByUserId: agent!.id,
-      code: newCode,
-      email: args.email,
-      expiresAt: null,
-      note: args.note ?? '',
-    });
-
-    if (roleIds) {
-      await Promise.all(
-        roleIds.map((roleId) =>
-          this.roleClaimDataSource.create(newInvite.id, roleId)
-        )
-      );
-    }
-
-    if (coProposerProposalPk) {
-      await this.coProposerClaimDataSource.create(
-        newInvite.id,
-        coProposerProposalPk
-      );
-    }
-
-    return newInvite;
-  }
 
   @Authorized()
   @EventBus(Event.INVITE_ACCEPTED)
@@ -167,14 +107,33 @@ export default class InviteMutations {
       deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
     );
 
-    const ONE_YEAR = 365 * 24 * 60 * 60 * 1000;
+    // Get invite validity period from settings
+    const inviteValidityPeriodSetting = await this.adminDataSource.getSetting(
+      SettingsId.INVITE_VALIDITY_PERIOD_DAYS
+    );
+    if (!inviteValidityPeriodSetting?.settingsValue) {
+      return rejection('Invite validity period setting not found');
+    }
+
+    const validityPeriodDays = parseInt(
+      inviteValidityPeriodSetting.settingsValue
+    );
+    if (isNaN(validityPeriodDays) || validityPeriodDays <= 0) {
+      return rejection('Invalid invite validity period value');
+    }
+
+    const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+    const expirationDate = new Date(
+      Date.now() + validityPeriodDays * MILLISECONDS_PER_DAY
+    );
+
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
         this.inviteDataSource.create({
           createdByUserId: user!.id,
           code: await this.generateInviteCode(),
           email: email,
-          expiresAt: new Date(Date.now() + ONE_YEAR),
+          expiresAt: expirationDate,
           note: '',
         })
       )
@@ -219,23 +178,21 @@ export default class InviteMutations {
     const coProposerClaim =
       await this.coProposerClaimDataSource.findByInviteId(inviteId);
 
-    if (coProposerClaim === null) {
-      return;
-    }
+    for await (const claim of coProposerClaim) {
+      const proposalHasUser = await this.proposalHasUser(
+        claim.proposalPk,
+        claimerUserId
+      );
+      // already a co-proposer
+      if (proposalHasUser) {
+        return;
+      }
 
-    const proposalHasUser = await this.proposalHasUser(
-      coProposerClaim.proposalPk,
-      claimerUserId
-    );
-    // already a co-proposer
-    if (proposalHasUser) {
-      return;
+      await this.proposalDataSource.addProposalUser(
+        claim.proposalPk,
+        claimerUserId
+      );
     }
-
-    await this.proposalDataSource.addProposalUser(
-      coProposerClaim.proposalPk,
-      claimerUserId
-    );
   }
 
   private async proposalHasUser(proposalPk: number, userId: number) {

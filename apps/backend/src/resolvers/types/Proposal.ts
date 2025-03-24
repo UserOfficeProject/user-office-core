@@ -25,6 +25,7 @@ import { FapMeetingDecision } from './FapMeetingDecision';
 import { GenericTemplate } from './GenericTemplate';
 import { InstrumentWithManagementTime } from './Instrument';
 import { Invite } from './Invite';
+import { ProposalAttachments } from './ProposalAttachments';
 import { ProposalBookingsCore, ProposalBookingFilter } from './ProposalBooking';
 import { Questionary } from './Questionary';
 import { Review } from './Review';
@@ -276,6 +277,7 @@ export class ProposalResolver {
       proposalPk: proposal.primaryKey,
     });
   }
+
   @FieldResolver(() => ProposalBookingsCore, { nullable: true })
   proposalBookingsCore(
     @Root() proposal: Proposal,
@@ -287,6 +289,14 @@ export class ProposalResolver {
       proposalPk: proposal.primaryKey,
       filter,
     });
+  }
+
+  @FieldResolver(() => ProposalAttachments, { nullable: true })
+  attachments(@Root() proposal: Proposal, @Ctx() ctx: ResolverContext) {
+    return ctx.queries.questionary.getProposalAttachments(
+      ctx.user,
+      proposal.primaryKey
+    );
   }
 }
 

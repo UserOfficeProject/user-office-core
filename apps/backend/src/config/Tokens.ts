@@ -42,8 +42,6 @@ export const Tokens = {
   VisitDataSource: Symbol('VisitDataSource'),
   PredefinedMessageDataSource: Symbol('PredefinedMessageDataSource'),
   InternalReviewDataSource: Symbol('InternalReviewDataSource'),
-  CoProposerClaimAuthorization: Symbol('CoProposerClaimAuthorization'),
-  RoleClaimAuthorization: Symbol('RoleClaimAuthorization'),
   FapDataColumns: Symbol('FapDataColumns'),
   FapDataRow: Symbol('FapDataRow'),
   PopulateRow: Symbol('PopulateRow'),

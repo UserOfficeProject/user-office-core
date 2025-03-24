@@ -58,10 +58,16 @@ export async function essEmailHandler(event: ApplicationEvent) {
         event.emailinviteresponse.inviterId
       );
 
-      if (!user || !inviter) {
+      if (!user) {
+        logger.logError('Failed email invite. No user found', {
+          event,
+        });
+
+        return;
+      }
+
+      if (!inviter) {
         logger.logError('Failed email invite. No inviter found', {
-          user,
-          inviter,
           event,
         });
 
@@ -346,7 +352,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       return;
     }
-    case Event.VISIT_REGISTRATION_APPROVED: {
+    case Event.VISIT_REGISTRATION_APPROVED:
+    case Event.VISIT_REGISTRATION_CANCELLED: {
       const visitRegistration = await visitDataSource.getRegistration(
         event.visitregistration.userId,
         event.visitregistration.visitId
@@ -377,10 +384,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
         return;
       }
 
+      const templateId =
+        event.type === Event.VISIT_REGISTRATION_APPROVED
+          ? 'visit-registration-approved'
+          : 'visit-registration-cancelled';
+
       mailService
         .sendMail({
           content: {
-            template_id: 'visit-registration-approved',
+            template_id: templateId,
           },
           substitution_data: {
             preferredname: user.preferredname,
@@ -400,14 +412,17 @@ export async function essEmailHandler(event: ApplicationEvent) {
           ],
         })
         .then((res) => {
-          logger.logInfo('Email sent on visit registration approval', {
-            result: res,
-            event,
-          });
+          logger.logInfo(
+            `Email sent on visit registration event ${event.type}`,
+            {
+              result: res,
+              event,
+            }
+          );
         })
         .catch((err: string) => {
           logger.logError(
-            'Could not send email on visit registration approval',
+            `Could not send email on visit registration event ${event.type}`,
             {
               error: err,
               event,

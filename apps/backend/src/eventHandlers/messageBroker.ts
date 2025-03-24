@@ -238,22 +238,24 @@ export async function createPostToRabbitMQHandler() {
       case Event.INVITE_ACCEPTED: {
         const invite = event.invite;
 
-        const claim = await coProposerClaimDataSource.findByInviteId(invite.id);
-        if (!claim) {
-          return;
-        }
-
-        const proposal = await proposalDataSource.get(claim.proposalPk);
-        if (!proposal) {
-          return;
-        }
-
-        const jsonMessage = await getProposalMessageData(proposal);
-        await rabbitMQ.sendMessageToExchange(
-          EXCHANGE_NAME,
-          Event.PROPOSAL_UPDATED,
-          jsonMessage
+        const claims = await coProposerClaimDataSource.findByInviteId(
+          invite.id
         );
+
+        for (const claim of claims) {
+          const proposal = await proposalDataSource.get(claim.proposalPk);
+          if (!proposal) {
+            return;
+          }
+
+          const jsonMessage = await getProposalMessageData(proposal);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            Event.PROPOSAL_UPDATED,
+            jsonMessage
+          );
+        }
+
         break;
       }
       case Event.INSTRUMENT_CREATED:
@@ -353,6 +355,23 @@ export async function createPostToRabbitMQHandler() {
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
           RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED,
+          jsonMessage
+        );
+        break;
+      }
+
+      case Event.VISIT_REGISTRATION_CANCELLED: {
+        const { visitregistration: visitRegistration } = event;
+        const user = await userDataSource.getUser(visitRegistration.userId);
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: user!.oidcSub,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
           jsonMessage
         );
         break;
