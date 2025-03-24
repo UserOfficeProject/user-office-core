@@ -2,6 +2,8 @@ DO
 $$
 BEGIN
   IF register_patch('0173_VisitsUpdate', 'Yoganandan Pandiyan', 'Updating the Visits to refer to the new Experiments table', '2025-03-08') THEN
+    DELETE FROM visits;  -- Cleaning up old data
+
     ALTER TABLE visits
     ADD COLUMN experiment_pk INT NOT NULL REFERENCES experiments(experiment_pk);
 
