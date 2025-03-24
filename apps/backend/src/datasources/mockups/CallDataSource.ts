@@ -44,7 +44,7 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.callReviewEnded || false,
     values?.callFapReviewEnded || false,
     values?.templateId || 1,
-    values?.esiTemplateId,
+    values?.esiTemplateId || 2,
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
     values?.title || 'Title',
     values?.description || 'Description',
