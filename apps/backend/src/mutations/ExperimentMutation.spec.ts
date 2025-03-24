@@ -405,7 +405,7 @@ describe('Removing Samples from Experiment', () => {
 
     expect(result).toBeInstanceOf(Rejection);
     expect((result as Rejection).reason).toBe(
-      'User does not have permission to remove samples from the experimemnt'
+      'User does not have permission to remove samples from the experiment'
     );
   });
 

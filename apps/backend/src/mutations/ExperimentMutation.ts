@@ -230,7 +230,7 @@ export default class ExperimentMutations {
     );
     if (hasAccessRights === false) {
       return rejection(
-        'User does not have permission to remove samples from the experimemnt',
+        'User does not have permission to remove samples from the experiment',
         {
           args,
         }
