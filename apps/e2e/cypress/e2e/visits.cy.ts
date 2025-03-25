@@ -234,10 +234,13 @@ context('visits tests', () => {
     });
 
     it('Visitor should be able to register for a visit', () => {
-      const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+      const pastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
         initialDBData.getFormats().dateFormat
       );
-      const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+      const nowDate = DateTime.fromJSDate(new Date()).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const futureDate = DateTime.fromJSDate(faker.date.future()).toFormat(
         initialDBData.getFormats().dateFormat
       );
 
@@ -273,14 +276,18 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Invalid date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(endDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(startDate);
-
+      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(pastDate);
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/end date can't be before start date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.contains(startQuestion).parent().find('input').clear().type(pastDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
+      cy.get('[data-cy=save-and-continue-button]').click();
+      cy.contains(/visit start date can not be in the past/i).should('exist');
+
+      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 
