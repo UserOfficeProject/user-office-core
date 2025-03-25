@@ -195,6 +195,28 @@ export default class PostgresExperimentDataSource
               query.whereIn('status', filter.status);
             }
           }),
+
+        // Third query: Experiments where the user is the visitor
+        database('experiments')
+          .select('experiments.*')
+          .join('visits', 'experiments.experiment_pk', 'visits.experiment_pk')
+          .join(
+            'visits_has_users',
+            'visits.visit_id',
+            'visits_has_users.visit_id'
+          )
+          .where('visits_has_users.user_id', userId)
+          .modify((query) => {
+            if (filter?.endsAfter) {
+              query.where('ends_at', '>', filter.endsAfter);
+            }
+            if (filter?.instrumentId) {
+              query.where('instrument_id', filter.instrumentId);
+            }
+            if (filter?.status) {
+              query.whereIn('status', filter.status);
+            }
+          }),
       ])
       .then((records: ExperimentRecord[]) => {
         return records.map(createExperimentObject);

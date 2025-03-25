@@ -196,7 +196,7 @@ context('visits tests', () => {
     }).then((result) => {
       if (result.createExperimentSafety) {
         cy.submitExperimentSafety({
-          experimentSafetyPk: result.createExperimentSafety.experimentPk,
+          experimentSafetyPk: result.createExperimentSafety.experimentSafetyPk,
           isSubmitted: true,
         });
       }
