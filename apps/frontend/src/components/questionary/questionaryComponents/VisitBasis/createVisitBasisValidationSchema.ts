@@ -8,6 +8,7 @@ export const createVisitBasisValidationSchema: CreateYupValidation = () => {
 
     startsAt: Yup.date()
       .typeError('Invalid date')
+      .min(new Date(), 'Visit start date can not be in the past')
       .required('Visit start date is required'),
 
     endsAt: Yup.date()
