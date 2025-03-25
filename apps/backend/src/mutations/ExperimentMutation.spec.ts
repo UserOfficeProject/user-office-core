@@ -114,9 +114,7 @@ describe('Test Experiment Safety', () => {
   });
 
   test('User should not be able create Experiment Safety for an Experiment, whose Call does not have a Experiment Safety Form Questionary template', async () => {
-    jest
-      .spyOn(calldatasource, 'getCall')
-      .mockResolvedValue(dummyCallFactory({ esiTemplateId: undefined }));
+    jest.spyOn(calldatasource, 'getCall').mockResolvedValue(dummyCallFactory());
 
     const experimentSafety =
       await experimentMutation.createOrGetExperimentSafety(
