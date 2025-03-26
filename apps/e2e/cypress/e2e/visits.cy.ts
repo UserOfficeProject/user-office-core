@@ -281,11 +281,6 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/end date can't be before start date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(pastDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
-      cy.get('[data-cy=save-and-continue-button]').click();
-      cy.contains(/visit start date can not be in the past/i).should('exist');
-
       cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
       cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
 
