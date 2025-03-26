@@ -10,7 +10,6 @@ import { Workflow, WorkflowType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useWorkflowsData(entityType: WorkflowType): {
-  //TODO: Entity Type should be extraced from the sdk
   loadingWorkflows: boolean;
   workflows: Workflow[];
   setWorkflowsWithLoading: Dispatch<SetStateAction<Workflow[]>>;
