@@ -169,13 +169,13 @@ export default class PostgresExperimentDataSource
           .where('proposal_user.user_id', userId)
           .modify((query) => {
             if (filter?.endsAfter) {
-              query.where('ends_at', '>', filter.endsAfter);
+              query.where('experiments.ends_at', '>', filter.endsAfter);
             }
             if (filter?.instrumentId) {
-              query.where('instrument_id', filter.instrumentId);
+              query.where('experiments.instrument_id', filter.instrumentId);
             }
             if (filter?.status) {
-              query.whereIn('status', filter.status);
+              query.whereIn('experiments.status', filter.status);
             }
           }),
 
@@ -186,13 +186,13 @@ export default class PostgresExperimentDataSource
           .where('proposals.proposer_id', userId)
           .modify((query) => {
             if (filter?.endsAfter) {
-              query.where('ends_at', '>', filter.endsAfter);
+              query.where('experiments.ends_at', '>', filter.endsAfter);
             }
             if (filter?.instrumentId) {
-              query.where('instrument_id', filter.instrumentId);
+              query.where('experiments.instrument_id', filter.instrumentId);
             }
             if (filter?.status) {
-              query.whereIn('status', filter.status);
+              query.whereIn('experiments.status', filter.status);
             }
           }),
 
@@ -208,13 +208,13 @@ export default class PostgresExperimentDataSource
           .where('visits_has_users.user_id', userId)
           .modify((query) => {
             if (filter?.endsAfter) {
-              query.where('ends_at', '>', filter.endsAfter);
+              query.where('experiments.ends_at', '>', filter.endsAfter);
             }
             if (filter?.instrumentId) {
-              query.where('instrument_id', filter.instrumentId);
+              query.where('experiments.instrument_id', filter.instrumentId);
             }
             if (filter?.status) {
-              query.whereIn('status', filter.status);
+              query.whereIn('experiments.status', filter.status);
             }
           }),
       ])
