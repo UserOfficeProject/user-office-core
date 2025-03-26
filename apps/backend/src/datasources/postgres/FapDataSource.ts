@@ -301,10 +301,11 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
-  async getFapProposals(
-    fapId: number,
-    callId: number | null
-  ): Promise<FapProposal[]> {
+  async getFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
@@ -320,11 +321,14 @@ export default class PostgresFapDataSource implements FapDataSource {
             this.where('s.short_code', 'ilike', 'FAP_%');
           });
 
-        if (callId) {
-          query.andWhere('fp.call_id', callId);
+        if (filter.callId) {
+          query.andWhere('fp.call_id', filter.callId);
+        }
+        if (filter.instrumentId) {
+          query.andWhere('fp.instrument_id', filter.instrumentId);
         }
       })
-      .where('fp.fap_id', fapId)
+      .where('fp.fap_id', filter.fapId)
       .distinctOn('fp.proposal_pk');
 
     return fapProposals.map((fapProposal) =>
@@ -1013,6 +1017,21 @@ export default class PostgresFapDataSource implements FapDataSource {
         qb.where('fap_chairs.user_id', userId);
         qb.orWhere('fap_secretaries.user_id', userId);
       })
+      .first();
+
+    return record !== undefined;
+  }
+
+  async isSecretaryForFapProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const record = await database<FapRecord>('faps')
+      .select<FapRecord>(['faps.*'])
+      .join('fap_proposals', 'fap_proposals.fap_id', '=', 'faps.fap_id')
+      .leftJoin('fap_secretaries', 'fap_secretaries.fap_id', '=', 'faps.fap_id')
+      .where('fap_proposals.proposal_pk', proposalPk)
+      .where('fap_secretaries.user_id', userId)
       .first();
 
     return record !== undefined;
