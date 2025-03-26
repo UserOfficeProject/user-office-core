@@ -4,15 +4,13 @@ ________________________________________________________________________________
 
 ## What is the Scheduler?
 
-The Scheduler section of the DUO ESS application allows instrument scientists to plan and manage time slots for the use of equipment and instruments. This feature is accessible via the calendar interface, where users can view, organize, and modify beam time slots. The module also allows filtering of time slots based on various criteria for efficient scheduling.  
+The Scheduler section of the User Office Application allows instrument scientists to plan and manage time slots for the use of equipment and instruments. This feature is accessible via the calendar interface, where users can view, organize, and modify beam time slots. The module also allows filtering of time slots based on various criteria for efficient scheduling.  
 
 _________________________________________________________________________________________________________
 
 ## Accessing the Scheduler Interface
 
-The scheduling module is not accessible by default within the core part of the DUO ESS application. Instead, scheduling is managed through a separate interface. Users must navigate to the dedicated scheduling URL:  
-[test-sun-scheduler.example.com](test-sun-scheduler.example.com) (example link)  
-The core application remains accessible at `test-sun-duo.example.com`, and scheduling must be accessed separately.
+The scheduling module is not accessible by default within the core part of the User Office Application. Instead, scheduling is managed through a separate interface. Since it is a dedicated Application, the User Office Scheduler comes with its own URL, which is usually different from that of User Office Core. However, It depends on how the Infrastructure is built.
 
 _________________________________________________________________________________________________________
 
@@ -23,11 +21,15 @@ ________________________________________________________________________________
 
 ### Essential Configuration
 - The scheduling module must be deployed and activated to allow access.
-- Users must have appropriate permissions as Instrument Scientists or administrators (useroffice) to access and modify scheduling data.
+- Users must have appropriate permissions as Instrument Scientists or administrators (User Officer) to access and modify scheduling data.
 
 ### Linking Proposals
-- Scheduling is tied to Calls for each proposal which must be correctly associated with planned time slots.
-- Proposals in **SCHEDULING** status will appear in the calendar, and administrators can assign time slots accordingly.
+- This part should be done by the User Officer in the User Office Core application.
+- Scheduling is tied to Calls for each Proposal which must be correctly associated with planned time slots.
+- Proposals in **SCHEDULING** status will appear in the calendar, and administrators can assign time slots accordingly. Note there are 2 ways to set a proposal to **SCHEDULING** status:
+  1. **Through Workflow**: Configure the workflow to automatically transition proposals to **SCHEDULING** status based on predefined criteria. For more details on configuring the **SCHEDULING** status, refer to the [Creating Workflow guide](../user-guide/user-officer/creating_workflow.md).
+  2. **Manual Status Change**: The User Officer can manually change the status of a proposal to **SCHEDULING** within the User Office Core application.
+- Proposals need to be **Accepted** by the User Officer in order to be scheduled.
 - It is necessary to check the **RabbitMQ** box in the **SCHEDULING** status of the Call Workflow to allow the proposal to be processed in the scheduler. To enable this:
   1. Click on the **SCHEDULING** status in your workflow tree.
 
@@ -54,12 +56,13 @@ ________________________________________________________________________________
 ## Interface
 
 ### Left Panel
-The left panel displays the different menus available in the DUO ESS application. The default page is **Calendar**, where all planned time slots are visualized. Additional menus, such as **Equipment List** and **Equipment Request**, will be added to manage equipment and related requests.
+The left panel displays the different menus available in the User Office Application. The default page is **Calendar**, where all planned time slots are visualized. Additional menus, such as **Equipment List** and **Equipment Request**, will be added to manage equipment and related requests.
 
 ![scheduler_menu](../assets/images/scheduler_menu.png)
 
 ### Calendar Page
-The calendar interface is dedicated to **Instrument Scientists** and allows them to view planned time slots on a calendar. Scheduling is done with a minimum granularity of **1 hour**, unlike shifts (**8-hour time slots**) used for other types of scheduling.
+The calendar interface is dedicated to **Instrument Scientists** and allows them to view planned time slots on a calendar.
+**NOTE:** Instrument Scientist will be able to do the Scheduling operation only for the Instruments they are assigned to.
 
 ![scheduler_calendar](../assets/images/scheduler_calendar.png)
 
@@ -93,10 +96,11 @@ ________________________________________________________________________________
 
 A **NEW EVENT** button is available to create new events, such as:
 - **Maintenance**: Scheduling a time period for instrument or equipment maintenance.
-- **Machine downtime**: Scheduling machine downtime.
-- **Events independent of proposals**: Creating events that are not linked to a proposal.
+- **Shutdown**: Scheduling machine downtime.
 
 ![scheduler_new_event](../assets/images/scheduler_new_event.png)
+
+![scheduler_plan_down](../assets/images/scheduler_plan_down.png)
 
 ### Time Slots to Plan
 Time slots are associated with proposals. For example, a proposal in **SCHEDULING** status may appear in the calendar, as shown with proposal **2025000**. This proposal is currently being scheduled for a duration of **2 days and 17 hours**. This process is essential for managing periods of instrument and equipment usage.
@@ -109,16 +113,3 @@ Time slots are associated with proposals. For example, a proposal in **SCHEDULIN
 
 _________________________________________________________________________________________________________
 
-## Key Features Summary:
-
-- Clear visualization of time slots through an interactive calendar.
-- Dynamic filters to sort by instrument, equipment, or local contact.
-- Flexible display with three different modes (**Calendar, Table, Timeline**).
-- Scheduling of specific events such as maintenance or machine downtime.
-- Management of proposals in **SCHEDULING** status for time slot assignment.
-
-![scheduler_plan_down](../assets/images/scheduler_plan_down.png)
-
-This interface allows **Instrument Scientists** and **administrators** to efficiently manage the use of instruments and equipment while providing an adaptable calendar view to meet each user's specific needs.
-
-_________________________________________________________________________________________________________
