@@ -193,6 +193,7 @@ registry.forEach((definition) =>
 
 export function getQuestionaryComponentDefinition(id: DataType) {
   const definition = componentMap.get(id);
+
   if (!definition) {
     throw new Error(`Definition for ${id} was not found`);
   }
