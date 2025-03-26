@@ -647,8 +647,15 @@ export default class PostgresAdminDataSource implements AdminDataSource {
       });
   }
 
-  async waitForDBUpgrade(): Promise<void> {
-    return;
+  waitForDBUpgrade(): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      const checkUpdate = () => {
+        if (this.autoUpgradedDBReady) return res();
+        setTimeout(checkUpdate, 30);
+      };
+
+      checkUpdate();
+    });
   }
 
   async updateRoleTitle(rolesToUpdate: {
