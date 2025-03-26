@@ -39,7 +39,6 @@ export class InviteDataSourceMock implements InviteDataSource {
         1,
         'invite-code',
         'test1@example.com',
-        'note1',
         new Date(),
         1,
         null,
@@ -51,7 +50,6 @@ export class InviteDataSourceMock implements InviteDataSource {
         2,
         'claimed-invite-code',
         'test2@example.com',
-        'note2',
         new Date(),
         2,
         null,
@@ -63,7 +61,6 @@ export class InviteDataSourceMock implements InviteDataSource {
         3,
         'expired-invite-code',
         'test3@example.com',
-        'note3',
         new Date(),
         3,
         new Date(),
@@ -91,7 +88,6 @@ export class InviteDataSourceMock implements InviteDataSource {
       this.invites.length + 1, // Generate new ID
       code,
       email,
-      note ?? '', // Default note to an empty string
       new Date(),
       createdByUserId,
       null,

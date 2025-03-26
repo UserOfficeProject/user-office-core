@@ -16,9 +16,6 @@ export class Invite implements Partial<InviteOrigin> {
   public email: string;
 
   @Field()
-  public note: string;
-
-  @Field()
   public createdAt: Date;
 
   @Field(() => Int)

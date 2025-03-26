@@ -5,7 +5,6 @@ export interface InviteDataSource {
     createdByUserId: number;
     code: string;
     email: string;
-    note: string;
     expiresAt: Date | null;
   }): Promise<Invite>;
 

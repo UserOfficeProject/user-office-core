@@ -134,7 +134,6 @@ export default class InviteMutations {
           code: await this.generateInviteCode(),
           email: email,
           expiresAt: expirationDate,
-          note: '',
         })
       )
     );
