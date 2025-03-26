@@ -42,7 +42,7 @@ export default function UserUpcomingExperimentsTable() {
     loading: experimentsLoading,
     userExperiments,
     setUserUpcomingExperiments,
-  } = useUserExperiments();
+  } = useUserExperiments({ notDraft: true, onlyUpcoming: true });
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });

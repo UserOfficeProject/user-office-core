@@ -7,7 +7,15 @@ import { useDataApi } from 'hooks/common/useDataApi';
 type MeType = NonNullable<GetUserExperimentsQuery['me']>;
 export type UserExperiment = MeType['experiments'][number];
 
-export function useUserExperiments() {
+export function useUserExperiments({
+  onlyUpcoming,
+  notDraft,
+  instrumentId,
+}: {
+  onlyUpcoming?: boolean;
+  notDraft?: boolean;
+  instrumentId?: number | null;
+}) {
   const [userExperiments, setUserUpcomingExperiments] = useState<
     UserExperiment[]
   >([]);
@@ -23,8 +31,11 @@ export function useUserExperiments() {
     api()
       .getUserExperiments({
         filter: {
-          status: [ExperimentStatus.ACTIVE, ExperimentStatus.COMPLETED],
-          endsAfter: DateTime.now().toUTC().toISO(),
+          status: notDraft
+            ? [ExperimentStatus.ACTIVE, ExperimentStatus.COMPLETED]
+            : null,
+          endsAfter: onlyUpcoming ? DateTime.now().toUTC().toISO() : null,
+          instrumentId,
         },
       })
       .then((data) => {

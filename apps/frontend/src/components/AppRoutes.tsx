@@ -34,9 +34,7 @@ const PageEditor = lazy(() => import('./pages/PageEditor'));
 const ProposalChooseCall = lazy(() => import('./proposal/ProposalChooseCall'));
 const ProposalCreate = lazy(() => import('./proposal/ProposalCreate'));
 const ProposalEdit = lazy(() => import('./proposal/ProposalEdit'));
-const InstrSciUpcomingExperimentTimesTable = lazy(
-  () => import('./proposalBooking/InstrSciUpcomingExperimentTimesTable')
-);
+
 const UserExperimentTimesTable = lazy(
   () => import('./proposalBooking/UserExperimentsTable')
 );
@@ -550,17 +548,6 @@ const AppRoutes = () => {
               <TitledRoute
                 title="User Experiment Times"
                 element={<UserExperimentTimesTable />}
-              />
-            }
-          />
-        )}
-        {isSchedulerEnabled && (
-          <Route
-            path="/UpcomingExperimentTimes"
-            element={
-              <TitledRoute
-                title="Upcoming Experiment Times"
-                element={<InstrSciUpcomingExperimentTimesTable />}
               />
             }
           />

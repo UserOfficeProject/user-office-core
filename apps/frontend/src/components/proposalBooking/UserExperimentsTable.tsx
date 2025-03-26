@@ -6,7 +6,7 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import ExperimentsTimesTable from './ExperimentTimesTable';
 
 export default function UserExperimentTimesTable() {
-  const { loading, userExperiments } = useUserExperiments();
+  const { loading, userExperiments } = useUserExperiments({ notDraft: true });
 
   return (
     <StyledContainer maxWidth={false}>
