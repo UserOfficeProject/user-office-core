@@ -32,9 +32,9 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
-  useFapProposalsData,
   FapProposalType,
   FapProposalAssignmentType,
+  FapProposals,
 } from 'hooks/fap/useFapProposalsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { tableIcons } from 'utils/materialIcons';
@@ -68,6 +68,7 @@ type FapProposalsAndAssignmentsTableProps = {
   /** Confirmation function that comes from withConfirm HOC */
   confirm: WithConfirmType;
   selectedInstrumentId: number | null;
+  fapProposals: FapProposals;
 };
 
 const getReviewsFromAssignments = (assignments: FapProposalAssignmentType[]) =>
@@ -173,15 +174,14 @@ const FapProposalColumns: Column<FapProposalType>[] = [
 const FapProposalsAndAssignmentsTable = ({
   data,
   onAssignmentsUpdate,
-  selectedCallId,
   confirm,
-  selectedInstrumentId,
+  fapProposals,
 }: FapProposalsAndAssignmentsTableProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
 
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
-    useFapProposalsData(data.id, selectedCallId, selectedInstrumentId);
+    fapProposals;
   const { api } = useDataApiWithFeedback();
   const [proposalPks, setProposalPks] = useState<number[]>([]);
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -211,6 +211,9 @@ const FapProposalsAndAssignmentsTable = ({
       : column
   );
 
+  const page = searchParams.get('page');
+  const pageSize = searchParams.get('pageSize');
+  const selection = searchParams.getAll('selection');
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
    * and selection flag is true they are not working properly.
@@ -708,9 +711,7 @@ const FapProposalsAndAssignmentsTable = ({
       return (
         <FapAssignedReviewersTable
           fapProposal={rowData}
-          fapChairAndSecs={data.fapChairs
-            .map((user) => user.id)
-            .concat(data.fapSecretaries.map((user) => user.id))}
+          fapSecs={data.fapSecretaries.map((user) => user.id)}
           removeAssignedReviewer={removeAssignedReviewer}
           updateView={updateFapProposalAssignmentsView}
         />
@@ -724,6 +725,9 @@ const FapProposalsAndAssignmentsTable = ({
       id: fapProposal.proposalPk,
       rowActionButtons: RowActionButtons(fapProposal),
       dateAssignedFormatted: toFormattedDateTime(fapProposal.dateAssigned),
+      tableData: {
+        checked: selection.includes(fapProposal.proposalPk.toString()),
+      },
     })
   );
 
@@ -752,9 +756,7 @@ const FapProposalsAndAssignmentsTable = ({
             PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
             PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW,
           ]}
-          fapSecAndChair={data.fapChairs
-            .map((user) => user.id)
-            .concat(data.fapSecretaries.map((user) => user.id))}
+          fapSec={data.fapSecretaries.map((user) => user.id)}
         />
       </ProposalReviewModal>
       <AssignFapMemberToProposalModal
@@ -789,7 +791,8 @@ const FapProposalsAndAssignmentsTable = ({
           options={{
             search: true,
             selection: true,
-            pageSize: Math.min(10, maxPageLength),
+            pageSize: pageSize ? +pageSize : Math.min(10, maxPageLength),
+            initialPage: page ? +page : 0,
             pageSizeOptions: pageSizeOptions,
             headerSelectionProps: {
               inputProps: {
@@ -797,6 +800,34 @@ const FapProposalsAndAssignmentsTable = ({
                 id: 'select-all-table-rows',
               },
             },
+          }}
+          onPageChange={(page) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('page', page.toString());
+
+              return searchParams;
+            });
+          }}
+          onRowsPerPageChange={(pageSize) => {
+            setSearchParams((searchParams) => {
+              searchParams.set('pageSize', pageSize.toString());
+
+              return searchParams;
+            });
+          }}
+          onSelectionChange={(selectedItems) => {
+            const selectedProposalPks = selectedItems.map(
+              (item) => item.proposalPk
+            );
+
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+              selectedProposalPks.forEach((pk) =>
+                searchParams.append('selection', pk.toString())
+              );
+
+              return searchParams;
+            });
           }}
         />
       </div>

@@ -6,6 +6,7 @@ import { defineConfig } from 'cypress';
 
 import {
   convertXlsxToJson,
+  deleteFile,
   downloadFile,
   readPdf,
   unzip,
@@ -113,6 +114,8 @@ module.exports = defineConfig({
       on('task', { unzip });
 
       on('task', { convertXlsxToJson });
+
+      on('task', { deleteFile });
     },
   },
 });
