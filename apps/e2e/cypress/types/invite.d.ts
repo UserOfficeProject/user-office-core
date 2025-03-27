@@ -1,3 +1,8 @@
+import {
+  SetCoProposerInvitesInput,
+  SetCoProposerInvitesMutation,
+} from '@user-office-software-libs/shared-types';
+
 declare global {
   namespace Cypress {
     interface Chainable {

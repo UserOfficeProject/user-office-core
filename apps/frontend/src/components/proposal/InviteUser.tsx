@@ -158,7 +158,6 @@ function InviteUser({
       code: '',
       id: 0,
       createdByUserId: 0,
-      note: '',
       isEmailSent: false,
       expiresAt: null,
     };

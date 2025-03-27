@@ -179,20 +179,14 @@ context('Invites tests', () => {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
       }
-      cy.createInvite({
-        input: {
-          email: faker.internet.email(),
-          note: faker.lorem.words(3),
-          claims: {
-            roleIds: [1],
-            coProposerProposalPk: 1,
-          },
-        },
-      }).then((invite) => {
+      cy.setCoProposerInvites({
+        emails: [faker.internet.email()],
+        proposalPk: 1,
+      }).then((response) => {
         cy.login('user3', initialDBData.roles.user);
         cy.visit('/');
         cy.get('[data-cy=join-proposal-btn]').click();
-        cy.get('#code').type(invite.createInvite.code ?? '');
+        cy.get('#code').type(response.setCoProposerInvites[0].code ?? '');
         cy.get('[data-cy="invitation-submit"]').click();
         cy.get('[data-testid="VisibilityIcon"]').click();
         cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();

@@ -2,7 +2,6 @@ fragment invite on Invite {
   id
   code
   email
-  note
   createdAt
   createdByUserId
   claimedAt
