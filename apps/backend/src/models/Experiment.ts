@@ -39,7 +39,7 @@ export class ExperimentSafety {
     public esiQuestionarySubmittedAt: Date | null,
     public createdBy: number,
     public status: string,
-    public safetyReviewQuestionaryId: number,
+    public safetyReviewQuestionaryId: number | null,
     public reviewedBy: number | null,
     public createdAt: Date,
     public updatedAt: Date
