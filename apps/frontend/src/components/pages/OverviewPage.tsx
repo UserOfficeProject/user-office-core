@@ -9,6 +9,7 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
+import ProposalTableFacility from 'components/proposal/ProposalTableFacility';
 
 const PaperContainer = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper>{children}</StyledPaper>
@@ -33,7 +34,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
         <>
           {isSchedulerEnabled && <UserUpcomingExperimentsTable />}
           <PaperContainer>
-            <ProposalTableUser />
+            <ProposalTableFacility />
           </PaperContainer>
         </>
       );

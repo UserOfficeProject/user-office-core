@@ -110,4 +110,20 @@ export class ProposalsViewQuery {
       proposalPk
     );
   }
+
+  @Query(() => ProposalsViewResult, { nullable: true })
+  async proposalsByUserFacility(
+    @Ctx() context: ResolverContext,
+    @Arg('filter', () => ProposalsFilter, { nullable: true })
+    filter?: ProposalsFilter,
+    @Arg('first', () => Int, { nullable: true }) first?: number,
+    @Arg('offset', () => Int, { nullable: true }) offset?: number
+  ): Promise<ProposalsViewResult | null> {
+    return context.queries.proposal.getUsersProposalsByFacility(
+      context.user,
+      filter,
+      first,
+      offset
+    );
+  }
 }

@@ -212,4 +212,18 @@ export default class ProposalQueries {
         );
       });
   }
+
+  async getUsersProposalsByFacility(
+    agent: UserWithRole | null,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ) {
+    return await this.dataSource.getUsersProposalsByFacility(
+      agent!.id,
+      filter,
+      first,
+      offset
+    );
+  }
 }
