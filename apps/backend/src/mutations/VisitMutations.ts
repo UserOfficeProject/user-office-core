@@ -9,6 +9,7 @@ import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSourc
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized, EventBus } from '../decorators';
+import { resolveApplicationEventBus } from '../events';
 import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
 import { rejection } from '../models/Rejection';
@@ -339,7 +340,6 @@ export default class VisitMutations {
   }
 
   @Authorized()
-  @EventBus(Event.VISIT_REGISTRATION_CANCELLED)
   async cancelVisitRegistration(
     user: UserWithRole | null,
     input: CancelVisitRegistrationInput
@@ -355,10 +355,36 @@ export default class VisitMutations {
       );
     }
 
+    const registration = await this.dataSource.getRegistration(
+      input.userId,
+      input.visitId
+    );
+
+    if (!registration) {
+      return rejection(
+        'Could not cancel Visit Registration because specified registration does not exist',
+        { input }
+      );
+    }
+
+    const oldStatus = registration.status;
     const newStatus =
       input.userId === user!.id
         ? VisitRegistrationStatus.CANCELLED_BY_USER
         : VisitRegistrationStatus.CANCELLED_BY_FACILITY;
+
+    if (oldStatus === VisitRegistrationStatus.APPROVED) {
+      // we are publishing cancellation message only if the registration was previously approved
+      const eventBus = resolveApplicationEventBus();
+
+      await eventBus.publish({
+        type: Event.VISIT_REGISTRATION_CANCELLED,
+        visitregistration: registration,
+        key: 'visitregistration',
+        loggedInUserId: user ? user.id : null,
+        isRejection: false,
+      });
+    }
 
     return this.dataSource.updateRegistration({
       userId: input.userId,
