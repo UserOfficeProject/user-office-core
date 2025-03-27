@@ -7,6 +7,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -203,6 +204,11 @@ export async function createPostToRabbitMQHandler() {
     Tokens.TemplateDataSource
   );
 
+  const coProposerClaimDataSource =
+    container.resolve<CoProposerClaimDataSource>(
+      Tokens.CoProposerClaimDataSource
+    );
+
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
@@ -228,6 +234,29 @@ export async function createPostToRabbitMQHandler() {
           event.type,
           jsonMessage
         );
+        break;
+      }
+      case Event.INVITE_ACCEPTED: {
+        const invite = event.invite;
+
+        const claims = await coProposerClaimDataSource.findByInviteId(
+          invite.id
+        );
+
+        for (const claim of claims) {
+          const proposal = await proposalDataSource.get(claim.proposalPk);
+          if (!proposal) {
+            return;
+          }
+
+          const jsonMessage = await getProposalMessageData(proposal);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            Event.PROPOSAL_UPDATED,
+            jsonMessage
+          );
+        }
+
         break;
       }
       case Event.INSTRUMENT_CREATED:
