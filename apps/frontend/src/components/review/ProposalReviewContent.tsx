@@ -48,7 +48,7 @@ type ProposalReviewContentProps = {
   proposalPk?: number | null;
   reviewId?: number | null;
   fapId?: number | null;
-  fapSecAndChair?: number[] | null;
+  fapSec?: number[] | null;
   isInsideModal?: boolean;
 };
 
@@ -57,17 +57,14 @@ const ProposalReviewContent = ({
   tabNames,
   reviewId,
   fapId,
-  fapSecAndChair: fapChairAndSecs,
+  fapSec: fapSecs,
   isInsideModal,
 }: ProposalReviewContentProps) => {
   const { user } = useContext(UserContext);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
   const isInternalReviewer = useCheckAccess([UserRole.INTERNAL_REVIEWER]);
-  const isFapChairOrSec = useCheckAccess([
-    UserRole.FAP_CHAIR,
-    UserRole.FAP_SECRETARY,
-  ]);
+  const isFapSec = useCheckAccess([UserRole.FAP_SECRETARY]);
   const { proposalData, setProposalData, loading } =
     useProposalData(proposalPk);
   const { t } = useTranslation();
@@ -105,10 +102,8 @@ const ProposalReviewContent = ({
       (instrument) => instrument?.id === instrumentId
     );
 
-  const canEditAsFapChairOrSec =
-    isFapChairOrSec &&
-    fapChairAndSecs &&
-    fapChairAndSecs.find((userId) => userId === user.id);
+  const canEditAsFapSec =
+    isFapSec && fapSecs && fapSecs.find((userId) => userId === user.id);
 
   const technicalReviewsContent = proposalData.technicalReviews.map(
     (technicalReview) => {
@@ -121,7 +116,8 @@ const ProposalReviewContent = ({
         technicalReview?.technicalReviewAssigneeId === user.id;
 
       return isUserOfficer ||
-        canEditAsFapChairOrSec ||
+        isFapSec ||
+        canEditAsFapSec ||
         canEditAsInstrumentSci ||
         isInternalReviewer ? (
         <Fragment key={technicalReview.id}>
@@ -131,7 +127,7 @@ const ProposalReviewContent = ({
               technicalReviewSubmitted={technicalReview.submitted}
             />
           )}
-          {!!technicalReviewInstrument && !canEditAsFapChairOrSec && (
+          {!!technicalReviewInstrument && !canEditAsFapSec && !isFapSec && (
             <ProposalTechnicalReviewerAssignment
               technicalReview={technicalReview}
               instrument={technicalReviewInstrument}
@@ -190,7 +186,11 @@ const ProposalReviewContent = ({
         </Fragment>
       ) : (
         <TechnicalReviewQuestionaryReview
-          data={technicalReview as TechnicalReviewWithQuestionary}
+          data={
+            (!isUserOfficer && !isFapSec
+              ? { ...technicalReview, comment: null }
+              : technicalReview) as TechnicalReviewWithQuestionary
+          }
         />
       );
     }

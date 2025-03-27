@@ -1,6 +1,5 @@
 import MaterialTable, { Column } from '@material-table/core';
 import { Dialog, DialogContent } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { TFunction } from 'i18next';
 import React, { useState } from 'react';
 import { ReactNode } from 'react';
@@ -12,7 +11,6 @@ import {
   ProposalScheduledEvent,
   useProposalBookingsScheduledEvents,
 } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
-import { StyledPaper } from 'styles/StyledComponents';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
@@ -83,30 +81,28 @@ export default function UserUpcomingExperimentsTable() {
   );
 
   return (
-    <Grid item xs={12} data-cy="upcoming-experiments">
-      <StyledPaper>
-        <MaterialTable
-          actions={[
-            formTeamAction,
-            finishEsi,
-            registerVisitAction,
-            declareShipmentAction,
-            giveFeedback,
-          ]}
-          icons={tableIcons}
-          title="Upcoming experiments"
-          isLoading={loading}
-          columns={columns(t)}
-          data={proposalScheduledEventsWithFormattedDates}
-          options={{
-            search: false,
-            padding: 'dense',
-            emptyRowsWhenPaging: false,
-            paging: false,
-            actionsColumnIndex: -1,
-          }}
-        />
-      </StyledPaper>
+    <div data-cy="upcoming-experiments">
+      <MaterialTable
+        actions={[
+          formTeamAction,
+          finishEsi,
+          registerVisitAction,
+          declareShipmentAction,
+          giveFeedback,
+        ]}
+        icons={tableIcons}
+        title="Upcoming experiments"
+        isLoading={loading}
+        columns={columns(t)}
+        data={proposalScheduledEventsWithFormattedDates}
+        options={{
+          search: false,
+          padding: 'dense',
+          emptyRowsWhenPaging: false,
+          paging: false,
+          actionsColumnIndex: -1,
+        }}
+      />
       <Dialog
         open={modalContents !== null}
         onClose={() => setModalContents(null)}
@@ -114,6 +110,6 @@ export default function UserUpcomingExperimentsTable() {
       >
         <DialogContent>{modalContents}</DialogContent>
       </Dialog>
-    </Grid>
+    </div>
   );
 }

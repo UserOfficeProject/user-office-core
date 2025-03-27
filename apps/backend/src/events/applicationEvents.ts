@@ -3,6 +3,7 @@ import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { InternalReview } from '../models/InternalReview';
+import { Invite } from '../models/Invite';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { AnswerBasic } from '../models/Questionary';
 import { Review } from '../models/Review';
@@ -230,13 +231,28 @@ interface UserDeletedEvent extends GeneralEvent {
   user: User;
 }
 
-interface EmailInvite extends GeneralEvent {
-  type: Event.EMAIL_INVITE;
+interface EmailInviteOld extends GeneralEvent {
+  type: Event.EMAIL_INVITE_LEGACY;
   emailinviteresponse: {
     userId: number;
     inviterId: number;
     role: UserRole;
   };
+}
+
+type InviteResponse = Pick<
+  Invite,
+  'id' | 'code' | 'email' | 'createdByUserId' | 'isEmailSent'
+>;
+
+interface EmailInvite extends GeneralEvent {
+  type: Event.EMAIL_INVITE;
+  invite: InviteResponse;
+}
+
+interface EmailInvites extends GeneralEvent {
+  type: Event.EMAIL_INVITES;
+  array: InviteResponse[];
 }
 
 interface FapCreatedEvent extends GeneralEvent {
@@ -296,6 +312,11 @@ interface CallReviewEndedEvent extends GeneralEvent {
 interface CallFapReviewEndedEvent extends GeneralEvent {
   type: Event.CALL_FAP_REVIEW_ENDED;
   call: Call;
+}
+
+interface InviteAcceptedEvent extends GeneralEvent {
+  type: Event.INVITE_ACCEPTED;
+  invite: Invite;
 }
 
 interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
@@ -396,7 +417,9 @@ export type ApplicationEvent =
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
+  | EmailInviteOld
   | EmailInvite
+  | EmailInvites
   | UserUpdateEvent
   | UserRoleUpdateEvent
   | FapCreatedEvent
@@ -413,6 +436,7 @@ export type ApplicationEvent =
   | CallEndedInternalEvent
   | CallReviewEndedEvent
   | CallFapReviewEndedEvent
+  | InviteAcceptedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewSubmittedEvent

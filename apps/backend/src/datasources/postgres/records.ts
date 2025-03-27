@@ -1433,11 +1433,12 @@ export interface InviteRecord {
   readonly invite_id: number;
   readonly code: string;
   readonly email: string;
-  readonly note: string;
   readonly created_by: number;
   readonly created_at: Date;
   readonly claimed_by: number | null;
   readonly claimed_at: Date | null;
+  readonly is_email_sent: boolean;
+  readonly expires_at: Date | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>
@@ -1445,11 +1446,12 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.invite_id,
     invite.code,
     invite.email,
-    invite.note,
     invite.created_at,
     invite.created_by,
     invite.claimed_at,
-    invite.claimed_by
+    invite.claimed_by,
+    invite.is_email_sent,
+    invite.expires_at
   );
 
 export interface RoleClaimRecord {
