@@ -109,7 +109,7 @@ const AccountActionButton = () => {
               fontSize: '1rem',
             }}
           >
-            Change Roles:
+            {hasMultipleRoles && 'Change Roles:'}
             <AccountCircle />
           </IconButton>
         </Badge>
@@ -126,6 +126,7 @@ const AccountActionButton = () => {
                 setShow(true);
                 handleClose();
               }}
+              data-cy="change-roles-button"
             >
               <Box paddingRight={1} paddingTop={1}>
                 <SupervisedUserCircleIcon />
