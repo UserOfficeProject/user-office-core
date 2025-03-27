@@ -229,10 +229,10 @@ export class AdminDataSourceMock implements AdminDataSource {
     throw new Error('Method not implemented.');
   }
 
-  updateRoleTitle(rolesToUpdate: {
-    shortCode: string;
-    title: string;
-  }): Promise<void> {
+  updateRole(
+    role: string,
+    update: { title?: string; description?: string }
+  ): Promise<void> {
     throw new Error('Method not implemented.');
   }
 }

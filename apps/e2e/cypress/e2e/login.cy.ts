@@ -92,4 +92,24 @@ context('User login tests', () => {
         });
     });
   });
+
+  describe('Role Model', () => {
+    it.only('The role model should be opened if the site is navigated to with the querystring', () => {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: initialDBData.users.officer.id,
+          roles: [
+            initialDBData.roles.user,
+            initialDBData.roles.instrumentScientist,
+          ],
+        });
+      }
+
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Assigned Roles').should('not.exist');
+      cy.visit('/?roleSelectionOpen=true');
+      cy.contains('Assigned Roles');
+    });
+  });
 });
