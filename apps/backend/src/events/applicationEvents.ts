@@ -242,7 +242,7 @@ interface EmailInviteOld extends GeneralEvent {
 
 type InviteResponse = Pick<
   Invite,
-  'id' | 'code' | 'email' | 'note' | 'createdByUserId' | 'isEmailSent'
+  'id' | 'code' | 'email' | 'createdByUserId' | 'isEmailSent'
 >;
 
 interface EmailInvite extends GeneralEvent {

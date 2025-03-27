@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import {
   Ctx,
   Field,
@@ -10,7 +11,6 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Sample as SampleOrigin, SampleStatus } from '../../models/Sample';
-import { TemplateCategoryId } from '../../models/Template';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
 
@@ -54,11 +54,19 @@ export class SampleResolver {
     @Root() sample: Sample,
     @Ctx() context: ResolverContext
   ): Promise<Questionary> {
-    return context.queries.questionary.getQuestionaryOrDefault(
+    const questionary = await context.queries.questionary.getQuestionary(
       context.user,
-      sample.questionaryId,
-      TemplateCategoryId.SAMPLE_DECLARATION
+      sample.questionaryId
     );
+
+    if (!questionary) {
+      // This should never happen because questionary is created when sample is created
+      throw new GraphQLError(
+        `Questionary for sample ${sample.id} was not found`
+      );
+    }
+
+    return questionary;
   }
 
   @FieldResolver(() => Proposal)
