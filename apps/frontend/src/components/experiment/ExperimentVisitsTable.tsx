@@ -5,13 +5,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import MailIcon from '@mui/icons-material/Mail';
 import { IconButton, styled, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
 import VisitStatusIcon from 'components/visit/VisitStatusIcon';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   GetScheduledEventsCoreQuery,
+  SettingsId,
   VisitRegistrationStatus,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
@@ -42,6 +44,11 @@ const ActionDiv = styled('div')({
 function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
   const { confirm } = params;
   const [scheduledEvent, setScheduledEvent] = useState(params.scheduledEvent);
+  const { settingsMap } = useContext(SettingsContext);
+  const organisationName = settingsMap
+    .get(SettingsId.ORGANISATION_NAME)
+    ?.settingsValue?.valueOf();
+
   const api = useDataApi();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
@@ -178,11 +185,14 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
           </IconButton>
         );
 
+        const subject = organisationName
+          ? `Important information regarding your experiment at ${organisationName}`
+          : 'Important information regarding your experiment';
         const sendEmailButton = (
           <IconButton
             component="a"
             href={`
-              mailto:${rowData.user?.email || ''}?subject=Important information regarding your experiment at ESS&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${
+              mailto:${rowData.user?.email || ''}?subject=${subject}&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${
                 params.scheduledEvent.proposal.title
               }" with proposal ID ${
                 params.scheduledEvent.proposal.proposalId
