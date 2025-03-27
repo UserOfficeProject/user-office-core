@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { Facility } from '../../models/Facility';
 import { Instrument } from '../../models/Instrument';
+import { ProposalView } from '../../models/ProposalView';
 import { BasicUserDetails } from '../../models/User';
 import { FacilityDataSource } from '../FacilityDataSource';
 import { UserDataSource } from '../UserDataSource';
@@ -13,6 +14,7 @@ import {
   FacilityRecord,
   FacilityUserRecord,
   InstrumentRecord,
+  ProposalViewRecord,
 } from './records';
 
 @injectable()
@@ -132,6 +134,32 @@ class PostgresFacilityDataSource implements FacilityDataSource {
     return await this.userDataSource.getBasicUsersInfo(
       users.map((user) => user.user_id)
     );
+  }
+
+  async getUsersProposalsByFacility(
+    userId: number
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    return await database<ProposalViewRecord>('facility_user as fu')
+      .join('facility_instrument as fi', function () {
+        this.on('fu.facility_id', '=', 'fi.facility_id').andOn(
+          'fu.user_id',
+          '=',
+          userId.toString()
+        ); // Apply the user_id condition here so hopefully we don't make a big joined table
+      })
+      .join(
+        'instrument_has_proposals as ihp',
+        'ihp.instrument_id',
+        '=',
+        'fi.instrument_id'
+      )
+      .join(
+        'proposal_table_view as ptv',
+        'ptv.proposal_pk',
+        '=',
+        'ihp.proposal_pk'
+      )
+      .select('ptv.*');
   }
 }
 

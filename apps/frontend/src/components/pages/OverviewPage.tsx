@@ -9,6 +9,7 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
+import ProposalTableFacility from 'components/proposal/ProposalTableFacility';
 
 const Paper = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper margin={[0, 0, 2, 0]}>{children}</StyledPaper>

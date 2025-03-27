@@ -15,7 +15,7 @@ declare global {
        *    cy.ceateFacility({ name: 'name', shortCode: 'shortCode' })
        */
       createFacility: (
-        updateFacilityInput?: CreateFacilityMutationVariables
+        updateFacilityInput: CreateFacilityMutationVariables
       ) => Cypress.Chainable<CreateFacilityMutation>;
     }
   }

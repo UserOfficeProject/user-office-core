@@ -1181,4 +1181,107 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     return proposal ? createProposalObject(proposal[0]) : null;
   }
+
+  async getUsersProposalsByFacility(
+    userId: number,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    return await database<ProposalViewRecord>('facility_user as fu')
+      .join('facility_instrument as fi', 'fu.facility_id', 'fi.facility_id')
+      .join(
+        'instrument_has_proposals as ihp',
+        'ihp.instrument_id',
+        '=',
+        'fi.instrument_id'
+      )
+      .join(
+        'proposal_table_view as ptv',
+        'ptv.proposal_pk',
+        '=',
+        'ihp.proposal_pk'
+      )
+      .select(['ptv.*', database.raw('count(*) OVER() AS full_count')])
+      .where('fu.user_id', '=', userId.toString())
+      .modify((query) => {
+        if (filter?.text) {
+          query.andWhere((qb) =>
+            qb
+              .orWhereRaw('title ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('proposal_id ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('proposal_status_name ILIKE ?', `%${filter.text}%`)
+              .orWhereRaw('users.email ILIKE', `%${filter.text}%`)
+              .orWhereRaw('users.firstname ILIKE', `%${filter.text}%`)
+              .orWhereRaw('users.lastname ILIKE', `%${filter.text}%`)
+              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+              .orWhereRaw(
+                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+                { searchText: filter.text }
+              )
+          );
+        }
+        if (filter?.callId) {
+          query.where('call_id', filter.callId);
+        }
+        if (filter?.reviewer === ReviewerFilter.ME) {
+          // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
+          query.whereRaw(
+            'jsonb_path_exists(technical_reviews, \'$[*].technicalReviewAssignee.id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId }
+          );
+        }
+
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          query.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+            { instrumentId: filter.instrumentFilter?.instrumentId }
+          );
+        }
+
+        if (filter?.proposalStatusId) {
+          query.where('proposal_status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.shortCodes) {
+          const filteredAndPreparedShortCodes = filter?.shortCodes
+            .filter((shortCode) => shortCode)
+            .join('|');
+
+          query.whereRaw(
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          );
+        }
+
+        if (filter?.questionFilter) {
+          const questionFilter = filter.questionFilter;
+
+          this.addQuestionFilter(query, questionFilter);
+        }
+
+        if (filter?.referenceNumbers) {
+          query.whereIn('proposal_id', filter.referenceNumbers);
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then((proposals: ProposalViewRecord[]) => {
+        const props = proposals.map((proposal) =>
+          createProposalViewObject(proposal)
+        );
+
+        return {
+          totalCount: proposals[0] ? proposals[0].full_count : 0,
+          proposals: props,
+        };
+      });
+  }
 }

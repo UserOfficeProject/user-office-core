@@ -49,12 +49,20 @@ export const CreateUpdateFacility = ({
             const result = await api({
               toastSuccessMessage: 'Call updated successfully!',
             }).updateFacility(values as UpdateFacilityMutationVariables);
-            close(result.updateFacility as FacilityData);
+            close({
+              ...result.updateFacility,
+              instruments: facility.instruments,
+              users: facility.users,
+            } as FacilityData);
           } else {
             const result = await api({
               toastSuccessMessage: 'Call created successfully!',
             }).createFacility(values as CreateFacilityMutationVariables);
-            close(result.createFacility as FacilityData);
+            close({
+              ...result.createFacility,
+              instruments: [],
+              users: [],
+            } as FacilityData);
           }
         }}
         validationSchema={
