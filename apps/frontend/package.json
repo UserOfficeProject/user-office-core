@@ -8,11 +8,13 @@
   },
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.13.5",
     "@codemirror/lang-html": "^6.4.5",
     "@graphql-codegen/cli": "^4.0.0",
     "@graphql-codegen/typescript": "^4.0.0",
     "@graphql-codegen/typescript-graphql-request": "^5.0.0",
     "@graphql-codegen/typescript-operations": "^4.0.0",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@hello-pangea/dnd": "^16.6.0",
     "@material-table/core": "^6.4.4",
@@ -28,7 +30,7 @@
     "@user-office-software/duo-localisation": "^1.2.0",
     "@user-office-software/duo-validation": "^5.1.13",
     "formik": "^2.4.6",
-    "graphql": "^16.8.1",
+    "graphql": "^16.10.0",
     "graphql-request": "^6.1.0",
     "html-react-parser": "^1.4.12",
     "i18next": "^23.11.5",
@@ -102,7 +104,7 @@
     "vite": "^5.4.14"
   },
   "engines": {
-    "npm": ">=10.9.2",
+    "npm": ">=10.5.2",
     "node": ">=20.0.0"
   }
 }

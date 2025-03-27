@@ -1,5 +1,12 @@
+import {
+  ApolloClient,
+  ApolloLink,
+  gql,
+  HttpLink,
+  InMemoryCache,
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 import { logger } from '@user-office-software/duo-logger';
-import { gql, GraphQLClient } from 'graphql-request';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -15,7 +22,7 @@ type GetAllQueriesAndMutationsQuery = {
   } | null;
 };
 
-const getSdk = (client: GraphQLClient) => {
+export const getSdk = (client: ApolloClient<any>) => {
   return {
     getQueriesAndMutations:
       async (): Promise<GetAllQueriesAndMutationsQuery> => {
@@ -27,10 +34,32 @@ const getSdk = (client: GraphQLClient) => {
             }
           }
         `;
+        const result = await client.query({
+          query: GetAllQueriesAndMutationsQuery,
+          fetchPolicy: 'cache-first', // Use cache-first policy for caching
+        });
 
-        return client.request(GetAllQueriesAndMutationsQuery);
+        return result.data;
       },
   };
+};
+
+const createApolloClient = (endpoint: string, token?: string) => {
+  const httpLink = new HttpLink({ uri: endpoint });
+
+  const authLink = setContext((_, { headers }) => {
+    return {
+      headers: {
+        ...headers,
+        ...(token && { authorization: token }),
+      },
+    };
+  });
+
+  return new ApolloClient({
+    link: ApolloLink.from([authLink, httpLink]),
+    cache: new InMemoryCache(),
+  });
 };
 
 export type Sdk = ReturnType<typeof getSdk>;
@@ -60,11 +89,7 @@ export default function initGraphQLClient(token?: string) {
       return;
     }
 
-    const client = new GraphQLClient(SCHEDULER_ENDPOINT, {
-      headers: {
-        ...(token && { authorization: token }),
-      },
-    });
+    const client = createApolloClient(SCHEDULER_ENDPOINT, token);
 
     return getSdk(client);
   };

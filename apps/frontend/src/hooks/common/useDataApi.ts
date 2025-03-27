@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GraphQLClient } from 'graphql-request';
-import { ClientError, RequestOptions, Variables } from 'graphql-request';
+import { ApolloClient, InMemoryCache, HttpLink, gql } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import {
+  ClientError,
+  GraphQLClient,
+  RequestOptions,
+  Variables,
+} from 'graphql-request';
 import { VariablesAndRequestHeadersArgs } from 'graphql-request/build/esm/types';
 import { jwtDecode } from 'jwt-decode';
 import { useSnackbar, WithSnackbarProps } from 'notistack';
@@ -17,6 +23,62 @@ const endpoint = '/graphql';
 
 const clientNameHeader = 'apollographql-client-name';
 const clientName = 'UOP frontend';
+
+class ApolloBaseClient extends GraphQLClient {
+  protected client: ApolloClient<any>;
+
+  constructor(uri: string) {
+    super('');
+    const httpLink = new HttpLink({ uri, fetch });
+
+    const authLink = setContext((_, { headers }) => {
+      // Return the headers to the context so httpLink can read them
+      return {
+        headers: {
+          ...headers,
+        },
+      };
+    });
+
+    this.client = new ApolloClient({
+      link: authLink.concat(httpLink),
+      cache: new InMemoryCache(),
+      connectToDevTools: true, // Enable debugging
+    });
+  }
+
+  async request<T = unknown, V extends Variables = Variables>(
+    query: RequestQuery<T, V> | RequestOptions<V, T>,
+    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
+  ): Promise<T> {
+    const [variables, headers] = variablesAndRequestHeaders;
+    const context = headers ? { headers } : {};
+    const result = await this.client.query<T>({
+      query: gql`
+        ${query}
+      `,
+      variables,
+      context,
+    });
+
+    return result.data;
+  }
+
+  setHeader(key: string, value: string) {
+    const authLink = setContext((_, { headers }) => {
+      return {
+        headers: {
+          ...headers,
+          [key]: value,
+        },
+      };
+    });
+
+    this.client.setLink(authLink.concat(this.client.link));
+
+    return this;
+  }
+}
 
 const notifyAndLog = async (
   enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
@@ -35,67 +97,18 @@ const notifyAndLog = async (
   if (writeToServerLog) {
     await getSdk(
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar, true)
+      new UnauthorizedApolloClient(endpoint, enqueueSnackbar, true)
     ).addClientLog({ error: JSON.stringify({ userMessage, error }) });
   }
 };
 
 export function getUnauthorizedApi() {
   return getSdk(
-    new GraphQLClient(endpoint).setHeader(clientNameHeader, clientName)
+    new ApolloBaseClient(endpoint).setHeader(clientNameHeader, clientName)
   );
 }
 
-class UnauthorizedGraphQLClient extends GraphQLClient {
-  constructor(
-    private endpoint: string,
-    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
-    private skipErrorReport?: boolean
-  ) {
-    super(endpoint);
-    this.setHeader(clientNameHeader, clientName);
-  }
-
-  async request<T = unknown, V extends Variables = Variables>(
-    query: RequestQuery<T, V> | RequestOptions<V, T>,
-    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
-  ): Promise<T> {
-    return super
-      .request<T, V>(query as RequestQuery<T, V>, ...variablesAndRequestHeaders)
-      .catch((error) => {
-        // if the `notificationWithClientLog` fails
-        // and it fails while reporting an error, it can
-        // easily cause an infinite loop
-        if (this.skipErrorReport) {
-          throw error;
-        }
-
-        if (!error || !error.response) {
-          notifyAndLog(
-            this.enqueueSnackbar,
-            'No response received from server',
-            error
-          );
-        } else if (
-          error.response.error &&
-          error.response.error.includes('ECONNREFUSED')
-        ) {
-          notifyAndLog(
-            this.enqueueSnackbar,
-            'Connection problem!',
-            error,
-            false
-          );
-        } else {
-          notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
-        }
-
-        throw error;
-      });
-  }
-}
-
-class AuthorizedGraphQLClient extends GraphQLClient {
+class AuthorizedApolloClient extends ApolloBaseClient {
   private renewalDate: number;
   private externalToken: string;
 
@@ -110,10 +123,12 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     private tokenRenewed?: (newToken: string) => void,
     private externalAuthLoginUrl?: string
   ) {
+    console.log('1');
     super(endpoint);
     this.setHeader(clientNameHeader, clientName);
     token && this.setHeader('authorization', `Bearer ${token}`);
     this.renewalDate = this.getRenewalDate(token);
+    console.log('2');
     this.externalToken = this.getExternalToken(token);
   }
 
@@ -121,6 +136,7 @@ class AuthorizedGraphQLClient extends GraphQLClient {
     query: RequestQuery<T, V> | RequestOptions<V, T>,
     ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
   ): Promise<T> {
+    console.log('3');
     const nowTimestampSeconds = Date.now() / 1000;
     if (this.renewalDate < nowTimestampSeconds) {
       try {
@@ -209,6 +225,58 @@ class AuthorizedGraphQLClient extends GraphQLClient {
   }
 }
 
+class UnauthorizedApolloClient extends ApolloBaseClient {
+  constructor(
+    private endpoint: string,
+    private enqueueSnackbar: WithSnackbarProps['enqueueSnackbar'],
+    private skipErrorReport?: boolean
+  ) {
+    console.log('4');
+    super(endpoint);
+    this.setHeader(clientNameHeader, clientName);
+  }
+
+  async request<T = unknown, V extends Variables = Variables>(
+    query: RequestQuery<T, V> | RequestOptions<V, T>,
+    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
+  ): Promise<T> {
+    console.log('5');
+
+    return super
+      .request<T, V>(query as RequestQuery<T, V>, ...variablesAndRequestHeaders)
+      .catch((error) => {
+        // if the `notificationWithClientLog` fails
+        // and it fails while reporting an error, it can
+        // easily cause an infinite loop
+        if (this.skipErrorReport) {
+          throw error;
+        }
+
+        if (!error || !error.response) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'No response received from server',
+            error
+          );
+        } else if (
+          error.response.error &&
+          error.response.error.includes('ECONNREFUSED')
+        ) {
+          notifyAndLog(
+            this.enqueueSnackbar,
+            'Connection problem!',
+            error,
+            false
+          );
+        } else {
+          notifyAndLog(this.enqueueSnackbar, 'Something went wrong!', error);
+        }
+
+        throw error;
+      });
+  }
+}
+
 export function useDataApi() {
   const settingsContext = useContext(SettingsContext);
   const featureContext = useContext(FeatureContext);
@@ -228,7 +296,7 @@ export function useDataApi() {
     () =>
       token
         ? getSdk(
-            new AuthorizedGraphQLClient(
+            new AuthorizedApolloClient(
               endpoint,
               token,
               enqueueSnackbar,
@@ -260,7 +328,7 @@ export function useUnauthorizedApi() {
   const { enqueueSnackbar } = useSnackbar();
 
   return useCallback(
-    () => getSdk(new UnauthorizedGraphQLClient(endpoint, enqueueSnackbar)),
+    () => getSdk(new UnauthorizedApolloClient(endpoint, enqueueSnackbar)),
     [enqueueSnackbar]
   );
 }
