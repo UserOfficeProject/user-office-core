@@ -20,6 +20,7 @@ import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefini
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { dynamicMultipleChoiceDefinition } from './questionaryComponents/DynamicMultipleChoice/DynamicMultipleChoiceDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
+import { experimentSafetyBasisDefinition } from './questionaryComponents/ExperimentSafetyBasis/experimentSafetyBasisDefinition';
 import { fapReviewBasisDefinition } from './questionaryComponents/FapReviewBasis/FapReviewBasisDefinition';
 import { feedbackBasisDefinition } from './questionaryComponents/FeedbackBasis/FeedbackBasisDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
@@ -182,6 +183,7 @@ const registry = [
   instrumentPickerDefinition,
   techniquePickerDefinition,
   technicalReviewBasisDefinition,
+  experimentSafetyBasisDefinition,
 ];
 
 Object.freeze(registry);

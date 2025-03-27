@@ -5,6 +5,7 @@ import DialogContent from '@mui/material/DialogContent';
 import React, { useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
+import ExperimentSafetyContainer from 'components/experimentSafety/ExperimentSafetyContainer';
 import ProposalContainer from 'components/proposal/ProposalContainer';
 import { createProposalStub } from 'components/proposal/ProposalCreate';
 import ProposalEsiContainer from 'components/proposalEsi/ProposalEsiContainer';
@@ -126,7 +127,7 @@ const PreviewTemplateModal = ({
           />
         );
       case TemplateGroupId.EXP_SAFETY_REVIEW:
-        return <>asd</>;
+        return <ExperimentSafetyContainer previewMode={true} />;
     }
   };
 
