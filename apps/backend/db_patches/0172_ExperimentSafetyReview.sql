@@ -23,7 +23,7 @@ BEGIN
       , "esi_questionary_submitted_at" TIMESTAMP
       , "created_by" INT NOT NULL REFERENCES users(user_id) ON DELETE SET NULL
       , "status" varchar(30) NOT NULL
-      , "safety_review_questionary_id" INT NOT NULL REFERENCES questionaries(questionary_id)
+      , "safety_review_questionary_id" INT REFERENCES questionaries(questionary_id)
       , "reviewed_by" INT REFERENCES users(user_id) ON DELETE SET NULL
       , "created_at" TIMESTAMP NOT NULL DEFAULT NOW()
       , "updated_at" TIMESTAMP NOT NULL DEFAULT NOW()
