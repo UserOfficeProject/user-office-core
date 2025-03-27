@@ -94,7 +94,7 @@ context('User login tests', () => {
   });
 
   describe('Role Model', () => {
-    it.only('The role model should be opened if the site is navigated to with the querystring', () => {
+    it('The role model should be opened if the site is navigated to with the querystring', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: initialDBData.users.officer.id,

@@ -1931,7 +1931,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it.only("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
+    it("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
       cy.login(scientist1);
       cy.visit('/');
       cy.finishedLoading();
