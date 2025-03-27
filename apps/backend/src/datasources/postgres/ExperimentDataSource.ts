@@ -280,7 +280,6 @@ export default class PostgresExperimentDataSource
         esi_questionary_id: questionaryId,
         created_by: creatorId,
         status: '', //todo: add status
-        safety_review_questionary_id: questionaryId, //todo: add safety_review_questionary_id
         reviewed_by: creatorId, //todo: add reviewed_by
       })
       .into('experiment_safety')

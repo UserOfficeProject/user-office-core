@@ -107,20 +107,19 @@ export default class ExperimentMutations {
         'Can not create Experiment Safety, because system has no Experiment Safety template configured'
       );
     }
-    const newQuestionary = await this.questionaryDataSource.create(
+    const newEsiQuestionary = await this.questionaryDataSource.create(
       user!.id,
       call.esiTemplateId
     );
-    const newQuestionaryId = newQuestionary.questionaryId;
     // Copying the answers from the Proposal Questionary to the new Experiment Safety(Proposal ESI) Questionary
     await this.questionaryDataSource.copyAnswers(
       proposal.questionaryId,
-      newQuestionaryId
+      newEsiQuestionary.questionaryId
     );
 
     return await this.dataSource.createExperimentSafety(
       experimentPk,
-      newQuestionaryId,
+      newEsiQuestionary.questionaryId,
       user!.id
     );
   }

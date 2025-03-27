@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
-import ProposalEsiDetailsButton from 'components/questionary/questionaryComponents/ProposalEsiBasis/ProposalEsiDetailsButton';
+import ExperimentSafetyReview from 'components/experimentSafetyReview/ExperimentSafetyReview';
 import { GetExperimentsQuery, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useExperiments } from 'hooks/experiment/useExperiments';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
@@ -59,9 +60,14 @@ function ExperimentTable() {
       title: 'Experiment Safety',
       render: (rowData: RowType) =>
         rowData.experimentSafety ? (
-          <ProposalEsiDetailsButton
-            esiId={rowData.experimentSafety?.experimentSafetyPk}
-          />
+          <ButtonWithDialog
+            label="Review Experiment Safety"
+            title="Review Experiment Safety"
+          >
+            <ExperimentSafetyReview
+              experimentSafetyPk={rowData.experimentSafety.experimentSafetyPk}
+            />
+          </ButtonWithDialog>
         ) : (
           'No Experiment Safety'
         ),

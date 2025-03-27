@@ -194,6 +194,7 @@ export function QuestionarySubmissionModel<
 ) {
   function reducer(state: T, action: Event) {
     return produce(state, (draftState) => {
+      // Default Reducers
       switch (action.type) {
         case 'ITEM_WITH_QUESTIONARY_CREATED':
         case 'ITEM_WITH_QUESTIONARY_LOADED':
@@ -286,6 +287,7 @@ export function QuestionarySubmissionModel<
           break;
       }
 
+      // Calls the reducers from consumers, if they exist. Opportunity for the consumer to define the own reducers
       (draftState as T | Draft<T>) =
         reducers?.(state, draftState as T, action) || draftState;
     });
