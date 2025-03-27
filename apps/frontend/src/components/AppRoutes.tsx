@@ -34,17 +34,12 @@ const PageEditor = lazy(() => import('./pages/PageEditor'));
 const ProposalChooseCall = lazy(() => import('./proposal/ProposalChooseCall'));
 const ProposalCreate = lazy(() => import('./proposal/ProposalCreate'));
 const ProposalEdit = lazy(() => import('./proposal/ProposalEdit'));
-const InstrSciUpcomingExperimentTimesTable = lazy(
-  () => import('./proposalBooking/InstrSciUpcomingExperimentTimesTable')
-);
+
 const UserExperimentTimesTable = lazy(
   () => import('./proposalBooking/UserExperimentsTable')
 );
-const CreateProposalEsiPage = lazy(
-  () => import('./proposalEsi/CreateProposalEsiPage')
-);
-const UpdateProposalEsiPage = lazy(
-  () => import('./proposalEsi/UpdateProposalEsiPage')
+const ExperimentSafetyPage = lazy(
+  () => import('./experimentSafety/ExperimentSafetyPage')
 );
 const ExperimentSafetyReviewPage = lazy(
   () => import('./experimentSafetyReview/ExperimentSafetyReviewPage')
@@ -61,7 +56,7 @@ const ProposalStatusesPage = lazy(
 );
 const WorkflowEditor = lazy(() => import('./settings/workflow/WorkflowEditor'));
 const ProposalWorkflowsPage = lazy(
-  () => import('./settings/proposalWorkflow/ProposalWorkflowsPage')
+  () => import('./settings/workflow/ProposalWorkflowsPage')
 );
 
 const ExperimentWorkflowsPage = lazy(
@@ -485,6 +480,17 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
+            path="/ExperimentWorkflows"
+            element={
+              <TitledRoute
+                title="Experiment Workflows"
+                element={<ExperimentWorkflowsPage />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
             path="/ProposalWorkflowEditor/:workflowId"
             element={
               <TitledRoute
@@ -559,17 +565,6 @@ const AppRoutes = () => {
             }
           />
         )}
-        {isSchedulerEnabled && (
-          <Route
-            path="/UpcomingExperimentTimes"
-            element={
-              <TitledRoute
-                title="Upcoming Experiment Times"
-                element={<InstrSciUpcomingExperimentTimesTable />}
-              />
-            }
-          />
-        )}
         {isUserOfficer && (
           <Route
             path="/Questions"
@@ -598,25 +593,16 @@ const AppRoutes = () => {
           />
         )}
         <Route
-          path="/CreateEsi/:scheduledEventId"
+          path="/ExperimentSafety/:experimentPk"
           element={
             <TitledRoute
-              title="Create ESI Proposal"
-              element={<CreateProposalEsiPage />}
+              title="Experiment Safety"
+              element={<ExperimentSafetyPage />}
             />
           }
         />
         <Route
-          path="/UpdateEsi/:esiId"
-          element={
-            <TitledRoute
-              title="Update ESI Proposal"
-              element={<UpdateProposalEsiPage />}
-            />
-          }
-        />
-        <Route
-          path="/CreateFeedback/:scheduledEventId"
+          path="/CreateFeedback/:experimentPk"
           element={
             <TitledRoute
               title="Create Feedback"
@@ -634,7 +620,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/DeclareShipments/:scheduledEventId"
+          path="/DeclareShipments/:experimentPk"
           element={
             <TitledRoute
               title="Declare Shipments"

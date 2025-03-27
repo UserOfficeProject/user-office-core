@@ -6,17 +6,18 @@ import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import {
-  ProposalScheduledEvent,
-  useProposalBookingsScheduledEvents,
-} from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
+  UserExperiment,
+  useUserExperiments,
+} from 'hooks/experiment/useUserExperiments';
+import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
 const columns: (
   t: TFunction<'translation', undefined>
-) => Column<ProposalScheduledEvent>[] = (t) => [
+) => Column<UserExperiment>[] = (t) => [
+  { title: 'Experiment Number', field: 'experimentId' },
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
   { title: t('instrument') as string, field: 'instrument.name' },
@@ -35,11 +36,11 @@ const columns: (
 ];
 
 export default function UserUpcomingExperimentsTable() {
-  const { loading, proposalScheduledEvents, setProposalScheduledEvents } =
-    useProposalBookingsScheduledEvents({
-      onlyUpcoming: true,
-      notDraft: true,
-    });
+  const {
+    loading: experimentsLoading,
+    userExperiments,
+    setUserUpcomingExperiments,
+  } = useUserExperiments({ notDraft: true, onlyUpcoming: true });
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -58,25 +59,27 @@ export default function UserUpcomingExperimentsTable() {
     closeModal: () => {
       setModalContents(null);
     },
-    eventUpdated: (updatedEvent) => {
-      const updatedEvents = proposalScheduledEvents.map((event) =>
-        event?.id === updatedEvent?.id ? updatedEvent : event
+    eventUpdated: (updatedExperiment) => {
+      const updatedExperiments = userExperiments.map((experiment) =>
+        experiment?.experimentPk === updatedExperiment?.experimentPk
+          ? updatedExperiment
+          : experiment
       );
-      setProposalScheduledEvents(updatedEvents);
+      setUserUpcomingExperiments(updatedExperiments);
     },
   });
 
   // if there are no upcoming experiments
   // just hide the whole table altogether
-  if (proposalScheduledEvents.length === 0) {
+  if (userExperiments.length === 0) {
     return null;
   }
 
-  const proposalScheduledEventsWithFormattedDates = proposalScheduledEvents.map(
-    (event) => ({
-      ...event,
-      startsAtFormatted: toFormattedDateTime(event.startsAt),
-      endsAtFormatted: toFormattedDateTime(event.endsAt),
+  const userExperimentsWithFormattedDates = userExperiments.map(
+    (experiment) => ({
+      ...experiment,
+      startsAtFormatted: toFormattedDateTime(experiment.startsAt),
+      endsAtFormatted: toFormattedDateTime(experiment.endsAt),
     })
   );
 
@@ -92,9 +95,9 @@ export default function UserUpcomingExperimentsTable() {
         ]}
         icons={tableIcons}
         title="Upcoming experiments"
-        isLoading={loading}
+        isLoading={experimentsLoading}
         columns={columns(t)}
-        data={proposalScheduledEventsWithFormattedDates}
+        data={userExperimentsWithFormattedDates}
         options={{
           search: false,
           padding: 'dense',

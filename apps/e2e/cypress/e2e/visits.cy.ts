@@ -18,7 +18,7 @@ context('visits tests', () => {
   const PI = initialDBData.users.user1;
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
-  const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+  const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
 
   beforeEach(function () {
     cy.resetDB(true);
@@ -72,7 +72,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [visitor.id],
         teamLeadUserId: visitor.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       }).then(({ createVisit: visit }: CreateVisitMutation) => {
         cy.createVisitRegistration({
           visitId: visit.id,
@@ -219,7 +219,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
       cy.login(visitor);
       cy.visit('/');
@@ -250,7 +250,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
 
       cy.login(visitor);
@@ -297,7 +297,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [PI.id, visitor.id, coProposer.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
       cy.login(PI);
       cy.visit('/');
