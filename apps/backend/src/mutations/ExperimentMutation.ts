@@ -112,6 +112,7 @@ export default class ExperimentMutations {
       call.esiTemplateId
     );
     const newQuestionaryId = newQuestionary.questionaryId;
+    // Copying the answers from the Proposal Questionary to the new Experiment Safety(Proposal ESI) Questionary
     await this.questionaryDataSource.copyAnswers(
       proposal.questionaryId,
       newQuestionaryId
@@ -170,11 +171,13 @@ export default class ExperimentMutations {
       );
     }
 
+    // Fetching the Sample
     const sample = await this.sampleDataSource.getSample(args.sampleId);
     if (!sample) {
       return rejection('No sample found');
     }
 
+    // Fetching the Question, that was attached as a Sample declaration in the Proposal Questionary
     const question = await this.templateDataSource.getQuestion(
       sample.questionId
     ); // TODO this should be a getQuestionTemplateRelation. There is no way currently of doing it. Sample should reference QuestionRel instead of Question
@@ -182,17 +185,20 @@ export default class ExperimentMutations {
       return rejection('No question found');
     }
 
+    // Fetching the Sample ESI Template ID
     const templateId = (question.config as SampleDeclarationConfig)
       .esiTemplateId;
     if (!templateId) {
       return rejection('Esi template is not defined');
     }
 
+    // Creating a new Questionary for the Sample using the ESI Template
     const newQuestionary = await this.questionaryDataSource.create(
       user!.id,
       templateId!
     );
 
+    // Copying the answers from the Sample Questionary to the new Sample ESI Questionary
     await this.questionaryDataSource.copyAnswers(
       sample.questionaryId,
       newQuestionary.questionaryId
