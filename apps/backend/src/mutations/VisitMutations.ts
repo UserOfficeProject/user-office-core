@@ -281,6 +281,22 @@ export default class VisitMutations {
         { args, user }
       );
     }
+    const TODAY_MIDNIGT = new Date(new Date().setHours(0, 0, 0, 0));
+
+    if (args.startsAt && args.startsAt < TODAY_MIDNIGT) {
+      return rejection(
+        'Could not update Visit Registration because the start date is in the past',
+        { args }
+      );
+    }
+
+    const startsAt = args.startsAt ?? visitRegistration.startsAt;
+    if (startsAt && args.endsAt && args.endsAt <= startsAt) {
+      return rejection(
+        'Could not update Visit Registration because the end date is before the start date',
+        { args }
+      );
+    }
 
     return this.dataSource.updateRegistration(args);
   }
