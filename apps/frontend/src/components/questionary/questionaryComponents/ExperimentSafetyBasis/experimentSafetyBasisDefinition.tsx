@@ -21,7 +21,11 @@ export const experimentSafetyBasisDefinition: QuestionaryComponentDefinition = {
   icon: <SafetyCheck />,
   createYupValidationSchema: createExperimentSafetyBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
-    // todo: this needs to be tested
+    // todo: Dummy
+    if (state) {
+      return 'Experiment Safety Basis YUP Initial Value';
+    }
+
     return 'Experiment Safety Basis YUP Initial Value';
   },
 };
