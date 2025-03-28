@@ -11,8 +11,8 @@ import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import ProposalTableFacility from 'components/proposal/ProposalTableFacility';
 
-const PaperContainer = ({ children }: { children: React.ReactNode }) => (
-  <StyledPaper>{children}</StyledPaper>
+const Paper = ({ children }: { children: React.ReactNode }) => (
+  <StyledPaper margin={[0, 0, 2, 0]}>{children}</StyledPaper>
 );
 
 export default function OverviewPage(props: { userRole: UserRole }) {
@@ -22,29 +22,36 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   const { featuresMap } = useContext(FeatureContext);
   const isSchedulerEnabled = featuresMap.get(FeatureId.SCHEDULER)?.isEnabled;
 
-  let roleBasedOverView = (
-    <PaperContainer>
-      <ProposalTableReviewer />
-    </PaperContainer>
-  );
+  let roleBasedOverView = null;
 
   switch (props.userRole) {
     case UserRole.USER:
       roleBasedOverView = (
         <>
-          {isSchedulerEnabled && <UserUpcomingExperimentsTable />}
-          <PaperContainer>
-            <ProposalTableFacility />
-          </PaperContainer>
+          {isSchedulerEnabled && (
+            <Paper>
+              <UserUpcomingExperimentsTable />
+            </Paper>
+          )}
+          <Paper>
+            <ProposalTableUser />
+          </Paper>
         </>
       );
       break;
     case UserRole.INSTRUMENT_SCIENTIST:
     case UserRole.INTERNAL_REVIEWER:
       roleBasedOverView = (
-        <PaperContainer>
+        <Paper>
           <ProposalTableInstrumentScientist />
-        </PaperContainer>
+        </Paper>
+      );
+      break;
+    default:
+      roleBasedOverView = (
+        <Paper>
+          <ProposalTableReviewer />
+        </Paper>
       );
       break;
   }
@@ -52,13 +59,13 @@ export default function OverviewPage(props: { userRole: UserRole }) {
   return (
     <StyledContainer maxWidth={false}>
       {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
-        <StyledPaper margin={[0, 0, 2, 0]}>
+        <Paper>
           {loadingContent ? (
             <div>Loading...</div>
           ) : (
             parse(pageContent as string)
           )}
-        </StyledPaper>
+        </Paper>
       )}
       {roleBasedOverView}
     </StyledContainer>

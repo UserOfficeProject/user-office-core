@@ -902,6 +902,7 @@ const ProposalTableOfficer = ({
         onSelectionChange={(selectedItems) => {
           if (selectedItems.length) {
             setSearchParams((searchParams) => {
+              searchParams.delete('selection');
               selectedItems.map((selectedItem) =>
                 searchParams.append(
                   'selection',

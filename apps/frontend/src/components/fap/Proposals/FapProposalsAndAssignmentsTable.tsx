@@ -32,9 +32,9 @@ import {
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import {
-  useFapProposalsData,
   FapProposalType,
   FapProposalAssignmentType,
+  FapProposals,
 } from 'hooks/fap/useFapProposalsData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { tableIcons } from 'utils/materialIcons';
@@ -68,6 +68,7 @@ type FapProposalsAndAssignmentsTableProps = {
   /** Confirmation function that comes from withConfirm HOC */
   confirm: WithConfirmType;
   selectedInstrumentId: number | null;
+  fapProposals: FapProposals;
 };
 
 const getReviewsFromAssignments = (assignments: FapProposalAssignmentType[]) =>
@@ -173,15 +174,14 @@ const FapProposalColumns: Column<FapProposalType>[] = [
 const FapProposalsAndAssignmentsTable = ({
   data,
   onAssignmentsUpdate,
-  selectedCallId,
   confirm,
-  selectedInstrumentId,
+  fapProposals,
 }: FapProposalsAndAssignmentsTableProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const reviewModal = searchParams.get('reviewModal');
 
   const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
-    useFapProposalsData(data.id, selectedCallId, selectedInstrumentId);
+    fapProposals;
   const { api } = useDataApiWithFeedback();
   const [proposalPks, setProposalPks] = useState<number[]>([]);
   const downloadPDFProposal = useDownloadPDFProposal();
@@ -720,18 +720,16 @@ const FapProposalsAndAssignmentsTable = ({
     [setFapProposalsData, data, onAssignmentsUpdate, api]
   );
 
-  // const FapProposalsWitIdAndFormattedDate = initialValues.map((fapProposal) =>
-  //   Object.assign(fapProposal, {
-  //     id: fapProposal.proposalPk,
-  //     rowActionButtons: RowActionButtons(fapProposal),
-  //     dateAssignedFormatted: toFormattedDateTime(fapProposal.dateAssigned),
-  //     tableData: {
-  //       checked: selection.includes(fapProposal.proposalPk.toString()),
-  //     },
-  //   })
-  // );
-
-  const FapProposalsWitIdAndFormattedDate = initialValues;
+  const FapProposalsWitIdAndFormattedDate = initialValues.map((fapProposal) =>
+    Object.assign(fapProposal, {
+      id: fapProposal.proposalPk,
+      rowActionButtons: RowActionButtons(fapProposal),
+      dateAssignedFormatted: toFormattedDateTime(fapProposal.dateAssigned),
+      tableData: {
+        checked: selection.includes(fapProposal.proposalPk.toString()),
+      },
+    })
+  );
 
   const maxPageLength = FapProposalsWitIdAndFormattedDate.length;
 
