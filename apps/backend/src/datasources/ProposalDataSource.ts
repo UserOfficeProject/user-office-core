@@ -2,14 +2,9 @@ import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
 import { Proposal, Proposals } from '../models/Proposal';
 import { ProposalView } from '../models/ProposalView';
-import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
-import {
-  ProposalBookingFilter,
-  ProposalBookingScheduledEventFilterCore,
-} from '../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../resolvers/types/User';
 import { ProposalsFilter } from './../resolvers/queries/ProposalsQuery';
 import { ProposalEventsRecord } from './postgres/records';
@@ -84,23 +79,6 @@ export interface ProposalDataSource {
     statusId: number,
     proposalPks: number[]
   ): Promise<Proposals>;
-  getProposalBookingsByProposalPk(
-    proposalPk: number,
-    filter?: ProposalBookingFilter
-  ): Promise<{ ids: number[] } | null>;
-  getAllProposalBookingsScheduledEvents(
-    proposalBookingIds: number[],
-    filter?: ProposalBookingScheduledEventFilterCore
-  ): Promise<ScheduledEventCore[] | null>;
-  addProposalBookingScheduledEvent(
-    eventMessage: ScheduledEventCore
-  ): Promise<void>;
-  removeProposalBookingScheduledEvents(
-    eventMessage: ScheduledEventCore[]
-  ): Promise<void>;
-  updateProposalBookingScheduledEvent(
-    eventMessage: ScheduledEventCore
-  ): Promise<void>;
   getRelatedUsersOnProposals(id: number): Promise<number[]>;
   getProposalById(proposalId: string): Promise<Proposal | null>;
   doesProposalNeedTechReview(proposalPk: number): Promise<boolean>;

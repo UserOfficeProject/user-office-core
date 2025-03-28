@@ -1,0 +1,5 @@
+query getExperiment($experimentPk: Int!) {
+  experiment(experimentPk: $experimentPk) {
+    ...experiment
+  }
+}

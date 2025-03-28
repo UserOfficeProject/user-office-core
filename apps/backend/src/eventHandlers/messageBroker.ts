@@ -8,6 +8,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
@@ -20,6 +21,7 @@ import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
+import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
@@ -406,8 +408,8 @@ export async function createListenToRabbitMQHandler() {
     SCHEDULER_EXCHANGE_NAME
   );
 
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
   );
 
   const visitDataSource = container.resolve<VisitDataSource>(
@@ -466,26 +468,22 @@ export async function createListenToRabbitMQHandler() {
             }
           );
 
-          const scheduledEventToAdd = {
-            id: message.id,
-            bookingType: message.bookingType,
+          const experimentToAdd = {
             startsAt: message.startsAt,
             endsAt: message.endsAt,
-            proposalBookingId: message.proposalBookingId,
+            scheduledEventId: message.id,
             proposalPk: message.proposalPk,
             status: message.status,
-            localContactId: message.localContact,
+            localContactId: message.localContactId,
             instrumentId: message.instrumentId,
-          } as ScheduledEventCore;
+          } as Omit<
+            Experiment,
+            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+          >;
 
-          await proposalDataSource.addProposalBookingScheduledEvent(
-            scheduledEventToAdd
-          );
+          await experimentDataSource.create(experimentToAdd);
 
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventToAdd.proposalPk
-          );
+          await handleWorkflowEngineChange(type, experimentToAdd.proposalPk);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -504,7 +502,7 @@ export async function createListenToRabbitMQHandler() {
             message.scheduledevents as ScheduledEventCore[];
 
           for (const scheduledEvent of scheduledEvents) {
-            const visit = await visitDataSource.getVisitByScheduledEventId(
+            const visit = await visitDataSource.getVisitByExperimentPk(
               scheduledEvent.id
             );
             if (visit) {
@@ -512,28 +510,13 @@ export async function createListenToRabbitMQHandler() {
             }
           }
 
-          const scheduledEventsToRemove = scheduledEvents.map(
-            (scheduledEvent) => ({
-              id: scheduledEvent.id,
-              bookingType: scheduledEvent.bookingType,
-              startsAt: scheduledEvent.startsAt,
-              endsAt: scheduledEvent.endsAt,
-              proposalBookingId: scheduledEvent.proposalBookingId,
-              proposalPk: scheduledEvent.proposalPk,
-              status: scheduledEvent.status,
-              localContactId: scheduledEvent.localContactId,
-              instrumentId: scheduledEvent.instrumentId,
-            })
-          );
+          scheduledEvents.forEach(async (scheduledEvent) => {
+            await experimentDataSource.deleteByScheduledEventId(
+              scheduledEvent.id
+            );
+          });
 
-          await proposalDataSource.removeProposalBookingScheduledEvents(
-            scheduledEventsToRemove
-          );
-
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventsToRemove[0].proposalPk
-          );
+          await handleWorkflowEngineChange(type, scheduledEvents[0].proposalPk);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -552,24 +535,18 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-          const scheduledEventToUpdate = {
-            id: message.id,
-            proposalBookingId: message.proposalBookingId,
+
+          await experimentDataSource.updateByScheduledEventId({
             startsAt: message.startsAt,
             endsAt: message.endsAt,
             status: message.status,
             localContactId: message.localContactId,
-            proposalPk: message.proposalPk,
-          } as ScheduledEventCore;
-
-          await proposalDataSource.updateProposalBookingScheduledEvent(
-            scheduledEventToUpdate
-          );
-
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventToUpdate.proposalPk
-          );
+            scheduledEventId: message.id,
+          } as Omit<
+            Experiment,
+            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+          >);
+          await handleWorkflowEngineChange(type, message.proposalPk as number);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }

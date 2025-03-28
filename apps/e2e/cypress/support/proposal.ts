@@ -5,14 +5,14 @@ import {
   ChangeProposalsStatusMutationVariables,
   CloneProposalsMutation,
   CloneProposalsMutationVariables,
-  CreateEsiMutation,
-  CreateEsiMutationVariables,
+  CreateOrGetExperimentSafetyMutation,
+  CreateOrGetExperimentSafetyMutationVariables,
   CreateProposalMutation,
   CreateProposalMutationVariables,
+  SubmitExperimentSafetyMutation,
+  SubmitExperimentSafetyMutationVariables,
   SubmitProposalMutation,
   SubmitProposalMutationVariables,
-  UpdateEsiMutation,
-  UpdateEsiMutationVariables,
   UpdateProposalMutation,
   UpdateProposalMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -73,20 +73,22 @@ const updateProposalManagementDecision = (
   return cy.wrap(request);
 };
 
-const createEsi = (
-  createEsiInput: CreateEsiMutationVariables
-): Cypress.Chainable<CreateEsiMutation> => {
+const createOrGetExperimentSafety = (
+  createOrGetExperimentSafetyInput: CreateOrGetExperimentSafetyMutationVariables
+): Cypress.Chainable<CreateOrGetExperimentSafetyMutation> => {
   const api = getE2EApi();
-  const request = api.createEsi(createEsiInput);
+  const request = api.createOrGetExperimentSafety(
+    createOrGetExperimentSafetyInput
+  );
 
   return cy.wrap(request);
 };
 
-const updateEsi = (
-  updateEsiInput: UpdateEsiMutationVariables
-): Cypress.Chainable<UpdateEsiMutation> => {
+const submitExperimentSafety = (
+  submitExperimentSafetyInput: SubmitExperimentSafetyMutationVariables
+): Cypress.Chainable<SubmitExperimentSafetyMutation> => {
   const api = getE2EApi();
-  const request = api.updateEsi(updateEsiInput);
+  const request = api.submitExperimentSafety(submitExperimentSafetyInput);
 
   return cy.wrap(request);
 };
@@ -101,5 +103,8 @@ Cypress.Commands.add(
   updateProposalManagementDecision
 );
 
-Cypress.Commands.add('createEsi', createEsi);
-Cypress.Commands.add('updateEsi', updateEsi);
+Cypress.Commands.add(
+  'createOrGetExperimentSafety',
+  createOrGetExperimentSafety
+);
+Cypress.Commands.add('submitExperimentSafety', submitExperimentSafety);

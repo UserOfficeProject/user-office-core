@@ -222,7 +222,7 @@ const getTinyMceContent = (tinyMceId: string) => {
 const getIconByCyTag = (cyTag: string) => {
   return cy
     .get('[data-cy=upcoming-experiments]')
-    .contains(initialDBData.scheduledEvents.upcoming.startsAt)
+    .contains(initialDBData.experiments.upcoming.startsAt)
     .closest('TR')
     .find(`[data-cy="${cyTag}"]`);
 };

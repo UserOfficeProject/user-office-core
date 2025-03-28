@@ -18,7 +18,7 @@ context('visits tests', () => {
   const PI = initialDBData.users.user1;
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
-  const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+  const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
 
   beforeEach(function () {
     cy.resetDB(true);
@@ -72,7 +72,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [visitor.id],
         teamLeadUserId: visitor.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       }).then(({ createVisit: visit }: CreateVisitMutation) => {
         cy.createVisitRegistration({
           visitId: visit.id,
@@ -219,7 +219,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
       cy.login(visitor);
       cy.visit('/');
@@ -234,10 +234,13 @@ context('visits tests', () => {
     });
 
     it('Visitor should be able to register for a visit', () => {
-      const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+      const pastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
         initialDBData.getFormats().dateFormat
       );
-      const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+      const nowDate = DateTime.fromJSDate(new Date()).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const futureDate = DateTime.fromJSDate(faker.date.future()).toFormat(
         initialDBData.getFormats().dateFormat
       );
 
@@ -250,7 +253,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
 
       cy.login(visitor);
@@ -273,14 +276,13 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Invalid date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(endDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(startDate);
-
+      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(pastDate);
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/end date can't be before start date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 
@@ -297,7 +299,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [PI.id, visitor.id, coProposer.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
       cy.login(PI);
       cy.visit('/');
