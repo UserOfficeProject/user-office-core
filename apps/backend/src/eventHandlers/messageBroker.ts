@@ -24,7 +24,6 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
-import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
@@ -498,8 +497,10 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-          const scheduledEvents =
-            message.scheduledevents as ScheduledEventCore[];
+          const scheduledEvents = message.scheduledevents as {
+            id: number;
+            proposalPk: number;
+          }[];
 
           for (const scheduledEvent of scheduledEvents) {
             const visit = await visitDataSource.getVisitByExperimentPk(
