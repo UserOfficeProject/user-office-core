@@ -9,7 +9,7 @@ export interface ShipmentDataSource {
     creatorId: number,
     proposalPk: number,
     questionaryId: number,
-    scheduledEventId: number
+    experimentPk: number
   ): Promise<Shipment>;
   getShipment(shipmentId: number): Promise<Shipment | null>;
   getShipments(args: ShipmentsArgs): Promise<Shipment[]>;

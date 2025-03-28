@@ -1,9 +1,7 @@
-import { GetUserProposalBookingsWithEventsQuery } from 'generated/sdk';
+import { GetUserExperimentsQuery } from 'generated/sdk';
 
 export type VisitRegistrationCore = NonNullable<
   NonNullable<
-    NonNullable<
-      NonNullable<GetUserProposalBookingsWithEventsQuery['me']>['proposals']
-    >[0]['proposalBookingsCore']
-  >['scheduledEvents'][0]['visit']
+    NonNullable<NonNullable<GetUserExperimentsQuery['me']>['experiments']>[0]
+  >['visit']
 >['registrations'][0];

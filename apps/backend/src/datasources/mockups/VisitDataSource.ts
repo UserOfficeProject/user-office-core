@@ -1,4 +1,3 @@
-import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit } from '../../models/Visit';
 import {
   VisitRegistration,
@@ -13,16 +12,13 @@ import { CreateVisitArgs } from './../../resolvers/mutations/CreateVisitMutation
 import { dummyUserWithRole } from './UserDataSource';
 
 export class VisitDataSourceMock implements VisitDataSource {
-  getEsiByVisitId(visitId: any): Promise<ExperimentSafetyInput | null> {
-    throw new Error('Method not implemented.');
-  }
   private visits: Visit[];
   private visitsHasVisitors: VisitRegistration[];
   init() {
     this.visits = [
-      new Visit(1, 1, 1, dummyUserWithRole.id, 1, new Date()),
-      new Visit(3, 3, 3, dummyUserWithRole.id, 3, new Date()),
-      new Visit(4, 4, 4, dummyUserWithRole.id, 4, new Date()),
+      new Visit(1, 1, 1, dummyUserWithRole.id, new Date(), 1),
+      new Visit(3, 3, 3, dummyUserWithRole.id, new Date(), 3),
+      new Visit(4, 4, 4, dummyUserWithRole.id, new Date(), 4),
     ];
 
     this.visitsHasVisitors = [
@@ -59,8 +55,8 @@ export class VisitDataSourceMock implements VisitDataSource {
       }
 
       if (
-        filter?.scheduledEventId &&
-        currentVisit.scheduledEventId === filter.scheduledEventId
+        filter?.experimentPk &&
+        currentVisit.experimentPk === filter.experimentPk
       ) {
         matchingVisits.push(currentVisit);
       }
@@ -69,9 +65,9 @@ export class VisitDataSourceMock implements VisitDataSource {
     }, new Array<Visit>());
   }
 
-  async getVisitByScheduledEventId(eventId: number): Promise<Visit | null> {
+  async getVisitByExperimentPk(experimentPk: number): Promise<Visit | null> {
     return (
-      this.visits.find((visit) => visit.scheduledEventId === eventId) ?? null
+      this.visits.find((visit) => visit.experimentPk === experimentPk) ?? null
     );
   }
 
@@ -93,7 +89,7 @@ export class VisitDataSourceMock implements VisitDataSource {
   }
 
   async createVisit(
-    { teamLeadUserId, scheduledEventId: scheduledEventId }: CreateVisitArgs,
+    { teamLeadUserId, experimentPk }: CreateVisitArgs,
     creatorId: number,
     proposalPk: number
   ): Promise<Visit> {
@@ -102,8 +98,8 @@ export class VisitDataSourceMock implements VisitDataSource {
       proposalPk,
       creatorId,
       teamLeadUserId,
-      scheduledEventId,
-      new Date()
+      new Date(),
+      experimentPk
     );
 
     this.visits.push(newVisit);
