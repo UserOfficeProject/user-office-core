@@ -1125,7 +1125,7 @@ context('Template Delete, Archive, Unarchive', () => {
     const endQuestion = 'Visit end';
 
     const cyTagRegisterVisit = 'register-visit-icon';
-    const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+    const startDate = DateTime.fromJSDate(new Date()).toFormat(
       initialDBData.getFormats().dateFormat
     );
     const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
