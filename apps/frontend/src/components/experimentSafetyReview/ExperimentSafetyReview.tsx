@@ -15,20 +15,17 @@ export default function ExperimentSafetyReview(
     useExperimentSafety(props.experimentSafetyPk);
 
   useEffect(() => {
-    // Start the safety review if it has not been started yet
-    if (experimentSafety && !experimentSafety.safetyReviewQuestionary) {
-      api()
-        .startExperimentSafetyReview({
-          experimentSafetyPk: experimentSafety.experimentSafetyPk,
-        })
-        .then((data) => {
-          setExperimentSafety(data.startExperimentSafetyReview);
-        })
-        .catch(() => {
-          throw new Error('Failed to start safety review');
-        });
-    }
-  }, [api, experimentSafety, setExperimentSafety]);
+    api()
+      .reviewExperimentSafety({
+        experimentSafetyPk: props.experimentSafetyPk,
+      })
+      .then((data) => {
+        setExperimentSafety(data.reviewExperimentSafety);
+      })
+      .catch(() => {
+        throw new Error('Failed to start safety review');
+      });
+  }, [api, props.experimentSafetyPk, setExperimentSafety]);
 
   if (loading) {
     return <>Loading...</>;
@@ -38,7 +35,8 @@ export default function ExperimentSafetyReview(
     return <>Experiment safety not found</>;
   }
 
-  if (!experimentSafety.safetyReviewQuestionary) {
+  if (!experimentSafety?.safetyReviewQuestionary) {
+    return <>Safety Review Not Available</>;
   }
 
   return (

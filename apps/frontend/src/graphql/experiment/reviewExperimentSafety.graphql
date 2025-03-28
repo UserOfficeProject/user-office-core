@@ -1,5 +1,5 @@
-mutation startExperimentSafetyReview($experimentSafetyPk: Int!) {
-  startExperimentSafetyReview(experimentSafetyPk: $experimentSafetyPk) {
+mutation reviewExperimentSafety($experimentSafetyPk: Int!) {
+  reviewExperimentSafety(experimentSafetyPk: $experimentSafetyPk) {
     ...experimentSafety
     questionary {
       isCompleted

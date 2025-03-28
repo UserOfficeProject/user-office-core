@@ -12,7 +12,7 @@ import { ResolverContext } from '../../context';
 import { ExperimentSafety } from '../types/ExperimentSafety';
 
 @ArgsType()
-export class StartExperimentSafetyReviewArgs {
+export class ReviewExperimentSafetyArgs {
   @Field(() => Int)
   experimentSafetyPk: number;
 
@@ -21,13 +21,13 @@ export class StartExperimentSafetyReviewArgs {
 }
 
 @Resolver()
-export class StartExperimentSafetyReviewMutation {
+export class ReviewExperimentSafetyMutation {
   @Mutation(() => ExperimentSafety)
-  startExperimentSafetyReview(
-    @Args() args: StartExperimentSafetyReviewArgs,
+  reviewExperimentSafety(
+    @Args() args: ReviewExperimentSafetyArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.experiment.startExperimentSafetyReview(
+    return context.mutations.experiment.reviewExperimentSafety(
       context.user,
       args
     );

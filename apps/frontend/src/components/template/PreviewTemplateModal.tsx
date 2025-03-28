@@ -129,7 +129,8 @@ const PreviewTemplateModal = ({
           />
         );
       case TemplateGroupId.EXP_SAFETY_REVIEW:
-        return <ExperimentSafetyContainer previewMode={true} />;
+        // return <ExperimentSafetyContainer previewMode={true} />;
+        return <>WIP</>;
     }
   };
 

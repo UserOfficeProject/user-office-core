@@ -141,7 +141,7 @@ export default class ExperimentMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async startExperimentSafetyReview(
+  async reviewExperimentSafety(
     user: UserWithRole | null,
     args: SubmitExperimentSafetyArgs
   ) {
@@ -156,6 +156,11 @@ export default class ExperimentMutations {
 
     if (!experimentSafety) {
       return rejection('No experiment safety found');
+    }
+
+    // Check if the Safety Review is already started
+    if (experimentSafety.safetyReviewQuestionaryId) {
+      return experimentSafety;
     }
 
     // Create questionary for the active template for Experiment Safety Review

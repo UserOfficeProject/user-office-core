@@ -6,9 +6,18 @@ import { ExperimentSafetyWithQuestionary } from './ExperimentSafetyWithQuestiona
 import { TemplateGroupId } from '../../../generated/sdk';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
+export type MakeFieldRequired<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]: NonNullable<T[P]>;
+};
+
 export class ExperimentSafetyReviewSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(public experimentSafety: ExperimentSafetyWithQuestionary) {
+  constructor(
+    public experimentSafety: MakeFieldRequired<
+      ExperimentSafetyWithQuestionary,
+      'safetyReviewQuestionary'
+    >
+  ) {
     super(TemplateGroupId.EXP_SAFETY_REVIEW, experimentSafety);
     this.stepIndex = this.getInitialStepIndex();
   }

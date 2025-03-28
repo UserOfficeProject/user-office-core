@@ -270,7 +270,6 @@ export default class PostgresExperimentDataSource
     if (!result) {
       throw new Error('Could not update experiment safety');
     }
-    console.log({ result });
 
     return createExperimentSafetyObject(result[0]);
   }

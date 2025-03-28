@@ -8,7 +8,11 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { QuestionaryStep, TemplateGroupId } from 'generated/sdk';
 import { ExperimentSafetySubmissionState } from 'models/questionary/experimentSafety/ExperimentSafetySubmissionState';
-import { ExperimentSafetyWithQuestionary } from 'models/questionary/experimentSafety/ExperimentSafetyWithQuestionary';
+import {
+  ExperimentSafetyWithQuestionary,
+  ExperimentSafetyWithReviewQuestionary,
+} from 'models/questionary/experimentSafety/ExperimentSafetyWithQuestionary';
+import { ExperimentSafetyReviewSubmissionState } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewSubmissionState';
 import {
   Event,
   QuestionarySubmissionModel,
@@ -57,7 +61,7 @@ export function createExperimentSafetyStub(
   };
 }
 
-const proposalEsiReducer = (
+const experimentSafetyReviewReducer = (
   state: ExperimentSafetySubmissionState,
   draftState: ExperimentSafetySubmissionState,
   action: Event
@@ -102,21 +106,21 @@ const proposalEsiReducer = (
 };
 
 export interface ExperimentSafetyReviewContainerProps {
-  experimentSafety: ExperimentSafetyWithQuestionary;
+  experimentSafety: ExperimentSafetyWithReviewQuestionary;
   previewMode?: boolean;
 }
 export default function ExperimentSafetyReviewContainer(
   props: ExperimentSafetyReviewContainerProps
 ) {
   const [initialState] = useState(
-    new ExperimentSafetySubmissionState(props.experimentSafety)
+    new ExperimentSafetyReviewSubmissionState(props.experimentSafety)
   );
-  const eventHandlers = useEventHandlers(TemplateGroupId.PROPOSAL_ESI);
+  const eventHandlers = useEventHandlers(TemplateGroupId.EXP_SAFETY_REVIEW);
 
   const { state, dispatch } = QuestionarySubmissionModel(
     initialState,
     [eventHandlers],
-    proposalEsiReducer
+    experimentSafetyReviewReducer
   );
 
   return (

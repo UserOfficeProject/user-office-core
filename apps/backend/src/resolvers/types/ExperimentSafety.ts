@@ -14,6 +14,7 @@ import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { ExperimentSafety as ExperimentSafetyOrigin } from '../../models/Experiment';
+import { TemplateCategoryId } from '../../models/Template';
 import { ExperimentHasSample } from './ExperimentHasSample';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
@@ -104,19 +105,17 @@ export class ExperimentSafetyResolver {
     return questionary;
   }
 
-  @FieldResolver(() => Questionary, { nullable: true })
+  @FieldResolver(() => Questionary)
   async safetyReviewQuestionary(
     @Root() experimentSafety: ExperimentSafety,
     @Ctx() context: ResolverContext
-  ): Promise<Questionary | null> {
-    if (experimentSafety.safetyReviewQuestionaryId === null) {
-      return null;
-    }
-
-    const questionary = await context.queries.questionary.getQuestionary(
-      context.user,
-      experimentSafety.safetyReviewQuestionaryId
-    );
+  ): Promise<Questionary> {
+    const questionary =
+      await context.queries.questionary.getQuestionaryOrDefault(
+        context.user,
+        experimentSafety.safetyReviewQuestionaryId ?? 0,
+        TemplateCategoryId.EXP_SAFETY_REVIEW
+      );
 
     return questionary;
   }
