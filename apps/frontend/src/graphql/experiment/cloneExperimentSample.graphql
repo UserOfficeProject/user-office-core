@@ -1,0 +1,20 @@
+mutation cloneExperimentSample(
+  $experimentPk: Int!
+  $sampleId: Int!
+  $newSampleTitle: String
+) {
+  cloneExperimentSample(
+    experimentPk: $experimentPk
+    sampleId: $sampleId
+    newSampleTitle: $newSampleTitle
+  ) {
+    ...experimentSample
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sample {
+      ...sample
+    }
+  }
+}
