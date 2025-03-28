@@ -3,6 +3,9 @@ import path from 'path';
 import { logger } from '@user-office-software/duo-logger';
 import EmailTemplates from 'email-templates';
 import * as nodemailer from 'nodemailer';
+import { Transporter } from 'nodemailer';
+import SMTPPool from 'nodemailer/lib/smtp-pool';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -29,17 +32,33 @@ export class SMTPMailService extends MailService {
       });
     }
 
+    let smtpTransport:
+      | Transporter<SMTPPool.SentMessageInfo>
+      | Transporter<SMTPTransport.SentMessageInfo>;
+
+    if (process.env.EMAIL_USE_POOL && process.env.EMAIL_MAX_CONNECTIONS) {
+      smtpTransport = nodemailer.createTransport({
+        pool: true,
+        maxConnections: parseInt(process.env.EMAIL_MAX_CONNECTIONS || '5'),
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+        ...this.getSmtpAuthOptions(),
+      });
+    } else {
+      smtpTransport = nodemailer.createTransport({
+        host: process.env.EMAIL_AUTH_HOST,
+        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
+        ...this.getSmtpAuthOptions(),
+      });
+    }
+
     this.emailTemplates = new EmailTemplates({
       message: {
         from: process.env.EMAIL_SENDER,
         attachments,
       },
       send: true,
-      transport: nodemailer.createTransport({
-        host: process.env.EMAIL_AUTH_HOST,
-        port: parseInt(process.env.EMAIL_AUTH_PORT || '25'),
-        ...this.getSmtpAuthOptions(),
-      }),
+      transport: smtpTransport,
       juice: true,
       juiceResources: {
         webResources: {
