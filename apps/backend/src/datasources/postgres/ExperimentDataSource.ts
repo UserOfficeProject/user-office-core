@@ -252,6 +252,25 @@ export default class PostgresExperimentDataSource
     return createExperimentSafetyObject(result);
   }
 
+  async addExperimentSafetyReviewQuestionaryToExperimentSafety(
+    experimentSafetyPk: number,
+    questionaryId: number
+  ): Promise<ExperimentSafety> {
+    const result = await database('experiment_safety')
+      .update({
+        safety_review_questionary_id: questionaryId,
+      })
+      .where('experiment_safety_pk', experimentSafetyPk)
+      .returning('*');
+
+    if (!result) {
+      throw new Error('Could not update experiment safety');
+    }
+    console.log({ result });
+
+    return createExperimentSafetyObject(result[0]);
+  }
+
   async getExperimentSafetyByExperimentPk(
     experimentPk: number
   ): Promise<ExperimentSafety | null> {

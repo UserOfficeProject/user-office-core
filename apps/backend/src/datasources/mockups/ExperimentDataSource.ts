@@ -144,6 +144,14 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   ): Promise<Experiment[]> {
     throw new Error('Method not implemented.');
   }
+
+  addExperimentSafetyReviewQuestionaryToExperimentSafety(
+    experimentSafetyPk: number,
+    questionaryId: number
+  ): Promise<ExperimentSafety> {
+    throw new Error('Method not implemented.');
+  }
+
   getExperiment(experimentPk: number): Promise<Experiment | null> {
     return new Promise((resolve) => {
       const experiment = this.experiments.find(

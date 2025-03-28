@@ -12,6 +12,8 @@ import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { ExperimentHasSample, ExperimentStatus } from '../models/Experiment';
 import { rejection, Rejection } from '../models/Rejection';
+import { Roles } from '../models/Role';
+import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
 import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
@@ -136,6 +138,46 @@ export default class ExperimentMutations {
     }
 
     return this.dataSource.submitExperimentSafety(args);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async startExperimentSafetyReview(
+    user: UserWithRole | null,
+    args: SubmitExperimentSafetyArgs
+  ) {
+    if (!user) {
+      return rejection('User not found');
+    }
+
+    const { experimentSafetyPk } = args;
+
+    const experimentSafety =
+      await this.dataSource.getExperimentSafety(experimentSafetyPk);
+
+    if (!experimentSafety) {
+      return rejection('No experiment safety found');
+    }
+
+    // Create questionary for the active template for Experiment Safety Review
+    const activeExperimentSafetyReviewTemplateId =
+      await this.templateDataSource.getActiveTemplateId(
+        TemplateGroupId.EXP_SAFETY_REVIEW
+      );
+
+    if (!activeExperimentSafetyReviewTemplateId) {
+      return rejection('No active experiment safety review template found');
+    }
+
+    const experimentSafetyReviewQuestionary =
+      await this.questionaryDataSource.create(
+        user.id,
+        activeExperimentSafetyReviewTemplateId
+      );
+
+    return this.dataSource.addExperimentSafetyReviewQuestionaryToExperimentSafety(
+      experimentSafetyPk,
+      experimentSafetyReviewQuestionary.questionaryId
+    );
   }
 
   @Authorized()

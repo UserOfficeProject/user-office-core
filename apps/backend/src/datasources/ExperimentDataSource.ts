@@ -36,6 +36,10 @@ export interface ExperimentDataSource {
   getExperimentSafety(
     experimentSafetyPk: number
   ): Promise<ExperimentSafety | null>;
+  addExperimentSafetyReviewQuestionaryToExperimentSafety(
+    experimentSafetyPk: number,
+    questionaryId: number
+  ): Promise<ExperimentSafety>;
   createExperimentSafety(
     experimentPk: number,
     questionaryId: number,

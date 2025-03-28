@@ -101,12 +101,12 @@ const proposalEsiReducer = (
   return draftState;
 };
 
-export interface ExperimentSafetyContainerProps {
+export interface ExperimentSafetyReviewContainerProps {
   experimentSafety: ExperimentSafetyWithQuestionary;
   previewMode?: boolean;
 }
-export default function ExperimentSafetyContainer(
-  props: ExperimentSafetyContainerProps
+export default function ExperimentSafetyReviewContainer(
+  props: ExperimentSafetyReviewContainerProps
 ) {
   const [initialState] = useState(
     new ExperimentSafetySubmissionState(props.experimentSafety)
@@ -125,6 +125,7 @@ export default function ExperimentSafetyContainer(
         title={'Input for Experiment Safety Form'}
         previewMode={props.previewMode}
       />
+      Awesome
     </QuestionaryContext.Provider>
   );
 }

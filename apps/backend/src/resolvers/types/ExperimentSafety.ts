@@ -104,6 +104,23 @@ export class ExperimentSafetyResolver {
     return questionary;
   }
 
+  @FieldResolver(() => Questionary, { nullable: true })
+  async safetyReviewQuestionary(
+    @Root() experimentSafety: ExperimentSafety,
+    @Ctx() context: ResolverContext
+  ): Promise<Questionary | null> {
+    if (experimentSafety.safetyReviewQuestionaryId === null) {
+      return null;
+    }
+
+    const questionary = await context.queries.questionary.getQuestionary(
+      context.user,
+      experimentSafety.safetyReviewQuestionaryId
+    );
+
+    return questionary;
+  }
+
   @FieldResolver(() => [ExperimentHasSample])
   async samples(
     @Root() experimentSafety: ExperimentSafety,
