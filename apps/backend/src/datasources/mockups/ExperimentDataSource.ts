@@ -142,7 +142,12 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     userId: User['id'],
     args: UserExperimentsFilter
   ): Promise<Experiment[]> {
-    throw new Error('Method not implemented.');
+    // Sort experiments by startsAt in ascending order
+    const sortedExperiments = this.experiments
+      .slice()
+      .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+
+    return Promise.resolve(sortedExperiments);
   }
   getExperiment(experimentPk: number): Promise<Experiment | null> {
     return new Promise((resolve) => {

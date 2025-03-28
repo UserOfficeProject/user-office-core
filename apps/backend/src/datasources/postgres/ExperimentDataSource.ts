@@ -218,8 +218,12 @@ export default class PostgresExperimentDataSource
             }
           }),
       ])
+      .orderBy('starts_at', 'asc')
       .then((records: ExperimentRecord[]) => {
-        return records.map(createExperimentObject);
+        const experiments = records.map(createExperimentObject);
+
+        // Sort experiments by starts_at (mapped to startsAt) ascending
+        return experiments;
       });
   }
 
