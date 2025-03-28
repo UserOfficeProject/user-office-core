@@ -15,7 +15,9 @@ import { SampleContextType } from '../SampleDeclaration/SampleDeclarationContain
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
 
-function QuestionaryComponentExperimentSafetyBasis(props: BasicComponentProps) {
+function QuestionaryComponentExperimentSafetyReviewBasis(
+  props: BasicComponentProps
+) {
   const {
     answer: {
       question: { id },
@@ -57,7 +59,7 @@ function QuestionaryComponentExperimentSafetyBasis(props: BasicComponentProps) {
   );
 }
 
-const experimentSafetyBasisPreSubmit =
+const experimentSafetyReviewBasisPreSubmit =
   () =>
   async ({ api, dispatch, state }: SubmitActionDependencyContainer) => {
     const sample = (state as SampleSubmissionState).sample;
@@ -97,6 +99,6 @@ const experimentSafetyBasisPreSubmit =
   };
 
 export {
-  QuestionaryComponentExperimentSafetyBasis,
-  experimentSafetyBasisPreSubmit,
+  QuestionaryComponentExperimentSafetyReviewBasis,
+  experimentSafetyReviewBasisPreSubmit,
 };

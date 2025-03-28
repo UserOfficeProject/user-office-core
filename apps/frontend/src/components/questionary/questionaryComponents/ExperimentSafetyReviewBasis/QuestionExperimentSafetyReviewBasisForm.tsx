@@ -9,7 +9,9 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 // TODO: this needs to be tested
-export const QuestionExperimentSafetyBasisForm = (props: QuestionFormProps) => {
+export const QuestionExperimentSafetyReviewBasisForm = (
+  props: QuestionFormProps
+) => {
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 

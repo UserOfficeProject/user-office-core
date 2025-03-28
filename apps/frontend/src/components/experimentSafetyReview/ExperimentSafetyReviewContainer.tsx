@@ -115,6 +115,8 @@ export default function ExperimentSafetyReviewContainer(
   const [initialState] = useState(
     new ExperimentSafetyReviewSubmissionState(props.experimentSafety)
   );
+
+  return <>Awesome</>;
   const eventHandlers = useEventHandlers(TemplateGroupId.EXP_SAFETY_REVIEW);
 
   const { state, dispatch } = QuestionarySubmissionModel(

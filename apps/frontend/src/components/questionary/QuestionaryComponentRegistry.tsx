@@ -20,7 +20,7 @@ import { booleanDefinition } from './questionaryComponents/Boolean/BooleanDefini
 import { dateDefinition } from './questionaryComponents/DatePicker/DatePickerDefinition';
 import { dynamicMultipleChoiceDefinition } from './questionaryComponents/DynamicMultipleChoice/DynamicMultipleChoiceDefinition';
 import { embellishmentDefinition } from './questionaryComponents/Embellishment/EmbellishmentDefinition';
-import { experimentSafetyBasisDefinition } from './questionaryComponents/ExperimentSafetyBasis/experimentSafetyBasisDefinition';
+import { experimentSafetyReviewBasisDefinition } from './questionaryComponents/ExperimentSafetyReviewBasis/experimentSafetyReviewBasisDefinition';
 import { fapReviewBasisDefinition } from './questionaryComponents/FapReviewBasis/FapReviewBasisDefinition';
 import { feedbackBasisDefinition } from './questionaryComponents/FeedbackBasis/FeedbackBasisDefinition';
 import { fileUploadDefinition } from './questionaryComponents/FileUpload/FileUploadDefinition';
@@ -183,7 +183,7 @@ const registry = [
   instrumentPickerDefinition,
   techniquePickerDefinition,
   technicalReviewBasisDefinition,
-  experimentSafetyBasisDefinition,
+  experimentSafetyReviewBasisDefinition,
 ];
 
 Object.freeze(registry);
@@ -197,7 +197,7 @@ export function getQuestionaryComponentDefinition(id: DataType) {
   const definition = componentMap.get(id);
 
   if (!definition) {
-    throw new Error(`Definition for ${id} was not found`);
+    throw new Error(`Definitions for ${id} was not found`);
   }
 
   return definition;
