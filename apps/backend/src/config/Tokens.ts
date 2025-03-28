@@ -54,4 +54,5 @@ export const Tokens = {
   WorkflowDataSource: Symbol('WorkflowDataSource'),
   StatusDataSource: Symbol('StatusDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
+  FacilityDataSource: Symbol('FacilityDataSource'),
 };

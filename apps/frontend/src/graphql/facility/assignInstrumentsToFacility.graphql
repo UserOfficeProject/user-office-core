@@ -1,0 +1,9 @@
+mutation assignInstrumentsToFacility(
+  $instrumentIds: [Int!]!
+  $facilityId: Int!
+) {
+  assignInstrumentsToFacility(
+    instrumentIds: $instrumentIds
+    facilityId: $facilityId
+  )
+}
