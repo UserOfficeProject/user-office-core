@@ -13,6 +13,8 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { VisitDataSource } from '../datasources/VisitDataSource';
+import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
@@ -21,6 +23,8 @@ import { Country } from '../models/Country';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { ScheduledEventCore } from '../models/ScheduledEventCore';
+import { Visit } from '../models/Visit';
+import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 export const EXCHANGE_NAME =
@@ -406,6 +410,10 @@ export async function createListenToRabbitMQHandler() {
     Tokens.ProposalDataSource
   );
 
+  const visitDataSource = container.resolve<VisitDataSource>(
+    Tokens.VisitDataSource
+  );
+
   const handleWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -417,6 +425,33 @@ export async function createListenToRabbitMQHandler() {
     await markProposalsEventAsDoneAndCallWorkflowEngine(eventType, [
       proposalPk,
     ]);
+  };
+
+  const cancelVisit = async (visit: Visit) => {
+    const visitRegistrations = await visitDataSource.getRegistrations({
+      visitId: visit.id,
+    });
+
+    const eventBus = resolveApplicationEventBus();
+
+    for (const registration of visitRegistrations) {
+      const oldStatus = registration.status;
+      await visitDataSource.updateRegistration({
+        visitId: registration.visitId,
+        userId: registration.userId,
+        status: VisitRegistrationStatus.CANCELLED_BY_FACILITY,
+      });
+
+      if (oldStatus === VisitRegistrationStatus.APPROVED) {
+        await eventBus.publish({
+          type: Event.VISIT_REGISTRATION_CANCELLED,
+          visitregistration: registration,
+          key: 'visitregistration',
+          loggedInUserId: null,
+          isRejection: false,
+        });
+      }
+    }
   };
 
   rabbitMQ.listenOn(EVENT_SCHEDULING_QUEUE_NAME, async (type, message) => {
@@ -465,19 +500,31 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-          const scheduledEventsToRemove = (
-            message.scheduledevents as ScheduledEventCore[]
-          ).map((scheduledEvent) => ({
-            id: scheduledEvent.id,
-            bookingType: scheduledEvent.bookingType,
-            startsAt: scheduledEvent.startsAt,
-            endsAt: scheduledEvent.endsAt,
-            proposalBookingId: scheduledEvent.proposalBookingId,
-            proposalPk: scheduledEvent.proposalPk,
-            status: scheduledEvent.status,
-            localContactId: scheduledEvent.localContactId,
-            instrumentId: scheduledEvent.instrumentId,
-          }));
+          const scheduledEvents =
+            message.scheduledevents as ScheduledEventCore[];
+
+          for (const scheduledEvent of scheduledEvents) {
+            const visit = await visitDataSource.getVisitByScheduledEventId(
+              scheduledEvent.id
+            );
+            if (visit) {
+              await cancelVisit(visit);
+            }
+          }
+
+          const scheduledEventsToRemove = scheduledEvents.map(
+            (scheduledEvent) => ({
+              id: scheduledEvent.id,
+              bookingType: scheduledEvent.bookingType,
+              startsAt: scheduledEvent.startsAt,
+              endsAt: scheduledEvent.endsAt,
+              proposalBookingId: scheduledEvent.proposalBookingId,
+              proposalPk: scheduledEvent.proposalPk,
+              status: scheduledEvent.status,
+              localContactId: scheduledEvent.localContactId,
+              instrumentId: scheduledEvent.instrumentId,
+            })
+          );
 
           await proposalDataSource.removeProposalBookingScheduledEvents(
             scheduledEventsToRemove
