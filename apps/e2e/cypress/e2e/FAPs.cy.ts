@@ -1726,6 +1726,8 @@ context('Fap reviews tests', () => {
 
       cy.closeModal();
 
+      cy.contains(proposal1.title).closest('tr').contains('Submitted');
+
       cy.get('[data-cy="submit-proposal-reviews"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
 
