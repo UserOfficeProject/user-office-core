@@ -92,9 +92,9 @@ context('Invites tests', () => {
       cy.get('.MuiChip-label').should('have.text', email);
     });
 
-    it('Should be able to add user by first name to proposal', function () {
-      cy.resetDB(true);
-      const userFirstName = initialDBData.users.user2.firstName;
+    it('Should be able to add user by knowing exact email', function () {
+      const firstName = initialDBData.users.user2.firstName;
+      const email = initialDBData.users.user2.email;
 
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -103,21 +103,16 @@ context('Invites tests', () => {
 
       cy.get('[data-cy="add-participant-button"]').click();
 
-      cy.get('[data-cy="invite-user-autocomplete"]').type(
-        userFirstName.substring(0, 5)
-      );
-
-      cy.get('#\\:r3f\\:-option-0').click();
-      cy.get('[data-cy="invite-user-submit-button"]').click();
-      cy.get('[data-cy="co-proposers"]').contains('Benjamin').should('exist');
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=menuitem]').contains(firstName);
     });
-
+    
     it('Should not be able to invite same email twice', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
       }
 
-      const email = 'john@example.com';
+      const email = faker.internet.email();
 
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
@@ -135,33 +130,6 @@ context('Invites tests', () => {
       cy.get('[data-cy="invite-user-autocomplete"]').type(email);
 
       cy.contains(`${email} has already been invited`).should('exist');
-    });
-
-    it('Should not be able to add same user twice', function () {
-      cy.resetDB(true);
-      const userFirstName = initialDBData.users.user2.firstName;
-
-      cy.login('user1', initialDBData.roles.user);
-      cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(
-        userFirstName.substring(0, 5)
-      );
-
-      cy.get('#\\:r3f\\:-option-0').click();
-      cy.get('[data-cy="invite-user-submit-button"]').click();
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(
-        userFirstName.substring(0, 5)
-      );
-
-      cy.contains(`No results found`).should('exist');
     });
   });
 

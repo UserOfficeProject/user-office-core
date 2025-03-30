@@ -41,7 +41,7 @@ function NoOptionsText({
   }
 
   if (isValidEmail(query)) {
-    if (excludeEmails.includes(query)) {
+    if (excludeEmails.includes(query.toLowerCase())) {
       return <>{query} has already been invited</>;
     }
 
