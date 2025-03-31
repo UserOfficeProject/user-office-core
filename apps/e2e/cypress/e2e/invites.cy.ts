@@ -106,7 +106,7 @@ context('Invites tests', () => {
       cy.get('[data-cy="invite-user-autocomplete"]').type(email);
       cy.get('[role=menuitem]').contains(firstName);
     });
-    
+
     it('Should not be able to invite same email twice', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
