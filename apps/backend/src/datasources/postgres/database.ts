@@ -27,9 +27,11 @@ db.on('query-error', function (error: any, obj: any) {
   });
 });
 
-db.on('query', function ({ sql }: any) {
-  // TODO: add timestamp to logger (maybe only ConsoleLogger needs it)
-  logger.logDebug(`${new Date().toISOString()} - QUERY`, sql);
-});
+if (process.env.DATABASE_LOG_QUERIES === '1') {
+  db.on('query', function ({ sql }: any) {
+    // TODO: add timestamp to logger (maybe only ConsoleLogger needs it)
+    logger.logDebug(`${new Date().toISOString()} - QUERY`, sql);
+  });
+}
 
 export default db;

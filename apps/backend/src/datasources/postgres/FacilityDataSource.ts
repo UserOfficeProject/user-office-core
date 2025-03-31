@@ -161,6 +161,15 @@ class PostgresFacilityDataSource implements FacilityDataSource {
       )
       .select('ptv.*');
   }
+
+  async getUsersFacilities(userId: number): Promise<Facility[]> {
+    const facilities = await database<FacilityRecord>('facility_user as fu')
+      .join('facility as f', 'fu.facility_id', '=', 'f.facility_id')
+      .where('fu.user_id', userId)
+      .select('f.*');
+
+    return facilities.map(createFacilityObject);
+  }
 }
 
 export default PostgresFacilityDataSource;

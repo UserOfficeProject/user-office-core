@@ -96,7 +96,7 @@ export function useProposalsCoreData(
           });
       } else {
         api()
-          .getProposalsByUserFacility({
+          .getProposalsCore({
             filter: {
               callId,
               instrumentFilter,
@@ -117,9 +117,9 @@ export function useProposalsCoreData(
             if (componentController?.unmounted) {
               return;
             }
-            if (data.proposalsByUserFacility?.proposals) {
+            if (data.proposalsView) {
               setProposalsData(
-                data.proposalsByUserFacility.proposals.map((proposal) => {
+                data.proposalsView.proposalViews.map((proposal) => {
                   return {
                     ...proposal,
                     status: proposal.submitted ? 'Submitted' : 'Open',
@@ -137,7 +137,7 @@ export function useProposalsCoreData(
                   } as ProposalViewData;
                 })
               );
-              setTotalCount(data.proposalsByUserFacility.totalCount);
+              setTotalCount(data.proposalsView.totalCount);
             }
             setLoading(false);
           });

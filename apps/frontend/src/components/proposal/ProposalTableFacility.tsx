@@ -11,7 +11,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import { proposalTechnicalReviewValidationSchema } from '@user-office-software/duo-validation';
 import { TFunction } from 'i18next';
 import React, { useContext, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,9 +21,6 @@ import ProposalReviewContent, {
   PROPOSAL_MODAL_TAB_NAMES,
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
-import ReviewerFilterComponent, {
-  reviewFilter,
-} from 'components/review/ReviewerFilter';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -33,22 +29,16 @@ import {
   Proposal,
   ProposalsFilter,
   ReviewerFilter,
-  SubmitTechnicalReviewInput,
-  SettingsId,
-  UserRole,
   ProposalViewTechnicalReviewAssignee,
   WorkflowType,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
-import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
-import {
-  ProposalViewData,
-  useProposalsCoreData,
-} from 'hooks/proposal/useProposalsCoreData';
+import { useFacilityProposalsDataCore } from 'hooks/proposal/useFacilityProposalsDataCore';
+import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
 import {
   addColumns,
@@ -57,7 +47,6 @@ import {
   setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -308,7 +297,7 @@ const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
   } = useStatusesData(WorkflowType.PROPOSAL);
 
   const { loading, proposalsData, totalCount, setProposalsData } =
-    useProposalsCoreData(
+    useFacilityProposalsDataCore(
       {
         proposalStatusId: proposalFilter.proposalStatusId,
         excludeProposalStatusIds: proposalFilter.excludeProposalStatusIds,
@@ -410,30 +399,18 @@ const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
   const RowActionButtons = (rowData: ProposalViewData) => {
     const iconButtonStyle = { padding: '7px' };
 
-    const showView = rowData.technicalReviews?.every((tr) => tr.submitted);
-
     return (
       <>
-        <Tooltip
-          title={
-            showView
-              ? 'View proposal and technical review'
-              : 'Edit technical review'
-          }
-        >
+        <Tooltip title={'View proposal and technical review'}>
           <IconButton
             onClick={() => {
               setSearchParams((searchParam) => {
                 searchParam.set('reviewModal', rowData.primaryKey.toString());
                 searchParam.set(
                   'modalTab',
-                  showView
-                    ? instrumentScientistProposalReviewTabs
-                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
-                        .toString()
-                    : instrumentScientistProposalReviewTabs
-                        .indexOf(PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW)
-                        .toString()
+                  instrumentScientistProposalReviewTabs
+                    .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
+                    .toString()
                 );
 
                 return searchParam;
@@ -441,11 +418,7 @@ const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
             }}
             style={iconButtonStyle}
           >
-            {showView ? (
-              <Visibility data-cy="view-proposal-and-technical-review" />
-            ) : (
-              <Edit data-cy="edit-technical-review" />
-            )}
+            {<Visibility data-cy="view-proposal-and-technical-review" />}
           </IconButton>
         </Tooltip>
       </>
@@ -559,6 +532,7 @@ const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
   } else {
     removeColumns(columns, fapReviewColumns(t));
   }
+
   columns = setSortDirectionOnSortField(columns, sortField, sortDirection);
 
   const GetAppIconComponent = (): JSX.Element => (
@@ -732,7 +706,7 @@ const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
 
       <MaterialTable
         icons={tableIcons}
-        title={'Proposals'}
+        title={'Proposals Facility'}
         components={{
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}

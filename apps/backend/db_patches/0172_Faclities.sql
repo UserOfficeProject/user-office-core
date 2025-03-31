@@ -24,6 +24,8 @@ BEGIN
           PRIMARY KEY (user_id, facility_id)
       );
 
+      INSERT INTO roles (short_code, title) VALUES ('facility_member', 'Facility Member');
+
     END;
   END IF;
 END;

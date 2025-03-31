@@ -16,6 +16,7 @@ import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
 import { User as UserOrigin } from '../../models/User';
+import { Facility } from './Facility';
 import { Fap } from './Fap';
 import { Instrument } from './Instrument';
 import { Proposal } from './Proposal';
@@ -183,6 +184,11 @@ export class UserResolver {
   @FieldResolver(() => [Instrument])
   async instruments(@Root() user: User, @Ctx() context: ResolverContext) {
     return context.queries.instrument.dataSource.getUserInstruments(user.id);
+  }
+
+  @FieldResolver(() => [Facility])
+  async facilities(@Root() user: User, @Ctx() context: ResolverContext) {
+    return context.queries.facility.dataSource.getUsersFacilities(user.id);
   }
 }
 

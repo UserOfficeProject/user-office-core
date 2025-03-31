@@ -23,4 +23,5 @@ export interface FacilityDataSource {
   ): Promise<boolean>;
   getFacilityInstruments(facilityId: number): Promise<Instrument[]>;
   getFacilityUsers(facilityId: number): Promise<BasicUserDetails[]>;
+  getUsersFacilities(userId: number): Promise<Facility[]>;
 }

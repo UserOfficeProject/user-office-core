@@ -43,7 +43,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     case UserRole.INTERNAL_REVIEWER:
       roleBasedOverView = (
         <Paper>
-          <ProposalTableInstrumentScientist />
+          <ProposalTableFacility />
         </Paper>
       );
       break;
