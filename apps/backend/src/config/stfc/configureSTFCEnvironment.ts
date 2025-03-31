@@ -141,6 +141,8 @@ async function setSTFCRoleNames() {
 
   await db.updateRole(Roles.INSTRUMENT_SCIENTIST, {
     title: 'Experiment Scientist',
+    description:
+      'Edit and view your technical feasibility reviews and view proposals for your experimental area',
   });
 
   await db.updateRole(Roles.FAP_CHAIR, {
