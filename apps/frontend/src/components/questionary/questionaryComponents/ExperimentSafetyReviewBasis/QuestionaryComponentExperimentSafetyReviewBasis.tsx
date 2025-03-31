@@ -1,8 +1,5 @@
-import { Field } from 'formik';
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { useContext } from 'react';
 
-import TextField from 'components/common/FormikUITextField';
-import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
   createMissingContextErrorMessage,
@@ -13,50 +10,18 @@ import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissio
 
 import { SampleContextType } from '../SampleDeclaration/SampleDeclarationContainer';
 
-const TextFieldNoSubmit = withPreventSubmit(TextField);
-
 function QuestionaryComponentExperimentSafetyReviewBasis(
   props: BasicComponentProps
 ) {
-  const {
-    answer: {
-      question: { id },
-    },
-  } = props;
-
   const { dispatch, state } = useContext(
     QuestionaryContext
   ) as SampleContextType;
-
-  const [title, setTitle] = useState(state?.sample.title || '');
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  return (
-    <Field
-      name={id}
-      id={`${id}-field`}
-      label={props.answer.question.question}
-      inputProps={{
-        onChange: (event: ChangeEvent<HTMLInputElement>) => {
-          setTitle(event.currentTarget.value);
-        },
-        onBlur: () => {
-          dispatch({
-            type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-            itemWithQuestionary: { title: title },
-          });
-        },
-      }}
-      required
-      fullWidth
-      component={TextFieldNoSubmit}
-      data-cy="title-input"
-      margin="dense"
-    />
-  );
+  return <>THE SUBMITTED SAMPLE INFORMATION SHOULD BE DISPLAYED HERE</>;
 }
 
 const experimentSafetyReviewBasisPreSubmit =

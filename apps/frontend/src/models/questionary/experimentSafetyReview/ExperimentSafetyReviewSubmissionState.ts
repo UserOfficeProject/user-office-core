@@ -2,43 +2,33 @@ import { immerable } from 'immer';
 
 import { Questionary } from 'generated/sdk';
 
-import { ExperimentSafetyWithQuestionary } from './ExperimentSafetyWithQuestionary';
+import { ExperimentSafetyWithReviewQuestionary } from './ExperimentSafetyReviewWithQuestionary';
 import { TemplateGroupId } from '../../../generated/sdk';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
-export type MakeFieldRequired<T, K extends keyof T> = Omit<T, K> & {
-  [P in K]: NonNullable<T[P]>;
-};
-
 export class ExperimentSafetyReviewSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(
-    public experimentSafety: MakeFieldRequired<
-      ExperimentSafetyWithQuestionary,
-      'safetyReviewQuestionary'
-    >
-  ) {
-    super(TemplateGroupId.EXP_SAFETY_REVIEW, experimentSafety);
+  constructor(public experimentSafety: ExperimentSafetyWithReviewQuestionary) {
+    super(TemplateGroupId.EXP_SAFETY_REVIEW, {
+      questionary: experimentSafety.safetyReviewQuestionary,
+    });
     this.stepIndex = this.getInitialStepIndex();
   }
 
   getItemId(): number {
-    return this.experimentSafety.experimentPk;
+    return this.experimentSafety.experimentSafetyPk;
   }
 
   get itemWithQuestionary() {
-    return this.experimentSafety;
+    return {
+      questionary: this.experimentSafety.safetyReviewQuestionary,
+    };
   }
 
   set itemWithQuestionary(item: { questionary: Questionary }) {
-    this.experimentSafety = { ...this.experimentSafety, ...item };
-  }
-
-  get questionary() {
-    return this.experimentSafety.safetyReviewQuestionary;
-  }
-
-  set questionary(safetyReviewQuestionary) {
-    this.experimentSafety.safetyReviewQuestionary = safetyReviewQuestionary;
+    this.experimentSafety = {
+      ...this.experimentSafety,
+      safetyReviewQuestionary: item.questionary,
+    };
   }
 }

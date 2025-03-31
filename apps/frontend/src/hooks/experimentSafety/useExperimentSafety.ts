@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useDataApi } from 'hooks/common/useDataApi';
-import { ExperimentSafetyWithReviewQuestionary } from 'models/questionary/experimentSafety/ExperimentSafetyWithQuestionary';
+import { ExperimentSafetyWithReviewQuestionary } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewWithQuestionary';
 
 export function useExperimentSafety(experimentSafetyPk: number) {
   const [experimentSafety, setExperimentSafety] =
