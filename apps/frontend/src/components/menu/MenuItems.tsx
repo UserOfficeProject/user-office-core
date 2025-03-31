@@ -317,14 +317,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItemButton>
       )}
-      {isSchedulerEnabled && (
-        <ListItemButton component={NavLink} to="/UpcomingExperimentTimes">
-          <ListItemIcon>
-            <EventIcon />
-          </ListItemIcon>
-          <ListItemText primary="Upcoming experiments" />
-        </ListItemButton>
-      )}
       {isExperimentSafetyReviewEnabled && (
         <ExperimentSafetyReviewMenuListItem />
       )}
