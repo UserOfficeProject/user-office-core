@@ -93,7 +93,7 @@ context('Invites tests', () => {
     });
 
     it('Should be able to add user by knowing exact email', function () {
-      const firstName = initialDBData.users.user2.firstName;
+      const lastName = initialDBData.users.user2.lastName;
       const email = initialDBData.users.user2.email;
 
       cy.login('user1', initialDBData.roles.user);
@@ -104,7 +104,7 @@ context('Invites tests', () => {
       cy.get('[data-cy="add-participant-button"]').click();
 
       cy.get('[data-cy="invite-user-autocomplete"]').type(email);
-      cy.get('[role=menuitem]').contains(firstName);
+      cy.get('[role=menuitem]').contains(lastName);
     });
 
     it('Should not be able to invite same email twice', function () {
