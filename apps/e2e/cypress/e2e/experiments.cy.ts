@@ -11,7 +11,12 @@ context('Experiments tests', () => {
     cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled().then(() => {
       // NOTE: We can check features after they are stored to the local storage
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      if (
+        !featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER) ||
+        !featureFlags
+          .getEnabledFeatures()
+          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
+      ) {
         this.skip();
       }
     });
@@ -26,11 +31,11 @@ context('Experiments tests', () => {
       ],
       managementDecisionSubmitted: true,
     });
-    cy.createEsi({
-      scheduledEventId: initialDBData.scheduledEvents.upcoming.id,
+    cy.createOrGetExperimentSafety({
+      experimentPk: initialDBData.experiments.upcoming.experimentPk,
     });
     cy.createVisit({
-      scheduledEventId: initialDBData.scheduledEvents.upcoming.id,
+      experimentPk: initialDBData.experiments.upcoming.experimentPk,
       team: [
         initialDBData.users.user1.id,
         initialDBData.users.user2.id,
@@ -77,14 +82,14 @@ context('Experiments tests', () => {
       cy.contains('1-4 of 4');
     });
 
-    it('Can view ESI', () => {
+    it('Can view Experiment Safety', () => {
       cy.login('officer');
       cy.visit('/');
       cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
       cy.get('[value=NONE]').click();
 
       cy.get('[data-cy=officer-scheduled-events-table]')
-        .contains('View ESI')
+        .contains('View Experiment Safety')
         .click();
       cy.get('[role=dialog]').contains(initialDBData.proposal.title);
     });
