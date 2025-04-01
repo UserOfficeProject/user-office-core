@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 
+import SampleDetails from 'components/experimentSafetyReview/SampleDetails';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
   createMissingContextErrorMessage,
@@ -8,20 +9,20 @@ import {
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
 
-import { SampleContextType } from '../SampleDeclaration/SampleDeclarationContainer';
-
 function QuestionaryComponentExperimentSafetyReviewBasis(
   props: BasicComponentProps
 ) {
-  const { dispatch, state } = useContext(
-    QuestionaryContext
-  ) as SampleContextType;
+  const { dispatch, state } = useContext(QuestionaryContext) as any;
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
+  console.log('*********');
+  console.log(state.experimentSafety.samples[0]);
 
-  return <>THE SUBMITTED SAMPLE INFORMATION SHOULD BE DISPLAYED HERE</>;
+  return (
+    <SampleDetails sampleId={state.experimentSafety.samples[0].sampleId} />
+  );
 }
 
 const experimentSafetyReviewBasisPreSubmit =

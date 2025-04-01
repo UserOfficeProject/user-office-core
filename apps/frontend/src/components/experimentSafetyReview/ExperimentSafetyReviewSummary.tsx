@@ -9,7 +9,7 @@ type ExperimentSafetyReviewSummaryProps = {
 function ExperimentSafetyReviewSummary({
   confirm,
 }: ExperimentSafetyReviewSummaryProps) {
-  return <>WIP</>;
+  return <>WIPsss</>;
 }
 
 export default withConfirm(ExperimentSafetyReviewSummary);

@@ -126,7 +126,6 @@ function Questionary({
         ref={titleRef}
         data-cy="questionary-title"
       >
-        {state.stepIndex}
         {title}
       </Typography>
       <Typography

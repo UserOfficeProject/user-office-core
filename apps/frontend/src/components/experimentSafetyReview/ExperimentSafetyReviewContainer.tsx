@@ -116,7 +116,6 @@ export default function ExperimentSafetyReviewContainer(
     new ExperimentSafetyReviewSubmissionState(props.experimentSafety)
   );
 
-  return <>Awesome</>;
   const eventHandlers = useEventHandlers(TemplateGroupId.EXP_SAFETY_REVIEW);
 
   const { state, dispatch } = QuestionarySubmissionModel(
@@ -131,7 +130,6 @@ export default function ExperimentSafetyReviewContainer(
         title={'Input for Experiment Safety Form'}
         previewMode={props.previewMode}
       />
-      Awesome
     </QuestionaryContext.Provider>
   );
 }
