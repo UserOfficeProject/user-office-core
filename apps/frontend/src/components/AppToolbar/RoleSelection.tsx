@@ -98,8 +98,6 @@ const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {
     </>
   );
 
-  // const RoleInfo = ()
-
   const rolesWithRoleAction = roles.map((role) => ({
     ...role,
     roleAction: RoleAction(role),
