@@ -170,6 +170,32 @@ class PostgresFacilityDataSource implements FacilityDataSource {
 
     return facilities.map(createFacilityObject);
   }
+
+  async isProposalOnUsersFacility(
+    user: number,
+    proposal: number
+  ): Promise<boolean> {
+    const result = await database('facility_user as fu')
+      .join(
+        'facility_instrument as fi',
+        'fu.facility_id',
+        '=',
+        'fi.facility_id'
+      )
+      .join(
+        'instrument_has_proposals as ihp',
+        'ihp.instrument_id',
+        '=',
+        'fi.instrument_id'
+      )
+      .where({
+        'fu.user_id': user,
+        'ihp.proposal_pk': proposal,
+      })
+      .first();
+
+    return !!result;
+  }
 }
 
 export default PostgresFacilityDataSource;

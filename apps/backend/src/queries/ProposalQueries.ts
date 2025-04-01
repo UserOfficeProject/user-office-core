@@ -75,7 +75,11 @@ export default class ProposalQueries {
     return this.proposalAuth.hasReadRights(agent, proposal);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ])
   async getAll(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,

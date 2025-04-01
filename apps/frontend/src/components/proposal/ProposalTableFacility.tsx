@@ -241,7 +241,6 @@ const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
   >([]);
   const { user } = useContext(UserContext);
   const featureContext = useContext(FeatureContext);
-  const { settingsMap } = useContext(SettingsContext);
   const [actionsMenuAnchorElement, setActionsMenuAnchorElement] =
     useState<null | HTMLElement>(null);
   const [openDownloadAttachment, setOpenDownloadAttachment] = useState(false);

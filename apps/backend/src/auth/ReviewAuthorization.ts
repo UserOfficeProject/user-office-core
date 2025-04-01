@@ -7,6 +7,7 @@ import { UserWithRole } from '../models/User';
 import { Review } from '../resolvers/types/Review';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
+import { Role, Roles } from '../models/Role';
 
 @injectable()
 export class ReviewAuthorization {
@@ -44,14 +45,14 @@ export class ReviewAuthorization {
     agent: UserWithRole | null,
     reviewOrReviewId: Review | number
   ): Promise<boolean> {
+    const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    if (isUserOfficer) {
+      return true;
+    }
+
     const review = await this.resolveReview(reviewOrReviewId);
     if (!review) {
       return false;
-    }
-
-    const isUserOfficer = await this.userAuth.isUserOfficer(agent);
-    if (isUserOfficer) {
-      return true;
     }
 
     const isAuthor = review.userID === agent?.id;
@@ -59,10 +60,11 @@ export class ReviewAuthorization {
       return true;
     }
 
-    const isChairOrSecretaryOfFap = await this.userAuth.isChairOrSecretaryOfFap(
-      agent,
-      review.fapID
-    );
+    const isChairOrSecretaryOfFap =
+      agent &&
+      agent.currentRole &&
+      [Role.FAP_CHAIR, Roles.FAP_SECRETARY].includes(agent.currentRole.id) &&
+      (await this.userAuth.isChairOrSecretaryOfFap(agent, review.fapID));
     if (isChairOrSecretaryOfFap) {
       return true;
     }

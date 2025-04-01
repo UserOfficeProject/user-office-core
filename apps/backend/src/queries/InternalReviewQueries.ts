@@ -17,7 +17,11 @@ export default class InternalReviewQueries {
     public dataSource: InternalReviewDataSource
   ) {}
 
-  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ])
   async get(agent: UserWithRole | null, id: number) {
     const internalReview = await this.dataSource.getInternalReview(id);
 
@@ -29,6 +33,7 @@ export default class InternalReviewQueries {
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
     Roles.INTERNAL_REVIEWER,
+    Roles.FACILITY_MEMBER,
   ])
   async getAll(agent: UserWithRole | null, filter?: InternalReviewsFilter) {
     if (

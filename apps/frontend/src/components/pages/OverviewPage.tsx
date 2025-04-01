@@ -47,6 +47,13 @@ export default function OverviewPage(props: { userRole: UserRole }) {
         </Paper>
       );
       break;
+    case UserRole.FACILITY_MEMBER:
+      roleBasedOverView = (
+        <Paper>
+          <ProposalTableFacility />
+        </Paper>
+      );
+      break;
     default:
       roleBasedOverView = (
         <Paper>
