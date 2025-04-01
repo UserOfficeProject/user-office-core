@@ -46,7 +46,7 @@ fragment call on Call {
     id
     code
   }
-  proposalWorkflow {
+  workflow {
     id
     name
     description

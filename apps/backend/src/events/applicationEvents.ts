@@ -3,14 +3,15 @@ import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { InternalReview } from '../models/InternalReview';
+import { Invite } from '../models/Invite';
 import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { AnswerBasic } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
-import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
+import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
 interface GeneralEvent {
@@ -229,13 +230,28 @@ interface UserDeletedEvent extends GeneralEvent {
   user: User;
 }
 
-interface EmailInvite extends GeneralEvent {
-  type: Event.EMAIL_INVITE;
+interface EmailInviteOld extends GeneralEvent {
+  type: Event.EMAIL_INVITE_LEGACY;
   emailinviteresponse: {
     userId: number;
     inviterId: number;
     role: UserRole;
   };
+}
+
+type InviteResponse = Pick<
+  Invite,
+  'id' | 'code' | 'email' | 'createdByUserId' | 'isEmailSent'
+>;
+
+interface EmailInvite extends GeneralEvent {
+  type: Event.EMAIL_INVITE;
+  invite: InviteResponse;
+}
+
+interface EmailInvites extends GeneralEvent {
+  type: Event.EMAIL_INVITES;
+  array: InviteResponse[];
 }
 
 interface FapCreatedEvent extends GeneralEvent {
@@ -296,17 +312,10 @@ interface CallFapReviewEndedEvent extends GeneralEvent {
   type: Event.CALL_FAP_REVIEW_ENDED;
   call: Call;
 }
-
-interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED;
-  scheduledEvent: ScheduledEventCore;
+interface InviteAcceptedEvent extends GeneralEvent {
+  type: Event.INVITE_ACCEPTED;
+  invite: Invite;
 }
-
-interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED;
-  scheduledEvents: ScheduledEventCore[];
-}
-
 interface InstrumentCreatedEvent extends GeneralEvent {
   type: Event.INSTRUMENT_CREATED;
   instrument: Instrument;
@@ -371,6 +380,16 @@ interface InternalReviewDeleted extends GeneralEvent {
   internalreview: InternalReview;
 }
 
+interface VisitRegistrationApprovedEvent extends GeneralEvent {
+  type: Event.VISIT_REGISTRATION_APPROVED;
+  visitregistration: VisitRegistration;
+}
+
+interface VisitRegistrationCancelledEvent extends GeneralEvent {
+  type: Event.VISIT_REGISTRATION_CANCELLED;
+  visitregistration: VisitRegistration;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -385,7 +404,9 @@ export type ApplicationEvent =
   | ProposalClonedEvent
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
+  | EmailInviteOld
   | EmailInvite
+  | EmailInvites
   | UserUpdateEvent
   | UserRoleUpdateEvent
   | FapCreatedEvent
@@ -402,6 +423,7 @@ export type ApplicationEvent =
   | CallEndedInternalEvent
   | CallReviewEndedEvent
   | CallFapReviewEndedEvent
+  | InviteAcceptedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewSubmittedEvent
@@ -421,8 +443,6 @@ export type ApplicationEvent =
   | ProposalFapMeetingRankingOverwrittenEvent
   | ProposalFapMeetingReorderEvent
   | ProposalTopicAnsweredEvent
-  | ProposalBookingTimeSlotAddedEvent
-  | ProposalBookingTimeSlotsRemovedEvent
   | FapAllMeetingsSubmittedEvent
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent
@@ -440,4 +460,6 @@ export type ApplicationEvent =
   | ProposalAssignedToTechniquesEvent
   | InternalReviewCreated
   | InternalReviewUpdated
-  | InternalReviewDeleted;
+  | InternalReviewDeleted
+  | VisitRegistrationApprovedEvent
+  | VisitRegistrationCancelledEvent;

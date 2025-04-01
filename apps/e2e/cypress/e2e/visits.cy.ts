@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import {
+  CreateVisitMutation,
   FeatureId,
   ProposalEndStatus,
   TemplateGroupId,
@@ -17,7 +18,7 @@ context('visits tests', () => {
   const PI = initialDBData.users.user1;
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
-  const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+  const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
 
   beforeEach(function () {
     cy.resetDB(true);
@@ -49,12 +50,77 @@ context('visits tests', () => {
 
   const cyTagDefineVisit = 'define-visit-icon';
   const cyTagRegisterVisit = 'register-visit-icon';
-  const cyTagFinishTraining = 'finish-training-icon';
   const cyTagDeclareShipment = 'declare-shipment-icon';
   const visitTemplate = {
     name: faker.lorem.words(2),
     description: faker.lorem.words(3),
   };
+
+  describe('Visits registration tests', () => {
+    beforeEach(() => {
+      cy.createTemplate({
+        groupId: TemplateGroupId.VISIT_REGISTRATION,
+        name: visitTemplate.name,
+        description: visitTemplate.description,
+      }).then(({ createTemplate: newTemplate }) => {
+        cy.setActiveTemplate({
+          templateGroupId: TemplateGroupId.VISIT_REGISTRATION,
+          templateId: newTemplate.templateId,
+        });
+      });
+
+      cy.createVisit({
+        team: [visitor.id],
+        teamLeadUserId: visitor.id,
+        experimentPk: existingExperimentPk,
+      }).then(({ createVisit: visit }: CreateVisitMutation) => {
+        cy.createVisitRegistration({
+          visitId: visit.id,
+          userId: visitor.id,
+        });
+
+        cy.submitVisitRegistration({
+          visitId: visit.id,
+          userId: visitor.id,
+        });
+      });
+    });
+
+    it('User officer should be able to cancel visit registration', () => {
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+
+      cy.get(
+        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
+      ).click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
+      cy.get('[data-cy="cancel-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="visit-status"]').should(
+        'have.text',
+        'CANCELLED_BY_FACILITY'
+      );
+    });
+
+    it('User officer should be able to approve visit registration', () => {
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+
+      cy.get(
+        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
+      ).click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
+      cy.get('[data-cy="approve-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="visit-status"]').should('have.text', 'APPROVED');
+    });
+  });
 
   describe('Visits basic tests', () => {
     it('Should be able to create visits template', () => {
@@ -87,7 +153,6 @@ context('visits tests', () => {
 
       cy.testActionButton(cyTagDefineVisit, 'active');
       cy.testActionButton(cyTagRegisterVisit, 'inactive');
-      cy.testActionButton(cyTagFinishTraining, 'inactive');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -111,7 +176,6 @@ context('visits tests', () => {
       // test that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'active');
       cy.testActionButton(cyTagRegisterVisit, 'inactive');
-      cy.testActionButton(cyTagFinishTraining, 'inactive');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
 
       // create visit
@@ -148,7 +212,6 @@ context('visits tests', () => {
       // test again that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'completed');
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -156,7 +219,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
       cy.login(visitor);
       cy.visit('/');
@@ -167,15 +230,17 @@ context('visits tests', () => {
 
       cy.testActionButton(cyTagDefineVisit, 'invisible');
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
     it('Visitor should be able to register for a visit', () => {
-      const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+      const pastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
         initialDBData.getFormats().dateFormat
       );
-      const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
+      const nowDate = DateTime.fromJSDate(new Date()).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const futureDate = DateTime.fromJSDate(faker.date.future()).toFormat(
         initialDBData.getFormats().dateFormat
       );
 
@@ -188,7 +253,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
 
       cy.login(visitor);
@@ -211,14 +276,13 @@ context('visits tests', () => {
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/Invalid date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(endDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(startDate);
-
+      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(pastDate);
       cy.get('[data-cy=save-and-continue-button]').click();
       cy.contains(/end date can't be before start date/i).should('exist');
 
-      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
-      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.contains(startQuestion).parent().find('input').clear().type(nowDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(futureDate);
 
       cy.get('[data-cy=save-and-continue-button]').click();
 
@@ -235,7 +299,7 @@ context('visits tests', () => {
       cy.createVisit({
         team: [PI.id, visitor.id, coProposer.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
       cy.login(PI);
       cy.visit('/');
@@ -245,7 +309,6 @@ context('visits tests', () => {
       cy.contains(/Upcoming experiments/i).should('exist');
 
       cy.testActionButton(cyTagRegisterVisit, 'active');
-      cy.testActionButton(cyTagFinishTraining, 'active');
 
       cy.get(`[data-cy="${cyTagDefineVisit}"]`)
         .closest('button')
@@ -269,7 +332,6 @@ context('visits tests', () => {
       cy.get('body').type('{esc}');
 
       cy.testActionButton(cyTagRegisterVisit, 'invisible');
-      cy.testActionButton(cyTagFinishTraining, 'invisible');
     });
   });
 });

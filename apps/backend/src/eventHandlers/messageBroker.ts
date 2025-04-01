@@ -7,9 +7,11 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
@@ -17,13 +19,18 @@ import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
 import { AllocationTimeUnits } from '../models/Call';
 import { Country } from '../models/Country';
+import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
-import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 export const EXCHANGE_NAME =
   process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
+
+enum RABBITMQ_VISIT_EVENT_TYPE {
+  VISIT_CREATED = 'VISIT_CREATED',
+  VISIT_DELETED = 'VISIT_DELETED',
+}
 
 type Member = {
   id: string;
@@ -95,10 +102,10 @@ export const getProposalMessageData = async (proposal: Proposal) => {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+
+  const statusDataSource = container.resolve<StatusDataSource>(
+    Tokens.StatusDataSource
+  );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
@@ -107,9 +114,7 @@ export const getProposalMessageData = async (proposal: Proposal) => {
     Tokens.CallDataSource
   );
 
-  const proposalStatus = await proposalSettingsDataSource.getProposalStatus(
-    proposal.statusId
-  );
+  const proposalStatus = await statusDataSource.getStatus(proposal.statusId);
 
   const proposalUsersWithInstitution =
     await userDataSource.getProposalUsersWithInstitution(proposal.primaryKey);
@@ -199,6 +204,15 @@ export async function createPostToRabbitMQHandler() {
     Tokens.TemplateDataSource
   );
 
+  const coProposerClaimDataSource =
+    container.resolve<CoProposerClaimDataSource>(
+      Tokens.CoProposerClaimDataSource
+    );
+
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+
   return async (event: ApplicationEvent) => {
     // if the original method failed
     // there is no point of publishing any event
@@ -220,6 +234,29 @@ export async function createPostToRabbitMQHandler() {
           event.type,
           jsonMessage
         );
+        break;
+      }
+      case Event.INVITE_ACCEPTED: {
+        const invite = event.invite;
+
+        const claims = await coProposerClaimDataSource.findByInviteId(
+          invite.id
+        );
+
+        for (const claim of claims) {
+          const proposal = await proposalDataSource.get(claim.proposalPk);
+          if (!proposal) {
+            return;
+          }
+
+          const jsonMessage = await getProposalMessageData(proposal);
+          await rabbitMQ.sendMessageToExchange(
+            EXCHANGE_NAME,
+            Event.PROPOSAL_UPDATED,
+            jsonMessage
+          );
+        }
+
         break;
       }
       case Event.INSTRUMENT_CREATED:
@@ -307,6 +344,39 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
+      case Event.VISIT_REGISTRATION_APPROVED: {
+        const { visitregistration: visitRegistration } = event;
+        const user = await userDataSource.getUser(visitRegistration.userId);
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: user!.oidcSub,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED,
+          jsonMessage
+        );
+        break;
+      }
+
+      case Event.VISIT_REGISTRATION_CANCELLED: {
+        const { visitregistration: visitRegistration } = event;
+        const user = await userDataSource.getUser(visitRegistration.userId);
+        const jsonMessage = JSON.stringify({
+          startAt: visitRegistration.startsAt,
+          endAt: visitRegistration.endsAt,
+          visitorId: user!.oidcSub,
+        });
+
+        await rabbitMQ.sendMessageToExchange(
+          EXCHANGE_NAME,
+          RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          jsonMessage
+        );
+        break;
+      }
     }
   };
 }
@@ -333,8 +403,8 @@ export async function createListenToRabbitMQHandler() {
     SCHEDULER_EXCHANGE_NAME
   );
 
-  const proposalDataSource = container.resolve<ProposalDataSource>(
-    Tokens.ProposalDataSource
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
   );
 
   const handleWorkflowEngineChange = async (
@@ -362,26 +432,22 @@ export async function createListenToRabbitMQHandler() {
             }
           );
 
-          const scheduledEventToAdd = {
-            id: message.id,
-            bookingType: message.bookingType,
+          const experimentToAdd = {
             startsAt: message.startsAt,
             endsAt: message.endsAt,
-            proposalBookingId: message.proposalBookingId,
+            scheduledEventId: message.id,
             proposalPk: message.proposalPk,
             status: message.status,
-            localContactId: message.localContact,
+            localContactId: message.localContactId,
             instrumentId: message.instrumentId,
-          } as ScheduledEventCore;
+          } as Omit<
+            Experiment,
+            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+          >;
 
-          await proposalDataSource.addProposalBookingScheduledEvent(
-            scheduledEventToAdd
-          );
+          await experimentDataSource.create(experimentToAdd);
 
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventToAdd.proposalPk
-          );
+          await handleWorkflowEngineChange(type, experimentToAdd.proposalPk);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -396,28 +462,18 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-          const scheduledEventsToRemove = (
-            message.scheduledevents as ScheduledEventCore[]
-          ).map((scheduledEvent) => ({
-            id: scheduledEvent.id,
-            bookingType: scheduledEvent.bookingType,
-            startsAt: scheduledEvent.startsAt,
-            endsAt: scheduledEvent.endsAt,
-            proposalBookingId: scheduledEvent.proposalBookingId,
-            proposalPk: scheduledEvent.proposalPk,
-            status: scheduledEvent.status,
-            localContactId: scheduledEvent.localContactId,
-            instrumentId: scheduledEvent.instrumentId,
-          }));
 
-          await proposalDataSource.removeProposalBookingScheduledEvents(
-            scheduledEventsToRemove
-          );
+          const scheduledEvents = message.scheduledevents as {
+            id: number;
+            proposalPk: number;
+          }[];
+          scheduledEvents.forEach(async (scheduledEvent) => {
+            await experimentDataSource.deleteByScheduledEventId(
+              scheduledEvent.id
+            );
+          });
 
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventsToRemove[0].proposalPk
-          );
+          await handleWorkflowEngineChange(type, scheduledEvents[0].proposalPk);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }
@@ -436,24 +492,18 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-          const scheduledEventToUpdate = {
-            id: message.id,
-            proposalBookingId: message.proposalBookingId,
+
+          await experimentDataSource.updateByScheduledEventId({
             startsAt: message.startsAt,
             endsAt: message.endsAt,
             status: message.status,
             localContactId: message.localContactId,
-            proposalPk: message.proposalPk,
-          } as ScheduledEventCore;
-
-          await proposalDataSource.updateProposalBookingScheduledEvent(
-            scheduledEventToUpdate
-          );
-
-          await handleWorkflowEngineChange(
-            type,
-            scheduledEventToUpdate.proposalPk
-          );
+            scheduledEventId: message.id,
+          } as Omit<
+            Experiment,
+            'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
+          >);
+          await handleWorkflowEngineChange(type, message.proposalPk as number);
         } catch (error) {
           logger.logException(`Error while handling event ${type}: `, error);
         }

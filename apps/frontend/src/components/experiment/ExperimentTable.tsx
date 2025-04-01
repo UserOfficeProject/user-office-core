@@ -5,18 +5,19 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
-import SuperMaterialTable from 'components/common/SuperMaterialTable';
+import MaterialTable from 'components/common/DenseMaterialTable';
 import ProposalEsiDetailsButton from 'components/questionary/questionaryComponents/ProposalEsiBasis/ProposalEsiDetailsButton';
-import { GetScheduledEventsCoreQuery, SettingsId } from 'generated/sdk';
+import { GetExperimentsQuery, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { useScheduledEvents } from 'hooks/scheduledEvent/useScheduledEvents';
+import { useExperiments } from 'hooks/experiment/useExperiments';
 import { tableIcons } from 'utils/materialIcons';
+import { tableLocalization } from 'utils/materialLocalization';
 import { getFullUserName } from 'utils/user';
 
 import { DEFAULT_DATE_FORMAT } from './DateFilter';
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
-type RowType = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
+type RowType = GetExperimentsQuery['experiments'][0];
 
 function ExperimentTable() {
   const [searchParams] = useSearchParams();
@@ -24,8 +25,7 @@ function ExperimentTable() {
   const instrument = searchParams.get('instrument');
   const experimentFromDate = searchParams.get('from');
   const experimentToDate = searchParams.get('to');
-  const { scheduledEvents, setScheduledEvents, loadingEvents, setArgs } =
-    useScheduledEvents({});
+  const { experiments, loadingEvents, setArgs } = useExperiments({});
 
   const { toFormattedDateTime, format } = useFormattedDateTime({
     shouldUseTimeZone: true,
@@ -56,12 +56,14 @@ function ExperimentTable() {
       render: (rowData: RowType) => toFormattedDateTime(rowData.endsAt),
     },
     {
-      title: 'ESI',
+      title: 'Experiment Safety',
       render: (rowData: RowType) =>
-        rowData.esi ? (
-          <ProposalEsiDetailsButton esiId={rowData.esi?.id} />
+        rowData.experimentSafety ? (
+          <ProposalEsiDetailsButton
+            esiId={rowData.experimentSafety?.experimentSafetyPk}
+          />
         ) : (
-          'No ESI'
+          'No Experiment Safety'
         ),
     },
     {
@@ -95,24 +97,24 @@ function ExperimentTable() {
     });
   }, [setArgs, format, call, instrument, experimentFromDate, experimentToDate]);
 
-  const ScheduledEventDetails = React.useCallback(
+  const ExperimentDetails = React.useCallback(
     ({ rowData }: Record<'rowData', RowType>) => {
-      return <ExperimentVisitsTable scheduledEvent={rowData} />;
+      return <ExperimentVisitsTable experiment={rowData} />;
     },
     []
   );
 
   return (
-    <SuperMaterialTable
-      data={scheduledEvents}
-      setData={setScheduledEvents}
+    <MaterialTable
       icons={tableIcons}
+      localization={tableLocalization}
       title={
         <Typography variant="h6" component="h2">
           Experiments
         </Typography>
       }
       columns={columns(t)}
+      data={experiments}
       isLoading={loadingEvents}
       options={{
         search: false,
@@ -120,14 +122,9 @@ function ExperimentTable() {
       detailPanel={[
         {
           tooltip: 'Show details',
-          render: ScheduledEventDetails,
+          render: ExperimentDetails,
         },
       ]}
-      hasAccess={{
-        create: false,
-        remove: false,
-        update: false,
-      }}
     />
   );
 }

@@ -21,9 +21,9 @@ context('Template Delete, Archive, Unarchive', () => {
     cy.getAndStoreFeaturesEnabled();
     cy.viewport(1920, 1680);
 
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow) {
-        workflowId = result.createProposalWorkflow.id;
+    cy.createWorkflow(proposalWorkflow).then((result) => {
+      if (result.createWorkflow) {
+        workflowId = result.createWorkflow.id;
       } else {
         throw new Error('Workflow creation failed');
       }
@@ -694,7 +694,8 @@ context('Template Delete, Archive, Unarchive', () => {
     const shipmentTitle = faker.lorem.words(2);
     const sampleTitle = /My sample title/i;
     const coProposer = initialDBData.users.user2;
-    const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+    const existingExperimentPk =
+      initialDBData.experiments.upcoming.experimentPk;
     const visitor = initialDBData.users.user3;
     const PI = initialDBData.users.user1;
 
@@ -711,7 +712,7 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id, PI.id],
         teamLeadUserId: PI.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
     });
 
@@ -1120,12 +1121,13 @@ context('Template Delete, Archive, Unarchive', () => {
     const PI = initialDBData.users.user1;
     const acceptedStatus = ProposalEndStatus.ACCEPTED;
     const existingProposalId = initialDBData.proposal.id;
-    const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+    const existingExperimentPk =
+      initialDBData.experiments.upcoming.experimentPk;
     const startQuestion = 'Visit start';
     const endQuestion = 'Visit end';
 
     const cyTagRegisterVisit = 'register-visit-icon';
-    const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
+    const startDate = DateTime.fromJSDate(new Date()).toFormat(
       initialDBData.getFormats().dateFormat
     );
     const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
@@ -1156,7 +1158,7 @@ context('Template Delete, Archive, Unarchive', () => {
       cy.createVisit({
         team: [coProposer.id, visitor.id],
         teamLeadUserId: coProposer.id,
-        scheduledEventId: existingScheduledEventId,
+        experimentPk: existingExperimentPk,
       });
 
       cy.login(visitor);

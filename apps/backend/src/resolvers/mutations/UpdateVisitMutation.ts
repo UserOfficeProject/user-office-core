@@ -9,16 +9,12 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { VisitStatus } from '../../models/Visit';
 import { Visit } from '../types/Visit';
 
 @ArgsType()
 export class UpdateVisitArgs {
   @Field(() => Int)
   visitId: number;
-
-  @Field(() => VisitStatus, { nullable: true })
-  status?: VisitStatus;
 
   @Field(() => [Int], { nullable: true })
   team?: number[];

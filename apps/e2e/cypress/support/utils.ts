@@ -205,6 +205,13 @@ const setDatePickerValue = (selector: string, value: string) =>
 const getTinyMceContent = (tinyMceId: string) => {
   cy.get(`#${tinyMceId}`).should('exist');
 
+  cy.window().should('have.property', 'tinymce'); // wait for tinyMCE
+  cy.get(`#${tinyMceId}`).should('exist');
+
+  // NOTE: // wait for editor to be ready
+  // eslint-disable-next-line cypress/no-unnecessary-waiting
+  cy.wait(1000);
+
   return cy.window().then((win) => {
     const editor = getEditorById(win, tinyMceId);
 
@@ -215,7 +222,7 @@ const getTinyMceContent = (tinyMceId: string) => {
 const getIconByCyTag = (cyTag: string) => {
   return cy
     .get('[data-cy=upcoming-experiments]')
-    .contains(initialDBData.scheduledEvents.upcoming.startsAt)
+    .contains(initialDBData.experiments.upcoming.startsAt)
     .closest('TR')
     .find(`[data-cy="${cyTag}"]`);
 };

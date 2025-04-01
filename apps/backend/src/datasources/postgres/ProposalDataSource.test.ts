@@ -5,6 +5,7 @@ import { container } from 'tsyringe';
 
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
+import { WorkflowType } from '../../models/Workflow';
 import database from './database';
 import ProposalDataSource from './ProposalDataSource';
 import { createCallObject, createProposalObject } from './records';
@@ -97,10 +98,11 @@ async function setup() {
     created_at: new Date(),
   });
 
-  await database('proposal_workflows').insert({
-    proposal_workflow_id: -999,
+  await database('workflows').insert({
+    workflow_id: -999,
     name: '[IT] workflow',
     description: 'Integration test workflow',
+    entity_type: WorkflowType.PROPOSAL,
   });
 }
 
@@ -113,8 +115,9 @@ async function teardown() {
 
   await database('templates').where('template_id', -999).del();
 
-  await database('proposal_workflows')
-    .where('proposal_workflow_id', -999)
+  await database('workflows')
+    .where('workflow_id', -999)
+    .andWhere('entity_type', WorkflowType.PROPOSAL)
     .del();
 }
 
