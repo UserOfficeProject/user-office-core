@@ -213,7 +213,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
       )}
       {isInstrumentManagementEnabled && (
-        <Tooltip title={i18n.format(t('instrument'), 'plural')}>
+        <Tooltip title="Instruments">
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
               <ScienceIcon />
