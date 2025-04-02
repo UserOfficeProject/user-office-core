@@ -84,6 +84,12 @@ const allDummyInstrumentHasProposals = [
 ];
 
 export class InstrumentDataSourceMock implements InstrumentDataSource {
+  async updateInstrumentContact(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return true;
+  }
   async assignScientistToInstruments(
     scientistId: number,
     instrumentIds: number[]

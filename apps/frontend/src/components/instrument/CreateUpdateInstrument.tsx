@@ -1,4 +1,8 @@
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import {
@@ -21,16 +25,19 @@ import {
   UserRole,
 } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
-import { getFullUserNameWithEmail } from 'utils/user';
+import { getFullUserName, getFullUserNameWithEmail } from 'utils/user';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 type CreateUpdateInstrumentProps = {
   close: (instrumentAdded: InstrumentFragment | null) => void;
   instrument: InstrumentFragment | null;
+  confirm: WithConfirmType;
 };
 
 const CreateUpdateInstrument = ({
   close,
   instrument,
+  confirm,
 }: CreateUpdateInstrumentProps) => {
   const featureContext = useContext(FeatureContext);
   const isUserSurnameSearchEnabled = featureContext.featuresMap.get(
@@ -41,6 +48,7 @@ const CreateUpdateInstrument = ({
   const [usersData, setUsersData] = useState(
     instrument?.instrumentContact ? [instrument?.instrumentContact] : []
   );
+  const [isChecked, setIsChecked] = useState(false);
 
   const initialValues = instrument
     ? { ...instrument, surname: '' }
@@ -120,39 +128,96 @@ const CreateUpdateInstrument = ({
     ) : null;
   };
 
+  const handleConfirmSubmit = async (values: typeof initialValues) => {
+    if (instrument) {
+      const updatedValues = { ...values };
+
+      if (!isChecked && values.managerUserId !== instrument.managerUserId) {
+        updatedValues.managerUserId = instrument.managerUserId;
+      }
+
+      if (updatedValues.managerUserId === null) {
+        return;
+      }
+
+      if (values.managerUserId !== instrument.managerUserId && isChecked) {
+        confirm(
+          async () => {
+            try {
+              const isManagerUpdated =
+                values.managerUserId &&
+                values.managerUserId !== instrument.managerUserId;
+              const newManager = usersData.find(
+                (user) => user.id === values.managerUserId
+              );
+              const newManagerName = newManager
+                ? getFullUserName(newManager)
+                : '';
+
+              const { updateInstrument } = await api({
+                toastSuccessMessage:
+                  t('instrument') +
+                  ' updated successfully! ' +
+                  (isManagerUpdated
+                    ? t('Instrument Contact') + ` updated to ${newManagerName}`
+                    : ''),
+              }).updateInstrument({
+                id: instrument.id,
+                name: updatedValues.name,
+                shortCode: updatedValues.shortCode,
+                description: updatedValues.description,
+                managerUserId: updatedValues.managerUserId,
+              });
+
+              close(updateInstrument);
+            } catch (error) {
+              close(null);
+            }
+          },
+          {
+            title: 'Confirm Technical Reviewer Reassignment',
+            description:
+              'Are you sure you want to update the technical reviewer assignment? This action will change the technical reviewer.',
+          }
+        )();
+      } else {
+        try {
+          const { updateInstrument } = await api({
+            toastSuccessMessage: t('instrument') + ' updated successfully!',
+          }).updateInstrument({
+            id: instrument.id,
+            name: updatedValues.name,
+            shortCode: updatedValues.shortCode,
+            description: updatedValues.description,
+            managerUserId: updatedValues.managerUserId,
+          });
+
+          close(updateInstrument);
+        } catch (error) {
+          close(null);
+        }
+      }
+    } else {
+      if (values.managerUserId === null) {
+        return;
+      }
+
+      try {
+        const { createInstrument } = await api({
+          toastSuccessMessage: t('instrument') + ' created successfully!',
+        }).createInstrument(values);
+
+        close(createInstrument);
+      } catch (error) {
+        close(null);
+      }
+    }
+  };
+
   return (
     <Formik
       initialValues={initialValues}
-      onSubmit={async (values): Promise<void> => {
-        if (values.managerUserId === null) {
-          return;
-        }
-
-        if (instrument) {
-          try {
-            const { updateInstrument } = await api({
-              toastSuccessMessage: t('instrument') + ' updated successfully!',
-            }).updateInstrument({
-              ...values,
-              id: instrument.id,
-            });
-
-            close(updateInstrument);
-          } catch (error) {
-            close(null);
-          }
-        } else {
-          try {
-            const { createInstrument } = await api({
-              toastSuccessMessage: t('instrument') + ' created successfully!',
-            }).createInstrument(values);
-
-            close(createInstrument);
-          } catch (error) {
-            close(null);
-          }
-        }
-      }}
+      onSubmit={(values) => handleConfirmSubmit(values)}
       validationSchema={
         instrument
           ? updateInstrumentValidationSchema
@@ -217,6 +282,21 @@ const CreateUpdateInstrument = ({
             required
           />
 
+          {instrument &&
+            formikProps.values.managerUserId !== instrument.managerUserId && (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    icon={<CheckBoxOutlineBlankIcon />}
+                    checkedIcon={<CheckBoxIcon />}
+                    checked={isChecked}
+                    onChange={(event) => setIsChecked(event.target.checked)}
+                  />
+                }
+                label="Update all un-assigned technical reviews to new contact"
+              />
+            )}
+
           <Button
             type="submit"
             sx={{ marginTop: 2 }}
@@ -233,4 +313,4 @@ const CreateUpdateInstrument = ({
   );
 };
 
-export default CreateUpdateInstrument;
+export default withConfirm(CreateUpdateInstrument);
