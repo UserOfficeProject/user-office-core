@@ -14,13 +14,15 @@
       "name": "user_office_backend.fanout",
       "vhost": "/",
       "type": "fanout",
-      "durable": true
+      "durable": true,
+      "auto_delete": false
     },
     {
       "name": "user_office_scheduler_backend.fanout",
       "vhost": "/",
       "type": "fanout",
-      "durable": true
+      "durable": true,
+      "auto_delete": false
     }
   ],
   "bindings": [
