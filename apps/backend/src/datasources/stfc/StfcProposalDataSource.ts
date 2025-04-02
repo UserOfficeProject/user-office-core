@@ -502,6 +502,29 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
     return result;
   }
 
+  async getUsersProposalsByFacility(
+    userId: number,
+    filter?: ProposalsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
+    const proposals = await super.getUsersProposalsByFacility(
+      userId,
+      filter,
+      first,
+      offset
+    );
+
+    const propsWithTechReviewerDetails = await this.getTechReviewersDetails(
+      proposals.proposals
+    );
+
+    return {
+      proposals: propsWithTechReviewerDetails,
+      totalCount: proposals.totalCount,
+    };
+  }
+
   async getTechReviewersDetails(proposals: ProposalView[]) {
     const technicalReviewers = removeDuplicates(
       proposals

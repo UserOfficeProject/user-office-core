@@ -1,6 +1,7 @@
 import parse from 'html-react-parser';
 import React, { useContext } from 'react';
 
+import ProposalTableFacility from 'components/proposal/ProposalTableFacility';
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
@@ -9,7 +10,6 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { PageName, UserRole, FeatureId } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
-import ProposalTableFacility from 'components/proposal/ProposalTableFacility';
 
 const Paper = ({ children }: { children: React.ReactNode }) => (
   <StyledPaper margin={[0, 0, 2, 0]}>{children}</StyledPaper>
@@ -43,7 +43,7 @@ export default function OverviewPage(props: { userRole: UserRole }) {
     case UserRole.INTERNAL_REVIEWER:
       roleBasedOverView = (
         <Paper>
-          <ProposalTableFacility />
+          <ProposalTableInstrumentScientist />
         </Paper>
       );
       break;

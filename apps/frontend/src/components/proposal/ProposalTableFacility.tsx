@@ -5,7 +5,6 @@ import {
   OrderByCollection,
 } from '@material-table/core';
 import DoneAll from '@mui/icons-material/DoneAll';
-import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import Visibility from '@mui/icons-material/Visibility';
 import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
@@ -22,7 +21,6 @@ import ProposalReviewContent, {
 } from 'components/review/ProposalReviewContent';
 import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeatureId,
@@ -48,7 +46,7 @@ import {
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
-import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+import withConfirm from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import ProposalFilterBar, {
@@ -234,7 +232,7 @@ const ToolbarWithSelectAllPrefetched = (props: {
     </div>
   );
 };
-const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
+const ProposalTableFacility = () => {
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedProposals, setSelectedProposals] = useState<
     ProposalViewData[]
@@ -388,7 +386,6 @@ const ProposalTableFacility = ({ confirm }: { confirm: WithConfirmType }) => {
     ...(isTechnicalReviewEnabled
       ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
       : []),
-    ...(isFapEnabled ? [PROPOSAL_MODAL_TAB_NAMES.ADMIN] : []),
   ];
 
   /**

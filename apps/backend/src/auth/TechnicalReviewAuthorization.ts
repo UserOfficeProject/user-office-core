@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { Roles } from '../models/Role';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { UserWithRole } from '../models/User';
 import { ProposalAuthorization } from './ProposalAuthorization';
@@ -95,48 +96,51 @@ export class TechnicalReviewAuthorization {
       return true;
     }
 
-    const isScientistToProposal = await this.proposalAuth.isScientistToProposal(
-      agent,
-      technicalreview.proposalPk
-    );
-    const isInstrumentManagerToProposal =
-      await this.proposalAuth.isInstrumentManagerToProposal(
-        agent,
-        technicalreview.proposalPk
-      );
+    let haveAccess = false;
 
-    const isInternalReviewerOnTechnicalReview =
-      await this.userAuth.isInternalReviewerOnTechnicalReview(
-        agent,
-        technicalreview.id
-      );
-
-    if (
-      isScientistToProposal ||
-      isInstrumentManagerToProposal ||
-      isInternalReviewerOnTechnicalReview
-    ) {
-      return true;
+    switch (agent?.currentRole?.shortCode) {
+      case Roles.USER:
+        haveAccess = await this.proposalAuth.isScientistToProposal(
+          agent,
+          technicalreview.proposalPk
+        );
+        break;
+      case Roles.INSTRUMENT_SCIENTIST:
+        haveAccess = await this.proposalAuth.isInstrumentManagerToProposal(
+          agent,
+          technicalreview.proposalPk
+        );
+        break;
+      case Roles.INTERNAL_REVIEWER:
+        haveAccess = await this.userAuth.isInternalReviewerOnTechnicalReview(
+          agent,
+          technicalreview.id
+        );
+        break;
+      case Roles.FACILITY_MEMBER:
+        haveAccess = await this.proposalAuth.isProposalOnUsersFacility(
+          agent?.id,
+          technicalreview.proposalPk
+        );
+        break;
+      case Roles.FAP_CHAIR:
+      case Roles.FAP_SECRETARY:
+        haveAccess = await this.proposalAuth.isChairOrSecretaryOfProposal(
+          agent,
+          technicalreview.proposalPk
+        );
+        break;
+      case Roles.FAP_REVIEWER:
+        haveAccess = await this.proposalAuth.isReviewerOfProposal(
+          agent,
+          technicalreview.proposalPk
+        );
+        break;
+      default:
+        break;
     }
 
-    const isChairOrSecretaryOfProposal =
-      await this.proposalAuth.isChairOrSecretaryOfProposal(
-        agent,
-        technicalreview.proposalPk
-      );
-    if (isChairOrSecretaryOfProposal) {
-      return true;
-    }
-
-    const isReviewerOfProposal = await this.proposalAuth.isReviewerOfProposal(
-      agent,
-      technicalreview.proposalPk
-    );
-    if (isReviewerOfProposal) {
-      return true;
-    }
-
-    return false;
+    return haveAccess;
   }
 
   async hasWriteRights(

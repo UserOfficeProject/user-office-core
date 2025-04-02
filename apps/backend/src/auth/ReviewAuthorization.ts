@@ -3,11 +3,11 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { ReviewStatus } from '../models/Review';
+import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Review } from '../resolvers/types/Review';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
-import { Role, Roles } from '../models/Role';
 
 @injectable()
 export class ReviewAuthorization {
@@ -60,11 +60,12 @@ export class ReviewAuthorization {
       return true;
     }
 
-    const isChairOrSecretaryOfFap =
-      agent &&
-      agent.currentRole &&
-      [Role.FAP_CHAIR, Roles.FAP_SECRETARY].includes(agent.currentRole.id) &&
-      (await this.userAuth.isChairOrSecretaryOfFap(agent, review.fapID));
+    const currentRole = agent?.currentRole?.shortCode;
+
+    const isChairOrSecretaryOfFap = await this.userAuth.isChairOrSecretaryOfFap(
+      agent,
+      review.fapID
+    );
     if (isChairOrSecretaryOfFap) {
       return true;
     }
@@ -81,6 +82,15 @@ export class ReviewAuthorization {
       review.fapID
     );
     if (isMemberOfFap) {
+      return true;
+    }
+    const isProposalOnUsersFacility =
+      agent?.currentRole?.shortCode === Roles.FACILITY_MEMBER &&
+      (await this.proposalAuth.isProposalOnUsersFacility(
+        agent?.id,
+        review.proposalPk
+      ));
+    if (isProposalOnUsersFacility) {
       return true;
     }
 

@@ -224,6 +224,13 @@ export class ProposalAuthorization {
     return isInternalReviewerOnSomeTechnicalReview;
   }
 
+  async isProposalOnUsersFacility(agentId: number, proposalPk: number) {
+    return await this.facilityDataSource.isProposalOnUsersFacility(
+      agentId,
+      proposalPk
+    );
+  }
+
   async hasReadRights(
     agent: UserWithRole | null,
     proposalOrProposalId: Proposal | number
@@ -272,7 +279,7 @@ export class ProposalAuthorization {
         );
         break;
       case Roles.FACILITY_MEMBER:
-        hasAccess = await this.facilityDataSource.isProposalOnUsersFacility(
+        hasAccess = await this.isProposalOnUsersFacility(
           agent.id,
           proposal.primaryKey
         );
