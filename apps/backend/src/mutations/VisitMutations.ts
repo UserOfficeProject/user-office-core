@@ -3,9 +3,9 @@ import { container, inject, injectable } from 'tsyringe';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized, EventBus } from '../decorators';
@@ -44,8 +44,8 @@ export default class VisitMutations {
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    @inject(Tokens.ScheduledEventDataSource)
-    private scheduledEventDataSource: ScheduledEventDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization
@@ -59,7 +59,7 @@ export default class VisitMutations {
     const visitAlreadyExists =
       (
         await this.dataSource.getVisits({
-          scheduledEventId: args.scheduledEventId,
+          experimentPk: args.experimentPk,
         })
       ).length > 0;
 
@@ -70,33 +70,21 @@ export default class VisitMutations {
       );
     }
 
-    const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEventCore(
-        args.scheduledEventId
-      );
-    if (!scheduledEvent) {
-      return rejection(
-        'Can not create visit because scheduled event does not exist',
-        {
-          args,
-          agent: user,
-        }
-      );
-    }
-
-    if (scheduledEvent.proposalPk === null) {
-      return rejection(
-        'Can not create visit because scheduled event does not have a proposal associated with',
-        {
-          args,
-          agent: user,
-        }
-      );
-    }
-
-    const proposal = await this.proposalDataSource.get(
-      scheduledEvent.proposalPk
+    const experiment = await this.experimentDataSource.getExperiment(
+      args.experimentPk
     );
+
+    if (!experiment) {
+      return rejection(
+        'Can not create visit because experiment does not exist',
+        {
+          args,
+          agent: user,
+        }
+      );
+    }
+
+    const proposal = await this.proposalDataSource.get(experiment.proposalPk);
 
     if (proposal === null) {
       return rejection(
@@ -279,6 +267,22 @@ export default class VisitMutations {
       return rejection(
         'Chould not update Visit Registration due to insufficient permissions',
         { args, user }
+      );
+    }
+    const TODAY_MIDNIGT = new Date(new Date().setHours(0, 0, 0, 0));
+
+    if (args.startsAt && args.startsAt < TODAY_MIDNIGT) {
+      return rejection(
+        'Could not update Visit Registration because the start date is in the past',
+        { args }
+      );
+    }
+
+    const startsAt = args.startsAt ?? visitRegistration.startsAt;
+    if (startsAt && args.endsAt && args.endsAt <= startsAt) {
+      return rejection(
+        'Could not update Visit Registration because the end date is before the start date',
+        { args }
       );
     }
 

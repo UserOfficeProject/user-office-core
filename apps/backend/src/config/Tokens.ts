@@ -30,7 +30,6 @@ export const Tokens = {
   FapDataSource: Symbol('FapDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),
   SampleEsiDataSource: Symbol('SampleEsiDataSource'),
-  ScheduledEventDataSource: Symbol('ScheduledEventDataSource'),
   ShipmentDataSource: Symbol('ShipmentDataSource'),
   SystemDataSource: Symbol('SystemDataSource'),
   TemplateDataSource: Symbol('TemplateDataSource'),
@@ -53,5 +52,6 @@ export const Tokens = {
   ),
   WorkflowDataSource: Symbol('WorkflowDataSource'),
   StatusDataSource: Symbol('StatusDataSource'),
+  ExperimentDataSource: Symbol('ExperimentDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
 };
