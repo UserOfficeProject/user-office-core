@@ -3,7 +3,6 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { ReviewStatus } from '../models/Review';
-import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { Review } from '../resolvers/types/Review';
 import { ProposalAuthorization } from './ProposalAuthorization';
@@ -82,15 +81,6 @@ export class ReviewAuthorization {
       review.fapID
     );
     if (isMemberOfFap) {
-      return true;
-    }
-    const isProposalOnUsersFacility =
-      agent?.currentRole?.shortCode === Roles.FACILITY_MEMBER &&
-      (await this.proposalAuth.isProposalOnUsersFacility(
-        agent?.id,
-        review.proposalPk
-      ));
-    if (isProposalOnUsersFacility) {
       return true;
     }
 

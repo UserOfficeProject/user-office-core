@@ -117,12 +117,6 @@ export class TechnicalReviewAuthorization {
           technicalreview.id
         );
         break;
-      case Roles.FACILITY_MEMBER:
-        haveAccess = await this.proposalAuth.isProposalOnUsersFacility(
-          agent?.id,
-          technicalreview.proposalPk
-        );
-        break;
       case Roles.FAP_CHAIR:
       case Roles.FAP_SECRETARY:
         haveAccess = await this.proposalAuth.isChairOrSecretaryOfProposal(

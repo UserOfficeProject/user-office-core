@@ -27,7 +27,6 @@ import {
   Proposal,
   ProposalsFilter,
   ReviewerFilter,
-  ProposalViewTechnicalReviewAssignee,
   WorkflowType,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
@@ -45,7 +44,6 @@ import {
   setSortDirectionOnSortField,
 } from 'utils/helperFunctions';
 import { tableIcons } from 'utils/materialIcons';
-import { getFullUserName } from 'utils/user';
 import withConfirm from 'utils/withConfirm';
 
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
@@ -123,35 +121,6 @@ let columns: Column<ProposalViewData>[] = [
     field: 'callShortCode',
     emptyValue: '-',
     hidden: true,
-  },
-];
-
-const technicalReviewColumns: Column<ProposalViewData>[] = [
-  {
-    title: 'Technical status',
-    field: 'technicalStatuses',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(
-        rowData.technicalReviews?.map((tr) => tr.status)
-      ),
-  },
-  {
-    title: 'Technical time allocation',
-    field: 'technicalTimeAllocations',
-    render: (rowData: ProposalViewData) =>
-      `${fromArrayToCommaSeparated(
-        rowData.technicalReviews?.map((tr) => tr.timeAllocation)
-      )} (${rowData.allocationTimeUnit}s)`,
-  },
-  {
-    title: 'Assigned technical reviewer',
-    field: 'technicalReviewAssigneeNames',
-    render: (rowData: ProposalViewData) =>
-      fromArrayToCommaSeparated(
-        rowData.technicalReviews?.map((tr) =>
-          getFullUserName(tr.technicalReviewAssignee)
-        )
-      ),
   },
 ];
 
@@ -369,10 +338,6 @@ const ProposalTableFacility = () => {
     Column<ProposalViewData>[] | null
   >('proposalColumnsInstrumentScientist', null);
 
-  const isTechnicalReviewEnabled = featureContext.featuresMap.get(
-    FeatureId.TECHNICAL_REVIEW
-  )?.isEnabled;
-
   const isInstrumentManagementEnabled = featureContext.featuresMap.get(
     FeatureId.INSTRUMENT_MANAGEMENT
   )?.isEnabled;
@@ -380,13 +345,6 @@ const ProposalTableFacility = () => {
   const isFapEnabled = featureContext.featuresMap.get(
     FeatureId.FAP_REVIEW
   )?.isEnabled;
-
-  const instrumentScientistProposalReviewTabs = [
-    PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
-    ...(isTechnicalReviewEnabled
-      ? [PROPOSAL_MODAL_TAB_NAMES.TECHNICAL_REVIEW]
-      : []),
-  ];
 
   /**
    * NOTE: Custom action buttons are here because when we have them inside actions on the material-table
@@ -397,24 +355,19 @@ const ProposalTableFacility = () => {
 
     return (
       <>
-        <Tooltip title={'View proposal and technical review'}>
+        <Tooltip title={'View proposal'}>
           <IconButton
             onClick={() => {
               setSearchParams((searchParam) => {
                 searchParam.set('reviewModal', rowData.primaryKey.toString());
-                searchParam.set(
-                  'modalTab',
-                  instrumentScientistProposalReviewTabs
-                    .indexOf(PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION)
-                    .toString()
-                );
+                searchParam.set('modalTab', '0');
 
                 return searchParam;
               });
             }}
             style={iconButtonStyle}
           >
-            {<Visibility data-cy="view-proposal-and-technical-review" />}
+            {<Visibility data-cy="view-proposal" />}
           </IconButton>
         </Tooltip>
       </>
@@ -511,12 +464,6 @@ const ProposalTableFacility = () => {
     }));
   }
 
-  if (isTechnicalReviewEnabled) {
-    addColumns(columns, technicalReviewColumns);
-  } else {
-    removeColumns(columns, technicalReviewColumns);
-  }
-
   if (isInstrumentManagementEnabled) {
     addColumns(columns, instrumentManagementColumns(t));
   } else {
@@ -609,20 +556,6 @@ const ProposalTableFacility = () => {
               if (proposal.primaryKey === updatedProposal?.primaryKey) {
                 return {
                   ...proposal,
-                  technicalReviews: updatedProposal.technicalReviews.map(
-                    (technicalReview) => {
-                      const technicalReviewAssignee =
-                        technicalReview.technicalReviewAssignee as ProposalViewTechnicalReviewAssignee;
-
-                      return {
-                        id: technicalReview.id,
-                        status: technicalReview.status,
-                        submitted: technicalReview.submitted,
-                        timeAllocation: technicalReview.timeAllocation,
-                        technicalReviewAssignee: technicalReviewAssignee,
-                      };
-                    }
-                  ),
                 };
               } else {
                 return proposal;
@@ -653,7 +586,7 @@ const ProposalTableFacility = () => {
       >
         <ProposalReviewContent
           proposalPk={proposalToReview?.primaryKey as number}
-          tabNames={instrumentScientistProposalReviewTabs}
+          tabNames={[PROPOSAL_MODAL_TAB_NAMES.PROPOSAL_INFORMATION]}
         />
       </ProposalReviewModal>
       <Dialog

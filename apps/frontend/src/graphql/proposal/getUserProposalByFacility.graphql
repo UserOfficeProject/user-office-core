@@ -21,17 +21,6 @@ query getProposalsByUserFacility(
         id
         name
       }
-      technicalReviews {
-        id
-        technicalReviewAssignee {
-          id
-          firstname
-          lastname
-        }
-        timeAllocation
-        status
-        submitted
-      }
       faps {
         code
       }
