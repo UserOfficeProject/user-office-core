@@ -12,7 +12,7 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
-export default function createHandler() {
+export default function createLoggingHandler() {
   const eventLogsDataSource = container.resolve<EventLogsDataSource>(
     Tokens.EventLogsDataSource
   );

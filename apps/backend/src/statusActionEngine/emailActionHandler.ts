@@ -6,6 +6,7 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { SettingsId } from '../models/Settings';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import {
@@ -20,11 +21,11 @@ import {
   getInstrumentScientistsAndFormatOutputForEmailSending,
   getPIAndFormatOutputForEmailSending,
   getFapReviewersAndFormatOutputForEmailSending,
-  publishMessageToTheEventBus,
   getFapChairSecretariesAndFormatOutputForEmailSending,
   statusActionLogger,
   getOtherAndFormatOutputForEmailSending,
   getTechniqueScientistsAndFormatOutputForEmailSending,
+  constructProposalStatusChangeEvent,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -415,6 +416,13 @@ const sendMail = async (
   loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
+  const loggingHandler = container.resolve<
+    (event: ApplicationEvent) => Promise<void>
+  >(Tokens.LoggingHandler);
+  const emailEventHandler = container.resolve<
+    (event: ApplicationEvent) => Promise<void>
+  >(Tokens.EmailEventHandler);
+
   if (!recipientsWithData.length) {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
@@ -448,12 +456,16 @@ const sendMail = async (
             result: res,
           });
 
-          await publishMessageToTheEventBus(
-            recipientWithData.proposals,
-            `${successfulMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
-            undefined,
-            loggedInUserId || undefined
-          );
+          for (const proposal of recipientWithData.proposals) {
+            const evt = constructProposalStatusChangeEvent(
+              proposal,
+              loggedInUserId || null,
+              `${successfulMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
+              undefined
+            );
+            emailEventHandler(evt);
+            loggingHandler(evt);
+          }
 
           return res;
         } catch (err) {
@@ -461,12 +473,16 @@ const sendMail = async (
             error: err,
           });
 
-          await publishMessageToTheEventBus(
-            recipientWithData.proposals,
-            `${failMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
-            undefined,
-            loggedInUserId || undefined
-          );
+          for (const proposal of recipientWithData.proposals) {
+            const evt = constructProposalStatusChangeEvent(
+              proposal,
+              loggedInUserId || null,
+              `${failMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
+              undefined
+            );
+            emailEventHandler(evt);
+            loggingHandler(evt);
+          }
           throw err;
         }
       })
