@@ -46,7 +46,7 @@ export default class ProposalQueries {
 
     // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
     if (!this.userAuth.isUserOfficer(agent) && !proposal.notified) {
-      proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
+      proposal = omit(proposal, 'commentForUser') as Proposal;
     }
     if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
