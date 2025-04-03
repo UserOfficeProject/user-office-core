@@ -172,6 +172,7 @@ const instrument = {
 };
 
 const scientist1 = initialDBData.users.user1;
+const scientist2 = initialDBData.users.user2;
 const instrument1 = {
   name: faker.random.words(2),
   shortCode: faker.random.alphaNumeric(15),
@@ -1128,6 +1129,77 @@ context('Fap reviews tests', () => {
       cy.get(`[data-cy="proposal-count-${fapMembers.chair.id}"]`).contains('1');
       cy.get(`[data-cy="proposal-count-${fapMembers.secretary.id}"]`).contains(
         '1'
+      );
+    });
+
+    it('Officer be able to update all un-assigned technical reviews to new contact', () => {
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+      cy.assignReviewersToFap({
+        fapId: createdFapId,
+        memberIds: [fapMembers.reviewer.id],
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: newlyCreatedInstrumentId,
+        comment: comment1,
+        publicComment: comment2,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
+      cy.createInstrument(instrument).then((result) => {
+        const createdInstrument = result.createInstrument;
+        if (createdInstrument) {
+          newlyCreatedInstrumentId = createdInstrument.id;
+        }
+      });
+      cy.assignProposalsToInstruments({
+        instrumentIds: [newlyCreatedInstrumentId],
+        proposalPks: [firstCreatedProposalPk],
+      });
+      const updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      cy.login('officer');
+      cy.visit(`/Instruments`);
+
+      cy.get('[aria-label="Edit"]').eq(1).click();
+
+      cy.get('[data-cy=instrument-contact-surname]')
+        .type(scientist2.lastName)
+        .get('[data-cy=findUser]')
+        .click();
+
+      cy.get('[aria-label="Open"]').first().click();
+      cy.contains(updatedContact).click();
+      cy.contains('Update all un-assigned technical reviews').should(
+        'be.visible'
+      );
+      cy.get('[type="checkbox"]').check();
+      cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="confirmation-dialog"]').should('be.visible');
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'be.visible'
       );
     });
   });
