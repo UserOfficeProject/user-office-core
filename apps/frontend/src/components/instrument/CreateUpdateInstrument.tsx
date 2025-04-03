@@ -131,9 +131,8 @@ const CreateUpdateInstrument = ({
   const handleConfirmSubmit = async (values: typeof initialValues) => {
     if (instrument) {
       const updatedValues = { ...values };
-
-      if (!isChecked && values.managerUserId !== instrument.managerUserId) {
-        updatedValues.managerUserId = instrument.managerUserId;
+      if (updatedValues.managerUserId !== instrument.managerUserId) {
+        updatedValues.managerUserId = values.managerUserId;
       }
 
       if (updatedValues.managerUserId === null) {
