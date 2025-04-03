@@ -8,7 +8,6 @@ import { Proposal, ProposalPks, Proposals } from '../models/Proposal';
 import { AnswerBasic } from '../models/Questionary';
 import { Review } from '../models/Review';
 import { Sample } from '../models/Sample';
-import { ScheduledEventCore } from '../models/ScheduledEventCore';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
@@ -313,22 +312,10 @@ interface CallFapReviewEndedEvent extends GeneralEvent {
   type: Event.CALL_FAP_REVIEW_ENDED;
   call: Call;
 }
-
 interface InviteAcceptedEvent extends GeneralEvent {
   type: Event.INVITE_ACCEPTED;
   invite: Invite;
 }
-
-interface ProposalBookingTimeSlotAddedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED;
-  scheduledEvent: ScheduledEventCore;
-}
-
-interface ProposalBookingTimeSlotsRemovedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED;
-  scheduledEvents: ScheduledEventCore[];
-}
-
 interface InstrumentCreatedEvent extends GeneralEvent {
   type: Event.INSTRUMENT_CREATED;
   instrument: Instrument;
@@ -456,8 +443,6 @@ export type ApplicationEvent =
   | ProposalFapMeetingRankingOverwrittenEvent
   | ProposalFapMeetingReorderEvent
   | ProposalTopicAnsweredEvent
-  | ProposalBookingTimeSlotAddedEvent
-  | ProposalBookingTimeSlotsRemovedEvent
   | FapAllMeetingsSubmittedEvent
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent

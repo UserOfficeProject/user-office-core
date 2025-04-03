@@ -5,6 +5,7 @@ import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
+import ExperimentMutations from '../mutations/ExperimentMutation';
 import FacilityMutations from '../mutations/FacilityMutations';
 import FapMutations from '../mutations/FapMutations';
 import FeedbackMutations from '../mutations/FeedbackMutations';
@@ -15,12 +16,10 @@ import InternalReviewMutations from '../mutations/InternalReviewMutations';
 import InviteMutations from '../mutations/InviteMutations';
 import PdfTemplateMutations from '../mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from '../mutations/PredefinedMessageMutations';
-import ProposalEsiMutations from '../mutations/ProposalEsiMutations';
 import ProposalMutations from '../mutations/ProposalMutations';
 import QuestionaryMutations from '../mutations/QuestionaryMutations';
 import RedeemCodesMutations from '../mutations/RedeemCodesMutations';
 import ReviewMutations from '../mutations/ReviewMutations';
-import SampleEsiMutations from '../mutations/SampleEsiMutations';
 import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
 import StatusActionsLogsMutations from '../mutations/StatusActionsLogsMutations';
@@ -34,6 +33,7 @@ import WorkflowMutations from '../mutations/WorkflowMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
 import EventLogQueries from '../queries/EventLogQueries';
+import ExperimentQueries from '../queries/ExperimentQueries';
 import FacilityQueries from '../queries/FacilityQueries';
 import FapQueries from '../queries/FapQueries';
 import FeedbackQueries from '../queries/FeedbackQueries';
@@ -44,13 +44,10 @@ import InternalReviewQueries from '../queries/InternalReviewQueries';
 import InviteQueries from '../queries/InviteQueries';
 import PdfTemplateQueries from '../queries/PdfTemplateQueries';
 import PredefinedMessageQueries from '../queries/PredefinedMessageQueries';
-import ProposalEsiQueries from '../queries/ProposalEsiQueries';
 import ProposalQueries from '../queries/ProposalQueries';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import ReviewQueries from '../queries/ReviewQueries';
-import SampleEsiQueries from '../queries/SampleEsiQueries';
 import SampleQueries from '../queries/SampleQueries';
-import ScheduledEventQueries from '../queries/ScheduledEventQueries';
 import SettingsQueries from '../queries/SettingsQueries';
 import ShipmentQueries from '../queries/ShipmentQueries';
 import StatusActionQueries from '../queries/StatusActionQueries';
@@ -77,12 +74,9 @@ interface ResolverContextQueries {
   technique: TechniqueQueries;
   pdfTemplate: PdfTemplateQueries;
   proposal: ProposalQueries;
-  proposalEsi: ProposalEsiQueries;
   questionary: QuestionaryQueries;
   review: ReviewQueries;
   sample: SampleQueries;
-  sampleEsi: SampleEsiQueries;
-  scheduledEvent: ScheduledEventQueries;
   fap: FapQueries;
   shipment: ShipmentQueries;
   system: SystemQueries;
@@ -99,6 +93,7 @@ interface ResolverContextQueries {
   workflow: WorkflowQueries;
   statusAction: StatusActionQueries;
   facility: FacilityQueries;
+  experiment: ExperimentQueries;
 }
 
 interface ResolverContextMutations {
@@ -111,12 +106,10 @@ interface ResolverContextMutations {
   invite: InviteMutations;
   pdfTemplate: PdfTemplateMutations;
   proposal: ProposalMutations;
-  proposalEsi: ProposalEsiMutations;
   questionary: QuestionaryMutations;
   redeemCodes: RedeemCodesMutations;
   review: ReviewMutations;
   sample: SampleMutations;
-  sampleEsi: SampleEsiMutations;
   fap: FapMutations;
   shipment: ShipmentMutations;
   template: TemplateMutations;
@@ -130,6 +123,7 @@ interface ResolverContextMutations {
   status: StatusMutations;
   workflow: WorkflowMutations;
   facility: FacilityMutations;
+  experiment: ExperimentMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

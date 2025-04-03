@@ -59,8 +59,8 @@ export class FeedbackAuthorization {
       return false;
     }
 
-    const visit = await this.visitDataSource.getVisitByScheduledEventId(
-      feedback.scheduledEventId
+    const visit = await this.visitDataSource.getVisitByExperimentPk(
+      feedback.experimentPk
     );
 
     if (!visit) {
@@ -104,8 +104,8 @@ export class FeedbackAuthorization {
       return false;
     }
 
-    const visit = await this.visitDataSource.getVisitByScheduledEventId(
-      feedback.scheduledEventId
+    const visit = await this.visitDataSource.getVisitByExperimentPk(
+      feedback.experimentPk
     );
 
     if (!visit) {

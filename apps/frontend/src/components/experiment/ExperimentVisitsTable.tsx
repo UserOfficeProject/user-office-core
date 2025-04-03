@@ -9,10 +9,7 @@ import { Link } from 'react-router-dom';
 
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
 import VisitStatusIcon from 'components/visit/VisitStatusIcon';
-import {
-  GetScheduledEventsCoreQuery,
-  VisitRegistrationStatus,
-} from 'generated/sdk';
+import { GetExperimentsQuery, VisitRegistrationStatus } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -21,13 +18,13 @@ import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 type RowType = NonNullable<
-  GetScheduledEventsCoreQuery['scheduledEventsCore'][0]['visit']
+  GetExperimentsQuery['experiments'][0]['visit']
 >['registrations'][0];
 
-type ScheduledEvent = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
+type Experiment = GetExperimentsQuery['experiments'][0];
 
-interface ScheduledEventDetailsTableProps extends WithConfirmProps {
-  scheduledEvent: ScheduledEvent;
+interface ExperimentDetailsTableProps extends WithConfirmProps {
+  experiment: Experiment;
 }
 
 const VisitorName = styled(Link)(({ theme }) => ({
@@ -38,16 +35,16 @@ const ActionDiv = styled('div')({
   display: 'flex',
 });
 
-function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
+function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
   const { confirm } = params;
-  const [scheduledEvent, setScheduledEvent] = useState(params.scheduledEvent);
+  const [experiment, setExperiment] = useState(params.experiment);
   const api = useDataApi();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
 
   const onVisitRegistrationSubmitted = (submittedRegistration: RowType) => {
-    setScheduledEvent((prev) => {
+    setExperiment((prev) => {
       if (!prev.visit) {
         return prev;
       }
@@ -69,9 +66,9 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
   };
 
   const replaceVisitRegistration = (
-    newRegistration: NonNullable<ScheduledEvent['visit']>['registrations'][0]
+    newRegistration: NonNullable<Experiment['visit']>['registrations'][0]
   ): void => {
-    setScheduledEvent((prev) => {
+    setExperiment((prev) => {
       if (!prev.visit) {
         return prev;
       }
@@ -225,9 +222,9 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
     {
       title: 'Teamleader',
       render: (rowData: RowType) =>
-        rowData.userId === scheduledEvent.visit?.teamLead.id ? 'Yes' : 'No',
+        rowData.userId === experiment.visit?.teamLead.id ? 'Yes' : 'No',
       customSort: (a: RowType) => {
-        return a.userId === scheduledEvent.visit?.teamLead.id ? 1 : -1;
+        return a.userId === experiment.visit?.teamLead.id ? 1 : -1;
       },
     },
     {
@@ -276,7 +273,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
     },
   ];
 
-  if (scheduledEvent.visit === null) {
+  if (experiment.visit === null) {
     return (
       <Box sx={{ textAlign: 'center', padding: '20px' }}>
         Visit is not defined
@@ -301,7 +298,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
         title=""
         icons={tableIcons}
         columns={columns}
-        data={scheduledEvent.visit.registrations}
+        data={experiment.visit.registrations}
         options={{
           search: false,
           paging: false,

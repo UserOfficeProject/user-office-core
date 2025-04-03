@@ -6,6 +6,7 @@ import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
+import ExperimentMutations from './mutations/ExperimentMutation';
 import FacilityMutations from './mutations/FacilityMutations';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
@@ -16,12 +17,10 @@ import InternalReviewMutations from './mutations/InternalReviewMutations';
 import InviteMutations from './mutations/InviteMutations';
 import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
-import ProposalEsiMutations from './mutations/ProposalEsiMutations';
 import ProposalMutations from './mutations/ProposalMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import RedeemCodesMutations from './mutations/RedeemCodesMutations';
 import ReviewMutations from './mutations/ReviewMutations';
-import SampleEsiMutations from './mutations/SampleEsiMutations';
 import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
@@ -35,6 +34,7 @@ import WorkflowMutations from './mutations/WorkflowMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
+import ExperimentQueries from './queries/ExperimentQueries';
 import FacilityQueries from './queries/FacilityQueries';
 import FapQueries from './queries/FapQueries';
 import FeedbackQueries from './queries/FeedbackQueries';
@@ -45,13 +45,10 @@ import InternalReviewQueries from './queries/InternalReviewQueries';
 import InviteQueries from './queries/InviteQueries';
 import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
-import ProposalEsiQueries from './queries/ProposalEsiQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
-import SampleEsiQueries from './queries/SampleEsiQueries';
 import SampleQueries from './queries/SampleQueries';
-import ScheduledEventQueries from './queries/ScheduledEventQueries';
 import SettingsQueries from './queries/SettingsQueries';
 import ShipmentQueries from './queries/ShipmentQueries';
 import StatusActionQueries from './queries/StatusActionQueries';
@@ -78,12 +75,9 @@ const context: BasicResolverContext = {
     invite: container.resolve(InviteQueries),
     pdfTemplate: container.resolve(PdfTemplateQueries),
     proposal: container.resolve(ProposalQueries),
-    proposalEsi: container.resolve(ProposalEsiQueries),
     questionary: container.resolve(QuestionaryQueries),
     review: container.resolve(ReviewQueries),
     sample: container.resolve(SampleQueries),
-    sampleEsi: container.resolve(SampleEsiQueries),
-    scheduledEvent: container.resolve(ScheduledEventQueries),
     fap: container.resolve(FapQueries),
     shipment: container.resolve(ShipmentQueries),
     system: container.resolve(SystemQueries),
@@ -101,6 +95,7 @@ const context: BasicResolverContext = {
     statusAction: container.resolve(StatusActionQueries),
     settings: container.resolve(SettingsQueries),
     facility: container.resolve(FacilityQueries),
+    experiment: container.resolve(ExperimentQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -112,12 +107,10 @@ const context: BasicResolverContext = {
     invite: container.resolve(InviteMutations),
     pdfTemplate: container.resolve(PdfTemplateMutations),
     proposal: container.resolve(ProposalMutations),
-    proposalEsi: container.resolve(ProposalEsiMutations),
     questionary: container.resolve(QuestionaryMutations),
     redeemCodes: container.resolve(RedeemCodesMutations),
     review: container.resolve(ReviewMutations),
     sample: container.resolve(SampleMutations),
-    sampleEsi: container.resolve(SampleEsiMutations),
     fap: container.resolve(FapMutations),
     shipment: container.resolve(ShipmentMutations),
     template: container.resolve(TemplateMutations),
@@ -131,6 +124,7 @@ const context: BasicResolverContext = {
     status: container.resolve(StatusMutations),
     workflow: container.resolve(WorkflowMutations),
     facility: container.resolve(FacilityMutations),
+    experiment: container.resolve(ExperimentMutations),
   },
   clients: {
     scheduler: async () => {

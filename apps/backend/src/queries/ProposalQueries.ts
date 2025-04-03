@@ -4,6 +4,7 @@ import { inject, injectable } from 'tsyringe';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ProposalInternalCommentsDataSource } from '../datasources/ProposalInternalCommentsDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
@@ -13,16 +14,14 @@ import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ProposalsFilter } from '../resolvers/queries/ProposalsQuery';
-import {
-  ProposalBookingFilter,
-  ProposalBookingScheduledEventFilterCore,
-} from '../resolvers/types/ProposalBooking';
 import { omit } from '../utils/helperFunctions';
 
 @injectable()
 export default class ProposalQueries {
   constructor(
     @inject(Tokens.ProposalDataSource) public dataSource: ProposalDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    public experimentDataSource: ExperimentDataSource,
     @inject(Tokens.ReviewDataSource) public reviewDataSource: ReviewDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
@@ -34,11 +33,9 @@ export default class ProposalQueries {
   @Authorized()
   async get(agent: UserWithRole | null, primaryKey: number) {
     let proposal = await this.dataSource.get(primaryKey);
-
     if (!proposal) {
       return null;
     }
-
     // If not a user officer or instrument scientist remove excellence, technical and safety score
     if (
       !this.userAuth.isUserOfficer(agent) &&
@@ -49,9 +46,8 @@ export default class ProposalQueries {
 
     // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
     if (!this.userAuth.isUserOfficer(agent) && !proposal.notified) {
-      proposal = omit(proposal, 'finalStatus', 'commentForUser') as Proposal;
+      proposal = omit(proposal, 'commentForUser') as Proposal;
     }
-
     if ((await this.hasReadRights(agent, proposal)) === true) {
       return proposal;
     } else {
@@ -155,42 +151,6 @@ export default class ProposalQueries {
   }
 
   @Authorized()
-  async getProposalBookingsByProposalPk(
-    agent: UserWithRole | null,
-    {
-      proposalPk,
-      filter,
-    }: { proposalPk: number; filter?: ProposalBookingFilter }
-  ) {
-    const proposal = await this.get(agent, proposalPk);
-    if (!proposal) {
-      return null;
-    }
-
-    const proposalBookings =
-      await this.dataSource.getProposalBookingsByProposalPk(proposalPk, filter);
-
-    return proposalBookings;
-  }
-
-  @Authorized()
-  async getAllProposalBookingsScheduledEvents(
-    agent: UserWithRole | null,
-    {
-      proposalBookingIds,
-      filter,
-    }: {
-      proposalBookingIds: number[];
-      filter?: ProposalBookingScheduledEventFilterCore;
-    }
-  ) {
-    return await this.dataSource.getAllProposalBookingsScheduledEvents(
-      proposalBookingIds,
-      filter
-    );
-  }
-
-  @Authorized()
   async getProposalById(agent: UserWithRole | null, proposalId: string) {
     const proposal = await this.dataSource.getProposalById(proposalId);
 
@@ -217,6 +177,7 @@ export default class ProposalQueries {
       });
   }
 
+  @Authorized()
   async getUsersProposalsByFacility(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
@@ -228,6 +189,21 @@ export default class ProposalQueries {
       filter,
       first,
       offset
+    );
+  }
+
+  @Authorized()
+  async getExperimentsByProposalPk(
+    agent: UserWithRole | null,
+    proposalPk: number
+  ) {
+    const proposal = await this.get(agent, proposalPk);
+    if (!proposal) {
+      return null;
+    }
+
+    return await this.experimentDataSource.getExperimentsByProposalPk(
+      proposalPk
     );
   }
 }

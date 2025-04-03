@@ -1,0 +1,24 @@
+mutation submitExperimentSafety(
+  $experimentSafetyPk: Int!
+  $isSubmitted: Boolean
+) {
+  submitExperimentSafety(
+    experimentSafetyPk: $experimentSafetyPk
+    isSubmitted: $isSubmitted
+  ) {
+    ...experimentSafety
+    # questionary {
+    #   isCompleted
+    #   ...questionary
+    # }
+    # sampleEsis {
+    #   sample {
+    #     ...sample
+    #   }
+    #   ...sampleEsi
+    #   questionary {
+    #     isCompleted
+    #   }
+    # }
+  }
+}
