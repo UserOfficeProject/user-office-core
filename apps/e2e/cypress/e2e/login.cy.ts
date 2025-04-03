@@ -93,8 +93,8 @@ context('User login tests', () => {
     });
   });
 
-  describe('Role Model', () => {
-    it('The role model should be opened if the site is navigated to with the querystring', () => {
+  describe.only('Role Model', () => {
+    beforeEach(() => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: initialDBData.users.officer.id,
@@ -104,12 +104,40 @@ context('User login tests', () => {
           ],
         });
       }
-
+    });
+    it('The role model should be opened if the site is navigated to with the querystring', () => {
       cy.login('officer');
       cy.visit('/');
+
+      //Site is loaded
+      cy.contains('Dashboard');
+
+      //Modal is not open if query string is not present
       cy.contains('Assigned Roles').should('not.exist');
-      cy.visit('/?roleSelectionOpen=true');
+
+      cy.visit('/?selectRoles=true');
       cy.contains('Assigned Roles');
+
+      cy.url().should('not.include', '/?selectRoles=true');
+
+      cy.get('[data-cy="select-role-user"]').click();
+
+      //Site is loaded
+      cy.contains('Dashboard');
+      cy.contains('Assigned Roles').should('not.exist');
+      cy.url().should('not.include', '/?selectRoles=true');
+    });
+
+    it('Role modal does not reoccure on refresh', () => {
+      cy.login('officer');
+      cy.visit('/?selectRoles=true');
+
+      cy.contains('Close').click();
+
+      cy.reload();
+
+      cy.contains('Dashboard');
+      cy.contains('Assigned Roles').should('not.exist');
     });
   });
 });

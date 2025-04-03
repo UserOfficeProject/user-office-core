@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import ImpersonateButton from 'components/common/ImpersonateButton';
@@ -33,14 +33,16 @@ const AccountActionButton = () => {
 
   const hasMultipleRoles = getUniqueArrayBy(roles, 'id').length > 1;
 
-  if (searchParams.get('roleSelectionOpen')) {
-    setShow(hasMultipleRoles);
-    setSearchParams((searchParams) => {
-      searchParams.delete('roleSelectionOpen');
+  useEffect(() => {
+    if (searchParams.get('selectRoles')) {
+      setShow(hasMultipleRoles);
+      setSearchParams((searchParams) => {
+        searchParams.delete('selectRoles');
 
-      return searchParams;
-    });
-  }
+        return searchParams;
+      });
+    }
+  }, [hasMultipleRoles, searchParams, setSearchParams]);
 
   const isUserImpersonated = typeof impersonatingUserId === 'number';
 
@@ -109,7 +111,6 @@ const AccountActionButton = () => {
               fontSize: '1rem',
             }}
           >
-            {hasMultipleRoles && 'Change Roles:'}
             <AccountCircle />
           </IconButton>
         </Badge>
