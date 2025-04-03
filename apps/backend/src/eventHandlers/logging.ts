@@ -363,3 +363,9 @@ export default function createLoggingHandler() {
     }
   };
 }
+
+export const createSkipLoggingHandler = () => {
+  return async function skipLoggingHandler(event: ApplicationEvent) {
+    logger.logInfo('Skip logging event', { type: event.type });
+  };
+};
