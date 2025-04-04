@@ -13,9 +13,6 @@ export class ExperimentSafetyReviewQuestionaryWizardStep extends QuestionaryWiza
   }
 
   getMetadata(state: ExperimentSafetyReviewSubmissionState) {
-    console.log('this.index', this.index);
-    console.log('state.questionary.steps', state.questionary.steps);
-
     const check = {
       title: this.step.topic.title,
       isCompleted: this.step.isCompleted,

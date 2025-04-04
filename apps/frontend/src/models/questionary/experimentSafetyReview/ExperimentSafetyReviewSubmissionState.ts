@@ -21,14 +21,18 @@ export class ExperimentSafetyReviewSubmissionState extends QuestionarySubmission
 
   get itemWithQuestionary() {
     return {
-      questionary: this.experimentSafety.safetyReviewQuestionary,
+      questionary: this.experimentSafety.safetyReviewQuestionary, // attach as questionary for reducer compatibility
+      safetyReviewQuestionary: this.experimentSafety.safetyReviewQuestionary,
     };
   }
 
-  set itemWithQuestionary(item: { questionary: Questionary }) {
+  set itemWithQuestionary(item: {
+    questionary: Questionary;
+    safetyReviewQuestionary: Questionary;
+  }) {
     this.experimentSafety = {
       ...this.experimentSafety,
-      safetyReviewQuestionary: item.questionary,
+      safetyReviewQuestionary: item.safetyReviewQuestionary,
     };
   }
 }

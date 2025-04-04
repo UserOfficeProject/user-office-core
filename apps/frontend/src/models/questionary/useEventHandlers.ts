@@ -41,7 +41,7 @@ export default function useEventHandlers(templateGroupId: TemplateGroupId) {
             });
             dispatch({
               type: 'STEPS_LOADED',
-              steps: itemWithQuestionary.questionary.steps,
+              // steps: itemWithQuestionary.questionary.steps,
               stepIndex: state.stepIndex,
             });
           });
@@ -79,7 +79,7 @@ export default function useEventHandlers(templateGroupId: TemplateGroupId) {
 
         case 'GO_TO_STEP_CLICKED':
           if (!state.isDirty) {
-            await handleReset();
+            // await handleReset();
             dispatch({
               type: 'GO_TO_STEP',
               stepIndex: action.stepIndex,

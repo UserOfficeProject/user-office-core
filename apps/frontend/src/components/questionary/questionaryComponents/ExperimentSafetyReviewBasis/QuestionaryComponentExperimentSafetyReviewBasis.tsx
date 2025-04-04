@@ -17,8 +17,6 @@ function QuestionaryComponentExperimentSafetyReviewBasis(
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
-  console.log('*********');
-  console.log(state.experimentSafety.samples[0]);
 
   return (
     <SampleDetails sampleId={state.experimentSafety.samples[0].sampleId} />

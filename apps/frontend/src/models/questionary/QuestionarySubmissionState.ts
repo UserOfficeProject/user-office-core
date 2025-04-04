@@ -5,7 +5,7 @@ import { Reducer } from 'react';
 import { StepsWizardWithoutReviewStepFactory } from 'components/questionary/questionaries/sample/StepsWizardWithoutReviewStepFactory';
 import { getQuestionaryDefinition } from 'components/questionary/QuestionaryRegistry';
 import { GenericTemplateFragment, Maybe, TemplateGroupId } from 'generated/sdk';
-import { Answer, Questionary, QuestionaryStep } from 'generated/sdk';
+import { Answer, Questionary } from 'generated/sdk';
 import { deepClone } from 'utils/json';
 import { clamp } from 'utils/Math';
 import {
@@ -45,7 +45,7 @@ export type Event =
   | { type: 'CLEAR_DELETE_LIST' }
   | { type: 'CLEAR_CREATED_LIST' }
   | { type: 'GO_TO_STEP'; stepIndex: number }
-  | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
+  | { type: 'STEPS_LOADED'; stepIndex?: number }
   | {
       type: 'STEP_ANSWERED';
       answers: AnswerMinimal[];
@@ -249,7 +249,6 @@ export function QuestionarySubmissionModel<
           break;
 
         case 'STEPS_LOADED': {
-          draftState.questionary.steps = action.steps;
           const stepIndex =
             action.stepIndex !== undefined
               ? action.stepIndex
