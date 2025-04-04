@@ -35,7 +35,7 @@
     {
       "source": "user_office_scheduler_backend.fanout",
       "vhost": "/",
-      "destination": "user_office_scheduler_backend.queue",
+      "destination": "user_office_backend.queue",
       "destination_type": "queue"
     }
   ]
