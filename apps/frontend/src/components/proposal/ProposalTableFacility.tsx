@@ -29,7 +29,7 @@ import {
   ReviewerFilter,
   WorkflowType,
 } from 'generated/sdk';
-import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
+import { useFacilityMemberCallsData } from 'hooks/call/useFacilityCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -256,7 +256,7 @@ const ProposalTableFacility = () => {
     searchText: search ?? undefined,
   });
   const { instruments, loadingInstruments } = useInstrumentsMinimalData();
-  const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
+  const { calls, loadingCalls } = useFacilityMemberCallsData(user.id);
   const {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,

@@ -74,4 +74,12 @@ export class CallsQuery {
       scientistId
     );
   }
+
+  @Query(() => [Call], { nullable: true })
+  callsByFacilityMember(
+    @Ctx() context: ResolverContext,
+    @Arg('userId', () => Int) userId: number
+  ) {
+    return context.queries.call.getCallsByFacilityMember(context.user, userId);
+  }
 }

@@ -69,14 +69,6 @@ export function useFacilityProposalsDataCore(
                 return {
                   ...proposal,
                   status: proposal.submitted ? 'Submitted' : 'Open',
-                  technicalReviews: proposal.technicalReviews?.map(
-                    (technicalReview) => ({
-                      ...technicalReview,
-                      status: getTranslation(
-                        technicalReview.status as ResourceId
-                      ),
-                    })
-                  ),
                   finalStatus: getTranslation(
                     proposal.finalStatus as ResourceId
                   ),
