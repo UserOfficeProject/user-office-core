@@ -2,13 +2,13 @@ import { immerable } from 'immer';
 
 import { Questionary } from 'generated/sdk';
 
-import { ExperimentSafetyWithReviewQuestionary } from './ExperimentSafetyReviewWithQuestionary';
+import { ExperimentSafetyReviewWithQuestionary } from './ExperimentSafetyReviewWithQuestionary';
 import { TemplateGroupId } from '../../../generated/sdk';
 import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class ExperimentSafetyReviewSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(public experimentSafety: ExperimentSafetyWithReviewQuestionary) {
+  constructor(public experimentSafety: ExperimentSafetyReviewWithQuestionary) {
     super(TemplateGroupId.EXP_SAFETY_REVIEW, {
       questionary: experimentSafety.safetyReviewQuestionary,
     });

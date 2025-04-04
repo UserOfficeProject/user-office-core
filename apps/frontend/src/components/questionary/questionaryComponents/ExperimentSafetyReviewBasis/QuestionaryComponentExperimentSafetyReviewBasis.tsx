@@ -12,6 +12,7 @@ import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissio
 function QuestionaryComponentExperimentSafetyReviewBasis(
   props: BasicComponentProps
 ) {
+  console.log({ props });
   const { dispatch, state } = useContext(QuestionaryContext) as any;
 
   if (!state || !dispatch) {

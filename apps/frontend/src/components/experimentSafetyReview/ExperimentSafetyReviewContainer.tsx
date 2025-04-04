@@ -8,11 +8,9 @@ import {
 } from 'components/questionary/QuestionaryContext';
 import { QuestionaryStep, TemplateGroupId } from 'generated/sdk';
 import { ExperimentSafetySubmissionState } from 'models/questionary/experimentSafety/ExperimentSafetySubmissionState';
-import {
-  ExperimentSafetyWithQuestionary,
-  ExperimentSafetyWithReviewQuestionary,
-} from 'models/questionary/experimentSafety/ExperimentSafetyWithQuestionary';
+import { ExperimentSafetyWithQuestionary } from 'models/questionary/experimentSafety/ExperimentSafetyWithQuestionary';
 import { ExperimentSafetyReviewSubmissionState } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewSubmissionState';
+import { ExperimentSafetyReviewWithQuestionary } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewWithQuestionary';
 import {
   Event,
   QuestionarySubmissionModel,
@@ -106,7 +104,7 @@ const experimentSafetyReviewReducer = (
 };
 
 export interface ExperimentSafetyReviewContainerProps {
-  experimentSafety: ExperimentSafetyWithReviewQuestionary;
+  experimentSafety: ExperimentSafetyReviewWithQuestionary;
   previewMode?: boolean;
 }
 export default function ExperimentSafetyReviewContainer(

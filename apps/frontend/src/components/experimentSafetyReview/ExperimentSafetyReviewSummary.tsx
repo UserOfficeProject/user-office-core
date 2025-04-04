@@ -9,6 +9,8 @@ type ExperimentSafetyReviewSummaryProps = {
 function ExperimentSafetyReviewSummary({
   confirm,
 }: ExperimentSafetyReviewSummaryProps) {
+  console.log({ confirm });
+
   return <>WIPsss</>;
 }
 

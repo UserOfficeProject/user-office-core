@@ -1,5 +1,5 @@
 import { ReviewExperimentSafetyMutation } from 'generated/sdk';
 
-export type ExperimentSafetyWithReviewQuestionary = NonNullable<
+export type ExperimentSafetyReviewWithQuestionary = NonNullable<
   ReviewExperimentSafetyMutation['reviewExperimentSafety']
 >;

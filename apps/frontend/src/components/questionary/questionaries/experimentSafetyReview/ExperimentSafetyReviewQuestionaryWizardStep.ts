@@ -1,27 +1,17 @@
-import { ExperimentSafetyReviewSubmissionState } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewSubmissionState';
+import { QuestionarySubmissionState } from 'models/questionary/QuestionarySubmissionState';
 
 import { QuestionaryWizardStep } from '../../DefaultWizardStepFactory';
 
 export class ExperimentSafetyReviewQuestionaryWizardStep extends QuestionaryWizardStep {
-  isItemWithQuestionaryEditable(state: ExperimentSafetyReviewSubmissionState) {
+  isItemWithQuestionaryEditable(state: QuestionarySubmissionState) {
+    // TODO: When the experiment safety review is submitted by the safety officer, this should not be editable anymore(ie., false)
+    console.log({ state });
+
     return true;
 
     // return (
     //   (state.stepIndex == 0 && fapChairOrSecCanEdit) ||
     //   technicalReview.submitted === false
     // );
-  }
-
-  getMetadata(state: ExperimentSafetyReviewSubmissionState) {
-    const check = {
-      title: this.step.topic.title,
-      isCompleted: this.step.isCompleted,
-      isReadonly:
-        !this.isItemWithQuestionaryEditable(state) ||
-        (this.index > 0 &&
-          state.questionary.steps[this.index - 1].isCompleted === false),
-    };
-
-    return check;
   }
 }
