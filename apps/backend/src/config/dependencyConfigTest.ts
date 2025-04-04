@@ -96,7 +96,7 @@ mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
-mapValue(Tokens.PostToMessageQueue, jest.mocked(new EventBus()));
+mapValue(Tokens.LoggingHandler, jest.mocked(new EventBus()));
 mapValue(Tokens.EventBus, jest.mocked(new EventBus()));
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
