@@ -1089,6 +1089,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.callId) {
           query.where('call_id', filter.callId);
         }
+
+        if (filter?.facilityId) {
+          query.where('fu.facility_id', filter.facilityId);
+        }
+
         if (filter?.reviewer === ReviewerFilter.ME) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
           query.whereRaw(

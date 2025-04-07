@@ -27,6 +27,7 @@ export function useFacilityProposalsDataCore(
   const {
     reviewer,
     callId,
+    facilityId,
     instrumentFilter,
     proposalStatusId,
     excludeProposalStatusIds,
@@ -45,6 +46,7 @@ export function useFacilityProposalsDataCore(
           filter: {
             reviewer,
             callId,
+            facilityId,
             instrumentFilter,
             proposalStatusId,
             excludeProposalStatusIds,
@@ -81,16 +83,17 @@ export function useFacilityProposalsDataCore(
         });
     },
     [
+      api,
       reviewer,
       callId,
+      facilityId,
       instrumentFilter,
       proposalStatusId,
       excludeProposalStatusIds,
       questionaryIds,
-      text,
-      questionFilter,
-      api,
       referenceNumbers,
+      questionFilter,
+      text,
       queryParameters,
     ]
   );

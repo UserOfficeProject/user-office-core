@@ -31,6 +31,7 @@ import {
 } from 'generated/sdk';
 import { useFacilityMemberCallsData } from 'hooks/call/useFacilityCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
+import { useMyFacilitiesData } from 'hooks/facility/useMyFacilitiesData';
 import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
@@ -216,6 +217,7 @@ const ProposalTableFacility = () => {
   const [searchParams, setSearchParams] = useSearchParams({});
   const callId = searchParams.get('call');
   const instrumentId = searchParams.get('instrument');
+  const facilityId = searchParams.get('facility');
   const proposalStatusId = searchParams.get('proposalStatus');
   const questionId = searchParams.get('questionId');
   const proposalId = searchParams.get('proposalId');
@@ -232,6 +234,7 @@ const ProposalTableFacility = () => {
   // NOTE: proposalStatusId has default value 2 because for Instrument Scientist default view should be all proposals in FEASIBILITY_REVIEW status
   const [proposalFilter, setProposalFilter] = useState<ProposalsFilter>({
     callId: callId ? +callId : undefined,
+    facilityId: facilityId ? +facilityId : undefined,
     instrumentFilter: {
       instrumentId: instrumentId != null ? +instrumentId : null,
       showAllProposals: !instrumentId,
@@ -261,6 +264,7 @@ const ProposalTableFacility = () => {
     statuses: proposalStatuses,
     loadingStatuses: loadingProposalStatuses,
   } = useStatusesData(WorkflowType.PROPOSAL);
+  const { facilities, loadingFacilities } = useMyFacilitiesData();
 
   const { loading, proposalsData, totalCount, setProposalsData } =
     useFacilityProposalsDataCore(
@@ -273,6 +277,7 @@ const ProposalTableFacility = () => {
         reviewer: proposalFilter.reviewer,
         referenceNumbers: proposalFilter.referenceNumbers,
         text: queryParameters.searchText,
+        facilityId: proposalFilter.facilityId,
       },
       queryParameters.query
     );
@@ -626,6 +631,7 @@ const ProposalTableFacility = () => {
               data: proposalStatuses,
               isLoading: loadingProposalStatuses,
             }}
+            facilities={{ data: facilities, isLoading: loadingFacilities }}
             setProposalFilter={setProposalFilter}
             filter={proposalFilter}
             hiddenStatuses={proposalFilter.excludeProposalStatusIds as number[]}

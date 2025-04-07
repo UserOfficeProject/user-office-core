@@ -65,15 +65,16 @@ export default function OverviewPage(props: { userRole: UserRole }) {
 
   return (
     <StyledContainer maxWidth={false}>
-      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
-        <Paper>
-          {loadingContent ? (
-            <div>Loading...</div>
-          ) : (
-            parse(pageContent as string)
-          )}
-        </Paper>
-      )}
+      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
+        props.userRole !== UserRole.FACILITY_MEMBER && (
+          <Paper>
+            {loadingContent ? (
+              <div>Loading...</div>
+            ) : (
+              parse(pageContent as string)
+            )}
+          </Paper>
+        )}
       {roleBasedOverView}
     </StyledContainer>
   );

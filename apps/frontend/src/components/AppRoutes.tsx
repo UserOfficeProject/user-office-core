@@ -132,6 +132,7 @@ const AppRoutes = () => {
   const isExperimentSafetyReviewer = useCheckAccess([
     UserRole.EXPERIMENT_SAFETY_REVIEWER,
   ]);
+  const isFacilityMember = useCheckAccess([UserRole.FACILITY_MEMBER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
 
   const featureContext = useContext(FeatureContext);
@@ -231,7 +232,7 @@ const AppRoutes = () => {
             }
           />
         )}
-        {isUserOfficer && (
+        {(isUserOfficer || isFacilityMember) && (
           <Route
             path="/Facility"
             element={
