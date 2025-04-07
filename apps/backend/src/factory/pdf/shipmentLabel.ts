@@ -2,6 +2,7 @@ import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
+import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { DataType, Question } from '../../models/Template';
@@ -9,7 +10,6 @@ import { Unit } from '../../models/Unit';
 import { UserWithRole } from '../../models/User';
 import { CallDataSource } from './../../datasources/CallDataSource';
 import { InstrumentDataSource } from './../../datasources/InstrumentDataSource';
-import { ScheduledEventDataSource } from './../../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from './../../datasources/TemplateDataSource';
 import { UserDataSource } from './../../datasources/UserDataSource';
 import { AnswerBasic } from './../../models/Questionary';
@@ -159,18 +159,17 @@ const getUser = async (userId: number) => {
   return user;
 };
 
-const getScheduledEvent = async (scheduledEventId: number) => {
-  const dataSource = container.resolve<ScheduledEventDataSource>(
-    Tokens.ScheduledEventDataSource
+const getExperiment = async (experimentPk: number) => {
+  const dataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
   );
 
-  const scheduledEvent =
-    await dataSource.getScheduledEventCore(scheduledEventId);
-  if (!scheduledEvent) {
-    throw new Error(`User not found for userId: ${scheduledEventId}`);
+  const experiment = await dataSource.getExperiment(experimentPk);
+  if (!experiment) {
+    throw new Error(`Experiment not found for experimentPk: ${experimentPk}`);
   }
 
-  return scheduledEvent;
+  return experiment;
 };
 
 export async function collectShipmentPDFData(
@@ -190,15 +189,15 @@ export async function collectShipmentPDFData(
 
   notify?.(`shipment_${shipment.id}.pdf`);
 
-  const scheduledEvent = await getScheduledEvent(shipment.scheduledEventId);
-  if (scheduledEvent.localContactId === null) {
+  const experiment = await getExperiment(shipment.experimentPk);
+  if (experiment.localContactId === null) {
     throw new Error(`Shipment with ID '${shipmentId}' has no local contact`);
   }
   const proposalData = await getProposalData(shipment.proposalPk);
   const questionaryData = await getQuestionaryData(shipment.questionaryId);
   const callData = await getCallData(proposalData.callId);
   const instrumentData = await getInstrumentData(proposalData.proposalPk);
-  const localContact = await getUser(scheduledEvent.localContactId);
+  const localContact = await getUser(experiment.localContactId);
 
   const out = {
     shipment: {

@@ -45,4 +45,15 @@ export class TechniqueQuery {
       techniqueIds
     );
   }
+
+  @Query(() => [Technique], { nullable: true })
+  techniquesByScientist(
+    @Arg('userNumber', () => Int) userId: number,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.technique.getTechniquesByScientist(
+      context.user,
+      userId
+    );
+  }
 }

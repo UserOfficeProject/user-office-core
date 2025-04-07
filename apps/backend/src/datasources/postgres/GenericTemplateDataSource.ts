@@ -4,6 +4,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { GenericTemplate } from '../../models/GenericTemplate';
+import { Role, Roles } from '../../models/Role';
 import { UpdateGenericTemplateArgs } from '../../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplatesArgs } from '../../resolvers/queries/GenericTemplatesQuery';
 import { SubTemplateConfig } from '../../resolvers/types/FieldConfig';
@@ -136,14 +137,6 @@ export default class PostgresGenericTemplateDataSource
     questionId: string,
     sourceQuestionaryId: number
   ): Promise<GenericTemplate> {
-    const newGenericTemplate = await this.create(
-      title,
-      creatorId,
-      proposalPk,
-      questionaryId,
-      questionId
-    );
-
     const proposalCallId = (await this.proposalDataSource.get(proposalPk))
       ?.callId;
 
@@ -160,7 +153,7 @@ export default class PostgresGenericTemplateDataSource
     const subTemplate = await database('templates_has_questions')
       .select('*')
       .first()
-      .where('question_id', newGenericTemplate.questionId)
+      .where('question_id', questionId)
       .andWhere('template_id', proposalTemplateId)
       .then((result) => {
         if (!result) {
@@ -186,6 +179,15 @@ export default class PostgresGenericTemplateDataSource
         `Can not create generic template because topic does not exist ID: ${templateId}`
       );
     }
+
+    const newGenericTemplate = await this.create(
+      title,
+      creatorId,
+      proposalPk,
+      questionaryId,
+      questionId
+    );
+
     await this.questionaryDataSource.copyAnswers(
       sourceQuestionaryId,
       newGenericTemplate.questionaryId,
@@ -246,5 +248,40 @@ export default class PostgresGenericTemplateDataSource
       .then((records: GenericTemplateRecord[]) =>
         records.map((record) => createGenericTemplateObject(record))
       );
+  }
+
+  async getGenericTemplatesForCopy(
+    userId?: number | null,
+    role?: Role
+  ): Promise<GenericTemplate[]> {
+    if (
+      !(
+        role?.shortCode == Roles.INSTRUMENT_SCIENTIST ||
+        role?.shortCode == Roles.USER_OFFICER
+      )
+    ) {
+      return database
+        .select('*')
+        .from('generic_templates_view')
+        .modify((query) => {
+          // add filter for user role
+          query.where('fap_reviewer', userId);
+          query.orWhere('creator_id', userId);
+          query.orWhere('scientist_on_proposal', userId);
+          query.orWhere('fap_chair', userId);
+          query.orWhere('fap_secretary', userId);
+          query.orWhere('instrument_manager', userId);
+          query.orWhere('visitor', userId);
+          query.distinctOn('generic_template_id');
+        })
+        .orderBy('generic_template_id', 'asc')
+        .then((records: GenericTemplateRecord[]) =>
+          records.map((record) => createGenericTemplateObject(record))
+        );
+    } else {
+      const args: GenericTemplatesArgs = {};
+
+      return this.getGenericTemplates(args);
+    }
   }
 }

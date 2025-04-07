@@ -98,6 +98,9 @@ export class UpdateCallInput {
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public technicalReviewTemplateId?: number;
+
   @Field({ nullable: true })
   public title?: string;
 

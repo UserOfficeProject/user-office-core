@@ -52,7 +52,7 @@ const ValidateArgs = (
 
       if (errors) {
         return rejection('Input validation errors', {
-          errors: errors.errors,
+          errors: errors.errors || errors.message,
           inputArgs,
         });
       }

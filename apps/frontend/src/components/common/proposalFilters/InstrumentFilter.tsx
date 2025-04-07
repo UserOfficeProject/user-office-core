@@ -9,7 +9,10 @@ import React, { Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
-import { InstrumentFilterInput, InstrumentFragment } from 'generated/sdk';
+import {
+  InstrumentFilterInput,
+  InstrumentMinimalFragment,
+} from 'generated/sdk';
 
 export enum InstrumentFilterEnum {
   ALL = 'all',
@@ -17,7 +20,7 @@ export enum InstrumentFilterEnum {
 }
 
 type InstrumentFilterProps = {
-  instruments?: InstrumentFragment[];
+  instruments?: InstrumentMinimalFragment[];
   isLoading?: boolean;
   onChange?: Dispatch<InstrumentFilterInput>;
   shouldShowAll?: boolean;

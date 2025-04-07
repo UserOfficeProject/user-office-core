@@ -13,4 +13,7 @@ export const StfcFapDataColumns = [
   'Reviewer 2',
   'Reviewer 2 score',
   'Reviewer 2 review comment',
+  'Reviewer 3',
+  'Reviewer 3 score',
+  'Reviewer 3 review comment',
 ];

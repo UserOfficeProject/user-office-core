@@ -1,5 +1,6 @@
 import { Call } from '../models/Call';
 import { CallHasInstrument } from '../models/CallHasInstrument';
+import { Workflow } from '../models/Workflow';
 import { CreateCallInput } from '../resolvers/mutations/CreateCallMutation';
 import {
   UpdateCallInput,
@@ -28,5 +29,6 @@ export interface CallDataSource {
   getCallsByInstrumentScientist(scientistId: number): Promise<Call[]>;
   isCallEnded(callId: number, checkIfInternalEnded: boolean): Promise<boolean>;
   isCallEnded(callId: number): Promise<boolean>;
-  getCallByQuestionId(questionId: string): Promise<Call>;
+  getCallByAnswerIdProposal(answerId: number): Promise<Call>;
+  getProposalWorkflowByCall(callId: number): Promise<Workflow | null>;
 }

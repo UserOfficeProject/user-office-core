@@ -4,7 +4,10 @@ import React, { useMemo } from 'react';
 
 import CopyToClipboard from 'components/common/CopyToClipboard';
 import { ProposalFragment, TemplateCategoryId } from 'generated/sdk';
-import { useProposalsData } from 'hooks/proposal/useProposalsData';
+import {
+  ProposalsDataQuantity,
+  useProposalsData,
+} from 'hooks/proposal/useProposalsData';
 import { useSamplesWithQuestionaryStatus } from 'hooks/sample/useSamplesWithQuestionaryStatus';
 import { useShipments } from 'hooks/shipment/useShipments';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
@@ -37,7 +40,10 @@ function ProposalList({ question }: { question: QuestionWithUsage }) {
     () => question.answers.map((answer) => answer.questionaryId),
     [question]
   );
-  const { proposalsData } = useProposalsData({ questionaryIds });
+  const { proposalsData } = useProposalsData(
+    { questionaryIds },
+    ProposalsDataQuantity.MINIMAL
+  );
 
   const proposalsDataWithId = proposalsData.map((proposal) =>
     Object.assign(proposal, { id: proposal.primaryKey })

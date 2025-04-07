@@ -5,10 +5,10 @@ import DialogContent from '@mui/material/DialogContent';
 import React, { useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
+import ExperimentSafetyContainer from 'components/experimentSafety/ExperimentSafetyContainer';
+import { createExperimentSafetyStub } from 'components/experimentSafety/ExperimentSafetyContainer';
 import ProposalContainer from 'components/proposal/ProposalContainer';
 import { createProposalStub } from 'components/proposal/ProposalCreate';
-import ProposalEsiContainer from 'components/proposalEsi/ProposalEsiContainer';
-import { createESIStub } from 'components/proposalEsi/ProposalEsiContainer';
 import { GenericTemplateContainer } from 'components/questionary/questionaryComponents/GenericTemplate/GenericTemplateContainer';
 import { createGenericTemplateStub } from 'components/questionary/questionaryComponents/GenericTemplate/QuestionaryComponentGenericTemplate';
 import { createSampleStub } from 'components/questionary/questionaryComponents/SampleDeclaration/QuestionaryComponentSampleDeclaration';
@@ -16,6 +16,9 @@ import { SampleDeclarationContainer } from 'components/questionary/questionaryCo
 import ReviewQuestionary, {
   createFapReviewStub,
 } from 'components/review/ReviewQuestionary';
+import TechnicalReviewQuestionary, {
+  createTechnicalReviewStub,
+} from 'components/review/TechnicalReviewQuestionary';
 import ShipmentContainer from 'components/shipments/ShipmentContainer';
 import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails } from 'generated/sdk';
@@ -47,8 +50,11 @@ const PreviewTemplateModal = ({
     switch (templateGroupId) {
       case TemplateGroupId.PROPOSAL_ESI:
         return (
-          <ProposalEsiContainer
-            esi={createESIStub(templateId, questionarySteps)}
+          <ExperimentSafetyContainer
+            experimentSafety={createExperimentSafetyStub(
+              templateId,
+              questionarySteps
+            )}
             previewMode={true}
           />
         );
@@ -105,6 +111,18 @@ const PreviewTemplateModal = ({
             review={createFapReviewStub(
               templateId,
               questionarySteps,
+              user as unknown as BasicUserDetails
+            )}
+            previewMode={true}
+          />
+        );
+      case TemplateGroupId.TECHNICAL_REVIEW:
+        return (
+          <TechnicalReviewQuestionary
+            technicalReview={createTechnicalReviewStub(
+              templateId,
+              questionarySteps,
+              user as unknown as BasicUserDetails,
               user as unknown as BasicUserDetails
             )}
             previewMode={true}

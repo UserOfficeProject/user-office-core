@@ -16,6 +16,7 @@ import {
   ProposalEndStatus,
 } from '../../models/Proposal';
 import { TechnicalReviewStatus } from '../../models/TechnicalReview';
+import { ProposalInternalComment } from './ProposalInternalComment';
 import { User } from './User';
 
 @InputType('FapInstrumentInput')
@@ -96,6 +97,8 @@ export class ProposalViewTechnicalReview {
   @Field(() => ProposalViewTechnicalReviewAssignee, { nullable: true })
   technicalReviewAssignee: ProposalViewTechnicalReviewAssignee;
 }
+@ObjectType()
+export class ProposalScientistComment extends ProposalInternalComment {}
 
 @ObjectType()
 export class ProposalView implements Partial<ProposalOrigin> {

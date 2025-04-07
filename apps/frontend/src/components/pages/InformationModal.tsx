@@ -7,6 +7,9 @@ import { styled } from '@mui/system';
 import parse from 'html-react-parser';
 import React from 'react';
 
+import { PageName } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+
 const DialogContent = styled(MuiDialogContent)(({ theme }) => ({
   root: {
     padding: theme.spacing(2),
@@ -22,6 +25,7 @@ const DialogActions = styled(MuiDialogActions)(({ theme }) => ({
 
 type InformationDialogProps = {
   /** Content of the information modal. */
+  pageName: PageName;
   text?: string;
   /** Text of the button link in the information modal. */
   linkText?: string;
@@ -31,16 +35,18 @@ type InformationDialogProps = {
 
 const InformationDialog = (props: InformationDialogProps) => {
   const [open, setOpen] = React.useState(false);
-  const handleClickOpen = () => {
+  const [dialogText, setDialogText] = React.useState<string | null>(null);
+  const api = useDataApi();
+
+  const handleClickOpen = async () => {
+    const pageContent = await api().getPageContent({ pageId: props.pageName });
+    setDialogText(pageContent.pageContent);
+
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
-
-  if (!props.text) {
-    return null;
-  }
 
   return (
     <>
@@ -67,7 +73,9 @@ const InformationDialog = (props: InformationDialogProps) => {
         open={open}
       >
         <DialogContent dividers>
-          <Typography gutterBottom>{parse(props.text)}</Typography>
+          <Typography gutterBottom>
+            {parse(dialogText ? dialogText : '')}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button autoFocus onClick={handleClose} variant="text">

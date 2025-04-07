@@ -4,19 +4,12 @@ import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
-import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import {
   TechnicalReview,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
-import {
-  ProposalBookingFilter,
-  ProposalBookingScheduledEventFilterCore,
-  ProposalBookingStatusCore,
-  ScheduledEventBookingType,
-} from '../../resolvers/types/ProposalBooking';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -72,18 +65,6 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   1
 );
 
-const dummyScheduledEventCore = new ScheduledEventCore(
-  1,
-  ScheduledEventBookingType.USER_OPERATIONS,
-  new Date(),
-  new Date(),
-  1,
-  1,
-  ProposalBookingStatusCore.ACTIVE,
-  1,
-  1
-);
-
 export const dummyProposalTechnicalReview = new TechnicalReview(
   1,
   1,
@@ -94,6 +75,7 @@ export const dummyProposalTechnicalReview = new TechnicalReview(
   false,
   1,
   '',
+  1,
   1,
   1
 );
@@ -272,7 +254,14 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     return proposal;
   }
 
-  async setProposalUsers(proposalPk: number, users: number[]): Promise<void> {
+  async setProposalUsers(
+    proposalPk: number,
+    usersIds: number[]
+  ): Promise<void> {
+    throw new Error('Not implemented');
+  }
+
+  async addProposalUser(proposalPk: number, userId: number): Promise<void> {
     throw new Error('Not implemented');
   }
 
@@ -293,6 +282,20 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     if (referenceNumber !== undefined) {
       newObj.proposalId = referenceNumber;
     }
+
+    Object.setPrototypeOf(newObj, Proposal.prototype);
+
+    return newObj;
+  }
+
+  async submitImportedProposal(
+    primaryKey: number,
+    referenceNumber: string,
+    submittedDate: Date
+  ): Promise<Proposal> {
+    const submitted = await this.submitProposal(primaryKey, referenceNumber);
+
+    const newObj = { ...submitted, submittedDate };
 
     Object.setPrototypeOf(newObj, Proposal.prototype);
 
@@ -381,39 +384,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     statusId: number,
     proposalPks: number[]
   ): Promise<Proposals> {
-    return new Proposals(allProposals);
-  }
+    const proposals = allProposals.map((p) => {
+      return { ...p, statusId };
+    });
 
-  async getProposalBookingsByProposalPk(
-    proposalPk: number,
-    filter?: ProposalBookingFilter
-  ): Promise<{ ids: number[] } | null> {
-    return { ids: [1] };
-  }
-
-  async getAllProposalBookingsScheduledEvents(
-    proposalBookingIds: number[],
-    filter?: ProposalBookingScheduledEventFilterCore
-  ): Promise<ScheduledEventCore[] | null> {
-    return [dummyScheduledEventCore];
-  }
-
-  async addProposalBookingScheduledEvent(
-    eventMessage: ScheduledEventCore
-  ): Promise<void> {
-    return;
-  }
-
-  async removeProposalBookingScheduledEvents(
-    eventMessage: ScheduledEventCore[]
-  ): Promise<void> {
-    return;
-  }
-
-  async updateProposalBookingScheduledEvent(
-    eventMessage: ScheduledEventCore
-  ): Promise<void> {
-    return;
+    return { proposals: proposals };
   }
 
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {

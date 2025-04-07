@@ -1,5 +1,0 @@
-query getCall($callId: Int!) {
-  call(callId: $callId) {
-    ...call
-  }
-}

@@ -143,7 +143,6 @@ export default class ReviewMutations {
   @Authorized([
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
-    Roles.FAP_CHAIR,
     Roles.FAP_SECRETARY,
   ])
   async submitTechnicalReview(
@@ -208,7 +207,7 @@ export default class ReviewMutations {
   }
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
-  @Authorized([Roles.USER_OFFICER, Roles.SAMPLE_SAFETY_REVIEWER])
+  @Authorized([Roles.USER_OFFICER, Roles.EXPERIMENT_SAFETY_REVIEWER])
   async submitSampleReview(
     agent: UserWithRole | null,
     args: SubmitSampleReviewArg
@@ -239,13 +238,19 @@ export default class ReviewMutations {
   @Authorized([
     Roles.USER_OFFICER,
     Roles.INSTRUMENT_SCIENTIST,
-    Roles.FAP_CHAIR,
     Roles.FAP_SECRETARY,
   ])
   async setTechnicalReview(
     agent: UserWithRole | null,
     args: AddTechnicalReviewInput | SubmitTechnicalReviewInput
   ): Promise<TechnicalReview | Rejection> {
+    if (!agent) {
+      return rejection(
+        'Can not set technical review because of unknown creator',
+        { agent, args }
+      );
+    }
+
     const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
       agent,
       args.proposalPk,
@@ -270,6 +275,34 @@ export default class ReviewMutations {
         args,
         agent,
       });
+    }
+
+    if (!shouldUpdateReview) {
+      const proposal = await this.proposalDataSource.get(args.proposalPk);
+
+      if (!proposal) {
+        return rejection(
+          'Cannot find the proposal for the technical review to be created',
+          { agent, args }
+        );
+      }
+
+      const call = await this.callDataSource.getCall(proposal.callId);
+
+      if (!call) {
+        return rejection(
+          'Cannot find the call for proposal of the technical review to be created',
+          { agent, args }
+        );
+      }
+
+      const technicalReviewQuestionary =
+        await this.questionaryDataSource.create(
+          agent.id,
+          call.technicalReviewTemplateId
+        );
+
+      args.questionaryId = technicalReviewQuestionary.questionaryId;
     }
 
     return this.dataSource

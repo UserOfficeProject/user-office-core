@@ -13,6 +13,7 @@ import React, { useState } from 'react';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import { IntervalConfig, Unit } from 'generated/sdk';
 import expressionToFunction from 'utils/expressionToFunction';
+import isEventFromAutoComplete from 'utils/isEventFromAutoComplete';
 
 type AcceptableUserInput = number | '';
 
@@ -183,6 +184,16 @@ export function QuestionaryComponentInterval(props: BasicComponentProps) {
                 siMax: convertToSi(newValue),
               };
               setStateValue(newStateValue);
+
+              /*
+                Firefox's number spinner arrows don't grant focus
+                (see https://bugzilla.mozilla.org/show_bug.cgi?id=1012818)
+                but we use loss of focus (blur) to update component state.
+                Using blur means we don't update on every keystroke.
+              */
+              if (!isEventFromAutoComplete(event)) {
+                event.target.focus();
+              }
             }}
             onBlur={() => onComplete(stateValue)}
             value={stateValue.max}

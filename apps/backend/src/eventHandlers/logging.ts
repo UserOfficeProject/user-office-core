@@ -7,7 +7,7 @@ import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
-import { ProposalSettingsDataSource } from '../datasources/ProposalSettingsDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
@@ -16,10 +16,10 @@ export default function createHandler() {
   const eventLogsDataSource = container.resolve<EventLogsDataSource>(
     Tokens.EventLogsDataSource
   );
-  const proposalSettingsDataSource =
-    container.resolve<ProposalSettingsDataSource>(
-      Tokens.ProposalSettingsDataSource
-    );
+
+  const statusDataSource = container.resolve<StatusDataSource>(
+    Tokens.StatusDataSource
+  );
   const instrumentDataSource = container.resolve<InstrumentDataSource>(
     Tokens.InstrumentDataSource
   );
@@ -53,13 +53,30 @@ export default function createHandler() {
     // NOTE: We need to have custom checks for events where response is not standard one.
     try {
       switch (event.type) {
-        case Event.EMAIL_INVITE:
+        case Event.EMAIL_INVITE_LEGACY:
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
             event.emailinviteresponse.userId.toString()
           );
+          break;
+        case Event.EMAIL_INVITE:
+        case Event.EMAIL_INVITES:
+          let invites;
+          if ('invite' in event) {
+            invites = [event.invite];
+          } else {
+            invites = event.array;
+          }
+          for (const invite of invites) {
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              invite.id.toString()
+            );
+          }
           break;
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
@@ -130,10 +147,9 @@ export default function createHandler() {
         case Event.PROPOSAL_STATUS_CHANGED_BY_USER:
           await Promise.all(
             event.proposals.proposals.map(async (proposal) => {
-              const proposalStatus =
-                await proposalSettingsDataSource.getProposalStatus(
-                  proposal.statusId
-                );
+              const proposalStatus = await statusDataSource.getStatus(
+                proposal.statusId
+              );
 
               const description = `Status changed to: ${proposalStatus?.name}`;
 
@@ -213,7 +229,8 @@ export default function createHandler() {
             event.loggedInUserId,
             event.type,
             json,
-            event.questionarystep.questionaryId.toString()
+            event.array.at(0)?.questionaryId.toString() ??
+              'Questionary ID not found'
           );
           break;
         case Event.INSTRUMENTS_REMOVED_FROM_TECHNIQUE:
@@ -286,6 +303,35 @@ export default function createHandler() {
                 event.type,
                 json,
                 obj[0].proposalPk,
+                description
+              );
+            }
+          }
+          break;
+
+        case Event.VISIT_REGISTRATION_APPROVED:
+          {
+            if (event.visitregistration) {
+              const description = 'Visit registration approved';
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                event.visitregistration.visitId.toString(),
+                description
+              );
+            }
+          }
+          break;
+        case Event.VISIT_REGISTRATION_CANCELLED:
+          {
+            if (event.visitregistration) {
+              const description = 'Visit registration cancelled';
+              await eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                event.visitregistration.visitId.toString(),
                 description
               );
             }

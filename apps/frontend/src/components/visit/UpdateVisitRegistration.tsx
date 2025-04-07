@@ -15,7 +15,10 @@ function UpdateVisitRegistration({
   visitRegistration,
   onSubmitted,
 }: UpdateVisitRegistrationProps) {
-  const { registration } = useVisitRegistration(visitRegistration.visitId);
+  const { registration } = useVisitRegistration(
+    visitRegistration.visitId,
+    visitRegistration.userId
+  );
 
   if (!registration) {
     return <UOLoader />;

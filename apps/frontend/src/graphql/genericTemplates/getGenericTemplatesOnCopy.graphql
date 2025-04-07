@@ -1,0 +1,11 @@
+query getGenericTemplatesOnCopy{
+  genericTemplatesOnCopy {
+    ...genericTemplate
+    id
+    proposal {
+      primaryKey
+      proposalId
+      title
+    }
+  }
+}

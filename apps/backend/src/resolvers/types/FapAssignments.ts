@@ -70,7 +70,7 @@ export class FapUserResolver {
     @Ctx() context: ResolverContext
   ) {
     return fapAssignment.fapMemberUserId
-      ? context.queries.user.dataSource.getBasicUserInfo(
+      ? context.loaders.basicUser.batchLoader.load(
           fapAssignment.fapMemberUserId
         )
       : null;

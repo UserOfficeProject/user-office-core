@@ -9,24 +9,18 @@ import { Event } from '../../events/event.enum';
 import { Call } from '../../models/Call';
 import { Proposal, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
-import { ProposalWorkflowConnection } from '../../models/ProposalWorkflowConnections';
 import { getQuestionDefinition } from '../../models/questionTypes/QuestionRegistry';
 import { ReviewerFilter } from '../../models/Review';
 import { Roles } from '../../models/Role';
-import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
+import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
-import {
-  ProposalBookingFilter,
-  ProposalBookingScheduledEventFilterCore,
-} from '../../resolvers/types/ProposalBooking';
 import { UserProposalsFilter } from '../../resolvers/types/User';
-import { removeDuplicates } from '../../utils/helperFunctions';
 import { AdminDataSource } from '../AdminDataSource';
 import { ProposalDataSource } from '../ProposalDataSource';
-import { ProposalSettingsDataSource } from '../ProposalSettingsDataSource';
+import { WorkflowDataSource } from '../WorkflowDataSource';
 import {
   ProposalsFilter,
   QuestionFilterInput,
@@ -36,13 +30,11 @@ import {
   CallRecord,
   createProposalObject,
   createProposalViewObject,
-  createScheduledEventObject,
   createTechnicalReviewObject,
   ProposalEventsRecord,
   ProposalRecord,
   ProposalViewRecord,
-  ProposalWorkflowConnectionRecord,
-  ScheduledEventRecord,
+  WorkflowConnectionRecord,
   StatusChangingEventRecord,
   TechnicalReviewRecord,
 } from './records';
@@ -102,8 +94,8 @@ export async function calculateReferenceNumber(
 @injectable()
 export default class PostgresProposalDataSource implements ProposalDataSource {
   constructor(
-    @inject(Tokens.ProposalSettingsDataSource)
-    private proposalSettingsDataSource: ProposalSettingsDataSource,
+    @inject(Tokens.WorkflowDataSource)
+    private workflowDataSource: WorkflowDataSource,
     @inject(Tokens.AdminDataSource)
     private AdminDataSource: AdminDataSource
   ) {}
@@ -230,6 +222,12 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
         return createProposalObject(proposal[0]);
       });
+  }
+
+  async addProposalUser(proposalPk: number, userId: number): Promise<void> {
+    return database
+      .insert({ proposal_pk: proposalPk, user_id: userId })
+      .into('proposal_user');
   }
 
   async setProposalUsers(proposalPk: number, userIds: number[]): Promise<void> {
@@ -534,11 +532,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         if (filter?.templateIds) {
           query
             .leftJoin(
-              'questionary',
-              'questionary.questionary_id',
+              'questionaries',
+              'questionaries.questionary_id',
               'proposals.questionary_id'
             )
-            .whereIn('questionary.template_id', filter.templateIds);
+            .whereIn('questionaries.template_id', filter.templateIds);
         }
 
         if (filter?.proposalStatusId) {
@@ -700,11 +698,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .select('p.*')
       .from('proposals as p')
       .where('p.proposer_id', id) // Principal investigator
-      .orWhereIn('proposal_pk', function () {
+      .orWhereIn('p.proposal_pk', function () {
         // co-proposer
         this.select('proposal_pk').from('proposal_user').where('user_id', id);
       })
-      .orWhereIn('proposal_pk', function () {
+      .orWhereIn('p.proposal_pk', function () {
         // visitor
         this.select('proposal_pk')
           .from('visits')
@@ -863,21 +861,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         const proposalWorkflowId = proposalCall.proposal_workflow_id;
 
         const proposalEventsToReset: (StatusChangingEventRecord &
-          ProposalWorkflowConnectionRecord)[] = (
+          WorkflowConnectionRecord)[] = (
           await database
             .raw(
               `
         SELECT *
-        FROM proposal_workflow_connections AS pwc
-        JOIN status_changing_events
-        ON status_changing_events.proposal_workflow_connection_id = pwc.proposal_workflow_connection_id
-        WHERE pwc.proposal_workflow_connection_id >= (
-          SELECT proposal_workflow_connection_id
-          FROM proposal_workflow_connections
-          WHERE proposal_workflow_id = ${proposalWorkflowId}
-          AND proposal_status_id = ${statusId}
+        FROM workflow_connections AS wc
+        JOIN status_changing_events sce
+        ON sce.workflow_connection_id = wc.workflow_connection_id
+        WHERE wc.workflow_connection_id >= (
+          SELECT workflow_connection_id
+          FROM workflow_connections
+          WHERE workflow_id = ${proposalWorkflowId}
+          AND status_id = ${statusId}
         )
-        AND pwc.proposal_workflow_id = ${proposalWorkflowId};
+        AND wc.workflow_id = ${proposalWorkflowId};
       `
             )
             .transacting(trx)
@@ -952,133 +950,6 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return new Proposals(result.map((item) => createProposalObject(item)));
   }
 
-  async getProposalBookingsByProposalPk(
-    proposalPk: number,
-    filter?: ProposalBookingFilter
-  ): Promise<{ ids: number[] } | null> {
-    const result: ScheduledEventRecord[] = await database<
-      ScheduledEventRecord[]
-    >('scheduled_events')
-      .select()
-      .where('proposal_pk', proposalPk)
-      .modify((qb) => {
-        if (filter?.status) {
-          qb.whereIn('status', filter.status);
-        }
-      });
-
-    if (result) {
-      return {
-        ids: removeDuplicates(
-          result.map((bookingId) => bookingId.proposal_booking_id)
-        ),
-      };
-    } else {
-      return null;
-    }
-  }
-
-  async getAllProposalBookingsScheduledEvents(
-    proposalBookingIds: number[],
-    filter?: ProposalBookingScheduledEventFilterCore
-  ): Promise<ScheduledEventCore[] | null> {
-    const scheduledEventRecords: ScheduledEventRecord[] =
-      await database<ScheduledEventRecord>('scheduled_events')
-        .select()
-        .whereIn('proposal_booking_id', proposalBookingIds)
-        .orderBy('starts_at', 'asc')
-        .modify((qb) => {
-          if (filter?.status) {
-            qb.whereIn('status', filter.status);
-          }
-          if (filter?.bookingType) {
-            qb.where('booking_type', filter.bookingType);
-          }
-
-          if (filter?.endsAfter !== undefined && filter?.endsAfter !== null) {
-            qb.where('ends_at', '>=', filter.endsAfter);
-          }
-
-          if (filter?.endsBefore !== undefined && filter.endsBefore !== null) {
-            qb.where('ends_at', '<=', filter.endsBefore);
-          }
-        });
-
-    return scheduledEventRecords.map(createScheduledEventObject);
-  }
-
-  async addProposalBookingScheduledEvent(
-    eventMessage: ScheduledEventCore
-  ): Promise<void> {
-    const [addedScheduledEvent]: ScheduledEventRecord[] = await database
-      .insert({
-        scheduled_event_id: eventMessage.id,
-        booking_type: eventMessage.bookingType,
-        starts_at: eventMessage.startsAt,
-        ends_at: eventMessage.endsAt,
-        proposal_booking_id: eventMessage.proposalBookingId,
-        proposal_pk: eventMessage.proposalPk,
-        status: eventMessage.status,
-        local_contact: eventMessage.localContactId,
-        instrument_id: eventMessage.instrumentId,
-      })
-      .into('scheduled_events')
-      .returning(['*']);
-
-    if (!addedScheduledEvent) {
-      throw new GraphQLError(
-        `Failed to add proposal booking scheduled event '${eventMessage.id}'`
-      );
-    }
-  }
-
-  async updateProposalBookingScheduledEvent(
-    eventToUpdate: ScheduledEventCore
-  ): Promise<void> {
-    const [updatedScheduledEvent]: ScheduledEventRecord[] = await database(
-      'scheduled_events'
-    )
-      .update({
-        starts_at: eventToUpdate.startsAt,
-        ends_at: eventToUpdate.endsAt,
-        status: eventToUpdate.status,
-        local_contact: eventToUpdate.localContactId,
-      })
-      .where('scheduled_event_id', eventToUpdate.id)
-      .andWhere('proposal_booking_id', eventToUpdate.proposalBookingId)
-      .returning(['*']);
-
-    if (!updatedScheduledEvent) {
-      throw new GraphQLError(
-        `Failed to update proposal booking scheduled event '${eventToUpdate.id}'`
-      );
-    }
-  }
-
-  async removeProposalBookingScheduledEvents(
-    eventMessage: ScheduledEventCore[]
-  ): Promise<void> {
-    const [removedScheduledEvent]: ScheduledEventRecord[] = await database(
-      'scheduled_events'
-    )
-      .whereIn(
-        'scheduled_event_id',
-        eventMessage.map((event) => event.id)
-      )
-      .andWhere('proposal_booking_id', eventMessage[0].proposalBookingId)
-      .andWhere('instrument_id', eventMessage[0].instrumentId)
-      .del()
-      .returning('*');
-
-    if (!removedScheduledEvent) {
-      throw new GraphQLError(
-        `Could not delete scheduled events with ids: ${eventMessage
-          .map((event) => event.id)
-          .join(', ')} `
-      );
-    }
-  }
-
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {
     const relatedCoIs = await database
       .select('ou.user_id')
@@ -1140,13 +1011,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .first()
       .then((value) => value.proposal_workflow_id);
 
-    const proposalStatus: ProposalWorkflowConnection[] =
-      await this.proposalSettingsDataSource.getProposalWorkflowConnections(
-        proposalWorkflowId
-      );
+    const proposalStatus: WorkflowConnectionWithStatus[] =
+      await this.workflowDataSource.getWorkflowConnections(proposalWorkflowId);
 
     return !!proposalStatus.find((status) =>
-      status.proposalStatus.shortCode.match(workflowStatus)
+      status.status.shortCode.match(workflowStatus)
     );
   }
 
@@ -1160,5 +1029,21 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
     return { totalCount: 0, proposals: [] };
+  }
+
+  async submitImportedProposal(
+    primaryKey: number,
+    referenceNumber: string,
+    submittedDate: Date
+  ): Promise<Proposal | null> {
+    await this.submitProposal(primaryKey, referenceNumber);
+
+    const proposal: ProposalRecord[] | undefined = await database
+      .from('proposals')
+      .where('proposal_pk', primaryKey)
+      .update({ submitted_date: submittedDate })
+      .returning('*');
+
+    return proposal ? createProposalObject(proposal[0]) : null;
   }
 }

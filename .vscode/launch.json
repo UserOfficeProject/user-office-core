@@ -12,13 +12,13 @@
             "webRoot": "${workspaceFolder}"
         },
         {
-            "name": "Attach to Windows Docker container",
+            "name": "Attach to Docker container",
             "type": "node",
             "request": "attach",
             "port": 9229,
             "protocol": "inspector",
-            "localRoot": "${workspaceFolder}",
-            "remoteRoot": "C:\\app"
+            "localRoot": "${workspaceFolder}/apps/backend",
+            "remoteRoot": "/app"
         }
     ]
 }

@@ -11,7 +11,7 @@ export function configureGraylogLogger() {
   if (server && port) {
     const env = process.env.NODE_ENV || 'unset';
     setLogger([
-      new ConsoleLogger(), // Log to console
+      new ConsoleLogger({ colorize: true }), // Log to console
       new GrayLogLogger( // Log to Graylog
         server,
         parseInt(port),
@@ -20,6 +20,6 @@ export function configureGraylogLogger() {
       ),
     ]);
   } else {
-    setLogger(new ConsoleLogger()); // Log to console
+    setLogger(new ConsoleLogger({ colorize: true })); // Log to console
   }
 }

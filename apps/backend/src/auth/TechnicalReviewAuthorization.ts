@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
@@ -9,11 +9,12 @@ import { UserAuthorization } from './UserAuthorization';
 
 @injectable()
 export class TechnicalReviewAuthorization {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   constructor(
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   async hasAccessRightsToInternalReviews(
@@ -158,10 +159,12 @@ export class TechnicalReviewAuthorization {
         : technicalReviewOrProposalPk.proposalPk;
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    const isFapChairOrSecOfFap =
-      await this.proposalAuth.isChairOrSecretaryOfProposal(agent, proposalPk);
+    const isFapSec = await this.proposalAuth.isSecretaryForFapProposal(
+      agent,
+      proposalPk
+    );
 
-    if (isUserOfficer || isFapChairOrSecOfFap) {
+    if (isUserOfficer || isFapSec) {
       return true;
     }
 

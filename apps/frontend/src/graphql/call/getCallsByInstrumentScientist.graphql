@@ -1,5 +1,7 @@
 query getCallsByInstrumentScientist($scientistId: Int!) {
   callsByInstrumentScientist(scientistId: $scientistId) {
-    ...call
+    id
+    shortCode
+    templateId
   }
 }

@@ -3,7 +3,7 @@ import {
   Questionary,
   QuestionaryStep,
 } from '../models/Questionary';
-import { Template } from '../models/Template';
+import { Question, Template } from '../models/Template';
 
 export interface QuestionaryDataSource {
   getCount(templateId: number): Promise<number>;
@@ -24,7 +24,7 @@ export interface QuestionaryDataSource {
     questionary_id: number,
     question_id: string,
     answer: string
-  ): Promise<string>;
+  ): Promise<AnswerBasic>;
   deleteAnswers(questionary_id: number, question_ids: string[]): Promise<void>;
   updateTopicCompleteness(
     questionary_id: number,
@@ -41,4 +41,5 @@ export interface QuestionaryDataSource {
     targetQuestionaryId: number,
     markAsComplete?: boolean
   ): Promise<void>;
+  getProposalAttachments(proposalPk: number): Promise<Question[]>;
 }

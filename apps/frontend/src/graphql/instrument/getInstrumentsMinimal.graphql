@@ -1,0 +1,8 @@
+query getInstrumentsMinimal($callIds: [Int!]) {
+  instruments(callIds: $callIds) {
+    instruments {
+      ...instrumentMinimal
+    }
+    totalCount
+  }
+}

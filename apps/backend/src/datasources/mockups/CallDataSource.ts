@@ -1,5 +1,6 @@
 import { AllocationTimeUnits, Call } from '../../models/Call';
 import { CallHasInstrument } from '../../models/CallHasInstrument';
+import { Workflow, WorkflowType } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -9,6 +10,13 @@ import {
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
+
+export const dummyWorkflow = new Workflow(
+  1,
+  'Test workflow',
+  'This is description',
+  WorkflowType.PROPOSAL
+);
 
 export const dummyCallFactory = (values?: Partial<Call>) => {
   return new Call(
@@ -36,12 +44,13 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.callReviewEnded || false,
     values?.callFapReviewEnded || false,
     values?.templateId || 1,
-    values?.esiTemplateId || 2,
+    values?.esiTemplateId,
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
     values?.title || 'Title',
     values?.description || 'Description',
     values?.pdfTemplateId || 1,
     values?.fapReviewTemplateId || 1,
+    values?.technicalReviewTemplateId || 1,
     values?.isActive || true
   );
 };
@@ -77,6 +86,7 @@ export const dummyCall = new Call(
   '',
   1,
   1,
+  1,
   true
 );
 
@@ -109,6 +119,7 @@ export const anotherDummyCall = new Call(
   AllocationTimeUnits.Day,
   '',
   '',
+  1,
   1,
   1,
   true
@@ -183,7 +194,12 @@ export class CallDataSourceMock implements CallDataSource {
   async isCallEnded(callId: number): Promise<boolean> {
     return callId !== 1;
   }
-  async getCallByQuestionId(questionId: string) {
+
+  async getCallByAnswerIdProposal(answer_id: number) {
     return dummyCall;
+  }
+
+  async getProposalWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return dummyWorkflow;
   }
 }

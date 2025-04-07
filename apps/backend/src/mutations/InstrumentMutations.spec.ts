@@ -1,17 +1,34 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
 import {
   dummyInstrument,
   dummyInstrumentHasProposals,
 } from '../datasources/mockups/InstrumentDataSource';
+import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
+import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import {
+  dummyInstrumentScientist,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { WorkflowType } from '../models/Workflow';
 import InstrumentMutations from './InstrumentMutations';
 
+let statusDataSource: StatusDataSourceMock;
+let techniqueDataSource: TechniqueDataSourceMock;
+
 const instrumentMutations = container.resolve(InstrumentMutations);
+
+beforeEach(() => {
+  statusDataSource = container.resolve<StatusDataSourceMock>(
+    Tokens.StatusDataSource
+  );
+  techniqueDataSource = container.resolve<TechniqueDataSourceMock>(
+    Tokens.TechniqueDataSource
+  );
+});
 
 describe('Test Instrument Mutations', () => {
   test('A user can not create an instrument', () => {
@@ -174,5 +191,155 @@ describe('Test Instrument Mutations', () => {
         fapId: 1,
       })
     ).resolves.toBe(dummyInstrumentHasProposals);
+  });
+
+  describe('Test Xpress instrument assignment', () => {
+    test('A user officer can change the instrument of an Xpress proposal from any status', () => {
+      const proposal = { statusId: 1 };
+
+      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
+        {
+          id: proposal.statusId,
+          shortCode: 'EXPIRED',
+          name: 'Expired',
+          description: '',
+          isDefault: true,
+          entityType: WorkflowType.PROPOSAL,
+        },
+      ]);
+
+      return expect(
+        instrumentMutations.assignXpressProposalsToInstruments(
+          dummyUserOfficerWithRole,
+          {
+            proposalPks: [1, 2],
+            instrumentIds: [1],
+          }
+        )
+      ).resolves.toEqual({
+        instrumentHasProposalIds: [1, 2],
+        proposalPks: [1, 2],
+        instrumentIds: [1],
+        submitted: false,
+      });
+    });
+
+    test('A scientist cannot change the instrument of an Xpress proposal from any status', () => {
+      const proposal = { statusId: 1 };
+
+      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
+        {
+          id: proposal.statusId,
+          shortCode: 'EXPIRED',
+          name: 'Expired',
+          description: '',
+          isDefault: true,
+          entityType: WorkflowType.PROPOSAL,
+        },
+      ]);
+
+      return expect(
+        instrumentMutations.assignXpressProposalsToInstruments(
+          dummyInstrumentScientist,
+          {
+            proposalPks: [1, 2],
+            instrumentIds: [1],
+          }
+        )
+      ).resolves.toEqual(
+        expect.objectContaining({
+          message: expect.stringContaining('forbidden current status'),
+        })
+      );
+    });
+
+    test('A scientist can change the instrument of an Xpress proposal when the status is under review', () => {
+      const proposal = { statusId: 1 };
+
+      jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
+        {
+          id: proposal.statusId,
+          shortCode: 'UNDER_REVIEW',
+          name: 'Under review',
+          description: '',
+          isDefault: true,
+          entityType: WorkflowType.PROPOSAL,
+        },
+      ]);
+
+      return expect(
+        instrumentMutations.assignXpressProposalsToInstruments(
+          dummyInstrumentScientist,
+          {
+            proposalPks: [1, 2],
+            instrumentIds: [1],
+          }
+        )
+      ).resolves.toEqual({
+        instrumentHasProposalIds: [1, 2],
+        proposalPks: [1, 2],
+        instrumentIds: [1],
+        submitted: false,
+      });
+    });
+
+    test('An instrument cannot be assigned if it does not belong to the technique of the proposal', () => {
+      jest
+        .spyOn(techniqueDataSource, 'getInstrumentsByTechniqueIds')
+        .mockResolvedValue([
+          {
+            id: 5,
+            name: 'Inst 1',
+            shortCode: 'INST_1',
+            description: '',
+            managerUserId: 1,
+          },
+        ]);
+
+      return expect(
+        instrumentMutations.assignXpressProposalsToInstruments(
+          dummyInstrumentScientist,
+          {
+            proposalPks: [1, 2],
+            instrumentIds: [1],
+          }
+        )
+      ).resolves.toEqual(
+        expect.objectContaining({
+          message: expect.stringContaining(
+            'instrument does not belong to proposal techniques'
+          ),
+        })
+      );
+    });
+
+    test('An instrument can be assigned if it belongs to the technique of the proposal', () => {
+      jest
+        .spyOn(techniqueDataSource, 'getInstrumentsByTechniqueIds')
+        .mockResolvedValue([
+          {
+            id: 1,
+            name: 'Inst 1',
+            shortCode: 'INST_1',
+            description: '',
+            managerUserId: 1,
+          },
+        ]);
+
+      return expect(
+        instrumentMutations.assignXpressProposalsToInstruments(
+          dummyInstrumentScientist,
+          {
+            proposalPks: [1, 2],
+            instrumentIds: [1],
+          }
+        )
+      ).resolves.toEqual({
+        instrumentHasProposalIds: [1, 2],
+        proposalPks: [1, 2],
+        instrumentIds: [1],
+        submitted: false,
+      });
+    });
   });
 });

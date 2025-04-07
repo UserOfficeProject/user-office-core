@@ -124,6 +124,14 @@ async function enableDefaultStfcFeatures() {
     settingsId: SettingsId.FAP_SECS_EDIT_TECH_REVIEWS,
     settingsValue: 'true',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_FAQ_LINK,
+    settingsValue: 'true',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK,
+    settingsValue: 'false',
+  });
 }
 
 async function setSTFCRoleNames() {

@@ -12,14 +12,17 @@ export type FapProposalAssignmentType = Unpacked<
   NonNullable<FapProposalType['assignments']>
 >;
 
-export function useFapProposalsData(
-  fapId: number,
-  callId: number | null
-): {
+export type FapProposals = {
   loadingFapProposals: boolean;
   FapProposalsData: FapProposalType[];
   setFapProposalsData: Dispatch<SetStateAction<FapProposalType[]>>;
-} {
+};
+
+export function useFapProposalsData(
+  fapId: number,
+  callId: number | null,
+  instrumentId: number | null
+): FapProposals {
   const api = useDataApi();
   const [FapProposalsData, setFapProposalsData] = useState<FapProposalType[]>(
     []
@@ -29,7 +32,7 @@ export function useFapProposalsData(
     let cancelled = false;
     setLoadingFapProposals(true);
     api()
-      .getFapProposals({ fapId, callId })
+      .getFapProposals({ fapId, callId, instrumentId })
       .then((data) => {
         if (cancelled) {
           return;
@@ -44,7 +47,7 @@ export function useFapProposalsData(
     return () => {
       cancelled = true;
     };
-  }, [fapId, api, callId]);
+  }, [fapId, api, callId, instrumentId]);
 
   return {
     loadingFapProposals,

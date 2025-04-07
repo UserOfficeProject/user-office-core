@@ -11,11 +11,11 @@ import CallDataSource from '../datasources/postgres/CallDataSource';
 import FapDataSource from '../datasources/postgres/FapDataSource';
 import InstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import ProposalDataSource from '../datasources/postgres/ProposalDataSource';
-import ProposalSettingsDataSource from '../datasources/postgres/ProposalSettingsDataSource';
 import QuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import ReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import TemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import UserDataSource from '../datasources/postgres/UserDataSource';
+import WorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { AllocationTimeUnits } from '../models/Call';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
 import { TechnicalReviewStatus } from '../models/TechnicalReview';
@@ -25,6 +25,7 @@ import {
   TemplatesHasQuestions,
 } from '../models/Template';
 import { UserRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 import { TemplateGroupId } from './../models/Template';
 import * as dummy from './dummy';
 import { execute } from './executor';
@@ -32,6 +33,7 @@ import { execute } from './executor';
 const MAX_USERS = 1000;
 const MAX_TEMPLATES = 15;
 const MAX_REVIEW_TEMPLATES = 15;
+const MAX_TECHNICAL_REVIEW_TEMPLATES = 15;
 const MAX_CALLS = 11;
 const MAX_INSTRUMENTS = 16;
 const MAX_PROPOSALS = 500;
@@ -43,9 +45,7 @@ const adminDataSource = container.resolve(AdminDataSource);
 const callDataSource = container.resolve(CallDataSource);
 const instrumentDataSource = container.resolve(InstrumentDataSource);
 const proposalDataSource = container.resolve(ProposalDataSource);
-const proposalSettingsDataSource = container.resolve(
-  ProposalSettingsDataSource
-);
+const workflowDataSource = container.resolve(WorkflowDataSource);
 const questionaryDataSource = container.resolve(QuestionaryDataSource);
 const reviewDataSource = container.resolve(ReviewDataSource);
 const fapDataSource = container.resolve(FapDataSource);
@@ -118,9 +118,10 @@ const createUsers = async () => {
 
 const createWorkflows = async () => {
   await execute(() => {
-    return proposalSettingsDataSource.createProposalWorkflow({
+    return workflowDataSource.createWorkflow({
       name: faker.lorem.word(),
       description: faker.lorem.words(5),
+      entityType: WorkflowType.PROPOSAL,
     });
   }, MAX_WORKFLOWS);
 };
@@ -151,6 +152,9 @@ const createCalls = async () => {
       proposalWorkflowId: 1,
       templateId: dummy.positiveNumber(MAX_TEMPLATES),
       fapReviewTemplateId: dummy.positiveNumber(MAX_REVIEW_TEMPLATES),
+      technicalReviewTemplateId: dummy.positiveNumber(
+        MAX_TECHNICAL_REVIEW_TEMPLATES
+      ),
       allocationTimeUnit: AllocationTimeUnits.Day,
       title: faker.random.words(8),
       description: faker.random.words(10),
@@ -341,7 +345,14 @@ const createProposals = async () => {
 };
 
 const createReviews = async () => {
-  await execute(() => {
+  await execute(async () => {
+    const tmpUserId = dummy.positiveNumber(MAX_USERS);
+
+    const technicalReviewQuestionary = await questionaryDataSource.create(
+      tmpUserId,
+      1
+    );
+
     return reviewDataSource.setTechnicalReview(
       {
         proposalPk: dummy.positiveNumber(MAX_PROPOSALS),
@@ -356,6 +367,7 @@ const createReviews = async () => {
         reviewerId: 1,
         instrumentId: 1,
         files: '[]',
+        questionaryId: technicalReviewQuestionary.questionaryId,
       },
       false
     );

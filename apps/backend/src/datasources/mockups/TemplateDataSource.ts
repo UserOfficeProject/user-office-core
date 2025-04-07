@@ -443,6 +443,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     return [dummyQuestionFactory()];
   }
 
+  async getAllQuestions(): Promise<{
+    totalCount: number;
+    questions: Question[];
+  }> {
+    return { totalCount: 1, questions: [dummyQuestionFactory()] };
+  }
+
   async getQuestionsInTemplate(templateId: number): Promise<Question[]> {
     return dummyTemplateSteps.flatMap((step) =>
       step.fields.map((field) => field.question)

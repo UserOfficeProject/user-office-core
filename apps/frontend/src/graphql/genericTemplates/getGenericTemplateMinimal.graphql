@@ -1,0 +1,6 @@
+query getGenericTemplateMinimal($genericTemplateId: Int!) {
+  genericTemplate(genericTemplateId: $genericTemplateId) {
+    title
+    questionaryId
+  }
+}

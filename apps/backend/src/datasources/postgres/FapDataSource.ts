@@ -301,10 +301,11 @@ export default class PostgresFapDataSource implements FapDataSource {
     );
   }
 
-  async getFapProposals(
-    fapId: number,
-    callId: number | null
-  ): Promise<FapProposal[]> {
+  async getFapProposals(filter: {
+    fapId: number;
+    callId?: number | null;
+    instrumentId?: number | null;
+  }): Promise<FapProposal[]> {
     const fapProposals: FapProposalRecord[] = await database
       .select(['fp.*'])
       .from('fap_proposals as fp')
@@ -313,18 +314,21 @@ export default class PostgresFapDataSource implements FapDataSource {
           .join('proposals as p', {
             'p.proposal_pk': 'fp.proposal_pk',
           })
-          .join('proposal_statuses as ps', {
-            'p.status_id': 'ps.proposal_status_id',
+          .join('statuses as s', {
+            'p.status_id': 's.status_id',
           })
           .where(function () {
-            this.where('ps.name', 'ilike', 'FAP_%');
+            this.where('s.short_code', 'ilike', 'FAP_%');
           });
 
-        if (callId) {
-          query.andWhere('fp.call_id', callId);
+        if (filter.callId) {
+          query.andWhere('fp.call_id', filter.callId);
+        }
+        if (filter.instrumentId) {
+          query.andWhere('fp.instrument_id', filter.instrumentId);
         }
       })
-      .where('fp.fap_id', fapId)
+      .where('fp.fap_id', filter.fapId)
       .distinctOn('fp.proposal_pk');
 
     return fapProposals.map((fapProposal) =>
@@ -510,8 +514,8 @@ export default class PostgresFapDataSource implements FapDataSource {
         'p.proposal_pk': 'fp.proposal_pk',
         'p.call_id': callId,
       })
-      .join('proposal_statuses as ps', {
-        'p.status_id': 'ps.proposal_status_id',
+      .join('statuses as s', {
+        'p.status_id': 's.status_id',
       })
       .where('fp.instrument_id', instrumentId)
       .modify((query) => {
@@ -858,28 +862,46 @@ export default class PostgresFapDataSource implements FapDataSource {
     fapId: number
   ) {
     await database.transaction(async (trx) => {
-      await trx<FapAssignmentRecord>('fap_assignments')
-        .insert(
-          assignments.map((assignment) => ({
-            proposal_pk: assignment.proposalPk,
-            fap_member_user_id: assignment.memberId,
-            fap_id: fapId,
-            fap_proposal_id: assignment.fapProposalId,
-          }))
+      try {
+        const fapAssignment = await database<FapAssignmentRecord>(
+          'fap_assignments'
         )
-        .returning<FapAssignmentRecord[]>(['*']);
-      await trx<ReviewRecord>('fap_reviews')
-        .insert(
-          assignments.map((assignment) => ({
-            user_id: assignment.memberId,
-            proposal_pk: assignment.proposalPk,
-            status: ReviewStatus.DRAFT,
-            fap_id: fapId,
-            fap_proposal_id: assignment.fapProposalId,
-            questionary_id: assignment.questionaryId,
-          }))
-        )
-        .returning<ReviewRecord[]>(['*']);
+          .insert(
+            assignments.map((assignment) => ({
+              proposal_pk: assignment.proposalPk,
+              fap_member_user_id: assignment.memberId,
+              fap_id: fapId,
+              fap_proposal_id: assignment.fapProposalId,
+            }))
+          )
+          .transacting(trx);
+        const reviewRecord = await database<ReviewRecord>('fap_reviews')
+          .insert(
+            assignments.map((assignment) => ({
+              user_id: assignment.memberId,
+              proposal_pk: assignment.proposalPk,
+              status: ReviewStatus.DRAFT,
+              fap_id: fapId,
+              fap_proposal_id: assignment.fapProposalId,
+              questionary_id: assignment.questionaryId,
+            }))
+          )
+          .transacting(trx);
+
+        if (!(fapAssignment && reviewRecord)) {
+          throw new GraphQLError('Could not assign reviewer');
+        }
+
+        return await trx.commit();
+      } catch (error) {
+        logger.logException(
+          `Could not assign reviewer ags: '${JSON.stringify(assignments)}'`,
+          error
+        );
+        trx.rollback();
+
+        throw new GraphQLError('Could not assign reviewer');
+      }
     });
 
     const updatedFap = await this.getFap(fapId);
@@ -896,15 +918,43 @@ export default class PostgresFapDataSource implements FapDataSource {
     fapId: number,
     memberId: number
   ) {
-    const memberRemovedFromProposal = await database('fap_assignments')
-      .del()
-      .where('fap_id', fapId)
-      .andWhere('proposal_pk', proposalPk)
-      .andWhere('fap_member_user_id', memberId);
+    await database.transaction(async (trx) => {
+      try {
+        const fapReview = await database('fap_reviews')
+          .del()
+          .where('fap_id', fapId)
+          .andWhere('proposal_pk', proposalPk)
+          .andWhere('user_id', memberId)
+          .returning('*')
+          .transacting(trx);
+
+        const fapAssignment = await database('fap_assignments')
+          .del()
+          .where('fap_id', fapId)
+          .andWhere('proposal_pk', proposalPk)
+          .andWhere('fap_member_user_id', memberId)
+          .returning('*')
+          .transacting(trx);
+
+        if (!(fapAssignment && fapReview)) {
+          throw new GraphQLError('Could not remove reviewer');
+        }
+
+        return await trx.commit();
+      } catch (error) {
+        logger.logException(
+          `Could not remove reviewer ags: '${JSON.stringify({ proposalPk, fapId, memberId })}'`,
+          error
+        );
+        trx.rollback();
+
+        throw new GraphQLError('Could not assign reviewer');
+      }
+    });
 
     const fapUpdated = await this.getFap(fapId);
 
-    if (memberRemovedFromProposal && fapUpdated) {
+    if (fapUpdated) {
       return fapUpdated;
     }
 
@@ -967,6 +1017,21 @@ export default class PostgresFapDataSource implements FapDataSource {
         qb.where('fap_chairs.user_id', userId);
         qb.orWhere('fap_secretaries.user_id', userId);
       })
+      .first();
+
+    return record !== undefined;
+  }
+
+  async isSecretaryForFapProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const record = await database<FapRecord>('faps')
+      .select<FapRecord>(['faps.*'])
+      .join('fap_proposals', 'fap_proposals.fap_id', '=', 'faps.fap_id')
+      .leftJoin('fap_secretaries', 'fap_secretaries.fap_id', '=', 'faps.fap_id')
+      .where('fap_proposals.proposal_pk', proposalPk)
+      .where('fap_secretaries.user_id', userId)
       .first();
 
     return record !== undefined;

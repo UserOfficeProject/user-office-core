@@ -66,6 +66,14 @@ async function setELIColourTheme() {
     settingsId: SettingsId.HEADER_LOGO_FILENAME,
     settingsValue: 'eli-white.svg',
   });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_FAQ_LINK,
+    settingsValue: 'true',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK,
+    settingsValue: 'true',
+  });
 }
 
 async function enableDefaultELIFeatures() {
@@ -81,7 +89,7 @@ async function enableDefaultELIFeatures() {
       FeatureId.FAP_REVIEW,
       FeatureId.USER_MANAGEMENT,
       FeatureId.VISIT_MANAGEMENT,
-      FeatureId.SAMPLE_SAFETY,
+      FeatureId.EXPERIMENT_SAFETY_REVIEW,
       FeatureId.OAUTH,
     ],
     true

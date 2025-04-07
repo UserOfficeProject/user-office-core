@@ -1,0 +1,11 @@
+query getProposalScientistComment(
+  $proposalPk: Int!
+) {
+  proposalScientistComment(
+     proposalPk: $proposalPk
+  ) {
+    comment
+    commentId
+    proposalPk
+  }
+}

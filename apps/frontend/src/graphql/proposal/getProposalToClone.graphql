@@ -1,0 +1,9 @@
+query getProposalToClone($primaryKey: Int!) {
+  proposal(primaryKey: $primaryKey) {
+    primaryKey
+    questionary {
+      ...questionary
+      isCompleted
+    }
+  }
+}

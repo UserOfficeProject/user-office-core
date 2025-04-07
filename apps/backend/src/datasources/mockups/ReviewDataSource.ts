@@ -1,9 +1,13 @@
 import { Review } from '../../models/Review';
-import { TechnicalReview } from '../../models/TechnicalReview';
+import {
+  TechnicalReview,
+  TechnicalReviewStatus,
+} from '../../models/TechnicalReview';
 import { AddTechnicalReviewInput } from '../../resolvers/mutations/AddTechnicalReviewMutation';
 import { AddUserForReviewArgs } from '../../resolvers/mutations/AddUserForReviewMutation';
 import { UpdateReviewArgs } from '../../resolvers/mutations/UpdateReviewMutation';
 import { ReviewsFilter } from '../../resolvers/queries/ReviewsQuery';
+import { TechnicalReviewsFilter } from '../../resolvers/queries/TechnicalReviewsQuery';
 import { ReviewDataSource } from '../ReviewDataSource';
 import { dummyProposalTechnicalReview } from './ProposalDataSource';
 
@@ -14,6 +18,21 @@ export const dummySubmittedReview = new Review(
   1,
   'Good proposal',
   9,
+  1,
+  1,
+  1
+);
+
+export const dummyTechnicalReview = new TechnicalReview(
+  6,
+  10,
+  'Good proposal',
+  'Good proposal (public)',
+  1,
+  TechnicalReviewStatus.FEASIBLE,
+  false,
+  1,
+  null,
   1,
   1,
   1
@@ -33,6 +52,18 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   ): Promise<TechnicalReview[] | null> {
     return [dummyProposalTechnicalReview];
   }
+
+  async getTechnicalReviewsByFilter(
+    filter?: TechnicalReviewsFilter,
+    first?: number,
+    offset?: number
+  ): Promise<{ totalCount: number; technicalReviews: TechnicalReview[] }> {
+    return {
+      totalCount: 1,
+      technicalReviews: [dummyTechnicalReview],
+    };
+  }
+
   async getTechnicalReviewById(
     technicalReviewId: number
   ): Promise<TechnicalReview | null> {

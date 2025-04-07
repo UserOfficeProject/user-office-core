@@ -38,6 +38,7 @@ export enum DataType {
   DYNAMIC_MULTIPLE_CHOICE = 'DYNAMIC_MULTIPLE_CHOICE',
   INSTRUMENT_PICKER = 'INSTRUMENT_PICKER',
   TECHNIQUE_PICKER = 'TECHNIQUE_PICKER',
+  TECHNICAL_REVIEW_BASIS = 'TECHNICAL_REVIEW_BASIS',
 }
 
 export class Topic {
@@ -114,6 +115,7 @@ export enum TemplateCategoryId {
   FEEDBACK = 8,
   PDF = 9,
   FAP_REVIEW = 10,
+  TECHNICAL_REVIEW = 11,
 }
 
 export enum TemplateGroupId {
@@ -127,6 +129,7 @@ export enum TemplateGroupId {
   FEEDBACK = 'FEEDBACK',
   PDF_TEMPLATE = 'PDF_TEMPLATE',
   FAP_REVIEW = 'FAP_REVIEW_TEMPLATE',
+  TECHNICAL_REVIEW = 'TECHNICAL_REVIEW_TEMPLATE',
 }
 
 export class FieldCondition {

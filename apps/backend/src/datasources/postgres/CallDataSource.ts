@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 
 import { Call } from '../../models/Call';
 import { CallHasInstrument } from '../../models/CallHasInstrument';
+import { Workflow } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
@@ -20,6 +21,7 @@ import {
   createCallHasInstrumentObject,
   createCallObject,
   ProposalRecord,
+  WorkflowRecord,
 } from './records';
 
 export default class PostgresCallDataSource implements CallDataSource {
@@ -61,6 +63,13 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     if (filter?.fapReviewTemplateIds) {
       query.whereIn('fap_review_template_id', filter.fapReviewTemplateIds);
+    }
+
+    if (filter?.technicalReviewTemplateIds) {
+      query.whereIn(
+        'technical_review_template_id',
+        filter.technicalReviewTemplateIds
+      );
     }
 
     if (filter?.esiTemplateIds) {
@@ -145,15 +154,11 @@ export default class PostgresCallDataSource implements CallDataSource {
     if (filter?.proposalStatusShortCode) {
       query
         .join(
-          'proposal_workflow_connections as w',
+          'workflow_connections as w',
           'call.proposal_workflow_id',
-          'w.proposal_workflow_id'
+          'w.workflow_id'
         )
-        .leftJoin(
-          'proposal_statuses as s',
-          'w.proposal_status_id',
-          's.proposal_status_id'
-        )
+        .leftJoin('statuses as s', 'w.status_id', 's.status_id')
         .where('s.short_code', filter.proposalStatusShortCode)
         .distinctOn('call.call_id');
     }
@@ -204,6 +209,7 @@ export default class PostgresCallDataSource implements CallDataSource {
             esi_template_id: args.esiTemplateId,
             pdf_template_id: args.pdfTemplateId,
             fap_review_template_id: args.fapReviewTemplateId,
+            technical_review_template_id: args.technicalReviewTemplateId,
             allocation_time_unit: args.allocationTimeUnit,
             title: args.title,
             description: args.description,
@@ -383,6 +389,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               esi_template_id: args.esiTemplateId,
               pdf_template_id: args.pdfTemplateId,
               fap_review_template_id: args.fapReviewTemplateId,
+              technical_review_template_id: args.technicalReviewTemplateId,
               allocation_time_unit: args.allocationTimeUnit,
               title: args.title,
               description: args.description,
@@ -511,20 +518,51 @@ export default class PostgresCallDataSource implements CallDataSource {
       .first()
       .then((call: CallRecord) => (call ? false : true));
   }
-  public async getCallByQuestionId(questionId: string): Promise<Call> {
+  public async getCallByAnswerIdProposal(answerId: number): Promise<Call> {
     const records: CallRecord[] = await database('call')
-      .leftJoin(
+      .join(
         'templates_has_questions',
         'templates_has_questions.template_id',
         'call.template_id'
       )
-      .leftJoin(
-        'answers',
-        'answers.question_id',
+      .join(
+        database('answers')
+          .select()
+          .where('answers.answer_id', answerId)
+          .as('a'),
+        'a.question_id',
         'templates_has_questions.question_id'
-      )
-      .where('answers.question_id', questionId);
+      );
 
-    return createCallObject(records[0]);
+    if (records.length > 0) {
+      return createCallObject(records[0]);
+    }
+
+    throw new GraphQLError(`Call not found for answerId: ${answerId}`);
+  }
+
+  private createProposalWorkflowObject(proposalWorkflow: WorkflowRecord) {
+    return new Workflow(
+      proposalWorkflow.workflow_id,
+      proposalWorkflow.name,
+      proposalWorkflow.description,
+      proposalWorkflow.entity_type
+    );
+  }
+
+  async getProposalWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return database
+      .select()
+      .from('call as c')
+      .join('workflows as w', {
+        'w.workflow_id': 'c.proposal_workflow_id',
+      })
+      .where('c.call_id', callId)
+      .first()
+      .then((proposalWorkflow: WorkflowRecord | null) =>
+        proposalWorkflow
+          ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
   }
 }

@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
@@ -8,11 +8,11 @@ import { QuestionaryAuthorizer } from '../QuestionaryAuthorization';
 
 @injectable()
 export class ProposalQuestionaryAuthorizer implements QuestionaryAuthorizer {
-  private proposalAuth = container.resolve(ProposalAuthorization);
-
   constructor(
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   /**

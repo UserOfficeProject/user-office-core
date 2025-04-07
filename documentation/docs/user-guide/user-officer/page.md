@@ -1,62 +1,61 @@
 # Pages :material-cog-box:
 
-_________________________________________________________________________________________________________
+---
 
 ## What are pages?
 
-Pages are highly customizable sections of information within User Office. Pages can be utilized to display key dates, advice and links to users and reviewers. 
+Pages are highly customizable sections of information within User Office. Pages can be utilized to display key dates, advice and links to users and reviewers.
 
-_________________________________________________________________________________________________________
+---
 
 ## How do I edit pages?
 
 ### Step 1: Navigate to the Page editor
 
-* To edit a page, select `PAGES` :material-cog-box: from the main menu
-* From the Page Editor, choose the page you wish to edit
+- To edit a page, select `PAGES` :material-cog-box: from the main menu
+- From the Page Editor, choose the page you wish to edit
 
 ### Step 2: Edit the page
 
-* To create a new page click on `FILE` > `NEW DOCUMENT`, or edit the preexisting message.
-* The editor contains many useful features to aid in creating the page such as `EDITING` and `FORMATTING` tools.
-* The `INSERT` button can also be used to insert images and links into the page.
+- To create a new page click on `FILE` > `NEW DOCUMENT`, or edit the preexisting message.
+- The editor contains many useful features to aid in creating the page such as `EDITING` and `FORMATTING` tools.
+- The `INSERT` button can also be used to insert images and links into the page.
 
 > **_NOTE:_** It is good practice to carefully check the preview before updating the page to ensure that it is well formatted. You can do this in `VIEW` > `PREVIEW`
 
 #### User page
 
 !!! note ""
-    This sets the users' homepage; this is the information that users will see on their dashboard.   
-    This may include the following key information: 
-    
+This sets the users' homepage; this is the information that users will see on their dashboard.  
+ This may include the following key information:
+
     * A welcome message to users
     * Key dates
-    * Information on the proposal process 
+    * Information on the proposal process
     * Important links (e.g., to publication guidelines)
 
     _____________________________________________________________________________________________________________
 
-    <figure markdown="span">  
+    <figure markdown="span">
         ![User](../../assets/images/user_homepage.png)
         <figcaption>User homepage (dashboard)</figcaption>
     </figure>
 
-
 #### Reviewer page
 
 !!! note ""
-    This sets the reviewers' homepage; this is the information that reviewers will see on their dashboard (This is displayed to the following roles: [Sample Safety Reviewer](roles.md), [Internal Reviewer](roles.md), [FAP chairs](roles.md), [FAP secretaries](roles.md) and [FAP reviewers](roles.md)).
+This sets the reviewers' homepage; this is the information that reviewers will see on their dashboard (This is displayed to the following roles: [Experiment Safety Reviewer](roles.md), [Internal Reviewer](roles.md), [FAP chairs](roles.md), [FAP secretaries](roles.md) and [FAP reviewers](roles.md)).
 
-    The reviewer page may include the following key information: 
+    The reviewer page may include the following key information:
 
-    * A welcome message to reviewers 
+    * A welcome message to reviewers
     * Key dates
-    * Information on the review process 
-    * Important links 
+    * Information on the review process
+    * Important links
 
     _____________________________________________________________________________________________________________
 
-    <figure markdown="span">  
+    <figure markdown="span">
         ![Reviewer Homepage](../../assets/images/reviewer_page.png)
         <figcaption>Reviewer homepage (dashboard)</figcaption>
     </figure>
@@ -64,10 +63,10 @@ ________________________________________________________________________________
 #### Help page
 
 !!! note ""
-    This sets the help page; this is the information that is displayed to users on the 'help' page, and at the FAQ button at the bottom of the page for all users. See the 'FAQs for help page section for a list of example questions that may be useful to include in the help page.
-    
+This sets the help page; this is the information that is displayed to users on the 'help' page, and at the FAQ button at the bottom of the page for all users. See the 'FAQs for help page section for a list of example questions that may be useful to include in the help page.
+
     ??? info "FAQs for help page"
-        Frequently asked questions: 
+        Frequently asked questions:
 
         * **Can I view all the questions before I start completing my proposal?**
 
@@ -99,12 +98,12 @@ ________________________________________________________________________________
 
     _____________________________________________________________________________________________________________
 
-    <figure markdown="span">  
+    <figure markdown="span">
         ![Help page](../../assets/images/faq_page.png)
         <figcaption>User help page (FAQ)</figcaption>
     </figure>
 
-    <figure markdown="span">  
+    <figure markdown="span">
         ![Help notice](../../assets/images/faq_notice.png)
         <figcaption>Help notice (FAQ)</figcaption>
     </figure>
@@ -112,9 +111,9 @@ ________________________________________________________________________________
 #### Privacy Agreement page
 
 !!! note ""
-    This sets the privacy agreement page; this is the information that is displayed when clicking on the `PRIVACY STATEMENT` button at the bottom of all pages.
+This sets the privacy agreement page; this is the information that is displayed when clicking on the `PRIVACY STATEMENT` button at the bottom of all pages.
 
-    <figure markdown="span">  
+    <figure markdown="span">
         ![Privacy page](../../assets/images/privacy_page.png)
         <figcaption>Privacy Agreement Page</figcaption>
     </figure>
@@ -122,20 +121,20 @@ ________________________________________________________________________________
 #### Footer
 
 !!! note ""
-    This sets the footer. The page must be refreshed in order to view the updated footer. 
+This sets the footer. The page must be refreshed in order to view the updated footer.
 
 #### Login
 
 !!! note ""
-    This sets the login.
+This sets the login.
 
 #### Grade guide
 
 !!! note ""
-    This sets the grade guide. Note: this is different from the grade guide in the FAP page
+This sets the grade guide. Note: this is different from the grade guide in the FAP page
 
 ### Step 3: Update your changes
 
-* Once you are satisfied with the changes and ensured that the page is well-formatted with the `PREVIEW` function you can update the page by clicking on the `UPDATE` button.
+- Once you are satisfied with the changes and ensured that the page is well-formatted with the `PREVIEW` function you can update the page by clicking on the `UPDATE` button.
 
-_________________________________________________________________________________________________________
+---

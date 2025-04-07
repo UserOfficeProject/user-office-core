@@ -1,4 +1,4 @@
-FROM node:18.18.0-alpine AS build-stage
+FROM node:22.14.0-alpine AS build-stage
 
 USER node
 
@@ -7,14 +7,16 @@ RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 
 COPY --chown=node:node package*.json ./
+COPY openapi.yaml openapi.yaml
 
 RUN npm ci --loglevel error --no-fund
+RUN npm run generate:uows
 
 COPY --chown=node:node . .
 
 RUN npm run build
 
-FROM node:18.18.0-alpine
+FROM node:22.14.0-alpine
 
 USER node
 
