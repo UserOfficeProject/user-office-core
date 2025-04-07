@@ -1,4 +1,4 @@
-fragment connectionStatusActionConfig on ProposalStatusActionConfig {
+fragment connectionStatusActionConfig on StatusActionConfig {
   ... on EmailActionConfig {
     recipientsWithEmailTemplate {
       recipient {

@@ -27,6 +27,126 @@ context('Questions tests', () => {
     });
   });
 
+  it('Clicking navigation buttons should render next page', () => {
+    cy.login('officer');
+    cy.visit(`/`);
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    cy.get("[data-cy='questions-table']").contains('1-10 of');
+
+    cy.get("button[aria-label='Next Page']").click();
+    cy.get("[data-cy='questions-table']").contains('11-20 of');
+
+    cy.get("button[aria-label='Previous Page']").click();
+    cy.get("[data-cy='questions-table']").contains('1-10 of');
+  });
+
+  it('Sorting by sortField should sort the table', () => {
+    cy.login('officer');
+    cy.visit(`/`);
+
+    cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
+
+    // KEY
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('thead')
+      .contains('Key')
+      .click();
+
+    cy.url().should('include', 'sortField=naturalKey');
+    cy.url().should('include', 'sortDirection=asc');
+
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('tbody tr')
+      .first()
+      .contains('boolean_question');
+
+    // KEY DESCENDING
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('thead')
+      .contains('Key')
+      .click();
+
+    cy.url().should('include', 'sortField=naturalKey');
+    cy.url().should('include', 'sortDirection=desc');
+
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('tbody tr')
+      .first()
+      .contains('visitat_basis');
+
+    // CATEGORY
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('thead')
+      .contains('Category')
+      .click();
+
+    cy.url().should('include', 'sortField=categoryId');
+    cy.url().should('include', 'sortDirection=asc');
+
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('tbody tr')
+      .first()
+      .contains('FAP_REVIEW');
+
+    // # ANSWERS
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('thead')
+      .contains('# Answers')
+      .click();
+
+    cy.url().should('include', 'sortField=answers');
+    cy.url().should('include', 'sortDirection=asc');
+
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('tbody tr')
+      .first()
+      .contains('1');
+
+    // # TEMPLATES
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('thead')
+      .contains('# Templates')
+      .click();
+
+    cy.url().should('include', 'sortField=templates');
+    cy.url().should('include', 'sortDirection=asc');
+
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('tbody tr')
+      .first()
+      .contains('1');
+  });
+
+  it('Setting URL Query param pageSize to X should render X questions', () => {
+    cy.login('officer');
+
+    cy.visit(`/Questions?page=0&pageSize=5`);
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('tbody')
+      .find('tr')
+      .should('have.length', 5);
+
+    cy.visit(`/Questions?page=0&pageSize=10`);
+    cy.get("[data-cy='questions-table'] table")
+      .first()
+      .find('tbody')
+      .find('tr')
+      .should('have.length', 10);
+  });
+
   it('User officer search questions', () => {
     cy.login('officer');
     cy.visit('/');
@@ -54,13 +174,15 @@ context('Questions tests', () => {
     cy.contains(textQuestion);
 
     const modifiedQuestion = textQuestion.split('').reverse().join();
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${modifiedQuestion}{enter}`);
 
     cy.contains(textQuestion).should('not.exist');
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${textQuestion}{enter}`);
 
@@ -75,7 +197,8 @@ context('Questions tests', () => {
 
     const samplesQuestionWithSpaces = '   ' + samplesQuestion + '   ';
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${samplesQuestionWithSpaces}{enter}`);
 
@@ -90,7 +213,8 @@ context('Questions tests', () => {
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${textQuestion}{enter}`);
 
@@ -111,7 +235,8 @@ context('Questions tests', () => {
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${textQuestion}{enter}`);
 
@@ -119,7 +244,7 @@ context('Questions tests', () => {
     cy.get('[data-cy=questions-table]')
       .contains(textQuestion)
       .closest('tr')
-      .find('[aria-label=Edit]')
+      .find('[data-testid=EditIcon]')
       .click();
 
     cy.finishedLoading();
@@ -156,7 +281,8 @@ context('Questions tests', () => {
 
     cy.get('[data-cy=officer-menu-items]').contains('Questions').click();
 
-    cy.get('[data-cy=search-input] input')
+    cy.get('[placeholder="Search"]')
+      .click()
       .clear()
       .type(`${initialDBData.questions.boolean.text}{enter}`);
 

@@ -25,7 +25,6 @@ import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 
 @injectable()
 export default class ShipmentMutations {
-  private proposalAuth = container.resolve(ProposalAuthorization);
   private sampleAuth = container.resolve(SampleAuthorization);
   private shipmentAuth = container.resolve(ShipmentAuthorization);
 
@@ -41,7 +40,9 @@ export default class ShipmentMutations {
     @inject(Tokens.AssetRegistrar)
     private assetRegistrarService: AssetRegistrar,
     @inject(Tokens.UserAuthorization)
-    private userAuth: UserAuthorization
+    private userAuth: UserAuthorization,
+    @inject(Tokens.ProposalAuthorization)
+    private proposalAuth: ProposalAuthorization
   ) {}
 
   @Authorized()
@@ -113,7 +114,7 @@ export default class ShipmentMutations {
           agent.id,
           args.proposalPk,
           questionary.questionaryId,
-          args.scheduledEventId
+          args.experimentPk
         );
       })
       .catch((error) => {

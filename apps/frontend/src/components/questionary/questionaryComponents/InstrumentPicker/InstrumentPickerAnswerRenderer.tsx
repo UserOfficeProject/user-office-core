@@ -2,14 +2,14 @@ import React, { useMemo } from 'react';
 
 import { AnswerRenderer } from 'components/questionary/QuestionaryComponentRegistry';
 import { InstrumentPickerConfig } from 'generated/sdk';
-import { useQuestionCallData } from 'hooks/call/useQuestionCallData';
+import { useAnswerCallData } from 'hooks/call/useQuestionCallData';
 import { useInstrumentsByIdsData } from 'hooks/instrument/useInstrumentsByIdsData';
 import { toArray } from 'utils/helperFunctions';
 
 const InstrumentPickerAnswerRenderer: AnswerRenderer = ({
+  answerId,
   value,
   config,
-  question,
 }) => {
   const ids = useMemo(
     () =>
@@ -19,7 +19,7 @@ const InstrumentPickerAnswerRenderer: AnswerRenderer = ({
     [value]
   );
   const { instruments } = useInstrumentsByIdsData(ids);
-  const data = useQuestionCallData(question.id);
+  const { callAllocatedTimeUnit } = useAnswerCallData(answerId);
   const instrumentPickerConfig = config as InstrumentPickerConfig;
   {
     if (instrumentPickerConfig.requestTime) {
@@ -39,7 +39,7 @@ const InstrumentPickerAnswerRenderer: AnswerRenderer = ({
           ' (' +
           filtered.timeRequested +
           ' ' +
-          data.call?.allocationTimeUnit +
+          callAllocatedTimeUnit +
           ') '
         );
       });

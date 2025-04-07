@@ -42,7 +42,9 @@ const ProposalChooseCall = () => {
     <StyledContainer>
       <StyledPaper>
         <Typography variant="h6" component="h2" gutterBottom>
-          Select a call
+          {calls.length !== 0
+            ? 'Select a call'
+            : 'There are no calls open at this time'}
         </Typography>
         <List data-cy="call-list">
           {calls.map((call) => {

@@ -32,7 +32,6 @@ interface ProposalContainerProps {
 }
 export default function ProposalContainer(props: ProposalContainerProps) {
   const { proposal, proposalUpdated, elevation, previewMode } = props;
-
   const [initialState] = useState(
     new ProposalSubmissionState(proposal, previewMode)
   );

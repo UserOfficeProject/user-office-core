@@ -1,0 +1,29 @@
+query getTechnicalReview($technicalReviewId: Int!) {
+  technicalReview(technicalReviewId: $technicalReviewId) {
+    ...coreTechnicalReview
+    proposal {
+      primaryKey
+      title
+      abstract
+      proposer {
+        id
+      }
+      call {
+        isActive
+        isActiveInternal
+        referenceNumberFormat
+        startCall
+        endCall
+        endCallInternal
+        allocationTimeUnit
+      }
+    }
+    reviewer {
+      ...basicUserDetails
+    }
+    questionary {
+      ...questionary
+      isCompleted
+    }
+  }
+}

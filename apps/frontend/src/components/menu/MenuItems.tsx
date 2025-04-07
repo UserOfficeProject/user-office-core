@@ -25,8 +25,9 @@ import {
 } from 'components/experiment/DateFilter';
 import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { Call, FeatureId, SettingsId, UserRole } from 'generated/sdk';
+import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
@@ -37,17 +38,16 @@ import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
-  callsData: Call[];
 };
 
-const SamplesMenuListItem = () => {
+const ExperimentSafetyReviewMenuListItem = () => {
   return (
-    <Tooltip title="Sample safety">
-      <ListItemButton component={NavLink} to="/SampleSafety">
+    <Tooltip title="Experiment Safety Review">
+      <ListItemButton component={NavLink} to="/ExperimentSafetyReview">
         <ListItemIcon>
           <BoxIcon />
         </ListItemIcon>
-        <ListItemText primary="Sample safety" />
+        <ListItemText primary="Experiment Safety" />
       </ListItemButton>
     </Tooltip>
   );
@@ -66,8 +66,7 @@ const ProposalsMenuListItem = () => {
   );
 };
 
-const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
-  const proposalDisabled = callsData.length === 0;
+const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
   const { format } = useFormattedDateTime({
@@ -84,14 +83,28 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isSampleSafetyEnabled = context.featuresMap.get(
-    FeatureId.SAMPLE_SAFETY
+  const isExperimentSafetyReviewEnabled = context.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
 
   const isXpressRouteEnabled = useXpressAccess([
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
+
+  const calls = useCallsData(
+    {
+      proposalStatusShortCode: 'QUICK_REVIEW',
+    },
+    CallsDataQuantity.MINIMAL
+  ).calls;
+
+  const openCall = calls?.find((call) => call.isActive);
+
+  const xpressUrl =
+    openCall && openCall.id
+      ? `/XpressProposals?call=${openCall?.id}`
+      : '/XpressProposals';
 
   const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
 
@@ -111,11 +124,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         </ListItemButton>
       </Tooltip>
       <Tooltip title="New Proposal">
-        <ListItemButton
-          component={NavLink}
-          to="/ProposalSelectType"
-          disabled={proposalDisabled}
-        >
+        <ListItemButton component={NavLink} to="/ProposalSelectType">
           <ListItemIcon>
             <NoteAdd />
           </ListItemIcon>
@@ -156,7 +165,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
       </Tooltip>
       {isXpressRouteEnabled && (
         <Tooltip title="Xpress Proposals">
-          <ListItemButton component={NavLink} to="/XpressProposals">
+          <ListItemButton component={NavLink} to={xpressUrl}>
             <ListItemIcon>
               <Topic />
             </ListItemIcon>
@@ -204,7 +213,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         </Tooltip>
       )}
       {isInstrumentManagementEnabled && (
-        <Tooltip title="Instruments">
+        <Tooltip title={i18n.format(t('instrument'), 'plural')}>
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
               <ScienceIcon />
@@ -258,7 +267,9 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           <ListItemText primary="Questions" />
         </ListItemButton>
       </Tooltip>
-      {isSampleSafetyEnabled && <SamplesMenuListItem />}
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
       <SettingsMenuListItem />
     </div>
   );
@@ -291,7 +302,7 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
         <ListItemText primary="Proposals" />
       </ListItemButton>
       {isXpressRouteEnabled && (
-        <ListItemButton component={NavLink} to="/XpressProposals">
+        <ListItemButton component={NavLink} to={xpressUrl}>
           <ListItemIcon>
             <Topic />
           </ListItemIcon>
@@ -306,20 +317,17 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItemButton>
       )}
-      {isSchedulerEnabled && (
-        <ListItemButton component={NavLink} to="/UpcomingExperimentTimes">
-          <ListItemIcon>
-            <EventIcon />
-          </ListItemIcon>
-          <ListItemText primary="Upcoming experiments" />
-        </ListItemButton>
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
       )}
     </div>
   );
 
-  const sampleSafetyReviewer = (
+  const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
-      <SamplesMenuListItem />
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
     </div>
   );
 
@@ -340,8 +348,8 @@ const MenuItems = ({ currentRole, callsData }: MenuItemsProps) => {
     case UserRole.FAP_SECRETARY:
     case UserRole.FAP_REVIEWER:
       return FapRoles;
-    case UserRole.SAMPLE_SAFETY_REVIEWER:
-      return sampleSafetyReviewer;
+    case UserRole.EXPERIMENT_SAFETY_REVIEWER:
+      return ExperimentSafetyReviewPageReviewer;
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
     default:

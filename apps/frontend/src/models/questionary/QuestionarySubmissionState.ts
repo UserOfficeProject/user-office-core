@@ -15,14 +15,21 @@ import {
 import { WithConfirmType } from 'utils/withConfirm';
 
 import { SampleFragment } from './../../generated/sdk';
+import { ExperimentSampleWithQuestionary } from './experimentSample/ExperimentSampleWithQuestionary';
 import { getFieldById } from './QuestionaryFunctions';
-import { SampleEsiWithQuestionary } from './sampleEsi/SampleEsiWithQuestionary';
 import { StepType } from './StepType';
 
 export enum GENERIC_TEMPLATE_EVENT {
   ITEMS_MODIFIED = 'ITEMS_MODIFIED',
   ITEMS_DELETED = 'ITEMS_DELETED',
 }
+
+type AnswerMinimal = {
+  questionId: string;
+  answer: any;
+  answerId: number | null;
+};
+
 export type Event =
   | { type: 'FIELD_CHANGED'; id: string; newValue: any }
   | { type: 'BACK_CLICKED'; confirm?: WithConfirmType }
@@ -39,7 +46,12 @@ export type Event =
   | { type: 'CLEAR_CREATED_LIST' }
   | { type: 'GO_TO_STEP'; stepIndex: number }
   | { type: 'STEPS_LOADED'; steps: QuestionaryStep[]; stepIndex?: number }
-  | { type: 'STEP_ANSWERED'; step: QuestionaryStep }
+  | {
+      type: 'STEP_ANSWERED';
+      answers: AnswerMinimal[];
+      topicId: number;
+      isPartialSave: boolean;
+    }
   // item with questionary
   | {
       type: 'ITEM_WITH_QUESTIONARY_CREATED';
@@ -58,14 +70,17 @@ export type Event =
       itemWithQuestionary: Record<string, unknown>;
     }
   // sample
-  | { type: 'ESI_SAMPLE_CREATED'; sample: SampleFragment }
-  | { type: 'ESI_SAMPLE_DELETED'; sampleId: number }
+  | { type: 'SAMPLE_CREATED'; sample: SampleFragment }
+  | { type: 'SAMPLE_DELETED'; sampleId: number }
   | {
-      type: 'ESI_ITEM_WITH_QUESTIONARY_CREATED';
-      sampleEsi: SampleEsiWithQuestionary;
+      type: 'SAMPLE_ADDED_TO_EXPERIMENT';
+      experimentSample: ExperimentSampleWithQuestionary;
     }
-  | { type: 'ESI_SAMPLE_ESI_UPDATED'; sampleEsi: SampleEsiWithQuestionary }
-  | { type: 'ESI_SAMPLE_ESI_DELETED'; sampleId: number }
+  | {
+      type: 'EXPERIMENT_SAMPLE_UPDATED';
+      experimentSample: ExperimentSampleWithQuestionary;
+    }
+  | { type: 'SAMPLE_REMOVED_FROM_EXPERIMENT'; sampleId: number }
   | {
       type: 'SAMPLE_DECLARATION_ITEMS_MODIFIED';
       id: string;
@@ -243,12 +258,29 @@ export function QuestionarySubmissionModel<
           break;
         }
         case 'STEP_ANSWERED':
-          const updatedStep = action.step;
           const stepIndex = draftState.questionary.steps.findIndex(
-            (step) => step.topic.id === updatedStep.topic.id
+            (step) => step.topic.id === action.topicId
           );
-          draftState.questionary.steps[stepIndex] = updatedStep;
 
+          draftState.questionary.steps[stepIndex].fields =
+            draftState.questionary.steps[stepIndex].fields.map(
+              (draftAnswer) => {
+                const updatedAnswer = action.answers.find(
+                  (updatedAnswer) =>
+                    updatedAnswer.questionId === draftAnswer.question.id
+                );
+
+                if (updatedAnswer) {
+                  draftAnswer.value = updatedAnswer.answer.value;
+                  draftAnswer.answerId = updatedAnswer.answerId;
+                }
+
+                return draftAnswer;
+              }
+            );
+
+          draftState.questionary.steps[stepIndex].isCompleted =
+            !action.isPartialSave;
           draftState.isDirty = false;
 
           break;

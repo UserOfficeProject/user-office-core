@@ -1,20 +1,14 @@
 import React, { useCallback, useState } from 'react';
 
-import {
-  Call,
-  Maybe,
-  ProposalPublicStatus,
-  ProposalStatus,
-} from 'generated/sdk';
+import { Call, Maybe, ProposalPublicStatus, Status } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
-import { timeAgo } from 'utils/Time';
 
 import ProposalTable from './ProposalTable';
 
 export type PartialProposalsDataType = {
   primaryKey: number;
   title: string;
-  status: Maybe<ProposalStatus>;
+  status: Maybe<Status>;
   publicStatus: ProposalPublicStatus;
   finalStatus?: string;
   notified?: boolean;
@@ -78,7 +72,7 @@ const ProposalTableUser = () => {
                   !proposal.submitted && hasReferenceNumberFormat
                     ? `* ${proposal.proposalId}`
                     : proposal.proposalId,
-                created: timeAgo(proposal.created),
+                created: proposal.created,
                 notified: proposal.notified,
                 proposerId: proposal.proposer?.id,
                 call: proposal.call,

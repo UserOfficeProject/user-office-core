@@ -84,7 +84,7 @@ const AssignedScientistsTable = ({
     >
       <MaterialTable
         columns={instrumentContactColumns}
-        title={`Instrument Contact`}
+        title={t(`Instrument Contact`)}
         data={[
           {
             firstname: instrument.instrumentContact?.firstname,

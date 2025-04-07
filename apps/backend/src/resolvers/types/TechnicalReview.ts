@@ -13,8 +13,10 @@ import {
   TechnicalReview as TechnicalReviewOrigin,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
+import { TemplateCategoryId } from '../../models/Template';
 import { Proposal } from '../types/Proposal';
 import { BasicUserDetails } from './BasicUserDetails';
+import { Questionary } from './Questionary';
 
 @ObjectType()
 export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
@@ -50,6 +52,9 @@ export class TechnicalReview implements Partial<TechnicalReviewOrigin> {
 
   @Field(() => Int)
   public instrumentId: number;
+
+  @Field(() => Int)
+  public questionaryId: number;
 }
 
 @Resolver(() => TechnicalReview)
@@ -87,5 +92,17 @@ export class TechnicalReviewResolver {
           technicalReview.technicalReviewAssigneeId
         )
       : null;
+  }
+
+  @FieldResolver(() => Questionary)
+  async questionary(
+    @Root() review: TechnicalReview,
+    @Ctx() context: ResolverContext
+  ): Promise<Questionary> {
+    return context.queries.questionary.getQuestionaryOrDefault(
+      context.user,
+      review.questionaryId,
+      TemplateCategoryId.TECHNICAL_REVIEW
+    );
   }
 }

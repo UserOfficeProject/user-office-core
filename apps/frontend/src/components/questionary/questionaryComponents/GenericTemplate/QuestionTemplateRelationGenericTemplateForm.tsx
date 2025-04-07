@@ -109,6 +109,15 @@ export const QuestionTemplateRelationGenericTemplateForm = (
 
           <TitledContainer label="Constraints">
             <Field
+              name="config.required"
+              component={CheckboxWithLabel}
+              type="checkbox"
+              Label={{
+                label: 'Is required',
+              }}
+              data-cy="required"
+            />
+            <Field
               name="config.minEntries"
               label="Min entries"
               id="Min-input"

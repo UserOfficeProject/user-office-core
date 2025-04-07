@@ -81,6 +81,12 @@ export async function getStfcDataRow(
 }
 
 export function populateStfcRow(row: RowObj) {
+  const reviews = row.reviews ? row.reviews : [];
+
+  while (reviews.length < 3) {
+    reviews.push(['No reviewer', '-', '-']);
+  }
+
   return [
     row.propShortCode ?? '<missing>',
     row.principalInv ?? '<missing>',
@@ -90,10 +96,16 @@ export function populateStfcRow(row: RowObj) {
     row.propTitle ?? '<missing>',
     row.techReviewComment ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
-  ].concat(row.reviews ? row.reviews?.flat() : []);
+  ].concat(reviews.flat());
 }
 
 export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
+  const reviews = row.reviews ? row.reviews : [];
+
+  while (reviews.length < 3) {
+    reviews.push(['No reviewer', '-', '-']);
+  }
+
   return [
     row.propShortCode ?? '<missing>',
     row.principalInv ?? '<missing>',
@@ -104,7 +116,7 @@ export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
     row.techReviewComment ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
   ]
-    .concat(row.reviews ? row.reviews?.flat() : [])
+    .concat(reviews.flat())
     .concat([
       row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
       row.fapMeetingDecision ?? '<missing>',

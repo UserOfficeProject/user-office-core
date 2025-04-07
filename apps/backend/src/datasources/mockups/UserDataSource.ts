@@ -101,7 +101,7 @@ export const dummyUser = new User(
 export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
   ...dummyUser,
   id: 1,
-  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'pi' },
+  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'user' },
 };
 
 export const dummyUserWithRole: UserWithRole = {
@@ -119,12 +119,17 @@ export const dummyFapSecretaryWithRole: UserWithRole = {
   currentRole: { id: 5, title: 'Fap Secretary', shortCode: 'fap_secretary' },
 };
 
+export const dummyFapReviewerWithRole: UserWithRole = {
+  ...dummyUser,
+  currentRole: { id: 6, title: 'Fap Reviewer', shortCode: 'fap_reviewer' },
+};
+
 export const dummySampleReviewer: UserWithRole = {
   ...dummyUser,
   currentRole: {
     id: 9,
-    title: 'Sample Reviewer',
-    shortCode: 'sample_safety_reviewer',
+    title: 'Experiment Safety Reviewer',
+    shortCode: 'experiment_safety_reviewer',
   },
 };
 
@@ -144,6 +149,16 @@ export const dummyInstrumentScientist: UserWithRole = {
     id: 1,
     title: 'Instrument Scientist',
     shortCode: 'instrument_scientist',
+  },
+};
+
+export const dummyVisitorWithRole: UserWithRole = {
+  ...dummyUser,
+  id: 102,
+  currentRole: {
+    id: 1,
+    title: 'Visitor',
+    shortCode: 'user',
   },
 };
 
@@ -227,6 +242,9 @@ export class UserDataSourceMock implements UserDataSource {
   async getBasicUserInfo(
     id: number
   ): Promise<import('../../models/User').BasicUserDetails | null> {
+    throw new Error('Method not implemented.');
+  }
+  async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
     throw new Error('Method not implemented.');
   }
 
@@ -372,11 +390,23 @@ export class UserDataSourceMock implements UserDataSource {
 
     return true;
   }
+
   async checkInstrumentManagerToProposal(
     scientsitId: number,
     proposalPk: number
   ): Promise<boolean> {
     if (scientsitId === dummyUserNotOnProposalWithRole.id) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async checkTechniqueScientistToProposal(
+    scientistId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    if (scientistId === dummyUserNotOnProposalWithRole.id) {
       return false;
     }
 
@@ -424,5 +454,34 @@ export class UserDataSourceMock implements UserDataSource {
 
   async getUsersByUserNumbers(id: readonly number[]): Promise<User[]> {
     return [dummyUser, dummyUserOfficer];
+  }
+
+  async getRolesForUser(id: number) {
+    return [
+      {
+        name: 'ISIS Instrument Scientist',
+      },
+      {
+        name: 'ISIS Administrator',
+      },
+      {
+        name: 'Developer',
+      },
+      {
+        name: 'Admin',
+      },
+      {
+        name: 'ISIS Instrument Scientist',
+      },
+      {
+        name: 'User Officer',
+      },
+      {
+        name: 'User Officer',
+      },
+      {
+        name: 'User',
+      },
+    ];
   }
 }

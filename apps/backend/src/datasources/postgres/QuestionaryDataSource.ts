@@ -15,6 +15,7 @@ import {
 import {
   DataType,
   FieldDependency,
+  Question,
   Template,
   Topic,
 } from '../../models/Template';
@@ -22,6 +23,7 @@ import { QuestionaryDataSource } from '../QuestionaryDataSource';
 import database from './database';
 import {
   CallRecord,
+  AnswerRecord,
   createAnswerBasic,
   createCallObject,
   createProposalTemplateObject,
@@ -35,9 +37,10 @@ import {
   TopicRecord,
   ProposalRecord,
   createProposalObject,
+  createQuestionObject,
 } from './records';
 
-type AnswerRecord<T extends DataType> = QuestionRecord &
+type QuestionaryAnswerRecord<T extends DataType> = QuestionRecord &
   QuestionTemplateRelRecord & { value: any; answer_id: number } & {
     config: QuestionDataTypeConfigMapping<T>;
     dependency_natural_key: string;
@@ -161,7 +164,7 @@ export default class PostgresQuestionaryDataSource
     questionary_id: number,
     question_id: string,
     answer: string
-  ): Promise<string> {
+  ): Promise<AnswerBasic> {
     const results: { count?: string | number | undefined } | undefined =
       await database
         .count()
@@ -182,7 +185,10 @@ export default class PostgresQuestionaryDataSource
           questionary_id,
           question_id,
         })
-        .then(() => question_id);
+        .returning('*')
+        .then((answer: AnswerRecord[]) => {
+          return createAnswerBasic(answer[0]);
+        });
     } else {
       return database('answers')
         .insert({
@@ -190,7 +196,10 @@ export default class PostgresQuestionaryDataSource
           question_id,
           answer,
         })
-        .then(() => question_id);
+        .returning('*')
+        .then((answer: AnswerRecord[]) => {
+          return createAnswerBasic(answer[0]);
+        });
     }
   }
 
@@ -314,7 +323,7 @@ export default class PostgresQuestionaryDataSource
 
   // TODO: This is repeated in template datasource. Find a way to reuse it.
   async getQuestionsDependencies(
-    questionRecords: AnswerRecord<DataType>[],
+    questionRecords: QuestionaryAnswerRecord<DataType>[],
     templateId: number
   ): Promise<FieldDependency[]> {
     const questionDependencies: QuestionDependencyRecord[] = await database
@@ -374,7 +383,7 @@ export default class PostgresQuestionaryDataSource
 
     // this contains all questions for template, with left joined answers
     // meaning that if there is no answer, it will still be on the list but `null`
-    const answerRecords: AnswerRecord<DataType>[] = (
+    const answerRecords: QuestionaryAnswerRecord<DataType>[] = (
       await database.raw(`
         SELECT 
           templates_has_questions.*, questions.*, answers.answer as value, answers.answer_id, questions.natural_key as dependency_natural_key
@@ -594,5 +603,47 @@ export default class PostgresQuestionaryDataSource
 
         return null;
       });
+  }
+
+  async getProposalAttachments(proposalPk: number): Promise<Question[]> {
+    const proposalAttachments = await database('proposals')
+      .select('questions.*')
+      .join(
+        'questionaries',
+        'questionaries.questionary_id',
+        'proposals.questionary_id'
+      )
+      .join(
+        'templates_has_questions as thq',
+        'thq.template_id',
+        'questionaries.template_id'
+      )
+      .join('questions', 'questions.question_id', 'thq.question_id')
+      .where('proposals.proposal_pk', proposalPk)
+      .andWhere('questions.data_type', DataType.FILE_UPLOAD);
+
+    const genTemplateAttachments = await database('questions')
+      .select('questions.*')
+      .join('answers', 'questions.question_id', 'answers.question_id')
+      .join(
+        'generic_templates',
+        'answers.questionary_id',
+        'generic_templates.questionary_id'
+      )
+      .where('generic_templates.proposal_pk', proposalPk)
+      .andWhere('questions.data_type', DataType.FILE_UPLOAD);
+
+    const sampleAttachments = await database('questions')
+      .select('questions.*')
+      .join('answers', 'questions.question_id', 'answers.question_id')
+      .join('samples', 'answers.questionary_id', 'samples.questionary_id')
+      .where('samples.proposal_pk', proposalPk)
+      .andWhere('questions.data_type', DataType.FILE_UPLOAD);
+
+    return [
+      ...proposalAttachments,
+      ...genTemplateAttachments,
+      ...sampleAttachments,
+    ].map((record) => createQuestionObject(record));
   }
 }

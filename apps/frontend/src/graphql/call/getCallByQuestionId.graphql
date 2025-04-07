@@ -1,5 +1,0 @@
-query getCallByQuestionId($questionId: String!) {
-  callByQuestionId(questionId: $questionId) {
-    ...call
-  }
-}

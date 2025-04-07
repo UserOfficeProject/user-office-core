@@ -202,7 +202,7 @@ const CreateUpdateInstrument = ({
           <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
-            label="Instrument Contact"
+            label={t('Instrument Contact')}
             noOptionsText="No one"
             items={usersData
               .sort(

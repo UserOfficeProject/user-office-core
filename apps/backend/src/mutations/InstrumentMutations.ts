@@ -11,9 +11,12 @@ import { inject, injectable } from 'tsyringe';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -21,6 +24,7 @@ import { Instrument, InstrumentsHasProposals } from '../models/Instrument';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 import {
   AssignProposalsToInstrumentsArgs,
   RemoveProposalsFromInstrumentArgs,
@@ -46,9 +50,15 @@ export default class InstrumentMutations {
     @inject(Tokens.FapDataSource) private fapDataSource: FapDataSource,
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.StatusDataSource)
+    private statusDataSource: StatusDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ReviewDataSource)
     private reviewDataSource: ReviewDataSource,
+    @inject(Tokens.CallDataSource)
+    private callDataSource: CallDataSource,
+    @inject(Tokens.QuestionaryDataSource)
+    private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TechniqueDataSource)
     private techniqueDataSource: TechniqueDataSource
   ) {}
@@ -151,6 +161,7 @@ export default class InstrumentMutations {
         args,
       }
     );
+
     const instrumentHasProposalIds: number[] = [];
 
     // TODO: Cleanup this part because it is quite ugly
@@ -227,6 +238,30 @@ export default class InstrumentMutations {
               instrumentId: instrument.id,
             });
           } else {
+            const proposal = await this.proposalDataSource.get(proposalPk);
+
+            if (!proposal) {
+              return rejection(
+                'Cannot find the proposal for the technical review to be created',
+                { agent, args }
+              );
+            }
+
+            const call = await this.callDataSource.getCall(proposal.callId);
+
+            if (!call) {
+              return rejection(
+                'Cannot find the call for proposal of the technical review to be created',
+                { agent, args }
+              );
+            }
+
+            const technicalReviewQuestionary =
+              await this.questionaryDataSource.create(
+                proposal.proposerId,
+                call.technicalReviewTemplateId
+              );
+
             await this.reviewDataSource.setTechnicalReview(
               {
                 proposalPk: proposalPk,
@@ -238,6 +273,7 @@ export default class InstrumentMutations {
                 files: null,
                 submitted: false,
                 instrumentId: instrument.id,
+                questionaryId: technicalReviewQuestionary.questionaryId,
               },
               false
             );
@@ -453,6 +489,49 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentsArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
+    /*
+    If the user is not a User Officer, ensure
+    the status is currently Under Review.
+    */
+    const isUserOfficerOrApiToken =
+      agent?.currentRole?.shortCode === Roles.USER_OFFICER ||
+      agent?.isApiAccessToken;
+
+    if (!isUserOfficerOrApiToken) {
+      const proposal = await this.proposalDataSource.get(args.proposalPks[0]);
+
+      if (!proposal) {
+        return rejection(
+          'Could not assign instrument: failed to retrieve proposal',
+          {
+            agent,
+            args,
+          }
+        );
+      }
+
+      const statuses = await this.statusDataSource.getAllStatuses(
+        WorkflowType.PROPOSAL
+      );
+
+      const currentStatus = statuses.find((s) => s.id === proposal.statusId);
+
+      if (currentStatus?.shortCode !== 'UNDER_REVIEW') {
+        return rejection(
+          'Could not assign instrument: forbidden current status',
+          {
+            agent,
+            args,
+            currentStatus: currentStatus,
+          }
+        );
+      }
+    }
+
+    /*
+    Ensure the instruments to be assigned belong
+    to the technique of the proposal.
+    */
     const techniquesWithProposal =
       await this.techniqueDataSource.getTechniquesByProposalPk(
         args.proposalPks[0]
@@ -460,7 +539,7 @@ export default class InstrumentMutations {
 
     if (!techniquesWithProposal || techniquesWithProposal.length < 1) {
       return rejection(
-        'Failed to retrieve techniques attached to the proposal',
+        'Could not assign instrument: failed to retrieve proposal techniques',
         {
           agent,
           args,
@@ -480,10 +559,13 @@ export default class InstrumentMutations {
       : false;
 
     if (!isXpress) {
-      return rejection('No permission to assign instrument for this proposal', {
-        agent,
-        args,
-      });
+      return rejection(
+        'Could not assign instrument: instrument does not belong to proposal techniques',
+        {
+          agent,
+          args,
+        }
+      );
     }
 
     return this.assignProposalsToInstrumentsInternal(agent, args);

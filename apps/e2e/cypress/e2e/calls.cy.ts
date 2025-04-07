@@ -5,6 +5,7 @@ import {
   FeatureId,
   TemplateGroupId,
   UpdateCallInput,
+  WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -36,6 +37,8 @@ context('Calls tests', () => {
     templateId: initialDBData.template.id,
     fapReviewTemplateName: initialDBData.fapReviewTemplate.name,
     fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+    technicalReviewTemplateName: initialDBData.technicalReviewTemplate.name,
+    technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -56,6 +59,7 @@ context('Calls tests', () => {
     endCycle: currentDayStart,
     templateId: initialDBData.template.id,
     fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+    technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
     allocationTimeUnit: AllocationTimeUnits.DAY,
     cycleComment: faker.lorem.word(10),
     surveyComment: faker.lorem.word(10),
@@ -70,10 +74,12 @@ context('Calls tests', () => {
   const proposalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
   const proposalInternalWorkflow = {
     name: faker.random.words(2),
     description: faker.random.words(5),
+    entityType: WorkflowType.PROPOSAL,
   };
   const instrumentAssignedToCall: CreateInstrumentMutationVariables = {
     name: faker.random.words(2),
@@ -96,29 +102,26 @@ context('Calls tests', () => {
       }
     });
 
-    cy.createProposalWorkflow(proposalWorkflow).then((result) => {
-      if (result.createProposalWorkflow) {
-        workflowId = result.createProposalWorkflow.id;
+    cy.createWorkflow(proposalWorkflow).then((result) => {
+      if (result.createWorkflow) {
+        workflowId = result.createWorkflow.id;
       } else {
         throw new Error('Workflow creation failed');
       }
     });
-    cy.createProposalWorkflow(proposalInternalWorkflow).then((result) => {
-      const workflow = result.createProposalWorkflow;
+    cy.createWorkflow(proposalInternalWorkflow).then((result) => {
+      const workflow = result.createWorkflow;
       if (workflow) {
-        cy.addProposalWorkflowStatus({
-          droppableGroupId:
-            workflow.proposalWorkflowConnectionGroups[0].groupId,
-          proposalStatusId:
-            initialDBData.proposalStatuses.editableSubmittedInternal.id,
-          proposalWorkflowId: workflow.id,
+        cy.addWorkflowStatus({
+          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
+          statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
+          workflowId: workflow.id,
           sortOrder: 1,
-          prevProposalStatusId:
-            workflow.proposalWorkflowConnectionGroups[0].connections[0].id,
+          prevStatusId: workflow.workflowConnectionGroups[0].connections[0].id,
         }).then((result) => {
-          if (result.addProposalWorkflowStatus) {
+          if (result.addWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
-              proposalWorkflowConnectionId: result.addProposalWorkflowStatus.id,
+              workflowConnectionId: result.addWorkflowStatus.id,
               statusChangingEvents: ['CALL_ENDED'],
             });
           }
@@ -213,6 +216,11 @@ context('Calls tests', () => {
       cy.get('[data-cy="call-fap-review-template"]').click();
       cy.get('[role="presentation"]')
         .contains(initialDBData.fapReviewTemplate.name)
+        .click();
+
+      cy.get('[data-cy="call-technical-review-template"]').click();
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.technicalReviewTemplate.name)
         .click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
@@ -346,6 +354,7 @@ context('Calls tests', () => {
         endCall,
         templateName,
         fapReviewTemplateName,
+        technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
@@ -381,6 +390,11 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="call-fap-review-template"]').click();
       cy.get('[role="presentation"]').contains(fapReviewTemplateName).click();
+
+      cy.get('[data-cy="call-technical-review-template"]').click();
+      cy.get('[role="presentation"]')
+        .contains(technicalReviewTemplateName)
+        .click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
@@ -424,6 +438,7 @@ context('Calls tests', () => {
         endCall,
         templateName,
         fapReviewTemplateName,
+        technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
@@ -464,6 +479,11 @@ context('Calls tests', () => {
 
       cy.get('[data-cy="call-fap-review-template"]').click();
       cy.get('[role="presentation"]').contains(fapReviewTemplateName).click();
+
+      cy.get('[data-cy="call-technical-review-template"]').click();
+      cy.get('[role="presentation"]')
+        .contains(technicalReviewTemplateName)
+        .click();
 
       if (featureFlags.getEnabledFeatures().get(FeatureId.RISK_ASSESSMENT)) {
         cy.get('[data-cy="call-esi-template"]').click();
@@ -527,6 +547,11 @@ context('Calls tests', () => {
       cy.get('[data-cy="call-fap-review-template"] input').should(
         'have.value',
         initialDBData.fapReviewTemplate.name
+      );
+
+      cy.get('[data-cy="call-technical-review-template"] input').should(
+        'have.value',
+        initialDBData.technicalReviewTemplate.name
       );
 
       cy.get('.MuiStep-root').contains('Reviews').click();

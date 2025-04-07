@@ -1,4 +1,15 @@
-import { Arg, Ctx, Field, InputType, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Args,
+  ArgsType,
+  Ctx,
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  Query,
+  Resolver,
+} from 'type-graphql';
 
 import { ResolverContext } from '../../context';
 import { DataType, TemplateCategoryId } from '../../models/Template';
@@ -22,6 +33,48 @@ export class QuestionsFilter {
   public questionIds?: string[];
 }
 
+@InputType()
+export class AllQuestionsFilter {
+  @Field(() => TemplateCategoryId, { nullable: true })
+  public category?: TemplateCategoryId;
+
+  @Field(() => [DataType], { nullable: true })
+  public dataType?: DataType[];
+
+  @Field(() => [DataType], { nullable: true })
+  public excludeDataType?: DataType[];
+}
+
+@ObjectType()
+class AllQuestionsQueryResult {
+  @Field(() => Int)
+  public totalCount: number;
+
+  @Field(() => [QuestionWithUsage])
+  public questions: QuestionWithUsage[];
+}
+
+@ArgsType()
+export class AllQuestionsFilterArgs {
+  @Field(() => AllQuestionsFilter, { nullable: true })
+  public filter?: AllQuestionsFilter;
+
+  @Field(() => Int, { nullable: true })
+  public first?: number;
+
+  @Field(() => Int, { nullable: true })
+  public offset?: number;
+
+  @Field({ nullable: true })
+  public sortField?: string;
+
+  @Field({ nullable: true })
+  public sortDirection?: string;
+
+  @Field({ nullable: true })
+  public searchText?: string;
+}
+
 @Resolver()
 export class QuestionsQuery {
   @Query(() => [QuestionWithUsage])
@@ -31,5 +84,13 @@ export class QuestionsQuery {
     @Ctx() context: ResolverContext
   ) {
     return context.queries.template.getQuestions(context.user, filter);
+  }
+
+  @Query(() => AllQuestionsQueryResult)
+  allQuestions(
+    @Args() args: AllQuestionsFilterArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.template.getAllQuestions(context.user, args);
   }
 }

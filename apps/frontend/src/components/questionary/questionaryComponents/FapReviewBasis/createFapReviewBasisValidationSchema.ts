@@ -5,7 +5,7 @@ import { QuestionaryComponentDefinition } from 'components/questionary/Questiona
 
 export const createFapReviewBasisValidationSchema: QuestionaryComponentDefinition['createYupValidationSchema'] =
   () => {
-    const FAP_REVIEW_COMMENT_CHAR_LIMIT = 100;
+    const FAP_REVIEW_COMMENT_CHAR_LIMIT = 6000;
 
     let commentSchema = Yup.string().transform(function (value: string) {
       return sanitizeHtmlAndCleanText(value);

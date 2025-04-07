@@ -15,6 +15,7 @@ import files from './src/middlewares/files';
 import apolloServer from './src/middlewares/graphql';
 import healthCheck from './src/middlewares/healthCheck';
 import jwtErrorHandler from './src/middlewares/jwtErrorHandler';
+import metrics from './src/middlewares/metrics/metrics';
 import readinessCheck from './src/middlewares/readinessCheck';
 
 async function bootstrap() {
@@ -23,14 +24,14 @@ async function bootstrap() {
   app.use(express.json({ limit: '5mb' }));
   app.use(express.urlencoded({ extended: false }));
   app
+    .use(metrics(app))
     .use(authorization())
     .use(jwtErrorHandler)
     .use(files())
     .use(factory())
     .use(healthCheck())
     .use(readinessCheck())
-    .use(exceptionHandler())
-    .use(express.json({ limit: '5mb' }));
+    .use(exceptionHandler());
 
   await apolloServer(app);
 
@@ -45,7 +46,7 @@ async function bootstrap() {
     {}
   );
 
-  startAsyncJobs();
+  startAsyncJobs(); // TODO: Should we do this here? Or those jobs should be started in a separate process?
   container.resolve<(() => void) | undefined>(Tokens.ConfigureLogger)?.();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }

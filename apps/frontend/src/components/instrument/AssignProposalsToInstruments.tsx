@@ -9,14 +9,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import { InstrumentFragment } from 'generated/sdk';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { InstrumentMinimalFragment } from 'generated/sdk';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { getUniqueArray } from 'utils/helperFunctions';
 
 type AssignProposalsToInstrumentsProps = {
   close: () => void;
   assignProposalsToInstruments: (
-    instrument: InstrumentFragment[] | null
+    instrument: InstrumentMinimalFragment[] | null
   ) => Promise<void>;
   callIds: number[];
   instrumentIds: (number | null)[];
@@ -30,7 +30,8 @@ const AssignProposalsToInstruments = ({
 }: AssignProposalsToInstrumentsProps) => {
   const { t } = useTranslation();
 
-  const { instruments, loadingInstruments } = useInstrumentsData(callIds);
+  const { instruments, loadingInstruments } =
+    useInstrumentsMinimalData(callIds);
 
   const uniqueInstrumentIds = getUniqueArray(instrumentIds);
 

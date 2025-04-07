@@ -1,0 +1,10 @@
+query getTechnicalReviewTemplates($filter: TechnicalReviewTemplatesFilter) {
+  technicalReviewTemplates(filter: $filter) {
+    templateId
+    name
+    description
+    isArchived
+    questionaryCount
+    callCount
+  }
+}

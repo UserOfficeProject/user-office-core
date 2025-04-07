@@ -29,6 +29,10 @@ export const genericTemplateDefinition: QuestionaryComponentDefinition = {
     const config = answer.config as SubTemplateConfig;
     let schema = Yup.array().of<Yup.AnyObjectSchema>(Yup.object());
 
+    if (config.required) {
+      schema = schema.min(1, 'This is a required field');
+    }
+
     if (config.minEntries) {
       schema = schema.min(
         config.minEntries,

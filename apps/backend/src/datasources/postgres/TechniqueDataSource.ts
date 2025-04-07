@@ -338,4 +338,20 @@ export default class PostgresTechniqueDataSource
       ? uniqueTechniques.map((tech) => this.createTechniqueObject(tech))
       : [];
   }
+
+  async getTechniquesByScientist(userId: number): Promise<Technique[]> {
+    const uniqueTechniques: TechniqueRecord[] = await database(
+      'techniques as t'
+    )
+      .select('t.*')
+      .join('technique_has_scientists as thi', {
+        'thi.technique_id': 't.technique_id',
+      })
+      .where('thi.user_id', userId)
+      .distinct();
+
+    return uniqueTechniques
+      ? uniqueTechniques.map((tech) => this.createTechniqueObject(tech))
+      : [];
+  }
 }

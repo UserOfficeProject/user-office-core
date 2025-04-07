@@ -8,7 +8,10 @@ import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { Question, TemplateGroupId, TemplateStep } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { QuestionsFilter } from '../resolvers/queries/QuestionsQuery';
+import {
+  AllQuestionsFilterArgs,
+  QuestionsFilter,
+} from '../resolvers/queries/QuestionsQuery';
 import { TemplatesArgs } from '../resolvers/queries/TemplatesQuery';
 import { DynamicMultipleChoiceConfig } from '../resolvers/types/FieldConfig';
 
@@ -47,6 +50,14 @@ export default class TemplateQueries {
     filter?: QuestionsFilter
   ): Promise<Question[] | null> {
     return this.dataSource.getQuestions(filter);
+  }
+
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
+  async getAllQuestions(
+    agent: UserWithRole | null,
+    args: AllQuestionsFilterArgs
+  ): Promise<{ totalCount: number; questions: Question[] }> {
+    return this.dataSource.getAllQuestions(args);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])

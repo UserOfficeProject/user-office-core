@@ -68,3 +68,11 @@ export const convertXlsxToJson = (filePath: string) => {
 
   return jsonData;
 };
+
+export const deleteFile = (filePath: string) => {
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+
+  return null;
+};

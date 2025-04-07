@@ -205,7 +205,7 @@ const init = (user: UserWithRole) => {
             .resolve<GenericTemplateDataSource>(
               Tokens.GenericTemplateDataSource
             )
-            .getGenericTemplates(args);
+            .getGenericTemplates(args, user);
         }
 
         return baseContext.queries.genericTemplate.getGenericTemplates(

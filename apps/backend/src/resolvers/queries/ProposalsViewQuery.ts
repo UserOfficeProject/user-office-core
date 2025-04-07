@@ -11,7 +11,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { ProposalView } from '../types/ProposalView';
+import { ProposalScientistComment, ProposalView } from '../types/ProposalView';
 import { ProposalsFilter } from './ProposalsQuery';
 
 @ArgsType()
@@ -98,6 +98,16 @@ export class ProposalsViewQuery {
       args.sortField,
       args.sortDirection,
       args.searchText
+    );
+  }
+  @Query(() => ProposalScientistComment, { nullable: true })
+  proposalScientistComment(
+    @Ctx() context: ResolverContext,
+    @Arg('proposalPk', () => Int) proposalPk: number
+  ) {
+    return context.queries.proposal.getProposalScientistComment(
+      context.user,
+      proposalPk
     );
   }
 }

@@ -37,18 +37,19 @@ import {
   SettingsId,
   UserRole,
   ProposalViewTechnicalReviewAssignee,
+  WorkflowType,
 } from 'generated/sdk';
 import { useInstrumentScientistCallsData } from 'hooks/call/useInstrumentScientistCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
-import { useInstrumentsData } from 'hooks/instrument/useInstrumentsData';
+import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { useDownloadProposalAttachment } from 'hooks/proposal/useDownloadProposalAttachment';
 import {
   ProposalViewData,
   useProposalsCoreData,
 } from 'hooks/proposal/useProposalsCoreData';
-import { useProposalStatusesData } from 'hooks/settings/useProposalStatusesData';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import {
   addColumns,
   fromArrayToCommaSeparated,
@@ -332,10 +333,12 @@ const ProposalTableInstrumentScientist = ({
     },
     searchText: search ?? undefined,
   });
-  const { instruments, loadingInstruments } = useInstrumentsData();
+  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
   const { calls, loadingCalls } = useInstrumentScientistCallsData(user.id);
-  const { proposalStatuses, loadingProposalStatuses } =
-    useProposalStatusesData();
+  const {
+    statuses: proposalStatuses,
+    loadingStatuses: loadingProposalStatuses,
+  } = useStatusesData(WorkflowType.PROPOSAL);
 
   const { loading, proposalsData, totalCount, setProposalsData } =
     useProposalsCoreData(

@@ -49,6 +49,9 @@ export class VisitBasisConfig extends ConfigBase {}
 export class FapReviewBasisConfig extends ConfigBase {}
 
 @ObjectType()
+export class TechnicalReviewBasisConfig extends ConfigBase {}
+
+@ObjectType()
 export class BooleanConfig extends ConfigBase {}
 
 @ObjectType()
@@ -342,6 +345,7 @@ export const FieldConfigType = createUnionType({
     RichTextInputConfig,
     VisitBasisConfig,
     FapReviewBasisConfig,
+    TechnicalReviewBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
     InstrumentPickerConfig,

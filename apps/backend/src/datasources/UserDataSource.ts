@@ -12,6 +12,7 @@ export interface UserDataSource {
   addUserRole(args: AddUserRoleArgs): Promise<boolean>;
   createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number>;
   getBasicUserInfo(id: number): Promise<BasicUserDetails | null>;
+  getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]>;
   getBasicUserDetailsByEmail(
     email: string,
     role?: UserRole
@@ -87,6 +88,10 @@ export interface UserDataSource {
     proposalPk: number
   ): Promise<boolean>;
   checkInstrumentManagerToProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean>;
+  checkTechniqueScientistToProposal(
     userId: number,
     proposalPk: number
   ): Promise<boolean>;

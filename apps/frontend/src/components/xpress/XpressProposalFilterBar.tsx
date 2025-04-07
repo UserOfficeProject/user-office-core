@@ -8,17 +8,17 @@ import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStat
 import TechniqueFilter from 'components/common/proposalFilters/TechniqueFilter';
 import {
   Call,
-  InstrumentFragment,
+  InstrumentMinimalFragment,
+  TechniqueMinimalFragment,
   ProposalsFilter,
-  ProposalStatus,
-  TechniqueFragment,
+  Status,
 } from 'generated/sdk';
 
 type ProposalFilterBarProps = {
   calls?: { data: Call[]; isLoading: boolean };
-  instruments?: { data: InstrumentFragment[]; isLoading: boolean };
-  techniques?: { data: TechniqueFragment[]; isLoading: boolean };
-  proposalStatuses?: { data: ProposalStatus[]; isLoading: boolean };
+  instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
+  techniques?: { data: TechniqueMinimalFragment[]; isLoading: boolean };
+  proposalStatuses?: { data: Status[]; isLoading: boolean };
   handleFilterChange: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;
 };

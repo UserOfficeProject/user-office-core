@@ -9,14 +9,14 @@ import UpdateShipment from './UpdateShipment';
 type CreateUpdateShipmentProps = {
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
   onShipmentCreated?: (shipment: ShipmentCore) => void;
-  scheduledEventId: number;
+  experimentPk: number;
   shipment: ShipmentFragment | null;
 };
 
 function CreateUpdateShipment({
   onShipmentSubmitted,
   onShipmentCreated,
-  scheduledEventId,
+  experimentPk,
   shipment,
 }: CreateUpdateShipmentProps) {
   return shipment ? (
@@ -26,7 +26,7 @@ function CreateUpdateShipment({
     />
   ) : (
     <CreateShipment
-      scheduledEventId={scheduledEventId}
+      experimentPk={experimentPk}
       onShipmentSubmitted={onShipmentSubmitted}
       onShipmentCreated={onShipmentCreated}
     />

@@ -239,6 +239,18 @@ export default class PostgresUserDataSource implements UserDataSource {
       );
   }
 
+  async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
+    return database
+      .select()
+      .from('users as u')
+      .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
+      .whereIn('u.user_id', ids)
+      .then(
+        (usersRecord: Array<UserRecord & InstitutionRecord & CountryRecord>) =>
+          usersRecord.map((user) => createBasicUserObject(user))
+      );
+  }
+
   async getBasicUserDetailsByEmail(
     email: string,
     role?: UserRole
@@ -706,6 +718,25 @@ export default class PostgresUserDataSource implements UserDataSource {
         'ihp.instrument_id': 'i.instrument_id',
       })
       .where('ihp.proposal_pk', proposalPk)
+      .first();
+
+    return !!proposal;
+  }
+
+  async checkTechniqueScientistToProposal(
+    scientistId: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const proposal = await database
+      .select('*')
+      .from('proposals as p')
+      .join('technique_has_scientists as ths', {
+        'ths.user_id': scientistId,
+      })
+      .join('technique_has_proposals as thp', {
+        'thp.technique_id': 'ths.technique_id',
+      })
+      .where('thp.proposal_id', proposalPk)
       .first();
 
     return !!proposal;

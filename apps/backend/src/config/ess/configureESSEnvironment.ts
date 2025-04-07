@@ -80,9 +80,10 @@ async function enableDefaultEssFeatures() {
       FeatureId.FAP_REVIEW,
       FeatureId.USER_MANAGEMENT,
       FeatureId.VISIT_MANAGEMENT,
-      FeatureId.SAMPLE_SAFETY,
+      FeatureId.EXPERIMENT_SAFETY_REVIEW,
       FeatureId.OAUTH,
       FeatureId.CONFLICT_OF_INTEREST_WARNING,
+      FeatureId.EXPERIMENT_SAFETY_REVIEW,
     ],
     true
   );
@@ -97,6 +98,14 @@ async function enableDefaultEssFeatures() {
   await db.updateSettings({
     settingsId: SettingsId.GRADE_PRECISION,
     settingsValue: '1',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_FAQ_LINK,
+    settingsValue: 'true',
+  });
+  await db.updateSettings({
+    settingsId: SettingsId.DISPLAY_PRIVACY_STATEMENT_LINK,
+    settingsValue: 'true',
   });
 }
 
