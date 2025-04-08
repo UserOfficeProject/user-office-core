@@ -1164,7 +1164,7 @@ context('Fap reviews tests', () => {
         instrumentIds: [newlyCreatedInstrumentId],
         proposalPks: [firstCreatedProposalPk],
       });
-      const optionText = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      const updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
@@ -1193,7 +1193,7 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[aria-label="Open"]').first().click();
-      cy.contains(optionText).click();
+      cy.contains(updatedContact).click();
       cy.contains('Update all un-assigned technical reviews').should(
         'be.visible'
       );
@@ -1252,7 +1252,7 @@ context('Fap reviews tests', () => {
         instrumentIds: [newlyCreatedInstrumentId],
         proposalPks: [firstCreatedProposalPk],
       });
-      const optionText = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      const updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
       cy.login('officer');
       cy.visit(`/FapPage/${createdFapId}?tab=3`);
 
@@ -1280,7 +1280,7 @@ context('Fap reviews tests', () => {
         .click();
 
       cy.get('[aria-label="Open"]').first().click();
-      cy.contains(optionText).click();
+      cy.contains(updatedContact).click();
       cy.contains('Update all un-assigned technical reviews').should(
         'be.visible'
       );
