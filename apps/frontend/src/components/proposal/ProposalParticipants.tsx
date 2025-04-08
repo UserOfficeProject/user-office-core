@@ -59,11 +59,6 @@ const Participants = ({
     setOpen(true);
   };
 
-  const addUsers = (addedUsers: BasicUserDetails[]) => {
-    setUsers([...users, ...addedUsers]);
-    setOpen(false);
-  };
-
   const handleAddParticipants = (props: {
     users: BasicUserDetails[];
     invites: Invite[];
@@ -71,6 +66,13 @@ const Participants = ({
     setUsers([...users, ...props.users]);
     setInvites([...invites, ...props.invites]);
     setOpen(false);
+  };
+
+  const addUsers = (addedUsers: BasicUserDetails[]) => {
+    handleAddParticipants({
+      users: addedUsers,
+      invites: [],
+    });
   };
 
   const handleDeleteInvite = (invite: Invite) => {
@@ -143,7 +145,7 @@ const Participants = ({
             setPrincipalInvestigator={setPrincipalInvestigator}
           />
 
-          {invites.length > 0 ? (
+          {invites.length > 0 && (
             <Box
               sx={{
                 display: 'flex',
@@ -176,7 +178,7 @@ const Participants = ({
                 />
               ))}
             </Box>
-          ) : null}
+          )}
           <ActionButtonContainer
             sx={(theme) => ({
               marginTop: theme.spacing(1),
