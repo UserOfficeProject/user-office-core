@@ -44,11 +44,15 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.esi_questionary_id,
     record.esi_questionary_submitted_at,
     record.created_by,
-    record.status,
+    record.statusId,
     record.safety_review_questionary_id,
     record.reviewed_by,
     record.created_at,
-    record.updated_at
+    record.updated_at,
+    record.instrument_scientist_decision,
+    record.instrument_scientist_comment,
+    record.experiment_safety_reviewer_decision,
+    record.experiment_safety_reviewer_comment
   );
 }
 

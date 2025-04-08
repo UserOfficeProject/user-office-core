@@ -6,9 +6,7 @@ import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
-import { QuestionaryStep, TemplateGroupId } from 'generated/sdk';
-import { ExperimentSafetySubmissionState } from 'models/questionary/experimentSafety/ExperimentSafetySubmissionState';
-import { ExperimentSafetyWithQuestionary } from 'models/questionary/experimentSafety/ExperimentSafetyWithQuestionary';
+import { TemplateGroupId } from 'generated/sdk';
 import { ExperimentSafetyReviewSubmissionState } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewSubmissionState';
 import { ExperimentSafetyReviewWithQuestionary } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewWithQuestionary';
 import {
@@ -17,51 +15,14 @@ import {
 } from 'models/questionary/QuestionarySubmissionState';
 import useEventHandlers from 'models/questionary/useEventHandlers';
 
-export interface ExperimentSafetyContextType extends QuestionaryContextType {
-  state: ExperimentSafetySubmissionState | null;
-}
-
-export function createExperimentSafetyStub(
-  templateId: number,
-  questionarySteps: QuestionaryStep[]
-): ExperimentSafetyWithQuestionary {
-  return {
-    experimentSafetyPk: 0,
-    experimentPk: 0,
-    esiQuestionaryId: 0,
-    esiQuestionarySubmittedAt: 0,
-    createdBy: 0,
-    status: '',
-    safetyReviewQuestionaryId: 0,
-    reviewedBy: 0,
-    createdAt: 0,
-    updatedAt: 0,
-    samples: [],
-    questionary: {
-      questionaryId: 0,
-      isCompleted: false,
-      templateId: templateId,
-      created: new Date(),
-      steps: questionarySteps,
-    },
-    proposal: {
-      primaryKey: 0,
-      title: '',
-      questionary: {
-        questionaryId: 0,
-        templateId: templateId,
-        created: new Date(),
-        steps: questionarySteps,
-      },
-      proposalId: '',
-      samples: [],
-    },
-  };
+export interface ExperimentSafetyReviewContextType
+  extends QuestionaryContextType {
+  state: ExperimentSafetyReviewSubmissionState | null;
 }
 
 const experimentSafetyReviewReducer = (
-  state: ExperimentSafetySubmissionState,
-  draftState: ExperimentSafetySubmissionState,
+  state: ExperimentSafetyReviewSubmissionState,
+  draftState: ExperimentSafetyReviewSubmissionState,
   action: Event
 ) => {
   switch (action.type) {
@@ -125,7 +86,7 @@ export default function ExperimentSafetyReviewContainer(
   return (
     <QuestionaryContext.Provider value={{ state, dispatch }}>
       <Questionary
-        title={'Input for Experiment Safety Form'}
+        title={'Experiment Safety Review'}
         previewMode={props.previewMode}
       />
     </QuestionaryContext.Provider>

@@ -13,7 +13,11 @@ import {
 import { Tokens } from '../../config/Tokens';
 import { ResolverContext } from '../../context';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
-import { ExperimentSafety as ExperimentSafetyOrigin } from '../../models/Experiment';
+import {
+  ExperimentSafety as ExperimentSafetyOrigin,
+  ExperimentSafetyReviewerDecisionEnum,
+  InstrumentScientistDecisionEnum,
+} from '../../models/Experiment';
 import { TemplateCategoryId } from '../../models/Template';
 import { ExperimentHasSample } from './ExperimentHasSample';
 import { Proposal } from './Proposal';
@@ -37,8 +41,8 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
   @Field(() => Number)
   public createdBy: number;
 
-  @Field(() => String)
-  public status: string;
+  @Field(() => Number, { nullable: true })
+  public statusId: number | null;
 
   @Field(() => Number, { nullable: true })
   public safetyReviewQuestionaryId: number | null;
@@ -51,6 +55,18 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
 
   @Field(() => Date)
   public updatedAt: Date;
+
+  @Field(() => String, { nullable: true })
+  public instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
+
+  @Field(() => String, { nullable: true })
+  public instrumentScientistComment: string | null;
+
+  @Field(() => String, { nullable: true })
+  public experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
+
+  @Field(() => String, { nullable: true })
+  public experimentSafetyReviewerComment: string | null;
 }
 
 @Resolver(() => ExperimentSafety)

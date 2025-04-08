@@ -38,11 +38,15 @@ const dummyExperimentSafetyFactory = (
     values?.esiQuestionaryId ?? 1,
     values?.esiQuestionarySubmittedAt ?? null,
     values?.createdBy ?? 1,
-    values?.status ?? 'PENDING',
+    values?.statusId ?? null,
     values?.safetyReviewQuestionaryId ?? 1,
     values?.reviewedBy ?? null,
     values?.createdAt ?? new Date(),
-    values?.updatedAt ?? new Date()
+    values?.updatedAt ?? new Date(),
+    values?.instrumentScientistDecision ?? null,
+    values?.instrumentScientistComment ?? null,
+    values?.experimentSafetyReviewerDecision ?? null,
+    values?.experimentSafetyReviewerComment ?? null
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
+import { ExperimentSafetyReviewContextType } from 'components/experimentSafetyReview/ExperimentSafetyReviewContainer';
 import SampleDetails from 'components/experimentSafetyReview/SampleDetails';
-import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -9,11 +9,10 @@ import {
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
 
-function QuestionaryComponentExperimentSafetyReviewBasis(
-  props: BasicComponentProps
-) {
-  console.log({ props });
-  const { dispatch, state } = useContext(QuestionaryContext) as any;
+function QuestionaryComponentExperimentSafetyReviewBasis() {
+  const { dispatch, state } = useContext(
+    QuestionaryContext
+  ) as ExperimentSafetyReviewContextType;
 
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
