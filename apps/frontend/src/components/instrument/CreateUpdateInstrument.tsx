@@ -131,9 +131,6 @@ const CreateUpdateInstrument = ({
   const handleConfirmSubmit = async (values: typeof initialValues) => {
     if (instrument) {
       const updatedValues = { ...values };
-      if (updatedValues.managerUserId !== instrument.managerUserId) {
-        updatedValues.managerUserId = values.managerUserId;
-      }
 
       if (updatedValues.managerUserId === null) {
         return;
@@ -161,11 +158,12 @@ const CreateUpdateInstrument = ({
                     ? t('Instrument Contact') + ` updated to ${newManagerName}`
                     : ''),
               }).updateInstrument({
-                id: instrument.id,
+                id: updatedValues.id,
                 name: updatedValues.name,
                 shortCode: updatedValues.shortCode,
                 description: updatedValues.description,
                 managerUserId: updatedValues.managerUserId,
+                updateTechReview: true,
               });
 
               close(updateInstrument);
@@ -189,6 +187,7 @@ const CreateUpdateInstrument = ({
             shortCode: updatedValues.shortCode,
             description: updatedValues.description,
             managerUserId: updatedValues.managerUserId,
+            updateTechReview: false,
           });
 
           close(updateInstrument);

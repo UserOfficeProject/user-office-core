@@ -329,21 +329,9 @@ export default class PostgresInstrumentDataSource
         return false;
       }
 
-      const updatedInstruments = await database('instruments')
-        .where('instrument_id', instrumentId)
-        .update({ manager_user_id: userId });
-
-      if (updatedInstruments === 0) {
-        logger.logError(
-          'Instrument with ID not found or no changes were made.',
-          { instrumentId }
-        );
-
-        return false;
-      }
-
       const updatedReviews = await database('technical_review')
-        .where('instrument_id', instrumentId)
+        .where({ instrument_id: instrumentId })
+        .andWhere({ submitted: false })
         .update({ technical_review_assignee_id: userId });
 
       if (updatedReviews === 0) {

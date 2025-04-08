@@ -96,7 +96,8 @@ export default class InstrumentMutations {
 
       if (
         args.managerUserId &&
-        args.managerUserId !== currentInstrument.managerUserId
+        args.managerUserId !== currentInstrument.managerUserId &&
+        args.updateTechReview
       ) {
         const updateSuccess = await this.dataSource.updateInstrumentContact(
           args.managerUserId,
@@ -109,8 +110,6 @@ export default class InstrumentMutations {
             managerUserId: args.managerUserId,
           });
         }
-
-        currentInstrument.managerUserId = args.managerUserId;
       }
 
       return await this.dataSource.update(args);
