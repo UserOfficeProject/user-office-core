@@ -37,6 +37,7 @@ import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
+import createLoggingHandler from '../eventHandlers/logging';
 import { SparkPostMailService } from '../eventHandlers/MailService/SparkPostMailService';
 import {
   createListenToRabbitMQHandler,
@@ -114,6 +115,7 @@ mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+mapValue(Tokens.LoggingHandler, createLoggingHandler());
 mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 
