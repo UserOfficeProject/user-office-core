@@ -97,7 +97,7 @@ context('Xpress tests', () => {
     description: string;
   } = {
     id: initialDBData.proposalStatuses.unsuccessful.id,
-    name: 'Unsucessful',
+    name: 'Unsuccessful',
     shortCode: 'UNSUCCESSFUL',
     description: '-',
   };
