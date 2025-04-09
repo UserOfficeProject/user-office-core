@@ -678,6 +678,184 @@ context('Instrument tests', () => {
       );
       cy.contains(proposal2.title);
     });
+
+    it('Officer should be able to update all un-assigned technical reviews to new contact', () => {
+      cy.assignScientistsToInstrument({
+        instrumentId: createdInstrumentId,
+        scientistIds: [scientist2.id],
+      });
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.login('user2');
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: createdProposalPk,
+        userId: scientist1.id,
+        instrumentId: createdInstrumentId,
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: createdProposalPk,
+        reviewerId: scientist2.id,
+        submitted: false,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: 1,
+        instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
+
+      const updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+
+      cy.login('officer', initialDBData.roles.userOfficer);
+      cy.visit('/');
+
+      cy.contains('Proposals');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.get('[data-cy="reviewed-by-info"]').contains(
+        `${scientist1.firstName} ${scientist1.lastName}`
+      );
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'not.exist'
+      );
+
+      cy.visit(`/Instruments`);
+
+      cy.get('[aria-label="Edit"]').eq(0).click();
+
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]')
+          .type(scientist2.lastName)
+          .get('[data-cy=findUser]')
+          .click();
+      }
+
+      cy.get('[aria-label="Open"]').first().click();
+      cy.contains(updatedContact).click();
+      cy.contains('Update all un-assigned technical reviews').should(
+        'be.visible'
+      );
+      cy.get('[type="checkbox"]').check();
+      cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="confirmation-dialog"]').should('be.visible');
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'be.visible'
+      );
+    });
+
+    it('Officer should only be able to update area contact for proposals with technical reviews submitted', () => {
+      cy.assignScientistsToInstrument({
+        instrumentId: createdInstrumentId,
+        scientistIds: [scientist2.id],
+      });
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.login('user2');
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: createdProposalPk,
+        userId: scientist1.id,
+        instrumentId: createdInstrumentId,
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: createdProposalPk,
+        reviewerId: scientist2.id,
+        submitted: true,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: 1,
+        instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
+      const updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      cy.login('officer', initialDBData.roles.userOfficer);
+      cy.visit('/');
+
+      cy.contains('Proposals');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'not.exist'
+      );
+
+      cy.visit(`/Instruments`);
+
+      cy.get('[aria-label="Edit"]').eq(0).click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]')
+          .type(scientist2.lastName)
+          .get('[data-cy=findUser]')
+          .click();
+      }
+
+      cy.get('[aria-label="Open"]').first().click();
+      cy.contains(updatedContact).click();
+      cy.contains('Update all un-assigned technical reviews').should(
+        'be.visible'
+      );
+      cy.get('[type="checkbox"]').check();
+      cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="confirmation-dialog"]').should('be.visible');
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').eq(0).click();
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'be.visible'
+      );
+
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'not.exist'
+      );
+    });
   });
 
   describe('Instruments tests as instrument scientist role', () => {
