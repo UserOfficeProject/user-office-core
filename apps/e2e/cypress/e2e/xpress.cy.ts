@@ -1907,6 +1907,13 @@ context('Xpress tests', () => {
         proposalPk: createdProposalPk3,
         techniqueIds: [createdTechniquePk3, createdTechniquePk1],
       }).then(() => {
+        if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+          cy.updateUserRoles({
+            id: scientist1.id,
+            roles: [initialDBData.roles.instrumentScientist],
+          });
+        }
+
         cy.login(scientist1);
         cy.visit('/');
         cy.finishedLoading();
