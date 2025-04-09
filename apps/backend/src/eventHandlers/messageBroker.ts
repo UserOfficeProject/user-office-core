@@ -84,13 +84,6 @@ const createRabbitMQMessageBroker = async () => {
   }
 };
 
-export function createPostToQueueHandler() {
-  // return the mapped implementation
-  return container.resolve<EventHandler<ApplicationEvent>>(
-    Tokens.PostToMessageQueue
-  );
-}
-
 export function createListenToQueueHandler() {
   // return the mapped implementation
   return container.resolve<EventHandler<ApplicationEvent>>(
