@@ -2,6 +2,7 @@ import { container } from 'tsyringe';
 
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { FeatureId } from '../../models/Feature';
+import { Roles } from '../../models/Role';
 import { SettingsId } from '../../models/Settings';
 import { setTimezone, setDateTimeFormats } from '../setTimezoneAndFormat';
 import { Tokens } from '../Tokens';
@@ -87,6 +88,7 @@ async function enableDefaultEssFeatures() {
     ],
     true
   );
+
   await db.updateSettings({
     settingsId: SettingsId.DEFAULT_INST_SCI_REVIEWER_FILTER,
     settingsValue: 'ME',
@@ -109,10 +111,30 @@ async function enableDefaultEssFeatures() {
   });
 }
 
+async function setESSRoleDescriptions() {
+  const db = container.resolve<AdminDataSource>(Tokens.AdminDataSource);
+
+  await db.updateRole(Roles.USER, {
+    description:
+      'Submit and view your proposals, visits, safety forms and declare shipments for your experiments',
+  });
+
+  await db.updateRole(Roles.INSTRUMENT_SCIENTIST, {
+    description:
+      'Edit and view your technical reviews, experiment safety reviews, and schedule/manage experiments times on your instruments',
+  });
+
+  await db.updateRole(Roles.EXPERIMENT_SAFETY_REVIEWER, {
+    description:
+      'Edit and view your experiment safety reports and schedule/manage experiments times on your instruments',
+  });
+}
+
 export async function configureESSDevelopmentEnvironment() {
   await setEssColourTheme();
   await enableDefaultEssFeatures();
   await setTimezone();
   await setDateTimeFormats();
   await updateOIDCSettings();
+  await setESSRoleDescriptions();
 }
