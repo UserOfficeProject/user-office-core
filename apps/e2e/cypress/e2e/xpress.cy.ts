@@ -72,6 +72,7 @@ context('Xpress tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.underReview.id,
     name: 'Under review',
     shortCode: 'UNDER_REVIEW',
     description: '-',
@@ -83,6 +84,7 @@ context('Xpress tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.approved.id,
     name: 'Approved',
     shortCode: 'APPROVED',
     description: '-',
@@ -94,6 +96,7 @@ context('Xpress tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.unsuccessful.id,
     name: 'Unsucessful',
     shortCode: 'UNSUCCESSFUL',
     description: '-',
@@ -105,6 +108,7 @@ context('Xpress tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.finished.id,
     name: 'Finished',
     shortCode: 'FINISHED',
     description: '-',
@@ -128,6 +132,7 @@ context('Xpress tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.quickReview.id,
     name: 'Quick review',
     shortCode: 'QUICK_REVIEW',
     description: '-',
@@ -231,54 +236,6 @@ context('Xpress tests', () => {
   beforeEach(function () {
     cy.resetDB();
 
-    /*
-     Create Xpress-specific statuses to avoid patching them in.
-     Others in the Xpress workflow are already created.
-    */
-    cy.createStatus({
-      name: underReviewStatus.name,
-      shortCode: underReviewStatus.shortCode,
-      description: underReviewStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        underReviewStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: approvedStatus.name,
-      shortCode: approvedStatus.shortCode,
-      description: approvedStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        approvedStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: unsuccessfulStatus.name,
-      shortCode: unsuccessfulStatus.shortCode,
-      description: unsuccessfulStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        unsuccessfulStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: finishedStatus.name,
-      shortCode: finishedStatus.shortCode,
-      description: finishedStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        finishedStatus.id = result.createStatus.id;
-      }
-    });
-
     cy.createStatus({
       name: submittedStatus.name,
       shortCode: submittedStatus.shortCode,
@@ -287,17 +244,6 @@ context('Xpress tests', () => {
     }).then((result) => {
       if (result.createStatus) {
         submittedStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: quickReviewStatus.name,
-      shortCode: quickReviewStatus.shortCode,
-      description: quickReviewStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        quickReviewStatus.id = result.createStatus.id;
       }
     });
 
@@ -1931,7 +1877,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it.only("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
+    it("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
       cy.login(scientist1);
       cy.visit('/');
       cy.finishedLoading();
