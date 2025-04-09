@@ -93,7 +93,7 @@ context('User login tests', () => {
     });
   });
 
-  describe.only('Role Model', () => {
+  describe('Role Model', () => {
     beforeEach(() => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
