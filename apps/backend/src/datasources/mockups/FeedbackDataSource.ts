@@ -48,8 +48,8 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
       }
 
       if (
-        filter?.scheduledEventId &&
-        currentFeedback.scheduledEventId === filter.scheduledEventId
+        filter?.experimentPk &&
+        currentFeedback.experimentPk === filter.experimentPk
       ) {
         matchingFeedbacks.push(currentFeedback);
       }
@@ -58,22 +58,17 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
     }, new Array<Feedback>());
   }
 
-  async getFeedbackByScheduledEventId(
-    eventId: number
-  ): Promise<Feedback | null> {
+  async getFeedbackByExperimentPk(eventId: number): Promise<Feedback | null> {
     return (
-      this.feedbacks.find(
-        (feedback) => feedback.scheduledEventId === eventId
-      ) ?? null
+      this.feedbacks.find((feedback) => feedback.experimentPk === eventId) ??
+      null
     );
   }
 
-  async getFeedbackRequests(
-    scheduledEventId: number
-  ): Promise<FeedbackRequest[]> {
+  async getFeedbackRequests(experimentPk: number): Promise<FeedbackRequest[]> {
     return this.feedbackRequests.reduce(
       (matchingFeedbackRequests, currentFeedbackRequest) => {
-        if (currentFeedbackRequest.scheduledEventId === scheduledEventId) {
+        if (currentFeedbackRequest.experimentPk === experimentPk) {
           matchingFeedbackRequests.push(currentFeedbackRequest);
         }
 
@@ -83,12 +78,10 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
     );
   }
 
-  async createFeedbackRequest(
-    scheduledEventId: number
-  ): Promise<FeedbackRequest> {
+  async createFeedbackRequest(experimentPk: number): Promise<FeedbackRequest> {
     const newFeedbackRequest = new FeedbackRequest(
       this.feedbacks.length,
-      scheduledEventId,
+      experimentPk,
       new Date()
     );
 
@@ -98,13 +91,13 @@ export class FeedbackDataSourceMock implements FeedbackDataSource {
   }
 
   async createFeedback({
-    scheduledEventId,
+    experimentPk,
     creatorId,
     questionaryId,
   }: CreateFeedbackArgs): Promise<Feedback> {
     const newFeedback = new Feedback(
       this.feedbacks.length,
-      scheduledEventId,
+      experimentPk,
       FeedbackStatus.DRAFT,
       questionaryId,
       creatorId,

@@ -5,10 +5,10 @@ import DialogContent from '@mui/material/DialogContent';
 import React, { useContext } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
+import ExperimentSafetyContainer from 'components/experimentSafety/ExperimentSafetyContainer';
+import { createExperimentSafetyStub } from 'components/experimentSafety/ExperimentSafetyContainer';
 import ProposalContainer from 'components/proposal/ProposalContainer';
 import { createProposalStub } from 'components/proposal/ProposalCreate';
-import ProposalEsiContainer from 'components/proposalEsi/ProposalEsiContainer';
-import { createESIStub } from 'components/proposalEsi/ProposalEsiContainer';
 import { GenericTemplateContainer } from 'components/questionary/questionaryComponents/GenericTemplate/GenericTemplateContainer';
 import { createGenericTemplateStub } from 'components/questionary/questionaryComponents/GenericTemplate/QuestionaryComponentGenericTemplate';
 import { createSampleStub } from 'components/questionary/questionaryComponents/SampleDeclaration/QuestionaryComponentSampleDeclaration';
@@ -50,8 +50,11 @@ const PreviewTemplateModal = ({
     switch (templateGroupId) {
       case TemplateGroupId.PROPOSAL_ESI:
         return (
-          <ProposalEsiContainer
-            esi={createESIStub(templateId, questionarySteps)}
+          <ExperimentSafetyContainer
+            experimentSafety={createExperimentSafetyStub(
+              templateId,
+              questionarySteps
+            )}
             previewMode={true}
           />
         );

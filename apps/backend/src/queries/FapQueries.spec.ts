@@ -72,6 +72,7 @@ describe('Test FapQueries', () => {
       FapQueriesInstance.getFapProposals(dummyUserOfficerWithRole, {
         fapId: 1,
         callId: 1,
+        instrumentId: 1,
       })
     ).resolves.toStrictEqual([dummyFapProposal]);
   });

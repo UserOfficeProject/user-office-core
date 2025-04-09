@@ -321,9 +321,9 @@ export default {
       name: 'EDITABLE_SUBMITTED_INTERNAL',
     },
   },
-  scheduledEvents: {
+  experiments: {
     upcoming: {
-      id: 996,
+      experimentPk: 996,
       startsAt: '07-01-2030 10:00',
       endsAt: '07-01-2030 11:00',
     },

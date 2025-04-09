@@ -15,11 +15,11 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
     creator_id: number,
     proposal_pk: number,
     questionary_id: number,
-    scheduled_event_id: number
+    experiment_pk: number
   ): Promise<Shipment> {
     return database('shipments')
       .insert(
-        { title, creator_id, proposal_pk, questionary_id, scheduled_event_id },
+        { title, creator_id, proposal_pk, questionary_id, experiment_pk },
         '*'
       )
       .then((records: ShipmentRecord[]) => {
@@ -29,7 +29,7 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
             creator_id,
             proposal_pk,
             questionary_id,
-            scheduled_event_id,
+            experiment_pk,
           });
           throw new GraphQLError('Failed to insert shipment');
         }
@@ -79,8 +79,8 @@ export default class PostgresShipmentDataSource implements ShipmentDataSource {
         if (filter?.externalRef) {
           query.where('external_ref', filter.externalRef);
         }
-        if (filter?.scheduledEventId) {
-          query.where('scheduled_event_id', filter.scheduledEventId);
+        if (filter?.experimentPk) {
+          query.where('experiment_pk', filter.experimentPk);
         }
       })
       .select('*')

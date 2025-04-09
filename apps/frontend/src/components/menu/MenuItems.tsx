@@ -213,7 +213,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </Tooltip>
       )}
       {isInstrumentManagementEnabled && (
-        <Tooltip title="Instruments">
+        <Tooltip title={i18n.format(t('instrument'), 'plural')}>
           <ListItemButton component={NavLink} to="/Instruments">
             <ListItemIcon>
               <ScienceIcon />
@@ -315,14 +315,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
             <GroupWorkIcon />
           </ListItemIcon>
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
-        </ListItemButton>
-      )}
-      {isSchedulerEnabled && (
-        <ListItemButton component={NavLink} to="/UpcomingExperimentTimes">
-          <ListItemIcon>
-            <EventIcon />
-          </ListItemIcon>
-          <ListItemText primary="Upcoming experiments" />
         </ListItemButton>
       )}
       {isExperimentSafetyReviewEnabled && (

@@ -7,16 +7,16 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import CreateFeedback from './CreateFeedback';
 
 function CreateFeedbackPage() {
-  const { scheduledEventId } = useParams<{ scheduledEventId: string }>();
+  const { experimentPk } = useParams<{ experimentPk: string }>();
 
-  if (!scheduledEventId) {
+  if (!experimentPk) {
     return <NotFound />;
   }
 
   return (
     <StyledContainer>
       <StyledPaper>
-        <CreateFeedback scheduledEventId={+scheduledEventId} />
+        <CreateFeedback experimentPk={+experimentPk} />
       </StyledPaper>
     </StyledContainer>
   );

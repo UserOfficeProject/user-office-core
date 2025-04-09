@@ -32,12 +32,7 @@ test('A user on the proposal can get a proposal it belongs to', () => {
   ).resolves.toStrictEqual(
     dummyProposal.notified
       ? omit(dummyProposal, 'commentForManagement')
-      : omit(
-          dummyProposal,
-          'commentForManagement',
-          'finalStatus',
-          'commentForUser'
-        )
+      : omit(dummyProposal, 'commentForManagement', 'commentForUser')
   );
 });
 

@@ -1,24 +1,23 @@
 import MaterialTable, { Column } from '@material-table/core';
 import { Dialog, DialogContent } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import { TFunction } from 'i18next';
 import React, { useState } from 'react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import {
-  ProposalScheduledEvent,
-  useProposalBookingsScheduledEvents,
-} from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
-import { StyledPaper } from 'styles/StyledComponents';
+  UserExperiment,
+  useUserExperiments,
+} from 'hooks/experiment/useUserExperiments';
+import { useActionButtons } from 'hooks/proposalBooking/useActionButtons';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
 const columns: (
   t: TFunction<'translation', undefined>
-) => Column<ProposalScheduledEvent>[] = (t) => [
+) => Column<UserExperiment>[] = (t) => [
+  { title: 'Experiment Number', field: 'experimentId' },
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
   { title: t('instrument') as string, field: 'instrument.name' },
@@ -37,11 +36,11 @@ const columns: (
 ];
 
 export default function UserUpcomingExperimentsTable() {
-  const { loading, proposalScheduledEvents, setProposalScheduledEvents } =
-    useProposalBookingsScheduledEvents({
-      onlyUpcoming: true,
-      notDraft: true,
-    });
+  const {
+    loading: experimentsLoading,
+    userExperiments,
+    setUserUpcomingExperiments,
+  } = useUserExperiments({ notDraft: true, onlyUpcoming: true });
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -53,7 +52,6 @@ export default function UserUpcomingExperimentsTable() {
     formTeamAction,
     finishEsi,
     registerVisitAction,
-    individualTrainingAction,
     declareShipmentAction,
     giveFeedback,
   } = useActionButtons({
@@ -61,54 +59,53 @@ export default function UserUpcomingExperimentsTable() {
     closeModal: () => {
       setModalContents(null);
     },
-    eventUpdated: (updatedEvent) => {
-      const updatedEvents = proposalScheduledEvents.map((event) =>
-        event?.id === updatedEvent?.id ? updatedEvent : event
+    eventUpdated: (updatedExperiment) => {
+      const updatedExperiments = userExperiments.map((experiment) =>
+        experiment?.experimentPk === updatedExperiment?.experimentPk
+          ? updatedExperiment
+          : experiment
       );
-      setProposalScheduledEvents(updatedEvents);
+      setUserUpcomingExperiments(updatedExperiments);
     },
   });
 
   // if there are no upcoming experiments
   // just hide the whole table altogether
-  if (proposalScheduledEvents.length === 0) {
+  if (userExperiments.length === 0) {
     return null;
   }
 
-  const proposalScheduledEventsWithFormattedDates = proposalScheduledEvents.map(
-    (event) => ({
-      ...event,
-      startsAtFormatted: toFormattedDateTime(event.startsAt),
-      endsAtFormatted: toFormattedDateTime(event.endsAt),
+  const userExperimentsWithFormattedDates = userExperiments.map(
+    (experiment) => ({
+      ...experiment,
+      startsAtFormatted: toFormattedDateTime(experiment.startsAt),
+      endsAtFormatted: toFormattedDateTime(experiment.endsAt),
     })
   );
 
   return (
-    <Grid item xs={12} data-cy="upcoming-experiments">
-      <StyledPaper>
-        <MaterialTable
-          actions={[
-            formTeamAction,
-            finishEsi,
-            registerVisitAction,
-            individualTrainingAction,
-            declareShipmentAction,
-            giveFeedback,
-          ]}
-          icons={tableIcons}
-          title="Upcoming experiments"
-          isLoading={loading}
-          columns={columns(t)}
-          data={proposalScheduledEventsWithFormattedDates}
-          options={{
-            search: false,
-            padding: 'dense',
-            emptyRowsWhenPaging: false,
-            paging: false,
-            actionsColumnIndex: -1,
-          }}
-        />
-      </StyledPaper>
+    <div data-cy="upcoming-experiments">
+      <MaterialTable
+        actions={[
+          formTeamAction,
+          finishEsi,
+          registerVisitAction,
+          declareShipmentAction,
+          giveFeedback,
+        ]}
+        icons={tableIcons}
+        title="Upcoming experiments"
+        isLoading={experimentsLoading}
+        columns={columns(t)}
+        data={userExperimentsWithFormattedDates}
+        options={{
+          search: false,
+          padding: 'dense',
+          emptyRowsWhenPaging: false,
+          paging: false,
+          actionsColumnIndex: -1,
+        }}
+      />
       <Dialog
         open={modalContents !== null}
         onClose={() => setModalContents(null)}
@@ -116,6 +113,6 @@ export default function UserUpcomingExperimentsTable() {
       >
         <DialogContent>{modalContents}</DialogContent>
       </Dialog>
-    </Grid>
+    </div>
   );
 }

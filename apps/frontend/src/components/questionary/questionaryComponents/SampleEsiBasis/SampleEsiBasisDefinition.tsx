@@ -2,7 +2,7 @@ import React from 'react';
 
 import EsiIcon from 'components/common/icons/EsiIcon';
 import { DataType } from 'generated/sdk';
-import { SampleEsiSubmissionState } from 'models/questionary/sampleEsi/SampleEsiSubmissionState';
+import { ExperimentSampleSubmissionState } from 'models/questionary/experimentSample/ExperimentSampleSubmissionState';
 
 import { createSampleEsiBasisValidationSchema } from './createSampleEsiValidationSchema';
 import { QuestionSampleEsiBasisForm } from './QuestionSampleEsiBasisForm';
@@ -21,8 +21,9 @@ export const sampleEsiBasisDefinition: QuestionaryComponentDefinition = {
   icon: <EsiIcon />,
   createYupValidationSchema: createSampleEsiBasisValidationSchema,
   getYupInitialValue: ({ state }) => {
-    const esiState = state as SampleEsiSubmissionState;
+    const experimentSampleSubmissionState =
+      state as ExperimentSampleSubmissionState;
 
-    return esiState.esi;
+    return experimentSampleSubmissionState.experimentSample;
   },
 };

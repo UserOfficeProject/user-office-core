@@ -1,17 +1,19 @@
 export class VisitRegistration {
   constructor(
-    public userId: number,
     public visitId: number,
+    public userId: number,
     public registrationQuestionaryId: number | null,
-    public isRegistrationSubmitted: boolean,
     public startsAt: Date | null,
     public endsAt: Date | null,
-    public trainingExpiryDate: Date | null
+    public status: VisitRegistrationStatus
   ) {}
 }
 
-export enum TrainingStatus {
-  ACTIVE = 'active',
-  EXPIRED = 'expired',
-  NONE = 'none',
+export enum VisitRegistrationStatus {
+  DRAFTED = 'DRAFTED',
+  SUBMITTED = 'SUBMITTED',
+  APPROVED = 'APPROVED',
+  CHANGE_REQUESTED = 'CHANGE_REQUESTED',
+  CANCELLED_BY_USER = 'CANCELLED_BY_USER',
+  CANCELLED_BY_FACILITY = 'CANCELLED_BY_FACILITY',
 }

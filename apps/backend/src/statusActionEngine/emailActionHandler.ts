@@ -6,13 +6,14 @@ import { AdminDataSource } from '../datasources/AdminDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { MailService } from '../eventHandlers/MailService/MailService';
-import { ConnectionHasStatusAction } from '../models/ProposalStatusAction';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { SettingsId } from '../models/Settings';
+import { ConnectionHasStatusAction } from '../models/StatusAction';
 import {
   EmailActionConfig,
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
-} from '../resolvers/types/ProposalStatusActionConfig';
+} from '../resolvers/types/StatusActionConfig';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import {
   EmailReadyType,
@@ -20,15 +21,15 @@ import {
   getInstrumentScientistsAndFormatOutputForEmailSending,
   getPIAndFormatOutputForEmailSending,
   getFapReviewersAndFormatOutputForEmailSending,
-  publishMessageToTheEventBus,
   getFapChairSecretariesAndFormatOutputForEmailSending,
   statusActionLogger,
   getOtherAndFormatOutputForEmailSending,
   getTechniqueScientistsAndFormatOutputForEmailSending,
+  constructProposalStatusChangeEvent,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
-  proposalStatusAction: ConnectionHasStatusAction,
+  statusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[],
   options?: {
     statusActionsLogId?: number;
@@ -42,7 +43,7 @@ export const emailActionHandler = async (
     statusActionRecipients: null,
     ...options,
   };
-  const config = proposalStatusAction.config as EmailActionConfig;
+  const config = statusAction.config as EmailActionConfig;
   if (!config.recipientsWithEmailTemplate?.length) {
     return;
   }
@@ -60,7 +61,7 @@ export const emailActionHandler = async (
     }
     emailStatusActionRecipient(
       recipientWithTemplate,
-      proposalStatusAction,
+      statusAction,
       proposals,
       statusActionsLogId,
       loggedInUserId
@@ -72,7 +73,7 @@ export const emailActionHandler = async (
     config.recipientsWithEmailTemplate.map(async (recipientWithTemplate) =>
       emailStatusActionRecipient(
         recipientWithTemplate,
-        proposalStatusAction,
+        statusAction,
         proposals,
         statusActionsLogId,
         loggedInUserId
@@ -83,7 +84,7 @@ export const emailActionHandler = async (
 
 export const emailStatusActionRecipient = async (
   recipientWithTemplate: EmailStatusActionRecipientsWithTemplate,
-  proposalStatusAction: ConnectionHasStatusAction,
+  statusAction: ConnectionHasStatusAction,
   proposals: WorkflowEngineProposalType[],
   statusActionsLogId?: number | null,
   loggedInUserId?: number | null
@@ -105,8 +106,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         PIs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.PI,
           proposalPks,
@@ -127,8 +128,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         CPs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.CO_PROPOSERS,
           proposalPks,
@@ -149,8 +150,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         ISs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.INSTRUMENT_SCIENTISTS,
@@ -173,8 +174,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         FRs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.FAP_REVIEWERS,
           proposalPks,
@@ -196,8 +197,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         FCSs,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.FAP_CHAIR_AND_SECRETARY,
@@ -271,8 +272,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         uoRecipient,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient: EmailStatusActionRecipients.USER_OFFICE,
           proposalPks,
@@ -294,8 +295,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         techniqueScientists,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.TECHNIQUE_SCIENTISTS,
@@ -352,8 +353,8 @@ export const emailStatusActionRecipient = async (
       await sendMail(
         experimentSafetyRecipients,
         statusActionLogger({
-          connectionId: proposalStatusAction.connectionId,
-          actionId: proposalStatusAction.actionId,
+          connectionId: statusAction.connectionId,
+          actionId: statusAction.actionId,
           statusActionsLogId,
           emailStatusActionRecipient:
             EmailStatusActionRecipients.EXPERIMENT_SAFETY_REVIEWERS,
@@ -385,8 +386,8 @@ export const emailStatusActionRecipient = async (
         await sendMail(
           oRecipients,
           statusActionLogger({
-            connectionId: proposalStatusAction.connectionId,
-            actionId: proposalStatusAction.actionId,
+            connectionId: statusAction.connectionId,
+            actionId: statusAction.actionId,
             statusActionsLogId,
             emailStatusActionRecipient: EmailStatusActionRecipients.OTHER,
             proposalPks,
@@ -415,6 +416,13 @@ const sendMail = async (
   loggedInUserId?: number | null
 ) => {
   const mailService = container.resolve<MailService>(Tokens.MailService);
+  const loggingHandler = container.resolve<
+    (event: ApplicationEvent) => Promise<void>
+  >(Tokens.LoggingHandler);
+  const emailEventHandler = container.resolve<
+    (event: ApplicationEvent) => Promise<void>
+  >(Tokens.EmailEventHandler);
+
   if (!recipientsWithData.length) {
     logger.logInfo('Could not send email(s) because there are no recipients.', {
       recipientsWithData,
@@ -448,12 +456,16 @@ const sendMail = async (
             result: res,
           });
 
-          await publishMessageToTheEventBus(
-            recipientWithData.proposals,
-            `${successfulMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
-            undefined,
-            loggedInUserId || undefined
-          );
+          for (const proposal of recipientWithData.proposals) {
+            const evt = constructProposalStatusChangeEvent(
+              proposal,
+              loggedInUserId || null,
+              `${successfulMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
+              undefined
+            );
+            emailEventHandler(evt);
+            loggingHandler(evt);
+          }
 
           return res;
         } catch (err) {
@@ -461,12 +473,16 @@ const sendMail = async (
             error: err,
           });
 
-          await publishMessageToTheEventBus(
-            recipientWithData.proposals,
-            `${failMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
-            undefined,
-            loggedInUserId || undefined
-          );
+          for (const proposal of recipientWithData.proposals) {
+            const evt = constructProposalStatusChangeEvent(
+              proposal,
+              loggedInUserId || null,
+              `${failMessage} to: ${recipientWithData.email} recipient: ${recipientWithData.id}`,
+              undefined
+            );
+            emailEventHandler(evt);
+            loggingHandler(evt);
+          }
           throw err;
         }
       })

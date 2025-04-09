@@ -11,7 +11,12 @@ context('Experiments tests', () => {
     cy.resetDB(true);
     cy.getAndStoreFeaturesEnabled().then(() => {
       // NOTE: We can check features after they are stored to the local storage
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      if (
+        !featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER) ||
+        !featureFlags
+          .getEnabledFeatures()
+          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
+      ) {
         this.skip();
       }
     });
@@ -26,11 +31,11 @@ context('Experiments tests', () => {
       ],
       managementDecisionSubmitted: true,
     });
-    cy.createEsi({
-      scheduledEventId: initialDBData.scheduledEvents.upcoming.id,
+    cy.createOrGetExperimentSafety({
+      experimentPk: initialDBData.experiments.upcoming.experimentPk,
     });
     cy.createVisit({
-      scheduledEventId: initialDBData.scheduledEvents.upcoming.id,
+      experimentPk: initialDBData.experiments.upcoming.experimentPk,
       team: [
         initialDBData.users.user1.id,
         initialDBData.users.user2.id,
@@ -77,14 +82,14 @@ context('Experiments tests', () => {
       cy.contains('1-4 of 4');
     });
 
-    it('Can view ESI', () => {
+    it('Can view Experiment Safety', () => {
       cy.login('officer');
       cy.visit('/');
       cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
       cy.get('[value=NONE]').click();
 
       cy.get('[data-cy=officer-scheduled-events-table]')
-        .contains('View ESI')
+        .contains('View Experiment Safety')
         .click();
       cy.get('[role=dialog]').contains(initialDBData.proposal.title);
     });
@@ -123,16 +128,35 @@ context('Experiments tests', () => {
           tableValue = [...tableValue, $el.text().toString()];
         })
         .then(() => {
-          // Explanation: The table has 5 columns. We will sort each column in ascending and descending order and check if the table is sorted correctly.
+          // Explanation: The table has 7 columns. We will sort each column in ascending and descending order and check if the table is sorted correctly.
           // tableColumns: Array of objects. Each object contains the title of the column and the data of the column in original, ascending and descending order.
           const tableColumns = [
             {
+              title: 'Actions',
+              data: {
+                original: tableValue.filter((d, i) => i % 6 === 0),
+                asc: tableValue.filter((d, i) => i % 6 === 0),
+                desc: tableValue.filter((d, i) => i % 6 === 0),
+              },
+            },
+            {
+              title: 'Status',
+              data: {
+                original: tableValue.filter((d, i) => i % 6 === 1),
+                asc: tableValue.filter((d, i) => i % 6 === 1).sort(),
+                desc: tableValue
+                  .filter((d, i) => i % 6 === 1)
+                  .sort()
+                  .reverse(),
+              },
+            },
+            {
               title: 'Visitor name',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 0),
-                asc: tableValue.filter((d, i) => i % 5 === 0).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 2),
+                asc: tableValue.filter((d, i) => i % 6 === 2).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 0)
+                  .filter((d, i) => i % 6 === 2)
                   .sort()
                   .reverse(),
               },
@@ -140,43 +164,32 @@ context('Experiments tests', () => {
             {
               title: 'Teamleader',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 1),
-                asc: tableValue.filter((d, i) => i % 5 === 1).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 3),
+                asc: tableValue.filter((d, i) => i % 6 === 3).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 1)
+                  .filter((d, i) => i % 6 === 3)
                   .sort()
                   .reverse(),
               },
             },
             {
-              title: 'Starts at',
+              title: 'Visit start',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 2),
-                asc: tableValue.filter((d, i) => i % 5 === 2).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 4),
+                asc: tableValue.filter((d, i) => i % 6 === 4).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 2)
+                  .filter((d, i) => i % 6 === 4)
                   .sort()
                   .reverse(),
               },
             },
             {
-              title: 'Ends at',
+              title: 'Visit end',
               data: {
-                original: tableValue.filter((d, i) => i % 5 === 3),
-                asc: tableValue.filter((d, i) => i % 5 === 3).sort(),
+                original: tableValue.filter((d, i) => i % 6 === 5),
+                asc: tableValue.filter((d, i) => i % 6 === 5).sort(),
                 desc: tableValue
-                  .filter((d, i) => i % 5 === 3)
-                  .sort()
-                  .reverse(),
-              },
-            },
-            {
-              title: 'Training',
-              data: {
-                original: tableValue.filter((d, i) => i % 5 === 4),
-                asc: tableValue.filter((d, i) => i % 5 === 4).sort(),
-                desc: tableValue
-                  .filter((d, i) => i % 5 === 4)
+                  .filter((d, i) => i % 6 === 5)
                   .sort()
                   .reverse(),
               },
@@ -192,9 +205,9 @@ context('Experiments tests', () => {
             // Check if the table is sorted in ascending order
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 5 === i) {
+                if (index % 6 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.asc[Math.floor(index / 5)]
+                    tableColumns[i].data.asc[Math.floor(index / 6)]
                   );
                 }
               }
@@ -207,9 +220,9 @@ context('Experiments tests', () => {
 
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 5 === i) {
+                if (index % 6 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.desc[Math.floor(index / 5)]
+                    tableColumns[i].data.desc[Math.floor(index / 6)]
                   );
                 }
               }
@@ -222,9 +235,9 @@ context('Experiments tests', () => {
 
             cy.get('[data-cy=visit-registrations-table] tbody td').each(
               ($el, index) => {
-                if (index % 5 === i) {
+                if (index % 6 === i) {
                   expect($el.text()).to.eq(
-                    tableColumns[i].data.original[Math.floor(index / 5)]
+                    tableColumns[i].data.original[Math.floor(index / 6)]
                   );
                 }
               }

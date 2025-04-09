@@ -2,7 +2,7 @@ import { DefaultReviewWizardStep } from 'components/questionary/DefaultReviewWiz
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import VisitRegistrationReview from 'components/visit/VisitRegistrationReview';
-import { Sdk, TemplateGroupId } from 'generated/sdk';
+import { Sdk, TemplateGroupId, VisitRegistrationStatus } from 'generated/sdk';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 import { VisitRegistrationSubmissionState } from 'models/questionary/visit/VisitRegistrationSubmissionState';
 
@@ -20,17 +20,17 @@ export const visitRegistrationQuestionaryDefinition: QuestionaryDefinition = {
     VisitRegistrationWizardStep,
     new DefaultReviewWizardStep(
       (state) =>
-        (state as VisitRegistrationSubmissionState).registration
-          .isRegistrationSubmitted
+        (state as VisitRegistrationSubmissionState).registration.status !==
+        VisitRegistrationStatus.DRAFTED
     )
   ),
 
   getItemWithQuestionary(
     api: Sdk,
-    visitId: number
+    [visitId, userId]: [number, number]
   ): Promise<ItemWithQuestionary | null> {
     return api
-      .getVisitRegistration({ visitId })
+      .getVisitRegistration({ visitId, userId })
       .then(({ visitRegistration }) => visitRegistration);
   },
 };

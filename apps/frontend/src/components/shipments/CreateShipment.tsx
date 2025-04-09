@@ -1,33 +1,33 @@
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { useScheduledEvent } from 'hooks/scheduledEvent/useScheduledEvent';
+import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useBlankShipment } from 'hooks/shipment/useBlankShipment';
 import { ShipmentCore } from 'models/questionary/shipment/ShipmentCore';
 
 import ShipmentContainer from './ShipmentContainer';
 
 interface CreateShipmentProps {
-  scheduledEventId: number;
+  experimentPk: number;
   onShipmentSubmitted?: (shipment: ShipmentCore) => void;
   onShipmentCreated?: (shipment: ShipmentCore) => void;
 }
 function CreateShipment({
-  scheduledEventId,
+  experimentPk,
   onShipmentSubmitted,
   onShipmentCreated,
 }: CreateShipmentProps) {
-  const { scheduledEvent } = useScheduledEvent(scheduledEventId);
+  const { experiment } = useExperiment(experimentPk);
   const { blankShipment, error: blankShipmentError } = useBlankShipment(
-    scheduledEvent?.id,
-    scheduledEvent?.proposalPk
+    experiment?.experimentPk,
+    experiment?.proposalPk
   );
 
   if (blankShipmentError) {
     return <div>{blankShipmentError}</div>;
   }
 
-  if (!blankShipment || !scheduledEvent) {
+  if (!blankShipment || !experiment) {
     return <UOLoader />;
   }
 

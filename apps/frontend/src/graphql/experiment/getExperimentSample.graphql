@@ -1,0 +1,12 @@
+query getExperimentSample($experimentPk: Int!, $sampleId: Int!) {
+  experimentSample(experimentPk: $experimentPk, sampleId: $sampleId) {
+    ...experimentSample
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    sample {
+      ...sample
+    }
+  }
+}

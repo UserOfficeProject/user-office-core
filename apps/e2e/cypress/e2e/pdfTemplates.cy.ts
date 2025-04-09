@@ -115,7 +115,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateData"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -128,7 +128,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateHeader"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -141,7 +141,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateFooter"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -154,7 +154,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateSampleDeclaration"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -167,7 +167,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="dummyData"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -233,7 +233,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateData"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -246,7 +246,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateHeader"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -259,7 +259,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateFooter"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -272,7 +272,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="templateSampleDeclaration"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });
@@ -285,7 +285,7 @@ context('PDF template tests', () => {
 
       cy.get('[data-cy="dummyData"] .cm-content')
         .first()
-        .type(pdfTemplateData)
+        .invoke('text', pdfTemplateData)
         .should(($p) => {
           expect($p).to.contain(pdfTemplateData);
         });

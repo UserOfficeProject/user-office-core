@@ -159,10 +159,12 @@ export class TechnicalReviewAuthorization {
         : technicalReviewOrProposalPk.proposalPk;
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    const isFapChairOrSecOfFap =
-      await this.proposalAuth.isChairOrSecretaryOfProposal(agent, proposalPk);
+    const isFapSec = await this.proposalAuth.isSecretaryForFapProposal(
+      agent,
+      proposalPk
+    );
 
-    if (isUserOfficer || isFapChairOrSecOfFap) {
+    if (isUserOfficer || isFapSec) {
       return true;
     }
 

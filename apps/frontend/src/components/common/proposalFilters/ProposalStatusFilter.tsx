@@ -7,10 +7,10 @@ import PropTypes from 'prop-types';
 import React, { Dispatch } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { ProposalStatus } from 'generated/sdk';
+import { Status } from 'generated/sdk';
 
 type ProposalStatusFilterProps = {
-  proposalStatuses?: ProposalStatus[];
+  proposalStatuses?: Status[];
   isLoading?: boolean;
   onChange?: Dispatch<number>;
   shouldShowAll?: boolean;
@@ -18,10 +18,7 @@ type ProposalStatusFilterProps = {
   hiddenStatuses: number[];
 };
 
-function checkToRemove(
-  hiddenStatuses: number[],
-  proposalStatus: ProposalStatus
-) {
+function checkToRemove(hiddenStatuses: number[], proposalStatus: Status) {
   if (hiddenStatuses != null) {
     for (let i = 0; i < hiddenStatuses.length; i++) {
       if (hiddenStatuses[i] == proposalStatus.id) return false;

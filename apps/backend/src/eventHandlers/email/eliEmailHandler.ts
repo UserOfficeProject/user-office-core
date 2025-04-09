@@ -4,9 +4,11 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
+import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
+import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -24,6 +26,15 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
+
+  const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
+    Tokens.RoleClaimDataSource
+  );
+
+  const inviteDataSource = container.resolve<InviteDataSource>(
+    Tokens.InviteDataSource
+  );
+
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
@@ -41,7 +52,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.EMAIL_INVITE: {
+    case Event.EMAIL_INVITE_LEGACY: {
       const user = await userDataSource.getUser(
         event.emailinviteresponse.userId
       );
@@ -93,6 +104,68 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         .catch((err: string) => {
           logger.logException('Failed email transmission', err);
         });
+
+      return;
+    }
+
+    case Event.EMAIL_INVITE:
+    case Event.EMAIL_INVITES: {
+      let invites;
+      if ('invite' in event) {
+        // single invite in response
+        invites = [event.invite];
+      } else {
+        // multiple invites in response
+        invites = event.array;
+      }
+
+      for (const invite of invites) {
+        if (invite.isEmailSent) {
+          continue;
+        }
+        const inviter = await userDataSource.getBasicUserInfo(
+          invite.createdByUserId
+        );
+
+        if (!inviter) {
+          logger.logError('Failed email invite. No inviter found', {
+            inviter,
+            event,
+          });
+
+          return;
+        }
+
+        const roleInviteClaim = await roleClaimDataSource.findByInviteId(
+          invite.id
+        );
+
+        const templateId = getTemplateIdForRole(roleInviteClaim[0].roleId);
+
+        mailService
+          .sendMail({
+            content: {
+              template_id: templateId,
+            },
+            substitution_data: {
+              email: invite.email,
+              inviterName: inviter.firstname,
+              inviterLastname: inviter.lastname,
+              redeemCode: invite.code,
+            },
+            recipients: [{ address: invite.email }],
+          })
+          .then(async (res) => {
+            await inviteDataSource.update({
+              id: invite.id,
+              isEmailSent: true,
+            });
+            logger.logInfo('Successful email transmission', { res });
+          })
+          .catch((err: string) => {
+            logger.logException('Failed email transmission', err);
+          });
+      }
 
       return;
     }
@@ -373,5 +446,16 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           });
         });
     }
+  }
+}
+
+function getTemplateIdForRole(role: UserRole): string {
+  switch (role) {
+    case UserRole.USER:
+      return 'user-office-registration-invitation';
+    case UserRole.INTERNAL_REVIEWER:
+      return 'user-office-registration-invitation-reviewer';
+    default:
+      throw new Error('No valid user role set for email invitation');
   }
 }

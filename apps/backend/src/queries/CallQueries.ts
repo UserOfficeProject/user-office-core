@@ -6,7 +6,7 @@ import { CallDataSource } from '../datasources/CallDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { CallsFilter } from './../resolvers/queries/CallsQuery';
+import { CallsFilter } from '../resolvers/queries/CallsQuery';
 
 @injectable()
 export default class CallQueries {

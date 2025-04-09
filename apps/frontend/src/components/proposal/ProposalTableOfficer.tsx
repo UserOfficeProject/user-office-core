@@ -45,12 +45,12 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
   ProposalsFilter,
-  ProposalStatus,
   InstrumentMinimalFragment,
   FeatureId,
   FapInstrumentInput,
   FapInstrument,
   ProposalViewInstrument,
+  Status,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
@@ -571,7 +571,7 @@ const ProposalTableOfficer = ({
     refreshTableData();
   };
 
-  const changeStatusOnProposals = async (status: ProposalStatus) => {
+  const changeStatusOnProposals = async (status: Status) => {
     const proposalPks = getSelectedProposalPks();
     if (status?.id && proposalPks.length) {
       const shouldAddPluralLetter = proposalPks.length > 1 ? 's' : '';
@@ -901,11 +901,16 @@ const ProposalTableOfficer = ({
         }}
         onSelectionChange={(selectedItems) => {
           if (selectedItems.length) {
-            setSearchParams({
-              ...searchParams,
-              selection: selectedItems.map((selectedItem) =>
-                selectedItem.primaryKey.toString()
-              ),
+            setSearchParams((searchParams) => {
+              searchParams.delete('selection');
+              selectedItems.map((selectedItem) =>
+                searchParams.append(
+                  'selection',
+                  selectedItem.primaryKey.toString()
+                )
+              );
+
+              return searchParams;
             });
           } else {
             setSearchParams((searchParams) => {

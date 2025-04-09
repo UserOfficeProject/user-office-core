@@ -1,12 +1,12 @@
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { SampleEsiDataSource } from '../datasources/SampleEsiDataSource';
+import { ExperimentHasSample } from '../models/Experiment';
 import { Sample } from '../models/Sample';
 import { Tokens } from './../config/Tokens';
 import { QuestionaryDataSource } from './../datasources/QuestionaryDataSource';
-import { SampleExperimentSafetyInput } from './../models/SampleExperimentSafetyInput';
 
 type SampleOverrides = Partial<
   Pick<
@@ -21,19 +21,17 @@ type SampleOverrides = Partial<
   >
 >;
 
-type SampleESIOverrides = Partial<
-  Pick<SampleExperimentSafetyInput, 'isSubmitted'>
->;
+type SampleESIOverrides = Partial<Pick<ExperimentHasSample, 'isEsiSubmitted'>>;
 
 @injectable()
 export class CloneUtils {
   constructor(
     @inject(Tokens.SampleDataSource)
     private sampleDataSource: SampleDataSource,
-    @inject(Tokens.SampleEsiDataSource)
-    private sampleEsiDataSource: SampleEsiDataSource,
     @inject(Tokens.QuestionaryDataSource)
-    private questionaryDataSource: QuestionaryDataSource
+    private questionaryDataSource: QuestionaryDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource
   ) {}
 
   /**
@@ -64,35 +62,37 @@ export class CloneUtils {
     return newSample;
   }
 
-  async cloneSampleEsi(
-    sourceSampleEsi: SampleExperimentSafetyInput,
+  async cloneExperimentSample(
+    sourceExperimentSample: ExperimentHasSample,
     overrides?: {
-      esi?: SampleESIOverrides;
+      experimentSafety?: SampleESIOverrides;
       sample?: SampleOverrides;
     }
   ) {
     const sourceSample = await this.sampleDataSource.getSample(
-      sourceSampleEsi.sampleId
+      sourceExperimentSample.sampleId
     );
     if (!sourceSample) {
       throw new GraphQLError('Sample could not be found');
     }
 
     const newSample = await this.cloneSample(sourceSample, overrides?.sample);
+
     const newQuestionary = await this.questionaryDataSource.clone(
-      sourceSampleEsi.questionaryId
+      sourceExperimentSample.sampleEsiQuestionaryId
     );
-    let newSampleEsi = await this.sampleEsiDataSource.createSampleEsi({
-      esiId: sourceSampleEsi.esiId,
-      sampleId: newSample.id,
-      questionaryId: newQuestionary.questionaryId,
-    });
-    if (overrides?.esi?.isSubmitted !== undefined) {
-      newSampleEsi = await this.sampleEsiDataSource.updateSampleEsi({
-        sampleId: newSampleEsi.sampleId,
-        esiId: newSampleEsi.esiId,
-        isSubmitted: overrides.esi.isSubmitted,
-      });
+
+    let newSampleEsi = await this.experimentDataSource.addSampleToExperiment(
+      sourceExperimentSample.experimentPk,
+      newSample.id,
+      newQuestionary.questionaryId
+    );
+    if (overrides?.experimentSafety?.isEsiSubmitted !== undefined) {
+      newSampleEsi = await this.experimentDataSource.updateExperimentSample(
+        newSampleEsi.experimentPk,
+        newSampleEsi.sampleId,
+        overrides.experimentSafety.isEsiSubmitted
+      );
     }
 
     return newSampleEsi;

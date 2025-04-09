@@ -1,13 +1,11 @@
 mutation updateVisit(
   $visitId: Int!
   $team: [Int!]
-  $status: VisitStatus
   $teamLeadUserId: Int
 ) {
   updateVisit(
     visitId: $visitId
     team: $team
-    status: $status
     teamLeadUserId: $teamLeadUserId
   ) {
     ...visit

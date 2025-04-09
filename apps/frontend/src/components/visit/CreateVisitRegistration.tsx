@@ -2,7 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
 import { UserContext } from 'context/UserContextProvider';
-import { QuestionaryStep, TemplateGroupId } from 'generated/sdk';
+import {
+  QuestionaryStep,
+  TemplateGroupId,
+  VisitRegistrationStatus,
+} from 'generated/sdk';
 import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
 import { RegistrationWithQuestionary } from 'models/questionary/visit/VisitRegistrationWithQuestionary';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -18,8 +22,7 @@ function createRegistrationStub(
   return {
     userId: userId,
     registrationQuestionaryId: 0,
-    isRegistrationSubmitted: false,
-    trainingExpiryDate: null,
+    status: VisitRegistrationStatus.DRAFTED,
     startsAt: null,
     endsAt: null,
     visitId: visitId,
@@ -51,8 +54,9 @@ interface CreateVisitProps {
   onUpdate?: (visit: VisitRegistrationCore) => void;
   onSubmitted?: (visit: VisitRegistrationCore) => void;
   visitId: number;
+  userId: number;
 }
-function CreateVisit({ onSubmitted, visitId }: CreateVisitProps) {
+function CreateVisit({ onSubmitted, visitId, userId }: CreateVisitProps) {
   const { user } = useContext(UserContext);
   const { api } = useDataApiWithFeedback();
   const [blankRegistration, setBlankRegistration] =
@@ -70,7 +74,7 @@ function CreateVisit({ onSubmitted, visitId }: CreateVisitProps) {
             .then((result) => {
               if (result.blankQuestionarySteps) {
                 const blankRegistration = createRegistrationStub(
-                  user.id,
+                  userId,
                   activeTemplateId,
                   result.blankQuestionarySteps,
                   visitId
@@ -80,7 +84,7 @@ function CreateVisit({ onSubmitted, visitId }: CreateVisitProps) {
             });
         }
       });
-  }, [setBlankRegistration, api, user, visitId]);
+  }, [setBlankRegistration, api, user, visitId, userId]);
 
   if (!blankRegistration) {
     return <UOLoader />;

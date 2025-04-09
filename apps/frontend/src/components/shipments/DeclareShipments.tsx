@@ -15,7 +15,7 @@ import {
   QuestionnairesListRow,
 } from 'components/questionary/questionaryComponents/QuestionnairesList';
 import { ShipmentFragment, ShipmentStatus } from 'generated/sdk';
-import { useScheduledEvent } from 'hooks/scheduledEvent/useScheduledEvent';
+import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useShipments } from 'hooks/shipment/useShipments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
@@ -24,7 +24,7 @@ import CreateUpdateShipment from './CreateUpdateShipment';
 import ShippingInstructions from './ShippingInstructions';
 
 interface DeclareShipmentsProps extends WithConfirmProps {
-  scheduledEventId: number;
+  experimentPk: number;
 }
 
 const shipmentToListRow = (
@@ -37,23 +37,20 @@ const shipmentToListRow = (
   };
 };
 
-function DeclareShipments({
-  scheduledEventId,
-  confirm,
-}: DeclareShipmentsProps) {
+function DeclareShipments({ experimentPk, confirm }: DeclareShipmentsProps) {
   const { api } = useDataApiWithFeedback();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { shipments, setShipments } = useShipments({
-    scheduledEventId: scheduledEventId,
+    experimentPk: experimentPk,
   });
 
-  const { scheduledEvent } = useScheduledEvent(scheduledEventId);
+  const { experiment } = useExperiment(experimentPk);
 
   const [selectedShipment, setSelectedShipment] =
     useState<ShipmentFragment | null>(null);
 
-  if (!shipments || !scheduledEvent) {
+  if (!shipments || !experiment) {
     return <UOLoader />;
   }
 
@@ -100,7 +97,7 @@ function DeclareShipments({
     setIsModalOpen(true);
   };
 
-  const hasLocalContact = scheduledEvent.localContactId !== null;
+  const hasLocalContact = experiment.localContactId !== null;
 
   return (
     <>
@@ -157,7 +154,7 @@ function DeclareShipments({
           <CreateUpdateShipment
             onShipmentSubmitted={handleSubmitted}
             onShipmentCreated={handleCreated}
-            scheduledEventId={scheduledEventId}
+            experimentPk={experimentPk}
             shipment={selectedShipment}
           />
         </DialogContent>

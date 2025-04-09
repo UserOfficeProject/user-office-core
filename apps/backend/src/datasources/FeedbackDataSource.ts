@@ -8,11 +8,11 @@ export interface FeedbackDataSource {
   // Read
   getFeedback(feedbackId: number): Promise<Feedback | null>;
   getFeedbacks(filter?: FeedbacksFilter): Promise<Feedback[]>;
-  getFeedbackByScheduledEventId(eventId: number): Promise<Feedback | null>;
-  getFeedbackRequests(scheduledEventId: number): Promise<FeedbackRequest[]>;
+  getFeedbackByExperimentPk(experimentPk: number): Promise<Feedback | null>;
+  getFeedbackRequests(experimentPk: number): Promise<FeedbackRequest[]>;
   // Write
   createFeedback(args: CreateFeedbackArgs): Promise<Feedback>;
   updateFeedback(args: UpdateFeedbackArgs): Promise<Feedback>;
   deleteFeedback(feedbackId: number): Promise<Feedback>;
-  createFeedbackRequest(scheduledEventId: number): Promise<FeedbackRequest>;
+  createFeedbackRequest(experimentPk: number): Promise<FeedbackRequest>;
 }

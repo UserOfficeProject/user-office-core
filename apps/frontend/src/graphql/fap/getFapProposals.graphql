@@ -1,5 +1,5 @@
-query getFapProposals($fapId: Int!, $callId: Int) {
-  fapProposals(fapId: $fapId, callId: $callId) {
+query getFapProposals($fapId: Int!, $callId: Int, $instrumentId: Int) {
+  fapProposals(fapId: $fapId, callId: $callId, instrumentId: $instrumentId) {
     proposalPk
     dateAssigned
     fapId
@@ -14,12 +14,17 @@ query getFapProposals($fapId: Int!, $callId: Int) {
         institutionId
       }
       status {
-        ...proposalStatus
+        ...status
       }
       users {
         id
         institutionId
       }
+    }
+    instrument {
+      id
+      name
+      shortCode
     }
     assignments {
       proposalPk

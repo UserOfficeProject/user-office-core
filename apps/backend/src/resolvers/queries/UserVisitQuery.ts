@@ -8,8 +8,9 @@ export class VisitRegistrationQuery {
   @Query(() => VisitRegistration, { nullable: true })
   visitRegistration(
     @Ctx() context: ResolverContext,
-    @Arg('visitId', () => Int) visitId: number
+    @Arg('visitId', () => Int) visitId: number,
+    @Arg('userId', () => Int) userId: number
   ) {
-    return context.queries.visit.getRegistration(context.user, visitId);
+    return context.queries.visit.getRegistration(context.user, visitId, userId);
   }
 }

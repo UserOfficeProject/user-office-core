@@ -1,6 +1,7 @@
 import { container, inject, injectable } from 'tsyringe';
 
 import { VisitAuthorization } from '../auth/VisitAuthorization';
+import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
@@ -8,7 +9,7 @@ import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized } from '../decorators';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
-import { TrainingStatus, VisitRegistration } from '../models/VisitRegistration';
+import { VisitRegistration } from '../models/VisitRegistration';
 import { VisitsFilter } from '../resolvers/queries/VisitsQuery';
 export interface GetRegistrationsFilter {
   questionaryIds?: number[];
@@ -18,6 +19,9 @@ export interface GetRegistrationsFilter {
 @injectable()
 export default class VisitQueries {
   private visitAuth = container.resolve(VisitAuthorization);
+  private visitRegistrationAuth = container.resolve(
+    VisitRegistrationAuthorization
+  );
 
   constructor(
     @inject(Tokens.VisitDataSource)
@@ -63,28 +67,26 @@ export default class VisitQueries {
   @Authorized()
   async getRegistration(
     user: UserWithRole | null,
-    visitId: number
+    visitId: number,
+    userId: number
   ): Promise<VisitRegistration | null> {
-    return this.dataSource.getRegistration(user!.id, visitId);
+    const hasReadRights = await this.visitRegistrationAuth.hasReadRights(user, {
+      visitId,
+      userId,
+    });
+
+    if (!hasReadRights) {
+      return null;
+    }
+
+    return this.dataSource.getRegistration(userId, visitId);
   }
 
   @Authorized()
-  async getVisitByScheduledEventId(
+  async getVisitByExperimentPk(
     agent: UserWithRole | null,
-    eventId: number
+    experimentId: number
   ) {
-    return this.dataSource.getVisitByScheduledEventId(eventId);
-  }
-
-  getTrainingStatus(visit: VisitRegistration): TrainingStatus {
-    if (!visit.trainingExpiryDate) {
-      return TrainingStatus.NONE;
-    }
-
-    if (visit.trainingExpiryDate < new Date()) {
-      return TrainingStatus.EXPIRED;
-    }
-
-    return TrainingStatus.ACTIVE;
+    return this.dataSource.getVisitByExperimentPk(experimentId);
   }
 }

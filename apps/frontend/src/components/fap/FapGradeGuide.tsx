@@ -14,12 +14,7 @@ type FapGradeGuideProps = {
 const FapGradeGuide: React.FC<FapGradeGuideProps> = ({ fap, onFapUpdate }) => {
   const { isExecutingCall } = useDataApiWithFeedback();
 
-  const hasAccessRights = useCheckAccess([
-    UserRole.USER_OFFICER,
-    UserRole.FAP_CHAIR,
-    UserRole.FAP_SECRETARY,
-    UserRole.FAP_REVIEWER,
-  ]);
+  const hasAccessRights = useCheckAccess([UserRole.USER_OFFICER]);
 
   return (
     <Grid item sm={25} xs={12}>

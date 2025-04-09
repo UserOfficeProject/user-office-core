@@ -11,8 +11,8 @@ import {
 import { ResolverContext } from '../../../context';
 import {
   ConnectionHasStatusAction,
-  ProposalStatusActionType,
-} from '../../../models/ProposalStatusAction';
+  StatusActionType,
+} from '../../../models/StatusAction';
 import { ConnectionStatusAction } from '../../types/ConnectionStatusAction';
 
 @InputType()
@@ -20,8 +20,8 @@ export class ConnectionHasActionsInput {
   @Field(() => Int)
   public actionId: number;
 
-  @Field(() => ProposalStatusActionType)
-  public actionType: ProposalStatusActionType;
+  @Field(() => StatusActionType)
+  public actionType: StatusActionType;
 
   @Field(() => String, { nullable: true })
   public config: string;
@@ -49,7 +49,7 @@ export class AddConnectionStatusActionsMutation {
     @Arg('newConnectionStatusActionsInput')
     newConnectionStatusActionsInput: AddConnectionStatusActionsInput
   ) {
-    return context.mutations.proposalSettings.addConnectionStatusActions(
+    return context.mutations.workflow.addConnectionStatusActions(
       context.user,
       newConnectionStatusActionsInput
     );

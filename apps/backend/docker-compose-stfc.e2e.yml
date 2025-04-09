@@ -35,7 +35,6 @@ services:
       NODE_ENV: development
       DATABASE_CONNECTION_STRING: postgres://duouser:duopassword@db:5432/duo
       UO_FEATURE_ALLOW_NO_SANDBOX: 1
-      HEADER_LOGO_PATH: /config/logos/STFC-Logo.png
     ports:
       - "4500:4500"
     cap_add:

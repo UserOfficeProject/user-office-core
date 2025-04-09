@@ -28,10 +28,8 @@ import { UserAuthorization } from './UserAuthorization';
 const UOWSClient = createUOWSClient();
 
 const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
-  'User Officer': ['ISIS', 'ARTEMIS', 'HPL', 'LSF'],
+  'User Officer': ['ISIS', 'HPL', 'LSF'],
   'ISIS Instrument Scientist': ['ISIS'],
-  'CLF Artemis FAP Secretary': ['ARTEMIS'],
-  'CLF Artemis Link Scientist': ['ARTEMIS'],
   'CLF HPL FAP Secretary': ['HPL'],
   'CLF HPL Link Scientist': ['HPL'],
   'CLF LSF FAP Secretary': ['LSF'],

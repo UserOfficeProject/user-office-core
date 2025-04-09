@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
@@ -8,6 +8,7 @@ import EventLogList from 'components/eventLog/EventLogList';
 import { Fap, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useFapData } from 'hooks/fap/useFapData';
+import { useFapProposalsData } from 'hooks/fap/useFapProposalsData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import FapFiles from './Files/FapFilesUpload';
@@ -26,6 +27,17 @@ const FapPage = () => {
     UserRole.FAP_SECRETARY,
   ]);
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+
+  const call = searchParams.get('call');
+  const instrument = searchParams.get('instrument');
+
+  const { loadingFapProposals, FapProposalsData, setFapProposalsData } =
+    useFapProposalsData(
+      parseInt(id as string),
+      call ? parseInt(call) : null,
+      instrument ? parseInt(instrument) : null
+    );
 
   if (loading) {
     return (
@@ -52,6 +64,11 @@ const FapPage = () => {
         <FapProposalsAndAssignmentsView
           data={fap}
           onFapUpdate={(newFap: Fap): void => setFap(newFap)}
+          fapProposals={{
+            loadingFapProposals,
+            FapProposalsData,
+            setFapProposalsData,
+          }}
         />
       ),
     },
@@ -91,6 +108,11 @@ const FapPage = () => {
           <FapProposalsAndAssignmentsView
             data={fap}
             onFapUpdate={(newFap: Fap): void => setFap(newFap)}
+            fapProposals={{
+              loadingFapProposals,
+              FapProposalsData,
+              setFapProposalsData,
+            }}
           />
         ),
       },

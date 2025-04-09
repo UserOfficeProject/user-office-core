@@ -193,11 +193,11 @@ const shipmentBasisPreSubmit =
         });
       }
     } else {
-      if (!shipment.scheduledEventId) return returnValue;
+      if (!shipment.experimentPk) return returnValue;
       const { createShipment } = await api.createShipment({
         title: title,
         proposalPk: shipment.proposalPk,
-        scheduledEventId: shipment.scheduledEventId,
+        experimentPk: shipment.experimentPk,
       });
       if (createShipment) {
         dispatch({

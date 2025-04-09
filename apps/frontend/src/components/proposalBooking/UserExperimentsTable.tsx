@@ -1,22 +1,19 @@
 import React from 'react';
 
-import { useProposalBookingsScheduledEvents } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
+import { useUserExperiments } from 'hooks/experiment/useUserExperiments';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import ExperimentsTable from './ExperimentTimesTable';
+import ExperimentsTimesTable from './ExperimentTimesTable';
 
 export default function UserExperimentTimesTable() {
-  const { loading, proposalScheduledEvents } =
-    useProposalBookingsScheduledEvents({
-      notDraft: true,
-    });
+  const { loading, userExperiments } = useUserExperiments({ notDraft: true });
 
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        <ExperimentsTable
+        <ExperimentsTimesTable
           isLoading={loading}
-          proposalScheduledEvents={proposalScheduledEvents}
+          experiments={userExperiments}
           title="Experiment Times"
           options={{
             search: true,

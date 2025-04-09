@@ -1,44 +1,46 @@
 import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { ProposalEsiDataSource } from '../../datasources/ProposalEsiDataSource';
+import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { UserWithRole } from '../../models/User';
-import { EsiAuthorization } from '../EsiAuthorization';
+import { ExperimentSafetyAuthorization } from '../ExperimentSafetyAuthorization';
 import { QuestionaryAuthorizer } from '../QuestionaryAuthorization';
 
 @injectable()
 export class ProposalEsiQuestionaryAuthorizer implements QuestionaryAuthorizer {
-  private esiAuth = container.resolve(EsiAuthorization);
+  private experimentSafetyAuth = container.resolve(
+    ExperimentSafetyAuthorization
+  );
 
   constructor(
-    @inject(Tokens.ProposalEsiDataSource)
-    private proposalEsiDataSource: ProposalEsiDataSource
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource
   ) {}
 
-  async getEsiId(esiQuestionaryId: number): Promise<number | null> {
-    const esi = await this.proposalEsiDataSource.getEsis({
-      questionaryId: esiQuestionaryId,
-    });
-    if (esi.length !== 1) {
-      return null;
-    }
+  async getExperimentSafetyPk(
+    esiQuestionaryId: number
+  ): Promise<number | null> {
+    const experimentSafety =
+      await this.experimentDataSource.getExperimentSafetyByESIQuestionaryId(
+        esiQuestionaryId
+      );
 
-    return esi[0].id;
+    return experimentSafety ? experimentSafety.experimentSafetyPk : null;
   }
   async hasReadRights(agent: UserWithRole | null, questionaryId: number) {
-    const esiId = await this.getEsiId(questionaryId);
-    if (esiId === null) {
+    const experimentSafetyPk = await this.getExperimentSafetyPk(questionaryId);
+    if (experimentSafetyPk === null) {
       return false;
     }
 
-    return this.esiAuth.hasReadRights(agent, esiId);
+    return this.experimentSafetyAuth.hasReadRights(agent, experimentSafetyPk);
   }
   async hasWriteRights(agent: UserWithRole | null, questionaryId: number) {
-    const esiId = await this.getEsiId(questionaryId);
-    if (esiId === null) {
+    const experimentSafetyPk = await this.getExperimentSafetyPk(questionaryId);
+    if (experimentSafetyPk === null) {
       return false;
     }
 
-    return this.esiAuth.hasWriteRights(agent, esiId);
+    return this.experimentSafetyAuth.hasWriteRights(agent, experimentSafetyPk);
   }
 }

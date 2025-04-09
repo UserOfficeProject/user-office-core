@@ -239,10 +239,11 @@ export default function createCustomHandler() {
             event.fapmeetingdecision.fapId
           );
 
-          const allFapProposals = await fapDataSource.getFapProposals(
-            event.fapmeetingdecision.fapId,
-            foundProposal.callId
-          );
+          const allFapProposals = await fapDataSource.getFapProposals({
+            fapId: event.fapmeetingdecision.fapId,
+            callId: foundProposal.callId,
+            instrumentId: null,
+          });
 
           const allMeetingDecisions =
             await fapDataSource.getAllFapMeetingDecisions(

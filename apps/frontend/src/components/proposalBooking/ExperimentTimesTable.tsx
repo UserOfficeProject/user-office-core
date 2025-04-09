@@ -4,20 +4,20 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import { ProposalScheduledEvent } from 'hooks/proposalBooking/useProposalBookingsScheduledEvents';
+import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
 
 type ExperimentTimesTableProps = {
   title: string;
   isLoading: boolean;
-  proposalScheduledEvents: ProposalScheduledEvent[];
-  options?: Partial<Options<ProposalScheduledEvent>>;
+  experiments: UserExperiment[];
+  options?: Partial<Options<UserExperiment>>;
 };
 
 const columns: (
   t: TFunction<'translation', undefined>
-) => Column<ProposalScheduledEvent>[] = (t) => [
+) => Column<UserExperiment>[] = (t) => [
   { title: 'Proposal title', field: 'proposal.title' },
   { title: 'Proposal ID', field: 'proposal.proposalId' },
   { title: t('instrument') as string, field: 'instrument.name' },
@@ -35,10 +35,10 @@ const columns: (
   },
 ];
 
-export default function ExperimentsTable({
+export default function ExperimentsTimesTable({
   title,
   isLoading,
-  proposalScheduledEvents,
+  experiments,
   options,
 }: ExperimentTimesTableProps) {
   const { t } = useTranslation();
@@ -46,14 +46,12 @@ export default function ExperimentsTable({
     shouldUseTimeZone: true,
   });
 
-  const proposalScheduledEventsWithFormattedDates = proposalScheduledEvents.map(
-    (event) => ({
-      ...event,
-      startsAtFormatted: toFormattedDateTime(event.startsAt),
-      endsAtFormatted: toFormattedDateTime(event.endsAt),
-      localContactFormatted: getFullUserName(event.localContact),
-    })
-  );
+  const experimentsWithFormattedDates = experiments.map((event) => ({
+    ...event,
+    startsAtFormatted: toFormattedDateTime(event.startsAt),
+    endsAtFormatted: toFormattedDateTime(event.endsAt),
+    localContactFormatted: getFullUserName(event.localContact),
+  }));
 
   return (
     <MaterialTable
@@ -61,7 +59,7 @@ export default function ExperimentsTable({
       title={title}
       isLoading={isLoading}
       columns={columns(t)}
-      data={proposalScheduledEventsWithFormattedDates}
+      data={experimentsWithFormattedDates}
       options={{
         search: false,
         padding: 'dense',
