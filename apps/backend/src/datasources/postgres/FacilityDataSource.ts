@@ -196,6 +196,14 @@ class PostgresFacilityDataSource implements FacilityDataSource {
 
     return !!result;
   }
+
+  async getFacilitiesByNames(facilityNames: string[]): Promise<Facility[]> {
+    const facilities = await database<FacilityRecord>('facility')
+      .whereIn('short_code', facilityNames)
+      .select('*');
+
+    return facilities.map(createFacilityObject);
+  }
 }
 
 export default PostgresFacilityDataSource;

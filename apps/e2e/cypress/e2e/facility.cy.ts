@@ -22,7 +22,7 @@ context('Facility tests', () => {
     cy.getAndStoreFeaturesEnabled();
   });
 
-  describe('Facility tests', () => {
+  describe('Facility tests User officer', () => {
     beforeEach(() => {
       cy.login('officer');
     });
@@ -115,5 +115,13 @@ context('Facility tests', () => {
 
       cy.contains(scientist1.firstName).should('not.exist');
     });
+  });
+
+  describe('Facility tests Facility Member', () => {
+    it('Facility Member should only be able to see instruments on its facility', () => {});
+
+    it('Facility Member should only be able to see proposals data on its facility', () => {});
+
+    it('Facility Member should be able to filter by facility', () => {});
   });
 });

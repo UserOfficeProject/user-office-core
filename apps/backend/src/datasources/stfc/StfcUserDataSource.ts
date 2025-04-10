@@ -26,14 +26,36 @@ type StfcRolesToEssRole = { [key: string]: Roles[] };
  * Must not contain user role, this is appended at the very last step.
  */
 const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
-  'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
-  'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF Artemis FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
-  'CLF Artemis Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF HPL FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
-  'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF LSF FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
-  'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
+  'User Officer': [
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ],
+  'ISIS Instrument Scientist': [
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ],
+  'CLF Artemis FAP Secretary': [
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ],
+  'CLF Artemis Link Scientist': [
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ],
+  'CLF HPL FAP Secretary': [
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ],
+  'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST, Roles.FACILITY_MEMBER],
+  'CLF LSF FAP Secretary': [
+    Roles.USER_OFFICER,
+    Roles.INSTRUMENT_SCIENTIST,
+    Roles.FACILITY_MEMBER,
+  ],
+  'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST, Roles.FACILITY_MEMBER],
   'FAP Member': [Roles.FAP_REVIEWER],
   'FAP Secretary': [Roles.FAP_SECRETARY],
   'FAP Chair': [Roles.FAP_CHAIR],
