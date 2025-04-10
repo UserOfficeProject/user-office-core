@@ -69,7 +69,12 @@ export const dummyUserOfficer = new User(
 
 export const dummyUserOfficerWithRole: UserWithRole = {
   ...dummyUserOfficer,
-  currentRole: { id: 2, title: 'User Officer', shortCode: 'user_officer' },
+  currentRole: {
+    id: 2,
+    title: 'User Officer',
+    shortCode: 'user_officer',
+    description: '',
+  },
 };
 
 export const dummyUser = new User(
@@ -101,27 +106,47 @@ export const dummyUser = new User(
 export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
   ...dummyUser,
   id: 1,
-  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'user' },
+  currentRole: {
+    id: 1,
+    title: 'Principal investigator',
+    shortCode: 'user',
+    description: '',
+  },
 };
 
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 1, title: 'User', shortCode: 'user' },
+  currentRole: { id: 1, title: 'User', shortCode: 'user', description: '' },
 };
 
 export const dummyFapChairWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 4, title: 'Fap Chair', shortCode: 'fap_chair' },
+  currentRole: {
+    id: 4,
+    title: 'Fap Chair',
+    shortCode: 'fap_chair',
+    description: '',
+  },
 };
 
 export const dummyFapSecretaryWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 5, title: 'Fap Secretary', shortCode: 'fap_secretary' },
+  currentRole: {
+    id: 5,
+    title: 'Fap Secretary',
+    shortCode: 'fap_secretary',
+    description: '',
+  },
 };
 
 export const dummyFapReviewerWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 6, title: 'Fap Reviewer', shortCode: 'fap_reviewer' },
+  currentRole: {
+    id: 6,
+    title: 'Fap Reviewer',
+    shortCode: 'fap_reviewer',
+    description: '',
+  },
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -130,6 +155,7 @@ export const dummySampleReviewer: UserWithRole = {
     id: 9,
     title: 'Experiment Safety Reviewer',
     shortCode: 'experiment_safety_reviewer',
+    description: '',
   },
 };
 
@@ -139,6 +165,7 @@ export const dummyInternalReviewer: UserWithRole = {
     id: 1,
     title: 'Internal Reviewer',
     shortCode: 'internal_reviewer',
+    description: '',
   },
 };
 
@@ -149,6 +176,7 @@ export const dummyInstrumentScientist: UserWithRole = {
     id: 1,
     title: 'Instrument Scientist',
     shortCode: 'instrument_scientist',
+    description: '',
   },
 };
 
@@ -159,6 +187,7 @@ export const dummyVisitorWithRole: UserWithRole = {
     id: 1,
     title: 'Visitor',
     shortCode: 'user',
+    description: '',
   },
 };
 
@@ -216,7 +245,7 @@ export const dummyUserNotOnProposal = new User(
 
 export const dummyUserNotOnProposalWithRole: UserWithRole = {
   ...dummyUserNotOnProposal,
-  currentRole: { id: 1, title: 'User', shortCode: 'user' },
+  currentRole: { id: 1, title: 'User', shortCode: 'user', description: '' },
 };
 
 export class UserDataSourceMock implements UserDataSource {
@@ -296,28 +325,50 @@ export class UserDataSourceMock implements UserDataSource {
   }
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
-      return [{ id: 1, shortCode: 'user_officer', title: 'User Officer' }];
+      return [
+        {
+          id: 1,
+          shortCode: 'user_officer',
+          title: 'User Officer',
+          description: '',
+        },
+      ];
     } else if (id === dummyInstrumentScientist.id) {
       return [
         {
           id: 1,
           title: 'Instrument Scientist',
           shortCode: 'instrument_scientist',
+          description: '',
         },
       ];
     } else if (id === 1001) {
-      return [{ id: 2, shortCode: 'fap_reviewer', title: 'Fap Reviewer' }];
+      return [
+        {
+          id: 2,
+          shortCode: 'fap_reviewer',
+          title: 'Fap Reviewer',
+          description: '',
+        },
+      ];
     } else if (id === dummyFapChairWithRole.id) {
-      return [{ id: 4, shortCode: 'fap_chair', title: 'Fap Chair' }];
+      return [
+        { id: 4, shortCode: 'fap_chair', title: 'Fap Chair', description: '' },
+      ];
     } else {
-      return [{ id: 2, shortCode: 'user', title: 'User' }];
+      return [{ id: 2, shortCode: 'user', title: 'User', description: '' }];
     }
   }
 
   async getRoles(): Promise<Role[]> {
     return [
-      { id: 1, shortCode: 'user_officer', title: 'User Officer' },
-      { id: 2, shortCode: 'user', title: 'User' },
+      {
+        id: 1,
+        shortCode: 'user_officer',
+        title: 'User Officer',
+        description: '',
+      },
+      { id: 2, shortCode: 'user', title: 'User', description: '' },
     ];
   }
 
@@ -426,7 +477,12 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
-    return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
+    return {
+      id: 1,
+      shortCode: 'user_officer',
+      title: 'User Officer',
+      description: '',
+    };
   }
 
   async externalTokenLogin(token: string): Promise<User> {
