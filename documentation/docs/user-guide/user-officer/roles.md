@@ -86,4 +86,12 @@ There are many roles within User Office:
     * Providing detailed feedback and evaluations
     * Submitting review grades and comments
 
+??? info "Choosing Roles at the Login"
+    
+    We can prompt the user to chose which role a user can access the system, we can do this by adding a query string `selectRole` to the link of the system.
+
+    Example:
+
+    `www.userofficeproject.com/external-auth?token=t0k3n?selectRole=true`
+
 ---

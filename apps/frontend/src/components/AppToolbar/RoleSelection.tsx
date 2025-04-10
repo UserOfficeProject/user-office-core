@@ -19,6 +19,10 @@ const columns: Column<Role>[] = [
     title: 'Role',
     field: 'title',
   },
+  {
+    title: 'Description',
+    field: 'description',
+  },
 ];
 
 const RoleSelection = ({ onClose }: { onClose: FunctionType }) => {

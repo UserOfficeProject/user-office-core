@@ -113,6 +113,7 @@ test('A instrument sci cannot access proposals they are not on', async () => {
           id: 1,
           title: 'Instrument Scientist',
           shortCode: 'instrument_scientist',
+          description: '',
         },
       },
       1
