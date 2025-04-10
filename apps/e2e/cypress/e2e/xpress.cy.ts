@@ -1849,6 +1849,12 @@ context('Xpress tests', () => {
     });
 
     it("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
+      cy.updateUserRoles({
+        id: scientist1.id,
+
+        roles: [initialDBData.roles.instrumentScientist],
+      });
+
       cy.assignProposalToTechniques({
         proposalPk: createdProposalPk3,
         techniqueIds: [createdTechniquePk3, createdTechniquePk1],
@@ -1878,6 +1884,12 @@ context('Xpress tests', () => {
     });
 
     it("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
+      cy.updateUserRoles({
+        id: scientist1.id,
+
+        roles: [initialDBData.roles.instrumentScientist],
+      });
+
       cy.login(scientist1);
       cy.visit('/');
       cy.finishedLoading();
