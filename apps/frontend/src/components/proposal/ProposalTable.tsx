@@ -203,7 +203,6 @@ const ProposalTable = ({
           <CallSelectModalOnProposalsClone
             cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
-            templateId={proposalToClone?.questionary.templateId}
           />
         </DialogContent>
       </Dialog>
