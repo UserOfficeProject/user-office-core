@@ -154,7 +154,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('roles')
       .then((roles: RoleRecord[]) =>
-        roles.map((role) => new Role(role.role_id, role.short_code, role.title))
+        roles.map(
+          (role) =>
+            new Role(
+              role.role_id,
+              role.short_code,
+              role.title,
+              role.description
+            )
+        )
       );
   }
 
@@ -166,7 +174,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('users as u', { 'u.user_id': 'rc.user_id' })
       .where('u.user_id', id)
       .then((roles: RoleRecord[]) =>
-        roles.map((role) => new Role(role.role_id, role.short_code, role.title))
+        roles.map(
+          (role) =>
+            new Role(
+              role.role_id,
+              role.short_code,
+              role.title,
+              role.description
+            )
+        )
       );
   }
 
@@ -750,7 +766,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first()
       .then(
         (role: RoleRecord) =>
-          new Role(role.role_id, role.short_code, role.title)
+          new Role(role.role_id, role.short_code, role.title, role.description)
       );
   }
 

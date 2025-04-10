@@ -42,6 +42,16 @@ export default function ProposalQuestionaryReview(
         .map((user: BasicUserDetails) => getFullUserNameWithEmail(user))
         .join(', '),
     },
+    ...(data.coProposerInvites?.length > 0
+      ? [
+          {
+            label: 'Invited',
+            value: data.coProposerInvites
+              .map((invite) => invite.email)
+              .join(', '),
+          },
+        ]
+      : []),
   ];
 
   return (

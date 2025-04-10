@@ -6,6 +6,7 @@ query getUserWithRoles($userId: Int!) {
       id
       shortCode
       title
+      description
     }
   }
 }
