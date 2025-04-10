@@ -47,7 +47,9 @@ type BasicUserDetailsWithTableData = (BasicUserDetails & {
   tableData?: { checked: boolean };
 })[];
 
-type BasicUserDetailsWithRole = BasicUserDetails & { role?: Maybe<Role> };
+type BasicUserDetailsWithRole = BasicUserDetails & {
+  role?: Maybe<Pick<Role, 'id' | 'shortCode' | 'title'>>;
+};
 
 type PeopleTableProps<T extends BasicUserDetails = BasicUserDetailsWithRole> = {
   selection: boolean;

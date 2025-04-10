@@ -1,0 +1,5 @@
+mutation acceptInvite($code: String!) {
+  acceptInvite(code: $code) {
+    ...invite
+  }
+}
