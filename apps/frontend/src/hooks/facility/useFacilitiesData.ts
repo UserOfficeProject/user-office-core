@@ -35,7 +35,6 @@ export function useFacilitiesData(): {
     api()
       .getFacilities()
       .then((data) => {
-        console.log(data);
         if (unmounted) {
           return;
         }
