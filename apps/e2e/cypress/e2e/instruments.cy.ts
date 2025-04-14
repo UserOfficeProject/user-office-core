@@ -539,7 +539,7 @@ context('Instrument tests', () => {
       // TODO: Extend here when technical reviewer is added to the table.
     });
 
-    it('User Officer should be able to bulk reassign Technical reviews', function () {
+    it('User Officer should be able to bulk reassign Technical reviews', () => {
       cy.assignProposalsToInstruments({
         proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
@@ -1352,7 +1352,7 @@ context('Instrument tests', () => {
         .should('exist');
     });
 
-    it('Technical review assignee should be able to bulk reassign technical reviews', function () {
+    it('Technical review assignee should be able to bulk reassign technical reviews', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           const createdProposal2Pk = result.createProposal.primaryKey;
