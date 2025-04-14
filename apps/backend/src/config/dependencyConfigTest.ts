@@ -10,6 +10,7 @@ import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
+import { FacilityDataSourceMock } from '../datasources/mockups/FacilityDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
@@ -35,7 +36,6 @@ import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSourc
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
-import PostgresFacilityDataSource from '../datasources/postgres/FacilityDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
@@ -90,7 +90,7 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
-mapClass(Tokens.FacilityDataSource, PostgresFacilityDataSource);
+mapClass(Tokens.FacilityDataSource, FacilityDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
