@@ -8,14 +8,13 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import Participants from 'components/proposal/ProposalParticipants';
 import { BasicUserDetails } from 'generated/sdk';
+import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
 
-import { ProposalScheduledEvent } from '../../hooks/proposalBooking/useProposalBookingsScheduledEvents';
-
 interface CreateUpdateVisitProps {
-  event: ProposalScheduledEvent;
-  close: (updatedEvent: ProposalScheduledEvent) => void;
+  event: UserExperiment;
+  close: (updatedEvent: UserExperiment) => void;
 }
 function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
   const { api } = useDataApiWithFeedback();
@@ -63,7 +62,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
         } else {
           api({ toastSuccessMessage: 'Visit created' })
             .createVisit({
-              scheduledEventId: event.id,
+              experimentPk: event.experimentPk,
               team: values.team?.map((user) => user.id),
               teamLeadUserId: values.teamLeadUserId as number,
             })
@@ -82,6 +81,8 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
           </Typography>
           <Participants
             title="Visitors"
+            setInvites={() => {}}
+            invites={[]}
             setUsers={(team: BasicUserDetails[]) => {
               setFieldValue('team', team);
             }}

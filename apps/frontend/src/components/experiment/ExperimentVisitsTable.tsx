@@ -2,16 +2,19 @@ import MaterialTable from '@material-table/core';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
+import MailIcon from '@mui/icons-material/Mail';
 import { IconButton, styled, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
 import VisitStatusIcon from 'components/visit/VisitStatusIcon';
+import { SettingsContext } from 'context/SettingsContextProvider';
 import {
-  GetScheduledEventsCoreQuery,
+  SettingsId,
   VisitRegistrationStatus,
+  GetExperimentsQuery,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
@@ -21,13 +24,13 @@ import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 type RowType = NonNullable<
-  GetScheduledEventsCoreQuery['scheduledEventsCore'][0]['visit']
+  GetExperimentsQuery['experiments'][0]['visit']
 >['registrations'][0];
 
-type ScheduledEvent = GetScheduledEventsCoreQuery['scheduledEventsCore'][0];
+type Experiment = GetExperimentsQuery['experiments'][0];
 
-interface ScheduledEventDetailsTableProps extends WithConfirmProps {
-  scheduledEvent: ScheduledEvent;
+interface ExperimentDetailsTableProps extends WithConfirmProps {
+  experiment: Experiment;
 }
 
 const VisitorName = styled(Link)(({ theme }) => ({
@@ -38,16 +41,21 @@ const ActionDiv = styled('div')({
   display: 'flex',
 });
 
-function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
+function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
   const { confirm } = params;
-  const [scheduledEvent, setScheduledEvent] = useState(params.scheduledEvent);
+  const [experiment, setExperiment] = useState(params.experiment);
+  const { settingsMap } = useContext(SettingsContext);
+  const organisationName = settingsMap
+    .get(SettingsId.ORGANISATION_NAME)
+    ?.settingsValue?.valueOf();
+
   const api = useDataApi();
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
 
   const onVisitRegistrationSubmitted = (submittedRegistration: RowType) => {
-    setScheduledEvent((prev) => {
+    setExperiment((prev) => {
       if (!prev.visit) {
         return prev;
       }
@@ -69,9 +77,9 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
   };
 
   const replaceVisitRegistration = (
-    newRegistration: NonNullable<ScheduledEvent['visit']>['registrations'][0]
+    newRegistration: NonNullable<Experiment['visit']>['registrations'][0]
   ): void => {
-    setScheduledEvent((prev) => {
+    setExperiment((prev) => {
       if (!prev.visit) {
         return prev;
       }
@@ -177,23 +185,54 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
           </IconButton>
         );
 
+        const subject = organisationName
+          ? `Important information regarding your experiment at ${organisationName}`
+          : 'Important information regarding your experiment';
+        const sendEmailButton = (
+          <IconButton
+            component="a"
+            href={`
+              mailto:${rowData.user?.email || ''}?subject=${subject}&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${
+                params.experiment.proposal.title
+              }" with proposal ID ${
+                params.experiment.proposal.proposalId
+              }.%0D%0A%0D%0A.%0D%0A%0D%0AKind regards`}
+            data-cy="send-email-button"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MailIcon />
+          </IconButton>
+        );
+
         switch (rowData.status) {
           case VisitRegistrationStatus.DRAFTED:
-            return editButton;
+            return (
+              <ActionDiv>
+                {sendEmailButton}
+                {editButton}
+              </ActionDiv>
+            );
           case VisitRegistrationStatus.SUBMITTED:
             return (
               <ActionDiv>
+                {sendEmailButton}
                 {approveButton}
                 {cancelButton}
                 {editButton}
               </ActionDiv>
             );
           case VisitRegistrationStatus.APPROVED:
-            return cancelButton;
+            return (
+              <ActionDiv>
+                {sendEmailButton}
+                {cancelButton}
+              </ActionDiv>
+            );
           case VisitRegistrationStatus.CANCELLED_BY_USER:
+            return <ActionDiv>{sendEmailButton}</ActionDiv>;
           case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-            return null;
-
+            return <ActionDiv>{sendEmailButton}</ActionDiv>;
           default:
             return null;
         }
@@ -225,9 +264,9 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
     {
       title: 'Teamleader',
       render: (rowData: RowType) =>
-        rowData.userId === scheduledEvent.visit?.teamLead.id ? 'Yes' : 'No',
+        rowData.userId === experiment.visit?.teamLead.id ? 'Yes' : 'No',
       customSort: (a: RowType) => {
-        return a.userId === scheduledEvent.visit?.teamLead.id ? 1 : -1;
+        return a.userId === experiment.visit?.teamLead.id ? 1 : -1;
       },
     },
     {
@@ -276,7 +315,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
     },
   ];
 
-  if (scheduledEvent.visit === null) {
+  if (experiment.visit === null) {
     return (
       <Box sx={{ textAlign: 'center', padding: '20px' }}>
         Visit is not defined
@@ -301,7 +340,7 @@ function ExperimentVisitsTable(params: ScheduledEventDetailsTableProps) {
         title=""
         icons={tableIcons}
         columns={columns}
-        data={scheduledEvent.visit.registrations}
+        data={experiment.visit.registrations}
         options={{
           search: false,
           paging: false,

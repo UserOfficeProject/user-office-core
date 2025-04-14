@@ -10,11 +10,10 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { ExperimentStatus } from '../../models/Experiment';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
-import { Feedback } from '../../models/Feedback';
-import { FeedbackRequest } from '../../models/FeedbackRequest';
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
@@ -36,8 +35,6 @@ import { Review } from '../../models/Review';
 import { Role } from '../../models/Role';
 import { RoleClaim } from '../../models/RoleClaim';
 import { Sample } from '../../models/Sample';
-import { SampleExperimentSafetyInput } from '../../models/SampleExperimentSafetyInput';
-import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { StatusActionType } from '../../models/StatusAction';
@@ -65,17 +62,12 @@ import {
 } from '../../models/VisitRegistration';
 import { WorkflowType } from '../../models/Workflow';
 import {
-  ProposalBookingStatusCore,
-  ScheduledEventBookingType,
-} from '../../resolvers/types/ProposalBooking';
-import {
   FapInstrument,
   ProposalViewFap,
   ProposalViewInstrument,
   ProposalViewTechnicalReview,
   ProposalViewTechnique,
 } from '../../resolvers/types/ProposalView';
-import { ExperimentSafetyInput } from './../../models/ExperimentSafetyInput';
 import { FeedbackStatus } from './../../models/Feedback';
 
 // Adds types to datasources: https://knexjs.org/guide/#typescript
@@ -111,18 +103,6 @@ export interface QuestionaryRecord {
   readonly template_id: number;
   readonly creator_id: number;
   readonly created_at: Date;
-}
-
-export interface ScheduledEventRecord {
-  readonly scheduled_event_id: number;
-  readonly booking_type: ScheduledEventBookingType;
-  readonly starts_at: Date;
-  readonly ends_at: Date;
-  readonly proposal_booking_id: number;
-  readonly proposal_pk: number;
-  readonly status: ProposalBookingStatusCore;
-  readonly local_contact: number | null;
-  readonly instrument_id: number;
 }
 
 export interface ProposalRecord {
@@ -281,6 +261,7 @@ export interface RoleRecord {
   readonly role_id: number;
   readonly short_code: string;
   readonly title: string;
+  readonly description: string;
 }
 
 export interface ReviewRecord {
@@ -559,7 +540,7 @@ export interface SampleRecord {
 }
 
 export interface ShipmentRecord {
-  readonly scheduled_event_id: number;
+  readonly experiment_pk: number;
   readonly shipment_id: number;
   readonly title: string;
   readonly creator_id: number;
@@ -691,17 +672,8 @@ export interface VisitRecord {
   readonly questionary_id: number;
   readonly creator_id: number;
   readonly team_lead_user_id: number;
-  readonly scheduled_event_id: number;
   readonly created_at: Date;
-}
-
-export interface EsiRecord {
-  readonly esi_id: number;
-  readonly scheduled_event_id: number;
-  readonly creator_id: number;
-  readonly questionary_id: number;
-  readonly is_submitted: boolean;
-  readonly created_at: Date;
+  readonly experiment_pk: number;
 }
 
 export interface GenericTemplateRecord {
@@ -714,13 +686,6 @@ export interface GenericTemplateRecord {
   readonly created_at: Date;
 }
 
-export interface SampleEsiRecord {
-  readonly esi_id: number;
-  readonly sample_id: number;
-  readonly questionary_id: number;
-  readonly is_submitted: boolean;
-}
-
 export interface TemplateGroupRecord {
   readonly template_group_id: string;
   readonly category_id: number;
@@ -728,7 +693,7 @@ export interface TemplateGroupRecord {
 
 export interface FeedbackRecord {
   readonly feedback_id: number;
-  readonly scheduled_event_id: number;
+  readonly experiment_pk: number;
   readonly status: FeedbackStatus;
   readonly questionary_id: number;
   readonly creator_id: number;
@@ -738,7 +703,7 @@ export interface FeedbackRecord {
 
 export interface FeedbackRequestRecord {
   readonly feedback_request_id: number;
-  readonly scheduled_event_id: number;
+  readonly experiment_pk: number;
   readonly requested_at: Date;
 }
 
@@ -1116,7 +1081,7 @@ export const createShipmentObject = (shipment: ShipmentRecord) => {
     shipment.creator_id,
     shipment.proposal_pk,
     shipment.questionary_id,
-    shipment.scheduled_event_id,
+    shipment.experiment_pk,
     shipment.status as ShipmentStatus,
     shipment.external_ref,
     shipment.created_at
@@ -1202,7 +1167,7 @@ export const createFapReviewerObject = (fapMember: FapReviewerRecord) => {
 };
 
 export const createRoleObject = (role: RoleRecord) => {
-  return new Role(role.role_id, role.short_code, role.title);
+  return new Role(role.role_id, role.short_code, role.title, role.description);
 };
 
 export const createVisitObject = (visit: VisitRecord) => {
@@ -1211,19 +1176,8 @@ export const createVisitObject = (visit: VisitRecord) => {
     visit.proposal_pk,
     visit.creator_id,
     visit.team_lead_user_id,
-    visit.scheduled_event_id,
-    visit.created_at
-  );
-};
-
-export const createEsiObject = (esi: EsiRecord) => {
-  return new ExperimentSafetyInput(
-    esi.esi_id,
-    esi.scheduled_event_id,
-    esi.creator_id,
-    esi.questionary_id,
-    esi.is_submitted,
-    esi.created_at
+    visit.created_at,
+    visit.experiment_pk
   );
 };
 
@@ -1238,15 +1192,6 @@ export const createGenericTemplateObject = (
     genericTemplate.questionary_id,
     genericTemplate.question_id,
     genericTemplate.created_at
-  );
-};
-
-export const createSampleEsiObject = (esi: SampleEsiRecord) => {
-  return new SampleExperimentSafetyInput(
-    esi.esi_id,
-    esi.sample_id,
-    esi.questionary_id,
-    esi.is_submitted
   );
 };
 
@@ -1269,41 +1214,6 @@ export const createInstitutionObject = (institution: InstitutionRecord) => {
 export const createCountryObject = (country: CountryRecord) => {
   return new Country(country.country_id, country.country);
 };
-
-export const createScheduledEventObject = (
-  scheduledEvent: ScheduledEventRecord
-) =>
-  new ScheduledEventCore(
-    scheduledEvent.scheduled_event_id,
-    scheduledEvent.booking_type,
-    scheduledEvent.starts_at,
-    scheduledEvent.ends_at,
-    scheduledEvent.proposal_pk,
-    scheduledEvent.proposal_booking_id,
-    scheduledEvent.status,
-    scheduledEvent.local_contact,
-    scheduledEvent.instrument_id
-  );
-
-export const createFeedbackObject = (scheduledEvent: FeedbackRecord) =>
-  new Feedback(
-    scheduledEvent.feedback_id,
-    scheduledEvent.scheduled_event_id,
-    scheduledEvent.status,
-    scheduledEvent.questionary_id,
-    scheduledEvent.creator_id,
-    scheduledEvent.created_at,
-    scheduledEvent.submitted_at
-  );
-
-export const createFeedbackRequestObject = (
-  feedbackRequest: FeedbackRequestRecord
-) =>
-  new FeedbackRequest(
-    feedbackRequest.feedback_request_id,
-    feedbackRequest.scheduled_event_id,
-    feedbackRequest.requested_at
-  );
 
 export const createUnitObject = (unit: UnitRecord) =>
   new Unit(
@@ -1432,11 +1342,12 @@ export interface InviteRecord {
   readonly invite_id: number;
   readonly code: string;
   readonly email: string;
-  readonly note: string;
   readonly created_by: number;
   readonly created_at: Date;
   readonly claimed_by: number | null;
   readonly claimed_at: Date | null;
+  readonly is_email_sent: boolean;
+  readonly expires_at: Date | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>
@@ -1444,11 +1355,12 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.invite_id,
     invite.code,
     invite.email,
-    invite.note,
     invite.created_at,
     invite.created_by,
     invite.claimed_at,
-    invite.claimed_by
+    invite.claimed_by,
+    invite.is_email_sent,
+    invite.expires_at
   );
 
 export interface RoleClaimRecord {
@@ -1467,3 +1379,39 @@ export interface CoProposerClaimRecord {
 
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
+
+export interface ExperimentRecord {
+  readonly experiment_pk: number;
+  readonly experiment_id: string;
+  readonly starts_at: Date;
+  readonly ends_at: Date;
+  readonly scheduled_event_id: number;
+  readonly proposal_pk: number;
+  readonly status: ExperimentStatus;
+  readonly local_contact_id: number;
+  readonly instrument_id: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
+export interface ExperimentSafetyRecord {
+  readonly experiment_safety_pk: number;
+  readonly experiment_pk: number;
+  readonly esi_questionary_id: number;
+  readonly esi_questionary_submitted_at: Date;
+  readonly created_by: number;
+  readonly status: string;
+  readonly safety_review_questionary_id: number;
+  readonly reviewed_by: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}
+
+export interface ExperimentHasSampleRecord {
+  readonly experiment_pk: number;
+  readonly sample_id: number;
+  readonly is_esi_submitted: boolean;
+  readonly sample_esi_questionary_id: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+}

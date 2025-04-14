@@ -1726,6 +1726,8 @@ context('Fap reviews tests', () => {
 
       cy.closeModal();
 
+      cy.contains(proposal1.title).closest('tr').contains('Submitted');
+
       cy.get('[data-cy="submit-proposal-reviews"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
 
@@ -4193,9 +4195,11 @@ context('Fap meeting exports test', () => {
     cy.visit('/FapPage/2?tab=4&call=1');
 
     cy.get('button[aria-label="Export in Excel"]').click();
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
 
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4208,6 +4212,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Officer should be able to download all FAP meetings in excel', function () {
@@ -4225,8 +4231,11 @@ context('Fap meeting exports test', () => {
       .find('[aria-label="Export Fap Data"]')
       .click();
 
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
+
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `${updatedCall.shortCode}_FAP_Results.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4239,6 +4248,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Officer should be able to download a summary of the FAP meeting stfc', function () {
@@ -4251,9 +4262,11 @@ context('Fap meeting exports test', () => {
     cy.visit('/FapPage/2?tab=4&call=1');
 
     cy.get('button[aria-label="Export in Excel"]').click();
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
 
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4266,6 +4279,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Officer should be able to download all FAP meetings in excel stfc', function () {
@@ -4283,8 +4298,11 @@ context('Fap meeting exports test', () => {
       .find('[aria-label="Export Fap Data"]')
       .click();
 
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
+
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `${updatedCall.shortCode}_FAP_Results.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4299,6 +4317,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Expired proposals should not appear in exports', function () {
@@ -4317,9 +4337,11 @@ context('Fap meeting exports test', () => {
     cy.visit('/FapPage/2?tab=4&call=1');
 
     cy.get('button[aria-label="Export in Excel"]').click();
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
 
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4334,5 +4356,7 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 });

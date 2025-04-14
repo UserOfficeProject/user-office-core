@@ -33,7 +33,7 @@ const feedbackBasisPreSubmit =
 
     // create new feedback and return new questionary id
     const { createFeedback } = await api.createFeedback({
-      scheduledEventId: feedback.scheduledEventId,
+      experimentPk: feedback.experimentPk,
     });
 
     dispatch({

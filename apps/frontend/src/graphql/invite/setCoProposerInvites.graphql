@@ -1,0 +1,5 @@
+mutation setCoProposerInvites($input: SetCoProposerInvitesInput!) {
+  setCoProposerInvites(input: $input) {
+    ...invite
+  }
+}

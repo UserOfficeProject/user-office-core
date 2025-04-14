@@ -12,7 +12,7 @@ import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 
-export default function createHandler() {
+export default function createLoggingHandler() {
   const eventLogsDataSource = container.resolve<EventLogsDataSource>(
     Tokens.EventLogsDataSource
   );
@@ -53,13 +53,30 @@ export default function createHandler() {
     // NOTE: We need to have custom checks for events where response is not standard one.
     try {
       switch (event.type) {
-        case Event.EMAIL_INVITE:
+        case Event.EMAIL_INVITE_LEGACY:
           await eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
             event.emailinviteresponse.userId.toString()
           );
+          break;
+        case Event.EMAIL_INVITE:
+        case Event.EMAIL_INVITES:
+          let invites;
+          if ('invite' in event) {
+            invites = [event.invite];
+          } else {
+            invites = event.array;
+          }
+          for (const invite of invites) {
+            await eventLogsDataSource.set(
+              event.loggedInUserId,
+              event.type,
+              json,
+              invite.id.toString()
+            );
+          }
           break;
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
@@ -346,3 +363,9 @@ export default function createHandler() {
     }
   };
 }
+
+export const createSkipLoggingHandler = () => {
+  return async function skipLoggingHandler(event: ApplicationEvent) {
+    logger.logInfo('Skip logging event', { type: event.type });
+  };
+};

@@ -27,7 +27,7 @@ beforeEach(() => {
 test('User can create visit for his proposal', async () => {
   await expect(
     mutations.createVisit(dummyUserWithRole, {
-      scheduledEventId: 2,
+      experimentPk: 2,
       teamLeadUserId: 1,
       team: [1],
     })
@@ -37,7 +37,7 @@ test('User can create visit for his proposal', async () => {
 test('User can not create visit for proposal that is not accepted', async () => {
   await expect(
     mutations.createVisit(dummyUserWithRole, {
-      scheduledEventId: 1,
+      experimentPk: 1,
       teamLeadUserId: dummyUserWithRole.id,
       team: [dummyUserWithRole.id],
     })
@@ -47,7 +47,7 @@ test('User can not create visit for proposal that is not accepted', async () => 
 test('User can not create visit for someone elses proposal', async () => {
   await expect(
     mutations.createVisit(dummyUserWithRole, {
-      scheduledEventId: 3,
+      experimentPk: 3,
       teamLeadUserId: dummyUserWithRole.id,
       team: [dummyUserWithRole.id],
     })
@@ -56,7 +56,7 @@ test('User can not create visit for someone elses proposal', async () => {
 
 test('User can update visit', async () => {
   const visit = (await mutations.createVisit(dummyUserWithRole, {
-    scheduledEventId: 2,
+    experimentPk: 2,
     teamLeadUserId: dummyUserWithRole.id,
     team: [dummyUserWithRole.id],
   })) as Visit;
@@ -71,7 +71,7 @@ test('User can update visit', async () => {
 
 test('User can not himself approve visit registration', async () => {
   const visit = (await mutations.createVisit(dummyUserWithRole, {
-    scheduledEventId: 2,
+    experimentPk: 2,
     teamLeadUserId: dummyUserWithRole.id,
     team: [dummyUserWithRole.id],
   })) as Visit;

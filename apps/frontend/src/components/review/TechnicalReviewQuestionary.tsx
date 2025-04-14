@@ -88,6 +88,7 @@ export function createTechnicalReviewStub(
       },
       submitted: false,
       users: [],
+      coProposerInvites: [],
       samples: [],
       genericTemplates: [],
       commentForManagement: '',
@@ -100,7 +101,6 @@ export function createTechnicalReviewStub(
       managementDecisionSubmitted: false,
       call: null,
       notified: false,
-      proposalBookingsCore: null,
       publicStatus: ProposalPublicStatus.ACCEPTED,
       reviews: [],
       proposerId: 0,
@@ -111,6 +111,7 @@ export function createTechnicalReviewStub(
       submittedDate: new Date(),
       techniques: [],
       attachments: { questions: [] },
+      experiments: null,
     },
   };
 }

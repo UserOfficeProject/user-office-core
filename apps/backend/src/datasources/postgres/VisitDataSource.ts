@@ -1,6 +1,5 @@
 import { GraphQLError } from 'graphql';
 
-import { ExperimentSafetyInput } from '../../models/ExperimentSafetyInput';
 import { Visit } from '../../models/Visit';
 import { VisitRegistration } from '../../models/VisitRegistration';
 import { GetRegistrationsFilter } from '../../queries/VisitQueries';
@@ -15,7 +14,6 @@ import {
   createVisitObject,
   VisitRecord,
   VisitRegistrationRecord,
-  createEsiObject,
 } from './records';
 
 class PostgresVisitDataSource implements VisitDataSource {
@@ -29,8 +27,8 @@ class PostgresVisitDataSource implements VisitDataSource {
         if (filter?.proposalPk) {
           query.where('proposal_pk', filter.proposalPk);
         }
-        if (filter?.scheduledEventId) {
-          query.where('scheduled_event_id', filter.scheduledEventId);
+        if (filter?.experimentPk) {
+          query.where('experiment_pk', filter.experimentPk);
         }
       })
       .then((visits: VisitRecord[]) =>
@@ -73,24 +71,16 @@ class PostgresVisitDataSource implements VisitDataSource {
       );
   }
 
-  getVisitByScheduledEventId(eventId: number): Promise<Visit | null> {
+  getVisitByExperimentPk(experimentPk: number): Promise<Visit | null> {
     return database('visits')
       .select('*')
-      .where({ scheduled_event_id: eventId })
+      .where({ experiment_pk: experimentPk })
       .first()
       .then((visit) => (visit ? createVisitObject(visit) : null));
   }
 
-  getEsiByVisitId(visitId: number): Promise<ExperimentSafetyInput | null> {
-    return database('experiment_safety_inputs')
-      .select('*')
-      .where({ visit_id: visitId })
-      .first()
-      .then((esi) => (esi ? createEsiObject(esi) : null));
-  }
-
   createVisit(
-    { scheduledEventId: scheduledEventId, teamLeadUserId }: CreateVisitArgs,
+    { experimentPk, teamLeadUserId }: CreateVisitArgs,
     creatorId: number,
     proposalPk: number
   ): Promise<Visit> {
@@ -98,7 +88,7 @@ class PostgresVisitDataSource implements VisitDataSource {
       .insert({
         proposal_pk: proposalPk,
         creator_id: creatorId,
-        scheduled_event_id: scheduledEventId,
+        experiment_pk: experimentPk,
         team_lead_user_id: teamLeadUserId,
       })
       .returning('*')

@@ -7,12 +7,12 @@ import { FeedbackRequest } from '../types/FeedbackRequest';
 export class RequestFeedbackMutation {
   @Mutation(() => FeedbackRequest)
   requestFeedback(
-    @Arg('scheduledEventId', () => Int) scheduledEventId: number,
+    @Arg('experimentPk', () => Int) experimentPk: number,
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.feedback.requestFeedback(
       context.user,
-      scheduledEventId
+      experimentPk
     );
   }
 }
