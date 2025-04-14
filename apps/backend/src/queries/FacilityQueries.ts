@@ -14,8 +14,4 @@ export default class FacilityQueries {
   async getFacilities(ids: number[] | null): Promise<Facility[]> {
     return this.dataSource.getFacilities(ids);
   }
-
-  // async getFacilityInstrumentIds(facilityId: number): Promise<number[]> {
-  //   return this.dataSource.getFacilityInstruments(facilityId);
-  // }
 }

@@ -24,7 +24,10 @@ BEGIN
           PRIMARY KEY (user_id, facility_id)
       );
 
-      INSERT INTO roles (short_code, title) VALUES ('facility_member', 'Facility Member');
+      INSERT INTO roles (short_code, title, description) VALUES ('facility_member', 'Facility Member', 'View proposals to your facility');
+
+      INSERT INTO features(feature_id, description) VALUES ('FACILITIES', 'Facilities feature');
+ 
 
     END;
   END IF;

@@ -37,7 +37,13 @@ const instrument2 = {
 };
 
 context('Facility tests', () => {
-  beforeEach(() => {
+  beforeEach(function () {
+    cy.getAndStoreFeaturesEnabled().then(() => {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.FACILITIES)) {
+        this.skip();
+      }
+    });
+
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
   });

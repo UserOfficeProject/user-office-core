@@ -37,10 +37,10 @@ declare global {
       /**
        * Add Instrument  to a facility
        *
-       * @returns {typeof AssignUsersToFacilityMutation}
+       * @returns {typeof AssignInstrumentsToFacilityMutation}
        * @memberof Chainable
        * @example
-       *    cy.addUserToFacility({ instrumentIds: [1], facilityId: [1] })
+       *    cy.addInstrumentToFacility({ instrumentIds: [1], facilityId: [1] })
        */
       addInstrumentToFacility: (
         updateFacilityInput: AssignInstrumentsToFacilityMutationVariables

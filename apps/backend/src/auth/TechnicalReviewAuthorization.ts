@@ -99,17 +99,16 @@ export class TechnicalReviewAuthorization {
     let haveAccess = false;
 
     switch (agent?.currentRole?.shortCode) {
-      case Roles.USER:
-        haveAccess = await this.proposalAuth.isScientistToProposal(
-          agent,
-          technicalreview.proposalPk
-        );
-        break;
       case Roles.INSTRUMENT_SCIENTIST:
-        haveAccess = await this.proposalAuth.isInstrumentManagerToProposal(
-          agent,
-          technicalreview.proposalPk
-        );
+        haveAccess =
+          (await this.proposalAuth.isScientistToProposal(
+            agent,
+            technicalreview.proposalPk
+          )) ||
+          (await this.proposalAuth.isInstrumentManagerToProposal(
+            agent,
+            technicalreview.proposalPk
+          ));
         break;
       case Roles.INTERNAL_REVIEWER:
         haveAccess = await this.userAuth.isInternalReviewerOnTechnicalReview(
