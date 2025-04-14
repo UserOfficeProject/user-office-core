@@ -539,7 +539,7 @@ context('Instrument tests', () => {
       // TODO: Extend here when technical reviewer is added to the table.
     });
 
-    it('Technical review assignee should be able to bulk reassign Technical reviews', function () {
+    it('User Officer should be able to bulk reassign Technical reviews', function () {
       cy.assignProposalsToInstruments({
         proposalPks: [createdProposalPk],
         instrumentIds: [createdInstrumentId],
@@ -586,12 +586,6 @@ context('Instrument tests', () => {
             proposalPks: [createdProposal2Pk],
             userId: scientist2.id,
             instrumentId: createdInstrumentId,
-          });
-
-          cy.updateTechnicalReviewAssignee({
-            proposalPks: [createdProposal2Pk],
-            userId: scientist2.id,
-            instrumentId: createdInstrument2Id,
           });
 
           cy.addProposalTechnicalReview({

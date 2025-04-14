@@ -232,8 +232,7 @@ const TechnicalBulkReassignModal = ({
           <FormHelperText error></FormHelperText>
           {!!proposalsWithMultipleInstrument.length && (
             <Alert severity="warning" data-cy="multi-instrument-alert">
-              {`Warning you have selected proposal(s) with multiple ${t('instrument')}s then
-              both there reviews will appear here: ${proposalsWithMultipleInstrument.toString().replaceAll(',', ', ')}`}
+              {`Warning: you have selected proposal(s) with multiple ${t('instrument')}s. All their reviews will appear here: ${proposalsWithMultipleInstrument.toString().replaceAll(',', ', ')}`}
             </Alert>
           )}
           <MaterialTable
@@ -304,8 +303,8 @@ const TechnicalBulkReassignModal = ({
             onClick={confirm(updateReviews, {
               title: 'Update Reviewers',
               description: isUserOfficer
-                ? `Please ensure you have reviewed which proposals you reassigning, current reviewers will lose access to complete these reviews.`
-                : 'Please ensure you have reviewed which proposals you reassigning. You will lose access to complete and reassign these reviews.',
+                ? `Please ensure you have reviewed which proposals you are reassigning, current reviewers will lose access to complete these reviews.`
+                : 'Please ensure you have reviewed which proposals you are reassigning. You will lose access to complete and reassign these reviews.',
             })}
             data-cy="bulk-update"
           >
