@@ -16,6 +16,7 @@ export const Tokens = {
   InviteDataSource: Symbol('InviteDataSource'),
   TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
+  LoggingHandler: Symbol('LoggingHandler'),
   MailService: Symbol('MailService'),
   PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),
   PostToMessageQueue: Symbol('PostToMessageQueue'),

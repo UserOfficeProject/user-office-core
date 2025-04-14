@@ -470,7 +470,7 @@ context('Status actions tests', () => {
       cy.get('[data-cy="RABBITMQ-status-action"] input').should('be.checked');
     });
 
-    it.only('User Officer should be able to see logs after status actions successful run', () => {
+    it('User Officer should be able to see logs after status actions successful run', () => {
       const proposalTitle = faker.lorem.words(3);
       const proposalAbstract = faker.lorem.paragraph();
       const statusActionEmail = faker.internet.email();
@@ -661,7 +661,7 @@ context('Status actions tests', () => {
       });
     });
 
-    it.only('User Officer should be able to view and replay status actions', () => {
+    it('User Officer should be able to view and replay status actions', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
@@ -684,7 +684,7 @@ context('Status actions tests', () => {
         text: 'Status action replay successfully send',
       });
     });
-    it.only('User Officer should be able to view and filter status actions logs', () => {
+    it('User Officer should be able to view and filter status actions logs', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
