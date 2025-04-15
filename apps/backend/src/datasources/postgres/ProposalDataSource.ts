@@ -373,6 +373,13 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return query;
   }
 
+  safeEscapeRegexForJsonPath(input: string): string {
+    if (!input) return '""';
+    // Escape regex special characters
+    const escaped = input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    return `"${escaped}"`;
+  }
   async getProposalsFromView(
     filter?: ProposalsFilter,
     first?: number,
@@ -433,20 +440,22 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
+          const regexLiteral = this.safeEscapeRegexForJsonPath(searchText);
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+          const jsonPathPattern = `$[*] ? (@.name.type() == "string" && @.name like_regex ${regexLiteral} flag "i")`;
+
           query.andWhere((qb) =>
             qb
-              .orWhereRaw('proposal_id ILIKE ?', `%${searchText}%`)
-              .orWhereRaw('title ILIKE ?', `%${searchText}%`)
-              .orWhereRaw('proposal_status_name ILIKE ?', `%${searchText}%`)
+              .orWhereRaw('proposal_id ILIKE ?', [`%${searchText}%`])
+              .orWhereRaw('title ILIKE ?', [`%${searchText}%`])
+              .orWhereRaw('proposal_status_name ILIKE ?', [`%${searchText}%`])
               .orWhere('users.email', 'ilike', `%${searchText}%`)
               .orWhere('users.firstname', 'ilike', `%${searchText}%`)
               .orWhere('users.lastname', 'ilike', `%${searchText}%`)
               .orWhere('principal_investigator', 'in', principalInvestigator)
-              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-              .orWhereRaw(
-                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
-                { searchText }
-              )
+              .orWhereRaw('jsonb_path_exists(instruments, ?)', [
+                jsonPathPattern,
+              ])
           );
         }
 
