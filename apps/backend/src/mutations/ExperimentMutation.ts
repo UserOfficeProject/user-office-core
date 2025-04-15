@@ -10,7 +10,12 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
-import { ExperimentHasSample, ExperimentStatus } from '../models/Experiment';
+import {
+  ExperimentHasSample,
+  ExperimentStatus,
+  InstrumentScientistDecisionEnum,
+  ExperimentSafetyReviewerDecisionEnum,
+} from '../models/Experiment';
 import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
@@ -137,10 +142,16 @@ export default class ExperimentMutations {
       );
     }
 
-    return this.dataSource.submitExperimentSafety(args);
+    return this.dataSource.updateExperimentSafety(args.experimentSafetyPk, {
+      esiQuestionarySubmittedAt: args.isSubmitted ? new Date() : null,
+    });
   }
 
-  @Authorized([Roles.USER_OFFICER])
+  @Authorized([
+    Roles.USER_OFFICER,
+    Roles.EXPERIMENT_SAFETY_REVIEWER,
+    Roles.INSTRUMENT_SCIENTIST,
+  ])
   async reviewExperimentSafety(
     user: UserWithRole | null,
     args: SubmitExperimentSafetyArgs
@@ -179,10 +190,78 @@ export default class ExperimentMutations {
         activeExperimentSafetyReviewTemplateId
       );
 
-    return this.dataSource.addExperimentSafetyReviewQuestionaryToExperimentSafety(
-      experimentSafetyPk,
-      experimentSafetyReviewQuestionary.questionaryId
-    );
+    return this.dataSource.updateExperimentSafety(experimentSafetyPk, {
+      safetyReviewQuestionaryId:
+        experimentSafetyReviewQuestionary.questionaryId,
+    });
+  }
+
+  @Authorized([Roles.INSTRUMENT_SCIENTIST])
+  async submitInstrumentScientistExperimentSafetyReview(
+    user: UserWithRole | null,
+    args: {
+      experimentSafetyPk: number;
+      decision: InstrumentScientistDecisionEnum | null;
+      comment: string | null;
+    }
+  ): Promise<ExperimentSafety | Rejection> {
+    if (!user) {
+      return rejection('User not found');
+    }
+
+    const { experimentSafetyPk, decision, comment } = args;
+
+    const experimentSafety =
+      await this.dataSource.getExperimentSafety(experimentSafetyPk);
+
+    if (!experimentSafety) {
+      return rejection('No experiment safety found');
+    }
+
+    // Check if the experiment safety has been reviewed already
+    if (experimentSafety.esiQuestionarySubmittedAt === null) {
+      return rejection('Experiment safety has not been submitted yet');
+    }
+
+    return this.dataSource.updateExperimentSafety(experimentSafetyPk, {
+      instrumentScientistDecision: decision,
+      instrumentScientistComment: comment,
+      reviewedBy: user.id,
+    });
+  }
+
+  @Authorized([Roles.EXPERIMENT_SAFETY_REVIEWER, Roles.USER_OFFICER])
+  async submitExperimentSafetyReviewerExperimentSafetyReview(
+    user: UserWithRole | null,
+    args: {
+      experimentSafetyPk: number;
+      decision: ExperimentSafetyReviewerDecisionEnum | null;
+      comment: string | null;
+    }
+  ): Promise<ExperimentSafety | Rejection> {
+    if (!user) {
+      return rejection('User not found');
+    }
+
+    const { experimentSafetyPk, decision, comment } = args;
+
+    const experimentSafety =
+      await this.dataSource.getExperimentSafety(experimentSafetyPk);
+
+    if (!experimentSafety) {
+      return rejection('No experiment safety found');
+    }
+
+    // Check if the experiment safety has been reviewed already
+    if (experimentSafety.esiQuestionarySubmittedAt === null) {
+      return rejection('Experiment safety has not been submitted yet');
+    }
+
+    return this.dataSource.updateExperimentSafety(experimentSafetyPk, {
+      experimentSafetyReviewerDecision: decision,
+      experimentSafetyReviewerComment: comment,
+      reviewedBy: user.id,
+    });
   }
 
   @Authorized()

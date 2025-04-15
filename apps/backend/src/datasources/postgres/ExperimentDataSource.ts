@@ -6,6 +6,8 @@ import {
   Experiment,
   ExperimentHasSample,
   ExperimentSafety,
+  ExperimentSafetyReviewerDecisionEnum,
+  InstrumentScientistDecisionEnum,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
@@ -44,15 +46,15 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.esi_questionary_id,
     record.esi_questionary_submitted_at,
     record.created_by,
-    record.statusId,
+    record.status_id,
     record.safety_review_questionary_id,
     record.reviewed_by,
     record.created_at,
     record.updated_at,
     record.instrument_scientist_decision,
-    record.instrument_scientist_comment,
+    record.instrument_scientist_decision_comment,
     record.experiment_safety_reviewer_decision,
-    record.experiment_safety_reviewer_comment
+    record.experiment_safety_reviewer_decision_comment
   );
 }
 
@@ -260,18 +262,59 @@ export default class PostgresExperimentDataSource
     return createExperimentSafetyObject(result);
   }
 
-  async addExperimentSafetyReviewQuestionaryToExperimentSafety(
+  async updateExperimentSafety(
     experimentSafetyPk: number,
-    questionaryId: number
+    updateFields: Partial<{
+      safetyReviewQuestionaryId: number;
+      esiQuestionarySubmittedAt: Date | null;
+      instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
+      instrumentScientistComment: string | null;
+      experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
+      experimentSafetyReviewerComment: string | null;
+      reviewedBy: number;
+    }>
   ): Promise<ExperimentSafety> {
+    // Create an object for database update with proper column names
+    const updateObject: Record<string, any> = {};
+
+    // Map the update fields to database column names
+    if (updateFields.safetyReviewQuestionaryId !== undefined) {
+      updateObject.safety_review_questionary_id =
+        updateFields.safetyReviewQuestionaryId;
+    }
+    if (updateFields.esiQuestionarySubmittedAt !== undefined) {
+      updateObject.esi_questionary_submitted_at =
+        updateFields.esiQuestionarySubmittedAt;
+    }
+    if (updateFields.instrumentScientistDecision !== undefined) {
+      updateObject.instrument_scientist_decision =
+        updateFields.instrumentScientistDecision;
+    }
+    if (updateFields.instrumentScientistComment !== undefined) {
+      updateObject.instrument_scientist_decision_comment =
+        updateFields.instrumentScientistComment;
+    }
+    if (updateFields.experimentSafetyReviewerDecision !== undefined) {
+      updateObject.experiment_safety_reviewer_decision =
+        updateFields.experimentSafetyReviewerDecision;
+    }
+    if (updateFields.experimentSafetyReviewerComment !== undefined) {
+      updateObject.experiment_safety_reviewer_decision_comment =
+        updateFields.experimentSafetyReviewerComment;
+    }
+    if (updateFields.reviewedBy !== undefined) {
+      updateObject.reviewed_by = updateFields.reviewedBy;
+    }
+
+    // Always update the updated_at timestamp
+    updateObject.updated_at = new Date();
+
     const result = await database('experiment_safety')
-      .update({
-        safety_review_questionary_id: questionaryId,
-      })
+      .update(updateObject)
       .where('experiment_safety_pk', experimentSafetyPk)
       .returning('*');
 
-    if (!result) {
+    if (!result || result.length === 0) {
       throw new Error('Could not update experiment safety');
     }
 
@@ -291,6 +334,7 @@ export default class PostgresExperimentDataSource
     if (!result) {
       return null;
     }
+    console.log('result', result);
 
     return createExperimentSafetyObject(result);
   }
@@ -305,7 +349,7 @@ export default class PostgresExperimentDataSource
         experiment_pk: experimentPk,
         esi_questionary_id: questionaryId,
         created_by: creatorId,
-        status: '', //todo: add status
+        // status_id: '', //todo: add status
         reviewed_by: creatorId, //todo: add reviewed_by
       })
       .into('experiment_safety')

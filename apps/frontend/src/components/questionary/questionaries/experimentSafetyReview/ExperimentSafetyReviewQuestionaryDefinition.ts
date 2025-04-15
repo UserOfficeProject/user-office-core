@@ -3,6 +3,7 @@ import { DefaultReviewWizardStep } from 'components/questionary/DefaultReviewWiz
 import { DefaultStepDisplayElementFactory } from 'components/questionary/DefaultStepDisplayElementFactory';
 import { DefaultWizardStepFactory } from 'components/questionary/DefaultWizardStepFactory';
 import { Sdk, TemplateGroupId } from 'generated/sdk';
+import { ExperimentSafetyReviewSubmissionState } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewSubmissionState';
 import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionState';
 
 import { ExperimentSafetyReviewQuestionaryWizardStep } from './ExperimentSafetyReviewQuestionaryWizardStep';
@@ -16,8 +17,22 @@ export const experimentSafetyReviewQuestionaryDefinition: QuestionaryDefinition 
     ),
     wizardStepFactory: new DefaultWizardStepFactory(
       ExperimentSafetyReviewQuestionaryWizardStep,
-      new DefaultReviewWizardStep(() => {
-        return true; //todo: this needs to be updated
+      new DefaultReviewWizardStep((state) => {
+        const experimentSafetyState =
+          state as ExperimentSafetyReviewSubmissionState;
+
+        // Check if any decision has been made (not null, not undefined, not UNSET)
+        const hasInstrumentScientistDecision =
+          !!experimentSafetyState.experimentSafety.instrumentScientistDecision;
+
+        const hasExperimentSafetyReviewerDecision =
+          !!experimentSafetyState.experimentSafety
+            .experimentSafetyReviewerDecision;
+
+        // Return true if any decision has been made - making the review step read-only
+        return (
+          hasInstrumentScientistDecision || hasExperimentSafetyReviewerDecision
+        );
       })
     ),
 

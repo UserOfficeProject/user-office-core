@@ -83,9 +83,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  const isExperimentSafetyReviewEnabled = context.featuresMap.get(
-    FeatureId.EXPERIMENT_SAFETY_REVIEW
-  )?.isEnabled;
+  // const isExperimentSafetyReviewEnabled = context.featuresMap.get(
+  //   FeatureId.EXPERIMENT_SAFETY_REVIEW
+  // )?.isEnabled; // TODO: This needs to be removed or used somewhere. It make sense to just have isSchedulerEnabled to enable Safety Reviews. Need to be checked with the team.
 
   const isXpressRouteEnabled = useXpressAccess([
     UserRole.USER_OFFICER,
@@ -267,9 +267,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Questions" />
         </ListItemButton>
       </Tooltip>
-      {isExperimentSafetyReviewEnabled && (
-        <ExperimentSafetyReviewMenuListItem />
-      )}
       <SettingsMenuListItem />
     </div>
   );
@@ -309,6 +306,19 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Xpress Proposals" />
         </ListItemButton>
       )}
+      {isSchedulerEnabled && (
+        <Tooltip title="Experiments">
+          <ListItemButton
+            component={NavLink}
+            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
+          >
+            <ListItemIcon>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText primary="Experiments" />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isInstrumentManagementEnabled && (
         <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>
@@ -317,16 +327,23 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItemButton>
       )}
-      {isExperimentSafetyReviewEnabled && (
-        <ExperimentSafetyReviewMenuListItem />
-      )}
     </div>
   );
 
   const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
-      {isExperimentSafetyReviewEnabled && (
-        <ExperimentSafetyReviewMenuListItem />
+      {isSchedulerEnabled && (
+        <Tooltip title="Experiments">
+          <ListItemButton
+            component={NavLink}
+            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
+          >
+            <ListItemIcon>
+              <EventIcon />
+            </ListItemIcon>
+            <ListItemText primary="Experiments" />
+          </ListItemButton>
+        </Tooltip>
       )}
     </div>
   );

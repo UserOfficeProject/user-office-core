@@ -3,6 +3,8 @@ import {
   ExperimentSafety,
   ExperimentHasSample,
   ExperimentStatus,
+  InstrumentScientistDecisionEnum,
+  ExperimentSafetyReviewerDecisionEnum,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { User } from '../../models/User';
@@ -305,5 +307,75 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     return Promise.resolve(
       this.experiments.filter((exp) => exp.proposalPk === proposalPk)
     );
+  }
+
+  updateExperimentSafety(
+    experimentSafetyPk: number,
+    updateFields: Partial<{
+      safetyReviewQuestionaryId: number;
+      esiQuestionarySubmittedAt: Date | null;
+      instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
+      instrumentScientistComment: string | null;
+      experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
+      experimentSafetyReviewerComment: string | null;
+      reviewedBy: number;
+    }>
+  ): Promise<ExperimentSafety> {
+    return new Promise((resolve) => {
+      const safety = this.experimentsSafety.find(
+        (safety) => safety.experimentSafetyPk === experimentSafetyPk
+      );
+
+      if (safety) {
+        const updatedSafety = new ExperimentSafety(
+          safety.experimentSafetyPk,
+          safety.experimentPk,
+          safety.esiQuestionaryId,
+          updateFields.esiQuestionarySubmittedAt !== undefined
+            ? updateFields.esiQuestionarySubmittedAt
+            : safety.esiQuestionarySubmittedAt,
+          safety.createdBy,
+          safety.statusId,
+          updateFields.safetyReviewQuestionaryId !== undefined
+            ? updateFields.safetyReviewQuestionaryId
+            : safety.safetyReviewQuestionaryId,
+          updateFields.reviewedBy !== undefined
+            ? updateFields.reviewedBy
+            : safety.reviewedBy,
+          safety.createdAt,
+          new Date(),
+          updateFields.instrumentScientistDecision !== undefined
+            ? updateFields.instrumentScientistDecision
+            : safety.instrumentScientistDecision,
+          updateFields.instrumentScientistComment !== undefined
+            ? updateFields.instrumentScientistComment
+            : safety.instrumentScientistComment,
+          updateFields.experimentSafetyReviewerDecision !== undefined
+            ? updateFields.experimentSafetyReviewerDecision
+            : safety.experimentSafetyReviewerDecision,
+          updateFields.experimentSafetyReviewerComment !== undefined
+            ? updateFields.experimentSafetyReviewerComment
+            : safety.experimentSafetyReviewerComment
+        );
+
+        // Update the safety in the array
+        const index = this.experimentsSafety.findIndex(
+          (s) => s.experimentSafetyPk === experimentSafetyPk
+        );
+        if (index !== -1) {
+          this.experimentsSafety[index] = updatedSafety;
+        }
+
+        resolve(updatedSafety);
+      } else {
+        // For mock, create a new one if not found
+        const newSafety = dummyExperimentSafetyFactory({
+          experimentSafetyPk,
+          ...updateFields,
+        });
+        this.experimentsSafety.push(newSafety);
+        resolve(newSafety);
+      }
+    });
   }
 }

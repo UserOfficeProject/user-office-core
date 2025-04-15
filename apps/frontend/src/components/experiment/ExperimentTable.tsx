@@ -60,16 +60,24 @@ function ExperimentTable() {
       title: 'Experiment Safety',
       render: (rowData: RowType) =>
         rowData.experimentSafety ? (
-          <ButtonWithDialog
-            label="Review Experiment Safety"
-            title="Review Experiment Safety"
-          >
-            <ExperimentSafetyReview
-              experimentSafetyPk={rowData.experimentSafety.experimentSafetyPk}
-            />
-          </ButtonWithDialog>
+          <>
+            {rowData.experimentSafety?.statusId == 1 ? (
+              'Approved'
+            ) : (
+              <ButtonWithDialog
+                label="Review Experiment Safety"
+                title="Review Experiment Safety"
+              >
+                <ExperimentSafetyReview
+                  experimentSafetyPk={
+                    rowData.experimentSafety.experimentSafetyPk
+                  }
+                />
+              </ButtonWithDialog>
+            )}
+          </>
         ) : (
-          'No Experiment Safety'
+          'Awaiting Experiment Safety'
         ),
     },
     {

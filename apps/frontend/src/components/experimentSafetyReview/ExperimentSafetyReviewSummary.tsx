@@ -5,11 +5,15 @@ import InputLabel from '@mui/material/InputLabel';
 import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import React, { useContext, useState } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
+import { UserContext } from 'context/UserContextProvider';
+import { UserRole } from 'generated/sdk';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import { ExperimentSafetyReviewContextType } from './ExperimentSafetyReviewContainer';
@@ -22,6 +26,10 @@ function ExperimentSafetyReviewSummary({
   confirm,
 }: ExperimentSafetyReviewSummaryProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [decision, setDecision] = useState<'ACCEPTED' | 'REJECTED'>('ACCEPTED');
+  const [comment, setComment] = useState<string>('');
+  const { api } = useDataApiWithFeedback();
+  const { currentRole } = useContext(UserContext);
 
   const { state, dispatch } = useContext(
     QuestionaryContext
@@ -48,31 +56,38 @@ function ExperimentSafetyReviewSummary({
         <Select
           id="technique-select"
           aria-labelledby="exp-safety-review"
-          onChange={() => {
-            // const newValue: TechniqueFilterInput = {
-            //   techniqueId: null,
-            //   showMultiTechniqueProposals: false,
-            //   showAllProposals: false,
-            // };
+          onChange={(e) => {
+            setDecision(e.target.value as 'ACCEPTED' | 'REJECTED');
           }}
-          value={'APPROVE'}
+          value={decision}
+          data-cy="safety-review-decision"
         >
           <ListSubheader sx={{ lineHeight: 1 }}>
-            <Divider>General</Divider>
+            <Divider>Decision</Divider>
           </ListSubheader>
-          <MenuItem value={'APPROVE'}>APPROVE</MenuItem>
-          <MenuItem value={'REJECT'}>REJECT</MenuItem>
+          <MenuItem value={'ACCEPTED'}>APPROVE</MenuItem>
+          <MenuItem value={'REJECTED'}>REJECT</MenuItem>
         </Select>
       </FormControl>
+
+      <FormControl fullWidth sx={{ mt: 2 }}>
+        <TextField
+          id="safety-review-comment"
+          label="Comments"
+          multiline
+          rows={4}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          variant="outlined"
+          data-cy="safety-review-comment"
+        />
+      </FormControl>
+
       <Divider sx={{ margin: '1rem 0' }} />
-      <NavigationFragment
-      // disabled={proposal.status?.id === 0}
-      // isLoading={isSubmitting}
-      >
+      <NavigationFragment>
         <NavigButton
           onClick={() => dispatch({ type: 'BACK_CLICKED' })}
           disabled={state.stepIndex === 0}
-          // isBusy={isSubmitting}
         >
           Back
         </NavigButton>
@@ -81,24 +96,58 @@ function ExperimentSafetyReviewSummary({
             confirm(
               async () => {
                 setIsSubmitting(true);
-                // try {
-                //   const { submitProposal } = await api({
-                //     toastSuccessMessage: proposalSubmissionSuccessMessage,
-                //   }).submitProposal({
-                //     proposalPk: state.proposal.primaryKey,
-                //   });
+                try {
+                  if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+                    // Call the instrument scientist mutation
+                    const { submitInstrumentScientistExperimentSafetyReview } =
+                      await api({
+                        toastSuccessMessage:
+                          'Safety review submitted successfully',
+                      }).submitInstrumentScientistExperimentSafetyReview({
+                        experimentSafetyPk:
+                          state.experimentSafety.experimentSafetyPk,
+                        decision: decision,
+                        comment: comment,
+                      });
 
-                //   dispatch({
-                //     type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                //     itemWithQuestionary: submitProposal,
-                //   });
-                //   dispatch({
-                //     type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                //     itemWithQuestionary: submitProposal,
-                //   });
-                // } finally {
-                //   setIsSubmitting(false);
-                // }
+                    dispatch({
+                      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                      itemWithQuestionary:
+                        submitInstrumentScientistExperimentSafetyReview,
+                    });
+                    dispatch({
+                      type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                      itemWithQuestionary:
+                        submitInstrumentScientistExperimentSafetyReview,
+                    });
+                  } else {
+                    // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
+                    const {
+                      submitExperimentSafetyReviewerExperimentSafetyReview,
+                    } = await api({
+                      toastSuccessMessage:
+                        'Safety review submitted successfully',
+                    }).submitExperimentSafetyReviewerExperimentSafetyReview({
+                      experimentSafetyPk:
+                        state.experimentSafety.experimentSafetyPk,
+                      decision: decision,
+                      comment: comment,
+                    });
+
+                    dispatch({
+                      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                      itemWithQuestionary:
+                        submitExperimentSafetyReviewerExperimentSafetyReview,
+                    });
+                    dispatch({
+                      type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                      itemWithQuestionary:
+                        submitExperimentSafetyReviewerExperimentSafetyReview,
+                    });
+                  }
+                } finally {
+                  setIsSubmitting(false);
+                }
               },
               {
                 title: 'Please confirm',

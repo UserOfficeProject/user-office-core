@@ -2,10 +2,11 @@ import {
   Experiment,
   ExperimentHasSample,
   ExperimentSafety,
+  InstrumentScientistDecisionEnum,
+  ExperimentSafetyReviewerDecisionEnum,
 } from '../models/Experiment';
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
-import { SubmitExperimentSafetyArgs } from '../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   ExperimentsArgs,
   UserExperimentsFilter,
@@ -36,18 +37,23 @@ export interface ExperimentDataSource {
   getExperimentSafety(
     experimentSafetyPk: number
   ): Promise<ExperimentSafety | null>;
-  addExperimentSafetyReviewQuestionaryToExperimentSafety(
+  updateExperimentSafety(
     experimentSafetyPk: number,
-    questionaryId: number
+    updateFields: Partial<{
+      safetyReviewQuestionaryId: number;
+      esiQuestionarySubmittedAt: Date | null;
+      instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
+      instrumentScientistComment: string | null;
+      experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
+      experimentSafetyReviewerComment: string | null;
+      reviewedBy: number;
+    }>
   ): Promise<ExperimentSafety>;
   createExperimentSafety(
     experimentPk: number,
     questionaryId: number,
     creatorId: number
   ): Promise<ExperimentSafety | Rejection>;
-  submitExperimentSafety(
-    args: SubmitExperimentSafetyArgs
-  ): Promise<ExperimentSafety>;
   getExperimentSafetyByESIQuestionaryId(
     esiQuestionaryId: number
   ): Promise<ExperimentSafety | null>;

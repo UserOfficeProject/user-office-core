@@ -1403,15 +1403,15 @@ export interface ExperimentSafetyRecord {
   readonly esi_questionary_id: number;
   readonly esi_questionary_submitted_at: Date;
   readonly created_by: number;
-  readonly statusId: number | null;
+  readonly status_id: number | null;
   readonly safety_review_questionary_id: number;
   readonly reviewed_by: number;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly instrument_scientist_decision: InstrumentScientistDecisionEnum;
-  readonly instrument_scientist_comment: string;
+  readonly instrument_scientist_decision_comment: string;
   readonly experiment_safety_reviewer_decision: ExperimentSafetyReviewerDecisionEnum;
-  readonly experiment_safety_reviewer_comment: string;
+  readonly experiment_safety_reviewer_decision_comment: string;
 }
 
 export interface ExperimentHasSampleRecord {
