@@ -188,6 +188,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
             firstname: 'Carl',
             lastname: 'Carlsson',
           },
+          instrumentId: 1,
         },
       ],
       [{ id: 1, code: 'fap code' }],
