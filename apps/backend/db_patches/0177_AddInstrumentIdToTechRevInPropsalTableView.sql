@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('0170_AddInstrumentIdToTechRevInPropsalTableView.sql', 'Tom Cottee Meldrum', 'Add Instrument Id to Techreview Review in proposal table view', '2024-08-16') THEN
+	IF register_patch('0177_AddInstrumentIdToTechRevInPropsalTableView.sql', 'Tom Cottee Meldrum', 'Add Instrument Id to Techreview Review in proposal table view', '2025-04-15') THEN
 	BEGIN	
 			-- drop view to allow recreating it
     	DROP VIEW proposal_table_view;
@@ -13,8 +13,8 @@ BEGIN
 				p.title,
 				p.proposer_id AS principal_investigator,
 				p.status_id AS proposal_status_id,
-				ps.name AS proposal_status_name,
-				ps.description AS proposal_status_description,
+				s.name AS proposal_status_name,
+				s.description AS proposal_status_description,
 				p.proposal_id,
 				p.final_status,
 				p.notified,
@@ -30,7 +30,7 @@ BEGIN
 				c.call_id,
 				c.proposal_workflow_id
 			FROM proposals p
-			LEFT JOIN proposal_statuses ps ON ps.proposal_status_id = p.status_id
+			LEFT JOIN statuses s ON s.status_id = p.status_id
 			LEFT JOIN call c ON c.call_id = p.call_id
 			LEFT JOIN (
 				SELECT
