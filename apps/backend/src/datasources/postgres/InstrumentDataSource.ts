@@ -314,49 +314,6 @@ export default class PostgresInstrumentDataSource
     return this.createInstrumentObject(instrumentRecord);
   }
 
-  async updateInstrumentContact(
-    userId: number,
-    instrumentId: number
-  ): Promise<boolean> {
-    try {
-      const existingUser = await database('users')
-        .where('user_id', userId)
-        .first();
-
-      if (!existingUser) {
-        logger.logError('User with ID not found', { userId });
-
-        return false;
-      }
-
-      const updatedReviews = await database('technical_review')
-        .where({ instrument_id: instrumentId })
-        .andWhere({ submitted: false })
-        .update({ technical_review_assignee_id: userId });
-
-      if (updatedReviews === 0) {
-        logger.logWarn(
-          'No technical review found for instrument, or no changes made.',
-          { instrumentId }
-        );
-      } else {
-        logger.logInfo('Technical review updated successfully', {
-          instrumentId,
-          technical_review_assignee_id: userId,
-        });
-      }
-
-      return true;
-    } catch (error) {
-      logger.logError('Error updating instrument contact:', {
-        message: (error as Error)?.message,
-        stack: (error as Error)?.stack,
-      });
-
-      return false;
-    }
-  }
-
   async assignProposalToInstrument(
     proposalPk: number,
     instrumentId: number

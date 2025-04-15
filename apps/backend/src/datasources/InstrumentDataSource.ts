@@ -64,10 +64,6 @@ export interface InstrumentDataSource {
   getInstrumentsByProposalPk(
     proposalPk: number
   ): Promise<InstrumentWithManagementTime[]>;
-  updateInstrumentContact(
-    userId: number,
-    instrumentId: number
-  ): Promise<boolean>;
   updateProposalInstrumentTimeAllocation(
     proposalPk: number,
     managementTimeAllocations: ManagementTimeAllocationsInput[]

@@ -99,10 +99,11 @@ export default class InstrumentMutations {
         args.managerUserId !== currentInstrument.managerUserId &&
         args.updateTechReview
       ) {
-        const updateSuccess = await this.dataSource.updateInstrumentContact(
-          args.managerUserId,
-          currentInstrument.id
-        );
+        const updateSuccess =
+          await this.reviewDataSource.updateInstrumentContact(
+            args.managerUserId,
+            currentInstrument.id
+          );
 
         if (!updateSuccess) {
           return rejection('Failed to update contact ', {
