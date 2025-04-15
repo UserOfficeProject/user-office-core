@@ -373,12 +373,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
     return query;
   }
 
-  safeEscapeRegexForJsonPath(input: string): string {
-    if (!input) return '""';
-    // Escape regex special characters
-    const escaped = input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  safeEscapeRegexExpression(expression: string): string {
+    const escaped = expression.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    return `"${escaped}"`;
+    return escaped;
   }
   async getProposalsFromView(
     filter?: ProposalsFilter,
@@ -440,9 +438,9 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           searchText !== null &&
           searchText !== undefined
         ) {
-          const regexLiteral = this.safeEscapeRegexForJsonPath(searchText);
+          const regexLiteral = this.safeEscapeRegexExpression(searchText);
           // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
-          const jsonPathPattern = `$[*] ? (@.name.type() == "string" && @.name like_regex ${regexLiteral} flag "i")`;
+          const jsonPathPattern = `$[*] ? (@.name.type() == "string" && @.name like_regex "${regexLiteral}" flag "i")`;
 
           query.andWhere((qb) =>
             qb
