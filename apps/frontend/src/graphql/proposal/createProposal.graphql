@@ -28,5 +28,8 @@ mutation createProposal($callId: Int!) {
         isCompleted
       }
     }
+    coProposerInvites {
+      ...invite
+    }
   }
 }

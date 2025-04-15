@@ -40,6 +40,7 @@ query getProposalsCore(
         timeAllocation
         status
         submitted
+        instrumentId
       }
       faps {
         id
