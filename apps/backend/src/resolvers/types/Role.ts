@@ -3,7 +3,7 @@ import { Field, ObjectType, Int } from 'type-graphql';
 
 @ObjectType()
 export class Role {
-  @Field((type) => Int)
+  @Field(() => Int)
   public id: number;
 
   @Field()
@@ -12,7 +12,15 @@ export class Role {
   @Field()
   public title: string;
 
-  constructor(initObj: { id: number; shortCode: string; title: string }) {
+  @Field()
+  public description: string;
+
+  constructor(initObj: {
+    id: number;
+    shortCode: string;
+    title: string;
+    description: string;
+  }) {
     Object.assign(this, initObj);
   }
 }

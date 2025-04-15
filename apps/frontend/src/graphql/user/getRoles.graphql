@@ -3,5 +3,6 @@ query getRoles {
     id
     shortCode
     title
+    description
   }
 }
