@@ -77,5 +77,8 @@ query getProposal($primaryKey: Int!) {
         isCompleted
       }
     }
+    coProposerInvites {
+      ...invite
+    }
   }
 }
