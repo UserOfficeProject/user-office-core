@@ -658,15 +658,11 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     });
   }
 
-  async updateRoleTitle(rolesToUpdate: {
-    shortCode: string;
-    title: string;
-  }): Promise<void> {
-    const { shortCode, title } = rolesToUpdate;
-
-    await database('roles')
-      .update({ title: title })
-      .where('short_code', shortCode);
+  async updateRole(
+    role: string,
+    update: { title?: string; description?: string }
+  ): Promise<void> {
+    await database('roles').update(update).where('short_code', role);
   }
 }
 

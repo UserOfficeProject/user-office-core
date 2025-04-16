@@ -113,18 +113,15 @@ async function setELIRoleNames() {
 
   await db.waitForDBUpgrade();
 
-  await db.updateRoleTitle({
-    shortCode: Roles.FAP_CHAIR,
+  await db.updateRole(Roles.FAP_CHAIR, {
     title: 'PRP Chair',
   });
 
-  await db.updateRoleTitle({
-    shortCode: Roles.FAP_REVIEWER,
+  await db.updateRole(Roles.FAP_REVIEWER, {
     title: 'PRP Reviewer',
   });
 
-  await db.updateRoleTitle({
-    shortCode: Roles.FAP_SECRETARY,
+  await db.updateRole(Roles.FAP_SECRETARY, {
     title: 'PRP Secretary',
   });
 }

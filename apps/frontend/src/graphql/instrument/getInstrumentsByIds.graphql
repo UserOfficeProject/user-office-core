@@ -1,7 +1,17 @@
 query getInstrumentsByIds($instrumentIds: [Int!]!) {
   instrumentsByIds(instrumentIds: $instrumentIds) {
     id
-    name
-    shortCode
+    instrumentContact {
+      id
+      firstname
+      lastname
+      preferredname
+    }
+    scientists {
+      id
+      firstname
+      lastname
+      preferredname
+    }
   }
 }

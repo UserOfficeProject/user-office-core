@@ -81,6 +81,8 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
           </Typography>
           <Participants
             title="Visitors"
+            setInvites={() => {}}
+            invites={[]}
             setUsers={(team: BasicUserDetails[]) => {
               setFieldValue('team', team);
             }}
