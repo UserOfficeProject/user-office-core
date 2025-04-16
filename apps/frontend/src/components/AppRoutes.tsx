@@ -161,6 +161,9 @@ const AppRoutes = () => {
   const isExperimentSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
+  const isFacilitiesEnabled = featureContext.featuresMap.get(
+    FeatureId.FACILITIES
+  )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
   return (
@@ -232,7 +235,7 @@ const AppRoutes = () => {
             }
           />
         )}
-        {(isUserOfficer || isFacilityMember) && (
+        {isFacilitiesEnabled && (isUserOfficer || isFacilityMember) && (
           <Route
             path="/Facility"
             element={
