@@ -34,29 +34,25 @@ const nodeTypes = {
   statusNode: StatusNode,
 };
 
-// Sample events - in a real application, these would come from your backend
-const sampleEvents = [
-  { id: 'submit', name: 'Submit', description: 'User submits the proposal' },
-  {
-    id: 'approve',
-    name: 'Approve',
-    description: 'Admin approves the proposal',
-  },
-  { id: 'reject', name: 'Reject', description: 'Admin rejects the proposal' },
-  { id: 'revise', name: 'Revise', description: 'User revises the proposal' },
-  { id: 'schedule', name: 'Schedule', description: 'Schedule the experiment' },
-  {
-    id: 'complete',
-    name: 'Complete',
-    description: 'Mark experiment as complete',
-  },
-];
-
 interface EdgeData {
   events: string[];
   sourceStatusName: string;
   targetStatusName: string;
 }
+
+const edgeFactory = (edgeData: Edge<EdgeData> | Connection) => {
+  return {
+    type: 'floating',
+    animated: true,
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 20,
+      height: 20,
+    },
+    style: { cursor: 'pointer' },
+    ...edgeData,
+  };
+};
 
 const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -69,7 +65,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
   // State for managing transition events dialog
   const [selectedEdge, setSelectedEdge] = useState<Edge<EdgeData> | null>(null);
-  const [workflowConnection, setWorkflowConnection] = useState<WorkflowConnection | null>(null);
+  const [workflowConnection, setWorkflowConnection] =
+    useState<WorkflowConnection | null>(null);
 
   const reducerMiddleware = () => {
     return (next: FunctionType) => (action: Event) => {
@@ -92,15 +89,11 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         eds.map((e) => {
           if (e.id === selectedEdge.id) {
             // Map the status changing events to their display names
-            const eventIds = workflowConnection.statusChangingEvents?.map(
-              (event) => event.statusChangingEvent
-            ) || [];
-            
-            // Get the event names from the sample events
-            const eventNames = eventIds
-              .map(eventId => sampleEvents.find(event => event.id === eventId)?.name || eventId)
-              .join(', ');
-              
+            const eventIds =
+              workflowConnection.statusChangingEvents?.map(
+                (event) => event.statusChangingEvent
+              ) || [];
+
             return {
               ...e,
               data: {
@@ -110,11 +103,12 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
               label: eventIds.length > 0 ? eventNames : undefined,
             };
           }
+
           return e;
         })
       );
     }
-  }, [workflowConnection, selectedEdge, setEdges, sampleEvents]);
+  }, [workflowConnection, selectedEdge, setEdges]);
 
   // Handle status deletion
   const handleStatusDelete = useCallback(
@@ -174,22 +168,20 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         if (index > 0) {
           const prevStatusId =
             group.connections[index - 1].status.id.toString();
-          newEdges.push({
+          const newEdge = edgeFactory({
             id: `e${prevStatusId}-${statusId}`,
             source: prevStatusId,
             target: statusId,
-            type: 'smoothstep',
-            animated: true,
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-            },
-            style: { cursor: 'pointer' },
             data: {
-              events: connection.statusChangingEvents?.map(event => event.statusChangingEvent) || [],
+              events:
+                connection.statusChangingEvents?.map(
+                  (event) => event.statusChangingEvent
+                ) || [],
               sourceStatusName: group.connections[index - 1].status.name,
               targetStatusName: connection.status.name,
             },
           });
+          newEdges.push(newEdge);
         }
 
         // If there's a parent group and this is the first status, connect from the last status of parent
@@ -202,22 +194,17 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
               parentGroup.connections[parentGroup.connections.length - 1]
                 .status;
             const parentLastStatusId = parentLastStatus.id.toString();
-            newEdges.push({
+            const newEdge = edgeFactory({
               id: `e${parentLastStatusId}-${statusId}`,
               source: parentLastStatusId,
               target: statusId,
-              type: 'smoothstep',
-              animated: true,
-              markerEnd: {
-                type: MarkerType.ArrowClosed,
-              },
-              style: { cursor: 'pointer' },
               data: {
                 events: connection.previousStatusEvents || [],
                 sourceStatusName: parentLastStatus.name,
                 targetStatusName: connection.status.name,
               },
             });
+            newEdges.push(newEdge);
           }
         }
 
@@ -261,20 +248,15 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       }
 
       // Add the connection to the graph
-      const newEdge = {
+      const newEdge = edgeFactory({
         ...connection,
         animated: true,
-        type: 'smoothstep',
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-        },
-        style: { cursor: 'pointer' },
         data: {
           events: [], // No events initially
           sourceStatusName: sourceStatus.name,
           targetStatusName: targetStatus.name,
         },
-      };
+      });
 
       setEdges((eds) => addEdge(newEdge, eds));
 
@@ -303,33 +285,40 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
   );
 
   // Handle edge click to open the transition event dialog
-  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-    setSelectedEdge(edge);
-    
-    // Create a workflowConnection object from the edge data that matches what StatusEventsAndActionsDialog expects
-    const sourceStatus = statuses.find(s => s.id.toString() === edge.source);
-    const targetStatus = statuses.find(s => s.id.toString() === edge.target);
-    
-    if (!sourceStatus || !targetStatus) return;
-    
-    // Create a WorkflowConnection-like object to pass to the dialog
-    const connection: WorkflowConnection = {
-      id: parseInt(edge.id.replace(/\D/g, '')), // Extract numeric part as ID
-      workflowId: state.id || 0,
-      sortOrder: 0,
-      parentId: null,
-      prevProposalStatusId: parseInt(edge.source),
-      proposalStatusId: parseInt(edge.target),
-      status: targetStatus,
-      statusChangingEvents: (edge.data?.events || []).map(eventId => ({
-        statusChangingEvent: eventId,
-        workflowConnectionId: 0
-      })),
-      statusActions: []
-    };
-    
-    setWorkflowConnection(connection);
-  }, [statuses, state.id]);
+  const onEdgeClick = useCallback(
+    (event: React.MouseEvent, edge: Edge) => {
+      setSelectedEdge(edge);
+
+      // Create a workflowConnection object from the edge data that matches what StatusEventsAndActionsDialog expects
+      const sourceStatus = statuses.find(
+        (s) => s.id.toString() === edge.source
+      );
+      const targetStatus = statuses.find(
+        (s) => s.id.toString() === edge.target
+      );
+
+      if (!sourceStatus || !targetStatus) return;
+
+      // Create a WorkflowConnection-like object to pass to the dialog
+      const connection: WorkflowConnection = {
+        id: parseInt(edge.id.replace(/\D/g, '')), // Extract numeric part as ID
+        workflowId: state.id || 0,
+        sortOrder: 0,
+        parentId: null,
+        prevProposalStatusId: parseInt(edge.source),
+        proposalStatusId: parseInt(edge.target),
+        status: targetStatus,
+        statusChangingEvents: (edge.data?.events || []).map((eventId) => ({
+          statusChangingEvent: eventId,
+          workflowConnectionId: 0,
+        })),
+        statusActions: [],
+      };
+
+      setWorkflowConnection(connection);
+    },
+    [statuses, state.id]
+  );
 
   // Handle status drag from picker to flow area
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -399,12 +388,13 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     },
     [
       reactFlowInstance,
-      dispatch,
       statuses,
       nodes,
       setNodes,
+      dispatch,
       state.id,
       enqueueSnackbar,
+      handleStatusDelete,
     ]
   );
 
@@ -426,7 +416,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
   const progressJsx = !dataLoaded ? <LinearProgress /> : null;
 
   return (
-    <StyledContainer>
+    <StyledContainer maxWidth={false}>
       <WorkflowMetadataEditor dispatch={dispatch} workflow={state} />
       <StyledPaper style={getContainerStyle()}>
         {progressJsx}
