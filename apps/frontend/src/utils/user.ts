@@ -12,7 +12,7 @@ export const getFullUserNameWithEmail = (
   > | null
 ): string =>
   user
-    ? `${user.preferredname}`
+    ? user.preferredname
       ? `${user.preferredname} ${user.lastname} ${
           user.email ? `(${user.email})` : ''
         }`
@@ -25,7 +25,7 @@ export const getFullUserNameWithInstitution = (
   user?: BasicUserData | null
 ): string =>
   user
-    ? `${user.preferredname}`
+    ? user.preferredname
       ? `${user.preferredname} ${user.lastname}; ${
           user.institution ? `${user.institution}` : ''
         }`
