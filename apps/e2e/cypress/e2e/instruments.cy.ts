@@ -769,7 +769,7 @@ context('Instrument tests', () => {
       );
     });
 
-    it('Officer should only be able to update area contact for proposals with technical reviews submitted', () => {
+    it('Officer should only be able to update area contact for proposals with un-submitted technical reviews', () => {
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
         scientistIds: [scientist2.id],
@@ -818,10 +818,11 @@ context('Instrument tests', () => {
 
       cy.get('[aria-label="Edit"]').eq(0).click();
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
-        cy.get('[data-cy=instrument-contact-surname]')
-          .type(scientist2.lastName)
-          .get('[data-cy=findUser]')
-          .click();
+        cy.get('[data-cy=instrument-contact-surname]').type(
+          scientist2.lastName
+        );
+        cy.get('[data-cy=findUser]').click();
+        cy.finishedLoading();
       }
 
       cy.get('[aria-label="Open"]').first().click();

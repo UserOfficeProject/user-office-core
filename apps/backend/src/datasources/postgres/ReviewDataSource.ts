@@ -404,26 +404,12 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     instrumentId: number
   ): Promise<boolean> {
     try {
-      const existingUser = await database('users')
-        .where('user_id', userId)
-        .first();
-
-      if (!existingUser) {
-        throw new GraphQLError(
-          `User with ID ${userId} not found. Cannot update instrument contact.`
-        );
-      }
-
-      const updatedReviews = await database('technical_review')
+      await database('technical_review')
         .where({ instrument_id: instrumentId })
         .andWhere({ submitted: false })
         .update({ technical_review_assignee_id: userId });
 
-      if (updatedReviews === 0) {
-        return false;
-      } else {
-        return true;
-      }
+      return true;
     } catch (error) {
       throw new GraphQLError('Failed to update instrument contact.');
     }
