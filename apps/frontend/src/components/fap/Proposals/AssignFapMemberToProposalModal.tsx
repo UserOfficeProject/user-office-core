@@ -9,7 +9,9 @@ import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, Maybe, Role } from 'generated/sdk';
 import { useFapMembersData } from 'hooks/fap/useFapMembersData';
 
-export type FapAssignedMember = BasicUserDetails & { role?: Maybe<Role> };
+export type FapAssignedMember = BasicUserDetails & {
+  role?: Maybe<Pick<Role, 'id' | 'shortCode' | 'title'>>;
+};
 
 type AssignFapMemberToProposalModalProps = {
   proposalPks: number[];

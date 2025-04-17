@@ -54,8 +54,11 @@ export interface AdminDataSource {
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;
   waitForDBUpgrade(): Promise<void>;
-  updateRoleTitle(rolesToUpdate: {
-    shortCode: string;
-    title: string;
-  }): Promise<void>;
+  updateRole(
+    role: string,
+    update: {
+      title?: string;
+      description?: string;
+    }
+  ): Promise<void>;
 }

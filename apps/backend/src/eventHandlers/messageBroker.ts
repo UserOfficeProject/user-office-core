@@ -14,6 +14,8 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { VisitDataSource } from '../datasources/VisitDataSource';
+import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
@@ -22,6 +24,8 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
+import { Visit } from '../models/Visit';
+import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
 export const EXCHANGE_NAME =
@@ -83,13 +87,6 @@ const createRabbitMQMessageBroker = async () => {
     );
   }
 };
-
-export function createPostToQueueHandler() {
-  // return the mapped implementation
-  return container.resolve<EventHandler<ApplicationEvent>>(
-    Tokens.PostToMessageQueue
-  );
-}
 
 export function createListenToQueueHandler() {
   // return the mapped implementation
@@ -407,6 +404,10 @@ export async function createListenToRabbitMQHandler() {
     Tokens.ExperimentDataSource
   );
 
+  const visitDataSource = container.resolve<VisitDataSource>(
+    Tokens.VisitDataSource
+  );
+
   const handleWorkflowEngineChange = async (
     eventType: Event,
     proposalPk: number | null
@@ -418,6 +419,33 @@ export async function createListenToRabbitMQHandler() {
     await markProposalsEventAsDoneAndCallWorkflowEngine(eventType, [
       proposalPk,
     ]);
+  };
+
+  const cancelVisit = async (visit: Visit) => {
+    const visitRegistrations = await visitDataSource.getRegistrations({
+      visitId: visit.id,
+    });
+
+    const eventBus = resolveApplicationEventBus();
+
+    for (const registration of visitRegistrations) {
+      const oldStatus = registration.status;
+      await visitDataSource.updateRegistration({
+        visitId: registration.visitId,
+        userId: registration.userId,
+        status: VisitRegistrationStatus.CANCELLED_BY_FACILITY,
+      });
+
+      if (oldStatus === VisitRegistrationStatus.APPROVED) {
+        await eventBus.publish({
+          type: Event.VISIT_REGISTRATION_CANCELLED,
+          visitregistration: registration,
+          key: 'visitregistration',
+          loggedInUserId: null,
+          isRejection: false,
+        });
+      }
+    }
   };
 
   rabbitMQ.listenOn(EVENT_SCHEDULING_QUEUE_NAME, async (type, message) => {
@@ -462,11 +490,20 @@ export async function createListenToRabbitMQHandler() {
               message,
             }
           );
-
           const scheduledEvents = message.scheduledevents as {
             id: number;
             proposalPk: number;
           }[];
+
+          for (const scheduledEvent of scheduledEvents) {
+            const visit = await visitDataSource.getVisitByExperimentPk(
+              scheduledEvent.id
+            );
+            if (visit) {
+              await cancelVisit(visit);
+            }
+          }
+
           scheduledEvents.forEach(async (scheduledEvent) => {
             await experimentDataSource.deleteByScheduledEventId(
               scheduledEvent.id
