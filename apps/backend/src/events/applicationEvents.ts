@@ -14,7 +14,7 @@ import { User, UserRole } from '../models/User';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
-interface GeneralEvent {
+export interface GeneralEvent {
   type: Event;
   key: string;
   loggedInUserId: number | null;
