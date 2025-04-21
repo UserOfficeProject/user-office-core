@@ -31,7 +31,8 @@ export class Call {
     public pdfTemplateId: number | undefined,
     public fapReviewTemplateId: number,
     public technicalReviewTemplateId: number,
-    public isActive: boolean
+    public isActive: boolean,
+    public experimentWorkflowId: number
   ) {}
 }
 

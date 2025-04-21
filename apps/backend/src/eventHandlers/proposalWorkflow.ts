@@ -11,7 +11,7 @@ import { searchObjectByKey } from '../utils/helperFunctions';
 import {
   WorkflowEngineProposalType,
   markProposalsEventAsDoneAndCallWorkflowEngine,
-} from '../workflowEngine';
+} from '../workflowEngine/proposal';
 
 enum ProposalInformationKeys {
   Proposal = 'proposal',

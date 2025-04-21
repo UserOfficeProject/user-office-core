@@ -26,7 +26,7 @@ import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
 import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
-import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
+import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine/proposal';
 
 export const EXCHANGE_NAME =
   process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';

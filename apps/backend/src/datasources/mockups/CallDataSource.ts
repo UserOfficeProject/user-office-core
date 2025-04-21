@@ -202,4 +202,8 @@ export class CallDataSourceMock implements CallDataSource {
   async getProposalWorkflowByCall(callId: number): Promise<Workflow | null> {
     return dummyWorkflow;
   }
+
+  async getExperimentWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return dummyWorkflow;
+  }
 }

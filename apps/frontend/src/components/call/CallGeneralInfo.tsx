@@ -63,6 +63,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const CallGeneralInfo = ({
   loadingProposalWorkflows,
   proposalWorkflows,
+  experimentWorkflows,
   templates,
   esiTemplates,
   pdfTemplates,
@@ -75,6 +76,8 @@ const CallGeneralInfo = ({
   reloadFapReviewTemplates,
   reloadTechnicalReviewTemplates,
   reloadProposalWorkflows,
+  reloadExperimentWorkflows,
+  loadingExperimentWorkflows,
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
@@ -82,6 +85,7 @@ const CallGeneralInfo = ({
   reloadFapReviewTemplates: () => void;
   reloadTechnicalReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
+  reloadExperimentWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
   pdfTemplates: GetTemplatesQuery['templates'];
@@ -89,7 +93,9 @@ const CallGeneralInfo = ({
   technicalReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: Workflow[];
+  experimentWorkflows: Workflow[];
   loadingProposalWorkflows: boolean;
+  loadingExperimentWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, timezone } = useFormattedDateTime();
@@ -135,6 +141,12 @@ const CallGeneralInfo = ({
     proposalWorkflows.map((proposalWorkflow) => ({
       text: proposalWorkflow.name,
       value: proposalWorkflow.id,
+    })) || [];
+
+  const experimentWorkflowOptions =
+    experimentWorkflows.map((experimentWorkflow) => ({
+      text: experimentWorkflow.name,
+      value: experimentWorkflow.id,
     })) || [];
 
   const allocationTimeUnitOptions = Object.values(AllocationTimeUnits).map(
@@ -464,6 +476,18 @@ const CallGeneralInfo = ({
         InputProps={{
           'data-cy': 'call-workflow',
           endAdornment: <RefreshListIcon onClick={reloadProposalWorkflows} />,
+        }}
+        required
+      />
+      <FormikUIAutocomplete
+        name="experimentWorkflowId"
+        label="Experiment workflow"
+        loading={loadingExperimentWorkflows}
+        noOptionsText="No experiment workflows"
+        items={experimentWorkflowOptions}
+        InputProps={{
+          'data-cy': 'call-workflow',
+          endAdornment: <RefreshListIcon onClick={reloadExperimentWorkflows} />,
         }}
         required
       />

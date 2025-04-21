@@ -62,6 +62,12 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
     refreshWorkflows: reloadProposalWorkflows,
   } = useWorkflowsData(WorkflowType.PROPOSAL);
 
+  const {
+    workflows: experimentWorkflows,
+    loadingWorkflows: loadingExperimentWorkflows,
+    refreshWorkflows: reloadExperimentWorkflows,
+  } = useWorkflowsData(WorkflowType.EXPERIMENT);
+
   const currentDayStart = DateTime.now()
     .setZone(timezone || undefined)
     .startOf('day');
@@ -140,6 +146,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
       <Wizard
         initialValues={initialValues}
         onSubmit={async (values) => {
+          console.log({ values });
           if (call) {
             const { updateCall } = await api({
               toastSuccessMessage: 'Call updated successfully!',
@@ -178,6 +185,9 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}
+            experimentWorkflows={experimentWorkflows}
+            loadingExperimentWorkflows={loadingExperimentWorkflows}
+            reloadExperimentWorkflows={reloadExperimentWorkflows}
           />
         </WizardStep>
         <WizardStep

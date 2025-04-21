@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
+import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
@@ -18,6 +19,7 @@ import {
 import { ExperimentDataSource } from '../ExperimentDataSource';
 import database from './database';
 import {
+  ExperimentSafetyEventsRecord,
   ExperimentHasSampleRecord,
   ExperimentRecord,
   ExperimentSafetyRecord,
@@ -276,7 +278,6 @@ export default class PostgresExperimentDataSource
   ): Promise<ExperimentSafety> {
     // Create an object for database update with proper column names
     const updateObject: Record<string, any> = {};
-
     // Map the update fields to database column names
     if (updateFields.safetyReviewQuestionaryId !== undefined) {
       updateObject.safety_review_questionary_id =
@@ -308,7 +309,6 @@ export default class PostgresExperimentDataSource
 
     // Always update the updated_at timestamp
     updateObject.updated_at = new Date();
-
     const result = await database('experiment_safety')
       .update(updateObject)
       .where('experiment_safety_pk', experimentSafetyPk)
@@ -316,6 +316,25 @@ export default class PostgresExperimentDataSource
 
     if (!result || result.length === 0) {
       throw new Error('Could not update experiment safety');
+    }
+
+    return createExperimentSafetyObject(result[0]);
+  }
+
+  async updateExperimentSafetyStatus(
+    experimentSafetyPk: number,
+    statusId: number
+  ): Promise<ExperimentSafety> {
+    console.log({ statusId });
+    const result = await database('experiment_safety')
+      .update({
+        status_id: statusId,
+      })
+      .where('experiment_safety_pk', experimentSafetyPk)
+      .returning('*');
+
+    if (!result || result.length === 0) {
+      throw new Error('Could not update experiment safety status');
     }
 
     return createExperimentSafetyObject(result[0]);
@@ -334,7 +353,6 @@ export default class PostgresExperimentDataSource
     if (!result) {
       return null;
     }
-    console.log('result', result);
 
     return createExperimentSafetyObject(result);
   }
@@ -342,14 +360,15 @@ export default class PostgresExperimentDataSource
   async createExperimentSafety(
     experimentPk: number,
     questionaryId: number,
-    creatorId: number
+    creatorId: number,
+    statusId: number
   ): Promise<ExperimentSafety | Rejection> {
     return database
       .insert({
         experiment_pk: experimentPk,
         esi_questionary_id: questionaryId,
         created_by: creatorId,
-        // status_id: '', //todo: add status
+        status_id: statusId,
         reviewed_by: creatorId, //todo: add reviewed_by
       })
       .into('experiment_safety')
@@ -563,5 +582,43 @@ export default class PostgresExperimentDataSource
       .then((rows: ExperimentRecord[]) =>
         rows.map((row) => createExperimentObject(row))
       );
+  }
+
+  async markEventAsDoneOnExperimentSafeties(
+    event: Event,
+    experimentPks: number[]
+  ): Promise<ExperimentSafetyEventsRecord[] | null> {
+    const dataToInsert = experimentPks.map((experimentPk) => ({
+      experiment_pk: experimentPk,
+      [event.toLowerCase()]: true,
+    }));
+    const result = await database.raw(
+      `? ON CONFLICT (experiment_pk)
+        DO UPDATE SET
+        ${event.toLowerCase()} = true
+        RETURNING *;`,
+      [database('experiment_safety_events').insert(dataToInsert)]
+    );
+
+    if (result.rows && result.rows.length) {
+      return result.rows;
+    } else {
+      return null;
+    }
+  }
+  async getExperimentSafetyEvents(
+    experimentPk: number
+  ): Promise<ExperimentSafetyEventsRecord | null> {
+    const result = await database
+      .select()
+      .from('experiment_events')
+      .where('experiment_pk', experimentPk)
+      .first();
+
+    if (!result) {
+      return null;
+    }
+
+    return result;
   }
 }

@@ -247,6 +247,7 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async update(args: UpdateCallInput): Promise<Call> {
+    console.log({ args });
     const call = await database.transaction(async (trx) => {
       try {
         const currentDate = new Date();
@@ -352,7 +353,6 @@ export default class PostgresCallDataSource implements CallDataSource {
           */
           return previousFlagValue;
         };
-
         const callUpdate = await database
           .update(
             {
@@ -373,6 +373,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               submission_message: args.submissionMessage,
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
+              experiment_workflow_id: args.experimentWorkflowId,
               call_ended: determineCallEndedFlag(
                 args.callEnded,
                 preUpdateCall.call_ended,
@@ -562,6 +563,22 @@ export default class PostgresCallDataSource implements CallDataSource {
       .then((proposalWorkflow: WorkflowRecord | null) =>
         proposalWorkflow
           ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
+  }
+
+  async getExperimentWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return database
+      .select()
+      .from('call as c')
+      .join('workflows as w', {
+        'w.workflow_id': 'c.experiment_workflow_id',
+      })
+      .where('c.call_id', callId)
+      .first()
+      .then((experimentWorkflow: WorkflowRecord | null) =>
+        experimentWorkflow
+          ? this.createProposalWorkflowObject(experimentWorkflow)
           : null
       );
   }

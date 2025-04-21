@@ -1,3 +1,4 @@
+import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentSafety,
@@ -14,6 +15,7 @@ import {
   ExperimentsArgs,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
+import { ExperimentSafetyEventsRecord } from '../postgres/records';
 
 const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
   return new Experiment(
@@ -93,6 +95,17 @@ export const ExperimentWithNonExistingProposalPk = dummyExperimentFactory({
   proposalPk: 9999,
 });
 
+const dummyExperimentSafetyEvents = {
+  experiment_pk: 1,
+  experiment_safety_management_decision_submitted_by_is: true,
+  experiment_safety_management_decision_submitted_by_esr: true,
+  experiment_esf_submitted: true,
+  experiment_esf_approved_by_is: true,
+  experiment_esf_rejected_by_is: true,
+  experiment_esf_approved_by_esr: true,
+  experiment_esf_rejected_by_esr: true,
+};
+
 export class ExperimentDataSourceMock implements ExperimentDataSource {
   private experiments: Experiment[] = [];
   private experimentsSafety: ExperimentSafety[] = [];
@@ -101,6 +114,17 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
 
   constructor() {
     this.init();
+  }
+  async markEventAsDoneOnExperimentSafeties(
+    event: Event,
+    experimentPks: number[]
+  ): Promise<ExperimentSafetyEventsRecord[] | null> {
+    return [dummyExperimentSafetyEvents];
+  }
+  async getExperimentSafetyEvents(
+    experimentPk: number
+  ): Promise<ExperimentSafetyEventsRecord | null> {
+    return dummyExperimentSafetyEvents;
   }
 
   init(): void {
@@ -377,5 +401,20 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
         resolve(newSafety);
       }
     });
+  }
+
+  async updateExperimentSafetyStatus(
+    experimentSafetyPk: number,
+    statusId: number
+  ): Promise<ExperimentSafety> {
+    const experimentSafety = await this.getExperimentSafety(experimentSafetyPk);
+
+    if (!experimentSafety) {
+      throw new Error('Experiment does not exist');
+    }
+    experimentSafety.statusId = statusId;
+
+    return experimentSafety;
+    }
   }
 }

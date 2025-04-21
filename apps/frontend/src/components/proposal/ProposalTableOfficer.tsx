@@ -149,7 +149,7 @@ let columns: Column<ProposalViewData>[] = [
     lookup: { true: 'Yes', false: 'No' },
   },
   {
-    title: 'Status',
+    title: 'Statusss',
     field: 'statusName',
   },
   {

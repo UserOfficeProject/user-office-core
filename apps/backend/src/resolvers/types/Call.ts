@@ -104,6 +104,9 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Boolean)
   public isActive: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public experimentWorkflowId: number;
 }
 
 @Resolver(() => Call)
@@ -121,9 +124,19 @@ export class CallInstrumentsResolver {
   }
 
   @FieldResolver(() => Workflow, { nullable: true })
-  async workflow(@Root() call: Call, @Ctx() context: ResolverContext) {
+  async proposalWorkflow(@Root() call: Call, @Ctx() context: ResolverContext) {
     return context.queries.workflow.dataSource.getWorkflow(
       call.proposalWorkflowId
+    );
+  }
+
+  @FieldResolver(() => Workflow, { nullable: true })
+  async experimentWorkflow(
+    @Root() call: Call,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.queries.workflow.dataSource.getWorkflow(
+      call.experimentWorkflowId
     );
   }
 

@@ -7,10 +7,11 @@ import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import ExperimentSafetyReview from 'components/experimentSafetyReview/ExperimentSafetyReview';
-import { GetExperimentsQuery, SettingsId } from 'generated/sdk';
+import { GetExperimentsQuery, SettingsId, WorkflowType } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useExperiments } from 'hooks/experiment/useExperiments';
+import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
 import { getFullUserName } from 'utils/user';
@@ -27,64 +28,67 @@ function ExperimentTable() {
   const experimentFromDate = searchParams.get('from');
   const experimentToDate = searchParams.get('to');
   const { experiments, loadingEvents, setArgs } = useExperiments({});
-
+  const {
+    statuses: experimentStatuses,
+    loadingStatuses: loadingExperimentStatuses,
+  } = useStatusesData(WorkflowType.EXPERIMENT);
   const { toFormattedDateTime, format } = useFormattedDateTime({
     shouldUseTimeZone: true,
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
 
-  const columns = (t: TFunction<'translation', undefined>) => [
-    {
-      title: 'Proposal ID',
-      field: 'proposal.proposalId',
-    },
-    {
-      title: 'Principal investigator',
-      render: (rowData: RowType) => getFullUserName(rowData.proposal.proposer),
-    },
-    {
-      title: 'Proposal',
-      field: 'proposal.title',
-    },
-    {
-      title: 'Experiment start',
-      field: 'startsAt',
-      render: (rowData: RowType) => toFormattedDateTime(rowData.startsAt),
-    },
-    {
-      title: 'Experiment end',
-      field: 'endsAt',
-      render: (rowData: RowType) => toFormattedDateTime(rowData.endsAt),
-    },
-    {
-      title: 'Experiment Safety',
-      render: (rowData: RowType) =>
-        rowData.experimentSafety ? (
-          <>
-            {rowData.experimentSafety?.statusId == 1 ? (
-              'Approved'
-            ) : (
-              <ButtonWithDialog
-                label="Review Experiment Safety"
-                title="Review Experiment Safety"
-              >
-                <ExperimentSafetyReview
-                  experimentSafetyPk={
-                    rowData.experimentSafety.experimentSafetyPk
-                  }
-                />
-              </ButtonWithDialog>
-            )}
-          </>
-        ) : (
-          'Awaiting Experiment Safety'
-        ),
-    },
-    {
-      title: t('instrument'),
-      field: 'instrument.name',
-    },
-  ];
+  const columns = React.useCallback(
+    (t: TFunction<'translation', undefined>) => [
+      {
+        title: 'Proposal ID',
+        field: 'proposal.proposalId',
+      },
+      {
+        title: 'Principal investigator',
+        render: (rowData: RowType) =>
+          getFullUserName(rowData.proposal.proposer),
+      },
+      {
+        title: 'Proposal',
+        field: 'proposal.title',
+      },
+      {
+        title: 'Experiment start',
+        field: 'startsAt',
+        render: (rowData: RowType) => toFormattedDateTime(rowData.startsAt),
+      },
+      {
+        title: 'Experiment end',
+        field: 'endsAt',
+        render: (rowData: RowType) => toFormattedDateTime(rowData.endsAt),
+      },
+      {
+        title: 'Experiment Safety Status',
+        field: 'experimentSafety.status.name',
+      },
+      {
+        title: 'Experiment Safety',
+        render: (rowData: RowType) =>
+          rowData.experimentSafety ? (
+            <ButtonWithDialog
+              label="Review Experiment Safety"
+              title="Review Experiment Safety"
+            >
+              <ExperimentSafetyReview
+                experimentSafetyPk={rowData.experimentSafety.experimentSafetyPk}
+              />
+            </ButtonWithDialog>
+          ) : (
+            'Awaiting Experiment Safety Form'
+          ),
+      },
+      {
+        title: t('instrument'),
+        field: 'instrument.name',
+      },
+    ],
+    [experimentStatuses.toString(), toFormattedDateTime]
+  );
 
   const { t } = useTranslation();
 
@@ -129,7 +133,7 @@ function ExperimentTable() {
       }
       columns={columns(t)}
       data={experiments}
-      isLoading={loadingEvents}
+      isLoading={loadingEvents || loadingExperimentStatuses}
       options={{
         search: false,
       }}

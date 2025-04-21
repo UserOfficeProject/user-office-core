@@ -74,6 +74,9 @@ export class UpdateCallInput {
   @Field(() => Int, { nullable: true })
   public proposalWorkflowId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public experimentWorkflowId?: number;
+
   @Field({ nullable: true })
   public callEnded?: boolean;
 
@@ -170,6 +173,9 @@ export class UpdateCallMutation {
     updateCallInput: UpdateCallInput,
     @Ctx() context: ResolverContext
   ) {
+    console.log('1-------------------------');
+    console.log({ updateCallInput });
+
     return context.mutations.call.update(context.user, updateCallInput);
   }
 

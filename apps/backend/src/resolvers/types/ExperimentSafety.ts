@@ -22,6 +22,7 @@ import { TemplateCategoryId } from '../../models/Template';
 import { ExperimentHasSample } from './ExperimentHasSample';
 import { Proposal } from './Proposal';
 import { Questionary } from './Questionary';
+import { Status } from './Status';
 
 @ObjectType()
 @Directive('@key(fields: "experimentSafetyPk")')
@@ -145,5 +146,28 @@ export class ExperimentSafetyResolver {
       context.user,
       experimentSafety.experimentPk
     );
+  }
+
+  @FieldResolver(() => Status, { nullable: true })
+  async status(
+    @Root() experimentSafety: ExperimentSafety,
+    @Ctx() context: ResolverContext
+  ): Promise<Status | null> {
+    if (experimentSafety.statusId === null) {
+      return null;
+    }
+
+    const status = await context.queries.status.getStatus(
+      context.user,
+      experimentSafety.statusId
+    );
+
+    if (status === null) {
+      throw new GraphQLError(
+        'Unexpected error. Experiment safety status does not exist'
+      );
+    }
+
+    return status;
   }
 }

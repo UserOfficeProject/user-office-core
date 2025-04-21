@@ -339,6 +339,7 @@ export interface CallRecord {
   readonly fap_review_template_id: number;
   readonly technical_review_template_id: number;
   readonly is_active: boolean;
+  readonly experiment_workflow_id: number;
 }
 
 export interface PageTextRecord {
@@ -1018,7 +1019,8 @@ export const createCallObject = (call: CallRecord) => {
     call.pdf_template_id,
     call.fap_review_template_id,
     call.technical_review_template_id,
-    call.is_active
+    call.is_active,
+    call.experiment_workflow_id
   );
 };
 
@@ -1422,4 +1424,15 @@ export interface ExperimentHasSampleRecord {
   readonly sample_esi_questionary_id: number;
   readonly created_at: Date;
   readonly updated_at: Date;
+}
+
+export interface ExperimentSafetyEventsRecord {
+  readonly experiment_pk: number;
+  readonly experiment_safety_management_decision_submitted_by_is: boolean;
+  readonly experiment_safety_management_decision_submitted_by_esr: boolean;
+  readonly experiment_esf_submitted: boolean;
+  readonly experiment_esf_approved_by_is: boolean;
+  readonly experiment_esf_rejected_by_is: boolean;
+  readonly experiment_esf_approved_by_esr: boolean;
+  readonly experiment_esf_rejected_by_esr: boolean;
 }

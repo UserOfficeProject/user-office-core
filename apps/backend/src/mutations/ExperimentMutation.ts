@@ -8,8 +8,10 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
+import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { Authorized } from '../decorators';
+import { Authorized, EventBus } from '../decorators';
+import { Event } from '../events/event.enum';
 import {
   ExperimentHasSample,
   ExperimentStatus,
@@ -20,6 +22,7 @@ import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
+import { WorkflowType } from '../models/Workflow';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
 import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
 import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
@@ -50,6 +53,8 @@ export default class ExperimentMutations {
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
+    @inject(Tokens.StatusDataSource)
+    private statusDataSource: StatusDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization
@@ -114,6 +119,15 @@ export default class ExperimentMutations {
         'Can not create Experiment Safety, because system has no Experiment Safety template configured'
       );
     }
+
+    const experimentSafetyWorkflowDefaultStatus =
+      await this.statusDataSource.getDefaultStatus(WorkflowType.EXPERIMENT);
+    if (!experimentSafetyWorkflowDefaultStatus) {
+      return rejection(
+        'Can not create Experiment Safety, because system has no default status for Experiment Safety'
+      );
+    }
+
     const newEsiQuestionary = await this.questionaryDataSource.create(
       user!.id,
       call.esiTemplateId
@@ -127,10 +141,12 @@ export default class ExperimentMutations {
     return await this.dataSource.createExperimentSafety(
       experimentPk,
       newEsiQuestionary.questionaryId,
-      user!.id
+      user!.id,
+      experimentSafetyWorkflowDefaultStatus.id
     );
   }
 
+  @EventBus(Event.EXPERIMENT_ESF_SUBMITTED)
   @Authorized()
   async submitExperimentSafety(
     user: UserWithRole | null,
@@ -196,6 +212,7 @@ export default class ExperimentMutations {
     });
   }
 
+  @EventBus(Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS)
   @Authorized([Roles.INSTRUMENT_SCIENTIST])
   async submitInstrumentScientistExperimentSafetyReview(
     user: UserWithRole | null,
@@ -230,6 +247,7 @@ export default class ExperimentMutations {
     });
   }
 
+  @EventBus(Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR)
   @Authorized([Roles.EXPERIMENT_SAFETY_REVIEWER, Roles.USER_OFFICER])
   async submitExperimentSafetyReviewerExperimentSafetyReview(
     user: UserWithRole | null,
@@ -242,7 +260,6 @@ export default class ExperimentMutations {
     if (!user) {
       return rejection('User not found');
     }
-
     const { experimentSafetyPk, decision, comment } = args;
 
     const experimentSafety =

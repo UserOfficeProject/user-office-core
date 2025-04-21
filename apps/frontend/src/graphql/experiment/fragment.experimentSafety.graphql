@@ -13,4 +13,7 @@ fragment experimentSafety on ExperimentSafety {
   instrumentScientistComment
   experimentSafetyReviewerDecision
   experimentSafetyReviewerComment
+  status {
+    ...status
+  }
 }

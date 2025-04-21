@@ -1,3 +1,4 @@
+import { Event } from '../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
@@ -11,6 +12,7 @@ import {
   ExperimentsArgs,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
+import { ExperimentSafetyEventsRecord } from './postgres/records';
 
 export interface ExperimentDataSource {
   create(
@@ -49,10 +51,15 @@ export interface ExperimentDataSource {
       reviewedBy: number;
     }>
   ): Promise<ExperimentSafety>;
+  updateExperimentSafetyStatus(
+    experimentSafetyPk: number,
+    statusId: number
+  ): Promise<ExperimentSafety>;
   createExperimentSafety(
     experimentPk: number,
     questionaryId: number,
-    creatorId: number
+    creatorId: number,
+    statusId: number
   ): Promise<ExperimentSafety | Rejection>;
   getExperimentSafetyByESIQuestionaryId(
     esiQuestionaryId: number
@@ -78,4 +85,11 @@ export interface ExperimentDataSource {
   ): Promise<ExperimentHasSample>;
   getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]>;
   getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]>;
+  markEventAsDoneOnExperimentSafeties(
+    event: Event,
+    experimentPks: number[]
+  ): Promise<ExperimentSafetyEventsRecord[] | null>;
+  getExperimentSafetyEvents(
+    experimentPk: number
+  ): Promise<ExperimentSafetyEventsRecord | null>;
 }

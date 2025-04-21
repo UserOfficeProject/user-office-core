@@ -98,6 +98,8 @@ export default class CallMutations {
     args: UpdateCallInput
   ): Promise<Call | Rejection> {
     try {
+      console.log('2-------------------------');
+      console.log({ args });
       const updatedCall = await this.dataSource.update(args);
 
       return updatedCall;

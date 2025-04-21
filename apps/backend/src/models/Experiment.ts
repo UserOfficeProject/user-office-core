@@ -70,6 +70,6 @@ export class ExperimentSafety {
     public instrumentScientistDecision: InstrumentScientistDecisionEnum | null,
     public instrumentScientistComment: string | null,
     public experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null,
-    public experimentSafetyReviewerDecisionComment: string | null
+    public experimentSafetyReviewerComment: string | null
   ) {}
 }
