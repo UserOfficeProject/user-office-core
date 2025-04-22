@@ -78,7 +78,7 @@ const FapAssignedReviewersTable = ({
   ]);
   const [rankReviewer, setRankReviewer] = useState<null | {
     reviewer: number | null;
-    proposal: number;
+    fapReviewId: number;
     rank: number | null;
   }>(null);
   const { toFormattedDateTime } = useFormattedDateTime({
@@ -184,7 +184,7 @@ const FapAssignedReviewersTable = ({
           onClose={() => setRankReviewer(null)}
           onSubmit={async (value) => {
             await api().saveReviewerRank({
-              proposalPk: rankReviewer?.proposal as number,
+              fapReviewId: rankReviewer?.fapReviewId as number,
               reviewerId: rankReviewer?.reviewer as number,
               rank: value,
             });
@@ -192,7 +192,7 @@ const FapAssignedReviewersTable = ({
               fapAssignmentsWithIdAndFormattedDate.map((fa) => ({
                 ...fa,
                 rank:
-                  fa.proposalPk === rankReviewer?.proposal &&
+                  fa.review?.id === rankReviewer?.fapReviewId &&
                   fa.fapMemberUserId === rankReviewer.reviewer
                     ? value
                     : fa.rank,
@@ -201,7 +201,7 @@ const FapAssignedReviewersTable = ({
             setFapAssignmentsWithIdAndFormattedDate(
               fapAssignmentsWithUpdatedRank
             );
-            updateView(rankReviewer?.proposal as number);
+            updateView(rankReviewer?.fapReviewId as number);
           }}
           currentRank={rankReviewer?.rank}
           totalReviewers={fapProposal.assignments?.length ?? 0}
@@ -264,7 +264,7 @@ const FapAssignedReviewersTable = ({
             icon: () => <FormatListNumberedIcon data-cy="rank-reviewer" />,
             onClick: () => {
               setRankReviewer({
-                proposal: rowData.proposalPk,
+                fapReviewId: rowData.review?.id as number,
                 reviewer: rowData.fapMemberUserId,
                 rank: rowData.rank,
               });
