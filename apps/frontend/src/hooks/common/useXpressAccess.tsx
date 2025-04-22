@@ -15,7 +15,7 @@ export const useXpressAccess = (allowedRoles: UserRole[]) => {
   //Check if feature flag is enabled
   const featureContext = useContext(FeatureContext);
   const isXpressRouteEnabled = featureContext.featuresMap.get(
-    FeatureId.STFC_XPRESS_MANAGEMENT
+    FeatureId.TECHNIQUE_PROPOSALS
   )?.isEnabled;
 
   return isUserAllowed && isXpressRouteEnabled;

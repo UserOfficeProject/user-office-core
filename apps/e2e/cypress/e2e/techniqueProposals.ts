@@ -565,9 +565,7 @@ context('Technique Proposal tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
-          !featureFlags
-            .getEnabledFeatures()
-            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
         ) {
           this.skip();
         }
@@ -1122,9 +1120,7 @@ context('Technique Proposal tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
-          !featureFlags
-            .getEnabledFeatures()
-            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
         ) {
           this.skip();
         }
@@ -1350,9 +1346,7 @@ context('Technique Proposal tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
-          !featureFlags
-            .getEnabledFeatures()
-            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
         ) {
           this.skip();
         }
