@@ -1,0 +1,7 @@
+query getInstrumentsByIdsMinimal($instrumentIds: [Int!]!) {
+  instrumentsByIds(instrumentIds: $instrumentIds) {
+    id
+    name
+    shortCode
+  }
+}
