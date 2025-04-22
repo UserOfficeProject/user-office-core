@@ -5,9 +5,9 @@ import { TemplateGroupId } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import PdfTemplatesTable from './PdfTemplatesTable';
+import PdfTemplatesTable from './pdf/proposal/PdfTemplatesTable';
 
-export default function PdfTemplatesPage() {
+export default function ExperimentPdfTemplatesPage() {
   const api = useDataApi();
 
   return (
@@ -17,10 +17,10 @@ export default function PdfTemplatesPage() {
           <PdfTemplatesTable
             dataProvider={() =>
               api()
-                .getPdfTemplates({
+                .getExperimentPdfTemplates({
                   filter: {
                     isArchived: false,
-                    group: TemplateGroupId.PDF_TEMPLATE,
+                    group: TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
                   },
                 })
                 .then((data) => data.templates || [])
@@ -29,10 +29,10 @@ export default function PdfTemplatesPage() {
           <PdfTemplatesTable
             dataProvider={() =>
               api()
-                .getPdfTemplates({
+                .getExperimentPdfTemplates({
                   filter: {
                     isArchived: true,
-                    group: TemplateGroupId.PDF_TEMPLATE,
+                    group: TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
                   },
                 })
                 .then((data) => data.templates || [])

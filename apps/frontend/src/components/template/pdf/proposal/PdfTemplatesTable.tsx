@@ -10,7 +10,7 @@ import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { tableIcons } from 'utils/materialIcons';
 
-import TemplatesTable, { TemplateRowDataType } from './TemplatesTable';
+import TemplatesTable, { TemplateRowDataType } from '../../TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
   const { calls } = useCallsData({ pdfTemplateIds: [props.filterTemplateId] });
@@ -117,7 +117,7 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
     <>
       <TemplatesTable
         columns={columns}
-        templateGroup={TemplateGroupId.PDF_TEMPLATE}
+        templateGroup={TemplateGroupId.PROPOSAL_PDF_TEMPLATE}
         isRowRemovable={(rowData) => {
           const pdfTemplateRowData = rowData as PdfTemplateRowDataType;
 
