@@ -1,4 +1,4 @@
-query getPdfTemplates($filter: TemplatesFilter) {
+query getProposalPdfTemplates($filter: TemplatesFilter) {
   templates(filter: $filter) {
     templateId
     name
