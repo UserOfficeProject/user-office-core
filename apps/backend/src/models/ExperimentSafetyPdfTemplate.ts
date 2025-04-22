@@ -1,6 +1,6 @@
-export class PdfTemplate {
+export class ExperimentSafetyPdfTemplate {
   constructor(
-    public pdfTemplateId: number,
+    public experimentSafetyPdfTemplateId: number,
     public templateId: number,
     public templateData: string,
     public templateHeader: string,

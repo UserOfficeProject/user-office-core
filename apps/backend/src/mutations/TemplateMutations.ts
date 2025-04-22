@@ -16,7 +16,7 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { PdfTemplateDataSource } from '../datasources/PdfTemplateDataSource';
+import { ProposalPdfTemplateDataSource } from '../datasources/ProposalPdfTemplateDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
@@ -48,8 +48,8 @@ import { TemplateExport } from './../models/Template';
 export default class TemplateMutations {
   constructor(
     @inject(Tokens.TemplateDataSource) private dataSource: TemplateDataSource,
-    @inject(Tokens.PdfTemplateDataSource)
-    private pdfTemplateDataSource: PdfTemplateDataSource
+    @inject(Tokens.ProposalPdfTemplateDataSource)
+    private proposalpdfTemplateDataSource: ProposalPdfTemplateDataSource
   ) {}
 
   @ValidateArgs(createTemplateValidationSchema)
@@ -142,7 +142,7 @@ export default class TemplateMutations {
         );
         break;
       case TemplateGroupId.PROPOSAL_PDF_TEMPLATE:
-        await this.pdfTemplateDataSource.createPdfTemplate({
+        await this.proposalpdfTemplateDataSource.createPdfTemplate({
           templateId: newTemplate.templateId,
           templateData: '',
           templateHeader: '',
@@ -232,7 +232,7 @@ export default class TemplateMutations {
       .then((result) => result);
 
     if (result && result.groupId === TemplateGroupId.PROPOSAL_PDF_TEMPLATE) {
-      await this.pdfTemplateDataSource.clonePdfTemplate(
+      await this.proposalpdfTemplateDataSource.clonePdfTemplate(
         templateId,
         result.templateId
       );

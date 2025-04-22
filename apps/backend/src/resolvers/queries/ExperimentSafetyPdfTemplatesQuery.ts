@@ -10,12 +10,12 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { PdfTemplate } from '../types/PdfTemplate';
+import { ExperimentSafetyPdfTemplate } from '../types/ExperimentSafetyPdfTemplate';
 
 @InputType()
-class PdfTemplatesFilter {
+class ExperimentSafetyPdfTemplatesFilter {
   @Field(() => [Int], { nullable: true })
-  public pdfTemplateIds?: number[];
+  public experimentSafetyPdfTemplateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
   public templateIds?: number[];
@@ -40,22 +40,23 @@ class PdfTemplatesFilter {
 }
 
 @ArgsType()
-export class PdfTemplatesArgs {
-  @Field(() => PdfTemplatesFilter, { nullable: true })
-  public filter?: PdfTemplatesFilter;
+export class ExperimentSafetyPdfTemplatesArgs {
+  @Field(() => ExperimentSafetyPdfTemplatesFilter, { nullable: true })
+  public filter?: ExperimentSafetyPdfTemplatesFilter;
 }
 
 @Resolver()
-export class PdfTemplatesQuery {
-  @Query(() => [PdfTemplate], { nullable: true })
-  async pdfTemplates(
+export class ExperimentSafetyPdfTemplatesQuery {
+  @Query(() => [ExperimentSafetyPdfTemplate], { nullable: true })
+  async experimentSafetyPdfTemplates(
     @Ctx() context: ResolverContext,
-    @Args() args: PdfTemplatesArgs
+    @Args() args: ExperimentSafetyPdfTemplatesArgs
   ) {
-    const response = await context.queries.pdfTemplate.getPdfTemplates(
-      context.user,
-      args
-    );
+    const response =
+      await context.queries.experimentSafetyPdfTemplate.getPdfTemplates(
+        context.user,
+        args
+      );
 
     return response;
   }

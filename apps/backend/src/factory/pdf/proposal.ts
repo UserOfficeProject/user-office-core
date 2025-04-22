@@ -7,8 +7,8 @@ import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
-import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
+import { ProposalPdfTemplateDataSource } from '../../datasources/ProposalPdfTemplateDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
@@ -30,7 +30,7 @@ import {
 import { DataType } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { InstrumentPickerConfig } from '../../resolvers/types/FieldConfig';
-import { PdfTemplate } from '../../resolvers/types/PdfTemplate';
+import { ProposalPdfTemplate } from '../../resolvers/types/ProposalPdfTemplate';
 import { getFileAttachments, Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,
@@ -55,7 +55,7 @@ export type ProposalPDFData = {
       'genericTemplate' | 'genericTemplateQuestionaryFields'
     >
   >;
-  pdfTemplate: PdfTemplate | null;
+  pdfTemplate: ProposalPdfTemplate | null;
 };
 
 const getTechnicalReviewHumanReadableStatus = (
@@ -263,15 +263,18 @@ export const collectProposalPDFData = async (
    * Because naming things is hard, the PDF template ID is the templateId for
    * for the PdfTemplate and not the pdfTemplateId.
    */
-  const pdfTemplateId = call?.proposalPdfTemplateId;
-  let pdfTemplate: PdfTemplate | null = null;
-  if (pdfTemplateId !== undefined) {
+  const proposalPdfTemplateId = call?.proposalPdfTemplateId;
+  let pdfTemplate: ProposalPdfTemplate | null = null;
+  if (proposalPdfTemplateId !== undefined) {
     pdfTemplate = (
-      await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
-        filter: {
-          templateIds: [pdfTemplateId],
-        },
-      })
+      await baseContext.queries.proposalPdfTemplate.getProposalPdfTemplates(
+        user,
+        {
+          filter: {
+            templateIds: [proposalPdfTemplateId],
+          },
+        }
+      )
     )[0];
   }
 
@@ -512,12 +515,13 @@ export const collectProposalPDFDataTokenAccess = async (
   );
   const call = await callDataSource.getCall(proposal.callId);
 
-  const pdfTemplateDataSource = container.resolve<PdfTemplateDataSource>(
-    Tokens.PdfTemplateDataSource
-  );
+  const pdfTemplateDataSource =
+    container.resolve<ProposalPdfTemplateDataSource>(
+      Tokens.ProposalPdfTemplateDataSource
+    );
 
   const pdfTemplateId = call?.proposalPdfTemplateId;
-  let pdfTemplate: PdfTemplate | null = null;
+  let pdfTemplate: ProposalPdfTemplate | null = null;
   if (pdfTemplateId !== undefined) {
     pdfTemplate = (
       await pdfTemplateDataSource.getPdfTemplates({

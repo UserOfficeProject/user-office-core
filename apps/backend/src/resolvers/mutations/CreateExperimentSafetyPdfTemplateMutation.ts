@@ -9,10 +9,10 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
-import { PdfTemplate } from '../types/PdfTemplate';
+import { ExperimentSafetyPdfTemplate } from '../types/ExperimentSafetyPdfTemplate';
 
 @ArgsType()
-export class CreatePdfTemplateInput {
+export class CreateExperimentSafetyPdfTemplateInput {
   @Field(() => Int)
   templateId: number;
 
@@ -33,12 +33,15 @@ export class CreatePdfTemplateInput {
 }
 
 @Resolver()
-export class CreatePdfTemplateMutation {
-  @Mutation(() => PdfTemplate)
-  createPdfTemplate(
-    @Args() input: CreatePdfTemplateInput,
+export class CreateExperimentSafetyPdfTemplateMutation {
+  @Mutation(() => ExperimentSafetyPdfTemplate)
+  createExperimentSafetyPdfTemplate(
+    @Args() input: CreateExperimentSafetyPdfTemplateInput,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.pdfTemplate.createPdfTemplate(context.user, input);
+    return context.mutations.experimentSafetyPdfTemplate.createExperimentSafetyPdfTemplate(
+      context.user,
+      input
+    );
   }
 }

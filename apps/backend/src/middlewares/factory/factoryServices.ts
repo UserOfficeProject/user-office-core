@@ -1,7 +1,7 @@
 import { container, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
+import { ProposalPdfTemplateDataSource } from '../../datasources/ProposalPdfTemplateDataSource';
 import { FactoryServicesAuthorized } from '../../decorators';
 import { MetaBase } from '../../factory/DownloadService';
 import {
@@ -14,7 +14,7 @@ import {
   ProposalAttachmentData,
 } from '../../factory/zip/attachment';
 import { UserWithRole } from '../../models/User';
-import { PdfTemplate } from '../../resolvers/types/PdfTemplate';
+import { ProposalPdfTemplate } from '../../resolvers/types/ProposalPdfTemplate';
 
 export type DownloadOptions = {
   filter?: string;
@@ -35,7 +35,7 @@ export interface DownloadTypeServices {
   getPdfTemplate(
     agent: UserWithRole,
     pdfTemplateId: number
-  ): Promise<PdfTemplate | null>;
+  ): Promise<ProposalPdfTemplate | null>;
 }
 @injectable()
 export default class FactoryServices implements DownloadTypeServices {
@@ -97,11 +97,13 @@ export default class FactoryServices implements DownloadTypeServices {
   async getPdfTemplate(
     agent: UserWithRole,
     pdfTemplateId: number
-  ): Promise<PdfTemplate | null> {
+  ): Promise<ProposalPdfTemplate | null> {
     let data = null;
     if (agent) {
       data = await container
-        .resolve<PdfTemplateDataSource>(Tokens.PdfTemplateDataSource)
+        .resolve<ProposalPdfTemplateDataSource>(
+          Tokens.ProposalPdfTemplateDataSource
+        )
         .getPdfTemplate(pdfTemplateId);
     }
 

@@ -3,10 +3,11 @@ import { container } from 'tsyringe';
 
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
+import { CallDataSource } from '../../datasources/CallDataSource';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
+import { ExperimentSafetyPdfTemplateDataSource } from '../../datasources/ExperimentSafetyPdfTemplateDataSource';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
-import { PdfTemplateDataSource } from '../../datasources/PdfTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
@@ -17,8 +18,9 @@ import { Instrument } from '../../models/Instrument';
 import { Proposal } from '../../models/Proposal';
 import { QuestionaryStep } from '../../models/Questionary';
 import { Sample } from '../../models/Sample';
+import { TemplateGroupId } from '../../models/Template';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
-import { PdfTemplate } from '../../resolvers/types/PdfTemplate';
+import { ExperimentSafetyPdfTemplate } from '../../resolvers/types/ExperimentSafetyPdfTemplate';
 import { Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,
@@ -41,7 +43,7 @@ export type ExperimentPDFData = {
       'genericTemplate' | 'genericTemplateQuestionaryFields'
     >
   >;
-  pdfTemplate: PdfTemplate | null;
+  pdfTemplate: ExperimentSafetyPdfTemplate | null;
 };
 
 const getSampleQuestionarySteps = async (
@@ -200,14 +202,14 @@ export const collectExperimentPDFData = async (
 const getPdfTemplate = async (
   user: UserWithRole,
   experiment: Experiment
-): Promise<PdfTemplate | null> => {
+): Promise<ExperimentSafetyPdfTemplate | null> => {
   try {
     // First try to get an experiment-specific PDF template
     const experimentTemplates = await baseContext.queries.template.getTemplates(
       user,
       {
         filter: {
-          group: 'EXPERIMENT_SAFETY_PDF_TEMPLATE',
+          group: TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
           isArchived: false,
         },
       }
@@ -218,11 +220,14 @@ const getPdfTemplate = async (
       const experimentPdfTemplateId = experimentTemplates[0].templateId;
 
       const pdfTemplates =
-        await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
-          filter: {
-            templateIds: [experimentPdfTemplateId],
-          },
-        });
+        await baseContext.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
+          user,
+          {
+            filter: {
+              templateIds: [experimentPdfTemplateId],
+            },
+          }
+        );
 
       if (pdfTemplates && pdfTemplates.length > 0) {
         return pdfTemplates[0];
@@ -242,11 +247,14 @@ const getPdfTemplate = async (
       // First, try to use the dedicated experiment safety PDF template
       if (call?.experimentSafetyPdfTemplateId) {
         const pdfTemplates =
-          await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
-            filter: {
-              templateIds: [call.experimentSafetyPdfTemplateId],
-            },
-          });
+          await baseContext.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
+            user,
+            {
+              filter: {
+                templateIds: [call.experimentSafetyPdfTemplateId],
+              },
+            }
+          );
 
         if (pdfTemplates && pdfTemplates.length > 0) {
           return pdfTemplates[0];
@@ -254,13 +262,16 @@ const getPdfTemplate = async (
       }
 
       // If no experiment safety template is available, fall back to the proposal PDF template
-      if (call?.proposalPdfTemplateId) {
+      if (call?.experimentSafetyPdfTemplateId) {
         const pdfTemplates =
-          await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
-            filter: {
-              templateIds: [call.proposalPdfTemplateId],
-            },
-          });
+          await baseContext.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
+            user,
+            {
+              filter: {
+                templateIds: [call.experimentSafetyPdfTemplateId],
+              },
+            }
+          );
 
         if (pdfTemplates && pdfTemplates.length > 0) {
           return pdfTemplates[0];
@@ -315,24 +326,27 @@ export const collectExperimentPDFDataTokenAccess = async (
   );
 
   // Get PDF template
-  const pdfTemplateDataSource = container.resolve<PdfTemplateDataSource>(
-    Tokens.PdfTemplateDataSource
-  );
+  const experimentSafetyPdfTemplateDataSource =
+    container.resolve<ExperimentSafetyPdfTemplateDataSource>(
+      Tokens.ExperimentSafetyPdfTemplateDataSource
+    );
 
   // Try to get experiment-specific template
-  const templateDataSource = container.resolve<PdfTemplateDataSource>(
-    Tokens.PdfTemplateDataSource
-  );
+  const templateDataSource =
+    container.resolve<ExperimentSafetyPdfTemplateDataSource>(
+      Tokens.ExperimentSafetyPdfTemplateDataSource
+    );
 
-  let pdfTemplate: PdfTemplate | null = null;
+  let pdfTemplate: ExperimentSafetyPdfTemplate | null = null;
 
   try {
     // Get experiment templates (simplified from the getPdfTemplate helper function)
-    const experimentTemplates = await pdfTemplateDataSource.getPdfTemplates({
-      filter: {
-        pdfTemplateData: 'EXPERIMENT_PDF_TEMPLATE', // This is a simplification, would need proper filtering
-      },
-    });
+    const experimentTemplates =
+      await experimentSafetyPdfTemplateDataSource.getPdfTemplates({
+        filter: {
+          pdfTemplateData: 'EXPERIMENT_PDF_TEMPLATE', // This is a simplification, would need proper filtering
+        },
+      });
 
     if (experimentTemplates.length > 0) {
       pdfTemplate = experimentTemplates[0];
@@ -345,11 +359,12 @@ export const collectExperimentPDFDataTokenAccess = async (
 
       // First try experiment safety PDF template
       if (call?.experimentSafetyPdfTemplateId) {
-        const templates = await pdfTemplateDataSource.getPdfTemplates({
-          filter: {
-            templateIds: [call.experimentSafetyPdfTemplateId],
-          },
-        });
+        const templates =
+          await experimentSafetyPdfTemplateDataSource.getPdfTemplates({
+            filter: {
+              templateIds: [call.experimentSafetyPdfTemplateId],
+            },
+          });
 
         if (templates.length > 0) {
           pdfTemplate = templates[0];
@@ -357,11 +372,12 @@ export const collectExperimentPDFDataTokenAccess = async (
       }
       // Then fall back to proposal PDF template
       else if (call?.proposalPdfTemplateId) {
-        const templates = await pdfTemplateDataSource.getPdfTemplates({
-          filter: {
-            templateIds: [call.proposalPdfTemplateId],
-          },
-        });
+        const templates =
+          await experimentSafetyPdfTemplateDataSource.getPdfTemplates({
+            filter: {
+              templateIds: [call.proposalPdfTemplateId],
+            },
+          });
 
         if (templates.length > 0) {
           pdfTemplate = templates[0];

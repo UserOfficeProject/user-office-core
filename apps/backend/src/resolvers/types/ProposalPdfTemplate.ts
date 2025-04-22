@@ -1,11 +1,11 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { PdfTemplate as PdfTemplateOrigin } from '../../models/PdfTemplate';
+import { ProposalPdfTemplate as ProposalPdfTemplateOrigin } from '../../models/ProposalPdfTemplate';
 
 @ObjectType()
-export class PdfTemplate implements Partial<PdfTemplateOrigin> {
+export class ProposalPdfTemplate implements Partial<ProposalPdfTemplateOrigin> {
   @Field(() => Int)
-  public pdfTemplateId: number;
+  public proposalPdfTemplateId: number;
 
   @Field(() => Int)
   public templateId: number;

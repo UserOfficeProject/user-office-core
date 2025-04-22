@@ -1,4 +1,7 @@
-import { PdfTemplateRecord } from 'knex/types/tables';
+import {
+  ProposalPdfTemplateRecord,
+  ExperimentSafetyPdfTemplateRecord,
+} from 'knex/types/tables';
 
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
@@ -15,6 +18,7 @@ import {
   ExperimentStatus,
   InstrumentScientistDecisionEnum,
 } from '../../models/Experiment';
+import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
@@ -22,10 +26,10 @@ import { GenericTemplate } from '../../models/GenericTemplate';
 import { Institution } from '../../models/Institution';
 import { Instrument } from '../../models/Instrument';
 import { Invite } from '../../models/Invite';
-import { PdfTemplate } from '../../models/PdfTemplate';
 import { PredefinedMessage } from '../../models/PredefinedMessage';
 import { Proposal, ProposalEndStatus } from '../../models/Proposal';
 import { ProposalInternalComment } from '../../models/ProposalInternalComment';
+import { ProposalPdfTemplate } from '../../models/ProposalPdfTemplate';
 import { ProposalView } from '../../models/ProposalView';
 import { Quantity } from '../../models/Quantity';
 import { AnswerBasic, Questionary } from '../../models/Questionary';
@@ -76,8 +80,20 @@ import { FeedbackStatus } from './../../models/Feedback';
 
 // Adds types to datasources: https://knexjs.org/guide/#typescript
 declare module 'knex/types/tables' {
-  export interface PdfTemplateRecord {
-    readonly pdf_template_id: number;
+  export interface ProposalPdfTemplateRecord {
+    readonly proposal_pdf_template_id: number;
+    readonly template_id: number;
+    readonly template_data: string;
+    readonly template_header: string;
+    readonly template_footer: string;
+    readonly template_sample_declaration: string;
+    readonly dummy_data: string;
+    readonly creator_id: number;
+    readonly created_at: Date;
+  }
+
+  export interface ExperimentSafetyPdfTemplateRecord {
+    readonly experiment_safety_pdf_template_id: number;
     readonly template_id: number;
     readonly template_data: string;
     readonly template_header: string;
@@ -89,7 +105,8 @@ declare module 'knex/types/tables' {
   }
 
   interface Tables {
-    pdf_templates: PdfTemplateRecord;
+    proposal_pdf_templates: ProposalPdfTemplateRecord;
+    experiment_safety_pdf_templates: ExperimentSafetyPdfTemplateRecord;
     techniques: TechniqueRecord;
     technique_has_instruments: TechniqueHasInstrumentsRecord;
   }
@@ -1246,9 +1263,27 @@ export const createPredefinedMessageObject = (
 export const createQuantityObject = (quantity: QuantityRecord) =>
   new Quantity(quantity.quantity_id);
 
-export const createPdfTemplateObject = (pdfTemplate: PdfTemplateRecord) => {
-  return new PdfTemplate(
-    pdfTemplate.pdf_template_id,
+export const createProposalPdfTemplateObject = (
+  pdfTemplate: ProposalPdfTemplateRecord
+) => {
+  return new ProposalPdfTemplate(
+    pdfTemplate.proposal_pdf_template_id,
+    pdfTemplate.template_id,
+    pdfTemplate.template_data,
+    pdfTemplate.template_header,
+    pdfTemplate.template_footer,
+    pdfTemplate.template_sample_declaration,
+    pdfTemplate.dummy_data,
+    pdfTemplate.creator_id,
+    pdfTemplate.created_at
+  );
+};
+
+export const createExperimentSafetyPdfTemplateObject = (
+  pdfTemplate: ExperimentSafetyPdfTemplateRecord
+) => {
+  return new ExperimentSafetyPdfTemplate(
+    pdfTemplate.experiment_safety_pdf_template_id,
     pdfTemplate.template_id,
     pdfTemplate.template_data,
     pdfTemplate.template_header,

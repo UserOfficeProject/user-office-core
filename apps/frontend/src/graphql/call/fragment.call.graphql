@@ -19,7 +19,8 @@ fragment call on Call {
   experimentWorkflowId
   templateId
   esiTemplateId
-  pdfTemplateId
+  proposalPdfTemplateId
+  experimentSafetyPdfTemplateId
   fapReviewTemplateId
   technicalReviewTemplateId
   allocationTimeUnit

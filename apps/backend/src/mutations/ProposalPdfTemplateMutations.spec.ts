@@ -1,52 +1,56 @@
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
+import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { PdfTemplate } from '../models/PdfTemplate';
+import { ProposalPdfTemplate } from '../models/ProposalPdfTemplate';
 import { isRejection } from '../models/Rejection';
 import { TemplateGroupId } from '../models/Template';
 import { Template } from '../models/Template';
-import PdfTemplateMutations from './PdfTemplateMutations';
+import ProposalPdfTemplateMutations from './ProposalPdfTemplateMutations';
 
-const pdfTemplateMutations = container.resolve(PdfTemplateMutations);
+const proposalPdfTemplateMutations = container.resolve(
+  ProposalPdfTemplateMutations
+);
 
 const mockGetTemplate = jest.spyOn(
   TemplateDataSourceMock.prototype,
   'getTemplate'
 );
 
-const mockCreatePdfTemplate = jest.spyOn(
-  PdfTemplateDataSourceMock.prototype,
+const mockCreateProposalPdfTemplate = jest.spyOn(
+  ProposalPdfTemplateDataSourceMock.prototype,
   'createPdfTemplate'
 );
 
-const mockUpdatePdfTemplate = jest.spyOn(
-  PdfTemplateDataSourceMock.prototype,
+const mockUpdateProposalPdfTemplate = jest.spyOn(
+  ProposalPdfTemplateDataSourceMock.prototype,
   'updatePdfTemplate'
 );
 
-const mockDeletePdfTemplate = jest.spyOn(
-  PdfTemplateDataSourceMock.prototype,
+const mockDeleteProposalPdfTemplate = jest.spyOn(
+  ProposalPdfTemplateDataSourceMock.prototype,
   'delete'
 );
 
 beforeEach(() => {
   container
-    .resolve<PdfTemplateDataSourceMock>(Tokens.PdfTemplateDataSource)
+    .resolve<ProposalPdfTemplateDataSourceMock>(
+      Tokens.ProposalPdfTemplateDataSource
+    )
     .init();
   container.resolve<TemplateDataSourceMock>(Tokens.TemplateDataSource).init();
 
   mockGetTemplate.mockClear();
-  mockCreatePdfTemplate.mockClear();
-  mockDeletePdfTemplate.mockClear();
+  mockCreateProposalPdfTemplate.mockClear();
+  mockDeleteProposalPdfTemplate.mockClear();
 });
 
-test('A userofficer can create a PDF template', async () => {
+test('A userofficer can create a Proposal PDF template', async () => {
   const templateId = 1;
   const templateData = '...';
   const templateHeader = '...';
@@ -66,7 +70,7 @@ test('A userofficer can create a PDF template', async () => {
     )
   );
 
-  let template = await pdfTemplateMutations.createPdfTemplate(
+  let template = await proposalPdfTemplateMutations.createProposalPdfTemplate(
     dummyUserOfficerWithRole,
     {
       templateId,
@@ -78,8 +82,8 @@ test('A userofficer can create a PDF template', async () => {
     }
   );
 
-  expect(template instanceof PdfTemplate).toBe(true);
-  template = template as PdfTemplate;
+  expect(template instanceof ProposalPdfTemplate).toBe(true);
+  template = template as ProposalPdfTemplate;
   expect(template.templateId).toEqual(templateId);
   expect(template.templateData).toEqual(templateData);
   expect(template.creatorId).toEqual(dummyUserOfficerWithRole.id);
@@ -106,7 +110,7 @@ test('A user cannot create a PDF template', async () => {
     )
   );
 
-  const template = await pdfTemplateMutations.createPdfTemplate(
+  const template = await proposalPdfTemplateMutations.createProposalPdfTemplate(
     dummyUserWithRole,
     {
       templateId,
@@ -118,7 +122,7 @@ test('A user cannot create a PDF template', async () => {
     }
   );
 
-  expect(template instanceof PdfTemplate).toBe(false);
+  expect(template instanceof ProposalPdfTemplate).toBe(false);
 });
 
 test('Template must be correct type for PDF template to be created', async () => {
@@ -135,7 +139,7 @@ test('Template must be correct type for PDF template to be created', async () =>
     )
   );
 
-  const template = await pdfTemplateMutations.createPdfTemplate(
+  const template = await proposalPdfTemplateMutations.createProposalPdfTemplate(
     dummyUserOfficerWithRole,
     {
       templateId,
@@ -170,9 +174,9 @@ test('Create PDF template database error gives friendly error', async () => {
     )
   );
 
-  mockCreatePdfTemplate.mockRejectedValue(new Error('Database error'));
+  mockCreateProposalPdfTemplate.mockRejectedValue(new Error('Database error'));
 
-  const template = await pdfTemplateMutations.createPdfTemplate(
+  const template = await proposalPdfTemplateMutations.createProposalPdfTemplate(
     dummyUserOfficerWithRole,
     {
       templateId,
@@ -195,10 +199,10 @@ test('A userofficer can update a PDF template', async () => {
   const newTemplateSampleDeclaration = 'new sample declaration';
   const newDummyData = 'new dummy data';
 
-  let template = await pdfTemplateMutations.updatePdfTemplate(
+  let template = await proposalPdfTemplateMutations.updateProposalPdfTemplate(
     dummyUserOfficerWithRole,
     {
-      pdfTemplateId: existingPdfTemplateId,
+      proposalPdfTemplateId: existingPdfTemplateId,
       templateData: newTemplateData,
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
@@ -208,8 +212,8 @@ test('A userofficer can update a PDF template', async () => {
   );
 
   expect(isRejection(template)).toBe(false);
-  template = template as PdfTemplate;
-  expect(template.pdfTemplateId).toEqual(existingPdfTemplateId);
+  template = template as ProposalPdfTemplate;
+  expect(template.proposalPdfTemplateId).toEqual(existingPdfTemplateId);
   expect(template.templateData).toEqual(newTemplateData);
   expect(template.templateHeader).toEqual(newTemplateHeader);
   expect(template.templateFooter).toEqual(newTemplateFooter);
@@ -227,10 +231,10 @@ test('A user cannot update a PDF template', async () => {
   const newTemplateSampleDeclaration = 'new sample declaration';
   const newDummyData = 'new dummy data';
 
-  const template = await pdfTemplateMutations.updatePdfTemplate(
+  const template = await proposalPdfTemplateMutations.updateProposalPdfTemplate(
     dummyUserWithRole,
     {
-      pdfTemplateId: existingPdfTemplateId,
+      proposalPdfTemplateId: existingPdfTemplateId,
       templateData: newTemplateData,
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
@@ -250,12 +254,12 @@ test('Update PDF template database error gives friendly error', async () => {
   const newTemplateSampleDeclaration = 'new sample declaration';
   const newDummyData = 'new dummy data';
 
-  mockUpdatePdfTemplate.mockRejectedValue(new Error('Database error'));
+  mockUpdateProposalPdfTemplate.mockRejectedValue(new Error('Database error'));
 
-  const template = await pdfTemplateMutations.updatePdfTemplate(
+  const template = await proposalPdfTemplateMutations.updateProposalPdfTemplate(
     dummyUserOfficerWithRole,
     {
-      pdfTemplateId: existingPdfTemplateId,
+      proposalPdfTemplateId: existingPdfTemplateId,
       templateData: newTemplateData,
       templateHeader: newTemplateHeader,
       templateFooter: newTemplateFooter,
@@ -270,34 +274,36 @@ test('Update PDF template database error gives friendly error', async () => {
 test('A userofficer can delete a PDF template', async () => {
   const pdfTemplateId = 1;
 
-  const template = await pdfTemplateMutations.deletePdfTemplate(
+  const template = await proposalPdfTemplateMutations.deleteProposalPdfTemplate(
     dummyUserOfficerWithRole,
     pdfTemplateId
   );
 
-  expect(template instanceof PdfTemplate).toBe(true);
-  expect((template as PdfTemplate).pdfTemplateId).toEqual(pdfTemplateId);
+  expect(template instanceof ProposalPdfTemplate).toBe(true);
+  expect((template as ProposalPdfTemplate).proposalPdfTemplateId).toEqual(
+    pdfTemplateId
+  );
 });
 
 test('A user cannot delete a PDF template', async () => {
-  const pdfTemplateId = 1;
+  const proposalPdfTemplateId = 1;
 
-  const template = await pdfTemplateMutations.deletePdfTemplate(
+  const template = await proposalPdfTemplateMutations.deleteProposalPdfTemplate(
     dummyUserWithRole,
-    pdfTemplateId
+    proposalPdfTemplateId
   );
 
   expect(isRejection(template)).toBeTruthy();
 });
 
 test('Delete PDF template database error gives friendly error', async () => {
-  const pdfTemplateId = 1;
+  const proposalPdfTemplateId = 1;
 
-  mockDeletePdfTemplate.mockRejectedValue(new Error('Database error'));
+  mockDeleteProposalPdfTemplate.mockRejectedValue(new Error('Database error'));
 
-  const template = await pdfTemplateMutations.deletePdfTemplate(
+  const template = await proposalPdfTemplateMutations.deleteProposalPdfTemplate(
     dummyUserOfficerWithRole,
-    pdfTemplateId
+    proposalPdfTemplateId
   );
 
   expect(isRejection(template)).toBeTruthy();

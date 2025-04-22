@@ -1,20 +1,20 @@
-mutation updatePdfTemplate(
-  $pdfTemplateId: Int!
+mutation updateExperimentSafetyPdfTemplate(
+  $experimentSafetyPdfTemplateId: Int!
   $templateData: String
   $templateHeader: String
   $templateFooter: String
   $templateSampleDeclaration: String
   $dummyData: String
 ) {
-  updatePdfTemplate(
-    pdfTemplateId: $pdfTemplateId
+  updateExperimentSafetyPdfTemplate(
+    experimentSafetyPdfTemplateId: $experimentSafetyPdfTemplateId
     templateData: $templateData
     templateHeader: $templateHeader
     templateFooter: $templateFooter
     templateSampleDeclaration: $templateSampleDeclaration
     dummyData: $dummyData
   ) {
-    pdfTemplateId
+    experimentSafetyPdfTemplateId
     templateId
     templateData
     templateHeader

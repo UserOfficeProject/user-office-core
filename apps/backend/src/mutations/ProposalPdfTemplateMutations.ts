@@ -1,29 +1,29 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { PdfTemplateDataSource } from '../datasources/PdfTemplateDataSource';
+import { ProposalPdfTemplateDataSource } from '../datasources/ProposalPdfTemplateDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized } from '../decorators';
 import { rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { CreatePdfTemplateInput } from '../resolvers/mutations/CreatePdfTemplateMutation';
-import { UpdatePdfTemplateArgs } from '../resolvers/mutations/UpdatePdfTemplateMutation';
+import { CreateProposalPdfTemplateInput } from '../resolvers/mutations/CreateProposalPdfTemplateMutation';
+import { UpdateProposalPdfTemplateArgs } from '../resolvers/mutations/UpdateProposalPdfTemplateMutation';
 
 @injectable()
-export default class PdfTemplateMutations {
+export default class ProposalPdfTemplateMutations {
   constructor(
-    @inject(Tokens.PdfTemplateDataSource)
-    private pdfTemplateDataSource: PdfTemplateDataSource,
+    @inject(Tokens.ProposalPdfTemplateDataSource)
+    private proposalPdfTemplateDataSource: ProposalPdfTemplateDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
-  async createPdfTemplate(
+  async createProposalPdfTemplate(
     agent: UserWithRole | null,
-    args: CreatePdfTemplateInput
+    args: CreateProposalPdfTemplateInput
   ) {
     const template = await this.templateDataSource.getTemplate(args.templateId);
     if (
@@ -37,7 +37,7 @@ export default class PdfTemplateMutations {
     }
 
     try {
-      return await this.pdfTemplateDataSource.createPdfTemplate({
+      return await this.proposalPdfTemplateDataSource.createPdfTemplate({
         templateId: template.templateId,
         templateData: args.templateData,
         templateHeader: args.templateHeader,
@@ -52,21 +52,24 @@ export default class PdfTemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async updatePdfTemplate(
+  async updateProposalPdfTemplate(
     agent: UserWithRole | null,
-    args: UpdatePdfTemplateArgs
+    args: UpdateProposalPdfTemplateArgs
   ) {
     try {
-      return await this.pdfTemplateDataSource.updatePdfTemplate(args);
+      return await this.proposalPdfTemplateDataSource.updatePdfTemplate(args);
     } catch (error) {
       return rejection('Can not update PDF template', { agent, args }, error);
     }
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async deletePdfTemplate(agent: UserWithRole | null, pdfTemplateId: number) {
+  async deleteProposalPdfTemplate(
+    agent: UserWithRole | null,
+    pdfTemplateId: number
+  ) {
     try {
-      return await this.pdfTemplateDataSource.delete(pdfTemplateId);
+      return await this.proposalPdfTemplateDataSource.delete(pdfTemplateId);
     } catch (error) {
       return rejection(
         'Can not delete PDF template because an error occurred',
