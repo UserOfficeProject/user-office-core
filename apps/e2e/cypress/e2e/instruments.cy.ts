@@ -847,6 +847,8 @@ context('Instrument tests', () => {
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
 
+      cy.finishedLoading();
+
       cy.contains('Proposals');
 
       cy.contains(proposal1.title)
@@ -875,10 +877,12 @@ context('Instrument tests', () => {
           .type(scientist2.lastName)
           .get('[data-cy=findUser]')
           .click();
+        cy.finishedLoading();
       }
 
       cy.get('[aria-label="Open"]').first().click();
       cy.contains(updatedContact).click();
+      cy.finishedLoading();
       cy.contains('Update all un-assigned technical reviews').should(
         'be.visible'
       );
@@ -935,6 +939,8 @@ context('Instrument tests', () => {
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
 
+      cy.finishedLoading();
+
       cy.contains('Proposals');
 
       cy.contains(proposal1.title)
@@ -963,6 +969,7 @@ context('Instrument tests', () => {
 
       cy.get('[aria-label="Open"]').first().click();
       cy.contains(updatedContact).click();
+      cy.finishedLoading();
       cy.contains('Update all un-assigned technical reviews').should(
         'be.visible'
       );
