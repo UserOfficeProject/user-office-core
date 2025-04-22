@@ -207,7 +207,7 @@ const getPdfTemplate = async (
       user,
       {
         filter: {
-          group: 'EXPERIMENT_PDF_TEMPLATE',
+          group: 'EXPERIMENT_SAFETY_PDF_TEMPLATE',
           isArchived: false,
         },
       }
@@ -239,11 +239,26 @@ const getPdfTemplate = async (
     if (proposal) {
       const call = await baseContext.queries.call.get(user, proposal.callId);
 
-      if (call?.pdfTemplateId) {
+      // First, try to use the dedicated experiment safety PDF template
+      if (call?.experimentSafetyPdfTemplateId) {
         const pdfTemplates =
           await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
             filter: {
-              templateIds: [call.pdfTemplateId],
+              templateIds: [call.experimentSafetyPdfTemplateId],
+            },
+          });
+
+        if (pdfTemplates && pdfTemplates.length > 0) {
+          return pdfTemplates[0];
+        }
+      }
+
+      // If no experiment safety template is available, fall back to the proposal PDF template
+      if (call?.proposalPdfTemplateId) {
+        const pdfTemplates =
+          await baseContext.queries.pdfTemplate.getPdfTemplates(user, {
+            filter: {
+              templateIds: [call.proposalPdfTemplateId],
             },
           });
 
@@ -328,10 +343,23 @@ export const collectExperimentPDFDataTokenAccess = async (
       );
       const call = await callDataSource.getCall(proposal.callId);
 
-      if (call?.pdfTemplateId) {
+      // First try experiment safety PDF template
+      if (call?.experimentSafetyPdfTemplateId) {
         const templates = await pdfTemplateDataSource.getPdfTemplates({
           filter: {
-            templateIds: [call.pdfTemplateId],
+            templateIds: [call.experimentSafetyPdfTemplateId],
+          },
+        });
+
+        if (templates.length > 0) {
+          pdfTemplate = templates[0];
+        }
+      }
+      // Then fall back to proposal PDF template
+      else if (call?.proposalPdfTemplateId) {
+        const templates = await pdfTemplateDataSource.getPdfTemplates({
+          filter: {
+            templateIds: [call.proposalPdfTemplateId],
           },
         });
 

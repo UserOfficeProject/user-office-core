@@ -13,7 +13,9 @@ import { tableIcons } from 'utils/materialIcons';
 import TemplatesTable, { TemplateRowDataType } from '../../TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
-  const { calls } = useCallsData({ pdfTemplateIds: [props.filterTemplateId] });
+  const { calls } = useCallsData({
+    proposalPdfTemplateIds: [props.filterTemplateId],
+  });
   const { toFormattedDateTime, timezone } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -65,11 +67,12 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
     </StyledDialog>
   );
 }
-export type PdfTemplateRowDataType = TemplateRowDataType & {
-  pdfCallCount?: number;
+
+type ProposalPdfTemplateRowDataType = TemplateRowDataType & {
+  proposalPdfCallCount?: number;
 };
 
-type PdfTemplatesTableProps = {
+type ProposalPdfTemplatesTableProps = {
   dataProvider: () => Promise<
     Pick<
       Template,
@@ -78,31 +81,31 @@ type PdfTemplatesTableProps = {
       | 'description'
       | 'isArchived'
       | 'questionaryCount'
-      | 'pdfCallCount'
+      | 'proposalPdfCallCount'
     >[]
   >;
 };
 
-function PdfTemplatesTable(props: PdfTemplatesTableProps) {
+function ProposalPdfTemplatesTable(props: ProposalPdfTemplatesTableProps) {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number>();
 
   // NOTE: Wrapping NumberOfCalls with useCallback to avoid the console warning(https://github.com/material-table-core/core/issues/286)
   const NumberOfCalls = useCallback(
-    (rowData: PdfTemplateRowDataType) => (
+    (rowData: ProposalPdfTemplateRowDataType) => (
       <Link
         onClick={() => {
           setSelectedTemplateId(rowData.templateId);
         }}
         style={{ cursor: 'pointer' }}
       >
-        {rowData.pdfCallCount || 0}
+        {rowData.proposalPdfCallCount || 0}
       </Link>
     ),
     []
   );
 
   // NOTE: Keeping the columns inside the component just because it needs NumberOfCalls which is wrapped with callback and uses setSelectedTemplateId.
-  const columns: Column<PdfTemplateRowDataType>[] = [
+  const columns: Column<ProposalPdfTemplateRowDataType>[] = [
     { title: 'Name', field: 'name' },
     { title: 'Description', field: 'description' },
     {
@@ -119,9 +122,9 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
         columns={columns}
         templateGroup={TemplateGroupId.PROPOSAL_PDF_TEMPLATE}
         isRowRemovable={(rowData) => {
-          const pdfTemplateRowData = rowData as PdfTemplateRowDataType;
+          const pdfTemplateRowData = rowData as ProposalPdfTemplateRowDataType;
 
-          return pdfTemplateRowData.pdfCallCount === 0;
+          return pdfTemplateRowData.proposalPdfCallCount === 0;
         }}
         dataProvider={props.dataProvider}
       />
@@ -133,4 +136,4 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
   );
 }
 
-export default PdfTemplatesTable;
+export default ProposalPdfTemplatesTable;

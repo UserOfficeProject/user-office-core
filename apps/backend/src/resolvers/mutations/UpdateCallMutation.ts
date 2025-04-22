@@ -96,7 +96,10 @@ export class UpdateCallInput {
   public esiTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
-  public pdfTemplateId?: number;
+  public proposalPdfTemplateId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public experimentSafetyPdfTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;
@@ -173,9 +176,6 @@ export class UpdateCallMutation {
     updateCallInput: UpdateCallInput,
     @Ctx() context: ResolverContext
   ) {
-    console.log('1-------------------------');
-    console.log({ updateCallInput });
-
     return context.mutations.call.update(context.user, updateCallInput);
   }
 

@@ -76,8 +76,18 @@ const GenericTemplatesPage = lazy(
 const ImportTemplatePage = lazy(
   () => import('./template/import/ImportTemplatePage')
 );
-const PdfTemplateEditor = lazy(() => import('./template/PdfTemplateEditor'));
-const PdfTemplatesPage = lazy(() => import('./template/PdfTemplatesPage'));
+const ProposalPdfTemplateEditor = lazy(
+  () => import('./template/pdf/proposal/PdfTemplateEditor')
+);
+const ProposalPdfTemplatesPage = lazy(
+  () => import('./template/pdf/proposal/PdfTemplatesPage')
+);
+const ExperimentSafetyPdfTemplateEditor = lazy(
+  () => import('./template/pdf/experimentSafety/PdfTemplateEditor')
+);
+const ExperimentSafetyPdfTemplatesPage = lazy(
+  () => import('./template/pdf/experimentSafety/PdfTemplatesPage')
+);
 const ExperimentSafetyReviewTemplatesPage = lazy(
   () => import('./template/ExperimentSafetyReviewTemplatesPage')
 );
@@ -326,18 +336,39 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/PdfTemplateEditor/:templateId"
+          path="/PdfTemplateEditor/Proposal/:templateId"
           element={
             <TitledRoute
-              title="PDF Template Editor"
-              element={<PdfTemplateEditor />}
+              title="Proposal PDF Template Editor"
+              element={<ProposalPdfTemplateEditor />}
             />
           }
         />
         <Route
-          path="/PdfTemplates"
+          path="/PdfTemplates/Proposal"
           element={
-            <TitledRoute title="PDF Templates" element={<PdfTemplatesPage />} />
+            <TitledRoute
+              title="Proposal PDF Templates"
+              element={<ProposalPdfTemplatesPage />}
+            />
+          }
+        />
+        <Route
+          path="/PdfTemplateEditor/ExperimentSafety/:templateId"
+          element={
+            <TitledRoute
+              title="Experiment Safety PDF Template Editor"
+              element={<ExperimentSafetyPdfTemplateEditor />}
+            />
+          }
+        />
+        <Route
+          path="/PdfTemplates/ExperimentSafety"
+          element={
+            <TitledRoute
+              title="Experiment Safety PDF Templates"
+              element={<ExperimentSafetyPdfTemplatesPage />}
+            />
           }
         />
         <Route

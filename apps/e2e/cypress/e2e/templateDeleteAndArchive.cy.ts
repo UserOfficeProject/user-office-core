@@ -164,7 +164,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be deleted if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       });
 
       shouldDeleteTemplate(templateName, '/PDFTemplates');
@@ -173,12 +173,12 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can not be deleted if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          pdfTemplateId: result.createTemplate.templateId,
+          proposalPdfTemplateId: result.createTemplate.templateId,
         });
 
         shouldNotDeleteTemplate(templateName, '/PDFTemplates');
@@ -188,7 +188,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('Archived PDF Template can be deleted if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       });
 
       shouldDeleteArchivedTemplate(templateName, '/PDFTemplates');
@@ -197,12 +197,12 @@ context('Template Delete, Archive, Unarchive', () => {
     it('Archived PDF Template can not be deleted if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          pdfTemplateId: result.createTemplate.templateId,
+          proposalPdfTemplateId: result.createTemplate.templateId,
         });
 
         shouldNotDeleteArchivedTemplate(templateName, '/PDFTemplates');
@@ -212,12 +212,12 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be archived if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          pdfTemplateId: result.createTemplate.templateId,
+          proposalPdfTemplateId: result.createTemplate.templateId,
         });
       });
 
@@ -227,7 +227,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be archived if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       });
 
       shouldArchiveTemplate(templateName, '/PDFTemplates');
@@ -236,12 +236,12 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be unarchived if archived and associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          pdfTemplateId: result.createTemplate.templateId,
+          proposalPdfTemplateId: result.createTemplate.templateId,
         });
       });
 
@@ -251,7 +251,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be unarchived if archived and not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
       });
 
       shouldUnarchiveArchivedTemplate(templateName, '/PDFTemplates');

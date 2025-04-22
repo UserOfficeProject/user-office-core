@@ -40,8 +40,21 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
   const { templates: proposalEsiTemplates, refreshTemplates: reloadEsi } =
     useActiveTemplates(TemplateGroupId.PROPOSAL_ESI, call?.esiTemplateId);
 
-  const { templates: pdfTemplates, refreshTemplates: reloadPdfTemplates } =
-    useActiveTemplates(TemplateGroupId.PDF_TEMPLATE, call?.pdfTemplateId);
+  const {
+    templates: proposalPdfTemplates,
+    refreshTemplates: reloadProposalPdfTemplates,
+  } = useActiveTemplates(
+    TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+    call?.pdfTemplateId
+  );
+
+  const {
+    templates: experimentSafetyPdfTemplates,
+    refreshTemplates: reloadExperimentSafetyPdfTemplates,
+  } = useActiveTemplates(
+    TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
+    call?.pdfTemplateId
+  );
 
   const {
     templates: fapReviewTemplates,
@@ -173,13 +186,17 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
           <CallGeneralInfo
             reloadTemplates={reloadProposal}
             reloadEsi={reloadEsi}
-            reloadPdfTemplates={reloadPdfTemplates}
+            reloadProposalPdfTemplates={reloadProposalPdfTemplates}
+            reloadExperimentSafetyPdfTemplates={
+              reloadExperimentSafetyPdfTemplates
+            }
             reloadFapReviewTemplates={reloadFapReviewTemplates}
             reloadTechnicalReviewTemplates={reloadTechnicalReviewTemplates}
             reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
-            pdfTemplates={pdfTemplates}
+            proposalPdfTemplates={proposalPdfTemplates}
+            experimentSafetyPdfTemplates={experimentSafetyPdfTemplates}
             fapReviewTemplates={fapReviewTemplates}
             technicalReviewTemplates={technicalReviewTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}

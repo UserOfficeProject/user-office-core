@@ -5,6 +5,6 @@ query getProposalPdfTemplates($filter: TemplatesFilter) {
     description
     isArchived
     questionaryCount
-    pdfCallCount
+    proposalPdfCallCount
   }
 }

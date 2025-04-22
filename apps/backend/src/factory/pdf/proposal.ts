@@ -263,7 +263,7 @@ export const collectProposalPDFData = async (
    * Because naming things is hard, the PDF template ID is the templateId for
    * for the PdfTemplate and not the pdfTemplateId.
    */
-  const pdfTemplateId = call?.pdfTemplateId;
+  const pdfTemplateId = call?.proposalPdfTemplateId;
   let pdfTemplate: PdfTemplate | null = null;
   if (pdfTemplateId !== undefined) {
     pdfTemplate = (
@@ -516,7 +516,7 @@ export const collectProposalPDFDataTokenAccess = async (
     Tokens.PdfTemplateDataSource
   );
 
-  const pdfTemplateId = call?.pdfTemplateId;
+  const pdfTemplateId = call?.proposalPdfTemplateId;
   let pdfTemplate: PdfTemplate | null = null;
   if (pdfTemplateId !== undefined) {
     pdfTemplate = (

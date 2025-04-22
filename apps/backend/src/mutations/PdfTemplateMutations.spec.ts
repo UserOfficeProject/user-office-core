@@ -56,7 +56,13 @@ test('A userofficer can create a PDF template', async () => {
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
-      new Template(templateId, TemplateGroupId.PDF_TEMPLATE, '', '', false)
+      new Template(
+        templateId,
+        TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        '',
+        '',
+        false
+      )
     )
   );
 
@@ -90,7 +96,13 @@ test('A user cannot create a PDF template', async () => {
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
-      new Template(templateId, TemplateGroupId.PDF_TEMPLATE, '', '', false)
+      new Template(
+        templateId,
+        TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        '',
+        '',
+        false
+      )
     )
   );
 
@@ -148,7 +160,13 @@ test('Create PDF template database error gives friendly error', async () => {
 
   mockGetTemplate.mockImplementation((templateId: number) =>
     Promise.resolve(
-      new Template(templateId, TemplateGroupId.PDF_TEMPLATE, '', '', false)
+      new Template(
+        templateId,
+        TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        '',
+        '',
+        false
+      )
     )
   );
 

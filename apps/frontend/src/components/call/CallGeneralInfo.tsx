@@ -66,13 +66,15 @@ const CallGeneralInfo = ({
   experimentWorkflows,
   templates,
   esiTemplates,
-  pdfTemplates,
+  proposalPdfTemplates,
+  experimentSafetyPdfTemplates,
   fapReviewTemplates,
   technicalReviewTemplates,
   loadingTemplates,
   reloadTemplates,
   reloadEsi,
-  reloadPdfTemplates,
+  reloadProposalPdfTemplates,
+  reloadExperimentSafetyPdfTemplates,
   reloadFapReviewTemplates,
   reloadTechnicalReviewTemplates,
   reloadProposalWorkflows,
@@ -81,14 +83,16 @@ const CallGeneralInfo = ({
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
-  reloadPdfTemplates: () => void;
+  reloadProposalPdfTemplates: () => void;
+  reloadExperimentSafetyPdfTemplates: () => void;
   reloadFapReviewTemplates: () => void;
   reloadTechnicalReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
   reloadExperimentWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
-  pdfTemplates: GetTemplatesQuery['templates'];
+  proposalPdfTemplates: GetTemplatesQuery['templates'];
+  experimentSafetyPdfTemplates: GetTemplatesQuery['templates'];
   fapReviewTemplates: GetTemplatesQuery['templates'];
   technicalReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
@@ -119,8 +123,14 @@ const CallGeneralInfo = ({
       value: template.templateId,
     })) || [];
 
-  const pdfTemplateOptions =
-    pdfTemplates?.map((template) => ({
+  const proposalPdfTemplateOptions =
+    proposalPdfTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const experimentSafetyPdfTemplateOptions =
+    experimentSafetyPdfTemplates?.map((template) => ({
       text: template.name,
       value: template.templateId,
     })) || [];
@@ -431,14 +441,29 @@ const CallGeneralInfo = ({
         </FormControl>
       )}
       <FormikUIAutocomplete
-        name="pdfTemplateId"
-        label="PDF template"
+        name="proposalPdfTemplateId"
+        label="Proposal PDF template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={pdfTemplateOptions}
+        items={proposalPdfTemplateOptions}
         InputProps={{
-          'data-cy': 'call-pdf-template',
-          endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
+          'data-cy': 'call-proposal-pdf-template',
+          endAdornment: (
+            <RefreshListIcon onClick={reloadProposalPdfTemplates} />
+          ),
+        }}
+      />
+      <FormikUIAutocomplete
+        name="experimentSafetyPdfTemplateId"
+        label="Experiment Safety PDF template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={experimentSafetyPdfTemplateOptions}
+        InputProps={{
+          'data-cy': 'call-experiment-safety-pdf-template',
+          endAdornment: (
+            <RefreshListIcon onClick={reloadExperimentSafetyPdfTemplates} />
+          ),
         }}
       />
       <FormikUIAutocomplete

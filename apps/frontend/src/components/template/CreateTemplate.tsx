@@ -36,7 +36,7 @@ const CreateTemplate = (props: {
           });
 
           if (
-            createTemplate.groupId == TemplateGroupId.PDF_TEMPLATE &&
+            createTemplate.groupId == TemplateGroupId.PROPOSAL_PDF_TEMPLATE &&
             createTemplate.pdfTemplate
           ) {
             await api({

@@ -74,12 +74,24 @@ export class TemplateResolver {
   }
 
   @FieldResolver(() => Int, { nullable: true })
-  async pdfCallCount(
+  async proposalPdfCallCount(
     @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<number> {
     return context.queries.call
-      .getAll(context.user, { pdfTemplateIds: [template.templateId] })
+      .getAll(context.user, { proposalPdfTemplateIds: [template.templateId] })
+      .then((result) => result?.length || 0);
+  }
+
+  @FieldResolver(() => Int, { nullable: true })
+  async experimentSafetyPdfCallCount(
+    @Root() template: Template,
+    @Ctx() context: ResolverContext
+  ): Promise<number> {
+    return context.queries.call
+      .getAll(context.user, {
+        experimentSafetyPdfTemplateIds: [template.templateId],
+      })
       .then((result) => result?.length || 0);
   }
 

@@ -335,7 +335,8 @@ export interface CallRecord {
   readonly allocation_time_unit: AllocationTimeUnits;
   readonly title: string;
   readonly description: string;
-  readonly pdf_template_id: number;
+  readonly proposal_pdf_template_id: number;
+  readonly experiment_safety_pdf_template_id: number;
   readonly fap_review_template_id: number;
   readonly technical_review_template_id: number;
   readonly is_active: boolean;
@@ -1016,7 +1017,8 @@ export const createCallObject = (call: CallRecord) => {
     call.allocation_time_unit,
     call.title,
     call.description,
-    call.pdf_template_id,
+    call.proposal_pdf_template_id,
+    call.experiment_safety_pdf_template_id,
     call.fap_review_template_id,
     call.technical_review_template_id,
     call.is_active,

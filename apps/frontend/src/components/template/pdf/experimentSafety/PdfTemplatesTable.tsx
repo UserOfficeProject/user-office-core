@@ -13,7 +13,9 @@ import { tableIcons } from 'utils/materialIcons';
 import TemplatesTable, { TemplateRowDataType } from '../../TemplatesTable';
 
 function CallsList(props: { filterTemplateId: number }) {
-  const { calls } = useCallsData({ pdfTemplateIds: [props.filterTemplateId] });
+  const { calls } = useCallsData({
+    experimentSafetyPdfTemplateIds: [props.filterTemplateId],
+  });
   const { toFormattedDateTime, timezone } = useFormattedDateTime({
     shouldUseTimeZone: true,
   });
@@ -66,7 +68,7 @@ function CallsModal(props: { templateId?: number; onClose: () => void }) {
   );
 }
 export type PdfTemplateRowDataType = TemplateRowDataType & {
-  pdfCallCount?: number;
+  experimentSafetyPdfCallCount?: number;
 };
 
 type PdfTemplatesTableProps = {
@@ -78,7 +80,7 @@ type PdfTemplatesTableProps = {
       | 'description'
       | 'isArchived'
       | 'questionaryCount'
-      | 'pdfCallCount'
+      | 'experimentSafetyPdfCallCount'
     >[]
   >;
 };
@@ -95,7 +97,7 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
         }}
         style={{ cursor: 'pointer' }}
       >
-        {rowData.pdfCallCount || 0}
+        {rowData.experimentSafetyPdfCallCount || 0}
       </Link>
     ),
     []
@@ -121,7 +123,7 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
         isRowRemovable={(rowData) => {
           const pdfTemplateRowData = rowData as PdfTemplateRowDataType;
 
-          return pdfTemplateRowData.pdfCallCount === 0;
+          return pdfTemplateRowData.experimentSafetyPdfCallCount === 0;
         }}
         dataProvider={props.dataProvider}
       />

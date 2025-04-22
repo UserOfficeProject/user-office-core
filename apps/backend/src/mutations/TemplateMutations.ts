@@ -141,7 +141,7 @@ export default class TemplateMutations {
           'feedback_basis'
         );
         break;
-      case TemplateGroupId.PDF_TEMPLATE:
+      case TemplateGroupId.PROPOSAL_PDF_TEMPLATE:
         await this.pdfTemplateDataSource.createPdfTemplate({
           templateId: newTemplate.templateId,
           templateData: '',
@@ -231,7 +231,7 @@ export default class TemplateMutations {
       .cloneTemplate(templateId)
       .then((result) => result);
 
-    if (result && result.groupId === TemplateGroupId.PDF_TEMPLATE) {
+    if (result && result.groupId === TemplateGroupId.PROPOSAL_PDF_TEMPLATE) {
       await this.pdfTemplateDataSource.clonePdfTemplate(
         templateId,
         result.templateId

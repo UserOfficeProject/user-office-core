@@ -26,7 +26,10 @@ export default class PdfTemplateMutations {
     args: CreatePdfTemplateInput
   ) {
     const template = await this.templateDataSource.getTemplate(args.templateId);
-    if (!template || template?.groupId !== TemplateGroupId.PDF_TEMPLATE) {
+    if (
+      !template ||
+      template?.groupId !== TemplateGroupId.PROPOSAL_PDF_TEMPLATE
+    ) {
       return rejection('Can not create PDF template with this template', {
         agent,
         args,

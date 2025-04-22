@@ -48,10 +48,12 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.allocationTimeUnit || AllocationTimeUnits.Day,
     values?.title || 'Title',
     values?.description || 'Description',
-    values?.pdfTemplateId || 1,
+    values?.proposalPdfTemplateId,
+    values?.experimentSafetyPdfTemplateId,
     values?.fapReviewTemplateId || 1,
     values?.technicalReviewTemplateId || 1,
-    values?.isActive || true
+    values?.isActive ?? true,
+    values?.experimentWorkflowId ?? 1
   );
 };
 
@@ -84,10 +86,12 @@ export const dummyCall = new Call(
   AllocationTimeUnits.Day,
   '',
   '',
-  1,
-  1,
-  1,
-  true
+  1, // proposalPdfTemplateId
+  undefined, // experimentSafetyPdfTemplateId
+  1, // fapReviewTemplateId
+  1, // technicalReviewTemplateId
+  true, // isActive
+  1 // experimentWorkflowId
 );
 
 export const anotherDummyCall = new Call(
@@ -119,10 +123,12 @@ export const anotherDummyCall = new Call(
   AllocationTimeUnits.Day,
   '',
   '',
-  1,
-  1,
-  1,
-  true
+  1, // proposalPdfTemplateId
+  undefined, // experimentSafetyPdfTemplateId
+  1, // fapReviewTemplateId
+  1, // technicalReviewTemplateId
+  true, // isActive
+  1 // experimentWorkflowId
 );
 
 export const dummyCalls = [dummyCall, anotherDummyCall];

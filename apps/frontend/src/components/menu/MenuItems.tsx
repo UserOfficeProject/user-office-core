@@ -32,25 +32,11 @@ import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
-import BoxIcon from '../common/icons/BoxIcon';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
-};
-
-const ExperimentSafetyReviewMenuListItem = () => {
-  return (
-    <Tooltip title="Experiment Safety Review">
-      <ListItemButton component={NavLink} to="/ExperimentSafetyReview">
-        <ListItemIcon>
-          <BoxIcon />
-        </ListItemIcon>
-        <ListItemText primary="Experiment Safety" />
-      </ListItemButton>
-    </Tooltip>
-  );
 };
 
 const ProposalsMenuListItem = () => {

@@ -57,8 +57,15 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('template_id', filter.templateIds);
     }
 
-    if (filter?.pdfTemplateIds) {
-      query.whereIn('pdf_template_id', filter.pdfTemplateIds);
+    if (filter?.proposalPdfTemplateIds) {
+      query.whereIn('proposal_pdf_template_id', filter.proposalPdfTemplateIds);
+    }
+
+    if (filter?.experimentSafetyPdfTemplateIds) {
+      query.whereIn(
+        'experiment_safety_pdf_template_id',
+        filter.experimentSafetyPdfTemplateIds
+      );
     }
 
     if (filter?.fapReviewTemplateIds) {
@@ -163,9 +170,9 @@ export default class PostgresCallDataSource implements CallDataSource {
         .distinctOn('call.call_id');
     }
 
-    return query.then((callDB: CallRecord[]) =>
-      callDB.map((call) => createCallObject(call))
-    );
+    return query.then((callDB: CallRecord[]) => {
+      return callDB.map((call) => createCallObject(call));
+    });
   }
 
   async getCallHasInstrumentsByInstrumentIds(
@@ -207,7 +214,9 @@ export default class PostgresCallDataSource implements CallDataSource {
             proposal_workflow_id: args.proposalWorkflowId,
             template_id: args.templateId,
             esi_template_id: args.esiTemplateId,
-            pdf_template_id: args.pdfTemplateId,
+            proposal_pdf_template_id: args.proposalPdfTemplateId,
+            experiment_safety_pdf_template_id:
+              args.experimentSafetyPdfTemplateId,
             fap_review_template_id: args.fapReviewTemplateId,
             technical_review_template_id: args.technicalReviewTemplateId,
             allocation_time_unit: args.allocationTimeUnit,
@@ -247,7 +256,6 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async update(args: UpdateCallInput): Promise<Call> {
-    console.log({ args });
     const call = await database.transaction(async (trx) => {
       try {
         const currentDate = new Date();
@@ -388,7 +396,9 @@ export default class PostgresCallDataSource implements CallDataSource {
               call_fap_review_ended: args.callFapReviewEnded,
               template_id: args.templateId,
               esi_template_id: args.esiTemplateId,
-              pdf_template_id: args.pdfTemplateId,
+              proposal_pdf_template_id: args.proposalPdfTemplateId,
+              experiment_safety_pdf_template_id:
+                args.experimentSafetyPdfTemplateId,
               fap_review_template_id: args.fapReviewTemplateId,
               technical_review_template_id: args.technicalReviewTemplateId,
               allocation_time_unit: args.allocationTimeUnit,

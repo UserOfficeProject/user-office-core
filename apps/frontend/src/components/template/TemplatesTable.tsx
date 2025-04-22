@@ -188,11 +188,14 @@ const TemplatesTable = ({
 
     return getArchiveButton();
   };
+  const editTemplate = (templateId: number) => {
+    if (templateGroup === TemplateGroupId.PROPOSAL_PDF_TEMPLATE)
+      navigate(`/PdfTemplateEditor/proposal/${templateId}`);
+    else if (templateGroup === TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE)
+      navigate(`/PdfTemplateEditor/experimentSafety/${templateId}`);
+    else navigate(`/QuestionaryEditor/${templateId}`);
+  };
 
-  const editTemplate = (templateId: number) =>
-    navigate(
-      `/${templateGroup === TemplateGroupId.PDF_TEMPLATE ? 'PdfTemplateEditor' : 'QuestionaryEditor'}/${templateId}`
-    );
   const customActions = actions || [];
   const EditIconComponent = () => <Edit />;
   const FileCopyIconComponent = () => <FileCopy />;
@@ -200,6 +203,7 @@ const TemplatesTable = ({
   const templatesWithId = templates.map((template) =>
     Object.assign(template, { id: template.templateId })
   );
+  console.log({ templateGroup });
 
   return (
     <>
