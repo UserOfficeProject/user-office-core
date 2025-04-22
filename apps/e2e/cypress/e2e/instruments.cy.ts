@@ -842,7 +842,10 @@ context('Instrument tests', () => {
         questionaryId: initialDBData.technicalReview.questionaryId,
       });
 
-      const updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      let updatedContact = `${scientist2.firstName} ${scientist2.lastName} (${scientist2.email})`;
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      }
 
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
@@ -935,7 +938,10 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
         questionaryId: initialDBData.technicalReview.questionaryId,
       });
-      const updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      let updatedContact = `${scientist2.firstName} ${scientist2.lastName} (${scientist2.email})`;
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      }
       cy.login('officer', initialDBData.roles.userOfficer);
       cy.visit('/');
 
