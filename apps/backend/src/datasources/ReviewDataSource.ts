@@ -59,4 +59,8 @@ export interface ReviewDataSource {
     fapID: number;
     questionaryID: number;
   }): Promise<Review>;
+  updateInstrumentContact(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean>;
 }
