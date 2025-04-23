@@ -45,11 +45,27 @@ export function QuestionaryComponentInstrumentPicker(
     question: { id, question, naturalKey },
     value,
   } = answer;
-  const [stateValue, setStateValue] = useState<
-    Array<InstrumentIdAndTime> | InstrumentIdAndTime
-  >(value);
 
   const config = answer.config as InstrumentPickerConfig;
+  const [stateValue, setStateValue] = useState<
+    Array<InstrumentIdAndTime> | InstrumentIdAndTime
+  >(() => {
+    if (Array.isArray(answer.value)) {
+      return answer.value.filter((answer) =>
+        answer?.instrumentId
+          ? config.instruments.some(
+              (instrument) => instrument.id.toString() === answer.instrumentId
+            )
+          : false
+      );
+    } else if (config?.instruments && answer.value?.instrumentId) {
+      const instrumentExists = config.instruments.some(
+        (instrument) => instrument.id.toString() === answer.value.instrumentId
+      );
+
+      return instrumentExists ? answer.value : null;
+    }
+  });
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
   const getValueWithInstrumentName = () => {
@@ -77,7 +93,26 @@ export function QuestionaryComponentInstrumentPicker(
     Array<InstrumentIdNameAndTime> | InstrumentIdNameAndTime
   >(getValueWithInstrumentName());
   useEffect(() => {
-    setStateValue(answer.value);
+    setStateValue((prevState) => {
+      if (Array.isArray(answer.value)) {
+        return answer.value.filter((answer) =>
+          answer?.instrumentId
+            ? config.instruments.some(
+                (instrument) => instrument.id.toString() === answer.instrumentId
+              )
+            : false
+        );
+      } else if (config?.instruments && answer.value?.instrumentId) {
+        const instrumentExists = config.instruments.some(
+          (instrument) => instrument.id.toString() === answer.value.instrumentId
+        );
+
+        return instrumentExists ? answer.value : null;
+      }
+
+      return prevState;
+    });
+
     setRequestTimeForInstrument(getValueWithInstrumentName());
   }, [answer, config.instruments.length]);
 
