@@ -386,6 +386,22 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       });
   }
 
+  async updateInstrumentContact(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    try {
+      await database('technical_review')
+        .where({ instrument_id: instrumentId })
+        .andWhere({ submitted: false })
+        .update({ technical_review_assignee_id: userId });
+
+      return true;
+    } catch (error) {
+      throw new GraphQLError('Failed to update instrument contact.');
+    }
+  }
+
   /*Brief explanation of the query used in getAllUsersReviews
     This query gets executed when a reviewer wishes to see all the proposals
     (proposals where they are assigned as a reviewer and where they are not) 

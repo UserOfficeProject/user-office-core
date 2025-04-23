@@ -28,6 +28,9 @@ export class UpdateInstrumentArgs {
 
   @Field(() => Int)
   public managerUserId: number;
+
+  @Field(() => Boolean)
+  public updateTechReview: boolean;
 }
 
 @ArgsType()

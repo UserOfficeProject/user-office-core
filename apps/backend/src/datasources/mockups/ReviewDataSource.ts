@@ -185,4 +185,10 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   async getAllUsersReviews(fapIds: number[]): Promise<Review[]> {
     return [dummyReview];
   }
+  async updateInstrumentContact(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    return true;
+  }
 }
