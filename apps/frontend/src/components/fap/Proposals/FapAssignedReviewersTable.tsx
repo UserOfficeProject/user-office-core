@@ -184,15 +184,15 @@ const FapAssignedReviewersTable = ({
           onClose={() => setRankReviewer(null)}
           onSubmit={async (value) => {
             await api().saveReviewerRank({
-              fapReviewId: rankReviewer?.fapReviewId as number,
-              reviewerId: rankReviewer?.reviewer as number,
+              fapReviewId: rankReviewer.fapReviewId,
+              reviewerId: rankReviewer.reviewer as number, //Should be a number as it set from row data from the Assigned reviewers table
               rank: value,
             });
             const fapAssignmentsWithUpdatedRank =
               fapAssignmentsWithIdAndFormattedDate.map((fa) => ({
                 ...fa,
                 rank:
-                  fa.review?.id === rankReviewer?.fapReviewId &&
+                  fa.review?.id === rankReviewer.fapReviewId &&
                   fa.fapMemberUserId === rankReviewer.reviewer
                     ? value
                     : fa.rank,
@@ -201,9 +201,9 @@ const FapAssignedReviewersTable = ({
             setFapAssignmentsWithIdAndFormattedDate(
               fapAssignmentsWithUpdatedRank
             );
-            updateView(rankReviewer?.fapReviewId as number);
+            updateView(rankReviewer.fapReviewId);
           }}
-          currentRank={rankReviewer?.rank}
+          currentRank={rankReviewer.rank}
           totalReviewers={fapProposal.assignments?.length ?? 0}
           takenRanks={
             fapProposal.assignments
@@ -243,7 +243,7 @@ const FapAssignedReviewersTable = ({
                   );
                 searchParams.set(
                   'modalTab',
-                  isDraftStatus(rowData?.review?.status)
+                  isDraftStatus(rowData.review?.status)
                     ? reviewProposalTabNames
                         .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
                         .toString()
@@ -256,7 +256,7 @@ const FapAssignedReviewersTable = ({
               });
               setOpenProposalPk(fapProposal.proposalPk);
             },
-            tooltip: isDraftStatus(rowData?.review?.status)
+            tooltip: isDraftStatus(rowData.review?.status)
               ? 'Grade proposal'
               : 'View review',
           }),
