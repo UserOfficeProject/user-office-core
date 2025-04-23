@@ -130,50 +130,51 @@ export function QuestionaryComponentInstrumentPicker(
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
     const newValue = event.target.value;
-    let newInstrumentTime: InstrumentIdAndTime[] | InstrumentIdAndTime =
-      [] || {};
     if (
       Array.isArray(newValue) &&
       newValue.length > 0 &&
       Array.isArray(requestTimeForInstrument)
     ) {
-      newInstrumentTime = newValue.map((id) => {
-        return {
-          instrumentId: id,
-          timeRequested: requestTimeForInstrument.filter(
-            (value) => value.instrumentId === id
-          )
-            ? requestTimeForInstrument.find(
-                (value) => value.instrumentId === id
-              )?.timeRequested
-            : '0',
-        };
-      });
+      onComplete(
+        newValue.map((id) => {
+          return {
+            instrumentId: id,
+            timeRequested: requestTimeForInstrument.filter(
+              (value) => value.instrumentId === id
+            )
+              ? requestTimeForInstrument.find(
+                  (value) => value.instrumentId === id
+                )?.timeRequested
+              : '0',
+          };
+        })
+      );
+
+      return;
     } else if (typeof newValue === 'string') {
-      newInstrumentTime = {
+      onComplete({
         instrumentId: newValue,
         timeRequested: '0',
-      };
+      });
     }
-    onComplete(newInstrumentTime);
+    onComplete([]);
   };
 
   const handleTimeInput = (time: string, id: string) => {
-    let newInstrumentTime: InstrumentIdAndTime[] | InstrumentIdAndTime =
-      [] || {};
-    newInstrumentTime = Array.isArray(requestTimeForInstrument)
-      ? requestTimeForInstrument.map((obj) => {
-          if (obj.instrumentId === id) {
-            return { instrumentId: obj.instrumentId, timeRequested: time };
-          } else {
-            return {
-              instrumentId: obj.instrumentId,
-              timeRequested: obj.timeRequested,
-            };
-          }
-        })
-      : { instrumentId: id, timeRequested: time };
-    onComplete(newInstrumentTime);
+    onComplete(
+      Array.isArray(requestTimeForInstrument)
+        ? requestTimeForInstrument.map((obj) => {
+            if (obj.instrumentId === id) {
+              return { instrumentId: obj.instrumentId, timeRequested: time };
+            } else {
+              return {
+                instrumentId: obj.instrumentId,
+                timeRequested: obj.timeRequested,
+              };
+            }
+          })
+        : { instrumentId: id, timeRequested: time }
+    );
   };
   const DynamicTimeFields = () => {
     const requestTime = Array.isArray(requestTimeForInstrument)
