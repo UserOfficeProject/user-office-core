@@ -3,7 +3,7 @@ import React from 'react';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType } from 'generated/sdk';
+import { DataType, InstrumentPickerConfig } from 'generated/sdk';
 
 import InstrumentPickerAnswerRenderer from './InstrumentPickerAnswerRenderer';
 import InstrumentPickerSearchCriteriaComponent from './InstrumentPickerSearchCriteriaComponent';
@@ -27,7 +27,28 @@ export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: instrumentPickerValidationSchema,
-  getYupInitialValue: ({ answer }) => answer.value || null,
+  getYupInitialValue: ({ answer }) => {
+    if (answer && answer.config) {
+      const config = answer.config as InstrumentPickerConfig;
+      if (Array.isArray(answer.value)) {
+        return answer.value.filter((answer) =>
+          answer?.instrumentId
+            ? config.instruments.some(
+                (instrument) => instrument.id.toString() === answer.instrumentId
+              )
+            : false
+        );
+      } else if (config?.instruments && answer.value?.instrumentId) {
+        const instrumentExists = config.instruments.some(
+          (instrument) => instrument.id.toString() === answer.value.instrumentId
+        );
+
+        return instrumentExists ? answer.value : null;
+      }
+    }
+
+    return null;
+  },
   searchCriteriaComponent: InstrumentPickerSearchCriteriaComponent,
 };
 
