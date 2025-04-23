@@ -201,7 +201,7 @@ const FapAssignedReviewersTable = ({
             setFapAssignmentsWithIdAndFormattedDate(
               fapAssignmentsWithUpdatedRank
             );
-            updateView(rankReviewer.fapReviewId);
+            updateView(fapProposal.proposalPk);
           }}
           currentRank={rankReviewer.rank}
           totalReviewers={fapProposal.assignments?.length ?? 0}
