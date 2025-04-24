@@ -92,6 +92,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
 
+  const isFacilitiesEnabled = context.featuresMap.get(
+    FeatureId.FACILITIES
+  )?.isEnabled;
+
   const calls = useCallsData(
     {
       proposalStatusShortCode: 'QUICK_REVIEW',
@@ -230,14 +234,16 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItemButton>
       </Tooltip>
-      <Tooltip title="Facility">
-        <ListItemButton component={NavLink} to="/Facility">
-          <ListItemIcon>
-            <Apartment />
-          </ListItemIcon>
-          <ListItemText primary={'Facility'} />
-        </ListItemButton>
-      </Tooltip>
+      {isFacilitiesEnabled && (
+        <Tooltip title="Facility">
+          <ListItemButton component={NavLink} to="/Facility">
+            <ListItemIcon>
+              <Apartment />
+            </ListItemIcon>
+            <ListItemText primary={'Facility'} />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isFapEnabled && (
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">
