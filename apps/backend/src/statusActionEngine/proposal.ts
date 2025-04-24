@@ -3,16 +3,14 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { StatusActionType } from '../models/StatusAction';
-import {
-  WorkflowEngineExperimentType,
-  getWorkflowConnectionByStatusId,
-} from '../workflowEngine/experiment';
+import { getWorkflowConnectionByStatusId } from '../workflowEngine/experiment';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { emailActionHandler } from './emailActionHandler';
 import { rabbitMQActionHandler } from './rabbitMQHandler';
 import { groupProposalsByProperties } from './statusActionUtils';
 
 export const proposalStatusActionEngine = async (
-  proposals: WorkflowEngineExperimentType[]
+  proposals: WorkflowEngineProposalType[]
 ) => {
   const statusActionsDataSource: StatusActionsDataSource = container.resolve(
     Tokens.StatusActionsDataSource

@@ -52,10 +52,11 @@ export class ProposalPdfTemplatesQuery {
     @Ctx() context: ResolverContext,
     @Args() args: ProposalPdfTemplatesArgs
   ) {
-    const response = await context.queries.proposalPdfTemplate.getPdfTemplates(
-      context.user,
-      args
-    );
+    const response =
+      await context.queries.proposalPdfTemplate.getProposalPdfTemplates(
+        context.user,
+        args
+      );
 
     return response;
   }

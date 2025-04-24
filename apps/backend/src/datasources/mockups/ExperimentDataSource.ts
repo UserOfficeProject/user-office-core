@@ -415,6 +415,5 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     experimentSafety.statusId = statusId;
 
     return experimentSafety;
-    }
   }
 }

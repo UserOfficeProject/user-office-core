@@ -1,7 +1,7 @@
 import { ExperimentSafetyPdfTemplate } from '../models/ExperimentSafetyPdfTemplate';
 import { CreateExperimentSafetyPdfTemplateInput } from '../resolvers/mutations/CreateExperimentSafetyPdfTemplateMutation';
 import { UpdateExperimentSafetyPdfTemplateArgs } from '../resolvers/mutations/UpdateExperimentSafetyPdfTemplateMutation';
-import { PdfTemplatesArgs } from '../resolvers/queries/ProposalPdfTemplatesQuery';
+import { ExperimentSafetyPdfTemplatesArgs } from '../resolvers/queries/ExperimentSafetyPdfTemplatesQuery';
 
 export type CreateExperimentSafetyPdfTemplateInputWithCreator =
   CreateExperimentSafetyPdfTemplateInput & {
@@ -26,6 +26,6 @@ export interface ExperimentSafetyPdfTemplateDataSource {
     experimentSafetyPdfTemplateId: number
   ): Promise<ExperimentSafetyPdfTemplate | null>;
   getPdfTemplates(
-    args: PdfTemplatesArgs
+    args: ExperimentSafetyPdfTemplatesArgs
   ): Promise<ExperimentSafetyPdfTemplate[]>;
 }

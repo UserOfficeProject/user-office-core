@@ -53,7 +53,7 @@ export class ExperimentSafetyPdfTemplatesQuery {
     @Args() args: ExperimentSafetyPdfTemplatesArgs
   ) {
     const response =
-      await context.queries.experimentSafetyPdfTemplate.getPdfTemplates(
+      await context.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
         context.user,
         args
       );

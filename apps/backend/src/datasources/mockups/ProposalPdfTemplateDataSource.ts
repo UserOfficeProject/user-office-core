@@ -1,6 +1,6 @@
 import { ProposalPdfTemplate } from '../../models/ProposalPdfTemplate';
 import { UpdateProposalPdfTemplateArgs } from '../../resolvers/mutations/UpdateProposalPdfTemplateMutation';
-import { PdfTemplatesArgs } from '../../resolvers/queries/ProposalPdfTemplatesQuery';
+import { ExperimentSafetyPdfTemplatesArgs } from '../../resolvers/queries/ExperimentSafetyPdfTemplatesQuery';
 import {
   CreateProposalPdfTemplateInputWithCreator,
   ProposalPdfTemplateDataSource,
@@ -92,7 +92,7 @@ export class ProposalPdfTemplateDataSourceMock
   }
 
   async getPdfTemplates(
-    args: PdfTemplatesArgs
+    args: ExperimentSafetyPdfTemplatesArgs
   ): Promise<ProposalPdfTemplate[]> {
     return [dummyPdfTemplate];
   }

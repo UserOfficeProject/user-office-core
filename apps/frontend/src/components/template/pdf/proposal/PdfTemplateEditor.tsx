@@ -15,7 +15,7 @@ import { StyledButtonContainer } from 'styles/StyledComponents';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import PDFTemplateDocumentation from '../../documentation';
-import PdfTemplateEditorViewer from '../../PdfTemplateEditorViewer';
+import PdfTemplateEditorViewer from './PdfTemplateEditorViewer';
 import { TemplateMetadataEditor } from '../../TemplateMetadataEditor';
 interface ITemplateEditorProps<Type extends string> {
   name: Type;
