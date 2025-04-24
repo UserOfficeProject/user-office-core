@@ -117,7 +117,13 @@ declare global {
           | 'declare-shipment-icon'
           | 'finish-experiment-safety-form-icon'
           | 'provide-feedback-icon',
-        state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
+        state:
+          | 'completed'
+          | 'active'
+          | 'inactive'
+          | 'neutral'
+          | 'invisible'
+          | 'cancelled'
       ) => void;
 
       /**
