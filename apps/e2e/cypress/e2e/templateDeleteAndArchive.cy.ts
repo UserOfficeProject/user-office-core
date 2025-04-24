@@ -164,7 +164,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be deleted if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       });
 
       shouldDeleteTemplate(templateName, '/PDFTemplates');
@@ -173,7 +173,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can not be deleted if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       }).then((result) => {
         cy.createCall({
           ...newCall,
@@ -188,7 +188,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('Archived PDF Template can be deleted if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       });
 
       shouldDeleteArchivedTemplate(templateName, '/PDFTemplates');
@@ -197,7 +197,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('Archived PDF Template can not be deleted if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       }).then((result) => {
         cy.createCall({
           ...newCall,
@@ -212,7 +212,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be archived if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       }).then((result) => {
         cy.createCall({
           ...newCall,
@@ -227,7 +227,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be archived if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       });
 
       shouldArchiveTemplate(templateName, '/PDFTemplates');
@@ -236,7 +236,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be unarchived if archived and associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       }).then((result) => {
         cy.createCall({
           ...newCall,
@@ -251,7 +251,7 @@ context('Template Delete, Archive, Unarchive', () => {
     it('PDF Template can be unarchived if archived and not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       });
 
       shouldUnarchiveArchivedTemplate(templateName, '/PDFTemplates');

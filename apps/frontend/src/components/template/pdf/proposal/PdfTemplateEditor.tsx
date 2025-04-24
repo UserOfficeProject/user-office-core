@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
-import { PdfTemplate, Template } from 'generated/sdk';
+import { ProposalPdfTemplate, Template } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel from 'models/questionary/QuestionaryEditorModel';
 import { StyledButtonContainer } from 'styles/StyledComponents';
@@ -23,8 +23,10 @@ interface ITemplateEditorProps<Type extends string> {
   initialValues: {
     [key in Type]: string | null;
   };
-  pdfTemplate: PdfTemplate | null;
-  setPdfTemplate: React.Dispatch<React.SetStateAction<PdfTemplate | null>>;
+  pdfTemplate: ProposalPdfTemplate | null;
+  setPdfTemplate: React.Dispatch<
+    React.SetStateAction<ProposalPdfTemplate | null>
+  >;
 }
 const TemplateEditor = <
   Type extends
@@ -58,12 +60,14 @@ const TemplateEditor = <
             await api({
               toastSuccessMessage: 'Template updated successfully!',
             })
-              .updatePdfTemplate({
+              .updateProposalPdfTemplate({
                 ...values,
-                pdfTemplateId: pdfTemplate?.pdfTemplateId,
+                proposalPdfTemplateId: pdfTemplate?.proposalPdfTemplateId,
               })
               .then((template) => {
-                setPdfTemplate(template.updatePdfTemplate as PdfTemplate);
+                setPdfTemplate(
+                  template.updateProposalPdfTemplate as ProposalPdfTemplate
+                );
               });
           }
         }}
@@ -103,7 +107,9 @@ export default function PdfTemplateEditor() {
   const { api } = useDataApiWithFeedback();
   const [loading, setLoading] = useState<boolean>(true);
   const [template, setTemplate] = useState<Template | null>(null);
-  const [pdfTemplate, setPdfTemplate] = useState<PdfTemplate | null>(null);
+  const [pdfTemplate, setPdfTemplate] = useState<ProposalPdfTemplate | null>(
+    null
+  );
   const [editorWidth, setEditorWidth] = useState(50);
   const pdfEditorContainerRef = useRef<HTMLDivElement>(null);
   const { templateId } = useParams<{
@@ -118,7 +124,7 @@ export default function PdfTemplateEditor() {
       .getTemplate({ templateId: parseInt(templateId) })
       .then(({ template }) => {
         setTemplate(template as Template);
-        setPdfTemplate(template?.pdfTemplate as PdfTemplate);
+        setPdfTemplate(template?.proposalPdfTemplate as ProposalPdfTemplate);
         setLoading(false);
       });
   }, [api, templateId]);

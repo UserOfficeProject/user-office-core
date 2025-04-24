@@ -1,7 +1,7 @@
 import { ProposalPdfTemplate } from '../models/ProposalPdfTemplate';
 import { CreateProposalPdfTemplateInput } from '../resolvers/mutations/CreateProposalPdfTemplateMutation';
 import { UpdateProposalPdfTemplateArgs } from '../resolvers/mutations/UpdateProposalPdfTemplateMutation';
-import { PdfTemplatesArgs } from '../resolvers/queries/ProposalPdfTemplatesQuery';
+import { ProposalPdfTemplatesArgs } from '../resolvers/queries/ProposalPdfTemplatesQuery';
 
 export type CreateProposalPdfTemplateInputWithCreator =
   CreateProposalPdfTemplateInput & {
@@ -23,5 +23,7 @@ export interface ProposalPdfTemplateDataSource {
   getPdfTemplate(
     proposalPdfTemplateId: number
   ): Promise<ProposalPdfTemplate | null>;
-  getPdfTemplates(args: PdfTemplatesArgs): Promise<ProposalPdfTemplate[]>;
+  getPdfTemplates(
+    args: ProposalPdfTemplatesArgs
+  ): Promise<ProposalPdfTemplate[]>;
 }

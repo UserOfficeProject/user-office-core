@@ -189,9 +189,9 @@ const TemplatesTable = ({
     return getArchiveButton();
   };
   const editTemplate = (templateId: number) => {
-    if (templateGroup === TemplateGroupId.PROPOSAL_PDF_TEMPLATE)
+    if (templateGroup === TemplateGroupId.PROPOSAL_PDF)
       navigate(`/PdfTemplateEditor/proposal/${templateId}`);
-    else if (templateGroup === TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE)
+    else if (templateGroup === TemplateGroupId.EXPERIMENT_SAFETY_PDF)
       navigate(`/PdfTemplateEditor/experimentSafety/${templateId}`);
     else navigate(`/QuestionaryEditor/${templateId}`);
   };

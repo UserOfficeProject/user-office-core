@@ -119,7 +119,7 @@ function PdfTemplatesTable(props: PdfTemplatesTableProps) {
     <>
       <TemplatesTable
         columns={columns}
-        templateGroup={TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE}
+        templateGroup={TemplateGroupId.EXPERIMENT_SAFETY_PDF}
         isRowRemovable={(rowData) => {
           const pdfTemplateRowData = rowData as PdfTemplateRowDataType;
 

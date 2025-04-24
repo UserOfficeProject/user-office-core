@@ -209,7 +209,7 @@ const getPdfTemplate = async (
       user,
       {
         filter: {
-          group: TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
+          group: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
           isArchived: false,
         },
       }

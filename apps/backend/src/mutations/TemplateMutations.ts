@@ -16,6 +16,7 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { ExperimentSafetyPdfTemplateDataSource } from '../datasources/ExperimentSafetyPdfTemplateDataSource';
 import { ProposalPdfTemplateDataSource } from '../datasources/ProposalPdfTemplateDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
@@ -49,7 +50,9 @@ export default class TemplateMutations {
   constructor(
     @inject(Tokens.TemplateDataSource) private dataSource: TemplateDataSource,
     @inject(Tokens.ProposalPdfTemplateDataSource)
-    private proposalpdfTemplateDataSource: ProposalPdfTemplateDataSource
+    private proposalpdfTemplateDataSource: ProposalPdfTemplateDataSource,
+    @inject(Tokens.ExperimentSafetyPdfTemplateDataSource)
+    private experimentSafetyPdfTemplateDataSource: ExperimentSafetyPdfTemplateDataSource
   ) {}
 
   @ValidateArgs(createTemplateValidationSchema)
@@ -141,7 +144,7 @@ export default class TemplateMutations {
           'feedback_basis'
         );
         break;
-      case TemplateGroupId.PROPOSAL_PDF_TEMPLATE:
+      case TemplateGroupId.PROPOSAL_PDF:
         await this.proposalpdfTemplateDataSource.createPdfTemplate({
           templateId: newTemplate.templateId,
           templateData: '',
@@ -151,6 +154,19 @@ export default class TemplateMutations {
           dummyData: '',
           creatorId: (agent as UserWithRole).id,
         });
+        break;
+      case TemplateGroupId.EXPERIMENT_SAFETY_PDF:
+        await this.experimentSafetyPdfTemplateDataSource.createPdfTemplate({
+          templateId: newTemplate.templateId,
+          templateData: '',
+          templateHeader: '',
+          templateFooter: '',
+          templateSampleDeclaration: '',
+          dummyData: '',
+          creatorId: (agent as UserWithRole).id,
+        });
+        break;
+
       case TemplateGroupId.EXP_SAFETY_REVIEW:
         await this.createInitialTopic(
           newTemplate.templateId,
@@ -231,7 +247,7 @@ export default class TemplateMutations {
       .cloneTemplate(templateId)
       .then((result) => result);
 
-    if (result && result.groupId === TemplateGroupId.PROPOSAL_PDF_TEMPLATE) {
+    if (result && result.groupId === TemplateGroupId.PROPOSAL_PDF) {
       await this.proposalpdfTemplateDataSource.clonePdfTemplate(
         templateId,
         result.templateId

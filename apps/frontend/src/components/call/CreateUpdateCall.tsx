@@ -44,16 +44,16 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
     templates: proposalPdfTemplates,
     refreshTemplates: reloadProposalPdfTemplates,
   } = useActiveTemplates(
-    TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
-    call?.pdfTemplateId
+    TemplateGroupId.PROPOSAL_PDF,
+    call?.proposalPdfTemplateId
   );
 
   const {
     templates: experimentSafetyPdfTemplates,
     refreshTemplates: reloadExperimentSafetyPdfTemplates,
   } = useActiveTemplates(
-    TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
-    call?.pdfTemplateId
+    TemplateGroupId.EXPERIMENT_SAFETY_PDF,
+    call?.experimentSafetyPdfTemplateId
   );
 
   const {
@@ -105,7 +105,8 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         description: call.description || '',
         templateId: call.templateId,
         esiTemplateId: call.esiTemplateId,
-        pdfTemplateId: call.pdfTemplateId,
+        proposalPdfTemplateId: call.proposalPdfTemplateId,
+        experimentSafetyPdfTemplateId: call.experimentSafetyPdfTemplateId,
         fapReviewTemplateId: call.fapReviewTemplateId,
         technicalReviewTemplateId: call.technicalReviewTemplateId,
         proposalWorkflowId: call.proposalWorkflowId,

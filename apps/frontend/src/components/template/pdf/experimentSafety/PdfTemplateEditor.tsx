@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import UOLoader from 'components/common/UOLoader';
-import { PdfTemplate, Template } from 'generated/sdk';
+import { ExperimentSafetyPdfTemplate, Template } from 'generated/sdk';
 import { usePersistQuestionaryEditorModel } from 'hooks/questionary/usePersistQuestionaryEditorModel';
 import QuestionaryEditorModel from 'models/questionary/QuestionaryEditorModel';
 import { StyledButtonContainer } from 'styles/StyledComponents';
@@ -23,8 +23,10 @@ interface ITemplateEditorProps<Type extends string> {
   initialValues: {
     [key in Type]: string | null;
   };
-  pdfTemplate: PdfTemplate | null;
-  setPdfTemplate: React.Dispatch<React.SetStateAction<PdfTemplate | null>>;
+  pdfTemplate: ExperimentSafetyPdfTemplate | null;
+  setPdfTemplate: React.Dispatch<
+    React.SetStateAction<ExperimentSafetyPdfTemplate | null>
+  >;
 }
 const TemplateEditor = <
   Type extends
@@ -58,12 +60,15 @@ const TemplateEditor = <
             await api({
               toastSuccessMessage: 'Template updated successfully!',
             })
-              .updatePdfTemplate({
+              .updateExperimentSafetyPdfTemplate({
                 ...values,
-                pdfTemplateId: pdfTemplate?.pdfTemplateId,
+                experimentSafetyPdfTemplateId:
+                  pdfTemplate?.experimentSafetyPdfTemplateId,
               })
               .then((template) => {
-                setPdfTemplate(template.updatePdfTemplate as PdfTemplate);
+                setPdfTemplate(
+                  template.updateExperimentSafetyPdfTemplate as ExperimentSafetyPdfTemplate
+                );
               });
           }
         }}
@@ -103,7 +108,8 @@ export default function PdfTemplateEditor() {
   const { api } = useDataApiWithFeedback();
   const [loading, setLoading] = useState<boolean>(true);
   const [template, setTemplate] = useState<Template | null>(null);
-  const [pdfTemplate, setPdfTemplate] = useState<PdfTemplate | null>(null);
+  const [pdfTemplate, setPdfTemplate] =
+    useState<ExperimentSafetyPdfTemplate | null>(null);
   const [editorWidth, setEditorWidth] = useState(50);
   const pdfEditorContainerRef = useRef<HTMLDivElement>(null);
   const { templateId } = useParams<{
@@ -118,7 +124,9 @@ export default function PdfTemplateEditor() {
       .getTemplate({ templateId: parseInt(templateId) })
       .then(({ template }) => {
         setTemplate(template as Template);
-        setPdfTemplate(template?.pdfTemplate as PdfTemplate);
+        setPdfTemplate(
+          template?.experimentSafetyPdfTemplate as ExperimentSafetyPdfTemplate
+        );
         setLoading(false);
       });
   }, [api, templateId]);

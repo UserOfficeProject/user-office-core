@@ -20,7 +20,7 @@ export default function PdfTemplatesPage() {
                 .getProposalPdfTemplates({
                   filter: {
                     isArchived: false,
-                    group: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+                    group: TemplateGroupId.PROPOSAL_PDF,
                   },
                 })
                 .then((data) => data.templates || [])
@@ -32,7 +32,7 @@ export default function PdfTemplatesPage() {
                 .getProposalPdfTemplates({
                   filter: {
                     isArchived: true,
-                    group: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+                    group: TemplateGroupId.PROPOSAL_PDF,
                   },
                 })
                 .then((data) => data.templates || [])

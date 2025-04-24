@@ -20,7 +20,7 @@ export default function PdfTemplatesPage() {
                 .getExperimentSafetyPdfTemplates({
                   filter: {
                     isArchived: false,
-                    group: TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
+                    group: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
                   },
                 })
                 .then((data) => data.templates || [])
@@ -32,7 +32,7 @@ export default function PdfTemplatesPage() {
                 .getExperimentSafetyPdfTemplates({
                   filter: {
                     isArchived: true,
-                    group: TemplateGroupId.EXPERIMENT_SAFETY_PDF_TEMPLATE,
+                    group: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
                   },
                 })
                 .then((data) => data.templates || [])

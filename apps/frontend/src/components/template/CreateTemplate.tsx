@@ -36,13 +36,30 @@ const CreateTemplate = (props: {
           });
 
           if (
-            createTemplate.groupId == TemplateGroupId.PROPOSAL_PDF_TEMPLATE &&
-            createTemplate.pdfTemplate
+            createTemplate.groupId == TemplateGroupId.PROPOSAL_PDF &&
+            createTemplate.proposalPdfTemplate
           ) {
             await api({
               toastSuccessMessage: 'Template updated successfully!',
-            }).updatePdfTemplate({
-              pdfTemplateId: createTemplate.pdfTemplate.pdfTemplateId,
+            }).updateProposalPdfTemplate({
+              proposalPdfTemplateId:
+                createTemplate.proposalPdfTemplate.proposalPdfTemplateId,
+              templateData: defaultProposalBody,
+              templateHeader: defaultProposalHeader,
+              templateFooter: defaultProposalFooter,
+              templateSampleDeclaration: defaultProposalSampleDeclaration,
+              dummyData: defaultProposalDummyData,
+            });
+          } else if (
+            createTemplate.groupId == TemplateGroupId.EXPERIMENT_SAFETY_PDF &&
+            createTemplate.experimentSafetyPdfTemplate
+          ) {
+            await api({
+              toastSuccessMessage: 'Template updated successfully!',
+            }).updateExperimentSafetyPdfTemplate({
+              experimentSafetyPdfTemplateId:
+                createTemplate.experimentSafetyPdfTemplate
+                  .experimentSafetyPdfTemplateId,
               templateData: defaultProposalBody,
               templateHeader: defaultProposalHeader,
               templateFooter: defaultProposalFooter,

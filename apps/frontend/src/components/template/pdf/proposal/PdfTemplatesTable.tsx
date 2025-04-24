@@ -120,7 +120,7 @@ function ProposalPdfTemplatesTable(props: ProposalPdfTemplatesTableProps) {
     <>
       <TemplatesTable
         columns={columns}
-        templateGroup={TemplateGroupId.PROPOSAL_PDF_TEMPLATE}
+        templateGroup={TemplateGroupId.PROPOSAL_PDF}
         isRowRemovable={(rowData) => {
           const pdfTemplateRowData = rowData as ProposalPdfTemplateRowDataType;
 

@@ -92,7 +92,7 @@ context('PDF template tests', () => {
     beforeEach(() => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF_TEMPLATE,
+        groupId: TemplateGroupId.PROPOSAL_PDF,
       }).then((result) => {
         if (result.createTemplate) {
           createdTemplateName = result.createTemplate.name;
