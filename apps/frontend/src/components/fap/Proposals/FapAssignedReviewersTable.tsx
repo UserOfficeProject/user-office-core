@@ -78,7 +78,7 @@ const FapAssignedReviewersTable = ({
   ]);
   const [rankReviewer, setRankReviewer] = useState<null | {
     reviewer: number | null;
-    proposal: number;
+    fapReviewId: number;
     rank: number | null;
   }>(null);
   const { toFormattedDateTime } = useFormattedDateTime({
@@ -184,15 +184,15 @@ const FapAssignedReviewersTable = ({
           onClose={() => setRankReviewer(null)}
           onSubmit={async (value) => {
             await api().saveReviewerRank({
-              proposalPk: rankReviewer?.proposal as number,
-              reviewerId: rankReviewer?.reviewer as number,
+              fapReviewId: rankReviewer.fapReviewId,
+              reviewerId: rankReviewer.reviewer as number, //Should be a number as it set from row data from the Assigned reviewers table
               rank: value,
             });
             const fapAssignmentsWithUpdatedRank =
               fapAssignmentsWithIdAndFormattedDate.map((fa) => ({
                 ...fa,
                 rank:
-                  fa.proposalPk === rankReviewer?.proposal &&
+                  fa.review?.id === rankReviewer.fapReviewId &&
                   fa.fapMemberUserId === rankReviewer.reviewer
                     ? value
                     : fa.rank,
@@ -201,9 +201,9 @@ const FapAssignedReviewersTable = ({
             setFapAssignmentsWithIdAndFormattedDate(
               fapAssignmentsWithUpdatedRank
             );
-            updateView(rankReviewer?.proposal as number);
+            updateView(fapProposal.proposalPk);
           }}
-          currentRank={rankReviewer?.rank}
+          currentRank={rankReviewer.rank}
           totalReviewers={fapProposal.assignments?.length ?? 0}
           takenRanks={
             fapProposal.assignments
@@ -243,7 +243,7 @@ const FapAssignedReviewersTable = ({
                   );
                 searchParams.set(
                   'modalTab',
-                  isDraftStatus(rowData?.review?.status)
+                  isDraftStatus(rowData.review?.status)
                     ? reviewProposalTabNames
                         .indexOf(PROPOSAL_MODAL_TAB_NAMES.GRADE)
                         .toString()
@@ -256,7 +256,7 @@ const FapAssignedReviewersTable = ({
               });
               setOpenProposalPk(fapProposal.proposalPk);
             },
-            tooltip: isDraftStatus(rowData?.review?.status)
+            tooltip: isDraftStatus(rowData.review?.status)
               ? 'Grade proposal'
               : 'View review',
           }),
@@ -264,7 +264,7 @@ const FapAssignedReviewersTable = ({
             icon: () => <FormatListNumberedIcon data-cy="rank-reviewer" />,
             onClick: () => {
               setRankReviewer({
-                proposal: rowData.proposalPk,
+                fapReviewId: rowData.review?.id as number,
                 reviewer: rowData.fapMemberUserId,
                 rank: rowData.rank,
               });

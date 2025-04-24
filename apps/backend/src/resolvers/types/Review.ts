@@ -40,6 +40,21 @@ export class Review implements Partial<ReviewOrigin> {
 
   @Field(() => Int)
   public questionaryID: number;
+
+  @Field(() => Date)
+  public dateAssigned: Date;
+
+  @Field(() => Boolean)
+  public reassigned: boolean;
+
+  @Field(() => Date, { nullable: true })
+  public dateReassigned: Date | null;
+
+  @Field(() => Boolean)
+  public emailSent: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public rank: number | null;
 }
 
 @Resolver(() => Review)
