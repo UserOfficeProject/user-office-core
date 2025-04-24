@@ -59,8 +59,6 @@ export class ReviewAuthorization {
       return true;
     }
 
-    const currentRole = agent?.currentRole?.shortCode;
-
     const isChairOrSecretaryOfFap = await this.userAuth.isChairOrSecretaryOfFap(
       agent,
       review.fapID

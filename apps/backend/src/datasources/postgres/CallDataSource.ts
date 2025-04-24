@@ -495,7 +495,7 @@ export default class PostgresCallDataSource implements CallDataSource {
     return records.map(createCallObject);
   }
 
-  async getCallsByFacilityMember(user: number): Promise<Call[]> {
+  async getCallsByFacilityMember(userId: number): Promise<Call[]> {
     return database('call')
       .distinct(['call.*'])
       .join(
@@ -518,7 +518,7 @@ export default class PostgresCallDataSource implements CallDataSource {
         'facility_user.facility_id',
         'facility_user.facility_id'
       )
-      .where('facility_user.user_id', user)
+      .where('facility_user.user_id', userId)
       .then((records: CallRecord[]) => records.map(createCallObject));
   }
 
