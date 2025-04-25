@@ -59,7 +59,6 @@ const createActionButton = (
   // eslint-disable-next-line
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
   hidden: state === 'invisible',
-  disabled: state === 'inactive',
   onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
     ? onClick
     : () => {},
@@ -175,9 +174,9 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             break;
           case VisitRegistrationStatus.CANCELLED_BY_USER:
           case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-            buttonState = 'inactive';
+            buttonState = 'cancelled';
             stateReason =
-              'This action is disabled because registration is cancelled';
+              'This action is disabled because your registration for visit is cancelled';
             break;
         }
       }
@@ -187,7 +186,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Define your own visit ${stateReason ? '(' + stateReason + ')' : ''}`,
+      `Define your visit ${stateReason ? '(' + stateReason + ')' : ''}`,
       <FlightTakeoffIcon data-cy="register-visit-icon" />,
       buttonState,
       () => {
