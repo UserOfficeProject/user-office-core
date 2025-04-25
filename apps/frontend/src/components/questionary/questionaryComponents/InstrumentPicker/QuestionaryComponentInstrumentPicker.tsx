@@ -156,6 +156,8 @@ export function QuestionaryComponentInstrumentPicker(
         instrumentId: newValue,
         timeRequested: '0',
       });
+
+      return;
     }
     onComplete([]);
   };

@@ -859,29 +859,6 @@ context('Template Basic tests', () => {
     });
 
     it('User officer can add instrument picker question as a dependency', () => {
-      cy.createInstrument({
-        shortCode: 'Instrument 1',
-        description: 'Instrument 1',
-        managerUserId: initialDBData.users.user1.id,
-        ...initialDBData.instrument1,
-      }).then((result) => {
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
-        });
-      });
-
-      cy.createInstrument({
-        shortCode: 'Instrument 3',
-        description: 'Instrument 3',
-        managerUserId: initialDBData.users.user1.id,
-        ...initialDBData.instrument3,
-      }).then((result) => {
-        cy.assignInstrumentToCall({
-          callId: initialDBData.call.id,
-          instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
-        });
-      });
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const createdProposal = result.createProposal;
         if (createdProposal) {
