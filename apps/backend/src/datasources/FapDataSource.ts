@@ -153,7 +153,7 @@ export interface FapDataSource {
     instrumentId?: number | null
   ): Promise<boolean>;
   setReviewerRank(
-    proposalPk: number,
+    fapReviewId: number,
     reviewerId: number,
     rank: number
   ): Promise<boolean>;
