@@ -7,7 +7,10 @@ import { DataType, InstrumentPickerConfig } from 'generated/sdk';
 
 import InstrumentPickerAnswerRenderer from './InstrumentPickerAnswerRenderer';
 import InstrumentPickerSearchCriteriaComponent from './InstrumentPickerSearchCriteriaComponent';
-import { QuestionaryComponentInstrumentPicker } from './QuestionaryComponentInstrumentPicker';
+import {
+  processInstrumentPickerValue,
+  QuestionaryComponentInstrumentPicker,
+} from './QuestionaryComponentInstrumentPicker';
 import { QuestionInstrumentPickerForm } from './QuestionInstrumentPickerForm';
 import { QuestionTemplateRelationInstrumentPickerForm } from './QuestionTemplateRelationInstrumentPickerForm';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -30,21 +33,8 @@ export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
   getYupInitialValue: ({ answer }) => {
     if (answer && answer.config) {
       const config = answer.config as InstrumentPickerConfig;
-      if (Array.isArray(answer.value)) {
-        return answer.value.filter((answer) =>
-          answer?.instrumentId
-            ? config.instruments.some(
-                (instrument) => instrument.id.toString() === answer.instrumentId
-              )
-            : false
-        );
-      } else if (config?.instruments && answer.value?.instrumentId) {
-        const instrumentExists = config.instruments.some(
-          (instrument) => instrument.id.toString() === answer.value.instrumentId
-        );
 
-        return instrumentExists ? answer.value : null;
-      }
+      return processInstrumentPickerValue(answer, config);
     }
 
     return null;

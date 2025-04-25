@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { InstrumentPickerConfig } from 'generated/sdk';
+import { Answer, InstrumentPickerConfig } from 'generated/sdk';
 
 /* InstrumentIdAndTime is used to save the 
 instrument id and requested time in database*/
@@ -32,7 +32,28 @@ interface InstrumentIdNameAndTime {
   instrumentName?: string;
   timeRequested?: string;
 }
+export function processInstrumentPickerValue(
+  answer: Answer,
+  config: InstrumentPickerConfig
+) {
+  if (Array.isArray(answer.value)) {
+    return answer.value.filter((answer) =>
+      answer?.instrumentId
+        ? config.instruments.some(
+            (instrument) => instrument.id.toString() === answer.instrumentId
+          )
+        : false
+    );
+  } else if (config?.instruments && answer.value?.instrumentId) {
+    const instrumentExists = config.instruments.some(
+      (instrument) => instrument.id.toString() === answer.value.instrumentId
+    );
 
+    return instrumentExists ? answer.value : null;
+  }
+
+  return undefined;
+}
 export function QuestionaryComponentInstrumentPicker(
   props: BasicComponentProps
 ) {
@@ -49,23 +70,7 @@ export function QuestionaryComponentInstrumentPicker(
   const config = answer.config as InstrumentPickerConfig;
   const [stateValue, setStateValue] = useState<
     Array<InstrumentIdAndTime> | InstrumentIdAndTime
-  >(() => {
-    if (Array.isArray(answer.value)) {
-      return answer.value.filter((answer) =>
-        answer?.instrumentId
-          ? config.instruments.some(
-              (instrument) => instrument.id.toString() === answer.instrumentId
-            )
-          : false
-      );
-    } else if (config?.instruments && answer.value?.instrumentId) {
-      const instrumentExists = config.instruments.some(
-        (instrument) => instrument.id.toString() === answer.value.instrumentId
-      );
-
-      return instrumentExists ? answer.value : null;
-    }
-  });
+  >(() => processInstrumentPickerValue(answer, config));
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
   const getValueWithInstrumentName = () => {
@@ -94,23 +99,9 @@ export function QuestionaryComponentInstrumentPicker(
   >(getValueWithInstrumentName());
   useEffect(() => {
     setStateValue((prevState) => {
-      if (Array.isArray(answer.value)) {
-        return answer.value.filter((answer) =>
-          answer?.instrumentId
-            ? config.instruments.some(
-                (instrument) => instrument.id.toString() === answer.instrumentId
-              )
-            : false
-        );
-      } else if (config?.instruments && answer.value?.instrumentId) {
-        const instrumentExists = config.instruments.some(
-          (instrument) => instrument.id.toString() === answer.value.instrumentId
-        );
+      const processedValue = processInstrumentPickerValue(answer, config);
 
-        return instrumentExists ? answer.value : null;
-      }
-
-      return prevState;
+      return processedValue !== undefined ? processedValue : prevState;
     });
 
     setRequestTimeForInstrument(getValueWithInstrumentName());
