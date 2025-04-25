@@ -99,7 +99,12 @@ export const dummyFapReview = new Review(
   7,
   0,
   1,
-  1
+  1,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false,
+  null
 );
 
 export const dummyFapProposal = new FapProposal(
@@ -544,7 +549,7 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async setReviewerRank(
-    proposalPk: number,
+    fapReviewId: number,
     reviewer_id: number,
     rank: number
   ): Promise<boolean> {
