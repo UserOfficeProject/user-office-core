@@ -1,23 +1,6 @@
 version: "3.1"
 
 services:
-
-  proxy:
-    image: traefik:2.10 # The official Traefik docker image
-    command:
-      - '--log.level=DEBUG'
-      - '--api.insecure=true'
-      - '--providers.docker=true'
-      - '--providers.docker.exposedbydefault=false'
-      - '--entrypoints.web.address=:80'
-      - '--entrypoints.ep1.address=:3000'
-      - '--entrypoints.ep2.address=:33000'
-    ports:
-      - '33000:33000'
-      - '8080:8080' # The Web UI (enabled by --api)
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      
   duo-cron-job:
     image: ghcr.io/userofficeproject/user-office-cron:develop
     environment:
@@ -68,66 +51,3 @@ services:
     environment:
       DATABASE_URL: postgres://duouser:duopassword@db:5432/duo
       PORT: 5000
-
-  scheduler-db:
-    image: postgres:11-alpine
-    restart: always
-    environment:
-      POSTGRES_DB: scheduler
-      POSTGRES_USER: schedulerUser
-      POSTGRES_PASSWORD: schedulerPassword
-    volumes:
-      - '/mnt/Data/dev/user-office-scheduler/apps/backend/db_patches/:/docker-entrypoint-initdb.d/'
-    ports:
-      - 5433:5432
-
-  gateway:
-    image: 'ghcr.io/userofficeproject/user-office-gateway:develop'
-    environment:
-      USER_OFFICE_BACKEND: http://host.docker.internal:4000/graphql
-      USER_OFFICE_SCHEDULER_BACKEND: http://scheduler-backend:4200/graphql
-      NODE_ENV: development
-      ENABLE_SERVICE_POLLING: 1 # see gateway
-      KEEP_RETRYING: 1 # see gateway
-    ports:
-      - 4100:4100
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.services.backend.loadbalancer.server.port=4100'
-      - 'traefik.http.routers.gateway.rule=(Host(`localhost`) && PathPrefix(`/gateway`, `/graphql`))'
-    depends_on:
-      - scheduler-backend
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-
-
-  scheduler-frontend:
-    image: 'ghcr.io/userofficeproject/user-office-scheduler-frontend:develop'
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.scheduler.rule=Host(`localhost`)'
-      - 'traefik.http.routers.scheduler.entrypoints=ep2'
-    depends_on:
-      - gateway
-
-
-  scheduler-backend:
-    image: 'ghcr.io/userofficeproject/user-office-scheduler-backend:develop'
-    environment:
-      NODE_ENV: development
-      PORT: 4200
-      DATABASE_HOSTNAME: scheduler-db
-      DATABASE_PORT: 5432
-      DATABASE_USER: schedulerUser
-      DATABASE_PASSWORD: schedulerPassword
-      DATABASE_DATABASE: scheduler
-      RABBITMQ_HOSTNAME: rabbitmq
-      RABBITMQ_PROPOSAL_SCHEDULING_QUEUE_NAME: user-office-backend.proposal_scheduling.queue
-      RABBITMQ_SCHEDULER_EXCHANGE_NAME: user_office_scheduler_backend.fanout
-      RABBITMQ_CORE_EXCHANGE_NAME: user_office_backend.fanout
-      USER_OFFICE_ENDPOINT: http://backend:4000/graphql
-      UPSERT_PROPOSAL_BOOKING_TRIGGER_STATUSES: SCHEDULING
-    depends_on:
-      - duo-development-authorization-server
-      - scheduler-db
-      - rabbitmq
