@@ -231,7 +231,13 @@ const getButtonByIconCyTag = (cyTag: string) =>
 
 const testActionButton = (
   iconCyTag: string,
-  state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
+  state:
+    | 'completed'
+    | 'active'
+    | 'inactive'
+    | 'neutral'
+    | 'invisible'
+    | 'cancelled'
 ) => {
   switch (state) {
     case 'completed':
