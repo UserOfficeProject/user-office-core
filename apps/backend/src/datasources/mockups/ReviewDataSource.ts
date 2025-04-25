@@ -11,7 +11,21 @@ import { TechnicalReviewsFilter } from '../../resolvers/queries/TechnicalReviews
 import { ReviewDataSource } from '../ReviewDataSource';
 import { dummyProposalTechnicalReview } from './ProposalDataSource';
 
-export const dummyReview = new Review(4, 10, 1, 'Good proposal', 9, 0, 1, 1);
+export const dummyReview = new Review(
+  4,
+  10,
+  1,
+  'Good proposal',
+  9,
+  0,
+  1,
+  1,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false,
+  null
+);
 export const dummySubmittedReview = new Review(
   5,
   10,
@@ -20,7 +34,12 @@ export const dummySubmittedReview = new Review(
   9,
   1,
   1,
-  1
+  1,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false,
+  null
 );
 
 export const dummyTechnicalReview = new TechnicalReview(
@@ -38,7 +57,21 @@ export const dummyTechnicalReview = new TechnicalReview(
   1
 );
 
-export const dummyReviewBad = new Review(1, 9, 1, 'bad proposal', 1, 0, 1, 1);
+export const dummyReviewBad = new Review(
+  1,
+  9,
+  1,
+  'bad proposal',
+  1,
+  0,
+  1,
+  1,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false,
+  null
+);
 
 export class ReviewDataSourceMock implements ReviewDataSource {
   async getProposalInstrumentTechnicalReview(
@@ -78,10 +111,38 @@ export class ReviewDataSourceMock implements ReviewDataSource {
   async addUserForReview(args: AddUserForReviewArgs): Promise<Review> {
     const { proposalPk, userID } = args;
 
-    return new Review(1, proposalPk, userID, ' ', 1, 1, 1, 1);
+    return new Review(
+      1,
+      proposalPk,
+      userID,
+      ' ',
+      1,
+      1,
+      1,
+      1,
+      new Date('2020-04-20 08:25:12.23043+00'),
+      false,
+      null,
+      false,
+      null
+    );
   }
   async removeUserForReview(id: number): Promise<Review> {
-    return new Review(1, 1, 1, ' ', 1, 1, 1, 1);
+    return new Review(
+      1,
+      1,
+      1,
+      ' ',
+      1,
+      1,
+      1,
+      1,
+      new Date('2020-04-20 08:25:12.23043+00'),
+      false,
+      null,
+      false,
+      null
+    );
   }
   async getReview(id: number): Promise<Review | null> {
     if (id === 1) {

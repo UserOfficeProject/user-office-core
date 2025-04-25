@@ -13,7 +13,7 @@ import { ResolverContext } from '../../context';
 @ArgsType()
 export class SaveReviewerRankArg {
   @Field(() => Int)
-  public proposalPk: number;
+  public fapReviewId: number;
 
   @Field(() => Int)
   public reviewerId: number;
