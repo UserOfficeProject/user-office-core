@@ -269,11 +269,11 @@ export default class ExperimentMutations {
     }
 
     const hasAccessRights =
-      !!this.userAuth.isApiToken(agent) ||
-      this.experimentSafetyAuth.hasWriteRights(
+      this.userAuth.isApiToken(agent) ||
+      (await this.experimentSafetyAuth.hasWriteRights(
         agent,
         experimentSafety.experimentSafetyPk
-      );
+      ));
     if (!hasAccessRights) {
       return rejection(
         'User does not have permission to update samples in the experiment',
