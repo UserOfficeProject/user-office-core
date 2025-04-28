@@ -146,7 +146,10 @@ export default class ProposalMutations {
       return rejection('Proposal not found', { args });
     }
 
-    if ((await this.proposalAuth.hasWriteRights(agent, proposal)) === false) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !(await this.proposalAuth.hasWriteRights(agent, proposal))
+    ) {
       return rejection('You do not have rights to update this proposal', {
         args,
       });
@@ -408,7 +411,10 @@ export default class ProposalMutations {
       await this.proposalAuth.isChairOrSecretaryOfProposal(agent, primaryKey);
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+
+    const isApiAccessToken = this.userAuth.isApiToken(agent);
+
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer && !isApiAccessToken) {
       return rejection(
         'Can not administer proposal because of insufficient permissions',
         { args, agent }
@@ -427,7 +433,11 @@ export default class ProposalMutations {
     const isFapProposalInstrumentSubmitted =
       await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
-    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
+    if (
+      isFapProposalInstrumentSubmitted &&
+      !isUserOfficer &&
+      !isApiAccessToken
+    ) {
       return rejection(
         'Can not administer proposal because instrument is submitted',
         { args, agent }
@@ -780,10 +790,9 @@ export default class ProposalMutations {
       );
     }
 
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      agent,
-      sourceProposal
-    );
+    const canReadProposal =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, sourceProposal));
 
     if (canReadProposal === false) {
       return rejection(

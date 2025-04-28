@@ -163,7 +163,7 @@ export default class FapMutations {
     args: AssignReviewersToFapArgs
   ): Promise<Fap | Rejection> {
     if (
-      !agent?.isApiAccessToken &&
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -195,12 +195,9 @@ export default class FapMutations {
       args.fapId
     );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isApiAccessToken = this.userAuth.isApiToken(agent);
 
-    if (
-      !agent?.isApiAccessToken &&
-      !isUserOfficer &&
-      !isChairOrSecretaryOfFap
-    ) {
+    if (!isApiAccessToken && !isUserOfficer && !isChairOrSecretaryOfFap) {
       return rejection(
         'Could not remove member from Fap because of insufficient permissions',
         { agent, args }
@@ -234,7 +231,7 @@ export default class FapMutations {
 
     // Fap Chair and Fap Secretary can not
     // modify Fap Chair and Fap Secretary members
-    if (isChairOrSecretaryOfFap && !isUserOfficer) {
+    if (isChairOrSecretaryOfFap && !isUserOfficer && !isApiAccessToken) {
       if (isMemberToRemoveChairOrSecretaryOfFap) {
         return rejection(
           `Could not remove member from Fap because Fap Chair and 
@@ -435,7 +432,7 @@ export default class FapMutations {
     args: AssignFapReviewersToProposalsArgs
   ): Promise<Fap | Rejection> {
     if (
-      !agent?.isApiAccessToken &&
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -503,7 +500,7 @@ export default class FapMutations {
     args: RemoveFapReviewerFromProposalArgs
   ): Promise<Fap | Rejection> {
     if (
-      !agent?.isApiAccessToken &&
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -536,7 +533,10 @@ export default class FapMutations {
     }: UpdateFapTimeAllocationArgs
   ) {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isApiAccessToken = this.userAuth.isApiToken(agent);
+
     if (
+      !isApiAccessToken &&
       !isUserOfficer &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId))
     ) {
@@ -552,7 +552,11 @@ export default class FapMutations {
         instrumentId
       );
 
-    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
+    if (
+      isFapProposalInstrumentSubmitted &&
+      !isUserOfficer &&
+      !isApiAccessToken
+    ) {
       return rejection(
         'Could not update the time allocation because the instrument is submitted',
         { agent, fapId, proposalPk }
@@ -587,7 +591,11 @@ export default class FapMutations {
       );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
-    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !isChairOrSecretaryOfProposal &&
+      !isUserOfficer
+    ) {
       return rejection(
         'Can not save Fap meeting decision because of insufficient permissions',
         { agent, args }

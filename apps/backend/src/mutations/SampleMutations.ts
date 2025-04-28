@@ -61,10 +61,9 @@ export default class SampleMutations {
       });
     }
 
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      agent,
-      proposal
-    );
+    const canReadProposal =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposal));
 
     if (canReadProposal === false) {
       return rejection(
@@ -110,9 +109,11 @@ export default class SampleMutations {
       return rejection('Sample does not exist', { agent, args });
     }
 
-    const hasWriteRights = await this.sampleAuth.hasWriteRights(agent, sample);
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.sampleAuth.hasWriteRights(agent, sample));
 
-    if (hasWriteRights === false) {
+    if (!hasWriteRights) {
       return rejection(
         'Can not update sample because of insufficient permissions',
         { agent, args }
@@ -140,9 +141,11 @@ export default class SampleMutations {
         { agent, sampleId }
       );
     }
-    const hasWriteRights = await this.sampleAuth.hasWriteRights(agent, sample);
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.sampleAuth.hasWriteRights(agent, sample));
 
-    if (hasWriteRights === false) {
+    if (!hasWriteRights) {
       return rejection(
         'Can not delete sample because of insufficient permissions',
         { agent, sampleId }
@@ -187,7 +190,12 @@ export default class SampleMutations {
       );
     }
 
-    if ((await this.sampleAuth.hasReadRights(agent, sourceSample)) === false) {
+    const isApiToken = this.userAuth.isApiToken(agent);
+
+    if (
+      !isApiToken &&
+      !(await this.sampleAuth.hasReadRights(agent, sourceSample))
+    ) {
       return rejection(
         'Could not clone sample, because of insufficient permissions',
         { agent, args }
@@ -203,7 +211,8 @@ export default class SampleMutations {
     }
 
     if (
-      (await this.proposalAuth.hasWriteRights(agent, proposal)) === false &&
+      !isApiToken &&
+      !(await this.proposalAuth.hasWriteRights(agent, proposal)) &&
       !isPostProposalSubmission
     ) {
       return rejection('Can not update proposal due to lack of permissions', {

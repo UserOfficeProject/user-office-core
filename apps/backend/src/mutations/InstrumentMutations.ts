@@ -408,7 +408,10 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: InstrumentSubmitInFapArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
-    if (!this.userAuth.isUserOfficer(agent)) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !this.userAuth.isUserOfficer(agent)
+    ) {
       return rejection('Submitting FAP instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
@@ -485,6 +488,7 @@ export default class InstrumentMutations {
     args: InstrumentSubmitInFapArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
     if (
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
