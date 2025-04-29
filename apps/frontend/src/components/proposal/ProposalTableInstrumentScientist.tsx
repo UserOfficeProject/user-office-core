@@ -76,7 +76,7 @@ import TableActionsDropdownMenu, {
 
 type QueryParameters = {
   query: {
-    first?: number;
+    first: number;
     offset?: number;
     refetch: boolean;
   };
@@ -965,17 +965,12 @@ const ProposalTableInstrumentScientist = ({
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}
         onPageChange={(page, pageSize) => {
-          const newOffset =
-            Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
-          if (
-            page !== currentPage &&
-            newOffset != queryParameters.query.offset
-          ) {
+          if ((page + 1) * pageSize >= queryParameters.query.first) {
             setQueryParameters({
               searchText: queryParameters.searchText,
               query: {
                 ...queryParameters.query,
-                offset: newOffset,
+                first: queryParameters.query.first * 2,
               },
             });
           }
