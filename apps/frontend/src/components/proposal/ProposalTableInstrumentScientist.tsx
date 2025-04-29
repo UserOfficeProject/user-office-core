@@ -970,7 +970,7 @@ const ProposalTableInstrumentScientist = ({
               searchText: queryParameters.searchText,
               query: {
                 ...queryParameters.query,
-                first: queryParameters.query.first * 2,
+                first: queryParameters.query.first + PREFETCH_SIZE,
               },
             });
           }
