@@ -327,7 +327,7 @@ context('visits tests', () => {
 
       cy.reload();
 
-      cy.testActionButton(cyTagRegisterVisit, 'completed');
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
     });
 
     it('User should not see register for visit or training button if he is not a visitor', () => {

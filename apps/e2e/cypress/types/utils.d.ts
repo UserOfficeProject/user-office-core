@@ -123,6 +123,7 @@ declare global {
           | 'inactive'
           | 'neutral'
           | 'invisible'
+          | 'pending'
           | 'cancelled'
       ) => void;
 
