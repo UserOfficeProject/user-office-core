@@ -1,6 +1,7 @@
 import { container, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { ExperimentSafetyPdfTemplateDataSource } from '../../datasources/ExperimentSafetyPdfTemplateDataSource';
 import { ProposalPdfTemplateDataSource } from '../../datasources/ProposalPdfTemplateDataSource';
 import { FactoryServicesAuthorized } from '../../decorators';
 import { MetaBase } from '../../factory/DownloadService';
@@ -14,6 +15,7 @@ import {
   ProposalAttachmentData,
 } from '../../factory/zip/attachment';
 import { UserWithRole } from '../../models/User';
+import { ExperimentSafetyPdfTemplate } from '../../resolvers/types/ExperimentSafetyPdfTemplate';
 import { ProposalPdfTemplate } from '../../resolvers/types/ProposalPdfTemplate';
 
 export type DownloadOptions = {
@@ -32,10 +34,14 @@ export interface DownloadTypeServices {
     proposalPks: number[],
     options: DownloadOptions
   ): Promise<ProposalAttachmentData[] | null>;
-  getPdfTemplate(
+  getProposalPdfTemplate(
     agent: UserWithRole,
     pdfTemplateId: number
   ): Promise<ProposalPdfTemplate | null>;
+  getExperimentSafetyPdfTemplate(
+    agent: UserWithRole,
+    pdfTemplateId: number
+  ): Promise<ExperimentSafetyPdfTemplate | null>;
 }
 @injectable()
 export default class FactoryServices implements DownloadTypeServices {
@@ -94,9 +100,9 @@ export default class FactoryServices implements DownloadTypeServices {
   }
 
   @FactoryServicesAuthorized()
-  async getPdfTemplate(
+  async getProposalPdfTemplate(
     agent: UserWithRole,
-    pdfTemplateId: number
+    proposalPdfTemplateId: number
   ): Promise<ProposalPdfTemplate | null> {
     let data = null;
     if (agent) {
@@ -104,7 +110,24 @@ export default class FactoryServices implements DownloadTypeServices {
         .resolve<ProposalPdfTemplateDataSource>(
           Tokens.ProposalPdfTemplateDataSource
         )
-        .getPdfTemplate(pdfTemplateId);
+        .getPdfTemplate(proposalPdfTemplateId);
+    }
+
+    return data;
+  }
+
+  @FactoryServicesAuthorized()
+  async getExperimentSafetyPdfTemplate(
+    agent: UserWithRole,
+    experimentSafetyPdfTemplateId: number
+  ): Promise<ExperimentSafetyPdfTemplate | null> {
+    let data = null;
+    if (agent) {
+      data = await container
+        .resolve<ExperimentSafetyPdfTemplateDataSource>(
+          Tokens.ExperimentSafetyPdfTemplateDataSource
+        )
+        .getPdfTemplate(experimentSafetyPdfTemplateId);
     }
 
     return data;

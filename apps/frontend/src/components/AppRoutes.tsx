@@ -679,9 +679,7 @@ const AppRoutes = () => {
         ) : isExperimentSafetyReviewer ? (
           <Route
             path="/"
-            element={
-              <TitledRoute title="" element={<ExperimentSafetyReviewPage />} />
-            }
+            element={<TitledRoute title="" element={<ExperimentPage />} />}
           />
         ) : (
           <Route

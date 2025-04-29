@@ -70,22 +70,20 @@ export class SampleAuthorization {
       return false;
     }
 
-    const canEditProposal = await this.proposalAuth.hasWriteRights(
-      agent,
-      sample.proposalPk
-    );
-
     const isMemberOfProposal = await this.proposalAuth.isMemberOfProposal(
       agent,
       sample.proposalPk
     );
 
-    const isPostProposalSubmission = sample.isPostProposalSubmission === true;
+    // const isPostProposalSubmission = sample.isPostProposalSubmission === true;
+    console.log({
+      isMemberOfProposal,
+      // isPostProposalSubmission,
+    });
 
     return (
-      canEditProposal ||
-      (isMemberOfProposal && isPostProposalSubmission) ||
-      this.userAuth.isExperimentSafetyReviewer(agent)
+      // (isMemberOfProposal && isPostProposalSubmission) ||
+      isMemberOfProposal || this.userAuth.isExperimentSafetyReviewer(agent)
     );
   }
 }

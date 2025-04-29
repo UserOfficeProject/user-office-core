@@ -33,7 +33,6 @@ const TemplateEditor = <
     | 'templateData'
     | 'templateHeader'
     | 'templateFooter'
-    | 'templateSampleDeclaration'
     | 'dummyData',
 >({
   name,
@@ -173,15 +172,7 @@ export default function PdfTemplateEditor() {
           }}
         >
           {template && pdfTemplate && (
-            <SimpleTabs
-              tabNames={[
-                'Body',
-                'Header',
-                'Footer',
-                'Sample Declaration',
-                'Dummy Data',
-              ]}
-            >
+            <SimpleTabs tabNames={['Body', 'Header', 'Footer', 'Dummy Data']}>
               <TemplateEditor<'templateData'>
                 name="templateData"
                 template={template}
@@ -205,16 +196,6 @@ export default function PdfTemplateEditor() {
                 template={template}
                 initialValues={{
                   templateFooter: pdfTemplate?.templateFooter,
-                }}
-                pdfTemplate={pdfTemplate}
-                setPdfTemplate={setPdfTemplate}
-              />
-              <TemplateEditor<'templateSampleDeclaration'>
-                name="templateSampleDeclaration"
-                template={template}
-                initialValues={{
-                  templateSampleDeclaration:
-                    pdfTemplate?.templateSampleDeclaration,
                 }}
                 pdfTemplate={pdfTemplate}
                 setPdfTemplate={setPdfTemplate}

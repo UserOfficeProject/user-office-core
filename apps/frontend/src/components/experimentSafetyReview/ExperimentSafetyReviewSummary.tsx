@@ -162,10 +162,9 @@ function ExperimentSafetyReviewSummary({
           {false ? '✔ Submitted' : 'Submit'}
         </NavigButton>
         <Button
-          onClick={
-            () => alert('hi')
+          onClick={() => {
             // downloadPDFProposal([proposal.primaryKey], proposal.title)
-          }
+          }}
           color="secondary"
         >
           Download Safety Review Document

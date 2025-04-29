@@ -28,7 +28,7 @@ import {
 } from './genericTemplates';
 import { collectSamplePDFData, SamplePDFData } from './sample';
 
-export type ExperimentPDFData = {
+export type ExperimentSafetyPDFData = {
   experiment: Experiment;
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;

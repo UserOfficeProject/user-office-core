@@ -73,6 +73,7 @@ function ExperimentTable() {
             <ButtonWithDialog
               label="Review Experiment Safety"
               title="Review Experiment Safety"
+              size="large"
             >
               <ExperimentSafetyReview
                 experimentSafetyPk={rowData.experimentSafety.experimentSafetyPk}
