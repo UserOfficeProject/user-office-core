@@ -47,7 +47,7 @@ type StyledDialogProps = {
 } & DialogProps;
 
 function StyledDialog(props: StyledDialogProps) {
-  const { extra, error, title } = props;
+  const { extra, error, title, onClose } = props;
 
   return (
     <Dialog {...props}>
@@ -65,11 +65,11 @@ function StyledDialog(props: StyledDialogProps) {
         </DialogTitle>
         {extra}
 
-        {props.onClose && (
+        {onClose && (
           <IconButton
             data-cy="close-modal-btn"
             aria-label="close"
-            onClick={(e) => props.onClose?.(e, 'escapeKeyDown')}
+            onClick={(e) => onClose?.(e, 'escapeKeyDown')}
             sx={{
               color: (theme) => theme.palette.grey[500],
             }}
