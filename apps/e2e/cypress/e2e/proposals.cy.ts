@@ -1418,6 +1418,12 @@ context('Proposal tests', () => {
       description: 'Instrument 2',
       managerUserId: initialDBData.users.user1.id,
     };
+    const instrument3 = {
+      name: 'Instrument 3',
+      shortCode: 'Instrument 3',
+      description: 'Instrument 3',
+      managerUserId: initialDBData.users.user1.id,
+    };
     let topicId: number;
     let instrumentPickerQuestionId: string;
 
@@ -1754,6 +1760,74 @@ context('Proposal tests', () => {
         'td',
         `${instrument2.name} (${time} ${AllocationTimeUnits.DAY})`
       ).should('exist');
+    });
+    it('Cloned proposal must save if instrument is not available on new call but can be updated to available instrument(s)', () => {
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: createdWorkflowId,
+      }).then((callResult) => {
+        if (callResult.createCall.id) {
+          cy.createInstrument(instrument3).then((result) => {
+            cy.assignInstrumentToCall({
+              callId: callResult.createCall.id,
+              instrumentFapIds: [{ instrumentId: result.createInstrument.id }],
+            });
+          });
+        }
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains(instrument.name).click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.get('[aria-label="Clone proposal"]').first().click();
+      cy.get('[data-cy="call-selection"]').click();
+      cy.get('[data-cy="call-selection-options"]')
+        .contains(newCall.shortCode)
+        .click();
+      cy.get('[data-cy="submit"]').click();
+      cy.finishedLoading();
+      cy.contains(`Copy of ${title}`)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-cy=save-button]').should('be.disabled');
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains(instrument3.name).click();
+      cy.get('[data-cy=save-button]').should('not.be.disabled');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
     });
   });
   describe('Proposal PDF generation with instrument picker question', () => {
