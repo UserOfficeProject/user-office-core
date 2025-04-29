@@ -73,6 +73,7 @@ describe('Test Instrument Mutations', () => {
       shortCode: '2020-06-15',
       description: 'Test instrument description 1',
       managerUserId: 1,
+      updateTechReview: true,
     };
 
     return expect(

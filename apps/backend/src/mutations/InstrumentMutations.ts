@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import {
   createInstrumentValidationSchema,
   updateInstrumentValidationSchema,
@@ -86,13 +87,45 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: UpdateInstrumentArgs
   ): Promise<Instrument | Rejection> {
-    return this.dataSource.update(args).catch((error) => {
+    try {
+      const currentInstrument = await this.dataSource.getInstrument(args.id);
+
+      if (!currentInstrument) {
+        return rejection('Instrument not found', { instrumentId: args.id });
+      }
+
+      if (
+        args.managerUserId &&
+        args.managerUserId !== currentInstrument.managerUserId &&
+        args.updateTechReview
+      ) {
+        const updateSuccess =
+          await this.reviewDataSource.updateInstrumentContact(
+            args.managerUserId,
+            currentInstrument.id
+          );
+
+        if (!updateSuccess) {
+          return rejection('Failed to update contact ', {
+            instrumentId: currentInstrument.id,
+            managerUserId: args.managerUserId,
+          });
+        }
+      }
+
+      return await this.dataSource.update(args);
+    } catch (error) {
+      logger.logError('Error updating instrument:', {
+        message: (error as Error)?.message,
+        stack: (error as Error)?.stack,
+      });
+
       return rejection(
         'Could not update instrument',
         { agent, instrumentId: args.id },
         error
       );
-    });
+    }
   }
 
   @EventBus(Event.INSTRUMENT_DELETED)

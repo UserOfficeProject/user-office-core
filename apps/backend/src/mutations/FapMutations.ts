@@ -22,7 +22,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Fap, FapProposal, FapReviewer } from '../models/Fap';
+import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
@@ -495,43 +495,6 @@ export default class FapMutations {
     );
   }
 
-  async getReviewerWithMinNumReviews(
-    reviewersAssignedReviewsMap: Map<FapReviewer, number>,
-    pendingAssignments: Map<FapReviewer, FapProposal[]>,
-    proposalPk: number,
-    fapId: number
-  ): Promise<FapReviewer> {
-    let fapReviewerWithMinNumReviews = [
-      ...reviewersAssignedReviewsMap.keys(),
-    ][0];
-    let minReviews = Number.MAX_VALUE;
-
-    for (const fapReviewer of [...reviewersAssignedReviewsMap.keys()]) {
-      const numReviews = reviewersAssignedReviewsMap.get(fapReviewer) ?? 0;
-      const numPendingReviews = (pendingAssignments.get(fapReviewer) ?? [])
-        .length;
-      const totalReviews = numReviews + numPendingReviews;
-      const isAssigned =
-        (pendingAssignments.get(fapReviewer) ?? []).some(
-          (fapProposal) => fapProposal.proposalPk === proposalPk
-        ) ||
-        (
-          await this.dataSource.getFapProposalAssignments(
-            fapId,
-            proposalPk,
-            fapReviewer.userId
-          )
-        ).length > 0;
-
-      if (totalReviews < minReviews && !isAssigned) {
-        minReviews = totalReviews;
-        fapReviewerWithMinNumReviews = fapReviewer;
-      }
-    }
-
-    return fapReviewerWithMinNumReviews;
-  }
-
   @ValidateArgs(assignFapMemberToProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL)
@@ -731,7 +694,7 @@ export default class FapMutations {
   ): Promise<boolean | Rejection> {
     try {
       return await this.dataSource.setReviewerRank(
-        args.proposalPk,
+        args.fapReviewId,
         args.reviewerId,
         args.rank
       );
