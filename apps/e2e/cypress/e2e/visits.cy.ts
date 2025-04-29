@@ -19,6 +19,7 @@ context('visits tests', () => {
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
   const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
+  let createdVisitId: number;
 
   beforeEach(function () {
     cy.resetDB(true);
@@ -74,6 +75,8 @@ context('visits tests', () => {
         teamLeadUserId: visitor.id,
         experimentPk: existingExperimentPk,
       }).then(({ createVisit: visit }: CreateVisitMutation) => {
+        createdVisitId = visit.id;
+
         cy.createVisitRegistration({
           visitId: visit.id,
           userId: visitor.id,
@@ -84,6 +87,38 @@ context('visits tests', () => {
           userId: visitor.id,
         });
       });
+    });
+
+    it('User should be able to cancel visit registration until visit is approved', () => {
+      cy.approveVisitRegistration({
+        visitRegistration: {
+          userId: visitor.id,
+          visitId: createdVisitId,
+        },
+      });
+
+      cy.login('user3');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
+      cy.get('[data-cy="registration-more-options"]').should('not.exist');
+    });
+
+    it('User should not be able to cancel visit registration after visit is approved', () => {
+      cy.login('user3');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
+      cy.get('[data-cy="registration-more-options"]').click();
+      cy.get('[data-cy="cancel-visit-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get(
+        '[aria-label="Define your visit (This action is disabled because your registration for visit is cancelled)"]'
+      ).should('exist');
     });
 
     it('User officer should be able to cancel visit registration', () => {

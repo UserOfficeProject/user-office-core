@@ -30,36 +30,54 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { DialogTitle, IconButton } from '@mui/material';
 import Dialog, { DialogProps } from '@mui/material/Dialog';
+import { styled } from '@mui/material/styles';
 import React from 'react';
-function StyledDialog(props: DialogProps & { title: string; error?: boolean }) {
+
+const DialogHeader = styled('div')({
+  display: 'flex',
+  width: '100%',
+  padding: '0 8px',
+  alignContent: 'center',
+});
+
+type StyledDialogProps = {
+  title?: string;
+  error?: boolean;
+  extra?: JSX.Element;
+} & DialogProps;
+
+function StyledDialog(props: StyledDialogProps) {
+  const { extra, error, title } = props;
+
   return (
     <Dialog {...props}>
-      <DialogTitle
-        id="customized-dialog-title"
-        sx={(theme) => ({
-          color: props.error
-            ? theme.palette.error.main
-            : theme.palette.primary.main,
-        })}
-      >
-        {props.title}
-      </DialogTitle>
-      {props.onClose && (
-        <IconButton
-          data-cy="close-modal-btn"
-          aria-label="close"
-          onClick={(e) => props.onClose?.(e, 'escapeKeyDown')}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
+      <DialogHeader>
+        <DialogTitle
+          id="customized-dialog-title"
+          sx={(theme) => ({
+            flex: 1,
+            color: error
+              ? theme.palette.error.main
+              : theme.palette.primary.main,
+          })}
         >
-          <CloseIcon />
-        </IconButton>
-      )}
+          {title}
+        </DialogTitle>
+        {extra}
 
+        {props.onClose && (
+          <IconButton
+            data-cy="close-modal-btn"
+            aria-label="close"
+            onClick={(e) => props.onClose?.(e, 'escapeKeyDown')}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
+      </DialogHeader>
       {props.children}
     </Dialog>
   );

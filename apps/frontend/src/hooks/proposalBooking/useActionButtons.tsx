@@ -11,7 +11,7 @@ import ActionButton, {
   ActionButtonState,
 } from 'components/proposalBooking/ActionButton';
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
-import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
+import CreateUpdateCancelVisitRegistration from 'components/visit/CreateUpdateCancelVisitRegistration';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
@@ -191,7 +191,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       buttonState,
       () => {
         openModal(
-          <CreateUpdateVisitRegistration
+          <CreateUpdateCancelVisitRegistration
             registration={
               event.visit!.registrations.find(
                 (registration) => registration.userId === user.id
@@ -210,6 +210,20 @@ export function useActionButtons(args: UseActionButtonsArgs) {
               });
               closeModal();
             }}
+            onCancelled={(cancelledRegistration) => {
+              const updatedRegistrations = event.visit!.registrations.map(
+                (registration) =>
+                  registration.userId === cancelledRegistration.userId
+                    ? cancelledRegistration
+                    : registration
+              );
+              eventUpdated({
+                ...event,
+                visit: { ...event.visit!, registrations: updatedRegistrations },
+              });
+              closeModal();
+            }}
+            onClose={closeModal}
           />
         );
       }

@@ -15,7 +15,7 @@ import { tableLocalization } from 'utils/materialLocalization';
 import { getFullUserName } from 'utils/user';
 
 import { DEFAULT_DATE_FORMAT } from './DateFilter';
-import ExperimentVisitsTable from './ExperimentVisitsTable';
+import ExperimentVisitsTable from '../visit/ExperimentVisitsTable';
 
 type RowType = GetExperimentsQuery['experiments'][0];
 

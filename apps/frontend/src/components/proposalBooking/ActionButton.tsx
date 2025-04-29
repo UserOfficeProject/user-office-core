@@ -3,6 +3,7 @@ import React from 'react';
 import CancelBadge from './CancelBadge';
 import CheckBadge from './CheckBadge';
 import DotBadge from './DotBadge';
+import PendingBadge from './PendingBadge';
 
 export type ActionButtonState =
   | 'completed'
@@ -74,19 +75,19 @@ const ActionButton = ({ children, variant: state }: ActionButtonProps) => {
       );
     case 'pending':
       return (
-        <CheckBadge
+        <PendingBadge
           sx={{
             color: '#000',
             marginRight: '2px',
             '& .MuiBadge-badge': {
-              fontSize: '17px',
-              color: '#4ba322',
-              textShadow: '-1px 2px 0 white',
+              color: '#bbb',
+              fontSize: '20px',
+              fontWeight: 'bold',
             },
           }}
         >
           {children}
-        </CheckBadge>
+        </PendingBadge>
       );
     case 'invisible':
       return <DotBadge />;
