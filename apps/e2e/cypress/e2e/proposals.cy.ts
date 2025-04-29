@@ -1761,7 +1761,7 @@ context('Proposal tests', () => {
         `${instrument2.name} (${time} ${AllocationTimeUnits.DAY})`
       ).should('exist');
     });
-    it('Cloned proposal must save if instrument is not available on new call but can be updated to available instrument(s)', () => {
+    it('Cloned proposal must not save if instrument is not available on new call but can be updated to available instrument(s)', () => {
       cy.createCall({
         ...newCall,
         proposalWorkflowId: createdWorkflowId,
