@@ -4,7 +4,7 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, UserRole } from 'generated/sdk';
 
-export const useXpressAccess = (allowedRoles: UserRole[]) => {
+export const useTechniqueProposalAccess = (allowedRoles: UserRole[]) => {
   // Check if user have access
   let isUserAllowed = false;
   const { currentRole } = useContext(UserContext);
@@ -14,9 +14,9 @@ export const useXpressAccess = (allowedRoles: UserRole[]) => {
 
   //Check if feature flag is enabled
   const featureContext = useContext(FeatureContext);
-  const isXpressRouteEnabled = featureContext.featuresMap.get(
+  const isTechniqueProposalsEnabled = featureContext.featuresMap.get(
     FeatureId.TECHNIQUE_PROPOSALS
   )?.isEnabled;
 
-  return isUserAllowed && isXpressRouteEnabled;
+  return isUserAllowed && isTechniqueProposalsEnabled;
 };

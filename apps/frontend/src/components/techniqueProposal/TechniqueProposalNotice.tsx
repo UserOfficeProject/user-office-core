@@ -5,9 +5,9 @@ import { PageName } from 'generated/sdk';
 import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-export default function XpressNotice() {
+export default function TechniqueProposalNotice() {
   const [loadingContent, pageContent] = useGetPageContent(
-    PageName.XPRESSMANAGEMENTPAGE
+    PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE
   );
 
   return (
