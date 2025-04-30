@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import { ExperimentSafetyReviewContextType } from 'components/experimentSafetyReview/ExperimentSafetyReviewContainer';
-import SampleDetails from 'components/experimentSafetyReview/SampleDetails';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
@@ -30,7 +29,6 @@ function QuestionaryComponentExperimentSafetyReviewBasis() {
       >
         {state.experimentSafety.samples.map((sample) => (
           <div key={sample.sampleId}>
-            <SampleDetails sampleId={sample.sampleId} />
             <QuestionaryDetails questionaryId={sample.sampleEsiQuestionaryId} />
           </div>
         ))}
