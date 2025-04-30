@@ -415,7 +415,7 @@ export default class VisitMutations {
 
     if (visitRegistration.status !== VisitRegistrationStatus.SUBMITTED) {
       return rejection(
-        'Could not approve Visit Registration because registration is not in submitted state',
+        'Could not request changes to Visit Registration because registration is not in submitted state',
         { visitRegistration: input }
       );
     }
