@@ -31,12 +31,6 @@ export class ExperimentHasSample {
   ) {}
 }
 
-export enum ExperimentSafetyStatus {
-  DRAFT = 'DRAFT',
-  ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED',
-}
-
 export enum InstrumentScientistDecision {
   UNSET = 0,
   ACCEPTED,
