@@ -86,6 +86,53 @@ context('visits tests', () => {
       });
     });
 
+    it('User officer should be able request changes', () => {
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get('[data-testid="ChevronRightIcon"]')
+        .first()
+        .closest('button')
+        .click();
+      cy.get('[data-cy="request-visit-registration-changhes-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="request-visit-registration-changhes-button"]').should(
+        'not.be.exist'
+      );
+
+      cy.logout();
+      cy.login(visitor);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.testActionButton(cyTagRegisterVisit, 'active');
+
+      cy.get(`[data-cy="${cyTagRegisterVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      const startDateObj = faker.date.future();
+      const endDateObj = new Date(startDateObj.getTime() + 24 * 60 * 60 * 1000);
+
+      const startDate = DateTime.fromJSDate(startDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const endDate = DateTime.fromJSDate(endDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+
+      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.get('[data-cy="submit-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.testActionButton(cyTagRegisterVisit, 'completed');
+    });
+
     it('User officer should be able to cancel visit registration', () => {
       cy.login('officer');
       cy.visit('/ExperimentPage');
