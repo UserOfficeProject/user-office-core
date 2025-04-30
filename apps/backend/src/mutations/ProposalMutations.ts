@@ -23,6 +23,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -73,7 +74,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.TemplateDataSource)
+    private templateDataSource: TemplateDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -815,17 +818,6 @@ export default class ProposalMutations {
       );
     }
 
-    const sourceQuestionary = await this.questionaryDataSource.getQuestionary(
-      sourceProposal.questionaryId
-    );
-
-    if (call.templateId !== sourceQuestionary?.templateId) {
-      return rejection(
-        'Can not clone proposal to a call whose template is different',
-        { call, sourceQuestionary }
-      );
-    }
-
     try {
       let clonedProposal = await this.proposalDataSource.cloneProposal(
         sourceProposal,
@@ -834,6 +826,7 @@ export default class ProposalMutations {
 
       const clonedQuestionary = await this.questionaryDataSource.clone(
         sourceProposal.questionaryId,
+        call.templateId,
         true
       );
 

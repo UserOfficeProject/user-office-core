@@ -399,7 +399,11 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return dummyQuestionarySteps.every((step) => step.isCompleted);
   }
 
-  async clone(questionaryId: number): Promise<Questionary> {
+  async clone(
+    questionaryId: number,
+    targetTemplateId?: number,
+    reviewBeforeSubmit?: boolean
+  ): Promise<Questionary> {
     return createDummyQuestionary({ questionaryId: questionaryId + 1 });
   }
 
