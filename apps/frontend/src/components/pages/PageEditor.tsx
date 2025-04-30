@@ -1,14 +1,17 @@
+import { t } from 'i18next';
 import React from 'react';
 
 import SimpleTabs from 'components/common/SimpleTabs';
 import { PageName, UserRole } from 'generated/sdk';
-import { useXpressAccess } from 'hooks/common/useXpressAccess';
+import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 import PageInputBox from './PageInputBox';
 
 export default function PageEditor() {
-  const isXpressRouteEnabled = useXpressAccess([UserRole.USER_OFFICER]);
+  const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
+    UserRole.USER_OFFICER,
+  ]);
 
   return (
     <StyledContainer maxWidth={false}>
@@ -23,7 +26,9 @@ export default function PageEditor() {
             'Footer',
             'Login',
             'Grade guide',
-            ...(isXpressRouteEnabled ? ['Xpress management'] : []),
+            ...(isTechniqueProposalsEnabled
+              ? [`${t('Technique Proposals')}`]
+              : []),
           ]}
         >
           <PageInputBox
@@ -58,10 +63,10 @@ export default function PageEditor() {
             pageName={PageName.GRADEGUIDEPAGE}
             heading={'Set grade guide page'}
           />
-          {isXpressRouteEnabled && (
+          {isTechniqueProposalsEnabled && (
             <PageInputBox
-              pageName={PageName.XPRESSMANAGEMENTPAGE}
-              heading={'Set Xpress management page notice'}
+              pageName={PageName.TECHNIQUEPROPOSALMANAGEMENTPAGE}
+              heading={`Set ${t('technique proposals')} management page notice`}
             />
           )}
         </SimpleTabs>
