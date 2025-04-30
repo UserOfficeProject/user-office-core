@@ -23,6 +23,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -73,7 +74,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.TemplateDataSource)
+    private templateDataSource: TemplateDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -601,7 +604,7 @@ export default class ProposalMutations {
 
   @EventBus(Event.PROPOSAL_STATUS_CHANGED_BY_USER)
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
-  async changeXpressProposalsStatus(
+  async changeTechniqueProposalsStatus(
     agent: UserWithRole | null,
     args: ChangeProposalsStatusInput
   ): Promise<Proposals | Rejection> {
@@ -630,7 +633,7 @@ export default class ProposalMutations {
 
     if (missingProposalPks.length > 0) {
       return rejection(
-        'Could not change status of Xpress proposal(s): proposals not found',
+        'Could not change status of technique proposal(s): proposals not found',
         {
           missingProposalPks: missingProposalPks,
           ...requesterContext,
@@ -658,19 +661,19 @@ export default class ProposalMutations {
 
       if (!currentStatus || !newStatus) {
         return rejection(
-          'Could not change status of Xpress proposal(s): cannot determine statuses',
+          'Could not change status of technique proposal(s): cannot determine statuses',
           context
         );
       }
 
       if (currentStatus.id === newStatus.id) {
         return rejection(
-          'Could not change status of Xpress proposal(s): same status',
+          'Could not change status of technique proposal(s): same status',
           context
         );
       }
 
-      enum XpressStatus {
+      enum TechniqueProposalStatus {
         DRAFT = 'DRAFT',
         SUBMITTED_LOCKED = 'SUBMITTED_LOCKED',
         UNDER_REVIEW = 'UNDER_REVIEW',
@@ -680,20 +683,20 @@ export default class ProposalMutations {
         EXPIRED = 'EXPIRED',
       }
 
-      if (!(newStatus.shortCode in XpressStatus)) {
+      if (!(newStatus.shortCode in TechniqueProposalStatus)) {
         return rejection(
-          'Could not change status of Xpress proposal(s): forbidden new status',
+          'Could not change status of technique proposal(s): forbidden new status',
           context
         );
       }
 
       if (
-        newStatus.shortCode === XpressStatus.DRAFT ||
-        newStatus.shortCode === XpressStatus.SUBMITTED_LOCKED ||
-        newStatus.shortCode === XpressStatus.EXPIRED
+        newStatus.shortCode === TechniqueProposalStatus.DRAFT ||
+        newStatus.shortCode === TechniqueProposalStatus.SUBMITTED_LOCKED ||
+        newStatus.shortCode === TechniqueProposalStatus.EXPIRED
       ) {
         return rejection(
-          'Could not change status of Xpress proposal(s): forbidden new status',
+          'Could not change status of technique proposal(s): forbidden new status',
           context
         );
       }
@@ -705,19 +708,20 @@ export default class ProposalMutations {
 
       const isInstrumentAbsent = (proposalInstruments?.length ?? 0) === 0;
 
-      const isCurrentlyDraft = currentStatus.shortCode === XpressStatus.DRAFT;
+      const isCurrentlyDraft =
+        currentStatus.shortCode === TechniqueProposalStatus.DRAFT;
       const isCurrentlySubmitted =
-        currentStatus.shortCode === XpressStatus.SUBMITTED_LOCKED;
+        currentStatus.shortCode === TechniqueProposalStatus.SUBMITTED_LOCKED;
       const isCurrentlyUnsuccessful =
-        currentStatus.shortCode === XpressStatus.UNSUCCESSFUL;
+        currentStatus.shortCode === TechniqueProposalStatus.UNSUCCESSFUL;
       const isCurrentlyApproved =
-        currentStatus.shortCode === XpressStatus.APPROVED;
+        currentStatus.shortCode === TechniqueProposalStatus.APPROVED;
       const isCurrentlyFinished =
-        currentStatus.shortCode === XpressStatus.FINISHED;
+        currentStatus.shortCode === TechniqueProposalStatus.FINISHED;
 
       if (isCurrentlyDraft || isCurrentlyFinished || isCurrentlyUnsuccessful) {
         return rejection(
-          'Could not change status of Xpress proposal(s): unmodifiable current status',
+          'Could not change status of technique proposal(s): unmodifiable current status',
           context
         );
       }
@@ -732,16 +736,17 @@ export default class ProposalMutations {
       const shouldDisableFinished = !isCurrentlyApproved || isInstrumentAbsent;
 
       if (
-        (newStatus.shortCode === XpressStatus.UNDER_REVIEW &&
+        (newStatus.shortCode === TechniqueProposalStatus.UNDER_REVIEW &&
           shouldDisableUnderReview) ||
-        (newStatus.shortCode === XpressStatus.APPROVED &&
+        (newStatus.shortCode === TechniqueProposalStatus.APPROVED &&
           shouldDisableApproved) ||
-        (newStatus.shortCode === XpressStatus.UNSUCCESSFUL &&
+        (newStatus.shortCode === TechniqueProposalStatus.UNSUCCESSFUL &&
           shouldDisableUnsuccessful) ||
-        (newStatus.shortCode === XpressStatus.FINISHED && shouldDisableFinished)
+        (newStatus.shortCode === TechniqueProposalStatus.FINISHED &&
+          shouldDisableFinished)
       ) {
         return rejection(
-          'Could not change status of Xpress proposal(s): forbidden status transition',
+          'Could not change status of technique proposal(s): forbidden status transition',
           context
         );
       }
@@ -813,17 +818,6 @@ export default class ProposalMutations {
       );
     }
 
-    const sourceQuestionary = await this.questionaryDataSource.getQuestionary(
-      sourceProposal.questionaryId
-    );
-
-    if (call.templateId !== sourceQuestionary?.templateId) {
-      return rejection(
-        'Can not clone proposal to a call whose template is different',
-        { call, sourceQuestionary }
-      );
-    }
-
     try {
       let clonedProposal = await this.proposalDataSource.cloneProposal(
         sourceProposal,
@@ -832,6 +826,7 @@ export default class ProposalMutations {
 
       const clonedQuestionary = await this.questionaryDataSource.clone(
         sourceProposal.questionaryId,
+        call.templateId,
         true
       );
 

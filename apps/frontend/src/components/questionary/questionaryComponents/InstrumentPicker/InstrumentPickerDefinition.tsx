@@ -3,11 +3,14 @@ import React from 'react';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import defaultRenderer from 'components/questionary/DefaultQuestionRenderer';
-import { DataType } from 'generated/sdk';
+import { DataType, InstrumentPickerConfig } from 'generated/sdk';
 
 import InstrumentPickerAnswerRenderer from './InstrumentPickerAnswerRenderer';
 import InstrumentPickerSearchCriteriaComponent from './InstrumentPickerSearchCriteriaComponent';
-import { QuestionaryComponentInstrumentPicker } from './QuestionaryComponentInstrumentPicker';
+import {
+  processInstrumentPickerValue,
+  QuestionaryComponentInstrumentPicker,
+} from './QuestionaryComponentInstrumentPicker';
 import { QuestionInstrumentPickerForm } from './QuestionInstrumentPickerForm';
 import { QuestionTemplateRelationInstrumentPickerForm } from './QuestionTemplateRelationInstrumentPickerForm';
 import { QuestionaryComponentDefinition } from '../../QuestionaryComponentRegistry';
@@ -27,7 +30,15 @@ export const instrumentPickerDefinition: QuestionaryComponentDefinition = {
     questionRenderer: defaultRenderer.questionRenderer,
   },
   createYupValidationSchema: instrumentPickerValidationSchema,
-  getYupInitialValue: ({ answer }) => answer.value || null,
+  getYupInitialValue: ({ answer }) => {
+    if (answer && answer.config) {
+      const config = answer.config as InstrumentPickerConfig;
+
+      return processInstrumentPickerValue(answer, config);
+    }
+
+    return null;
+  },
   searchCriteriaComponent: InstrumentPickerSearchCriteriaComponent,
 };
 
