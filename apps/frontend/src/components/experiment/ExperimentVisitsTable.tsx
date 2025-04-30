@@ -212,7 +212,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
               onRequestChangesClick(rowData.visitId, rowData.userId)
             }
             component="button"
-            data-cy="request-visit-registration-changhes-button"
+            data-cy="request-visit-registration-changes-button"
           >
             <Tooltip title="Request visit registration changes">
               <ReplayIcon />
