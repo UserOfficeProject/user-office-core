@@ -41,7 +41,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useDownloadXLSXProposal } from 'hooks/proposal/useDownloadXLSXProposal';
 import { ProposalViewData } from 'hooks/proposal/useProposalsCoreData';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
-import { useXpressTechniquesData } from 'hooks/technique/useXpressTechniquesData';
+import { useTechniqueProposalsTechniquesData } from 'hooks/technique/useTechniqueProposalsTechniquesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import {
   addColumns,
@@ -53,11 +53,11 @@ import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import ProposalScientistComment from './ProposalScientistComment';
-import { useXpressInstrumentsData } from './useXpressInstrumentsData';
-import XpressNotice from './XpressNotice';
-import XpressProposalFilterBar from './XpressProposalFilterBar';
+import TechniqueProposalFilterBar from './TechniqueProposalFilterBar';
+import TechniqueProposalNotice from './TechniqueProposalNotice';
+import { useTechniqueProposalInstrumentsData } from './useTechniqueProposalInstrumentsData';
 
-const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
+const TechniqueProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const tableRef = React.useRef<MaterialTableCore<ProposalViewData>>();
   const refreshTableData = () => {
     tableRef.current?.onQueryChange({});
@@ -79,11 +79,12 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   );
 
   // Only show techniques that the user is assigned to
-  const { techniques, loadingTechniques } = useXpressTechniquesData();
+  const { techniques, loadingTechniques } =
+    useTechniqueProposalsTechniquesData();
 
   // Only show instruments in the user's techniques
   const { allInstruments, techniqueInstruments, loadingInstruments } =
-    useXpressInstrumentsData(techniques);
+    useTechniqueProposalInstrumentsData(techniques);
 
   const [searchParams, setSearchParams] = useSearchParams({});
   const { toFormattedDateTime } = useFormattedDateTime({
@@ -126,7 +127,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     EXPIRED = 'EXPIRED',
   }
 
-  const xpressStatusCodes = [
+  const techPropStatusCodes = [
     StatusCode.DRAFT,
     StatusCode.SUBMITTED_LOCKED,
     StatusCode.UNDER_REVIEW,
@@ -136,21 +137,21 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     ...(currentRole === UserRole.USER_OFFICER ? [StatusCode.EXPIRED] : []),
   ];
 
-  const xpressStatuses = proposalStatuses.filter((ps) =>
-    xpressStatusCodes.includes(ps.shortCode as StatusCode)
+  const techPropStatuses = proposalStatuses.filter((ps) =>
+    techPropStatusCodes.includes(ps.shortCode as StatusCode)
   );
 
-  // Use a consistent order representing the Xpress flow
-  xpressStatuses.sort((a, b) => {
+  // Use a consistent order representing the technique proposal flow
+  techPropStatuses.sort((a, b) => {
     return (
-      xpressStatusCodes.indexOf(a.shortCode as StatusCode) -
-      xpressStatusCodes.indexOf(b.shortCode as StatusCode)
+      techPropStatusCodes.indexOf(a.shortCode as StatusCode) -
+      techPropStatusCodes.indexOf(b.shortCode as StatusCode)
     );
   });
 
   const excludedStatusIds = proposalStatuses
     .filter(
-      (status) => !xpressStatusCodes.includes(status.shortCode as StatusCode)
+      (status) => !techPropStatusCodes.includes(status.shortCode as StatusCode)
     )
     .map((status) => status.id);
 
@@ -269,7 +270,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           t('instrument'),
           'lowercase'
         )} successfully!`,
-      }).assignXpressProposalsToInstruments({
+      }).assignTechniqueProposalsToInstruments({
         proposalPks: [proposalPk],
         instrumentIds: [instrument],
       });
@@ -284,7 +285,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   ): Promise<void> => {
     await api({
       toastSuccessMessage: 'Proposal status updated successfully!',
-    }).changeXpressProposalsStatus({
+    }).changeTechniqueProposalsStatus({
       statusId: statusId,
       proposalPks: [proposalPk],
     });
@@ -485,9 +486,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
         // Disallow setting submitted or draft status, unless user officer
         let availableStatuses;
         if (isUserOfficer) {
-          availableStatuses = xpressStatuses;
+          availableStatuses = techPropStatuses;
         } else {
-          availableStatuses = xpressStatuses.filter(
+          availableStatuses = techPropStatuses.filter(
             (status) =>
               status.shortCode !== StatusCode.SUBMITTED_LOCKED &&
               status.shortCode !== StatusCode.DRAFT &&
@@ -495,10 +496,10 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           );
         }
 
-        xpressStatuses.sort((a, b) => {
+        techPropStatuses.sort((a, b) => {
           return (
-            xpressStatusCodes.indexOf(a.shortCode as StatusCode) -
-            xpressStatusCodes.indexOf(b.shortCode as StatusCode)
+            techPropStatusCodes.indexOf(a.shortCode as StatusCode) -
+            techPropStatusCodes.indexOf(b.shortCode as StatusCode)
           );
         });
 
@@ -741,7 +742,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
     searchParams.set('search', searchText ? searchText : '');
     searchParams.set('page', searchText ? '0' : page || '');
   };
-  const XpressTablePanelDetails = React.useCallback(
+  const techPropPanelDetails = React.useCallback(
     ({ rowData }: Record<'rowData', ProposalViewData>) => {
       return <ProposalScientistComment proposalPk={rowData.primaryKey} />;
     },
@@ -812,9 +813,9 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
 
   return (
     <>
-      <XpressNotice />
+      <TechniqueProposalNotice />
       <StyledContainer maxWidth={false}>
-        <StyledPaper data-cy="xpress-proposals-table">
+        <StyledPaper data-cy="technique-proposals-table">
           <ProposalReviewModal
             title={`View proposal: ${proposalToReview?.title} (${proposalToReview?.proposalId})`}
             proposalReviewModalOpen={!!proposalToReview}
@@ -841,7 +842,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               tabNames={userOfficerProposalReviewTabs}
             />
           </ProposalReviewModal>
-          <XpressProposalFilterBar
+          <TechniqueProposalFilterBar
             calls={{ data: calls, isLoading: loadingCalls }}
             instruments={{
               data: techniqueInstruments,
@@ -852,7 +853,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
               isLoading: loadingTechniques,
             }}
             proposalStatuses={{
-              data: xpressStatuses,
+              data: techPropStatuses,
               isLoading: loadingProposalStatuses,
             }}
             handleFilterChange={handleFilterChange}
@@ -861,7 +862,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
           <MaterialTableCore<ProposalViewData>
             tableRef={tableRef}
             icons={tableIcons}
-            title={'Xpress Proposals'}
+            title={t('Technique Proposals')}
             columns={columns}
             data={fetchRemoteProposalsData}
             options={{
@@ -983,7 +984,7 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
             detailPanel={[
               {
                 tooltip: 'Show comment',
-                render: XpressTablePanelDetails,
+                render: techPropPanelDetails,
               },
             ]}
             localization={{
@@ -998,4 +999,4 @@ const XpressProposalTable = ({ confirm }: { confirm: WithConfirmType }) => {
   );
 };
 
-export default withConfirm(XpressProposalTable);
+export default withConfirm(TechniqueProposalTable);

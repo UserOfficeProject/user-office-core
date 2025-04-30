@@ -10,7 +10,7 @@ import { DateTime } from 'luxon';
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
-context('Xpress tests', () => {
+context('Technique Proposal tests', () => {
   let createdInstrumentId1: number;
   let createdInstrumentId2: number;
   let createdInstrumentId3: number;
@@ -248,7 +248,7 @@ context('Xpress tests', () => {
     });
 
     /*
-    Create the workflow with the QUICK_REVIEW status needed for Xpress calls
+    Create the workflow with the QUICK_REVIEW status needed for technique proposal calls
     */
     cy.createWorkflow(proposalWorkflow).then((result) => {
       const workflow = result.createWorkflow;
@@ -507,34 +507,35 @@ context('Xpress tests', () => {
     });
   });
 
-  describe('Xpress basic tests', () => {
+  describe('Technique proposal basic tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
-          !featureFlags
-            .getEnabledFeatures()
-            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
         ) {
           this.skip();
         }
       });
     });
 
-    it('User should not be able to see Xpress page', function () {
+    it('User should not be able to see Technique Proposal page', function () {
       cy.login('user1', initialDBData.roles.user);
       cy.visit('/');
 
       cy.get('[data-cy="profile-page-btn"]').should('exist');
 
-      cy.get('[data-cy="user-menu-items"]').should('not.contain', 'Xpress');
+      cy.get('[data-cy="user-menu-items"]').should(
+        'not.contain',
+        'Technique Proposals'
+      );
     });
 
-    it('Xpress proposals can be filtered by technique', function () {
+    it('Technique proposals can be filtered by technique', function () {
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="technique-filter"]').click();
       cy.get('[role="listbox"]').contains(technique1.name).click();
@@ -587,7 +588,7 @@ context('Xpress tests', () => {
       cy.contains(proposal3.title);
     });
 
-    it('Xpress proposals can be filtered by instrument', function () {
+    it('Technique proposals can be filtered by instrument', function () {
       cy.assignProposalsToInstruments({
         proposalPks: [createdProposalPk1, createdProposalPk2],
         instrumentIds: createdInstrumentId1,
@@ -602,7 +603,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.finishedLoading();
 
@@ -664,7 +665,7 @@ context('Xpress tests', () => {
       cy.contains(proposal3.title);
     });
 
-    it('Xpress proposals can be filtered by call', function () {
+    it('Technique proposals can be filtered by call', function () {
       let esiTemplateId: number;
       const esiTemplateName = faker.lorem.words(2);
       const currentDayStart = DateTime.now().startOf('day');
@@ -708,7 +709,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains('call 1').click();
@@ -751,16 +752,16 @@ context('Xpress tests', () => {
       cy.contains(proposal3.title);
     });
 
-    it('Xpress proposals can be filtered by status', function () {
+    it('Technique proposals can be filtered by status', function () {
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="status-filter"]').click();
 
-      // Ensure the dropdown only contains Xpress statuses
+      // Ensure the dropdown only contains technique proposal statuses
       cy.get('[role="listbox"] [data-value]').then((options) => {
         const actualStatuses = [...options].map((option) =>
           option.innerText.trim()
@@ -823,7 +824,7 @@ context('Xpress tests', () => {
       cy.contains(proposal3.title);
     });
 
-    it('Xpress proposals can be filtered by multiple filters', function () {
+    it('Technique proposals can be filtered by multiple filters', function () {
       cy.assignProposalsToInstruments({
         proposalPks: [createdProposalPk2, createdProposalPk3],
         instrumentIds: createdInstrumentId2,
@@ -833,7 +834,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
@@ -899,12 +900,12 @@ context('Xpress tests', () => {
       );
     });
 
-    it('Xpress proposals can be searched for by title and proposal ID', function () {
+    it('Technique proposals can be searched for by title and proposal ID', function () {
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       // Test with proposal title
       cy.get('input[aria-label="Search"]').focus().type(proposal1.title);
@@ -937,7 +938,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.contains(proposal1.title)
         .parent()
@@ -959,7 +960,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.contains(proposal1.title)
         .parent()
@@ -980,7 +981,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.contains(proposal1.title)
         .parent()
@@ -1001,7 +1002,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.contains(proposal1.title)
         .parent()
@@ -1023,7 +1024,7 @@ context('Xpress tests', () => {
         cy.visit('/');
         cy.finishedLoading();
 
-        cy.contains('Xpress').click();
+        cy.contains('Technique Proposals').click();
         cy.finishedLoading();
 
         cy.contains(proposal1.title).should('not.exist');
@@ -1036,11 +1037,11 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress Proposals').click();
+      cy.contains('Technique Proposals').click();
 
       cy.get('[data-cy="status-filter"]').click();
 
-      // Ensure the dropdown only contains Xpress statuses
+      // Ensure the dropdown only contains technique proposal statuses
       cy.get('[role="listbox"] [data-value]').then((options) => {
         const actualStatuses = [...options].map((option) =>
           option.innerText.trim()
@@ -1065,22 +1066,20 @@ context('Xpress tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
-          !featureFlags
-            .getEnabledFeatures()
-            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
         ) {
           this.skip();
         }
       });
     });
 
-    it('User officer can see all submitted and unsubmitted Xpress proposals', function () {
+    it('User officer can see all submitted and unsubmitted technique proposals', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -1100,7 +1099,7 @@ context('Xpress tests', () => {
       cy.contains(technique5.name);
     });
 
-    it('Instrument scientist can only see submitted and unsubmitted Xpress proposals for their techniques', function () {
+    it('Instrument scientist can only see submitted and unsubmitted technique proposals for their techniques', function () {
       /*
       Scientist 1 belongs to technique 1, which only has proposal 1
       */
@@ -1109,7 +1108,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -1139,7 +1138,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title);
@@ -1169,7 +1168,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       // Check if only instrument 1 and 2 is available to be selected for proposal 1
@@ -1208,7 +1207,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       // Check if only instrument 1 and 2 is available to be selected for proposal 1
@@ -1231,12 +1230,12 @@ context('Xpress tests', () => {
       cy.contains(instrument1.name);
     });
 
-    it('Instrument scientist must be able to add update and remove comment on an xpress proposal', function () {
+    it('Instrument scientist must be able to add update and remove comment on a technique proposal', function () {
       cy.login(scientist1);
       cy.changeActiveRole(initialDBData.roles.instrumentScientist);
       cy.visit('/');
       cy.finishedLoading();
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
       cy.contains(proposal1.title)
         .parent()
@@ -1289,26 +1288,24 @@ context('Xpress tests', () => {
     });
   });
 
-  describe('Xpress statuses tests', () => {
+  describe('Technique proposal statuses tests', () => {
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
         if (
-          !featureFlags
-            .getEnabledFeatures()
-            .get(FeatureId.STFC_XPRESS_MANAGEMENT)
+          !featureFlags.getEnabledFeatures().get(FeatureId.TECHNIQUE_PROPOSALS)
         ) {
           this.skip();
         }
       });
     });
 
-    it('User officer can change to/from any Xpress status', function () {
+    it('User officer can change to/from any technique proposal status', function () {
       cy.login('officer');
       cy.changeActiveRole(initialDBData.roles.userOfficer);
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1419,7 +1416,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1471,7 +1468,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1517,7 +1514,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1561,7 +1558,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1611,7 +1608,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1702,7 +1699,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       cy.contains(proposal1.title)
@@ -1757,7 +1754,7 @@ context('Xpress tests', () => {
       cy.visit('/');
       cy.finishedLoading();
 
-      cy.contains('Xpress').click();
+      cy.contains('Technique Proposals').click();
       cy.finishedLoading();
 
       // Initially, instrument 1 and instrument 2 are displayed
@@ -1810,11 +1807,11 @@ context('Xpress tests', () => {
     });
   });
 
-  describe('Xpress PDF download tests', () => {
+  describe('Technique proposal PDF download tests', () => {
     /*
-    These tests run in e2e dependency config despite being Xpress,
-    because of an existing issue with STFC mode cannot communicate
-    with the factory.
+    These tests run in e2e dependency config despite being technique 
+    proposal feature specific, because of an existing issue with STFC 
+    mode cannot communicate with the factory.
     */
     beforeEach(function () {
       cy.getAndStoreFeaturesEnabled().then(() => {
@@ -1824,7 +1821,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it('User officer can download any Xpress proposal', function () {
+    it('User officer can download any technique proposal', function () {
       cy.login('officer');
       cy.visit('/');
       cy.finishedLoading();
@@ -1848,7 +1845,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it("Scientist can download Xpress proposals when they are in one of the proposal's technique", function () {
+    it("Scientist can download technique proposals when they are in one of the proposal's technique", function () {
       cy.updateUserRoles({
         id: scientist1.id,
 
@@ -1890,7 +1887,7 @@ context('Xpress tests', () => {
       });
     });
 
-    it("Scientist cannot download Xpress proposals when they are not in the proposal's technique", function () {
+    it("Scientist cannot download technique proposals when they are not in the proposal's technique", function () {
       cy.updateUserRoles({
         id: scientist1.id,
 

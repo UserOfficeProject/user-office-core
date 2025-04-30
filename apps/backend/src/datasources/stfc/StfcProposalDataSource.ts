@@ -63,7 +63,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         ]
       : [];
 
-    const xpressCallIds: number[] = (
+    const techniqueProposalCallIds: number[] = (
       await this.callDataSource.getCalls({
         proposalStatusShortCode: 'QUICK_REVIEW',
       })
@@ -86,8 +86,12 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
         'chi.instrument_id'
       )
       .where(function () {
-        if (xpressCallIds) {
-          this.where('proposal_table_view.call_id', 'not in', xpressCallIds);
+        if (techniqueProposalCallIds) {
+          this.where(
+            'proposal_table_view.call_id',
+            'not in',
+            techniqueProposalCallIds
+          );
         }
 
         if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
