@@ -109,10 +109,10 @@ export default class VisitMutations {
       );
     }
 
-    const isProposalOwner =
+    const hasReadRights =
       this.userAuth.isApiToken(agent) ||
       (await this.proposalAuth.hasReadRights(agent, proposal));
-    if (isProposalOwner === false) {
+    if (hasReadRights === false) {
       return rejection(
         'Can not create visit for proposal that does not belong to you',
         { args, agent }

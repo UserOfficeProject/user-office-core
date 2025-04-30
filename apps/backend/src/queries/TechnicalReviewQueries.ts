@@ -80,9 +80,10 @@ export default class TechnicalReviewQueries {
       })
     );
 
-    const isReviewerOfProposal =
-      this.userAuth.isApiToken(agent) ||
-      (await this.proposalAuth.isReviewerOfProposal(agent, proposalPk));
+    const isReviewerOfProposal = await this.proposalAuth.isReviewerOfProposal(
+      agent,
+      proposalPk
+    );
     if (isReviewerOfProposal) {
       technicalReviews.forEach((technicalReview) => {
         technicalReview.comment = '';
