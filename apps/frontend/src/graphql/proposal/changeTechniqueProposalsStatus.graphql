@@ -1,8 +1,8 @@
-mutation changeXpressProposalsStatus(
+mutation changeTechniqueProposalsStatus(
   $proposalPks: [Int!]!
   $statusId: Int!
 ) {
-  changeXpressProposalsStatus(
+  changeTechniqueProposalsStatus(
     changeProposalsStatusInput: { proposalPks: $proposalPks, statusId: $statusId }
   )
 }
