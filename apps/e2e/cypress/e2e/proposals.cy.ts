@@ -2,10 +2,10 @@ import { faker } from '@faker-js/faker';
 import {
   AllocationTimeUnits,
   DataType,
-  TemplateCategoryId,
-  TemplateGroupId,
   FeatureId,
   SettingsId,
+  TemplateCategoryId,
+  TemplateGroupId,
   WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -148,6 +148,53 @@ context('Proposal tests', () => {
             proposerId: proposer.id,
           });
         }
+      });
+    });
+
+    it('Should be able clone proposal to another call', () => {
+      const CALL_TO_CLONE_SHORTCODE = 'CALL_TO_CLONE';
+      cy.createTemplate({
+        name: 'Another template',
+        groupId: TemplateGroupId.PROPOSAL,
+      }).then((result) => {
+        if (result.createTemplate) {
+          createdTemplateId = result.createTemplate.templateId;
+        } else {
+          throw new Error('Template creation failed');
+        }
+
+        cy.createCall({
+          ...newCall,
+          shortCode: CALL_TO_CLONE_SHORTCODE,
+          templateId: createdTemplateId,
+          proposalWorkflowId: createdWorkflowId,
+        });
+
+        cy.submitProposal({ proposalPk: createdProposalPk });
+
+        cy.login('user1', initialDBData.roles.user);
+        cy.visit('/');
+
+        cy.contains(newProposalTitle);
+
+        cy.get('[aria-label="Clone proposal"]').first().click();
+
+        cy.get('[data-cy="call-selection"]').click();
+
+        cy.get('[data-cy="call-selection-options"]')
+          .contains(CALL_TO_CLONE_SHORTCODE)
+          .click();
+
+        cy.get('[data-cy="submit"]').click();
+
+        cy.notification({
+          variant: 'success',
+          text: 'Proposal cloned successfully',
+        });
+
+        cy.contains(clonedProposalTitle)
+          .parent()
+          .should('contain.text', CALL_TO_CLONE_SHORTCODE);
       });
     });
 

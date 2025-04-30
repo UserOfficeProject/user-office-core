@@ -44,6 +44,7 @@ export default class PostgresGenericTemplateDataSource
 
     const newQuestionary = await this.questionaryDataSource.clone(
       sourceGenericTemplate.questionaryId,
+      undefined,
       reviewBeforeSubmit
     );
 
