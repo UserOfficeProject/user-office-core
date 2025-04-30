@@ -280,7 +280,7 @@ describe('User can cancel their visit registration', () => {
   );
 });
 
-describe('User officer can request chanhes', () => {
+describe('User officer can request changes', () => {
   test.each`
     initialStatus                                    | expectedStatus
     ${VisitRegistrationStatus.DRAFTED}               | ${VisitRegistrationStatus.DRAFTED}
