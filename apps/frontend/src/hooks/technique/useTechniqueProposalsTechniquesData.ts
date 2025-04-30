@@ -10,7 +10,7 @@ import { UserContext } from 'context/UserContextProvider';
 import { TechniqueMinimalFragment, UserRole } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useXpressTechniquesData(): {
+export function useTechniqueProposalsTechniquesData(): {
   loadingTechniques: boolean;
   techniques: TechniqueMinimalFragment[];
   setTechniquesWithLoading: Dispatch<
