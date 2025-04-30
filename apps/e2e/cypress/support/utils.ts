@@ -265,7 +265,7 @@ const testActionButton = (
     case 'pending':
       getButtonByIconCyTag(iconCyTag)
         .find('.MuiBadge-badge')
-        .should('not.have.css', 'background-color', 'rgb(255, 153, 0)');
+        .should('have.css', 'background-color', 'rgb(255, 153, 0)');
       break;
 
     case 'inactive':

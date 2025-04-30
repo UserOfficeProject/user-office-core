@@ -89,7 +89,22 @@ context('visits tests', () => {
       });
     });
 
-    it('User should be able to cancel visit registration until visit is approved', () => {
+    it('User should be able to cancel visit registration', () => {
+      cy.login('user3');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
+      cy.get('[data-cy="registration-more-options"]').click();
+      cy.get('[data-cy="cancel-visit-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get(
+        '[aria-label="Define your visit (This action is disabled because your registration for visit is cancelled)"]'
+      ).should('exist');
+    });
+
+    it('User should not be able to cancel visit registration after visit is approved', () => {
       cy.approveVisitRegistration({
         visitRegistration: {
           userId: visitor.id,
@@ -104,21 +119,6 @@ context('visits tests', () => {
 
       cy.get('[data-cy="register-visit-icon"]').closest('button').click();
       cy.get('[data-cy="registration-more-options"]').should('not.exist');
-    });
-
-    it('User should not be able to cancel visit registration after visit is approved', () => {
-      cy.login('user3');
-      cy.visit('/');
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
-      cy.get('[data-cy="registration-more-options"]').click();
-      cy.get('[data-cy="cancel-visit-button"]').click();
-      cy.get('[data-cy="confirm-ok"]').click();
-      cy.get(
-        '[aria-label="Define your visit (This action is disabled because your registration for visit is cancelled)"]'
-      ).should('exist');
     });
 
     it('User officer should be able to cancel visit registration', () => {
