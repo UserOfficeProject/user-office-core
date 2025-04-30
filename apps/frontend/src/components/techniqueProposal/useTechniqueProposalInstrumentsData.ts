@@ -8,7 +8,7 @@ import {
 } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
-export function useXpressInstrumentsData(
+export function useTechniqueProposalInstrumentsData(
   techniques?: TechniqueMinimalFragment[]
 ): {
   loadingInstruments: boolean;
