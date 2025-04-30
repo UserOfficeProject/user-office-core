@@ -21,14 +21,14 @@ export const createProposalBasisValidationSchema: QuestionaryComponentDefinition
           MAX_TITLE_LEN,
           `Please make abstract at most ${MAX_TITLE_LEN} characters long`
         )
-        .required('Title is required'),
+        .required('Propsoal Title is required'),
       abstract: Yup.string()
         .trim()
         .max(
           MAX_ABSTRACT_LEN,
           `Please make abstract at most ${MAX_ABSTRACT_LEN} characters long`
         )
-        .required('Abstract is required'),
+        .required('Proposal Abstract is required'),
       proposer: Yup.number().required('Please specify principal investigator'),
       users: Yup.array()
         .of(Yup.number())

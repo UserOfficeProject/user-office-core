@@ -209,16 +209,16 @@ context('Proposal tests', () => {
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.contains('Title is required');
-      cy.contains('Abstract is required');
+      cy.contains('Proposal Title is required');
+      cy.contains('Proposal Abstract is required');
 
       cy.get('[data-cy=title]').type(' ');
       cy.get('[data-cy=abstract]').type(' ');
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.contains('Title is required');
-      cy.contains('Abstract is required');
+      cy.contains('Proposal Title is required');
+      cy.contains('Proposal Abstract is required');
 
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
@@ -1067,8 +1067,8 @@ context('Proposal tests', () => {
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
-      cy.contains('Title is required');
-      cy.contains('Abstract is required');
+      cy.contains('Proposal Title is required');
+      cy.contains('Proposal Abstract is required');
 
       cy.contains('New Proposal').click();
       cy.get('[data-cy=call-list]').find('li:first-child').click();
