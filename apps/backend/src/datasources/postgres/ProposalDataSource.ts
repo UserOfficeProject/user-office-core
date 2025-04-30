@@ -1136,8 +1136,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (
-          filter?.dateFilter?.from !== undefined &&
-          filter?.dateFilter?.from !== null &&
+          filter?.dateFilter?.from != null &&
           filter?.dateFilter?.from !== 'Invalid DateTime'
         ) {
           const dateParts: string[] = filter.dateFilter.from.split('-');
@@ -1159,8 +1158,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
 
         if (
-          filter?.dateFilter?.to !== undefined &&
-          filter?.dateFilter?.to !== null &&
+          filter?.dateFilter?.to != null &&
           filter?.dateFilter?.to !== 'Invalid DateTime'
         ) {
           const dateParts: string[] = filter.dateFilter.to.split('-');
