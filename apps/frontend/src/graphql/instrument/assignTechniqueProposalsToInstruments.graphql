@@ -1,8 +1,8 @@
-mutation assignXpressProposalsToInstruments(
+mutation assignTechniqueProposalsToInstruments(
   $proposalPks: [Int!]!
   $instrumentIds: [Int!]!
 ) {
-  assignXpressProposalsToInstruments(
+  assignTechniqueProposalsToInstruments(
     proposalPks: $proposalPks
     instrumentIds: $instrumentIds
   )
