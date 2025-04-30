@@ -36,7 +36,7 @@ context('Personal information tests', () => {
 
     cy.get("[data-cy='profile-page-btn']").click();
 
-    cy.contains('Roles').click();
+    cy.get("[data-cy='change-roles-button']").click();
 
     cy.finishedLoading();
 
@@ -193,7 +193,7 @@ context('Personal information tests', () => {
 
       cy.get("[data-cy='profile-page-btn']").click();
 
-      cy.contains('Roles').click();
+      cy.get("[data-cy='change-roles-button']").click();
 
       cy.finishedLoading();
 

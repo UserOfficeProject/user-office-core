@@ -261,6 +261,7 @@ export interface RoleRecord {
   readonly role_id: number;
   readonly short_code: string;
   readonly title: string;
+  readonly description: string;
 }
 
 export interface ReviewRecord {
@@ -273,6 +274,11 @@ export interface ReviewRecord {
   readonly fap_id: number;
   readonly questionary_id: number;
   readonly full_count: number;
+  readonly date_assigned: Date;
+  readonly reassigned: boolean;
+  readonly date_reassigned: Date;
+  readonly email_sent: boolean;
+  readonly rank: number | null;
 }
 
 export interface TechnicalReviewRecord {
@@ -802,7 +808,12 @@ export const createReviewObject = (review: ReviewRecord) => {
     review.grade,
     review.status,
     review.fap_id,
-    review.questionary_id
+    review.questionary_id,
+    review.date_assigned,
+    review.reassigned,
+    review.date_reassigned,
+    review.email_sent,
+    review.rank
   );
 };
 
@@ -1146,12 +1157,10 @@ export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
     fapProposal.fap_meeting_instrument_submitted
   );
 };
-export const createFapAssignmentObject = (
-  fapAssignment: FapAssignmentRecord
-) => {
+export const createFapAssignmentObject = (fapAssignment: ReviewRecord) => {
   return new FapAssignment(
     fapAssignment.proposal_pk,
-    fapAssignment.fap_member_user_id,
+    fapAssignment.user_id,
     fapAssignment.fap_id,
     fapAssignment.date_assigned,
     fapAssignment.reassigned,
@@ -1166,7 +1175,7 @@ export const createFapReviewerObject = (fapMember: FapReviewerRecord) => {
 };
 
 export const createRoleObject = (role: RoleRecord) => {
-  return new Role(role.role_id, role.short_code, role.title);
+  return new Role(role.role_id, role.short_code, role.title, role.description);
 };
 
 export const createVisitObject = (visit: VisitRecord) => {
