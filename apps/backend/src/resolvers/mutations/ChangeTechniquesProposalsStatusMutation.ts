@@ -5,17 +5,18 @@ import { isRejection } from '../../models/Rejection';
 import { ChangeProposalsStatusInput } from './ChangeProposalsStatusMutation';
 
 @Resolver()
-export class ChangeXpressProposalsStatusMutation {
+export class ChangeTechniqueProposalsStatusMutation {
   @Mutation(() => Boolean)
-  async changeXpressProposalsStatus(
+  async changeTechniqueProposalsStatus(
     @Arg('changeProposalsStatusInput')
     changeProposalsStatusInput: ChangeProposalsStatusInput,
     @Ctx() context: ResolverContext
   ) {
-    const result = await context.mutations.proposal.changeXpressProposalsStatus(
-      context.user,
-      changeProposalsStatusInput
-    );
+    const result =
+      await context.mutations.proposal.changeTechniqueProposalsStatus(
+        context.user,
+        changeProposalsStatusInput
+      );
 
     return isRejection(result) ? result : true;
   }
