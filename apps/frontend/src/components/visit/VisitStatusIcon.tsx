@@ -1,5 +1,5 @@
 import ClearOutlinedIcon from '@mui/icons-material/Clear';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import RestorePageOutlinedIcon from '@mui/icons-material/RestorePageOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
@@ -26,7 +26,7 @@ export default function VisitStatusOutlinedIcon(props: IVisitStatusIconProps) {
             },
           }}
         >
-          <InsertDriveFileOutlinedIcon />
+          <DescriptionOutlinedIcon />
         </DotBadge>
       );
     case VisitRegistrationStatus.APPROVED:
