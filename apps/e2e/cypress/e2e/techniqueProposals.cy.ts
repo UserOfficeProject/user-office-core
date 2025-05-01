@@ -72,6 +72,7 @@ context('Technique Proposal tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.underReview.id,
     name: 'Under review',
     shortCode: 'UNDER_REVIEW',
     description: '-',
@@ -83,6 +84,7 @@ context('Technique Proposal tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.approved.id,
     name: 'Approved',
     shortCode: 'APPROVED',
     description: '-',
@@ -94,7 +96,8 @@ context('Technique Proposal tests', () => {
     shortCode: string;
     description: string;
   } = {
-    name: 'Unsucessful',
+    id: initialDBData.proposalStatuses.unsuccessful.id,
+    name: 'Unsuccessful',
     shortCode: 'UNSUCCESSFUL',
     description: '-',
   };
@@ -105,6 +108,7 @@ context('Technique Proposal tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.finished.id,
     name: 'Finished',
     shortCode: 'FINISHED',
     description: '-',
@@ -128,6 +132,7 @@ context('Technique Proposal tests', () => {
     shortCode: string;
     description: string;
   } = {
+    id: initialDBData.proposalStatuses.quickReview.id,
     name: 'Quick review',
     shortCode: 'QUICK_REVIEW',
     description: '-',
@@ -231,54 +236,6 @@ context('Technique Proposal tests', () => {
   beforeEach(function () {
     cy.resetDB();
 
-    /*
-     Create technique proposal statuses to avoid patching them in.
-     Others in the technique proposal workflow are already created.
-    */
-    cy.createStatus({
-      name: underReviewStatus.name,
-      shortCode: underReviewStatus.shortCode,
-      description: underReviewStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        underReviewStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: approvedStatus.name,
-      shortCode: approvedStatus.shortCode,
-      description: approvedStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        approvedStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: unsuccessfulStatus.name,
-      shortCode: unsuccessfulStatus.shortCode,
-      description: unsuccessfulStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        unsuccessfulStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: finishedStatus.name,
-      shortCode: finishedStatus.shortCode,
-      description: finishedStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        finishedStatus.id = result.createStatus.id;
-      }
-    });
-
     cy.createStatus({
       name: submittedStatus.name,
       shortCode: submittedStatus.shortCode,
@@ -287,17 +244,6 @@ context('Technique Proposal tests', () => {
     }).then((result) => {
       if (result.createStatus) {
         submittedStatus.id = result.createStatus.id;
-      }
-    });
-
-    cy.createStatus({
-      name: quickReviewStatus.name,
-      shortCode: quickReviewStatus.shortCode,
-      description: quickReviewStatus.description,
-      entityType: WorkflowType.PROPOSAL,
-    }).then((result) => {
-      if (result.createStatus) {
-        quickReviewStatus.id = result.createStatus.id;
       }
     });
 
@@ -1900,6 +1846,12 @@ context('Technique Proposal tests', () => {
     });
 
     it("Scientist can download technique proposals when they are in one of the proposal's technique", function () {
+      cy.updateUserRoles({
+        id: scientist1.id,
+
+        roles: [initialDBData.roles.instrumentScientist],
+      });
+
       cy.assignProposalToTechniques({
         proposalPk: createdProposalPk3,
         techniqueIds: [createdTechniquePk3, createdTechniquePk1],
@@ -1936,6 +1888,12 @@ context('Technique Proposal tests', () => {
     });
 
     it("Scientist cannot download technique proposals when they are not in the proposal's technique", function () {
+      cy.updateUserRoles({
+        id: scientist1.id,
+
+        roles: [initialDBData.roles.instrumentScientist],
+      });
+
       cy.login(scientist1);
       cy.visit('/');
       cy.finishedLoading();
