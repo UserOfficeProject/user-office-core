@@ -28,6 +28,7 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
+  - tables
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -75,6 +76,7 @@ nav:
       - Depencency Injection: developer-guide/dependency_injection.md
       - Email Service: developer-guide/email.md
       - Documentation Changes: developer-guide/documentation_changes.md
+      - Technique Proposals: developer-guide/technique_proposals.md
   - FAQ: faq.md
   - Glossary: glossary.md
   
