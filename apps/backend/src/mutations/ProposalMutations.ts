@@ -23,6 +23,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
@@ -73,7 +74,9 @@ export default class ProposalMutations {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.ProposalInternalCommentsDataSource)
-    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource
+    private proposalInternalCommentsDataSource: ProposalInternalCommentsDataSource,
+    @inject(Tokens.TemplateDataSource)
+    private templateDataSource: TemplateDataSource
   ) {}
 
   @ValidateArgs(createProposalValidationSchema)
@@ -146,7 +149,10 @@ export default class ProposalMutations {
       return rejection('Proposal not found', { args });
     }
 
-    if ((await this.proposalAuth.hasWriteRights(agent, proposal)) === false) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !(await this.proposalAuth.hasWriteRights(agent, proposal))
+    ) {
       return rejection('You do not have rights to update this proposal', {
         args,
       });
@@ -408,7 +414,10 @@ export default class ProposalMutations {
       await this.proposalAuth.isChairOrSecretaryOfProposal(agent, primaryKey);
 
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
-    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+
+    const isApiAccessToken = this.userAuth.isApiToken(agent);
+
+    if (!isChairOrSecretaryOfProposal && !isUserOfficer && !isApiAccessToken) {
       return rejection(
         'Can not administer proposal because of insufficient permissions',
         { args, agent }
@@ -427,7 +436,11 @@ export default class ProposalMutations {
     const isFapProposalInstrumentSubmitted =
       await this.fapDataSource.isFapProposalInstrumentSubmitted(primaryKey);
 
-    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
+    if (
+      isFapProposalInstrumentSubmitted &&
+      !isUserOfficer &&
+      !isApiAccessToken
+    ) {
       return rejection(
         'Can not administer proposal because instrument is submitted',
         { args, agent }
@@ -782,10 +795,9 @@ export default class ProposalMutations {
       );
     }
 
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      agent,
-      sourceProposal
-    );
+    const canReadProposal =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, sourceProposal));
 
     if (canReadProposal === false) {
       return rejection(
@@ -815,17 +827,6 @@ export default class ProposalMutations {
       );
     }
 
-    const sourceQuestionary = await this.questionaryDataSource.getQuestionary(
-      sourceProposal.questionaryId
-    );
-
-    if (call.templateId !== sourceQuestionary?.templateId) {
-      return rejection(
-        'Can not clone proposal to a call whose template is different',
-        { call, sourceQuestionary }
-      );
-    }
-
     try {
       let clonedProposal = await this.proposalDataSource.cloneProposal(
         sourceProposal,
@@ -834,6 +835,7 @@ export default class ProposalMutations {
 
       const clonedQuestionary = await this.questionaryDataSource.clone(
         sourceProposal.questionaryId,
+        call.templateId,
         true
       );
 
