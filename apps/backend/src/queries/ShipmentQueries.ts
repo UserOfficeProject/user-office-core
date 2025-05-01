@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { ShipmentAuthorization } from '../auth/ShipmentAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ShipmentDataSource } from '../datasources/ShipmentDataSource';
 import { Authorized } from '../decorators';
@@ -14,11 +15,15 @@ export default class ShipmentQueries {
   private shipmentAuth = container.resolve(ShipmentAuthorization);
 
   constructor(
-    @inject(Tokens.ShipmentDataSource) private dataSource: ShipmentDataSource
+    @inject(Tokens.ShipmentDataSource) private dataSource: ShipmentDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
+  @Authorized()
   async getShipment(agent: UserWithRole | null, shipmentId: number) {
-    const hasRights = await this.shipmentAuth.hasReadRights(agent, shipmentId);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.shipmentAuth.hasReadRights(agent, shipmentId));
     if (hasRights == false) {
       logger.logWarn('Unauthorized getShipment access', { agent, shipmentId });
 
@@ -33,8 +38,10 @@ export default class ShipmentQueries {
     let shipments = await this.dataSource.getShipments(args);
 
     shipments = await Promise.all(
-      shipments.map((shipment) =>
-        this.shipmentAuth.hasReadRights(agent, shipment)
+      shipments.map(
+        (shipment) =>
+          this.userAuth.isApiToken(agent) ||
+          this.shipmentAuth.hasReadRights(agent, shipment)
       )
     ).then((results) => shipments.filter((_v, index) => results[index]));
 
@@ -53,8 +60,10 @@ export default class ShipmentQueries {
     });
 
     shipments = await Promise.all(
-      shipments.map((shipment) =>
-        this.shipmentAuth.hasReadRights(agent, shipment)
+      shipments.map(
+        (shipment) =>
+          this.userAuth.isApiToken(agent) ||
+          this.shipmentAuth.hasReadRights(agent, shipment)
       )
     ).then((results) => shipments.filter((_v, index) => results[index]));
 

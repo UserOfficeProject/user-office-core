@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
@@ -33,7 +34,8 @@ export default class InviteMutations {
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.AdminDataSource)
-    private adminDataSource: AdminDataSource
+    private adminDataSource: AdminDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -70,14 +72,13 @@ export default class InviteMutations {
   @Authorized()
   @EventBus(Event.EMAIL_INVITES)
   public async setCoProposerInvites(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: SetCoProposerInvitesInput
   ): Promise<Invite[] | Rejection> {
     const { proposalPk, emails } = args;
-    const hasWriteRights = await this.proposalAuth.hasWriteRights(
-      user,
-      proposalPk
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasWriteRights(agent, proposalPk));
 
     if (!hasWriteRights) {
       return rejection(
@@ -130,7 +131,7 @@ export default class InviteMutations {
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
         this.inviteDataSource.create({
-          createdByUserId: user!.id,
+          createdByUserId: agent!.id,
           code: await this.generateInviteCode(),
           email: email,
           expiresAt: expirationDate,

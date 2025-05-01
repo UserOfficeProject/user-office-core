@@ -1,5 +1,6 @@
 import { container, inject, injectable } from 'tsyringe';
 
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -29,7 +30,8 @@ export default class VisitQueries {
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    public templateDataSource: TemplateDataSource
+    public templateDataSource: TemplateDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -38,7 +40,9 @@ export default class VisitQueries {
     if (!visit) {
       return null;
     }
-    const hasRights = await this.visitAuth.hasReadRights(agent, visit);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitAuth.hasReadRights(agent, visit));
     if (hasRights === false) {
       return null;
     }
@@ -66,14 +70,16 @@ export default class VisitQueries {
 
   @Authorized()
   async getRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     visitId: number,
     userId: number
   ): Promise<VisitRegistration | null> {
-    const hasReadRights = await this.visitRegistrationAuth.hasReadRights(user, {
-      visitId,
-      userId,
-    });
+    const hasReadRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitRegistrationAuth.hasReadRights(agent, {
+        visitId,
+        userId,
+      }));
 
     if (!hasReadRights) {
       return null;
