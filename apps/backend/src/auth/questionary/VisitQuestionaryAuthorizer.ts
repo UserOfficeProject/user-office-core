@@ -70,11 +70,14 @@ export class VisitQuestionaryAuthorizer implements QuestionaryAuthorizer {
       registration.status !== VisitRegistrationStatus.DRAFTED &&
       registration.status !== VisitRegistrationStatus.CHANGE_REQUESTED
     ) {
-      logger.logError('User tried to update visit that is not draft', {
-        agent,
-        questionaryId,
-        registration,
-      });
+      logger.logError(
+        `Can not update visit that is in ${registration.status} status`,
+        {
+          agent,
+          questionaryId,
+          registration,
+        }
+      );
 
       return false;
     }

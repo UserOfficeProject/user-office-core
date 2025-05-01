@@ -265,7 +265,7 @@ export default class VisitMutations {
     );
     if (hasWriteRights === false) {
       return rejection(
-        'Chould not update Visit Registration due to insufficient permissions',
+        'Could not update Visit Registration due to insufficient permissions',
         { args, user }
       );
     }
@@ -331,7 +331,7 @@ export default class VisitMutations {
     );
     if (hasWriteRights === false) {
       return rejection(
-        'Chould not submit Visit Registration due to insufficient permissions',
+        'Could not submit Visit Registration due to insufficient permissions',
         { args, user }
       );
     }
@@ -354,7 +354,7 @@ export default class VisitMutations {
     );
     if (!hasCancelRights) {
       return rejection(
-        'Chould not cancel Visit Registration due to insufficient permissions',
+        'Could not cancel Visit Registration due to insufficient permissions',
         { args: input, user }
       );
     }
@@ -408,14 +408,14 @@ export default class VisitMutations {
     );
     if (!visitRegistration) {
       return rejection(
-        'Could not approve Visit Registration because specified registration does not exist',
+        'Could not request changes for visit registration because specified registration does not exist',
         { visitRegistration: input }
       );
     }
 
     if (visitRegistration.status !== VisitRegistrationStatus.SUBMITTED) {
       return rejection(
-        'Could not request changes to Visit Registration because registration is not in submitted state',
+        'Could not request changes to visit registration because registration is not in submitted state',
         { visitRegistration: input }
       );
     }

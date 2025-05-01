@@ -290,7 +290,7 @@ describe('User officer can request changes', () => {
     ${VisitRegistrationStatus.CANCELLED_BY_USER}     | ${VisitRegistrationStatus.CANCELLED_BY_USER}
     ${VisitRegistrationStatus.CANCELLED_BY_FACILITY} | ${VisitRegistrationStatus.CANCELLED_BY_FACILITY}
   `(
-    'User can cancel registration with initial status $initialStatus resulting in $expectedStatus',
+    'User officer trying request changes for visit in $initialStatus status should result visit having $expectedStatus status',
     async ({ initialStatus, expectedStatus }) => {
       // Create a registration (default status is DRAFTED)
       const registration = (await mutations.createVisitRegistration(
