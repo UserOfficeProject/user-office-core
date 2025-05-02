@@ -3,6 +3,7 @@ import moment from 'moment';
 import { container, inject, injectable } from 'tsyringe';
 
 import { FeedbackAuthorization } from '../auth/FeedbackAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
@@ -46,12 +47,13 @@ export default class FeedbackMutations {
     @inject(Tokens.ExperimentDataSource)
     private experimentDataSource: ExperimentDataSource,
     @inject(Tokens.MailService)
-    private mailService: MailService
+    private mailService: MailService,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
   async createFeedback(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: CreateFeedbackArgs
   ): Promise<Feedback | Rejection> {
     const feedbackAlreadyExists =
@@ -76,7 +78,7 @@ export default class FeedbackMutations {
         'Can not create feedback because experiment does not exist',
         {
           args,
-          agent: user,
+          agent: agent,
         }
       );
     }
@@ -86,7 +88,7 @@ export default class FeedbackMutations {
         'Can not create feedback because experiment is not completed',
         {
           args,
-          agent: user,
+          agent: agent,
         }
       );
     }
@@ -98,16 +100,16 @@ export default class FeedbackMutations {
     if (visit === null) {
       return rejection('Can not create feedback because visit does not exist', {
         args,
-        agent: user,
+        agent: agent,
       });
     }
 
-    const isTeamlead = visit.teamLeadUserId === user!.id;
+    const isTeamlead = visit.teamLeadUserId === agent!.id;
 
     if (isTeamlead === false) {
       return rejection(
         'Can not create feedback because only teamlead can do that',
-        { args, agent: user }
+        { args, agent: agent }
       );
     }
 
@@ -119,16 +121,16 @@ export default class FeedbackMutations {
       if (activeTemplateId === null) {
         return rejection(
           'Can not create feedback because feedback template is not configured',
-          { args, agent: user }
+          { args, agent: agent }
         );
       }
       const questionary = await this.questionaryDataSource.create(
-        user!.id,
+        agent!.id,
         activeTemplateId
       );
       const feedback = await this.dataSource.createFeedback({
         ...args,
-        creatorId: user!.id,
+        creatorId: agent!.id,
         questionaryId: questionary.questionaryId,
       });
 
@@ -144,10 +146,10 @@ export default class FeedbackMutations {
 
   @Authorized()
   async updateFeedback(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: UpdateFeedbackArgs
   ): Promise<Feedback | Rejection> {
-    if (!user) {
+    if (!agent) {
       return rejection(
         'Could not update feedback because request is not authorized',
         { args }
@@ -162,12 +164,14 @@ export default class FeedbackMutations {
       );
     }
 
-    const hasRights = await this.feedbackAuth.hasWriteRights(user, feedback);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.feedbackAuth.hasWriteRights(agent, feedback));
 
     if (hasRights === false) {
       return rejection(
         'Can not update feedback because of insufficient permissions',
-        { args, agent: user }
+        { args, agent: agent }
       );
     }
 
@@ -176,14 +180,16 @@ export default class FeedbackMutations {
 
   @Authorized()
   async deleteFeedback(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     feedbackId: number
   ): Promise<Feedback | Rejection> {
-    const hasRights = await this.feedbackAuth.hasWriteRights(user, feedbackId);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.feedbackAuth.hasWriteRights(agent, feedbackId));
     if (hasRights === false) {
       return rejection(
         'Can not delete feedback because of insufficient permissions',
-        { user, feedbackId }
+        { user: agent, feedbackId }
       );
     }
 
