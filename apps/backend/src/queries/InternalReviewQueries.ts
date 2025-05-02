@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import { container, inject, injectable } from 'tsyringe';
 
 import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { InternalReviewDataSource } from '../datasources/InternalReviewDataSource';
 import { Authorized } from '../decorators';
@@ -14,7 +15,8 @@ export default class InternalReviewQueries {
   private technicalReviewAuth = container.resolve(TechnicalReviewAuthorization);
   constructor(
     @inject(Tokens.InternalReviewDataSource)
-    public dataSource: InternalReviewDataSource
+    public dataSource: InternalReviewDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
@@ -32,10 +34,13 @@ export default class InternalReviewQueries {
   ])
   async getAll(agent: UserWithRole | null, filter?: InternalReviewsFilter) {
     if (
-      !(await this.technicalReviewAuth.hasAccessRightsToInternalReviews(
-        agent,
-        filter?.technicalReviewId
-      ))
+      !(
+        this.userAuth.isApiToken(agent) ||
+        (await this.technicalReviewAuth.hasAccessRightsToInternalReviews(
+          agent,
+          filter?.technicalReviewId
+        ))
+      )
     ) {
       throw new GraphQLError('INSUFFICIENT_PERMISSIONS');
     }
