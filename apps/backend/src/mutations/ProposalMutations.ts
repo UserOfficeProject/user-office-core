@@ -872,12 +872,9 @@ export default class ProposalMutations {
       }
 
       const proposalGenericTemplates =
-        await this.genericTemplateDataSource.getGenericTemplates(
-          {
-            filter: { proposalPk: sourceProposal.primaryKey },
-          },
-          agent
-        );
+        await this.genericTemplateDataSource.getGenericTemplates({
+          filter: { proposalPk: sourceProposal.primaryKey },
+        });
 
       for await (const genericTemplate of proposalGenericTemplates) {
         const clonedGenericTemplate =

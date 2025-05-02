@@ -127,15 +127,12 @@ export default class QuestionaryMutations {
     ).proposals[0];
 
     const genericTemplates =
-      await this.genericTemplateDataSource.getGenericTemplates(
-        {
-          filter: {
-            questionId: questionId,
-            proposalPk: proposal?.primaryKey,
-          },
+      await this.genericTemplateDataSource.getGenericTemplates({
+        filter: {
+          questionId: questionId,
+          proposalPk: proposal?.primaryKey,
         },
-        agent
-      );
+      });
 
     if (!genericTemplates) {
       return;
