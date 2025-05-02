@@ -39,16 +39,24 @@ export default class ProposalQueries {
     // If not a user officer or instrument scientist remove excellence, technical and safety score
     if (
       !this.userAuth.isUserOfficer(agent) &&
-      !this.userAuth.isInstrumentScientist(agent)
+      !this.userAuth.isInstrumentScientist(agent) &&
+      !this.userAuth.isApiToken(agent)
     ) {
       proposal = omit(proposal, 'commentForManagement') as Proposal;
     }
 
     // If user not notified remove finalStatus and comment as these are not confirmed and it is not user officer
-    if (!this.userAuth.isUserOfficer(agent) && !proposal.notified) {
+    if (
+      !this.userAuth.isUserOfficer(agent) &&
+      !proposal.notified &&
+      !this.userAuth.isApiToken(agent)
+    ) {
       proposal = omit(proposal, 'commentForUser') as Proposal;
     }
-    if ((await this.hasReadRights(agent, proposal)) === true) {
+    if (
+      this.userAuth.isApiToken(agent) ||
+      (await this.hasReadRights(agent, proposal))
+    ) {
       return proposal;
     } else {
       return null;
@@ -150,7 +158,10 @@ export default class ProposalQueries {
   async getProposalById(agent: UserWithRole | null, proposalId: string) {
     const proposal = await this.dataSource.getProposalById(proposalId);
 
-    if ((await this.hasReadRights(agent, proposal)) === true) {
+    if (
+      this.userAuth.isApiToken(agent) ||
+      (await this.hasReadRights(agent, proposal))
+    ) {
       return proposal;
     } else {
       return null;

@@ -1,6 +1,5 @@
 import {
   createCallValidationSchemas,
-  updateCallValidationSchemas,
   removeAssignedInstrumentFromCallValidationSchema,
   updateCallValidationBackendSchema,
 } from '@user-office-software/duo-validation';
@@ -25,9 +24,6 @@ import { mergeValidationSchemas } from '../utils/helperFunctions';
 
 const createCallValidationSchema = mergeValidationSchemas(
   ...createCallValidationSchemas
-);
-const updateCallValidationSchema = mergeValidationSchemas(
-  ...updateCallValidationSchemas
 );
 
 @injectable()
