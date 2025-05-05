@@ -53,7 +53,7 @@ export default class VisitMutations {
 
   @Authorized()
   async createVisit(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: CreateVisitArgs
   ): Promise<Visit | Rejection> {
     const visitAlreadyExists =
@@ -79,7 +79,7 @@ export default class VisitMutations {
         'Can not create visit because experiment does not exist',
         {
           args,
-          agent: user,
+          agent,
         }
       );
     }
@@ -91,7 +91,7 @@ export default class VisitMutations {
         'Can not create visit, proposal for the scheduled event does not exist',
         {
           args,
-          agent: user,
+          agent,
         }
       );
     }
@@ -104,19 +104,18 @@ export default class VisitMutations {
         'Can not create visit because the proposal is not yet accepted',
         {
           args,
-          agent: user,
+          agent,
         }
       );
     }
 
-    const isProposalOwner = await this.proposalAuth.hasReadRights(
-      user,
-      proposal
-    );
-    if (isProposalOwner === false) {
+    const hasReadRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposal));
+    if (hasReadRights === false) {
       return rejection(
         'Can not create visit for proposal that does not belong to you',
-        { args, agent: user }
+        { args, agent }
       );
     }
 
@@ -129,14 +128,14 @@ export default class VisitMutations {
         'Can not create visit because team lead is not part of the team',
         {
           args,
-          agent: user,
+          agent,
         }
       );
     }
     try {
       const visit = await this.dataSource.createVisit(
         args,
-        user!.id,
+        agent!.id,
         proposal.primaryKey
       );
 
@@ -160,10 +159,10 @@ export default class VisitMutations {
 
   @Authorized()
   async updateVisit(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: UpdateVisitArgs
   ): Promise<Visit | Rejection> {
-    if (!user) {
+    if (!agent) {
       return rejection(
         'Could not update visit because request is not authorized',
         { args }
@@ -178,11 +177,13 @@ export default class VisitMutations {
       );
     }
 
-    const hasRights = await this.visitAuth.hasWriteRights(user, visit);
-    if (hasRights === false) {
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitAuth.hasWriteRights(agent, visit));
+    if (!hasRights) {
       return rejection(
         'Can not update visit because of insufficient permissions',
-        { args, agent: user }
+        { args, agent }
       );
     }
 
@@ -191,14 +192,16 @@ export default class VisitMutations {
 
   @Authorized()
   async deleteVisit(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     visitId: number
   ): Promise<Visit | Rejection> {
-    const hasRights = await this.visitAuth.hasWriteRights(user, visitId);
-    if (hasRights === false) {
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitAuth.hasWriteRights(agent, visitId));
+    if (!hasRights) {
       return rejection(
         'Can not update visit because of insufficient permissions',
-        { user, visitId }
+        { user: agent, visitId }
       );
     }
 
@@ -206,17 +209,21 @@ export default class VisitMutations {
   }
   @Authorized()
   async createVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     visitId: number,
     userId: number
   ): Promise<VisitRegistration | Rejection> {
-    if (!user) {
+    if (!agent) {
       return rejection(
         'Can not create visit registration, because the request is not authorized'
       );
     }
 
-    if (!this.userAuth.isUserOfficer(user) && user.id !== userId) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !this.userAuth.isUserOfficer(agent) &&
+      agent.id !== userId
+    ) {
       return rejection(
         'Can not create visit registration, because the request is not authorized'
       );
@@ -245,7 +252,7 @@ export default class VisitMutations {
 
   @Authorized()
   async updateVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: UpdateVisitRegistrationArgs
   ): Promise<VisitRegistration | Rejection> {
     const visitRegistration = await this.dataSource.getRegistration(
@@ -259,14 +266,13 @@ export default class VisitMutations {
       );
     }
 
-    const hasWriteRights = await this.registrationAuth.hasWriteRights(
-      user,
-      args
-    );
-    if (hasWriteRights === false) {
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.registrationAuth.hasWriteRights(agent, args));
+    if (!hasWriteRights) {
       return rejection(
         'Could not update Visit Registration due to insufficient permissions',
-        { args, user }
+        { args, agent }
       );
     }
     const TODAY_MIDNIGT = new Date(new Date().setHours(0, 0, 0, 0));
@@ -322,17 +328,16 @@ export default class VisitMutations {
 
   @Authorized()
   async submitVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: SubmitVisitRegistrationArgs
   ) {
-    const hasWriteRights = await this.registrationAuth.hasWriteRights(
-      user,
-      args
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.registrationAuth.hasWriteRights(agent, args));
     if (hasWriteRights === false) {
       return rejection(
         'Could not submit Visit Registration due to insufficient permissions',
-        { args, user }
+        { args, agent }
       );
     }
 
@@ -345,17 +350,16 @@ export default class VisitMutations {
 
   @Authorized()
   async cancelVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     input: CancelVisitRegistrationInput
   ) {
-    const hasCancelRights = await this.registrationAuth.hasCancelRights(
-      user,
-      input
-    );
+    const hasCancelRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.registrationAuth.hasCancelRights(agent, input));
     if (!hasCancelRights) {
       return rejection(
-        'Could not cancel Visit Registration due to insufficient permissions',
-        { args: input, user }
+        'Chould not cancel Visit Registration due to insufficient permissions',
+        { input, agent }
       );
     }
 
@@ -373,7 +377,7 @@ export default class VisitMutations {
 
     const oldStatus = registration.status;
     const newStatus =
-      input.userId === user!.id
+      input.userId === agent!.id
         ? VisitRegistrationStatus.CANCELLED_BY_USER
         : VisitRegistrationStatus.CANCELLED_BY_FACILITY;
 
@@ -385,7 +389,7 @@ export default class VisitMutations {
         type: Event.VISIT_REGISTRATION_CANCELLED,
         visitregistration: registration,
         key: 'visitregistration',
-        loggedInUserId: user ? user.id : null,
+        loggedInUserId: agent ? agent.id : null,
         isRejection: false,
       });
     }

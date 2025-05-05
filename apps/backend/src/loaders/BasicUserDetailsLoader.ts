@@ -10,17 +10,20 @@ export default class BasicUserDetailsLoader {
   constructor(
     @inject(Tokens.UserDataSource) private userDataSource: UserDataSource
   ) {}
-  batchLoader = new DataLoader(async (keys: readonly number[]) => {
-    logger.logInfo(
-      `Inside batch loading function fetching the basic user details for user id(s)  ${keys}`,
-      {}
-    );
+  batchLoader = new DataLoader(
+    async (keys: readonly number[]) => {
+      logger.logInfo(
+        `Inside batch loading function fetching the basic user details for user id(s)  ${keys}`,
+        {}
+      );
 
-    const usersList = await this.userDataSource.getBasicUsersInfo(keys);
-    const result = keys.map((id) => {
-      return usersList?.find((user) => user.id === id);
-    });
+      const usersList = await this.userDataSource.getBasicUsersInfo(keys);
+      const result = keys.map((id) => {
+        return usersList?.find((user) => user.id === id);
+      });
 
-    return result;
-  });
+      return result;
+    },
+    { cache: false }
+  );
 }

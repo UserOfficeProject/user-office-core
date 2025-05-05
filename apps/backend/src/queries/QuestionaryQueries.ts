@@ -3,6 +3,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { Authorized } from '../decorators';
@@ -19,7 +20,8 @@ export default class QuestionaryQueries {
 
   constructor(
     @inject(Tokens.QuestionaryDataSource)
-    public dataSource: QuestionaryDataSource
+    public dataSource: QuestionaryDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -27,10 +29,9 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     questionaryId: number
   ): Promise<Questionary | null> {
-    const hasRights = await this.questionaryAuth.hasReadRights(
-      agent,
-      questionaryId
-    );
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.questionaryAuth.hasReadRights(agent, questionaryId));
     if (!hasRights) {
       logger.logWarn('Permissions violated trying to access questionary', {
         email: agent?.email,
@@ -84,10 +85,9 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     questionaryId: number
   ): Promise<QuestionaryStep[] | null> {
-    const hasRights = await this.questionaryAuth.hasReadRights(
-      agent,
-      questionaryId
-    );
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.questionaryAuth.hasReadRights(agent, questionaryId));
     if (!hasRights) {
       logger.logWarn('Permissions violated trying to access steps', {
         email: agent?.email,
@@ -107,10 +107,9 @@ export default class QuestionaryQueries {
 
   @Authorized()
   async isCompleted(agent: UserWithRole | null, questionaryId: number) {
-    const hasRights = await this.questionaryAuth.hasReadRights(
-      agent,
-      questionaryId
-    );
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.questionaryAuth.hasReadRights(agent, questionaryId));
     if (!hasRights) {
       logger.logWarn('Permissions violated trying to access isComplete', {
         email: agent?.email,
@@ -157,7 +156,7 @@ export default class QuestionaryQueries {
   ): Promise<ProposalAttachments | null> {
     let hasRights;
 
-    if (agent?.currentRole?.shortCode === Roles.USER_OFFICER) {
+    if (this.userAuth.isUserOfficer(agent) || this.userAuth.isApiToken(agent)) {
       hasRights = true;
     } else {
       hasRights = await this.proposalAuth.hasReadRights(agent, proposalPk);
