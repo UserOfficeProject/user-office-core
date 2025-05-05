@@ -355,6 +355,6 @@ test('User can not submit visit registration that has been cancelled by facility
   )) as VisitRegistration;
   expect(submitResult).toHaveProperty(
     'reason',
-    'Chould not submit Visit Registration due to insufficient permissions'
+    'Could not submit Visit Registration due to insufficient permissions'
   );
 });

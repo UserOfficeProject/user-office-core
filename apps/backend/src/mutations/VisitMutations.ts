@@ -358,7 +358,7 @@ export default class VisitMutations {
       (await this.registrationAuth.hasCancelRights(agent, input));
     if (!hasCancelRights) {
       return rejection(
-        'Chould not cancel Visit Registration due to insufficient permissions',
+        'Could not cancel Visit Registration due to insufficient permissions',
         { args: input, user: agent }
       );
     }
