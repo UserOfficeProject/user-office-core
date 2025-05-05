@@ -272,7 +272,7 @@ export default class VisitMutations {
     if (!hasWriteRights) {
       return rejection(
         'Could not update Visit Registration due to insufficient permissions',
-        { args, agent }
+        { args, user: agent }
       );
     }
     const TODAY_MIDNIGT = new Date(new Date().setHours(0, 0, 0, 0));
@@ -337,7 +337,7 @@ export default class VisitMutations {
     if (hasWriteRights === false) {
       return rejection(
         'Could not submit Visit Registration due to insufficient permissions',
-        { args, agent }
+        { args, user: agent }
       );
     }
 
@@ -359,7 +359,7 @@ export default class VisitMutations {
     if (!hasCancelRights) {
       return rejection(
         'Chould not cancel Visit Registration due to insufficient permissions',
-        { input, agent }
+        { args: input, user: agent }
       );
     }
 
