@@ -1,0 +1,8 @@
+mutation requestVisitRegistrationChanges($visitRegistration: RequestVisitRegistrationChangesInput!) {
+  requestVisitRegistrationChanges(visitRegistration: $visitRegistration) {
+    ...visitRegistration
+    user {
+      ...basicUserDetails
+    }
+  }
+}
