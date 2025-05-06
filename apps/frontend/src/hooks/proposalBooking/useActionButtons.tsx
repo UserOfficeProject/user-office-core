@@ -162,8 +162,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       } else {
         switch (registration.status) {
           case VisitRegistrationStatus.DRAFTED:
+            buttonState = 'active';
+            break;
           case VisitRegistrationStatus.CHANGE_REQUESTED:
             buttonState = 'active';
+            stateReason = 'Changes are requested for your registration';
             break;
           case VisitRegistrationStatus.SUBMITTED:
             buttonState = 'pending';
