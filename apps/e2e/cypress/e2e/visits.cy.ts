@@ -96,9 +96,9 @@ context('visits tests', () => {
         .first()
         .closest('button')
         .click();
-      cy.get('[data-cy="request-visit-registration-changhes-button"]').click();
+      cy.get('[data-cy="request-visit-registration-changes-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
-      cy.get('[data-cy="request-visit-registration-changhes-button"]').should(
+      cy.get('[data-cy="request-visit-registration-changes-button"]').should(
         'not.be.exist'
       );
 
