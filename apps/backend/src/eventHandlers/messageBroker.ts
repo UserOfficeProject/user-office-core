@@ -28,6 +28,10 @@ import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
+export const QUEUE_NAME =
+  (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
+  'user_office_backend.queue';
+
 export const EXCHANGE_NAME =
   process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
 
@@ -379,9 +383,6 @@ export async function createPostToRabbitMQHandler() {
 }
 
 export async function createListenToRabbitMQHandler() {
-  const QUEUE_NAME = process.env.RABBITMQ_CORE_QUEUE_NAME as Queue;
-  const EXCHANGE_NAME = process.env.RABBITMQ_CORE_EXCHANGE_NAME;
-
   if (!QUEUE_NAME || !EXCHANGE_NAME) {
     throw new Error('RabbitMQ environment variables not set');
   }
