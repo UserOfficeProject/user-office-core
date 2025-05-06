@@ -109,7 +109,7 @@ export default class UserMutations {
 
     if (
       args.userRole === UserRole.FAP_REVIEWER &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
 
@@ -130,20 +130,20 @@ export default class UserMutations {
       role = UserRole.USER;
     } else if (
       args.userRole === UserRole.FAP_CHAIR &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in separate call.
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.FAP_CHAIR;
     } else if (
       args.userRole === UserRole.FAP_SECRETARY &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.FAP_SECRETARY;
     } else if (
       args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.INSTRUMENT_SCIENTIST;
@@ -168,7 +168,11 @@ export default class UserMutations {
     args: UpdateUserArgs
   ): Promise<User | Rejection> {
     const isUpdatingOwnUser = agent?.id === args.id;
-    if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !this.userAuth.isUserOfficer(agent) &&
+      !isUpdatingOwnUser
+    ) {
       return rejection(
         'Can not update user because of insufficient permissions',
         {

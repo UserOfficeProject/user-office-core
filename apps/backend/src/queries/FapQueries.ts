@@ -32,6 +32,7 @@ export default class FapQueries {
     }
 
     if (
+      this.userAuth.isApiToken(agent) ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, id))
     ) {
@@ -71,7 +72,7 @@ export default class FapQueries {
     }: { fapId: number; callId: number | null; instrumentId: number | null }
   ) {
     if (
-      agent?.isApiAccessToken ||
+      this.userAuth.isApiToken(agent) ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
@@ -92,6 +93,7 @@ export default class FapQueries {
     { fapId, proposalPk }: { fapId: number; proposalPk: number }
   ) {
     if (
+      this.userAuth.isApiToken(agent) ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
@@ -116,6 +118,7 @@ export default class FapQueries {
     }: { fapId: number; instrumentId: number; callId: number }
   ) {
     if (
+      this.userAuth.isApiToken(agent) ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
@@ -182,6 +185,7 @@ export default class FapQueries {
     }
 
     if (
+      this.userAuth.isApiToken(agent) ||
       this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fap.id))
     ) {

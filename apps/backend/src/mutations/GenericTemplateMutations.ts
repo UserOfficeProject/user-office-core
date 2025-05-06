@@ -3,6 +3,7 @@ import { container, inject, injectable } from 'tsyringe';
 import { GenericTemplateAuthorization } from '../auth/GenericTemplateAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -31,7 +32,8 @@ export default class GenericTemplateMutations {
     @inject(Tokens.ProposalDataSource)
     private proposalDataSource: ProposalDataSource,
     @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -68,10 +70,9 @@ export default class GenericTemplateMutations {
       );
     }
 
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      agent,
-      proposal
-    );
+    const canReadProposal =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposal));
     if (canReadProposal === false) {
       return rejection(
         'Can not create genericTemplate because of insufficient permissions',
@@ -130,10 +131,9 @@ export default class GenericTemplateMutations {
         }
       );
     }
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      agent,
-      proposal
-    );
+    const canReadProposal =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposal));
     if (canReadProposal === false) {
       return rejection(
         'Can not create generic template because of insufficient permissions',
@@ -154,18 +154,19 @@ export default class GenericTemplateMutations {
               }
             );
         });
-      await this.questionaryAuth
-        .hasReadRights(agent, answerInput.sourceQuestionaryId)
-        .then((questionary) => {
-          if (!questionary)
-            return rejection(
-              'Can not copy questionary answers because of insufficient permissions',
-              {
-                agent,
-                args,
-              }
-            );
-        });
+      this.userAuth.isApiToken(agent) ||
+        (await this.questionaryAuth
+          .hasReadRights(agent, answerInput.sourceQuestionaryId)
+          .then((questionary) => {
+            if (!questionary)
+              return rejection(
+                'Can not copy questionary answers because of insufficient permissions',
+                {
+                  agent,
+                  args,
+                }
+              );
+          }));
 
       return await this.questionaryDataSource
         .create(agent.id, args.templateId)
@@ -198,10 +199,12 @@ export default class GenericTemplateMutations {
     agent: UserWithRole | null,
     args: UpdateGenericTemplateArgs
   ) {
-    const hasWriteRights = await this.genericTemplateAuth.hasWriteRights(
-      agent,
-      args.genericTemplateId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.genericTemplateAuth.hasWriteRights(
+        agent,
+        args.genericTemplateId
+      ));
 
     if (hasWriteRights === false) {
       return rejection(
@@ -227,10 +230,9 @@ export default class GenericTemplateMutations {
     agent: UserWithRole | null,
     genericTemplateId: number
   ) {
-    const hasWriteRights = await this.genericTemplateAuth.hasWriteRights(
-      agent,
-      genericTemplateId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.genericTemplateAuth.hasWriteRights(agent, genericTemplateId));
 
     if (hasWriteRights === false) {
       return rejection(
@@ -264,7 +266,13 @@ export default class GenericTemplateMutations {
       );
     }
     if (
-      !(await this.genericTemplateAuth.hasWriteRights(agent, genericTemplateId))
+      !(
+        this.userAuth.isApiToken(agent) ||
+        (await this.genericTemplateAuth.hasWriteRights(
+          agent,
+          genericTemplateId
+        ))
+      )
     ) {
       return rejection(
         'Could not clone genericTemplate because of insufficient permissions',

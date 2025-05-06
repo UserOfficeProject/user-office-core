@@ -2,6 +2,7 @@ import { container, inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { TechnicalReviewAuthorization } from '../auth/TechnicalReviewAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { Authorized } from '../decorators';
@@ -16,7 +17,8 @@ export default class TechnicalReviewQueries {
   private technicalReviewAuth = container.resolve(TechnicalReviewAuthorization);
 
   constructor(
-    @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource
+    @inject(Tokens.ReviewDataSource) public dataSource: ReviewDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -30,7 +32,10 @@ export default class TechnicalReviewQueries {
       return null;
     }
 
-    if (await this.technicalReviewAuth.hasReadRights(agent, technicalReview)) {
+    if (
+      this.userAuth.isApiToken(agent) ||
+      (await this.technicalReviewAuth.hasReadRights(agent, technicalReview))
+    ) {
       return technicalReview;
     } else {
       return null;
@@ -59,13 +64,15 @@ export default class TechnicalReviewQueries {
       return [];
     }
 
-    // NOTE: We only return the tehcnical reviews that the user has rights to see.
+    // NOTE: We only return the technical reviews that the user has rights to see.
     await Promise.all(
-      technicalReviews.map(async (tehcnicalReview, index) => {
-        const hasReadRights = await this.technicalReviewAuth.hasReadRights(
-          agent,
-          tehcnicalReview
-        );
+      technicalReviews.map(async (technicalReview, index) => {
+        const hasReadRights =
+          this.userAuth.isApiToken(agent) ||
+          (await this.technicalReviewAuth.hasReadRights(
+            agent,
+            technicalReview
+          ));
 
         if (!hasReadRights) {
           technicalReviews.splice(index, 1);
