@@ -12,8 +12,7 @@ import { Authorized, EventBus } from '../decorators';
 import { resolveApplicationEventBus } from '../events';
 import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
-import { rejection } from '../models/Rejection';
-import { Rejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
@@ -25,6 +24,7 @@ import {
 import { ApproveVisitRegistrationInput } from '../resolvers/mutations/ApproveVisitRegistrationMutations';
 import { CancelVisitRegistrationInput } from '../resolvers/mutations/CancelVisitRegistrationMutation';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
+import { RequestVisitRegistrationChangesInput } from '../resolvers/mutations/RequestVisitRegistrationChangesMutation';
 import { SubmitVisitRegistrationArgs } from '../resolvers/mutations/SubmitVisitRegistration';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistrationMutation';
@@ -271,7 +271,7 @@ export default class VisitMutations {
       (await this.registrationAuth.hasWriteRights(agent, args));
     if (!hasWriteRights) {
       return rejection(
-        'Chould not update Visit Registration due to insufficient permissions',
+        'Could not update Visit Registration due to insufficient permissions',
         { args, user: agent }
       );
     }
@@ -336,7 +336,7 @@ export default class VisitMutations {
       (await this.registrationAuth.hasWriteRights(agent, args));
     if (hasWriteRights === false) {
       return rejection(
-        'Chould not submit Visit Registration due to insufficient permissions',
+        'Could not submit Visit Registration due to insufficient permissions',
         { args, user: agent }
       );
     }
@@ -358,7 +358,7 @@ export default class VisitMutations {
       (await this.registrationAuth.hasCancelRights(agent, input));
     if (!hasCancelRights) {
       return rejection(
-        'Chould not cancel Visit Registration due to insufficient permissions',
+        'Could not cancel Visit Registration due to insufficient permissions',
         { args: input, user: agent }
       );
     }
@@ -398,6 +398,36 @@ export default class VisitMutations {
       userId: input.userId,
       visitId: input.visitId,
       status: newStatus,
+    });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async requestVisitRegistrationChanges(
+    user: UserWithRole | null,
+    input: RequestVisitRegistrationChangesInput
+  ) {
+    const visitRegistration = await this.dataSource.getRegistration(
+      input.userId,
+      input.visitId
+    );
+    if (!visitRegistration) {
+      return rejection(
+        'Could not request changes for visit registration because specified registration does not exist',
+        { visitRegistration: input }
+      );
+    }
+
+    if (visitRegistration.status !== VisitRegistrationStatus.SUBMITTED) {
+      return rejection(
+        'Could not request changes to visit registration because registration is not in submitted state',
+        { visitRegistration: input }
+      );
+    }
+
+    return this.dataSource.updateRegistration({
+      userId: input.userId,
+      visitId: input.visitId,
+      status: VisitRegistrationStatus.CHANGE_REQUESTED,
     });
   }
 }
