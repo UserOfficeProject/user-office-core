@@ -17,7 +17,6 @@ const Authorized = (roles: Roles[] = []) => {
     }
   ) => {
     const originalMethod = descriptor.value;
-
     descriptor.value = async function (...args) {
       const [agent] = args;
       const isMutation = target.constructor.name.includes('Mutation');
@@ -57,6 +56,14 @@ const Authorized = (roles: Roles[] = []) => {
         (role) => role === agent.currentRole?.shortCode
       );
 
+      //check if user has dynamic role with permissions for this method
+      if (
+        agent.currentRole?.permissions.some(
+          (permission) => permission === `${target.constructor.name}.${name}`
+        )
+      ) {
+        return await originalMethod?.apply(this, args);
+      }
       if (hasAccessRights) {
         return await originalMethod?.apply(this, args);
       } else {
