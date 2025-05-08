@@ -86,6 +86,9 @@ export function useBlankVisitRegistration(visitId?: number | null) {
             });
         } else {
           setError('There is no active visit registration template');
+          api().addClientLog({
+            error: 'There is no active visit registration template',
+          });
         }
       })
       .catch(() => {
