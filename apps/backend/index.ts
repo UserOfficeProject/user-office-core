@@ -44,7 +44,7 @@ async function bootstrap() {
   });
 
   logger.logInfo(
-    `Running a GraphQL API server at my local:${PORT}/graphql`,
+    `Running a GraphQL API server at localhost:${PORT}/graphql`,
     {}
   );
 
