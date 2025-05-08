@@ -7,6 +7,7 @@ import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
+import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
@@ -135,6 +136,15 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
 }
 
 export class StfcUserDataSource implements UserDataSource {
+  createRole(args: CreateRoleArgs): Promise<Role> {
+    throw new Error('Method not implemented.');
+  }
+  updateRole(args: CreateRoleArgs): Promise<Role> {
+    throw new Error('Method not implemented.');
+  }
+  deleteRole(id: number): Promise<Role | null> {
+    throw new Error('Method not implemented.');
+  }
   private static readonly userDetailsCacheMaxElements = 1000;
   private static readonly userDetailsCacheSecondsToLive = 600; // 10 minutes
   private static readonly rolesCacheMaxElements = 1000;

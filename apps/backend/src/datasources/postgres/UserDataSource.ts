@@ -13,7 +13,9 @@ import {
   UserRoleShortCodeMap,
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
+import { CreateRoleArgs } from '../../resolvers/mutations/CreateRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
+import { UpdateRoleArgs } from '../../resolvers/mutations/UpdateRoleMutation';
 import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
@@ -160,7 +162,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.data_access
             )
         )
       );
@@ -180,7 +184,9 @@ export default class PostgresUserDataSource implements UserDataSource {
               role.role_id,
               role.short_code,
               role.title,
-              role.description
+              role.description,
+              role.permissions,
+              role.data_access
             )
         )
       );
@@ -766,7 +772,14 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first()
       .then(
         (role: RoleRecord) =>
-          new Role(role.role_id, role.short_code, role.title, role.description)
+          new Role(
+            role.role_id,
+            role.short_code,
+            role.title,
+            role.description,
+            role.permissions,
+            role.data_access
+          )
       );
   }
 
@@ -796,5 +809,93 @@ export default class PostgresUserDataSource implements UserDataSource {
           return createUserObject(user);
         });
       });
+  }
+
+  private toPostgresArray(array: string[]): string {
+    return `{${array.map((item) => `"${item}"`).join(',')}}`;
+  }
+
+  async createRole(args: CreateRoleArgs): Promise<Role> {
+    const { shortCode, title, description, permissions, dataAccess } = args;
+
+    const postgresPermissions = Array.isArray(permissions)
+      ? this.toPostgresArray(permissions)
+      : permissions;
+
+    const postgresDataAccess = Array.isArray(dataAccess)
+      ? this.toPostgresArray(dataAccess)
+      : dataAccess;
+
+    const [roleRecord] = await database
+      .insert({
+        short_code: shortCode,
+        title,
+        description,
+        permissions: postgresPermissions,
+        data_access: postgresDataAccess,
+      })
+      .into('roles')
+      .returning('*');
+
+    return new Role(
+      roleRecord.role_id,
+      roleRecord.short_code,
+      roleRecord.title,
+      roleRecord.description,
+      roleRecord.permissions, // No need to parse as it's already in array format
+      roleRecord.data_access // No need to parse as it's already in array format
+    );
+  }
+
+  async updateRole(args: UpdateRoleArgs): Promise<Role> {
+    const { roleID, shortCode, title, description, permissions, dataAccess } =
+      args;
+
+    const postgresPermissions = Array.isArray(permissions)
+      ? this.toPostgresArray(permissions)
+      : permissions;
+
+    const postgresDataAccess = Array.isArray(dataAccess)
+      ? this.toPostgresArray(dataAccess)
+      : dataAccess;
+
+    const [roleRecord] = await database
+      .update({
+        title,
+        description,
+        permissions: postgresPermissions,
+        data_access: postgresDataAccess,
+      })
+      .from('roles')
+      .where('role_id', roleID)
+      .returning('*');
+
+    return new Role(
+      roleRecord.role_id,
+      roleRecord.short_code,
+      roleRecord.title,
+      roleRecord.description,
+      roleRecord.permissions, // No need to parse as it's already in array format
+      roleRecord.data_access // No need to parse as it's already in array format
+    );
+  }
+
+  async deleteRole(id: number): Promise<Role | null> {
+    const [deletedRole] = await database('roles')
+      .where('role_id', id)
+      .returning('*');
+
+    if (!deletedRole) {
+      return null;
+    }
+
+    return new Role(
+      deletedRole.role_id,
+      deletedRole.short_code,
+      deletedRole.title,
+      deletedRole.description,
+      deletedRole.permissions,
+      deletedRole.data_access
+    );
   }
 }

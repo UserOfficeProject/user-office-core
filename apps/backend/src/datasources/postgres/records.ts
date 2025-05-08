@@ -262,6 +262,8 @@ export interface RoleRecord {
   readonly short_code: string;
   readonly title: string;
   readonly description: string;
+  readonly permissions: string[]; // Changed from string to string[]
+  readonly data_access: string[]; // Changed from string to string[]
 }
 
 export interface ReviewRecord {
@@ -1175,7 +1177,14 @@ export const createFapReviewerObject = (fapMember: FapReviewerRecord) => {
 };
 
 export const createRoleObject = (role: RoleRecord) => {
-  return new Role(role.role_id, role.short_code, role.title, role.description);
+  return new Role(
+    role.role_id,
+    role.short_code,
+    role.title,
+    role.description,
+    role.permissions,
+    role.data_access
+  );
 };
 
 export const createVisitObject = (visit: VisitRecord) => {
