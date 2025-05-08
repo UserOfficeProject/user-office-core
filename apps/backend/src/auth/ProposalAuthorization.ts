@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
+import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
@@ -35,6 +36,8 @@ export class ProposalAuthorization {
     private statusDataSource: StatusDataSource,
     @inject(Tokens.TechniqueDataSource)
     private techniqueDataSource: TechniqueDataSource,
+    @inject(Tokens.InstrumentDataSource)
+    private instrumentDataSource: InstrumentDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
@@ -239,6 +242,24 @@ export class ProposalAuthorization {
 
     let hasAccess = false;
 
+    // Check data access
+
+    const proposalIsntruments =
+      await this.instrumentDataSource.getInstrumentsByProposalPk(
+        proposal.primaryKey
+      );
+    proposalIsntruments.forEach((instrument) => {
+      agent.currentRole?.dataAccess.some((dataAccess) => {
+        if (dataAccess === instrument.shortCode) {
+          hasAccess = true;
+
+          return true;
+        }
+      });
+    });
+    if (hasAccess) {
+      return true;
+    }
     switch (currentRole) {
       case Roles.USER:
         hasAccess =
