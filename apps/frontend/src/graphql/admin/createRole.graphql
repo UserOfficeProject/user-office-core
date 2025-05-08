@@ -1,0 +1,5 @@
+mutation createRole($args: CreateRoleArgs!) {
+  createRole(args: $args) {
+    success
+  }
+}
