@@ -3,12 +3,14 @@ mutation createInstrument(
   $shortCode: String!
   $description: String!
   $managerUserId: Int!
+  $selectable: Boolean
 ) {
   createInstrument(
     name: $name
     shortCode: $shortCode
     description: $description
     managerUserId: $managerUserId
+    selectable: $selectable
   ) {
     ...instrument
   }

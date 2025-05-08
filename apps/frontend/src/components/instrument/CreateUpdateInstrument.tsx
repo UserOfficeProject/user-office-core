@@ -48,7 +48,9 @@ const CreateUpdateInstrument = ({
   const [usersData, setUsersData] = useState(
     instrument?.instrumentContact ? [instrument?.instrumentContact] : []
   );
-  const [isChecked, setIsChecked] = useState(false);
+  const [isReviewerUpdateChecked, setIsReviewerUpdateChecked] = useState(false);
+
+  console.log(instrument);
 
   const initialValues = instrument
     ? { ...instrument, surname: '' }
@@ -58,6 +60,7 @@ const CreateUpdateInstrument = ({
         description: '',
         managerUserId: null,
         surname: '',
+        selectable: true,
       };
 
   useEffect(() => {
@@ -136,7 +139,10 @@ const CreateUpdateInstrument = ({
         return;
       }
 
-      if (values.managerUserId !== instrument.managerUserId && isChecked) {
+      if (
+        values.managerUserId !== instrument.managerUserId &&
+        isReviewerUpdateChecked
+      ) {
         confirm(
           async () => {
             try {
@@ -164,6 +170,7 @@ const CreateUpdateInstrument = ({
                 description: updatedValues.description,
                 managerUserId: updatedValues.managerUserId,
                 updateTechReview: true,
+                selectable: updatedValues.selectable,
               });
 
               close(updateInstrument);
@@ -188,6 +195,7 @@ const CreateUpdateInstrument = ({
             description: updatedValues.description,
             managerUserId: updatedValues.managerUserId,
             updateTechReview: false,
+            selectable: updatedValues.selectable,
           });
 
           close(updateInstrument);
@@ -262,6 +270,16 @@ const CreateUpdateInstrument = ({
             disabled={isExecutingCall}
             required
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon />}
+                checkedIcon={<CheckBoxIcon />}
+                checked={formikProps.values.selectable}
+              />
+            }
+            label="Allow this instrument to be selectable in proposal submission"
+          />
           <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
             name="managerUserId"
@@ -287,8 +305,10 @@ const CreateUpdateInstrument = ({
                   <Checkbox
                     icon={<CheckBoxOutlineBlankIcon />}
                     checkedIcon={<CheckBoxIcon />}
-                    checked={isChecked}
-                    onChange={(event) => setIsChecked(event.target.checked)}
+                    checked={isReviewerUpdateChecked}
+                    onChange={(event) =>
+                      setIsReviewerUpdateChecked(event.target.checked)
+                    }
                   />
                 }
                 label="Update all un-assigned technical reviews to new contact"
