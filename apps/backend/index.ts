@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/order, @typescript-eslint/no-unused-vars
+import startTracing from './src/middlewares/tracing/tracing';
 import { logger } from '@user-office-software/duo-logger';
 import express from 'express';
 import 'reflect-metadata';
@@ -42,7 +44,7 @@ async function bootstrap() {
   });
 
   logger.logInfo(
-    `Running a GraphQL API server at localhost:${PORT}/graphql`,
+    `Running a GraphQL API server at my local:${PORT}/graphql`,
     {}
   );
 
@@ -50,5 +52,5 @@ async function bootstrap() {
   container.resolve<(() => void) | undefined>(Tokens.ConfigureLogger)?.();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }
-
+startTracing();
 bootstrap();
