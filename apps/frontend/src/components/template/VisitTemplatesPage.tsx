@@ -23,9 +23,9 @@ export default function SampleEsiPage() {
             isArchived={false}
             emptyDataSourceMessage={
               <div>
-                <strong>Warning</strong> Visit registration has no active
-                template. Users will not be able to register visits. Please
-                create a new template and mark it as active.
+                <strong>Warning</strong> Visit registration has no templates.
+                Users will not be able to register visits. Please create a new
+                template and mark it as active.
               </div>
             }
           />

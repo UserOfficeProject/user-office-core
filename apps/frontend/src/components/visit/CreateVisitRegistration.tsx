@@ -1,90 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react';
+import Alert from '@mui/material/Alert'; // Added Alert for error display
+import React from 'react'; // Removed useContext, useEffect, useState
 
 import UOLoader from 'components/common/UOLoader';
-import { UserContext } from 'context/UserContextProvider';
-import {
-  QuestionaryStep,
-  TemplateGroupId,
-  VisitRegistrationStatus,
-} from 'generated/sdk';
+import { useBlankVisitRegistration } from 'hooks/visit/useBlankVisitRegistration'; // Added import for the new hook
 import { VisitRegistrationCore } from 'models/questionary/visit/VisitRegistrationCore';
-import { RegistrationWithQuestionary } from 'models/questionary/visit/VisitRegistrationWithQuestionary';
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import VisitRegistrationContainer from './VisitRegistrationContainer';
-
-function createRegistrationStub(
-  userId: number,
-  templateId: number,
-  questionarySteps: QuestionaryStep[],
-  visitId: number
-): RegistrationWithQuestionary {
-  return {
-    userId: userId,
-    registrationQuestionaryId: 0,
-    status: VisitRegistrationStatus.DRAFTED,
-    startsAt: null,
-    endsAt: null,
-    visitId: visitId,
-    user: {
-      firstname: '',
-      lastname: '',
-      preferredname: '',
-      id: userId,
-      created: new Date(),
-      institution: '',
-      institutionId: 1,
-      placeholder: false,
-      position: '',
-      email: '',
-      country: '',
-    },
-    questionary: {
-      isCompleted: false,
-      questionaryId: 0,
-      templateId: templateId,
-      created: new Date(),
-      steps: questionarySteps,
-    },
-  };
-}
 
 interface CreateVisitProps {
   onCreate?: (visit: VisitRegistrationCore) => void;
   onUpdate?: (visit: VisitRegistrationCore) => void;
   onSubmitted?: (visit: VisitRegistrationCore) => void;
   visitId: number;
-  userId: number;
 }
-function CreateVisit({ onSubmitted, visitId, userId }: CreateVisitProps) {
-  const { user } = useContext(UserContext);
-  const { api } = useDataApiWithFeedback();
-  const [blankRegistration, setBlankRegistration] =
-    useState<RegistrationWithQuestionary>();
+function CreateVisit({ onSubmitted, visitId }: CreateVisitProps) {
+  const { blankRegistration, error: blankRegistrationError } =
+    useBlankVisitRegistration(visitId);
 
-  useEffect(() => {
-    api()
-      .getActiveTemplateId({
-        templateGroupId: TemplateGroupId.VISIT_REGISTRATION,
-      })
-      .then(({ activeTemplateId }) => {
-        if (activeTemplateId) {
-          api()
-            .getBlankQuestionarySteps({ templateId: activeTemplateId })
-            .then((result) => {
-              if (result.blankQuestionarySteps) {
-                const blankRegistration = createRegistrationStub(
-                  userId,
-                  activeTemplateId,
-                  result.blankQuestionarySteps,
-                  visitId
-                );
-                setBlankRegistration(blankRegistration);
-              }
-            });
-        }
-      });
-  }, [setBlankRegistration, api, user, visitId, userId]);
+  if (blankRegistrationError) {
+    return (
+      <Alert severity="error">
+        <strong>Error:</strong>
+        {blankRegistrationError}
+      </Alert>
+    );
+  }
 
   if (!blankRegistration) {
     return <UOLoader />;
