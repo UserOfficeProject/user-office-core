@@ -275,7 +275,7 @@ const CreateUpdateInstrument = ({
               <Checkbox
                 icon={<CheckBoxOutlineBlankIcon />}
                 checkedIcon={<CheckBoxIcon />}
-                checked={formikProps.values.selectable}
+                checked={formikProps.values.selectable ?? true}
               />
             }
             label="Allow this instrument to be selectable in proposal submission"
