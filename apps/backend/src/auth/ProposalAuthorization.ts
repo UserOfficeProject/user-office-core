@@ -9,7 +9,7 @@ import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
-import { Roles } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
 import { UserWithRole } from '../models/User';
 import { Proposal } from '../resolvers/types/Proposal';
@@ -248,15 +248,30 @@ export class ProposalAuthorization {
       await this.instrumentDataSource.getInstrumentsByProposalPk(
         proposal.primaryKey
       );
-    proposalIsntruments.forEach((instrument) => {
-      agent.currentRole?.dataAccess.some((dataAccess) => {
-        if (dataAccess === instrument.shortCode) {
-          hasAccess = true;
 
-          return true;
-        }
-      });
+    const rolesArray: Role[] = await this.userDataSource.getUserRoles(agent.id);
+    const userRoles: Record<string, { dataAccess: string[] }> =
+      rolesArray.reduce(
+        (acc, role) => {
+          acc[role.shortCode] = { dataAccess: role.dataAccess };
+
+          return acc;
+        },
+        {} as Record<string, { dataAccess: string[] }>
+      );
+    proposalIsntruments.forEach((instrument) => {
+      agent.currentRole?.shortCode &&
+        userRoles[agent.currentRole.shortCode]?.dataAccess.some(
+          (dataAccess) => {
+            if (dataAccess === instrument.shortCode) {
+              hasAccess = true;
+
+              return true;
+            }
+          }
+        );
     });
+
     if (hasAccess) {
       return true;
     }
