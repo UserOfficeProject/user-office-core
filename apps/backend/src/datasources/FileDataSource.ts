@@ -12,7 +12,13 @@ export interface FileDataSource {
   put(
     fileName: string,
     mimeType: string,
-    sizeImBytes: number,
-    path: string
+    sizeInBytes: number,
+    filePath: string
+  ): Promise<FileMetadata>;
+  put(
+    fileName: string,
+    mimeType: string,
+    sizeInBytes: number,
+    readStream: NodeJS.ReadableStream
   ): Promise<FileMetadata>;
 }

@@ -61,11 +61,29 @@ export default class PostgresFileDataSource implements FileDataSource {
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    path: string
+    filePath: string
+  ): Promise<FileMetadata>;
+  public async put(
+    fileName: string,
+    mimeType: string,
+    sizeInBytes: number,
+    readableStream: NodeJS.ReadableStream
+  ): Promise<FileMetadata>;
+  public async put(
+    fileName: string,
+    mimeType: string,
+    sizeInBytes: number,
+    source: string | NodeJS.ReadableStream
   ): Promise<FileMetadata> {
-    const oid = await this.storeBlob(path);
+    let oid: number;
 
-    fs.unlinkSync(path);
+    if (typeof source === 'string') {
+      oid = await this.storeBlob(source);
+      fs.unlinkSync(source);
+    } else {
+      oid = await this.storeBlobFromStream(source);
+    }
+
     const resultSet: FileRecord[] = await database
       .insert({
         file_name: fileName,
@@ -131,6 +149,70 @@ export default class PostgresFileDataSource implements FileDataSource {
       .finally(() => {
         database.client.releaseConnection(connection);
       });
+  }
+
+  private async storeBlobFromStream(
+    readableStream: NodeJS.ReadableStream
+  ): Promise<number> {
+    const [err, connection] = await to<Client, Error>(
+      database.client.acquireConnection()
+    );
+    if (err) {
+      throw new Error(`Could not establish connection with database: ${err}`);
+    }
+
+    if (!connection) {
+      throw new Error('Could not obtain database connection.');
+    }
+
+    return new Promise<number>(async (resolve, reject) => {
+      const [transactionError] = await to(connection.query('BEGIN'));
+      if (transactionError) {
+        database.client.releaseConnection(connection);
+
+        return reject(`Could not begin transaction: ${transactionError}`);
+      }
+
+      const blobManager = new LargeObjectManager({ pg: connection });
+
+      const [writeableStreamError, response] = await to(
+        blobManager.createAndWritableStreamAsync()
+      );
+      if (writeableStreamError || !response) {
+        connection.query('ROLLBACK', () => {
+          database.client.releaseConnection(connection);
+          reject(`Could not create writable stream: ${writeableStreamError}`);
+        });
+
+        return;
+      }
+
+      const [oid, stream] = response;
+
+      stream.on('finish', () => {
+        connection.query('COMMIT', () => {
+          database.client.releaseConnection(connection);
+          resolve(oid);
+        });
+      });
+
+      stream.on('error', (streamError) => {
+        connection.query('ROLLBACK', () => {
+          database.client.releaseConnection(connection);
+          reject(`Error writing to large object stream: ${streamError}`);
+        });
+      });
+
+      readableStream.pipe(stream);
+
+      readableStream.on('error', (readError) => {
+        stream.destroy(readError);
+        connection.query('ROLLBACK', () => {
+          database.client.releaseConnection(connection);
+          reject(`Error reading from response stream: ${readError}`);
+        });
+      });
+    });
   }
 
   private async retrieveBlob(oid: number, output: string): Promise<void> {
