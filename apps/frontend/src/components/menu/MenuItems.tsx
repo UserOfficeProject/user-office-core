@@ -25,11 +25,11 @@ import {
 } from 'components/experiment/DateFilter';
 import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
+import { useMeData } from 'hooks/user/useMeData';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
@@ -69,8 +69,7 @@ const ProposalsMenuListItem = () => {
 
 const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
-  const userInfo = useContext(UserContext);
-
+  const { meData } = useMeData();
   const { t } = useTranslation();
   const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
@@ -102,14 +101,17 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     CallsDataQuantity.MINIMAL
   ).calls;
 
-  const currentRoleInfo = userInfo.roles.find((role) => {
-    if (
-      role.shortCode.toLocaleLowerCase() === currentRole?.toLocaleLowerCase()
-    ) {
-      return true;
-    }
-  });
+  let currentRoleInfo = null;
 
+  if (meData) {
+    currentRoleInfo = meData.roles.find((role) => {
+      if (
+        role.shortCode.toLocaleLowerCase() === currentRole?.toLocaleLowerCase()
+      ) {
+        return true;
+      }
+    });
+  }
   const permissions = currentRoleInfo?.permissions;
   let dynamicMenuItems: React.ReactNode = null;
   const openCall = calls?.find((call) => call.isActive);
