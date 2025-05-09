@@ -50,8 +50,6 @@ const CreateUpdateInstrument = ({
   );
   const [isReviewerUpdateChecked, setIsReviewerUpdateChecked] = useState(false);
 
-  console.log(instrument);
-
   const initialValues = instrument
     ? { ...instrument, surname: '' }
     : {
@@ -276,6 +274,9 @@ const CreateUpdateInstrument = ({
                 icon={<CheckBoxOutlineBlankIcon />}
                 checkedIcon={<CheckBoxIcon />}
                 checked={formikProps.values.selectable ?? true}
+                onChange={(event) =>
+                  formikProps.setFieldValue('selectable', event.target.checked)
+                }
               />
             }
             label="Allow this instrument to be selectable in proposal submission"
