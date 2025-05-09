@@ -883,6 +883,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   async deleteRole(id: number): Promise<Role | null> {
     const [deletedRole] = await database('roles')
       .where('role_id', id)
+      .del()
       .returning('*');
 
     if (!deletedRole) {
