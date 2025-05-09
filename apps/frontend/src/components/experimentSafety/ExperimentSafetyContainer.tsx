@@ -39,6 +39,7 @@ export function createExperimentSafetyStub(
     experimentSafetyReviewerDecision: null,
     experimentSafetyReviewerComment: null,
     samples: [],
+    status: null,
     questionary: {
       questionaryId: 0,
       isCompleted: false,

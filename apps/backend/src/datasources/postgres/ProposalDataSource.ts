@@ -58,10 +58,10 @@ const fieldMap: { [key: string]: string } = {
   notified: 'notified',
 };
 
-export async function calculateReferenceNumber(
+export function calculateReferenceNumber(
   format: string,
   sequence: number | null
-): Promise<string> {
+): string {
   const prefix: string = format.slice(0, format.indexOf('{'));
   const formatParameters: { [param: string]: string } = {};
   format.match(/(\w+:\w+)/g)?.forEach((el: string) => {
@@ -70,17 +70,13 @@ export async function calculateReferenceNumber(
   });
 
   if (!prefix || !('digits' in formatParameters)) {
-    return Promise.reject(
-      new Error(`The reference number format ('${format}') is invalid`)
-    );
+    throw new Error(`The reference number format ('${format}') is invalid`);
   }
 
   sequence = sequence ?? 0;
   if (String(sequence).length > Number(formatParameters['digits'])) {
-    return Promise.reject(
-      new Error(
-        `The sequence number provided ('${formatParameters['digits']}') exceeds the format's digits parameter`
-      )
+    throw new Error(
+      `The sequence number provided ('${formatParameters['digits']}') exceeds the format's digits parameter`
     );
   }
   const paddedSequence: string = String(sequence).padStart(

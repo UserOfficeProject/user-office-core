@@ -71,7 +71,8 @@ export default function QuestionaryEditorModel(
       groupId: TemplateGroupId.PROPOSAL,
     },
     json: '',
-    pdfTemplate: null,
+    proposalPdfTemplate: null,
+    experimentSafetyPdfTemplate: null,
     proposalPdfCallCount: 0,
     experimentSafetyPdfCallCount: 0,
   };

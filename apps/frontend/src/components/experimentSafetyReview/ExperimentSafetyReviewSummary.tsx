@@ -12,7 +12,11 @@ import { NavigButton } from 'components/common/NavigButton';
 import NavigationFragment from 'components/questionary/NavigationFragment';
 import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
 import { UserContext } from 'context/UserContextProvider';
-import { UserRole } from 'generated/sdk';
+import {
+  ExperimentSafetyReviewerDecisionEnum,
+  InstrumentScientistDecisionEnum,
+  UserRole,
+} from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -106,7 +110,7 @@ function ExperimentSafetyReviewSummary({
                       }).submitInstrumentScientistExperimentSafetyReview({
                         experimentSafetyPk:
                           state.experimentSafety.experimentSafetyPk,
-                        decision: decision,
+                        decision: decision as InstrumentScientistDecisionEnum,
                         comment: comment,
                       });
 
@@ -130,7 +134,8 @@ function ExperimentSafetyReviewSummary({
                     }).submitExperimentSafetyReviewerExperimentSafetyReview({
                       experimentSafetyPk:
                         state.experimentSafety.experimentSafetyPk,
-                      decision: decision,
+                      decision:
+                        decision as ExperimentSafetyReviewerDecisionEnum,
                       comment: comment,
                     });
 

@@ -16,7 +16,8 @@ export class Experiment {
     public localContactId: number | null,
     public instrumentId: number,
     public createdAt: Date,
-    public updatedAt: Date
+    public updatedAt: Date,
+    public referenceNumberSequence: number | null
   ) {}
 }
 

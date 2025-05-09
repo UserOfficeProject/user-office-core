@@ -37,7 +37,8 @@ export function createExperimentObject(record: ExperimentRecord) {
     record.local_contact_id,
     record.instrument_id,
     record.created_at,
-    record.updated_at
+    record.updated_at,
+    record.reference_number_sequence
   );
 }
 
@@ -73,6 +74,13 @@ export function createExperimentHasSampleObject(
   );
 }
 
+function generateExperimentId(
+  proposalNumber: number,
+  sequence: number | null
+): string {
+  return `${proposalNumber}-${sequence ?? 0}`;
+}
+
 @injectable()
 export default class PostgresExperimentDataSource
   implements ExperimentDataSource
@@ -80,35 +88,76 @@ export default class PostgresExperimentDataSource
   constructor() {}
 
   async create(
-    experiment: Omit<
+    createExperimentPayload: Omit<
       Experiment,
       'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
     >
   ): Promise<Experiment> {
-    return database('experiments')
-      .insert(
-        {
-          experiment_id: experiment.scheduledEventId.toString(),
-          starts_at: experiment.startsAt,
-          ends_at: experiment.endsAt,
-          scheduled_event_id: experiment.scheduledEventId,
-          proposal_pk: experiment.proposalPk,
-          status: experiment.status,
-          local_contact_id: experiment.localContactId,
-          instrument_id: experiment.instrumentId,
-        },
-        '*'
-      )
-      .then((records: ExperimentRecord[]) => {
-        if (records.length !== 1) {
-          logger.logError('Could not create experiment', {
-            experiment,
-          });
-          throw new GraphQLError('Failed to insert experiment');
-        }
+    const experiment: ExperimentRecord[] | undefined =
+      await database.transaction(async (trx) => {
+        try {
+          const proposal = await database('proposals')
+            .select('proposal_id', 'experiment_sequence')
+            .where('proposal_pk', createExperimentPayload.proposalPk)
+            .first()
+            .forUpdate()
+            .transacting(trx);
 
-        return createExperimentObject(records[0]);
+          if (!proposal) {
+            logger.logError('Could not find proposal for experiment', {
+              experiment,
+            });
+            throw new GraphQLError('Failed to find proposal for experiment');
+          }
+          const { proposal_id: proposalNumber, experiment_sequence: sequence } =
+            proposal;
+          const experimentId = await generateExperimentId(
+            proposalNumber,
+            sequence ?? 1
+          );
+
+          await database('proposals')
+            .where('proposal_pk', createExperimentPayload.proposalPk)
+            .update({
+              experiment_sequence: sequence ? sequence + 1 : 2,
+            })
+            .transacting(trx);
+
+          const experimentCreate = await database('experiments')
+            .insert(
+              {
+                experiment_id: experimentId,
+                starts_at: createExperimentPayload.startsAt,
+                ends_at: createExperimentPayload.endsAt,
+                scheduled_event_id: createExperimentPayload.scheduledEventId,
+                proposal_pk: createExperimentPayload.proposalPk,
+                status: createExperimentPayload.status,
+                local_contact_id: createExperimentPayload.localContactId,
+                instrument_id: createExperimentPayload.instrumentId,
+                reference_number_sequence: sequence ?? 1,
+              },
+              '*'
+            )
+            .transacting(trx);
+
+          return await trx.commit(experimentCreate);
+        } catch (error) {
+          await trx.rollback();
+          logger.logError('Failed to create Experiment', {
+            error,
+          });
+        }
       });
+
+    if (!experiment || experiment.length === 0) {
+      logger.logError('Failed to create Experiment', {
+        experiment,
+      });
+      throw new GraphQLError('Failed to create experiment');
+    }
+    const createdExperiment = experiment[0];
+
+    return createExperimentObject(createdExperiment);
   }
 
   async updateByScheduledEventId(
@@ -325,7 +374,6 @@ export default class PostgresExperimentDataSource
     experimentSafetyPk: number,
     statusId: number
   ): Promise<ExperimentSafety> {
-    console.log({ statusId });
     const result = await database('experiment_safety')
       .update({
         status_id: statusId,

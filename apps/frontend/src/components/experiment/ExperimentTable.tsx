@@ -40,6 +40,15 @@ function ExperimentTable() {
   const columns = React.useCallback(
     (t: TFunction<'translation', undefined>) => [
       {
+        title: 'Experiment ID',
+        field: 'experimentId',
+        render: (rowData: RowType) => (
+          <a href={`/experiments/${rowData.experimentId}`}>
+            {rowData.experimentId}
+          </a>
+        ),
+      },
+      {
         title: 'Proposal ID',
         field: 'proposal.proposalId',
       },

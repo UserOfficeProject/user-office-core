@@ -174,7 +174,6 @@ export const workflowEngine = async (
         if (!experimentWorkflow) {
           return;
         }
-        console.log('*****************', experimentSafety);
         if (!experimentSafety.statusId) return;
 
         const currentWorkflowConnections =
@@ -321,7 +320,6 @@ export const markExperimentSafetyEventAsDoneAndCallWorkflowEngine = async (
   });
 
   const updatedExperiments = await workflowEngine(experimentPksWithEvents);
-  console.log('END---------------------------');
 
   return updatedExperiments;
 };

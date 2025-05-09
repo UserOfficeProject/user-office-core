@@ -161,7 +161,6 @@ router.get(`/${PDFType.EXPERIMENT_SAFETY}`, async (req, res, next) => {
         userWithRole,
         pdfTemplateIdNumber
       );
-      console.log({ pdfTemplate });
       if (!pdfTemplate) {
         throw new Error('Could not get pdf template');
       }
@@ -181,7 +180,6 @@ router.get(`/${PDFType.EXPERIMENT_SAFETY}`, async (req, res, next) => {
     if (!payload) {
       throw new Error('Invalid request');
     }
-    console.log('payload', payload);
     downloadService.callFactoryService<ExperimentSafetyPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.EXPERIMENT_SAFETY,

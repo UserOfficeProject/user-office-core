@@ -76,10 +76,6 @@ export class SampleAuthorization {
     );
 
     // const isPostProposalSubmission = sample.isPostProposalSubmission === true;
-    console.log({
-      isMemberOfProposal,
-      // isPostProposalSubmission,
-    });
 
     return (
       // (isMemberOfProposal && isPostProposalSubmission) ||

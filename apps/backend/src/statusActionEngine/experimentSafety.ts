@@ -9,7 +9,6 @@ import {
 } from '../workflowEngine/experiment';
 import { emailActionHandler } from './emailActionHandler';
 import { rabbitMQActionHandler } from './rabbitMQHandler';
-import { groupProposalsByProperties } from './statusActionUtils';
 
 export const experimentSafetyStatusActionEngine = async (
   experiments: WorkflowEngineExperimentType[]
@@ -21,13 +20,13 @@ export const experimentSafetyStatusActionEngine = async (
   // NOTE: We need to group the proposals by 'workflow' and 'status' because proposals coming in here can be from different workflows/calls.
   const groupByProperties = ['workflowId', 'statusId'];
   // NOTE: Here the result is something like: [[proposalsWithWorkflowStatusIdCombination1], [proposalsWithWorkflowStatusIdCombination2]...]
-  const groupResult = groupProposalsByProperties(
-    experiments,
-    groupByProperties
-  );
-
+  // const groupResult = groupProposalsByProperties(
+  //   experiments,
+  //   groupByProperties
+  // );
+  const groupResult: any = [];
   Promise.all(
-    groupResult.map(async (groupedProposals) => {
+    groupResult.map(async (groupedProposals: any) => {
       // NOTE: We get the needed ids from the first proposal in the group.
       const [{ workflowId, statusId, prevStatusId }] = groupedProposals;
 

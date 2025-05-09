@@ -24,7 +24,6 @@ export default class ExperimentQueries {
   ): Promise<ExperimentSafety | null> {
     const experimentSafety =
       await this.dataSource.getExperimentSafetyByExperimentPk(experimentPk);
-    console.log(experimentSafety);
 
     return experimentSafety;
   }

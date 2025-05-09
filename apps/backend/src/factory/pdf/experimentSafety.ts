@@ -80,7 +80,7 @@ export const collectExperimentPDFData = async (
   experimentPk: number,
   user: UserWithRole,
   notify?: CallableFunction
-): Promise<ExperimentPDFData> => {
+): Promise<any> => {
   const experiment = await baseContext.queries.experiment.getExperiment(
     user,
     experimentPk
@@ -295,7 +295,7 @@ export const collectExperimentPDFDataTokenAccess = async (
   user: UserWithRole,
   options?: DownloadOptions,
   notify?: CallableFunction
-): Promise<ExperimentPDFData> => {
+): Promise<any> => {
   const experimentDataSource = container.resolve<ExperimentDataSource>(
     Tokens.ExperimentDataSource
   );

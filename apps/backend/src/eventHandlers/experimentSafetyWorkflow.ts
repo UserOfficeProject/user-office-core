@@ -51,7 +51,6 @@ export const handleWorkflowEngineChange = async (
   event: ApplicationEvent,
   experimentPks: number[] | number
 ) => {
-  console.log('11----------------------------');
   const isArray = Array.isArray(experimentPks);
   const updatedExperimentSafeties =
     await markExperimentSafetyEventAsDoneAndCallWorkflowEngine(

@@ -29,7 +29,8 @@ const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
     values?.localContactId ?? null,
     values?.instrumentId ?? 1,
     values?.createdAt ?? new Date(),
-    values?.updatedAt ?? new Date()
+    values?.updatedAt ?? new Date(),
+    values?.referenceNumberSequence ?? null
   );
 };
 
