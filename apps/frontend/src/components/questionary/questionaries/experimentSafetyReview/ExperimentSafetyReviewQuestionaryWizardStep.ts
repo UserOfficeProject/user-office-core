@@ -25,9 +25,9 @@ export class ExperimentSafetyReviewQuestionaryWizardStep extends QuestionaryWiza
         ExperimentSafetyReviewerDecisionEnum.UNSET;
 
     // If any decision has been made, the form should not be editable
-    // if (hasInstrumentScientistDecision || hasExperimentSafetyReviewerDecision) {
-    //   return false;
-    // }
+    if (hasInstrumentScientistDecision || hasExperimentSafetyReviewerDecision) {
+      return false;
+    }
 
     return true;
   }
