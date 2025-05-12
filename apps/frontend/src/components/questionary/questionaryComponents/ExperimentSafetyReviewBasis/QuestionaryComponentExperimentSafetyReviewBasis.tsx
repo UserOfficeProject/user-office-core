@@ -1,12 +1,10 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
-import SimpleTabs from 'components/common/SimpleTabs';
 import { ExperimentSafetyReviewContextType } from 'components/experimentSafetyReview/ExperimentSafetyReviewContainer';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import QuestionaryDetails from 'components/questionary/QuestionaryDetails';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { SampleSubmissionState } from 'models/questionary/sample/SampleSubmissionState';
 
@@ -19,25 +17,7 @@ function QuestionaryComponentExperimentSafetyReviewBasis() {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  return (
-    <>
-      <SimpleTabs
-        tabNames={state.experimentSafety.samples.map(
-          (sample) => sample.sample.title || `Sample ${sample.sampleId}`
-        )}
-        tabPanelPadding={2}
-      >
-        {state.experimentSafety.samples.map((sample) => (
-          <div key={sample.sampleId}>
-            <QuestionaryDetails questionaryId={sample.sampleEsiQuestionaryId} />
-          </div>
-        ))}
-      </SimpleTabs>
-      <QuestionaryDetails
-        questionaryId={state.experimentSafety.esiQuestionaryId}
-      />
-    </>
-  );
+  return null;
 }
 
 const experimentSafetyReviewBasisPreSubmit =

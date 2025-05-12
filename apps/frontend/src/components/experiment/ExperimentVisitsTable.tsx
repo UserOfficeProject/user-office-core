@@ -14,7 +14,7 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   SettingsId,
   VisitRegistrationStatus,
-  GetExperimentsQuery,
+  GetAllExperimentsQuery,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
@@ -24,10 +24,16 @@ import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 type RowType = NonNullable<
-  GetExperimentsQuery['experiments'][0]['visit']
+  NonNullable<
+    NonNullable<GetAllExperimentsQuery['allExperiments']>['experiments']
+  >[0]['visit']
 >['registrations'][0];
 
-type Experiment = GetExperimentsQuery['experiments'][0];
+type Experiment = NonNullable<
+  NonNullable<
+    NonNullable<GetAllExperimentsQuery['allExperiments']>['experiments']
+  >
+>[0];
 
 interface ExperimentDetailsTableProps extends WithConfirmProps {
   experiment: Experiment;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { ExperimentsFilter, GetAllExperimentsQuery } from 'generated/sdk';
+import { ExperimentsFilter } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 type QueryParameters = {
@@ -16,23 +16,11 @@ export function useAllExperiments(
   filter: ExperimentsFilter,
   queryParameters?: QueryParameters
 ) {
-  const [experiments, setExperiments] = useState<
-    GetAllExperimentsQuery['allExperiments']
-  >([]);
   const [loading, setLoading] = useState(true);
 
   const api = useDataApi();
 
-  const {
-    callId,
-    instrumentFilter,
-    proposalStatusId,
-    excludeProposalStatusIds,
-    questionaryIds,
-    referenceNumbers,
-    questionFilter,
-    text,
-  } = filter;
+  const { callId } = filter;
 
   const fetchAllExperimentsData = useCallback(
     async (componentController?: { unmounted: boolean }) => {

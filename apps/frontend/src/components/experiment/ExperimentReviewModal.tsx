@@ -1,16 +1,15 @@
 import CloseIcon from '@mui/icons-material/Close';
-import AppBar from '@mui/material/AppBar';
+import {
+  AppBar,
+  DialogContent,
+  IconButton,
+  Toolbar,
+  Typography,
+} from '@mui/material';
 import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import IconButton from '@mui/material/IconButton';
 import Slide from '@mui/material/Slide';
-import Toolbar from '@mui/material/Toolbar';
 import { TransitionProps } from '@mui/material/transitions/transition';
-import Typography from '@mui/material/Typography';
 import React from 'react';
-
-import { Proposal } from 'generated/sdk';
-import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -21,55 +20,27 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-type ProposalReviewModalProps = {
-  proposalReviewModalOpen: boolean;
-  setProposalReviewModalOpen: (updatedProposal?: Proposal) => void;
+type ExperimentReviewModalProps = {
+  modalOpen: boolean;
+  handleClose: () => void;
   title: string;
   reviewItemId?: number | null;
   children: React.ReactElement;
 };
 
-const ProposalReviewModal = ({
+//TODO: This is a copy of the ProposalReviewModal. We should refactor this to use a common modal component.
+const ExperimentReviewModal = ({
   title,
-  proposalReviewModalOpen,
-  setProposalReviewModalOpen,
-  reviewItemId,
+  modalOpen,
+  handleClose,
   children,
-}: ProposalReviewModalProps) => {
-  const { api } = useDataApiWithFeedback();
-
-  const loadProposal = async () => {
-    if (!reviewItemId) {
-      return;
-    }
-
-    return api()
-      .getProposal({ primaryKey: reviewItemId })
-      .then((data) => {
-        return data.proposal as Proposal;
-      });
-  };
-
-  // TODO: Remove this after the InstrumentScientistProposalTable is refactored. The ProposalTableOfficer doesn't use this anymore.
-  const handleClose = async () => {
-    /**
-     * TODO: This needs to be refactored a bit and instead of loading proposal before close we could use the proposal used in the modal content tabs.
-     * For now this is the easiest solution to get all changes that are done on the proposal inside the modal.
-     */
-    try {
-      const freshProposal = await loadProposal();
-      setProposalReviewModalOpen(freshProposal);
-    } catch {
-      setProposalReviewModalOpen();
-    }
-  };
-
+}: ExperimentReviewModalProps) => {
   return (
     <>
       <Dialog
-        open={proposalReviewModalOpen}
+        open={modalOpen}
         fullScreen
-        onClose={(): Promise<void> => handleClose()}
+        onClose={handleClose}
         TransitionComponent={Transition}
       >
         <AppBar sx={{ position: 'relative' }}>
@@ -107,4 +78,4 @@ const ProposalReviewModal = ({
   );
 };
 
-export default ProposalReviewModal;
+export default ExperimentReviewModal;

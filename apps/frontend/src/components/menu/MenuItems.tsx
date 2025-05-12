@@ -13,20 +13,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import i18n from 'i18n';
-import { DateTime } from 'luxon';
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
-import {
-  DEFAULT_DATE_FORMAT,
-  getRelativeDatesFromToday,
-} from 'components/experiment/DateFilter';
-import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
-import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
+import { FeatureId, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useXpressAccess } from 'hooks/common/useXpressAccess';
 
@@ -55,9 +48,6 @@ const ProposalsMenuListItem = () => {
 const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
-  const { format } = useFormattedDateTime({
-    settingsFormatToUse: SettingsId.DATE_FORMAT,
-  });
 
   const isSchedulerEnabled = context.featuresMap.get(
     FeatureId.SCHEDULER
@@ -91,13 +81,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     openCall && openCall.id
       ? `/XpressProposals?call=${openCall?.id}`
       : '/XpressProposals';
-
-  const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
-
-  const formattedDate = (value?: Date) =>
-    value
-      ? DateTime.fromJSDate(value).toFormat(format || DEFAULT_DATE_FORMAT)
-      : undefined;
 
   const user = (
     <div data-cy="user-menu-items">
@@ -161,10 +144,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
-          <ListItemButton
-            component={NavLink}
-            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
-          >
+          <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>
@@ -294,10 +274,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
-          <ListItemButton
-            component={NavLink}
-            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
-          >
+          <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>
@@ -320,10 +297,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     <div data-cy="reviewer-menu-items">
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
-          <ListItemButton
-            component={NavLink}
-            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
-          >
+          <ListItemButton component={NavLink} to={`/Experiments`}>
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>

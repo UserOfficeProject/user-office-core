@@ -112,6 +112,7 @@ export function createTechnicalReviewStub(
       techniques: [],
       attachments: { questions: [] },
       experiments: null,
+      experimentSequence: null,
     },
   };
 }

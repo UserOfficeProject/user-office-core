@@ -12,6 +12,11 @@ import { Experiment, ExperimentsFilter, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import ExperimentReviewContent, {
+  EXPERIMENT_MODAL_TAB_NAMES,
+} from './ExperimentReviewContent';
+import ExperimentReviewModal from './ExperimentReviewModal';
+
 type ExperimentsTableProps = {
   experimentsFilter: ExperimentsFilter;
   setExperimentsFilter?: (filter: ExperimentsFilter) => void;
@@ -26,7 +31,7 @@ const RowActionButtons = (rowData: Experiment) => {
         data-cy="view-experiment"
         onClick={() => {
           setSearchParams((searchParams) => {
-            searchParams.set('reviewModal', rowData.experimentPk.toString());
+            searchParams.set('experiment', rowData.experimentId.toString());
 
             return searchParams;
           });
@@ -44,23 +49,23 @@ export default function ExperimentsTable({
   const { api } = useDataApiWithFeedback();
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableData, setTableData] = useState<Experiment[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
   const [selectedExperiment, setSelectedExperiment] = useState<Experiment>();
 
   const search = searchParams.get('search');
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
-  const reviewModal = searchParams.get('reviewModal');
+  const selectedExperimentId = searchParams.get('experiment');
 
   React.useEffect(() => {
     setSelectedExperiment(
       tableData.find(
-        (experiment) => experiment.experimentPk.toString() == reviewModal
+        (experiment) =>
+          experiment.experimentId.toString() == selectedExperimentId
       )
     );
-  }, [reviewModal, tableData]);
+  }, [selectedExperimentId, tableData]);
 
-  const { toFormattedDateTime, format } = useFormattedDateTime({
+  const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
@@ -68,7 +73,6 @@ export default function ExperimentsTable({
   const fetchExperimentsData = (tableQuery: Query<Experiment>) =>
     new Promise<QueryResult<Experiment>>(async (resolve, reject) => {
       try {
-        console.log({ tableQuery });
         const [orderBy] = tableQuery.orderByCollection;
         const { callId } = experimentsFilter;
 
@@ -103,7 +107,6 @@ export default function ExperimentsTable({
           }) || [];
 
         setTableData(tableData);
-        setTotalCount(allExperiments?.totalCount || 0);
 
         resolve({
           data: tableData,
@@ -160,33 +163,63 @@ export default function ExperimentsTable({
     ];
   }
 
-  return (
-    <MaterialTable
-      title={
-        <Typography variant="h6" component="h2">
-          Experiments
-        </Typography>
-      }
-      columns={columns}
-      data={fetchExperimentsData}
-      options={{
-        searchText: search || undefined,
-        pageSize: pageSize ? +pageSize : 10,
-        initialPage: search ? 0 : page ? +page : 0,
-      }}
-      onSearchChange={(searchText) => {
-        setSearchParams({
-          search: searchText ? searchText : '',
-          page: searchText ? '0' : page || '',
-        });
-      }}
-      onPageChange={(page) => {
-        setSearchParams((searchParams) => {
-          searchParams.set('page', page.toString());
+  const experimentReviewTabs = [
+    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION,
+    EXPERIMENT_MODAL_TAB_NAMES.PROPOSAL_INFORMATION,
+    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_FORM,
+    EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_REVIEW,
+    EXPERIMENT_MODAL_TAB_NAMES.VISIT,
+  ];
 
-          return searchParams;
-        });
-      }}
-    />
+  return (
+    <>
+      <MaterialTable
+        title={
+          <Typography variant="h6" component="h2">
+            Experiments
+          </Typography>
+        }
+        columns={columns}
+        data={fetchExperimentsData}
+        options={{
+          searchText: search || undefined,
+          pageSize: pageSize ? +pageSize : 10,
+          initialPage: search ? 0 : page ? +page : 0,
+        }}
+        onSearchChange={(searchText) => {
+          setSearchParams({
+            search: searchText ? searchText : '',
+            page: searchText ? '0' : page || '',
+          });
+        }}
+        onPageChange={(page) => {
+          setSearchParams((searchParams) => {
+            searchParams.set('page', page.toString());
+
+            return searchParams;
+          });
+        }}
+      />
+
+      {selectedExperiment && (
+        <ExperimentReviewModal
+          title={`View Experiment: ${selectedExperiment?.experimentId} - (${toFormattedDateTime(selectedExperiment?.startsAt)} - ${toFormattedDateTime(selectedExperiment?.endsAt)})`}
+          modalOpen={!!selectedExperiment}
+          handleClose={() => {
+            setSearchParams((searchParams) => {
+              searchParams.delete('experiment');
+
+              return searchParams;
+            });
+          }}
+        >
+          <ExperimentReviewContent
+            experimentPk={selectedExperiment.experimentPk}
+            tabNames={experimentReviewTabs}
+            isInsideModal={true}
+          />
+        </ExperimentReviewModal>
+      )}
+    </>
   );
 }

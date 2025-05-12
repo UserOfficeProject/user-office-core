@@ -18,7 +18,6 @@ import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
 import XpressProposalTable from './xpress/XpressProposalTable';
 
 const CallPage = lazy(() => import('./call/CallPage'));
-const ExperimentPage = lazy(() => import('./experiment/ExperimentPage'));
 const ExperimentsPage = lazy(() => import('./experiment/ExperimentsPage'));
 const FapPage = lazy(() => import('./fap/FapPage'));
 const FapsPage = lazy(() => import('./fap/FapsPage'));
@@ -234,16 +233,6 @@ const AppRoutes = () => {
                 title="Xpress Proposals"
                 element={<XpressProposalTable />}
               />
-            }
-          />
-        )}
-        {(isUserOfficer ||
-          isInstrumentScientist ||
-          isExperimentSafetyReviewer) && (
-          <Route
-            path="/ExperimentPage"
-            element={
-              <TitledRoute title="Experiments" element={<ExperimentPage />} />
             }
           />
         )}
