@@ -6,20 +6,20 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
-import ExperimentSafetyReview from 'components/experimentSafetyReview/ExperimentSafetyReview';
-import { GetExperimentsQuery, SettingsId, WorkflowType } from 'generated/sdk';
+import {
+  GetAllExperimentsQuery,
+  SettingsId,
+  WorkflowType,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
-import { useExperiments } from 'hooks/experiment/useExperiments';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { tableIcons } from 'utils/materialIcons';
 import { tableLocalization } from 'utils/materialLocalization';
-import { getFullUserName } from 'utils/user';
 
 import { DEFAULT_DATE_FORMAT } from './DateFilter';
 import ExperimentVisitsTable from './ExperimentVisitsTable';
 
-type RowType = GetExperimentsQuery['experiments'][0];
+type RowType = GetAllExperimentsQuery['allExperiments'][0];
 
 function ExperimentTable() {
   const [searchParams] = useSearchParams();
@@ -27,6 +27,7 @@ function ExperimentTable() {
   const instrument = searchParams.get('instrument');
   const experimentFromDate = searchParams.get('from');
   const experimentToDate = searchParams.get('to');
+
   const { experiments, loadingEvents, setArgs } = useExperiments({});
   const {
     statuses: experimentStatuses,
@@ -47,54 +48,6 @@ function ExperimentTable() {
             {rowData.experimentId}
           </a>
         ),
-      },
-      {
-        title: 'Proposal ID',
-        field: 'proposal.proposalId',
-      },
-      {
-        title: 'Principal investigator',
-        render: (rowData: RowType) =>
-          getFullUserName(rowData.proposal.proposer),
-      },
-      {
-        title: 'Proposal',
-        field: 'proposal.title',
-      },
-      {
-        title: 'Experiment start',
-        field: 'startsAt',
-        render: (rowData: RowType) => toFormattedDateTime(rowData.startsAt),
-      },
-      {
-        title: 'Experiment end',
-        field: 'endsAt',
-        render: (rowData: RowType) => toFormattedDateTime(rowData.endsAt),
-      },
-      {
-        title: 'Experiment Safety Status',
-        field: 'experimentSafety.status.name',
-      },
-      {
-        title: 'Experiment Safety',
-        render: (rowData: RowType) =>
-          rowData.experimentSafety ? (
-            <ButtonWithDialog
-              label="Review Experiment Safety"
-              title="Review Experiment Safety"
-              size="large"
-            >
-              <ExperimentSafetyReview
-                experimentSafetyPk={rowData.experimentSafety.experimentSafetyPk}
-              />
-            </ButtonWithDialog>
-          ) : (
-            'Awaiting Experiment Safety Form'
-          ),
-      },
-      {
-        title: t('instrument'),
-        field: 'instrument.name',
       },
     ],
     [experimentStatuses.toString(), toFormattedDateTime]
@@ -135,7 +88,7 @@ function ExperimentTable() {
   return (
     <MaterialTable
       icons={tableIcons}
-      localization={tableLocalization}
+      localization={tableLocalization} //todo: What is this
       title={
         <Typography variant="h6" component="h2">
           Experiments

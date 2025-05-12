@@ -19,6 +19,7 @@ import XpressProposalTable from './xpress/XpressProposalTable';
 
 const CallPage = lazy(() => import('./call/CallPage'));
 const ExperimentPage = lazy(() => import('./experiment/ExperimentPage'));
+const ExperimentsPage = lazy(() => import('./experiment/ExperimentsPage'));
 const FapPage = lazy(() => import('./fap/FapPage'));
 const FapsPage = lazy(() => import('./fap/FapsPage'));
 const CreateFeedbackPage = lazy(() => import('./feedback/CreateFeedbackPage'));
@@ -243,6 +244,16 @@ const AppRoutes = () => {
             path="/ExperimentPage"
             element={
               <TitledRoute title="Experiments" element={<ExperimentPage />} />
+            }
+          />
+        )}
+        {(isUserOfficer ||
+          isInstrumentScientist ||
+          isExperimentSafetyReviewer) && (
+          <Route
+            path="/Experiments"
+            element={
+              <TitledRoute title="Experiments" element={<ExperimentsPage />} />
             }
           />
         )}
@@ -679,7 +690,7 @@ const AppRoutes = () => {
         ) : isExperimentSafetyReviewer ? (
           <Route
             path="/"
-            element={<TitledRoute title="" element={<ExperimentPage />} />}
+            element={<TitledRoute title="" element={<ExperimentsPage />} />}
           />
         ) : (
           <Route

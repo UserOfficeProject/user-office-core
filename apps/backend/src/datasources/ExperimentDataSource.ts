@@ -10,6 +10,7 @@ import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
 import {
   ExperimentsArgs,
+  ExperimentsFilter,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
 import { ExperimentSafetyEventsRecord } from './postgres/records';
@@ -84,6 +85,17 @@ export interface ExperimentDataSource {
     isSubmitted: boolean
   ): Promise<ExperimentHasSample>;
   getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]>;
+  getAllExperiments(
+    filter?: ExperimentsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{
+    totalCount: number;
+    experiments: Experiment[];
+  }>;
   getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]>;
   markEventAsDoneOnExperimentSafeties(
     event: Event,

@@ -149,7 +149,7 @@ let columns: Column<ProposalViewData>[] = [
     lookup: { true: 'Yes', false: 'No' },
   },
   {
-    title: 'Statusss',
+    title: 'Status',
     field: 'statusName',
   },
   {
@@ -661,7 +661,6 @@ const ProposalTableOfficer = ({
           questionFilter,
           referenceNumbers,
         } = proposalFilter;
-
         const { proposalsView } = await api().getProposalsCore({
           filter: {
             callId: callId,

@@ -14,6 +14,7 @@ import {
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
 import {
+  Experiment,
   ExperimentSafetyReviewerDecisionEnum,
   ExperimentStatus,
   InstrumentScientistDecisionEnum,
@@ -1439,6 +1440,41 @@ export interface ExperimentRecord {
   readonly updated_at: Date;
   readonly reference_number_sequence: number;
 }
+
+export interface ExperimentPaginatedRecord {
+  readonly experiment_pk: number;
+  readonly experiment_id: string;
+  readonly starts_at: Date;
+  readonly ends_at: Date;
+  readonly scheduled_event_id: number;
+  readonly proposal_pk: number;
+  readonly status: ExperimentStatus;
+  readonly local_contact_id: number;
+  readonly instrument_id: number;
+  readonly created_at: Date;
+  readonly updated_at: Date;
+  readonly reference_number_sequence: number;
+  readonly full_count: number;
+}
+
+export const createExperimentPaginatedObject = (
+  experiment: ExperimentPaginatedRecord
+) => {
+  return new Experiment(
+    experiment.experiment_pk,
+    experiment.experiment_id,
+    experiment.starts_at,
+    experiment.ends_at,
+    experiment.scheduled_event_id,
+    experiment.proposal_pk,
+    experiment.status,
+    experiment.local_contact_id,
+    experiment.instrument_id,
+    experiment.created_at,
+    experiment.updated_at,
+    experiment.reference_number_sequence
+  );
+};
 
 export interface ExperimentSafetyRecord {
   readonly experiment_safety_pk: number;

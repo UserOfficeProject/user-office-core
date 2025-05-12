@@ -14,6 +14,7 @@ import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   ExperimentsArgs,
+  ExperimentsFilter,
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
@@ -23,6 +24,8 @@ import {
   ExperimentHasSampleRecord,
   ExperimentRecord,
   ExperimentSafetyRecord,
+  ExperimentPaginatedRecord,
+  createExperimentPaginatedObject,
 } from './records';
 
 export function createExperimentObject(record: ExperimentRecord) {
@@ -80,6 +83,10 @@ function generateExperimentId(
 ): string {
   return `${proposalNumber}-${sequence ?? 0}`;
 }
+
+const fieldMap: { [key: string]: string } = {
+  experimentId: 'experiment_id',
+};
 
 @injectable()
 export default class PostgresExperimentDataSource
@@ -558,6 +565,108 @@ export default class PostgresExperimentDataSource
       .then((records: ExperimentHasSampleRecord[]) =>
         records.map(createExperimentHasSampleObject)
       );
+  }
+
+  async getAllExperiments(
+    filter?: ExperimentsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{ totalCount: number; experiments: Experiment[] }> {
+    return database('experiments')
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .join(
+        'proposals',
+        'proposals.proposal_pk',
+        '=',
+        'experiments.proposal_pk'
+      )
+      .modify((query) => {
+        if (filter?.endsBefore) {
+          query.where('ends_at', '<', filter.endsBefore);
+        }
+        if (filter?.endsAfter) {
+          query.where('ends_at', '>', filter.endsAfter);
+        }
+        if (filter?.startsBefore) {
+          query.where('starts_at', '<', filter.startsBefore);
+        }
+        if (filter?.startsAfter) {
+          query.where('starts_at', '>', filter.startsAfter);
+        }
+        if (filter?.instrumentId) {
+          query.where('instrument_id', filter.instrumentId);
+        }
+        if (filter?.experimentSafetyStatusId) {
+          query.where('status', filter?.experimentSafetyStatusId);
+        }
+        if (filter?.callId) {
+          query.where('proposals.call_id', filter.callId);
+        }
+        const { from, to } = filter?.overlaps || {};
+        if (from && to) {
+          query.where((builder) =>
+            builder
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.starts_at', '>=', from)
+                  .andWhere('experiments.starts_at', '<=', to)
+              )
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.ends_at', '>=', from)
+                  .andWhere('experiments.ends_at', '<=', to)
+              )
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.starts_at', '<=', from)
+                  .andWhere('experiments.ends_at', '>=', from)
+              )
+              .orWhere((subBuilder) =>
+                subBuilder
+                  .where('experiments.starts_at', '<=', to)
+                  .andWhere('experiments.ends_at', '>=', to)
+              )
+          );
+        }
+
+        if (
+          searchText !== '' &&
+          searchText !== null &&
+          searchText !== undefined
+        ) {
+          query.andWhere((qb) =>
+            qb
+              .orWhereRaw('experiment_id ILIKE ?', `%${searchText}%`)
+              .orWhereRaw('proposal_id ILIKE ?', `%${searchText}%`)
+          );
+        }
+
+        if (sortField && sortDirection) {
+          if (!fieldMap.hasOwnProperty(sortField)) {
+            throw new GraphQLError(`Bad sort field given: ${sortField}`);
+          }
+          sortField = fieldMap[sortField];
+          query.orderByRaw(`${sortField} ${sortDirection}`);
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then((experiments: ExperimentPaginatedRecord[]) => {
+        return {
+          totalCount: experiments[0] ? experiments[0].full_count : 0,
+          experiments: experiments.map((experiment) =>
+            createExperimentPaginatedObject(experiment)
+          ),
+        };
+      });
   }
 
   async getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
