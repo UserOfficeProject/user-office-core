@@ -526,6 +526,7 @@ export default class PostgresQuestionaryDataSource
 
   async clone(
     questionaryId: number,
+    targetTemplateId?: number,
     reviewBeforeSubmit?: boolean
   ): Promise<Questionary> {
     const sourceQuestionary = await this.getQuestionary(questionaryId);
@@ -539,7 +540,7 @@ export default class PostgresQuestionaryDataSource
     }
     const clonedQuestionary = await this.create(
       sourceQuestionary.creatorId,
-      sourceQuestionary.templateId
+      targetTemplateId ?? sourceQuestionary.templateId
     );
 
     // Clone answers
@@ -558,10 +559,16 @@ export default class PostgresQuestionaryDataSource
         answers
       WHERE
         questionary_id = :sourceQuestionaryId
+        AND question_id IN (
+          SELECT question_id 
+          FROM templates_has_questions
+          WHERE template_id = :targetTemplateId
+        )
       `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
+        targetTemplateId: targetTemplateId ?? sourceQuestionary.templateId,
       }
     );
 

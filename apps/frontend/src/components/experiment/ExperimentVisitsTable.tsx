@@ -3,6 +3,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import MailIcon from '@mui/icons-material/Mail';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { IconButton, styled, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import React, { useContext, useState } from 'react';
@@ -132,6 +133,18 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
     replaceVisitRegistration(approvedRegistration);
   };
 
+  const requestVisitChanges = async (visitId: number, userId: number) => {
+    const updatedRegistration = (
+      await api().requestVisitRegistrationChanges({
+        visitRegistration: {
+          visitId,
+          userId,
+        },
+      })
+    ).requestVisitRegistrationChanges;
+    replaceVisitRegistration(updatedRegistration);
+  };
+
   const onApproveVisitClick = async (visitId: number, userId: number) => {
     confirm(async () => approveVisit(visitId, userId), {
       title: 'Approve visit registration',
@@ -143,6 +156,14 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
     confirm(async () => cancelVisit(visitId, userId), {
       title: 'Cancel visit registration',
       description: 'Are you sure you want to cancel this visit registration?',
+    })();
+  };
+
+  const onRequestChangesClick = async (visitId: number, userId: number) => {
+    confirm(async () => requestVisitChanges(visitId, userId), {
+      title: 'Request visit registration changes',
+      description:
+        'Are you sure you want to request visit registration changes?',
     })();
   };
 
@@ -191,6 +212,20 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
           </IconButton>
         );
 
+        const requestChangesButton = (
+          <IconButton
+            onClick={() =>
+              onRequestChangesClick(rowData.visitId, rowData.userId)
+            }
+            component="button"
+            data-cy="request-visit-registration-changes-button"
+          >
+            <Tooltip title="Request visit registration changes">
+              <ReplayIcon />
+            </Tooltip>
+          </IconButton>
+        );
+
         const subject = organisationName
           ? `Important information regarding your experiment at ${organisationName}`
           : 'Important information regarding your experiment';
@@ -223,15 +258,26 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
             return (
               <ActionDiv>
                 {sendEmailButton}
+                {editButton}
                 {approveButton}
                 {cancelButton}
-                {editButton}
+                {requestChangesButton}
               </ActionDiv>
             );
           case VisitRegistrationStatus.APPROVED:
             return (
               <ActionDiv>
                 {sendEmailButton}
+                {cancelButton}
+              </ActionDiv>
+            );
+
+          case VisitRegistrationStatus.CHANGE_REQUESTED:
+            return (
+              <ActionDiv>
+                {sendEmailButton}
+                {editButton}
+                {approveButton}
                 {cancelButton}
               </ActionDiv>
             );

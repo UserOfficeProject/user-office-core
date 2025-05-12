@@ -69,12 +69,12 @@ export class AssignProposalsToInstrumentsMutation {
   }
 
   @Mutation(() => Boolean)
-  async assignXpressProposalsToInstruments(
+  async assignTechniqueProposalsToInstruments(
     @Args() args: AssignProposalsToInstrumentsArgs,
     @Ctx() context: ResolverContext
   ) {
     const res =
-      await context.mutations.instrument.assignXpressProposalsToInstruments(
+      await context.mutations.instrument.assignTechniqueProposalsToInstruments(
         context.user,
         args
       );

@@ -23,7 +23,7 @@ type ProposalFilterBarProps = {
   filter: ProposalsFilter;
 };
 
-const XpressProposalFilterBar = ({
+const TechniqueProposalFilterBar = ({
   calls,
   instruments,
   techniques,
@@ -119,4 +119,4 @@ const XpressProposalFilterBar = ({
   );
 };
 
-export default XpressProposalFilterBar;
+export default TechniqueProposalFilterBar;

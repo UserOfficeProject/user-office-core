@@ -62,7 +62,7 @@ export default class ExperimentMutations {
 
   @Authorized()
   async createOrGetExperimentSafety(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     experimentPk: number
   ): Promise<ExperimentSafety | Rejection> {
     const experiment = await this.dataSource.getExperiment(experimentPk);
@@ -82,10 +82,9 @@ export default class ExperimentMutations {
     }
 
     // Check the authenticity of the User
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      user,
-      proposal
-    );
+    const canReadProposal =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposal));
     if (canReadProposal === false) {
       return rejection(
         'User is not authorized to create Experiment Safety for this experiment'
@@ -129,7 +128,7 @@ export default class ExperimentMutations {
     }
 
     const newEsiQuestionary = await this.questionaryDataSource.create(
-      user!.id,
+      agent!.id,
       call.esiTemplateId
     );
     // Copying the answers from the Proposal Questionary to the new Experiment Safety(Proposal ESI) Questionary
@@ -141,7 +140,7 @@ export default class ExperimentMutations {
     return await this.dataSource.createExperimentSafety(
       experimentPk,
       newEsiQuestionary.questionaryId,
-      user!.id,
+      agent!.id,
       experimentSafetyWorkflowDefaultStatus.id
     );
   }
@@ -149,10 +148,13 @@ export default class ExperimentMutations {
   @EventBus(Event.EXPERIMENT_ESF_SUBMITTED)
   @Authorized()
   async submitExperimentSafety(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: SubmitExperimentSafetyArgs
   ): Promise<ExperimentSafety | Rejection> {
-    if (args.isSubmitted === false && !this.userAuth.isUserOfficer(user)) {
+    if (
+      args.isSubmitted === false &&
+      !(this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
+    ) {
       return rejection(
         'Can not update Experiment Safety, it is not allowed to change Experiment Safety once it has been submitted'
       );
@@ -283,7 +285,7 @@ export default class ExperimentMutations {
 
   @Authorized()
   async addSampleToExperiment(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: AddSampleToExperimentInput
   ): Promise<ExperimentHasSample | Rejection> {
     const experiment = await this.dataSource.getExperiment(args.experimentPk);
@@ -300,10 +302,12 @@ export default class ExperimentMutations {
       return rejection('No experiment safety found');
     }
 
-    const hasAccessRights = await this.experimentSafetyAuth.hasWriteRights(
-      user,
-      experimentSafety.experimentSafetyPk
-    );
+    const hasAccessRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.experimentSafetyAuth.hasWriteRights(
+        agent,
+        experimentSafety.experimentSafetyPk
+      ));
     if (hasAccessRights === false) {
       return rejection(
         'User does not have permission to attach samples to the experiment',
@@ -336,7 +340,7 @@ export default class ExperimentMutations {
 
     // Creating a new Questionary for the Sample using the ESI Template
     const newQuestionary = await this.questionaryDataSource.create(
-      user!.id,
+      agent!.id,
       templateId!
     );
 
@@ -355,7 +359,7 @@ export default class ExperimentMutations {
 
   @Authorized()
   async removeSampleFromExperiment(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: RemoveSampleFromExperimentInput
   ): Promise<ExperimentHasSample | Rejection> {
     const experiment = await this.dataSource.getExperiment(args.experimentPk);
@@ -372,10 +376,12 @@ export default class ExperimentMutations {
       return rejection('No experiment safety found');
     }
 
-    const hasAccessRights = await this.experimentSafetyAuth.hasWriteRights(
-      user,
-      experimentSafety.experimentSafetyPk
-    );
+    const hasAccessRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.experimentSafetyAuth.hasWriteRights(
+        agent,
+        experimentSafety.experimentSafetyPk
+      ));
     if (hasAccessRights === false) {
       return rejection(
         'User does not have permission to remove samples from the experiment',
@@ -393,7 +399,7 @@ export default class ExperimentMutations {
 
   @Authorized()
   async updateExperimentSample(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: UpdateExperimentSampleInput
   ): Promise<ExperimentHasSample | Rejection> {
     const experiment = await this.dataSource.getExperiment(args.experimentPk);
@@ -410,11 +416,13 @@ export default class ExperimentMutations {
       return rejection('No experiment safety found');
     }
 
-    const hasAccessRights = await this.experimentSafetyAuth.hasWriteRights(
-      user,
-      experimentSafety.experimentSafetyPk
-    );
-    if (hasAccessRights === false) {
+    const hasAccessRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.experimentSafetyAuth.hasWriteRights(
+        agent,
+        experimentSafety.experimentSafetyPk
+      ));
+    if (!hasAccessRights) {
       return rejection(
         'User does not have permission to update samples in the experiment',
         {
@@ -432,7 +440,7 @@ export default class ExperimentMutations {
 
   @Authorized()
   async cloneExperimentSample(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: CloneExperimentSampleInput
   ): Promise<ExperimentHasSample | Rejection> {
     const experimentSample = await this.dataSource.getExperimentSample(
@@ -457,11 +465,13 @@ export default class ExperimentMutations {
       return rejection('No experiment safety found');
     }
 
-    const hasAccessRights = await this.experimentSafetyAuth.hasWriteRights(
-      user,
-      experimentSafety.experimentSafetyPk
-    );
-    if (hasAccessRights === false) {
+    const hasAccessRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.experimentSafetyAuth.hasWriteRights(
+        agent,
+        experimentSafety.experimentSafetyPk
+      ));
+    if (!hasAccessRights) {
       return rejection(
         'User does not have permission to clone samples in the experiment',
         {

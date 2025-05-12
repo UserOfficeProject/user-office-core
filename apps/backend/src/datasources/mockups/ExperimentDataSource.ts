@@ -13,6 +13,7 @@ import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExpe
 import {
   UserExperimentsFilter,
   ExperimentsArgs,
+  ExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 import { ExperimentSafetyEventsRecord } from '../postgres/records';
@@ -115,6 +116,17 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
 
   constructor() {
     this.init();
+  }
+  getAllExperiments(
+    //TODO: This needs to be implemented
+    filter?: ExperimentsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{ totalCount: number; experiments: Experiment[] }> {
+    throw new Error('Method not implemented.');
   }
   async markEventAsDoneOnExperimentSafeties(
     event: Event,

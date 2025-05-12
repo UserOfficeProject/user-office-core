@@ -73,6 +73,7 @@ describe('Test Instrument Mutations', () => {
       shortCode: '2020-06-15',
       description: 'Test instrument description 1',
       managerUserId: 1,
+      updateTechReview: true,
     };
 
     return expect(
@@ -193,8 +194,8 @@ describe('Test Instrument Mutations', () => {
     ).resolves.toBe(dummyInstrumentHasProposals);
   });
 
-  describe('Test Xpress instrument assignment', () => {
-    test('A user officer can change the instrument of an Xpress proposal from any status', () => {
+  describe('Test technique proposal instrument assignment', () => {
+    test('A user officer can change the instrument of a technique proposal from any status', () => {
       const proposal = { statusId: 1 };
 
       jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
@@ -209,7 +210,7 @@ describe('Test Instrument Mutations', () => {
       ]);
 
       return expect(
-        instrumentMutations.assignXpressProposalsToInstruments(
+        instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyUserOfficerWithRole,
           {
             proposalPks: [1, 2],
@@ -224,7 +225,7 @@ describe('Test Instrument Mutations', () => {
       });
     });
 
-    test('A scientist cannot change the instrument of an Xpress proposal from any status', () => {
+    test('A scientist cannot change the instrument of a technique proposal from any status', () => {
       const proposal = { statusId: 1 };
 
       jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
@@ -239,7 +240,7 @@ describe('Test Instrument Mutations', () => {
       ]);
 
       return expect(
-        instrumentMutations.assignXpressProposalsToInstruments(
+        instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyInstrumentScientist,
           {
             proposalPks: [1, 2],
@@ -253,7 +254,7 @@ describe('Test Instrument Mutations', () => {
       );
     });
 
-    test('A scientist can change the instrument of an Xpress proposal when the status is under review', () => {
+    test('A scientist can change the instrument of a technique proposal when the status is under review', () => {
       const proposal = { statusId: 1 };
 
       jest.spyOn(statusDataSource, 'getAllStatuses').mockResolvedValue([
@@ -268,7 +269,7 @@ describe('Test Instrument Mutations', () => {
       ]);
 
       return expect(
-        instrumentMutations.assignXpressProposalsToInstruments(
+        instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyInstrumentScientist,
           {
             proposalPks: [1, 2],
@@ -297,7 +298,7 @@ describe('Test Instrument Mutations', () => {
         ]);
 
       return expect(
-        instrumentMutations.assignXpressProposalsToInstruments(
+        instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyInstrumentScientist,
           {
             proposalPks: [1, 2],
@@ -327,7 +328,7 @@ describe('Test Instrument Mutations', () => {
         ]);
 
       return expect(
-        instrumentMutations.assignXpressProposalsToInstruments(
+        instrumentMutations.assignTechniqueProposalsToInstruments(
           dummyInstrumentScientist,
           {
             proposalPks: [1, 2],

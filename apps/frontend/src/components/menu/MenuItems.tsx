@@ -21,7 +21,7 @@ import Tooltip from 'components/common/MenuTooltip';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId, UserRole } from 'generated/sdk';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
-import { useXpressAccess } from 'hooks/common/useXpressAccess';
+import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
@@ -63,7 +63,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   //   FeatureId.EXPERIMENT_SAFETY_REVIEW
   // )?.isEnabled; // TODO: This needs to be removed or used somewhere. It make sense to just have isSchedulerEnabled to enable Safety Reviews. Need to be checked with the team.
 
-  const isXpressRouteEnabled = useXpressAccess([
+  const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
@@ -77,10 +77,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
 
   const openCall = calls?.find((call) => call.isActive);
 
-  const xpressUrl =
+  const techniqueProposalUrl =
     openCall && openCall.id
-      ? `/XpressProposals?call=${openCall?.id}`
-      : '/XpressProposals';
+      ? `/TechniqueProposals?call=${openCall?.id}`
+      : '/TechniqueProposals';
 
   const user = (
     <div data-cy="user-menu-items">
@@ -132,13 +132,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Proposals" />
         </ListItemButton>
       </Tooltip>
-      {isXpressRouteEnabled && (
-        <Tooltip title="Xpress Proposals">
-          <ListItemButton component={NavLink} to={xpressUrl}>
+      {isTechniqueProposalsEnabled && (
+        <Tooltip title={t('Technique Proposals')}>
+          <ListItemButton component={NavLink} to={techniqueProposalUrl}>
             <ListItemIcon>
               <Topic />
             </ListItemIcon>
-            <ListItemText primary="Xpress Proposals" />
+            <ListItemText primary={t('Technique Proposals')} />
           </ListItemButton>
         </Tooltip>
       )}
@@ -264,12 +264,12 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
         </ListItemIcon>
         <ListItemText primary="Proposals" />
       </ListItemButton>
-      {isXpressRouteEnabled && (
-        <ListItemButton component={NavLink} to={xpressUrl}>
+      {isTechniqueProposalsEnabled && (
+        <ListItemButton component={NavLink} to={techniqueProposalUrl}>
           <ListItemIcon>
             <Topic />
           </ListItemIcon>
-          <ListItemText primary="Xpress Proposals" />
+          <ListItemText primary={t('Technique Proposals')} />
         </ListItemButton>
       )}
       {isSchedulerEnabled && (

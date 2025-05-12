@@ -688,9 +688,6 @@ export default class PostgresExperimentDataSource
         if (filter?.instrumentId) {
           query.where('instrument_id', filter.instrumentId);
         }
-        if (filter?.status) {
-          query.whereIn('status', filter.status);
-        }
         if (filter?.callId) {
           query
             .leftJoin(

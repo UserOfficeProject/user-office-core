@@ -18,11 +18,14 @@ export const visitRegistrationQuestionaryDefinition: QuestionaryDefinition = {
 
   wizardStepFactory: new DefaultWizardStepFactory(
     VisitRegistrationWizardStep,
-    new DefaultReviewWizardStep(
-      (state) =>
+    new DefaultReviewWizardStep((state) => {
+      return (
         (state as VisitRegistrationSubmissionState).registration.status !==
-        VisitRegistrationStatus.DRAFTED
-    )
+          VisitRegistrationStatus.DRAFTED &&
+        (state as VisitRegistrationSubmissionState).registration.status !==
+          VisitRegistrationStatus.CHANGE_REQUESTED
+      );
+    })
   ),
 
   getItemWithQuestionary(

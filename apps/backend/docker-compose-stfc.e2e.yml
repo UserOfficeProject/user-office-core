@@ -24,6 +24,8 @@ services:
       - "5672:5672"
     volumes:
       - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+      - ./rabbitmq-definitions.json:/etc/rabbitmq/definitions.json
+    command: bash -c "rabbitmq-server & while ! rabbitmqctl status >/dev/null 2>&1; do sleep 1; done; rabbitmqctl import_definitions /etc/rabbitmq/definitions.json; wait"
 
   factory:
     image: ghcr.io/userofficeproject/user-office-factory:${USER_OFFICE_FACTORY_TAG}

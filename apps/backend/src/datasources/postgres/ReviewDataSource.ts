@@ -210,7 +210,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((review: ReviewRecord) => createReviewObject(review));
   }
 
-  getReviews(
+  async getReviews(
     filter?: ReviewsFilter,
     first?: number,
     offset?: number
@@ -279,7 +279,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
   }
 
   async updateReview(args: UpdateReviewArgs): Promise<Review> {
-    const { reviewID, comment, grade, status, fapID, questionaryID } = args;
+    const { reviewID, comment, grade, status } = args;
 
     return database
       .update(
@@ -293,16 +293,7 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .from('fap_reviews')
       .where('review_id', reviewID)
       .then((review: ReviewRecord[]) => {
-        return new Review(
-          reviewID,
-          review[0].proposal_pk,
-          review[0].user_id,
-          comment,
-          grade,
-          status,
-          fapID,
-          questionaryID
-        );
+        return createReviewObject(review[0]);
       });
   }
 
@@ -313,10 +304,6 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
     const subQuery = database
       .select('*')
       .from('fap_reviews as fr')
-      .join('fap_assignments', {
-        'fap_assignments.proposal_pk': 'fr.proposal_pk',
-        'fap_assignments.fap_member_user_id': 'fr.user_id',
-      })
       .distinctOn('fr.review_id')
       .where('fr.proposal_pk', proposalPk)
       .modify((query) => {
@@ -397,6 +384,22 @@ export default class PostgresReviewDataSource implements ReviewDataSource {
       .then((reviews: ReviewRecord[]) => {
         return reviews.map((review) => createReviewObject(review));
       });
+  }
+
+  async updateInstrumentContact(
+    userId: number,
+    instrumentId: number
+  ): Promise<boolean> {
+    try {
+      await database('technical_review')
+        .where({ instrument_id: instrumentId })
+        .andWhere({ submitted: false })
+        .update({ technical_review_assignee_id: userId });
+
+      return true;
+    } catch (error) {
+      throw new GraphQLError('Failed to update instrument contact.');
+    }
   }
 
   /*Brief explanation of the query used in getAllUsersReviews
