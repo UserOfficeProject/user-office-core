@@ -1,0 +1,68 @@
+import { useCallback, useEffect, useState } from 'react';
+
+import { ExperimentsFilter, GetAllExperimentsQuery } from 'generated/sdk';
+import { useDataApi } from 'hooks/common/useDataApi';
+
+type QueryParameters = {
+  first?: number;
+  offset?: number;
+  sortField?: string | undefined;
+  sortDirection?: string | undefined;
+  searchText?: string | undefined;
+  refetch?: boolean;
+};
+
+export function useAllExperiments(
+  filter: ExperimentsFilter,
+  queryParameters?: QueryParameters
+) {
+  const [experiments, setExperiments] = useState<
+    GetAllExperimentsQuery['allExperiments']
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  const api = useDataApi();
+
+  const {
+    callId,
+    instrumentFilter,
+    proposalStatusId,
+    excludeProposalStatusIds,
+    questionaryIds,
+    referenceNumbers,
+    questionFilter,
+    text,
+  } = filter;
+
+  const fetchAllExperimentsData = useCallback(
+    async (componentController?: { unmounted: boolean }) => {
+      setLoading(true);
+      api()
+        .getAllExperiments({
+          filter: {
+            callId,
+          },
+          ...queryParameters,
+        })
+        .then((data) => {
+          if (componentController?.unmounted) {
+            return;
+          }
+          console.log({ data });
+          setLoading(false);
+        });
+    },
+    []
+  );
+
+  useEffect(() => {
+    const componentController = { unmounted: false };
+    fetchAllExperimentsData(componentController);
+
+    return () => {
+      componentController.unmounted = true;
+    };
+  }, [fetchAllExperimentsData]);
+
+  return { loading };
+}
