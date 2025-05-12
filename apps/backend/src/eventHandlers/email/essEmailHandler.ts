@@ -34,7 +34,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
   );
 
   const coProposerDataSource = container.resolve<CoProposerClaimDataSource>(
-    Tokens.RoleClaimDataSource
+    Tokens.CoProposerClaimDataSource
   );
 
   const inviteDataSource = container.resolve<InviteDataSource>(
@@ -207,6 +207,13 @@ export async function essEmailHandler(event: ApplicationEvent) {
           return;
         }
 
+        const claimer = await userDataSource.getUser(
+          invite.claimedByUserId as number
+        );
+        if (!claimer) {
+          return;
+        }
+
         mailService
           .sendMail({
             content: {
@@ -218,6 +225,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
               email: invite.email,
               proposalTitle: proposal.title,
               proposalId: proposal.proposalId,
+              claimerPreferredname: claimer.preferredname,
+              claimerLastname: claimer.lastname,
             },
             recipients: [{ address: principalInvestigator.email }],
           })
