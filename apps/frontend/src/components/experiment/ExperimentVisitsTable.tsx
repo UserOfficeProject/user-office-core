@@ -16,6 +16,7 @@ import {
   SettingsId,
   VisitRegistrationStatus,
   GetAllExperimentsQuery,
+  GetExperimentQuery,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
@@ -30,11 +31,7 @@ type RowType = NonNullable<
   >[0]['visit']
 >['registrations'][0];
 
-type Experiment = NonNullable<
-  NonNullable<
-    NonNullable<GetAllExperimentsQuery['allExperiments']>['experiments']
-  >
->[0];
+type Experiment = GetExperimentQuery['experiment'];
 
 interface ExperimentDetailsTableProps extends WithConfirmProps {
   experiment: Experiment;
@@ -233,11 +230,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
           <IconButton
             component="a"
             href={`
-              mailto:${rowData.user?.email || ''}?subject=${subject}&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${
-                params.experiment.proposal.title
-              }" with proposal ID ${
-                params.experiment.proposal.proposalId
-              }.%0D%0A%0D%0A.%0D%0A%0D%0AKind regards`}
+              mailto:${rowData.user?.email || ''}?subject=${subject}&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${params.experiment.proposal.title}" with proposal ID ${params.experiment.proposal.proposalId}.%0D%0A%0D%0A.%0D%0A%0D%0AKind regards`}
             data-cy="send-email-button"
             target="_blank"
             rel="noopener noreferrer"
@@ -376,33 +369,12 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
   }
 
   return (
-    <Box
-      sx={{
-        '& tr:last-child td': {
-          border: 'none',
-        },
-        '& .MuiPaper-root': {
-          padding: '0 40px',
-          backgroundColor: '#fafafa',
-        },
-      }}
-      data-cy="visit-registrations-table"
-    >
-      <MaterialTable
-        title=""
-        icons={tableIcons}
-        columns={columns}
-        data={experiment.visit.registrations}
-        options={{
-          search: false,
-          paging: false,
-          toolbar: false,
-          headerStyle: { backgroundColor: '#fafafa', fontWeight: 'bolder' },
-          pageSize: 20,
-          padding: 'dense',
-        }}
-      />
-    </Box>
+    <MaterialTable
+      title="Experiment Visit Registrations"
+      icons={tableIcons}
+      columns={columns}
+      data={experiment.visit.registrations}
+    />
   );
 }
 

@@ -14,6 +14,8 @@ import { useExperiment } from 'hooks/experiment/useExperiment';
 import { useExperimentSafety } from 'hooks/experimentSafety/useExperimentSafety';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 
+import ExperimentVisitsTable from './ExperimentVisitsTable';
+
 export enum EXPERIMENT_MODAL_TAB_NAMES {
   EXPERIMENT_INFORMATION = 'Experiment Information',
   PROPOSAL_INFORMATION = 'Proposal Information',
@@ -167,8 +169,6 @@ const ExperimentReviewContent = ({
     </>
   );
 
-  const VisitTab = <>VisitTab</>;
-
   const tabsContent = tabNames.map((tab, index) => {
     switch (tab) {
       case EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_INFORMATION:
@@ -200,7 +200,11 @@ const ExperimentReviewContent = ({
       case EXPERIMENT_MODAL_TAB_NAMES.EXPERIMENT_SAFETY_REVIEW:
         return <Fragment key={index}>{ExperimentSafetyReviewTab}</Fragment>;
       case EXPERIMENT_MODAL_TAB_NAMES.VISIT:
-        return <Fragment key={index}>{VisitTab}</Fragment>;
+        return (
+          <Fragment key={index}>
+            <ExperimentVisitsTable experiment={experiment} />
+          </Fragment>
+        );
       default:
         return null;
     }
