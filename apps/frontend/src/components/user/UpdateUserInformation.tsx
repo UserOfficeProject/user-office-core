@@ -28,7 +28,6 @@ import { SettingsId, UpdateUserMutationVariables } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useInstitutionsData } from 'hooks/admin/useInstitutionData';
 import { useCountries } from 'hooks/user/useCountries';
-import { useNationalities } from 'hooks/user/useNationalities';
 import { useUserData } from 'hooks/user/useUserData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { Option } from 'utils/utilTypes';
@@ -46,10 +45,8 @@ export default function UpdateUserInformation(
     settingsFormatToUse: SettingsId.DATE_FORMAT,
   });
   const { api } = useDataApiWithFeedback();
-  const nationalities = useNationalities();
   const countries = useCountries();
   const { institutions, loadingInstitutions } = useInstitutionsData();
-  const [nationalitiesList, setNationalitiesList] = useState<Option[]>([]);
   const [institutionsList, setInstitutionsList] = useState<Option[]>([]);
   const [countriesList, setCountriesList] = useState<Option[]>([]);
 
@@ -99,14 +96,6 @@ export default function UpdateUserInformation(
     setInstitutionsList(
       institutions.map((institution) => {
         return { text: institution.name, value: institution.id };
-      })
-    );
-  }
-
-  if (!nationalitiesList.length && nationalities) {
-    setNationalitiesList(
-      nationalities.map((nationality) => {
-        return { text: nationality.value, value: nationality.id };
       })
     );
   }
