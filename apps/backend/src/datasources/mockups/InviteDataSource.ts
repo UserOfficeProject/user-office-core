@@ -3,7 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
-import { InviteDataSource } from '../InviteDataSource';
+import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
 
 @injectable()
 export class InviteDataSourceMock implements InviteDataSource {
@@ -15,6 +15,7 @@ export class InviteDataSourceMock implements InviteDataSource {
   ) {
     this.init();
   }
+
   async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
     const coProposerClaims =
       await this.coProposerDataSource.findByProposalPk(proposalPk);
@@ -44,6 +45,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         null,
         true,
+        false,
         null
       ),
       new Invite(
@@ -55,6 +57,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         1,
         true,
+        false,
         null
       ),
       new Invite(
@@ -66,6 +69,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         new Date(),
         null,
         false,
+        false,
         new Date('2022-01-01')
       ),
     ];
@@ -73,6 +77,28 @@ export class InviteDataSourceMock implements InviteDataSource {
 
   async findByCode(code: string): Promise<Invite | null> {
     return this.invites.find((invite) => invite.code === code) || null;
+  }
+
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+    return new Promise((resolve) => {
+      const filteredInvites = this.invites.filter((invite) => {
+        if (filter.isReminderEmailSent !== undefined) {
+          if (invite.isReminderEmailSent !== filter.isReminderEmailSent) {
+            return false;
+          }
+        }
+
+        if (filter.createdBefore) {
+          if (invite.createdAt >= filter.createdBefore) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      resolve(filteredInvites);
+    });
   }
 
   async create(args: {
@@ -93,6 +119,7 @@ export class InviteDataSourceMock implements InviteDataSource {
       null,
       null,
       false,
+      false,
       expiresAt ?? null
     );
 
@@ -109,6 +136,7 @@ export class InviteDataSourceMock implements InviteDataSource {
     claimedAt?: Date | null;
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
+    isReminderEmailSent?: boolean;
     expiresAt?: Date | null;
   }): Promise<Invite> {
     const invite = await this.findById(args.id);

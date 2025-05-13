@@ -1,5 +1,11 @@
 import { Invite } from '../models/Invite';
 
+export interface GetInvitesFilter {
+  isReminderEmailSent?: boolean;
+  createdBefore?: Date;
+  isClaimed?: boolean;
+}
+
 export interface InviteDataSource {
   create(args: {
     createdByUserId: number;
@@ -14,6 +20,7 @@ export interface InviteDataSource {
     proposalPk: number,
     isClaimed?: boolean
   ): Promise<Invite[]>;
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
 
   update(args: {
     id: number;
@@ -23,6 +30,7 @@ export interface InviteDataSource {
     claimedAt?: Date | null;
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
+    isReminderEmailSent?: boolean;
     expiresAt?: Date | null;
   }): Promise<Invite>;
 

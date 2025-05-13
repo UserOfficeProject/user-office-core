@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Invite } from '../../models/Invite';
-import { InviteDataSource } from '../InviteDataSource';
+import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
 import database from './database';
 import { createInviteObject, InviteRecord } from './records';
 
@@ -47,6 +47,30 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       });
   }
 
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+    return database
+      .select('*')
+      .from('invites')
+      .modify((query) => {
+        if (filter.isReminderEmailSent !== undefined) {
+          query.where('is_reminder_email_sent', filter.isReminderEmailSent);
+        }
+
+        if (filter.createdBefore) {
+          query.where('created_at', '<', filter.createdBefore);
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (filter.isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
+  }
+
   async create(args: {
     code: string;
     email: string;
@@ -79,6 +103,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     claimedAt?: Date | null;
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
+    isReminderEmailSent?: boolean;
     expiresAt?: Date | null;
   }): Promise<Invite> {
     return database
@@ -89,6 +114,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         claimed_at: args.claimedAt,
         claimed_by: args.claimedByUserId,
         is_email_sent: args.isEmailSent,
+        is_reminder_email_sent: args.isReminderEmailSent,
         expires_at: args.expiresAt,
       })
       .from('invites')
