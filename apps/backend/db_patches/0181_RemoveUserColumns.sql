@@ -4,7 +4,7 @@ $$
 BEGIN
     IF register_patch(
         '0181_RemoveUserColumns.sql',
-        'DBAdmin',
+        'Jekabs Karklins',
         'Remove middle name, nationality, and alternate telephone columns from users table',
         '2025-05-12'
     ) THEN
@@ -19,6 +19,7 @@ BEGIN
                 DROP COLUMN nationality,
                 DROP COLUMN telephone_alt;
 
+            -- now drop the nationalities table
             DROP TABLE IF EXISTS public.nationalities;
         END;
     END IF;
