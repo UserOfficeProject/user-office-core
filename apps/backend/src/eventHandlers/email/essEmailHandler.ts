@@ -197,6 +197,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
       for (const claim of coProposerClaims) {
         const proposal = await proposalDataSource.get(claim.proposalPk);
         if (!proposal) {
+          logger.logError(
+            'No proposal found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
           return;
         }
 
@@ -204,6 +212,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
           proposal.proposerId
         );
         if (!principalInvestigator) {
+          logger.logError(
+            'No principal investigator found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
           return;
         }
 
@@ -211,6 +227,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
           invite.claimedByUserId as number
         );
         if (!claimer) {
+          logger.logError(
+            'No claimer found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
           return;
         }
 
