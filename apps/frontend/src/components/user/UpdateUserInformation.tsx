@@ -63,7 +63,6 @@ export default function UpdateUserInformation(
   const initialValues = {
     username: userData.username,
     firstname: userData.firstname,
-    middlename: userData.middlename || '',
     lastname: userData.lastname,
     preferredname: userData.preferredname || '',
     gender:
@@ -71,7 +70,6 @@ export default function UpdateUserInformation(
         ? 'other'
         : userData.gender,
     othergender: userData.gender,
-    nationality: userData.nationality,
     birthdate: DateTime.fromJSDate(new Date(userData.birthdate)),
     institutionId: userData.institutionId,
     department: userData.department,
@@ -79,7 +77,6 @@ export default function UpdateUserInformation(
     oldEmail: userData.email,
     email: userData.email,
     telephone: userData.telephone,
-    telephone_alt: userData.telephone_alt || '',
     user_title: userData.user_title,
     oidcSub: userData.oidcSub,
   };
@@ -136,7 +133,6 @@ export default function UpdateUserInformation(
         const newValues = {
           id: props.id,
           ...values,
-          nationality: +(values.nationality as number),
           institutionId: values.institutionId ? +values.institutionId : null,
           gender:
             values.gender === 'other' ? values.othergender : values.gender,
@@ -191,14 +187,6 @@ export default function UpdateUserInformation(
                   data-cy="firstname"
                 />
                 <Field
-                  name="middlename"
-                  label="Middle name"
-                  id="middlename-input"
-                  component={TextField}
-                  type="text"
-                  data-cy="middlename"
-                />
-                <Field
                   name="lastname"
                   label="Lastname"
                   id="lastname-input"
@@ -233,15 +221,6 @@ export default function UpdateUserInformation(
                     data-cy="othergender"
                   />
                 )}
-                <FormikUIAutocomplete
-                  name="nationality"
-                  label="Nationality"
-                  items={nationalitiesList}
-                  data-cy="nationality"
-                  required
-                  loading={!nationalities}
-                  noOptionsText="No nationalities"
-                />
                 <Field
                   name="birthdate"
                   label="Birthdate"
@@ -350,14 +329,6 @@ export default function UpdateUserInformation(
                 type="text"
                 data-cy="telephone"
                 required
-              />
-              <Field
-                name="telephone_alt"
-                label="Telephone Alt."
-                id="telephone-alt-input"
-                component={TextField}
-                type="text"
-                data-cy="telephone-alt"
               />
             </Grid>
           </Grid>

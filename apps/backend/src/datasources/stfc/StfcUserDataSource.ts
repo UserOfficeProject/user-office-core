@@ -111,7 +111,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     Number(stfcUser.userNumber),
     stfcUser.title ?? '',
     stfcUser.givenName ?? '',
-    undefined,
     stfcUser.familyName ?? '',
     stfcUser.email ?? '',
     stfcUser.firstNameKnownAs ?? stfcUser.givenName,
@@ -119,7 +118,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     '',
     '',
     '',
-    1,
     new Date('2000-01-01'),
     1,
     stfcUser.orgName,
@@ -127,7 +125,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     '',
     stfcUser.email ?? '',
     stfcUser.workPhone ?? '',
-    undefined,
     false,
     '2000-01-01 00:00:00.000000+00',
     '2000-01-01 00:00:00.000000+00'
@@ -643,7 +640,6 @@ export class StfcUserDataSource implements UserDataSource {
   async create(
     user_title: string | undefined,
     firstname: string,
-    middlename: string | undefined,
     lastname: string,
     username: string,
     preferredname: string | undefined,
@@ -651,14 +647,12 @@ export class StfcUserDataSource implements UserDataSource {
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,
-    nationality: number,
     birthdate: Date,
     institution: number,
     department: string,
     position: string,
     email: string,
-    telephone: string,
-    telephone_alt: string | undefined
+    telephone: string
   ): Promise<User> {
     throw new Error('Method not implemented.');
   }
