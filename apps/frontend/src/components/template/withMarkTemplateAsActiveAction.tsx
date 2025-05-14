@@ -49,10 +49,7 @@ function withMarkTemplateAsActiveAction<T>(
                 />
               );
             },
-            tooltip:
-              rowData.templateId === activeTemplateId
-                ? 'Mark as Inactive'
-                : 'Mark as active',
+            tooltip: 'Mark as active',
             onClick: async (_event, data) => {
               const newActiveTemplateId = (data as Pick<Template, 'templateId'>)
                 .templateId;
