@@ -304,10 +304,18 @@ const StatusActionsLogsTable = ({
                         }),
                     {
                       title: 'Are you sure?',
-                      description: `You are about to send a status action replay request`,
-                      alertText: statusActionsLog.statusActionsSuccessful
-                        ? 'This status action is already successful resending a request will lead to duplicate notifications being send'
-                        : '',
+                      description: `You are about to send a status action replay request.`,
+                      alertText: (() => {
+                        if (statusActionsLog.statusActionsSuccessful) {
+                          switch (statusActionType) {
+                            case StatusActionType.EMAIL:
+                              return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
+                            default:
+                              return 'This status action was already successful. Replaying it may lead to unexpected behavior or redundant processes.';
+                          }
+                        }
+                      })(),
+                      confirmationText: 'Replay',
                       shouldEnableOKWithAlert: true,
                     }
                   )();
