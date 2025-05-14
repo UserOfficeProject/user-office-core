@@ -247,7 +247,7 @@ const AppRoutes = () => {
             path="/EmailStatusActionsLogs"
             element={
               <TitledRoute
-                title="StatusActionsLogs"
+                title="Status Actions Logs"
                 element={<EmailStatusActionsLogsPage />}
               />
             }
@@ -258,7 +258,7 @@ const AppRoutes = () => {
             path="/ProposalDownloadStatusActionsLogs"
             element={
               <TitledRoute
-                title="StatusActionsLogs"
+                title="Status Actions Logs"
                 element={<ProposalDownloadStatusActionsLogsPage />}
               />
             }

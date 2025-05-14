@@ -235,7 +235,16 @@ const StatusActionsLogsTable = ({
           icons={tableIcons}
           title={
             <Typography variant="h6" component="h2">
-              Status Actions Logs
+              {(() => {
+                switch (statusActionType) {
+                  case StatusActionType.EMAIL:
+                    return 'Email Status Actions Logs';
+                  case StatusActionType.PROPOSALDOWNLOAD:
+                    return 'Proposal Download Status Actions Logs';
+                  default:
+                    return 'Status Actions Logs';
+                }
+              })()}
             </Typography>
           }
           onRowClick={() => {
