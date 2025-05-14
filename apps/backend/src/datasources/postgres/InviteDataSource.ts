@@ -52,10 +52,9 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       .select('*')
       .from('invites')
       .modify((query) => {
-        if (filter.isReminderEmailSent !== undefined) {
-          query.where('is_reminder_email_sent', filter.isReminderEmailSent);
+        if (filter.createdAfter) {
+          query.where('created_at', '>', filter.createdAfter);
         }
-
         if (filter.createdBefore) {
           query.where('created_at', '<', filter.createdBefore);
         }
@@ -66,6 +65,10 @@ export default class PostgresInviteDataSource implements InviteDataSource {
           } else {
             query.whereNull('claimed_at');
           }
+        }
+
+        if (filter.isExpired) {
+          query.where('expires_at', '<', new Date());
         }
       })
       .then((invites: InviteRecord[]) => invites.map(createInviteObject));
@@ -103,7 +106,6 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     claimedAt?: Date | null;
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
-    isReminderEmailSent?: boolean;
     expiresAt?: Date | null;
   }): Promise<Invite> {
     return database
@@ -114,7 +116,6 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         claimed_at: args.claimedAt,
         claimed_by: args.claimedByUserId,
         is_email_sent: args.isEmailSent,
-        is_reminder_email_sent: args.isReminderEmailSent,
         expires_at: args.expiresAt,
       })
       .from('invites')

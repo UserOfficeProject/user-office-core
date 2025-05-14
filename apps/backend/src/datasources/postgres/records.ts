@@ -1355,7 +1355,6 @@ export interface InviteRecord {
   readonly claimed_by: number | null;
   readonly claimed_at: Date | null;
   readonly is_email_sent: boolean;
-  readonly is_reminder_email_sent: boolean;
   readonly expires_at: Date | null;
 }
 
@@ -1369,7 +1368,6 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.claimed_at,
     invite.claimed_by,
     invite.is_email_sent,
-    invite.is_reminder_email_sent,
     invite.expires_at
   );
 

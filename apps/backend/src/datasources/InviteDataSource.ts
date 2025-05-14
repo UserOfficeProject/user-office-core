@@ -1,9 +1,10 @@
 import { Invite } from '../models/Invite';
 
 export interface GetInvitesFilter {
-  isReminderEmailSent?: boolean;
   createdBefore?: Date;
+  createdAfter?: Date;
   isClaimed?: boolean;
+  isExpired?: boolean;
 }
 
 export interface InviteDataSource {
@@ -30,7 +31,6 @@ export interface InviteDataSource {
     claimedAt?: Date | null;
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
-    isReminderEmailSent?: boolean;
     expiresAt?: Date | null;
   }): Promise<Invite>;
 

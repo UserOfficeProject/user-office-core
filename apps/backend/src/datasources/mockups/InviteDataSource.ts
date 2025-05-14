@@ -15,7 +15,6 @@ export class InviteDataSourceMock implements InviteDataSource {
   ) {
     this.init();
   }
-
   async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
     const coProposerClaims =
       await this.coProposerDataSource.findByProposalPk(proposalPk);
@@ -45,7 +44,6 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         null,
         true,
-        false,
         null
       ),
       new Invite(
@@ -57,7 +55,6 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         1,
         true,
-        false,
         null
       ),
       new Invite(
@@ -68,7 +65,6 @@ export class InviteDataSourceMock implements InviteDataSource {
         3,
         new Date(),
         null,
-        false,
         false,
         new Date('2022-01-01')
       ),
@@ -82,8 +78,21 @@ export class InviteDataSourceMock implements InviteDataSource {
   getInvites(filter: GetInvitesFilter): Promise<Invite[]> {
     return new Promise((resolve) => {
       const filteredInvites = this.invites.filter((invite) => {
-        if (filter.isReminderEmailSent !== undefined) {
-          if (invite.isReminderEmailSent !== filter.isReminderEmailSent) {
+        if (filter.isClaimed !== undefined) {
+          if (invite.claimedAt === null && filter.isClaimed) {
+            return false;
+          }
+          if (invite.claimedAt !== null && !filter.isClaimed) {
+            return false;
+          }
+        }
+        if (filter.isExpired) {
+          if (invite.expiresAt && invite.expiresAt < new Date()) {
+            return false;
+          }
+        }
+        if (filter.createdAfter) {
+          if (invite.createdAt <= filter.createdAfter) {
             return false;
           }
         }
@@ -119,7 +128,6 @@ export class InviteDataSourceMock implements InviteDataSource {
       null,
       null,
       false,
-      false,
       expiresAt ?? null
     );
 
@@ -136,7 +144,6 @@ export class InviteDataSourceMock implements InviteDataSource {
     claimedAt?: Date | null;
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
-    isReminderEmailSent?: boolean;
     expiresAt?: Date | null;
   }): Promise<Invite> {
     const invite = await this.findById(args.id);

@@ -4,12 +4,12 @@ BEGIN
     IF register_patch(
         '0181_AddReminderEmailSentToInvites.sql',
         'Jekabs Karklins',
-        'Add is_reminder_email_sent to invites',
+        'Add INVITE_REMINDERS_SEND_DELAY_DAYS app setting',
         '2025-05-13'
     ) THEN
         BEGIN
-            ALTER TABLE public.invites
-                ADD COLUMN is_reminder_email_sent BOOLEAN DEFAULT FALSE;
+            INSERT INTO settings (settings_id, settings_value, description) 
+                VALUES ('INVITE_REMINDERS_SEND_DELAY_DAYS', '', 'Delay when to send the reminder about pending invites. For multiple reminders specify comma separated values e.g. 7,14. To disable leave empty.'); 
         END;
     END IF;
 END;
