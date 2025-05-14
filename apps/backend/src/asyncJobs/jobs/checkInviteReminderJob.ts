@@ -151,9 +151,6 @@ const checkInviteReminder = async () => {
   }
 };
 
-setTimeout(() => {
-  checkInviteReminder();
-}, 5000);
 // NOTE: Run every day at 6:00 AM
 const options = { timeToRun: '6 0 * * *' };
 
