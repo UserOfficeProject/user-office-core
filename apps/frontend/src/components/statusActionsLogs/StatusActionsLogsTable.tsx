@@ -96,6 +96,7 @@ const StatusActionsLogsTable = ({
     {
       title: 'Log Time',
       field: 'statusActionsTstamp',
+      defaultSort: 'desc',
     },
   ];
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
