@@ -294,7 +294,7 @@ export default class PostgresInstrumentDataSource
           short_code: instrument.shortCode,
           description: instrument.description,
           manager_user_id: instrument.managerUserId,
-          selectable: instrument.selectable ?? false,
+          selectable: instrument.selectable,
         },
         ['*']
       )
