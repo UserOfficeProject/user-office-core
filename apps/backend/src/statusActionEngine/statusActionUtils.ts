@@ -534,7 +534,7 @@ export const publishMessageToTheEventBus = async (
 export const statusActionLogger = (args: {
   connectionId: number;
   actionId: number;
-  emailStatusActionRecipient: EmailStatusActionRecipients;
+  emailStatusActionRecipient?: EmailStatusActionRecipients;
   proposalPks: number[];
   statusActionsLogId?: number | null;
 }) => {
@@ -549,6 +549,7 @@ export const statusActionLogger = (args: {
   ) {
     const statusActionsLogsArgs: StatusActionsLogsArgs = {
       ...args,
+      emailStatusActionRecipient: args?.emailStatusActionRecipient || null,
       statusActionsLogId: args?.statusActionsLogId || null,
       statusActionsSuccessful,
       statusActionsMessage,

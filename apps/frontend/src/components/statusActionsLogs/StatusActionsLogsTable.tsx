@@ -11,7 +11,11 @@ import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import { StatusActionsLog } from 'generated/sdk';
+import {
+  StatusActionsLog,
+  StatusActionsLogsFilter,
+  StatusActionType,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -24,7 +28,16 @@ import StatusActionsStatusFilter, {
   StatusActionsLogStatus,
 } from './StatusActionsStatusFilter';
 
-const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
+interface StatusActionsLogsTableProps {
+  confirm: WithConfirmType;
+  statusActionType: StatusActionType;
+}
+
+const StatusActionsLogsTable = ({
+  confirm,
+  statusActionType: propStatusActionType,
+}: StatusActionsLogsTableProps) => {
+  const [statusActionType] = useState<StatusActionType>(propStatusActionType);
   const { toFormattedDateTime } = useFormattedDateTime();
   const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>();
   const { api } = useDataApiWithFeedback();
@@ -47,10 +60,14 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
   let columns: Column<StatusActionsLog>[] = [
-    {
-      title: 'Email Status Action Recipient',
-      field: 'emailStatusActionRecipient',
-    },
+    ...(statusActionType === StatusActionType.EMAIL
+      ? [
+          {
+            title: 'Email Status Action Recipient',
+            field: 'emailStatusActionRecipient',
+          },
+        ]
+      : []),
     {
       title: 'Proposal IDs',
       field: 'proposalIds',
@@ -127,7 +144,10 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     new Promise<QueryResult<StatusActionsLog>>(async (resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
-        let filter = {};
+        let filter: StatusActionsLogsFilter = {
+          statusActionType: statusActionType,
+        };
+
         if (
           statusActionsLogStatus &&
           statusActionsLogStatus !== StatusActionsLogStatus.ALL

@@ -10,27 +10,47 @@ import type { ProposalPDFData } from '../factory/pdf/proposal';
 import { FileMetadata } from '../models/Blob';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { WorkflowEngineProposalType } from '../workflowEngine';
+import { statusActionLogger } from './statusActionUtils';
 
 const FACTORY_ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
 export const proposalDownloadActionHandler = async (
   statusAction: ConnectionHasStatusAction,
-  proposals: WorkflowEngineProposalType[]
+  proposals: WorkflowEngineProposalType[],
+  options?: {
+    statusActionsLogId?: number;
+    loggedInUserId?: number;
+  }
 ) => {
   const fileDataSource = container.resolve<FileDataSource>(
     Tokens.FileDataSource
   );
+
+  const successMessage = !!options?.statusActionsLogId
+    ? 'Proposal successfully downloaded on status action replay'
+    : 'Proposal successfully downloaded';
+  const failMessage = !!options?.statusActionsLogId
+    ? 'Proposal failed to download on status action replay'
+    : 'Proposal failed to download';
 
   const submittedProposals = proposals.filter(
     (prop) => (prop.submitted = true)
   );
 
   for (const proposal of submittedProposals) {
+    const statusLogger = statusActionLogger({
+      connectionId: statusAction.connectionId,
+      actionId: statusAction.actionId,
+      statusActionsLogId: null,
+      proposalPks: [proposal.primaryKey],
+    });
+
     const logContext = {
       proposalPk: proposal.primaryKey,
       proposalId: proposal.proposalId,
       callId: proposal.callId,
       statusAction: statusAction,
+      executedBy: options?.loggedInUserId ? options.loggedInUserId : 'Workflow',
     };
 
     logger.logInfo(
@@ -58,6 +78,8 @@ export const proposalDownloadActionHandler = async (
         }
       );
 
+      await statusLogger(false, failMessage);
+
       continue;
     }
 
@@ -81,6 +103,8 @@ export const proposalDownloadActionHandler = async (
         }
       );
 
+      await statusLogger(false, failMessage);
+
       continue;
     }
 
@@ -91,6 +115,8 @@ export const proposalDownloadActionHandler = async (
         filemetadata: fileMetadata,
       }
     );
+
+    await statusLogger(true, successMessage);
   }
 };
 

@@ -11,6 +11,7 @@ import {
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
+import { StatusActionType } from '../../models/StatusAction';
 import { EmailStatusActionRecipients } from '../types/StatusActionConfig';
 import { StatusActionsLog } from '../types/StatusActionsLog';
 
@@ -27,6 +28,9 @@ export class StatusActionsLogsFilter {
 
   @Field(() => [Int], { nullable: true })
   public statusActionIds?: number[];
+
+  @Field(() => StatusActionType, { nullable: true })
+  public statusActionType?: StatusActionType;
 
   @Field(() => [Int], { nullable: true })
   public connectionIds?: number[];
@@ -48,8 +52,8 @@ export class StatusActionsLogsArgs {
   @Field(() => Int)
   public actionId: number;
 
-  @Field(() => EmailStatusActionRecipients)
-  public emailStatusActionRecipient: EmailStatusActionRecipients;
+  @Field(() => EmailStatusActionRecipients, { nullable: true })
+  public emailStatusActionRecipient: EmailStatusActionRecipients | null;
 
   @Field(() => Boolean, { nullable: true })
   public statusActionsSuccessful: boolean;
