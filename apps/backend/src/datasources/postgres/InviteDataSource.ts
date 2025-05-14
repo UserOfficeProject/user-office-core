@@ -52,11 +52,12 @@ export default class PostgresInviteDataSource implements InviteDataSource {
       .select('*')
       .from('invites')
       .modify((query) => {
-        if (filter.createdAfter) {
-          query.where('created_at', '>', filter.createdAfter);
-        }
         if (filter.createdBefore) {
           query.where('created_at', '<', filter.createdBefore);
+        }
+
+        if (filter.createdAfter) {
+          query.where('created_at', '>', filter.createdAfter);
         }
 
         if (filter.isClaimed !== undefined) {

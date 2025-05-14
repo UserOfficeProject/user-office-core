@@ -78,6 +78,18 @@ export class InviteDataSourceMock implements InviteDataSource {
   getInvites(filter: GetInvitesFilter): Promise<Invite[]> {
     return new Promise((resolve) => {
       const filteredInvites = this.invites.filter((invite) => {
+        if (filter.createdBefore) {
+          if (invite.createdAt >= filter.createdBefore) {
+            return false;
+          }
+        }
+
+        if (filter.createdAfter) {
+          if (invite.createdAt <= filter.createdAfter) {
+            return false;
+          }
+        }
+
         if (filter.isClaimed !== undefined) {
           if (invite.claimedAt === null && filter.isClaimed) {
             return false;
@@ -86,19 +98,9 @@ export class InviteDataSourceMock implements InviteDataSource {
             return false;
           }
         }
+
         if (filter.isExpired) {
           if (invite.expiresAt && invite.expiresAt < new Date()) {
-            return false;
-          }
-        }
-        if (filter.createdAfter) {
-          if (invite.createdAt <= filter.createdAfter) {
-            return false;
-          }
-        }
-
-        if (filter.createdBefore) {
-          if (invite.createdAt >= filter.createdBefore) {
             return false;
           }
         }
