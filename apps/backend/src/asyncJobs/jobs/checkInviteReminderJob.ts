@@ -63,10 +63,9 @@ const checkInviteReminder = async () => {
     return;
   }
 
-  logger.logInfo(
-    `Checking invites for reminders at days: ${reminderDays.join(', ')}`,
-    {}
-  );
+  logger.logInfo('Checking invites for reminder based on configured days', {
+    reminderDays: reminderDays.join(', '),
+  });
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -82,8 +81,12 @@ const checkInviteReminder = async () => {
     endDate.setHours(23, 59, 59, 999);
 
     logger.logInfo(
-      `Fetching invites created on day ${reminderDay} (${startDate.toISOString()})`,
-      {}
+      'Fetching invites for specific reminder day and date range',
+      {
+        reminderDay,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      }
     );
 
     const invites = await inviteDataSource.getInvites({
@@ -93,10 +96,10 @@ const checkInviteReminder = async () => {
       createdBefore: endDate,
     });
 
-    logger.logInfo(
-      `Found ${invites.length} invites for day ${reminderDay}`,
-      {}
-    );
+    logger.logInfo('Found invites for specified reminder day', {
+      count: invites.length,
+      reminderDay,
+    });
 
     for (const invite of invites) {
       const inviter = await userDataSource.getBasicUserInfo(
