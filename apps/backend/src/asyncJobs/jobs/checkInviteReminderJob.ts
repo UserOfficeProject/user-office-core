@@ -11,13 +11,14 @@ import { MailService } from '../../eventHandlers/MailService/MailService';
 import { SettingsId } from '../../models/Settings';
 
 /*
- * This job checks for invites that are older than a certain number of days
- * and sends a reminder email to the inviter.
+ * This job finds invites that are a certain number of days old
+ * and sends a reminder email to the inviter, if invite has not been accepted yet.
  * The number of days is configured in the settings.
  * The job runs every day at 6:00 AM.
  *
  * NB! this job assumes that is is run once a day. Running it more than once a day
- * will result in sending multiple reminder emails for the same invite.
+ * will result in sending multiple reminder emails for the same invite, running it
+ * less than once a day will result in not sending reminder emails for some invites.
  */
 
 const checkInviteReminder = async () => {
