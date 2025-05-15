@@ -150,13 +150,25 @@ export default class ExperimentMutations {
       return rejection('No experiment found');
     }
 
+    const proposal = await this.proposalDataSource.get(experiment.proposalPk);
+    if (!proposal) {
+      return rejection('No proposal found', { args });
+    }
+
+    const proposalQuestoinary = await this.questionaryDataSource.getQuestionary(
+      proposal.questionaryId
+    );
+    if (!proposalQuestoinary) {
+      return rejection('No proposal questionary found', { args });
+    }
+
     const experimentSafety =
       await this.dataSource.getExperimentSafetyByExperimentPk(
         args.experimentPk
       );
 
     if (!experimentSafety) {
-      return rejection('No experiment safety found');
+      return rejection('No experiment safety found', { args });
     }
 
     const hasAccessRights =
@@ -176,20 +188,22 @@ export default class ExperimentMutations {
 
     const sample = await this.sampleDataSource.getSample(args.sampleId);
     if (!sample) {
-      return rejection('No sample found');
+      return rejection('No sample found', { args });
     }
 
-    const question = await this.templateDataSource.getQuestion(
-      sample.questionId
-    ); // TODO this should be a getQuestionTemplateRelation. There is no way currently of doing it. Sample should reference QuestionRel instead of Question
-    if (!question) {
+    const questionTemplateRel =
+      await this.templateDataSource.getQuestionTemplateRelation(
+        sample.questionId,
+        proposalQuestoinary.templateId
+      );
+    if (!questionTemplateRel) {
       return rejection('No question found');
     }
 
-    const templateId = (question.config as SampleDeclarationConfig)
+    const templateId = (questionTemplateRel.config as SampleDeclarationConfig)
       .esiTemplateId;
     if (!templateId) {
-      return rejection('Esi template is not defined');
+      return rejection('Esi template is not defined', { args });
     }
 
     const newQuestionary = await this.questionaryDataSource.create(
