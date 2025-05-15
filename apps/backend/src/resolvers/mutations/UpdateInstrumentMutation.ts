@@ -31,6 +31,9 @@ export class UpdateInstrumentArgs {
 
   @Field(() => Boolean)
   public updateTechReview: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public selectable?: boolean;
 }
 
 @ArgsType()

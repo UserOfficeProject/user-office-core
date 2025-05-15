@@ -32,6 +32,9 @@ export class Instrument implements Partial<InstrumentOrigin> {
 
   @Field(() => Int)
   public managerUserId: number;
+
+  @Field(() => Boolean, { nullable: true })
+  public selectable?: boolean;
 }
 
 @ObjectType()
