@@ -155,10 +155,10 @@ export default class ExperimentMutations {
       return rejection('No proposal found', { args });
     }
 
-    const proposalQuestoinary = await this.questionaryDataSource.getQuestionary(
+    const proposalQuestionary = await this.questionaryDataSource.getQuestionary(
       proposal.questionaryId
     );
-    if (!proposalQuestoinary) {
+    if (!proposalQuestionary) {
       return rejection('No proposal questionary found', { args });
     }
 
@@ -194,10 +194,10 @@ export default class ExperimentMutations {
     const questionTemplateRel =
       await this.templateDataSource.getQuestionTemplateRelation(
         sample.questionId,
-        proposalQuestoinary.templateId
+        proposalQuestionary.templateId
       );
     if (!questionTemplateRel) {
-      return rejection('No question found');
+      return rejection('No question found', { args });
     }
 
     const templateId = (questionTemplateRel.config as SampleDeclarationConfig)
