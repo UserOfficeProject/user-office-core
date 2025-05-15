@@ -86,6 +86,7 @@ export const proposalDownloadActionHandler = async (
     let fileMetadata: FileMetadata;
     try {
       fileMetadata = await fetchAndStorePdfFromFactory(
+        proposal.primaryKey,
         {
           data: [proposalPDFData],
         },
@@ -121,6 +122,7 @@ export const proposalDownloadActionHandler = async (
 };
 
 async function fetchAndStorePdfFromFactory<TData>(
+  primaryKey: number,
   properties: {
     data: TData[];
   },
@@ -155,7 +157,7 @@ async function fetchAndStorePdfFromFactory<TData>(
     const contentType =
       factoryResp.headers.get('Content-Type') || 'application/pdf';
 
-    const filename = 'test123456.pdf';
+    const filename = `${primaryKey}.pdf`;
 
     return await storeFileWithSize(
       fileDataSource,
@@ -194,7 +196,8 @@ async function fetchAndStorePdfFromFactory<TData>(
             filename,
             contentType,
             contentLength,
-            readableStream
+            readableStream,
+            true
           );
           resolve(metadata);
         } catch (error) {

@@ -5,6 +5,9 @@ BEGIN
       BEGIN
         INSERT INTO status_actions(name, description, type)
         VALUES('Proposal download action', 'This is an action for proposal downloading. It can be configured to download PDFs from the factory and store them in the database.', 'PROPOSALDOWNLOAD');
+
+        ALTER TABLE files
+        ADD COLUMN internal_use BOOLEAN DEFAULT FALSE;
       END;
     END IF;
 END;

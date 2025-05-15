@@ -387,6 +387,7 @@ export interface FileRecord {
   readonly mime_type: string;
   readonly oid: number;
   readonly created_at: Date;
+  readonly internal_use: boolean;
 }
 
 export interface EventLogRecord {
@@ -894,7 +895,8 @@ export const createFileMetadata = (record: FileRecord) => {
     record.file_name,
     record.mime_type,
     record.size_in_bytes,
-    record.created_at
+    record.created_at,
+    record.internal_use
   );
 };
 

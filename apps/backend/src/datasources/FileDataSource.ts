@@ -7,18 +7,23 @@ export interface FileDataSource {
   // Read
   getMetadata(fileId: string): Promise<FileMetadata>;
   getMetadata(filter: FilesMetadataFilter): Promise<FileMetadata[]>;
-  getBlobdata(fileName: string): Promise<ReadStream | null>;
+  getBlobdata(
+    fileName: string,
+    internalUse?: boolean
+  ): Promise<ReadStream | null>;
   // write
   put(
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    filePath: string
+    filePath: string,
+    internalUse?: boolean
   ): Promise<FileMetadata>;
   put(
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    readStream: NodeJS.ReadableStream
+    readStream: NodeJS.ReadableStream,
+    internalUse?: boolean
   ): Promise<FileMetadata>;
 }

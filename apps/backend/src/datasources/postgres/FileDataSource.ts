@@ -61,19 +61,22 @@ export default class PostgresFileDataSource implements FileDataSource {
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    filePath: string
+    filePath: string,
+    internalUse?: boolean
   ): Promise<FileMetadata>;
   public async put(
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    readableStream: NodeJS.ReadableStream
+    readableStream: NodeJS.ReadableStream,
+    internalUse?: boolean
   ): Promise<FileMetadata>;
   public async put(
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    source: string | NodeJS.ReadableStream
+    source: string | NodeJS.ReadableStream,
+    internalUse?: boolean
   ): Promise<FileMetadata> {
     let oid: number;
 
@@ -90,6 +93,7 @@ export default class PostgresFileDataSource implements FileDataSource {
         mime_type: mimeType,
         size_in_bytes: sizeInBytes,
         oid: oid,
+        ...(internalUse === true && { internal_use: true }),
       })
       .into('files')
       .returning(['*']);
@@ -262,14 +266,22 @@ export default class PostgresFileDataSource implements FileDataSource {
     });
   }
 
-  public async getBlobdata(fileName: string): Promise<ReadStream | null> {
+  public async getBlobdata(
+    fileName: string,
+    internalUse?: boolean
+  ): Promise<ReadStream | null> {
     if (!fileName) {
       return null;
     }
 
-    const result = await database('files')
+    const result = await database('files as f')
       .select('oid')
       .where('file_name', fileName)
+      .modify((query) => {
+        if (internalUse === true) {
+          query.andWhere('f.internal_use', true);
+        }
+      })
       .first();
 
     if (!result) {

@@ -17,7 +17,8 @@ export default class FileDataSourceMock implements FileDataSource {
 
       return Promise.resolve(
         filter.fileIds?.map(
-          (id) => new FileMetadata(id, 1, 'name', 'text/xml', 1, new Date())
+          (id) =>
+            new FileMetadata(id, 1, 'name', 'text/xml', 1, new Date(), false)
         ) ?? []
       );
     }
@@ -25,7 +26,15 @@ export default class FileDataSourceMock implements FileDataSource {
     if (typeof param === 'string') {
       const fileId = param as string;
 
-      return new FileMetadata(fileId, 1, 'name', 'text/xml', 100, new Date());
+      return new FileMetadata(
+        fileId,
+        1,
+        'name',
+        'text/xml',
+        100,
+        new Date(),
+        false
+      );
     }
 
     throw new Error('Unsupported input for getMetaData');
@@ -55,11 +64,15 @@ export default class FileDataSourceMock implements FileDataSource {
       fileName,
       mimeType,
       sizeInBytes,
-      new Date()
+      new Date(),
+      false
     );
   }
 
-  async getBlobdata(fileName: string): Promise<ReadStream | null> {
+  async getBlobdata(
+    fileName: string,
+    internalUse?: boolean
+  ): Promise<ReadStream | null> {
     return fileName ? new ReadStream() : null;
   }
 }
