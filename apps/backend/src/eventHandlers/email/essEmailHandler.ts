@@ -191,6 +191,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
         event.proposal.primaryKey
       );
 
+      const invites = await inviteDataSource.findCoProposerInvites(
+        event.proposal.primaryKey
+      );
+
       const call = await callDataSource.getCall(event.proposal.callId);
 
       const options: EmailSettings = {
@@ -213,6 +217,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
             return {
               address: {
                 email: partipant.email,
+                header_to: principalInvestigator.email,
+              },
+            };
+          }),
+          ...invites.map((invite) => {
+            return {
+              address: {
+                email: invite.email,
                 header_to: principalInvestigator.email,
               },
             };

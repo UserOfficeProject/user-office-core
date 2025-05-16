@@ -4,7 +4,8 @@ export class Instrument {
     public name: string,
     public shortCode: string,
     public description: string,
-    public managerUserId: number
+    public managerUserId: number,
+    public selectable?: boolean
   ) {}
 }
 

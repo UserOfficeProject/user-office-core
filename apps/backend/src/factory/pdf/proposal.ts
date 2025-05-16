@@ -1,7 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
-import { ProposalAuthorization } from '../../auth/ProposalAuthorization';
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
@@ -240,17 +239,10 @@ export const collectProposalPDFData = async (
   user: UserWithRole,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
-  const proposalAuth = container.resolve(ProposalAuthorization);
   const proposal = await baseContext.queries.proposal.get(user, proposalPk);
 
   if (proposal === null) {
     throw new Error('Proposal not found');
-  }
-
-  // Authenticate user
-  const hasReadRights = await proposalAuth.hasReadRights(user, proposal);
-  if (hasReadRights === false) {
-    throw new Error('User was not allowed to download PDF');
   }
 
   const call = await baseContext.queries.call.get(user, proposal.callId);

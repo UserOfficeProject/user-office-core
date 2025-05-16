@@ -408,7 +408,10 @@ export default class InstrumentMutations {
     agent: UserWithRole | null,
     args: InstrumentSubmitInFapArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
-    if (!this.userAuth.isUserOfficer(agent)) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !this.userAuth.isUserOfficer(agent)
+    ) {
       return rejection('Submitting FAP instrument is not permitted', {
         code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
         agent,
@@ -485,6 +488,7 @@ export default class InstrumentMutations {
     args: InstrumentSubmitInFapArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
     if (
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -518,7 +522,7 @@ export default class InstrumentMutations {
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
-  async assignXpressProposalsToInstruments(
+  async assignTechniqueProposalsToInstruments(
     agent: UserWithRole | null,
     args: AssignProposalsToInstrumentsArgs
   ): Promise<InstrumentsHasProposals | Rejection> {
@@ -585,13 +589,13 @@ export default class InstrumentMutations {
         techniquesWithProposal.map((technique) => technique.id)
       );
 
-    const isXpress = instrumentWithTechnique.find(
+    const isTechniqueProposal = instrumentWithTechnique.find(
       (instruments) => instruments.id === args.instrumentIds[0]
     )
       ? true
       : false;
 
-    if (!isXpress) {
+    if (!isTechniqueProposal) {
       return rejection(
         'Could not assign instrument: instrument does not belong to proposal techniques',
         {

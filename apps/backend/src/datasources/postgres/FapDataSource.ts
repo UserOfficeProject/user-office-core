@@ -406,7 +406,8 @@ export default class PostgresFapDataSource implements FapDataSource {
   }
 
   async getCurrentFapReviewerProposalCount(
-    reviewerId: number
+    reviewerId: number,
+    fapId: number
   ): Promise<number> {
     const callFilter = {
       isFapReviewEnded: false,
@@ -424,6 +425,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       })
       .whereIn('fp.call_id', callIds)
       .andWhere('fr.user_id', reviewerId)
+      .andWhere('fr.fap_id', fapId)
       .groupBy('fr.user_id')
       .first()
       .then((result: { count?: string | undefined } | undefined) => {

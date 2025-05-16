@@ -17,19 +17,16 @@ const callSelectModalOnProposalsCloneValidationSchema = yup.object().shape({
 type CallSelectModalOnProposalsCloneProps = {
   close: () => void;
   cloneProposalsToCall: (call: Call) => Promise<void>;
-  templateId?: number;
 };
 
 const CallSelectModalOnProposalsClone = ({
   close,
   cloneProposalsToCall,
-  templateId,
 }: CallSelectModalOnProposalsCloneProps) => {
   const { calls, loadingCalls } = useCallsData({
     isActive: true,
     isActiveInternal: true,
     isEnded: false,
-    templateIds: templateId ? [templateId] : undefined,
   });
 
   return (
