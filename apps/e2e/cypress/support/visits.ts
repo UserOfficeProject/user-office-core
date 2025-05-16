@@ -1,4 +1,6 @@
 import {
+  ApproveVisitRegistrationMutation,
+  ApproveVisitRegistrationMutationVariables,
   CreateVisitMutation,
   CreateVisitMutationVariables,
   CreateVisitRegistrationMutation,
@@ -36,6 +38,16 @@ const submitVisitRegistration = (
   return cy.wrap(request);
 };
 
+const approveVisitRegistration = (
+  input: ApproveVisitRegistrationMutationVariables
+): Cypress.Chainable<ApproveVisitRegistrationMutation> => {
+  const api = getE2EApi();
+  const request = api.approveVisitRegistration(input);
+
+  return cy.wrap(request);
+};
+
 Cypress.Commands.add('createVisit', createVisit);
 Cypress.Commands.add('createVisitRegistration', createVisitRegistration);
 Cypress.Commands.add('submitVisitRegistration', submitVisitRegistration);
+Cypress.Commands.add('approveVisitRegistration', approveVisitRegistration);
