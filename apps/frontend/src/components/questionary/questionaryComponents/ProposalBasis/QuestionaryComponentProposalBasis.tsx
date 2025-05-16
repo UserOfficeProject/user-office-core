@@ -116,8 +116,16 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           name={`${id}.abstract`}
           label="Proposal Abstract"
           inputProps={{
-            onChange: (event: ChangeEvent<HTMLInputElement>) =>
-              setLocalAbstract(event.target.value),
+            onChange: (event: ChangeEvent<HTMLInputElement>) => {
+              const value = event.target.value;
+              const cleanedValue = value.replace(/[^\x20-\x7E\n\r\t]/g, ' ');
+              if (value !== cleanedValue) {
+                console.warn(
+                  'Replace any non-printable characters found within the proposal abstract field with a space character.'
+                );
+              }
+              setLocalAbstract(cleanedValue);
+            },
             onBlur: () => {
               dispatch({
                 type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
