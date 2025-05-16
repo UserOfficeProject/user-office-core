@@ -61,6 +61,9 @@ export class Experiment implements ExperimentOrigin {
 
   @Field(() => Date)
   public updatedAt: Date;
+
+  @Field(() => Number, { nullable: true })
+  public referenceNumberSequence: number | null;
 }
 
 @Resolver(() => Experiment)

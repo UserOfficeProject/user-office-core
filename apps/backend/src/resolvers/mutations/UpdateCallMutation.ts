@@ -74,6 +74,9 @@ export class UpdateCallInput {
   @Field(() => Int, { nullable: true })
   public proposalWorkflowId?: number;
 
+  @Field(() => Int, { nullable: true })
+  public experimentWorkflowId?: number;
+
   @Field({ nullable: true })
   public callEnded?: boolean;
 
@@ -93,7 +96,10 @@ export class UpdateCallInput {
   public esiTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
-  public pdfTemplateId?: number;
+  public proposalPdfTemplateId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public experimentSafetyPdfTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;

@@ -1,10 +1,10 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import { isRejection, Rejection } from '../models/Rejection';
+import { GeneralEvent } from './applicationEvents';
 
 export type EventHandler<T> = (event: T) => Promise<void>;
 
-export class EventBus<T extends { type: string }> {
+export class EventBus<T extends GeneralEvent> {
   constructor(
     private handlers: Promise<EventHandler<T>>[] | EventHandler<T>[] = []
   ) {}
@@ -22,19 +22,5 @@ export class EventBus<T extends { type: string }> {
         );
       }
     }
-  }
-
-  // TODO: it is not used at all, investigate if we need this
-  public async wrap<V>(
-    inner: () => Promise<V | Rejection>,
-    formEvent: (result: V) => T
-  ): Promise<V | Rejection> {
-    const result = await inner();
-    if (!isRejection(result)) {
-      const event = formEvent(result);
-      this.publish(event);
-    }
-
-    return result;
   }
 }

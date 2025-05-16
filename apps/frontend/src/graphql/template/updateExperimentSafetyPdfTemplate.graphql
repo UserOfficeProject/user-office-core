@@ -1,0 +1,27 @@
+mutation updateExperimentSafetyPdfTemplate(
+  $experimentSafetyPdfTemplateId: Int!
+  $templateData: String
+  $templateHeader: String
+  $templateFooter: String
+  $templateSampleDeclaration: String
+  $dummyData: String
+) {
+  updateExperimentSafetyPdfTemplate(
+    experimentSafetyPdfTemplateId: $experimentSafetyPdfTemplateId
+    templateData: $templateData
+    templateHeader: $templateHeader
+    templateFooter: $templateFooter
+    templateSampleDeclaration: $templateSampleDeclaration
+    dummyData: $dummyData
+  ) {
+    experimentSafetyPdfTemplateId
+    templateId
+    templateData
+    templateHeader
+    templateFooter
+    templateSampleDeclaration
+    dummyData
+    created
+    creatorId
+  }
+}

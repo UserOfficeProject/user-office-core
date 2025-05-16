@@ -5,20 +5,37 @@ import { useSearchParams } from 'react-router-dom';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
-import { useCallsData } from 'hooks/call/useCallsData';
-import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
+import StatusFilter from 'components/common/proposalFilters/StatusFilter';
+import {
+  Call,
+  ExperimentsFilter,
+  InstrumentMinimalFragment,
+  Status,
+} from 'generated/sdk';
 
 import DateFilter from './DateFilter';
 
-function ExperimentFilterBar() {
+type ExperimentFilterBarProps = {
+  calls?: {
+    data: Pick<Call, 'shortCode' | 'id' | 'templateId'>[];
+    isLoading: boolean;
+  };
+  instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
+  experimentStatuses?: { data: Status[]; isLoading: boolean };
+  setExperimentFilter: (filter: ExperimentsFilter) => void;
+  filter: ExperimentsFilter;
+};
+
+function ExperimentFilterBar({
+  calls,
+  instruments,
+  experimentStatuses,
+  setExperimentFilter,
+  filter,
+}: ExperimentFilterBarProps) {
   const [searchParams, setSearchParam] = useSearchParams();
-  const call = searchParams.get('call');
-  const instrument = searchParams.get('instrument');
   const experimentFromDate = searchParams.get('from');
   const experimentToDate = searchParams.get('to');
-
-  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
-  const { calls, loadingCalls } = useCallsData();
 
   const handleOnChange = (format: string, from?: Date, to?: Date) => {
     setSearchParam((searchParam) => {
@@ -39,22 +56,47 @@ function ExperimentFilterBar() {
 
   return (
     <Grid container spacing={2}>
-      <Grid item sm={3} xs={12}>
+      <Grid item sm={4} xs={12}>
         <CallFilter
-          callId={call ? +call : null}
-          calls={calls}
-          isLoading={loadingCalls}
+          callId={filter.callId as number}
+          calls={calls?.data}
+          isLoading={calls?.isLoading}
           shouldShowAll={true}
-          data-cy="call-filter"
+          onChange={(callId) => {
+            setExperimentFilter({
+              ...filter,
+              callId,
+            });
+          }}
         />
       </Grid>
-      <Grid item sm={3} xs={12}>
+      <Grid item sm={4} xs={12}>
         <InstrumentFilter
-          instrumentId={instrument ? +instrument : null}
-          instruments={instruments}
-          isLoading={loadingInstruments}
+          instrumentId={filter.instrumentId}
+          instruments={instruments?.data}
+          isLoading={instruments?.isLoading}
           shouldShowAll={true}
-          data-cy="instrument-filter"
+          onChange={(instrumentFilterValue) => {
+            setExperimentFilter({
+              ...filter,
+              instrumentId: instrumentFilterValue.instrumentId,
+            });
+          }}
+        />
+      </Grid>
+      <Grid item sm={4} xs={12}>
+        <StatusFilter
+          statusId={filter.experimentSafetyStatusId as number}
+          statuses={experimentStatuses?.data}
+          isLoading={experimentStatuses?.isLoading}
+          shouldShowAll={true}
+          hiddenStatuses={[]}
+          onChange={(experimentSafetyStatusId) => {
+            setExperimentFilter({
+              ...filter,
+              experimentSafetyStatusId,
+            });
+          }}
         />
       </Grid>
       <Grid item xs={12}>

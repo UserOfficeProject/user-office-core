@@ -9,6 +9,10 @@ import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
+import {
+  ExperimentSafetyReviewerDecisionEnum,
+  InstrumentScientistDecisionEnum,
+} from '../models/Experiment';
 import { ProposalEndStatus } from '../models/Proposal';
 import { ReviewStatus } from '../models/Review';
 import { SampleStatus } from '../models/Sample';
@@ -385,6 +389,50 @@ export default function createCustomHandler() {
           );
         }
 
+        break;
+      case Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR:
+        switch (event.experimentsafety.experimentSafetyReviewerDecision) {
+          case ExperimentSafetyReviewerDecisionEnum.ACCEPTED:
+            eventBus.publish({
+              type: Event.EXPERIMENT_ESF_APPROVED_BY_ESR,
+              experimentsafety: event.experimentsafety,
+              isRejection: false,
+              key: 'experimentsafety',
+              loggedInUserId: event.loggedInUserId,
+            });
+            break;
+          case ExperimentSafetyReviewerDecisionEnum.REJECTED:
+            eventBus.publish({
+              type: Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
+              experimentsafety: event.experimentsafety,
+              isRejection: false,
+              key: 'experimentsafety',
+              loggedInUserId: event.loggedInUserId,
+            });
+            break;
+        }
+        break;
+      case Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS:
+        switch (event.experimentsafety.instrumentScientistDecision) {
+          case InstrumentScientistDecisionEnum.ACCEPTED:
+            eventBus.publish({
+              type: Event.EXPERIMENT_ESF_APPROVED_BY_IS,
+              experimentsafety: event.experimentsafety,
+              isRejection: false,
+              key: 'experimentsafety',
+              loggedInUserId: event.loggedInUserId,
+            });
+            break;
+          case InstrumentScientistDecisionEnum.REJECTED:
+            eventBus.publish({
+              type: Event.EXPERIMENT_ESF_REJECTED_BY_IS,
+              experimentsafety: event.experimentsafety,
+              isRejection: false,
+              key: 'experimentsafety',
+              loggedInUserId: event.loggedInUserId,
+            });
+            break;
+        }
         break;
     }
   };

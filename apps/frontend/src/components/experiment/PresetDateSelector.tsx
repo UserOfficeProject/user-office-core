@@ -27,7 +27,6 @@ interface PresetDateSelectorProps {
 function PresetDateSelector({ value, setValue }: PresetDateSelectorProps) {
   return (
     <StyledToggleButtonGroup
-      size="small"
       value={value}
       exclusive
       onChange={(_e, val) => setValue(val)}

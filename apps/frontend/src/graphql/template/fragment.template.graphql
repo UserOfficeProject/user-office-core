@@ -20,8 +20,16 @@ fragment template on Template {
     groupId
     categoryId
   }
-  pdfTemplate {
-    pdfTemplateId
+  proposalPdfTemplate {
+    proposalPdfTemplateId
+    templateData
+    templateHeader
+    templateFooter
+    templateSampleDeclaration
+    dummyData
+  }
+  experimentSafetyPdfTemplate {
+    experimentSafetyPdfTemplateId
     templateData
     templateHeader
     templateFooter
