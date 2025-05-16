@@ -41,7 +41,8 @@ export default class PostgresInstrumentDataSource
       instrument.name,
       instrument.short_code,
       instrument.description,
-      instrument.manager_user_id
+      instrument.manager_user_id,
+      instrument.selectable
     );
   }
 
@@ -80,6 +81,7 @@ export default class PostgresInstrumentDataSource
         short_code: args.shortCode,
         description: args.description,
         manager_user_id: args.managerUserId,
+        selectable: !!args.selectable,
       })
       .into('instruments')
       .returning('*');
@@ -153,7 +155,8 @@ export default class PostgresInstrumentDataSource
   }
 
   async getInstrumentsByCallId(
-    callIds: number[]
+    callIds: number[],
+    selectableOnly?: boolean
   ): Promise<InstrumentWithAvailabilityTime[]> {
     return database
       .select([
@@ -170,6 +173,11 @@ export default class PostgresInstrumentDataSource
         'i.instrument_id': 'chi.instrument_id',
       })
       .whereIn('chi.call_id', callIds)
+      .modify((query) => {
+        if (selectableOnly) {
+          query.andWhere('i.selectable', true);
+        }
+      })
       .distinct('i.instrument_id')
       .then((instruments: InstrumentWithAvailabilityTimeRecord[]) => {
         const result = instruments.map((instrument) =>
@@ -286,6 +294,7 @@ export default class PostgresInstrumentDataSource
           short_code: instrument.shortCode,
           description: instrument.description,
           manager_user_id: instrument.managerUserId,
+          selectable: instrument.selectable,
         },
         ['*']
       )
