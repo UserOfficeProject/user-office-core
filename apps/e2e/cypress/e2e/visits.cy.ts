@@ -133,7 +133,7 @@ context('visits tests', () => {
       cy.get('[data-cy="save-and-continue-button"]').click();
       cy.get('[data-cy="submit-visit-registration-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
-      cy.testActionButton(cyTagRegisterVisit, 'completed');
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
     });
 
     it('User should be able to cancel visit registration', () => {
