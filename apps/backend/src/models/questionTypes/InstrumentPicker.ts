@@ -64,9 +64,10 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
           Tokens.InstrumentDataSource
         );
 
-        const instruments = await instrumentDataSource.getInstrumentsByCallId([
-          callId,
-        ]);
+        const instruments = await instrumentDataSource.getInstrumentsByCallId(
+          [callId],
+          true
+        );
 
         return {
           ...config,
