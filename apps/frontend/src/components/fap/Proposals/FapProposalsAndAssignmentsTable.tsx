@@ -129,13 +129,15 @@ const FapProposalColumns: Column<FapProposalType>[] = [
   {
     title: 'Average grade',
     render: (rowData) => {
-      const avgGrade = average(
-        getGradesFromReviews(
-          getReviewsFromAssignments(rowData.assignments ?? [])
-        )
+      const grades = getGradesFromReviews(
+        getReviewsFromAssignments(rowData.assignments ?? [])
       );
+      if (grades.length === 0) {
+        return '-';
+      }
+      const avgGrade = average(grades);
 
-      return avgGrade === 0 ? '-' : `${avgGrade}`;
+      return `${avgGrade}`;
     },
     customSort: (a, b) =>
       average(

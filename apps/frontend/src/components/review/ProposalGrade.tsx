@@ -66,7 +66,10 @@ const ProposalGrade = ({
   }
 
   const initialValues = {
-    grade: review.grade?.toString() || '',
+    grade:
+      review.grade !== undefined && review.grade !== null
+        ? review.grade.toString()
+        : '',
     comment: review.comment || '',
     submitted: review.status === ReviewStatus.SUBMITTED,
     saveOnly: true,
@@ -188,7 +191,7 @@ const ProposalGrade = ({
                       step: gradeDecimalPoints,
                       inputMode: 'decimal',
                       type: 'number',
-                      min: '1',
+                      min: '0',
                       max: '10',
                     }
               }
@@ -196,9 +199,9 @@ const ProposalGrade = ({
               labelId="grade-proposal-label"
               options={
                 gradeDecimalPoints === 1
-                  ? [...Array(10)].map((e, i) => ({
-                      text: (i + 1).toString(),
-                      value: i + 1,
+                  ? [...Array(11)].map((e, i) => ({
+                      text: i.toString(),
+                      value: i,
                     }))
                   : undefined
               }

@@ -21,7 +21,8 @@ export const createFapReviewBasisValidationSchema: QuestionaryComponentDefinitio
     const schema = Yup.object().shape({
       comment: commentSchema,
       grade: Yup.number()
-        .min(1, 'Lowest grade is 1')
+        .min(0, 'Lowest grade is 0')
+        //.positive('it cant be negative')
         .max(10, 'Highest grade is 10')
         .required('Grade is required'),
     });

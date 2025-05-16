@@ -41,11 +41,11 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
   const [numberOfChars, setNumberOfChars] = useState(0);
 
   const [localGrade, setLocalGrade] = useState(
-    state?.fapReview.grade || undefined
+    state?.fapReview.grade ?? undefined
   );
 
   useEffect(() => {
-    setLocalGrade(state?.fapReview.grade || undefined);
+    setLocalGrade(state?.fapReview.grade ?? undefined);
   }, [state]);
 
   if (!state || !dispatch) {
@@ -116,6 +116,9 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             component={gradeDecimalPoints === 1 ? Select : TextField}
             MenuProps={{ 'data-cy': 'grade-proposal-options' }}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setLocalGrade(+event.target.value);
+              console.log('event value:', event.target.value);
+              console.log('local grade:', localGrade);
               dispatch({
                 type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
                 itemWithQuestionary: { grade: +event.target.value },
@@ -136,7 +139,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                     step: gradeDecimalPoints,
                     inputMode: 'decimal',
                     type: 'number',
-                    min: '1',
+                    min: '0',
                     max: '10',
                   }
             }
@@ -144,9 +147,9 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             labelId="grade-proposal-label"
             options={
               gradeDecimalPoints === 1
-                ? [...Array(10)].map((e, i) => ({
-                    text: (i + 1).toString(),
-                    value: i + 1,
+                ? [...Array(11)].map((e, i) => ({
+                    text: i.toString(),
+                    value: i,
                   }))
                 : undefined
             }
@@ -164,14 +167,14 @@ const fapReviewBasisPreSubmit =
     const { id, comment, grade, fapID, status, questionaryID } = fapReview;
 
     const returnValue = state.questionary.questionaryId;
-
+    console.log(`testing`, grade);
     if (id > 0) {
       await api.updateReview({
         reviewID: id,
         status: status,
         fapID: fapID,
         questionaryID: questionaryID,
-        grade: grade || 0,
+        grade: grade ?? 0,
         comment: comment || '',
       });
     }
