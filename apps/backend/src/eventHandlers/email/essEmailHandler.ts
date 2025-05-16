@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { CoProposerClaimDataSource } from '../../datasources/CoProposerClaimDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
@@ -12,6 +13,7 @@ import { UserDataSource } from '../../datasources/UserDataSource';
 import { VisitDataSource } from '../../datasources/VisitDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
+import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
@@ -29,6 +31,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
   const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
     Tokens.RoleClaimDataSource
+  );
+
+  const coProposerDataSource = container.resolve<CoProposerClaimDataSource>(
+    Tokens.CoProposerClaimDataSource
   );
 
   const inviteDataSource = container.resolve<InviteDataSource>(
@@ -169,6 +175,90 @@ export async function essEmailHandler(event: ApplicationEvent) {
               isEmailSent: true,
             });
             logger.logInfo('Successful email transmission', { res });
+          })
+          .catch((err: string) => {
+            logger.logException('Failed email transmission', err);
+          });
+      }
+
+      return;
+    }
+
+    case Event.INVITE_ACCEPTED: {
+      const invite: Invite = event.invite;
+
+      const coProposerClaims = await coProposerDataSource.findByInviteId(
+        invite.id
+      );
+      if (!coProposerClaims || coProposerClaims.length === 0) {
+        return;
+      }
+
+      for (const claim of coProposerClaims) {
+        const proposal = await proposalDataSource.get(claim.proposalPk);
+        if (!proposal) {
+          logger.logError(
+            'No proposal found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        const principalInvestigator = await userDataSource.getUser(
+          proposal.proposerId
+        );
+        if (!principalInvestigator) {
+          logger.logError(
+            'No principal investigator found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        const claimer = await userDataSource.getUser(
+          invite.claimedByUserId as number
+        );
+        if (!claimer) {
+          logger.logError(
+            'No claimer found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        mailService
+          .sendMail({
+            content: {
+              template_id: 'co-proposer-invite-accepted',
+            },
+            substitution_data: {
+              piPreferredname: principalInvestigator.preferredname,
+              piLastname: principalInvestigator.lastname,
+              email: invite.email,
+              proposalTitle: proposal.title,
+              proposalId: proposal.proposalId,
+              claimerPreferredname: claimer.preferredname,
+              claimerLastname: claimer.lastname,
+            },
+            recipients: [{ address: principalInvestigator.email }],
+          })
+          .then(async (res) => {
+            logger.logInfo(
+              'Successful email transmission for accepting invite',
+              { res }
+            );
           })
           .catch((err: string) => {
             logger.logException('Failed email transmission', err);
