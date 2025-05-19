@@ -24,7 +24,6 @@ function CreateUpdateVisitRegistration({
   ) : (
     <CreateVisitRegistration
       visitId={registration.visitId}
-      userId={registration.userId}
       onSubmitted={onSubmitted}
     />
   );

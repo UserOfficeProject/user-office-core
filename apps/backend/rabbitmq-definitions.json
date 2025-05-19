@@ -1,0 +1,44 @@
+{
+  "queues": [
+    {
+      "name": "user_office_backend.queue",
+      "vhost": "/"
+    },
+    {
+      "name": "user_office_scheduler_backend.queue",
+      "vhost": "/"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "user_office_backend.fanout",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false
+    },
+    {
+      "name": "user_office_scheduler_backend.fanout",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true,
+      "auto_delete": false
+    }
+  ],
+  "bindings": [
+    {
+      "source": "user_office_backend.fanout",
+      "vhost": "/",
+      "destination": "user_office_scheduler_backend.queue",
+      "destination_type": "queue",
+      "routing_key": ""
+    },
+    {
+      "source": "user_office_scheduler_backend.fanout",
+      "vhost": "/",
+      "destination": "user_office_backend.queue",
+      "destination_type": "queue",
+      "routing_key": ""
+    }
+  ]
+}
