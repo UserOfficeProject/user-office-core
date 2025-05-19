@@ -121,7 +121,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
               const cleanedValue = value.replace(/[^\x20-\x7E\n\r\t]/g, ' ');
               if (value !== cleanedValue) {
                 console.warn(
-                  'Replace any non-printable characters found within the proposal abstract field with a space character'
+                  'Replace any non-printable characters found within the proposal abstract field with a space character.'
                 );
               }
               setLocalAbstract(cleanedValue);
