@@ -34,6 +34,7 @@ export interface QuestionaryDataSource {
   create(creator_id: number, template_id: number): Promise<Questionary>;
   clone(
     questionaryId: number,
+    targetTemplateId?: number,
     reviewBeforeSubmit?: boolean
   ): Promise<Questionary>;
   copyAnswers(

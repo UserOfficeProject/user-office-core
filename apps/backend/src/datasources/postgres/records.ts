@@ -485,6 +485,7 @@ export interface InstrumentRecord {
   readonly description: string;
   readonly manager_user_id: number;
   readonly full_count: number;
+  readonly selectable: boolean;
 }
 
 export interface InstrumentHasProposalRecord {
@@ -824,7 +825,8 @@ export const createInstrumentObject = (instrument: InstrumentRecord) => {
     instrument.name,
     instrument.short_code,
     instrument.description,
-    instrument.manager_user_id
+    instrument.manager_user_id,
+    instrument.selectable
   );
 };
 

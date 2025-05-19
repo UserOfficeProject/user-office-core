@@ -43,7 +43,10 @@ export default class CallQueries {
     agent: UserWithRole | null,
     scientistId: number
   ) {
-    if (!this.userAuth.isUserOfficer(agent) && agent?.id !== scientistId) {
+    if (
+      this.userAuth.isApiToken(agent) ||
+      (!this.userAuth.isUserOfficer(agent) && agent?.id !== scientistId)
+    ) {
       return null;
     }
 

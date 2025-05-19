@@ -12,7 +12,16 @@ import { useGetPageContent } from 'hooks/admin/useGetPageContent';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
 const Paper = ({ children }: { children: React.ReactNode }) => (
-  <StyledPaper margin={[0, 0, 2, 0]}>{children}</StyledPaper>
+  <StyledPaper
+    margin={[0, 0, 2, 0]}
+    sx={{
+      '&:empty': {
+        display: 'none',
+      },
+    }}
+  >
+    {children}
+  </StyledPaper>
 );
 
 export default function OverviewPage(props: { userRole: UserRole }) {

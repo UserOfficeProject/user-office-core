@@ -321,6 +321,26 @@ export default {
       id: 15,
       name: 'EDITABLE_SUBMITTED_INTERNAL',
     },
+    quickReview: {
+      id: 22,
+      name: 'QUICK_REVIEW',
+    },
+    underReview: {
+      id: 23,
+      name: 'UNDER_REVIEW',
+    },
+    approved: {
+      id: 24,
+      name: 'APPROVED',
+    },
+    unsuccessful: {
+      id: 25,
+      name: 'UNSUCCESSFUL',
+    },
+    finished: {
+      id: 26,
+      name: 'FINISHED',
+    },
   },
   experiments: {
     upcoming: {

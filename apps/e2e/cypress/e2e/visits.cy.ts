@@ -19,6 +19,7 @@ context('visits tests', () => {
   const acceptedStatus = ProposalEndStatus.ACCEPTED;
   const existingProposalId = initialDBData.proposal.id;
   const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
+  let createdVisitId: number;
 
   beforeEach(function () {
     cy.resetDB(true);
@@ -74,6 +75,8 @@ context('visits tests', () => {
         teamLeadUserId: visitor.id,
         experimentPk: existingExperimentPk,
       }).then(({ createVisit: visit }: CreateVisitMutation) => {
+        createdVisitId = visit.id;
+
         cy.createVisitRegistration({
           visitId: visit.id,
           userId: visitor.id,
@@ -84,6 +87,85 @@ context('visits tests', () => {
           userId: visitor.id,
         });
       });
+    });
+
+    it('User officer should be able request changes', () => {
+      cy.login('officer');
+      cy.visit('/ExperimentPage');
+
+      cy.finishedLoading();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get('[data-testid="ChevronRightIcon"]')
+        .first()
+        .closest('button')
+        .click();
+      cy.get('[data-cy="request-visit-registration-changes-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="request-visit-registration-changes-button"]').should(
+        'not.be.exist'
+      );
+
+      cy.logout();
+      cy.login(visitor);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.testActionButton(cyTagRegisterVisit, 'active');
+
+      cy.get(`[data-cy="${cyTagRegisterVisit}"]`)
+        .closest('button')
+        .first()
+        .click();
+
+      const startDateObj = faker.date.future();
+      const endDateObj = new Date(startDateObj.getTime() + 24 * 60 * 60 * 1000);
+
+      const startDate = DateTime.fromJSDate(startDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+      const endDate = DateTime.fromJSDate(endDateObj).toFormat(
+        initialDBData.getFormats().dateFormat
+      );
+
+      cy.contains(startQuestion).parent().find('input').clear().type(startDate);
+      cy.contains(endQuestion).parent().find('input').clear().type(endDate);
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.get('[data-cy="submit-visit-registration-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
+    });
+
+    it('User should be able to cancel visit registration', () => {
+      cy.login('user3');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
+      cy.get('[data-cy="registration-more-options"]').click();
+      cy.get('[data-cy="cancel-visit-button"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get(
+        '[aria-label="Define your visit (This action is disabled because your registration for visit is cancelled)"]'
+      ).should('exist');
+    });
+
+    it('User should not be able to cancel visit registration after visit is approved', () => {
+      cy.approveVisitRegistration({
+        visitRegistration: {
+          userId: visitor.id,
+          visitId: createdVisitId,
+        },
+      });
+
+      cy.login('user3');
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="register-visit-icon"]').closest('button').click();
+      cy.get('[data-cy="registration-more-options"]').should('not.exist');
     });
 
     it('User officer should be able to cancel visit registration', () => {
@@ -152,7 +234,7 @@ context('visits tests', () => {
       cy.contains(/Upcoming experiments/i).should('exist');
 
       cy.testActionButton(cyTagDefineVisit, 'active');
-      cy.testActionButton(cyTagRegisterVisit, 'inactive');
+      cy.testActionButton(cyTagRegisterVisit, 'cancelled');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
     });
 
@@ -175,7 +257,7 @@ context('visits tests', () => {
 
       // test that that actions has correct state
       cy.testActionButton(cyTagDefineVisit, 'active');
-      cy.testActionButton(cyTagRegisterVisit, 'inactive');
+      cy.testActionButton(cyTagRegisterVisit, 'cancelled');
       cy.testActionButton(cyTagDeclareShipment, 'neutral');
 
       // create visit
@@ -292,7 +374,7 @@ context('visits tests', () => {
 
       cy.reload();
 
-      cy.testActionButton(cyTagRegisterVisit, 'completed');
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
     });
 
     it('User should not see register for visit or training button if he is not a visitor', () => {

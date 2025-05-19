@@ -17,14 +17,6 @@ export default class InstrumentQueries {
     private userAuth: UserAuthorization
   ) {}
 
-  private isUserOfficer(agent: UserWithRole | null) {
-    if (agent == null) {
-      return false;
-    }
-
-    return agent?.currentRole?.shortCode === Roles.USER_OFFICER;
-  }
-
   @Authorized()
   async get(agent: UserWithRole | null, instrumentId: number) {
     const instrument = await this.dataSource.getInstrument(instrumentId);
@@ -66,7 +58,7 @@ export default class InstrumentQueries {
   async getUserInstruments(
     agent: UserWithRole | null
   ): Promise<{ totalCount: number; instruments: Instrument[] }> {
-    if (this.isUserOfficer(agent)) {
+    if (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent)) {
       return this.dataSource.getInstruments();
     }
 
@@ -92,7 +84,8 @@ export default class InstrumentQueries {
     { fapId, callId }: { fapId: number; callId: number }
   ) {
     if (
-      this.isUserOfficer(agent) ||
+      this.userAuth.isApiToken(agent) ||
+      this.userAuth.isUserOfficer(agent) ||
       (await this.userAuth.isMemberOfFap(agent, fapId))
     ) {
       const instruments = await this.dataSource.getInstrumentsByFapId(

@@ -87,9 +87,8 @@ RabbitMQ is used for messaging and queueing. Uncomment and configure the followi
 - **RABBITMQ_HOSTNAME**: The hostname for RabbitMQ.
 - **RABBITMQ_USERNAME**: The username for RabbitMQ.
 - **RABBITMQ_PASSWORD**: The password for RabbitMQ.
+- **RABBITMQ_CORE_QUEUE_NAME**: The core queue name for RabbitMQ.
 - **RABBITMQ_CORE_EXCHANGE_NAME**: The core exchange name for RabbitMQ.
-- **RABBITMQ_SCHEDULER_EXCHANGE_NAME**: The scheduler exchange name for RabbitMQ.
-- **RABBITMQ_EVENT_SCHEDULING_QUEUE_NAME**: The queue name for event scheduling in RabbitMQ.
 
 ### Scheduler Configuration
 The scheduler endpoint is used for managing scheduled tasks:

@@ -8,7 +8,10 @@ export class VisitRegistrationWizardStep extends QuestionaryWizardStep {
     const registrationState = state as VisitRegistrationSubmissionState;
 
     return (
-      registrationState.registration.status === VisitRegistrationStatus.DRAFTED
+      registrationState.registration.status ===
+        VisitRegistrationStatus.DRAFTED ||
+      registrationState.registration.status ===
+        VisitRegistrationStatus.CHANGE_REQUESTED
     );
   }
 }

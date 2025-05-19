@@ -3,12 +3,13 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import MailIcon from '@mui/icons-material/Mail';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { IconButton, styled, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
+import CreateUpdateCancelVisitRegistration from 'components/visit/CreateUpdateCancelVisitRegistration';
 import VisitStatusIcon from 'components/visit/VisitStatusIcon';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import {
@@ -17,7 +18,6 @@ import {
   GetExperimentsQuery,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
-import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { tableIcons } from 'utils/materialIcons';
 import { getFullUserName } from 'utils/user';
@@ -48,6 +48,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
   const organisationName = settingsMap
     .get(SettingsId.ORGANISATION_NAME)
     ?.settingsValue?.valueOf();
+  const [selectedVisit, setSelectedVisit] = useState<RowType | null>(null);
 
   const api = useDataApi();
   const { toFormattedDateTime } = useFormattedDateTime({
@@ -126,6 +127,18 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
     replaceVisitRegistration(approvedRegistration);
   };
 
+  const requestVisitChanges = async (visitId: number, userId: number) => {
+    const updatedRegistration = (
+      await api().requestVisitRegistrationChanges({
+        visitRegistration: {
+          visitId,
+          userId,
+        },
+      })
+    ).requestVisitRegistrationChanges;
+    replaceVisitRegistration(updatedRegistration);
+  };
+
   const onApproveVisitClick = async (visitId: number, userId: number) => {
     confirm(async () => approveVisit(visitId, userId), {
       title: 'Approve visit registration',
@@ -140,25 +153,23 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
     })();
   };
 
+  const onRequestChangesClick = async (visitId: number, userId: number) => {
+    confirm(async () => requestVisitChanges(visitId, userId), {
+      title: 'Request visit registration changes',
+      description:
+        'Are you sure you want to request visit registration changes?',
+    })();
+  };
+
   const columns = [
     {
       title: 'Actions',
       sorting: false,
       render: (rowData: RowType) => {
         const editButton = (
-          <ButtonWithDialog
-            button={
-              <IconButton>
-                <EditIcon />
-              </IconButton>
-            }
-            title="Edit visit registration"
-          >
-            <CreateUpdateVisitRegistration
-              registration={rowData}
-              onSubmitted={onVisitRegistrationSubmitted}
-            />
-          </ButtonWithDialog>
+          <IconButton onClick={() => setSelectedVisit(rowData)}>
+            <EditIcon />
+          </IconButton>
         );
 
         const approveButton = (
@@ -181,6 +192,20 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
           >
             <Tooltip title="Cancel visit registration">
               <ClearIcon />
+            </Tooltip>
+          </IconButton>
+        );
+
+        const requestChangesButton = (
+          <IconButton
+            onClick={() =>
+              onRequestChangesClick(rowData.visitId, rowData.userId)
+            }
+            component="button"
+            data-cy="request-visit-registration-changes-button"
+          >
+            <Tooltip title="Request visit registration changes">
+              <ReplayIcon />
             </Tooltip>
           </IconButton>
         );
@@ -210,6 +235,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
             return (
               <ActionDiv>
                 {sendEmailButton}
+                {cancelButton}
                 {editButton}
               </ActionDiv>
             );
@@ -217,15 +243,26 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
             return (
               <ActionDiv>
                 {sendEmailButton}
+                {editButton}
                 {approveButton}
                 {cancelButton}
-                {editButton}
+                {requestChangesButton}
               </ActionDiv>
             );
           case VisitRegistrationStatus.APPROVED:
             return (
               <ActionDiv>
                 {sendEmailButton}
+                {cancelButton}
+              </ActionDiv>
+            );
+
+          case VisitRegistrationStatus.CHANGE_REQUESTED:
+            return (
+              <ActionDiv>
+                {sendEmailButton}
+                {editButton}
+                {approveButton}
                 {cancelButton}
               </ActionDiv>
             );
@@ -324,33 +361,41 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
   }
 
   return (
-    <Box
-      sx={{
-        '& tr:last-child td': {
-          border: 'none',
-        },
-        '& .MuiPaper-root': {
-          padding: '0 40px',
-          backgroundColor: '#fafafa',
-        },
-      }}
-      data-cy="visit-registrations-table"
-    >
-      <MaterialTable
-        title=""
-        icons={tableIcons}
-        columns={columns}
-        data={experiment.visit.registrations}
-        options={{
-          search: false,
-          paging: false,
-          toolbar: false,
-          headerStyle: { backgroundColor: '#fafafa', fontWeight: 'bolder' },
-          pageSize: 20,
-          padding: 'dense',
+    <>
+      <Box
+        sx={{
+          '& tr:last-child td': {
+            border: 'none',
+          },
+          '& .MuiPaper-root': {
+            padding: '0 40px',
+            backgroundColor: '#fafafa',
+          },
         }}
+        data-cy="visit-registrations-table"
+      >
+        <MaterialTable
+          title=""
+          icons={tableIcons}
+          columns={columns}
+          data={experiment.visit.registrations}
+          options={{
+            search: false,
+            paging: false,
+            toolbar: false,
+            headerStyle: { backgroundColor: '#fafafa', fontWeight: 'bolder' },
+            pageSize: 20,
+            padding: 'dense',
+          }}
+        />
+      </Box>
+      <CreateUpdateCancelVisitRegistration
+        registration={selectedVisit}
+        onSubmitted={onVisitRegistrationSubmitted}
+        onClose={() => setSelectedVisit(null)}
+        onCancelled={replaceVisitRegistration}
       />
-    </Box>
+    </>
   );
 }
 
