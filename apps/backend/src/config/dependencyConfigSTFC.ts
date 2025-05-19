@@ -1,4 +1,3 @@
-import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
@@ -54,6 +53,7 @@ import {
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
+import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -116,7 +116,7 @@ mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
-mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 
 mapClass(Tokens.DownloadService, StfcDownloadService);
 
