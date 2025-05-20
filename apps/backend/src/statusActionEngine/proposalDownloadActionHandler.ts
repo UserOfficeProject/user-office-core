@@ -6,11 +6,15 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { FileDataSource } from '../datasources/FileDataSource';
+import { ApplicationEvent } from '../events/applicationEvents';
 import type { ProposalPDFData } from '../factory/pdf/proposal';
 import { FileMetadata } from '../models/Blob';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
 import { WorkflowEngineProposalType } from '../workflowEngine';
-import { statusActionLogger } from './statusActionUtils';
+import {
+  constructProposalStatusChangeEvent,
+  statusActionLogger,
+} from './statusActionUtils';
 
 const FACTORY_ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
@@ -25,6 +29,10 @@ export const proposalDownloadActionHandler = async (
   const fileDataSource = container.resolve<FileDataSource>(
     Tokens.FileDataSource
   );
+
+  const loggingHandler = container.resolve<
+    (event: ApplicationEvent) => Promise<void>
+  >(Tokens.LoggingHandler);
 
   const successMessage = !!options?.statusActionsLogId
     ? 'Proposal successfully downloaded on status action replay'
@@ -116,6 +124,14 @@ export const proposalDownloadActionHandler = async (
         filemetadata: fileMetadata,
       }
     );
+
+    const evt = constructProposalStatusChangeEvent(
+      proposal,
+      options?.loggedInUserId || null,
+      successMessage,
+      undefined
+    );
+    loggingHandler(evt);
 
     await statusLogger(true, successMessage);
   }
