@@ -50,10 +50,6 @@ export abstract class UserAuthorization {
     return agent?.currentRole?.shortCode === Roles.USER;
   }
 
-  isFacilityMember(agent: UserWithRole) {
-    return agent?.currentRole?.shortCode === Roles.FACILITY_MEMBER;
-  }
-
   isApiToken(agent: UserWithRole | null) {
     return agent?.isApiAccessToken;
   }
@@ -139,7 +135,6 @@ export abstract class UserAuthorization {
 
     const isUserOfficer = this.isUserOfficer(agent);
     const isInstrumentScientist = this.isInstrumentScientist(agent);
-    const isFacilityMember = this.isFacilityMember(agent);
     const isFapMember = await this.isMemberOfFap(agent);
     const isApiAccessToken = this.isApiToken(agent);
     const isInternalReviewer = await this.isInternalReviewer(agent);

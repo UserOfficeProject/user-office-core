@@ -91,10 +91,4 @@ export interface ProposalDataSource {
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
-  getUsersProposalsByFacility(
-    userId: number,
-    filter?: ProposalsFilter,
-    first?: number,
-    offset?: number
-  ): Promise<{ totalCount: number; proposals: ProposalView[] }>;
 }

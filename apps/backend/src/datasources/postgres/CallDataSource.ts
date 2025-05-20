@@ -495,33 +495,6 @@ export default class PostgresCallDataSource implements CallDataSource {
     return records.map(createCallObject);
   }
 
-  async getCallsByFacilityMember(userId: number): Promise<Call[]> {
-    return database('call')
-      .distinct(['call.*'])
-      .join(
-        'call_has_instruments',
-        'call_has_instruments.call_id',
-        'call.call_id'
-      )
-      .join(
-        'instruments',
-        'instruments.instrument_id',
-        'call_has_instruments.instrument_id'
-      )
-      .join(
-        'facility_instrument',
-        'facility_instrument.instrument_id',
-        'call_has_instruments.instrument_id'
-      )
-      .join(
-        'facility_user',
-        'facility_user.facility_id',
-        'facility_user.facility_id'
-      )
-      .where('facility_user.user_id', userId)
-      .then((records: CallRecord[]) => records.map(createCallObject));
-  }
-
   public async isCallEnded(callId: number): Promise<boolean>;
   public async isCallEnded(
     callId: number,

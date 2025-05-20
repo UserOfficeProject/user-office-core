@@ -191,10 +191,6 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCalls;
   }
 
-  async getCallsByFacilityMember(userId: number): Promise<Call[]> {
-    throw new Error('Method not implemented.');
-  }
-
   async isCallEnded(callId: number): Promise<boolean> {
     return callId !== 1;
   }

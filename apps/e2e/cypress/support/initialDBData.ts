@@ -244,7 +244,6 @@ export default {
     instrumentScientist: 7,
     experimentSafetyReviewer: 8,
     internalReviewer: 9,
-    facilityMember: 10,
   },
   users: {
     user1: {

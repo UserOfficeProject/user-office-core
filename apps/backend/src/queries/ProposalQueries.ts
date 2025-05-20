@@ -79,11 +79,7 @@ export default class ProposalQueries {
     return this.proposalAuth.hasReadRights(agent, proposal);
   }
 
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.INSTRUMENT_SCIENTIST,
-    Roles.FACILITY_MEMBER,
-  ])
+  @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
   async getAll(
     agent: UserWithRole | null,
     filter?: ProposalsFilter,
@@ -186,21 +182,6 @@ export default class ProposalQueries {
           error
         );
       });
-  }
-
-  @Authorized()
-  async getUsersProposalsByFacility(
-    agent: UserWithRole | null,
-    filter?: ProposalsFilter,
-    first?: number,
-    offset?: number
-  ) {
-    return await this.dataSource.getUsersProposalsByFacility(
-      agent!.id,
-      filter,
-      first,
-      offset
-    );
   }
 
   @Authorized()

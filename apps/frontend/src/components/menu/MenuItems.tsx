@@ -337,26 +337,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     </div>
   );
 
-  const facilityMember = (
-    <div>
-      <ListItemButton component={NavLink} to="/">
-        <ListItemIcon>
-          <FolderOpen />
-        </ListItemIcon>
-        <ListItemText primary="Proposals" />
-      </ListItemButton>
-
-      <Tooltip title="Facility">
-        <ListItemButton component={NavLink} to="/Facility">
-          <ListItemIcon>
-            <Apartment />
-          </ListItemIcon>
-          <ListItemText primary={'Facility'} />
-        </ListItemButton>
-      </Tooltip>
-    </div>
-  );
-
   const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
       {isExperimentSafetyReviewEnabled && (
@@ -386,8 +366,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       return ExperimentSafetyReviewPageReviewer;
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
-    case UserRole.FACILITY_MEMBER:
-      return facilityMember;
     default:
       return null;
   }

@@ -11,14 +11,13 @@ import {
   TokenWrapperDTO,
 } from '../../generated';
 import { Tokens } from '../config/Tokens';
-import { FacilityDataSource } from '../datasources/FacilityDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
 import {
   StfcBasicPersonDetails,
   toStfcBasicPersonDetails,
 } from '../datasources/stfc/StfcUserDataSource';
 import { createUOWSClient } from '../datasources/stfc/UOWSClient';
-import { Facility } from '../models/Facility';
+import { Instrument } from '../models/Instrument';
 import { Rejection, rejection } from '../models/Rejection';
 import { Role, Roles } from '../models/Role';
 import { AuthJwtPayload, User, UserWithRole } from '../models/User';
@@ -28,7 +27,7 @@ import { UserAuthorization } from './UserAuthorization';
 
 const UOWSClient = createUOWSClient();
 
-const stfcInstrumentScientistRolesToFacility: Record<string, string[]> = {
+const stfcInstrumentScientistRolesToInstrument: Record<string, string[]> = {
   'User Officer': ['ISIS', 'HPL', 'LSF'],
   'ISIS Instrument Scientist': ['ISIS'],
   'CLF HPL FAP Secretary': ['HPL'],
@@ -51,108 +50,117 @@ export class StfcUserAuthorization extends UserAuthorization {
     Tokens.InstrumentDataSource
   );
 
-  protected facilityDataSource: FacilityDataSource = container.resolve(
-    Tokens.FacilityDataSource
-  );
-
   protected userDataSource: StfcUserDataSource = container.resolve(
     Tokens.UserDataSource
   ) as StfcUserDataSource;
 
-  getRequiredFacilityForRole(roles: RoleDTO[]) {
+  getRequiredInstrumentForRole(roles: RoleDTO[]) {
     return roles
-      .flatMap((role) => stfcInstrumentScientistRolesToFacility[role.name!])
-      .filter((facilityName) => facilityName);
+      .flatMap((role) => stfcInstrumentScientistRolesToInstrument[role.name!])
+      .filter((instrumentName) => instrumentName);
   }
 
-  async getFacilitiesToAdd(
-    requiredFacilityNames: string[],
-    currentFacilities: Facility[]
+  async getInstrumentsToAdd(
+    requiredInstrumentNames: string[],
+    currentInstruments: Instrument[]
   ) {
-    // Get the names of currently assigned facilities
-    const currentFacilityNames = currentFacilities.map(
-      (facility) => facility.name
+    // Get the names of currently assigned instruments
+    const currentInstrumentNames = currentInstruments.map(
+      (instrument) => instrument.name
     );
 
-    // Get the required facilities names which aren't currently assigned
-    const FacilityNamesToAssign = requiredFacilityNames.filter(
-      (name) => !currentFacilityNames.includes(name)
+    // Get the required instrument names which aren't currently assigned
+    const instrumentNamesToAssign = requiredInstrumentNames.filter(
+      (name) => !currentInstrumentNames.includes(name)
     );
 
-    // We can only assign required facilities if they exist in the DB.
+    // We can only assign required instruments if they exist in the DB.
     // This may not be the case, as User Officers can rename or delete instruments.
     // Here, we check if the instruments we expect are in the DB
     // and log a warning for the ones we didn't find
-    const facilitiesToAssign =
-      await this.facilityDataSource.getFacilitiesByNames(FacilityNamesToAssign);
+    const instrumentsToAssign =
+      await this.instrumentDataSource.getInstrumentsByNames(
+        instrumentNamesToAssign
+      );
 
-    const facilityNamesNotFound = FacilityNamesToAssign.filter(
-      (facilityName) =>
-        !facilitiesToAssign.find(
-          (facilities) => facilities.name === facilityName
+    const instrumentNamesNotFound = instrumentNamesToAssign.filter(
+      (instrumentName) =>
+        !instrumentsToAssign.find(
+          (instrument) => instrument.name === instrumentName
         )
     );
 
-    if (facilityNamesNotFound.length > 0) {
+    if (instrumentNamesNotFound.length > 0) {
       logger.logWarn(
-        'Could not find facilities while auto-assigning STFC instrument scientist',
+        'Could not find instruments while auto-assigning STFC instrument scientist',
         {
-          facilities: facilityNamesNotFound,
+          instruments: instrumentNamesNotFound,
         }
       );
     }
 
-    return facilitiesToAssign.map((facilities) => facilities.id);
+    return instrumentsToAssign.map((instrument) => instrument.id);
   }
 
-  async getFacilitiesToRemove(
-    requiredFacilityNames: string[],
-    currentFacilities: Facility[]
+  async getInstrumentsToRemove(
+    requiredInstrumentNames: string[],
+    currentInstruments: Instrument[]
   ) {
-    return currentFacilities
-      .filter((facility) => !requiredFacilityNames.includes(facility.name))
-      .map((facility) => facility.id);
+    // Remove instrument scientist from any instruments they are assigned to,
+    // but shouldn't be.
+    // We don't need to check if the instruments exist here,
+    // because we fetch the list of currently assigned instruments from the DB
+    return currentInstruments
+      .filter(
+        (instrument) => !requiredInstrumentNames.includes(instrument.name)
+      )
+      .map((instrument) => instrument.id);
   }
 
-  async autoAssignRemoveFacilities(
+  async autoAssignRemoveInstruments(
     userId: number,
-    requiredFacilityNames: string[],
-    currentFacilities: Facility[],
-    removeFacilities: boolean
+    requiredInstrumentNames: string[],
+    currentInstruments: Instrument[],
+    removeInstruments: boolean
   ) {
-    // Assign any facilities which aren't currently assigned
-    const facilitiesToAdd = await this.getFacilitiesToAdd(
-      requiredFacilityNames,
-      currentFacilities
+    // Assign any instruments which aren't currently assigned
+    const instrumentsToAdd = await this.getInstrumentsToAdd(
+      requiredInstrumentNames,
+      currentInstruments
     );
 
-    if (facilitiesToAdd.length > 0) {
-      logger.logInfo('Auto-assigning STFC instrument scientist to facilities', {
-        facilities: facilitiesToAdd,
-      });
+    if (instrumentsToAdd.length > 0) {
+      logger.logInfo(
+        'Auto-assigning STFC instrument scientist to instruments',
+        {
+          instruments: instrumentsToAdd,
+        }
+      );
 
-      facilitiesToAdd.map((facility) =>
-        this.facilityDataSource.addUsersToFacility([userId], facility)
+      this.instrumentDataSource.assignScientistToInstruments(
+        userId,
+        instrumentsToAdd
       );
     }
 
-    if (removeFacilities) {
+    if (removeInstruments) {
       // Remove any instruments which are currently assigned, but not required
-      const facilitiesToRemove = await this.getFacilitiesToRemove(
-        requiredFacilityNames,
-        currentFacilities
+      const instrumentsToRemove = await this.getInstrumentsToRemove(
+        requiredInstrumentNames,
+        currentInstruments
       );
 
-      if (facilitiesToRemove.length > 0) {
+      if (instrumentsToRemove.length > 0) {
         logger.logInfo(
-          'Auto-removing STFC instrument scientist from facilities',
+          'Auto-removing STFC instrument scientist from instruments',
           {
-            facilities: facilitiesToRemove,
+            instruments: instrumentsToRemove,
           }
         );
 
-        facilitiesToRemove.map((facility) =>
-          this.facilityDataSource.removeUserFromFacility(userId, facility)
+        this.instrumentDataSource.removeScientistFromInstruments(
+          userId,
+          instrumentsToRemove
         );
       }
     }
@@ -235,17 +243,17 @@ export class StfcUserAuthorization extends UserAuthorization {
           stfcRoles.findIndex((r) => r.name == role.name) === index
       );
 
-      const requiredFacilities = this.getRequiredFacilityForRole(uniqueRoles);
+      const requiredInstruments =
+        this.getRequiredInstrumentForRole(uniqueRoles);
 
-      const currentUserFacility =
-        await this.facilityDataSource.getUsersFacilities(userNumber);
+      const currentUserInstruments =
+        await this.instrumentDataSource.getUserInstruments(userNumber);
 
       // Don't remove instruments from ISIS Staff and User officers as these will be manually assigned
-
-      this.autoAssignRemoveFacilities(
+      this.autoAssignRemoveInstruments(
         userNumber,
-        requiredFacilities,
-        currentUserFacility,
+        requiredInstruments,
+        currentUserInstruments,
         !uniqueRoles.find(
           (role) =>
             role.name === 'ISIS Instrument Scientist' ||

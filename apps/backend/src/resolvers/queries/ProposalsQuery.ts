@@ -81,9 +81,6 @@ export class ProposalsFilter {
   @Field(() => Int, { nullable: true })
   public instrumentId?: number;
 
-  @Field(() => Int, { nullable: true })
-  public facilityId?: number;
-
   @Field(() => InstrumentFilterInput, { nullable: true })
   public instrumentFilter?: InstrumentFilterInput;
 

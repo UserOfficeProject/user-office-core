@@ -2,7 +2,6 @@ import Grid from '@mui/material/Grid';
 import React from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import FacilityFilter from 'components/common/proposalFilters/FacilityFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
 import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStatusFilter';
 import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilter';
@@ -56,7 +55,6 @@ type ProposalFilterBarProps = {
 const ProposalFilterBar = ({
   calls,
   instruments,
-  facilities,
   proposalStatuses,
   setProposalFilter,
   filter,
@@ -112,21 +110,6 @@ const ProposalFilterBar = ({
             setProposalFilter({
               ...filter,
               proposalStatusId,
-            });
-          }}
-        />
-      </Grid>
-
-      <Grid item sm={4} xs={12}>
-        <FacilityFilter
-          facilityId={filter.facilityId as number}
-          facilities={facilities?.data}
-          isLoading={facilities?.isLoading}
-          shouldShowAll={true}
-          onChange={(facilityId) => {
-            setProposalFilter({
-              ...filter,
-              facilityId,
             });
           }}
         />

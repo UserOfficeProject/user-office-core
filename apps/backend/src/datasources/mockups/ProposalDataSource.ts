@@ -415,10 +415,4 @@ export class ProposalDataSourceMock implements ProposalDataSource {
   ) {
     return { totalCount: 1, proposals: [dummyProposalView] };
   }
-
-  async getUsersProposalsByFacility(
-    userId: number
-  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    throw new Error('Method not implemented.');
-  }
 }

@@ -4,13 +4,20 @@ import { Tokens } from '../../config/Tokens';
 import { Call } from '../../models/Call';
 import { Proposal } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
+import { ReviewerFilter } from '../../models/Review';
+import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
 import { ProposalViewTechnicalReview } from '../../resolvers/types/ProposalView';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { CallDataSource } from '../CallDataSource';
 import PostgresAdminDataSource from '../postgres/AdminDataSource';
 import database from '../postgres/database';
-import { CallRecord, createCallObject } from '../postgres/records';
+import {
+  CallRecord,
+  createCallObject,
+  createProposalViewObject,
+  ProposalViewRecord,
+} from '../postgres/records';
 import PostgresWorkflowDataSource from '../postgres/WorkflowDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
 import PostgresProposalDataSource from './../postgres/ProposalDataSource';
@@ -62,36 +69,146 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       })
     ).map((call) => call.id);
 
-    const proposals = super
-      .getInstrumentScientistProposals(user, filter, first, offset)
-      .then(
-        async (proposals: {
-          proposals: ProposalView[];
-          totalCount: number;
-        }) => {
-          const propsWithUserFilter = stfcUserIds.length
-            ? proposals.proposals.filter((prop) =>
-                stfcUserIds.includes(prop.principalInvestigatorId)
-              )
-            : proposals.proposals;
-
-          const propsWithXpressFilter = techniqueProposalCallIds.length
-            ? propsWithUserFilter.filter(
-                (prop) => !techniqueProposalCallIds.includes(prop.callId)
-              )
-            : propsWithUserFilter;
-
-          const propsWithTechReviewerDetails =
-            await this.getTechReviewersDetails(propsWithXpressFilter);
-
-          return {
-            totalCount: propsWithTechReviewerDetails.length,
-            proposals: propsWithTechReviewerDetails,
-          };
+    const proposals = database
+      .select('proposal_pk')
+      .from('proposal_table_view')
+      .join(
+        'call_has_instruments as chi',
+        'chi.call_id',
+        '=',
+        'proposal_table_view.call_id'
+      )
+      .join('instruments as in', 'in.instrument_id', '=', 'chi.instrument_id')
+      .leftJoin(
+        'instrument_has_scientists as ihs',
+        'ihs.instrument_id',
+        '=',
+        'chi.instrument_id'
+      )
+      .where(function () {
+        if (techniqueProposalCallIds) {
+          this.where(
+            'proposal_table_view.call_id',
+            'not in',
+            techniqueProposalCallIds
+          );
         }
-      );
 
-    return proposals;
+        if (user.currentRole?.shortCode === Roles.INTERNAL_REVIEWER) {
+          // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains internalReviewers array of objects with id equal to user.id
+          this.whereRaw(
+            'jsonb_path_exists(technical_reviews, \'$[*].internalReviewers[*].id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
+        } else {
+          this.where('ihs.user_id', user.id).orWhere(
+            'in.manager_user_id',
+            user.id
+          );
+        }
+      });
+    const result = database
+      .select(['*', database.raw('count(*) OVER() AS full_count')])
+      .from('proposal_table_view')
+      .join(
+        'users',
+        'users.user_id',
+        '=',
+        'proposal_table_view.principal_investigator'
+      )
+      .whereIn('proposal_pk', proposals)
+      .orderBy('proposal_pk', 'desc')
+      .modify((query) => {
+        if (filter?.text) {
+          query.where(function () {
+            this.where('title', 'ilike', `%${filter.text}%`)
+              .orWhere('proposal_id', 'ilike', `%${filter.text}%`)
+              .orWhere('proposal_status_name', 'ilike', `%${filter.text}%`)
+              .orWhere('users.email', 'ilike', `%${filter.text}%`)
+              .orWhere('users.firstname', 'ilike', `%${filter.text}%`)
+              .orWhere('users.lastname', 'ilike', `%${filter.text}%`)
+              .orWhere('principal_investigator', 'in', stfcUserIds)
+              // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with name equal to searchText case insensitive
+              .orWhereRaw(
+                'jsonb_path_exists(instruments, \'$[*].name \\? (@.type() == "string" && @ like_regex :searchText: flag "i")\')',
+                { searchText: filter.text }
+              );
+          });
+        }
+        if (filter?.reviewer === ReviewerFilter.ME) {
+          // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
+          query.whereRaw(
+            'jsonb_path_exists(technical_reviews, \'$[*].technicalReviewAssignee.id \\? (@.type() == "number" && @ == :userId:)\')',
+            { userId: user.id }
+          );
+        }
+        if (filter?.callId) {
+          query.where('call_id', filter.callId);
+        }
+        if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
+          query.whereRaw('jsonb_array_length(instruments) > 1');
+        } else if (filter?.instrumentFilter?.instrumentId) {
+          // NOTE: Using jsonpath we check the jsonb (instruments) field if it contains object with id equal to filter.instrumentId
+          query.whereRaw(
+            'jsonb_path_exists(instruments, \'$[*].id \\? (@.type() == "number" && @ == :instrumentId:)\')',
+            { instrumentId: filter?.instrumentFilter?.instrumentId }
+          );
+        }
+
+        if (filter?.proposalStatusId) {
+          query.where('proposal_status_id', filter?.proposalStatusId);
+        }
+
+        if (filter?.excludeProposalStatusIds) {
+          query.where(
+            'proposal_status_id',
+            'not in',
+            filter?.excludeProposalStatusIds
+          );
+        }
+
+        if (filter?.shortCodes) {
+          const filteredAndPreparedShortCodes = filter?.shortCodes
+            .filter((shortCode) => shortCode)
+            .join('|');
+
+          query.whereRaw(
+            `proposal_id similar to '%(${filteredAndPreparedShortCodes})%'`
+          );
+        }
+
+        if (filter?.questionFilter) {
+          const questionFilter = filter.questionFilter;
+
+          this.addQuestionFilter(query, questionFilter);
+        }
+
+        if (filter?.referenceNumbers) {
+          query.whereIn('proposal_id', filter.referenceNumbers);
+        }
+
+        if (first) {
+          query.limit(first);
+        }
+        if (offset) {
+          query.offset(offset);
+        }
+      })
+      .then(async (proposals: ProposalViewRecord[]) => {
+        const props = proposals.map((proposal) =>
+          createProposalViewObject(proposal)
+        );
+
+        const propsWithTechReviewerDetails =
+          await this.getTechReviewersDetails(props);
+
+        return {
+          totalCount: proposals[0] ? proposals[0].full_count : 0,
+          proposals: propsWithTechReviewerDetails,
+        };
+      });
+
+    return result;
   }
 
   async getProposalsFromView(
@@ -166,29 +283,6 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
       sortDirection,
       searchText
     );
-  }
-
-  async getUsersProposalsByFacility(
-    userId: number,
-    filter?: ProposalsFilter,
-    first?: number,
-    offset?: number
-  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    const proposals = await super.getUsersProposalsByFacility(
-      userId,
-      filter,
-      first,
-      offset
-    );
-
-    const propsWithTechReviewerDetails = await this.getTechReviewersDetails(
-      proposals.proposals
-    );
-
-    return {
-      proposals: propsWithTechReviewerDetails,
-      totalCount: proposals.totalCount,
-    };
   }
 
   async getTechReviewersDetails(proposals: ProposalView[]) {

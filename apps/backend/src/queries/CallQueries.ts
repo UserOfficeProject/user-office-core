@@ -53,15 +53,6 @@ export default class CallQueries {
     return this.dataSource.getCallsByInstrumentScientist(scientistId);
   }
 
-  @Authorized([Roles.USER_OFFICER, Roles.FACILITY_MEMBER])
-  async getCallsByFacilityMember(agent: UserWithRole | null, userId: number) {
-    if (!this.userAuth.isUserOfficer(agent) && agent?.id !== userId) {
-      return null;
-    }
-
-    return this.dataSource.getCallsByFacilityMember(userId);
-  }
-
   @Authorized()
   async getCallOfAnswersProposal(user: UserWithRole | null, answerId: number) {
     return this.dataSource.getCallByAnswerIdProposal(answerId);
