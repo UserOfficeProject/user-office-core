@@ -9,7 +9,12 @@ const EmailStatusActionsLogsPage = () => {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        <StatusActionsLogsTable statusActionType={StatusActionType.EMAIL} />
+        <StatusActionsLogsTable
+          statusActionTypes={[
+            StatusActionType.EMAIL,
+            StatusActionType.RABBITMQ,
+          ]}
+        />
       </StyledPaper>
     </StyledContainer>
   );

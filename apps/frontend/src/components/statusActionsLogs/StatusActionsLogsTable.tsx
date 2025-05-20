@@ -30,14 +30,16 @@ import StatusActionsStatusFilter, {
 
 interface StatusActionsLogsTableProps {
   confirm: WithConfirmType;
-  statusActionType: StatusActionType;
+  statusActionTypes: StatusActionType[];
 }
 
 const StatusActionsLogsTable = ({
   confirm,
-  statusActionType: propStatusActionType,
+  statusActionTypes: propStatusActionTypes,
 }: StatusActionsLogsTableProps) => {
-  const [statusActionType] = useState<StatusActionType>(propStatusActionType);
+  const [statusActionTypes] = useState<StatusActionType[]>(
+    propStatusActionTypes
+  );
   const { toFormattedDateTime } = useFormattedDateTime();
   const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>();
   const { api } = useDataApiWithFeedback();
@@ -60,7 +62,7 @@ const StatusActionsLogsTable = ({
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
   let columns: Column<StatusActionsLog>[] = [
-    ...(statusActionType === StatusActionType.EMAIL
+    ...(statusActionTypes.includes(StatusActionType.EMAIL)
       ? [
           {
             title: 'Email Status Action Recipient',
@@ -146,7 +148,7 @@ const StatusActionsLogsTable = ({
       try {
         const [orderBy] = tableQuery.orderByCollection;
         let filter: StatusActionsLogsFilter = {
-          statusActionType: statusActionType,
+          statusActionTypes: statusActionTypes,
         };
 
         if (
@@ -237,13 +239,12 @@ const StatusActionsLogsTable = ({
           title={
             <Typography variant="h6" component="h2">
               {(() => {
-                switch (statusActionType) {
-                  case StatusActionType.EMAIL:
-                    return 'Email Status Actions Logs';
-                  case StatusActionType.PROPOSALDOWNLOAD:
-                    return 'Proposal Download Status Actions Logs';
-                  default:
-                    return 'Status Actions Logs';
+                if (
+                  statusActionTypes.includes(StatusActionType.PROPOSALDOWNLOAD)
+                ) {
+                  return 'Proposal Download Status Actions Logs';
+                } else {
+                  return 'Email & RabbitMQ Status Action Logs';
                 }
               })()}
             </Typography>
@@ -307,14 +308,7 @@ const StatusActionsLogsTable = ({
                       title: 'Are you sure?',
                       description: `You are about to send a status action replay request.`,
                       alertText: (() => {
-                        if (statusActionsLog.statusActionsSuccessful) {
-                          switch (statusActionType) {
-                            case StatusActionType.EMAIL:
-                              return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
-                            default:
-                              return 'This status action was already successful. Replaying it may lead to unexpected behavior or redundant processes.';
-                          }
-                        }
+                        return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
                       })(),
                       confirmationText: 'Replay',
                       shouldEnableOKWithAlert: true,

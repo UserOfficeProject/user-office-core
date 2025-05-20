@@ -10,7 +10,7 @@ const ProposalDownloadStatusActionsLogsPage = () => {
     <StyledContainer maxWidth={false}>
       <StyledPaper>
         <StatusActionsLogsTable
-          statusActionType={StatusActionType.PROPOSALDOWNLOAD}
+          statusActionTypes={[StatusActionType.PROPOSALDOWNLOAD]}
         />
       </StyledPaper>
     </StyledContainer>

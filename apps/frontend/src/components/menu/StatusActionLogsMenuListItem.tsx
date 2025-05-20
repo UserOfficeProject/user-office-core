@@ -50,7 +50,7 @@ export function StatusActionLogsMenuListItem() {
             <ListItemIcon>
               <PictureAsPdfIcon />
             </ListItemIcon>
-            <ListItemText primary="Email" />
+            <ListItemText primary="Email & RabbitMQ" />
           </ListItemButton>
         </Tooltip>
 
