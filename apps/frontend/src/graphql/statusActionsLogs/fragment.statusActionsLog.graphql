@@ -8,5 +8,9 @@ fragment statusActionsLog on StatusActionsLog {
         proposalId
         primaryKey
     }
-    
+    connectionStatusAction {
+      action {
+        name
+      }
+    }
 }

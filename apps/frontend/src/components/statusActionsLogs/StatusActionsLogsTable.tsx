@@ -308,7 +308,15 @@ const StatusActionsLogsTable = ({
                       title: 'Are you sure?',
                       description: `You are about to send a status action replay request.`,
                       alertText: (() => {
-                        return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
+                        if (
+                          statusActionsLog?.connectionStatusAction?.action.name
+                            .toLowerCase()
+                            .includes('email')
+                        ) {
+                          return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
+                        } else {
+                          return 'This status action was already successful. Replaying it might lead to unexpected behavior or redundant processes.';
+                        }
                       })(),
                       confirmationText: 'Replay',
                       shouldEnableOKWithAlert: true,
