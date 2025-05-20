@@ -1,7 +1,7 @@
-import DescriptionIcon from '@mui/icons-material/Description';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import MailIcon from '@mui/icons-material/Mail';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
@@ -33,7 +33,7 @@ export function StatusActionLogsMenuListItem() {
       <Tooltip title="Status Action Logs">
         <ListItemButton onClick={toggleExpand}>
           <ListItemIcon>
-            <LibraryBooksIcon />
+            <EventNoteIcon />
             {isExpanded ? (
               <ExpandLess fontSize="small" />
             ) : (
@@ -48,7 +48,7 @@ export function StatusActionLogsMenuListItem() {
         <Tooltip title="Email">
           <ListItemButton component={NavLink} to={menuMap['email']}>
             <ListItemIcon>
-              <PictureAsPdfIcon />
+              <MailIcon />
             </ListItemIcon>
             <ListItemText primary="Email & RabbitMQ" />
           </ListItemButton>
@@ -57,7 +57,7 @@ export function StatusActionLogsMenuListItem() {
         <Tooltip title="Proposal download">
           <ListItemButton component={NavLink} to={menuMap['proposalDownload']}>
             <ListItemIcon>
-              <DescriptionIcon />
+              <PictureAsPdfIcon />
             </ListItemIcon>
             <ListItemText primary="Proposal download" />
           </ListItemButton>
