@@ -1,5 +1,12 @@
 import { Invite } from '../models/Invite';
 
+export interface GetInvitesFilter {
+  createdBefore?: Date;
+  createdAfter?: Date;
+  isClaimed?: boolean;
+  isExpired?: boolean;
+}
+
 export interface InviteDataSource {
   create(args: {
     createdByUserId: number;
@@ -14,6 +21,7 @@ export interface InviteDataSource {
     proposalPk: number,
     isClaimed?: boolean
   ): Promise<Invite[]>;
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
 
   update(args: {
     id: number;
