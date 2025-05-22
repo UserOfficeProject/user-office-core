@@ -347,11 +347,16 @@ export async function createPostToRabbitMQHandler() {
       }
       case Event.VISIT_REGISTRATION_APPROVED: {
         const { visitregistration: visitRegistration } = event;
+        const proposal = await proposalDataSource.getProposalByVisitId(
+          visitRegistration.visitId
+        );
+        const proposalPayload = await getProposalMessageData(proposal);
         const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
           startAt: visitRegistration.startsAt,
           endAt: visitRegistration.endsAt,
           visitorId: user!.oidcSub,
+          proposal: JSON.parse(proposalPayload),
         });
 
         await rabbitMQ.sendMessageToExchange(
