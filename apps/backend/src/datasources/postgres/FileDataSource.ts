@@ -67,24 +67,31 @@ export default class PostgresFileDataSource implements FileDataSource {
   public async put(
     fileName: string,
     mimeType: string,
-    sizeInBytes: number,
+    sizeInBytes: number | undefined,
     readableStream: NodeJS.ReadableStream,
     internalUse?: boolean
   ): Promise<FileMetadata>;
   public async put(
     fileName: string,
     mimeType: string,
-    sizeInBytes: number,
+    sizeInBytes: number | undefined,
     source: string | NodeJS.ReadableStream,
     internalUse?: boolean
   ): Promise<FileMetadata> {
     let oid: number;
 
     if (typeof source === 'string') {
+      if (typeof sizeInBytes !== 'number') {
+        throw new GraphQLError(
+          'sizeInBytes must be provided when putting from a file path.'
+        );
+      }
       oid = await this.storeBlob(source);
       fs.unlinkSync(source);
     } else {
-      oid = await this.storeBlobFromStream(source);
+      const result = await this.storeBlobFromStream(source);
+      oid = result.oid;
+      sizeInBytes = result.sizeInBytes;
     }
 
     const resultSet: FileRecord[] = await database
@@ -157,7 +164,7 @@ export default class PostgresFileDataSource implements FileDataSource {
 
   private async storeBlobFromStream(
     readableStream: NodeJS.ReadableStream
-  ): Promise<number> {
+  ): Promise<{ oid: number; sizeInBytes: number }> {
     const [err, connection] = await to<Client, Error>(
       database.client.acquireConnection()
     );
@@ -169,7 +176,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       throw new Error('Could not obtain database connection.');
     }
 
-    return new Promise<number>(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const [transactionError] = await to(connection.query('BEGIN'));
       if (transactionError) {
         database.client.releaseConnection(connection);
@@ -192,11 +199,12 @@ export default class PostgresFileDataSource implements FileDataSource {
       }
 
       const [oid, stream] = response;
+      let sizeInBytes = 0;
 
       stream.on('finish', () => {
         connection.query('COMMIT', () => {
           database.client.releaseConnection(connection);
-          resolve(oid);
+          resolve({ oid, sizeInBytes });
         });
       });
 
@@ -207,8 +215,6 @@ export default class PostgresFileDataSource implements FileDataSource {
         });
       });
 
-      readableStream.pipe(stream);
-
       readableStream.on('error', (readError) => {
         stream.destroy(readError);
         connection.query('ROLLBACK', () => {
@@ -216,6 +222,21 @@ export default class PostgresFileDataSource implements FileDataSource {
           reject(`Error reading from response stream: ${readError}`);
         });
       });
+
+      /*
+       Override the stream's write method to track bytes
+       written without consuming the stream twice.
+      */
+      const originalWrite = stream.write.bind(stream);
+      stream.write = (chunk: any, encoding?: any, callback?: any): boolean => {
+        sizeInBytes += Buffer.isBuffer(chunk)
+          ? chunk.length
+          : Buffer.byteLength(chunk, encoding);
+
+        return originalWrite(chunk, encoding, callback);
+      };
+
+      readableStream.pipe(stream);
     });
   }
 

@@ -175,11 +175,12 @@ async function fetchAndStorePdfFromFactory<TData>(
 
     const filename = `${primaryKey}.pdf`;
 
-    return await storeFileWithSize(
-      fileDataSource,
+    return await fileDataSource.put(
       filename,
       contentType,
-      readableStream
+      undefined,
+      readableStream as NodeJS.ReadableStream,
+      true
     );
   } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error(String(error));
@@ -191,37 +192,5 @@ async function fetchAndStorePdfFromFactory<TData>(
     });
 
     throw err;
-  }
-
-  async function storeFileWithSize(
-    fileDataSource: FileDataSource,
-    filename: string,
-    contentType: string,
-    readableStream: Readable
-  ): Promise<FileMetadata> {
-    let contentLength = 0;
-
-    readableStream.on('data', (chunk: Buffer) => {
-      contentLength += chunk.length;
-    });
-
-    return new Promise((resolve, reject) => {
-      readableStream.on('end', async () => {
-        try {
-          const metadata = await fileDataSource.put(
-            filename,
-            contentType,
-            contentLength,
-            readableStream,
-            true
-          );
-          resolve(metadata);
-        } catch (error) {
-          reject(error);
-        }
-      });
-
-      readableStream.on('error', reject);
-    });
   }
 }

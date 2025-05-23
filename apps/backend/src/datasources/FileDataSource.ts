@@ -22,7 +22,7 @@ export interface FileDataSource {
   put(
     fileName: string,
     mimeType: string,
-    sizeInBytes: number,
+    sizeInBytes: number | undefined,
     readStream: NodeJS.ReadableStream,
     internalUse?: boolean
   ): Promise<FileMetadata>;
