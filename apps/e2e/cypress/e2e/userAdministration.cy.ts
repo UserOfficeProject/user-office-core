@@ -11,7 +11,6 @@ context('User administration tests', () => {
   const newPrefferedName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.number('0##########');
-  const newTelephoneAlt = faker.phone.number('0##########');
   const newInstitution = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
   const title = faker.lorem.words(2);
@@ -44,8 +43,6 @@ context('User administration tests', () => {
     cy.get("[name='department']").clear().type(newDepartment);
 
     cy.get("[name='telephone']").clear().type(newTelephone);
-
-    cy.get("[name='telephone_alt']").clear().type(newTelephoneAlt);
 
     cy.get("[name='otherInstitution']").clear().type(newInstitution);
 
