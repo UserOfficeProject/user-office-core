@@ -50,16 +50,16 @@ export function StatusActionLogsMenuListItem() {
             <ListItemIcon>
               <MailIcon />
             </ListItemIcon>
-            <ListItemText primary="Email & RabbitMQ" />
+            <ListItemText primary="Email" />
           </ListItemButton>
         </Tooltip>
 
-        <Tooltip title="Proposal download">
+        <Tooltip title="Proposal Download">
           <ListItemButton component={NavLink} to={menuMap['proposalDownload']}>
             <ListItemIcon>
               <PictureAsPdfIcon />
             </ListItemIcon>
-            <ListItemText primary="Proposal download" />
+            <ListItemText primary="Proposal Download" />
           </ListItemButton>
         </Tooltip>
       </Collapse>

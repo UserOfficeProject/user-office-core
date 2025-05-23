@@ -131,12 +131,12 @@ export default class PostgresStatusActionsLogsDataSource
         if (args.filter?.statusActionIds) {
           query.whereIn('sal.action_id', args.filter.statusActionIds);
         }
-        if (args.filter?.statusActionTypes) {
+        if (args.filter?.statusActionType) {
           query
             .join('status_actions as sa', {
               'sa.status_action_id': 'sal.action_id',
             })
-            .whereIn('sa.type', args.filter.statusActionTypes);
+            .where('sa.type', args.filter.statusActionType);
         }
         if (args.filter?.statusActionsMessage) {
           query.where(

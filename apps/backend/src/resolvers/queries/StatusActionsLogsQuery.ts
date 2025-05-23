@@ -29,8 +29,8 @@ export class StatusActionsLogsFilter {
   @Field(() => [Int], { nullable: true })
   public statusActionIds?: number[];
 
-  @Field(() => [StatusActionType], { nullable: true })
-  public statusActionTypes?: StatusActionType[];
+  @Field(() => StatusActionType, { nullable: true })
+  public statusActionType?: StatusActionType;
 
   @Field(() => [Int], { nullable: true })
   public connectionIds?: number[];

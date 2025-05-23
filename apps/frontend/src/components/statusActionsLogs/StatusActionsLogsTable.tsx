@@ -30,16 +30,14 @@ import StatusActionsStatusFilter, {
 
 interface StatusActionsLogsTableProps {
   confirm: WithConfirmType;
-  statusActionTypes: StatusActionType[];
+  statusActionType: StatusActionType;
 }
 
 const StatusActionsLogsTable = ({
   confirm,
-  statusActionTypes: propStatusActionTypes,
+  statusActionType: propStatusActionType,
 }: StatusActionsLogsTableProps) => {
-  const [statusActionTypes] = useState<StatusActionType[]>(
-    propStatusActionTypes
-  );
+  const [statusActionType] = useState<StatusActionType>(propStatusActionType);
   const { toFormattedDateTime } = useFormattedDateTime();
   const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>();
   const { api } = useDataApiWithFeedback();
@@ -62,7 +60,7 @@ const StatusActionsLogsTable = ({
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
   let columns: Column<StatusActionsLog>[] = [
-    ...(statusActionTypes.includes(StatusActionType.EMAIL)
+    ...(statusActionType === StatusActionType.EMAIL
       ? [
           {
             title: 'Email Status Action Recipient',
@@ -148,7 +146,7 @@ const StatusActionsLogsTable = ({
       try {
         const [orderBy] = tableQuery.orderByCollection;
         let filter: StatusActionsLogsFilter = {
-          statusActionTypes: statusActionTypes,
+          statusActionType: statusActionType,
         };
 
         if (
@@ -239,12 +237,12 @@ const StatusActionsLogsTable = ({
           title={
             <Typography variant="h6" component="h2">
               {(() => {
-                if (
-                  statusActionTypes.includes(StatusActionType.PROPOSALDOWNLOAD)
-                ) {
+                if (statusActionType === StatusActionType.PROPOSALDOWNLOAD) {
                   return 'Proposal Download Status Actions Logs';
+                } else if (statusActionType === StatusActionType.EMAIL) {
+                  return 'Email Status Actions Logs';
                 } else {
-                  return 'Email & RabbitMQ Status Action Logs';
+                  return 'Status Action Logs';
                 }
               })()}
             </Typography>
@@ -315,7 +313,7 @@ const StatusActionsLogsTable = ({
                         ) {
                           return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
                         } else {
-                          return 'This status action was already successful. Replaying it might lead to unexpected behavior or redundant processes.';
+                          return 'This status action was already successful. Replaying it might lead to unexpected behaviour or redundant processes.';
                         }
                       })(),
                       confirmationText: 'Replay',
