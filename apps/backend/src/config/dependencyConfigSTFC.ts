@@ -1,4 +1,3 @@
-import { setLogger, ConsoleLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
@@ -37,6 +36,7 @@ import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
 import StfcTechniqueDataSource from '../datasources/stfc/StfcTechniqueDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
 import { stfcEmailHandler } from '../eventHandlers/email/stfcEmailHandler';
+import createLoggingHandler from '../eventHandlers/logging';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
   createPostToRabbitMQHandler,
@@ -53,6 +53,7 @@ import {
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
 import { configureSTFCEnvironment } from './stfc/configureSTFCEnvironment';
+import { configureSTFCWinstonLogger } from './stfc/configureSTFCWinstonLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -110,11 +111,12 @@ mapValue(Tokens.PopulateCallRow, callFapStfcPopulateRow);
 mapValue(Tokens.EmailEventHandler, stfcEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+mapValue(Tokens.LoggingHandler, createLoggingHandler());
 mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
-mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
+mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 
 mapClass(Tokens.DownloadService, StfcDownloadService);
 

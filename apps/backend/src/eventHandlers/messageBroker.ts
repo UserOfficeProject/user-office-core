@@ -14,6 +14,8 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { VisitDataSource } from '../datasources/VisitDataSource';
+import { resolveApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { EventHandler } from '../events/eventBus';
@@ -22,7 +24,13 @@ import { Country } from '../models/Country';
 import { Experiment } from '../models/Experiment';
 import { Institution } from '../models/Institution';
 import { Proposal } from '../models/Proposal';
+import { Visit } from '../models/Visit';
+import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
+
+export const QUEUE_NAME =
+  (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
+  'user_office_backend.queue';
 
 export const EXCHANGE_NAME =
   process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
@@ -83,13 +91,6 @@ const createRabbitMQMessageBroker = async () => {
     );
   }
 };
-
-export function createPostToQueueHandler() {
-  // return the mapped implementation
-  return container.resolve<EventHandler<ApplicationEvent>>(
-    Tokens.PostToMessageQueue
-  );
-}
 
 export function createListenToQueueHandler() {
   // return the mapped implementation
@@ -382,29 +383,18 @@ export async function createPostToRabbitMQHandler() {
 }
 
 export async function createListenToRabbitMQHandler() {
-  const EVENT_SCHEDULING_QUEUE_NAME = process.env
-    .RABBITMQ_SCHEDULER_EXCHANGE_NAME as Queue;
-  const SCHEDULER_EXCHANGE_NAME = process.env.RABBITMQ_SCHEDULER_EXCHANGE_NAME;
-
-  if (!SCHEDULER_EXCHANGE_NAME) {
-    throw new Error(
-      'RABBITMQ_SCHEDULER_EXCHANGE_NAME environment variable not set'
-    );
-  }
-
-  if (!EVENT_SCHEDULING_QUEUE_NAME) {
-    throw new Error('RABBITMQ_SCHEDULER_EXCHANGE_NAME env variable not set');
+  if (!QUEUE_NAME || !EXCHANGE_NAME) {
+    throw new Error('RabbitMQ environment variables not set');
   }
 
   const rabbitMQ = await getRabbitMQMessageBroker();
 
-  rabbitMQ.addQueueToExchangeBinding(
-    EVENT_SCHEDULING_QUEUE_NAME,
-    SCHEDULER_EXCHANGE_NAME
-  );
-
   const experimentDataSource = container.resolve<ExperimentDataSource>(
     Tokens.ExperimentDataSource
+  );
+
+  const visitDataSource = container.resolve<VisitDataSource>(
+    Tokens.VisitDataSource
   );
 
   const handleWorkflowEngineChange = async (
@@ -420,17 +410,40 @@ export async function createListenToRabbitMQHandler() {
     ]);
   };
 
-  rabbitMQ.listenOn(EVENT_SCHEDULING_QUEUE_NAME, async (type, message) => {
+  const cancelVisit = async (visit: Visit) => {
+    const visitRegistrations = await visitDataSource.getRegistrations({
+      visitId: visit.id,
+    });
+
+    const eventBus = resolveApplicationEventBus();
+
+    for (const registration of visitRegistrations) {
+      const oldStatus = registration.status;
+      await visitDataSource.updateRegistration({
+        visitId: registration.visitId,
+        userId: registration.userId,
+        status: VisitRegistrationStatus.CANCELLED_BY_FACILITY,
+      });
+
+      if (oldStatus === VisitRegistrationStatus.APPROVED) {
+        await eventBus.publish({
+          type: Event.VISIT_REGISTRATION_CANCELLED,
+          visitregistration: registration,
+          key: 'visitregistration',
+          loggedInUserId: null,
+          isRejection: false,
+        });
+      }
+    }
+  };
+  rabbitMQ.listenOn(QUEUE_NAME, async (type, message) => {
     switch (type) {
       case Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED:
         try {
-          logger.logDebug(
-            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
-            {
-              type,
-              message,
-            }
-          );
+          logger.logDebug(`Listener on ${QUEUE_NAME}: Received event`, {
+            type,
+            message,
+          });
 
           const experimentToAdd = {
             startsAt: message.startsAt,
@@ -455,18 +468,25 @@ export async function createListenToRabbitMQHandler() {
         return;
       case Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED:
         try {
-          logger.logDebug(
-            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
-            {
-              type,
-              message,
-            }
-          );
+          logger.logDebug(`Listener on ${QUEUE_NAME}: Received event`, {
+            type,
+            message,
+          });
 
           const scheduledEvents = message.scheduledevents as {
             id: number;
             proposalPk: number;
           }[];
+
+          for (const scheduledEvent of scheduledEvents) {
+            const visit = await visitDataSource.getVisitByExperimentPk(
+              scheduledEvent.id
+            );
+            if (visit) {
+              await cancelVisit(visit);
+            }
+          }
+
           scheduledEvents.forEach(async (scheduledEvent) => {
             await experimentDataSource.deleteByScheduledEventId(
               scheduledEvent.id
@@ -485,13 +505,10 @@ export async function createListenToRabbitMQHandler() {
       case Event.PROPOSAL_BOOKING_TIME_UPDATED:
       case Event.PROPOSAL_BOOKING_TIME_REOPENED:
         try {
-          logger.logDebug(
-            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
-            {
-              type,
-              message,
-            }
-          );
+          logger.logDebug(`Listener on ${QUEUE_NAME}: Received event`, {
+            type,
+            message,
+          });
 
           await experimentDataSource.updateByScheduledEventId({
             startsAt: message.startsAt,

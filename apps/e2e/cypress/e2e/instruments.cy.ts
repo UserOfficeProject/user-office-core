@@ -177,6 +177,7 @@ context('Instrument tests', () => {
 
   describe('Advanced instruments tests as user officer role', () => {
     let createdInstrumentId: number;
+    let createdInstrument2Id: number;
     let createdProposalPk: number;
 
     beforeEach(() => {
@@ -538,6 +539,141 @@ context('Instrument tests', () => {
       // TODO: Extend here when technical reviewer is added to the table.
     });
 
+    it('User Officer should be able to bulk reassign Technical reviews', () => {
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: [createdProposalPk],
+        userId: scientist2.id,
+        instrumentId: createdInstrumentId,
+      });
+      cy.createInstrument(instrument2).then((result) => {
+        if (result.createInstrument) {
+          createdInstrument2Id = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createdInstrument2Id }],
+          });
+
+          cy.assignScientistsToInstrument({
+            instrumentId: createdInstrument2Id,
+            scientistIds: [scientist2.id],
+          });
+        }
+      });
+
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          const createdProposal2Pk = result.createProposal.primaryKey;
+          cy.wrap(result.createProposal.proposalId).as('createdProposal2Id');
+
+          cy.updateProposal({
+            proposalPk: createdProposal2Pk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposal2Pk],
+            instrumentIds: [createdInstrumentId, createdInstrument2Id],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Pk],
+            userId: scientist2.id,
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrumentId,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview1Id')
+          );
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrument2Id,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview2Id')
+          );
+        }
+      });
+      cy.visit('/');
+
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(proposal2.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="bulk-reassign-reviews"]').click();
+
+      cy.get('@createdProposal2Id').then((proposalId) => {
+        cy.get('[data-cy="multi-instrument-alert"]').contains(`${proposalId}`);
+      });
+
+      // The expand button does not allow for data cy tags
+      cy.get('[data-cy="bulk-reassign-modal"]')
+        .contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="bulk-reassign-modal"]')
+        .contains(instrument2.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
+      cy.get('@technicalReview1Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('exist');
+      });
+
+      cy.get('@technicalReview2Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).click();
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('not.exist');
+      });
+
+      cy.get('[data-cy="bulk-reassign-modal"]').should(
+        'not.contain',
+        instrument2.name
+      );
+      cy.get(`[data-cy="user-list-${createdInstrumentId}"]`).click();
+
+      cy.get('#user-list-1-option-0').click();
+
+      cy.get('[data-cy="bulk-update"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal2.title);
+      cy.should('not.contain', proposal1.title);
+    });
+
     it('User Officer should be able to remove assigned scientist from instrument', () => {
       cy.assignScientistsToInstrument({
         instrumentId: createdInstrumentId,
@@ -677,6 +813,198 @@ context('Instrument tests', () => {
         proposal1.title
       );
       cy.contains(proposal2.title);
+    });
+
+    it('Officer should be able to update all un-assigned technical reviews to new contact', () => {
+      cy.assignScientistsToInstrument({
+        instrumentId: createdInstrumentId,
+        scientistIds: [scientist2.id],
+      });
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.login('user2');
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: createdProposalPk,
+        userId: scientist1.id,
+        instrumentId: createdInstrumentId,
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: createdProposalPk,
+        reviewerId: scientist2.id,
+        submitted: false,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: 1,
+        instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
+
+      let updatedContact = `${scientist2.firstName} ${scientist2.lastName} (${scientist2.email})`;
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      }
+
+      cy.login('officer', initialDBData.roles.userOfficer);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains('Proposals');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.get('[data-cy="reviewed-by-info"]').contains(
+        `${scientist1.firstName} ${scientist1.lastName}`
+      );
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'not.exist'
+      );
+
+      cy.visit(`/Instruments`);
+
+      cy.get('[aria-label="Edit"]').eq(0).click();
+
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]')
+          .type(scientist2.lastName)
+          .get('[data-cy=findUser]')
+          .click();
+        cy.finishedLoading();
+      }
+
+      cy.get('[aria-label="Open"]').first().click();
+      cy.contains(updatedContact).click();
+      cy.finishedLoading();
+      cy.contains('Update all un-assigned technical reviews').should(
+        'be.visible'
+      );
+      cy.get('[type="checkbox"]').check();
+      cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="confirmation-dialog"]').should('be.visible');
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'be.visible'
+      );
+    });
+
+    it('Officer should only be able to update area contact for proposals with un-submitted technical reviews', () => {
+      cy.assignScientistsToInstrument({
+        instrumentId: createdInstrumentId,
+        scientistIds: [scientist2.id],
+      });
+      cy.assignProposalsToInstruments({
+        proposalPks: [createdProposalPk],
+        instrumentIds: [createdInstrumentId],
+      });
+
+      cy.login('user2');
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: createdProposalPk,
+        userId: scientist1.id,
+        instrumentId: createdInstrumentId,
+      });
+      cy.addProposalTechnicalReview({
+        proposalPk: createdProposalPk,
+        reviewerId: scientist2.id,
+        submitted: true,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: 1,
+        instrumentId: createdInstrumentId,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
+      let updatedContact = `${scientist2.firstName} ${scientist2.lastName} (${scientist2.email})`;
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        updatedContact = `${scientist2.firstName.slice(0, 3)} ${scientist2.lastName} (${scientist2.email})`;
+      }
+      cy.login('officer', initialDBData.roles.userOfficer);
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains('Proposals');
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'not.exist'
+      );
+
+      cy.visit(`/Instruments`);
+
+      cy.get('[aria-label="Edit"]').eq(0).click();
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_SEARCH_FILTER)) {
+        cy.get('[data-cy=instrument-contact-surname]').type(
+          scientist2.lastName
+        );
+        cy.get('[data-cy=findUser]').click();
+        cy.finishedLoading();
+      }
+
+      cy.get('[aria-label="Open"]').first().click();
+      cy.contains(updatedContact).click();
+      cy.finishedLoading();
+      cy.contains('Update all un-assigned technical reviews').should(
+        'be.visible'
+      );
+      cy.get('[type="checkbox"]').check();
+      cy.get('[data-cy="submit"]').click();
+      cy.get('[data-cy="confirmation-dialog"]').should('be.visible');
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.get('[aria-label="Detail panel visibility toggle"]').eq(0).click();
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'be.visible'
+      );
+
+      cy.visit('/');
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(`${scientist2.firstName} ${scientist2.lastName}`).should(
+        'not.exist'
+      );
     });
   });
 
@@ -1214,6 +1542,119 @@ context('Instrument tests', () => {
         .parent()
         .find('[data-cy="view-proposal-and-technical-review"]')
         .should('exist');
+    });
+
+    it('Technical review assignee should be able to bulk reassign technical reviews', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          const createdProposal2Pk = result.createProposal.primaryKey;
+          cy.wrap(result.createProposal.proposalId).as('createdProposal2Id');
+
+          cy.updateProposal({
+            proposalPk: createdProposal2Pk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposal2Pk],
+            instrumentIds: [createdInstrumentId, createdInstrument2Id],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Pk],
+            userId: scientist2.id,
+            instrumentId: createdInstrumentId,
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposal2Pk],
+            userId: scientist2.id,
+            instrumentId: createdInstrument2Id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrumentId,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview1Id')
+          );
+
+          cy.addProposalTechnicalReview({
+            proposalPk: createdProposal2Pk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: 1,
+            reviewerId: scientist2.id,
+            submitted: false,
+            instrumentId: createdInstrument2Id,
+            questionaryId: 3,
+          }).then((result) =>
+            cy
+              .wrap(result.addTechnicalReview.id.toString())
+              .as('technicalReview2Id')
+          );
+        }
+      });
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(proposal2.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="bulk-reassign-reviews"]').click();
+
+      cy.get('@createdProposal2Id').then((proposalId) => {
+        cy.get('[data-cy="multi-instrument-alert"]').contains(`${proposalId}`);
+      });
+
+      // The expand button does not allow for data cy tags
+      cy.get('[data-cy="bulk-reassign-modal"]')
+        .contains(instrument1.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+      cy.get('[data-cy="bulk-reassign-modal"]')
+        .contains(instrument2.name)
+        .parent()
+        .find('[aria-label="Detail panel visibility toggle"]')
+        .click();
+
+      cy.get('@technicalReview1Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('exist');
+      });
+
+      cy.get('@technicalReview2Id').then((reviewId) => {
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).click();
+        cy.get(`[data-cy="remove-proposal-${reviewId}"]`).should('not.exist');
+      });
+
+      cy.get('[data-cy="bulk-reassign-modal"]').should(
+        'not.contain',
+        instrument2.name
+      );
+      cy.get(`[data-cy="user-list-${createdInstrumentId}"]`).click();
+
+      cy.get('#user-list-1-option-1').click();
+
+      cy.get('[data-cy="bulk-update"]').click();
+
+      cy.finishedLoading();
+
+      cy.contains(proposal2.title);
+      cy.should('not.contain', proposal1.title);
     });
   });
 });

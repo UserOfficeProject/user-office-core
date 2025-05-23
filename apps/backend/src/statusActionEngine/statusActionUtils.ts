@@ -479,13 +479,12 @@ export const getOtherAndFormatOutputForEmailSending = async (
   return Others;
 };
 
-export const publishProposalMessageToTheEventBus = async (
+export const constructProposalStatusChangeEvent = (
   proposal: WorkflowEngineProposalType,
+  loggedInUserId: number | null,
   messageDescription: string,
-  exchange?: string,
-  loggedInUserId?: number
+  exchange?: string
 ) => {
-  const eventBus = resolveApplicationEventBus();
   const event = {
     type: Event.PROPOSAL_STATUS_ACTION_EXECUTED,
     proposal: proposal,
@@ -495,6 +494,23 @@ export const publishProposalMessageToTheEventBus = async (
     description: messageDescription,
     exchange: exchange,
   } as ApplicationEvent;
+
+  return event;
+};
+
+export const publishProposalMessageToTheEventBus = async (
+  proposal: WorkflowEngineProposalType,
+  messageDescription: string,
+  exchange?: string,
+  loggedInUserId?: number
+) => {
+  const eventBus = resolveApplicationEventBus();
+  const event = constructProposalStatusChangeEvent(
+    proposal,
+    loggedInUserId || null,
+    messageDescription,
+    exchange
+  );
 
   return eventBus
     .publish(event)

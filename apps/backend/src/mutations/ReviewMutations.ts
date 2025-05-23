@@ -66,7 +66,9 @@ export default class ReviewMutations {
       });
     }
 
-    const hasWriteRights = await this.reviewAuth.hasWriteRights(agent, review);
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.reviewAuth.hasWriteRights(agent, review));
 
     if (!hasWriteRights) {
       return rejection(
@@ -104,11 +106,13 @@ export default class ReviewMutations {
     // NOTE: This is added for bulk submit where reviewer should be able to submit even already submitted reviews.
     const canSubmitAlreadySubmittedReview = true;
 
-    const hasWriteRights = await this.reviewAuth.hasWriteRights(
-      agent,
-      review,
-      canSubmitAlreadySubmittedReview
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.reviewAuth.hasWriteRights(
+        agent,
+        review,
+        canSubmitAlreadySubmittedReview
+      ));
     if (!hasWriteRights) {
       return rejection(
         'Can not submit proposal review because of insufficient permissions',
@@ -149,11 +153,13 @@ export default class ReviewMutations {
     agent: UserWithRole | null,
     args: SubmitTechnicalReviewInput
   ): Promise<TechnicalReview | Rejection> {
-    const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
-      agent,
-      args.proposalPk,
-      args.instrumentId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.technicalReviewAuth.hasWriteRights(
+        agent,
+        args.proposalPk,
+        args.instrumentId
+      ));
     if (!hasWriteRights) {
       return rejection(
         'Can not set technical review because of insufficient permissions',
@@ -251,11 +257,13 @@ export default class ReviewMutations {
       );
     }
 
-    const hasWriteRights = await this.technicalReviewAuth.hasWriteRights(
-      agent,
-      args.proposalPk,
-      args.instrumentId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.technicalReviewAuth.hasWriteRights(
+        agent,
+        args.proposalPk,
+        args.instrumentId
+      ));
     if (!hasWriteRights) {
       return rejection(
         'Can not set technical review because of insufficient permissions',
@@ -270,7 +278,12 @@ export default class ReviewMutations {
       );
     const shouldUpdateReview = technicalReview !== null;
 
-    if (args.reviewerId !== undefined && args.reviewerId !== agent?.id) {
+    if (
+      this.userAuth.isApiToken(agent) ||
+      (agent.currentRole?.shortCode !== Roles.USER_OFFICER &&
+        args.reviewerId !== undefined &&
+        args.reviewerId !== agent?.id)
+    ) {
       return rejection('Request is impersonating another user', {
         args,
         agent,
@@ -323,6 +336,7 @@ export default class ReviewMutations {
     { reviewId, fapId }: { reviewId: number; fapId: number }
   ): Promise<Review | Rejection> {
     if (
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId))
     ) {
@@ -370,6 +384,7 @@ export default class ReviewMutations {
     args: UpdateTechnicalReviewAssigneeInput
   ): Promise<TechnicalReview[] | Rejection> {
     if (
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !this.isTechnicalReviewAssignee(
         args.proposalPks,
@@ -391,6 +406,7 @@ export default class ReviewMutations {
   ): Promise<Review | Rejection> {
     const { proposalPk, userID, fapID } = args;
     if (
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapID))
     ) {

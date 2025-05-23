@@ -21,6 +21,13 @@ export default function SampleEsiPage() {
             templateGroup={templateGroup}
             itemCountLabel={itemCountLabel}
             isArchived={false}
+            emptyDataSourceMessage={
+              <div>
+                <strong>Warning</strong> Shipments has no templates. Users will
+                not be able to fill out shipments. Please create a new template
+                and mark it as active.
+              </div>
+            }
           />
           <TableComponent
             templateGroup={templateGroup}

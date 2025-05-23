@@ -49,6 +49,20 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
     },
   ];
 
+  const getSubmitButtonLabel = () => {
+    if (registration.status === VisitRegistrationStatus.DRAFTED) {
+      return 'Submit';
+    } else if (
+      registration.status === VisitRegistrationStatus.CHANGE_REQUESTED
+    ) {
+      return 'Submit changes';
+    } else if (registration.status === VisitRegistrationStatus.SUBMITTED) {
+      return '✔ Submitted';
+    }
+
+    return '';
+  };
+
   return (
     <div>
       <QuestionaryDetails
@@ -82,12 +96,15 @@ function VisitRegistrationReview({ confirm }: VisitRegistrationReviewProps) {
               }
             )()
           }
-          disabled={registration.status !== VisitRegistrationStatus.DRAFTED}
+          disabled={
+            ![
+              VisitRegistrationStatus.DRAFTED,
+              VisitRegistrationStatus.CHANGE_REQUESTED,
+            ].includes(registration.status)
+          }
           data-cy="submit-visit-registration-button"
         >
-          {registration.status === VisitRegistrationStatus.DRAFTED
-            ? 'Submit'
-            : '✔ Submitted'}
+          {getSubmitButtonLabel()}
         </NavigButton>
       </NavigationFragment>
     </div>

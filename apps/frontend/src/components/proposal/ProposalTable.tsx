@@ -28,13 +28,13 @@ import { timeAgo } from 'utils/Time';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import AcceptInvite from './AcceptInvite';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
 import {
   PartialProposalsDataType,
   UserProposalDataType,
 } from './ProposalTableUser';
-import RedeemCode from './RedeemCode';
 
 type ProposalTableProps = {
   /** Error flag */
@@ -203,7 +203,6 @@ const ProposalTable = ({
           <CallSelectModalOnProposalsClone
             cloneProposalsToCall={cloneProposalsToCall}
             close={(): void => setOpenCallSelection(false)}
-            templateId={proposalToClone?.questionary.templateId}
           />
         </DialogContent>
       </Dialog>
@@ -312,8 +311,8 @@ const ProposalTable = ({
             startIcon={<AddIcon />}
             title="Join proposal"
           >
-            <RedeemCode
-              onRedeemed={() => {
+            <AcceptInvite
+              onAccepted={() => {
                 searchQuery().then((data) => {
                   if (data) {
                     setPartialProposalsData(data.data);

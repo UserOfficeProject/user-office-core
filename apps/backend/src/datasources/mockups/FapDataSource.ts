@@ -99,7 +99,12 @@ export const dummyFapReview = new Review(
   7,
   0,
   1,
-  1
+  1,
+  new Date('2020-04-20 08:25:12.23043+00'),
+  false,
+  null,
+  false,
+  null
 );
 
 export const dummyFapProposal = new FapProposal(
@@ -353,7 +358,7 @@ export class FapDataSourceMock implements FapDataSource {
     return dummyFapProposals.length;
   }
 
-  async getCurrentFapReviewerProposalCount(reviewerId: number) {
+  async getCurrentFapReviewerProposalCount(reviewerId: number, fapId: number) {
     return dummyFapProposals.length;
   }
 
@@ -425,7 +430,12 @@ export class FapDataSourceMock implements FapDataSource {
       return null;
     }
 
-    return { id: 4, shortCode: 'fap_chair', title: 'Fap Chair' };
+    return {
+      id: 4,
+      shortCode: 'fap_chair',
+      title: 'Fap Chair',
+      description: '',
+    };
   }
 
   async assignProposalsToFaps(data: AssignProposalsToFapsInput[]) {
@@ -539,7 +549,7 @@ export class FapDataSourceMock implements FapDataSource {
   }
 
   async setReviewerRank(
-    proposalPk: number,
+    fapReviewId: number,
     reviewer_id: number,
     rank: number
   ): Promise<boolean> {

@@ -11,7 +11,7 @@ import ActionButton, {
   ActionButtonState,
 } from 'components/proposalBooking/ActionButton';
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
-import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
+import CreateUpdateCancelVisitRegistration from 'components/visit/CreateUpdateCancelVisitRegistration';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
@@ -59,7 +59,6 @@ const createActionButton = (
   // eslint-disable-next-line
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
   hidden: state === 'invisible',
-  disabled: state === 'inactive',
   onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
     ? onClick
     : () => {},
@@ -163,8 +162,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       } else {
         switch (registration.status) {
           case VisitRegistrationStatus.DRAFTED:
+            buttonState = 'active';
+            break;
           case VisitRegistrationStatus.CHANGE_REQUESTED:
             buttonState = 'active';
+            stateReason = 'Changes are requested for your registration';
             break;
           case VisitRegistrationStatus.SUBMITTED:
             buttonState = 'pending';
@@ -175,9 +177,9 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             break;
           case VisitRegistrationStatus.CANCELLED_BY_USER:
           case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-            buttonState = 'inactive';
+            buttonState = 'cancelled';
             stateReason =
-              'This action is disabled because registration is cancelled';
+              'This action is disabled because your registration for visit is cancelled';
             break;
         }
       }
@@ -187,12 +189,12 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Define your own visit ${stateReason ? '(' + stateReason + ')' : ''}`,
+      `Define your visit ${stateReason ? '(' + stateReason + ')' : ''}`,
       <FlightTakeoffIcon data-cy="register-visit-icon" />,
       buttonState,
       () => {
         openModal(
-          <CreateUpdateVisitRegistration
+          <CreateUpdateCancelVisitRegistration
             registration={
               event.visit!.registrations.find(
                 (registration) => registration.userId === user.id
@@ -211,6 +213,20 @@ export function useActionButtons(args: UseActionButtonsArgs) {
               });
               closeModal();
             }}
+            onCancelled={(cancelledRegistration) => {
+              const updatedRegistrations = event.visit!.registrations.map(
+                (registration) =>
+                  registration.userId === cancelledRegistration.userId
+                    ? cancelledRegistration
+                    : registration
+              );
+              eventUpdated({
+                ...event,
+                visit: { ...event.visit!, registrations: updatedRegistrations },
+              });
+              closeModal();
+            }}
+            onClose={closeModal}
           />
         );
       }

@@ -83,7 +83,10 @@ export interface FapDataSource {
   getFapProposalCount(fapId: number): Promise<number>;
   getCurrentFapProposalCount(fapId: number): Promise<number>;
   getFapReviewerProposalCount(reviewerId: number): Promise<number>;
-  getCurrentFapReviewerProposalCount(reviewerId: number): Promise<number>;
+  getCurrentFapReviewerProposalCount(
+    reviewerId: number,
+    fapId: number
+  ): Promise<number>;
   getFapProposal(
     fapId: number,
     proposalPk: number,
@@ -153,7 +156,7 @@ export interface FapDataSource {
     instrumentId?: number | null
   ): Promise<boolean>;
   setReviewerRank(
-    proposalPk: number,
+    fapReviewId: number,
     reviewerId: number,
     rank: number
   ): Promise<boolean>;
