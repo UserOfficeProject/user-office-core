@@ -291,7 +291,7 @@ const StatusActionsLogsTable = ({
                     () =>
                       api({
                         toastSuccessMessage:
-                          'Status action replay successfully send',
+                          'Status action replay successfully sent.',
                       })
                         .replayStatusActionsLog({
                           statusActionsLogId:
