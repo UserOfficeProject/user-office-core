@@ -193,14 +193,6 @@ const ProposalReviewContent = ({
           data={technicalReview as TechnicalReviewWithQuestionary}
         />
       );
-      //<TechnicalReviewInformation data={technicalReview as TechnicalReview} />
-      // <TechnicalReviewQuestionaryReview
-      //   data={
-      //     (!isUserOfficer && !isFapSec
-      //       ? { ...technicalReview, comment: null }
-      //       : technicalReview) as TechnicalReviewWithQuestionary
-      //   }
-      // />
     }
   );
 
