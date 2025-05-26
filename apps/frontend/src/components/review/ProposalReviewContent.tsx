@@ -18,6 +18,7 @@ import {
   CoreTechnicalReviewFragment,
   InstrumentWithManagementTime,
   Review,
+  TechnicalReview,
   UserRole,
 } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -31,6 +32,7 @@ import { getFullUserName } from 'utils/user';
 import ProposalReviewContainer from './ProposalReviewContainer';
 import ProposalTechnicalReviewerAssignment from './ProposalTechnicalReviewerAssignment';
 import TechnicalReviewContainer from './TechnicalReviewContainer';
+import TechnicalReviewInformation from './TechnicalReviewInformation';
 import TechnicalReviewQuestionaryReview from './TechnicalReviewQuestionaryReview';
 import InternalReviews from '../internalReview/InternalReviews';
 
@@ -184,15 +186,21 @@ const ProposalReviewContent = ({
             ></TechnicalReviewContainer>
           </Paper>
         </Fragment>
+      ) : !isUserOfficer && !isFapSec ? (
+        <TechnicalReviewInformation data={technicalReview as TechnicalReview} />
       ) : (
         <TechnicalReviewQuestionaryReview
-          data={
-            (!isUserOfficer && !isFapSec
-              ? { ...technicalReview, comment: null }
-              : technicalReview) as TechnicalReviewWithQuestionary
-          }
+          data={technicalReview as TechnicalReviewWithQuestionary}
         />
       );
+      //<TechnicalReviewInformation data={technicalReview as TechnicalReview} />
+      // <TechnicalReviewQuestionaryReview
+      //   data={
+      //     (!isUserOfficer && !isFapSec
+      //       ? { ...technicalReview, comment: null }
+      //       : technicalReview) as TechnicalReviewWithQuestionary
+      //   }
+      // />
     }
   );
 
