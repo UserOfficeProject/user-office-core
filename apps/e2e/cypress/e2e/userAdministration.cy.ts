@@ -6,13 +6,11 @@ import initialDBData from '../support/initialDBData';
 
 context('User administration tests', () => {
   const newFirstName = faker.name.firstName();
-  const newMiddleName = faker.name.firstName();
   const newLastName = faker.name.lastName();
   const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
   const newPosition = faker.random.word().split(' ')[0];
   const newTelephone = faker.phone.number('0##########');
-  const newTelephoneAlt = faker.phone.number('0##########');
   const newInstitution = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
   const title = faker.lorem.words(2);
@@ -36,8 +34,6 @@ context('User administration tests', () => {
 
     cy.get("[name='firstname']").clear().type(newFirstName);
 
-    cy.get("[name='middlename']").clear().type(newMiddleName);
-
     cy.get("[name='lastname']").clear().type(newLastName);
 
     cy.get("[name='preferredname']").clear().type(newPrefferedName);
@@ -48,8 +44,6 @@ context('User administration tests', () => {
 
     cy.get("[name='telephone']").clear().type(newTelephone);
 
-    cy.get("[name='telephone_alt']").clear().type(newTelephoneAlt);
-
     cy.get("[name='otherInstitution']").clear().type(newInstitution);
 
     cy.contains('Update Profile').click();
@@ -59,8 +53,6 @@ context('User administration tests', () => {
     cy.reload();
 
     cy.get("[name='firstname']").invoke('val').should('eq', newFirstName);
-
-    cy.get("[name='middlename']").invoke('val').should('eq', newMiddleName);
 
     cy.get("[name='lastname']").invoke('val').should('eq', newLastName);
 
@@ -177,7 +169,6 @@ context('User administration tests', () => {
         lastname: 'Beckley',
         preferredname: 'Ben',
         gender: 'male',
-        nationality: 1,
         birthdate: new Date('2000/04/02'),
         department: 'IT deparment',
         position: 'Management',
@@ -227,7 +218,6 @@ context('User administration tests', () => {
         lastname: 'Dawson',
         preferredname: '',
         gender: 'male',
-        nationality: 1,
         birthdate: new Date('1995/04/01'),
         department: 'Maxillofacial surgeon',
         position: 'Management',

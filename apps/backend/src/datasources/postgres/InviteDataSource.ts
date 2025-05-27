@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Invite } from '../../models/Invite';
-import { InviteDataSource } from '../InviteDataSource';
+import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
 import database from './database';
 import { createInviteObject, InviteRecord } from './records';
 
@@ -45,6 +45,34 @@ export default class PostgresInviteDataSource implements InviteDataSource {
 
         return createInviteObject(invites[0]);
       });
+  }
+
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+    return database
+      .select('*')
+      .from('invites')
+      .modify((query) => {
+        if (filter.createdBefore) {
+          query.where('created_at', '<', filter.createdBefore);
+        }
+
+        if (filter.createdAfter) {
+          query.where('created_at', '>', filter.createdAfter);
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (filter.isClaimed) {
+            query.whereNotNull('claimed_at');
+          } else {
+            query.whereNull('claimed_at');
+          }
+        }
+
+        if (filter.isExpired) {
+          query.where('expires_at', '<', new Date());
+        }
+      })
+      .then((invites: InviteRecord[]) => invites.map(createInviteObject));
   }
 
   async create(args: {

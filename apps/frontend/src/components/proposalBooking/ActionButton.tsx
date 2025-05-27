@@ -74,19 +74,18 @@ const ActionButton = ({ children, variant: state }: ActionButtonProps) => {
       );
     case 'pending':
       return (
-        <CheckBadge
+        <DotBadge
           sx={{
             color: '#000',
             marginRight: '2px',
-            '& .MuiBadge-badge': {
-              fontSize: '17px',
-              color: '#4ba322',
-              textShadow: '-1px 2px 0 white',
+            '& .MuiBadge-dot': {
+              background: '#ff9900',
+              boxShadow: '-1px 1px 0 white',
             },
           }}
         >
           {children}
-        </CheckBadge>
+        </DotBadge>
       );
     case 'invisible':
       return <DotBadge />;

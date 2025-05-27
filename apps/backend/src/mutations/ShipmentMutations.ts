@@ -81,10 +81,9 @@ export default class ShipmentMutations {
       });
     }
 
-    const canReadProposal = await this.proposalAuth.hasReadRights(
-      agent,
-      proposal
-    );
+    const canReadProposal =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposal));
 
     if (canReadProposal === false) {
       return rejection(
@@ -123,10 +122,9 @@ export default class ShipmentMutations {
   }
 
   async submitShipment(agent: UserWithRole | null, args: SubmitShipmentArgs) {
-    const hasWriteRights = await this.shipmentAuth.hasWriteRights(
-      agent,
-      args.shipmentId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.shipmentAuth.hasWriteRights(agent, args.shipmentId));
 
     if (hasWriteRights === false) {
       return rejection(
@@ -163,10 +161,9 @@ export default class ShipmentMutations {
 
   @EventBus(Event.PROPOSAL_SAMPLE_REVIEW_SUBMITTED)
   async updateShipment(agent: UserWithRole | null, args: UpdateShipmentArgs) {
-    const hasWriteRights = await this.shipmentAuth.hasWriteRights(
-      agent,
-      args.shipmentId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.shipmentAuth.hasWriteRights(agent, args.shipmentId));
 
     if (hasWriteRights === false) {
       return rejection(
@@ -175,8 +172,9 @@ export default class ShipmentMutations {
       );
     }
 
-    const canAdministerShipment = this.userAuth.isUserOfficer(agent);
-    if (canAdministerShipment === false) {
+    const canAdministerShipment =
+      this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent);
+    if (!canAdministerShipment) {
       delete args.status;
       delete args.externalRef;
     }
@@ -190,12 +188,11 @@ export default class ShipmentMutations {
   }
 
   async deleteShipment(agent: UserWithRole | null, shipmentId: number) {
-    const hasWriteRights = await this.shipmentAuth.hasWriteRights(
-      agent,
-      shipmentId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.shipmentAuth.hasWriteRights(agent, shipmentId));
 
-    if (hasWriteRights === false) {
+    if (!hasWriteRights) {
       return rejection(
         'Can not delete shipment because user is not authorized',
         { shipmentId }
@@ -219,10 +216,9 @@ export default class ShipmentMutations {
     sampleIds: number[]
   ) => {
     for (const sampleId of sampleIds) {
-      const isAuthorized = await this.sampleAuth.hasWriteRights(
-        agent,
-        sampleId
-      );
+      const isAuthorized =
+        this.userAuth.isApiToken(agent) ||
+        (await this.sampleAuth.hasWriteRights(agent, sampleId));
       if (!isAuthorized) {
         return false;
       }
@@ -232,12 +228,11 @@ export default class ShipmentMutations {
   };
 
   async addSamples(agent: UserWithRole | null, args: AddSamplesToShipmentArgs) {
-    const hasWriteRights = await this.shipmentAuth.hasWriteRights(
-      agent,
-      args.shipmentId
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.shipmentAuth.hasWriteRights(agent, args.shipmentId));
 
-    if (hasWriteRights === false) {
+    if (!hasWriteRights) {
       return rejection(
         'Can not add samples user does not have permissions to change shipment',
         { args, agent }

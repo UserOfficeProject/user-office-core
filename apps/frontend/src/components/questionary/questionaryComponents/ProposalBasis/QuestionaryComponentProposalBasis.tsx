@@ -91,7 +91,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       <Box sx={{ margin: theme.spacing(2, 0) }}>
         <Field
           name={`${id}.title`}
-          label="Title"
+          label="Proposal Title"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
               setLocalTitle(event.target.value),
@@ -114,7 +114,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
         <Field
           name={`${id}.abstract`}
-          label="Abstract"
+          label="Proposal Abstract"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
               setLocalAbstract(event.target.value),

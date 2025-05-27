@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { container, inject, injectable } from 'tsyringe';
 
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -39,7 +40,8 @@ export default class QuestionaryMutations {
     @inject(Tokens.GenericTemplateDataSource)
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   async deleteOldAnswers(
@@ -187,10 +189,9 @@ export default class QuestionaryMutations {
       );
     }
 
-    const hasRights = await this.questionaryAuth.hasWriteRights(
-      agent,
-      questionaryId
-    );
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.questionaryAuth.hasWriteRights(agent, questionaryId));
     if (!hasRights) {
       return rejection(
         'Can not answer topic because of insufficient permissions',

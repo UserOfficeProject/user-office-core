@@ -164,7 +164,6 @@ export class OAuthAuthorization extends UserAuthorization {
       const newUser = await this.userDataSource.create(
         (userInfo.title as string) ?? 'unspecified',
         userInfo.given_name,
-        undefined,
         userInfo.family_name,
         userInfo.email,
         userInfo.preferred_username ?? '',
@@ -172,14 +171,12 @@ export class OAuthAuthorization extends UserAuthorization {
         tokenSet.refresh_token ?? '',
         client.issuer.metadata.issuer,
         userInfo.gender ?? 'unspecified',
-        1,
         new Date(),
         institutionId ?? 1,
         '',
         (userInfo.position as string) ?? '',
         userInfo.email,
-        '',
-        undefined
+        ''
       );
 
       const roleID = this.getUserRole(newUser);

@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import {
+  dummyUserNotOnProposalWithRole,
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
@@ -52,6 +53,16 @@ test('User can not create visit for someone elses proposal', async () => {
       team: [dummyUserWithRole.id],
     })
   ).resolves.toBeInstanceOf(Rejection);
+});
+
+test('User can not delete visit for someone elses proposal', async () => {
+  const result = await mutations.deleteVisit(dummyUserNotOnProposalWithRole, 1);
+
+  expect(result).toBeInstanceOf(Rejection);
+  expect(result).toHaveProperty(
+    'message',
+    'Can not update visit because of insufficient permissions'
+  );
 });
 
 test('User can update visit', async () => {
@@ -146,6 +157,47 @@ test('Not authorized user can not create visit registration', async () => {
   ).resolves.toBeInstanceOf(Rejection);
 });
 
+test('User can not set visit start date in past', async () => {
+  const registration = (await mutations.createVisitRegistration(
+    dummyUserWithRole,
+    1,
+    2
+  )) as VisitRegistration;
+
+  const result = await mutations.updateVisitRegistration(dummyUserWithRole, {
+    visitId: registration.visitId,
+    userId: registration.userId,
+    startsAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // Set start date in the past
+  });
+
+  expect(result).toBeInstanceOf(Rejection);
+  expect(result).toHaveProperty(
+    'message',
+    'Could not update Visit Registration because the start date is in the past'
+  );
+});
+
+test('User can not set visit end date earlier than start date', async () => {
+  const registration = (await mutations.createVisitRegistration(
+    dummyUserWithRole,
+    1,
+    2
+  )) as VisitRegistration;
+
+  const result = await mutations.updateVisitRegistration(dummyUserWithRole, {
+    visitId: registration.visitId,
+    userId: registration.userId,
+    startsAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // Set start date in the future
+    endsAt: new Date(Date.now() - 1000 * 60 * 60 * 24), // Set end date in the past
+  });
+
+  expect(result).toBeInstanceOf(Rejection);
+  expect(result).toHaveProperty(
+    'message',
+    'Could not update Visit Registration because the end date is before the start date'
+  );
+});
+
 describe('User officer can cancel the visit registration', () => {
   test.each([
     VisitRegistrationStatus.DRAFTED,
@@ -228,6 +280,51 @@ describe('User can cancel their visit registration', () => {
   );
 });
 
+describe('User officer can request changes', () => {
+  test.each`
+    initialStatus                                    | expectedStatus
+    ${VisitRegistrationStatus.DRAFTED}               | ${VisitRegistrationStatus.DRAFTED}
+    ${VisitRegistrationStatus.SUBMITTED}             | ${VisitRegistrationStatus.CHANGE_REQUESTED}
+    ${VisitRegistrationStatus.APPROVED}              | ${VisitRegistrationStatus.APPROVED}
+    ${VisitRegistrationStatus.CHANGE_REQUESTED}      | ${VisitRegistrationStatus.CHANGE_REQUESTED}
+    ${VisitRegistrationStatus.CANCELLED_BY_USER}     | ${VisitRegistrationStatus.CANCELLED_BY_USER}
+    ${VisitRegistrationStatus.CANCELLED_BY_FACILITY} | ${VisitRegistrationStatus.CANCELLED_BY_FACILITY}
+  `(
+    'User officer trying request changes for visit in $initialStatus status should result visit having $expectedStatus status',
+    async ({ initialStatus, expectedStatus }) => {
+      // Create a registration (default status is DRAFTED)
+      const registration = (await mutations.createVisitRegistration(
+        dummyUserWithRole,
+        1,
+        2
+      )) as VisitRegistration;
+
+      // Update the registration status to the parameterized initial status
+      await visitDataSource.updateRegistration({
+        visitId: registration.visitId,
+        userId: registration.userId,
+        status: initialStatus,
+      });
+
+      // Attempt to cancel the registration as the user
+      await mutations.requestVisitRegistrationChanges(
+        dummyUserOfficerWithRole,
+        {
+          visitId: registration.visitId,
+          userId: registration.userId,
+        }
+      );
+
+      await expect(
+        visitDataSource.getRegistration(
+          registration.userId,
+          registration.visitId
+        )
+      ).resolves.toHaveProperty('status', expectedStatus);
+    }
+  );
+});
+
 test('User can not submit visit registration that has been cancelled by facility', async () => {
   const registration = (await mutations.createVisitRegistration(
     dummyUserWithRole,
@@ -258,6 +355,6 @@ test('User can not submit visit registration that has been cancelled by facility
   )) as VisitRegistration;
   expect(submitResult).toHaveProperty(
     'reason',
-    'Chould not submit Visit Registration due to insufficient permissions'
+    'Could not submit Visit Registration due to insufficient permissions'
   );
 });
