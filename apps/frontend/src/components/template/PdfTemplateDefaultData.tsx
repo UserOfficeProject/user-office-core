@@ -6,8 +6,6 @@ export const body = `<html lang="en">
   <link
     href="http://localhost:4500/static/css/bootstrap.min.css"
     rel="stylesheet"
-    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
-    crossorigin="anonymous"
   />
 
   <link href="http://localhost:4500/fonts/segoeui" rel="stylesheet">

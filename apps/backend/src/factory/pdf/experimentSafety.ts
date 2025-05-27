@@ -12,38 +12,39 @@ import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { DownloadOptions } from '../../middlewares/factory/factoryServices';
-import { Experiment } from '../../models/Experiment';
+import { Experiment, ExperimentSafety } from '../../models/Experiment';
 import { Instrument } from '../../models/Instrument';
 import { Proposal } from '../../models/Proposal';
 import { QuestionaryStep } from '../../models/Questionary';
-import { Sample } from '../../models/Sample';
-import { TemplateGroupId } from '../../models/Template';
+import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { ExperimentSafetyPdfTemplate } from '../../resolvers/types/ExperimentSafetyPdfTemplate';
 import { Attachment } from '../util';
 import {
-  collectGenericTemplatePDFData,
-  GenericTemplatePDFData,
-} from './genericTemplates';
-import { collectSamplePDFData, SamplePDFData } from './sample';
+  collectExperimentSamplePDFData,
+  ExperimentSamplePDFData,
+} from './experimentSample';
+import { collectGenericTemplatePDFData } from './genericTemplates';
+import { collectSamplePDFData } from './sample';
 
 export type ExperimentSafetyPDFData = {
-  experiment: Experiment;
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;
+  experiment: Experiment;
+  experimentSafety: ExperimentSafety;
   localContact: BasicUserDetails | null;
   instrument: Instrument | null;
-  questionarySteps: QuestionaryStep[];
-  attachments: Attachment[];
-  samples: Array<Pick<SamplePDFData, 'sample' | 'sampleQuestionaryFields'>>;
-  genericTemplates: Array<
-    Pick<
-      GenericTemplatePDFData,
-      'genericTemplate' | 'genericTemplateQuestionaryFields'
-    >
-  >;
+  esiQuestionary: {
+    questionarySteps: QuestionaryStep[];
+    answers: Record<string, any>;
+  };
+  safetyReviewQuestionary: {
+    questionarySteps: QuestionaryStep[];
+    answers: Record<string, any>;
+  };
+  experimentSamples: ExperimentSamplePDFData[];
   pdfTemplate: ExperimentSafetyPdfTemplate | null;
+  attachments: Attachment[];
 };
 
 const getSampleQuestionarySteps = async (
@@ -76,11 +77,25 @@ const getQuestionary = async (questionaryId: number) => {
   return questionary;
 };
 
+export function extractAnswerMap(questionarySteps: QuestionaryStep[]) {
+  return questionarySteps
+    .flatMap((questionaryStep) => questionaryStep.fields)
+    .flatMap((field) => ({
+      key: field.question.naturalKey,
+      value: field.value,
+    }))
+    .reduce((p: Record<string, unknown>, v) => {
+      p[v.key] = v.value;
+
+      return p;
+    }, {});
+}
+
 export const collectExperimentPDFData = async (
   experimentPk: number,
   user: UserWithRole,
   notify?: CallableFunction
-): Promise<any> => {
+): Promise<ExperimentSafetyPDFData> => {
   const experiment = await baseContext.queries.experiment.getExperiment(
     user,
     experimentPk
@@ -88,6 +103,57 @@ export const collectExperimentPDFData = async (
 
   if (experiment === null) {
     throw new Error('Experiment not found');
+  }
+  // Get Experiment Safety data
+  const experimentSafety =
+    await baseContext.queries.experiment.getExperimentSafetyByExperimentPk(
+      user,
+      experimentPk
+    );
+  if (experimentSafety === null) {
+    throw new Error('Experiment safety not found');
+  }
+
+  const esiQuestionarySteps =
+    await baseContext.queries.questionary.getQuestionarySteps(
+      user,
+      experimentSafety.esiQuestionaryId
+    );
+
+  const esiQuestionary = {
+    questionarySteps: esiQuestionarySteps ?? [],
+    answers: extractAnswerMap(esiQuestionarySteps ?? []),
+  };
+
+  if (isRejection(esiQuestionarySteps) || esiQuestionarySteps == null) {
+    throw new Error('Could not fetch ESI Questionary');
+  }
+
+  const safetyReviewQuestionary: {
+    questionarySteps: QuestionaryStep[];
+    answers: Record<string, any>;
+  } = {
+    questionarySteps: [],
+    answers: {},
+  };
+
+  if (experimentSafety.safetyReviewQuestionaryId) {
+    const safetyReviewQuestionarySteps =
+      await baseContext.queries.questionary.getQuestionarySteps(
+        user,
+        experimentSafety.safetyReviewQuestionaryId
+      );
+    if (
+      isRejection(safetyReviewQuestionarySteps) ||
+      safetyReviewQuestionarySteps == null
+    ) {
+      throw new Error('Could not fetch Safety Review Questionary');
+    }
+
+    safetyReviewQuestionary.questionarySteps = safetyReviewQuestionarySteps;
+    safetyReviewQuestionary.answers = extractAnswerMap(
+      safetyReviewQuestionarySteps
+    );
   }
 
   // Get the proposal related to this experiment
@@ -100,13 +166,6 @@ export const collectExperimentPDFData = async (
     throw new Error('Proposal not found');
   }
 
-  // Get experiment safety information if available
-  const experimentSafety =
-    await baseContext.queries.experiment.getExperimentSafety(
-      user,
-      experimentPk
-    );
-
   // Get the instrument
   const instrument = await baseContext.queries.instrument.get(
     user,
@@ -115,7 +174,6 @@ export const collectExperimentPDFData = async (
 
   // Get the PDF template (if experiment template is set, otherwise fallback to proposal template)
   const pdfTemplate = await getPdfTemplate(user, experiment);
-
   // Get the principal investigator
   const principalInvestigator = await baseContext.queries.user.getBasic(
     user,
@@ -139,61 +197,40 @@ export const collectExperimentPDFData = async (
     );
 
   const sampleAttachments: Attachment[] = [];
-  const sampleIds = experimentSamples.map((es) => es.sampleId);
-  const samples = await Promise.all(
-    sampleIds.map((id) => baseContext.queries.sample.getSample(user, id))
-  );
-  const validSamples = samples.filter((s): s is Sample => s !== null);
 
-  const samplePDFData = (
+  const experimentSamplesPDFData = (
     await Promise.all(
-      validSamples.map((sample) => collectSamplePDFData(sample.id, user))
-    )
-  ).map(({ sample, sampleQuestionaryFields, attachments }) => {
-    sampleAttachments.push(...attachments);
-
-    return { sample, sampleQuestionaryFields };
-  });
-
-  // Get generic templates related to the proposal
-  const genericTemplateAttachments: Attachment[] = [];
-  const genericTemplates =
-    await baseContext.queries.genericTemplate.getGenericTemplates(user, {
-      filter: { proposalPk: proposal.primaryKey },
-    });
-
-  const genericTemplatePDFData = (
-    await Promise.all(
-      genericTemplates.map((genericTemplate) =>
-        collectGenericTemplatePDFData(genericTemplate.id, user)
+      experimentSamples.map((experimentSample) =>
+        collectExperimentSamplePDFData(
+          experimentPk,
+          experimentSample.sampleId,
+          user
+        )
       )
     )
-  ).map(
-    ({ genericTemplate, genericTemplateQuestionaryFields, attachments }) => {
-      genericTemplateAttachments.push(...attachments);
+  ).map((pdfData) => {
+    sampleAttachments.push(...pdfData.attachments);
 
-      return { genericTemplate, genericTemplateQuestionaryFields };
-    }
-  );
+    return pdfData;
+  });
 
   // Create filename for notification
   notify?.(
-    `${experiment.experimentId}_${
-      principalInvestigator.lastname
-    }_${experiment.createdAt.getUTCFullYear()}.pdf`
+    `ESD_${experiment.experimentId}_${experiment.createdAt.getUTCFullYear()}.pdf`
   );
 
   // Return the experiment PDF data
   return {
-    experiment,
     proposal,
     principalInvestigator,
-    localContact,
+    experiment,
+    experimentSafety,
+    esiQuestionary,
+    safetyReviewQuestionary,
     instrument,
-    questionarySteps: [], // This will be populated if there are experiment-specific questionary steps
-    attachments: [...sampleAttachments, ...genericTemplateAttachments],
-    samples: samplePDFData,
-    genericTemplates: genericTemplatePDFData,
+    localContact,
+    experimentSamples: experimentSamplesPDFData,
+    attachments: [...sampleAttachments],
     pdfTemplate,
   };
 };
@@ -204,36 +241,6 @@ const getPdfTemplate = async (
   experiment: Experiment
 ): Promise<ExperimentSafetyPdfTemplate | null> => {
   try {
-    // First try to get an experiment-specific PDF template
-    const experimentTemplates = await baseContext.queries.template.getTemplates(
-      user,
-      {
-        filter: {
-          group: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-          isArchived: false,
-        },
-      }
-    );
-
-    if (experimentTemplates && experimentTemplates.length > 0) {
-      // Use the first available experiment PDF template
-      const experimentPdfTemplateId = experimentTemplates[0].templateId;
-
-      const pdfTemplates =
-        await baseContext.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
-          user,
-          {
-            filter: {
-              templateIds: [experimentPdfTemplateId],
-            },
-          }
-        );
-
-      if (pdfTemplates && pdfTemplates.length > 0) {
-        return pdfTemplates[0];
-      }
-    }
-
     // If no experiment-specific template, fall back to the proposal's PDF template
     // Get the proposal to find its call
     const proposal = await baseContext.queries.proposal.get(
@@ -245,23 +252,6 @@ const getPdfTemplate = async (
       const call = await baseContext.queries.call.get(user, proposal.callId);
 
       // First, try to use the dedicated experiment safety PDF template
-      if (call?.experimentSafetyPdfTemplateId) {
-        const pdfTemplates =
-          await baseContext.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
-            user,
-            {
-              filter: {
-                templateIds: [call.experimentSafetyPdfTemplateId],
-              },
-            }
-          );
-
-        if (pdfTemplates && pdfTemplates.length > 0) {
-          return pdfTemplates[0];
-        }
-      }
-
-      // If no experiment safety template is available, fall back to the proposal PDF template
       if (call?.experimentSafetyPdfTemplateId) {
         const pdfTemplates =
           await baseContext.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
@@ -293,7 +283,6 @@ const getPdfTemplate = async (
 export const collectExperimentPDFDataTokenAccess = async (
   experimentPk: number,
   user: UserWithRole,
-  options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<any> => {
   const experimentDataSource = container.resolve<ExperimentDataSource>(
@@ -341,47 +330,23 @@ export const collectExperimentPDFDataTokenAccess = async (
 
   try {
     // Get experiment templates (simplified from the getPdfTemplate helper function)
-    const experimentTemplates =
-      await experimentSafetyPdfTemplateDataSource.getPdfTemplates({
-        filter: {
-          pdfTemplateData: 'EXPERIMENT_PDF_TEMPLATE', // This is a simplification, would need proper filtering
-        },
-      });
 
-    if (experimentTemplates.length > 0) {
-      pdfTemplate = experimentTemplates[0];
-    } else {
-      // Fallback to proposal PDF template
-      const callDataSource = container.resolve<CallDataSource>(
-        Tokens.CallDataSource
-      );
-      const call = await callDataSource.getCall(proposal.callId);
+    const callDataSource = container.resolve<CallDataSource>(
+      Tokens.CallDataSource
+    );
+    const call = await callDataSource.getCall(proposal.callId);
 
-      // First try experiment safety PDF template
-      if (call?.experimentSafetyPdfTemplateId) {
-        const templates =
-          await experimentSafetyPdfTemplateDataSource.getPdfTemplates({
-            filter: {
-              templateIds: [call.experimentSafetyPdfTemplateId],
-            },
-          });
+    // First try experiment safety PDF template
+    if (call?.experimentSafetyPdfTemplateId) {
+      const templates =
+        await experimentSafetyPdfTemplateDataSource.getPdfTemplates({
+          filter: {
+            templateIds: [call.experimentSafetyPdfTemplateId],
+          },
+        });
 
-        if (templates.length > 0) {
-          pdfTemplate = templates[0];
-        }
-      }
-      // Then fall back to proposal PDF template
-      else if (call?.proposalPdfTemplateId) {
-        const templates =
-          await experimentSafetyPdfTemplateDataSource.getPdfTemplates({
-            filter: {
-              templateIds: [call.proposalPdfTemplateId],
-            },
-          });
-
-        if (templates.length > 0) {
-          pdfTemplate = templates[0];
-        }
+      if (templates.length > 0) {
+        pdfTemplate = templates[0];
       }
     }
   } catch (error) {
@@ -390,7 +355,6 @@ export const collectExperimentPDFDataTokenAccess = async (
       experimentPk,
     });
   }
-
   // Get the principal investigator and local contact
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource

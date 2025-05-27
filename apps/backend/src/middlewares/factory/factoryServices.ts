@@ -6,6 +6,11 @@ import { ProposalPdfTemplateDataSource } from '../../datasources/ProposalPdfTemp
 import { FactoryServicesAuthorized } from '../../decorators';
 import { MetaBase } from '../../factory/DownloadService';
 import {
+  collectExperimentPDFData,
+  collectExperimentPDFDataTokenAccess,
+  ExperimentSafetyPDFData,
+} from '../../factory/pdf/experimentSafety';
+import {
   collectProposalPDFData,
   collectProposalPDFDataTokenAccess,
   ProposalPDFData,
@@ -29,6 +34,11 @@ export interface DownloadTypeServices {
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
   ): Promise<ProposalPDFData[] | null>;
+  getPdfExperimentsSafety(
+    agent: UserWithRole,
+    experimentPks: number[],
+    experimentFileMeta: MetaBase
+  ): Promise<ExperimentSafetyPDFData[] | null>;
   getProposalAttachments(
     agent: UserWithRole,
     proposalPks: number[],
@@ -82,6 +92,40 @@ export default class FactoryServices implements DownloadTypeServices {
     return data;
   }
 
+  @FactoryServicesAuthorized()
+  async getPdfExperimentsSafety(
+    agent: UserWithRole,
+    experimentPks: number[],
+    experimentFileMeta: MetaBase
+  ) {
+    let data = null;
+    if (agent) {
+      data = await Promise.all(
+        experimentPks.map((experimentPk, index) => {
+          if (agent?.isApiAccessToken)
+            return collectExperimentPDFDataTokenAccess(
+              experimentPk,
+              agent,
+              index === 0
+                ? (filename: string) =>
+                    (experimentFileMeta.singleFilename = filename)
+                : undefined
+            );
+
+          return collectExperimentPDFData(
+            experimentPk,
+            agent,
+            index === 0
+              ? (filename: string) =>
+                  (experimentFileMeta.singleFilename = filename)
+              : undefined
+          );
+        })
+      );
+    }
+
+    return data;
+  }
   @FactoryServicesAuthorized()
   async getProposalAttachments(
     agent: UserWithRole,

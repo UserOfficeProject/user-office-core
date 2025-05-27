@@ -17,6 +17,7 @@ import {
   InstrumentScientistDecisionEnum,
   UserRole,
 } from 'generated/sdk';
+import { useDownloadPDFExperimentSafety } from 'hooks/experiment/useDownloadPDFExperimentSafety';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
@@ -38,6 +39,8 @@ function ExperimentSafetyReviewSummary({
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ExperimentSafetyReviewContextType;
+
+  const downloadExperimentSafety = useDownloadPDFExperimentSafety();
 
   if (!state?.experimentSafety) {
     throw new Error('Experiment safety review not found');
@@ -167,9 +170,12 @@ function ExperimentSafetyReviewSummary({
           {false ? '✔ Submitted' : 'Submit'}
         </NavigButton>
         <Button
-          onClick={() => {
-            // downloadPDFProposal([proposal.primaryKey], proposal.title)
-          }}
+          onClick={() =>
+            downloadExperimentSafety(
+              [state.experimentSafety.experimentPk],
+              'Experiment Safety Review'
+            )
+          }
           color="secondary"
         >
           Download Safety Review Document

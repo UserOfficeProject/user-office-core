@@ -8,6 +8,12 @@ import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import {
+  experimentBody as defaultExperimentBody,
+  experimentHeader as defaultExperimentHeader,
+  experimentFooter as defaultExperimentFooter,
+  experimentDummyData as defaultExperimentDummyData,
+} from './ExperimentPdfTemplateDefaultData';
+import {
   body as defaultProposalBody,
   header as defaultProposalHeader,
   footer as defaultProposalFooter,
@@ -34,7 +40,6 @@ const CreateTemplate = (props: {
             ...values,
             groupId,
           });
-
           if (
             createTemplate.groupId == TemplateGroupId.PROPOSAL_PDF &&
             createTemplate.proposalPdfTemplate
@@ -60,11 +65,10 @@ const CreateTemplate = (props: {
               experimentSafetyPdfTemplateId:
                 createTemplate.experimentSafetyPdfTemplate
                   .experimentSafetyPdfTemplateId,
-              templateData: defaultProposalBody,
-              templateHeader: defaultProposalHeader,
-              templateFooter: defaultProposalFooter,
-              templateSampleDeclaration: defaultProposalSampleDeclaration,
-              dummyData: defaultProposalDummyData,
+              templateData: defaultExperimentBody,
+              templateHeader: defaultExperimentHeader,
+              templateFooter: defaultExperimentFooter,
+              dummyData: defaultExperimentDummyData,
             });
           }
 
