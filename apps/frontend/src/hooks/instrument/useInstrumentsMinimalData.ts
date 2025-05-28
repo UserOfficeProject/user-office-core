@@ -49,6 +49,19 @@ export function useInstrumentsMinimalData(callIds?: number[]): {
           }
           setLoadingInstruments(false);
         });
+    } else if (currentRole && UserRole.FACILITY_MEMBER === currentRole) {
+      api()
+        .getMyFacilitiesInstruments()
+        .then((data) => {
+          if (unmounted) {
+            return;
+          }
+
+          if (data.me?.facilities) {
+            setInstruments(data.me.facilities.flatMap((f) => f.instruments));
+          }
+          setLoadingInstruments(false);
+        });
     } else {
       api()
         .getMyInstrumentsMinimal()

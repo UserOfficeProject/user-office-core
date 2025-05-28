@@ -1,0 +1,14 @@
+query getMyFacilities {
+  me {
+    facilities {
+      id
+      name
+      shortCode
+      instruments {
+        id
+        name
+        shortCode
+      }
+    }
+  }
+}

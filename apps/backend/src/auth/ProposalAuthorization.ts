@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { FacilityDataSource } from '../datasources/FacilityDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
@@ -35,6 +36,8 @@ export class ProposalAuthorization {
     private statusDataSource: StatusDataSource,
     @inject(Tokens.TechniqueDataSource)
     private techniqueDataSource: TechniqueDataSource,
+    @inject(Tokens.FacilityDataSource)
+    private facilityDataSource: FacilityDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
@@ -221,6 +224,13 @@ export class ProposalAuthorization {
     return isInternalReviewerOnSomeTechnicalReview;
   }
 
+  async isProposalOnUsersFacility(agentId: number, proposalPk: number) {
+    return await this.facilityDataSource.isProposalOnUsersFacility(
+      agentId,
+      proposalPk
+    );
+  }
+
   async hasReadRights(
     agent: UserWithRole | null,
     proposalOrProposalId: Proposal | number
@@ -268,12 +278,19 @@ export class ProposalAuthorization {
           proposal.primaryKey
         );
         break;
+      case Roles.FACILITY_MEMBER:
+        hasAccess = await this.isProposalOnUsersFacility(
+          agent.id,
+          proposal.primaryKey
+        );
+        break;
       case Roles.USER_OFFICER:
         hasAccess = true;
         break;
       case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
+
       default:
         hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }

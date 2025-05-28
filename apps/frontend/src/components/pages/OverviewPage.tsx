@@ -1,6 +1,7 @@
 import parse from 'html-react-parser';
 import React, { useContext } from 'react';
 
+import ProposalTableFacility from 'components/proposal/ProposalTableFacility';
 import ProposalTableInstrumentScientist from 'components/proposal/ProposalTableInstrumentScientist';
 import ProposalTableUser from 'components/proposal/ProposalTableUser';
 import UserUpcomingExperimentsTable from 'components/proposalBooking/UserUpcomingExperimentsTable';
@@ -55,6 +56,13 @@ export default function OverviewPage(props: { userRole: UserRole }) {
         </Paper>
       );
       break;
+    case UserRole.FACILITY_MEMBER:
+      roleBasedOverView = (
+        <Paper>
+          <ProposalTableFacility />
+        </Paper>
+      );
+      break;
     default:
       roleBasedOverView = (
         <Paper>
@@ -66,15 +74,16 @@ export default function OverviewPage(props: { userRole: UserRole }) {
 
   return (
     <StyledContainer maxWidth={false}>
-      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST && (
-        <Paper>
-          {loadingContent ? (
-            <div>Loading...</div>
-          ) : (
-            parse(pageContent as string)
-          )}
-        </Paper>
-      )}
+      {props.userRole !== UserRole.INSTRUMENT_SCIENTIST &&
+        props.userRole !== UserRole.FACILITY_MEMBER && (
+          <Paper>
+            {loadingContent ? (
+              <div>Loading...</div>
+            ) : (
+              parse(pageContent as string)
+            )}
+          </Paper>
+        )}
       {roleBasedOverView}
     </StyledContainer>
   );

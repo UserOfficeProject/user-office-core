@@ -1,0 +1,7 @@
+query getCallsByFacilityMember($userId: Int!) {
+  callsByFacilityMember(userId: $userId) {
+    id
+    shortCode
+    templateId
+  }
+}

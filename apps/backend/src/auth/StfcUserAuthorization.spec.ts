@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
+import { FacilityDataSource } from '../datasources/FacilityDataSource';
 import { dummyUser } from '../datasources/mockups/UserDataSource';
-import { Instrument } from '../models/Instrument';
+import { Facility } from '../models/Facility';
 import { StfcUserAuthorization } from './StfcUserAuthorization';
 
 jest.mock('../utils/Cache');
@@ -92,48 +92,46 @@ jest.mock('../datasources/stfc/UOWSClient.ts', () => {
 
 const userAuthorization = container.resolve(StfcUserAuthorization);
 
-const instrumentDataSource = container.resolve(
-  Tokens.InstrumentDataSource
-) as InstrumentDataSource;
+const facilityDataSource = container.resolve(
+  Tokens.FacilityDataSource
+) as FacilityDataSource;
 
-const mockRemoveScientistFromInstruments = jest.spyOn(
-  instrumentDataSource,
-  'removeScientistFromInstruments'
+const mockRemoveScientistFromFacility = jest.spyOn(
+  facilityDataSource,
+  'removeUserFromFacility'
 );
 
-const mockAssignScientistToInstruments = jest.spyOn(
-  instrumentDataSource,
-  'assignScientistToInstruments'
+const mockAssignScientistToFacility = jest.spyOn(
+  facilityDataSource,
+  'addUsersToFacility'
 );
 
-const mockGetRequiredInstrumentForRole = jest.spyOn(
+const mockGetRequiredFacilityForRole = jest.spyOn(
   userAuthorization,
-  'getRequiredInstrumentForRole'
+  'getRequiredFacilityForRole'
 );
 
-const instruments = [
-  new Instrument(0, 'ISIS', '', '', 0),
-  new Instrument(1, 'LSF', '', '', 0),
+const facilities = [
+  new Facility(0, 'ISIS Facility', 'ISIS'),
+  new Facility(1, 'LSF Facility', 'LSF'),
 ];
 
-const isisInstrument = instruments[0];
-const lsfInstrument = instruments[1];
-const nonExistingInstrumentName = 'NONEXISTING_INSTRUMENT';
+const isisFacility = facilities[0];
+const lsfFacility = facilities[1];
+const nonExistingFacilityName = 'NONEXISTING_INSTRUMENT';
 
 beforeAll(() => {
   jest
-    .spyOn(instrumentDataSource, 'getInstrumentsByNames')
-    .mockImplementation(async (instrumentNames: string[]) =>
-      instruments.filter((instrument) =>
-        instrumentNames.includes(instrument.name)
-      )
+    .spyOn(facilityDataSource, 'getFacilitiesByNames')
+    .mockImplementation(async (facilityNames: string[]) =>
+      facilities.filter((facility) => facilityNames.includes(facility.name))
     );
 });
 
 beforeEach(() => {
-  mockAssignScientistToInstruments.mockClear();
-  mockRemoveScientistFromInstruments.mockClear();
-  mockGetRequiredInstrumentForRole.mockClear();
+  mockAssignScientistToFacility.mockClear();
+  mockRemoveScientistFromFacility.mockClear();
+  mockGetRequiredFacilityForRole.mockClear();
 });
 
 test('When an invalid external token is supplied, no user is found', async () => {
@@ -151,11 +149,11 @@ test('When a valid external token is supplied, valid user is returned', async ()
   expect(result?.email).toBe(dummyUser.email);
 });
 
-test('When getting instruments for roles, duplicate roles are filtered out before', async () => {
+test('When getting facilities for roles, duplicate roles are filtered out before', async () => {
   await userAuthorization.externalTokenLogin('valid', '');
 
-  // Duplicate 'User Officer' and 'ISIS Instrument Scientist' roles removed
-  expect(mockGetRequiredInstrumentForRole).toHaveBeenCalledWith([
+  // Duplicate 'User Officer' and 'ISIS Facility Scientist' roles removed
+  expect(mockGetRequiredFacilityForRole).toHaveBeenCalledWith([
     {
       name: 'ISIS Instrument Scientist',
     },
@@ -177,161 +175,162 @@ test('When getting instruments for roles, duplicate roles are filtered out befor
   ]);
 });
 
-// getInstrumentsToAdd
-test('When a user is not already assigned to a requested instrument, the instrument is added', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments: Instrument[] = [];
+// getFacilitiesToAdd
+test('When a user is not already assigned to a requested facility, the facility is added', async () => {
+  const requiredFacilities = [isisFacility.name];
+  const currentFacilities: Facility[] = [];
 
-  const result = await userAuthorization.getInstrumentsToAdd(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToAdd(
+    requiredFacilities,
+    currentFacilities
   );
 
-  expect(result).toEqual([isisInstrument.id]);
+  expect(result).toEqual([isisFacility.id]);
 });
 
-test('When a user is already assigned to a requested instrument, the instrument is not added', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments = [isisInstrument];
+test('When a user is already assigned to a requested facility, the facility is not added', async () => {
+  const requiredFacilities = [isisFacility.name];
+  const currentFacilities = [isisFacility];
 
-  const result = await userAuthorization.getInstrumentsToAdd(
-    requiredInstruments,
-    currentInstruments
-  );
-
-  expect(result).toEqual([]);
-});
-
-test('When a user requests a nonexisting instrument, no instrument is added', async () => {
-  const requiredInstruments = [nonExistingInstrumentName];
-  const currentInstruments: Instrument[] = [];
-
-  const result = await userAuthorization.getInstrumentsToAdd(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToAdd(
+    requiredFacilities,
+    currentFacilities
   );
 
   expect(result).toEqual([]);
 });
 
-test('When a user requests multiple instruments, only new existing ones are added', async () => {
-  const requiredInstruments = [
-    isisInstrument.name,
-    lsfInstrument.name,
-    nonExistingInstrumentName,
+test('When a user requests a nonexisting facility, no facility is added', async () => {
+  const requiredFacilities = [nonExistingFacilityName];
+  const currentFacilities: Facility[] = [];
+
+  const result = await userAuthorization.getFacilitiesToAdd(
+    requiredFacilities,
+    currentFacilities
+  );
+
+  expect(result).toEqual([]);
+});
+
+test('When a user requests multiple facilities, only new existing ones are added', async () => {
+  const requiredFacilities = [
+    isisFacility.name,
+    lsfFacility.name,
+    nonExistingFacilityName,
   ];
-  const currentInstruments: Instrument[] = [isisInstrument];
+  const currentFacilities: Facility[] = [isisFacility];
 
-  const result = await userAuthorization.getInstrumentsToAdd(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToAdd(
+    requiredFacilities,
+    currentFacilities
   );
 
-  expect(result).toEqual([lsfInstrument.id]);
+  expect(result).toEqual([lsfFacility.id]);
 });
 
-// getInstrumentsToRemove
-test('When a user has an instrument they have not requested, the instrument is removed', async () => {
-  const requiredInstruments: string[] = [];
-  const currentInstruments = [isisInstrument];
+// getFacilitiesToRemove
+test('When a user has an facility they have not requested, the facility is removed', async () => {
+  const requiredFacilities: string[] = [];
+  const currentFacilities = [isisFacility];
 
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToRemove(
+    requiredFacilities,
+    currentFacilities
   );
 
-  expect(result).toEqual([isisInstrument.id]);
+  expect(result).toEqual([isisFacility.id]);
 });
 
-test('When a user has an instrument they have requested, no instrument is removed', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments = [isisInstrument];
+test('When a user has an facility they have requested, no facility is removed', async () => {
+  const requiredFacilities = [isisFacility.name];
+  const currentFacilities = [isisFacility];
 
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToRemove(
+    requiredFacilities,
+    currentFacilities
   );
 
   expect(result).toEqual([]);
 });
 
-test('When a user does not have an instrument they requested, no instrument is removed', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments: Instrument[] = [];
+test('When a user does not have an facility they requested, no facility is removed', async () => {
+  const requiredFacilities = [isisFacility.name];
+  const currentFacilities: Facility[] = [];
 
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToRemove(
+    requiredFacilities,
+    currentFacilities
   );
 
   expect(result).toEqual([]);
 });
 
-test('When a user requests a nonexisting instrument, all other instruments are removed', async () => {
-  const requiredInstruments = [nonExistingInstrumentName];
-  const currentInstruments = [isisInstrument, lsfInstrument];
+test('When a user requests a nonexisting facility, all other facilities are removed', async () => {
+  const requiredFacilities = [nonExistingFacilityName];
+  const currentFacilities = [isisFacility, lsfFacility];
 
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToRemove(
+    requiredFacilities,
+    currentFacilities
   );
 
-  expect(result).toEqual([isisInstrument.id, lsfInstrument.id]);
+  expect(result).toEqual([isisFacility.id, lsfFacility.id]);
 });
 
-test('When a user requests multiple instrument, only non requested ones are removed', async () => {
-  const requiredInstruments = [isisInstrument.name];
-  const currentInstruments: Instrument[] = [isisInstrument, lsfInstrument];
+test('When a user requests multiple facility, only non requested ones are removed', async () => {
+  const requiredFacilities = [isisFacility.name];
+  const currentFacilities: Facility[] = [isisFacility, lsfFacility];
 
-  const result = await userAuthorization.getInstrumentsToRemove(
-    requiredInstruments,
-    currentInstruments
+  const result = await userAuthorization.getFacilitiesToRemove(
+    requiredFacilities,
+    currentFacilities
   );
 
-  expect(result).toEqual([lsfInstrument.id]);
+  expect(result).toEqual([lsfFacility.id]);
 });
 
-//autoAssignRemoveInstruments
-test('When a user requires an instrument but does not have it, the instrument is assigned and no instrument are removed', async () => {
-  await userAuthorization.autoAssignRemoveInstruments(
+//autoAssignRemoveFacilities
+test('When a user requires an facility but does not have it, the facility is assigned and no facility are removed', async () => {
+  await userAuthorization.autoAssignRemoveFacilities(
     0,
-    [isisInstrument.name],
+    [isisFacility.name],
     [],
     true
   );
 
-  expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
-    isisInstrument.id,
-  ]);
-  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledTimes(0);
+  expect(mockAssignScientistToFacility).toHaveBeenCalledWith([0], 0);
+  expect(mockRemoveScientistFromFacility).toHaveBeenCalledTimes(0);
 });
 
-test('When a user does not require an instrument but has it, no instrument is assigned and the instrument is removed', async () => {
-  await userAuthorization.autoAssignRemoveInstruments(
+test('When a user does not require an facility but has it, no facility is assigned and the facility is removed', async () => {
+  await userAuthorization.autoAssignRemoveFacilities(
     0,
     [],
-    [isisInstrument],
+    [isisFacility],
     true
   );
 
-  expect(mockAssignScientistToInstruments).toHaveBeenCalledTimes(0);
-  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledWith(0, [
-    isisInstrument.id,
-  ]);
+  expect(mockAssignScientistToFacility).toHaveBeenCalledTimes(0);
+  expect(mockRemoveScientistFromFacility).toHaveBeenCalledWith(
+    0,
+    isisFacility.id
+  );
 });
 
-test('When a user requires an instrument but has a different one, the requested instrument is assigned and the current instrument is removed', async () => {
-  await userAuthorization.autoAssignRemoveInstruments(
+test('When a user requires an facility but has a different one, the requested facility is assigned and the current facility is removed', async () => {
+  await userAuthorization.autoAssignRemoveFacilities(
     0,
-    [isisInstrument.name],
-    [lsfInstrument],
+    [isisFacility.name],
+    [lsfFacility],
     true
   );
 
-  expect(mockAssignScientistToInstruments).toHaveBeenCalledWith(0, [
-    isisInstrument.id,
-  ]);
-  expect(mockRemoveScientistFromInstruments).toHaveBeenCalledWith(0, [
-    lsfInstrument.id,
-  ]);
+  expect(mockAssignScientistToFacility).toHaveBeenCalledWith(
+    [0],
+    isisFacility.id
+  );
+  expect(mockRemoveScientistFromFacility).toHaveBeenCalledWith(
+    0,
+    lsfFacility.id
+  );
 });

@@ -10,6 +10,7 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import ChangeRole from './common/ChangeRole';
+import FacilityPage from './facility/FacilityPage';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
 import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
@@ -131,6 +132,7 @@ const AppRoutes = () => {
   const isExperimentSafetyReviewer = useCheckAccess([
     UserRole.EXPERIMENT_SAFETY_REVIEWER,
   ]);
+  const isFacilityMember = useCheckAccess([UserRole.FACILITY_MEMBER]);
   const isInstrumentScientist = useCheckAccess([UserRole.INSTRUMENT_SCIENTIST]);
 
   const featureContext = useContext(FeatureContext);
@@ -158,6 +160,9 @@ const AppRoutes = () => {
   ]);
   const isExperimentSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
+  )?.isEnabled;
+  const isFacilitiesEnabled = featureContext.featuresMap.get(
+    FeatureId.FACILITIES
   )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
@@ -228,6 +233,14 @@ const AppRoutes = () => {
             path="/ExperimentPage"
             element={
               <TitledRoute title="Experiments" element={<ExperimentPage />} />
+            }
+          />
+        )}
+        {isFacilitiesEnabled && (isUserOfficer || isFacilityMember) && (
+          <Route
+            path="/Facility"
+            element={
+              <TitledRoute title="Facility" element={<FacilityPage />} />
             }
           />
         )}

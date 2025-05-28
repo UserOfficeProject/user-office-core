@@ -1,0 +1,9 @@
+mutation assignUsersToFacility(
+  $userIds: [Int!]!
+  $facilityId: Int!
+) {
+  assignUsersToFacility(
+    userIds: $userIds
+    facilityId: $facilityId
+  )
+}

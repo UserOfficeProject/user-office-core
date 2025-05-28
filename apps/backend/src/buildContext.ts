@@ -7,6 +7,7 @@ import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import ExperimentMutations from './mutations/ExperimentMutation';
+import FacilityMutations from './mutations/FacilityMutations';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
@@ -34,6 +35,7 @@ import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import ExperimentQueries from './queries/ExperimentQueries';
+import FacilityQueries from './queries/FacilityQueries';
 import FapQueries from './queries/FapQueries';
 import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
@@ -92,6 +94,7 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowQueries),
     statusAction: container.resolve(StatusActionQueries),
     settings: container.resolve(SettingsQueries),
+    facility: container.resolve(FacilityQueries),
     experiment: container.resolve(ExperimentQueries),
   },
   mutations: {
@@ -120,6 +123,7 @@ const context: BasicResolverContext = {
     statusActionsLogs: container.resolve(StatusActionsLogsMutations),
     status: container.resolve(StatusMutations),
     workflow: container.resolve(WorkflowMutations),
+    facility: container.resolve(FacilityMutations),
     experiment: container.resolve(ExperimentMutations),
   },
   clients: {
