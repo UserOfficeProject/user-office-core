@@ -345,35 +345,26 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
-      case Event.VISIT_REGISTRATION_APPROVED: {
-        const { visitregistration: visitRegistration } = event;
-        const user = await userDataSource.getUser(visitRegistration.userId);
-        const jsonMessage = JSON.stringify({
-          startAt: visitRegistration.startsAt,
-          endAt: visitRegistration.endsAt,
-          visitorId: user!.oidcSub,
-        });
-
-        await rabbitMQ.sendMessageToExchange(
-          EXCHANGE_NAME,
-          RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED,
-          jsonMessage
-        );
-        break;
-      }
-
+      case Event.VISIT_REGISTRATION_APPROVED:
       case Event.VISIT_REGISTRATION_CANCELLED: {
         const { visitregistration: visitRegistration } = event;
+        const proposal = await proposalDataSource.getProposalByVisitId(
+          visitRegistration.visitId
+        );
+        const proposalPayload = await getProposalMessageData(proposal);
         const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
           startAt: visitRegistration.startsAt,
           endAt: visitRegistration.endsAt,
           visitorId: user!.oidcSub,
+          proposal: JSON.parse(proposalPayload),
         });
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
-          RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          event.type === Event.VISIT_REGISTRATION_APPROVED
+            ? RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED
+            : RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
           jsonMessage
         );
         break;
