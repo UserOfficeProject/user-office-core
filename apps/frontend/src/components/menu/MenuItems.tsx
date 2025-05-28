@@ -29,6 +29,7 @@ import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
+import { useMeData } from 'hooks/user/useMeData';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
@@ -68,6 +69,7 @@ const ProposalsMenuListItem = () => {
 
 const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
+  const { meData } = useMeData();
   const { t } = useTranslation();
   const { format } = useFormattedDateTime({
     settingsFormatToUse: SettingsId.DATE_FORMAT,
@@ -99,7 +101,50 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     CallsDataQuantity.MINIMAL
   ).calls;
 
+  let currentRoleInfo = null;
+
+  if (meData) {
+    currentRoleInfo = meData.roles.find((role) => {
+      if (
+        role.shortCode.toLocaleLowerCase() === currentRole?.toLocaleLowerCase()
+      ) {
+        return true;
+      }
+    });
+  }
+  const permissions = currentRoleInfo?.permissions;
+  let dynamicMenuItems: React.ReactNode = null;
   const openCall = calls?.find((call) => call.isActive);
+  if (permissions) {
+    dynamicMenuItems = (
+      <div data-cy="user-menu-items">
+        {permissions.some(
+          (permission) => permission === 'ProposalQueries.getAll'
+        ) && (
+          <Tooltip title="Proposals">
+            <ListItemButton component={NavLink} to="/Proposals">
+              <ListItemIcon>
+                <FolderOpen />
+              </ListItemIcon>
+              <ListItemText primary="Proposals" />
+            </ListItemButton>
+          </Tooltip>
+        )}
+        {permissions.some(
+          (permission) => permission === 'InstrumentQueries.getAll'
+        ) && (
+          <Tooltip title={i18n.format(t('instrument'), 'plural')}>
+            <ListItemButton component={NavLink} to="/Instruments">
+              <ListItemIcon>
+                <ScienceIcon />
+              </ListItemIcon>
+              <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
+            </ListItemButton>
+          </Tooltip>
+        )}
+      </div>
+    );
+  }
 
   const techniqueProposalUrl =
     openCall && openCall.id
@@ -353,7 +398,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     case UserRole.INTERNAL_REVIEWER:
       return internalReviewer;
     default:
-      return null;
+      return dynamicMenuItems;
   }
 };
 

@@ -4,5 +4,7 @@ query getRoles {
     shortCode
     title
     description
+    dataAccess
+    permissions
   }
 }
