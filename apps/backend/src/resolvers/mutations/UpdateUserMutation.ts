@@ -24,9 +24,6 @@ export class UpdateUserArgs {
   public firstname?: string;
 
   @Field(() => String, { nullable: true })
-  public middlename?: string;
-
-  @Field(() => String, { nullable: true })
   public lastname?: string;
 
   @Field(() => String, { nullable: true })
@@ -37,9 +34,6 @@ export class UpdateUserArgs {
 
   @Field(() => String, { nullable: true })
   public gender?: string;
-
-  @Field(() => Int, { nullable: true })
-  public nationality?: number;
 
   @Field({ nullable: true })
   public birthdate?: Date;
@@ -58,9 +52,6 @@ export class UpdateUserArgs {
 
   @Field(() => String, { nullable: true })
   public telephone?: string;
-
-  @Field(() => String, { nullable: true })
-  public telephone_alt?: string;
 
   @Field(() => String, { nullable: true })
   public placeholder?: boolean;
