@@ -56,7 +56,6 @@ export interface UserDataSource {
   create(
     user_title: string | undefined,
     firstname: string,
-    middlename: string | undefined,
     lastname: string,
     username: string,
     preferredname: string | undefined,
@@ -64,14 +63,12 @@ export interface UserDataSource {
     oauth_refreshtoken: string,
     oauth_issuer: string,
     gender: string,
-    nationality: number,
     birthdate: Date,
     institution: number,
     department: string,
     position: string,
     email: string,
-    telephone: string,
-    telephone_alt: string | undefined
+    telephone: string
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
   ensureDummyUsersExist(userIds: number[]): Promise<User[]>;
