@@ -1,13 +1,13 @@
 /* eslint-disable prefer-const */
 import fs from 'fs';
 
+import { logger } from '@user-office-software/duo-logger';
 import to from 'await-to-js';
 import { GraphQLError } from 'graphql';
 import { Client } from 'pg';
 import { LargeObjectManager, ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
-import { FilesMetadataFilter } from '../../resolvers/queries/FilesMetadataQuery';
 import { FileDataSource } from '../FileDataSource';
 import database from './database';
 import { FileRecord, createFileMetadata } from './records';
@@ -24,37 +24,27 @@ export default class PostgresFileDataSource implements FileDataSource {
     return fileId;
   }
 
-  async getMetadata(fileId: string): Promise<FileMetadata>;
-  async getMetadata(filter: FilesMetadataFilter): Promise<FileMetadata[]>;
-  async getMetadata(param: unknown): Promise<FileMetadata | FileMetadata[]> {
-    if (param instanceof FilesMetadataFilter) {
-      const filter = param as FilesMetadataFilter;
-
-      if (!filter.fileIds || filter.fileIds.length === 0) {
-        return [];
-      }
-
-      return database('files')
-        .select('*')
-        .whereIn('file_id', filter.fileIds)
-        .then((records: FileRecord[]) => {
-          return records.map((record) => createFileMetadata(record));
-        });
-    }
-
-    if (typeof param === 'string') {
-      const fileId = param as string;
-
-      return database('files')
-        .select('*')
-        .where('file_id', fileId)
-        .first()
-        .then((record: FileRecord) => {
-          return createFileMetadata(record);
-        });
-    }
-
-    throw new GraphQLError('Unsupported input for getMetaData');
+  async getMetadata(
+    fileIds?: string[],
+    filenames?: string[],
+    internalUse?: boolean
+  ): Promise<FileMetadata[]> {
+    return database('files')
+      .select('*')
+      .modify((queryBuilder) => {
+        if (fileIds && fileIds.length > 0) {
+          queryBuilder.whereIn('file_id', fileIds);
+        }
+        if (filenames && filenames.length > 0) {
+          queryBuilder.whereIn('file_name', filenames);
+        }
+        if (internalUse === true) {
+          queryBuilder.where('internal_use', internalUse);
+        }
+      })
+      .then((records: FileRecord[]) => {
+        return records.map((record) => createFileMetadata(record));
+      });
   }
 
   public async put(
@@ -364,5 +354,58 @@ export default class PostgresFileDataSource implements FileDataSource {
 
       resolve(stream);
     });
+  }
+
+  public async delete(oid: number): Promise<boolean> {
+    return database
+      .transaction(async (trx) => {
+        const [metadataErr, fileRecord] = await to(
+          database('files')
+            .select('oid')
+            .where('oid', oid)
+            .first()
+            .transacting(trx)
+        );
+
+        if (metadataErr) {
+          throw new GraphQLError(
+            `Failed to get file metadata for deletion: ${metadataErr.message}`
+          );
+        }
+
+        if (!fileRecord) {
+          logger.logInfo('No file metadata found for deletion.', { oid: oid });
+
+          return false;
+        }
+
+        const pgClient = await (trx.client as any).acquireConnection();
+
+        const blobManager = new LargeObjectManager({ pg: pgClient });
+        const [unlinkError] = await to(blobManager.unlinkAsync(oid));
+
+        if (unlinkError) {
+          throw new GraphQLError(
+            `Failed to delete large object with OID ${oid}: ${unlinkError.message}`
+          );
+        }
+
+        const [deleteMetadataErr] = await to(
+          database('files').where('oid', oid).del().transacting(trx)
+        );
+
+        if (deleteMetadataErr) {
+          throw new GraphQLError(
+            `Failed to delete file metadata for oid ${oid}: ${deleteMetadataErr.message}`
+          );
+        }
+
+        return true;
+      })
+      .catch((error) => {
+        throw new GraphQLError(
+          `An unexpected error occurred during file deletion of OID ${oid}: ${error.message}`
+        );
+      });
   }
 }

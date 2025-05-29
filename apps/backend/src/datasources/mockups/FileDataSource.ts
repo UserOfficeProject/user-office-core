@@ -2,42 +2,49 @@ import { ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
 import { FileDataSource } from '../FileDataSource';
-import { FilesMetadataFilter } from './../../resolvers/queries/FilesMetadataQuery';
 
 export default class FileDataSourceMock implements FileDataSource {
   async prepare(fileId: string, _output: string): Promise<string> {
     return fileId;
   }
 
-  async getMetadata(fileId: string): Promise<FileMetadata>;
-  async getMetadata(filter: FilesMetadataFilter): Promise<FileMetadata[]>;
-  async getMetadata(param: unknown): Promise<FileMetadata | FileMetadata[]> {
-    if (param instanceof FilesMetadataFilter) {
-      const filter = param as FilesMetadataFilter;
-
+  async getMetadata(
+    fileIds?: string[],
+    filenames?: string[],
+    internalUse?: boolean
+  ): Promise<FileMetadata[]> {
+    if (fileIds || filenames) {
       return Promise.resolve(
-        filter.fileIds?.map(
+        fileIds?.map(
           (id) =>
-            new FileMetadata(id, 1, 'name', 'text/xml', 1, new Date(), false)
+            new FileMetadata(
+              id,
+              1,
+              'name',
+              'text/xml',
+              1,
+              new Date(),
+              internalUse ?? false
+            )
         ) ?? []
       );
     }
 
-    if (typeof param === 'string') {
-      const fileId = param as string;
-
-      return new FileMetadata(
-        fileId,
-        1,
-        'name',
-        'text/xml',
-        100,
-        new Date(),
-        false
-      );
+    if (internalUse != null && internalUse !== undefined) {
+      return Promise.resolve([
+        new FileMetadata(
+          'fileId',
+          1,
+          'name',
+          'text/xml',
+          1,
+          new Date(),
+          internalUse
+        ),
+      ]);
     }
 
-    throw new Error('Unsupported input for getMetaData');
+    return Promise.resolve([]);
   }
 
   async put(
@@ -74,5 +81,9 @@ export default class FileDataSourceMock implements FileDataSource {
     internalUse?: boolean
   ): Promise<ReadStream | null> {
     return fileName ? new ReadStream() : null;
+  }
+
+  public async delete(oid: number): Promise<boolean> {
+    return Promise.resolve(true);
   }
 }

@@ -13,12 +13,12 @@ export default class FileQueries {
   async getFileMetadata(fileId: string) {
     // TODO There should be authentication
 
-    return this.dataSource.getMetadata(fileId);
+    return this.dataSource.getMetadata([fileId]);
   }
 
   async getFilesMetadata(filter: FilesMetadataFilter) {
     // TODO There should be authentication
 
-    return this.dataSource.getMetadata(filter);
+    return this.dataSource.getMetadata(filter.fileIds, undefined, undefined);
   }
 }

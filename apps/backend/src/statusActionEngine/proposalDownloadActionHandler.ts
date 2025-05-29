@@ -91,6 +91,14 @@ export const proposalDownloadActionHandler = async (
       continue;
     }
 
+    const previousFile: FileMetadata | undefined = (
+      await fileDataSource.getMetadata(
+        undefined,
+        [`${proposal.primaryKey}.pdf`],
+        true
+      )
+    )[0];
+
     let fileMetadata: FileMetadata;
     try {
       fileMetadata = await fetchAndStorePdfFromFactory(
@@ -124,6 +132,28 @@ export const proposalDownloadActionHandler = async (
         filemetadata: fileMetadata,
       }
     );
+
+    if (previousFile) {
+      try {
+        await fileDataSource.delete(previousFile.oid);
+        logger.logInfo(
+          `Successfully deleted previous file for proposal ${proposal.proposalId}`,
+          {
+            ...logContext,
+            previousFile: previousFile,
+          }
+        );
+      } catch (error) {
+        logger.logWarn(
+          `Error deleting previous file for proposal ${proposal.proposalId}`,
+          {
+            ...logContext,
+            error,
+            previousFile: previousFile,
+          }
+        );
+      }
+    }
 
     const evt = constructProposalStatusChangeEvent(
       proposal,

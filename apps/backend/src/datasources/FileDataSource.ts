@@ -1,12 +1,15 @@
 import { ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../models/Blob';
-import { FilesMetadataFilter } from '../resolvers/queries/FilesMetadataQuery';
+
 export interface FileDataSource {
   prepare(fileId: string, output: string): Promise<string>;
   // Read
-  getMetadata(fileId: string): Promise<FileMetadata>;
-  getMetadata(filter: FilesMetadataFilter): Promise<FileMetadata[]>;
+  getMetadata(
+    fileIds?: string[],
+    filenames?: string[],
+    internalUse?: boolean
+  ): Promise<FileMetadata[]>;
   getBlobdata(
     fileName: string,
     internalUse?: boolean
@@ -26,4 +29,5 @@ export interface FileDataSource {
     readStream: NodeJS.ReadableStream,
     internalUse?: boolean
   ): Promise<FileMetadata>;
+  delete(oid: number): Promise<boolean>;
 }
