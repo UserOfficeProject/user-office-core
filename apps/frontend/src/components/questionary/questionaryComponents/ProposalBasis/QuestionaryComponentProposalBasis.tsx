@@ -35,8 +35,9 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   ) as ProposalContextType;
 
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
-  const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
-
+  // const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
+  const [localAbstract, setLocalAbstract] = useState('');
+  const [hasInvalidChars, setHasInvalidChars] = useState(false);
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -118,12 +119,11 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) => {
               const value = event.target.value;
-              const cleanedValue = value.replace(/[^\x20-\x7E\n\r\t]/g, ' ');
-              if (value !== cleanedValue) {
-                console.warn(
-                  'Replace any non-printable characters found within the proposal abstract field with a space character.'
-                );
-              }
+              const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
+              const hasInvalid = nonPrintableRegex.test(value);
+              const cleanedValue = value.replace(nonPrintableRegex, ' ');
+
+              setHasInvalidChars(hasInvalid);
               setLocalAbstract(cleanedValue);
             },
             onBlur: () => {
@@ -145,6 +145,12 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           InputLabelProps={{
             shrink: true,
           }}
+          error={hasInvalidChars}
+          helperText={
+            hasInvalidChars
+              ? 'Non-printable characters have been removed from your input.'
+              : 'Only printable ASCII characters are allowed.'
+          }
         />
       </Box>
       <ProposalParticipant
