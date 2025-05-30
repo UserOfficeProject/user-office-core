@@ -77,6 +77,7 @@ export default class PostgresStatusActionsLogsDataSource
 
     return createStatusActionsLogObject(statusActionLogRecord);
   }
+
   async update(args: StatusActionsLogsArgs): Promise<StatusActionsLog> {
     return database('status_actions_logs')
       .update({
@@ -89,6 +90,7 @@ export default class PostgresStatusActionsLogsDataSource
         return createStatusActionsLogObject(statusActionsLog[0]);
       });
   }
+
   async getStatusActionsLog(statusActionsLogId: number) {
     const statusActionsLog = await database
       .select<StatusActionsLogRecord>()
@@ -128,6 +130,13 @@ export default class PostgresStatusActionsLogsDataSource
         }
         if (args.filter?.statusActionIds) {
           query.whereIn('sal.action_id', args.filter.statusActionIds);
+        }
+        if (args.filter?.statusActionType) {
+          query
+            .join('status_actions as sa', {
+              'sa.status_action_id': 'sal.action_id',
+            })
+            .where('sa.type', args.filter.statusActionType);
         }
         if (args.filter?.statusActionsMessage) {
           query.where(
@@ -199,6 +208,7 @@ export default class PostgresStatusActionsLogsDataSource
         };
       });
   }
+
   async getStatusActionsLogHasProposals(
     statusActionsLogId: number
   ): Promise<StatusActionsLogHasProposal[]> {

@@ -11,7 +11,11 @@ import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import { StatusActionsLog } from 'generated/sdk';
+import {
+  StatusActionsLog,
+  StatusActionsLogsFilter,
+  StatusActionType,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -24,7 +28,16 @@ import StatusActionsStatusFilter, {
   StatusActionsLogStatus,
 } from './StatusActionsStatusFilter';
 
-const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
+interface StatusActionsLogsTableProps {
+  confirm: WithConfirmType;
+  statusActionType: StatusActionType;
+}
+
+const StatusActionsLogsTable = ({
+  confirm,
+  statusActionType: propStatusActionType,
+}: StatusActionsLogsTableProps) => {
+  const [statusActionType] = useState<StatusActionType>(propStatusActionType);
   const { toFormattedDateTime } = useFormattedDateTime();
   const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>();
   const { api } = useDataApiWithFeedback();
@@ -47,10 +60,14 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
   let columns: Column<StatusActionsLog>[] = [
-    {
-      title: 'Email Status Action Recipient',
-      field: 'emailStatusActionRecipient',
-    },
+    ...(statusActionType === StatusActionType.EMAIL
+      ? [
+          {
+            title: 'Email Status Action Recipient',
+            field: 'emailStatusActionRecipient',
+          },
+        ]
+      : []),
     {
       title: 'Proposal IDs',
       field: 'proposalIds',
@@ -79,6 +96,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     {
       title: 'Log Time',
       field: 'statusActionsTstamp',
+      defaultSort: 'desc',
     },
   ];
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
@@ -127,7 +145,10 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     new Promise<QueryResult<StatusActionsLog>>(async (resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
-        let filter = {};
+        let filter: StatusActionsLogsFilter = {
+          statusActionType: statusActionType,
+        };
+
         if (
           statusActionsLogStatus &&
           statusActionsLogStatus !== StatusActionsLogStatus.ALL
@@ -215,7 +236,15 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           icons={tableIcons}
           title={
             <Typography variant="h6" component="h2">
-              Status Actions Logs
+              {(() => {
+                if (statusActionType === StatusActionType.PROPOSALDOWNLOAD) {
+                  return 'Proposal Download Status Actions Logs';
+                } else if (statusActionType === StatusActionType.EMAIL) {
+                  return 'Email Status Actions Logs';
+                } else {
+                  return 'Status Action Logs';
+                }
+              })()}
             </Typography>
           }
           onRowClick={() => {
@@ -262,7 +291,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     () =>
                       api({
                         toastSuccessMessage:
-                          'Status action replay successfully send',
+                          'Status action replay successfully sent.',
                       })
                         .replayStatusActionsLog({
                           statusActionsLogId:
@@ -275,10 +304,19 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
                         }),
                     {
                       title: 'Are you sure?',
-                      description: `You are about to send a status action replay request`,
-                      alertText: statusActionsLog.statusActionsSuccessful
-                        ? 'This status action is already successful resending a request will lead to duplicate notifications being send'
-                        : '',
+                      description: `You are about to send a status action replay request.`,
+                      alertText: (() => {
+                        if (
+                          statusActionsLog?.connectionStatusAction?.action.name
+                            .toLowerCase()
+                            .includes('email')
+                        ) {
+                          return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
+                        } else {
+                          return 'This status action was already successful. Replaying it might lead to unexpected behaviour or redundant processes.';
+                        }
+                      })(),
+                      confirmationText: 'Replay',
                       shouldEnableOKWithAlert: true,
                     }
                   )();

@@ -17,4 +17,7 @@ export class FileMetadata implements Partial<FileMetaDataOrigin> {
 
   @Field()
   public fileId: string;
+
+  @Field(() => Boolean)
+  public internalUse: boolean;
 }
