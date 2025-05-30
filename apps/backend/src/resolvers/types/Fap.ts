@@ -81,7 +81,8 @@ export class FapResolvers {
         userId: fapChairUserId,
         count:
           context.queries.fap.dataSource.getCurrentFapReviewerProposalCount(
-            fapChairUserId
+            fapChairUserId,
+            fap.id
           ),
       };
     });
@@ -112,7 +113,8 @@ export class FapResolvers {
         userId: fapSecretariesUserId,
         count:
           context.queries.fap.dataSource.getCurrentFapReviewerProposalCount(
-            fapSecretariesUserId
+            fapSecretariesUserId,
+            fap.id
           ),
       };
     });

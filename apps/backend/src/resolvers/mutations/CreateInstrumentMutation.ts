@@ -24,6 +24,9 @@ export class CreateInstrumentArgs {
 
   @Field(() => Int)
   public managerUserId: number;
+
+  @Field(() => Boolean, { nullable: true, defaultValue: true })
+  public selectable?: boolean;
 }
 
 @Resolver()

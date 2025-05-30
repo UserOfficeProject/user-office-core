@@ -1,3 +1,4 @@
+import Alert from '@mui/material/Alert';
 import React from 'react';
 
 import UOLoader from 'components/common/UOLoader';
@@ -24,7 +25,12 @@ function CreateShipment({
   );
 
   if (blankShipmentError) {
-    return <div>{blankShipmentError}</div>;
+    return (
+      <Alert severity="error">
+        <strong>Error:</strong>
+        {blankShipmentError}
+      </Alert>
+    );
   }
 
   if (!blankShipment || !experiment) {

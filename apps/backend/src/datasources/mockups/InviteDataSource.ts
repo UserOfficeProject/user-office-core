@@ -3,7 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
-import { InviteDataSource } from '../InviteDataSource';
+import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
 
 @injectable()
 export class InviteDataSourceMock implements InviteDataSource {
@@ -73,6 +73,43 @@ export class InviteDataSourceMock implements InviteDataSource {
 
   async findByCode(code: string): Promise<Invite | null> {
     return this.invites.find((invite) => invite.code === code) || null;
+  }
+
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+    return new Promise((resolve) => {
+      const filteredInvites = this.invites.filter((invite) => {
+        if (filter.createdBefore) {
+          if (invite.createdAt >= filter.createdBefore) {
+            return false;
+          }
+        }
+
+        if (filter.createdAfter) {
+          if (invite.createdAt <= filter.createdAfter) {
+            return false;
+          }
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (invite.claimedAt === null && filter.isClaimed) {
+            return false;
+          }
+          if (invite.claimedAt !== null && !filter.isClaimed) {
+            return false;
+          }
+        }
+
+        if (filter.isExpired) {
+          if (invite.expiresAt && invite.expiresAt < new Date()) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      resolve(filteredInvites);
+    });
   }
 
   async create(args: {

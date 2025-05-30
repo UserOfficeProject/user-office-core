@@ -54,9 +54,6 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public firstname: string;
 
-  @Field(() => String, { nullable: true })
-  public middlename: string | undefined;
-
   @Field()
   public lastname: string;
 
@@ -75,9 +72,6 @@ export class User implements Partial<UserOrigin> {
   @Field()
   public gender: string;
 
-  @Field(() => Int, { nullable: true })
-  public nationality: number;
-
   @Field()
   public birthdate: Date;
 
@@ -95,9 +89,6 @@ export class User implements Partial<UserOrigin> {
 
   @Field()
   public telephone: string;
-
-  @Field(() => String, { nullable: true })
-  public telephone_alt: string | undefined;
 
   @Field()
   public placeholder: boolean;

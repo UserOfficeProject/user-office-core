@@ -121,9 +121,7 @@ export class AdminDataSourceMock implements AdminDataSource {
   async getCountries(): Promise<Entry[]> {
     throw new Error('Method not implemented.');
   }
-  async getNationalities(): Promise<Entry[]> {
-    throw new Error('Method not implemented.');
-  }
+
   async get(id: number): Promise<string | null> {
     return 'HELLO WORLD';
   }
