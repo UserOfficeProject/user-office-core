@@ -92,8 +92,8 @@ export const emailStatusActionRecipient = async (
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
   const templateMessage = 'template: ' + recipientWithTemplate.emailTemplate.id;
   const successfulMessage = !!statusActionsLogId
-    ? 'Email successfully sent on status action replay '
-    : 'Email successfully sent ';
+    ? 'Email successfully sent on status action replay'
+    : 'Email successfully sent';
   const failMessage = !!statusActionsLogId
     ? 'Email(s) could not be sent on status action replay'
     : 'Email(s) could not be sent';
