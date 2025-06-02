@@ -90,7 +90,7 @@ export const emailStatusActionRecipient = async (
   loggedInUserId?: number | null
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
-  const templateMessage = 'template: ' + recipientWithTemplate.emailTemplate.id;
+  const templateMessage = recipientWithTemplate.emailTemplate.id;
   const successfulMessage = !!statusActionsLogId
     ? 'Email successfully sent on status action replay'
     : 'Email successfully sent';
