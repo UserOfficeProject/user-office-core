@@ -24,6 +24,7 @@ const Paper = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function OverviewPage(props: { userRole: UserRole }) {
+  console.log('OverviewPage', props.userRole);
   const [loadingContent, pageContent] = useGetPageContent(
     props.userRole === UserRole.USER ? PageName.HOMEPAGE : PageName.REVIEWPAGE
   );

@@ -9,6 +9,7 @@ import { FeatureId, UserRole, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
+import RoleManagement from './admin/RoleManagement';
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
@@ -207,6 +208,14 @@ const AppRoutes = () => {
             element={<TitledRoute title="People" element={<PeoplePage />} />}
           />
         )}
+
+        <Route
+          path="/admin/roles"
+          element={
+            <TitledRoute title="Role creation" element={<RoleManagement />} />
+          }
+        />
+
         <Route
           path="/Proposals"
           element={<TitledRoute title="Proposals" element={<ProposalPage />} />}

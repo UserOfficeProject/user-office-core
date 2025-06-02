@@ -1,8 +1,11 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import { container } from 'tsyringe';
 
+import { Tokens } from '../config/Tokens';
+import { UserDataSource } from '../datasources/UserDataSource';
 import { Rejection, rejection } from '../models/Rejection';
-import { Roles } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 
 const Authorized = (roles: Roles[] = []) => {
@@ -17,7 +20,6 @@ const Authorized = (roles: Roles[] = []) => {
     }
   ) => {
     const originalMethod = descriptor.value;
-
     descriptor.value = async function (...args) {
       const [agent] = args;
       const isMutation = target.constructor.name.includes('Mutation');
@@ -50,6 +52,32 @@ const Authorized = (roles: Roles[] = []) => {
       }
 
       if (roles.length === 0) {
+        return await originalMethod?.apply(this, args);
+      }
+
+      const userDataSource = container.resolve<UserDataSource>(
+        Tokens.UserDataSource
+      );
+
+      const rolesArray: Role[] = await userDataSource.getUserRoles(agent.id);
+      const userRoles: Record<string, { permissions: string[] }> =
+        rolesArray.reduce(
+          (acc, role) => {
+            acc[role.shortCode] = { permissions: role.permissions };
+
+            return acc;
+          },
+          {} as Record<string, { permissions: string[] }>
+        );
+
+      //check if user has dynamic role with permissions for this method
+      if (
+        agent.currentRole?.shortCode &&
+        userRoles[agent.currentRole.shortCode]?.permissions.some(
+          (permission: string) =>
+            permission === `${target.constructor.name}.${name}`
+        )
+      ) {
         return await originalMethod?.apply(this, args);
       }
 
