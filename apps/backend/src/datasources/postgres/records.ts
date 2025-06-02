@@ -248,7 +248,6 @@ export interface UserRecord {
   readonly user_id: number;
   readonly user_title: string;
   readonly firstname: string;
-  readonly middlename: string;
   readonly lastname: string;
   readonly username: string;
   readonly preferredname: string;
@@ -256,13 +255,11 @@ export interface UserRecord {
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;
-  readonly nationality: number;
   readonly birthdate: Date;
   readonly department: string;
   readonly position: string;
   readonly email: string;
   readonly telephone: string;
-  readonly telephone_alt: string;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
@@ -370,11 +367,6 @@ export interface CallRecord {
 export interface PageTextRecord {
   readonly pagetext_id: number;
   readonly content: string;
-}
-
-export interface NationalityRecord {
-  readonly nationality_id: number;
-  readonly nationality: string;
 }
 
 export interface InstitutionRecord {
@@ -509,6 +501,7 @@ export interface InstrumentRecord {
   readonly description: string;
   readonly manager_user_id: number;
   readonly full_count: number;
+  readonly selectable: boolean;
 }
 
 export interface InstrumentHasProposalRecord {
@@ -849,7 +842,8 @@ export const createInstrumentObject = (instrument: InstrumentRecord) => {
     instrument.name,
     instrument.short_code,
     instrument.description,
-    instrument.manager_user_id
+    instrument.manager_user_id,
+    instrument.selectable
   );
 };
 
@@ -963,7 +957,6 @@ export const createUserObject = (user: UserRecord) => {
     user.user_id,
     user.user_title,
     user.firstname,
-    user.middlename,
     user.lastname,
     user.username,
     user.preferredname,
@@ -971,7 +964,6 @@ export const createUserObject = (user: UserRecord) => {
     user.oauth_refresh_token,
     user.oauth_issuer,
     user.gender,
-    user.nationality,
     user.birthdate,
     user.institution_id,
     user.institution,
@@ -979,7 +971,6 @@ export const createUserObject = (user: UserRecord) => {
     user.position,
     user.email,
     user.telephone,
-    user.telephone_alt,
     user.placeholder,
     user.created_at.toISOString(),
     user.updated_at.toISOString()

@@ -35,6 +35,7 @@ export interface TemplatesTableProps {
   dataProvider: () => Promise<NonNullable<GetTemplatesQuery['templates']>>;
   isRowRemovable: (row: TemplateRowDataType) => boolean;
   actions?: MaterialTableProps<TemplateRowDataType>['actions'];
+  emptyDataSourceMessage?: React.ReactNode;
 }
 
 const TemplatesTable = ({
@@ -44,6 +45,7 @@ const TemplatesTable = ({
   isRowRemovable,
   confirm,
   actions,
+  emptyDataSourceMessage,
 }: TemplatesTableProps & { confirm: WithConfirmType }) => {
   const [templates, setTemplates] = useState<TemplateRowDataType[]>([]);
   const { api } = useDataApiWithFeedback();
@@ -241,6 +243,13 @@ const TemplatesTable = ({
         columns={columns}
         isLoading={loadingTemplates}
         data={templatesWithId}
+        // text to show when the table is empty
+        localization={{
+          body: {
+            emptyDataSourceMessage:
+              emptyDataSourceMessage ?? 'No templates found',
+          },
+        }}
         actions={[
           ...customActions,
           {

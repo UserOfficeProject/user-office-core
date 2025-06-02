@@ -1185,7 +1185,7 @@ context('Template Delete, Archive, Unarchive', () => {
 
       cy.reload();
 
-      cy.testActionButton(cyTagRegisterVisit, 'completed');
+      cy.testActionButton(cyTagRegisterVisit, 'pending');
     };
 
     beforeEach(function () {

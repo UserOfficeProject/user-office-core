@@ -84,6 +84,9 @@ export function useBlankShipment(
             });
         } else {
           setError('There is no active shipment template');
+          api().addClientLog({
+            error: 'There is no active shipment template',
+          });
         }
       });
   }, [api, user, experimentPk, proposalPk]);
