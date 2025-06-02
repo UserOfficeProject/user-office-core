@@ -7,6 +7,10 @@ query getExperimentSample($experimentPk: Int!, $sampleId: Int!) {
     }
     sample {
       ...sample
+      questionary {
+        isCompleted
+        ...questionary
+      }
     }
   }
 }

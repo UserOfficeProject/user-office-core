@@ -7,6 +7,7 @@ import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import ExperimentMutations from './mutations/ExperimentMutation';
+import ExperimentSafetyPdfTemplateMutations from './mutations/ExperimentSafetyPdfTemplateMutations';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
@@ -14,9 +15,9 @@ import GenericTemplateMutations from './mutations/GenericTemplateMutations';
 import InstrumentMutations from './mutations/InstrumentMutations';
 import InternalReviewMutations from './mutations/InternalReviewMutations';
 import InviteMutations from './mutations/InviteMutations';
-import PdfTemplateMutations from './mutations/PdfTemplateMutations';
 import PredefinedMessageMutations from './mutations/PredefinedMessageMutations';
 import ProposalMutations from './mutations/ProposalMutations';
+import ProposalPdfTemplateMutations from './mutations/ProposalPdfTemplateMutations';
 import QuestionaryMutations from './mutations/QuestionaryMutations';
 import RedeemCodesMutations from './mutations/RedeemCodesMutations';
 import ReviewMutations from './mutations/ReviewMutations';
@@ -34,6 +35,7 @@ import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import ExperimentQueries from './queries/ExperimentQueries';
+import ExperimentSafetyPdfTemplateQueries from './queries/ExperimentSafetyPdfTemplateQueries';
 import FapQueries from './queries/FapQueries';
 import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
@@ -41,8 +43,8 @@ import GenericTemplateQueries from './queries/GenericTemplateQueries';
 import InstrumentQueries from './queries/InstrumentQueries';
 import InternalReviewQueries from './queries/InternalReviewQueries';
 import InviteQueries from './queries/InviteQueries';
-import PdfTemplateQueries from './queries/PdfTemplateQueries';
 import PredefinedMessageQueries from './queries/PredefinedMessageQueries';
+import ProposalPdfTemplateQueries from './queries/ProposalPdfTemplateQueries';
 import ProposalQueries from './queries/ProposalQueries';
 import QuestionaryQueries from './queries/QuestionaryQueries';
 import ReviewQueries from './queries/ReviewQueries';
@@ -71,7 +73,10 @@ const context: BasicResolverContext = {
     genericTemplate: container.resolve(GenericTemplateQueries),
     instrument: container.resolve(InstrumentQueries),
     invite: container.resolve(InviteQueries),
-    pdfTemplate: container.resolve(PdfTemplateQueries),
+    proposalPdfTemplate: container.resolve(ProposalPdfTemplateQueries),
+    experimentSafetyPdfTemplate: container.resolve(
+      ExperimentSafetyPdfTemplateQueries
+    ),
     proposal: container.resolve(ProposalQueries),
     questionary: container.resolve(QuestionaryQueries),
     review: container.resolve(ReviewQueries),
@@ -102,7 +107,10 @@ const context: BasicResolverContext = {
     genericTemplate: container.resolve(GenericTemplateMutations),
     instrument: container.resolve(InstrumentMutations),
     invite: container.resolve(InviteMutations),
-    pdfTemplate: container.resolve(PdfTemplateMutations),
+    proposalPdfTemplate: container.resolve(ProposalPdfTemplateMutations),
+    experimentSafetyPdfTemplate: container.resolve(
+      ExperimentSafetyPdfTemplateMutations
+    ),
     proposal: container.resolve(ProposalMutations),
     questionary: container.resolve(QuestionaryMutations),
     redeemCodes: container.resolve(RedeemCodesMutations),

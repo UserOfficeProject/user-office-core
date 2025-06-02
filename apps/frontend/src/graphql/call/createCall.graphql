@@ -19,7 +19,8 @@ mutation createCall(
   $proposalWorkflowId: Int!
   $templateId: Int!
   $esiTemplateId: Int
-  $pdfTemplateId: Int
+  $proposalPdfTemplateId: Int
+  $experimentSafetyPdfTemplateId: Int
   $fapReviewTemplateId: Int
   $technicalReviewTemplateId: Int
   $title: String
@@ -48,7 +49,8 @@ mutation createCall(
       proposalWorkflowId: $proposalWorkflowId
       templateId: $templateId
       esiTemplateId: $esiTemplateId
-      pdfTemplateId: $pdfTemplateId
+      proposalPdfTemplateId: $proposalPdfTemplateId
+      experimentSafetyPdfTemplateId: $experimentSafetyPdfTemplateId
       fapReviewTemplateId: $fapReviewTemplateId
       technicalReviewTemplateId: $technicalReviewTemplateId
       title: $title

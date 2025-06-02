@@ -24,6 +24,7 @@ export enum PDFType {
   PROPOSAL = 'proposal',
   SAMPLE = 'sample',
   SHIPMENT_LABEL = 'shipment-label',
+  EXPERIMENT_SAFETY = 'experiment-safety',
 }
 export enum ZIPType {
   ATTACHMENT = 'attachment',
@@ -33,7 +34,7 @@ export enum ZIPType {
 export type MetaBase = { collectionFilename: string; singleFilename: string };
 export type XLSXMetaBase = MetaBase & { columns: string[] };
 
-const ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
+const ENDPOINT = 'http://localhost:4500/generate'; //process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
 export interface DownloadService {
   callFactoryService<TData, TMeta extends MetaBase>(
