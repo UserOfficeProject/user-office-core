@@ -40,6 +40,7 @@ export default class InviteMutations {
 
   @Authorized()
   @EventBus(Event.INVITE_ACCEPTED)
+  @EventBus(Event.PROPOSAL_INVITE_ACCEPTED)
   async accept(
     agent: UserWithRole | null,
     code: string
@@ -71,6 +72,7 @@ export default class InviteMutations {
 
   @Authorized()
   @EventBus(Event.EMAIL_INVITES)
+  @EventBus(Event.PROPOSAL_INVITES_SENT)
   public async setCoProposerInvites(
     agent: UserWithRole | null,
     args: SetCoProposerInvitesInput

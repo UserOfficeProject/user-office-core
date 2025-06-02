@@ -215,6 +215,16 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
   array: AnswerBasic[];
 }
 
+interface ProposalInvitesSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_INVITES_SENT;
+  invites: Invite[];
+}
+
+interface ProposalInviteAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_INVITE_ACCEPTED;
+  invite: Invite;
+}
+
 interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
   user: User;
@@ -447,6 +457,8 @@ export type ApplicationEvent =
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent
   | ProposalAllFapInstrumentSubmittedEvent
+  | ProposalInvitesSentEvent
+  | ProposalInviteAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
