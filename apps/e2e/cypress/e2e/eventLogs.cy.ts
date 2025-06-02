@@ -69,7 +69,6 @@ context('Event log tests', () => {
         user_title: 'Dr.',
         lastname: 'Doe',
         gender: 'male',
-        nationality: 1,
         birthdate: new Date('2000/01/01'),
         institutionId: 1,
         department: 'IT',

@@ -537,10 +537,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 }
 
-function getTemplateIdForRole(role: UserRole): string {
+export function getTemplateIdForRole(role: UserRole): string {
   switch (role) {
     case UserRole.USER:
-      return 'user-office-registration-invitation';
+      return 'user-office-registration-invitation-co-proposer';
     case UserRole.INTERNAL_REVIEWER:
       return 'user-office-registration-invitation-reviewer';
     default:
