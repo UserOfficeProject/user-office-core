@@ -9,10 +9,12 @@ import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
+import { StatusActionType } from '../models/StatusAction';
 import { StatusActionsLog } from '../models/StatusActionsLog';
 import { UserWithRole } from '../models/User';
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 import { emailActionHandler } from '../statusActionEngine/emailActionHandler';
+import { proposalDownloadActionHandler } from '../statusActionEngine/proposalDownloadActionHandler';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 
 @injectable()
@@ -103,12 +105,29 @@ export default class StatusActionsLogsMutations {
       );
     }
 
-    emailActionHandler(statusAction, workflowEngineProposals, {
-      statusActionsLogId: statusActionsLog.statusActionsLogId,
-      loggedInUserId: agent?.id,
-      statusActionRecipients:
-        statusActionsLog.emailStatusActionRecipient as EmailStatusActionRecipients,
-    });
+    switch (statusAction.type) {
+      case StatusActionType.EMAIL:
+        emailActionHandler(statusAction, workflowEngineProposals, {
+          statusActionsLogId: statusActionsLog.statusActionsLogId,
+          loggedInUserId: agent?.id,
+          statusActionRecipients:
+            statusActionsLog.emailStatusActionRecipient as EmailStatusActionRecipients,
+        });
+
+        break;
+      case StatusActionType.PROPOSALDOWNLOAD:
+        proposalDownloadActionHandler(statusAction, workflowEngineProposals, {
+          statusActionsLogId: statusActionsLog.statusActionsLogId,
+          loggedInUserId: agent?.id,
+        });
+
+        break;
+      default:
+        return rejection('Status action type does not support replay', {
+          statusActionsLog,
+          statusAction,
+        });
+    }
 
     return true;
   }

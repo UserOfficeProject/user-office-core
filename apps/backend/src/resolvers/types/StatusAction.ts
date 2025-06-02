@@ -36,7 +36,7 @@ export class StatusAction implements Partial<StatusActionOrigin> {
 
 @Resolver(() => StatusAction)
 export class StatusActionResolver {
-  @FieldResolver(() => StatusActionDefaultConfig)
+  @FieldResolver(() => StatusActionDefaultConfig, { nullable: true })
   async defaultConfig(
     @Root() statusAction: StatusAction,
     @Ctx() context: ResolverContext
