@@ -3,18 +3,15 @@ query getUserMe {
     user_title
     username
     firstname
-    middlename
     lastname
     preferredname
     gender
-    nationality
     birthdate
     institutionId
     department
     position
     email
     telephone
-    telephone_alt
     oidcSub
     placeholder
   }
