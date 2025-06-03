@@ -24,4 +24,6 @@ export interface FacilityDataSource {
   getFacilityInstruments(facilityId: number): Promise<Instrument[]>;
   getFacilityCalls(facilityId: number): Promise<Call[]>;
   getFacilitiesByNames(facilityNames: string[]): Promise<Facility[]>;
+  getCallsFacilities(callId: number | null): Promise<Facility[]>;
+  getInstrumentsFacilities(instrumentId: number | null): Promise<Facility[]>;
 }

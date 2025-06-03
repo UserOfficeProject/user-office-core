@@ -4,6 +4,12 @@ import { Instrument } from '../../models/Instrument';
 import { FacilityDataSource } from '../FacilityDataSource';
 
 export class FacilityDataSourceMock implements FacilityDataSource {
+  getCallsFacilities(callId: number | null): Promise<Facility[]> {
+    throw new Error('Method not implemented.');
+  }
+  getInstrumentsFacilities(instrumentId: number | null): Promise<Facility[]> {
+    throw new Error('Method not implemented.');
+  }
   addCallsToFacility(callIds: number[], facilityId: number): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
