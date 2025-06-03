@@ -588,7 +588,7 @@ context('Status actions tests', () => {
         .invoke('text')
         .then((tableText) => {
           expect(tableText).to.contain(
-            `${statusActionEvent}Email successfully sent to: ${statusActionEmail}`
+            `${statusActionEvent}Email successfully sent`
           );
 
           expect(tableText).to.contain(
