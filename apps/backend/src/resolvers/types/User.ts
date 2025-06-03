@@ -182,7 +182,7 @@ export class UserResolver {
 
     return context.queries.fap.dataSource.getUserFaps(
       user.id,
-      context.user.currentRole
+      context.user.currentRole.shortCode
     );
   }
 
