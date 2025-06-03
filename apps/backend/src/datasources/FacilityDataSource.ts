@@ -1,6 +1,6 @@
+import { Call } from '../models/Call';
 import { Facility } from '../models/Facility';
 import { Instrument } from '../models/Instrument';
-import { BasicUserDetails } from '../models/User';
 
 export interface FacilityDataSource {
   getFacilities(ids: number[] | null): Promise<Facility[]>;
@@ -11,8 +11,6 @@ export interface FacilityDataSource {
     shortCode: string
   ): Promise<Facility>;
   deleteFacility(id: number): Promise<Facility>;
-  addUsersToFacility(userIds: number[], facilityId: number): Promise<boolean>;
-  removeUserFromFacility(userId: number, facilityId: number): Promise<boolean>;
   addInstrumentsToFacility(
     instrumentIds: number[],
     facilityId: number
@@ -21,9 +19,9 @@ export interface FacilityDataSource {
     instrumentId: number,
     facilityId: number
   ): Promise<boolean>;
+  addCallsToFacility(callIds: number[], facilityId: number): Promise<boolean>;
+  removeCallFromFacility(callId: number, facilityId: number): Promise<boolean>;
   getFacilityInstruments(facilityId: number): Promise<Instrument[]>;
-  getFacilityUsers(facilityId: number): Promise<BasicUserDetails[]>;
-  getUsersFacilities(userId: number): Promise<Facility[]>;
-  isProposalOnUsersFacility(user: number, proposal: number): Promise<boolean>;
+  getFacilityCalls(facilityId: number): Promise<Call[]>;
   getFacilitiesByNames(facilityNames: string[]): Promise<Facility[]>;
 }

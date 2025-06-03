@@ -1,10 +1,9 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { Call } from '../../models/Call';
 import { Facility } from '../../models/Facility';
 import { Instrument } from '../../models/Instrument';
-import { ProposalView } from '../../models/ProposalView';
-import { BasicUserDetails } from '../../models/User';
 import { FacilityDataSource } from '../FacilityDataSource';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
@@ -12,9 +11,8 @@ import {
   createFacilityObject,
   createInstrumentObject,
   FacilityRecord,
-  FacilityUserRecord,
   InstrumentRecord,
-  ProposalViewRecord,
+  createCallObject,
 } from './records';
 
 @injectable()
@@ -65,31 +63,6 @@ class PostgresFacilityDataSource implements FacilityDataSource {
     return createFacilityObject(facility);
   }
 
-  async addUsersToFacility(
-    userId: number[],
-    facilityId: number
-  ): Promise<boolean> {
-    const dataToInsert = userId.map((userId) => ({
-      facility_id: facilityId,
-      user_id: userId,
-    }));
-
-    const result = await database('facility_user').insert(dataToInsert);
-
-    return result.length > 0;
-  }
-
-  async removeUserFromFacility(
-    userId: number,
-    facilityId: number
-  ): Promise<boolean> {
-    const result = await database('facility_user')
-      .where({ user_id: userId, facility_id: facilityId })
-      .del();
-
-    return result > 0;
-  }
-
   async addInstrumentsToFacility(
     instrumentIds: number[],
     facilityId: number
@@ -115,6 +88,30 @@ class PostgresFacilityDataSource implements FacilityDataSource {
     return result > 0;
   }
 
+  async addCallsToFacility(
+    callIds: number[],
+    facilityId: number
+  ): Promise<boolean> {
+    const dataToInsert = callIds.map((callId) => ({
+      facility_id: facilityId,
+      call_id: callId,
+    }));
+
+    const result = await database('facility_call').insert(dataToInsert);
+
+    return result.length > 0;
+  }
+  async removeCallFromFacility(
+    callId: number,
+    facilityId: number
+  ): Promise<boolean> {
+    const result = await database('facility_call')
+      .where({ call_id: callId, facility_id: facilityId })
+      .del();
+
+    return result > 0;
+  }
+
   async getFacilityInstruments(facilityId: number): Promise<Instrument[]> {
     const instruments = await database<InstrumentRecord>(
       'facility_instrument as fi'
@@ -126,75 +123,13 @@ class PostgresFacilityDataSource implements FacilityDataSource {
     return instruments.map(createInstrumentObject);
   }
 
-  async getFacilityUsers(facilityId: number): Promise<BasicUserDetails[]> {
-    const users = await database<FacilityUserRecord>('facility_user')
-      .where('facility_id', facilityId)
-      .select('user_id');
+  async getFacilityCalls(facilityId: number): Promise<Call[]> {
+    const calls = await database('facility_call as fc')
+      .join('call as c', 'fc.call_id', 'c.call_id')
+      .where('fc.facility_id', facilityId)
+      .select('c.*');
 
-    return await this.userDataSource.getBasicUsersInfo(
-      users.map((user) => user.user_id)
-    );
-  }
-
-  async getUsersProposalsByFacility(
-    userId: number
-  ): Promise<{ totalCount: number; proposals: ProposalView[] }> {
-    return await database<ProposalViewRecord>('facility_user as fu')
-      .join('facility_instrument as fi', function () {
-        this.on('fu.facility_id', '=', 'fi.facility_id').andOn(
-          'fu.user_id',
-          '=',
-          userId.toString()
-        ); // Apply the user_id condition here so hopefully we don't make a big joined table
-      })
-      .join(
-        'instrument_has_proposals as ihp',
-        'ihp.instrument_id',
-        '=',
-        'fi.instrument_id'
-      )
-      .join(
-        'proposal_table_view as ptv',
-        'ptv.proposal_pk',
-        '=',
-        'ihp.proposal_pk'
-      )
-      .select('ptv.*');
-  }
-
-  async getUsersFacilities(userId: number): Promise<Facility[]> {
-    const facilities = await database<FacilityRecord>('facility_user as fu')
-      .join('facility as f', 'fu.facility_id', '=', 'f.facility_id')
-      .where('fu.user_id', userId)
-      .select('f.*');
-
-    return facilities.map(createFacilityObject);
-  }
-
-  async isProposalOnUsersFacility(
-    user: number,
-    proposal: number
-  ): Promise<boolean> {
-    const result = await database('facility_user as fu')
-      .join(
-        'facility_instrument as fi',
-        'fu.facility_id',
-        '=',
-        'fi.facility_id'
-      )
-      .join(
-        'instrument_has_proposals as ihp',
-        'ihp.instrument_id',
-        '=',
-        'fi.instrument_id'
-      )
-      .where({
-        'fu.user_id': user,
-        'ihp.proposal_pk': proposal,
-      })
-      .first();
-
-    return !!result;
+    return calls.map(createCallObject);
   }
 
   async getFacilitiesByNames(facilityNames: string[]): Promise<Facility[]> {

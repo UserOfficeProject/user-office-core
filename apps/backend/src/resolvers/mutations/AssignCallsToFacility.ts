@@ -11,39 +11,39 @@ import {
 import { ResolverContext } from '../../context';
 
 @ArgsType()
-export class AssignUsersToFacilityArgs {
+export class AssignCallsToFacilityArgs {
   @Field(() => [Int])
-  public userIds: number[];
+  public callIds: number[];
 
   @Field(() => Int)
   public facilityId: number;
 }
 
 @ArgsType()
-export class RemoveScientistFromFacilityArgs {
+export class RemoveCallFromFacilityArgs {
   @Field(() => Int)
-  public userId: number;
+  public callId: number;
 
   @Field(() => Int)
   public facilityId: number;
 }
 
 @Resolver()
-export class AssignScientistsToFacilityMutation {
+export class AssignCallsToFacilityMutation {
   @Mutation(() => Boolean)
-  async assignUsersToFacility(
-    @Args() args: AssignUsersToFacilityArgs,
+  async assignCallsToFacility(
+    @Args() args: AssignCallsToFacilityArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.facility.addUserToFacility(context.user, args);
+    return context.mutations.facility.addCallsToFacility(context.user, args);
   }
 
   @Mutation(() => Boolean)
-  async removeUserFromFacility(
-    @Args() args: RemoveScientistFromFacilityArgs,
+  async removeCallFromFacility(
+    @Args() args: RemoveCallFromFacilityArgs,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.facility.removeUserFromFacility(
+    return context.mutations.facility.removeCallFromFacility(
       context.user,
       args
     );

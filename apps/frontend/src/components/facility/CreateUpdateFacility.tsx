@@ -47,21 +47,20 @@ export const CreateUpdateFacility = ({
         onSubmit={async (values: FormikValues): Promise<void> => {
           if (facility) {
             const result = await api({
-              toastSuccessMessage: 'Call updated successfully!',
+              toastSuccessMessage: 'Facility updated successfully!',
             }).updateFacility(values as UpdateFacilityMutationVariables);
             close({
               ...result.updateFacility,
               instruments: facility.instruments,
-              users: facility.users,
             } as FacilityData);
           } else {
             const result = await api({
-              toastSuccessMessage: 'Call created successfully!',
+              toastSuccessMessage: 'Facility created successfully!',
             }).createFacility(values as CreateFacilityMutationVariables);
             close({
               ...result.createFacility,
               instruments: [],
-              users: [],
+              calls: [],
             } as FacilityData);
           }
         }}

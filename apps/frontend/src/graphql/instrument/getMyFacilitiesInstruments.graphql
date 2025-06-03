@@ -1,9 +1,0 @@
-query getMyFacilitiesInstruments {
-  me {
-    facilities {
-      instruments {
-        ...instrumentMinimal
-      }
-    }
-  }
-}

@@ -1,0 +1,9 @@
+mutation removeCallFromFacility(
+  $callId: Int!
+  $facilityId: Int!
+) {
+  removeCallFromFacility(
+    callId: $callId
+    facilityId: $facilityId
+  )
+}

@@ -3,38 +3,40 @@ import { Delete } from '@mui/icons-material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { BasicUserDetails, InstrumentMinimalFragment } from 'generated/sdk';
+import { Call, InstrumentMinimalFragment } from 'generated/sdk';
 import { FacilityData } from 'hooks/facility/useFacilitiesData';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 export const FacilityDetailsPanel = ({
   facility,
-  removeUser,
   removeInstrument,
+  removeCall,
 }: {
   facility: FacilityData;
-  removeUser: (userId: number, facilityId: number) => void;
   removeInstrument: (instrumentId: number, facilityId: number) => void;
+  removeCall: (callId: number, facilityId: number) => void;
 }) => {
   const { api, isExecutingCall } = useDataApiWithFeedback();
   const { t } = useTranslation();
 
-  const userRowActions = [
+  const callRowActions = [
     {
       icon: () => <Delete />,
-      tooltip: 'Remove User',
+      tooltip: 'Remove Call',
       onClick: (
         event: React.MouseEvent<HTMLElement>,
-        rowData: BasicUserDetails | BasicUserDetails[]
+        rowData:
+          | Pick<Call, 'id' | 'shortCode'>
+          | Pick<Call, 'id' | 'shortCode'>[]
       ) => {
         // It will always be a singleton not a array but the type checker needs the array
-        const user = rowData as BasicUserDetails;
+        const call = rowData as Pick<Call, 'id' | 'shortCode'>;
 
-        api().removeUserFromFacility({
-          userId: user.id,
+        api().removeCallFromFacility({
+          callId: call.id,
           facilityId: facility.id,
         });
-        removeUser(user.id, facility.id);
+        removeCall(call.id, facility.id);
       },
     },
   ];
@@ -74,27 +76,14 @@ export const FacilityDetailsPanel = ({
         actions={instrumentRowActions}
       />
       <MaterialTable
-        columns={[
-          {
-            title: 'Name',
-            field: 'firstname',
-          },
-          {
-            title: 'Surname',
-            field: 'lastname',
-          },
-          {
-            title: 'Institution',
-            field: 'institution',
-          },
-        ]}
-        data={facility.users}
+        columns={[{ title: 'ShortCode', field: 'shortCode' }]}
+        data={facility.calls}
         isLoading={isExecutingCall}
-        title="Users"
+        title="Calls"
         options={{
           selection: false,
         }}
-        actions={userRowActions}
+        actions={callRowActions}
       />
     </>
   );

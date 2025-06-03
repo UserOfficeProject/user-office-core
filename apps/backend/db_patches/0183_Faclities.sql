@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('0172_Faclities', 'TCMeldrum', 'Add facilitys feature', '2025-01-10') THEN
+  IF register_patch('0183_Faclities', 'TCMeldrum', 'Add facilitys feature', '2025-01-10') THEN
     BEGIN
       CREATE TABLE IF NOT EXISTS facility
       (
@@ -17,11 +17,11 @@ BEGIN
           PRIMARY KEY (facility_id, instrument_id)
       );
 
-      CREATE TABLE IF NOT EXISTS facility_user
+      CREATE TABLE IF NOT EXISTS facility_call
       (
-          user_id integer NOT NULL REFERENCES users (user_id) ON UPDATE CASCADE ON DELETE CASCADE,
           facility_id integer NOT NULL REFERENCES facility (facility_id) ON UPDATE CASCADE ON DELETE CASCADE,
-          PRIMARY KEY (user_id, facility_id)
+          call_id integer NOT NULL REFERENCES call (call_id) ON UPDATE CASCADE ON DELETE CASCADE,
+          PRIMARY KEY (facility_id, call_id)
       );
 
       INSERT INTO features(feature_id, description) VALUES ('FACILITIES', 'Facilities feature');

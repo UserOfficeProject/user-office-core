@@ -1,15 +1,10 @@
-import AssignmentInd from '@mui/icons-material/AssignmentInd';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ScienceIcon from 'components/common/icons/ScienceIcon';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
-import ParticipantModal from 'components/proposal/ParticipantModal';
-import {
-  BasicUserDetails,
-  InstrumentMinimalFragment,
-  UserRole,
-} from 'generated/sdk';
+import { Call, InstrumentMinimalFragment } from 'generated/sdk';
 import {
   FacilityData,
   useFacilitiesData,
@@ -19,6 +14,7 @@ import { FunctionType } from 'utils/utilTypes';
 
 import { CreateUpdateFacility } from './CreateUpdateFacility';
 import { FacilityDetailsPanel } from './FacilityDetailsPanel';
+import { SelectCallModel } from './SelectCallModel';
 import { SelectInstrumentModel } from './SelectInstrumentModel';
 
 const facilitiesColumns = [
@@ -35,7 +31,7 @@ const facilitiesColumns = [
 const FacilityTable = () => {
   const { facilities, loadingFacilities, setFacilitiesWithLoading } =
     useFacilitiesData();
-  const [assigningUserFacilityId, setAssigningUserFacilityId] = useState<
+  const [assigningCallFacilityId, setAssigningCallFacilityId] = useState<
     number | null
   >(null);
   const [assigningInstrumentFacilityId, setAssigningInstrumentFacilityId] =
@@ -55,22 +51,6 @@ const FacilityTable = () => {
       }}
     />
   );
-
-  const assignUsersToFacility = async (users: BasicUserDetails[]) => {
-    api().assignUsersToFacility({
-      userIds: users.map((user) => user.id),
-      facilityId: assigningUserFacilityId as number,
-    });
-    setFacilitiesWithLoading(
-      facilities.map((facility) =>
-        facility.id === assigningUserFacilityId
-          ? { ...facility, users: facility.users.concat(users) }
-          : facility
-      )
-    );
-    setAssigningUserFacilityId(null);
-  };
-
   const assignInstrumentsToFacility = async (
     instruments: InstrumentMinimalFragment[]
   ) => {
@@ -91,29 +71,39 @@ const FacilityTable = () => {
     setAssigningInstrumentFacilityId(null);
   };
 
-  const AssignUserIcon = (): JSX.Element => <AssignmentInd />;
+  const assignCallsToFacility = async (
+    calls: Pick<Call, 'id' | 'shortCode'>[]
+  ) => {
+    api().assignCallsToFacility({
+      callIds: calls.map((call) => call.id),
+      facilityId: assigningCallFacilityId as number,
+    });
+
+    setFacilitiesWithLoading(
+      facilities.map((facility) =>
+        facility.id === assigningCallFacilityId
+          ? {
+              ...facility,
+              calls: facility.calls.concat(calls),
+            }
+          : facility
+      )
+    );
+
+    setAssigningCallFacilityId(null);
+  };
+
   const AssignInstrumentIcon = (): JSX.Element => <ScienceIcon />;
 
-  const userAssignments = facilities?.find(
-    (facility) => facility.id === assigningUserFacilityId
-  );
+  const AssignCallIcon = (): JSX.Element => <CalendarTodayIcon />;
 
   const instrumentsAssignments = facilities?.find(
     (facility) => facility.id === assigningInstrumentFacilityId
   );
 
-  const removeUser = (userId: number, facilityId: number) => {
-    setFacilitiesWithLoading(
-      facilities.map((facility) =>
-        facility.id === facilityId
-          ? {
-              ...facility,
-              users: facility.users.filter((u) => u.id !== userId),
-            }
-          : facility
-      )
-    );
-  };
+  const callAssignments = facilities?.find(
+    (facility) => facility.id === assigningCallFacilityId
+  );
 
   const removeInstrument = (instrumentId: number, facilityId: number) => {
     setFacilitiesWithLoading(
@@ -130,18 +120,21 @@ const FacilityTable = () => {
     );
   };
 
+  const removeCall = (callId: number, facilityId: number) => {
+    setFacilitiesWithLoading(
+      facilities.map((facility) =>
+        facility.id === facilityId
+          ? {
+              ...facility,
+              calls: facility.calls.filter((i) => i.id !== callId),
+            }
+          : facility
+      )
+    );
+  };
+
   return (
     <>
-      <ParticipantModal
-        show={!!assigningUserFacilityId}
-        close={(): void => setAssigningUserFacilityId(null)}
-        addParticipants={assignUsersToFacility}
-        selectedUsers={userAssignments?.users.map((user) => user.id) ?? []}
-        selection={true}
-        userRole={UserRole.INSTRUMENT_SCIENTIST}
-        title={t('instrumentSci')}
-        invitationUserRole={UserRole.INSTRUMENT_SCIENTIST}
-      />
       <SelectInstrumentModel
         facilityId={assigningInstrumentFacilityId ?? 0}
         preSelectedInstruments={instrumentsAssignments?.instruments.map(
@@ -150,6 +143,13 @@ const FacilityTable = () => {
         open={!!assigningInstrumentFacilityId}
         close={(): void => setAssigningInstrumentFacilityId(null)}
         addInstruments={assignInstrumentsToFacility}
+      />
+      <SelectCallModel
+        facilityId={assigningCallFacilityId ?? 0}
+        preSelectedCalls={callAssignments?.calls.map((call) => call.id)}
+        open={!!assigningCallFacilityId}
+        close={(): void => setAssigningCallFacilityId(null)}
+        addCalls={assignCallsToFacility}
       />
       <div data-cy="facility-table">
         <SuperMaterialTable
@@ -160,7 +160,6 @@ const FacilityTable = () => {
           options={{
             search: false,
             paging: false,
-            headerStyle: { backgroundColor: '#fafafa' },
           }}
           isLoading={loadingFacilities || isExecutingCall}
           setData={setFacilitiesWithLoading}
@@ -168,24 +167,24 @@ const FacilityTable = () => {
             return (
               <FacilityDetailsPanel
                 facility={rowData.rowData}
-                removeUser={removeUser}
                 removeInstrument={removeInstrument}
+                removeCall={removeCall}
               />
             );
           }}
           actions={[
             {
-              icon: AssignUserIcon,
-              tooltip: 'Assign scientist',
-              onClick: (_event, rowdata) => {
-                setAssigningUserFacilityId((rowdata as FacilityData).id);
-              },
-            },
-            {
               icon: AssignInstrumentIcon,
               tooltip: `Assign ${t('instrument')}`,
               onClick: (_event, rowdata) => {
                 setAssigningInstrumentFacilityId((rowdata as FacilityData).id);
+              },
+            },
+            {
+              icon: AssignCallIcon,
+              tooltip: `Assign Call`,
+              onClick: (_event, rowdata) => {
+                setAssigningCallFacilityId((rowdata as FacilityData).id);
               },
             },
           ]}

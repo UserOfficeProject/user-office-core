@@ -81,33 +81,26 @@ context('Facility tests', () => {
       cy.contains(instrument1.name).should('not.exist');
     });
 
-    it('User officer should be able to assign and remove users from facilities', () => {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
-        cy.updateUserRoles({
-          id: scientist1.id,
-          roles: [initialDBData.roles.instrumentScientist],
-        });
-      }
-      cy.contains(scientist1.firstName).should('not.exist');
-
+    it('User officer should be able to assign and remove calls from facilities', () => {
       cy.createFacility({ name: facilityName, shortCode: facilityShortCode });
       cy.visit('/Facility');
 
-      cy.get('[aria-label="Assign scientist"]').click();
+      cy.contains(facilityName);
 
-      cy.contains(scientist1.firstName)
-        .parent()
-        .find('[type="checkbox"]')
-        .click();
+      cy.contains('call 1').should('not.exist');
 
-      cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('[aria-label="Assign Call"]').click();
+
+      cy.contains('call 1').parent().find('[type="checkbox"]').click();
+
+      cy.get('[data-cy="assign-selected-calls"]').click();
 
       cy.contains(facilityName)
         .parent()
         .get('[aria-label="Detail panel visibility toggle"]')
         .click();
 
-      cy.contains(scientist1.firstName);
+      cy.contains('call 1');
 
       // It persisits after reload
       cy.visit('/Facility');
@@ -115,11 +108,10 @@ context('Facility tests', () => {
         .parent()
         .get('[aria-label="Detail panel visibility toggle"]')
         .click();
-      cy.contains(scientist1.firstName);
+      cy.contains('call 1');
 
       cy.get('[data-testId=DeleteIcon]').click();
-
-      cy.contains(scientist1.firstName).should('not.exist');
+      cy.contains('call 1').should('not.exist');
     });
   });
 });

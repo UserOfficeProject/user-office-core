@@ -1,6 +1,6 @@
 import { useEffect, useState, SetStateAction, Dispatch } from 'react';
 
-import { BasicUserDetails, InstrumentMinimalFragment } from 'generated/sdk';
+import { InstrumentMinimalFragment } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export type FacilityData = {
@@ -8,7 +8,7 @@ export type FacilityData = {
   name: string;
   shortCode: string;
   instruments: InstrumentMinimalFragment[];
-  users: BasicUserDetails[];
+  calls: { id: number; shortCode: string }[];
 };
 
 export function useFacilitiesData(): {

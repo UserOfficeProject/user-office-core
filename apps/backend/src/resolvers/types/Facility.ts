@@ -10,7 +10,7 @@ import {
 
 import { ResolverContext } from '../../context';
 import { Facility as FacilityBase } from '../../models/Facility';
-import { BasicUserDetails } from './BasicUserDetails';
+import { Call } from './Call';
 import { Instrument } from './Instrument';
 
 @ObjectType()
@@ -27,11 +27,6 @@ export class Facility implements FacilityBase {
 
 @Resolver(() => Facility)
 export class FacilityResolver {
-  @FieldResolver(() => [BasicUserDetails])
-  async users(@Root() facility: Facility, @Ctx() context: ResolverContext) {
-    return context.queries.facility.dataSource.getFacilityUsers(facility.id);
-  }
-
   @FieldResolver(() => [Instrument])
   async instruments(
     @Root() facility: Facility,
@@ -40,5 +35,10 @@ export class FacilityResolver {
     return context.queries.facility.dataSource.getFacilityInstruments(
       facility.id
     );
+  }
+
+  @FieldResolver(() => [Call])
+  async calls(@Root() facility: Facility, @Ctx() context: ResolverContext) {
+    return context.queries.facility.dataSource.getFacilityCalls(facility.id);
   }
 }

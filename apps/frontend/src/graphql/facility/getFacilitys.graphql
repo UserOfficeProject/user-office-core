@@ -6,8 +6,9 @@ query getFacilities {
       instruments {
         ...instrumentMinimal
       }
-      users {
-        ...basicUserDetails
+      calls {
+        id
+        shortCode
       }
   }
 }

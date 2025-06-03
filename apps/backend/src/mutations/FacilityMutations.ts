@@ -7,13 +7,13 @@ import { Facility } from '../models/Facility';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import {
+  AssignCallsToFacilityArgs,
+  RemoveCallFromFacilityArgs,
+} from '../resolvers/mutations/AssignCallsToFacility';
+import {
   AssignInstrumentsToFacilityArgs,
   RemoveInstrumentFromFacilityArgs,
 } from '../resolvers/mutations/AssignInstrumentsToFacility';
-import {
-  AssignUsersToFacilityArgs,
-  RemoveScientistFromFacilityArgs,
-} from '../resolvers/mutations/AssignUsersToFacility';
 
 @injectable()
 export default class FacilityMutations {
@@ -69,18 +69,18 @@ export default class FacilityMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async addUserToFacility(
+  async addCallsToFacility(
     agent: UserWithRole | null,
-    args: AssignUsersToFacilityArgs
+    args: AssignCallsToFacilityArgs
   ): Promise<boolean> {
-    return this.dataSource.addUsersToFacility(args.userIds, args.facilityId);
+    return this.dataSource.addCallsToFacility(args.callIds, args.facilityId);
   }
 
   @Authorized([Roles.USER_OFFICER])
-  async removeUserFromFacility(
+  async removeCallFromFacility(
     agent: UserWithRole | null,
-    args: RemoveScientistFromFacilityArgs
+    args: RemoveCallFromFacilityArgs
   ): Promise<boolean> {
-    return this.dataSource.removeUserFromFacility(args.userId, args.facilityId);
+    return this.dataSource.removeCallFromFacility(args.callId, args.facilityId);
   }
 }
