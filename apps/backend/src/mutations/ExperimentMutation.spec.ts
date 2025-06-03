@@ -12,7 +12,10 @@ import {
   OngoingExperiment,
   UpcomingExperimentWithExperiment,
 } from '../datasources/mockups/ExperimentDataSource';
-import { dummyQuestionFactory } from '../datasources/mockups/QuestionaryDataSource';
+import {
+  dummyQuestionFactory,
+  dummyQuestionTemplateRelationFactory,
+} from '../datasources/mockups/QuestionaryDataSource';
 import { SampleDataSourceMock } from '../datasources/mockups/SampleDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
@@ -24,9 +27,10 @@ import {
   ExperimentSafety,
   ExperimentStatus,
 } from '../models/Experiment';
+import { createConfig } from '../models/questionTypes/QuestionRegistry';
 import { Rejection } from '../models/Rejection';
 import { Sample } from '../models/Sample';
-import { TemplateCategoryId } from '../models/Template';
+import { DataType } from '../models/Template';
 import { SampleDeclarationConfig } from '../resolvers/types/FieldConfig';
 import ExperimentMutations from './ExperimentMutation';
 
@@ -173,6 +177,10 @@ describe('Adding Samples to Experiment', () => {
       .init();
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('User can not add Sample to an Experiment that does not exist', async () => {
     const experimentHasSample = await experimentMutation.addSampleToExperiment(
       dummyPrincipalInvestigatorWithRole,
@@ -283,13 +291,22 @@ describe('Adding Samples to Experiment', () => {
     expect((experimentHasSample as Rejection).reason).toBe('No question found');
   });
 
-  test('User cannot add Sapmle that does not have any ESI defined', async () => {
-    jest.spyOn(templateDataSource, 'getQuestion').mockResolvedValue(
-      dummyQuestionFactory({
-        categoryId: TemplateCategoryId.SAMPLE_DECLARATION,
-        config: { esiTemplateId: null } as SampleDeclarationConfig,
-      })
-    );
+  test('User cannot add Sample that does not have any ESI defined', async () => {
+    jest
+      .spyOn(templateDataSource, 'getQuestionTemplateRelation')
+      .mockResolvedValue(
+        dummyQuestionTemplateRelationFactory({
+          question: dummyQuestionFactory({
+            dataType: DataType.SAMPLE_DECLARATION,
+          }),
+          config: createConfig<SampleDeclarationConfig>(
+            DataType.SAMPLE_DECLARATION,
+            {
+              esiTemplateId: null,
+            }
+          ),
+        })
+      );
 
     const experimentSafety =
       await experimentMutation.createOrGetExperimentSafety(
@@ -313,12 +330,21 @@ describe('Adding Samples to Experiment', () => {
   });
 
   test('User should be able to add Sample to an Experiment', async () => {
-    jest.spyOn(templateDataSource, 'getQuestion').mockResolvedValue(
-      dummyQuestionFactory({
-        categoryId: TemplateCategoryId.SAMPLE_DECLARATION,
-        config: { esiTemplateId: 1 } as SampleDeclarationConfig,
-      })
-    );
+    jest
+      .spyOn(templateDataSource, 'getQuestionTemplateRelation')
+      .mockResolvedValue(
+        dummyQuestionTemplateRelationFactory({
+          question: dummyQuestionFactory({
+            dataType: DataType.SAMPLE_DECLARATION,
+          }),
+          config: createConfig<SampleDeclarationConfig>(
+            DataType.SAMPLE_DECLARATION,
+            {
+              esiTemplateId: 1,
+            }
+          ),
+        })
+      );
 
     const experimemntSafety =
       await experimentMutation.createOrGetExperimentSafety(

@@ -240,9 +240,13 @@ export class TemplateDataSourceMock implements TemplateDataSource {
     questionId: string,
     _templateId: number
   ): Promise<QuestionTemplateRelation | null> {
-    return dummyQuestionTemplateRelationFactory({
-      question: { id: questionId },
-    });
+    const steps = await this.getTemplateSteps();
+    const allQuestions = steps.map((step) => step.fields).flat();
+    const templateHasQuestion = allQuestions.find(
+      (templateHasQuestion) => templateHasQuestion.question.id === questionId
+    );
+
+    return templateHasQuestion ?? null;
   }
 
   async getQuestionTemplateRelations(
