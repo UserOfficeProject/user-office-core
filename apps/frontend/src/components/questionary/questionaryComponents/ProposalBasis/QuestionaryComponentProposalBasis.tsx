@@ -7,9 +7,9 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import TextField from 'components/common/FormikUITextField';
 import withPreventSubmit from 'components/common/withPreventSubmit';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import Participants from 'components/proposal/Participants';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
 import ProposalParticipant from 'components/proposal/ProposalParticipant';
-import Participants from 'components/proposal/ProposalParticipants';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,

@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
-import Participants from 'components/proposal/ProposalParticipants';
+import Participants from 'components/proposal/Participants';
 import { BasicUserDetails } from 'generated/sdk';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
