@@ -10,6 +10,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus } from '../decorators';
+import { ApplicationEventBus } from '../events';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
@@ -35,7 +36,8 @@ export default class InviteMutations {
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.EventBus) private eventBus: ApplicationEventBus
   ) {}
 
   @Authorized()
@@ -57,8 +59,8 @@ export default class InviteMutations {
       return rejection('Invite code has expired', { invite: code });
     }
 
-    await this.processRoleClaims(agent!.id, invite.id);
-    await this.processCoProposerClaims(agent!.id, invite.id);
+    await this.processRoleClaims(agent!.id, invite);
+    await this.processCoProposerClaims(agent!.id, invite);
 
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
@@ -71,6 +73,7 @@ export default class InviteMutations {
 
   @Authorized()
   @EventBus(Event.EMAIL_INVITES)
+  @EventBus(Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT)
   public async setCoProposerInvites(
     agent: UserWithRole | null,
     args: SetCoProposerInvitesInput
@@ -151,7 +154,8 @@ export default class InviteMutations {
     ];
   }
 
-  private async processRoleClaims(claimerUserId: number, inviteId: number) {
+  private async processRoleClaims(claimerUserId: number, invite: Invite) {
+    const inviteId = invite.id;
     const roleClaims = await this.roleClaimDataSource.findByInviteId(inviteId);
 
     if (roleClaims.length > 0) {
@@ -171,10 +175,8 @@ export default class InviteMutations {
     }
   }
 
-  private async processCoProposerClaims(
-    claimerUserId: number,
-    inviteId: number
-  ) {
+  private async processCoProposerClaims(claimerUserId: number, invite: Invite) {
+    const inviteId = invite.id;
     const coProposerClaim =
       await this.coProposerClaimDataSource.findByInviteId(inviteId);
 
@@ -192,6 +194,15 @@ export default class InviteMutations {
         claim.proposalPk,
         claimerUserId
       );
+
+      this.eventBus.publish({
+        type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: claimerUserId,
+        invite: invite,
+        description: `User with ID ${claimerUserId} accepted invite for proposal ${claim.proposalPk}`,
+      });
     }
   }
 
