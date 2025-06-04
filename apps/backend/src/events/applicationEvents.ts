@@ -216,12 +216,12 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
 }
 
 interface ProposalInvitesSentEvent extends GeneralEvent {
-  type: Event.PROPOSAL_INVITES_SENT;
+  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT;
   invites: Invite[];
 }
 
 interface ProposalInviteAcceptedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_INVITE_ACCEPTED;
+  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED;
   invite: Invite;
 }
 

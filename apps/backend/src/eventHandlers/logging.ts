@@ -88,8 +88,8 @@ export default function createLoggingHandler() {
             );
           }
           break;
-        case Event.PROPOSAL_INVITES_SENT:
-        case Event.PROPOSAL_INVITE_ACCEPTED: {
+        case Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT:
+        case Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED: {
           let invites;
           if ('invite' in event) {
             invites = [event.invite];
@@ -107,7 +107,7 @@ export default function createLoggingHandler() {
                   event.type,
                   json,
                   coProposerInvite.proposalPk.toString(),
-                  event.type === Event.PROPOSAL_INVITE_ACCEPTED
+                  event.type === Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED
                     ? `Co-proposer invite accepted: ${invite.email}`
                     : `Co-proposer invite sent: ${invite.email}`
                 );
