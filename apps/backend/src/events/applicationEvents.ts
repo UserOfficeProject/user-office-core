@@ -215,12 +215,12 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
   array: AnswerBasic[];
 }
 
-interface ProposalInvitesSentEvent extends GeneralEvent {
+interface ProposalCoProposerClaimSentEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT;
   invites: Invite[];
 }
 
-interface ProposalInviteAcceptedEvent extends GeneralEvent {
+interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED;
   invite: Invite;
 }
@@ -457,8 +457,8 @@ export type ApplicationEvent =
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent
   | ProposalAllFapInstrumentSubmittedEvent
-  | ProposalInvitesSentEvent
-  | ProposalInviteAcceptedEvent
+  | ProposalCoProposerClaimSentEvent
+  | ProposalCoProposerClaimAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
