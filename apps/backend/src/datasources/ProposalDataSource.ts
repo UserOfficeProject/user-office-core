@@ -37,6 +37,7 @@ export interface ProposalDataSource {
     filter?: UserProposalsFilter
   ): Promise<Proposal[]>;
   getProposalsByPks(pks: number[]): Promise<Proposal[]>;
+  getProposalByVisitId(visitId: number): Promise<Proposal>;
   // Write
   create(
     proposer_id: number,
