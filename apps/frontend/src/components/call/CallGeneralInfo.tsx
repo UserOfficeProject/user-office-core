@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
+import DayRangePicker from 'components/common/FormikUIDayRangePicker';
 import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import StyledDialog from 'components/common/StyledDialog';
@@ -145,11 +146,13 @@ const CallGeneralInfo = ({
   );
 
   const formik = useFormikContext<
-    CreateCallMutationVariables | UpdateCallMutationVariables
+    (CreateCallMutationVariables | UpdateCallMutationVariables) & {
+      startEndDate: { from: string; to: string };
+    }
   >();
 
   const { values, setValues } = formik;
-  const { startCall, endCall, proposalWorkflowId, templateId, esiTemplateId } =
+  const { startEndDate, proposalWorkflowId, templateId, esiTemplateId } =
     values;
 
   useEffect(() => {
@@ -170,17 +173,20 @@ const CallGeneralInfo = ({
       setInternalCallDate({ showField: result, isValueSet: true });
     }
   }, [proposalWorkflowId, proposalWorkflows]);
-
   useEffect(() => {
-    if (internalCallDate.isValueSet && !internalCallDate.showField && endCall) {
+    if (
+      internalCallDate.isValueSet &&
+      !internalCallDate.showField &&
+      startEndDate.to
+    ) {
       setValues((prevState) => {
-        const endCallInternal = endCall;
+        const endCallInternal = startEndDate.to;
+        const endCall = startEndDate.to;
 
-        return { ...prevState, endCallInternal };
+        return { ...prevState, endCallInternal, endCall };
       });
     }
-  }, [setValues, endCall, setInternalCallDate, internalCallDate]);
-
+  }, [setValues, startEndDate, setInternalCallDate, internalCallDate]);
   function validateRefNumFormat(input: string) {
     let errorMessage;
     const regExp = /^[a-z|\d]+{digits:[1-9]+}$/;
@@ -232,44 +238,23 @@ const CallGeneralInfo = ({
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
-          name="startCall"
-          label={`Start (${timezone})`}
-          id="start-call-input"
+          name="startEndDate"
+          label={`Start and End date (${timezone})`}
+          id="start-end-call-input"
           format={dateTimeFormat}
           ampm={false}
-          component={DateTimePicker}
+          component={DayRangePicker}
           inputProps={{ placeholder: dateTimeFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
             required: true,
-            'data-cy': 'start-date',
+            'data-cy': 'start-end-date',
           }}
           // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
           desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
-        <Field
-          name="endCall"
-          label={`End (${timezone})`}
-          id="end-call-input"
-          format={dateTimeFormat}
-          ampm={false}
-          allowSameDateSelection
-          component={DateTimePicker}
-          inputProps={{ placeholder: dateTimeFormat }}
-          textField={{
-            fullWidth: true,
-            required: true,
-            'data-cy': 'end-date',
-          }}
-          // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
-          // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
-          minDate={startCall}
-          required
-        />
-
         <Field
           name="referenceNumberFormat"
           validate={validateRefNumFormat}
@@ -486,7 +471,7 @@ const CallGeneralInfo = ({
             // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
             // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
             desktopModeMediaQuery={theme.breakpoints.up('sm')}
-            minDate={endCall}
+            minDate={startEndDate.to}
             required
           />
         )}
