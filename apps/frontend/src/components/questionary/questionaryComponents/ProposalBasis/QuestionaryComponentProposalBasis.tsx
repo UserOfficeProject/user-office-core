@@ -35,8 +35,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   ) as ProposalContextType;
 
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
-  // const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
-  const [localAbstract, setLocalAbstract] = useState('');
+  const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
   const [hasInvalidChars, setHasInvalidChars] = useState(false);
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
