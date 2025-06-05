@@ -221,7 +221,7 @@ function InviteUser({
       fullWidth
       maxWidth="md"
       onClose={handleClose}
-      title="Add people to proposal"
+      title="Add user"
     >
       <DialogContent
         dividers
