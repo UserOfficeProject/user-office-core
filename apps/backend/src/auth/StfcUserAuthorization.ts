@@ -309,7 +309,11 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
   }
 
-  async isExternalTokenValid(token: string): Promise<boolean> {
+  async isExternalTokenValid(token: string | undefined): Promise<boolean> {
+    if (token === undefined) {
+      return false;
+    }
+
     const cachedValidity = await this.uowsTokenCache.get(token);
     if (cachedValidity !== undefined) {
       if (!cachedValidity) {

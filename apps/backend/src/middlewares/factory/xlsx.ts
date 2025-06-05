@@ -36,8 +36,7 @@ router.get(`/${XLSXType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const proposalPks: number[] = req.params.proposal_pks
@@ -91,8 +90,7 @@ router.get(`/${XLSXType.FAP}/:fap_id/call/:call_id`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const fapId = parseInt(req.params.fap_id);
@@ -137,8 +135,7 @@ router.get(`/${XLSXType.CALL_FAP}/:call_id`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const callId = parseInt(req.params.call_id);
@@ -190,8 +187,7 @@ router.get(`/${XLSXType.TECHNIQUE}/:proposal_pks`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const proposalPks: number[] = req.params.proposal_pks

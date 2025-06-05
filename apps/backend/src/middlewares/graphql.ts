@@ -61,12 +61,9 @@ export const context: ContextFunction<
         currentRole:
           req.user.currentRole || (req.user.roles ? req.user.roles[0] : null),
         externalToken: req.user.externalToken,
-        externalTokenValid:
-          req.user.externalToken !== undefined
-            ? await userAuthorization.isExternalTokenValid(
-                req.user.externalToken
-              )
-            : false,
+        externalTokenValid: await userAuthorization.isExternalTokenValid(
+          req.user.externalToken
+        ),
         isInternalUser: req.user.isInternalUser,
         impersonatingUserId: req.user.impersonatingUserId,
       } as UserWithRole;

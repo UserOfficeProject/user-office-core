@@ -3,10 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
-import {
-  dummyUser,
-  dummyUserWithRole,
-} from '../datasources/mockups/UserDataSource';
+import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
 import { isRejection } from '../models/Rejection';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import QuestionaryMutations from './QuestionaryMutations';
@@ -68,7 +65,7 @@ it('User should not be able to answer topic questions if proposal has no active 
 it('User should update question', async () => {
   const NEW_ANSWER = 'NEW_ANSWER';
   const { firstAnswer, questionaryId } = await getDummyUsersProposal();
-  const result = await mutations.updateAnswer(dummyUser, {
+  const result = await mutations.updateAnswer(dummyUserWithRole, {
     questionaryId,
     answer: {
       questionId: firstAnswer.question.id,

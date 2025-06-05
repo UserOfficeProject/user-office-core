@@ -31,9 +31,7 @@ const getUserWithRoleFromExpressUser = async ({
     currentRole: currentRole || (roles ? roles[0] : null),
     externalToken: externalToken,
     externalTokenValid:
-      externalToken !== undefined
-        ? await userAuthorization.isExternalTokenValid(externalToken)
-        : false,
+      await userAuthorization.isExternalTokenValid(externalToken),
     isInternalUser: isInternalUser,
     impersonatingUserId: impersonatingUserId,
   } as UserWithRole;
