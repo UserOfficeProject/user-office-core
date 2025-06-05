@@ -104,5 +104,38 @@ context('Event log tests', () => {
       cy.get('@lastRowText').should('contain', 'USER_UPDATED');
       cy.get('@lastRowText').should('contain', updateProfileDate);
     });
+
+    it('If user impersonates someone, it reflects in the action logs', () => {
+      cy.login('officer');
+      cy.visit('/People');
+
+      cy.finishedLoading();
+
+      cy.contains(user.firstName)
+        .parent()
+        .find('button[aria-label="Edit user"]')
+        .click();
+
+      cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
+      cy.get('[data-cy="add-role-button"]').click();
+      cy.get('input[type="checkbox"]').eq(1).check();
+      cy.get('[data-cy="assign-role-to-user"]').click();
+
+      cy.get('.MuiTabs-flexContainer > #horizontal-tab-0').click();
+      cy.get('[data-cy="impersonate-user-button"]').click();
+
+      cy.get('[data-cy="profile-page-btn"]').click();
+      cy.get('[data-cy="change-roles-button"]').click();
+      cy.get('[data-cy="select-role-user_officer"]').click();
+
+      cy.get('[href="/Faps"]').click();
+      cy.get('[aria-label="Edit"]').click();
+      cy.get('.MuiTabs-flexContainer > #horizontal-tab-1').click();
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('input[type="checkbox"]').eq(0).check();
+      cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('.MuiTabs-flexContainer > #horizontal-tab-6').click();
+      cy.contains('2 impersonating 1');
+    });
   });
 });
