@@ -7,7 +7,7 @@ import NodeClam from 'clamscan';
 import { GraphQLError } from 'graphql';
 import fileTypeInfo from 'magic-bytes.js';
 import { GuessedFile } from 'magic-bytes.js/dist/model/tree';
-// import { createReader } from 'muhammara';
+import { createReader } from 'muhammara';
 import { container } from 'tsyringe';
 
 import FileMutations from '../../mutations/FileMutations';
@@ -286,11 +286,11 @@ const hasAllowedPdfNumPages = async (
     return true;
   }
 
-  // const readPdf = async () => {
-  //   return createReader(path);
-  // };
+  const readPdf = async () => {
+    return createReader(path);
+  };
 
-  const pageCount = 2;
+  const pageCount = (await readPdf()).getPagesCount();
 
   if (pageCount > pageLimit) {
     logger.logInfo('PDF page count exceeds limit', {
