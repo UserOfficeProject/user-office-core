@@ -331,6 +331,7 @@ export default function UpdateUserInformation(
               <ImpersonateButton
                 userId={props.id}
                 startIcon={<SwitchAccountOutlinedIcon />}
+                data-cy="impersonate-user-button"
               >
                 Connect as this user...
               </ImpersonateButton>

@@ -6,7 +6,8 @@ export interface EventLogsDataSource {
     eventType: string,
     rowData: string,
     changedObjectId: string,
-    description?: string
+    description?: string,
+    impersonatingUserId?: number
   ): Promise<EventLog>;
   get(filter: EventLogFilter): Promise<EventLog[]>;
 }

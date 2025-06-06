@@ -39,6 +39,7 @@ const EventBusDecorator = (eventType: Event) => {
           loggedInUserId: loggedInUser ? loggedInUser.id : null,
           isRejection: isRejection(result),
           inputArgs: JSON.stringify(restArgs),
+          impersonatingUserId: loggedInUser.impersonatingUserId,
         } as ApplicationEvent;
 
         const eventBus = resolveApplicationEventBus();

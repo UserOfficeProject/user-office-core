@@ -6,6 +6,7 @@ export class EventLog {
     public rowData: string,
     public eventTStamp: Date,
     public changedObjectId: string,
-    public description: string
+    public description: string,
+    public impersonatingUserId?: number
   ) {}
 }
