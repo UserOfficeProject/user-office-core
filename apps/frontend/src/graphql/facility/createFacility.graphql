@@ -1,0 +1,13 @@
+mutation createFacility(
+  $name: String!
+  $shortCode: String!
+) {
+  createFacility(
+    name: $name
+    shortCode: $shortCode
+  ) {
+    id
+    name
+    shortCode
+  }
+}

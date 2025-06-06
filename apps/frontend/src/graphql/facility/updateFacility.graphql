@@ -1,0 +1,15 @@
+mutation updateFacility(
+  $id: Int!
+  $name: String!
+  $shortCode: String!
+) {
+  updateFacility(
+    id: $id
+    name: $name
+    shortCode: $shortCode
+  ) {
+    id
+    name
+    shortCode
+  }
+}
