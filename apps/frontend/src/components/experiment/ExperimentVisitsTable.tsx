@@ -15,7 +15,8 @@ import { SettingsContext } from 'context/SettingsContextProvider';
 import {
   SettingsId,
   VisitRegistrationStatus,
-  GetExperimentsQuery,
+  GetAllExperimentsQuery,
+  GetExperimentQuery,
 } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -24,10 +25,12 @@ import { getFullUserName } from 'utils/user';
 import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
 
 type RowType = NonNullable<
-  GetExperimentsQuery['experiments'][0]['visit']
+  NonNullable<
+    NonNullable<GetAllExperimentsQuery['allExperiments']>['experiments']
+  >[0]['visit']
 >['registrations'][0];
 
-type Experiment = GetExperimentsQuery['experiments'][0];
+type Experiment = GetExperimentQuery['experiment'];
 
 interface ExperimentDetailsTableProps extends WithConfirmProps {
   experiment: Experiment;
@@ -217,11 +220,7 @@ function ExperimentVisitsTable(params: ExperimentDetailsTableProps) {
           <IconButton
             component="a"
             href={`
-              mailto:${rowData.user?.email || ''}?subject=${subject}&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${
-                params.experiment.proposal.title
-              }" with proposal ID ${
-                params.experiment.proposal.proposalId
-              }.%0D%0A%0D%0A.%0D%0A%0D%0AKind regards`}
+              mailto:${rowData.user?.email || ''}?subject=${subject}&body=Dear ${getFullUserName(rowData.user)},%0D%0A%0D%0AWe are writing regarding your proposal "${params.experiment.proposal.title}" with proposal ID ${params.experiment.proposal.proposalId}.%0D%0A%0D%0A.%0D%0A%0D%0AKind regards`}
             data-cy="send-email-button"
             target="_blank"
             rel="noopener noreferrer"
