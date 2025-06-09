@@ -292,10 +292,7 @@ export default class UserMutations {
     });
 
     if (isUserOfficer && shouldImpersonateUser && agent) {
-      logger.logInfo(
-        `User officer ${agent.id} impersonated user ${userId}`,
-        {}
-      );
+      logger.logInfo(`userId ${agent.id} impersonating userId ${userId}`, {});
     }
 
     return token;

@@ -32,7 +32,7 @@ export default class PostgresEventLogsDataSource
     const actingUserId = impersonatingUserId ?? changedBy;
 
     const updatedDescription = isImpersonating
-      ? `${description || ''} (${impersonatingUserId} impersonating ${changedBy})`
+      ? `${description || ''} (userId:${impersonatingUserId} impersonating userId:${changedBy})`
       : description;
 
     return database
@@ -42,6 +42,7 @@ export default class PostgresEventLogsDataSource
         row_data: rowData,
         changed_object_id: changedObjectId,
         description: updatedDescription,
+        impersonating_user_id: impersonatingUserId,
       })
       .returning('*')
       .into('event_logs')
