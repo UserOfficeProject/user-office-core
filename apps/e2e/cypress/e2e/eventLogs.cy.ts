@@ -135,7 +135,7 @@ context('Event log tests', () => {
       cy.get('input[type="checkbox"]').eq(0).check();
       cy.get('[data-cy="assign-selected-users"]').click();
       cy.get('.MuiTabs-flexContainer > #horizontal-tab-6').click();
-      cy.contains('2 impersonating 1');
+      cy.contains('userId:2 impersonating userId:1');
     });
   });
 });
