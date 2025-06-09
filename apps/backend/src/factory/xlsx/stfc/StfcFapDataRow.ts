@@ -47,7 +47,7 @@ export async function getStfcDataRow(
       )
     : null;
 
-  const daysRequested = proposalAnswers
+  const timeRequested = proposalAnswers
     ?.flatMap((step) => step.fields)
     .find(
       (answer) =>
@@ -77,7 +77,7 @@ export async function getStfcDataRow(
       technicalReviewComment,
       propFapRankOrder
     ),
-    daysRequested,
+    timeRequested: timeRequested,
     reviews: individualReviews,
     piCountry: piCountry,
   };
@@ -95,7 +95,7 @@ export function populateStfcRow(row: RowObj) {
     row.principalInv ?? '<missing>',
     row.piCountry ?? '<missing>',
     row.instrName ?? '<missing>',
-    row.daysRequested ?? '<missing>',
+    row.timeRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
     row.techReviewComment ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
@@ -114,14 +114,14 @@ export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
     row.principalInv ?? '<missing>',
     row.piCountry ?? '<missing>',
     row.instrName ?? '<missing>',
-    row.daysRequested ?? '<missing>',
+    row.timeRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
     row.techReviewComment ?? '<missing>',
     row.propReviewAvgScore ?? '<missing>',
   ]
     .concat(reviews.flat())
     .concat([
-      row.fapTimeAllocation ?? row.daysRequested ?? '<missing>',
+      row.fapTimeAllocation ?? row.timeRequested ?? '<missing>',
       row.fapMeetingDecision ?? '<missing>',
       row.fapMeetingInComment ?? '<missing>',
       row.fapMeetingExComment ?? '<missing>',
