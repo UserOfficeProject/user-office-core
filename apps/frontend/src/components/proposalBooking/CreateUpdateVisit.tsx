@@ -18,13 +18,16 @@ interface CreateUpdateVisitProps {
 }
 function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
   const { api } = useDataApiWithFeedback();
-  const [visitInvites, setVisitInvites] = useState<Invite[]>([]);
+  const [visitInvites, setVisitInvites] = useState<Invite[]>(
+    event.visit?.registrationInvites || []
+  );
 
   const visit = event.visit;
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user!) || [],
     teamLeadUserId: visit?.teamLead.id || null,
+    inviteEmails: visit?.registrationInvites || [],
   };
 
   return (
@@ -46,6 +49,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
                 .includes(teamLeadUserId);
             },
           }),
+        inviteEmails: Yup.array().default([]),
       })}
       onSubmit={async (values): Promise<void> => {
         if (visit) {
@@ -54,6 +58,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               visitId: visit.id,
               team: values.team.map((user) => user.id),
               teamLeadUserId: values.teamLeadUserId,
+              inviteEmails: visitInvites.map((invite) => invite.email),
             })
             .then(({ updateVisit }) => {
               if (updateVisit) {

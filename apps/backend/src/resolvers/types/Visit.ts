@@ -55,7 +55,7 @@ export class VisitResolver {
   }
 
   @FieldResolver(() => [Invite])
-  async visitRegistrationInvites(
+  async registrationInvites(
     @Root() visit: Visit,
     @Ctx() context: ResolverContext
   ): Promise<Invite[] | null> {

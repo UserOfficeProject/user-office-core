@@ -1,14 +1,19 @@
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { Tokens } from '../config/Tokens';
 import { AdminDataSource } from '../datasources/AdminDataSource';
 import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { InviteDataSource } from '../datasources/InviteDataSource';
+import database from '../datasources/postgres/database';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
+import { VisitDataSource } from '../datasources/VisitDataSource';
+import { VisitRegistrationClaimDataSource } from '../datasources/VisitRegistrationClaimDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
@@ -31,8 +36,14 @@ export default class InviteMutations {
     private roleClaimDataSource: RoleClaimDataSource,
     @inject(Tokens.CoProposerClaimDataSource)
     private coProposerClaimDataSource: CoProposerClaimDataSource,
+    @inject(Tokens.VisitRegistrationClaimDataSource)
+    private visitRegistrationClaimDataSource: VisitRegistrationClaimDataSource,
+    @inject(Tokens.VisitDataSource)
+    private visitDataSource: VisitDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
+    @inject(Tokens.VisitAuthorization)
+    private visitAuthorization: VisitAuthorization,
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
@@ -48,7 +59,6 @@ export default class InviteMutations {
     if (invite === null) {
       return rejection('Invite code not found', { invite: code });
     }
-
     if (invite.claimedByUserId !== null) {
       return rejection('Invite code already claimed', { invite: code });
     }
@@ -59,6 +69,7 @@ export default class InviteMutations {
 
     await this.processRoleClaims(agent!.id, invite.id);
     await this.processCoProposerClaims(agent!.id, invite.id);
+    await this.processVisitRegistrationClaims(agent!.id, invite.id);
 
     const updatedInvite = await this.inviteDataSource.update({
       id: invite.id,
@@ -108,25 +119,7 @@ export default class InviteMutations {
       deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
     );
 
-    // Get invite validity period from settings
-    const inviteValidityPeriodSetting = await this.adminDataSource.getSetting(
-      SettingsId.INVITE_VALIDITY_PERIOD_DAYS
-    );
-    if (!inviteValidityPeriodSetting?.settingsValue) {
-      return rejection('Invite validity period setting not found');
-    }
-
-    const validityPeriodDays = parseInt(
-      inviteValidityPeriodSetting.settingsValue
-    );
-    if (isNaN(validityPeriodDays) || validityPeriodDays <= 0) {
-      return rejection('Invalid invite validity period value');
-    }
-
-    const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
-    const expirationDate = new Date(
-      Date.now() + validityPeriodDays * MILLISECONDS_PER_DAY
-    );
+    const expirationDate = await this.getInviteExpirationDate();
 
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
@@ -141,6 +134,76 @@ export default class InviteMutations {
     await Promise.all(
       newInvites.map(async (newInvite) => {
         await this.coProposerClaimDataSource.create(newInvite.id, proposalPk);
+        await this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
+      })
+    );
+
+    return [
+      ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
+      ...newInvites,
+    ];
+  }
+
+  @Authorized()
+  @EventBus(Event.EMAIL_INVITES)
+  public async setVisitRegistrationInvites(
+    agent: UserWithRole | null,
+    args: { visitId: number; inviteEmails: string[] }
+  ): Promise<Invite[] | Rejection> {
+    const { visitId, inviteEmails } = args;
+
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitAuthorization.hasWriteRights(agent, visitId));
+
+    if (!hasWriteRights) {
+      return rejection(
+        'User is not authorized to create invites for this visit'
+      );
+    }
+
+    const existingClaims =
+      await this.visitRegistrationClaimDataSource.findByVisitId(visitId);
+    const existingInvites = (await Promise.all(
+      existingClaims.map((claim) =>
+        this.inviteDataSource.findById(claim.inviteId)
+      )
+    )) as Invite[];
+    const existingEmails = existingInvites.map((invite) => invite.email);
+
+    const deletedEmails = existingEmails.filter(
+      (email) => !inviteEmails.includes(email)
+    );
+    const newEmails = inviteEmails.filter(
+      (email) => !existingEmails.includes(email)
+    );
+
+    const deletedInvites = existingInvites.filter((invite) =>
+      deletedEmails.includes(invite.email)
+    );
+
+    await Promise.all(
+      deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
+    );
+
+    const expirationDate = await this.getInviteExpirationDate();
+
+    const newInvites = await Promise.all(
+      newEmails.map(async (email) =>
+        this.inviteDataSource.create({
+          createdByUserId: agent!.id,
+          code: await this.generateInviteCode(),
+          email: email,
+          expiresAt: expirationDate,
+        })
+      )
+    );
+    await Promise.all(
+      newInvites.map(async (newInvite) => {
+        await this.visitRegistrationClaimDataSource.create(
+          newInvite.id,
+          visitId
+        );
         await this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
       })
     );
@@ -195,6 +258,40 @@ export default class InviteMutations {
     }
   }
 
+  private async processVisitRegistrationClaims(
+    claimerUserId: number,
+    inviteId: number
+  ) {
+    const visitRegistrationClaim =
+      await this.visitRegistrationClaimDataSource.findByInviteId(inviteId);
+
+    if (!visitRegistrationClaim) {
+      return;
+    }
+
+    const existingRegistration = await this.visitDataSource.getRegistration(
+      claimerUserId,
+      visitRegistrationClaim.visitId
+    );
+
+    if (existingRegistration) {
+      return;
+    }
+
+    // Insert the user into the visits_has_users table to create a new visit registration
+    await database('visits_has_users')
+      .insert({
+        visit_id: visitRegistrationClaim.visitId,
+        user_id: claimerUserId,
+        registration_questionary_id: null,
+        starts_at: null,
+        ends_at: null,
+        // status will default to 'DRAFTED' as defined in the database schema
+      })
+      .onConflict(['user_id', 'visit_id'])
+      .ignore();
+  }
+
   private async proposalHasUser(proposalPk: number, userId: number) {
     const proposalUsers =
       await this.userDataSource.getProposalUsers(proposalPk);
@@ -216,4 +313,28 @@ export default class InviteMutations {
 
     return code;
   }
+
+  private readonly getInviteExpirationDate = async (): Promise<Date> => {
+    const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    const inviteValidityPeriodSetting = await this.adminDataSource.getSetting(
+      SettingsId.INVITE_VALIDITY_PERIOD_DAYS
+    );
+    if (!inviteValidityPeriodSetting?.settingsValue) {
+      throw new GraphQLError('Invite validity period setting not found');
+    }
+
+    const validityPeriodDays = parseInt(
+      inviteValidityPeriodSetting.settingsValue
+    );
+    if (isNaN(validityPeriodDays) || validityPeriodDays <= 0) {
+      throw new GraphQLError('Invalid invite validity period value');
+    }
+
+    const expirationDate = new Date(
+      Date.now() + validityPeriodDays * MILLISECONDS_PER_DAY
+    );
+
+    return expirationDate;
+  };
 }

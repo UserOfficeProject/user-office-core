@@ -11,6 +11,7 @@ import { Sample } from '../models/Sample';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
+import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
@@ -380,6 +381,10 @@ interface InternalReviewDeleted extends GeneralEvent {
   internalreview: InternalReview;
 }
 
+interface VisitCreatedEvent extends GeneralEvent {
+  type: Event.VISIT_CREATED;
+  visit: Visit;
+}
 interface VisitRegistrationApprovedEvent extends GeneralEvent {
   type: Event.VISIT_REGISTRATION_APPROVED;
   visitregistration: VisitRegistration;
@@ -461,5 +466,6 @@ export type ApplicationEvent =
   | InternalReviewCreated
   | InternalReviewUpdated
   | InternalReviewDeleted
+  | VisitCreatedEvent
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent;

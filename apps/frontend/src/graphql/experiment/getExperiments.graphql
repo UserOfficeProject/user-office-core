@@ -22,6 +22,9 @@ query getExperiments($filter: ExperimentsFilter, $first: Int, $offset: Int) {
       teamLead {
         ...basicUserDetails
       }
+      registrationInvites {
+        ...invite
+      }
     }
   }
 }

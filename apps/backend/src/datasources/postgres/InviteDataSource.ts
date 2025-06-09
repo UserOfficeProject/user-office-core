@@ -36,7 +36,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
   ): Promise<Invite[]> {
     return database
       .select('*')
-      .from('visit_registration_invites')
+      .from('visit_registration_claims')
       .where('visit_id', visitId)
       .modify((query) => {
         if (isClaimed !== undefined) {
@@ -47,6 +47,11 @@ export default class PostgresInviteDataSource implements InviteDataSource {
           }
         }
       })
+      .leftJoin(
+        'invites',
+        'visit_registration_claims.invite_id',
+        'invites.invite_id'
+      )
       .catch((error: Error) => {
         throw new Error(
           `Could not find visit registration invites: ${error.message}`

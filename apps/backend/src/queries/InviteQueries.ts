@@ -1,4 +1,4 @@
-import { container, inject, injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { UserAuthorization } from '../auth/UserAuthorization';
@@ -15,10 +15,9 @@ export default class InviteQueries {
     public dataSource: InviteDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.VisitAuthorization) private visitAuth: VisitAuthorization
   ) {}
-
-  private visitAuth = container.resolve(VisitAuthorization); // TODO move into dependency injection
 
   @Authorized()
   async getCoProposerInvites(agent: UserWithRole | null, proposalPk: number) {

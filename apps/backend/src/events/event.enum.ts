@@ -89,6 +89,7 @@ export enum Event {
   EXPERIMENT_ESF_REJECTED_BY_IS = 'EXPERIMENT_ESF_REJECTED_BY_IS',
   EXPERIMENT_ESF_APPROVED_BY_ESR = 'EXPERIMENT_ESF_APPROVED_BY_ESR',
   EXPERIMENT_ESF_REJECTED_BY_ESR = 'EXPERIMENT_ESF_REJECTED_BY_ESR',
+  VISIT_CREATED = 'VISIT_CREATED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -344,6 +345,7 @@ export const EventLabel = new Map<Event, string>([
     Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
     'Event occurs when a proposal is assigned to techniques',
   ],
+  [Event.VISIT_CREATED, 'Event occurs when visit is created'],
   [
     Event.VISIT_REGISTRATION_APPROVED,
     'Event occurs when visit registration is approved',
