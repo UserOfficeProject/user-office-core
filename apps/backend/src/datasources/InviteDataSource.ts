@@ -21,6 +21,10 @@ export interface InviteDataSource {
     proposalPk: number,
     isClaimed?: boolean
   ): Promise<Invite[]>;
+  findVisitRegistrationInvites(
+    visitId: number,
+    isClaimed?: boolean
+  ): Promise<Invite[]>;
   getInvites(filter: GetInvitesFilter): Promise<Invite[]>;
 
   update(args: {

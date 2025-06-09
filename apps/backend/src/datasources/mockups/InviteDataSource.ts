@@ -15,6 +15,7 @@ export class InviteDataSourceMock implements InviteDataSource {
   ) {
     this.init();
   }
+
   async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
     const coProposerClaims =
       await this.coProposerDataSource.findByProposalPk(proposalPk);
@@ -24,6 +25,18 @@ export class InviteDataSourceMock implements InviteDataSource {
     );
 
     return invites.filter((invite) => invite !== null) as Invite[];
+  }
+  async findVisitRegistrationInvites(
+    visitId: number,
+    includeExpired: boolean
+  ): Promise<Invite[]> {
+    const invites = this.invites.filter(
+      (invite) =>
+        invite.id === visitId &&
+        (includeExpired || !invite.expiresAt || invite.expiresAt > new Date())
+    );
+
+    return invites;
   }
   async delete(id: number): Promise<void> {
     this.invites = this.invites.filter((invite) => invite.id !== id);
