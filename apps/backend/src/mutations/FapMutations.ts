@@ -133,7 +133,7 @@ export default class FapMutations {
       .assignChairOrSecretaryToFap(args.assignChairOrSecretaryToFapInput)
       .catch((error) => {
         return rejection(
-          'Could not assign chair or secretary to Fap please ensure they have the correct roles',
+          'Could not assign chair or secretary to Fap, please ensure they have the correct roles',
           { agent },
           error
         );

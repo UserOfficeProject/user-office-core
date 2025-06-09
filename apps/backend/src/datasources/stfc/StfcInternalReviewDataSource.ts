@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -5,9 +6,12 @@ import { InternalReview } from '../../models/InternalReview';
 import { Roles } from '../../models/Role';
 import { UserWithRole } from '../../models/User';
 import { CreateInternalReviewInput } from '../../resolvers/mutations/internalReview/CreateInternalReviewMutation';
+import { DeleteInternalReviewInput } from '../../resolvers/mutations/internalReview/DeleteInternalReviewMutation';
 import { InternalReviewDataSource } from '../InternalReviewDataSource';
 import PostgresInternalReviewDataSource from '../postgres/InternalReviewDataSource';
 import { StfcUserDataSource } from './StfcUserDataSource';
+
+const InternalReviewRoleNumber = 53; // STFC Internal Reviewer role ID
 
 export default class StfcInternalReviewDataSource
   extends PostgresInternalReviewDataSource
@@ -33,9 +37,34 @@ export default class StfcInternalReviewDataSource
     }
     if (!userRoles.find((role) => role.shortCode === Roles.INTERNAL_REVIEWER)) {
       // STFC Internal Reviewer role has ID 53
-      this.stfcUserDataSource.assignSTFCRoleToUser(input.reviewerId, 53);
+      this.stfcUserDataSource.assignSTFCRoleToUser(
+        input.reviewerId,
+        InternalReviewRoleNumber
+      );
     }
 
     return super.create(agent, input);
+  }
+
+  async delete(input: DeleteInternalReviewInput): Promise<InternalReview> {
+    const internalReview = await this.getInternalReview(input.id);
+
+    if (!internalReview) {
+      throw new GraphQLError('Internal review not found');
+    }
+
+    const hasMoreInternalReviews = await this.getInternalReviews({
+      reviewerId: internalReview.reviewerId,
+    });
+
+    // If user has no other internal reviews, remove the Internal Reviewer role
+    if (hasMoreInternalReviews.length === 1) {
+      this.stfcUserDataSource.removeFapRoleFromUser(
+        internalReview.reviewerId,
+        InternalReviewRoleNumber
+      );
+    }
+
+    return super.delete(input);
   }
 }

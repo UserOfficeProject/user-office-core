@@ -41,7 +41,7 @@ export default class StfcFapDataSource
     if (
       !roles.find((role) => {
         return (
-          role.shortCode === STFCRolesMap[args.roleId] ||
+          role.shortCode === UserRoleShortCodeMap[args.roleId] ||
           role.shortCode === 'user_officer'
         );
       })
@@ -132,6 +132,7 @@ export default class StfcFapDataSource
     const role = UserRoleShortCodeMap[args.roleId];
     const faps = await this.getUserFaps(args.memberId, role);
 
+    // If the user has no FAP left assigned to them we revoke their role
     if (faps.length === 1) {
       await this.stfcUserDataSource
         .removeFapRoleFromUser(
