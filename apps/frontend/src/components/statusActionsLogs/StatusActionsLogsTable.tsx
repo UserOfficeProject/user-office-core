@@ -5,8 +5,9 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import { Replay, Refresh } from '@mui/icons-material';
+import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import { Grid, Typography, useTheme } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
@@ -43,8 +44,14 @@ const StatusActionsLogsTable = ({
   const { api } = useDataApiWithFeedback();
   const theme = useTheme();
   const { calls, loadingCalls } = useCallsData();
+  const [selectedCallName, setSelectedCallName] = useState<string | undefined>(
+    undefined
+  );
   const ReplayIcon = (): JSX.Element => (
     <Replay data-cy="replay_status_action_icon" />
+  );
+  const ReplayAllIcon = (): JSX.Element => (
+    <ReplayCircleFilledIcon data-cy="replay_all_status_action_icon" />
   );
   const RefreshIcon = (): JSX.Element => <Refresh />;
   const [selectedStatusActionsLog, setStatusActionsLog] =
@@ -205,6 +212,40 @@ const StatusActionsLogsTable = ({
       }
     });
 
+  useEffect(() => {
+    if (call) {
+      const callFromParam = calls.find((c) => c.id === +call);
+      setSelectedCallName(callFromParam?.shortCode);
+    } else {
+      setSelectedCallName(undefined);
+    }
+  }, [call, setSelectedCallName, calls]);
+
+  const getAllFailedLogsForCall = async (
+    callId: number
+  ): Promise<StatusActionsLog[]> => {
+    const filter: StatusActionsLogsFilter = {
+      statusActionType: statusActionType,
+      callIds: [callId],
+      statusActionsSuccessful: false,
+    };
+
+    const result = await api().getStatusActionsLogs({
+      filter,
+    });
+
+    return (
+      result.statusActionsLogs?.statusActionsLogs.map((statusActionsLog) => {
+        return {
+          ...statusActionsLog,
+          statusActionsTstamp: toFormattedDateTime(
+            statusActionsLog.statusActionsTstamp
+          ),
+        } as StatusActionsLog;
+      }) || []
+    );
+  };
+
   return (
     <>
       <Grid container spacing={2}>
@@ -306,6 +347,10 @@ const StatusActionsLogsTable = ({
                       title: 'Are you sure?',
                       description: `You are about to send a status action replay request.`,
                       alertText: (() => {
+                        if (!statusActionsLog.statusActionsSuccessful) {
+                          return '';
+                        }
+
                         if (
                           statusActionsLog?.connectionStatusAction?.action.name
                             .toLowerCase()
@@ -329,6 +374,42 @@ const StatusActionsLogsTable = ({
               isFreeAction: true,
               onClick: () =>
                 tableRef.current && tableRef.current.onQueryChange({}),
+            },
+            {
+              icon: ReplayAllIcon,
+              tooltip: 'Replay all failed in call',
+              isFreeAction: true,
+              hidden: !call,
+              onClick: () => {
+                if (!call) {
+                  return;
+                }
+
+                confirm(
+                  async () => {
+                    const failedLogs = await getAllFailedLogsForCall(+call);
+
+                    return await api({
+                      toastSuccessMessage:
+                        'Replay request sent for all failed logs in the call.',
+                    }).replayStatusActionsLogs({
+                      statusActionsLogIds: failedLogs.map(
+                        (log) => log.statusActionsLogId
+                      ),
+                    });
+                  },
+                  {
+                    title: 'Retry all failed status actions in call',
+                    description: `You are about to retry all failed status actions in call '${selectedCallName}'. 
+                    This process will run in the background and may take some time to complete. 
+                    Sort by the latest log time and use the refresh button in the table to see progress.`,
+                    alertText:
+                      'Ensure this operation is safe to perform - it cannot be cancelled.',
+                    confirmationText: 'Retry All Failed',
+                    shouldEnableOKWithAlert: true,
+                  }
+                )();
+              },
             },
           ]}
           onChangeColumnHidden={(columnChange) => {

@@ -739,6 +739,70 @@ context('Status actions tests', () => {
       });
     });
 
+    it('User Officer should be able to replay all email status actions in a call', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal;
+        if (proposal) {
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Email');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('not.exist');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]')
+        .should('exist')
+        .first()
+        .click({ force: true });
+
+      cy.contains(
+        `all failed status actions in call '${initialDBData.call.shortCode}'`
+      ).should('exist');
+
+      cy.get('[data-cy="confirm-ok"]').click();
+    });
+
+    it('User Officer should be able to replay all proposal download status actions in a call', () => {
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        const proposal = result.createProposal;
+        if (proposal) {
+          cy.submitProposal({ proposalPk: proposal.primaryKey });
+        }
+      });
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.navigateToStatusActionLogsSubmenu('Proposal Download');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]').should('not.exist');
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
+
+      cy.get('[data-cy="replay_all_status_action_icon"]')
+        .should('exist')
+        .first()
+        .click({ force: true });
+
+      cy.contains(
+        `all failed status actions in call '${initialDBData.call.shortCode}'`
+      ).should('exist');
+
+      cy.get('[data-cy="confirm-ok"]').click();
+    });
+
     it('User Officer should be able to view and filter email status actions logs', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
