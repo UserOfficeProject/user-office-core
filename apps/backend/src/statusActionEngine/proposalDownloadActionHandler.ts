@@ -41,9 +41,7 @@ export const proposalDownloadActionHandler = async (
     ? 'Proposal failed to download on status action replay'
     : 'Proposal failed to download';
 
-  const submittedProposals = proposals.filter(
-    (prop) => (prop.submitted = true)
-  );
+  const submittedProposals = proposals.filter((prop) => prop.submitted);
 
   for (const proposal of submittedProposals) {
     const statusLogger = statusActionLogger({
