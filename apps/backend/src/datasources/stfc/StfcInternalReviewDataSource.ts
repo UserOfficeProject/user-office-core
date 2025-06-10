@@ -53,12 +53,12 @@ export default class StfcInternalReviewDataSource
       throw new GraphQLError('Internal review not found');
     }
 
-    const hasMoreInternalReviews = await this.getInternalReviews({
+    const allAssignedInternalReviews = await this.getInternalReviews({
       reviewerId: internalReview.reviewerId,
     });
 
     // If user has no other internal reviews, remove the Internal Reviewer role
-    if (hasMoreInternalReviews.length === 1) {
+    if (allAssignedInternalReviews.length === 1) {
       this.stfcUserDataSource.removeFapRoleFromUser(
         internalReview.reviewerId,
         InternalReviewRoleNumber
