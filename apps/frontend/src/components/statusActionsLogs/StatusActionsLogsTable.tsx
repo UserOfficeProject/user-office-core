@@ -377,7 +377,7 @@ const StatusActionsLogsTable = ({
             },
             {
               icon: ReplayAllIcon,
-              tooltip: 'Replay all failed in call',
+              tooltip: 'Replay all failed status actions in call',
               isFreeAction: true,
               hidden: !call,
               onClick: () => {
