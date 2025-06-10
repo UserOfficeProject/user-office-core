@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import {
   addUserRoleValidationSchema,
   createUserByEmailInviteValidationSchema,
@@ -289,6 +290,10 @@ export default class UserMutations {
       impersonatingUserId:
         isUserOfficer && shouldImpersonateUser ? agent?.id : undefined,
     });
+
+    if (isUserOfficer && shouldImpersonateUser && agent) {
+      logger.logInfo(`userId: ${agent.id} impersonating userId: ${userId}`, {});
+    }
 
     return token;
   }
