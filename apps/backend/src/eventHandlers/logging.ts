@@ -135,7 +135,8 @@ export default function createLoggingHandler() {
                   event.type,
                   json,
                   proposalPk.toString(),
-                  description
+                  description,
+                  event.impersonatingUserId
                 );
               }
             )
@@ -156,7 +157,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 proposalPk.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             })
           );
@@ -177,7 +179,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 fapProposal.proposalPk.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             })
           );
@@ -197,7 +200,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 proposal.primaryKey.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             })
           );
@@ -223,7 +227,8 @@ export default function createLoggingHandler() {
                   event.type,
                   json,
                   proposalPk.toString(),
-                  description
+                  description,
+                  event.impersonatingUserId
                 );
               }
             )
@@ -245,7 +250,8 @@ export default function createLoggingHandler() {
                   event.type,
                   json,
                   proposalPk.toString(),
-                  description
+                  description,
+                  event.impersonatingUserId
                 );
               }
             )
@@ -293,7 +299,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 obj[0].techniqueId,
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -319,7 +326,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 obj[0].techniqueId,
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -342,7 +350,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 obj[0].proposalPk,
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -357,7 +366,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 event.visitregistration.visitId.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -371,7 +381,8 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 event.visitregistration.visitId.toString(),
-                description
+                description,
+                event.impersonatingUserId
               );
             }
           }
@@ -392,7 +403,8 @@ export default function createLoggingHandler() {
             event.type,
             json,
             changedObjectId.toString(),
-            description
+            description,
+            event.impersonatingUserId
           );
           break;
         }
