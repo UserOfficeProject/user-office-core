@@ -22,6 +22,7 @@ interface GeneralEvent {
   isRejection: boolean;
   inputArgs?: string;
   description?: string;
+  impersonatingUserId?: number;
   exchange?: string;
 }
 
