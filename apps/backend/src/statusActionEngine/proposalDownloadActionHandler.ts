@@ -135,14 +135,24 @@ export const proposalDownloadActionHandler = async (
 
     if (previousFile) {
       try {
-        await fileDataSource.delete(previousFile.oid);
-        logger.logInfo(
-          `Successfully deleted previous file for proposal ${proposal.proposalId}`,
-          {
-            ...logContext,
-            previousFile: previousFile,
-          }
-        );
+        const deletionSuccess = await fileDataSource.delete(previousFile.oid);
+        if (deletionSuccess) {
+          logger.logInfo(
+            `Successfully deleted previous file for proposal ${proposal.proposalId}`,
+            {
+              ...logContext,
+              previousFile: previousFile,
+            }
+          );
+        } else {
+          logger.logWarn(
+            `Error deleting previous file for proposal ${proposal.proposalId}`,
+            {
+              ...logContext,
+              previousFile: previousFile,
+            }
+          );
+        }
       } catch (error) {
         logger.logWarn(
           `Error deleting previous file for proposal ${proposal.proposalId}`,
