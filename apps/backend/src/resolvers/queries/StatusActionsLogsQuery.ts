@@ -53,7 +53,7 @@ export class StatusActionsLogsArgs {
   public actionId: number;
 
   @Field(() => EmailStatusActionRecipients, { nullable: true })
-  public emailStatusActionRecipient: EmailStatusActionRecipients | null;
+  public emailStatusActionRecipient?: EmailStatusActionRecipients;
 
   @Field(() => Boolean, { nullable: true })
   public statusActionsSuccessful: boolean;

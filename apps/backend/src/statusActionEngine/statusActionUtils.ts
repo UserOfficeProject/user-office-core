@@ -549,7 +549,7 @@ export const statusActionLogger = (args: {
   ) {
     const statusActionsLogsArgs: StatusActionsLogsArgs = {
       ...args,
-      emailStatusActionRecipient: args?.emailStatusActionRecipient || null,
+      emailStatusActionRecipient: args?.emailStatusActionRecipient,
       statusActionsLogId: args?.statusActionsLogId || null,
       statusActionsSuccessful,
       statusActionsMessage,
