@@ -184,8 +184,6 @@ export default class StatusActionsLogsMutations {
 
       if (result instanceof Rejection) {
         failed.push({ logId, error: result.message });
-
-        continue;
       } else {
         successful.push(logId);
       }
