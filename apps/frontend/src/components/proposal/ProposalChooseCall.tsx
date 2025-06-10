@@ -38,16 +38,20 @@ const ProposalChooseCall = () => {
   }
   const { calls } = useCallsData(getDashBoardCallFilter());
 
+  const callsOrdered = calls.sort((a, b) =>
+    a.cycleComment > b.cycleComment ? 1 : -1
+  );
+
   return (
     <StyledContainer>
       <StyledPaper>
         <Typography variant="h6" component="h2" gutterBottom>
-          {calls.length !== 0
+          {callsOrdered.length !== 0
             ? 'Select a call'
             : 'There are no calls open at this time'}
         </Typography>
         <List data-cy="call-list">
-          {calls.map((call) => {
+          {callsOrdered.map((call) => {
             const timeRemainingText = timeRemaining(new Date(call.endCall));
             const InternalCalltimeRemainingText = timeRemaining(
               new Date(call.endCallInternal)
