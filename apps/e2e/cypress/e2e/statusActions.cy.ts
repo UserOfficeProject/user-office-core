@@ -3,9 +3,37 @@ import {
   Event as PROPOSAL_EVENTS,
   EmailStatusActionRecipients,
   StatusActionType,
+  AllocationTimeUnits,
 } from '@user-office-software-libs/shared-types';
+import { DateTime } from 'luxon';
 
 import initialDBData from '../support/initialDBData';
+
+const currentDayStart = DateTime.now().startOf('day');
+
+const newCall = {
+  shortCode: faker.string.alphanumeric(15),
+  startCall: faker.date.past().toISOString(),
+  endCall: faker.date.future().toISOString(),
+  startReview: currentDayStart,
+  endReview: currentDayStart,
+  startFapReview: currentDayStart,
+  endFapReview: currentDayStart,
+  startNotify: currentDayStart,
+  endNotify: currentDayStart,
+  startCycle: currentDayStart,
+  endCycle: currentDayStart,
+  templateName: initialDBData.template.name,
+  templateId: initialDBData.template.id,
+  fapReviewTemplateId: initialDBData.fapReviewTemplate.id,
+  technicalReviewTemplateId: initialDBData.technicalReviewTemplate.id,
+  allocationTimeUnit: AllocationTimeUnits.DAY,
+  cycleComment: faker.lorem.word(10),
+  surveyComment: faker.lorem.word(10),
+};
+
+let proposal1Id: string;
+let proposal2Id: string;
 
 context('Status actions tests', () => {
   beforeEach(function () {
@@ -685,15 +713,36 @@ context('Status actions tests', () => {
           });
         }
       });
-    });
 
-    it('User Officer should be able to view and replay email status actions', () => {
+      cy.createCall({
+        ...newCall,
+        proposalWorkflowId: initialDBData.workflows.defaultWorkflow.id,
+      }).then((result) => {
+        cy.createProposal({ callId: result.createCall.id }).then((result) => {
+          const proposal = result.createProposal;
+          if (proposal) {
+            cy.submitProposal({ proposalPk: proposal.primaryKey }).then(
+              (result) => {
+                proposal1Id = result.submitProposal.proposalId;
+              }
+            );
+          }
+        });
+      });
+
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         const proposal = result.createProposal;
         if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
+          cy.submitProposal({ proposalPk: proposal.primaryKey }).then(
+            (result) => {
+              proposal2Id = result.submitProposal.proposalId;
+            }
+          );
         }
       });
+    });
+
+    it('User Officer should be able to view and replay email status actions', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -714,12 +763,6 @@ context('Status actions tests', () => {
     });
 
     it('User Officer should be able to view and replay proposal download status actions', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
-        }
-      });
       cy.login('officer');
       cy.visit('/');
 
@@ -740,12 +783,6 @@ context('Status actions tests', () => {
     });
 
     it('User Officer should be able to replay all email status actions in a call', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
-        }
-      });
       cy.login('officer');
       cy.visit('/');
 
@@ -772,12 +809,6 @@ context('Status actions tests', () => {
     });
 
     it('User Officer should be able to replay all proposal download status actions in a call', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
-        }
-      });
       cy.login('officer');
       cy.visit('/');
 
@@ -804,12 +835,21 @@ context('Status actions tests', () => {
     });
 
     it('User Officer should be able to view and filter email status actions logs', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
-        }
-      });
+      const assertProposalPresentInTable = (proposalId: string) => {
+        return cy
+          .get('[data-cy="status-actions-logs-table"]')
+          .find('tbody td')
+          .contains(proposalId)
+          .parents('tr')
+          .should('contain', 'SUCCESSFUL');
+      };
+
+      const assertProposalAbsentInTable = (proposalId: string) => {
+        cy.get('[data-cy="status-actions-logs-table"]').should(
+          'not.contain',
+          proposalId
+        );
+      };
 
       cy.login('officer');
       cy.visit('/');
@@ -826,12 +866,16 @@ context('Status actions tests', () => {
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
-        .should('have.length', 2);
+        .should('have.length', 4);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
 
       cy.get('[data-cy="status-actions-log-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Failed').click();
 
       cy.finishedLoading();
+
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
         .first()
@@ -847,7 +891,10 @@ context('Status actions tests', () => {
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
-        .should('have.length', 2);
+        .should('have.length', 4);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
@@ -859,8 +906,11 @@ context('Status actions tests', () => {
         .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
 
+      assertProposalAbsentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
       cy.get('[data-cy="call-filter"]').click();
-      cy.get('[role="listbox"]').contains('All').click();
+      cy.get('[role="listbox"]').contains(newCall.shortCode).click();
 
       cy.finishedLoading();
 
@@ -868,15 +918,40 @@ context('Status actions tests', () => {
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
         .should('have.length', 2);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalAbsentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains('All').click();
+
+      cy.finishedLoading();
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="status-actions-logs-table"]')
+        .find('tbody td')
+        .filter(':contains("SUCCESSFUL")')
+        .should('have.length', 4);
     });
 
     it('User Officer should be able to view and filter proposal download status actions logs', () => {
-      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
-        const proposal = result.createProposal;
-        if (proposal) {
-          cy.submitProposal({ proposalPk: proposal.primaryKey });
-        }
-      });
+      const assertProposalPresentInTable = (proposalId: string) => {
+        return cy
+          .get('[data-cy="status-actions-logs-table"]')
+          .find('tbody td')
+          .contains(proposalId)
+          .parents('tr')
+          .should('contain', 'SUCCESSFUL');
+      };
+
+      const assertProposalAbsentInTable = (proposalId: string) => {
+        cy.get('[data-cy="status-actions-logs-table"]').should(
+          'not.contain',
+          proposalId
+        );
+      };
 
       cy.login('officer');
       cy.visit('/');
@@ -893,7 +968,12 @@ context('Status actions tests', () => {
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
-        .should('have.length', 1);
+        .should('have.length', 2);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.log('after');
 
       cy.get('[data-cy="status-actions-log-status-filter"]').click();
       cy.get('[role="listbox"]').contains('Failed').click();
@@ -914,17 +994,26 @@ context('Status actions tests', () => {
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
-        .should('have.length', 1);
+        .should('have.length', 2);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains(initialDBData.call.shortCode).click();
 
       cy.finishedLoading();
 
-      cy.get('[data-cy="status-actions-logs-table"]')
-        .find('tbody td')
-        .filter(':contains("SUCCESSFUL")')
-        .should('have.length', 1);
+      assertProposalAbsentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
+
+      cy.get('[data-cy="call-filter"]').click();
+      cy.get('[role="listbox"]').contains(newCall.shortCode).click();
+
+      cy.finishedLoading();
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalAbsentInTable(String(proposal2Id));
 
       cy.get('[data-cy="call-filter"]').click();
       cy.get('[role="listbox"]').contains('All').click();
@@ -934,7 +1023,10 @@ context('Status actions tests', () => {
       cy.get('[data-cy="status-actions-logs-table"]')
         .find('tbody td')
         .filter(':contains("SUCCESSFUL")')
-        .should('have.length', 1);
+        .should('have.length', 2);
+
+      assertProposalPresentInTable(String(proposal1Id));
+      assertProposalPresentInTable(String(proposal2Id));
     });
 
     it('User Officer should be able to access the proposal from the link in status actions logs', () => {
