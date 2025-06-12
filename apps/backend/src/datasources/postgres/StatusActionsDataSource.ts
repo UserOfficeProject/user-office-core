@@ -200,7 +200,7 @@ export default class PostgresStatusActionsDataSource
         connection_id: connectionStatusActionsInput.connectionId,
         action_id: item.actionId,
         workflow_id: connectionStatusActionsInput.workflowId,
-        config: item.config,
+        config: item.config ?? null,
       }));
     const connectionHasStatusActions:
       | (WorkflowConnectionHasActionsRecord &

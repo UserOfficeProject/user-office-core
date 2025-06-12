@@ -44,7 +44,9 @@ const files = () => {
     try {
       const fileId = req.params.file_id;
       const path = await baseContext.mutations.file.prepare(fileId);
-      const metaData = await baseContext.queries.file.getFileMetadata(fileId);
+      const metaData = (
+        await baseContext.queries.file.getFileMetadata(fileId)
+      )[0];
       if (!isRejection(path) && metaData) {
         res.download(path, metaData.originalFileName, (err) => {
           if (err) {
