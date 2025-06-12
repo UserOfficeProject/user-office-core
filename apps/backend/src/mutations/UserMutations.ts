@@ -287,6 +287,7 @@ export default class UserMutations {
       roles,
       currentRole: roles[0],
       isInternalUser: false,
+      externalToken: agent?.externalToken,
       impersonatingUserId:
         isUserOfficer && shouldImpersonateUser ? agent?.id : undefined,
     });
