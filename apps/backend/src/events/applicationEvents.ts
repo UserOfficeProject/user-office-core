@@ -217,6 +217,16 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
   array: AnswerBasic[];
 }
 
+interface ProposalCoProposerClaimSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT;
+  invites: Invite[];
+}
+
+interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED;
+  invite: Invite;
+}
+
 interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
   user: User;
@@ -453,6 +463,8 @@ export type ApplicationEvent =
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent
   | ProposalAllFapInstrumentSubmittedEvent
+  | ProposalCoProposerClaimSentEvent
+  | ProposalCoProposerClaimAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
