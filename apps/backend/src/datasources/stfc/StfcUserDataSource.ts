@@ -192,47 +192,72 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     if (cacheMisses.length > 0) {
-      const uowsRequestTemp: BasicPersonDetailsDTO[] | null = searchableOnly
-        ? await UOWSClient.basicPersonDetails
-            .getSearchableBasicPersonDetails(undefined, undefined, cacheMisses)
-            .catch((error) => {
-              logger.logError(
-                'An error occurred while fetching searchable person details using getSearchableBasicPersonDetails',
-                error
-              );
+      // Create promise that will request a chunk of the missing user details
+      // Requesting too many users at once can cause "414 Request-URI Too Long" errors
+      const chunkSize = 100;
+      const cacheMissChunks = Array.from(
+        { length: Math.ceil(cacheMisses.length / chunkSize) },
+        (_, index) =>
+          cacheMisses.slice(index * chunkSize, (index + 1) * chunkSize)
+      );
 
-              return null;
-            })
-        : await UOWSClient.basicPersonDetails
-            .getBasicPersonDetails(undefined, undefined, undefined, cacheMisses)
-            .catch((error) => {
-              logger.logError(
-                'An error occurred while fetching searchable person details using getBasicPersonDetails',
-                error
-              );
+      const uowsRequests: Array<Promise<Array<StfcBasicPersonDetails | null>>> =
+        [];
 
-              return null;
-            });
+      cacheMissChunks.forEach((cacheMissChunk) => {
+        const request: Promise<Array<StfcBasicPersonDetails | null>> = (
+          searchableOnly
+            ? UOWSClient.basicPersonDetails
+                .getSearchableBasicPersonDetails(
+                  undefined,
+                  undefined,
+                  cacheMissChunk
+                )
+                .catch((error) => {
+                  logger.logError(
+                    'An error occurred while fetching searchable person details using getSearchableBasicPersonDetails',
+                    error
+                  );
 
-      const uowsRequest = uowsRequestTemp
-        ? uowsRequestTemp.map(toStfcBasicPersonDetails)
-        : null;
+                  return [];
+                })
+            : UOWSClient.basicPersonDetails
+                .getBasicPersonDetails(
+                  undefined,
+                  undefined,
+                  undefined,
+                  cacheMissChunk
+                )
+                .catch((error) => {
+                  logger.logError(
+                    'An error occurred while fetching searchable person details using getBasicPersonDetails',
+                    error
+                  );
 
-      if (uowsRequest) {
-        for (const userNumber of cacheMisses) {
-          const userRequest = Promise.resolve(
-            uowsRequest.find((user) => user?.userNumber === userNumber) ||
-              undefined
+                  return [];
+                })
+        ).then((uowsResults) => uowsResults.map(toStfcBasicPersonDetails));
+        uowsRequests.push(request);
+        // Build promises for individual missing users and add them to the cache.
+        // Doing this as soon as possible after creating the requests and before any awaits on them ensures any parallel requests can reuse the promise and don't repeat calls for the same user data
+        for (const userNumber of cacheMissChunk) {
+          const userRequest = request.then(
+            (users) =>
+              users.find((user) => user?.userNumber === userNumber) || undefined
           );
 
           cache.put(userNumber, userRequest);
           stfcUserRequests.push(userRequest);
         }
+      });
 
-        await this.ensureDummyUsersExist(
-          uowsRequest.map((stfcUser) => parseInt(stfcUser!.userNumber))
-        );
-      }
+      // Now that all requests are made and cached, wait for the user data then store it in the database
+      const usersFromUows = await Promise.all(uowsRequests).then((responses) =>
+        responses.flat()
+      );
+      await this.ensureDummyUsersExist(
+        usersFromUows.map((stfcUser) => parseInt(stfcUser!.userNumber))
+      );
     }
 
     const stfcUsers: StfcBasicPersonDetails[] = await Promise.all(
