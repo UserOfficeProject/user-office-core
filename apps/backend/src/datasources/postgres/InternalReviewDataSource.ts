@@ -20,6 +20,7 @@ export default class PostgresInternalReviewDataSource
   constructor(
     @inject(Tokens.ReviewDataSource) private reviewDataSource: ReviewDataSource
   ) {}
+
   private createInternalReviewObject(internalReview: InternalReviewRecord) {
     return new InternalReview(
       internalReview.internal_review_id,
