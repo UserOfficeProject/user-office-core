@@ -306,10 +306,10 @@ const ProposalTable = ({
       {isEmailInviteEnabled && (
         <ActionButtonContainer>
           <ButtonWithDialog
-            label="Join proposal or visit"
+            label="Join proposal"
             data-cy="join-proposal-btn"
             startIcon={<AddIcon />}
-            title="Join proposal or visit"
+            title="Join proposal"
           >
             <AcceptInvite
               onAccepted={() => {
