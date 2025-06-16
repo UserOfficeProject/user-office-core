@@ -32,11 +32,12 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
     const wordCount = editor.plugins.wordcount;
     setNumberOfChars(wordCount.body.getCharacterCount());
   };
+  const [paragraphSpacingError, setParagraphSpacingError] = useState(false);
 
   return (
     <FormControl
       required={config.required}
-      error={isError}
+      error={isError || paragraphSpacingError}
       margin="dense"
       fullWidth
     >
@@ -77,6 +78,18 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
         onEditorChange={(content, editor) => {
           handleCharacterCount(editor);
           onComplete(content);
+          const plainText = editor.getContent({ format: 'text' });
+          const hasExtraLines = /\n\s*\n\s*\n/.test(plainText);
+          setParagraphSpacingError(hasExtraLines);
+        }}
+        onBlur={(_, editor) => {
+          const content = editor.getContent();
+          const cleanedcontent = content
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/(\r\n|\r|\n)+/g, '\n')
+            .replace(/<p>\s*&nbsp;\s*<\/p>/gi, '');
+          handleCharacterCount(editor);
+          onComplete(cleanedcontent);
         }}
         onInit={(_, editor) => {
           handleCharacterCount(editor);
@@ -95,6 +108,12 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
         </Box>
       )}
       {isError && <FormHelperText>{fieldError}</FormHelperText>}
+      {paragraphSpacingError && (
+        <FormHelperText sx={{ color: theme.palette.error.main }}>
+          Extra blank lines between paragraphs will be removed to comply with
+          formatting standards.
+        </FormHelperText>
+      )}
     </FormControl>
   );
 }
