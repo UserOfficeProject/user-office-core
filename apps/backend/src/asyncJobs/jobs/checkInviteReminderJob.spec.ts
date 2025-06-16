@@ -27,11 +27,11 @@ const mockAdminDataSource = {
   getSetting: sinon.stub(),
 };
 
-const mockGetTemplateIdForRole = sinon.stub();
+const mockGetTemplateIdForInvite = sinon.stub();
 
 describe('checkInviteReminderJob', () => {
   let clock: sinon.SinonFakeTimers;
-  let getTemplateIdForRoleSpy: sinon.SinonSpy;
+  let getTemplateIdForInviteSpy: sinon.SinonSpy;
 
   beforeEach(() => {
     mockUserDataSource.getBasicUserInfo.reset();
@@ -39,7 +39,7 @@ describe('checkInviteReminderJob', () => {
     mockRoleClaimDataSource.findByInviteId.reset();
     mockMailService.sendMail.reset();
     mockAdminDataSource.getSetting.reset();
-    mockGetTemplateIdForRole.reset();
+    mockGetTemplateIdForInvite.reset();
 
     container.clearInstances();
 
@@ -55,10 +55,10 @@ describe('checkInviteReminderJob', () => {
       useValue: mockAdminDataSource,
     });
 
-    getTemplateIdForRoleSpy = sinon
+    getTemplateIdForInviteSpy = sinon
       .stub(EssEmailHandler, 'getTemplateIdForInvite')
-      .callsFake(mockGetTemplateIdForRole);
-    mockGetTemplateIdForRole.returns('template_id_for_role');
+      .callsFake(mockGetTemplateIdForInvite);
+    mockGetTemplateIdForInvite.returns('template_id_for_invite');
 
     const now = new Date('2025-05-14T10:00:00.000Z');
     clock = sinon.useFakeTimers(now.getTime());
@@ -67,8 +67,8 @@ describe('checkInviteReminderJob', () => {
   afterEach(() => {
     sinon.restore();
     clock.restore();
-    if (getTemplateIdForRoleSpy) {
-      getTemplateIdForRoleSpy.restore();
+    if (getTemplateIdForInviteSpy) {
+      getTemplateIdForInviteSpy.restore();
     }
   });
 
@@ -166,7 +166,7 @@ describe('checkInviteReminderJob', () => {
         .withArgs(mockInvite.id)
         .resolves([mockRoleClaim]);
       mockMailService.sendMail.resolves();
-      mockGetTemplateIdForRole
+      mockGetTemplateIdForInvite
         .withArgs(UserRole.USER)
         .returns('user_template_id');
     });
@@ -181,7 +181,7 @@ describe('checkInviteReminderJob', () => {
       const expectedEndDate = new Date(targetCreationDate);
       expectedEndDate.setHours(23, 59, 59, 999);
 
-      expect(mockGetTemplateIdForRole.calledWith(UserRole.USER)).toBe(true);
+      expect(mockGetTemplateIdForInvite.calledWith(mockInvite.id)).toBe(true);
       expect(mockMailService.sendMail.calledOnce).toBe(true);
     });
 
