@@ -3,6 +3,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -32,6 +33,11 @@ export default function createLoggingHandler() {
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
+
+  const coProposerClaimDataSource =
+    container.resolve<CoProposerClaimDataSource>(
+      Tokens.CoProposerClaimDataSource
+    );
 
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
@@ -78,6 +84,36 @@ export default function createLoggingHandler() {
             );
           }
           break;
+
+        case Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT:
+        case Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED: {
+          let invites;
+          if ('invite' in event) {
+            invites = [event.invite];
+          } else {
+            invites = event.array;
+          }
+          for (const invite of invites) {
+            const coProposerInvites =
+              await coProposerClaimDataSource.findByInviteId(invite.id);
+
+            await Promise.all(
+              coProposerInvites.map(async (coProposerInvite) => {
+                return eventLogsDataSource.set(
+                  event.loggedInUserId,
+                  event.type,
+                  json,
+                  coProposerInvite.proposalPk.toString(),
+                  event.type === Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED
+                    ? `Co-proposer invite accepted: ${invite.email}`
+                    : `Co-proposer invite sent: ${invite.email}`
+                );
+              })
+            );
+          }
+
+          break;
+        }
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(

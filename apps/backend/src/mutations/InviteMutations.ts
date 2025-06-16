@@ -10,6 +10,7 @@ import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { Authorized, EventBus } from '../decorators';
+import { ApplicationEventBus } from '../events';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
@@ -35,7 +36,8 @@ export default class InviteMutations {
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
-    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
+    @inject(Tokens.EventBus) private eventBus: ApplicationEventBus
   ) {}
 
   @Authorized()
@@ -71,6 +73,7 @@ export default class InviteMutations {
 
   @Authorized()
   @EventBus(Event.EMAIL_INVITES)
+  @EventBus(Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT)
   public async setCoProposerInvites(
     agent: UserWithRole | null,
     args: SetCoProposerInvitesInput
@@ -192,6 +195,17 @@ export default class InviteMutations {
         claim.proposalPk,
         claimerUserId
       );
+
+      const invite = await this.inviteDataSource.findById(inviteId);
+
+      this.eventBus.publish({
+        type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: claimerUserId,
+        invite: invite!,
+        description: `User with ID ${claimerUserId} accepted invite for proposal ${claim.proposalPk}`,
+      });
     }
   }
 
