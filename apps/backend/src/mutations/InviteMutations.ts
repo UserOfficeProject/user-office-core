@@ -165,15 +165,10 @@ export default class InviteMutations {
       );
     }
 
-    const existingClaims =
-      await this.visitRegistrationClaimDataSource.findByVisitId(visitId);
-    const existingInvites = (await Promise.all(
-      existingClaims.map((claim) =>
-        this.inviteDataSource.findById(claim.inviteId)
-      )
-    )) as Invite[];
-    const existingEmails = existingInvites.map((invite) => invite.email);
+    const existingInvites =
+      await this.inviteDataSource.findVisitRegistrationInvites(visitId, false);
 
+    const existingEmails = existingInvites.map((invite) => invite.email);
     const deletedEmails = existingEmails.filter(
       (email) => !inviteEmails.includes(email)
     );
@@ -207,7 +202,6 @@ export default class InviteMutations {
           newInvite.id,
           visitId
         );
-        await this.roleClaimDataSource.create(newInvite.id, UserRole.USER);
       })
     );
 
@@ -273,16 +267,16 @@ export default class InviteMutations {
     invite: Invite
   ) {
     const inviteId = invite.id;
-    const visitRegistrationClaim =
+    const claim =
       await this.visitRegistrationClaimDataSource.findByInviteId(inviteId);
 
-    if (!visitRegistrationClaim) {
+    if (!claim) {
       return;
     }
 
     const existingRegistration = await this.visitDataSource.getRegistration(
       claimerUserId,
-      visitRegistrationClaim.visitId
+      claim.visitId
     );
 
     if (existingRegistration) {
@@ -292,7 +286,7 @@ export default class InviteMutations {
     // Insert the user into the visits_has_users table to create a new visit registration
     await database('visits_has_users')
       .insert({
-        visit_id: visitRegistrationClaim.visitId,
+        visit_id: claim.visitId,
         user_id: claimerUserId,
         registration_questionary_id: null,
         starts_at: null,
@@ -301,6 +295,15 @@ export default class InviteMutations {
       })
       .onConflict(['user_id', 'visit_id'])
       .ignore();
+
+    this.eventBus.publish({
+      type: Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED,
+      isRejection: false,
+      key: 'proposal',
+      loggedInUserId: claimerUserId,
+      invite: invite,
+      description: `User with ID ${claimerUserId} accepted visit invite`,
+    });
   }
 
   private async proposalHasUser(proposalPk: number, userId: number) {

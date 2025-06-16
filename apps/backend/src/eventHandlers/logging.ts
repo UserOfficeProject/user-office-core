@@ -117,6 +117,26 @@ export default function createLoggingHandler() {
 
           break;
         }
+        case Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED: {
+          const invite = event.invite;
+
+          const coProposerInvites =
+            await coProposerClaimDataSource.findByInviteId(invite.id);
+
+          await Promise.all(
+            coProposerInvites.map(async (coProposerInvite) => {
+              return eventLogsDataSource.set(
+                event.loggedInUserId,
+                event.type,
+                json,
+                coProposerInvite.proposalPk.toString(),
+                `Visit registration claim accepted: ${invite.email}`
+              );
+            })
+          );
+
+          break;
+        }
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(

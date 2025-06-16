@@ -56,7 +56,7 @@ describe('checkInviteReminderJob', () => {
     });
 
     getTemplateIdForRoleSpy = sinon
-      .stub(EssEmailHandler, 'getTemplateIdForRole')
+      .stub(EssEmailHandler, 'getTemplateIdForInvite')
       .callsFake(mockGetTemplateIdForRole);
     mockGetTemplateIdForRole.returns('template_id_for_role');
 

@@ -227,6 +227,10 @@ interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
   invite: Invite;
 }
 
+interface ProposalVisitClaimAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED;
+  invite: Invite;
+}
 interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
   user: User;
@@ -465,6 +469,7 @@ export type ApplicationEvent =
   | ProposalAllFapInstrumentSubmittedEvent
   | ProposalCoProposerClaimSentEvent
   | ProposalCoProposerClaimAcceptedEvent
+  | ProposalVisitClaimAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
