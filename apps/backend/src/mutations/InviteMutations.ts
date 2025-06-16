@@ -267,43 +267,41 @@ export default class InviteMutations {
     invite: Invite
   ) {
     const inviteId = invite.id;
-    const claim =
+    const claims =
       await this.visitRegistrationClaimDataSource.findByInviteId(inviteId);
 
-    if (!claim) {
-      return;
+    for await (const claim of claims) {
+      const existingRegistration = await this.visitDataSource.getRegistration(
+        claimerUserId,
+        claim.visitId
+      );
+
+      if (existingRegistration) {
+        return;
+      }
+
+      // Insert the user into the visits_has_users table to create a new visit registration
+      await database('visits_has_users')
+        .insert({
+          visit_id: claim.visitId,
+          user_id: claimerUserId,
+          registration_questionary_id: null,
+          starts_at: null,
+          ends_at: null,
+          // status will default to 'DRAFTED' as defined in the database schema
+        })
+        .onConflict(['user_id', 'visit_id'])
+        .ignore();
+
+      this.eventBus.publish({
+        type: Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED,
+        isRejection: false,
+        key: 'proposal',
+        loggedInUserId: claimerUserId,
+        invite: invite,
+        description: `User with ID ${claimerUserId} accepted visit invite`,
+      });
     }
-
-    const existingRegistration = await this.visitDataSource.getRegistration(
-      claimerUserId,
-      claim.visitId
-    );
-
-    if (existingRegistration) {
-      return;
-    }
-
-    // Insert the user into the visits_has_users table to create a new visit registration
-    await database('visits_has_users')
-      .insert({
-        visit_id: claim.visitId,
-        user_id: claimerUserId,
-        registration_questionary_id: null,
-        starts_at: null,
-        ends_at: null,
-        // status will default to 'DRAFTED' as defined in the database schema
-      })
-      .onConflict(['user_id', 'visit_id'])
-      .ignore();
-
-    this.eventBus.publish({
-      type: Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED,
-      isRejection: false,
-      key: 'proposal',
-      loggedInUserId: claimerUserId,
-      invite: invite,
-      description: `User with ID ${claimerUserId} accepted visit invite`,
-    });
   }
 
   private async proposalHasUser(proposalPk: number, userId: number) {

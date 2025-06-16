@@ -33,21 +33,16 @@ export default class PostgresVisitRegistrationClaimDataSource
     );
   }
 
-  async findByInviteId(inviteId: number): Promise<VisitRegistrationClaim> {
-    const record = await database<VisitRegistrationClaimRecord>(
+  async findByInviteId(inviteId: number): Promise<VisitRegistrationClaim[]> {
+    const records = await database<VisitRegistrationClaimRecord>(
       'visit_registration_claims'
     )
       .select('*')
-      .where('invite_id', inviteId)
-      .first();
+      .where('invite_id', inviteId);
 
-    if (!record) {
-      throw new Error(
-        `Visit registration claim with inviteId ${inviteId} not found`
-      );
-    }
-
-    return createVisitRegistrationClaimObject(record);
+    return records.map((record: VisitRegistrationClaimRecord) =>
+      createVisitRegistrationClaimObject(record)
+    );
   }
 
   async findByVisitId(visitId: number): Promise<VisitRegistrationClaim[]> {

@@ -32,18 +32,10 @@ export class VisitRegistrationClaimDataSourceMock
     return newClaim;
   }
 
-  async findByInviteId(inviteId: number): Promise<VisitRegistrationClaim> {
-    const claim = this.visitRegistrationClaims.find(
+  async findByInviteId(inviteId: number): Promise<VisitRegistrationClaim[]> {
+    return this.visitRegistrationClaims.filter(
       (claim) => claim.inviteId === inviteId
     );
-
-    if (!claim) {
-      throw new Error(
-        `VisitRegistrationClaim not found for inviteId: ${inviteId}`
-      );
-    }
-
-    return claim;
   }
 
   async findByVisitId(visitId: number): Promise<VisitRegistrationClaim[]> {
