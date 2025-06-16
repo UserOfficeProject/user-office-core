@@ -11,6 +11,7 @@ import { Sample } from '../models/Sample';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
+import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
@@ -218,7 +219,7 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
 
 interface ProposalCoProposerClaimSentEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT;
-  array: Invite[];
+  invites: Invite[];
 }
 
 interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
@@ -226,6 +227,10 @@ interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
   invite: Invite;
 }
 
+interface ProposalVisitClaimAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED;
+  invite: Invite;
+}
 interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
   user: User;
@@ -391,6 +396,10 @@ interface InternalReviewDeleted extends GeneralEvent {
   internalreview: InternalReview;
 }
 
+interface VisitCreatedEvent extends GeneralEvent {
+  type: Event.VISIT_CREATED;
+  visit: Visit;
+}
 interface VisitRegistrationApprovedEvent extends GeneralEvent {
   type: Event.VISIT_REGISTRATION_APPROVED;
   visitregistration: VisitRegistration;
@@ -460,6 +469,7 @@ export type ApplicationEvent =
   | ProposalAllFapInstrumentSubmittedEvent
   | ProposalCoProposerClaimSentEvent
   | ProposalCoProposerClaimAcceptedEvent
+  | ProposalVisitClaimAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
@@ -474,5 +484,6 @@ export type ApplicationEvent =
   | InternalReviewCreated
   | InternalReviewUpdated
   | InternalReviewDeleted
+  | VisitCreatedEvent
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent;

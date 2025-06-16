@@ -10,6 +10,7 @@ import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { VisitDataSource } from '../../datasources/VisitDataSource';
+import { VisitRegistrationClaimDataSource } from '../../datasources/VisitRegistrationClaimDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
@@ -470,15 +471,23 @@ export async function getTemplateIdForInvite(
   const coProposerDS = container.resolve<CoProposerClaimDataSource>(
     Tokens.CoProposerClaimDataSource
   );
+  const visitRegDS = container.resolve<VisitRegistrationClaimDataSource>(
+    Tokens.VisitRegistrationClaimDataSource
+  );
 
   // Fetch all claims concurrently
-  const [coProposerClaim, roleClaims] = await Promise.all([
+  const [coProposerClaim, visitRegClaim, roleClaims] = await Promise.all([
     coProposerDS.findByInviteId(inviteId),
+    visitRegDS.findByInviteId(inviteId),
     roleClaimDS.findByInviteId(inviteId),
   ]);
 
   if (coProposerClaim.length > 0) {
     return 'user-office-registration-invitation-co-proposer';
+  }
+
+  if (visitRegClaim) {
+    return 'user-office-registration-invitation-visit-registration';
   }
 
   if (roleClaims.length > 0) {

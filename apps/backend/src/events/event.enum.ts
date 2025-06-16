@@ -44,8 +44,8 @@ export enum Event {
   USER_DELETED = 'USER_DELETED',
   USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
   EMAIL_INVITE_LEGACY = 'EMAIL_INVITE_LEGACY',
-  EMAIL_INVITE = 'EMAIL_INVITE',
-  EMAIL_INVITES = 'EMAIL_INVITES',
+  EMAIL_INVITE = 'EMAIL_INVITE', // TODO: this should be called INVITE_CREATED
+  EMAIL_INVITES = 'EMAIL_INVITES', // TODO: this should be called INVITES_CREATED
   FAP_CREATED = 'FAP_CREATED',
   FAP_UPDATED = 'FAP_UPDATED',
   FAP_MEMBERS_ASSIGNED = 'FAP_MEMBERS_ASSIGNED',
@@ -68,6 +68,7 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
   PROPOSAL_CO_PROPOSER_CLAIM_SENT = 'PROPOSAL_CO_PROPOSER_CLAIM_SENT',
   PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED = 'PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED',
+  PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED = 'PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED',
   INSTRUMENT_CREATED = 'INSTRUMENT_CREATED',
   INSTRUMENT_UPDATED = 'INSTRUMENT_UPDATED',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
@@ -91,6 +92,7 @@ export enum Event {
   EXPERIMENT_ESF_REJECTED_BY_IS = 'EXPERIMENT_ESF_REJECTED_BY_IS',
   EXPERIMENT_ESF_APPROVED_BY_ESR = 'EXPERIMENT_ESF_APPROVED_BY_ESR',
   EXPERIMENT_ESF_REJECTED_BY_ESR = 'EXPERIMENT_ESF_REJECTED_BY_ESR',
+  VISIT_CREATED = 'VISIT_CREATED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -271,6 +273,10 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when the proposal status action is being executed in the status engine',
   ],
   [
+    Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED,
+    'Event occurs when user accepts the visit registration claim for a proposal',
+  ],
+  [
     Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
     'Event occurs when the proposal status was changed by the workflow engine',
   ],
@@ -346,6 +352,7 @@ export const EventLabel = new Map<Event, string>([
     Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
     'Event occurs when a proposal is assigned to techniques',
   ],
+  [Event.VISIT_CREATED, 'Event occurs when visit is created'],
   [
     Event.VISIT_REGISTRATION_APPROVED,
     'Event occurs when visit registration is approved',

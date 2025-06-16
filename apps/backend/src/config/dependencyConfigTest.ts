@@ -4,6 +4,7 @@ import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 import 'reflect-metadata';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
@@ -34,6 +35,7 @@ import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSou
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
+import { VisitRegistrationClaimDataSourceMock } from '../datasources/mockups/VisitRegistrationClaimDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
@@ -83,6 +85,11 @@ mapClass(Tokens.TemplateDataSource, TemplateDataSourceMock);
 mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
+mapClass(
+  Tokens.VisitRegistrationClaimDataSource,
+  VisitRegistrationClaimDataSourceMock
+);
+mapClass(Tokens.VisitAuthorization, VisitAuthorization);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
 mapClass(
   Tokens.PredefinedMessageDataSource,
