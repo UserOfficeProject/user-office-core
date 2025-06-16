@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from 'type-graphql';
 
-import { VisitRegistrationClaim as VisitRegistrationClaimOrig } from '../../models/VisitRegistrationInvite';
+import { VisitRegistrationClaim as VisitRegistrationClaimOrig } from '../../models/VisitRegistrationClaim';
 
 @ObjectType()
 export class VisitRegistrationClaim
