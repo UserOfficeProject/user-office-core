@@ -69,6 +69,7 @@ export default function createLoggingHandler() {
           break;
         case Event.EMAIL_INVITE:
         case Event.EMAIL_INVITES:
+        case Event.INVITE_ACCEPTED:
           let invites;
           if ('invite' in event) {
             invites = [event.invite];
@@ -80,7 +81,10 @@ export default function createLoggingHandler() {
               event.loggedInUserId,
               event.type,
               json,
-              invite.id.toString()
+              invite.id.toString(),
+              event.type === Event.INVITE_ACCEPTED
+                ? `Invite accepted: ${invite.email}`
+                : `Invite sent: ${invite.email}`
             );
           }
           break;
