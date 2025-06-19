@@ -1,5 +1,7 @@
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import { Button } from '@mui/material';
 import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
 import { FieldProps, getIn } from 'formik';
 import { Field } from 'formik';
 import { DateTime } from 'luxon';
@@ -36,6 +38,36 @@ const HourSelector = ({
     </select>
   </div>
 );
+
+const StyledPickerWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  '.rdp-range_start': {
+    background: `linear-gradient(90deg, transparent 50%, ${theme.palette.primary.main} 50%)`,
+    border: 'none',
+  },
+  '.rdp-range_end': {
+    background: `linear-gradient(90deg, ${theme.palette.primary.main} 50%, transparent 50%)`,
+    border: 'none',
+  },
+  '.rdp-range_start .rdp-day_button, .rdp-range_end .rdp-day_button': {
+    backgroundColor: theme.palette.primary.main,
+    border: 'none',
+  },
+  '.rdp-range_middle .rdp-day_button': {
+    backgroundColor: theme.palette.primary.main,
+    borderColor: theme.palette.primary.main,
+    color: 'white',
+  },
+  '.rdp-day': {
+    padding: 0,
+    width: '100%',
+    height: '100%',
+  },
+  '.rdp-nav svg': {
+    fill: theme.palette.primary.dark,
+  },
+}));
 
 export interface DayRangePickerProps extends FieldProps {
   label?: string;
@@ -92,7 +124,7 @@ export function fieldToDayRangePicker({
   };
 }
 
-export default function DayRangePicker({
+export default function DayTimeRangePicker({
   label,
   helperText,
   ...props
@@ -154,7 +186,7 @@ export default function DayRangePicker({
           fullWidth
           placeholder="dd/mm/yyyy - dd/mm/yyyy"
           value={generateDateTimeString(selected)}
-          onFocus={() => setShowPicker(true)}
+          onClick={() => setShowPicker((prev) => !prev)}
         />
       </div>
       <div
@@ -175,12 +207,14 @@ export default function DayRangePicker({
           ref={pickerRef}
           style={{ position: 'absolute', top: '100%', left: 0, zIndex: 1 }}
         >
-          <DayPicker
-            mode="range"
-            selected={selected}
-            onSelect={onSelect}
-            disabled={disabled}
-          />
+          <StyledPickerWrapper>
+            <DayPicker
+              mode="range"
+              selected={selected}
+              onSelect={onSelect}
+              disabled={disabled}
+            />
+          </StyledPickerWrapper>
           <div
             style={{
               display: 'flex',
@@ -208,20 +242,14 @@ export default function DayRangePicker({
               padding: '8px',
             }}
           >
-            <button
+            <Button
               onClick={handleDone}
+              variant="contained"
+              color="primary"
               data-cy={`${props.id}-done-btn`}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: '#1976d2',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
             >
               Done
-            </button>
+            </Button>
           </div>
         </Paper>
       )}

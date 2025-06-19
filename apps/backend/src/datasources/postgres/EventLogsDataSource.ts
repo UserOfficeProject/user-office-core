@@ -23,15 +23,26 @@ export default class PostgresEventLogsDataSource
     eventType: string,
     rowData: string,
     changedObjectId: string,
-    description?: string
+    description?: string,
+    impersonatingUserId?: number
   ) {
+    const isImpersonating =
+      impersonatingUserId != null && impersonatingUserId !== changedBy;
+
+    const actingUserId = impersonatingUserId ?? changedBy;
+
+    const updatedDescription = isImpersonating
+      ? `${description || ''} (userId:${impersonatingUserId} impersonating userId:${changedBy})`
+      : description;
+
     return database
       .insert({
-        changed_by: changedBy,
+        changed_by: actingUserId,
         event_type: eventType,
         row_data: rowData,
         changed_object_id: changedObjectId,
-        description: description,
+        description: updatedDescription,
+        impersonating_user_id: impersonatingUserId,
       })
       .returning('*')
       .into('event_logs')

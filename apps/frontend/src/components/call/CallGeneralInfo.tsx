@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
-import DayRangePicker from 'components/common/FormikUIDayRangePicker';
+import DayTimeRangePicker from 'components/common/FormikUIDayTimeRangePicker';
 import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import StyledDialog from 'components/common/StyledDialog';
@@ -243,7 +243,7 @@ const CallGeneralInfo = ({
           id="start-end-call-input"
           format={dateTimeFormat}
           ampm={false}
-          component={DayRangePicker}
+          component={DayTimeRangePicker}
           inputProps={{ placeholder: dateTimeFormat }}
           allowSameDateSelection
           textField={{
