@@ -41,6 +41,7 @@ export interface DayRangePickerProps extends FieldProps {
   label?: string;
   helperText?: string;
   disabled?: boolean;
+  id: string;
 }
 
 export function fieldToDayRangePicker({
@@ -146,6 +147,7 @@ export default function DayRangePicker({
       <div style={{ flex: 1 }}>
         {label && <label>{label}</label>}
         <Field
+          data-cy={props.id}
           name="startEndDateField"
           component={TextField}
           multiline
@@ -159,6 +161,7 @@ export default function DayRangePicker({
         onClick={() => setShowPicker((prev) => !prev)}
         style={{
           marginLeft: '8px',
+          marginTop: '30px',
           display: 'flex',
           alignItems: 'center',
           cursor: 'pointer',
@@ -207,6 +210,7 @@ export default function DayRangePicker({
           >
             <button
               onClick={handleDone}
+              data-cy={`${props.id}-done-btn`}
               style={{
                 padding: '6px 12px',
                 backgroundColor: '#1976d2',
