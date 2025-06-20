@@ -6,7 +6,7 @@ import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { getTemplateIdForRole } from '../../eventHandlers/email/essEmailHandler';
+import { getTemplateIdForInvite } from '../../eventHandlers/email/essEmailHandler';
 import { MailService } from '../../eventHandlers/MailService/MailService';
 import { SettingsId } from '../../models/Settings';
 
@@ -114,18 +114,7 @@ const checkInviteReminder = async () => {
         continue;
       }
 
-      const roleInviteClaims = await roleClaimDataSource.findByInviteId(
-        invite.id
-      );
-
-      if (!roleInviteClaims.length) {
-        logger.logError('No role claims found for invite', {
-          inviteId: invite.id,
-        });
-        continue;
-      }
-
-      const templateId = getTemplateIdForRole(roleInviteClaims[0].roleId);
+      const templateId = await getTemplateIdForInvite(invite.id);
 
       try {
         await mailService.sendMail({
