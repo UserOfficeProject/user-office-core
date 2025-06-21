@@ -1,6 +1,5 @@
 import { GenericTemplate } from '../../models/GenericTemplate';
 import { Role } from '../../models/Role';
-import { UserWithRole } from '../../models/User';
 import { UpdateGenericTemplateArgs } from '../../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplatesArgs } from '../../resolvers/queries/GenericTemplatesQuery';
 import { GenericTemplateDataSource } from '../GenericTemplateDataSource';
@@ -37,8 +36,7 @@ export class GenericTemplateDataSourceMock
   }
 
   async getGenericTemplates(
-    _args: GenericTemplatesArgs,
-    agent: UserWithRole | null
+    _args: GenericTemplatesArgs
   ): Promise<GenericTemplate[]> {
     return this.genericTemplates;
   }

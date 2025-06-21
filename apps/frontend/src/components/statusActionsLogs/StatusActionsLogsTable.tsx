@@ -5,13 +5,18 @@ import MaterialTableCore, {
   QueryResult,
 } from '@material-table/core';
 import { Replay, Refresh } from '@mui/icons-material';
+import ReplayCircleFilledIcon from '@mui/icons-material/ReplayCircleFilled';
 import { Grid, Typography, useTheme } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link as ReactRouterLink, useSearchParams } from 'react-router-dom';
 
 import MaterialTable from 'components/common/DenseMaterialTable';
 import CallFilter from 'components/common/proposalFilters/CallFilter';
-import { StatusActionsLog } from 'generated/sdk';
+import {
+  StatusActionsLog,
+  StatusActionsLogsFilter,
+  StatusActionType,
+} from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { useCallsData } from 'hooks/call/useCallsData';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -24,14 +29,29 @@ import StatusActionsStatusFilter, {
   StatusActionsLogStatus,
 } from './StatusActionsStatusFilter';
 
-const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
+interface StatusActionsLogsTableProps {
+  confirm: WithConfirmType;
+  statusActionType: StatusActionType;
+}
+
+const StatusActionsLogsTable = ({
+  confirm,
+  statusActionType: propStatusActionType,
+}: StatusActionsLogsTableProps) => {
+  const [statusActionType] = useState<StatusActionType>(propStatusActionType);
   const { toFormattedDateTime } = useFormattedDateTime();
   const tableRef = React.useRef<MaterialTableCore<StatusActionsLog>>();
   const { api } = useDataApiWithFeedback();
   const theme = useTheme();
   const { calls, loadingCalls } = useCallsData();
+  const [selectedCallName, setSelectedCallName] = useState<string | undefined>(
+    undefined
+  );
   const ReplayIcon = (): JSX.Element => (
     <Replay data-cy="replay_status_action_icon" />
+  );
+  const ReplayAllIcon = (): JSX.Element => (
+    <ReplayCircleFilledIcon data-cy="replay_all_status_action_icon" />
   );
   const RefreshIcon = (): JSX.Element => <Refresh />;
   const [selectedStatusActionsLog, setStatusActionsLog] =
@@ -47,10 +67,14 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
   const page = searchParams.get('page');
   const pageSize = searchParams.get('pageSize');
   let columns: Column<StatusActionsLog>[] = [
-    {
-      title: 'Email Status Action Recipient',
-      field: 'emailStatusActionRecipient',
-    },
+    ...(statusActionType === StatusActionType.EMAIL
+      ? [
+          {
+            title: 'Email Status Action Recipient',
+            field: 'emailStatusActionRecipient',
+          },
+        ]
+      : []),
     {
       title: 'Proposal IDs',
       field: 'proposalIds',
@@ -79,6 +103,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     {
       title: 'Log Time',
       field: 'statusActionsTstamp',
+      defaultSort: 'desc',
     },
   ];
   const [localStorageValue, setLocalStorageValue] = useLocalStorage<
@@ -127,7 +152,10 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
     new Promise<QueryResult<StatusActionsLog>>(async (resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
-        let filter = {};
+        let filter: StatusActionsLogsFilter = {
+          statusActionType: statusActionType,
+        };
+
         if (
           statusActionsLogStatus &&
           statusActionsLogStatus !== StatusActionsLogStatus.ALL
@@ -184,6 +212,40 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
       }
     });
 
+  useEffect(() => {
+    if (call) {
+      const callFromParam = calls.find((c) => c.id === +call);
+      setSelectedCallName(callFromParam?.shortCode);
+    } else {
+      setSelectedCallName(undefined);
+    }
+  }, [call, setSelectedCallName, calls]);
+
+  const getAllFailedLogsForCall = async (
+    callId: number
+  ): Promise<StatusActionsLog[]> => {
+    const filter: StatusActionsLogsFilter = {
+      statusActionType: statusActionType,
+      callIds: [callId],
+      statusActionsSuccessful: false,
+    };
+
+    const result = await api().getStatusActionsLogs({
+      filter,
+    });
+
+    return (
+      result.statusActionsLogs?.statusActionsLogs.map((statusActionsLog) => {
+        return {
+          ...statusActionsLog,
+          statusActionsTstamp: toFormattedDateTime(
+            statusActionsLog.statusActionsTstamp
+          ),
+        } as StatusActionsLog;
+      }) || []
+    );
+  };
+
   return (
     <>
       <Grid container spacing={2}>
@@ -215,7 +277,15 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
           icons={tableIcons}
           title={
             <Typography variant="h6" component="h2">
-              Status Actions Logs
+              {(() => {
+                if (statusActionType === StatusActionType.PROPOSALDOWNLOAD) {
+                  return 'Proposal Download Status Actions Logs';
+                } else if (statusActionType === StatusActionType.EMAIL) {
+                  return 'Email Status Actions Logs';
+                } else {
+                  return 'Status Action Logs';
+                }
+              })()}
             </Typography>
           }
           onRowClick={() => {
@@ -262,7 +332,7 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
                     () =>
                       api({
                         toastSuccessMessage:
-                          'Status action replay successfully send',
+                          'Status action replay successfully sent.',
                       })
                         .replayStatusActionsLog({
                           statusActionsLogId:
@@ -275,10 +345,23 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
                         }),
                     {
                       title: 'Are you sure?',
-                      description: `You are about to send a status action replay request`,
-                      alertText: statusActionsLog.statusActionsSuccessful
-                        ? 'This status action is already successful resending a request will lead to duplicate notifications being send'
-                        : '',
+                      description: `You are about to send a status action replay request.`,
+                      alertText: (() => {
+                        if (!statusActionsLog.statusActionsSuccessful) {
+                          return '';
+                        }
+
+                        if (
+                          statusActionsLog?.connectionStatusAction?.action.name
+                            .toLowerCase()
+                            .includes('email')
+                        ) {
+                          return 'This email status action was already successful. Replaying it will lead to duplicate emails being sent.';
+                        } else {
+                          return 'This status action was already successful. Replaying it might lead to unexpected behaviour or redundant processes.';
+                        }
+                      })(),
+                      confirmationText: 'Replay',
                       shouldEnableOKWithAlert: true,
                     }
                   )();
@@ -291,6 +374,42 @@ const StatusActionsLogsTable = ({ confirm }: { confirm: WithConfirmType }) => {
               isFreeAction: true,
               onClick: () =>
                 tableRef.current && tableRef.current.onQueryChange({}),
+            },
+            {
+              icon: ReplayAllIcon,
+              tooltip: 'Replay all failed status actions in call',
+              isFreeAction: true,
+              hidden: !call,
+              onClick: () => {
+                if (!call) {
+                  return;
+                }
+
+                confirm(
+                  async () => {
+                    const failedLogs = await getAllFailedLogsForCall(+call);
+
+                    return await api({
+                      toastSuccessMessage:
+                        'Replay request sent for all failed logs in the call.',
+                    }).replayStatusActionsLogs({
+                      statusActionsLogIds: failedLogs.map(
+                        (log) => log.statusActionsLogId
+                      ),
+                    });
+                  },
+                  {
+                    title: 'Retry all failed status actions in call',
+                    description: `You are about to retry all failed status actions in call '${selectedCallName}'. 
+                    This process will run in the background and may take some time to complete. 
+                    Sort by the latest log time and use the refresh button in the table to see progress.`,
+                    alertText:
+                      'Ensure this operation is safe to perform - it cannot be cancelled.',
+                    confirmationText: 'Retry All Failed',
+                    shouldEnableOKWithAlert: true,
+                  }
+                )();
+              },
             },
           ]}
           onChangeColumnHidden={(columnChange) => {

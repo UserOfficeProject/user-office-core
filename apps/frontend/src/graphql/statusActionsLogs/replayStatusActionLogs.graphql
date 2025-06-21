@@ -1,0 +1,12 @@
+mutation replayStatusActionsLogs(
+  $statusActionsLogIds: [Int!]!
+) {
+  replayStatusActionsLogs(statusActionsLogIds: $statusActionsLogIds) {
+    totalRequested
+    successful
+    failed {
+      logId
+      error
+    }
+  }
+}
