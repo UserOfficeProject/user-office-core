@@ -11,6 +11,7 @@ import {
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
 import { ExperimentStatus } from '../../models/Experiment';
+import { Facility } from '../../models/Facility';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
@@ -1378,6 +1379,20 @@ export interface CoProposerClaimRecord {
 
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
+
+export interface FacilityRecord {
+  readonly facility_id: number;
+  readonly name: string;
+  readonly short_code: string;
+}
+
+export const createFacilityObject = (facility: FacilityRecord) =>
+  new Facility(facility.facility_id, facility.name, facility.short_code);
+
+export interface FacilityUserRecord {
+  readonly facility_id: number;
+  readonly user_id: number;
+}
 
 export interface ExperimentRecord {
   readonly experiment_pk: number;
