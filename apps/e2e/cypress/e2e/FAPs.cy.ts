@@ -11,6 +11,8 @@ import {
   SettingsId,
   Event,
   WorkflowType,
+  TemplateCategoryId,
+  DataType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -3952,6 +3954,213 @@ context('Automatic Fap assignment to Proposal', () => {
     });
   });
 });
+
+context(
+  'Automatic Fap assignment to Proposal through Instrument Picker',
+  () => {
+    const title = faker.lorem.words(2);
+    const abstract = faker.lorem.words(3);
+    const proposalWorkflow = {
+      name: faker.random.words(2),
+      description: faker.random.words(5),
+    };
+
+    const instrumentPickerQuestion = 'Select your Instrument';
+    const instrument = {
+      name: 'Instrument 1',
+      shortCode: 'Instrument 1',
+      description: 'Instrument 1',
+      managerUserId: initialDBData.users.user1.id,
+    };
+    const instrument2 = {
+      name: 'Instrument 2',
+      shortCode: 'Instrument 2',
+      description: 'Instrument 2',
+      managerUserId: initialDBData.users.user1.id,
+    };
+
+    let topicId: number;
+    let instrumentPickerQuestionId: string;
+
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+      cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
+      initializationBeforeTests();
+      cy.createTemplate({
+        name: 'Proposal Template with Instrument Picker',
+        groupId: TemplateGroupId.PROPOSAL_ESI,
+      });
+      cy.createWorkflow({
+        name: proposalWorkflow.name,
+        description: proposalWorkflow.description,
+        entityType: WorkflowType.PROPOSAL,
+      }).then((result) => {
+        if (result.createWorkflow) {
+          createdWorkflowId = result.createWorkflow.id;
+        }
+      });
+      cy.createInstrument(instrument).then((result) => {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [
+            {
+              instrumentId: result.createInstrument.id,
+              fapId: initialDBData.fap.id,
+            },
+          ],
+        });
+      });
+      cy.createInstrument(instrument2).then((result) => {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [
+            {
+              instrumentId: result.createInstrument.id,
+              fapId: createdFapId,
+            },
+          ],
+        });
+      });
+      cy.createTopic({
+        templateId: initialDBData.template.id,
+        sortOrder: 1,
+      }).then((topicResult) => {
+        if (topicResult.createTopic) {
+          topicId =
+            topicResult.createTopic.steps[
+              topicResult.createTopic.steps.length - 1
+            ].topic.id;
+          cy.createQuestion({
+            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+            dataType: DataType.INSTRUMENT_PICKER,
+          }).then((result) => {
+            instrumentPickerQuestionId = result.createQuestion.id;
+            cy.updateQuestion({
+              id: result.createQuestion.id,
+              question: instrumentPickerQuestion,
+              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false}`,
+            });
+            cy.createQuestionTemplateRelation({
+              questionId: instrumentPickerQuestionId,
+              templateId: initialDBData.template.id,
+              sortOrder: 0,
+              topicId: topicId,
+            });
+          });
+        }
+      });
+    });
+
+    it('Automatic FAP assignment to Proposal, when an Instrument is assigned to a Proposal using Instrument Picker', () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+      cy.contains('td', initialDBData.fap.code).should('exist');
+    });
+
+    it('Automatic FAPs assignment to Proposal, when multiple Instruments are assigned to a Proposal using Instrument Picker', () => {
+      cy.updateQuestionTemplateRelationSettings({
+        questionId: instrumentPickerQuestionId,
+        templateId: initialDBData.template.id,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false}`,
+        dependencies: [],
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[role="option"]').contains('Instrument 2').click();
+      cy.get('body').type('{esc}');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().contains(instrument2.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+      cy.contains('td', instrument2.name).should('exist');
+      cy.contains('td', initialDBData.fap.code).should('exist');
+      cy.contains('td', fap1.code).should('exist');
+    });
+  }
+);
 
 context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
