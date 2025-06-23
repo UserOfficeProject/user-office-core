@@ -261,7 +261,6 @@ export default class InviteMutations {
       });
     }
   }
-
   private async processVisitRegistrationClaims(
     claimerUserId: number,
     invite: Invite
@@ -270,7 +269,7 @@ export default class InviteMutations {
     const claims =
       await this.visitRegistrationClaimDataSource.findByInviteId(inviteId);
 
-    for await (const claim of claims) {
+    for (const claim of claims) {
       const existingRegistration = await this.visitDataSource.getRegistration(
         claimerUserId,
         claim.visitId

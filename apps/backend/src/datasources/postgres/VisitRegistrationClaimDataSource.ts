@@ -16,13 +16,16 @@ export default class PostgresVisitRegistrationClaimDataSource
     inviteId: number,
     visitId: number
   ): Promise<VisitRegistrationClaim> {
-    const records = await database('visit_registration_claims').insert(
-      {
-        invite_id: inviteId,
-        visit_id: visitId,
-      },
-      '*'
-    );
+    const records = await database('visit_registration_claims')
+      .insert(
+        {
+          invite_id: inviteId,
+          visit_id: visitId,
+        },
+        '*'
+      )
+      .onConflict(['invite_id', 'visit_id'])
+      .ignore();
 
     if (records.length !== 1) {
       throw new Error('Failed to create visit registration claim');

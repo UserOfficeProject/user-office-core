@@ -35,7 +35,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     isClaimed?: boolean
   ): Promise<Invite[]> {
     return database
-      .select('*')
+      .select('invites.*')
       .from('visit_registration_claims')
       .where('visit_id', visitId)
       .modify((query) => {
