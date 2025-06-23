@@ -8,7 +8,10 @@ import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
@@ -489,7 +492,13 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.getRoles();
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
 
