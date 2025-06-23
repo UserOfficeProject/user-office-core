@@ -283,7 +283,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  async updateAnswer(agent: UserJWT | null, args: UpdateAnswerArgs) {
+  async updateAnswer(agent: UserWithRole | null, args: UpdateAnswerArgs) {
     const hasRights = await this.questionaryAuth.hasWriteRights(
       agent,
       args.questionaryId
