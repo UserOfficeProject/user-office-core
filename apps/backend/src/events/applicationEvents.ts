@@ -218,7 +218,7 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
 
 interface ProposalCoProposerClaimSentEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT;
-  invites: Invite[];
+  array: Invite[];
 }
 
 interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
