@@ -1,9 +1,8 @@
--- 0181_RemoveUserColumns.sql
 DO
 $$
 BEGIN
     IF register_patch(
-        '0182_AddVisitRegistrationClaim.sql',
+        'AddVisitRegistrationClaim.sql',
         'Jekabs Karklins',
         'Adding table to store visit registration claims',
         '2025-06-04'
