@@ -22,7 +22,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
     event.visit?.registrationInvites || []
   );
 
-  const visit = event.visit;
+  const { visit } = event;
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user!) || [],
