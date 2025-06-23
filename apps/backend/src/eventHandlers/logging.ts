@@ -94,7 +94,7 @@ export default function createLoggingHandler() {
           if ('invite' in event) {
             invites = [event.invite];
           } else {
-            invites = event.invites;
+            invites = event.array;
           }
           for (const invite of invites) {
             const coProposerInvites =
