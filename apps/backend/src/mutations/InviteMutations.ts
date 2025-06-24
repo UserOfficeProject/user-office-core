@@ -82,6 +82,19 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
+  private async getCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    const existingClaims =
+      await this.coProposerClaimDataSource.findByProposalPk(proposalPk);
+
+    const existingInvites = (await Promise.all(
+      existingClaims.map((claim) =>
+        this.inviteDataSource.findById(claim.inviteId)
+      )
+    )) as Invite[];
+
+    return existingInvites;
+  }
+
   @Authorized()
   @EventBus(Event.EMAIL_INVITES)
   @EventBus(Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT)
@@ -100,13 +113,7 @@ export default class InviteMutations {
       );
     }
 
-    const existingClaims =
-      await this.coProposerClaimDataSource.findByProposalPk(proposalPk);
-    const existingInvites = (await Promise.all(
-      existingClaims.map((claim) =>
-        this.inviteDataSource.findById(claim.inviteId)
-      )
-    )) as Invite[];
+    const existingInvites = await this.getCoProposerInvites(proposalPk);
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
@@ -151,9 +158,9 @@ export default class InviteMutations {
   @EventBus(Event.EMAIL_INVITES)
   public async setVisitRegistrationInvites(
     agent: UserWithRole | null,
-    args: { visitId: number; inviteEmails: string[] }
+    args: { visitId: number; emails: string[] }
   ): Promise<Invite[] | Rejection> {
-    const { visitId, inviteEmails } = args;
+    const { visitId, emails } = args;
 
     const hasWriteRights =
       this.userAuth.isApiToken(agent) ||
@@ -170,11 +177,9 @@ export default class InviteMutations {
 
     const existingEmails = existingInvites.map((invite) => invite.email);
     const deletedEmails = existingEmails.filter(
-      (email) => !inviteEmails.includes(email)
+      (email) => !emails.includes(email)
     );
-    const newEmails = inviteEmails.filter(
-      (email) => !existingEmails.includes(email)
-    );
+    const newEmails = emails.filter((email) => !existingEmails.includes(email));
 
     const deletedInvites = existingInvites.filter((invite) =>
       deletedEmails.includes(invite.email)

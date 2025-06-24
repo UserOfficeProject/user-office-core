@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
@@ -13,6 +14,8 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
+import { MailService } from '../eventHandlers/MailService/MailService';
+import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
 import InviteMutations from './InviteMutations';
@@ -30,6 +33,10 @@ describe('Test Invite Mutations', () => {
       .init();
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
     container.resolve<VisitDataSourceMock>(Tokens.VisitDataSource).init();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   test('A user can accept valid invite code', () => {
@@ -201,5 +208,92 @@ describe('Test Invite Mutations', () => {
     );
 
     expect(response).toBeInstanceOf(Rejection);
+  });
+
+  test('A co-proposer should receive an invite email when co-proposer invite is created', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    const mailService = container.resolve<MailService>(Tokens.MailService);
+    const sendMailSpy = jest.spyOn(mailService, 'sendMail');
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    // Wait for async handlers to complete
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(sendMailSpy).toHaveBeenCalledTimes(1);
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipients: [{ address: email }],
+      })
+    );
+  });
+
+  test('An log should be added when co-proposer invite is created', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    // Get the exact same instance that the logging handler will use
+    const eventLogDataSource = container.resolve<EventLogsDataSource>(
+      Tokens.EventLogsDataSource
+    );
+    const setEventInDataSourceSpy = jest.spyOn(eventLogDataSource, 'set');
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
+    expect(setEventInDataSourceSpy).toHaveBeenCalledWith(
+      expect.any(Number), // changedBy (userId)
+      expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT), // eventType
+      expect.stringContaining(email), // rowData (JSON string containing the email)
+      expect.any(String), // rowData (JSON string containing the email)
+      expect.any(String) // changedObjectId (should be the invite ID)
+    );
+  });
+
+  test('A visitor should receive an invite email when visitor invite is created', async () => {
+    const email = faker.internet.email();
+    const visitId = 1;
+
+    const mailService = container.resolve<MailService>(Tokens.MailService);
+    const sendMailSpy = jest.spyOn(mailService, 'sendMail');
+
+    const response = await inviteMutations.setVisitRegistrationInvites(
+      dummyUserWithRole,
+      {
+        visitId: visitId,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    // Wait for async handlers to complete
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(sendMailSpy).toHaveBeenCalledTimes(1);
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipients: [{ address: email }],
+      })
+    );
   });
 });

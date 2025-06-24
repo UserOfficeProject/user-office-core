@@ -40,7 +40,7 @@ export class UpdateVisitMutation {
 
     await context.mutations.invite.setVisitRegistrationInvites(context.user, {
       visitId: args.visitId,
-      inviteEmails: args.inviteEmails ?? [],
+      emails: args.inviteEmails ?? [],
     });
 
     return result;

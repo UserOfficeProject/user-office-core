@@ -41,7 +41,7 @@ export class CreateVisitMutation {
 
     await context.mutations.invite.setVisitRegistrationInvites(context.user, {
       visitId: visit.id,
-      inviteEmails: args.inviteEmails ?? [],
+      emails: args.inviteEmails ?? [],
     });
 
     return visit;
