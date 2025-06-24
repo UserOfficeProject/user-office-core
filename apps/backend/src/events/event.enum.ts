@@ -38,14 +38,11 @@ export enum Event {
   CALL_ENDED_INTERNAL = 'CALL_ENDED_INTERNAL',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_FAP_REVIEW_ENDED = 'CALL_FAP_REVIEW_ENDED',
-  INVITE_ACCEPTED = 'INVITE_ACCEPTED',
   USER_UPDATED = 'USER_UPDATED',
   USER_ROLE_UPDATED = 'USER_ROLE_UPDATED',
   USER_DELETED = 'USER_DELETED',
   USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
   EMAIL_INVITE_LEGACY = 'EMAIL_INVITE_LEGACY',
-  EMAIL_INVITE = 'EMAIL_INVITE', // TODO: this should be called INVITE_CREATED
-  EMAIL_INVITES = 'EMAIL_INVITES', // TODO: this should be called INVITES_CREATED
   FAP_CREATED = 'FAP_CREATED',
   FAP_UPDATED = 'FAP_UPDATED',
   FAP_MEMBERS_ASSIGNED = 'FAP_MEMBERS_ASSIGNED',
@@ -66,9 +63,12 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
   PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
-  PROPOSAL_CO_PROPOSER_CLAIM_SENT = 'PROPOSAL_CO_PROPOSER_CLAIM_SENT',
-  PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED = 'PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED',
-  PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED = 'PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED',
+  PROPOSAL_CO_PROPOSER_INVITES_UPDATED = 'PROPOSAL_CO_PROPOSER_INVITES_UPDATED',
+  PROPOSAL_CO_PROPOSER_INVITE_SENT = 'PROPOSAL_CO_PROPOSER_INVITE_SENT',
+  PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED = 'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED',
+  PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED = 'PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED',
+  PROPOSAL_VISIT_REGISTRATION_INVITE_SENT = 'PROPOSAL_VISIT_REGISTRATION_INVITE_SENT',
+  PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED = 'PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED',
   INSTRUMENT_CREATED = 'INSTRUMENT_CREATED',
   INSTRUMENT_UPDATED = 'INSTRUMENT_UPDATED',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
@@ -238,11 +238,6 @@ export const EventLabel = new Map<Event, string>([
     Event.EMAIL_INVITE_LEGACY,
     '[Deprecated] Event occurs when user is created using email invite',
   ],
-  [Event.EMAIL_INVITE, 'Event occurs when user is invited by email'],
-  [
-    Event.EMAIL_INVITES,
-    'Event occurs when multiple users are invited by email',
-  ],
   [Event.FAP_CREATED, 'Event occurs when FAP is created'],
   [Event.FAP_UPDATED, 'Event occurs when FAP is updated'],
   [Event.FAP_MEMBERS_ASSIGNED, 'Event occurs when we assign member/s to a FAP'],
@@ -273,7 +268,27 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when the proposal status action is being executed in the status engine',
   ],
   [
-    Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED,
+    Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+    'Event occurs when user sets the visit registration claim for a proposal',
+  ],
+  [
+    Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
+    'Event occurs when co-proposer invite is sent to a user',
+  ],
+  [
+    Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+    'Event occurs when user accepts the co-proposer claim for a proposal',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+    'Event occurs when user sets the visit registration claim for a proposal',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
+    'Event occurs when visit registration invite is sent to a user',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED,
     'Event occurs when user accepts the visit registration claim for a proposal',
   ],
   [

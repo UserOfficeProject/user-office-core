@@ -39,6 +39,11 @@ export default function createLoggingHandler() {
       Tokens.CoProposerClaimDataSource
     );
 
+  // const visitRegistrationClaimDataSource =
+  //   container.resolve<VisitRegistrationClaimDataSource>(
+  //     Tokens.VisitRegistrationClaimDataSource
+  //   );
+
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);
@@ -67,58 +72,9 @@ export default function createLoggingHandler() {
             event.emailinviteresponse.userId.toString()
           );
           break;
-        case Event.EMAIL_INVITE:
-        case Event.EMAIL_INVITES:
-        case Event.INVITE_ACCEPTED:
-          let invites;
-          if ('invite' in event) {
-            invites = [event.invite];
-          } else {
-            invites = event.array;
-          }
-          for (const invite of invites) {
-            await eventLogsDataSource.set(
-              event.loggedInUserId,
-              event.type,
-              json,
-              invite.id.toString(),
-              event.type === Event.INVITE_ACCEPTED
-                ? `Invite accepted: ${invite.email}`
-                : `Invite sent: ${invite.email}`
-            );
-          }
-          break;
-        case Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT:
-        case Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED: {
-          let invites;
-          if ('invite' in event) {
-            invites = [event.invite];
-          } else {
-            invites = event.array;
-          }
-          for (const invite of invites) {
-            const coProposerInvites =
-              await coProposerClaimDataSource.findByInviteId(invite.id);
-
-            await Promise.all(
-              coProposerInvites.map(async (coProposerInvite) => {
-                return eventLogsDataSource.set(
-                  event.loggedInUserId,
-                  event.type,
-                  json,
-                  coProposerInvite.proposalPk.toString(),
-                  event.type === Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED
-                    ? `Co-proposer invite accepted: ${invite.email}`
-                    : `Co-proposer invite sent: ${invite.email}`
-                );
-              })
-            );
-          }
-
-          break;
-        }
-        case Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED: {
-          const invite = event.invite;
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED:
+        case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED: {
+          const { invite } = event;
 
           const coProposerInvites =
             await coProposerClaimDataSource.findByInviteId(invite.id);
@@ -137,6 +93,38 @@ export default function createLoggingHandler() {
 
           break;
         }
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_SENT: {
+          const { invite } = event;
+          const proposal = await proposalDataSource.getProposalByVisitId(
+            invite.id
+          );
+
+          return eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposal.primaryKey.toString(),
+            `Co-proposer invite sent to: ${invite.email}`,
+            event.impersonatingUserId
+          );
+        }
+
+        case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT: {
+          const { invite } = event;
+          const proposal = await proposalDataSource.getProposalByVisitId(
+            invite.id
+          );
+
+          return eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposal.primaryKey.toString(),
+            `Visit registration invite sent to: ${invite.email}`,
+            event.impersonatingUserId
+          );
+        }
+
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {
           await Promise.all(
             event.instrumentshasproposals.proposalPks.map(

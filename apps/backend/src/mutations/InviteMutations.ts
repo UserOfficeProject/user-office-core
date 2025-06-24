@@ -52,7 +52,6 @@ export default class InviteMutations {
   ) {}
 
   @Authorized()
-  @EventBus(Event.INVITE_ACCEPTED)
   async accept(
     agent: UserWithRole | null,
     code: string
@@ -96,8 +95,7 @@ export default class InviteMutations {
   }
 
   @Authorized()
-  @EventBus(Event.EMAIL_INVITES)
-  @EventBus(Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT)
+  @EventBus(Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED)
   public async setCoProposerInvites(
     agent: UserWithRole | null,
     args: SetCoProposerInvitesInput
@@ -155,7 +153,7 @@ export default class InviteMutations {
   }
 
   @Authorized()
-  @EventBus(Event.EMAIL_INVITES)
+  @EventBus(Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED)
   public async setVisitRegistrationInvites(
     agent: UserWithRole | null,
     args: { visitId: number; emails: string[] }
@@ -257,7 +255,7 @@ export default class InviteMutations {
       );
 
       this.eventBus.publish({
-        type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED,
+        type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
         isRejection: false,
         key: 'proposal',
         loggedInUserId: claimerUserId,
@@ -298,7 +296,7 @@ export default class InviteMutations {
         .ignore();
 
       this.eventBus.publish({
-        type: Event.PROPOSAL_VISIT_REGISTRATION_CLAIM_ACCEPTED,
+        type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED,
         isRejection: false,
         key: 'proposal',
         loggedInUserId: claimerUserId,

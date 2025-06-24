@@ -238,7 +238,7 @@ describe('Test Invite Mutations', () => {
     );
   });
 
-  test('An log should be added when co-proposer invite is created', async () => {
+  test('A log should be added when co-proposer invite is sent', async () => {
     const email = faker.internet.email();
     const proposalPk = 1;
 
@@ -261,11 +261,12 @@ describe('Test Invite Mutations', () => {
 
     expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
     expect(setEventInDataSourceSpy).toHaveBeenCalledWith(
-      expect.any(Number), // changedBy (userId)
-      expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT), // eventType
+      dummyUserWithRole.id, // changedBy (userId)
+      expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_INVITE_SENT), // eventType
       expect.stringContaining(email), // rowData (JSON string containing the email)
-      expect.any(String), // rowData (JSON string containing the email)
-      expect.any(String) // changedObjectId (should be the invite ID)
+      expect.any(String), // changedObjectId (should be the invite ID)
+      expect.stringContaining(`Co-proposer invite sent to: ${email}`), // description
+      undefined
     );
   });
 
@@ -294,6 +295,38 @@ describe('Test Invite Mutations', () => {
       expect.objectContaining({
         recipients: [{ address: email }],
       })
+    );
+  });
+
+  test('A log should be added when visitor invite is sent', async () => {
+    const email = faker.internet.email();
+    const visitId = 1;
+
+    // Get the exact same instance that the logging handler will use
+    const eventLogDataSource = container.resolve<EventLogsDataSource>(
+      Tokens.EventLogsDataSource
+    );
+    const setEventInDataSourceSpy = jest.spyOn(eventLogDataSource, 'set');
+
+    const response = await inviteMutations.setVisitRegistrationInvites(
+      dummyUserWithRole,
+      {
+        visitId: visitId,
+        emails: [email],
+      }
+    );
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
+    expect(setEventInDataSourceSpy).toHaveBeenCalledWith(
+      dummyUserWithRole.id, // changedBy (userId)
+      expect.stringMatching(Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT), // eventType
+      expect.stringContaining(email), // rowData (JSON string containing the email)
+      expect.any(String), // changedObjectId (should be the invite ID)
+      expect.stringContaining(`Visit registration invite sent to: ${email}`), // description
+      undefined
     );
   });
 });
