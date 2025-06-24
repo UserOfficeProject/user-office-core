@@ -12,6 +12,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
 import InviteMutations from './InviteMutations';
@@ -28,6 +29,7 @@ describe('Test Invite Mutations', () => {
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
       .init();
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
+    container.resolve<VisitDataSourceMock>(Tokens.VisitDataSource).init();
   });
 
   test('A user can accept valid invite code', () => {
