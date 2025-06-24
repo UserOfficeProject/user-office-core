@@ -178,6 +178,8 @@ export class StfcUserDataSource implements UserDataSource {
     userNumbers: string[],
     searchableOnly?: boolean
   ): Promise<StfcBasicPersonDetails[]> {
+    const distinctUserNumbers = Array.from(new Set(userNumbers));
+
     const cache = searchableOnly
       ? this.uowsSearchableBasicUserDetailsCache
       : this.uowsBasicUserDetailsCache;
@@ -185,7 +187,7 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcUserRequests: Promise<StfcBasicPersonDetails | undefined>[] = [];
     const cacheMisses: string[] = [];
 
-    for (const userNumber of userNumbers) {
+    for (const userNumber of distinctUserNumbers) {
       const cachedUser = cache.get(userNumber);
       if (cachedUser) {
         stfcUserRequests.push(cachedUser);
@@ -269,7 +271,7 @@ export class StfcUserDataSource implements UserDataSource {
       users.filter((user): user is StfcBasicPersonDetails => user !== undefined)
     );
     // Uncache any failed lookups
-    userNumbers
+    distinctUserNumbers
       .filter(
         (un) => stfcUsers.find((user) => user.userNumber === un) === undefined
       )
