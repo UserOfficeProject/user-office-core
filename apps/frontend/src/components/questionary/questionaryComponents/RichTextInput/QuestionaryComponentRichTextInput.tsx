@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
@@ -42,6 +41,14 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
       fullWidth
     >
       <FormLabel sx={{ marginBottom: theme.spacing(2) }}>{question}</FormLabel>
+      {config.max && (
+        <FormLabel
+          sx={{ marginBottom: theme.spacing(2) }}
+          data-cy="rich-text-char-count"
+        >
+          Characters: {numberOfChars} / {config.max}
+        </FormLabel>
+      )}
       <Editor
         id={id}
         value={value}
@@ -95,18 +102,7 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
           handleCharacterCount(editor);
         }}
       />
-      {config.max && (
-        <Box
-          sx={{
-            position: 'absolute',
-            right: 0,
-            color: theme.palette.grey[600],
-          }}
-          data-cy="rich-text-char-count"
-        >
-          Characters: {numberOfChars} / {config.max}
-        </Box>
-      )}
+
       {isError && <FormHelperText>{fieldError}</FormHelperText>}
       {paragraphSpacingError && (
         <FormHelperText sx={{ color: theme.palette.error.main }}>
