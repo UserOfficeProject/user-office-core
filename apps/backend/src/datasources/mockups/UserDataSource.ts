@@ -9,7 +9,10 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 
@@ -72,6 +75,7 @@ export const dummyUserOfficerWithRole: UserWithRole = {
     shortCode: 'user_officer',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyUser = new User(
@@ -106,11 +110,13 @@ export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
     shortCode: 'user',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
   currentRole: { id: 1, title: 'User', shortCode: 'user', description: '' },
+  externalTokenValid: true,
 };
 
 export const dummyFapChairWithRole: UserWithRole = {
@@ -121,6 +127,7 @@ export const dummyFapChairWithRole: UserWithRole = {
     shortCode: 'fap_chair',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyFapSecretaryWithRole: UserWithRole = {
@@ -131,6 +138,7 @@ export const dummyFapSecretaryWithRole: UserWithRole = {
     shortCode: 'fap_secretary',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyFapReviewerWithRole: UserWithRole = {
@@ -141,6 +149,7 @@ export const dummyFapReviewerWithRole: UserWithRole = {
     shortCode: 'fap_reviewer',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -151,6 +160,7 @@ export const dummySampleReviewer: UserWithRole = {
     shortCode: 'experiment_safety_reviewer',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyInternalReviewer: UserWithRole = {
@@ -172,6 +182,7 @@ export const dummyInstrumentScientist: UserWithRole = {
     shortCode: 'instrument_scientist',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyVisitorWithRole: UserWithRole = {
@@ -183,6 +194,7 @@ export const dummyVisitorWithRole: UserWithRole = {
     shortCode: 'user',
     description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyPlaceHolderUser = new User(
@@ -234,6 +246,7 @@ export const dummyUserNotOnProposal = new User(
 export const dummyUserNotOnProposalWithRole: UserWithRole = {
   ...dummyUserNotOnProposal,
   currentRole: { id: 1, title: 'User', shortCode: 'user', description: '' },
+  externalTokenValid: true,
 };
 
 export class UserDataSourceMock implements UserDataSource {
@@ -360,8 +373,19 @@ export class UserDataSourceMock implements UserDataSource {
     ];
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
     return dummyUser;
+  }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
+    if (dummyUser.oidcSub === args.oidcSub) {
+      return { ...dummyUser, ...args };
+    }
+
+    // User not found
+    return null;
   }
 
   async me(id: number) {

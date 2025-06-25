@@ -14,7 +14,10 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
@@ -70,7 +73,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
     const {
       firstname,
       user_title,
@@ -113,6 +116,55 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     return createUserObject(userRecord);
   }
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
+    const {
+      firstname,
+      user_title,
+      lastname,
+      preferredname,
+      gender,
+      birthdate,
+      institutionId,
+      department,
+      position,
+      email,
+      telephone,
+      placeholder,
+      oauthRefreshToken,
+      oauthIssuer,
+    } = args;
+
+    const [userRecord]: UserRecord[] = await database
+      .update({
+        firstname,
+        user_title,
+        lastname,
+        preferredname,
+        gender,
+        birthdate,
+        institution_id: institutionId,
+        department,
+        position,
+        email,
+        telephone,
+        placeholder,
+        oauth_refresh_token: oauthRefreshToken,
+        oauth_issuer: oauthIssuer,
+        updated_at: new Date(),
+      })
+      .from('users')
+      .where('oidc_sub', args.oidcSub)
+      .returning(['*']);
+
+    if (!userRecord) {
+      return null;
+    }
+
+    return createUserObject(userRecord);
+  }
+
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     const { firstname, lastname, email } = args;
 
