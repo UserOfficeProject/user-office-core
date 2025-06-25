@@ -17,6 +17,21 @@ context('Calls tests', () => {
   const esiTemplateName = faker.lorem.words(2);
   let workflowId: number;
 
+  const firstDayMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    2
+  )
+    .toISOString()
+    .split('T')[0];
+  const lastDayMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    0
+  )
+    .toISOString()
+    .split('T')[0];
+
   const currentDayStart = DateTime.now().startOf('day');
   const yesterday = currentDayStart.plus({ days: -1 });
   const twoDaysAgo = currentDayStart.plus({ days: -2 });
@@ -151,19 +166,6 @@ context('Calls tests', () => {
 
     it('A user-officer should not be able go to next step or create call if there is validation error', () => {
       const shortCode = faker.random.alphaNumeric(15);
-      const startDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const endDate = DateTime.fromJSDate(faker.date.future()).toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-
-      const invalidPastDate = DateTime.fromJSDate(faker.date.past()).toFormat(
-        initialDBData.getFormats().dateFormat + ' HH'
-      ); // no minutes
-      const invalidFutureDate = DateTime.fromJSDate(
-        faker.date.future()
-      ).toFormat(initialDBData.getFormats().dateFormat + ' HH'); // no minutes
 
       cy.contains('Proposals');
 
@@ -180,33 +182,13 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
-      cy.get('[data-cy=start-date] input').type('{selectall}{backspace}');
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.get('[data-cy="next-step"]').click();
+      cy.get(`[data-day=${firstDayMonth}]`).click();
 
-      cy.contains('Invalid Date');
+      cy.get(`[data-day=${lastDayMonth}]`).click();
 
-      cy.setDatePickerValue(
-        '[data-cy=start-date] input',
-        invalidPastDate
-      ).should('have.value', invalidPastDate + ':mm');
-
-      cy.contains('Invalid Date');
-
-      cy.setDatePickerValue('[data-cy=start-date] input', startDate).should(
-        'have.value',
-        startDate
-      );
-
-      cy.setDatePickerValue(
-        '[data-cy=end-date] input',
-        invalidFutureDate
-      ).should('have.value', invalidFutureDate + ':mm');
-
-      cy.setDatePickerValue('[data-cy=end-date] input', endDate).should(
-        'have.value',
-        endDate
-      );
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]')
@@ -261,63 +243,17 @@ context('Calls tests', () => {
       cy.get('[data-cy="cycle-comment"] .Mui-error').should('exist');
     });
 
-    it('A user-officer should not be able to create a call with end dates before start dates', () => {
-      const shortCode = faker.random.alphaNumeric(15);
-      const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
-      const today = DateTime.fromJSDate(todayJsDate); // set date to specific date to easier test the validation
-      cy.clock(todayJsDate);
-
-      const yesterday = today.minus({ days: 1 }).day;
-      const tomorrow = today
-        .plus({ days: 1 })
-        .startOf('day')
-        // TODO: Find a way how to access the settings format here and not hard coding it like this.
-        .toFormat(initialDBData.getFormats().dateTimeFormat)
-        .toString();
-
-      cy.contains('Proposals');
-
-      cy.contains('Calls').click();
-
-      cy.contains('Create').click();
-
-      cy.get('[data-cy=short-code] input')
-        .type(shortCode)
-        .should('have.value', shortCode);
-
-      cy.get('[data-cy=end-date]').find('[data-testid="CalendarIcon"]').click();
-
-      cy.get('[role="dialog"] .MuiDateCalendar-root .MuiPickersDay-root')
-        .contains(yesterday)
-        .closest('button')
-        .should('be.disabled');
-
-      cy.get('[data-cy=start-date] input').click();
-
-      cy.setDatePickerValue('[data-cy=start-date] input', tomorrow)
-        .should('have.value', tomorrow)
-        .blur();
-
-      cy.get('[data-cy=end-date] .Mui-error').should('exist');
-    });
-
     it('A user-officer should not be able to create a call with intenal end date before call end date', function () {
       // will be enabled after @user-office-software/duo-validation new version
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      const todayJsDate = new Date(2022, 1, 14, 12, 0, 0, 0);
+      const todayJsDate = new Date();
       const today = DateTime.fromJSDate(todayJsDate); // set date to specific date to easier test the validation
       cy.clock(todayJsDate);
 
       const yesterday = today
         .minus({ days: 1 })
-        .toFormat(initialDBData.getFormats().dateTimeFormat)
-        .toString();
-      const tomorrow = today
-        .plus({ days: 1 })
-        .startOf('day')
-        // TODO: Find a way how to access the settings format here and not hard coding it like this.
         .toFormat(initialDBData.getFormats().dateTimeFormat)
         .toString();
 
@@ -334,10 +270,13 @@ context('Calls tests', () => {
         .contains(proposalInternalWorkflow.name)
         .click();
 
-      cy.setDatePickerValue('[data-cy=end-date] input', tomorrow).should(
-        'have.value',
-        tomorrow
-      );
+      cy.get('[data-cy=start-end-call-input]').click();
+
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.setDatePickerValue(
         '[data-cy=end-call-internal-date] input',
@@ -350,20 +289,12 @@ context('Calls tests', () => {
     it('A user-officer should be able to create a call', () => {
       const {
         shortCode,
-        startCall,
-        endCall,
         templateName,
         fapReviewTemplateName,
         technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callStartDate = startCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const callEndDate = endCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
       const callSurveyComment = faker.lorem.word(10);
       const callCycleComment = faker.lorem.word(10);
 
@@ -375,15 +306,13 @@ context('Calls tests', () => {
         .type(callShortCode)
         .should('have.value', callShortCode);
 
-      cy.setDatePickerValue('[data-cy=start-date] input', callStartDate).should(
-        'have.value',
-        callStartDate
-      );
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.setDatePickerValue('[data-cy=end-date] input', callEndDate).should(
-        'have.value',
-        callEndDate
-      );
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
@@ -434,23 +363,15 @@ context('Calls tests', () => {
       }
       const {
         shortCode,
-        startCall,
-        endCall,
         templateName,
         fapReviewTemplateName,
         technicalReviewTemplateName,
         esiTemplateName,
       } = newCall;
       const callShortCode = shortCode || faker.lorem.word(10);
-      const callStartDate = startCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const callEndDate = endCall.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
 
-      const callInternalEndDate = endCall
-        .plus({ days: 7 })
+      const callInternalEndDate = DateTime.now()
+        .plus({ days: 40 })
         .toFormat(initialDBData.getFormats().dateTimeFormat);
 
       const callSurveyComment = faker.lorem.word(10);
@@ -464,15 +385,13 @@ context('Calls tests', () => {
         .type(callShortCode)
         .should('have.value', callShortCode);
 
-      cy.setDatePickerValue('[data-cy=start-date] input', callStartDate).should(
-        'have.value',
-        callStartDate
-      );
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.setDatePickerValue('[data-cy=end-date] input', callEndDate).should(
-        'have.value',
-        callEndDate
-      );
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="call-template"]').click();
       cy.get('[role="presentation"]').contains(templateName).click();
@@ -573,13 +492,7 @@ context('Calls tests', () => {
     });
 
     it('A user-officer should be able to edit a call', () => {
-      const { shortCode, startDate, endDate } = updatedCall;
-      const updatedCallStartDate = startDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const updatedCallEndDate = endDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
+      const { shortCode } = updatedCall;
 
       const refNumFormat = '211{digits:5}';
 
@@ -607,20 +520,17 @@ context('Calls tests', () => {
         'have.value',
         proposalWorkflow.name
       );
-
-      cy.setDatePickerValue(
-        '[data-cy=start-date] input',
-        updatedCallStartDate
-      ).should('have.value', updatedCallStartDate);
-
-      cy.setDatePickerValue(
-        '[data-cy=end-date] input',
-        updatedCallEndDate
-      ).should('have.value', updatedCallEndDate);
-
       cy.get('[data-cy=reference-number-format] input').type(refNumFormat, {
         parseSpecialCharSequences: false,
       });
+
+      cy.get('[data-cy=start-end-call-input]').click();
+
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('[data-cy="next-step"]').click();
 
@@ -647,15 +557,10 @@ context('Calls tests', () => {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
-      const { shortCode, startDate, endDate } = updatedCall;
-      const updatedCallStartDate = startDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const updatedCallEndDate = endDate.toFormat(
-        initialDBData.getFormats().dateTimeFormat
-      );
-      const callInternalEndDate = endDate
-        .plus({ days: 7 })
+      const { shortCode } = updatedCall;
+
+      const callInternalEndDate = DateTime.now()
+        .plus({ days: 35 })
         .toFormat(initialDBData.getFormats().dateTimeFormat);
 
       const refNumFormat = '211{digits:5}';
@@ -680,15 +585,13 @@ context('Calls tests', () => {
         .type(shortCode)
         .should('have.value', shortCode);
 
-      cy.setDatePickerValue(
-        '[data-cy=start-date] input',
-        updatedCallStartDate
-      ).should('have.value', updatedCallStartDate);
+      cy.get('[data-cy=start-end-call-input]').click();
 
-      cy.setDatePickerValue(
-        '[data-cy=end-date] input',
-        updatedCallEndDate
-      ).should('have.value', updatedCallEndDate);
+      cy.get(`[data-day=${firstDayMonth}]`).click();
+
+      cy.get(`[data-day=${lastDayMonth}]`).click();
+
+      cy.get('[data-cy=start-end-call-input-done-btn]').click();
 
       cy.get('#proposalWorkflowId-input').click();
 
