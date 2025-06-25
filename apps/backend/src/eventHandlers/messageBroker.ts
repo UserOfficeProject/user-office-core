@@ -237,8 +237,8 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
-      case Event.INVITE_ACCEPTED: {
-        const invite = event.invite;
+      case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
+        const { invite } = event;
 
         const claims = await coProposerClaimDataSource.findByInviteId(
           invite.id

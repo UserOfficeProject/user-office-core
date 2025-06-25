@@ -269,10 +269,14 @@ export class UserDataSourceMock implements UserDataSource {
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
     throw new Error('Method not implemented.');
   }
-  async getBasicUserInfo(
-    id: number
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
-    throw new Error('Method not implemented.');
+  async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
+    if (id === dummyUser.id) {
+      return basicDummyUser;
+    } else if (id === dummyUserNotOnProposal.id) {
+      return basicDummyUserNotOnProposal;
+    }
+
+    return null;
   }
   async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
     throw new Error('Method not implemented.');
@@ -281,7 +285,7 @@ export class UserDataSourceMock implements UserDataSource {
   async getBasicUserDetailsByEmail(
     email: string,
     role?: UserRole
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
+  ): Promise<BasicUserDetails> {
     return new BasicUserDetails(
       1,
       'John',

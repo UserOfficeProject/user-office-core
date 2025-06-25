@@ -11,6 +11,7 @@ import { Sample } from '../models/Sample';
 import { TechnicalReview } from '../models/TechnicalReview';
 import { Technique } from '../models/Technique';
 import { User, UserRole } from '../models/User';
+import { Visit } from '../models/Visit';
 import { VisitRegistration } from '../models/VisitRegistration';
 import { Event } from './event.enum';
 
@@ -216,13 +217,33 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
   array: AnswerBasic[];
 }
 
-interface ProposalCoProposerClaimSentEvent extends GeneralEvent {
-  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT;
+interface ProposalCoProposerInvitesUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED;
   array: Invite[];
 }
 
-interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
-  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED;
+interface ProposalCoProposerInviteSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT;
+  invite: Invite;
+}
+
+interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED;
+  invite: Invite;
+}
+
+interface ProposalVisitRegistrationInvitesUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED;
+  array: Invite[];
+}
+
+interface ProposalVisitRegistrationInviteSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT;
+  invite: Invite;
+}
+
+interface ProposalVisitRegistrationInviteAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED;
   invite: Invite;
 }
 
@@ -248,21 +269,6 @@ interface EmailInviteOld extends GeneralEvent {
     inviterId: number;
     role: UserRole;
   };
-}
-
-type InviteResponse = Pick<
-  Invite,
-  'id' | 'code' | 'email' | 'createdByUserId' | 'isEmailSent'
->;
-
-interface EmailInvite extends GeneralEvent {
-  type: Event.EMAIL_INVITE;
-  invite: InviteResponse;
-}
-
-interface EmailInvites extends GeneralEvent {
-  type: Event.EMAIL_INVITES;
-  array: InviteResponse[];
 }
 
 interface FapCreatedEvent extends GeneralEvent {
@@ -322,10 +328,6 @@ interface CallReviewEndedEvent extends GeneralEvent {
 interface CallFapReviewEndedEvent extends GeneralEvent {
   type: Event.CALL_FAP_REVIEW_ENDED;
   call: Call;
-}
-interface InviteAcceptedEvent extends GeneralEvent {
-  type: Event.INVITE_ACCEPTED;
-  invite: Invite;
 }
 interface InstrumentCreatedEvent extends GeneralEvent {
   type: Event.INSTRUMENT_CREATED;
@@ -391,6 +393,10 @@ interface InternalReviewDeleted extends GeneralEvent {
   internalreview: InternalReview;
 }
 
+interface VisitCreatedEvent extends GeneralEvent {
+  type: Event.VISIT_CREATED;
+  visit: Visit;
+}
 interface VisitRegistrationApprovedEvent extends GeneralEvent {
   type: Event.VISIT_REGISTRATION_APPROVED;
   visitregistration: VisitRegistration;
@@ -416,8 +422,6 @@ export type ApplicationEvent =
   | ProposalManagementDecisionUpdatedEvent
   | ProposalManagementDecisionSubmittedEvent
   | EmailInviteOld
-  | EmailInvite
-  | EmailInvites
   | UserUpdateEvent
   | UserRoleUpdateEvent
   | FapCreatedEvent
@@ -434,7 +438,6 @@ export type ApplicationEvent =
   | CallEndedInternalEvent
   | CallReviewEndedEvent
   | CallFapReviewEndedEvent
-  | InviteAcceptedEvent
   | ProposalFeasibilityReviewUpdatedEvent
   | ProposalFeasibilityReviewSubmittedEvent
   | ProposalALLFeasibilityReviewSubmittedEvent
@@ -458,8 +461,12 @@ export type ApplicationEvent =
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent
   | ProposalAllFapInstrumentSubmittedEvent
-  | ProposalCoProposerClaimSentEvent
-  | ProposalCoProposerClaimAcceptedEvent
+  | ProposalCoProposerInvitesUpdatedEvent
+  | ProposalCoProposerInviteSentEvent
+  | ProposalCoProposerInviteAcceptedEvent
+  | ProposalVisitRegistrationInvitesUpdatedEvent
+  | ProposalVisitRegistrationInviteSentEvent
+  | ProposalVisitRegistrationInviteAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent
@@ -474,5 +481,6 @@ export type ApplicationEvent =
   | InternalReviewCreated
   | InternalReviewUpdated
   | InternalReviewDeleted
+  | VisitCreatedEvent
   | VisitRegistrationApprovedEvent
   | VisitRegistrationCancelledEvent;
