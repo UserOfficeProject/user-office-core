@@ -269,7 +269,7 @@ export const EventLabel = new Map<Event, string>([
   ],
   [
     Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
-    'Event occurs when user sets the visit registration claim for a proposal',
+    'Event occurs when co-proposer invites are updated for a proposal',
   ],
   [
     Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
@@ -281,7 +281,7 @@ export const EventLabel = new Map<Event, string>([
   ],
   [
     Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
-    'Event occurs when user sets the visit registration claim for a proposal',
+    'Event occurs when visit registration invites are updated for a proposal',
   ],
   [
     Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
