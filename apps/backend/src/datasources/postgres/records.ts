@@ -477,6 +477,7 @@ export interface InstrumentRecord {
   readonly manager_user_id: number;
   readonly full_count: number;
   readonly selectable: boolean;
+  readonly multiple_tech_reviews_enabled: boolean;
 }
 
 export interface InstrumentHasProposalRecord {
@@ -516,6 +517,7 @@ export interface InstrumentWithManagementTimeRecord {
   readonly manager_user_id: number;
   readonly management_time_allocation: number;
   readonly submitted: boolean;
+  readonly multiple_tech_reviews_enabled: boolean;
 }
 
 export interface TemplateCategoryRecord {
