@@ -13,7 +13,7 @@ import { dummyProposalTechnicalReview } from './ProposalDataSource';
 
 export const dummyReview = new Review(
   4,
-  10,
+  1,
   1,
   'Good proposal',
   9,
@@ -28,7 +28,7 @@ export const dummyReview = new Review(
 );
 export const dummySubmittedReview = new Review(
   5,
-  10,
+  1,
   1,
   'Good proposal',
   9,
@@ -44,7 +44,7 @@ export const dummySubmittedReview = new Review(
 
 export const dummyTechnicalReview = new TechnicalReview(
   6,
-  10,
+  1,
   'Good proposal',
   'Good proposal (public)',
   1,
@@ -59,7 +59,7 @@ export const dummyTechnicalReview = new TechnicalReview(
 
 export const dummyReviewBad = new Review(
   1,
-  9,
+  1,
   1,
   'bad proposal',
   1,
