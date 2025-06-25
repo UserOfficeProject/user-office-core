@@ -49,7 +49,7 @@ export interface FapDataSource {
     role: Role,
     fapId?: number
   ): Promise<Fap[]>;
-  getUserFaps(id: number, role: Role): Promise<Fap[]>;
+  getUserFaps(id: number, roleShortCode: string): Promise<Fap[]>;
   getFapsByCallId(callId: number): Promise<Fap[]>;
   // TODO: This should be removed as we have getFapsByProposalPk and getFapsByProposalPks
   getFapByProposalPk(proposalPk: number): Promise<Fap | null>;

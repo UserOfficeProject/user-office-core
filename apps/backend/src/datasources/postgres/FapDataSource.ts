@@ -1,6 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import {
@@ -26,6 +26,7 @@ import { FapsFilter } from '../../resolvers/queries/FapsQuery';
 import { removeDuplicates } from '../../utils/helperFunctions';
 import { CallDataSource } from '../CallDataSource';
 import { FapDataSource } from '../FapDataSource';
+import { UserDataSource } from '../UserDataSource';
 import database from './database';
 import {
   FapRecord,
@@ -55,6 +56,10 @@ import {
 
 @injectable()
 export default class PostgresFapDataSource implements FapDataSource {
+  protected userDataSource: UserDataSource = container.resolve(
+    Tokens.UserDataSource
+  ) as UserDataSource;
+
   constructor(
     @inject(Tokens.CallDataSource) private callDataSource: CallDataSource
   ) {}
@@ -186,22 +191,22 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getUserFaps(userId: number, role: Role): Promise<Fap[]> {
+  async getUserFaps(userId: number, role: string): Promise<Fap[]> {
     const qb = database<FapRecord>('faps').select<FapRecord[]>('faps.*');
 
-    if (role.shortCode === Roles.FAP_CHAIR) {
+    if (role === Roles.FAP_CHAIR) {
       qb.join('fap_chairs', 'fap_chairs.fap_id', '=', 'faps.fap_id').where(
         'fap_chairs.user_id',
         userId
       );
-    } else if (role.shortCode === Roles.FAP_SECRETARY) {
+    } else if (role === Roles.FAP_SECRETARY) {
       qb.join(
         'fap_secretaries',
         'fap_secretaries.fap_id',
         '=',
         'faps.fap_id'
       ).where('fap_secretaries.user_id', userId);
-    } else if (role.shortCode === Roles.FAP_REVIEWER) {
+    } else if (role === Roles.FAP_REVIEWER) {
       qb.join(
         'fap_reviewers',
         'fap_reviewers.fap_id',
@@ -679,6 +684,18 @@ export default class PostgresFapDataSource implements FapDataSource {
   async assignChairOrSecretaryToFap(
     args: AssignChairOrSecretaryToFapInput
   ): Promise<Fap> {
+    const userRoles = await this.userDataSource.getUserRoles(args.userId);
+
+    // only users with fap reviewer role can be chair or secretary
+    const isFapReviewer = userRoles.some(
+      (role) => role.shortCode === Roles.FAP_REVIEWER
+    );
+    if (!isFapReviewer) {
+      new GraphQLError(
+        'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary'
+      );
+    }
+
     await database.transaction(async (trx) => {
       const isChairAssignment = args.roleId === UserRole.FAP_CHAIR;
 
