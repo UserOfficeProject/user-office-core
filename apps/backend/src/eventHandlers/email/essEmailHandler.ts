@@ -20,6 +20,21 @@ import { BasicUserDetails, UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
+export enum EmailTemplateId {
+  CO_PROPOSER_INVITE_ACCEPTED = 'co-proposer-invite-accepted',
+  PROPOSAL_SUBMITTED = 'proposal-submitted',
+  ACCEPTED_PROPOSAL = 'Accepted-Proposal',
+  REJECTED_PROPOSAL = 'Rejected-Proposal',
+  RESERVED_PROPOSAL = 'Reserved-Proposal',
+  REVIEW_REMINDER = 'review-reminder',
+  VISIT_REGISTRATION_APPROVED = 'visit-registration-approved',
+  VISIT_REGISTRATION_CANCELLED = 'visit-registration-cancelled',
+  USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER = 'user-office-registration-invitation-co-proposer',
+  USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION = 'user-office-registration-invitation-visit-registration',
+  USER_OFFICE_REGISTRATION_INVITATION_REVIEWER = 'user-office-registration-invitation-reviewer',
+  USER_OFFICE_REGISTRATION_INVITATION_USER = 'user-office-registration-invitation-user',
+}
+
 export async function essEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -110,7 +125,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         mailService
           .sendMail({
             content: {
-              template_id: 'co-proposer-invite-accepted',
+              template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
             },
             substitution_data: {
               piPreferredname: principalInvestigator.preferredname,
@@ -158,7 +173,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const options: EmailSettings = {
         content: {
-          template_id: 'proposal-submitted',
+          template_id: EmailTemplateId.PROPOSAL_SUBMITTED,
         },
         substitution_data: {
           piPreferredname: principalInvestigator.preferredname,
@@ -220,11 +235,11 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const { finalStatus } = event.proposal;
       let templateId = '';
       if (finalStatus === ProposalEndStatus.ACCEPTED) {
-        templateId = 'Accepted-Proposal';
+        templateId = EmailTemplateId.ACCEPTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.REJECTED) {
-        templateId = 'Rejected-Proposal';
+        templateId = EmailTemplateId.REJECTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.RESERVED) {
-        templateId = 'Reserved-Proposal';
+        templateId = EmailTemplateId.RESERVED_PROPOSAL;
       } else {
         logger.logError('Failed email notification', { event });
 
@@ -344,7 +359,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: 'review-reminder',
+            template_id: EmailTemplateId.REVIEW_REMINDER,
           },
           substitution_data: {
             fapReviewerPreferredName: fapReviewer.preferredname,
@@ -418,8 +433,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const templateId =
         event.type === Event.VISIT_REGISTRATION_APPROVED
-          ? 'visit-registration-approved'
-          : 'visit-registration-cancelled';
+          ? EmailTemplateId.VISIT_REGISTRATION_APPROVED
+          : EmailTemplateId.VISIT_REGISTRATION_CANCELLED;
 
       mailService
         .sendMail({
@@ -489,20 +504,20 @@ export async function getTemplateIdForInvite(
   ]);
 
   if (coProposerClaim.length > 0) {
-    return 'user-office-registration-invitation-co-proposer';
+    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER;
   }
 
   if (visitRegClaim) {
-    return 'user-office-registration-invitation-visit-registration';
+    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION;
   }
 
   if (roleClaims.length > 0) {
     const { roleId } = roleClaims[0];
     switch (roleId) {
       case UserRole.INTERNAL_REVIEWER:
-        return 'user-office-registration-invitation-reviewer';
+        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
       case UserRole.USER:
-        return 'user-office-registration-invitation-user';
+        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER;
       default:
         throw new Error(
           `Unsupported role \"${roleId}\" for invite ${inviteId}`

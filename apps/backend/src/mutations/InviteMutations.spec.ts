@@ -14,6 +14,8 @@ import {
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
+import { VisitDataSource } from '../datasources/VisitDataSource';
+import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
@@ -21,6 +23,9 @@ import { Rejection } from '../models/Rejection';
 import InviteMutations from './InviteMutations';
 
 const inviteMutations = container.resolve(InviteMutations);
+const visitDataSource = container.resolve<VisitDataSource>(
+  Tokens.VisitDataSource
+);
 
 describe('Test Invite Mutations', () => {
   beforeEach(() => {
@@ -235,7 +240,8 @@ describe('Test Invite Mutations', () => {
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id: 'user-office-registration-invitation-co-proposer',
+          template_id:
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
         },
       })
     );
@@ -275,15 +281,23 @@ describe('Test Invite Mutations', () => {
 
   test('A visitor should receive an invite email when visitor invite is created', async () => {
     const email = faker.internet.email();
-    const visitId = 1;
 
     const mailService = container.resolve<MailService>(Tokens.MailService);
     const sendMailSpy = jest.spyOn(mailService, 'sendMail');
 
+    const newVisit = await visitDataSource.createVisit(
+      {
+        teamLeadUserId: dummyUserWithRole.id,
+        experimentPk: 1,
+        team: [dummyUserWithRole.id],
+      },
+      dummyUserWithRole.id,
+      1
+    );
     const response = await inviteMutations.setVisitRegistrationInvites(
       dummyUserWithRole,
       {
-        visitId: visitId,
+        visitId: newVisit.id,
         emails: [email],
       }
     );
@@ -298,7 +312,8 @@ describe('Test Invite Mutations', () => {
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id: 'user-office-registration-invitation-visitor',
+          template_id:
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION,
         },
       })
     );
