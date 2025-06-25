@@ -10,7 +10,7 @@ import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type AssignedScientistsTableProps = {
-  instrument: Instrument;
+  instrument: Pick<Instrument, 'id' | 'scientists' | 'instrumentContact'>;
   removeAssignedScientistFromInstrument: (
     scientistId: number,
     instrumentId: number

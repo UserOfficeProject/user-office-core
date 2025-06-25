@@ -13,6 +13,7 @@ import { ResolverContext } from '../../context';
 import { Instrument as InstrumentOrigin } from '../../models/Instrument';
 import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
+import { Facility } from './Facility';
 import { Fap } from './Fap';
 
 @ObjectType()
@@ -92,6 +93,19 @@ export class InstrumentResolver {
       context.user,
       instrument.managerUserId
     );
+  }
+
+  @FieldResolver(() => [Facility], { nullable: true })
+  async facilities(
+    @Root() instrument: Instrument,
+    @Ctx() context: ResolverContext
+  ): Promise<Facility[] | null> {
+    const facilities =
+      context.queries.facility.dataSource.getInstrumentsFacilities(
+        instrument.id
+      );
+
+    return isRejection(facilities) ? [] : facilities;
   }
 }
 
