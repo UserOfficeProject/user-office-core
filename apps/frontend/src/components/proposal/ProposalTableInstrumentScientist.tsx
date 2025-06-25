@@ -457,9 +457,15 @@ const ProposalTableInstrumentScientist = ({
         ?.map((tr) => tr.technicalReviewAssignee?.id)
         .includes(user.id);
 
+    const isMultipleTechReviewsEnabled =
+      isInstrumentScientist &&
+      rowData.instruments?.some((i) => i.multipleTechReviewsEnabled);
+
     const showView =
       rowData.technicalReviews?.every((tr) => tr.submitted) ||
-      (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
+      (isCurrentUserTechnicalReviewAssignee === false &&
+        !isInternalReviewer &&
+        !isMultipleTechReviewsEnabled);
 
     return (
       <>
