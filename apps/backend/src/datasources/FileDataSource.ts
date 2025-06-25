@@ -18,15 +18,8 @@ export interface FileDataSource {
   put(
     fileName: string,
     mimeType: string,
-    sizeInBytes: number,
-    filePath: string,
-    internalUse?: boolean
-  ): Promise<FileMetadata>;
-  put(
-    fileName: string,
-    mimeType: string,
     sizeInBytes: number | undefined,
-    readStream: NodeJS.ReadableStream,
+    source: string | NodeJS.ReadableStream,
     internalUse?: boolean
   ): Promise<FileMetadata>;
   delete(oid: number): Promise<boolean>;

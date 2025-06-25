@@ -50,20 +50,6 @@ export default class PostgresFileDataSource implements FileDataSource {
   public async put(
     fileName: string,
     mimeType: string,
-    sizeInBytes: number,
-    filePath: string,
-    internalUse?: boolean
-  ): Promise<FileMetadata>;
-  public async put(
-    fileName: string,
-    mimeType: string,
-    sizeInBytes: number | undefined,
-    readableStream: NodeJS.ReadableStream,
-    internalUse?: boolean
-  ): Promise<FileMetadata>;
-  public async put(
-    fileName: string,
-    mimeType: string,
     sizeInBytes: number | undefined,
     source: string | NodeJS.ReadableStream,
     internalUse?: boolean

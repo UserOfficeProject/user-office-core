@@ -51,18 +51,6 @@ export default class FileDataSourceMock implements FileDataSource {
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    filePath: string
-  ): Promise<FileMetadata>;
-  async put(
-    fileName: string,
-    mimeType: string,
-    sizeInBytes: number,
-    readStream: NodeJS.ReadableStream
-  ): Promise<FileMetadata>;
-  async put(
-    fileName: string,
-    mimeType: string,
-    sizeInBytes: number,
     source: string | NodeJS.ReadableStream
   ): Promise<FileMetadata> {
     return new FileMetadata(
