@@ -234,6 +234,9 @@ describe('Test Invite Mutations', () => {
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         recipients: [{ address: email }],
+        content: {
+          template_id: 'user-office-registration-invitation-co-proposer',
+        },
       })
     );
   });
@@ -294,6 +297,9 @@ describe('Test Invite Mutations', () => {
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         recipients: [{ address: email }],
+        content: {
+          template_id: 'user-office-registration-invitation-visitor',
+        },
       })
     );
   });
