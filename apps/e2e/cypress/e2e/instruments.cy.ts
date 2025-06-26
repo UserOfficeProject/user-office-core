@@ -34,7 +34,7 @@ context('Instrument tests', () => {
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(5),
     managerUserId: scientist1.id,
-    multipleTechReviewsEnabled: true,
+    multipleTechReviewsEnabled: false,
   };
 
   const instrument2 = {
@@ -42,6 +42,14 @@ context('Instrument tests', () => {
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(5),
     managerUserId: scientist1.id,
+  };
+
+  const instrument3 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+    multipleTechReviewsEnabled: true,
   };
 
   beforeEach(() => {
@@ -1012,6 +1020,7 @@ context('Instrument tests', () => {
   describe('Instruments tests as instrument scientist role', () => {
     let createdInstrumentId: number;
     let createdInstrument2Id: number;
+    let createdInstrument3Id: number;
     let createdProposalPk: number;
     let createdProposalId: string;
 
@@ -1049,6 +1058,21 @@ context('Instrument tests', () => {
 
           cy.assignScientistsToInstrument({
             instrumentId: createdInstrument2Id,
+            scientistIds: [scientist2.id],
+          });
+        }
+      });
+      cy.createInstrument(instrument3).then((result) => {
+        if (result.createInstrument) {
+          createdInstrument3Id = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createdInstrument3Id }],
+          });
+
+          cy.assignScientistsToInstrument({
+            instrumentId: createdInstrument3Id,
             scientistIds: [scientist2.id],
           });
         }
@@ -1387,17 +1411,34 @@ context('Instrument tests', () => {
       cy.contains('20');
     });
 
-    it('Instrument scientist should be able to save and submit technical review on instrument which has multiple tech reviews enabled ', () => {
-      cy.login('officer');
-      cy.visit('/');
-      cy.updateTechnicalReviewAssignee({
-        proposalPks: [createdProposalPk],
-        userId: scientist1.id,
-        instrumentId: createdInstrumentId,
-      });
+    it('Instrument scientist should be able to save and submit technical review on instrument which has multiple tech reviews enabled ', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        this.skip();
+      }
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
 
-      // cy.login('user1');
-      // cy.visit('/');
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposalPk],
+            instrumentIds: [createdInstrument3Id],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposalPk],
+            userId: scientist1.id,
+            instrumentId: createdInstrument3Id,
+          });
+        }
+      });
+      cy.login('user1');
+      cy.visit('/');
 
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
