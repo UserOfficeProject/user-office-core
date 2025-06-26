@@ -6,6 +6,7 @@ mutation updateInstrument(
   $managerUserId: Int!
   $updateTechReview: Boolean!
   $selectable: Boolean
+  $multipleTechReviewsEnabled: Boolean
 ) {
   updateInstrument(
     id: $id
@@ -15,6 +16,7 @@ mutation updateInstrument(
     managerUserId: $managerUserId
     updateTechReview: $updateTechReview
     selectable: $selectable
+    multipleTechReviewsEnabled: $multipleTechReviewsEnabled
   ) {
     ...instrument
   }

@@ -42,6 +42,9 @@ export class ProposalViewInstrument {
 
   @Field(() => Int, { nullable: true })
   managementTimeAllocation: number;
+
+  @Field(() => Boolean, { nullable: true })
+  multipleTechReviewsEnabled?: boolean;
 }
 
 @ObjectType()
