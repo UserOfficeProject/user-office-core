@@ -1396,8 +1396,8 @@ context('Instrument tests', () => {
         instrumentId: createdInstrumentId,
       });
 
-      cy.login('user1');
-      cy.visit('/');
+      // cy.login('user1');
+      // cy.visit('/');
 
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
