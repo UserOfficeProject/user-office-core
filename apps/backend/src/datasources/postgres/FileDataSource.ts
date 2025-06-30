@@ -120,7 +120,7 @@ export default class PostgresFileDataSource implements FileDataSource {
     );
     if (err) {
       throw new GraphQLError(
-        `Could not establish connection with database \n ${err}`
+        `Could not establish connection to database \n ${err}`
       );
     }
 
@@ -171,7 +171,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       database.client.acquireConnection()
     );
     if (err) {
-      throw new Error(`Could not establish connection with database: ${err}`);
+      throw new Error(`Could not establish connection to database: ${err}`);
     }
 
     if (!connection) {
