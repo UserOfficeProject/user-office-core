@@ -10,7 +10,7 @@ import { LargeObjectManager, ReadStream } from 'pg-large-object';
 import { FileMetadata } from '../../models/Blob';
 import { FileDataSource } from '../FileDataSource';
 import database from './database';
-import { FileRecord, createFileMetadata } from './records';
+import { FileRecord, ProposalRecord, createFileMetadata } from './records';
 
 export default class PostgresFileDataSource implements FileDataSource {
   public async prepare(fileId: string, output: string): Promise<string> {
@@ -24,22 +24,12 @@ export default class PostgresFileDataSource implements FileDataSource {
     return fileId;
   }
 
-  async getMetadata(
-    fileIds?: string[],
-    filenames?: string[],
-    internalUse?: boolean
-  ): Promise<FileMetadata[]> {
+  async getMetadata(fileIds?: string[]): Promise<FileMetadata[]> {
     return database('files')
       .select('*')
       .modify((queryBuilder) => {
         if (fileIds && fileIds.length > 0) {
           queryBuilder.whereIn('file_id', fileIds);
-        }
-        if (filenames && filenames.length > 0) {
-          queryBuilder.whereIn('file_name', filenames);
-        }
-        if (internalUse === true) {
-          queryBuilder.where('internal_use', internalUse);
         }
       })
       .then((records: FileRecord[]) => {
@@ -50,42 +40,78 @@ export default class PostgresFileDataSource implements FileDataSource {
   public async put(
     fileName: string,
     mimeType: string,
-    sizeInBytes: number | undefined,
-    source: string | NodeJS.ReadableStream,
-    internalUse?: boolean
+    sizeInBytes: number,
+    path: string
   ): Promise<FileMetadata> {
-    let oid: number;
+    const oid = await this.storeBlob(path);
 
-    if (typeof source === 'string') {
-      if (typeof sizeInBytes !== 'number') {
-        throw new GraphQLError(
-          'sizeInBytes must be provided when putting from a file path.'
-        );
-      }
-      oid = await this.storeBlob(source);
-      fs.unlinkSync(source);
-    } else {
-      const result = await this.storeBlobFromStream(source);
-      oid = result.oid;
-      sizeInBytes = result.sizeInBytes;
-    }
-
+    fs.unlinkSync(path);
     const resultSet: FileRecord[] = await database
       .insert({
         file_name: fileName,
         mime_type: mimeType,
         size_in_bytes: sizeInBytes,
         oid: oid,
-        ...(internalUse === true && { internal_use: true }),
       })
       .into('files')
       .returning(['*']);
-
     if (!resultSet || resultSet.length !== 1) {
       throw new GraphQLError('Expected to receive entry');
     }
 
     return createFileMetadata(resultSet[0]);
+  }
+
+  public async putProposalPdf(
+    fileName: string,
+    mimeType: string,
+    stream: NodeJS.ReadableStream,
+    proposalPk: number
+  ): Promise<FileMetadata> {
+    const result = await this.storeBlobFromStream(stream);
+
+    if (!result || !result.oid || !result.sizeInBytes) {
+      throw new GraphQLError('Failed to store blob from stream');
+    }
+
+    const oid = result.oid;
+    const sizeInBytes = result.sizeInBytes;
+
+    /*
+    In a transaction, update the files table with the new
+    file metadata, then update the proposal with its file_id.
+    */
+    return await database.transaction(async (trx) => {
+      const fileMetaData: FileRecord[] = await database
+        .insert({
+          file_name: fileName,
+          mime_type: mimeType,
+          size_in_bytes: sizeInBytes,
+          oid: oid,
+        })
+        .into('files')
+        .returning(['*'])
+        .transacting(trx);
+
+      if (fileMetaData.length === 0) {
+        throw new GraphQLError('Failed to insert metadata into files table');
+      }
+
+      const proposal: ProposalRecord[] = await database
+        .update({
+          file_id: fileMetaData[0].file_id,
+        })
+        .from('proposals')
+        .where('proposal_pk', proposalPk)
+        .returning(['*'])
+        .transacting(trx);
+
+      if (proposal.length === 0) {
+        throw new GraphQLError('Failed to insert file_id into proposals table');
+      }
+
+      return createFileMetadata(fileMetaData[0]);
+    });
   }
 
   private async storeBlob(filePath: string): Promise<number> {
@@ -263,10 +289,7 @@ export default class PostgresFileDataSource implements FileDataSource {
     });
   }
 
-  public async getBlobdata(
-    fileName: string,
-    internalUse?: boolean
-  ): Promise<ReadStream | null> {
+  public async getBlobdata(fileName: string): Promise<ReadStream | null> {
     if (!fileName) {
       return null;
     }
@@ -274,11 +297,6 @@ export default class PostgresFileDataSource implements FileDataSource {
     const result = await database('files as f')
       .select('oid')
       .where('file_name', fileName)
-      .modify((query) => {
-        if (internalUse === true) {
-          query.andWhere('f.internal_use', true);
-        }
-      })
       .first();
 
     if (!result) {

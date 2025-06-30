@@ -8,50 +8,23 @@ export default class FileDataSourceMock implements FileDataSource {
     return fileId;
   }
 
-  async getMetadata(
-    fileIds?: string[],
-    filenames?: string[],
-    internalUse?: boolean
-  ): Promise<FileMetadata[]> {
-    if (fileIds || filenames) {
-      return Promise.resolve(
+  async getMetadata(fileIds?: string[]): Promise<FileMetadata[]> {
+    if (fileIds) {
+      return (
         fileIds?.map(
-          (id) =>
-            new FileMetadata(
-              id,
-              1,
-              'name',
-              'text/xml',
-              1,
-              new Date(),
-              internalUse ?? false
-            )
+          (id) => new FileMetadata(id, 1, 'name', 'text/xml', 1, new Date())
         ) ?? []
       );
     }
 
-    if (internalUse != null && internalUse !== undefined) {
-      return Promise.resolve([
-        new FileMetadata(
-          'fileId',
-          1,
-          'name',
-          'text/xml',
-          1,
-          new Date(),
-          internalUse
-        ),
-      ]);
-    }
-
-    return Promise.resolve([]);
+    return [new FileMetadata('fileId', 1, 'name', 'text/xml', 1, new Date())];
   }
 
   async put(
     fileName: string,
     mimeType: string,
     sizeInBytes: number,
-    source: string | NodeJS.ReadableStream
+    path: string
   ): Promise<FileMetadata> {
     return new FileMetadata(
       'fileId',
@@ -59,19 +32,24 @@ export default class FileDataSourceMock implements FileDataSource {
       fileName,
       mimeType,
       sizeInBytes,
-      new Date(),
-      false
+      new Date()
     );
   }
 
-  async getBlobdata(
+  async putProposalPdf(
     fileName: string,
-    internalUse?: boolean
-  ): Promise<ReadStream | null> {
+    mimeType: string,
+    stream: NodeJS.ReadableStream,
+    proposalPk: number
+  ): Promise<FileMetadata> {
+    return new FileMetadata('fileId', 1, fileName, mimeType, 1, new Date());
+  }
+
+  async getBlobdata(fileName: string): Promise<ReadStream | null> {
     return fileName ? new ReadStream() : null;
   }
 
-  public async delete(oid: number): Promise<boolean> {
-    return Promise.resolve(true);
+  async delete(oid: number): Promise<boolean> {
+    return true;
   }
 }

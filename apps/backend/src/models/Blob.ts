@@ -5,7 +5,6 @@ export class FileMetadata {
     public originalFileName: string,
     public mimeType: string,
     public sizeInBytes: number,
-    public createdDate: Date,
-    public internalUse: boolean
+    public createdDate: Date
   ) {}
 }

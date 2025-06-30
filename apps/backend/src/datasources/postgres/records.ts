@@ -126,6 +126,7 @@ export interface ProposalRecord {
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
   readonly submitted_date: Date;
+  readonly file_id: string;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -379,7 +380,6 @@ export interface FileRecord {
   readonly mime_type: string;
   readonly oid: number;
   readonly created_at: Date;
-  readonly internal_use: boolean;
 }
 
 export interface EventLogRecord {
@@ -789,7 +789,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.submitted,
     proposal.reference_number_sequence,
     proposal.management_decision_submitted,
-    proposal.submitted_date
+    proposal.submitted_date,
+    proposal.file_id
   );
 };
 
@@ -889,8 +890,7 @@ export const createFileMetadata = (record: FileRecord) => {
     record.file_name,
     record.mime_type,
     record.size_in_bytes,
-    record.created_at,
-    record.internal_use
+    record.created_at
   );
 };
 

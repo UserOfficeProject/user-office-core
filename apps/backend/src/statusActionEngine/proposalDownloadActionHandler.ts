@@ -89,13 +89,7 @@ export const proposalDownloadActionHandler = async (
       continue;
     }
 
-    const previousFile: FileMetadata | undefined = (
-      await fileDataSource.getMetadata(
-        undefined,
-        [`${proposal.primaryKey}.pdf`],
-        true
-      )
-    )[0];
+    const previousFileId = proposal.fileId;
 
     let fileMetadata: FileMetadata;
     try {
@@ -131,33 +125,37 @@ export const proposalDownloadActionHandler = async (
       }
     );
 
-    if (previousFile) {
+    if (previousFileId) {
       try {
-        const deletionSuccess = await fileDataSource.delete(previousFile.oid);
-        if (deletionSuccess) {
+        const isSuccessfullyDeleted = await deletePreviousFile(
+          previousFileId,
+          fileDataSource
+        );
+
+        if (isSuccessfullyDeleted) {
           logger.logInfo(
             `Successfully deleted previous file for proposal ${proposal.proposalId}`,
             {
               ...logContext,
-              previousFile: previousFile,
+              previousFileId: previousFileId,
             }
           );
         } else {
           logger.logWarn(
-            `Error deleting previous file for proposal ${proposal.proposalId}`,
+            `Problem deleting previous file ID ${previousFileId} for proposal ${proposal.proposalId}`,
             {
               ...logContext,
-              previousFile: previousFile,
+              previousFile: previousFileId,
             }
           );
         }
-      } catch (error) {
+      } catch (deleteError) {
         logger.logWarn(
-          `Error deleting previous file for proposal ${proposal.proposalId}`,
+          `Error deleting previous file ID ${previousFileId} for proposal ${proposal.proposalId}`,
           {
             ...logContext,
-            error,
-            previousFile: previousFile,
+            error: deleteError,
+            previousFile: previousFileId,
           }
         );
       }
@@ -213,12 +211,11 @@ async function fetchAndStorePdfFromFactory<TData>(
 
     const filename = `${primaryKey}.pdf`;
 
-    return await fileDataSource.put(
+    return await fileDataSource.putProposalPdf(
       filename,
       contentType,
-      undefined,
       readableStream as NodeJS.ReadableStream,
-      true
+      primaryKey
     );
   } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error(String(error));
@@ -231,4 +228,21 @@ async function fetchAndStorePdfFromFactory<TData>(
 
     throw err;
   }
+}
+
+async function deletePreviousFile(
+  previousFileId: string,
+  fileDataSource: FileDataSource
+): Promise<boolean> {
+  const previousFileMetadata = await fileDataSource.getMetadata([
+    previousFileId,
+  ]);
+
+  if (previousFileMetadata.length === 0) {
+    throw new Error(
+      `Previous file metadata not found for fileId ${previousFileId}`
+    );
+  }
+
+  return await fileDataSource.delete(previousFileMetadata[0].oid);
 }

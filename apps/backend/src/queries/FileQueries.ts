@@ -19,6 +19,6 @@ export default class FileQueries {
   async getFilesMetadata(filter: FilesMetadataFilter) {
     // TODO There should be authentication
 
-    return this.dataSource.getMetadata(filter.fileIds, undefined, undefined);
+    return this.dataSource.getMetadata(filter.fileIds);
   }
 }

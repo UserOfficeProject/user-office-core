@@ -859,6 +859,7 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
         submittedDate: null,
+        fileId: null,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
