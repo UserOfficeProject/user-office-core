@@ -682,7 +682,7 @@ export const experimentDummyData = `{
               "dependenciesOperator": "AND",
               "answerId": 344,
               "value": "Disposal is managed in accordance with safety and environmental regulations. All waste materials are categorized, labeled, and stored properly before being collected by certified disposal services. Hazardous substances are handled with special procedures to prevent contamination. Regular audits ensure compliance with disposal protocols and proper documentation is maintained."
-            },
+            }
           ]
         },
         {
