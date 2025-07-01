@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
@@ -32,15 +31,24 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
     const wordCount = editor.plugins.wordcount;
     setNumberOfChars(wordCount.body.getCharacterCount());
   };
+  const [paragraphSpacingError, setParagraphSpacingError] = useState(false);
 
   return (
     <FormControl
       required={config.required}
-      error={isError}
+      error={isError || paragraphSpacingError}
       margin="dense"
       fullWidth
     >
       <FormLabel sx={{ marginBottom: theme.spacing(2) }}>{question}</FormLabel>
+      {config.max && (
+        <FormLabel
+          sx={{ marginBottom: theme.spacing(2) }}
+          data-cy="rich-text-char-count"
+        >
+          Characters: {numberOfChars} / {config.max}
+        </FormLabel>
+      )}
       <Editor
         id={id}
         value={value}
@@ -77,24 +85,31 @@ export function QuestionaryComponentRichTextInput(props: BasicComponentProps) {
         onEditorChange={(content, editor) => {
           handleCharacterCount(editor);
           onComplete(content);
+          const plainText = editor.getContent({ format: 'text' });
+          const hasExtraLines = /\n\s*\n\s*\n/.test(plainText);
+          setParagraphSpacingError(hasExtraLines);
+        }}
+        onBlur={(_, editor) => {
+          const content = editor.getContent();
+          const cleanedcontent = content
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/(\r\n|\r|\n)+/g, '\n')
+            .replace(/<p>\s*&nbsp;\s*<\/p>/gi, '');
+          handleCharacterCount(editor);
+          onComplete(cleanedcontent);
         }}
         onInit={(_, editor) => {
           handleCharacterCount(editor);
         }}
       />
-      {config.max && (
-        <Box
-          sx={{
-            position: 'absolute',
-            right: 0,
-            color: theme.palette.grey[600],
-          }}
-          data-cy="rich-text-char-count"
-        >
-          Characters: {numberOfChars} / {config.max}
-        </Box>
-      )}
+
       {isError && <FormHelperText>{fieldError}</FormHelperText>}
+      {paragraphSpacingError && (
+        <FormHelperText sx={{ color: theme.palette.error.main }}>
+          Extra blank lines between paragraphs will be removed to comply with
+          formatting standards.
+        </FormHelperText>
+      )}
     </FormControl>
   );
 }
