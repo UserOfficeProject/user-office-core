@@ -237,7 +237,9 @@ const AppRoutes = () => {
               }
             />
           )}
-        {isUserOfficer && (
+        {(isUserOfficer ||
+          isInstrumentScientist ||
+          isExperimentSafetyReviewer) && (
           <Route
             path="/Experiments"
             element={
