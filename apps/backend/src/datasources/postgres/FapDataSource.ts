@@ -684,18 +684,6 @@ export default class PostgresFapDataSource implements FapDataSource {
   async assignChairOrSecretaryToFap(
     args: AssignChairOrSecretaryToFapInput
   ): Promise<Fap> {
-    const userRoles = await this.userDataSource.getUserRoles(args.userId);
-
-    // only users with fap reviewer role can be chair or secretary
-    const isFapReviewer = userRoles.some(
-      (role) => role.shortCode === Roles.FAP_REVIEWER
-    );
-    if (!isFapReviewer) {
-      new GraphQLError(
-        'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary'
-      );
-    }
-
     await database.transaction(async (trx) => {
       const isChairAssignment = args.roleId === UserRole.FAP_CHAIR;
 

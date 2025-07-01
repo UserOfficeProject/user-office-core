@@ -114,7 +114,7 @@ describe('Test FapMutations', () => {
     );
 
     return expect((result as Rejection).reason).toBe(
-      'Could not assign chair or secretary to Fap, please ensure they have the correct roles'
+      'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary'
     );
   });
 
@@ -131,7 +131,7 @@ describe('Test FapMutations', () => {
     );
 
     return expect((result as Rejection).reason).toBe(
-      'Could not assign chair or secretary to Fap, please ensure they have the correct roles'
+      'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary'
     );
   });
 

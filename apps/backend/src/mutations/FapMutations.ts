@@ -129,6 +129,17 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: AssignChairOrSecretaryToFapArgs
   ): Promise<Fap | Rejection> {
+    if (
+      !(await this.userAuth.canBeAssignedToFap(
+        args.assignChairOrSecretaryToFapInput.userId
+      ))
+    ) {
+      return rejection(
+        'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary',
+        { args, agent }
+      );
+    }
+
     return this.dataSource
       .assignChairOrSecretaryToFap(args.assignChairOrSecretaryToFapInput)
       .catch((error) => {
