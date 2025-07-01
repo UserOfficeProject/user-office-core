@@ -2,6 +2,7 @@ import querystring from 'querystring';
 import { Readable } from 'stream';
 import { ReadableStream } from 'stream/web';
 
+import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
 
@@ -69,50 +70,82 @@ export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
       gotResponse = true;
     });
 
-    const factoryResp = await fetch(`${ENDPOINT}/${downloadType}/${type}`, {
-      signal: controller.signal,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(properties),
-    });
+    const tracer = trace.getTracer('default');
 
-    if (!factoryResp.ok) {
-      throw new Error(await factoryResp.text());
-    }
+    await tracer.startActiveSpan(
+      'factory-service-call',
+      { kind: SpanKind.CLIENT },
+      async (span) => {
+        try {
+          const headers: Record<string, string> = {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          };
+          propagation.inject(context.active(), headers);
 
-    const factoryRespBody = factoryResp.body;
-    if (!factoryRespBody) {
-      return;
-    }
+          const factoryResp = await fetch(
+            `${ENDPOINT}/${downloadType}/${type}`,
+            {
+              signal: controller.signal,
+              headers: headers,
+              method: 'POST',
+              body: JSON.stringify(properties),
+            }
+          );
 
-    const readableStream = Readable.fromWeb(factoryRespBody as ReadableStream, {
-      signal: controller.signal,
-    });
+          if (!factoryResp.ok) {
+            throw new Error(await factoryResp.text());
+          }
 
-    readableStream.on('error', (err) => {
-      next({
-        error: err.toString(),
-        message: `Could not download generated ${downloadType}/${type}`,
-      });
-    });
+          const factoryRespBody = factoryResp.body;
+          if (!factoryRespBody) {
+            return;
+          }
 
-    const filename =
-      properties.data.length > 1
-        ? properties.meta.collectionFilename
-        : properties.meta.singleFilename;
+          const readableStream = Readable.fromWeb(
+            factoryRespBody as ReadableStream,
+            {
+              signal: controller.signal,
+            }
+          );
 
-    const contentTypeHeaders = factoryResp.headers.get('content-type');
+          readableStream.on('error', (err) => {
+            next({
+              error: err.toString(),
+              message: `Could not download generated ${downloadType}/${type}`,
+            });
+          });
 
-    res.setHeader('Content-Disposition', contentDisposition(filename));
-    res.setHeader('x-download-filename', querystring.escape(filename));
-    if (contentTypeHeaders) {
-      res.setHeader('content-type', contentTypeHeaders);
-    }
+          const filename =
+            properties.data.length > 1
+              ? properties.meta.collectionFilename
+              : properties.meta.singleFilename;
 
-    readableStream.pipe(res);
+          const contentTypeHeaders = factoryResp.headers.get('content-type');
+
+          res.setHeader('Content-Disposition', contentDisposition(filename));
+          res.setHeader('x-download-filename', querystring.escape(filename));
+          if (contentTypeHeaders) {
+            res.setHeader('content-type', contentTypeHeaders);
+          }
+
+          readableStream.pipe(res);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            span.recordException(err);
+            span.setStatus({ code: 2, message: err.message });
+          } else {
+            span.recordException({
+              name: 'UnknownError',
+              message: String(err),
+            });
+            span.setStatus({ code: 2, message: String(err) });
+          }
+        } finally {
+          span.end();
+        }
+      }
+    );
   } catch (error) {
     next({
       error,
