@@ -293,13 +293,25 @@ export default class ExperimentMutations {
       return rejection('No experiment found');
     }
 
+    const proposal = await this.proposalDataSource.get(experiment.proposalPk);
+    if (!proposal) {
+      return rejection('No proposal found', { args });
+    }
+
+    const proposalQuestionary = await this.questionaryDataSource.getQuestionary(
+      proposal.questionaryId
+    );
+    if (!proposalQuestionary) {
+      return rejection('No proposal questionary found', { args });
+    }
+
     const experimentSafety =
       await this.dataSource.getExperimentSafetyByExperimentPk(
         args.experimentPk
       );
 
     if (!experimentSafety) {
-      return rejection('No experiment safety found');
+      return rejection('No experiment safety found', { args });
     }
 
     const hasAccessRights =
@@ -320,22 +332,22 @@ export default class ExperimentMutations {
     // Fetching the Sample
     const sample = await this.sampleDataSource.getSample(args.sampleId);
     if (!sample) {
-      return rejection('No sample found');
+      return rejection('No sample found', { args });
     }
 
-    // Fetching the Question, that was attached as a Sample declaration in the Proposal Questionary
-    const question = await this.templateDataSource.getQuestion(
-      sample.questionId
-    ); // TODO this should be a getQuestionTemplateRelation. There is no way currently of doing it. Sample should reference QuestionRel instead of Question
-    if (!question) {
-      return rejection('No question found');
+    const questionTemplateRel =
+      await this.templateDataSource.getQuestionTemplateRelation(
+        sample.questionId,
+        proposalQuestionary.templateId
+      );
+    if (!questionTemplateRel) {
+      return rejection('No question found', { args });
     }
 
-    // Fetching the Sample ESI Template ID
-    const templateId = (question.config as SampleDeclarationConfig)
+    const templateId = (questionTemplateRel.config as SampleDeclarationConfig)
       .esiTemplateId;
     if (!templateId) {
-      return rejection('Esi template is not defined');
+      return rejection('Esi template is not defined', { args });
     }
 
     // Creating a new Questionary for the Sample using the ESI Template

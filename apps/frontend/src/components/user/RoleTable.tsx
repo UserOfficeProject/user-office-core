@@ -55,7 +55,7 @@ const RoleTable = ({ add, activeRoles }: RoleTableProps) => {
           type="button"
           onClick={() => add(selectedRoles)}
           disabled={selectedRoles.length === 0 || loading}
-          data-cy="assign-instrument-to-call"
+          data-cy="assign-role-to-user"
         >
           Update
         </Button>

@@ -753,6 +753,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       );
   }
 
+  getProposalByVisitId(visitId: number): Promise<Proposal> {
+    return database
+      .select('p.*')
+      .from('visits as v')
+      .join('proposals as p', 'v.proposal_pk', 'p.proposal_pk')
+      .where('v.visit_id', visitId)
+      .first()
+      .then((proposal) => createProposalObject(proposal));
+  }
+
   async markEventAsDoneOnProposals(
     event: Event,
     proposalPks: number[]

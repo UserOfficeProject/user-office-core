@@ -22,6 +22,7 @@ export interface GeneralEvent {
   isRejection: boolean;
   inputArgs?: string;
   description?: string;
+  impersonatingUserId?: number;
   exchange?: string;
 }
 
@@ -214,6 +215,16 @@ interface ProposalFapMeetingReorderEvent extends GeneralEvent {
 interface ProposalTopicAnsweredEvent extends GeneralEvent {
   type: Event.TOPIC_ANSWERED;
   array: AnswerBasic[];
+}
+
+interface ProposalCoProposerClaimSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT;
+  array: Invite[];
+}
+
+interface ProposalCoProposerClaimAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED;
+  invite: Invite;
 }
 
 interface UserUpdateEvent extends GeneralEvent {
@@ -489,6 +500,8 @@ export type ApplicationEvent =
   | ProposalAllFapReviewsSubmittedForAllPanelsEvent
   | ProposalAllFapMeetingsSubmittedEvent
   | ProposalAllFapInstrumentSubmittedEvent
+  | ProposalCoProposerClaimSentEvent
+  | ProposalCoProposerClaimAcceptedEvent
   | InstrumentCreatedEvent
   | InstrumentUpdatedEvent
   | InstrumentDeletedEvent

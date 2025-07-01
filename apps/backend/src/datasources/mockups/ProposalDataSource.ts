@@ -344,6 +344,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposalPks.includes(proposal.primaryKey)
     );
   }
+
+  async getProposalByVisitId(visitId: number): Promise<Proposal> {
+    return dummyProposalFactory();
+  }
+
   async getInstrumentScientistProposals(
     scientist: UserWithRole,
     filter?: ProposalsFilter,

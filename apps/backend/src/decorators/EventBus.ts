@@ -11,7 +11,10 @@ const EventBusDecorator = (eventType: Event) => {
     target: any,
     name: string,
     descriptor: {
-      value?: (agent: UserWithRole, args: any) => Promise<Rejection | any>;
+      value?: (
+        agent: UserWithRole | null,
+        args: any
+      ) => Promise<Rejection | any>;
     }
   ) => {
     // NOTE: This decorator is used to log the events to the event bus.
@@ -40,6 +43,9 @@ const EventBusDecorator = (eventType: Event) => {
           loggedInUserId: loggedInUser ? loggedInUser.id : null,
           isRejection: isRejection(result),
           inputArgs: JSON.stringify(restArgs),
+          impersonatingUserId: loggedInUser
+            ? loggedInUser.impersonatingUserId
+            : null,
         } as ApplicationEvent;
 
         const eventBus = resolveApplicationEventBus();

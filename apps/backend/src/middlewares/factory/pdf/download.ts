@@ -76,8 +76,7 @@ router.get(`/${PDFType.SAMPLE}/:sample_ids`, async (req, res, next) => {
     }
 
     const userWithRole = {
-      ...req.user.user,
-      currentRole: req.user.currentRole,
+      ...res.locals.agent,
     };
 
     const sampleIds: number[] = req.params.sample_ids
@@ -124,8 +123,7 @@ router.get(
 
     try {
       const userWithRole = {
-        ...req.user.user,
-        currentRole: req.user.currentRole,
+        ...res.locals.agent,
       };
 
       const shipmentIds: number[] = req.params.shipment_ids

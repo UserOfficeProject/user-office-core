@@ -29,9 +29,10 @@ export type RowObj = {
   propFapRankOrder: number | null;
   inAvailZone?: string | null;
   feedback?: string;
-  daysRequested?: number;
+  timeRequested?: number;
   reviews?: (string | number)[][] | null;
   piCountry?: string | null;
+  piOrg?: string | null;
 };
 
 const fapDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
