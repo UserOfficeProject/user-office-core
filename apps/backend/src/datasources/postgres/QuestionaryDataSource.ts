@@ -12,6 +12,7 @@ import {
   getDefaultAnswerValue,
   QuestionDataTypeConfigMapping,
 } from '../../models/questionTypes/QuestionRegistry';
+import { Roles } from '../../models/Role';
 import {
   DataType,
   FieldDependency,
@@ -271,7 +272,8 @@ export default class PostgresQuestionaryDataSource
       });
   }
   async getQuestionarySteps(
-    questionary_id: number
+    questionary_id: number,
+    currentUserRole: string | null
   ): Promise<QuestionaryStep[]> {
     const questionary = await this.getQuestionary(questionary_id);
     if (!questionary) {
@@ -280,18 +282,25 @@ export default class PostgresQuestionaryDataSource
 
     return this.getQuestionaryStepsWithTemplateId(
       questionary_id,
-      questionary.templateId
+      questionary.templateId,
+      currentUserRole
     );
   }
 
   async getBlankQuestionarySteps(
-    templateId: number
+    templateId: number,
+    currentUserRole: string
   ): Promise<QuestionaryStep[]> {
-    return this.getQuestionaryStepsWithTemplateId(0, templateId);
+    return this.getQuestionaryStepsWithTemplateId(
+      0,
+      templateId,
+      currentUserRole
+    );
   }
 
   async getBlankQuestionaryStepsByCallId(
-    callId: number
+    callId: number,
+    currentUserRole: string
   ): Promise<QuestionaryStep[]> {
     const call = await database
       .select()
@@ -303,7 +312,12 @@ export default class PostgresQuestionaryDataSource
       );
     if (!call) return [];
 
-    return this.getQuestionaryStepsWithTemplateId(0, call.templateId, callId);
+    return this.getQuestionaryStepsWithTemplateId(
+      0,
+      call.templateId,
+      currentUserRole,
+      callId
+    );
   }
 
   async updateTopicCompleteness(
@@ -353,6 +367,7 @@ export default class PostgresQuestionaryDataSource
   private async getQuestionaryStepsWithTemplateId(
     questionaryId: number,
     templateId: number,
+    currentUserRole: string | null,
     callId?: number
   ): Promise<QuestionaryStep[]> {
     if (!callId && questionaryId > 0) {
@@ -411,25 +426,42 @@ export default class PostgresQuestionaryDataSource
     );
 
     const fields = await Promise.all(
-      answerRecords.map(async (record) => {
-        const questionDependencies = dependencies.filter(
-          (dependency) => dependency.questionId === record.question_id
-        );
-        const questionTemplateRelation =
-          await createQuestionTemplateRelationObject(
-            record,
-            questionDependencies,
-            callId
+      answerRecords
+        .filter((record) => {
+          if (currentUserRole === null || currentUserRole === Roles.USER) {
+            // "user" is a api key or user
+            // If user role is user then proposal must be there own proposal due to prior checks
+            return true;
+          }
+
+          const readPermissions = record.config.readPermissions;
+
+          if (readPermissions?.length === 0) {
+            return true; // no read permissions means all users can read
+          } else {
+            return readPermissions.includes(currentUserRole as Roles);
+          }
+        })
+
+        .map(async (record) => {
+          const questionDependencies = dependencies.filter(
+            (dependency) => dependency.questionId === record.question_id
           );
+          const questionTemplateRelation =
+            await createQuestionTemplateRelationObject(
+              record,
+              questionDependencies,
+              callId
+            );
 
-        // if no answer has been saved, return the default answer value
-        const value =
-          record.value === null
-            ? getDefaultAnswerValue(questionTemplateRelation)
-            : record.value.value;
+          // if no answer has been saved, return the default answer value
+          const value =
+            record.value === null
+              ? getDefaultAnswerValue(questionTemplateRelation)
+              : record.value.value;
 
-        return new Answer(record.answer_id, questionTemplateRelation, value);
-      })
+          return new Answer(record.answer_id, questionTemplateRelation, value);
+        })
     );
 
     const steps = Array<QuestionaryStep>();

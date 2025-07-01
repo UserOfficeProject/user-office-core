@@ -11,6 +11,7 @@ import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { DateConfig, SettingsId } from 'generated/sdk';
 import { minMaxDateTimeCalculations } from 'utils/Time';
@@ -160,6 +161,10 @@ export const QuestionTemplateRelationDateForm = (
                 template={props.template}
               />
             </TitledContainer>
+            <QuestionReadPermissionsConfig
+              config={props.questionRel.config}
+              rolesData={props.rolesData}
+            />
           </>
         );
       }}

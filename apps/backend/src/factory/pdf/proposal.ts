@@ -78,8 +78,11 @@ const getSampleQuestionarySteps = async (
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
-  const questionarySteps =
-    await questionaryDataSource.getQuestionarySteps(questionaryId);
+  // TODO pdf generation with question based read permssions
+  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
+    questionaryId,
+    null
+  );
   if (!questionarySteps) {
     throw new Error(
       `Questionary steps for Questionary ID '${questionaryId}' not found, or the user has insufficient rights`
@@ -525,7 +528,8 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   const questionarySteps = await questionaryDataSource.getQuestionarySteps(
-    proposal.questionaryId
+    proposal.questionaryId,
+    user.currentRole?.shortCode || null
   );
 
   if (isRejection(questionarySteps) || questionarySteps == null) {

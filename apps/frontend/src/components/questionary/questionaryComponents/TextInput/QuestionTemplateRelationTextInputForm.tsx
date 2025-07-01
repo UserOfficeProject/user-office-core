@@ -9,6 +9,7 @@ import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { TextInputConfig } from 'generated/sdk';
 
 import QuestionDependencyList from '../QuestionDependencyList';
@@ -35,7 +36,6 @@ export const QuestionTemplateRelationTextInputForm = (
       {(formikProps) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -155,13 +155,16 @@ export const QuestionTemplateRelationTextInputForm = (
               />
             </Collapse>
           </TitledContainer>
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}
               template={props.template}
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.questionRel.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

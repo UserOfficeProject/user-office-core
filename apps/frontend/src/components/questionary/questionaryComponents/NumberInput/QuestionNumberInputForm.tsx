@@ -18,6 +18,7 @@ import StyledDialog from 'components/common/StyledDialog';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import CreateUnit from 'components/settings/unitList/CreateUnit';
 import { NumberInputConfig, NumberValueConstraint, Unit } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
@@ -89,7 +90,6 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <Field
             name="config.small_label"
             label="Small label"
@@ -99,7 +99,6 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'small-label' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -205,6 +204,10 @@ export const QuestionNumberForm = (props: QuestionFormProps) => {
               <CreateUnit close={onCreated} unit={null} />
             </DialogContent>
           </StyledDialog>
+          <QuestionReadPermissionsConfig
+            config={props.question.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

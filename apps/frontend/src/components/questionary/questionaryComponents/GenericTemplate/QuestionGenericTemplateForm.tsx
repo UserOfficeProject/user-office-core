@@ -9,6 +9,7 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { SubTemplateConfig, TemplateGroupId } from 'generated/sdk';
 import { useActiveTemplates } from 'hooks/call/useCallTemplates';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
@@ -16,6 +17,7 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
+  console.log(props.question.config);
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 
@@ -59,7 +61,6 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
-
           <Field
             name="question"
             id="Question-Input"
@@ -69,7 +70,6 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <FormikUIAutocomplete
@@ -178,6 +178,10 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
               data-cy="max-entries"
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.question.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

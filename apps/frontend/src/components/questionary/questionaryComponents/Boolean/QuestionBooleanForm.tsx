@@ -7,6 +7,7 @@ import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 export const QuestionBooleanForm = (props: QuestionFormProps) => {
@@ -44,7 +45,6 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
             inputProps={{ 'data-cy': 'question' }}
             id="boolean-question-input"
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -56,6 +56,10 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
               data-cy="required"
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.question.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

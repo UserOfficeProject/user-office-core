@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
 
@@ -32,6 +33,10 @@ export const QuestionTemplateRelationGenericTemplateBasisForm = (
               inputProps={{ 'data-cy': 'question' }}
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.questionRel.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionTemplateRelationFormShell>
