@@ -191,7 +191,7 @@ export default class PostgresFapDataSource implements FapDataSource {
       });
   }
 
-  async getUserFaps(userId: number, role: string): Promise<Fap[]> {
+  async getUserFaps(userId: number, role: Roles): Promise<Fap[]> {
     const qb = database<FapRecord>('faps').select<FapRecord[]>('faps.*');
 
     if (role === Roles.FAP_CHAIR) {
