@@ -61,7 +61,7 @@ export default class ExperimentMutations {
   ) {}
 
   @Authorized()
-  async createOrGetExperimentSafety(
+  async createExperimentSafety(
     agent: UserWithRole | null,
     experimentPk: number
   ): Promise<ExperimentSafety | Rejection> {
@@ -109,7 +109,7 @@ export default class ExperimentMutations {
       await this.dataSource.getExperimentSafetyByExperimentPk(experimentPk);
 
     if (experimentSafety) {
-      return experimentSafety;
+      return rejection('Experiment Safety already exists for this experiment');
     }
 
     const call = (await this.callDataSource.getCall(proposal.callId))!;

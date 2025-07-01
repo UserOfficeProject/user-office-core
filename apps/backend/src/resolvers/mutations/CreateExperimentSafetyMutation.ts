@@ -10,7 +10,7 @@ export class CreateExperimentSafetyMutation {
     @Arg('experimentPk', () => Int) experimentPk: number,
     @Ctx() context: ResolverContext
   ) {
-    return context.mutations.experiment.createOrGetExperimentSafety(
+    return context.mutations.experiment.createExperimentSafety(
       context.user,
       experimentPk
     );

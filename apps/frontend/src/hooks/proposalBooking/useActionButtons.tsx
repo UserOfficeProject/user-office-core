@@ -20,6 +20,7 @@ import {
   VisitRegistrationStatus,
 } from 'generated/sdk';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const getParticipationRole = (
   user: UserJwt,
@@ -72,6 +73,7 @@ interface UseActionButtonsArgs {
 export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const { api } = useDataApiWithFeedback();
   const { openModal, closeModal, eventUpdated } = args;
 
   const formTeamAction = (event: UserExperiment) => {
@@ -144,7 +146,23 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <EsiIcon data-cy="finish-experiment-safety-form-icon" />,
       buttonState,
       () => {
-        navigate(`/ExperimentSafety/${event.experimentPk}`);
+        if (event.experimentSafety) {
+          // If experiment safety already exists, navigate directly
+          navigate(
+            `/ExperimentSafety/${event.experimentSafety.experimentSafetyPk}`
+          );
+        } else {
+          // Create experiment safety first, then navigate
+          api()
+            .createExperimentSafety({ experimentPk: event.experimentPk })
+            .then((result) => {
+              if (result.createExperimentSafety) {
+                navigate(
+                  `/ExperimentSafety/${result.createExperimentSafety.experimentSafetyPk}`
+                );
+              }
+            });
+        }
       }
     );
   };

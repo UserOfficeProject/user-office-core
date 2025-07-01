@@ -47,6 +47,13 @@ export function createExperimentSafetyStub(
       created: new Date(),
       steps: questionarySteps,
     },
+    safetyReviewQuestionary: {
+      questionaryId: 0,
+      isCompleted: false,
+      templateId: templateId,
+      created: new Date(),
+      steps: questionarySteps,
+    },
     proposal: {
       primaryKey: 0,
       title: '',

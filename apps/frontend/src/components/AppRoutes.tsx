@@ -627,7 +627,7 @@ const AppRoutes = () => {
           />
         )}
         <Route
-          path="/ExperimentSafety/:experimentPk"
+          path="/ExperimentSafety/:experimentSafetyPk"
           element={
             <TitledRoute
               title="Experiment Safety"

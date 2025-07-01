@@ -31,7 +31,7 @@ context('Experiments tests', () => {
       ],
       managementDecisionSubmitted: true,
     });
-    cy.createOrGetExperimentSafety({
+    cy.createExperimentSafety({
       experimentPk: initialDBData.experiments.upcoming.experimentPk,
     });
     cy.createVisit({
