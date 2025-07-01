@@ -21,23 +21,6 @@ import { BasicUserDetails, UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
-export enum EmailTemplateId {
-  USER_OFFICE_REGISTRATION_INVITATION = 'user-office-registration-invitation',
-  USER_OFFICE_REGISTRATION_INVITATION_REVIEWER = 'user-office-registration-invitation-reviewer',
-  PROPOSAL_CREATED = 'proposal-created',
-  PROPOSAL_SUBMITTED = 'proposal-submitted',
-  ACCEPTED_PROPOSAL = 'Accepted-Proposal',
-  REJECTED_PROPOSAL = 'Rejected-Proposal',
-  RESERVED_PROPOSAL = 'Reserved-Proposal',
-  REVIEW_REMINDER = 'review-reminder',
-  INTERNAL_REVIEW_CREATED = 'internal-review-created',
-  INTERNAL_REVIEW_UPDATED = 'internal-review-updated',
-  INTERNAL_REVIEW_DELETED = 'internal-review-deleted',
-  USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER = 'user-office-registration-invitation-co-proposer',
-  USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION = 'user-office-registration-invitation-visit-registration',
-  USER_OFFICE_REGISTRATION_INVITATION_USER = 'user-office-registration-invitation-user',
-}
-
 export async function eliEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const proposalDataSource = container.resolve<ProposalDataSource>(
@@ -101,8 +84,8 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           content: {
             template_id:
               event.emailinviteresponse.role === UserRole.USER
-                ? EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION
-                : EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER,
+                ? 'user-office-registration-invitation'
+                : 'user-office-registration-invitation-reviewer',
           },
           substitution_data: {
             firstname: user.preferredname,
@@ -124,155 +107,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       return;
     }
 
-    case Event.PROPOSAL_CREATED: {
-      const principalInvestigator = await userDataSource.getUser(
-        event.proposal.proposerId
-      );
-
-      const call = await callDataSource.getCall(event.proposal.callId);
-
-      if (!principalInvestigator || !call) {
-        return;
-      }
-
-      const options: EmailSettings = {
-        content: {
-          template_id: EmailTemplateId.PROPOSAL_CREATED,
-        },
-        substitution_data: {
-          piPreferredname: principalInvestigator.preferredname,
-          piLastname: principalInvestigator.lastname,
-          proposalNumber: event.proposal.proposalId,
-          proposalTitle: event.proposal.title,
-          callShortCode: call.shortCode,
-        },
-        recipients: [{ address: principalInvestigator.email }],
-      };
-
-      mailService
-        .sendMail(options)
-        .then((res: any) => {
-          logger.logInfo('Emails sent on proposal submission:', {
-            result: res,
-            event,
-          });
-        })
-        .catch((err: string) => {
-          logger.logError('Could not send email(s) on proposal submission:', {
-            error: err,
-            event,
-          });
-        });
-
-      return;
-    }
-
-    case Event.PROPOSAL_SUBMITTED: {
-      const principalInvestigator = await userDataSource.getUser(
-        event.proposal.proposerId
-      );
-      const participants = await userDataSource.getProposalUsersFull(
-        event.proposal.primaryKey
-      );
-      if (!principalInvestigator) {
-        return;
-      }
-
-      const options: EmailSettings = {
-        content: {
-          template_id: EmailTemplateId.PROPOSAL_SUBMITTED,
-        },
-        substitution_data: {
-          piPreferredname: principalInvestigator.preferredname,
-          piLastname: principalInvestigator.lastname,
-          proposalNumber: event.proposal.proposalId,
-          proposalTitle: event.proposal.title,
-          coProposers: participants.map(
-            (partipant) => `${partipant.preferredname} ${partipant.lastname} `
-          ),
-          call: '',
-        },
-        recipients: [
-          { address: principalInvestigator.email },
-          ...participants.map((partipant) => {
-            return {
-              address: {
-                email: partipant.email,
-                header_to: principalInvestigator.email,
-              },
-            };
-          }),
-        ],
-      };
-
-      mailService
-        .sendMail(options)
-        .then((res: any) => {
-          logger.logInfo('Emails sent on proposal submission:', {
-            result: res,
-            event,
-          });
-        })
-        .catch((err: string) => {
-          logger.logError('Could not send email(s) on proposal submission:', {
-            error: err,
-            event,
-          });
-        });
-
-      return;
-    }
-
-    case Event.PROPOSAL_NOTIFIED: {
-      const principalInvestigator = await userDataSource.getUser(
-        event.proposal.proposerId
-      );
-      if (!principalInvestigator) {
-        return;
-      }
-      const { finalStatus } = event.proposal;
-      let templateId = '';
-      if (finalStatus === ProposalEndStatus.ACCEPTED) {
-        templateId = EmailTemplateId.ACCEPTED_PROPOSAL;
-      } else if (finalStatus === ProposalEndStatus.REJECTED) {
-        templateId = EmailTemplateId.REJECTED_PROPOSAL;
-      } else if (finalStatus === ProposalEndStatus.RESERVED) {
-        templateId = EmailTemplateId.RESERVED_PROPOSAL;
-      } else {
-        logger.logError('Failed email notification', { event });
-
-        return;
-      }
-
-      mailService
-        .sendMail({
-          content: {
-            template_id: templateId,
-          },
-          substitution_data: {
-            piPreferredname: principalInvestigator.preferredname,
-            piLastname: principalInvestigator.lastname,
-            proposalNumber: event.proposal.proposalId,
-            proposalTitle: event.proposal.title,
-            commentForUser: event.proposal.commentForUser,
-          },
-          recipients: [{ address: principalInvestigator.email }],
-        })
-        .then((res: any) => {
-          logger.logInfo('Email sent on proposal notify:', {
-            result: res,
-            event,
-          });
-        })
-        .catch((err: string) => {
-          logger.logError('Could not send email on proposal notify:', {
-            error: err,
-            event,
-          });
-        });
-
-      return;
-    }
     case Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED: {
       const invites = event.array;
 
@@ -334,6 +168,156 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       }
       break;
     }
+
+    case Event.PROPOSAL_CREATED: {
+      const principalInvestigator = await userDataSource.getUser(
+        event.proposal.proposerId
+      );
+
+      const call = await callDataSource.getCall(event.proposal.callId);
+
+      if (!principalInvestigator || !call) {
+        return;
+      }
+
+      const options: EmailSettings = {
+        content: {
+          template_id: 'proposal-created',
+        },
+        substitution_data: {
+          piPreferredname: principalInvestigator.preferredname,
+          piLastname: principalInvestigator.lastname,
+          proposalNumber: event.proposal.proposalId,
+          proposalTitle: event.proposal.title,
+          callShortCode: call.shortCode,
+        },
+        recipients: [{ address: principalInvestigator.email }],
+      };
+
+      mailService
+        .sendMail(options)
+        .then((res: any) => {
+          logger.logInfo('Emails sent on proposal submission:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email(s) on proposal submission:', {
+            error: err,
+            event,
+          });
+        });
+
+      return;
+    }
+
+    case Event.PROPOSAL_SUBMITTED: {
+      const principalInvestigator = await userDataSource.getUser(
+        event.proposal.proposerId
+      );
+      const participants = await userDataSource.getProposalUsersFull(
+        event.proposal.primaryKey
+      );
+      if (!principalInvestigator) {
+        return;
+      }
+
+      const options: EmailSettings = {
+        content: {
+          template_id: 'proposal-submitted',
+        },
+        substitution_data: {
+          piPreferredname: principalInvestigator.preferredname,
+          piLastname: principalInvestigator.lastname,
+          proposalNumber: event.proposal.proposalId,
+          proposalTitle: event.proposal.title,
+          coProposers: participants.map(
+            (partipant) => `${partipant.preferredname} ${partipant.lastname} `
+          ),
+          call: '',
+        },
+        recipients: [
+          { address: principalInvestigator.email },
+          ...participants.map((partipant) => {
+            return {
+              address: {
+                email: partipant.email,
+                header_to: principalInvestigator.email,
+              },
+            };
+          }),
+        ],
+      };
+
+      mailService
+        .sendMail(options)
+        .then((res: any) => {
+          logger.logInfo('Emails sent on proposal submission:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email(s) on proposal submission:', {
+            error: err,
+            event,
+          });
+        });
+
+      return;
+    }
+
+    case Event.PROPOSAL_NOTIFIED: {
+      const principalInvestigator = await userDataSource.getUser(
+        event.proposal.proposerId
+      );
+      if (!principalInvestigator) {
+        return;
+      }
+      const { finalStatus } = event.proposal;
+      let templateId = '';
+      if (finalStatus === ProposalEndStatus.ACCEPTED) {
+        templateId = 'Accepted-Proposal';
+      } else if (finalStatus === ProposalEndStatus.REJECTED) {
+        templateId = 'Rejected-Proposal';
+      } else if (finalStatus === ProposalEndStatus.RESERVED) {
+        templateId = 'Reserved-Proposal';
+      } else {
+        logger.logError('Failed email notification', { event });
+
+        return;
+      }
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+          },
+          substitution_data: {
+            piPreferredname: principalInvestigator.preferredname,
+            piLastname: principalInvestigator.lastname,
+            proposalNumber: event.proposal.proposalId,
+            proposalTitle: event.proposal.title,
+            commentForUser: event.proposal.commentForUser,
+          },
+          recipients: [{ address: principalInvestigator.email }],
+        })
+        .then((res: any) => {
+          logger.logInfo('Email sent on proposal notify:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on proposal notify:', {
+            error: err,
+            event,
+          });
+        });
+
+      return;
+    }
     case Event.FAP_REVIEWER_NOTIFIED: {
       const { id: reviewId, userID, proposalPk } = event.fapReview;
       const fapReviewer = await userDataSource.getUser(userID);
@@ -346,7 +330,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: EmailTemplateId.REVIEW_REMINDER,
+            template_id: 'review-reminder',
           },
           substitution_data: {
             fapReviewerPreferredName: fapReviewer.preferredname,
@@ -422,12 +406,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         }
       }
 
-      let templateId = EmailTemplateId.INTERNAL_REVIEW_CREATED;
+      let templateId = 'internal-review-created';
 
       if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
-        templateId = EmailTemplateId.INTERNAL_REVIEW_UPDATED;
+        templateId = 'internal-review-updated';
       } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
-        templateId = EmailTemplateId.INTERNAL_REVIEW_DELETED;
+        templateId = 'internal-review-deleted';
       }
 
       mailService
@@ -485,20 +469,20 @@ export async function getTemplateIdForInvite(
   ]);
 
   if (coProposerClaim.length > 0) {
-    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER;
+    return 'user-office-registration-invitation-co-proposer';
   }
 
   if (visitRegClaim.length > 0) {
-    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION;
+    return 'user-office-registration-invitation-visit-registration';
   }
 
   if (roleClaims.length > 0) {
     const { roleId } = roleClaims[0];
     switch (roleId) {
       case UserRole.INTERNAL_REVIEWER:
-        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
+        return 'user-office-registration-invitation-reviewer';
       case UserRole.USER:
-        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER;
+        return 'user-office-registration-invitation-user';
       default:
         throw new Error(
           `Unsupported role \"${roleId}\" for invite ${inviteId}`
