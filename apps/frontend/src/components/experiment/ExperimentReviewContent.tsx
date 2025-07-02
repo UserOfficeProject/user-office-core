@@ -299,7 +299,9 @@ const ExperimentReviewContent = ({
                 }
               />
             ) : (
-              <>Experiment Safety Not Submitted by the User</>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <h2>Experiment Safety Not Submitted by the User</h2>
+              </Box>
             )}
           </Fragment>
         );

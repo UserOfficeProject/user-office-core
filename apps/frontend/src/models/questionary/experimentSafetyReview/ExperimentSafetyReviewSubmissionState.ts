@@ -1,6 +1,6 @@
 import { immerable } from 'immer';
 
-import { Questionary } from 'generated/sdk';
+import { Questionary, UserRole } from 'generated/sdk';
 
 import { ExperimentSafetyReviewWithQuestionary } from './ExperimentSafetyReviewWithQuestionary';
 import { TemplateGroupId } from '../../../generated/sdk';
@@ -8,10 +8,18 @@ import { QuestionarySubmissionState } from '../QuestionarySubmissionState';
 
 export class ExperimentSafetyReviewSubmissionState extends QuestionarySubmissionState {
   [immerable] = true;
-  constructor(public experimentSafety: ExperimentSafetyReviewWithQuestionary) {
-    super(TemplateGroupId.EXP_SAFETY_REVIEW, {
-      questionary: experimentSafety.safetyReviewQuestionary,
-    });
+  constructor(
+    public experimentSafety: ExperimentSafetyReviewWithQuestionary,
+    public currentUserRole?: UserRole | null,
+    public isPreviewMode?: boolean
+  ) {
+    super(
+      TemplateGroupId.EXP_SAFETY_REVIEW,
+      {
+        questionary: experimentSafety.safetyReviewQuestionary,
+      },
+      isPreviewMode
+    );
     this.stepIndex = this.getInitialStepIndex();
   }
 

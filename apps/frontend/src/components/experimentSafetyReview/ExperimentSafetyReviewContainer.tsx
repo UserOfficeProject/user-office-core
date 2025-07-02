@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { default as React, useState } from 'react';
+import { default as React, useContext, useState } from 'react';
 
 import Questionary from 'components/questionary/Questionary';
 import {
   QuestionaryContext,
   QuestionaryContextType,
 } from 'components/questionary/QuestionaryContext';
+import { UserContext } from 'context/UserContextProvider';
 import { TemplateGroupId } from 'generated/sdk';
 import { ExperimentSafetyReviewSubmissionState } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewSubmissionState';
 import { ExperimentSafetyReviewWithQuestionary } from 'models/questionary/experimentSafetyReview/ExperimentSafetyReviewWithQuestionary';
@@ -71,8 +72,14 @@ export interface ExperimentSafetyReviewContainerProps {
 export default function ExperimentSafetyReviewContainer(
   props: ExperimentSafetyReviewContainerProps
 ) {
+  const { currentRole } = useContext(UserContext);
+
   const [initialState] = useState(
-    new ExperimentSafetyReviewSubmissionState(props.experimentSafety)
+    new ExperimentSafetyReviewSubmissionState(
+      props.experimentSafety,
+      currentRole,
+      props.previewMode
+    )
   );
 
   const eventHandlers = useEventHandlers(TemplateGroupId.EXP_SAFETY_REVIEW);
