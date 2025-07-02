@@ -13,12 +13,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
-import {
-  Experiment,
-  ExperimentSafetyReviewerDecisionEnum,
-  ExperimentStatus,
-  InstrumentScientistDecisionEnum,
-} from '../../models/Experiment';
+import { Experiment, ExperimentStatus } from '../../models/Experiment';
 import { ExperimentSafetyPdfTemplate } from '../../models/ExperimentSafetyPdfTemplate';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
@@ -1486,9 +1481,9 @@ export interface ExperimentSafetyRecord {
   readonly reviewed_by: number;
   readonly created_at: Date;
   readonly updated_at: Date;
-  readonly instrument_scientist_decision: InstrumentScientistDecisionEnum;
+  readonly instrument_scientist_decision: number;
   readonly instrument_scientist_decision_comment: string;
-  readonly experiment_safety_reviewer_decision: ExperimentSafetyReviewerDecisionEnum;
+  readonly experiment_safety_reviewer_decision: number;
   readonly experiment_safety_reviewer_decision_comment: string;
 }
 

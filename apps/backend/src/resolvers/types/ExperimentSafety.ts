@@ -57,13 +57,13 @@ export class ExperimentSafety implements ExperimentSafetyOrigin {
   @Field(() => Date)
   public updatedAt: Date;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => InstrumentScientistDecisionEnum, { nullable: true })
   public instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
 
   @Field(() => String, { nullable: true })
   public instrumentScientistComment: string | null;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => ExperimentSafetyReviewerDecisionEnum, { nullable: true })
   public experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
 
   @Field(() => String, { nullable: true })

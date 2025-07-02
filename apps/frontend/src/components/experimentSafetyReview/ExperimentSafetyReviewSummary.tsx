@@ -6,7 +6,7 @@ import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 
 import { NavigButton } from 'components/common/NavigButton';
 import NavigationFragment from 'components/questionary/NavigationFragment';
@@ -31,14 +31,55 @@ function ExperimentSafetyReviewSummary({
   confirm,
 }: ExperimentSafetyReviewSummaryProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [decision, setDecision] = useState<'ACCEPTED' | 'REJECTED'>('ACCEPTED');
-  const [comment, setComment] = useState<string>('');
   const { api } = useDataApiWithFeedback();
   const { currentRole } = useContext(UserContext);
 
   const { state, dispatch } = useContext(
     QuestionaryContext
   ) as ExperimentSafetyReviewContextType;
+
+  // Initialize decision and comment based on current role and existing data
+  const getInitialDecision = useMemo(() => {
+    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+      const decision = state?.experimentSafety.instrumentScientistDecision;
+      if (decision === InstrumentScientistDecisionEnum.ACCEPTED)
+        return 'ACCEPTED';
+      if (decision === InstrumentScientistDecisionEnum.REJECTED)
+        return 'REJECTED';
+    } else {
+      const decision = state?.experimentSafety.experimentSafetyReviewerDecision;
+      if (decision === ExperimentSafetyReviewerDecisionEnum.ACCEPTED)
+        return 'ACCEPTED';
+      if (decision === ExperimentSafetyReviewerDecisionEnum.REJECTED)
+        return 'REJECTED';
+    }
+
+    return '';
+  }, [
+    currentRole,
+    state?.experimentSafety.instrumentScientistDecision,
+    state?.experimentSafety.experimentSafetyReviewerDecision,
+  ]);
+
+  const getInitialComment = useMemo(() => {
+    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+      return state?.experimentSafety.instrumentScientistComment || '';
+    } else {
+      return state?.experimentSafety.experimentSafetyReviewerComment || '';
+    }
+  }, [
+    currentRole,
+    state?.experimentSafety.instrumentScientistComment,
+    state?.experimentSafety.experimentSafetyReviewerComment,
+  ]);
+
+  const [decision, setDecision] = useState<'ACCEPTED' | 'REJECTED' | ''>(
+    getInitialDecision
+  );
+  const [comment, setComment] = useState<string>(getInitialComment);
+  const [isFormLocked, setIsFormLocked] = useState<boolean>(
+    getInitialDecision !== ''
+  );
 
   const downloadExperimentSafety = useDownloadPDFExperimentSafety();
 
@@ -64,16 +105,21 @@ function ExperimentSafetyReviewSummary({
           id="technique-select"
           aria-labelledby="exp-safety-review"
           onChange={(e) => {
-            setDecision(e.target.value as 'ACCEPTED' | 'REJECTED');
+            setDecision(e.target.value as 'ACCEPTED' | 'REJECTED' | '');
           }}
           value={decision}
           data-cy="safety-review-decision"
+          displayEmpty
+          disabled={isFormLocked}
         >
+          <MenuItem value="" disabled>
+            <em>Make a Decision</em>
+          </MenuItem>
           <ListSubheader sx={{ lineHeight: 1 }}>
             <Divider>Decision</Divider>
           </ListSubheader>
-          <MenuItem value={'ACCEPTED'}>APPROVE</MenuItem>
-          <MenuItem value={'REJECTED'}>REJECT</MenuItem>
+          <MenuItem value={'ACCEPTED'}>ACCEPTED</MenuItem>
+          <MenuItem value={'REJECTED'}>REJECTED</MenuItem>
         </Select>
       </FormControl>
 
@@ -87,6 +133,7 @@ function ExperimentSafetyReviewSummary({
           onChange={(e) => setComment(e.target.value)}
           variant="outlined"
           data-cy="safety-review-comment"
+          disabled={isFormLocked}
         />
       </FormControl>
 
@@ -98,16 +145,25 @@ function ExperimentSafetyReviewSummary({
         >
           Back
         </NavigButton>
-        <NavigButton
-          onClick={() => {
-            confirm(
-              async () => {
-                setIsSubmitting(true);
-                try {
-                  if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
-                    // Call the instrument scientist mutation
-                    const { submitInstrumentScientistExperimentSafetyReview } =
-                      await api({
+        {isFormLocked ? (
+          <NavigButton
+            onClick={() => setIsFormLocked(false)}
+            data-cy="button-change-decision"
+          >
+            Change Decision
+          </NavigButton>
+        ) : (
+          <NavigButton
+            onClick={() => {
+              confirm(
+                async () => {
+                  setIsSubmitting(true);
+                  try {
+                    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+                      // Call the instrument scientist mutation
+                      const {
+                        submitInstrumentScientistExperimentSafetyReview,
+                      } = await api({
                         toastSuccessMessage:
                           'Safety review submitted successfully',
                       }).submitInstrumentScientistExperimentSafetyReview({
@@ -117,58 +173,62 @@ function ExperimentSafetyReviewSummary({
                         comment: comment,
                       });
 
-                    dispatch({
-                      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                      itemWithQuestionary:
-                        submitInstrumentScientistExperimentSafetyReview,
-                    });
-                    dispatch({
-                      type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                      itemWithQuestionary:
-                        submitInstrumentScientistExperimentSafetyReview,
-                    });
-                  } else {
-                    // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
-                    const {
-                      submitExperimentSafetyReviewerExperimentSafetyReview,
-                    } = await api({
-                      toastSuccessMessage:
-                        'Safety review submitted successfully',
-                    }).submitExperimentSafetyReviewerExperimentSafetyReview({
-                      experimentSafetyPk:
-                        state.experimentSafety.experimentSafetyPk,
-                      decision:
-                        decision as ExperimentSafetyReviewerDecisionEnum,
-                      comment: comment,
-                    });
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                        itemWithQuestionary:
+                          submitInstrumentScientistExperimentSafetyReview,
+                      });
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                        itemWithQuestionary:
+                          submitInstrumentScientistExperimentSafetyReview,
+                      });
+                    } else {
+                      // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
+                      const {
+                        submitExperimentSafetyReviewerExperimentSafetyReview,
+                      } = await api({
+                        toastSuccessMessage:
+                          'Safety review submitted successfully',
+                      }).submitExperimentSafetyReviewerExperimentSafetyReview({
+                        experimentSafetyPk:
+                          state.experimentSafety.experimentSafetyPk,
+                        decision:
+                          decision as ExperimentSafetyReviewerDecisionEnum,
+                        comment: comment,
+                      });
 
-                    dispatch({
-                      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
-                      itemWithQuestionary:
-                        submitExperimentSafetyReviewerExperimentSafetyReview,
-                    });
-                    dispatch({
-                      type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
-                      itemWithQuestionary:
-                        submitExperimentSafetyReviewerExperimentSafetyReview,
-                    });
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                        itemWithQuestionary:
+                          submitExperimentSafetyReviewerExperimentSafetyReview,
+                      });
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                        itemWithQuestionary:
+                          submitExperimentSafetyReviewerExperimentSafetyReview,
+                      });
+                    }
+                    // Lock the form after successful submission
+                    setIsFormLocked(true);
+                  } finally {
+                    setIsSubmitting(false);
                   }
-                } finally {
-                  setIsSubmitting(false);
+                },
+                {
+                  title: 'Please confirm',
+                  description:
+                    'Are you sure want to submit the Experiment Safety Review?',
                 }
-              },
-              {
-                title: 'Please confirm',
-                description:
-                  'Are you sure want to submit the Experiment Safety Review?',
-              }
-            )();
-          }}
-          isBusy={isSubmitting}
-          data-cy="button-submit-experiment-safety-review"
-        >
-          {false ? '✔ Submitted' : 'Submit'}
-        </NavigButton>
+              )();
+            }}
+            isBusy={isSubmitting}
+            disabled={!decision}
+            data-cy="button-submit-experiment-safety-review"
+          >
+            {false ? '✔ Submitted' : 'Submit'}
+          </NavigButton>
+        )}
         <Button
           onClick={() =>
             downloadExperimentSafety(
