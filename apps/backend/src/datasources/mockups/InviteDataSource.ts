@@ -122,9 +122,9 @@ export class InviteDataSourceMock implements InviteDataSource {
     note: string;
     createdByUserId: number;
     expiresAt: Date | null;
-    template?: string | null;
+    templateId?: string | null;
   }): Promise<Invite> {
-    const { code, email, createdByUserId, expiresAt, template } = args;
+    const { code, email, createdByUserId, expiresAt, templateId } = args;
 
     const newInvite = new Invite(
       this.invites.length + 1, // Generate new ID
@@ -136,7 +136,7 @@ export class InviteDataSourceMock implements InviteDataSource {
       null,
       false,
       expiresAt ?? null,
-      template ?? null
+      templateId ?? null
     );
 
     this.invites.push(newInvite);
