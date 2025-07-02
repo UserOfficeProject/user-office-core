@@ -16,6 +16,9 @@ BEGIN
                 FOREIGN KEY (visit_id) REFERENCES visits(visit_id) ON DELETE CASCADE,
                 UNIQUE (invite_id, visit_id)
             );
+
+            ALTER TABLE visit_registration_claims ADD CONSTRAINT visit_registration_unique
+            UNIQUE (invite_id, visit_id);
         END;
     END IF;
 END;
