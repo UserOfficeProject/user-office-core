@@ -237,6 +237,7 @@ function ExperimentSafetyReviewSummary({
             )
           }
           color="secondary"
+          disabled={state.experimentSafety.status?.shortCode !== 'ESF_APPROVED'}
         >
           Download Safety Review Document
         </Button>
