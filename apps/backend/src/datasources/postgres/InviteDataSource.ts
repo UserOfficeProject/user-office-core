@@ -81,9 +81,9 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     note: string;
     createdByUserId: number;
     expiresAt: Date | null;
-    template?: string | null;
+    templateId?: string | null;
   }): Promise<Invite> {
-    const { code, email, createdByUserId, expiresAt, template } = args;
+    const { code, email, createdByUserId, expiresAt, templateId } = args;
 
     return database
       .insert({
@@ -91,7 +91,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         email: email,
         created_by: createdByUserId,
         expires_at: expiresAt,
-        template_id: template,
+        template_id: templateId,
       })
       .into('invites')
       .returning('*')
