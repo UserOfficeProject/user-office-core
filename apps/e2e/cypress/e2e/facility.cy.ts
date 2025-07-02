@@ -113,5 +113,30 @@ context('Facility tests', () => {
       cy.get('[data-testId=DeleteIcon]').click();
       cy.contains('call 1').should('not.exist');
     });
+
+    it('User officer should not be able to assign instruments to facility that do not share a facility with the selected call', () => {
+      cy.createFacility({ name: facilityName, shortCode: facilityShortCode });
+      cy.createInstrument(instrument1);
+
+      cy.visit('/Facility');
+
+      cy.get('[aria-label="Assign Call"]').click();
+
+      cy.contains('call 1').parent().find('[type="checkbox"]').click();
+
+      cy.get('[data-cy="assign-selected-calls"]').click();
+
+      cy.visit('/Calls');
+      cy.get('[aria-label="Assign Instrument"]').click();
+
+      cy.contains(instrument1.name).parent().find('[type="checkbox"]').click();
+
+      cy.get('[data-cy="assign-instrument-to-call"]').click();
+
+      cy.notification({
+        variant: 'error',
+        text: 'One or more instruments do not share a facility with the selected call',
+      });
+    });
   });
 });
