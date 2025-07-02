@@ -47,14 +47,4 @@ export default class PostgresVisitRegistrationClaimDataSource
       createVisitRegistrationClaimObject(record)
     );
   }
-
-  async findByVisitId(visitId: number): Promise<VisitRegistrationClaim[]> {
-    const records = await database('visit_registration_claims')
-      .select('*')
-      .where('visit_id', visitId);
-
-    return records.map((record: VisitRegistrationClaimRecord) =>
-      createVisitRegistrationClaimObject(record)
-    );
-  }
 }

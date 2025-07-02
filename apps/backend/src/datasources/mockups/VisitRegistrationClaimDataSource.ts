@@ -37,10 +37,4 @@ export class VisitRegistrationClaimDataSourceMock
       (claim) => claim.inviteId === inviteId
     );
   }
-
-  async findByVisitId(visitId: number): Promise<VisitRegistrationClaim[]> {
-    return this.visitRegistrationClaims.filter(
-      (claim) => claim.visitId === visitId
-    );
-  }
 }
