@@ -126,7 +126,10 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
       ) {
-        if (event.experimentSafety) {
+        if (
+          event.experimentSafety &&
+          event.experimentSafety.esiQuestionarySubmittedAt
+        ) {
           // TODO: This needs to be worked on. There is no is_submitted field unlike in experiment_safety_input. Instead we have status field in the new experiment_safety table. The status is not finalized yet. We will work on it, when we get in here
           buttonState = 'completed';
         } else {
