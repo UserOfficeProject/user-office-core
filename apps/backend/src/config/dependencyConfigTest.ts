@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-
-import 'reflect-metadata';
-import { setLogger } from '@user-office-software/duo-logger';
+import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
@@ -113,9 +111,9 @@ mapClass(Tokens.MailService, SkipSendMailService);
 mapValue(Tokens.EmailEventHandler, essEmailHandler);
 
 mapValue(Tokens.ConfigureEnvironment, () => {});
-mapValue(Tokens.ConfigureLogger, () => {
-  setLogger([]);
-});
+mapValue(Tokens.ConfigureLogger, () =>
+  setLogger(new ConsoleLogger({ colorize: true }))
+);
 
 mapClass(Tokens.DownloadService, DefaultDownloadService);
 

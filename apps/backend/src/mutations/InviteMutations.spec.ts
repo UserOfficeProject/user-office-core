@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
+import { InviteDataSource } from '../datasources/InviteDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
@@ -343,6 +344,31 @@ describe('Test Invite Mutations', () => {
       expect.any(String), // changedObjectId (should be the invite ID)
       expect.stringContaining(`Visit registration invite sent to: ${email}`), // description
       undefined
+    );
+  });
+
+  test('Invite should have the templateId set', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const invite = (await container
+      .resolve<InviteDataSource>(Tokens.InviteDataSource)
+      .findById((response as Invite[])[0].id)) as Invite;
+
+    expect(invite.templateId).toBe(
+      'user-office-registration-invitation-co-proposer'
     );
   });
 });
