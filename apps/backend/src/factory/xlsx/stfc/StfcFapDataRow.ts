@@ -63,6 +63,10 @@ export async function getStfcDataRow(
     (user) => user.userNumber === proposer_id?.toString()
   )?.country;
 
+  const piOrg = piDetails.find(
+    (user) => user.userNumber === proposer_id?.toString()
+  )?.orgName;
+
   return {
     ...getDataRow(
       proposalPk,
@@ -80,6 +84,7 @@ export async function getStfcDataRow(
     timeRequested: timeRequested,
     reviews: individualReviews,
     piCountry: piCountry,
+    piOrg: piOrg,
   };
 }
 
@@ -94,6 +99,7 @@ export function populateStfcRow(row: RowObj) {
     row.propShortCode ?? '<missing>',
     row.principalInv ?? '<missing>',
     row.piCountry ?? '<missing>',
+    row.piOrg ?? '<missing>',
     row.instrName ?? '<missing>',
     row.timeRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
@@ -113,6 +119,7 @@ export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
     row.propShortCode ?? '<missing>',
     row.principalInv ?? '<missing>',
     row.piCountry ?? '<missing>',
+    row.piOrg ?? '<missing>',
     row.instrName ?? '<missing>',
     row.timeRequested ?? '<missing>',
     row.propTitle ?? '<missing>',

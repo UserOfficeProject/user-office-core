@@ -88,13 +88,14 @@ export default function createLoggingHandler() {
             );
           }
           break;
+
         case Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT:
         case Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED: {
           let invites;
           if ('invite' in event) {
             invites = [event.invite];
           } else {
-            invites = event.invites;
+            invites = event.array;
           }
           for (const invite of invites) {
             const coProposerInvites =

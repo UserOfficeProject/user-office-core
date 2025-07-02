@@ -8,7 +8,10 @@ import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
@@ -28,11 +31,11 @@ type StfcRolesToEssRole = { [key: string]: Roles[] };
 const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
   'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF Artemis FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF Artemis FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
   'CLF Artemis Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF HPL FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF HPL FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
   'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF LSF FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF LSF FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
   'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
   'FAP Member': [Roles.FAP_REVIEWER],
   'FAP Secretary': [Roles.FAP_SECRETARY],
@@ -489,7 +492,13 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.getRoles();
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
 
