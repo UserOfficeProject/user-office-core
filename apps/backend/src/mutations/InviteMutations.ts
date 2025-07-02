@@ -14,8 +14,9 @@ import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { VisitRegistrationClaimDataSource } from '../datasources/VisitRegistrationClaimDataSource';
-import { Authorized, EventBus } from '../decorators';
+import { Authorized } from '../decorators';
 import { ApplicationEventBus } from '../events';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
@@ -95,7 +96,6 @@ export default class InviteMutations {
   }
 
   @Authorized()
-  @EventBus(Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED)
   public async setCoProposerInvites(
     agent: UserWithRole | null,
     args: SetCoProposerInvitesInput
@@ -146,14 +146,25 @@ export default class InviteMutations {
       })
     );
 
-    return [
+    const invites = [
       ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
       ...newInvites,
     ];
+
+    await this.eventBus.publish({
+      type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+      array: invites,
+      key: 'array',
+      loggedInUserId: agent?.id,
+      inputArgs: JSON.stringify(args),
+      impersonatingUserId: agent ? agent.impersonatingUserId : null,
+      proposalPk: proposalPk,
+    } as ApplicationEvent);
+
+    return invites;
   }
 
   @Authorized()
-  @EventBus(Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED)
   public async setVisitRegistrationInvites(
     agent: UserWithRole | null,
     args: { visitId: number; emails: string[] }
@@ -208,10 +219,25 @@ export default class InviteMutations {
       })
     );
 
-    return [
+    const invites = [
       ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
       ...newInvites,
     ];
+
+    const { primaryKey: proposalPk } =
+      await this.proposalDataSource.getProposalByVisitId(visitId);
+
+    await this.eventBus.publish({
+      type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+      array: invites,
+      key: 'array',
+      loggedInUserId: agent?.id,
+      inputArgs: JSON.stringify(args),
+      impersonatingUserId: agent ? agent.impersonatingUserId : null,
+      proposalPk: proposalPk,
+    } as ApplicationEvent);
+
+    return invites;
   }
   private async processRoleClaims(claimerUserId: number, invite: Invite) {
     const inviteId = invite.id;

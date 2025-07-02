@@ -7,16 +7,14 @@ import { CoProposerClaimDataSource } from '../../datasources/CoProposerClaimData
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { VisitDataSource } from '../../datasources/VisitDataSource';
-import { VisitRegistrationClaimDataSource } from '../../datasources/VisitRegistrationClaimDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { EventBus } from '../../events/eventBus';
 import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
-import { BasicUserDetails, UserRole } from '../../models/User';
+import { BasicUserDetails } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
@@ -284,6 +282,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       return;
     }
+
     case Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED: {
       const invites = event.array;
 
@@ -304,7 +303,11 @@ export async function essEmailHandler(event: ApplicationEvent) {
           return;
         }
 
-        await sendInviteEmail(invite, inviter).then(async () => {
+        await sendInviteEmail(
+          invite,
+          inviter,
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION
+        ).then(async () => {
           await eventBus.publish({
             ...event,
             type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
@@ -315,6 +318,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       }
       break;
     }
+
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
 
@@ -335,7 +339,11 @@ export async function essEmailHandler(event: ApplicationEvent) {
           return;
         }
 
-        await sendInviteEmail(invite, inviter).then(async () => {
+        await sendInviteEmail(
+          invite,
+          inviter,
+          EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+        ).then(async () => {
           await eventBus.publish({
             ...event,
             type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
@@ -345,6 +353,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       }
       break;
     }
+
     case Event.FAP_REVIEWER_NOTIFIED: {
       const { id: reviewId, userID, proposalPk } = event.fapReview;
       const fapReviewer = await userDataSource.getUser(userID);
@@ -399,6 +408,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       return;
     }
+
     case Event.VISIT_REGISTRATION_APPROVED:
     case Event.VISIT_REGISTRATION_CANCELLED: {
       const visitRegistration = await visitDataSource.getRegistration(
@@ -482,59 +492,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 }
 
-export async function getTemplateIdForInvite(
-  inviteId: number
-): Promise<string> {
-  // Resolve all necessary data sources in one go
-  const roleClaimDS = container.resolve<RoleClaimDataSource>(
-    Tokens.RoleClaimDataSource
-  );
-  const coProposerDS = container.resolve<CoProposerClaimDataSource>(
-    Tokens.CoProposerClaimDataSource
-  );
-  const visitRegDS = container.resolve<VisitRegistrationClaimDataSource>(
-    Tokens.VisitRegistrationClaimDataSource
-  );
-
-  // Fetch all claims concurrently
-  const [coProposerClaim, visitRegClaim, roleClaims] = await Promise.all([
-    coProposerDS.findByInviteId(inviteId),
-    visitRegDS.findByInviteId(inviteId),
-    roleClaimDS.findByInviteId(inviteId),
-  ]);
-
-  if (coProposerClaim.length > 0) {
-    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER;
-  }
-
-  if (visitRegClaim) {
-    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION;
-  }
-
-  if (roleClaims.length > 0) {
-    const { roleId } = roleClaims[0];
-    switch (roleId) {
-      case UserRole.INTERNAL_REVIEWER:
-        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
-      case UserRole.USER:
-        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER;
-      default:
-        throw new Error(
-          `Unsupported role \"${roleId}\" for invite ${inviteId}`
-        );
-    }
-  }
-
-  throw new Error(`No valid claim found for invite ${inviteId}`);
-}
-
-async function sendInviteEmail(invite: Invite, inviter: BasicUserDetails) {
+async function sendInviteEmail(
+  invite: Invite,
+  inviter: BasicUserDetails,
+  templateId: EmailTemplateId
+) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const inviteDataSource = container.resolve<InviteDataSource>(
     Tokens.InviteDataSource
   );
-
-  const templateId = await getTemplateIdForInvite(invite.id);
 
   return mailService
     .sendMail({
@@ -554,6 +520,7 @@ async function sendInviteEmail(invite: Invite, inviter: BasicUserDetails) {
       await inviteDataSource.update({
         id: invite.id,
         isEmailSent: true,
+        templateId: templateId,
       });
       logger.logInfo('Successful email transmission', { res });
     })

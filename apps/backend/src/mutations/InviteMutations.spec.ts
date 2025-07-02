@@ -232,9 +232,6 @@ describe('Test Invite Mutations', () => {
 
     expect(response).not.toBeInstanceOf(Rejection);
 
-    // Wait for async handlers to complete
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
     expect(sendMailSpy).toHaveBeenCalledTimes(1);
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -265,8 +262,6 @@ describe('Test Invite Mutations', () => {
       }
     );
     expect(response).not.toBeInstanceOf(Rejection);
-
-    await new Promise((resolve) => setTimeout(resolve, 200));
 
     expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
     expect(setEventInDataSourceSpy).toHaveBeenCalledWith(

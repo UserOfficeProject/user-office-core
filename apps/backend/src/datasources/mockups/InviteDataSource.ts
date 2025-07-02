@@ -57,6 +57,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         null,
         true,
+        null,
         null
       ),
       new Invite(
@@ -68,7 +69,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         1,
         true,
-        null
+        null,
+        'email-template'
       ),
       new Invite(
         3,
@@ -79,7 +81,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         new Date(),
         null,
         false,
-        new Date('2022-01-01')
+        new Date('2022-01-01'),
+        null
       ),
     ];
   }
@@ -131,8 +134,9 @@ export class InviteDataSourceMock implements InviteDataSource {
     note: string;
     createdByUserId: number;
     expiresAt: Date | null;
+    template?: string | null;
   }): Promise<Invite> {
-    const { code, email, note, createdByUserId, expiresAt } = args;
+    const { code, email, createdByUserId, expiresAt, template } = args;
 
     const newInvite = new Invite(
       this.invites.length + 1, // Generate new ID
@@ -143,7 +147,8 @@ export class InviteDataSourceMock implements InviteDataSource {
       null,
       null,
       false,
-      expiresAt ?? null
+      expiresAt ?? null,
+      template ?? null
     );
 
     this.invites.push(newInvite);
@@ -160,6 +165,7 @@ export class InviteDataSourceMock implements InviteDataSource {
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
     expiresAt?: Date | null;
+    template?: string | null;
   }): Promise<Invite> {
     const invite = await this.findById(args.id);
     if (!invite) {

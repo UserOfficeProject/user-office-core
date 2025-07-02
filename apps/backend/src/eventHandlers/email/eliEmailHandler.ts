@@ -3,15 +3,12 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
-import { CoProposerClaimDataSource } from '../../datasources/CoProposerClaimDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
-import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { VisitRegistrationClaimDataSource } from '../../datasources/VisitRegistrationClaimDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { EventBus } from '../../events/eventBus';
@@ -107,37 +104,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       return;
     }
 
-    case Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED: {
-      const invites = event.array;
-
-      for (const invite of invites) {
-        if (invite.isEmailSent) {
-          continue;
-        }
-        const inviter = await userDataSource.getBasicUserInfo(
-          invite.createdByUserId
-        );
-
-        if (!inviter) {
-          logger.logError('No inviter found when trying to send email', {
-            inviter,
-            event,
-          });
-
-          return;
-        }
-
-        await sendInviteEmail(invite, inviter).then(async () => {
-          await eventBus.publish({
-            ...event,
-            type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
-            description: 'Visit registration invite sent',
-            invite,
-          });
-        });
-      }
-      break;
-    }
     case Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED: {
       const invites = event.array;
 
@@ -158,7 +124,11 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           return;
         }
 
-        await sendInviteEmail(invite, inviter).then(async () => {
+        await sendInviteEmail(
+          invite,
+          inviter,
+          'user-office-registration-invitation'
+        ).then(async () => {
           await eventBus.publish({
             ...event,
             type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
@@ -448,58 +418,15 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   }
 }
 
-export async function getTemplateIdForInvite(
-  inviteId: number
-): Promise<string> {
-  const roleClaimDS = container.resolve<RoleClaimDataSource>(
-    Tokens.RoleClaimDataSource
-  );
-  const coProposerDS = container.resolve<CoProposerClaimDataSource>(
-    Tokens.CoProposerClaimDataSource
-  );
-  const visitRegDS = container.resolve<VisitRegistrationClaimDataSource>(
-    Tokens.VisitRegistrationClaimDataSource
-  );
-
-  // Fetch all claims concurrently
-  const [coProposerClaim, visitRegClaim, roleClaims] = await Promise.all([
-    coProposerDS.findByInviteId(inviteId),
-    visitRegDS.findByInviteId(inviteId),
-    roleClaimDS.findByInviteId(inviteId),
-  ]);
-
-  if (coProposerClaim.length > 0) {
-    return 'user-office-registration-invitation-co-proposer';
-  }
-
-  if (visitRegClaim.length > 0) {
-    return 'user-office-registration-invitation-visit-registration';
-  }
-
-  if (roleClaims.length > 0) {
-    const { roleId } = roleClaims[0];
-    switch (roleId) {
-      case UserRole.INTERNAL_REVIEWER:
-        return 'user-office-registration-invitation-reviewer';
-      case UserRole.USER:
-        return 'user-office-registration-invitation-user';
-      default:
-        throw new Error(
-          `Unsupported role \"${roleId}\" for invite ${inviteId}`
-        );
-    }
-  }
-
-  throw new Error(`No valid claim found for invite ${inviteId}`);
-}
-
-async function sendInviteEmail(invite: Invite, inviter: BasicUserDetails) {
+async function sendInviteEmail(
+  invite: Invite,
+  inviter: BasicUserDetails,
+  templateId: string
+) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const inviteDataSource = container.resolve<InviteDataSource>(
     Tokens.InviteDataSource
   );
-
-  const templateId = await getTemplateIdForInvite(invite.id);
 
   return mailService
     .sendMail({
@@ -519,6 +446,7 @@ async function sendInviteEmail(invite: Invite, inviter: BasicUserDetails) {
       await inviteDataSource.update({
         id: invite.id,
         isEmailSent: true,
+        templateId: templateId,
       });
       logger.logInfo('Successful email transmission', { res });
     })

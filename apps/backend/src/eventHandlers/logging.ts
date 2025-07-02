@@ -39,11 +39,6 @@ export default function createLoggingHandler() {
       Tokens.CoProposerClaimDataSource
     );
 
-  // const visitRegistrationClaimDataSource =
-  //   container.resolve<VisitRegistrationClaimDataSource>(
-  //     Tokens.VisitRegistrationClaimDataSource
-  //   );
-
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);
@@ -94,35 +89,33 @@ export default function createLoggingHandler() {
           break;
         }
         case Event.PROPOSAL_CO_PROPOSER_INVITE_SENT: {
-          const { invite } = event;
-          const proposal = await proposalDataSource.getProposalByVisitId(
-            invite.id
-          );
+          const { invite, proposalPk } = event;
 
-          return eventLogsDataSource.set(
+          eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
-            proposal.primaryKey.toString(),
+            proposalPk.toString(),
             `Co-proposer invite sent to: ${invite.email}`,
             event.impersonatingUserId
           );
+
+          break;
         }
 
         case Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT: {
-          const { invite } = event;
-          const proposal = await proposalDataSource.getProposalByVisitId(
-            invite.id
-          );
+          const { invite, proposalPk } = event;
 
-          return eventLogsDataSource.set(
+          eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
-            proposal.primaryKey.toString(),
+            proposalPk.toString(),
             `Visit registration invite sent to: ${invite.email}`,
             event.impersonatingUserId
           );
+
+          break;
         }
 
         case Event.PROPOSAL_INSTRUMENTS_SELECTED: {

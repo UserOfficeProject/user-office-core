@@ -220,11 +220,13 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
 interface ProposalCoProposerInvitesUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED;
   array: Invite[];
+  proposalPk: number;
 }
 
 interface ProposalCoProposerInviteSentEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT;
   invite: Invite;
+  proposalPk: number;
 }
 
 interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
@@ -235,11 +237,13 @@ interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
 interface ProposalVisitRegistrationInvitesUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED;
   array: Invite[];
+  proposalPk: number;
 }
 
 interface ProposalVisitRegistrationInviteSentEvent extends GeneralEvent {
   type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT;
   invite: Invite;
+  proposalPk: number;
 }
 
 interface ProposalVisitRegistrationInviteAcceptedEvent extends GeneralEvent {
