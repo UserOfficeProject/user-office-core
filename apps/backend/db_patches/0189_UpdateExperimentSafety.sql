@@ -8,6 +8,7 @@ BEGIN
     ALTER TABLE experiment_safety ADD COLUMN IF NOT EXISTS "experiment_safety_reviewer_decision_comment" text;
     ALTER TABLE experiment_safety DROP COLUMN IF EXISTS "status";
     ALTER TABLE experiment_safety ADD COLUMN IF NOT EXISTS "status_id" int;
+    CREATE UNIQUE INDEX experiment_safety_experiment_pk_idx ON experiment_safety(experiment_pk)
   END IF;
 END;
 $$
