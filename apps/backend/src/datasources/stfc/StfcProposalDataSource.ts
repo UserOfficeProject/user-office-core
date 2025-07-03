@@ -143,6 +143,7 @@ export default class StfcProposalDataSource extends PostgresProposalDataSource {
               { userId: user.id }
             )
             .orWhereRaw(
+              // This query finds proposals where the current user is a scientist on an instrument that allows multiple technical reviews
               // eslint-disable-next-line prettier/prettier
               'jsonb_path_exists(instruments, \'$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)\')',
               { userId: user.id }
