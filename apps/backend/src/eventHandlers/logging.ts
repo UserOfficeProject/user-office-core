@@ -80,7 +80,7 @@ export default function createLoggingHandler() {
                 event.type,
                 json,
                 coProposerInvite.proposalPk.toString(),
-                `Visit registration claim accepted: ${invite.email}`,
+                `Co-proposer invite accepted: ${invite.email}`,
                 event.impersonatingUserId
               );
             })
