@@ -288,6 +288,7 @@ const ProposalReviewContent = ({
         <SimpleTabs
           tabNames={tabNames.map((name) => t(name))}
           isInsideModal={isInsideModal}
+          data-cy="proposal-review-tabs"
         >
           {tabsContent}
         </SimpleTabs>

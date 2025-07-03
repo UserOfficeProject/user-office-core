@@ -143,7 +143,7 @@ context('Invites tests', () => {
       cy.getAndStoreFeaturesEnabled();
     });
 
-    it('Should be able to accept invite', function () {
+    it('Should be able to accept invite and then see that in log', function () {
       if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
         this.skip();
       }
@@ -162,7 +162,19 @@ context('Invites tests', () => {
           'contain.text',
           initialDBData.users.user3.lastName
         );
+        cy.logout();
+
+        cy.login('officer', initialDBData.roles.userOfficer);
+        cy.visit('/');
       });
+      cy.get('[data-testid="VisibilityIcon"] > path').click();
+      cy.get('[data-cy="proposal-review-tabs"]').contains('Logs').click();
+      cy.get('[data-cy="event-logs-table"]').contains(
+        'PROPOSAL_CO_PROPOSER_INVITE_SENT'
+      );
+      cy.get('[data-cy="event-logs-table"]').contains(
+        'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED'
+      );
     });
   });
 });
