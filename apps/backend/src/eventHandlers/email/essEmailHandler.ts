@@ -498,16 +498,16 @@ export async function getTemplateIdForInvite(
   ]);
 
   if (coProposerClaim.length > 0) {
-    return 'user-office-registration-invitation-co-proposer';
+    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER;
   }
 
   if (roleClaims.length > 0) {
     const { roleId } = roleClaims[0];
     switch (roleId) {
       case UserRole.INTERNAL_REVIEWER:
-        return 'user-office-registration-invitation-reviewer';
+        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
       case UserRole.USER:
-        return 'user-office-registration-invitation-user';
+        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER;
       default:
         throw new Error(
           `Unsupported role \"${roleId}\" for invite ${inviteId}`
