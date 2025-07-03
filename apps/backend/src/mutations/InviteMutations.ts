@@ -150,7 +150,7 @@ export default class InviteMutations {
       loggedInUserId: agent?.id,
       inputArgs: JSON.stringify(args),
       impersonatingUserId: agent ? agent.impersonatingUserId : null,
-      proposalPk: proposalPk,
+      proposalPKey: proposalPk,
     } as ApplicationEvent);
 
     return invites;
@@ -204,6 +204,7 @@ export default class InviteMutations {
         loggedInUserId: claimerUserId,
         invite: invite,
         description: `User with ID ${claimerUserId} accepted invite for proposal ${claim.proposalPk}`,
+        proposalPKey: claim.proposalPk,
       });
     }
   }

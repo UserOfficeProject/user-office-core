@@ -3,7 +3,6 @@ import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { CoProposerClaimDataSource } from '../datasources/CoProposerClaimDataSource';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { InstrumentDataSource } from '../datasources/InstrumentDataSource';
@@ -34,11 +33,6 @@ export default function createLoggingHandler() {
     Tokens.ProposalDataSource
   );
 
-  const coProposerClaimDataSource =
-    container.resolve<CoProposerClaimDataSource>(
-      Tokens.CoProposerClaimDataSource
-    );
-
   // Handler that logs every mutation wrapped with the event bus event to logger and event_logs table.
   return async function loggingHandler(event: ApplicationEvent) {
     const json = JSON.stringify(event);
@@ -68,35 +62,28 @@ export default function createLoggingHandler() {
           );
           break;
         case Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED: {
-          const { invite } = event;
+          const { invite, proposalPKey } = event;
 
-          const coProposerInvites =
-            await coProposerClaimDataSource.findByInviteId(invite.id);
-
-          await Promise.all(
-            coProposerInvites.map(async (coProposerInvite) => {
-              return eventLogsDataSource.set(
-                event.loggedInUserId,
-                event.type,
-                json,
-                coProposerInvite.proposalPk.toString(),
-                `Co-proposer invite accepted: ${invite.email}`,
-                event.impersonatingUserId
-              );
-            })
+          await eventLogsDataSource.set(
+            event.loggedInUserId,
+            event.type,
+            json,
+            proposalPKey.toString(),
+            `Co-proposer invite issued to ${invite.email} accepted by userId: ${event.loggedInUserId}`,
+            event.impersonatingUserId
           );
 
           break;
         }
         case Event.PROPOSAL_CO_PROPOSER_INVITE_SENT: {
-          const { invite, proposalPk } = event;
+          const { invite, proposalPKey } = event;
 
           eventLogsDataSource.set(
             event.loggedInUserId,
             event.type,
             json,
-            proposalPk.toString(),
-            `Co-proposer invite sent to: ${invite.email}`,
+            proposalPKey.toString(),
+            `Co-proposer invite sent to: ${invite.email} by userId: ${event.loggedInUserId}`,
             event.impersonatingUserId
           );
 

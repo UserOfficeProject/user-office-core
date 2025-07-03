@@ -219,18 +219,19 @@ interface ProposalTopicAnsweredEvent extends GeneralEvent {
 interface ProposalCoProposerInvitesUpdatedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED;
   array: Invite[];
-  proposalPk: number;
+  proposalPKey: number;
 }
 
 interface ProposalCoProposerInviteSentEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT;
   invite: Invite;
-  proposalPk: number;
+  proposalPKey: number;
 }
 
 interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
   type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED;
   invite: Invite;
+  proposalPKey: number;
 }
 
 interface UserUpdateEvent extends GeneralEvent {
