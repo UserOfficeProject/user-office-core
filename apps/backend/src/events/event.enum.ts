@@ -44,8 +44,6 @@ export enum Event {
   USER_DELETED = 'USER_DELETED',
   USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
   EMAIL_INVITE_LEGACY = 'EMAIL_INVITE_LEGACY',
-  EMAIL_INVITE = 'EMAIL_INVITE',
-  EMAIL_INVITES = 'EMAIL_INVITES',
   FAP_CREATED = 'FAP_CREATED',
   FAP_UPDATED = 'FAP_UPDATED',
   FAP_MEMBERS_ASSIGNED = 'FAP_MEMBERS_ASSIGNED',
@@ -273,10 +271,6 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
     'Event occurs when co-proposer invite is sent to a user',
-  ],
-  [
-    Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
-    'Event occurs when user accepts the co-proposer claim for a proposal',
   ],
   [
     Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
