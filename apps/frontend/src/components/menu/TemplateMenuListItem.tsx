@@ -24,6 +24,7 @@ import { FeatureId } from 'generated/sdk';
 const menuMap = {
   ProposalPdfTemplates: '/PdfTemplates/proposal',
   ExperimentSafetyPdfTemplates: '/PdfTemplates/experimentSafety',
+  ExperimentSafetyReviewTemplates: '/ExperimentSafetyReviewTemplates',
   ProposalTemplates: '/ProposalTemplates',
   FapReviewTemplates: '/FapReviewTemplates',
   TechnicalReviewTemplates: '/TechnicalReviewTemplates',
@@ -184,7 +185,7 @@ export function TemplateMenuListItem() {
         <Tooltip title="Experiment Safety Review">
           <ListItemButton
             component={NavLink}
-            to="/ExperimentSafetyReviewTemplates"
+            to={menuMap['ExperimentSafetyReviewTemplates']}
           >
             <ListItemIcon>
               <DescriptionIcon />
