@@ -158,7 +158,7 @@ export default class InviteMutations {
       loggedInUserId: agent?.id,
       inputArgs: JSON.stringify(args),
       impersonatingUserId: agent ? agent.impersonatingUserId : null,
-      proposalPk: proposalPk,
+      proposalPKey: proposalPk,
     } as ApplicationEvent);
 
     return invites;
@@ -234,7 +234,7 @@ export default class InviteMutations {
       loggedInUserId: agent?.id,
       inputArgs: JSON.stringify(args),
       impersonatingUserId: agent ? agent.impersonatingUserId : null,
-      proposalPk: proposalPk,
+      proposalPKey: proposalPk,
     } as ApplicationEvent);
 
     return invites;
@@ -287,6 +287,7 @@ export default class InviteMutations {
         loggedInUserId: claimerUserId,
         invite: invite,
         description: `User with ID ${claimerUserId} accepted invite for proposal ${claim.proposalPk}`,
+        proposalPKey: claim.proposalPk,
       });
     }
   }
@@ -321,6 +322,10 @@ export default class InviteMutations {
         .onConflict(['user_id', 'visit_id'])
         .ignore();
 
+      const proposal = await this.proposalDataSource.getProposalByVisitId(
+        claim.visitId
+      );
+
       this.eventBus.publish({
         type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED,
         isRejection: false,
@@ -328,6 +333,7 @@ export default class InviteMutations {
         loggedInUserId: claimerUserId,
         invite: invite,
         description: `User with ID ${claimerUserId} accepted visit invite`,
+        proposalPKey: proposal.primaryKey,
       });
     }
   }
