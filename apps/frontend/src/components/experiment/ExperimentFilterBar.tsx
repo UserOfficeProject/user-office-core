@@ -3,17 +3,15 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import CallFilter from 'components/common/proposalFilters/CallFilter';
-import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
-import StatusFilter from 'components/common/proposalFilters/StatusFilter';
 import {
-  Call,
-  ExperimentsFilter,
-  InstrumentMinimalFragment,
-  Status,
-} from 'generated/sdk';
+  CallFilter,
+  DateFilter,
+  ExperimentSafetyStatusFilter,
+  InstrumentFilter,
+} from 'components/common/experimentFilters';
+import { Call, InstrumentMinimalFragment, Status } from 'generated/sdk';
 
-import DateFilter from './DateFilter';
+import { ExperimentsFilter } from '../experiment/ExperimentsPage';
 
 type ExperimentFilterBarProps = {
   calls?: {
@@ -34,23 +32,40 @@ function ExperimentFilterBar({
   filter,
 }: ExperimentFilterBarProps) {
   const [searchParams, setSearchParam] = useSearchParams();
-  const experimentFromDate = searchParams.get('from');
-  const experimentToDate = searchParams.get('to');
+  const experimentStartDate = searchParams.get('experimentStartDate');
+  const experimentEndDate = searchParams.get('experimentEndDate');
 
-  const handleOnChange = (format: string, from?: Date, to?: Date) => {
+  const handleOnChange = (
+    format: string,
+    experimentStartDate?: Date,
+    experimentEndDate?: Date
+  ) => {
     setSearchParam((searchParam) => {
-      searchParam.delete('from');
-      searchParam.delete('to');
+      searchParam.delete('experimentStartDate');
+      searchParam.delete('experimentEndDate');
 
-      if (from) {
-        searchParam.set('from', DateTime.fromJSDate(from).toFormat(format));
+      if (experimentStartDate) {
+        searchParam.set(
+          'experimentStartDate',
+          DateTime.fromJSDate(experimentStartDate).toFormat(format)
+        );
       }
 
-      if (to) {
-        searchParam.set('to', DateTime.fromJSDate(to).toFormat(format));
+      if (experimentEndDate) {
+        searchParam.set(
+          'experimentEndDate',
+          DateTime.fromJSDate(experimentEndDate).toFormat(format)
+        );
       }
 
       return searchParam;
+    });
+
+    // Update the filter with the new experimentStartDate and experimentEndDate
+    setExperimentFilter({
+      ...filter,
+      experimentStartDate: experimentStartDate,
+      experimentEndDate: experimentEndDate,
     });
   };
 
@@ -85,13 +100,13 @@ function ExperimentFilterBar({
         />
       </Grid>
       <Grid item sm={4} xs={12}>
-        <StatusFilter
+        <ExperimentSafetyStatusFilter
           statusId={filter.experimentSafetyStatusId as number}
           statuses={experimentStatuses?.data}
           isLoading={experimentStatuses?.isLoading}
           shouldShowAll={true}
           hiddenStatuses={[]}
-          onChange={(experimentSafetyStatusId) => {
+          onChange={(experimentSafetyStatusId: number) => {
             setExperimentFilter({
               ...filter,
               experimentSafetyStatusId,
@@ -101,8 +116,8 @@ function ExperimentFilterBar({
       </Grid>
       <Grid item xs={12}>
         <DateFilter
-          from={experimentFromDate ?? undefined}
-          to={experimentToDate ?? undefined}
+          experimentStartDate={experimentStartDate ?? undefined}
+          experimentEndDate={experimentEndDate ?? undefined}
           onChange={handleOnChange}
           data-cy="date-filter"
         />

@@ -26,16 +26,10 @@ class TimeSpan {
 @InputType()
 export class ExperimentsFilter {
   @Field({ nullable: true })
-  endsBefore?: Date;
+  experimentStartDate?: Date;
 
   @Field({ nullable: true })
-  endsAfter?: Date;
-
-  @Field({ nullable: true })
-  startsBefore?: Date;
-
-  @Field({ nullable: true })
-  startsAfter?: Date;
+  experimentEndDate?: Date;
 
   @Field(() => Int, { nullable: true })
   callId?: number;

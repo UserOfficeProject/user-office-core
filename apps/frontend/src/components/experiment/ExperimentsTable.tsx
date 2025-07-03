@@ -8,7 +8,7 @@ import { IconButton, Tooltip, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { Experiment, ExperimentsFilter, SettingsId } from 'generated/sdk';
+import { Experiment, SettingsId } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -16,6 +16,7 @@ import ExperimentReviewContent, {
   EXPERIMENT_MODAL_TAB_NAMES,
 } from './ExperimentReviewContent';
 import ExperimentReviewModal from './ExperimentReviewModal';
+import { ExperimentsFilter } from './ExperimentsPage';
 
 type ExperimentsTableProps = {
   experimentsFilter: ExperimentsFilter;
@@ -46,6 +47,8 @@ const RowActionButtons = (rowData: Experiment) => {
 export default function ExperimentsTable({
   experimentsFilter,
 }: ExperimentsTableProps) {
+  const tableRef = React.useRef<MaterialTable<Experiment>>();
+
   const { api } = useDataApiWithFeedback();
   const [searchParams, setSearchParams] = useSearchParams();
   const [tableData, setTableData] = useState<Experiment[]>([]);
@@ -56,6 +59,10 @@ export default function ExperimentsTable({
   const pageSize = searchParams.get('pageSize');
   const selectedExperimentId = searchParams.get('experiment');
 
+  const refreshTableData = () => {
+    tableRef.current?.onQueryChange({});
+  };
+
   React.useEffect(() => {
     setSelectedExperiment(
       tableData.find(
@@ -64,6 +71,19 @@ export default function ExperimentsTable({
       )
     );
   }, [selectedExperimentId, tableData]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    if (isMounted) {
+      refreshTableData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(experimentsFilter)]);
 
   const { toFormattedDateTime } = useFormattedDateTime({
     shouldUseTimeZone: true,
@@ -74,11 +94,21 @@ export default function ExperimentsTable({
     new Promise<QueryResult<Experiment>>(async (resolve, reject) => {
       try {
         const [orderBy] = tableQuery.orderByCollection;
-        const { callId } = experimentsFilter;
-
+        const {
+          callId,
+          instrumentId,
+          experimentSafetyStatusId,
+          experimentStartDate,
+          experimentEndDate,
+        } = experimentsFilter;
         const { allExperiments } = await api().getAllExperiments({
           filter: {
-            callId: callId,
+            callId,
+            instrumentId,
+            experimentSafetyStatusId,
+            // Type assertion to tell TypeScript these fields are valid
+            ...(experimentStartDate ? { experimentStartDate } : {}),
+            ...(experimentEndDate ? { experimentEndDate } : {}),
           },
           sortField: orderBy?.orderByField,
           sortDirection: orderBy?.orderDirection,
@@ -174,6 +204,7 @@ export default function ExperimentsTable({
   return (
     <>
       <MaterialTable
+        tableRef={tableRef}
         title={
           <Typography variant="h6" component="h2">
             Experiments
@@ -187,9 +218,14 @@ export default function ExperimentsTable({
           initialPage: search ? 0 : page ? +page : 0,
         }}
         onSearchChange={(searchText) => {
-          setSearchParams({
-            search: searchText ? searchText : '',
-            page: searchText ? '0' : page || '',
+          setSearchParams((searchParams) => {
+            if (searchText) {
+              searchParams.set('search', searchText);
+            } else {
+              searchParams.delete('search');
+            }
+
+            return searchParams;
           });
         }}
         onPageChange={(page) => {

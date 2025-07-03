@@ -584,23 +584,26 @@ export default class PostgresExperimentDataSource
         'experiments.proposal_pk'
       )
       .modify((query) => {
-        if (filter?.endsBefore) {
-          query.where('ends_at', '<', filter.endsBefore);
+        if (filter?.experimentEndDate) {
+          query.where('ends_at', '<=', filter.experimentEndDate);
         }
-        if (filter?.endsAfter) {
-          query.where('ends_at', '>', filter.endsAfter);
-        }
-        if (filter?.startsBefore) {
-          query.where('starts_at', '<', filter.startsBefore);
-        }
-        if (filter?.startsAfter) {
-          query.where('starts_at', '>', filter.startsAfter);
+        if (filter?.experimentStartDate) {
+          query.where('starts_at', '>=', filter.experimentStartDate);
         }
         if (filter?.instrumentId) {
           query.where('instrument_id', filter.instrumentId);
         }
         if (filter?.experimentSafetyStatusId) {
-          query.where('status', filter?.experimentSafetyStatusId);
+          query
+            .leftJoin(
+              'experiment_safety',
+              'experiments.experiment_pk',
+              'experiment_safety.experiment_pk'
+            )
+            .where(
+              'experiment_safety.status_id',
+              filter?.experimentSafetyStatusId
+            );
         }
         if (filter?.callId) {
           query.where('proposals.call_id', filter.callId);
@@ -673,17 +676,11 @@ export default class PostgresExperimentDataSource
     return database('experiments')
       .select('*')
       .modify((query) => {
-        if (filter?.endsBefore) {
-          query.where('ends_at', '<', filter.endsBefore);
+        if (filter?.experimentEndDate) {
+          query.where('ends_at', '<=', filter.experimentEndDate);
         }
-        if (filter?.endsAfter) {
-          query.where('ends_at', '>', filter.endsAfter);
-        }
-        if (filter?.startsBefore) {
-          query.where('starts_at', '<', filter.startsBefore);
-        }
-        if (filter?.startsAfter) {
-          query.where('starts_at', '>', filter.startsAfter);
+        if (filter?.experimentStartDate) {
+          query.where('starts_at', '>=', filter.experimentStartDate);
         }
         if (filter?.instrumentId) {
           query.where('instrument_id', filter.instrumentId);
