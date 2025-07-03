@@ -270,7 +270,9 @@ describe('Test Invite Mutations', () => {
       expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_INVITE_SENT), // eventType
       expect.stringContaining(email), // rowData (JSON string containing the email)
       expect.any(String), // changedObjectId (should be the invite ID)
-      expect.stringContaining(`Co-proposer invite sent to: ${email}`), // description
+      expect.stringContaining(
+        `Co-proposer invite issued to ${email} by userId ${dummyUserWithRole.id}`
+      ), // description
       undefined
     );
   });
@@ -342,7 +344,9 @@ describe('Test Invite Mutations', () => {
       expect.stringMatching(Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT), // eventType
       expect.stringContaining(email), // rowData (JSON string containing the email)
       expect.any(String), // changedObjectId (should be the invite ID)
-      expect.stringContaining(`Visit registration invite sent to: ${email}`), // description
+      expect.stringContaining(
+        `Visit invite issued to ${email} by userId ${dummyUserWithRole.id}`
+      ), // description
       undefined
     );
   });
