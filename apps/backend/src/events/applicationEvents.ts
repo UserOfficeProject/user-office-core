@@ -234,6 +234,23 @@ interface ProposalCoProposerInviteAcceptedEvent extends GeneralEvent {
   invite: Invite;
 }
 
+interface ProposalVisitRegistrationInvitesUpdatedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED;
+  array: Invite[];
+  proposalPk: number;
+}
+
+interface ProposalVisitRegistrationInviteSentEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT;
+  invite: Invite;
+  proposalPk: number;
+}
+
+interface ProposalVisitRegistrationInviteAcceptedEvent extends GeneralEvent {
+  type: Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED;
+  invite: Invite;
+}
+
 interface UserUpdateEvent extends GeneralEvent {
   type: Event.USER_UPDATED;
   user: User;
