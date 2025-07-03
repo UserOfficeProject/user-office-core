@@ -12,7 +12,8 @@ import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAcc
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
-import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
+import EmailStatusActionsLogsPage from './statusActionsLogs/EmailStatusActionsLogsPage';
+import ProposalDownloadStatusActionsLogsPage from './statusActionsLogs/ProposalDownloadStatusActionsLogsPage';
 import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
@@ -243,11 +244,22 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
-            path="/StatusActionsLogs"
+            path="/EmailStatusActionsLogs"
             element={
               <TitledRoute
-                title="StatusActionsLogs"
-                element={<StatusActionsLogsPage />}
+                title="Status Actions Logs"
+                element={<EmailStatusActionsLogsPage />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/ProposalDownloadStatusActionsLogs"
+            element={
+              <TitledRoute
+                title="Status Actions Logs"
+                element={<ProposalDownloadStatusActionsLogsPage />}
               />
             }
           />

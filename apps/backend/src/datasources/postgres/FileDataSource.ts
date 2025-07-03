@@ -1,16 +1,16 @@
 /* eslint-disable prefer-const */
 import fs from 'fs';
 
+import { logger } from '@user-office-software/duo-logger';
 import to from 'await-to-js';
 import { GraphQLError } from 'graphql';
 import { Client } from 'pg';
 import { LargeObjectManager, ReadStream } from 'pg-large-object';
 
 import { FileMetadata } from '../../models/Blob';
-import { FilesMetadataFilter } from '../../resolvers/queries/FilesMetadataQuery';
 import { FileDataSource } from '../FileDataSource';
 import database from './database';
-import { FileRecord, createFileMetadata } from './records';
+import { FileRecord, ProposalRecord, createFileMetadata } from './records';
 
 export default class PostgresFileDataSource implements FileDataSource {
   public async prepare(fileId: string, output: string): Promise<string> {
@@ -24,37 +24,17 @@ export default class PostgresFileDataSource implements FileDataSource {
     return fileId;
   }
 
-  async getMetadata(fileId: string): Promise<FileMetadata>;
-  async getMetadata(filter: FilesMetadataFilter): Promise<FileMetadata[]>;
-  async getMetadata(param: unknown): Promise<FileMetadata | FileMetadata[]> {
-    if (param instanceof FilesMetadataFilter) {
-      const filter = param as FilesMetadataFilter;
-
-      if (!filter.fileIds || filter.fileIds.length === 0) {
-        return [];
-      }
-
-      return database('files')
-        .select('*')
-        .whereIn('file_id', filter.fileIds)
-        .then((records: FileRecord[]) => {
-          return records.map((record) => createFileMetadata(record));
-        });
-    }
-
-    if (typeof param === 'string') {
-      const fileId = param as string;
-
-      return database('files')
-        .select('*')
-        .where('file_id', fileId)
-        .first()
-        .then((record: FileRecord) => {
-          return createFileMetadata(record);
-        });
-    }
-
-    throw new GraphQLError('Unsupported input for getMetaData');
+  async getMetadata(fileIds?: string[]): Promise<FileMetadata[]> {
+    return database('files')
+      .select('*')
+      .modify((queryBuilder) => {
+        if (fileIds && fileIds.length > 0) {
+          queryBuilder.whereIn('file_id', fileIds);
+        }
+      })
+      .then((records: FileRecord[]) => {
+        return records.map((record) => createFileMetadata(record));
+      });
   }
 
   public async put(
@@ -75,12 +55,63 @@ export default class PostgresFileDataSource implements FileDataSource {
       })
       .into('files')
       .returning(['*']);
-
     if (!resultSet || resultSet.length !== 1) {
       throw new GraphQLError('Expected to receive entry');
     }
 
     return createFileMetadata(resultSet[0]);
+  }
+
+  public async putProposalPdf(
+    fileName: string,
+    mimeType: string,
+    stream: NodeJS.ReadableStream,
+    proposalPk: number
+  ): Promise<FileMetadata> {
+    const result = await this.storeBlobFromStream(stream);
+
+    if (!result || !result.oid || !result.sizeInBytes) {
+      throw new GraphQLError('Failed to store blob from stream');
+    }
+
+    const oid = result.oid;
+    const sizeInBytes = result.sizeInBytes;
+
+    /*
+    In a transaction, update the files table with the new
+    file metadata, then update the proposal with its file_id.
+    */
+    return await database.transaction(async (trx) => {
+      const fileMetaData: FileRecord[] = await database
+        .insert({
+          file_name: fileName,
+          mime_type: mimeType,
+          size_in_bytes: sizeInBytes,
+          oid: oid,
+        })
+        .into('files')
+        .returning(['*'])
+        .transacting(trx);
+
+      if (fileMetaData.length === 0) {
+        throw new GraphQLError('Failed to insert metadata into files table');
+      }
+
+      const proposal: ProposalRecord[] = await database
+        .update({
+          file_id: fileMetaData[0].file_id,
+        })
+        .from('proposals')
+        .where('proposal_pk', proposalPk)
+        .returning(['*'])
+        .transacting(trx);
+
+      if (proposal.length === 0) {
+        throw new GraphQLError('Failed to insert file_id into proposals table');
+      }
+
+      return createFileMetadata(fileMetaData[0]);
+    });
   }
 
   private async storeBlob(filePath: string): Promise<number> {
@@ -89,7 +120,7 @@ export default class PostgresFileDataSource implements FileDataSource {
     );
     if (err) {
       throw new GraphQLError(
-        `Could not establish connection with database \n ${err}`
+        `Could not establish connection to database \n ${err}`
       );
     }
 
@@ -131,6 +162,84 @@ export default class PostgresFileDataSource implements FileDataSource {
       .finally(() => {
         database.client.releaseConnection(connection);
       });
+  }
+
+  private async storeBlobFromStream(
+    readableStream: NodeJS.ReadableStream
+  ): Promise<{ oid: number; sizeInBytes: number }> {
+    const [err, connection] = await to<Client, Error>(
+      database.client.acquireConnection()
+    );
+    if (err) {
+      throw new Error(`Could not establish connection to database: ${err}`);
+    }
+
+    if (!connection) {
+      throw new Error('Could not obtain database connection.');
+    }
+
+    return new Promise(async (resolve, reject) => {
+      const [transactionError] = await to(connection.query('BEGIN'));
+      if (transactionError) {
+        database.client.releaseConnection(connection);
+
+        return reject(`Could not begin transaction: ${transactionError}`);
+      }
+
+      const blobManager = new LargeObjectManager({ pg: connection });
+
+      const [writeableStreamError, response] = await to(
+        blobManager.createAndWritableStreamAsync()
+      );
+      if (writeableStreamError || !response) {
+        connection.query('ROLLBACK', () => {
+          database.client.releaseConnection(connection);
+          reject(`Could not create writable stream: ${writeableStreamError}`);
+        });
+
+        return;
+      }
+
+      const [oid, stream] = response;
+      let sizeInBytes = 0;
+
+      stream.on('finish', () => {
+        connection.query('COMMIT', () => {
+          database.client.releaseConnection(connection);
+          resolve({ oid, sizeInBytes });
+        });
+      });
+
+      stream.on('error', (streamError) => {
+        connection.query('ROLLBACK', () => {
+          database.client.releaseConnection(connection);
+          reject(`Error writing to large object stream: ${streamError}`);
+        });
+      });
+
+      readableStream.on('error', (readError) => {
+        stream.destroy(readError);
+        connection.query('ROLLBACK', () => {
+          database.client.releaseConnection(connection);
+          reject(`Error reading from response stream: ${readError}`);
+        });
+      });
+
+      /*
+       Override the stream's write method to track bytes
+       written without consuming the stream twice.
+      */
+      const originalWrite = stream.write.bind(stream);
+      stream.write = (chunk: any, encoding?: any, callback?: any): boolean => {
+        sizeInBytes += Buffer.isBuffer(chunk)
+          ? chunk.length
+          : Buffer.byteLength(chunk, encoding);
+
+        return originalWrite(chunk, encoding, callback);
+      };
+
+      readableStream.pipe(stream);
+    });
   }
 
   private async retrieveBlob(oid: number, output: string): Promise<void> {
@@ -185,7 +294,7 @@ export default class PostgresFileDataSource implements FileDataSource {
       return null;
     }
 
-    const result = await database('files')
+    const result = await database('files as f')
       .select('oid')
       .where('file_name', fileName)
       .first();
@@ -249,5 +358,58 @@ export default class PostgresFileDataSource implements FileDataSource {
 
       resolve(stream);
     });
+  }
+
+  public async delete(oid: number): Promise<boolean> {
+    return database
+      .transaction(async (trx) => {
+        const [metadataErr, fileRecord] = await to(
+          database('files')
+            .select('oid')
+            .where('oid', oid)
+            .first()
+            .transacting(trx)
+        );
+
+        if (metadataErr) {
+          throw new GraphQLError(
+            `Failed to get file metadata for deletion: ${metadataErr.message}`
+          );
+        }
+
+        if (!fileRecord) {
+          logger.logInfo('No file metadata found for deletion.', { oid: oid });
+
+          return false;
+        }
+
+        const pgClient = await (trx.client as any).acquireConnection();
+
+        const blobManager = new LargeObjectManager({ pg: pgClient });
+        const [unlinkError] = await to(blobManager.unlinkAsync(oid));
+
+        if (unlinkError) {
+          throw new GraphQLError(
+            `Failed to delete large object with OID ${oid}: ${unlinkError.message}`
+          );
+        }
+
+        const [deleteMetadataErr] = await to(
+          database('files').where('oid', oid).del().transacting(trx)
+        );
+
+        if (deleteMetadataErr) {
+          throw new GraphQLError(
+            `Failed to delete file metadata for oid ${oid}: ${deleteMetadataErr.message}`
+          );
+        }
+
+        return true;
+      })
+      .catch((error) => {
+        throw new GraphQLError(
+          `An unexpected error occurred during file deletion of OID ${oid}: ${error.message}`
+        );
+      });
   }
 }

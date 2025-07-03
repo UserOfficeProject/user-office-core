@@ -44,8 +44,16 @@ const files = () => {
     try {
       const fileId = req.params.file_id;
       const path = await baseContext.mutations.file.prepare(fileId);
-      const metaData = await baseContext.queries.file.getFileMetadata(fileId);
-      if (!isRejection(path) && metaData) {
+      const allMetaData =
+        await baseContext.queries.file.getFileMetadata(fileId);
+      if (allMetaData.length === 0) {
+        throw new Error(
+          `Could not prepare file: file metadata not found ${fileId}`
+        );
+      }
+      const metaData = allMetaData[0];
+
+      if (!isRejection(path)) {
         res.download(path, metaData.originalFileName, (err) => {
           if (err) {
             throw err;

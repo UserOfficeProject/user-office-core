@@ -39,12 +39,9 @@ export class GenericTemplateQuestionaryAuthorizer
     }
 
     const queryResult =
-      await this.genericTemplateDataSource.getGenericTemplates(
-        {
-          filter: { questionaryIds: [questionaryId] },
-        },
-        agent
-      );
+      await this.genericTemplateDataSource.getGenericTemplates({
+        filter: { questionaryIds: [questionaryId] },
+      });
 
     if (queryResult.length !== 1) {
       logger.logError(
