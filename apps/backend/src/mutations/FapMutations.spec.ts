@@ -108,7 +108,7 @@ describe('Test FapMutations', () => {
         assignChairOrSecretaryToFapInput: {
           fapId: 1,
           roleId: UserRole.FAP_CHAIR,
-          userId: 1,
+          userId: 5,
         },
       }
     );
@@ -125,7 +125,7 @@ describe('Test FapMutations', () => {
         assignChairOrSecretaryToFapInput: {
           fapId: 1,
           roleId: UserRole.FAP_SECRETARY,
-          userId: 1,
+          userId: 6,
         },
       }
     );

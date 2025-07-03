@@ -129,15 +129,11 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: AssignChairOrSecretaryToFapArgs
   ): Promise<Fap | Rejection> {
-    const userRoles = await this.userDataSource.getUserRoles(
-      args.assignChairOrSecretaryToFapInput.userId
-    );
-
-    // only users with fap reviewer role can be chair or secretary
-    const isFapReviewer = userRoles.some(
-      (role) => role.shortCode === Roles.FAP_REVIEWER
-    );
-    if (!isFapReviewer) {
+    if (
+      !(await this.userAuth.canBeAssignedToFap(
+        args.assignChairOrSecretaryToFapInput.userId
+      ))
+    ) {
       return rejection(
         'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary',
         { args, agent }
@@ -148,7 +144,7 @@ export default class FapMutations {
       .assignChairOrSecretaryToFap(args.assignChairOrSecretaryToFapInput)
       .catch((error) => {
         return rejection(
-          'Could not assign chair or secretary to Fap please ensure they have the correct roles',
+          'Could not assign chair or secretary to Fap, please ensure they have the correct roles',
           { agent },
           error
         );
