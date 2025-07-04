@@ -17,6 +17,7 @@ import { Instrument } from '../../models/Instrument';
 import { Proposal } from '../../models/Proposal';
 import { QuestionaryStep } from '../../models/Questionary';
 import { isRejection } from '../../models/Rejection';
+import { Status } from '../../models/Status';
 import { BasicUserDetails, UserWithRole } from '../../models/User';
 import { ExperimentSafetyPdfTemplate } from '../../resolvers/types/ExperimentSafetyPdfTemplate';
 import { Attachment } from '../util';
@@ -32,6 +33,7 @@ export type ExperimentSafetyPDFData = {
   principalInvestigator: BasicUserDetails;
   experiment: Experiment;
   experimentSafety: ExperimentSafety;
+  experimentSafetyStatus: Status | null;
   localContact: BasicUserDetails | null;
   instrument: Instrument | null;
   esiQuestionary: {
@@ -113,6 +115,12 @@ export const collectExperimentPDFData = async (
   if (experimentSafety === null) {
     throw new Error('Experiment safety not found');
   }
+
+  // Get the status of the experiment safety
+  const experimentSafetyStatus = await baseContext.queries.status.getStatus(
+    user,
+    experimentSafety.statusId ?? 0
+  );
 
   const esiQuestionarySteps =
     await baseContext.queries.questionary.getQuestionarySteps(
@@ -225,6 +233,7 @@ export const collectExperimentPDFData = async (
     principalInvestigator,
     experiment,
     experimentSafety,
+    experimentSafetyStatus,
     esiQuestionary,
     safetyReviewQuestionary,
     instrument,

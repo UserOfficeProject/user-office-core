@@ -56,9 +56,9 @@ export const experimentBody = `<!DOCTYPE html>
       <div class="mb-4">
         <div>Experiment Number: <strong >{{ experiment.experimentId }}</strong></div>
         <div class="fst-italic mt-1">
-          {{#if ($eq experimentSafety.statusId '21')}}
+          {{#if ($eq experimentSafetyStatus.shortCode 'ESF_APPROVED')}}
             Approved
-          {{else if ($eq experimentSafety.statusId '20')}}
+          {{else if ($eq experimentSafetyStatus.shortCode 'ESF_REJECTED')}}
             Rejected
           {{/if}}
         </div>
@@ -281,6 +281,14 @@ export const experimentDummyData = `{
       "instrumentScientistComment": null,
       "experimentSafetyReviewerDecision": 1,
       "experimentSafetyReviewerComment": "All safety measures have been reviewed and deemed adequate. Ensure ongoing risk assessments during the experiment. Emergency protocols must be clearly communicated to all personnel involved at the experiment site."
+    },
+    "expermientSafetyStatus": {
+      "id": 21,
+      "shortCode": "ESF_APPROVED",
+      "name": "Experiment Safety Approved",
+      "description": "The experiment safety has been approved by the safety review team.",
+      "isDefault": false,
+      "entityType": "EXPERIMENT_SAFETY"
     },
     "esiQuestionary": {
       "questionarySteps": [
