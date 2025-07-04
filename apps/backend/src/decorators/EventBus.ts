@@ -30,30 +30,27 @@ const EventBusDecorator = (eventType: Event) => {
         loggedInUser = result.user;
       }
 
-      // NOTE: Do not log the event in testing environment.
-      if (process.env.NODE_ENV !== 'test') {
-        // NOTE: Get the name of the object or class like: 'Fap', 'USER', 'Proposal' and lowercase it.
-        const resultKey = (result.constructor.name as string).toLowerCase();
+      // NOTE: Get the name of the object or class like: 'Fap', 'USER', 'Proposal' and lowercase it.
+      const resultKey = (result.constructor.name as string).toLowerCase();
 
-        const event = {
-          type: eventType,
-          [resultKey]: result,
-          key: resultKey,
-          loggedInUserId: loggedInUser ? loggedInUser.id : null,
-          isRejection: isRejection(result),
-          inputArgs: JSON.stringify(restArgs),
-          impersonatingUserId: loggedInUser
-            ? loggedInUser.impersonatingUserId
-            : null,
-        } as ApplicationEvent;
+      const event = {
+        type: eventType,
+        [resultKey]: result,
+        key: resultKey,
+        loggedInUserId: loggedInUser ? loggedInUser.id : null,
+        isRejection: isRejection(result),
+        inputArgs: JSON.stringify(restArgs),
+        impersonatingUserId: loggedInUser
+          ? loggedInUser.impersonatingUserId
+          : null,
+      } as ApplicationEvent;
 
-        const eventBus = resolveApplicationEventBus();
-        eventBus
-          .publish(event)
-          .catch((e) =>
-            logger.logError(`EventBus publish failed ${event.type}`, e)
-          );
-      }
+      const eventBus = resolveApplicationEventBus();
+      eventBus
+        .publish(event)
+        .catch((e) =>
+          logger.logError(`EventBus publish failed ${event.type}`, e)
+        );
 
       return result;
     };
