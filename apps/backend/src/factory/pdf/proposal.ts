@@ -73,15 +73,15 @@ const getTechnicalReviewHumanReadableStatus = (
 };
 
 const getSampleQuestionarySteps = async (
-  questionaryId: number
+  questionaryId: number,
+  role: string | null
 ): Promise<QuestionaryStep[]> => {
   const questionaryDataSource = container.resolve<QuestionaryDataSource>(
     Tokens.QuestionaryDataSource
   );
-  // TODO pdf generation with question based read permssions
   const questionarySteps = await questionaryDataSource.getQuestionarySteps(
     questionaryId,
-    null
+    role
   );
   if (!questionarySteps) {
     throw new Error(
@@ -572,7 +572,10 @@ export const collectProposalPDFDataTokenAccess = async (
           undefined,
           sample,
           await getQuestionary(sample.questionaryId),
-          await getSampleQuestionarySteps(sample.questionaryId)
+          await getSampleQuestionarySteps(
+            sample.questionaryId,
+            user.currentRole?.shortCode ?? null
+          )
         )
       )
     )
@@ -611,7 +614,10 @@ export const collectProposalPDFDataTokenAccess = async (
           undefined,
           genericTemplate,
           await getQuestionary(genericTemplate.questionaryId),
-          await getSampleQuestionarySteps(genericTemplate.questionaryId)
+          await getSampleQuestionarySteps(
+            genericTemplate.questionaryId,
+            user.currentRole?.shortCode ?? null
+          )
         )
       )
     )
