@@ -30,7 +30,6 @@ const EventBusDecorator = (eventType: Event) => {
         loggedInUser = result.user;
       }
 
-      // NOTE: Do not log the event in testing environment.
       // NOTE: Get the name of the object or class like: 'Fap', 'USER', 'Proposal' and lowercase it.
       const resultKey = (result.constructor.name as string).toLowerCase();
 
