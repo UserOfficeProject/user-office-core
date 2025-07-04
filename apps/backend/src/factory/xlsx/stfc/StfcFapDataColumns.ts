@@ -1,5 +1,6 @@
 export const StfcFapDataColumns = [
   'Proposal Reference Number',
+  'Access Route',
   'Principal Investigator',
   'PI Country',
   'PI Organisation',
