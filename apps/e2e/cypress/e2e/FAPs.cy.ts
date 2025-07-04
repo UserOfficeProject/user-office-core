@@ -4043,7 +4043,7 @@ context(
             cy.updateQuestion({
               id: result.createQuestion.id,
               question: instrumentPickerQuestion,
-              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false}`,
+              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false,"readPermissions":[]}`,
             });
             cy.createQuestionTemplateRelation({
               questionId: instrumentPickerQuestionId,
