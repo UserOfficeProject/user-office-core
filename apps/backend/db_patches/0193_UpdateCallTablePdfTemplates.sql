@@ -1,8 +1,8 @@
 DO
 $$
 BEGIN
-    IF register_patch('0181_UpdateCallTablePdfTemplates.sql', 'Yoganandan Pandiyan', 'Rename pdf_template_id to proposal_pdf_template_id and add experiment_safety_pdf_template_id column', '2025-04-22') THEN
-
+    IF register_patch('UpdateCallTablePdfTemplates.sql', 'Yoganandan Pandiyan', 'Rename pdf_template_id to proposal_pdf_template_id and add experiment_safety_pdf_template_id column', '2025-04-22') THEN
+ 
     -- Rename existing pdf_template_id to proposal_pdf_template_id
     ALTER TABLE call RENAME COLUMN pdf_template_id TO proposal_pdf_template_id;
 

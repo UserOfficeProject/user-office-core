@@ -205,7 +205,6 @@ const TemplatesTable = ({
   const templatesWithId = templates.map((template) =>
     Object.assign(template, { id: template.templateId })
   );
-  console.log({ templateGroup });
 
   return (
     <>

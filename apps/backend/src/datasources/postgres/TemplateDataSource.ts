@@ -233,14 +233,6 @@ export default class PostgresTemplateDataSource implements TemplateDataSource {
   }
 
   async deleteTemplate(templateId: number): Promise<Template> {
-    // await database('proposal_pdf_templates')
-    //   .delete()
-    //   .where({ template_id: templateId });
-
-    // await database('proposal_pdf_templates')
-    //   .delete()
-    //   .where({ template_id: templateId });
-
     return database('templates')
       .delete()
       .where({ template_id: templateId })

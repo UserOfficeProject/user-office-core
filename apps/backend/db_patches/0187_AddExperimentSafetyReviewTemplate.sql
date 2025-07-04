@@ -5,7 +5,7 @@ DECLARE
     exp_safety_review_topic_id_var int;
     questionary_id_var int;
 BEGIN
-    IF register_patch('0171_AddExperimentSafetyReviewTemplate.sql', 'Yoganandan Pandiyan', 'Add Experiment Safety review template', '2025-03-03') THEN
+    IF register_patch('AddExperimentSafetyReviewTemplate.sql', 'Yoganandan Pandiyan', 'Add Experiment Safety review template', '2025-03-03') THEN
 
         INSERT INTO template_categories(template_category_id, name) VALUES(12, 'Experiment Safety Review');
         

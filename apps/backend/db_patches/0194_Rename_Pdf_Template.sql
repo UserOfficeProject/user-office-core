@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-    IF register_patch('0182_Rename_Pdf_Template.sql', 'Yoganandan Pandiyan', 'Rename pdf_templates table to proposal_pdf_templates', '2025-04-22') THEN
+    IF register_patch('Rename_Pdf_Template.sql', 'Yoganandan Pandiyan', 'Rename pdf_templates table to proposal_pdf_templates', '2025-04-22') THEN
 
     -- Rename the table
     ALTER TABLE pdf_templates RENAME TO proposal_pdf_templates;

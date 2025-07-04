@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-	IF register_patch('0178_AddExperimentEvents.sql', 'Yoganandan Pandiyan', 'Add experiment events table to keep track of all fired events on a experiment.', '2025-04-21') THEN
+	IF register_patch('AddExperimentEvents.sql', 'Yoganandan Pandiyan', 'Add experiment events table to keep track of all fired events on a experiment.', '2025-04-21') THEN
 	  BEGIN
 			CREATE TABLE IF NOT EXISTS experiment_safety_events (
 				experiment_pk INT REFERENCES experiments(experiment_pk) ON DELETE CASCADE,

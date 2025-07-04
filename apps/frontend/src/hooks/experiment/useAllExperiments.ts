@@ -32,11 +32,10 @@ export function useAllExperiments(
           },
           ...queryParameters,
         })
-        .then((data) => {
+        .then(() => {
           if (componentController?.unmounted) {
             return;
           }
-          console.log({ data });
           setLoading(false);
         });
     },

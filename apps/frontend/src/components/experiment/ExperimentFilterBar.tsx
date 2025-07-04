@@ -64,8 +64,12 @@ function ExperimentFilterBar({
     // Update the filter with the new experimentStartDate and experimentEndDate
     setExperimentFilter({
       ...filter,
-      experimentStartDate: experimentStartDate,
-      experimentEndDate: experimentEndDate,
+      experimentStartDate: experimentStartDate
+        ? DateTime.fromJSDate(experimentStartDate)
+        : undefined,
+      experimentEndDate: experimentEndDate
+        ? DateTime.fromJSDate(experimentEndDate)
+        : undefined,
     });
   };
 

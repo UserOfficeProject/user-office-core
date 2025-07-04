@@ -18,10 +18,10 @@ type StatusFilterProps = {
   hiddenStatuses: number[];
 };
 
-function checkToRemove(hiddenStatuses: number[], status: Status) {
+function isStatusVisible(hiddenStatuses: number[], status: Status) {
   if (hiddenStatuses != null) {
     for (let i = 0; i < hiddenStatuses.length; i++) {
-      if (hiddenStatuses[i] == status.id) return false;
+      if (hiddenStatuses[i] === status.id) return false;
     }
   }
 
@@ -75,7 +75,7 @@ const StatusFilter = ({
             {shouldShowAll && <MenuItem value={0}>All</MenuItem>}
             {statuses.map(
               (status) =>
-                checkToRemove(hiddenStatuses, status) && (
+                isStatusVisible(hiddenStatuses, status) && (
                   <MenuItem key={status.id} value={status.id}>
                     {status.name}
                   </MenuItem>

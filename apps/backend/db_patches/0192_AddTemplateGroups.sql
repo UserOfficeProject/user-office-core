@@ -5,7 +5,7 @@ DECLARE
     technical_review_topic_id_var int;
     technical_review_loop_var int;
 BEGIN
-    IF register_patch('0180_AddTemplateGroups.sql', 'Yoganandan Pandiyan', 'Add new Template Groups', '2025-04-22') THEN
+    IF register_patch('AddTemplateGroups.sql', 'Yoganandan Pandiyan', 'Add new Template Groups', '2025-04-22') THEN
 
     INSERT INTO template_categories(template_category_id, name) VALUES(13, 'Experiment Safety PDF');
 
