@@ -1,29 +1,36 @@
+import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 
 import UOLoader from 'components/common/UOLoader';
-import { CreateOrGetExperimentSafetyMutation } from 'generated/sdk';
+import { GetExperimentSafetyQuery } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import ExperimentSafetyContainer from './ExperimentSafetyContainer';
 
 interface ExperimentSafetyProps {
-  experimentPk: number;
+  experimentSafetyPk: number;
 }
-function ExperimentSafety({ experimentPk }: ExperimentSafetyProps) {
+function ExperimentSafety({ experimentSafetyPk }: ExperimentSafetyProps) {
   const { api } = useDataApiWithFeedback();
+  const { enqueueSnackbar } = useSnackbar();
   const [experimentSafety, setExperimentSafety] = useState<
-    CreateOrGetExperimentSafetyMutation['createExperimentSafety'] | null
+    GetExperimentSafetyQuery['experimentSafety'] | null
   >(null);
 
   useEffect(() => {
     api()
-      .createOrGetExperimentSafety({ experimentPk })
+      .getExperimentSafety({ experimentSafetyPk })
       .then((result) => {
-        if (result.createExperimentSafety) {
-          setExperimentSafety(result.createExperimentSafety);
+        if (result.experimentSafety) {
+          setExperimentSafety(result.experimentSafety);
+        } else {
+          enqueueSnackbar('Experiment Safety data not found', {
+            variant: 'error',
+            className: 'snackbar-error',
+          });
         }
       });
-  }, [experimentPk, api]);
+  }, [experimentSafetyPk, api, enqueueSnackbar]);
 
   if (!experimentSafety) {
     return <UOLoader />;

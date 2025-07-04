@@ -661,7 +661,6 @@ const ProposalTableOfficer = ({
           questionFilter,
           referenceNumbers,
         } = proposalFilter;
-
         const { proposalsView } = await api().getProposalsCore({
           filter: {
             callId: callId,

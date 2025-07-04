@@ -91,6 +91,10 @@ export enum Event {
   EXPERIMENT_ESF_REJECTED_BY_IS = 'EXPERIMENT_ESF_REJECTED_BY_IS',
   EXPERIMENT_ESF_APPROVED_BY_ESR = 'EXPERIMENT_ESF_APPROVED_BY_ESR',
   EXPERIMENT_ESF_REJECTED_BY_ESR = 'EXPERIMENT_ESF_REJECTED_BY_ESR',
+  EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS = 'EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS',
+  EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR = 'EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR',
+  EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER',
+  EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -373,5 +377,21 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
     'Event occurs when experiment ESF is rejected by ESR',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS,
+    'Event occurs when experiment safety management decision is submitted by IS',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR,
+    'Event occurs when experiment safety management decision is submitted by ESR',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER,
+    'Event occurs when experiment safety status is changed by user',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
+    'Event occurs when experiment safety status is changed by workflow',
   ],
 ]);

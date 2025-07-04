@@ -562,6 +562,7 @@ export default class WorkflowMutations {
     >(
       StatusActionType.EMAIL,
       StatusActionType.RABBITMQ,
+      StatusActionType.RABBITMQ,
       Object.values(StatusActionType),
       EmailStatusActionRecipients.OTHER
     )

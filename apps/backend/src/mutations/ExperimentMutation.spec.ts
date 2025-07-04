@@ -53,11 +53,10 @@ describe('Test Experiment Safety', () => {
   });
 
   test('Experiment User should not be able to create Experiment safety for an unexisting Experiments', async () => {
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        300 // Experiment ID that does not exist
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      300 // Experiment ID that does not exist
+    );
 
     expect(experimentSafety).toBeInstanceOf(Rejection);
     expect((experimentSafety as Rejection).reason).toBe(
@@ -66,11 +65,10 @@ describe('Test Experiment Safety', () => {
   });
 
   test('Experiment User should not be able to create Experiment Safety for a completed Experiment', async () => {
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        CompletedExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      CompletedExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(Rejection);
     expect((experimentSafety as Rejection).reason).toBe(
@@ -79,11 +77,10 @@ describe('Test Experiment Safety', () => {
   });
 
   test('Experiment User should not be able to create Experiment safety for an ongoing Experiment', async () => {
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        OngoingExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      OngoingExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(Rejection);
     expect((experimentSafety as Rejection).reason).toBe(
@@ -92,11 +89,10 @@ describe('Test Experiment Safety', () => {
   });
 
   test('Experiment User should not be able to create Experiment safety for an Experiment, which is not connected to a valid Proposal', async () => {
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        ExperimentWithNonExistingProposalPk.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      ExperimentWithNonExistingProposalPk.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(Rejection);
     expect((experimentSafety as Rejection).reason).toBe(
@@ -105,11 +101,10 @@ describe('Test Experiment Safety', () => {
   });
 
   test('User who is not a part of the Proposal, should not be able to create Experiment Safety', async () => {
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyUserNotOnProposalWithRole,
-        OngoingExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyUserNotOnProposalWithRole,
+      OngoingExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(Rejection);
     expect((experimentSafety as Rejection).reason).toBe(
@@ -120,11 +115,10 @@ describe('Test Experiment Safety', () => {
   test('User should not be able create Experiment Safety for an Experiment, whose Call does not have a Experiment Safety Form Questionary template', async () => {
     jest.spyOn(calldatasource, 'getCall').mockResolvedValue(dummyCallFactory());
 
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(Rejection);
     expect((experimentSafety as Rejection).reason).toBe(
@@ -137,11 +131,10 @@ describe('Test Experiment Safety', () => {
       .spyOn(calldatasource, 'getCall')
       .mockResolvedValue(dummyCallFactory({ esiTemplateId: 1 }));
 
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
   });
@@ -151,22 +144,17 @@ describe('Test Experiment Safety', () => {
       .spyOn(calldatasource, 'getCall')
       .mockResolvedValue(dummyCallFactory({ esiTemplateId: 1 }));
 
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
-
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
 
-    const experimentSafety2 =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
-
-    expect(experimentSafety2).toBeInstanceOf(ExperimentSafety);
-    expect(experimentSafety2).toEqual(experimentSafety);
+    const experimentSafety2 = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
+    expect(experimentSafety2).toBeInstanceOf(Rejection);
   });
 });
 
@@ -212,11 +200,10 @@ describe('Adding Samples to Experiment', () => {
   });
 
   test('User who does not belong to an Experiment cannot add samples to it', async () => {
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
 
@@ -235,11 +222,10 @@ describe('Adding Samples to Experiment', () => {
   });
 
   test('User cannot add unidentified sample to an Experiment', async () => {
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
 
@@ -272,11 +258,10 @@ describe('Adding Samples to Experiment', () => {
       )
     );
 
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
     const experimentHasSample = await experimentMutation.addSampleToExperiment(
@@ -308,11 +293,10 @@ describe('Adding Samples to Experiment', () => {
         })
       );
 
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
 
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
     const experimentHasSample = await experimentMutation.addSampleToExperiment(
@@ -346,11 +330,10 @@ describe('Adding Samples to Experiment', () => {
         })
       );
 
-    const experimemntSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimemntSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
 
     expect(experimemntSafety).toBeInstanceOf(ExperimentSafety);
 
@@ -412,11 +395,10 @@ describe('Removing Samples from Experiment', () => {
 
   test('User who is not authorized cannot remove samples from the Experiment', async () => {
     // First create experiment safety so that the experiment exists and safety is present
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
 
     const result = await experimentMutation.removeSampleFromExperiment(
@@ -435,11 +417,10 @@ describe('Removing Samples from Experiment', () => {
 
   test('User should be able to remove sample from an Experiment', async () => {
     // First create experiment safety so that removal can proceed
-    const experimentSafety =
-      await experimentMutation.createOrGetExperimentSafety(
-        dummyPrincipalInvestigatorWithRole,
-        UpcomingExperimentWithExperiment.experimentPk
-      );
+    const experimentSafety = await experimentMutation.createExperimentSafety(
+      dummyPrincipalInvestigatorWithRole,
+      UpcomingExperimentWithExperiment.experimentPk
+    );
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
 
     const result = await experimentMutation.removeSampleFromExperiment(

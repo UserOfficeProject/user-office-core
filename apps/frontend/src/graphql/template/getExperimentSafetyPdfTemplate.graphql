@@ -1,0 +1,13 @@
+query getExperimentSafetyPdfTemplate($experimentSafetyPdfTemplateId: Int!) {
+  experimentSafetyPdfTemplate(
+    experimentSafetyPdfTemplateId: $experimentSafetyPdfTemplateId
+  ) {
+    experimentSafetyPdfTemplateId
+    templateId
+    templateData
+    templateHeader
+    templateFooter
+    templateSampleDeclaration
+    dummyData
+  }
+}

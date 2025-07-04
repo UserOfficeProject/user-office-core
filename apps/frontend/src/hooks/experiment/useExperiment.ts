@@ -7,12 +7,12 @@ export function useExperiment(experimentPk: number) {
   const [experiment, setExperiment] = useState<
     GetExperimentQuery['experiment'] | null
   >(null);
-
+  const [loading, setLoading] = useState(true);
   const api = useDataApi();
 
   useEffect(() => {
     let unmounted = false;
-
+    setLoading(true);
     api()
       .getExperiment({ experimentPk })
       .then(({ experiment }) => {
@@ -22,6 +22,7 @@ export function useExperiment(experimentPk: number) {
         if (experiment) {
           setExperiment(experiment);
         }
+        setLoading(false);
       });
 
     return () => {
@@ -29,5 +30,5 @@ export function useExperiment(experimentPk: number) {
     };
   }, [api, experimentPk]);
 
-  return { experiment, setExperiment };
+  return { experiment, setExperiment, loading };
 }
