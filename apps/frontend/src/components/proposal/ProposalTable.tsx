@@ -4,6 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Edit from '@mui/icons-material/Edit';
 import FileCopy from '@mui/icons-material/FileCopy';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import PeopleIcon from '@mui/icons-material/People';
 import Visibility from '@mui/icons-material/Visibility';
 import { Typography } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
@@ -17,7 +18,7 @@ import CopyToClipboard from 'components/common/CopyToClipboard';
 import MaterialTable from 'components/common/DenseMaterialTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
-import { Call, FeatureId } from 'generated/sdk';
+import { Call, FeatureId, ProposalPublicStatus } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { useDownloadPDFProposal } from 'hooks/proposal/useDownloadPDFProposal';
 import { ProposalData } from 'hooks/proposal/useProposalData';
@@ -35,6 +36,7 @@ import {
   PartialProposalsDataType,
   UserProposalDataType,
 } from './ProposalTableUser';
+import RemoteUsersModal from './RemoteUsersModal';
 
 type ProposalTableProps = {
   /** Error flag */
@@ -96,9 +98,17 @@ const ProposalTable = ({
     ProposalData,
     'primaryKey' | 'questionary'
   > | null>(null);
+  const [isRemoteUsersModalOpen, setIsRemoteUsersModalOpen] = useState(false);
+  const [selectedProposalPk, setSelectedProposalPk] = useState<
+    number | undefined
+  >();
 
   const isEmailInviteEnabled = featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
+  )?.isEnabled;
+
+  const isRemoteUsersEnabled = featureContext.featuresMap.get(
+    FeatureId.REMOTE_USERS
   )?.isEnabled;
 
   // TODO: This api call here should be replaced with a hook for getting user proposals.
@@ -206,6 +216,11 @@ const ProposalTable = ({
           />
         </DialogContent>
       </Dialog>
+      <RemoteUsersModal
+        open={isRemoteUsersModalOpen}
+        onClose={() => setIsRemoteUsersModalOpen(false)}
+        proposalPk={selectedProposalPk}
+      />
       <MaterialTable
         icons={tableIcons}
         localization={tableLocalization}
@@ -253,6 +268,21 @@ const ProposalTable = ({
                   setOpenCallSelection(true);
                 });
             },
+          },
+          (rowData) => {
+            return {
+              icon: PeopleIcon,
+              tooltip: 'View remote users',
+              hidden:
+                isRemoteUsersEnabled !== true ||
+                rowData.publicStatus !== ProposalPublicStatus.ACCEPTED,
+              onClick: (_event, rowData) => {
+                setSelectedProposalPk(
+                  (rowData as PartialProposalsDataType).primaryKey
+                );
+                setIsRemoteUsersModalOpen(true);
+              },
+            };
           },
           {
             icon: GetAppIcon,
