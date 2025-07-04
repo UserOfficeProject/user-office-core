@@ -1,0 +1,5 @@
+query getRemoteUsers($proposalPk: Int!) {
+  remoteUsers(proposalPk: $proposalPk) {
+    ...basicUserDetails
+  }
+}
