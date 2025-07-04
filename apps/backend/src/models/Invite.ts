@@ -8,6 +8,7 @@ export class Invite {
     public claimedAt: Date | null,
     public claimedByUserId: number | null,
     public isEmailSent: boolean,
-    public expiresAt: Date | null
+    public expiresAt: Date | null,
+    public templateId: string | null
   ) {}
 }

@@ -5,7 +5,7 @@ import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
 import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
 import { UserRole } from '../../models/User';
-import { getTemplateIdForInvite } from './essEmailHandler';
+import { EmailTemplateId, getTemplateIdForInvite } from './essEmailHandler';
 
 describe('essEmailHandler', () => {
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
@@ -44,7 +44,9 @@ describe('essEmailHandler', () => {
 
       const result = await getTemplateIdForInvite(inviteId);
 
-      expect(result).toBe('user-office-registration-invitation-co-proposer');
+      expect(result).toBe(
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+      );
     });
 
     test('should return reviewer template when internal reviewer role claim exists', async () => {
@@ -67,7 +69,9 @@ describe('essEmailHandler', () => {
 
       const result = await getTemplateIdForInvite(inviteId);
 
-      expect(result).toBe('user-office-registration-invitation-reviewer');
+      expect(result).toBe(
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
+      );
     });
 
     test('should return user template when user role claim exists', async () => {
@@ -90,7 +94,9 @@ describe('essEmailHandler', () => {
 
       const result = await getTemplateIdForInvite(inviteId);
 
-      expect(result).toBe('user-office-registration-invitation-user');
+      expect(result).toBe(
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER
+      );
     });
   });
 });
