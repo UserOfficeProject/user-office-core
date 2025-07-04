@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
 
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
@@ -9,8 +10,10 @@ import { InviteDataSource } from '../datasources/InviteDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { RoleClaimDataSource } from '../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
-import { Authorized, EventBus } from '../decorators';
+import { VisitDataSource } from '../datasources/VisitDataSource';
+import { Authorized } from '../decorators';
 import { ApplicationEventBus } from '../events';
+import { ApplicationEvent } from '../events/applicationEvents';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { rejection, Rejection } from '../models/Rejection';
@@ -32,6 +35,8 @@ export default class InviteMutations {
     private roleClaimDataSource: RoleClaimDataSource,
     @inject(Tokens.CoProposerClaimDataSource)
     private coProposerClaimDataSource: CoProposerClaimDataSource,
+    @inject(Tokens.VisitDataSource)
+    private visitDataSource: VisitDataSource,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization,
     @inject(Tokens.AdminDataSource)
@@ -41,7 +46,6 @@ export default class InviteMutations {
   ) {}
 
   @Authorized()
-  @EventBus(Event.INVITE_ACCEPTED)
   async accept(
     agent: UserWithRole | null,
     code: string
@@ -50,7 +54,6 @@ export default class InviteMutations {
     if (invite === null) {
       return rejection('Invite code not found', { invite: code });
     }
-
     if (invite.claimedByUserId !== null) {
       return rejection('Invite code already claimed', { invite: code });
     }
@@ -71,9 +74,20 @@ export default class InviteMutations {
     return updatedInvite;
   }
 
+  private async getCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    const existingClaims =
+      await this.coProposerClaimDataSource.findByProposalPk(proposalPk);
+
+    const existingInvites = (await Promise.all(
+      existingClaims.map((claim) =>
+        this.inviteDataSource.findById(claim.inviteId)
+      )
+    )) as Invite[];
+
+    return existingInvites;
+  }
+
   @Authorized()
-  @EventBus(Event.EMAIL_INVITES)
-  @EventBus(Event.PROPOSAL_CO_PROPOSER_CLAIM_SENT)
   public async setCoProposerInvites(
     agent: UserWithRole | null,
     args: SetCoProposerInvitesInput
@@ -89,13 +103,7 @@ export default class InviteMutations {
       );
     }
 
-    const existingClaims =
-      await this.coProposerClaimDataSource.findByProposalPk(proposalPk);
-    const existingInvites = (await Promise.all(
-      existingClaims.map((claim) =>
-        this.inviteDataSource.findById(claim.inviteId)
-      )
-    )) as Invite[];
+    const existingInvites = await this.getCoProposerInvites(proposalPk);
     const existingEmails = existingInvites.map((invite) => invite.email);
 
     const deletedEmails = existingEmails.filter(
@@ -111,25 +119,7 @@ export default class InviteMutations {
       deletedInvites.map((invite) => this.inviteDataSource.delete(invite.id))
     );
 
-    // Get invite validity period from settings
-    const inviteValidityPeriodSetting = await this.adminDataSource.getSetting(
-      SettingsId.INVITE_VALIDITY_PERIOD_DAYS
-    );
-    if (!inviteValidityPeriodSetting?.settingsValue) {
-      return rejection('Invite validity period setting not found');
-    }
-
-    const validityPeriodDays = parseInt(
-      inviteValidityPeriodSetting.settingsValue
-    );
-    if (isNaN(validityPeriodDays) || validityPeriodDays <= 0) {
-      return rejection('Invalid invite validity period value');
-    }
-
-    const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
-    const expirationDate = new Date(
-      Date.now() + validityPeriodDays * MILLISECONDS_PER_DAY
-    );
+    const expirationDate = await this.getInviteExpirationDate();
 
     const newInvites = await Promise.all(
       newEmails.map(async (email) =>
@@ -148,10 +138,22 @@ export default class InviteMutations {
       })
     );
 
-    return [
+    const invites = [
       ...existingInvites.filter((invite) => !deletedInvites.includes(invite)),
       ...newInvites,
     ];
+
+    await this.eventBus.publish({
+      type: Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+      array: invites,
+      key: 'array',
+      loggedInUserId: agent?.id,
+      inputArgs: JSON.stringify(args),
+      impersonatingUserId: agent ? agent.impersonatingUserId : null,
+      proposalPKey: proposalPk,
+    } as ApplicationEvent);
+
+    return invites;
   }
 
   private async processRoleClaims(claimerUserId: number, invite: Invite) {
@@ -196,12 +198,13 @@ export default class InviteMutations {
       );
 
       this.eventBus.publish({
-        type: Event.PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED,
+        type: Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
         isRejection: false,
         key: 'proposal',
         loggedInUserId: claimerUserId,
         invite: invite,
         description: `User with ID ${claimerUserId} accepted invite for proposal ${claim.proposalPk}`,
+        proposalPKey: claim.proposalPk,
       });
     }
   }
@@ -227,4 +230,28 @@ export default class InviteMutations {
 
     return code;
   }
+
+  private readonly getInviteExpirationDate = async (): Promise<Date> => {
+    const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    const inviteValidityPeriodSetting = await this.adminDataSource.getSetting(
+      SettingsId.INVITE_VALIDITY_PERIOD_DAYS
+    );
+    if (!inviteValidityPeriodSetting?.settingsValue) {
+      throw new GraphQLError('Invite validity period setting not found');
+    }
+
+    const validityPeriodDays = parseInt(
+      inviteValidityPeriodSetting.settingsValue
+    );
+    if (isNaN(validityPeriodDays) || validityPeriodDays <= 0) {
+      throw new GraphQLError('Invalid invite validity period value');
+    }
+
+    const expirationDate = new Date(
+      Date.now() + validityPeriodDays * MILLISECONDS_PER_DAY
+    );
+
+    return expirationDate;
+  };
 }
