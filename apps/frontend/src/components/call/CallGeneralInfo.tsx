@@ -514,7 +514,6 @@ const CallGeneralInfo = ({
           'data-cy': 'call-workflow',
           endAdornment: <RefreshListIcon onClick={reloadExperimentWorkflows} />,
         }}
-        required
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
         {internalCallDate.showField && (

@@ -212,6 +212,7 @@ export default class PostgresCallDataSource implements CallDataSource {
             reference_number_format: args.referenceNumberFormat,
             proposal_sequence: args.proposalSequence,
             proposal_workflow_id: args.proposalWorkflowId,
+            experiment_workflow_id: args.experimentWorkflowId,
             template_id: args.templateId,
             esi_template_id: args.esiTemplateId,
             proposal_pdf_template_id: args.proposalPdfTemplateId,

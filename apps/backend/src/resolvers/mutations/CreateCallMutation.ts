@@ -71,6 +71,9 @@ export class CreateCallInput {
   @Field(() => Int)
   public proposalWorkflowId: number;
 
+  @Field(() => Int, { nullable: true })
+  public experimentWorkflowId?: number;
+
   @Field(() => Int)
   public templateId: number;
 

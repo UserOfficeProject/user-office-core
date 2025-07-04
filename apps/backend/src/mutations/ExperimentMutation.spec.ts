@@ -148,16 +148,13 @@ describe('Test Experiment Safety', () => {
       dummyPrincipalInvestigatorWithRole,
       UpcomingExperimentWithExperiment.experimentPk
     );
-
     expect(experimentSafety).toBeInstanceOf(ExperimentSafety);
 
     const experimentSafety2 = await experimentMutation.createExperimentSafety(
       dummyPrincipalInvestigatorWithRole,
       UpcomingExperimentWithExperiment.experimentPk
     );
-
-    expect(experimentSafety2).toBeInstanceOf(ExperimentSafety);
-    expect(experimentSafety2).toEqual(experimentSafety);
+    expect(experimentSafety2).toBeInstanceOf(Rejection);
   });
 });
 

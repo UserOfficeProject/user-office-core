@@ -17,6 +17,7 @@ mutation createCall(
   $allocationTimeUnit: AllocationTimeUnits!
   $referenceNumberFormat: String
   $proposalWorkflowId: Int!
+  $experimentWorkflowId: Int
   $templateId: Int!
   $esiTemplateId: Int
   $proposalPdfTemplateId: Int
@@ -47,6 +48,7 @@ mutation createCall(
       allocationTimeUnit: $allocationTimeUnit
       referenceNumberFormat: $referenceNumberFormat
       proposalWorkflowId: $proposalWorkflowId
+      experimentWorkflowId: $experimentWorkflowId
       templateId: $templateId
       esiTemplateId: $esiTemplateId
       proposalPdfTemplateId: $proposalPdfTemplateId
