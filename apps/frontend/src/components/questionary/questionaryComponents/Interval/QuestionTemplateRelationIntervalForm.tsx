@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import Autocomplete from '@mui/material/Autocomplete';
 import MUITextField from '@mui/material/TextField';
 import { Field } from 'formik';
@@ -14,6 +15,7 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 
 export const QuestionTemplateRelationIntervalForm = (
   props: QuestionTemplateRelationFormProps
@@ -82,13 +84,16 @@ export const QuestionTemplateRelationIntervalForm = (
               data-cy="units"
             />
           </TitledContainer>
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}
               template={props.template}
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.questionRel.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

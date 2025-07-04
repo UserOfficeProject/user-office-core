@@ -36,6 +36,7 @@ export const intervalDefinition: Question<DataType.INTERVAL> = {
     config.required = false;
     config.tooltip = '';
     config.units = [];
+    config.readPermissions = [];
 
     return config;
   },

@@ -18,7 +18,7 @@ BEGIN
 
 	INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('proposal_esi_basis', proposal_esi_template_id, proposal_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('proposal_esi_basis', proposal_esi_template_id, proposal_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"","readPermissions":[]}', 'AND');
 
 	INSERT INTO templates(name, description, is_archived, group_id) VALUES 
 	('default sample esi template', 'default sample esi template', false, 'SAMPLE_ESI')
@@ -31,7 +31,7 @@ BEGIN
 
 	INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_esi_basis', sample_esi_template_id, sample_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('sample_esi_basis', sample_esi_template_id, sample_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"", "readPermissions":[]}', 'AND');
 
 	UPDATE public.call SET esi_template_id=proposal_esi_template_id;
 

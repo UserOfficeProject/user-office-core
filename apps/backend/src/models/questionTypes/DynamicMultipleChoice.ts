@@ -31,6 +31,7 @@ export const dynamicMultipleChoiceDefinition: Question<DataType.DYNAMIC_MULTIPLE
       config.jsonPath = '';
       config.isMultipleSelect = false;
       config.apiCallRequestHeaders = [];
+      config.readPermissions = [];
 
       return config;
     },

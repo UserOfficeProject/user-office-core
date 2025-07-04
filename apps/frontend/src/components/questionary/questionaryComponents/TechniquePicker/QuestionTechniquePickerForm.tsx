@@ -48,7 +48,10 @@ export const QuestionTechniquePickerForm = (props: QuestionFormProps) => {
             inputProps={{ 'data-cy': 'question' }}
           />
 
-          <QuestionTechniquePickerFormCommon config={config} />
+          <QuestionTechniquePickerFormCommon
+            config={config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

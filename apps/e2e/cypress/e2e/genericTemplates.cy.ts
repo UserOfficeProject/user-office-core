@@ -122,7 +122,7 @@ context('GenericTemplates tests', () => {
                   cy.updateQuestion({
                     id: createdQuestion1Id,
                     question: genericTemplateQuestion[0],
-                    config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":true,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                    config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":true,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":"","readPermissions":[]}`,
                   });
 
                   cy.createQuestionTemplateRelation({
@@ -142,7 +142,7 @@ context('GenericTemplates tests', () => {
                   cy.updateQuestion({
                     id: createdQuestion2.id,
                     question: genericTemplateQuestion[1],
-                    config: `{"addEntryButtonLabel":"${addButtonLabel[1]}","minEntries":"0","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                    config: `{"addEntryButtonLabel":"${addButtonLabel[1]}","minEntries":"0","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":"","readPermissions":[]}`,
                   });
 
                   cy.createQuestionTemplateRelation({
@@ -235,7 +235,7 @@ context('GenericTemplates tests', () => {
                 cy.updateQuestion({
                   id: createdQuestion1Id,
                   question: genericTemplateQuestion[index],
-                  config: `{"addEntryButtonLabel":"${addButtonLabel[index]}","minEntries":"1","maxEntries":"2","templateId":${genericSubTemplateIds[index]},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                  config: `{"addEntryButtonLabel":"${addButtonLabel[index]}","minEntries":"1","maxEntries":"2","templateId":${genericSubTemplateIds[index]},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":"","readPermissions":[]}`,
                 });
 
                 cy.createQuestionTemplateRelation({
@@ -294,7 +294,7 @@ context('GenericTemplates tests', () => {
             cy.updateQuestion({
               id: selectQuestionId,
               question: selectQuestion,
-              config: `{"options": ["Yes","No"],"variant": "dropdown","required": true,"isMultipleSelect": false}`,
+              config: `{"options": ["Yes","No"],"variant": "dropdown","required": true,"isMultipleSelect": false,"readPermissions":[]}`,
             });
 
             cy.createQuestionTemplateRelation({
@@ -315,7 +315,7 @@ context('GenericTemplates tests', () => {
               cy.updateQuestion({
                 id: createdQuestion1Id,
                 question: genericTemplateQuestion[1],
-                config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","minEntries":"1","maxEntries":"2","templateId":${genericSubTemplateIds[0]},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","minEntries":"1","maxEntries":"2","templateId":${genericSubTemplateIds[0]},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":"","readPermissions":[]}`,
               });
 
               cy.createQuestionTemplateRelation({
@@ -886,7 +886,7 @@ context('GenericTemplates tests', () => {
       cy.updateQuestion({
         id: createdQuestion1Id,
         question: genericTemplateQuestion[0],
-        config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":false,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+        config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":false,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":"","readPermissions":[]}`,
       });
 
       cy.updateQuestionTemplateRelationSettings({

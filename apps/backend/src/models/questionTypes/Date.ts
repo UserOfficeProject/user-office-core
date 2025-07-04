@@ -23,6 +23,7 @@ export const dateDefinition: Question<DataType.DATE> = {
     config.required = false;
     config.tooltip = '';
     config.includeTime = false;
+    config.readPermissions = [];
 
     return config;
   },

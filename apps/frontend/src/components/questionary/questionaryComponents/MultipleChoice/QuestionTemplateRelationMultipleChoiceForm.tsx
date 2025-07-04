@@ -10,6 +10,7 @@ import FormikUICustomTable from 'components/common/FormikUICustomTable';
 import Select from 'components/common/FormikUISelect';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
 
 import QuestionDependencyList from '../QuestionDependencyList';
@@ -54,7 +55,6 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
               data-cy="required"
             />
           </TitledContainer>
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.variant" shrink>
@@ -89,7 +89,6 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
               />
             )}
           </TitledContainer>
-
           <TitledContainer label="Items">
             <Field
               title=""
@@ -116,6 +115,10 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
               form={formikProps}
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.questionRel.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

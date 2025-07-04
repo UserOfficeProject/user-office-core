@@ -97,7 +97,9 @@ export default class QuestionaryQueries {
       return null;
     }
 
-    return this.dataSource.getQuestionarySteps(questionaryId);
+    const role = agent?.currentRole?.shortCode || null;
+
+    return this.dataSource.getQuestionarySteps(questionaryId, role);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
@@ -126,14 +128,20 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     templateId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionarySteps(templateId);
+    return this.dataSource.getBlankQuestionarySteps(
+      templateId,
+      agent?.currentRole?.shortCode || null
+    );
   }
 
   async getBlankQuestionaryStepsByCallId(
     agent: UserWithRole | null,
     callId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionaryStepsByCallId(callId);
+    return this.dataSource.getBlankQuestionaryStepsByCallId(
+      callId,
+      agent?.currentRole?.shortCode || null
+    );
   }
 
   async getQuestionaryStepsOrDefault(
