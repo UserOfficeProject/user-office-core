@@ -52,6 +52,7 @@ export default class VisitMutations {
   ) {}
 
   @Authorized()
+  @EventBus(Event.VISIT_CREATED)
   async createVisit(
     agent: UserWithRole | null,
     args: CreateVisitArgs
