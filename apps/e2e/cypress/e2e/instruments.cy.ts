@@ -34,6 +34,7 @@ context('Instrument tests', () => {
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(5),
     managerUserId: scientist1.id,
+    multipleTechReviewsEnabled: false,
   };
 
   const instrument2 = {
@@ -41,6 +42,14 @@ context('Instrument tests', () => {
     shortCode: faker.random.alphaNumeric(15),
     description: faker.random.words(5),
     managerUserId: scientist1.id,
+  };
+
+  const instrument3 = {
+    name: faker.random.words(2),
+    shortCode: faker.random.alphaNumeric(15),
+    description: faker.random.words(5),
+    managerUserId: scientist1.id,
+    multipleTechReviewsEnabled: true,
   };
 
   beforeEach(() => {
@@ -1011,6 +1020,7 @@ context('Instrument tests', () => {
   describe('Instruments tests as instrument scientist role', () => {
     let createdInstrumentId: number;
     let createdInstrument2Id: number;
+    let createdInstrument3Id: number;
     let createdProposalPk: number;
     let createdProposalId: string;
 
@@ -1048,6 +1058,21 @@ context('Instrument tests', () => {
 
           cy.assignScientistsToInstrument({
             instrumentId: createdInstrument2Id,
+            scientistIds: [scientist2.id],
+          });
+        }
+      });
+      cy.createInstrument(instrument3).then((result) => {
+        if (result.createInstrument) {
+          createdInstrument3Id = result.createInstrument.id;
+
+          cy.assignInstrumentToCall({
+            callId: initialDBData.call.id,
+            instrumentFapIds: [{ instrumentId: createdInstrument3Id }],
+          });
+
+          cy.assignScientistsToInstrument({
+            instrumentId: createdInstrument3Id,
             scientistIds: [scientist2.id],
           });
         }
@@ -1384,6 +1409,115 @@ context('Instrument tests', () => {
       selectAllProposalsFilterStatus();
 
       cy.contains('20');
+    });
+
+    it('Instrument scientist should be able to save and submit technical review on instrument which has multiple tech reviews enabled ', function () {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+        this.skip();
+      }
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposalPk],
+            instrumentIds: [createdInstrument3Id],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposalPk],
+            userId: scientist1.id,
+            instrumentId: createdInstrument3Id,
+          });
+        }
+      });
+      cy.login('user1');
+      cy.visit('/');
+
+      const internalComment = faker.random.words(2);
+      const publicComment = faker.random.words(2);
+
+      cy.addProposalTechnicalReview({
+        proposalPk: createdProposalPk,
+        reviewerId: scientist1.id,
+        submitted: false,
+        status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
+        timeAllocation: 2,
+        comment: internalComment,
+        publicComment: publicComment,
+        instrumentId: createdInstrumentId,
+        questionaryId: 3,
+      });
+
+      cy.login(scientist2);
+      cy.visit('/');
+
+      const internalComment2 = faker.random.words(2);
+      const publicComment2 = faker.random.words(2);
+      cy.contains('Proposals');
+
+      selectAllProposalsFilterStatus();
+
+      cy.get('[data-cy="reviewer-filter"]').click();
+      cy.get(
+        `[property="reviewer-filter-options"] [data-value=${ReviewerFilter.ME}]`
+      ).click();
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .click();
+      cy.get('[role="dialog"]').as('dialog');
+      cy.finishedLoading();
+      cy.get('@dialog').contains('Technical review').click();
+
+      cy.get('@dialog')
+        .find('[data-cy="timeAllocation"] input')
+        .should('exist');
+
+      cy.get('[data-cy="timeAllocation"] input').clear().type('5');
+
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.contains('Feasible').click();
+
+      cy.get('[data-cy="save-button"]').click();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Saved',
+      });
+
+      cy.setTinyMceContent('comment', internalComment2);
+      cy.setTinyMceContent('publicComment', publicComment2);
+
+      cy.getTinyMceContent('comment').then((content) =>
+        expect(content).to.have.string(internalComment2)
+      );
+
+      cy.getTinyMceContent('publicComment').then((content) =>
+        expect(content).to.have.string(publicComment2)
+      );
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.get('[data-cy="button-submit-technical-review"]').click();
+      cy.get('[data-cy="confirm-ok"]').click();
+      cy.get('[data-cy="button-submit-technical-review"]').should(
+        'be.disabled'
+      );
+
+      cy.notification({ text: 'successfully', variant: 'success' });
+
+      cy.get('[data-cy="back-button"]').click();
+
+      cy.get('[data-cy="timeAllocation"] input').should('be.disabled');
+
+      cy.closeModal();
     });
 
     it('Instrument scientists should be able to see but not modify the management decision', () => {

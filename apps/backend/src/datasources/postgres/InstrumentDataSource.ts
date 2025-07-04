@@ -42,7 +42,8 @@ export default class PostgresInstrumentDataSource
       instrument.short_code,
       instrument.description,
       instrument.manager_user_id,
-      instrument.selectable
+      instrument.selectable,
+      instrument.multiple_tech_reviews_enabled
     );
   }
 
@@ -70,7 +71,8 @@ export default class PostgresInstrumentDataSource
       instrument.short_code,
       instrument.description,
       instrument.manager_user_id,
-      instrument.management_time_allocation
+      instrument.management_time_allocation,
+      instrument.multiple_tech_reviews_enabled
     );
   }
 
@@ -82,6 +84,7 @@ export default class PostgresInstrumentDataSource
         description: args.description,
         manager_user_id: args.managerUserId,
         selectable: !!args.selectable,
+        multiple_tech_reviews_enabled: !!args.multipleTechReviewsEnabled,
       })
       .into('instruments')
       .returning('*');
@@ -295,6 +298,7 @@ export default class PostgresInstrumentDataSource
           description: instrument.description,
           manager_user_id: instrument.managerUserId,
           selectable: instrument.selectable,
+          multiple_tech_reviews_enabled: instrument.multipleTechReviewsEnabled,
         },
         ['*']
       )
@@ -383,6 +387,7 @@ export default class PostgresInstrumentDataSource
         'description',
         'manager_user_id',
         'management_time_allocation',
+        'multiple_tech_reviews_enabled',
       ])
       .from('instruments as i')
       .join('instrument_has_proposals as ihp', {
