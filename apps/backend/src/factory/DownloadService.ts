@@ -6,6 +6,7 @@ import { context, propagation, SpanKind, trace } from '@opentelemetry/api';
 import contentDisposition from 'content-disposition';
 import { Request, Response, NextFunction } from 'express';
 
+import { isTracingEnabled } from '../middlewares/tracing/tracing';
 import { Role } from '../models/Role';
 
 export enum DownloadType {
@@ -70,82 +71,103 @@ export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
       gotResponse = true;
     });
 
-    const tracer = trace.getTracer('default');
+    let factoryRespBody;
+    let contentTypeHeaders;
 
-    await tracer.startActiveSpan(
-      'factory-service-call',
-      { kind: SpanKind.CLIENT },
-      async (span) => {
-        try {
-          const headers: Record<string, string> = {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          };
-          propagation.inject(context.active(), headers);
+    const headers: Record<string, string> = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
 
-          const factoryResp = await fetch(
-            `${ENDPOINT}/${downloadType}/${type}`,
-            {
-              signal: controller.signal,
-              headers: headers,
-              method: 'POST',
-              body: JSON.stringify(properties),
+    if (isTracingEnabled()) {
+      const tracer = trace.getTracer('default');
+
+      await tracer.startActiveSpan(
+        'factory-service-call',
+        { kind: SpanKind.CLIENT },
+        async (span) => {
+          try {
+            propagation.inject(context.active(), headers);
+
+            const factoryResp = await fetch(
+              `${ENDPOINT}/${downloadType}/${type}`,
+              {
+                signal: controller.signal,
+                headers: headers,
+                method: 'POST',
+                body: JSON.stringify(properties),
+              }
+            );
+
+            if (!factoryResp.ok) {
+              throw new Error(await factoryResp.text());
             }
-          );
 
-          if (!factoryResp.ok) {
-            throw new Error(await factoryResp.text());
-          }
-
-          const factoryRespBody = factoryResp.body;
-          if (!factoryRespBody) {
-            return;
-          }
-
-          const readableStream = Readable.fromWeb(
-            factoryRespBody as ReadableStream,
-            {
-              signal: controller.signal,
+            factoryRespBody = factoryResp.body;
+            if (!factoryRespBody) {
+              return;
             }
-          );
 
-          readableStream.on('error', (err) => {
-            next({
-              error: err.toString(),
-              message: `Could not download generated ${downloadType}/${type}`,
-            });
-          });
-
-          const filename =
-            properties.data.length > 1
-              ? properties.meta.collectionFilename
-              : properties.meta.singleFilename;
-
-          const contentTypeHeaders = factoryResp.headers.get('content-type');
-
-          res.setHeader('Content-Disposition', contentDisposition(filename));
-          res.setHeader('x-download-filename', querystring.escape(filename));
-          if (contentTypeHeaders) {
-            res.setHeader('content-type', contentTypeHeaders);
+            contentTypeHeaders = factoryResp.headers.get('content-type');
+          } catch (err: unknown) {
+            if (err instanceof Error) {
+              span.recordException(err);
+              span.setStatus({ code: 2, message: err.message });
+            } else {
+              span.recordException({
+                name: 'UnknownError',
+                message: String(err),
+              });
+              span.setStatus({ code: 2, message: String(err) });
+            }
+          } finally {
+            span.end();
           }
-
-          readableStream.pipe(res);
-        } catch (err: unknown) {
-          if (err instanceof Error) {
-            span.recordException(err);
-            span.setStatus({ code: 2, message: err.message });
-          } else {
-            span.recordException({
-              name: 'UnknownError',
-              message: String(err),
-            });
-            span.setStatus({ code: 2, message: String(err) });
-          }
-        } finally {
-          span.end();
         }
+      );
+    } else {
+      const factoryResp = await fetch(`${ENDPOINT}/${downloadType}/${type}`, {
+        signal: controller.signal,
+        headers: headers,
+        method: 'POST',
+        body: JSON.stringify(properties),
+      });
+
+      if (!factoryResp.ok) {
+        throw new Error(await factoryResp.text());
       }
-    );
+
+      factoryRespBody = factoryResp.body;
+      if (!factoryRespBody) {
+        return;
+      }
+
+      contentTypeHeaders = factoryResp.headers.get('content-type');
+    }
+
+    const readableStream = Readable.fromWeb(factoryRespBody as ReadableStream, {
+      signal: controller.signal,
+    });
+
+    readableStream.on('error', (err) => {
+      next({
+        error: err.toString(),
+        message: `Could not download generated ${downloadType}/${type}`,
+      });
+    });
+
+    const filename =
+      properties.data.length > 1
+        ? properties.meta.collectionFilename
+        : properties.meta.singleFilename;
+
+    res.setHeader('Content-Disposition', contentDisposition(filename));
+    res.setHeader('x-download-filename', querystring.escape(filename));
+    if (contentTypeHeaders) {
+      res.setHeader('content-type', contentTypeHeaders);
+    }
+
+    readableStream.pipe(res);
   } catch (error) {
     next({
       error,
