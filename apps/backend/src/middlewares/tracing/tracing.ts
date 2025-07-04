@@ -71,3 +71,7 @@ export default async function startTracing() {
     otelSDK.start();
   }
 }
+
+export function isTracingEnabled(): boolean {
+  return !!process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
+}
