@@ -25,6 +25,8 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
+const scientist1 = initialDBData.users.user1;
+
 context('Template Basic tests', () => {
   beforeEach(() => {
     cy.resetDB(true);
@@ -1085,6 +1087,63 @@ context('Template Basic tests', () => {
       addDependency(field1, [field2, field3], field2);
       addDependency(field2, [field3], field3);
       addDependency(field3, []);
+    });
+
+    it('Should be able to add read permissions to a template', () => {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
+        cy.updateUserRoles({
+          id: scientist1.id,
+          roles: [initialDBData.roles.instrumentScientist],
+        });
+      }
+
+      cy.assignScientistsToInstrument({
+        scientistIds: [scientist1.id],
+        instrumentId: 1,
+      });
+
+      cy.updateTechnicalReviewAssignee({
+        proposalPks: 1,
+        userId: scientist1.id,
+        instrumentId: 1,
+      });
+
+      cy.changeProposalsStatus({ proposalPks: [1], statusId: 2 });
+
+      cy.login('officer');
+      cy.visit('/');
+
+      cy.visit('/ProposalTemplates');
+      cy.get('[data-testid="EditIcon"]').first().click();
+
+      cy.contains(booleanQuestion).click();
+
+      cy.get('[data-cy="read-permissions"]').click();
+
+      cy.contains('user_officer').click();
+      // Only way i found to close the menu in the test
+      // you cannot just press escape you must select a element and then press escape
+      // and the only elements that can be selected are the ones in the menu
+      // plese fix this if you can
+      cy.contains('fap_reviewer').click().type('{esc}');
+
+      cy.get('[data-cy="submit"]').click();
+
+      cy.visit('/Proposals');
+
+      cy.get('[data-cy="view-proposal').click();
+
+      cy.contains(booleanQuestion).should('exist');
+
+      cy.login(scientist1, initialDBData.roles.instrumentScientist);
+
+      cy.visit('/');
+
+      cy.get('[data-cy="edit-technical-review').click();
+
+      cy.contains('Proposal information').click();
+
+      cy.contains(booleanQuestion).should('not.exist');
     });
 
     it('User officer should be able to search questions', function () {
