@@ -17,7 +17,8 @@ export const QuestionReadPermissionsConfig = ({
   return (
     <TitledContainer label="Read Permissions">
       <InputLabel htmlFor="config.readPermissions" shrink>
-        Read Permissions
+        Read Permissions - leave blank for all users to be able to read the
+        question
       </InputLabel>
       <Field
         id="config.readPermissions"
