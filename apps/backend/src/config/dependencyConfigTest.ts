@@ -10,6 +10,7 @@ import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
+import { FacilityDataSourceMock } from '../datasources/mockups/FacilityDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
@@ -89,6 +90,7 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
+mapClass(Tokens.FacilityDataSource, FacilityDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);

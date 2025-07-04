@@ -1,0 +1,14 @@
+query getFacilities {
+  facilities {
+      id
+      name
+      shortCode
+      instruments {
+        ...instrumentMinimal
+      }
+      calls {
+        id
+        shortCode
+      }
+  }
+}

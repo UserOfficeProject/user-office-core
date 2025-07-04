@@ -111,17 +111,22 @@ const AssignInstrumentsToCall = ({
   }) as Instrument[];
 
   const onAssignButtonClick = async () => {
-    const response = await api({
-      toastSuccessMessage: t('instrument') + '/s assigned successfully!',
-    }).assignInstrumentsToCall({
-      callId,
-      instrumentFapIds: selectedInstruments.map((instrumentToAssign) => ({
-        instrumentId: instrumentToAssign.id,
-        fapId: instrumentFapMapping[instrumentToAssign.id],
-      })),
-    });
+    // This would cause a uncaught error but there are other examples of this happening in the codebase that only cause a console warning
+    try {
+      const response = await api({
+        toastSuccessMessage: t('instrument') + '/s assigned successfully!',
+      }).assignInstrumentsToCall({
+        callId,
+        instrumentFapIds: selectedInstruments.map((instrumentToAssign) => ({
+          instrumentId: instrumentToAssign.id,
+          fapId: instrumentFapMapping[instrumentToAssign.id],
+        })),
+      });
 
-    assignInstrumentsToCall(response.assignInstrumentsToCall.instruments);
+      assignInstrumentsToCall(response.assignInstrumentsToCall.instruments);
+    } catch (error) {
+      return;
+    }
   };
 
   return (

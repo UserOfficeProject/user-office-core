@@ -7,6 +7,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { FacilityDataSource } from '../datasources/FacilityDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
@@ -29,7 +30,9 @@ const createCallValidationSchema = mergeValidationSchemas(
 @injectable()
 export default class CallMutations {
   constructor(
-    @inject(Tokens.CallDataSource) private dataSource: CallDataSource
+    @inject(Tokens.CallDataSource) private dataSource: CallDataSource,
+    @inject(Tokens.FacilityDataSource)
+    private facilityDataSource: FacilityDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -113,6 +116,47 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: AssignInstrumentsToCallInput
   ): Promise<Call | Rejection> {
+    const callFacilities = await this.facilityDataSource.getCallsFacilities(
+      args.callId
+    );
+
+    if (callFacilities.length > 0) {
+      let shareFacility = true;
+
+      await Promise.all(
+        args.instrumentFapIds.map(async (instrumentFap) => {
+          const instrumentFacility =
+            await this.facilityDataSource.getInstrumentsFacilities(
+              instrumentFap.instrumentId
+            );
+
+          if (instrumentFacility.length === 0) {
+            shareFacility = false;
+          }
+
+          const facilityCrossover = instrumentFacility.some(
+            (facilityInstrument) =>
+              callFacilities.some(
+                (facilityCall) => facilityInstrument.id === facilityCall.id
+              )
+          );
+
+          if (!facilityCrossover) {
+            shareFacility = false;
+          }
+        })
+      );
+
+      if (!shareFacility) {
+        return rejection(
+          'One or more instruments do not share a facility with the selected call',
+          {
+            args,
+          }
+        );
+      }
+    }
+
     return this.dataSource
       .assignInstrumentsToCall(args)
       .then((result) => result)

@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Technique } from 'generated/sdk';
+import { TechniqueFragment } from 'generated/sdk';
 
 type AssignedInstrumentsTableProps = {
-  technique: Technique;
+  technique: TechniqueFragment;
 };
 
 const instrumentContactColumns = [
