@@ -71,14 +71,12 @@ const PageLayout = ({
   };
   const drawerOpen = () => ({
     width: drawerWidth,
-    overflowX: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   });
   const drawerClose = () => ({
-    overflowX: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -164,7 +162,7 @@ const PageLayout = ({
             </IconButton>
           </Box>
           <Divider />
-          <List disablePadding>
+          <List disablePadding sx={{ overflowX: 'hidden' }}>
             <MenuItems currentRole={currentRole} />
           </List>
           <Divider />
