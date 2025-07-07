@@ -13,6 +13,7 @@ import {
 import { ResolverContext } from '../../context';
 import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
+import { Facility } from './Facility';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
 import { Template } from './Template';
@@ -146,6 +147,11 @@ export class CallInstrumentsResolver {
     const endCallInternal = new Date(call.endCallInternal);
 
     return startCall <= now && endCallInternal >= now;
+  }
+
+  @FieldResolver(() => Facility)
+  async facilities(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.facility.dataSource.getCallsFacilities(call.id);
   }
 }
 
