@@ -534,7 +534,7 @@ export const collectProposalPDFDataTokenAccess = async (
 
   const questionarySteps = await questionaryDataSource.getQuestionarySteps(
     proposal.questionaryId,
-    user.currentRole?.shortCode || null
+    null
   );
 
   if (isRejection(questionarySteps) || questionarySteps == null) {
@@ -576,10 +576,7 @@ export const collectProposalPDFDataTokenAccess = async (
           undefined,
           sample,
           await getQuestionary(sample.questionaryId),
-          await getSampleQuestionarySteps(
-            sample.questionaryId,
-            user.currentRole?.shortCode ?? null
-          )
+          await getSampleQuestionarySteps(sample.questionaryId, null)
         )
       )
     )
@@ -614,10 +611,7 @@ export const collectProposalPDFDataTokenAccess = async (
           undefined,
           genericTemplate,
           await getQuestionary(genericTemplate.questionaryId),
-          await getSampleQuestionarySteps(
-            genericTemplate.questionaryId,
-            user.currentRole?.shortCode ?? null
-          )
+          await getSampleQuestionarySteps(genericTemplate.questionaryId, null)
         )
       )
     )

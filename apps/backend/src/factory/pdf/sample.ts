@@ -134,7 +134,10 @@ export async function collectSamplePDFDataTokenAccess(
 
   const questionarySteps =
     newQuestionarySteps ||
-    (await questionaryDataSource.getQuestionarySteps(sample.questionaryId));
+    (await questionaryDataSource.getQuestionarySteps(
+      sample.questionaryId,
+      null
+    ));
 
   if (!questionarySteps) {
     throw new Error(
