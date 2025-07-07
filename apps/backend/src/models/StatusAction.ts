@@ -3,6 +3,7 @@ import { StatusActionConfig } from '../resolvers/types/StatusActionConfig';
 export enum StatusActionType {
   EMAIL = 'EMAIL',
   RABBITMQ = 'RABBITMQ',
+  PROPOSALDOWNLOAD = 'PROPOSALDOWNLOAD',
 }
 
 export class StatusAction {
