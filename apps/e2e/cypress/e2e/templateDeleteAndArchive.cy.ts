@@ -932,7 +932,7 @@ context('Template Delete, Archive, Unarchive', () => {
                 id: createdQuestion.id,
                 question: faker.lorem.words(5),
                 naturalKey: faker.lorem.word(5),
-                config: `{"required":false,"multiline":false}`,
+                config: `{"required":false,"multiline":false,"readPermissions":[]}`,
               });
               cy.createQuestionTemplateRelation({
                 questionId: createdQuestion.id,
