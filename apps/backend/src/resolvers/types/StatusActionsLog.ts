@@ -21,8 +21,8 @@ export class StatusActionsLog implements Partial<StatusActionsLogOrigin> {
   @Field(() => Int)
   public statusActionsLogId: number;
 
-  @Field(() => EmailStatusActionRecipients)
-  public emailStatusActionRecipient: EmailStatusActionRecipients;
+  @Field(() => EmailStatusActionRecipients, { nullable: true })
+  public emailStatusActionRecipient?: EmailStatusActionRecipients;
 
   @Field(() => Boolean)
   public statusActionsSuccessful: boolean;
