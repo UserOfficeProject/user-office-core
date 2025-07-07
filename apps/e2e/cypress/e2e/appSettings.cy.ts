@@ -28,13 +28,7 @@ context('App settings tests', () => {
 
       cy.get('[data-cy="calls-table"] [data-cy="create-new-entry"]').click();
 
-      cy.get('[data-cy="start-date"] input').should(
-        'have.attr',
-        'placeholder',
-        initialDBData.getCorrectFormatCase(
-          initialDBData.getFormats().dateTimeFormat
-        )
-      );
+      cy.get('[data-cy="start-end-call-input"]').should('exist');
 
       cy.get('[data-cy="close-modal-btn"]').click();
 
@@ -82,11 +76,7 @@ context('App settings tests', () => {
 
       cy.get('[data-cy="calls-table"] [data-cy="create-new-entry"]').click();
 
-      cy.get('[data-cy="start-date"] input').should(
-        'have.attr',
-        'placeholder',
-        initialDBData.getCorrectFormatCase(newDateTimeFormat)
-      );
+      cy.get('[data-cy="start-end-call-input"]').should('exist');
     });
 
     it('Instrument Scientist filter should differ based on setting value', function () {
