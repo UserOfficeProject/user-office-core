@@ -480,9 +480,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 }
 
-export async function getTemplateIdForInvite(
-  inviteId: number
-): Promise<string> {
+async function getTemplateIdForInvite(inviteId: number): Promise<string> {
   // Resolve all necessary data sources in one go
   const roleClaimDS = container.resolve<RoleClaimDataSource>(
     Tokens.RoleClaimDataSource
