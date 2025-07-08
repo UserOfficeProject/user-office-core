@@ -4,6 +4,7 @@ import sinon from 'sinon';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
 import { Invite } from '../../models/Invite';
 import { RoleClaim } from '../../models/RoleClaim';
 import { SettingsId } from '../../models/Settings';
@@ -125,7 +126,7 @@ describe('checkInviteReminderJob', () => {
         claimedByUserId: null,
         isEmailSent: true,
         expiresAt: new Date('2025-12-31T00:00:00.000Z'),
-        templateId: 'user_template_id',
+        templateId: EmailTemplateId.PROPOSAL_SUBMITTED,
       };
 
       mockInviter = {
