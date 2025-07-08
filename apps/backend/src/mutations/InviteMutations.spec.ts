@@ -14,6 +14,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
@@ -281,7 +282,7 @@ describe('Test Invite Mutations', () => {
       .findById((response as Invite[])[0].id)) as Invite;
 
     expect(invite.templateId).toBe(
-      'user-office-registration-invitation-co-proposer'
+      EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
     );
   });
 });
