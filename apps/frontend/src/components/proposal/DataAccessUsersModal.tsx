@@ -36,7 +36,7 @@ const DataAccessUsersModal = ({
       onClose={onClose}
       maxWidth="md"
       fullWidth
-      title="Remote Users"
+      title="Data access users"
     >
       <DialogContent>
         {loadingDataAccessUsers ? (
@@ -48,21 +48,21 @@ const DataAccessUsersModal = ({
               setUsers={setManagedUsers}
               invites={[]}
               setInvites={() => {}}
-              title="Remote Users"
-              addButtonLabel="Add Remote User"
+              title="Data access users"
+              addButtonLabel="Add Data Access User"
             />
             <ActionButtonContainer>
               <Button
                 onClick={onClose}
                 variant="outlined"
-                data-cy="close-remote-users-modal"
+                data-cy="close-data-access-users-modal"
               >
                 Close
               </Button>
               <Button
                 onClick={onClose}
                 variant="contained"
-                data-cy="save-remote-users-modal"
+                data-cy="save-data-access-users-modal"
               >
                 Update
               </Button>

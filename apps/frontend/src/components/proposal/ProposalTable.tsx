@@ -273,7 +273,7 @@ const ProposalTable = ({
           (rowData) => {
             return {
               icon: PeopleIcon,
-              tooltip: 'View remote users',
+              tooltip: 'View data access users',
               hidden:
                 isDataAccessUsersEnabled !== true ||
                 rowData.publicStatus !== ProposalPublicStatus.ACCEPTED,
