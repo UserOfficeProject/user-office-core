@@ -1090,6 +1090,7 @@ context('Template Basic tests', () => {
     });
 
     it('Should be able to add read permissions to a template', () => {
+      createTopicWithQuestionsAndRelations();
       if (featureFlags.getEnabledFeatures().get(FeatureId.USER_MANAGEMENT)) {
         cy.updateUserRoles({
           id: scientist1.id,
@@ -1115,6 +1116,13 @@ context('Template Basic tests', () => {
 
       cy.visit('/ProposalTemplates');
       cy.get('[data-testid="EditIcon"]').first().click();
+
+      cy.createBooleanQuestion(booleanQuestion);
+
+      cy.contains(booleanQuestion)
+        .closest('[data-cy=question-container]')
+        .find("[data-cy='proposal-question-id']")
+        .invoke('html');
 
       cy.contains(booleanQuestion).click();
 
