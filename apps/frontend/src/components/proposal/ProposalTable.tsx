@@ -31,12 +31,12 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import AcceptInvite from './AcceptInvite';
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
+import DataAccessUsersModal from './DataAccessUsersModal';
 import { ProposalStatusDefaultShortCodes } from './ProposalsSharedConstants';
 import {
   PartialProposalsDataType,
   UserProposalDataType,
 } from './ProposalTableUser';
-import RemoteUsersModal from './RemoteUsersModal';
 
 type ProposalTableProps = {
   /** Error flag */
@@ -98,7 +98,8 @@ const ProposalTable = ({
     ProposalData,
     'primaryKey' | 'questionary'
   > | null>(null);
-  const [isRemoteUsersModalOpen, setIsRemoteUsersModalOpen] = useState(false);
+  const [isDataAccessUsersModalOpen, setIsDataAccessUsersModalOpen] =
+    useState(false);
   const [selectedProposalPk, setSelectedProposalPk] = useState<
     number | undefined
   >();
@@ -107,8 +108,8 @@ const ProposalTable = ({
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
 
-  const isRemoteUsersEnabled = featureContext.featuresMap.get(
-    FeatureId.REMOTE_USERS
+  const isDataAccessUsersEnabled = featureContext.featuresMap.get(
+    FeatureId.DATA_ACCESS_USERS
   )?.isEnabled;
 
   // TODO: This api call here should be replaced with a hook for getting user proposals.
@@ -216,9 +217,9 @@ const ProposalTable = ({
           />
         </DialogContent>
       </Dialog>
-      <RemoteUsersModal
-        open={isRemoteUsersModalOpen}
-        onClose={() => setIsRemoteUsersModalOpen(false)}
+      <DataAccessUsersModal
+        open={isDataAccessUsersModalOpen}
+        onClose={() => setIsDataAccessUsersModalOpen(false)}
         proposalPk={selectedProposalPk}
       />
       <MaterialTable
@@ -274,13 +275,13 @@ const ProposalTable = ({
               icon: PeopleIcon,
               tooltip: 'View remote users',
               hidden:
-                isRemoteUsersEnabled !== true ||
+                isDataAccessUsersEnabled !== true ||
                 rowData.publicStatus !== ProposalPublicStatus.ACCEPTED,
               onClick: (_event, rowData) => {
                 setSelectedProposalPk(
                   (rowData as PartialProposalsDataType).primaryKey
                 );
-                setIsRemoteUsersModalOpen(true);
+                setIsDataAccessUsersModalOpen(true);
               },
             };
           },

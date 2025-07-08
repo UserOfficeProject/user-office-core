@@ -4,9 +4,9 @@ import { ResolverContext } from '../../context';
 import { BasicUserDetails } from '../types/BasicUserDetails';
 
 @Resolver()
-export class RemoteUsersQuery {
+export class DataAccessUsersQuery {
   @Query(() => [BasicUserDetails])
-  async remoteUsers(
+  async dataAccessUsers(
     @Ctx() context: ResolverContext,
     @Arg('proposalPk', () => Int) proposalPk: number
   ): Promise<BasicUserDetails[]> {

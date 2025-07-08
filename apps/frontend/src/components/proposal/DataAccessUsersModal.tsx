@@ -6,28 +6,29 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import StyledDialog from 'components/common/StyledDialog';
 import UserManagementTable from 'components/common/UserManagementTable';
 import { BasicUserDetails } from 'generated/sdk';
-import { useRemoteUsersData } from 'hooks/remoteUser/useRemoteUsersData';
+import { useDataAccessUsersData } from 'hooks/remoteUser/useDataAccessUsersData';
 
-type RemoteUsersModalProps = {
+type DataAccessUsersModalProps = {
   open: boolean;
   onClose: () => void;
   proposalPk?: number;
 };
 
-const RemoteUsersModal = ({
+const DataAccessUsersModal = ({
   open,
   onClose,
   proposalPk,
-}: RemoteUsersModalProps) => {
-  const { remoteUsers, loadingRemoteUsers } = useRemoteUsersData(proposalPk);
+}: DataAccessUsersModalProps) => {
+  const { dataAccessUsers, loadingDataAccessUsers } =
+    useDataAccessUsersData(proposalPk);
   const [managedUsers, setManagedUsers] = useState<BasicUserDetails[]>([]);
 
-  // Update managed users when remote users data changes
+  // Update managed users when data access users data changes
   React.useEffect(() => {
-    if (remoteUsers && !loadingRemoteUsers) {
-      setManagedUsers(remoteUsers);
+    if (dataAccessUsers && !loadingDataAccessUsers) {
+      setManagedUsers(dataAccessUsers);
     }
-  }, [remoteUsers, loadingRemoteUsers]);
+  }, [dataAccessUsers, loadingDataAccessUsers]);
 
   return (
     <StyledDialog
@@ -38,7 +39,7 @@ const RemoteUsersModal = ({
       title="Remote Users"
     >
       <DialogContent>
-        {loadingRemoteUsers ? (
+        {loadingDataAccessUsers ? (
           <Typography>Loading...</Typography>
         ) : (
           <>
@@ -73,4 +74,4 @@ const RemoteUsersModal = ({
   );
 };
 
-export default RemoteUsersModal;
+export default DataAccessUsersModal;
