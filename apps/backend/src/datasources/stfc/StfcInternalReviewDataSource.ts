@@ -37,7 +37,7 @@ export default class StfcInternalReviewDataSource
     }
     if (!userRoles.find((role) => role.shortCode === Roles.INTERNAL_REVIEWER)) {
       // STFC Internal Reviewer role has ID 53
-      this.stfcUserDataSource.assignSTFCRoleToUser(
+      await this.stfcUserDataSource.assignSTFCRoleToUser(
         input.reviewerId,
         InternalReviewRoleNumber
       );
@@ -59,7 +59,7 @@ export default class StfcInternalReviewDataSource
 
     // If user has no other internal reviews, remove the Internal Reviewer role
     if (allAssignedInternalReviews.length === 1) {
-      this.stfcUserDataSource.removeFapRoleFromUser(
+      await this.stfcUserDataSource.removeFapRoleFromUser(
         internalReview.reviewerId,
         InternalReviewRoleNumber
       );

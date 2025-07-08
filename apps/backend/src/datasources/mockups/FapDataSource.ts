@@ -173,12 +173,6 @@ export class FapDataSourceMock implements FapDataSource {
   async assignChairOrSecretaryToFap(
     args: AssignChairOrSecretaryToFapInput
   ): Promise<Fap> {
-    if (args.userId === 5 || args.userId === 6) {
-      throw new Error(
-        'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary'
-      );
-    }
-
     const fap = dummyFaps.find((element) => element.id === args.fapId);
 
     if (fap) {
