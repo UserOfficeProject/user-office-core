@@ -46,7 +46,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         true,
         null,
-        null
+        'email-template-id'
       ),
       new Invite(
         2,
@@ -58,7 +58,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         1,
         true,
         null,
-        'email-template'
+        'email-template-id'
       ),
       new Invite(
         3,
@@ -70,7 +70,7 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         false,
         new Date('2022-01-01'),
-        null
+        'email-template-id'
       ),
     ];
   }
