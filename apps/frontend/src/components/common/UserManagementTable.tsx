@@ -104,7 +104,11 @@ const UserManagementTable = ({
       selection={true}
       userRole={UserRole.USER}
       participant={true}
-      setPrincipalInvestigator={onUserAction ? (user) => onUserAction('setPrincipalInvestigator', user) : undefined}
+      setPrincipalInvestigator={
+        onUserAction
+          ? (user) => onUserAction('setPrincipalInvestigator', user)
+          : undefined
+      }
     />
   );
 
@@ -139,7 +143,11 @@ const UserManagementTable = ({
             invitationUserRole={UserRole.USER}
             onRemove={removeUser}
             preserveSelf={preserveSelf}
-            setPrincipalInvestigator={onUserAction ? (user) => onUserAction('setPrincipalInvestigator', user) : undefined}
+            setPrincipalInvestigator={
+              onUserAction
+                ? (user) => onUserAction('setPrincipalInvestigator', user)
+                : undefined
+            }
           />
 
           {invites.length > 0 && (
