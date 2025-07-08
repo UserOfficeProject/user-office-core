@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
 import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
@@ -15,6 +16,7 @@ export class InviteDataSourceMock implements InviteDataSource {
   ) {
     this.init();
   }
+
   async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
     const coProposerClaims =
       await this.coProposerDataSource.findByProposalPk(proposalPk);
@@ -44,7 +46,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         null,
         true,
-        null
+        null,
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER
       ),
       new Invite(
         2,
@@ -55,7 +58,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         null,
         1,
         true,
-        null
+        null,
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
       ),
       new Invite(
         3,
@@ -66,7 +70,8 @@ export class InviteDataSourceMock implements InviteDataSource {
         new Date(),
         null,
         false,
-        new Date('2022-01-01')
+        new Date('2022-01-01'),
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
       ),
     ];
   }
@@ -118,8 +123,9 @@ export class InviteDataSourceMock implements InviteDataSource {
     note: string;
     createdByUserId: number;
     expiresAt: Date | null;
+    templateId?: EmailTemplateId | null;
   }): Promise<Invite> {
-    const { code, email, note, createdByUserId, expiresAt } = args;
+    const { code, email, createdByUserId, expiresAt, templateId } = args;
 
     const newInvite = new Invite(
       this.invites.length + 1, // Generate new ID
@@ -130,7 +136,8 @@ export class InviteDataSourceMock implements InviteDataSource {
       null,
       null,
       false,
-      expiresAt ?? null
+      expiresAt ?? null,
+      templateId ?? (null as EmailTemplateId | null)
     );
 
     this.invites.push(newInvite);
@@ -147,6 +154,7 @@ export class InviteDataSourceMock implements InviteDataSource {
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
     expiresAt?: Date | null;
+    templateId?: string | null;
   }): Promise<Invite> {
     const invite = await this.findById(args.id);
     if (!invite) {

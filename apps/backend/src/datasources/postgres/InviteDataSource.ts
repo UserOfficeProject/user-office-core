@@ -81,8 +81,9 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     note: string;
     createdByUserId: number;
     expiresAt: Date | null;
+    templateId?: string | null;
   }): Promise<Invite> {
-    const { code, email, createdByUserId, expiresAt } = args;
+    const { code, email, createdByUserId, expiresAt, templateId } = args;
 
     return database
       .insert({
@@ -90,6 +91,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         email: email,
         created_by: createdByUserId,
         expires_at: expiresAt,
+        template_id: templateId,
       })
       .into('invites')
       .returning('*')
@@ -108,6 +110,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
     expiresAt?: Date | null;
+    templateId?: string | null;
   }): Promise<Invite> {
     return database
       .update({
@@ -118,6 +121,7 @@ export default class PostgresInviteDataSource implements InviteDataSource {
         claimed_by: args.claimedByUserId,
         is_email_sent: args.isEmailSent,
         expires_at: args.expiresAt,
+        template_id: args.templateId,
       })
       .from('invites')
       .where('invite_id', args.id)

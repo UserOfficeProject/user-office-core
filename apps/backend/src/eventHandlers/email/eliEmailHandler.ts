@@ -164,6 +164,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           })
           .catch((err: string) => {
             logger.logException('Failed email transmission', err);
+          })
+          .finally(() => {
+            inviteDataSource.update({
+              id: invite.id,
+              templateId: templateId,
+            });
           });
       }
 
