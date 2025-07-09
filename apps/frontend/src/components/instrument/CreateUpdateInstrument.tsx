@@ -300,7 +300,7 @@ const CreateUpdateInstrument = ({
                 }
               />
             }
-            label="Allow mutiple reviews for a technical review for this instrument"
+            label="Allow multiple reviews for a technical review for this instrument"
           />
           <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
