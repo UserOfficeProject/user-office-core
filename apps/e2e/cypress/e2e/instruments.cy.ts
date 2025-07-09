@@ -1412,9 +1412,6 @@ context('Instrument tests', () => {
     });
 
     it('Instrument scientist can only add/edit technical review for proposal with multiple tech reviews enabled ', function () {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
-        this.skip();
-      }
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           createdProposalPk = result.createProposal.primaryKey;
@@ -1470,7 +1467,7 @@ context('Instrument tests', () => {
       ).click();
       cy.finishedLoading();
 
-      cy.contains(proposal1.title)
+      cy.contains(proposal2.title)
         .parent()
         .find('[data-cy="edit-technical-review"]')
         .click();
@@ -1505,11 +1502,13 @@ context('Instrument tests', () => {
         expect(content).to.have.string(publicComment2)
       );
       cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.notification({
+        variant: 'success',
+        text: 'Saved',
+      });
       cy.get('[data-cy="button-submit-technical-review"]').should(
         'be.disabled'
       );
-
-      cy.notification({ text: 'successfully', variant: 'success' });
 
       cy.get('[data-cy="back-button"]').click();
 
