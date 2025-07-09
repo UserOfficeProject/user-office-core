@@ -1411,7 +1411,7 @@ context('Instrument tests', () => {
       cy.contains('20');
     });
 
-    it('Instrument scientist should be able to only add/edit and not submit technical review on instrument which has multiple tech reviews enabled ', function () {
+    it('Instrument scientist can only add/edit technical review for proposal with multiple tech reviews enabled ', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
