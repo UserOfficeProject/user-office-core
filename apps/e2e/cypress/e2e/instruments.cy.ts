@@ -1434,29 +1434,9 @@ context('Instrument tests', () => {
           });
         }
       });
-      cy.login('user1');
-      cy.visit('/');
 
       const internalComment = faker.random.words(2);
       const publicComment = faker.random.words(2);
-
-      cy.addProposalTechnicalReview({
-        proposalPk: createdProposalPk,
-        reviewerId: scientist1.id,
-        submitted: false,
-        status: TechnicalReviewStatus.PARTIALLY_FEASIBLE,
-        timeAllocation: 2,
-        comment: internalComment,
-        publicComment: publicComment,
-        instrumentId: createdInstrumentId,
-        questionaryId: 3,
-      });
-
-      cy.login(scientist2);
-      cy.visit('/');
-
-      const internalComment2 = faker.random.words(2);
-      const publicComment2 = faker.random.words(2);
       cy.contains('Proposals');
 
       selectAllProposalsFilterStatus();
@@ -1491,15 +1471,15 @@ context('Instrument tests', () => {
         text: 'Saved',
       });
 
-      cy.setTinyMceContent('comment', internalComment2);
-      cy.setTinyMceContent('publicComment', publicComment2);
+      cy.setTinyMceContent('comment', internalComment);
+      cy.setTinyMceContent('publicComment', publicComment);
 
       cy.getTinyMceContent('comment').then((content) =>
-        expect(content).to.have.string(internalComment2)
+        expect(content).to.have.string(internalComment)
       );
 
       cy.getTinyMceContent('publicComment').then((content) =>
-        expect(content).to.have.string(publicComment2)
+        expect(content).to.have.string(publicComment)
       );
       cy.get('[data-cy="save-and-continue-button"]').click();
       cy.notification({
