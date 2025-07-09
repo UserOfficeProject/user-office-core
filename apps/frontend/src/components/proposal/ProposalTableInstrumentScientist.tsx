@@ -635,24 +635,44 @@ const ProposalTableInstrumentScientist = ({
 
   const handleBulkTechnicalReviewsSubmit = async () => {
     const invalid = [];
+    // Proposals with at least one submitted technical review (cannot be re-submitted)
+    const technicalReviewAlreadySubmitted = selectedProposals.filter(
+      (proposal) =>
+        proposal.technicalReviews?.some(
+          (technicalReview) => technicalReview.submitted
+        )
+    );
+    // Proposals where the current user is not the assignee for any unsubmitted technical review (cannot be submitted)
+    const notAPrimaryReviewerOfProposal = selectedProposals.filter((proposal) =>
+      proposal.technicalReviews?.some(
+        (technicalReview) =>
+          technicalReview.technicalReviewAssignee?.id !== user.id &&
+          !technicalReview.submitted
+      )
+    );
 
-    for await (const proposal of selectedProposals) {
-      const { technicalReviews } = proposal;
-      if (technicalReviews?.length) {
-        const isValidSchema = (
-          await Promise.all(
-            technicalReviews.map(
-              async (tr) =>
-                await proposalTechnicalReviewValidationSchema.isValid({
-                  status: tr.status,
-                  timeAllocation: tr.timeAllocation,
-                })
+    if (
+      technicalReviewAlreadySubmitted.length == 0 &&
+      notAPrimaryReviewerOfProposal.length == 0
+    ) {
+      for await (const proposal of selectedProposals) {
+        const { technicalReviews } = proposal;
+        if (technicalReviews?.length) {
+          const isValidSchema = (
+            await Promise.all(
+              technicalReviews.map(
+                async (tr) =>
+                  await proposalTechnicalReviewValidationSchema.isValid({
+                    status: tr.status,
+                    timeAllocation: tr.timeAllocation,
+                  })
+              )
             )
-          )
-        ).every(Boolean);
+          ).every(Boolean);
 
-        if (!isValidSchema) {
-          invalid.push(proposal);
+          if (!isValidSchema) {
+            invalid.push(proposal);
+          }
         }
       }
     }
@@ -666,11 +686,15 @@ const ProposalTableInstrumentScientist = ({
         description:
           'No further changes to technical reviews are possible after submission. Are you sure you want to submit the selected proposals technical reviews?',
         alertText:
-          invalid.length > 0
-            ? `Some of the selected proposals are missing some required input. Please correct the status and time allocation for the proposal(s) with ID: ${invalid
-                .map((proposal) => proposal.proposalId)
-                .join(', ')}`
-            : '',
+          technicalReviewAlreadySubmitted.length > 0
+            ? `These proposals ${technicalReviewAlreadySubmitted.map((proposal) => proposal.proposalId).join(',')} are already submitted`
+            : notAPrimaryReviewerOfProposal.length > 0
+              ? `You are attempting to submit reviews for proposals where you are not the assigned technical reviewer. Please contact the designated reviewer to submit the proposals with ID : ${notAPrimaryReviewerOfProposal.map((proposal) => proposal.proposalId).join(',')}`
+              : invalid.length > 0
+                ? `Some of the selected proposals are missing some required input. Please correct the status and time allocation for the proposal(s) with ID: ${invalid
+                    .map((proposal) => proposal.proposalId)
+                    .join(', ')}`
+                : '',
       }
     )();
   };
