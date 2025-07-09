@@ -1411,7 +1411,7 @@ context('Instrument tests', () => {
       cy.contains('20');
     });
 
-    it('Instrument scientist should be able to save and submit technical review on instrument which has multiple tech reviews enabled ', function () {
+    it('Instrument scientist should be able to only add/edit and not submit technical review on instrument which has multiple tech reviews enabled ', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
@@ -1505,8 +1505,6 @@ context('Instrument tests', () => {
         expect(content).to.have.string(publicComment2)
       );
       cy.get('[data-cy="save-and-continue-button"]').click();
-      cy.get('[data-cy="button-submit-technical-review"]').click();
-      cy.get('[data-cy="confirm-ok"]').click();
       cy.get('[data-cy="button-submit-technical-review"]').should(
         'be.disabled'
       );
@@ -1515,7 +1513,7 @@ context('Instrument tests', () => {
 
       cy.get('[data-cy="back-button"]').click();
 
-      cy.get('[data-cy="timeAllocation"] input').should('be.disabled');
+      cy.get('[data-cy="timeAllocation"] input').should('not.be.disabled');
 
       cy.closeModal();
     });
