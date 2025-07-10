@@ -2,21 +2,30 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
+import { AdminDataSource } from '../../datasources/AdminDataSource';
 import {
   DownloadService,
   DownloadType,
   MetaBase,
   ZIPType,
 } from '../../factory/DownloadService';
-import { ProposalPDFData } from '../../factory/pdf/proposal';
+import {
+  FullProposalPDFData,
+  PregeneratedProposalPDFData,
+  ProposalPDFData,
+} from '../../factory/pdf/proposal';
 import { getCurrentTimestamp } from '../../factory/util';
 import { ProposalAttachmentData } from '../../factory/zip/attachment';
+import { FeatureId } from '../../models/Feature';
 import FactoryServices, { DownloadTypeServices } from './factoryServices';
 
 const router = express.Router();
 
 const downloadService = container.resolve<DownloadService>(
   Tokens.DownloadService
+);
+const adminDataSource = container.resolve<AdminDataSource>(
+  Tokens.AdminDataSource
 );
 
 router.get(`/${ZIPType.ATTACHMENT}/:proposal_pks`, async (req, res, next) => {
@@ -88,24 +97,61 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     const userWithRole = {
       ...res.locals.agent,
     };
-    const proposalPks: number[] = req.params.proposal_pks
-      .split(',')
-      .map((n: string) => parseInt(n))
-      .filter((id: number) => !isNaN(id));
+    const requestedPks: number[] = Array.from(
+      new Set(
+        req.params.proposal_pks
+          .split(',')
+          .map((n: string) => parseInt(n))
+          .filter((id: number) => !isNaN(id))
+      )
+    );
 
     const meta: MetaBase = {
       collectionFilename: `proposals_${getCurrentTimestamp()}.zip`,
       singleFilename: '',
     };
 
-    const data = await factoryServices.getPdfProposals(
-      userWithRole,
-      proposalPks,
-      meta,
-      {
-        filter: req.query?.filter?.toString(),
-      }
+    const features = await adminDataSource.getFeatures();
+
+    const isPreferPregeneratedPdfsEnabled = features.find(
+      (feature) =>
+        feature.id === FeatureId.PREFER_PREGENERATED_PROPOSAL_DOWNLOAD
+    )?.isEnabled;
+
+    const data: ProposalPDFData[] = [];
+    const pregeneratedPks = new Set<number>();
+
+    if (isPreferPregeneratedPdfsEnabled) {
+      const pregeneratedProposalPdfData: PregeneratedProposalPDFData[] =
+        await factoryServices.getPregeneratedPdfProposals(
+          userWithRole,
+          requestedPks,
+          meta
+        );
+
+      pregeneratedProposalPdfData.forEach((propData) => {
+        data.push({ ...propData });
+        pregeneratedPks.add(propData.proposal.primaryKey);
+      });
+    }
+
+    const pksToFetchFullData = requestedPks.filter(
+      (pk) => !pregeneratedPks.has(pk)
     );
+
+    const fullProposalPdfData: FullProposalPDFData[] | null =
+      await factoryServices.getPdfProposals(
+        userWithRole,
+        pksToFetchFullData,
+        meta,
+        {
+          filter: req.query?.filter?.toString(),
+        }
+      );
+
+    if (fullProposalPdfData) {
+      data.push(...fullProposalPdfData);
+    }
 
     if (!data) {
       throw new Error('Could not get proposal details');

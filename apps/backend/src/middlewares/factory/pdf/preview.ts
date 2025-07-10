@@ -8,7 +8,7 @@ import {
   DownloadType,
   DownloadService,
 } from '../../../factory/DownloadService';
-import { ProposalPDFData } from '../../../factory/pdf/proposal';
+import { FullProposalPDFData } from '../../../factory/pdf/proposal';
 import { Role } from '../../../models/Role';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
@@ -78,7 +78,7 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       }
 
       const dummyData = JSON.parse(pdfTemplate.dummyData) as {
-        data: ProposalPDFData;
+        data: FullProposalPDFData;
         userRole: Role;
       };
 
@@ -93,7 +93,7 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       throw new Error('Invalid request');
     }
 
-    downloadService.callFactoryService<ProposalPDFData, MetaBase>(
+    downloadService.callFactoryService<FullProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
       payload,

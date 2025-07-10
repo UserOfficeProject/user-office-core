@@ -2,16 +2,22 @@ import express from 'express';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../../config/Tokens';
+import { AdminDataSource } from '../../../datasources/AdminDataSource';
 import {
   PDFType,
   MetaBase,
   DownloadType,
   DownloadService,
 } from '../../../factory/DownloadService';
-import { ProposalPDFData } from '../../../factory/pdf/proposal';
+import {
+  FullProposalPDFData,
+  PregeneratedProposalPDFData,
+  ProposalPDFData,
+} from '../../../factory/pdf/proposal';
 import { collectSamplePDFData } from '../../../factory/pdf/sample';
 import { collectShipmentPDFData } from '../../../factory/pdf/shipmentLabel';
 import { getCurrentTimestamp } from '../../../factory/util';
+import { FeatureId } from '../../../models/Feature';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
@@ -19,36 +25,76 @@ const router = express.Router();
 const downloadService = container.resolve<DownloadService>(
   Tokens.DownloadService
 );
+const factoryServices =
+  container.resolve<DownloadTypeServices>(FactoryServices);
+const adminDataSource = container.resolve<AdminDataSource>(
+  Tokens.AdminDataSource
+);
 
 router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
   try {
     if (!req.user) {
       throw new Error('Not authorized');
     }
-    const factoryServices =
-      container.resolve<DownloadTypeServices>(FactoryServices);
 
     const userWithRole = {
       ...res.locals.agent,
     };
-    const proposalPks: number[] = req.params.proposal_pks
-      .split(',')
-      .map((n: string) => parseInt(n))
-      .filter((id: number) => !isNaN(id));
+    const requestedPks: number[] = Array.from(
+      new Set(
+        req.params.proposal_pks
+          .split(',')
+          .map((n: string) => parseInt(n))
+          .filter((id: number) => !isNaN(id))
+      )
+    );
 
     const meta: MetaBase = {
       collectionFilename: `proposals_${getCurrentTimestamp()}.pdf`,
       singleFilename: '',
     };
 
-    const data = await factoryServices.getPdfProposals(
-      userWithRole,
-      proposalPks,
-      meta,
-      {
-        filter: req.query?.filter?.toString(),
-      }
+    const features = await adminDataSource.getFeatures();
+
+    const isPreferPregeneratedPdfsEnabled = features.find(
+      (feature) =>
+        feature.id === FeatureId.PREFER_PREGENERATED_PROPOSAL_DOWNLOAD
+    )?.isEnabled;
+
+    const data: ProposalPDFData[] = [];
+    const pregeneratedPks = new Set<number>();
+
+    if (isPreferPregeneratedPdfsEnabled) {
+      const pregeneratedProposalPdfData: PregeneratedProposalPDFData[] =
+        await factoryServices.getPregeneratedPdfProposals(
+          userWithRole,
+          requestedPks,
+          meta
+        );
+
+      pregeneratedProposalPdfData.forEach((propData) => {
+        data.push({ ...propData });
+        pregeneratedPks.add(propData.proposal.primaryKey);
+      });
+    }
+
+    const pksToFetchFullData = requestedPks.filter(
+      (pk) => !pregeneratedPks.has(pk)
     );
+
+    const fullProposalPdfData: FullProposalPDFData[] | null =
+      await factoryServices.getPdfProposals(
+        userWithRole,
+        pksToFetchFullData,
+        meta,
+        {
+          filter: req.query?.filter?.toString(),
+        }
+      );
+
+    if (fullProposalPdfData) {
+      data.push(...fullProposalPdfData);
+    }
 
     if (!data) {
       throw new Error('Could not get proposal details');

@@ -7,7 +7,10 @@ import { MetaBase } from '../../factory/DownloadService';
 import {
   collectProposalPDFData,
   collectProposalPDFDataTokenAccess,
-  ProposalPDFData,
+  collectProposalPregeneratedPdfData,
+  collectProposalPregeneratedPdfDataTokenAccess,
+  FullProposalPDFData,
+  PregeneratedProposalPDFData,
 } from '../../factory/pdf/proposal';
 import {
   collectProposalAttachmentData,
@@ -26,7 +29,12 @@ export interface DownloadTypeServices {
     proposalPks: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
-  ): Promise<ProposalPDFData[] | null>;
+  ): Promise<FullProposalPDFData[] | null>;
+  getPregeneratedPdfProposals(
+    agent: UserWithRole,
+    proposalPks: number[],
+    proposalFileMeta: MetaBase
+  ): Promise<PregeneratedProposalPDFData[]>;
   getProposalAttachments(
     agent: UserWithRole,
     proposalPks: number[],
@@ -45,7 +53,7 @@ export default class FactoryServices implements DownloadTypeServices {
     proposalPks: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
-  ): Promise<ProposalPDFData[] | null> {
+  ): Promise<FullProposalPDFData[] | null> {
     let data = null;
     if (agent) {
       data = await Promise.all(
@@ -73,6 +81,44 @@ export default class FactoryServices implements DownloadTypeServices {
     }
 
     return data;
+  }
+
+  @FactoryServicesAuthorized()
+  async getPregeneratedPdfProposals(
+    agent: UserWithRole | null,
+    proposalPks: number[],
+    proposalFileMeta: MetaBase
+  ): Promise<PregeneratedProposalPDFData[]> {
+    if (!agent) {
+      return [];
+    }
+
+    const allProposalData = await Promise.all(
+      proposalPks.map((proposalPk, indx) => {
+        if (agent?.isApiAccessToken)
+          return collectProposalPregeneratedPdfDataTokenAccess(
+            proposalPk,
+            indx === 0
+              ? (filename: string) =>
+                  (proposalFileMeta.singleFilename = filename)
+              : undefined
+          );
+
+        return collectProposalPregeneratedPdfData(
+          proposalPk,
+          agent,
+          indx === 0
+            ? (filename: string) => (proposalFileMeta.singleFilename = filename)
+            : undefined
+        );
+      })
+    );
+
+    const pregeneratedProposalData = allProposalData.filter(
+      (item): item is PregeneratedProposalPDFData => item !== null
+    );
+
+    return pregeneratedProposalData;
   }
 
   @FactoryServicesAuthorized()

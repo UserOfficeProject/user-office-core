@@ -85,6 +85,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.FAP_REVIEW,
       FeatureId.USER_SEARCH_FILTER,
       FeatureId.TECHNIQUE_PROPOSALS,
+      FeatureId.PREFER_PREGENERATED_PROPOSAL_DOWNLOAD,
     ],
     true
   );

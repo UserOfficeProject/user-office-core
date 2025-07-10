@@ -42,7 +42,7 @@ import {
   SamplePDFData,
 } from './sample';
 
-export type ProposalPDFData = {
+export type FullProposalPDFData = {
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;
   coProposers: BasicUserDetails[];
@@ -61,7 +61,16 @@ export type ProposalPDFData = {
     >
   >;
   pdfTemplate: PdfTemplate | null;
+  type: 'full';
 };
+
+export type PregeneratedProposalPDFData = {
+  proposal: Pick<Proposal, 'created' | 'primaryKey' | 'proposalId' | 'fileId'>;
+  principalInvestigator: BasicUserDetails;
+  type: 'pregenerated';
+};
+
+export type ProposalPDFData = FullProposalPDFData | PregeneratedProposalPDFData;
 
 const getTechnicalReviewHumanReadableStatus = (
   status: TechnicalReviewStatus | null
@@ -146,7 +155,7 @@ const instrumentPickerAnswer = (
   }
 };
 const addTopicInformation = async (
-  proposalPDFData: ProposalPDFData,
+  proposalPDFData: FullProposalPDFData,
   questionarySteps: QuestionaryStep[],
   samples: Sample[],
   genericTemplates: GenericTemplate[],
@@ -244,7 +253,7 @@ export const collectProposalPDFData = async (
   proposalPk: number,
   user: UserWithRole,
   notify?: CallableFunction
-): Promise<ProposalPDFData> => {
+): Promise<FullProposalPDFData> => {
   const proposal = await baseContext.queries.proposal.get(user, proposalPk);
 
   if (proposal === null) {
@@ -356,6 +365,7 @@ export const collectProposalPDFData = async (
     samples: samplePDFData,
     genericTemplates: genericTemplatePDFData,
     pdfTemplate,
+    type: 'full',
   };
 
   // Information from each topic in proposal
@@ -486,7 +496,7 @@ export const collectProposalPDFDataTokenAccess = async (
   proposalPk: number,
   options?: DownloadOptions,
   notify?: CallableFunction
-): Promise<ProposalPDFData> => {
+): Promise<FullProposalPDFData> => {
   const proposalDataSource = container.resolve<ProposalDataSource>(
     Tokens.ProposalDataSource
   );
@@ -626,7 +636,7 @@ export const collectProposalPDFDataTokenAccess = async (
   );
 
   // Add information from each topic in proposal
-  const proposalPDFData: ProposalPDFData = await addTopicInformation(
+  const proposalPDFData: FullProposalPDFData = await addTopicInformation(
     {
       proposal,
       principalInvestigator,
@@ -637,6 +647,7 @@ export const collectProposalPDFDataTokenAccess = async (
       samples: samplePDFData,
       genericTemplates: genericTemplatePDFData,
       pdfTemplate,
+      type: 'full',
     },
     questionarySteps,
     samples,
@@ -671,4 +682,141 @@ export const collectProposalPDFDataTokenAccess = async (
   }
 
   return proposalPDFData;
+};
+
+export const collectProposalPregeneratedPdfData = async (
+  proposalPk: number,
+  user: UserWithRole,
+  notify?: CallableFunction
+): Promise<PregeneratedProposalPDFData | null> => {
+  const proposal = await baseContext.queries.proposal.get(user, proposalPk);
+
+  if (isRejection(proposal) || proposal == null) {
+    logger.logError(
+      `Could not fetch proposal with PK ${proposalPk} for pregenerated proposal download`,
+      {
+        reason: proposal?.reason || 'Proposal is null',
+        proposalPk: proposalPk,
+        requestedBy: user,
+      }
+    );
+
+    throw new Error(
+      `Could not fetch proposal with PK ${proposalPk} for pregenerated proposal download`
+    );
+  }
+
+  const pi = await baseContext.queries.user.getBasic(user, proposal.proposerId);
+
+  if (isRejection(pi) || pi == null) {
+    logger.logError(
+      `Could not fetch PI with user ID ${proposal.proposerId} for pregenerated proposal download`,
+      {
+        reason: pi?.reason || 'PI is null',
+        proposalPk: proposalPk,
+        piUserId: proposal.proposerId,
+        requestedBy: user,
+      }
+    );
+
+    throw new Error(
+      `Could not fetch PI with user ID ${proposal.proposerId} for pregenerated proposal download`
+    );
+  }
+
+  if (proposal.fileId) {
+    notify?.(
+      `${proposal.proposalId}_${
+        pi.lastname
+      }_${proposal.created.getUTCFullYear()}.pdf`
+    );
+
+    return {
+      proposal: {
+        primaryKey: proposal.primaryKey,
+        proposalId: proposal.proposalId,
+        fileId: proposal.fileId,
+      },
+      principalInvestigator: pi,
+      type: 'pregenerated',
+    } as PregeneratedProposalPDFData;
+  } else {
+    logger.logInfo(`No pregenerated PDF found for proposal PK ${proposalPk}`, {
+      proposalPk: proposal.primaryKey,
+      proposalId: proposal.proposalId,
+    });
+
+    return null;
+  }
+};
+
+export const collectProposalPregeneratedPdfDataTokenAccess = async (
+  proposalPk: number,
+  notify?: CallableFunction
+): Promise<PregeneratedProposalPDFData | null> => {
+  const proposalDataSource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+  const proposal = await proposalDataSource.get(proposalPk);
+
+  if (isRejection(proposal) || proposal == null) {
+    logger.logError(
+      `Could not fetch proposal with PK ${proposalPk} for pregenerated proposal download`,
+      {
+        reason: proposal?.reason || 'Proposal is null',
+        proposalPk: proposalPk,
+        requestedBy: 'API key',
+      }
+    );
+
+    throw new Error(
+      `Could not fetch proposal with PK ${proposalPk} for pregenerated proposal download`
+    );
+  }
+
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+  const pi = await userDataSource.getBasicUserInfo(proposal.proposerId);
+
+  if (isRejection(pi) || pi == null) {
+    logger.logError(
+      `Could not fetch PI with user ID ${proposal.proposerId} for pregenerated proposal download`,
+      {
+        reason: pi?.reason || 'PI is null',
+        proposalPk: proposalPk,
+        piUserId: proposal.proposerId,
+        requestedBy: 'API key',
+      }
+    );
+
+    throw new Error(
+      `Could not fetch PI with user ID ${proposal.proposerId} for pregenerated proposal download`
+    );
+  }
+
+  if (proposal.fileId) {
+    notify?.(
+      `${proposal.proposalId}_${
+        pi.lastname
+      }_${proposal.created.getUTCFullYear()}.pdf`
+    );
+
+    return {
+      proposal: {
+        primaryKey: proposal.primaryKey,
+        proposalId: proposal.proposalId,
+        fileId: proposal.fileId,
+      },
+      principalInvestigator: pi,
+      type: 'pregenerated',
+    } as PregeneratedProposalPDFData;
+  } else {
+    logger.logInfo(`No pregenerated PDF found for proposal PK ${proposalPk}`, {
+      proposalPk: proposal.primaryKey,
+      proposalId: proposal.proposalId,
+    });
+
+    return null;
+  }
 };
