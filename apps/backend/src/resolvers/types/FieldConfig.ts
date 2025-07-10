@@ -215,10 +215,7 @@ export class TextInputConfig extends ConfigBase {
 }
 
 @ObjectType()
-export class ShipmentBasisConfig extends ConfigBase {
-  @Field(() => [String])
-  readPermissions: string[];
-}
+export class ShipmentBasisConfig extends ConfigBase {}
 
 @ObjectType()
 export class FeedbackBasisConfig extends ConfigBase {
