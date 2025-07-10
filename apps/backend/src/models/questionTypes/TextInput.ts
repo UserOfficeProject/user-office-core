@@ -28,6 +28,7 @@ export const textInputDefinition: Question<DataType.TEXT_INPUT> = {
     config.multiline = false;
     config.placeholder = '';
     config.isCounterHidden = false;
+    config.readPermissions = [];
 
     return config;
   },

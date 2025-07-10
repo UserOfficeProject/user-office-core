@@ -1,1 +1,1450 @@
-{"metadata":{"version":"1.2.0","exportDate":"2022-06-21T11:27:55.062Z"},"data":{"template":{"templateId":20,"groupId":"SHIPMENT","name":"Shipment template","description":"Default shipment template","isArchived":false},"templateSteps":[{"topic":{"id":82,"title":"New shipment","templateId":20,"sortOrder":0,"isEnabled":true},"fields":[{"question":{"categoryId":3,"id":"shipment_basis","naturalKey":"shipment_basis","dataType":"SHIPMENT_BASIS","question":"Name of the contents","config":{"tooltip":"","required":false,"small_label":""}},"topicId":82,"sortOrder":0,"config":{"tooltip":"","required":false,"small_label":""},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558124022","naturalKey":"detailed_description_of_content","dataType":"TEXT_INPUT","question":"Detailed description of content","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":1,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"number_input_1625560985685","naturalKey":"parcel_length","dataType":"NUMBER_INPUT","question":"Length","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":"ONLY_POSITIVE"}},"topicId":82,"sortOrder":2,"config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":"ONLY_POSITIVE"},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"number_input_1618486507976","naturalKey":"parcel_width","dataType":"NUMBER_INPUT","question":"Width","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":null}},"topicId":82,"sortOrder":3,"config":{"small_label":"","required":true,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":"ONLY_POSITIVE"},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"number_input_1618486519108","naturalKey":"parcel_height","dataType":"NUMBER_INPUT","question":"Height","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":null}},"topicId":82,"sortOrder":4,"config":{"small_label":"","required":true,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":"NONE"},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"number_input_1625558279983","naturalKey":"parcel_weight","dataType":"NUMBER_INPUT","question":"Weight","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"gram","unit":"gram","symbol":"g","quantity":"mass","siConversionFormula":"x / 1000"},{"id":"mass","unit":"kilogram","symbol":"kg","quantity":"mass","siConversionFormula":"x"}],"numberValueConstraint":"ONLY_POSITIVE"}},"topicId":82,"sortOrder":5,"config":{"small_label":"","required":true,"tooltip":"","units":[{"id":"gram","unit":"gram","symbol":"g","quantity":"mass","siConversionFormula":"x / 1000"},{"id":"mass","unit":"kilogram","symbol":"kg","quantity":"mass","siConversionFormula":"x"}],"numberValueConstraint":"ONLY_POSITIVE"},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"selection_from_options_1643620237783","naturalKey":"storage_temperature","dataType":"SELECTION_FROM_OPTIONS","question":"Storage temperature","config":{"small_label":"","required":true,"tooltip":"","variant":"dropdown","options":["Ambient","< 0 C","< -20 C"],"isMultipleSelect":false}},"topicId":82,"sortOrder":6,"config":{"small_label":"","required":true,"tooltip":"","variant":"dropdown","options":["Ambient","< 0 C","< -20 C"],"isMultipleSelect":false},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"boolean_1625558385021","naturalKey":"is_dangerous_goods","dataType":"BOOLEAN","question":"Dangerous goods","config":{"small_label":"","required":false,"tooltip":""}},"topicId":82,"sortOrder":7,"config":{"small_label":"","required":false,"tooltip":""},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558434184","naturalKey":"dangerous_goods_un_number","dataType":"TEXT_INPUT","question":"Dangerous goods UN number","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":"4","max":"4","multiline":false,"placeholder":"A four-digit number that identifies hazardous materials (United Nations number)","isCounterHidden":true}},"topicId":82,"sortOrder":8,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":4,"max":4,"multiline":false,"placeholder":"A four-digit number that identifies hazardous materials (United Nations number)","isCounterHidden":true},"dependencies":[{"questionId":"text_input_1625558434184","dependencyId":"boolean_1625558385021","dependencyNaturalKey":"is_dangerous_goods","condition":{"params":true,"condition":"eq"}}],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558611322","naturalKey":"dangerous_goods_details","dataType":"TEXT_INPUT","question":"Specify all dangerous goods in detail","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":9,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true},"dependencies":[{"questionId":"text_input_1625558611322","dependencyId":"boolean_1625558385021","dependencyNaturalKey":"is_dangerous_goods","condition":{"params":true,"condition":"eq"}}],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1610625438357","naturalKey":"shipment_sample_risks","dataType":"TEXT_INPUT","question":"Specify risks for shipment associated with samples, if any","config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":false}},"topicId":82,"sortOrder":10,"config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":false},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"number_input_1610625456101","naturalKey":"parcel_value","dataType":"NUMBER_INPUT","question":"Value(EUR)","config":{"small_label":"","required":false,"tooltip":"","units":[],"numberValueConstraint":null}},"topicId":82,"sortOrder":11,"config":{"small_label":"","required":false,"tooltip":"","units":[]},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558974500","naturalKey":"shipment_sender_name","dataType":"TEXT_INPUT","question":"Sender name","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":12,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558691786","naturalKey":"shipment_sender_company","dataType":"TEXT_INPUT","question":"Sender Company","config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"Optional","isCounterHidden":true}},"topicId":82,"sortOrder":13,"config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"Optional","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558989021","naturalKey":"shipment_sender_email","dataType":"TEXT_INPUT","question":"Sender email","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":14,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625559010980","naturalKey":"shipment_sender_phone","dataType":"TEXT_INPUT","question":"Sender phone number","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":15,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558820540","naturalKey":"shipment_sender_street_address","dataType":"TEXT_INPUT","question":"Sender street address","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":16,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558884080","naturalKey":"shipment_sender_zip_code","dataType":"TEXT_INPUT","question":"Sender Zip code","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":17,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1625558913433","naturalKey":"shipment_sender_city_country","dataType":"TEXT_INPUT","question":"Sender City / Country","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":18,"config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"file_upload_1625559467285","naturalKey":"shipment_file_attachment","dataType":"FILE_UPLOAD","question":"Attachment","config":{"small_label":"","required":false,"tooltip":"","file_type":[],"max_files":0}},"topicId":82,"sortOrder":19,"config":{"small_label":"","required":false,"tooltip":"","file_type":[],"max_files":"10"},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"file_upload_1625559541684","naturalKey":"shipment_customs_invoice","dataType":"FILE_UPLOAD","question":"Customs invoice","config":{"small_label":"","required":false,"tooltip":"","file_type":[".pdf",".doc",".docx","image/*"],"max_files":1}},"topicId":82,"sortOrder":20,"config":{"small_label":"","required":false,"tooltip":"","file_type":[".pdf",".doc",".docx","image/*"],"max_files":"1"},"dependencies":[],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"file_upload_1625559734367","naturalKey":"shipment_msds","dataType":"FILE_UPLOAD","question":"MSDS","config":{"small_label":"Please, attach technical product data sheet and related safety data sheet","required":false,"tooltip":"","file_type":[],"max_files":0}},"topicId":82,"sortOrder":21,"config":{"small_label":"If there are any dangerous goods, please, attach technical product data sheet and related safety data sheet.","required":false,"tooltip":"","file_type":[],"max_files":0},"dependencies":[{"questionId":"file_upload_1625559734367","dependencyId":"boolean_1625558385021","dependencyNaturalKey":"is_dangerous_goods","condition":{"params":true,"condition":"eq"}}],"dependenciesOperator":"AND"},{"question":{"categoryId":3,"id":"text_input_1610363200423","naturalKey":"shipment_additional_information","dataType":"TEXT_INPUT","question":"Additional information","config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true}},"topicId":82,"sortOrder":22,"config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true},"dependencies":[],"dependenciesOperator":"AND"}]}],"questions":[{"categoryId":3,"id":"shipment_basis","naturalKey":"shipment_basis","dataType":"SHIPMENT_BASIS","question":"Shipment basic information","config":{"tooltip":"","required":false,"small_label":""}},{"categoryId":3,"id":"text_input_1625558124022","naturalKey":"detailed_description_of_content","dataType":"TEXT_INPUT","question":"Detailed description of content","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"number_input_1625560985685","naturalKey":"parcel_length","dataType":"NUMBER_INPUT","question":"Length","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":"ONLY_POSITIVE"}},{"categoryId":3,"id":"number_input_1618486507976","naturalKey":"parcel_width","dataType":"NUMBER_INPUT","question":"Width","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":null}},{"categoryId":3,"id":"number_input_1618486519108","naturalKey":"parcel_height","dataType":"NUMBER_INPUT","question":"Height","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"centimeter","unit":"centimeter","symbol":"cm","quantity":"length","siConversionFormula":"x / 100"},{"id":"length","unit":"meter","symbol":"m","quantity":"length","siConversionFormula":"x"}],"numberValueConstraint":null}},{"categoryId":3,"id":"number_input_1625558279983","naturalKey":"parcel_weight","dataType":"NUMBER_INPUT","question":"Weight","config":{"small_label":"","required":false,"tooltip":"","units":[{"id":"gram","unit":"gram","symbol":"g","quantity":"mass","siConversionFormula":"x / 1000"},{"id":"mass","unit":"kilogram","symbol":"kg","quantity":"mass","siConversionFormula":"x"}],"numberValueConstraint":"ONLY_POSITIVE"}},{"categoryId":3,"id":"selection_from_options_1643620237783","naturalKey":"storage_temperature","dataType":"SELECTION_FROM_OPTIONS","question":"Storage temperature","config":{"small_label":"","required":true,"tooltip":"","variant":"dropdown","options":["Ambient","< 0 C","< -20 C"],"isMultipleSelect":false}},{"categoryId":3,"id":"boolean_1625558385021","naturalKey":"is_dangerous_goods","dataType":"BOOLEAN","question":"Dangerous goods","config":{"small_label":"","required":false,"tooltip":""}},{"categoryId":3,"id":"text_input_1625558434184","naturalKey":"dangerous_goods_un_number","dataType":"TEXT_INPUT","question":"Dangerous goods UN number","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":"4","max":"4","multiline":false,"placeholder":"A four-digit number that identifies hazardous materials (United Nations number)","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1625558611322","naturalKey":"dangerous_goods_details","dataType":"TEXT_INPUT","question":"Specify all dangerous goods in detail","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1610625438357","naturalKey":"shipment_sample_risks","dataType":"TEXT_INPUT","question":"Specify risks for shipment associated with samples, if any","config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":false}},{"categoryId":3,"id":"number_input_1610625456101","naturalKey":"parcel_value","dataType":"NUMBER_INPUT","question":"Value(EUR)","config":{"small_label":"","required":false,"tooltip":"","units":[],"numberValueConstraint":null}},{"categoryId":3,"id":"text_input_1625558974500","naturalKey":"shipment_sender_name","dataType":"TEXT_INPUT","question":"Sender name","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1625558691786","naturalKey":"shipment_sender_company","dataType":"TEXT_INPUT","question":"Sender Company","config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"Optional","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1625558989021","naturalKey":"shipment_sender_email","dataType":"TEXT_INPUT","question":"Sender email","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1625559010980","naturalKey":"shipment_sender_phone","dataType":"TEXT_INPUT","question":"Sender phone number","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1625558820540","naturalKey":"shipment_sender_street_address","dataType":"TEXT_INPUT","question":"Sender street address","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1625558884080","naturalKey":"shipment_sender_zip_code","dataType":"TEXT_INPUT","question":"Sender Zip code","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"text_input_1625558913433","naturalKey":"shipment_sender_city_country","dataType":"TEXT_INPUT","question":"Sender City / Country","config":{"required":true,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":false,"placeholder":"","isCounterHidden":true}},{"categoryId":3,"id":"file_upload_1625559467285","naturalKey":"shipment_file_attachment","dataType":"FILE_UPLOAD","question":"Attachment","config":{"small_label":"","required":false,"tooltip":"","file_type":[],"max_files":0}},{"categoryId":3,"id":"file_upload_1625559541684","naturalKey":"shipment_customs_invoice","dataType":"FILE_UPLOAD","question":"Customs invoice","config":{"small_label":"","required":false,"tooltip":"","file_type":[".pdf",".doc",".docx","image/*"],"max_files":1}},{"categoryId":3,"id":"file_upload_1625559734367","naturalKey":"shipment_msds","dataType":"FILE_UPLOAD","question":"MSDS","config":{"small_label":"Please, attach technical product data sheet and related safety data sheet","required":false,"tooltip":"","file_type":[],"max_files":0}},{"categoryId":3,"id":"text_input_1610363200423","naturalKey":"shipment_additional_information","dataType":"TEXT_INPUT","question":"Additional information","config":{"required":false,"small_label":"","tooltip":"","htmlQuestion":"","isHtmlQuestion":false,"min":null,"max":null,"multiline":true,"placeholder":"","isCounterHidden":true}}],"subTemplates":[]}}
+{
+    "metadata": {
+        "version": "1.2.0",
+        "exportDate": "2022-06-21T11:27:55.062Z"
+    },
+    "data": {
+        "template": {
+            "templateId": 20,
+            "groupId": "SHIPMENT",
+            "name": "Shipment template",
+            "description": "Default shipment template",
+            "isArchived": false
+        },
+        "templateSteps": [
+            {
+                "topic": {
+                    "id": 82,
+                    "title": "New shipment",
+                    "templateId": 20,
+                    "sortOrder": 0,
+                    "isEnabled": true
+                },
+                "fields": [
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "shipment_basis",
+                            "naturalKey": "shipment_basis",
+                            "dataType": "SHIPMENT_BASIS",
+                            "question": "Name of the contents",
+                            "config": {
+                                "readPermissions": [],
+                                "tooltip": "",
+                                "required": false,
+                                "small_label": ""
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 0,
+                        "config": {
+                            "readPermissions": [],
+                            "tooltip": "",
+                            "required": false,
+                            "small_label": ""
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558124022",
+                            "naturalKey": "detailed_description_of_content",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Detailed description of content",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": true,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 1,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": true,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "number_input_1625560985685",
+                            "naturalKey": "parcel_length",
+                            "dataType": "NUMBER_INPUT",
+                            "question": "Length",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": "",
+                                "units": [
+                                    {
+                                        "id": "centimeter",
+                                        "unit": "centimeter",
+                                        "symbol": "cm",
+                                        "quantity": "length",
+                                        "siConversionFormula": "x / 100"
+                                    },
+                                    {
+                                        "id": "length",
+                                        "unit": "meter",
+                                        "symbol": "m",
+                                        "quantity": "length",
+                                        "siConversionFormula": "x"
+                                    }
+                                ],
+                                "numberValueConstraint": "ONLY_POSITIVE"
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 2,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": "",
+                            "units": [
+                                {
+                                    "id": "centimeter",
+                                    "unit": "centimeter",
+                                    "symbol": "cm",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x / 100"
+                                },
+                                {
+                                    "id": "length",
+                                    "unit": "meter",
+                                    "symbol": "m",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x"
+                                }
+                            ],
+                            "numberValueConstraint": "ONLY_POSITIVE"
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "number_input_1618486507976",
+                            "naturalKey": "parcel_width",
+                            "dataType": "NUMBER_INPUT",
+                            "question": "Width",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": "",
+                                "units": [
+                                    {
+                                        "id": "centimeter",
+                                        "unit": "centimeter",
+                                        "symbol": "cm",
+                                        "quantity": "length",
+                                        "siConversionFormula": "x / 100"
+                                    },
+                                    {
+                                        "id": "length",
+                                        "unit": "meter",
+                                        "symbol": "m",
+                                        "quantity": "length",
+                                        "siConversionFormula": "x"
+                                    }
+                                ],
+                                "numberValueConstraint": null
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 3,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": true,
+                            "tooltip": "",
+                            "units": [
+                                {
+                                    "id": "centimeter",
+                                    "unit": "centimeter",
+                                    "symbol": "cm",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x / 100"
+                                },
+                                {
+                                    "id": "length",
+                                    "unit": "meter",
+                                    "symbol": "m",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x"
+                                }
+                            ],
+                            "numberValueConstraint": "ONLY_POSITIVE"
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "number_input_1618486519108",
+                            "naturalKey": "parcel_height",
+                            "dataType": "NUMBER_INPUT",
+                            "question": "Height",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": "",
+                                "units": [
+                                    {
+                                        "id": "centimeter",
+                                        "unit": "centimeter",
+                                        "symbol": "cm",
+                                        "quantity": "length",
+                                        "siConversionFormula": "x / 100"
+                                    },
+                                    {
+                                        "id": "length",
+                                        "unit": "meter",
+                                        "symbol": "m",
+                                        "quantity": "length",
+                                        "siConversionFormula": "x"
+                                    }
+                                ],
+                                "numberValueConstraint": null
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 4,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": true,
+                            "tooltip": "",
+                            "units": [
+                                {
+                                    "id": "centimeter",
+                                    "unit": "centimeter",
+                                    "symbol": "cm",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x / 100"
+                                },
+                                {
+                                    "id": "length",
+                                    "unit": "meter",
+                                    "symbol": "m",
+                                    "quantity": "length",
+                                    "siConversionFormula": "x"
+                                }
+                            ],
+                            "numberValueConstraint": "NONE"
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "number_input_1625558279983",
+                            "naturalKey": "parcel_weight",
+                            "dataType": "NUMBER_INPUT",
+                            "question": "Weight",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": "",
+                                "units": [
+                                    {
+                                        "id": "gram",
+                                        "unit": "gram",
+                                        "symbol": "g",
+                                        "quantity": "mass",
+                                        "siConversionFormula": "x / 1000"
+                                    },
+                                    {
+                                        "id": "mass",
+                                        "unit": "kilogram",
+                                        "symbol": "kg",
+                                        "quantity": "mass",
+                                        "siConversionFormula": "x"
+                                    }
+                                ],
+                                "numberValueConstraint": "ONLY_POSITIVE"
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 5,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": true,
+                            "tooltip": "",
+                            "units": [
+                                {
+                                    "id": "gram",
+                                    "unit": "gram",
+                                    "symbol": "g",
+                                    "quantity": "mass",
+                                    "siConversionFormula": "x / 1000"
+                                },
+                                {
+                                    "id": "mass",
+                                    "unit": "kilogram",
+                                    "symbol": "kg",
+                                    "quantity": "mass",
+                                    "siConversionFormula": "x"
+                                }
+                            ],
+                            "numberValueConstraint": "ONLY_POSITIVE"
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "selection_from_options_1643620237783",
+                            "naturalKey": "storage_temperature",
+                            "dataType": "SELECTION_FROM_OPTIONS",
+                            "question": "Storage temperature",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": true,
+                                "tooltip": "",
+                                "variant": "dropdown",
+                                "options": [
+                                    "Ambient",
+                                    "< 0 C",
+                                    "< -20 C"
+                                ],
+                                "isMultipleSelect": false
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 6,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": true,
+                            "tooltip": "",
+                            "variant": "dropdown",
+                            "options": [
+                                "Ambient",
+                                "< 0 C",
+                                "< -20 C"
+                            ],
+                            "isMultipleSelect": false
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "boolean_1625558385021",
+                            "naturalKey": "is_dangerous_goods",
+                            "dataType": "BOOLEAN",
+                            "question": "Dangerous goods",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": ""
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 7,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": ""
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558434184",
+                            "naturalKey": "dangerous_goods_un_number",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Dangerous goods UN number",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": "4",
+                                "max": "4",
+                                "multiline": false,
+                                "placeholder": "A four-digit number that identifies hazardous materials (United Nations number)",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 8,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": 4,
+                            "max": 4,
+                            "multiline": false,
+                            "placeholder": "A four-digit number that identifies hazardous materials (United Nations number)",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [
+                            {
+                                "questionId": "text_input_1625558434184",
+                                "dependencyId": "boolean_1625558385021",
+                                "dependencyNaturalKey": "is_dangerous_goods",
+                                "condition": {
+                                    "params": true,
+                                    "condition": "eq"
+                                }
+                            }
+                        ],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558611322",
+                            "naturalKey": "dangerous_goods_details",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Specify all dangerous goods in detail",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": true,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 9,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": true,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [
+                            {
+                                "questionId": "text_input_1625558611322",
+                                "dependencyId": "boolean_1625558385021",
+                                "dependencyNaturalKey": "is_dangerous_goods",
+                                "condition": {
+                                    "params": true,
+                                    "condition": "eq"
+                                }
+                            }
+                        ],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1610625438357",
+                            "naturalKey": "shipment_sample_risks",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Specify risks for shipment associated with samples, if any",
+                            "config": {
+                                "readPermissions": [],
+                                "required": false,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": true,
+                                "placeholder": "",
+                                "isCounterHidden": false
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 10,
+                        "config": {
+                            "readPermissions": [],
+                            "required": false,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": true,
+                            "placeholder": "",
+                            "isCounterHidden": false
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "number_input_1610625456101",
+                            "naturalKey": "parcel_value",
+                            "dataType": "NUMBER_INPUT",
+                            "question": "Value(EUR)",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": "",
+                                "units": [],
+                                "numberValueConstraint": null
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 11,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": "",
+                            "units": []
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558974500",
+                            "naturalKey": "shipment_sender_name",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Sender name",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": false,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 12,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": false,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558691786",
+                            "naturalKey": "shipment_sender_company",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Sender Company",
+                            "config": {
+                                "readPermissions": [],
+                                "required": false,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": false,
+                                "placeholder": "Optional",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 13,
+                        "config": {
+                            "readPermissions": [],
+                            "required": false,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": false,
+                            "placeholder": "Optional",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558989021",
+                            "naturalKey": "shipment_sender_email",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Sender email",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": false,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 14,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": false,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625559010980",
+                            "naturalKey": "shipment_sender_phone",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Sender phone number",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": false,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 15,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": false,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558820540",
+                            "naturalKey": "shipment_sender_street_address",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Sender street address",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": false,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 16,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": false,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558884080",
+                            "naturalKey": "shipment_sender_zip_code",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Sender Zip code",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": false,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 17,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": false,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1625558913433",
+                            "naturalKey": "shipment_sender_city_country",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Sender City / Country",
+                            "config": {
+                                "readPermissions": [],
+                                "required": true,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": false,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 18,
+                        "config": {
+                            "readPermissions": [],
+                            "required": true,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": false,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "file_upload_1625559467285",
+                            "naturalKey": "shipment_file_attachment",
+                            "dataType": "FILE_UPLOAD",
+                            "question": "Attachment",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": "",
+                                "file_type": [],
+                                "max_files": 0
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 19,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": "",
+                            "file_type": [],
+                            "max_files": "10"
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "file_upload_1625559541684",
+                            "naturalKey": "shipment_customs_invoice",
+                            "dataType": "FILE_UPLOAD",
+                            "question": "Customs invoice",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "",
+                                "required": false,
+                                "tooltip": "",
+                                "file_type": [
+                                    ".pdf",
+                                    ".doc",
+                                    ".docx",
+                                    "image/*"
+                                ],
+                                "max_files": 1
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 20,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "",
+                            "required": false,
+                            "tooltip": "",
+                            "file_type": [
+                                ".pdf",
+                                ".doc",
+                                ".docx",
+                                "image/*"
+                            ],
+                            "max_files": "1"
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "file_upload_1625559734367",
+                            "naturalKey": "shipment_msds",
+                            "dataType": "FILE_UPLOAD",
+                            "question": "MSDS",
+                            "config": {
+                                "readPermissions": [],
+                                "small_label": "Please, attach technical product data sheet and related safety data sheet",
+                                "required": false,
+                                "tooltip": "",
+                                "file_type": [],
+                                "max_files": 0
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 21,
+                        "config": {
+                            "readPermissions": [],
+                            "small_label": "If there are any dangerous goods, please, attach technical product data sheet and related safety data sheet.",
+                            "required": false,
+                            "tooltip": "",
+                            "file_type": [],
+                            "max_files": 0
+                        },
+                        "dependencies": [
+                            {
+                                "questionId": "file_upload_1625559734367",
+                                "dependencyId": "boolean_1625558385021",
+                                "dependencyNaturalKey": "is_dangerous_goods",
+                                "condition": {
+                                    "params": true,
+                                    "condition": "eq"
+                                }
+                            }
+                        ],
+                        "dependenciesOperator": "AND"
+                    },
+                    {
+                        "question": {
+                            "categoryId": 3,
+                            "id": "text_input_1610363200423",
+                            "naturalKey": "shipment_additional_information",
+                            "dataType": "TEXT_INPUT",
+                            "question": "Additional information",
+                            "config": {
+                                "readPermissions": [],
+                                "required": false,
+                                "small_label": "",
+                                "tooltip": "",
+                                "htmlQuestion": "",
+                                "isHtmlQuestion": false,
+                                "min": null,
+                                "max": null,
+                                "multiline": true,
+                                "placeholder": "",
+                                "isCounterHidden": true
+                            }
+                        },
+                        "topicId": 82,
+                        "sortOrder": 22,
+                        "config": {
+                            "readPermissions": [],
+                            "required": false,
+                            "small_label": "",
+                            "tooltip": "",
+                            "htmlQuestion": "",
+                            "isHtmlQuestion": false,
+                            "min": null,
+                            "max": null,
+                            "multiline": true,
+                            "placeholder": "",
+                            "isCounterHidden": true
+                        },
+                        "dependencies": [],
+                        "dependenciesOperator": "AND"
+                    }
+                ]
+            }
+        ],
+        "questions": [
+            {
+                "categoryId": 3,
+                "id": "shipment_basis",
+                "naturalKey": "shipment_basis",
+                "dataType": "SHIPMENT_BASIS",
+                "question": "Shipment basic information",
+                "config": {
+                    "readPermissions": [],
+                    "tooltip": "",
+                    "required": false,
+                    "small_label": ""
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558124022",
+                "naturalKey": "detailed_description_of_content",
+                "dataType": "TEXT_INPUT",
+                "question": "Detailed description of content",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": true,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "number_input_1625560985685",
+                "naturalKey": "parcel_length",
+                "dataType": "NUMBER_INPUT",
+                "question": "Length",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "units": [
+                        {
+                            "id": "centimeter",
+                            "unit": "centimeter",
+                            "symbol": "cm",
+                            "quantity": "length",
+                            "siConversionFormula": "x / 100"
+                        },
+                        {
+                            "id": "length",
+                            "unit": "meter",
+                            "symbol": "m",
+                            "quantity": "length",
+                            "siConversionFormula": "x"
+                        }
+                    ],
+                    "numberValueConstraint": "ONLY_POSITIVE"
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "number_input_1618486507976",
+                "naturalKey": "parcel_width",
+                "dataType": "NUMBER_INPUT",
+                "question": "Width",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "units": [
+                        {
+                            "id": "centimeter",
+                            "unit": "centimeter",
+                            "symbol": "cm",
+                            "quantity": "length",
+                            "siConversionFormula": "x / 100"
+                        },
+                        {
+                            "id": "length",
+                            "unit": "meter",
+                            "symbol": "m",
+                            "quantity": "length",
+                            "siConversionFormula": "x"
+                        }
+                    ],
+                    "numberValueConstraint": null
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "number_input_1618486519108",
+                "naturalKey": "parcel_height",
+                "dataType": "NUMBER_INPUT",
+                "question": "Height",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "units": [
+                        {
+                            "id": "centimeter",
+                            "unit": "centimeter",
+                            "symbol": "cm",
+                            "quantity": "length",
+                            "siConversionFormula": "x / 100"
+                        },
+                        {
+                            "id": "length",
+                            "unit": "meter",
+                            "symbol": "m",
+                            "quantity": "length",
+                            "siConversionFormula": "x"
+                        }
+                    ],
+                    "numberValueConstraint": null
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "number_input_1625558279983",
+                "naturalKey": "parcel_weight",
+                "dataType": "NUMBER_INPUT",
+                "question": "Weight",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "units": [
+                        {
+                            "id": "gram",
+                            "unit": "gram",
+                            "symbol": "g",
+                            "quantity": "mass",
+                            "siConversionFormula": "x / 1000"
+                        },
+                        {
+                            "id": "mass",
+                            "unit": "kilogram",
+                            "symbol": "kg",
+                            "quantity": "mass",
+                            "siConversionFormula": "x"
+                        }
+                    ],
+                    "numberValueConstraint": "ONLY_POSITIVE"
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "selection_from_options_1643620237783",
+                "naturalKey": "storage_temperature",
+                "dataType": "SELECTION_FROM_OPTIONS",
+                "question": "Storage temperature",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": true,
+                    "tooltip": "",
+                    "variant": "dropdown",
+                    "options": [
+                        "Ambient",
+                        "< 0 C",
+                        "< -20 C"
+                    ],
+                    "isMultipleSelect": false
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "boolean_1625558385021",
+                "naturalKey": "is_dangerous_goods",
+                "dataType": "BOOLEAN",
+                "question": "Dangerous goods",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": ""
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558434184",
+                "naturalKey": "dangerous_goods_un_number",
+                "dataType": "TEXT_INPUT",
+                "question": "Dangerous goods UN number",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": "4",
+                    "max": "4",
+                    "multiline": false,
+                    "placeholder": "A four-digit number that identifies hazardous materials (United Nations number)",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558611322",
+                "naturalKey": "dangerous_goods_details",
+                "dataType": "TEXT_INPUT",
+                "question": "Specify all dangerous goods in detail",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": true,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1610625438357",
+                "naturalKey": "shipment_sample_risks",
+                "dataType": "TEXT_INPUT",
+                "question": "Specify risks for shipment associated with samples, if any",
+                "config": {
+                    "readPermissions": [],
+                    "required": false,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": true,
+                    "placeholder": "",
+                    "isCounterHidden": false
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "number_input_1610625456101",
+                "naturalKey": "parcel_value",
+                "dataType": "NUMBER_INPUT",
+                "question": "Value(EUR)",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "units": [],
+                    "numberValueConstraint": null
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558974500",
+                "naturalKey": "shipment_sender_name",
+                "dataType": "TEXT_INPUT",
+                "question": "Sender name",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": false,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558691786",
+                "naturalKey": "shipment_sender_company",
+                "dataType": "TEXT_INPUT",
+                "question": "Sender Company",
+                "config": {
+                    "readPermissions": [],
+                    "required": false,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": false,
+                    "placeholder": "Optional",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558989021",
+                "naturalKey": "shipment_sender_email",
+                "dataType": "TEXT_INPUT",
+                "question": "Sender email",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": false,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625559010980",
+                "naturalKey": "shipment_sender_phone",
+                "dataType": "TEXT_INPUT",
+                "question": "Sender phone number",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": false,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558820540",
+                "naturalKey": "shipment_sender_street_address",
+                "dataType": "TEXT_INPUT",
+                "question": "Sender street address",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": false,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558884080",
+                "naturalKey": "shipment_sender_zip_code",
+                "dataType": "TEXT_INPUT",
+                "question": "Sender Zip code",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": false,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1625558913433",
+                "naturalKey": "shipment_sender_city_country",
+                "dataType": "TEXT_INPUT",
+                "question": "Sender City / Country",
+                "config": {
+                    "readPermissions": [],
+                    "required": true,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": false,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "file_upload_1625559467285",
+                "naturalKey": "shipment_file_attachment",
+                "dataType": "FILE_UPLOAD",
+                "question": "Attachment",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "file_type": [],
+                    "max_files": 0
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "file_upload_1625559541684",
+                "naturalKey": "shipment_customs_invoice",
+                "dataType": "FILE_UPLOAD",
+                "question": "Customs invoice",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "",
+                    "required": false,
+                    "tooltip": "",
+                    "file_type": [
+                        ".pdf",
+                        ".doc",
+                        ".docx",
+                        "image/*"
+                    ],
+                    "max_files": 1
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "file_upload_1625559734367",
+                "naturalKey": "shipment_msds",
+                "dataType": "FILE_UPLOAD",
+                "question": "MSDS",
+                "config": {
+                    "readPermissions": [],
+                    "small_label": "Please, attach technical product data sheet and related safety data sheet",
+                    "required": false,
+                    "tooltip": "",
+                    "file_type": [],
+                    "max_files": 0
+                }
+            },
+            {
+                "categoryId": 3,
+                "id": "text_input_1610363200423",
+                "naturalKey": "shipment_additional_information",
+                "dataType": "TEXT_INPUT",
+                "question": "Additional information",
+                "config": {
+                    "readPermissions": [],
+                    "required": false,
+                    "small_label": "",
+                    "tooltip": "",
+                    "htmlQuestion": "",
+                    "isHtmlQuestion": false,
+                    "min": null,
+                    "max": null,
+                    "multiline": true,
+                    "placeholder": "",
+                    "isCounterHidden": true
+                }
+            }
+        ],
+        "subTemplates": []
+    }
+}

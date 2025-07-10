@@ -17,7 +17,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions":[]
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -32,7 +33,8 @@ VALUES
     'boolean_question', 1, 7, 3, '{
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions":[]
         }'
   );
 INSERT INTO answers(
@@ -54,7 +56,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions":[]
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -66,7 +69,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'date_question', 1, 7, 5, '{ "tooltip": "","required": false,"small_label": "" }'
+    'date_question', 1, 7, 5, '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -85,7 +88,7 @@ VALUES
   (
     'embellishment_question', 'EMBELLISHMENT', 
     'Embellishment question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'embellishment_question', 1
@@ -97,7 +100,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'embellishment_question', 1, 7, 9, 
-    '{ "tooltip": "", "required": false, "small_label": "" }'
+    '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -116,7 +119,7 @@ VALUES
   (
     'file_upload_question', 'FILE_UPLOAD', 
     'File upload question from seeds', 
-    '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}', 
+    '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'file_upload_question', 1
@@ -127,7 +130,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'file_upload_question', 1, 7, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}'
+    'file_upload_question', 1, 7, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -159,7 +162,8 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "", 
+        "readPermissions":[]
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -183,7 +187,8 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions":[]
       }'
   );
 INSERT INTO answers(
@@ -228,7 +233,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions":[]
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -260,7 +266,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions":[]
       }'
   );
 INSERT INTO answers(
@@ -292,7 +299,7 @@ VALUES
   (
     'rich_text_input_question', 'RICH_TEXT_INPUT', 
     'Rich text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'rich_text_input_question', 1
@@ -304,7 +311,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'rich_text_input_question', 1, 7, 
-    8, '{ "tooltip": "", "required": false, "small_label": "" }'
+    8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -323,7 +330,7 @@ VALUES
   (
     'selection_from_options_question', 
     'SELECTION_FROM_OPTIONS', 'Selection from options question from seeds', 
-    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}', 
+    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'selection_from_options_question', 
@@ -336,7 +343,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'selection_from_options_question', 
-    1, 7, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+    1, 7, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -357,7 +364,7 @@ VALUES
   (
     'dynamic_multiple_choice_question', 
     'DYNAMIC_MULTIPLE_CHOICE', 'Dynamic multiple choice question from seeds', 
-    '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}', 
+    '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[], "readPermissions":[]}', 
     '2023-02-08 10:23:10.285415+00', 
     '2023-02-08 10:23:10.285415+00', 
     'dynamic_multiple_choice_question', 
@@ -370,7 +377,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'dynamic_multiple_choice_question', 
-    1, 7, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}'
+    1, 7, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],"readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -391,7 +398,7 @@ VALUES
   (
     'text_input_question', 'TEXT_INPUT', 
     'Text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'text_input_question', 1
@@ -402,7 +409,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'text_input_question', 1, 7, 7, '{ "tooltip": "", "required": false, "small_label": "" }'
+    'text_input_question', 1, 7, 7, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -423,7 +430,7 @@ VALUES
   (
     'instrument_picker_question', 
     'INSTRUMENT_PICKER', 'Instrument Picker question from seeds', 
-    '{"variant":"dropdown","options":[1, 2]}', 
+    '{"variant":"dropdown","options":[1, 2],"readPermissions":[]}', 
     '2023-02-08 10:23:10.285415+00', 
     '2023-02-08 10:23:10.285415+00', 
     'instrument_picker_question', 
@@ -437,7 +444,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'instrument_picker_question', 
-    1, 7, 6, '{"variant":"dropdown","options":[1, 2]}'
+    1, 7, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -458,7 +465,7 @@ VALUES
   (
     'technique_picker_question', 
     'TECHNIQUE_PICKER', 'Technique Picker question from seeds', 
-    '{"variant":"dropdown","options":[1, 2]}', 
+    '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}', 
     '2024-06-08 10:23:10.285415+00', 
     '2024-06-08 10:23:10.285415+00', 
     'technique_picker_question', 
@@ -472,7 +479,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'technique_picker_question', 
-    1, 7, 6, '{"variant":"dropdown","options":[1, 2]}'
+    1, 7, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer

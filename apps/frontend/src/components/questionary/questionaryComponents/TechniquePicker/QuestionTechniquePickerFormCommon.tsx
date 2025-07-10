@@ -5,14 +5,16 @@ import React, { useState } from 'react';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
 import TitledContainer from 'components/common/TitledContainer';
-import { TechniquePickerConfig } from 'generated/sdk';
+import { GetRolesQuery, TechniquePickerConfig } from 'generated/sdk';
 const availableVariantOptions = [
   { label: 'Radio', value: 'radio' },
   { label: 'Dropdown', value: 'dropdown' },
 ];
 export const QuestionTechniquePickerFormCommon = ({
+  rolesData,
   config,
 }: {
+  rolesData: GetRolesQuery['roles'];
   config: TechniquePickerConfig;
 }) => {
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
@@ -63,6 +65,35 @@ export const QuestionTechniquePickerFormCommon = ({
             data-cy="is-multiple-select"
           />
         )}
+      </TitledContainer>
+      <TitledContainer label="Read Permissions">
+        <FormControl fullWidth>
+          <InputLabel htmlFor="config.readPermissions" shrink>
+            Read Permissions
+          </InputLabel>
+          <Field
+            id="config.readPermissions"
+            name="config.readPermissions"
+            type="text"
+            multiple
+            renderValue={(selected?: string[] | string) => {
+              if (typeof selected === 'string') {
+                return selected;
+              }
+
+              return selected?.join(', ') || '';
+            }}
+            component={Select}
+            data-cy="read-permissions"
+            options={
+              rolesData?.map((role) => ({
+                text: role.shortCode,
+                value: role.shortCode,
+              })) ?? []
+            }
+            isMultiSelect={true}
+          />
+        </FormControl>
       </TitledContainer>
     </>
   );

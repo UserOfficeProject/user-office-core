@@ -411,7 +411,7 @@ context('Proposal administration tests', () => {
               cy.updateQuestion({
                 id: createdQuestion.id,
                 question: initialDBData.questions.fileUpload.text,
-                config: `{"file_type":[".pdf",".docx","image/*"]}`,
+                config: `{"file_type":[".pdf",".docx","image/*"],"readPermissions":[]}`,
               });
               cy.createQuestionTemplateRelation({
                 templateId: initialDBData.template.id,

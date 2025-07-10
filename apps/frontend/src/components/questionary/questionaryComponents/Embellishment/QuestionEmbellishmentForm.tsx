@@ -41,7 +41,6 @@ export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
-
           <Field
             name="question"
             id="Question-Input"
@@ -51,7 +50,6 @@ export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <Field
             name="config.html"
             id="HTML-Input"
@@ -67,7 +65,6 @@ export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
             }}
             data-cy="html"
           />
-
           <Field
             name="config.plain"
             id="Plain-Description-Input"
@@ -77,7 +74,6 @@ export const QuestionEmbellishmentForm = (props: QuestionFormProps) => {
             fullWidth
             data-cy="plain"
           />
-
           <Field
             name="config.omitFromPdf"
             id="Omit-from-pdf-checkbox"

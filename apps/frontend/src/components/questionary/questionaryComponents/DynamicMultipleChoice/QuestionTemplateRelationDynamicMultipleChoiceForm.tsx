@@ -11,6 +11,7 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import {
   ApiCallRequestHeader,
   DynamicMultipleChoiceConfig,
@@ -64,7 +65,6 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
               data-cy="required"
             />
           </TitledContainer>
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.variant" shrink>
@@ -99,7 +99,6 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
               />
             )}
           </TitledContainer>
-
           <TitledContainer label="Dynamic URL">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.url" shrink>
@@ -147,6 +146,10 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
               </TitledContainer>
             </FormControl>
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.questionRel.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

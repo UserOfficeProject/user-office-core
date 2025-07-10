@@ -178,7 +178,10 @@ const init = (user: UserWithRole) => {
         if (user.isApiAccessToken) {
           return container
             .resolve<QuestionaryDataSource>(Tokens.QuestionaryDataSource)
-            .getQuestionarySteps(questionaryId);
+            .getQuestionarySteps(
+              questionaryId,
+              user.currentRole?.shortCode ?? null
+            );
         }
 
         return baseContext.queries.questionary.getQuestionarySteps(

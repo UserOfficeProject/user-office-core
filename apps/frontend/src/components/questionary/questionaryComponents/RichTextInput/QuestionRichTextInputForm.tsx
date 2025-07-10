@@ -6,6 +6,7 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { TextInputConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -46,7 +47,6 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -85,6 +85,10 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
               value={(formikProps.values.config as TextInputConfig).max ?? ''}
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.question.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

@@ -12,11 +12,11 @@ INSERT INTO public.topics(
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_basis', 6, 6, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('sample_basis', 6, 6, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"", "readPermissions":[]}', 'AND');
 	
 INSERT INTO public.questions(
 	question_id, data_type, question, default_config, created_at, updated_at, natural_key, category_id)
-	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":6,"esiTemplateId":5,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":""}',
+	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":6,"esiTemplateId":5,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":"","readPermissions":[]}',
 			'2021-07-20 13:53:29.246687+00', '2021-07-20 13:53:29.246687+00', 'sample_declaration_question', 1);
 	
 INSERT INTO public.topics(
@@ -25,7 +25,7 @@ INSERT INTO public.topics(
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_declaration_question', 1, 7, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":6,"esiTemplateId":5,"small_label":"","required":false,"minEntries":null,"maxEntries":null}', 'AND');
+	VALUES ('sample_declaration_question', 1, 7, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":6,"esiTemplateId":5,"small_label":"","required":false,"minEntries":null,"maxEntries":null, "readPermissions":[]}', 'AND');
 
 INSERT INTO public.questionaries(
 	template_id, created_at, creator_id)

@@ -40,6 +40,7 @@ export const numberInputDefinition: Question<DataType.NUMBER_INPUT> = {
     config.required = false;
     config.tooltip = '';
     config.units = [];
+    config.readPermissions = [];
 
     return config;
   },

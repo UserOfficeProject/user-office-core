@@ -9,6 +9,7 @@ export const embellishmentDefinition: Question<DataType.EMBELLISHMENT> = {
     config.html = '';
     config.plain = '';
     config.omitFromPdf = false;
+    config.readPermissions = [];
 
     return config;
   },

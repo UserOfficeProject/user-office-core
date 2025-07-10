@@ -1,4 +1,4 @@
-import FormControl from '@mui/material/FormControl';
+import { FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import React, { useContext, ChangeEvent } from 'react';
@@ -9,6 +9,7 @@ import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   FeatureId,
@@ -57,6 +58,7 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
           addEntryButtonLabel: Yup.string().required(),
           minEntries: Yup.number().min(0).nullable(),
           maxEntries: Yup.number().min(1).nullable(),
+          readPermissions: Yup.array().of(Yup.string()),
         }),
       })}
     >
@@ -71,7 +73,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
-
           <Field
             name="question"
             id="Question-Input"
@@ -142,7 +143,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               </FormControl>
             )}
           </TitledContainer>
-
           <TitledContainer label="Constraints">
             <Field
               name="config.minEntries"
@@ -187,6 +187,10 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               }
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.question.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

@@ -9,6 +9,7 @@ import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { IntervalConfig } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
@@ -60,7 +61,6 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <Field
             name="config.small_label"
             label="Small label"
@@ -70,7 +70,6 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'small-label' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -99,6 +98,10 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
               data-cy="units"
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.question.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

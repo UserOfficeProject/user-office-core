@@ -11,6 +11,7 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { SelectionFromOptionsConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -63,7 +64,6 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -75,7 +75,6 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
               data-cy="required"
             />
           </TitledContainer>
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.variant" shrink>
@@ -111,7 +110,6 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
               />
             )}
           </TitledContainer>
-
           <TitledContainer label="Items">
             <Field
               title=""
@@ -132,6 +130,10 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
               data-cy="options"
             />
           </TitledContainer>
+          <QuestionReadPermissionsConfig
+            config={props.question.config}
+            rolesData={props.rolesData}
+          />
         </>
       )}
     </QuestionFormShell>

@@ -21,6 +21,7 @@ export const sampleDeclarationDefinition: Question<DataType.SAMPLE_DECLARATION> 
       config.esiTemplateId = null;
       config.small_label = '';
       config.required = false;
+      config.readPermissions = [];
 
       return config;
     },

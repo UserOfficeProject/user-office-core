@@ -1524,7 +1524,7 @@ context('Proposal tests', () => {
             cy.updateQuestion({
               id: result.createQuestion.id,
               question: instrumentPickerQuestion,
-              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false}`,
+              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false,"readPermissions":[]}`,
             });
             cy.createQuestionTemplateRelation({
               questionId: instrumentPickerQuestionId,
@@ -1641,7 +1641,7 @@ context('Proposal tests', () => {
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false}`,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
         dependencies: [],
       });
 
@@ -1696,7 +1696,7 @@ context('Proposal tests', () => {
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":true}`,
+        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":true,"readPermissions":[]}`,
         dependencies: [],
       });
       cy.login('user1', initialDBData.roles.user);
@@ -1750,7 +1750,7 @@ context('Proposal tests', () => {
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":true}`,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":true,"readPermissions":[]}`,
         dependencies: [],
       });
       cy.login('user1', initialDBData.roles.user);
@@ -1929,7 +1929,7 @@ context('Proposal tests', () => {
               cy.updateQuestion({
                 id: instrumentPickerQuestionId,
                 question: instrumentPickerQuestion,
-                config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":true}`,
+                config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":true,"readPermissions":[]}`,
               });
               cy.createQuestionTemplateRelation({
                 questionId: instrumentPickerQuestionId,

@@ -11,6 +11,7 @@ import DateTimePicker from 'components/common/FormikUIDateTimePicker';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
+import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { DateConfig, SettingsId } from 'generated/sdk';
 import { minMaxDateTimeCalculations } from 'utils/Time';
@@ -179,6 +180,10 @@ export const QuestionDateForm = (props: QuestionFormProps) => {
                   desktopModeMediaQuery={theme.breakpoints.up('sm')}
                 />
               </LocalizationProvider>
+              <QuestionReadPermissionsConfig
+                config={props.question.config}
+                rolesData={props.rolesData}
+              />
             </TitledContainer>
           </>
         );

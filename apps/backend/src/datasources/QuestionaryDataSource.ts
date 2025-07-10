@@ -14,9 +14,18 @@ export interface QuestionaryDataSource {
   ): Promise<AnswerBasic | null>;
   delete(questionary_id: number): Promise<Questionary>;
   getQuestionary(questionary_id: number): Promise<Questionary | null>;
-  getQuestionarySteps(questionaryId: number): Promise<QuestionaryStep[]>;
-  getBlankQuestionarySteps(templateId: number): Promise<QuestionaryStep[]>;
-  getBlankQuestionaryStepsByCallId(callId: number): Promise<QuestionaryStep[]>;
+  getQuestionarySteps(
+    questionaryId: number,
+    currentUserRole: string | null
+  ): Promise<QuestionaryStep[]>;
+  getBlankQuestionarySteps(
+    templateId: number,
+    currentUserRoles: string | null
+  ): Promise<QuestionaryStep[]>;
+  getBlankQuestionaryStepsByCallId(
+    callId: number,
+    currentUserRole: string | null
+  ): Promise<QuestionaryStep[]>;
   getAnswers(questionId: string): Promise<AnswerBasic[]>;
   getTemplates(questionId: string): Promise<Template[]>;
   getIsCompleted(questionaryId: number): Promise<boolean>;

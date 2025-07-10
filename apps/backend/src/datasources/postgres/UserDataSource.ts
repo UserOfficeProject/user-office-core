@@ -438,6 +438,9 @@ export default class PostgresUserDataSource implements UserDataSource {
       users.push(...newUsers);
     }
 
+    // console.log('users', users);
+    // console.log('userIds', userIds);
+
     if (userIds.length !== users.length) {
       const failedUsers = userIds.filter(
         (userId) => !users.find((user) => user.user_id === userId)
