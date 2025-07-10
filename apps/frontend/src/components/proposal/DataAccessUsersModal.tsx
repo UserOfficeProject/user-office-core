@@ -6,6 +6,7 @@ import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import StyledDialog from 'components/common/StyledDialog';
 import UserManagementTable from 'components/common/UserManagementTable';
 import { BasicUserDetails } from 'generated/sdk';
+import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useDataAccessUsersData } from 'hooks/remoteUser/useDataAccessUsersData';
 
 type DataAccessUsersModalProps = {
@@ -21,6 +22,7 @@ const DataAccessUsersModal = ({
 }: DataAccessUsersModalProps) => {
   const { dataAccessUsers, loadingDataAccessUsers } =
     useDataAccessUsersData(proposalPk);
+  const { proposalData } = useProposalData(proposalPk);
   const [managedUsers, setManagedUsers] = useState<BasicUserDetails[]>([]);
 
   // Update managed users when data access users data changes
@@ -29,6 +31,18 @@ const DataAccessUsersModal = ({
       setManagedUsers(dataAccessUsers);
     }
   }, [dataAccessUsers, loadingDataAccessUsers]);
+
+  // Calculate excludeUserIds from proposal data (proposer + co-proposers)
+  const excludeUserIds = React.useMemo(() => {
+    if (!proposalData) {
+      return [];
+    }
+
+    const proposerId = proposalData.proposer?.id;
+    const coProposerIds = proposalData.users?.map((user) => user.id) || [];
+
+    return proposerId ? [proposerId, ...coProposerIds] : coProposerIds;
+  }, [proposalData]);
 
   return (
     <StyledDialog
@@ -50,6 +64,7 @@ const DataAccessUsersModal = ({
               setInvites={() => {}}
               title="Data access users"
               addButtonLabel="Add Data Access User"
+              excludeUserIds={excludeUserIds}
             />
             <ActionButtonContainer>
               <Button
