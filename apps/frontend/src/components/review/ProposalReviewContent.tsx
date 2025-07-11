@@ -115,7 +115,11 @@ const ProposalReviewContent = ({
 
       const canEditAsInstrumentSci =
         isInstrumentScientist &&
-        technicalReview?.technicalReviewAssigneeId === user.id;
+        (technicalReview?.technicalReviewAssigneeId === user.id ||
+          (technicalReviewInstrument?.scientists.some(
+            (scientist) => scientist.id === user.id
+          ) &&
+            technicalReviewInstrument.multipleTechReviewsEnabled));
 
       return isUserOfficer ||
         isFapSec ||

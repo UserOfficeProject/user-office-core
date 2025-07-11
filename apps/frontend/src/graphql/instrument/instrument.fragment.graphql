@@ -5,6 +5,7 @@ fragment instrument on Instrument {
   description
   managerUserId
   selectable
+  multipleTechReviewsEnabled
   instrumentContact {
     ...basicUserDetails
   }

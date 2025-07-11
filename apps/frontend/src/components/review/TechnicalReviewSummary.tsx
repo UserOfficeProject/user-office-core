@@ -92,7 +92,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
     if (isInstrumentScientist) {
       //reviewers should not be able to submit a grade for proposals on which they are not a reviewer
       submissionDisabled =
-        technicalReview.reviewer?.id !== user.id ? true : false;
+        technicalReview.technicalReviewAssignee?.id !== user.id ? true : false;
     }
 
     return submissionDisabled;
@@ -268,7 +268,8 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                 disabled={
                   isSubmitting ||
                   technicalReview.submitted ||
-                  isInternalReviewer
+                  isInternalReviewer ||
+                  submitDisabled
                 }
                 isBusy={isSubmitting}
                 data-cy="button-submit-technical-review"

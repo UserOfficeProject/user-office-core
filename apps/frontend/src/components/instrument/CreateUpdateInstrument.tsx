@@ -59,6 +59,7 @@ const CreateUpdateInstrument = ({
         managerUserId: null,
         surname: '',
         selectable: true,
+        multipleTechReviewsEnabled: false,
       };
 
   useEffect(() => {
@@ -169,6 +170,8 @@ const CreateUpdateInstrument = ({
                 managerUserId: updatedValues.managerUserId,
                 updateTechReview: true,
                 selectable: updatedValues.selectable,
+                multipleTechReviewsEnabled:
+                  updatedValues.multipleTechReviewsEnabled,
               });
 
               close(updateInstrument);
@@ -194,6 +197,8 @@ const CreateUpdateInstrument = ({
             managerUserId: updatedValues.managerUserId,
             updateTechReview: false,
             selectable: updatedValues.selectable,
+            multipleTechReviewsEnabled:
+              updatedValues.multipleTechReviewsEnabled,
           });
 
           close(updateInstrument);
@@ -280,6 +285,22 @@ const CreateUpdateInstrument = ({
               />
             }
             label="Allow this instrument to be selectable in proposal submission"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon />}
+                checkedIcon={<CheckBoxIcon />}
+                checked={formikProps.values.multipleTechReviewsEnabled ?? false}
+                onChange={(event) =>
+                  formikProps.setFieldValue(
+                    'multipleTechReviewsEnabled',
+                    event.target.checked
+                  )
+                }
+              />
+            }
+            label="Allow multiple reviews for a technical review for this instrument"
           />
           <SurnameSearchField {...formikProps} />
           <FormikUIAutocomplete
