@@ -642,17 +642,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
-          query
-            .whereRaw(
+          query.where(function () {
+            this.whereRaw(
               'jsonb_path_exists(technical_reviews, \'$[*].technicalReviewAssignee.id \\? (@.type() == "number" && @ == :userId:)\')',
               { userId: user.id }
-            )
-            .orWhereRaw(
+            ).orWhereRaw(
               // This query finds proposals where the current user is a scientist on an instrument that allows multiple technical reviews
               // eslint-disable-next-line prettier/prettier
               'jsonb_path_exists(instruments, \'$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)\')',
               { userId: user.id }
             );
+          });
         }
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {
