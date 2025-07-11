@@ -1,0 +1,5 @@
+query getDataAccessUsers($proposalPk: Int!) {
+  dataAccessUsers(proposalPk: $proposalPk) {
+    ...basicUserDetails
+  }
+}
