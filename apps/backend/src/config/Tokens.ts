@@ -6,6 +6,7 @@ export const Tokens = {
   ConfigureEnvironment: Symbol('ConfigureEnvironment'),
   ConfigureLogger: Symbol('ConfigureLogger'),
   CoProposerClaimDataSource: Symbol('CoProposerClaimDataSource'),
+  DataAccessUsersDataSource: Symbol('DataAccessUsersDataSource'),
   EmailEventHandler: Symbol('EmailEventHandler'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),

@@ -11,6 +11,7 @@ import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthori
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
+import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
@@ -67,6 +68,7 @@ async function skipEmailHandler(event: ApplicationEvent) {
 
 mapClass(Tokens.AdminDataSource, PostgresAdminDataSourceWithAutoUpgrade);
 mapClass(Tokens.CoProposerClaimDataSource, PostgresCoProposerClaimDataSource);
+mapClass(Tokens.DataAccessUsersDataSource, PostgresDataAccessUsersDataSource);
 mapClass(Tokens.CallDataSource, PostgresCallDataSource);
 mapClass(Tokens.EventLogsDataSource, PostgresEventLogsDataSource);
 mapClass(Tokens.FeedbackDataSource, PostgresFeedbackDataSource);

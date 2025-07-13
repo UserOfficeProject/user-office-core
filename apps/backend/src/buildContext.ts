@@ -6,6 +6,7 @@ import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
+import DataAccessUsersMutations from './mutations/DataAccessUsersMutations';
 import ExperimentMutations from './mutations/ExperimentMutation';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
@@ -32,6 +33,7 @@ import VisitMutations from './mutations/VisitMutations';
 import WorkflowMutations from './mutations/WorkflowMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
+import DataAccessUsersQueries from './queries/DataAccessUsersQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import ExperimentQueries from './queries/ExperimentQueries';
 import FapQueries from './queries/FapQueries';
@@ -65,6 +67,7 @@ const context: BasicResolverContext = {
   queries: {
     admin: container.resolve(AdminQueries),
     call: container.resolve(CallQueries),
+    dataAccessUsers: container.resolve(DataAccessUsersQueries),
     eventLogs: container.resolve(EventLogQueries),
     feedback: container.resolve(FeedbackQueries),
     file: container.resolve(FileQueries),
@@ -97,6 +100,7 @@ const context: BasicResolverContext = {
   mutations: {
     admin: container.resolve(AdminMutations),
     call: container.resolve(CallMutations),
+    dataAccessUsers: container.resolve(DataAccessUsersMutations),
     feedback: container.resolve(FeedbackMutations),
     file: container.resolve(FileMutations),
     genericTemplate: container.resolve(GenericTemplateMutations),

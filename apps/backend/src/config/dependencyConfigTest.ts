@@ -8,6 +8,7 @@ import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthori
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import MockDataAccessUsersDataSource from '../datasources/mockups/DataAccessUsersDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
@@ -53,6 +54,7 @@ import { mapClass, mapValue } from './utils';
 
 mapClass(Tokens.AdminDataSource, AdminDataSourceMock);
 mapClass(Tokens.CoProposerClaimDataSource, CoProposerClaimDataSourceMock);
+mapClass(Tokens.DataAccessUsersDataSource, MockDataAccessUsersDataSource);
 mapClass(Tokens.CallDataSource, CallDataSourceMock);
 mapClass(Tokens.EventLogsDataSource, EventLogsDataSourceMock);
 mapClass(Tokens.FeedbackDataSource, FeedbackDataSourceMock);

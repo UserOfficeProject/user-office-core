@@ -8,6 +8,7 @@ import UserManagementTable from 'components/common/UserManagementTable';
 import { BasicUserDetails } from 'generated/sdk';
 import { useProposalData } from 'hooks/proposal/useProposalData';
 import { useDataAccessUsersData } from 'hooks/remoteUser/useDataAccessUsersData';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 type DataAccessUsersModalProps = {
   open: boolean;
@@ -24,6 +25,7 @@ const DataAccessUsersModal = ({
     useDataAccessUsersData(proposalPk);
   const { proposalData } = useProposalData(proposalPk);
   const [managedUsers, setManagedUsers] = useState<BasicUserDetails[]>([]);
+  const { api, isExecutingCall } = useDataApiWithFeedback();
 
   // Update managed users when data access users data changes
   React.useEffect(() => {
@@ -43,6 +45,27 @@ const DataAccessUsersModal = ({
 
     return proposerId ? [proposerId, ...coProposerIds] : coProposerIds;
   }, [proposalData]);
+
+  const handleUpdateDataAccessUsers = async () => {
+    if (!proposalPk) {
+      return;
+    }
+
+    const userIds = managedUsers.map((user) => user.id);
+
+    try {
+      await api({
+        toastSuccessMessage: 'Data access users updated successfully!',
+      }).updateDataAccessUsers({
+        proposalPk,
+        userIds,
+      });
+      onClose();
+    } catch (error) {
+      // Error handling is done by useDataApiWithFeedback
+      console.error('Failed to update data access users:', error);
+    }
+  };
 
   return (
     <StyledDialog
@@ -75,8 +98,9 @@ const DataAccessUsersModal = ({
                 Close
               </Button>
               <Button
-                onClick={onClose}
+                onClick={handleUpdateDataAccessUsers}
                 variant="contained"
+                disabled={isExecutingCall}
                 data-cy="save-data-access-users-modal"
               >
                 Update
