@@ -7,4 +7,5 @@ export interface DataAccessUsersDataSource {
     proposalPk: number,
     userIds: number[]
   ): Promise<BasicUserDetails[] | Rejection>;
+  isDataAccessUserOfProposal(id: number, proposalPk: number): Promise<boolean>;
 }

@@ -2,11 +2,11 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
+import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { FapDataSource } from '../datasources/FapDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { ReviewDataSource } from '../datasources/ReviewDataSource';
 import { StatusDataSource } from '../datasources/StatusDataSource';
-import { TechniqueDataSource } from '../datasources/TechniqueDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Roles } from '../models/Role';
 import { ProposalStatusDefaultShortCodes } from '../models/Status';
@@ -33,8 +33,8 @@ export class ProposalAuthorization {
     private callDataSource: CallDataSource,
     @inject(Tokens.StatusDataSource)
     private statusDataSource: StatusDataSource,
-    @inject(Tokens.TechniqueDataSource)
-    private techniqueDataSource: TechniqueDataSource,
+    @inject(Tokens.DataAccessUsersDataSource)
+    private dataAccessUsersDataSource: DataAccessUsersDataSource,
     @inject(Tokens.UserAuthorization) protected userAuth: UserAuthorization
   ) {}
 
@@ -178,6 +178,13 @@ export class ProposalAuthorization {
     return this.visitDataSource.isVisitorOfProposal(agent.id, proposalPk);
   }
 
+  async isDataAccessUserOfProposal(agent: UserWithRole, proposalPk: number) {
+    return this.dataAccessUsersDataSource.isDataAccessUserOfProposal(
+      agent.id,
+      proposalPk
+    );
+  }
+
   async isChairOrSecretaryOfProposal(
     agent: UserJWT | null,
     proposalPk: number
@@ -243,7 +250,8 @@ export class ProposalAuthorization {
       case Roles.USER:
         hasAccess =
           (await this.isMemberOfProposal(agent, proposal)) ||
-          (await this.isVisitorOfProposal(agent, proposal.primaryKey));
+          (await this.isVisitorOfProposal(agent, proposal.primaryKey)) ||
+          (await this.isDataAccessUserOfProposal(agent, proposal.primaryKey));
         break;
       case Roles.INSTRUMENT_SCIENTIST:
         hasAccess =

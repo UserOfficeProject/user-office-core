@@ -71,4 +71,13 @@ export default class MockDataAccessUsersDataSource
       });
     }
   }
+
+  async isDataAccessUserOfProposal(
+    id: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    return Promise.resolve(
+      (proposalPk === 1 && id === 100) || (proposalPk === 2 && id === 100)
+    );
+  }
 }

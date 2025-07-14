@@ -60,4 +60,17 @@ export default class PostgresDataAccessUsersDataSource
       });
     }
   }
+
+  async isDataAccessUserOfProposal(
+    id: number,
+    proposalPk: number
+  ): Promise<boolean> {
+    const result = await database
+      .select('user_id')
+      .from('data_access_user_has_proposal')
+      .where({ proposal_pk: proposalPk, user_id: id })
+      .first();
+
+    return result !== undefined;
+  }
 }
