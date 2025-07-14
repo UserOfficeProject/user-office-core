@@ -38,12 +38,13 @@ import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
+import createLoggingHandler from '../eventHandlers/logging';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
 import {
   createSkipListeningHandler,
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
-import { EventBus } from '../events/eventBus';
+import { createApplicationEventBus } from '../events';
 import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import BasicUserDetailsLoader from '../loaders/BasicUserDetailsLoader';
 import { SkipAssetRegistrar } from '../services/assetRegistrar/skip/SkipAssetRegistrar';
@@ -98,8 +99,7 @@ mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 
 mapValue(Tokens.PostToMessageQueue, createSkipPostingHandler());
-mapValue(Tokens.LoggingHandler, jest.mocked(new EventBus()));
-mapValue(Tokens.EventBus, jest.mocked(new EventBus()));
+mapValue(Tokens.LoggingHandler, createLoggingHandler());
 mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapClass(Tokens.MailService, SkipSendMailService);
@@ -114,7 +114,4 @@ mapValue(Tokens.ConfigureLogger, () =>
 mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
-
-jest.mock('../decorators/EventBus', () => {
-  return () => jest.fn();
-});
+mapValue(Tokens.EventBus, createApplicationEventBus());
