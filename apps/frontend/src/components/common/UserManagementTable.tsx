@@ -192,7 +192,7 @@ const UserManagementTable = ({
             <Button
               variant="outlined"
               onClick={openModal}
-              data-cy="add-user-button"
+              data-cy="add-participant-button"
               size="small"
               startIcon={<PersonAddIcon />}
               disabled={disabled}
