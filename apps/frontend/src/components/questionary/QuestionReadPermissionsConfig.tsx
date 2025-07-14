@@ -12,13 +12,10 @@ export const QuestionReadPermissionsConfig = ({
   config: FieldConfig;
   rolesData: GetRolesQuery['roles'];
 }) => {
-  console.log(rolesData);
-
   return (
     <TitledContainer label="Read Permissions">
       <InputLabel htmlFor="config.readPermissions" shrink>
-        Read Permissions - leave blank for all users to be able to read the
-        question
+        Select specific roles to restrict the permission to access this question
       </InputLabel>
       <Field
         id="config.readPermissions"
@@ -33,7 +30,7 @@ export const QuestionReadPermissionsConfig = ({
             return selected;
           }
 
-          return selected?.join(', ') || '';
+          return selected?.join(', ') || 'All Roles';
         }}
         component={Select}
         data-cy="read-permissions"
@@ -44,6 +41,7 @@ export const QuestionReadPermissionsConfig = ({
           })) ?? []
         }
         isMultiSelect={true}
+        displayEmpty={true}
       />
     </TitledContainer>
   );
