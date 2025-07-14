@@ -1497,6 +1497,95 @@ context('Instrument tests', () => {
       cy.closeModal();
     });
 
+    it('Instrument Scientists should not be able to bulk submit technical reviews and see warning for proposals where they are not assigned reviewer ', () => {
+      let createdProposalId2 = '';
+      cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+        if (result.createProposal) {
+          createdProposalPk = result.createProposal.primaryKey;
+          createdProposalId2 = result.createProposal.proposalId;
+
+          cy.updateProposal({
+            proposalPk: createdProposalPk,
+            title: proposal2.title,
+            abstract: proposal2.abstract,
+          });
+
+          cy.assignProposalsToInstruments({
+            proposalPks: [createdProposalPk],
+            instrumentIds: [createdInstrument3Id],
+          });
+
+          cy.updateTechnicalReviewAssignee({
+            proposalPks: [createdProposalPk],
+            userId: scientist1.id,
+            instrumentId: createdInstrument3Id,
+          });
+        }
+      });
+      selectAllProposalsFilterStatus();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.contains(proposal2.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+
+      cy.get('[role="presentation"] [role="alert"] .MuiAlert-message')
+        .should('exist')
+        .and('include.text', createdProposalId2);
+
+      cy.get('[data-cy="confirm-cancel"]').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="edit-technical-review"]')
+        .click();
+
+      cy.get('[data-cy="technical-review-status"]').click();
+      cy.get('[data-cy="technical-review-status-options"]')
+        .contains('Feasible')
+        .click();
+      cy.get('[data-cy="timeAllocation"] input').type('10');
+
+      cy.get('[data-cy="save-button"]').click();
+
+      cy.notification({
+        text: 'Saved',
+        variant: 'success',
+      });
+
+      cy.closeModal();
+      cy.finishedLoading();
+      cy.contains(proposal2.title)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+
+      cy.get('[data-cy="submit-proposal-reviews"]').click();
+
+      cy.get('[role="presentation"] [role="alert"] .MuiAlert-message').should(
+        'not.exist'
+      );
+
+      cy.get('[data-cy="confirm-ok"]').click();
+
+      cy.notification({
+        text: 'Saved',
+        variant: 'success',
+      });
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal-and-technical-review"]')
+        .should('exist');
+    });
+
     it('Instrument scientists should be able to see but not modify the management decision', () => {
       cy.contains('Proposals');
 
