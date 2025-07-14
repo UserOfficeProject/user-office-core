@@ -92,9 +92,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
 
-  const isFacilitiesEnabled = context.featuresMap.get(
-    FeatureId.FACILITIES
-  )?.isEnabled;
+  const isTagsEnabled = context.featuresMap.get(FeatureId.TAGS)?.isEnabled;
 
   const calls = useCallsData(
     {
@@ -234,13 +232,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItemButton>
       </Tooltip>
-      {isFacilitiesEnabled && (
-        <Tooltip title="Facility">
-          <ListItemButton component={NavLink} to="/Facility">
+      {isTagsEnabled && (
+        <Tooltip title="Tag">
+          <ListItemButton component={NavLink} to="/Tag">
             <ListItemIcon>
               <Apartment />
             </ListItemIcon>
-            <ListItemText primary={'Facility'} />
+            <ListItemText primary={'Tag'} />
           </ListItemButton>
         </Tooltip>
       )}

@@ -1,9 +1,0 @@
-mutation assignCallsToFacility(
-  $callIds: [Int!]!
-  $facilityId: Int!
-) {
-  assignCallsToFacility(
-    callIds: $callIds
-    facilityId: $facilityId
-  )
-}

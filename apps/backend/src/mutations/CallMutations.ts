@@ -7,7 +7,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { CallDataSource } from '../datasources/CallDataSource';
-import { FacilityDataSource } from '../datasources/FacilityDataSource';
+import { TagDataSource } from '../datasources/TagDataSource';
 import { Authorized, EventBus, ValidateArgs } from '../decorators';
 import { Event } from '../events/event.enum';
 import { Call } from '../models/Call';
@@ -31,8 +31,8 @@ const createCallValidationSchema = mergeValidationSchemas(
 export default class CallMutations {
   constructor(
     @inject(Tokens.CallDataSource) private dataSource: CallDataSource,
-    @inject(Tokens.FacilityDataSource)
-    private facilityDataSource: FacilityDataSource
+    @inject(Tokens.TagDataSource)
+    private tagDataSource: TagDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -116,40 +116,34 @@ export default class CallMutations {
     agent: UserWithRole | null,
     args: AssignInstrumentsToCallInput
   ): Promise<Call | Rejection> {
-    const callFacilities = await this.facilityDataSource.getCallsFacilities(
-      args.callId
-    );
+    const callTags = await this.tagDataSource.getCallsTags(args.callId);
 
-    if (callFacilities.length > 0) {
-      let shareFacility = true;
+    if (callTags.length > 0) {
+      let shareTag = true;
 
       await Promise.all(
         args.instrumentFapIds.map(async (instrumentFap) => {
-          const instrumentFacility =
-            await this.facilityDataSource.getInstrumentsFacilities(
-              instrumentFap.instrumentId
-            );
-
-          if (instrumentFacility.length === 0) {
-            shareFacility = false;
-          }
-
-          const facilityCrossover = instrumentFacility.some(
-            (facilityInstrument) =>
-              callFacilities.some(
-                (facilityCall) => facilityInstrument.id === facilityCall.id
-              )
+          const instrumentTag = await this.tagDataSource.getInstrumentsTags(
+            instrumentFap.instrumentId
           );
 
-          if (!facilityCrossover) {
-            shareFacility = false;
+          if (instrumentTag.length === 0) {
+            shareTag = false;
+          }
+
+          const tagCrossover = instrumentTag.some((tagInstrument) =>
+            callTags.some((tagCall) => tagInstrument.id === tagCall.id)
+          );
+
+          if (!tagCrossover) {
+            shareTag = false;
           }
         })
       );
 
-      if (!shareFacility) {
+      if (!shareTag) {
         return rejection(
-          'One or more instruments do not share a facility with the selected call',
+          'One or more instruments do not share a tag with the selected call',
           {
             args,
           }

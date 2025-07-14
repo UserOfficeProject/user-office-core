@@ -7,7 +7,6 @@ import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
 import ExperimentMutations from './mutations/ExperimentMutation';
-import FacilityMutations from './mutations/FacilityMutations';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
 import FileMutations from './mutations/FileMutations';
@@ -25,6 +24,7 @@ import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
 import StatusMutations from './mutations/StatusMutations';
+import TagMutations from './mutations/TagMutations';
 import TechniqueMutations from './mutations/TechniqueMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UnitMutations from './mutations/UnitMutations';
@@ -35,7 +35,6 @@ import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import ExperimentQueries from './queries/ExperimentQueries';
-import FacilityQueries from './queries/FacilityQueries';
 import FapQueries from './queries/FapQueries';
 import FeedbackQueries from './queries/FeedbackQueries';
 import FileQueries from './queries/FileQueries';
@@ -55,6 +54,7 @@ import StatusActionQueries from './queries/StatusActionQueries';
 import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
 import StatusQueries from './queries/StatusQueries';
 import SystemQueries from './queries/SystemQueries';
+import TagQueries from './queries/TagQueries';
 import TechnicalReviewQueries from './queries/TechnicalReviewQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
@@ -94,7 +94,7 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowQueries),
     statusAction: container.resolve(StatusActionQueries),
     settings: container.resolve(SettingsQueries),
-    facility: container.resolve(FacilityQueries),
+    tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
   },
   mutations: {
@@ -123,7 +123,7 @@ const context: BasicResolverContext = {
     statusActionsLogs: container.resolve(StatusActionsLogsMutations),
     status: container.resolve(StatusMutations),
     workflow: container.resolve(WorkflowMutations),
-    facility: container.resolve(FacilityMutations),
+    tag: container.resolve(TagMutations),
     experiment: container.resolve(ExperimentMutations),
   },
   clients: {

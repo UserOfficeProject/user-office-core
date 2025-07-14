@@ -11,7 +11,6 @@ import {
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
 import { ExperimentStatus } from '../../models/Experiment';
-import { Facility } from '../../models/Facility';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Feature, FeatureId } from '../../models/Feature';
@@ -40,6 +39,7 @@ import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { StatusActionType } from '../../models/StatusAction';
 import { StatusActionsLog } from '../../models/StatusActionsLog';
+import { Tag } from '../../models/Tag';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import {
@@ -1380,17 +1380,17 @@ export interface CoProposerClaimRecord {
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
 
-export interface FacilityRecord {
-  readonly facility_id: number;
+export interface TagRecord {
+  readonly tag_id: number;
   readonly name: string;
   readonly short_code: string;
 }
 
-export const createFacilityObject = (facility: FacilityRecord) =>
-  new Facility(facility.facility_id, facility.name, facility.short_code);
+export const createTagObject = (tag: TagRecord) =>
+  new Tag(tag.tag_id, tag.name, tag.short_code);
 
-export interface FacilityUserRecord {
-  readonly facility_id: number;
+export interface TagUserRecord {
+  readonly tag_id: number;
   readonly user_id: number;
 }
 

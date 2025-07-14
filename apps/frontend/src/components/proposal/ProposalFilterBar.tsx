@@ -42,7 +42,7 @@ type ProposalFilterBarProps = {
     isLoading: boolean;
   };
   instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
-  facilities?: {
+  tags?: {
     data: { id: number; name: string; shortCode: string }[];
     isLoading: boolean;
   };

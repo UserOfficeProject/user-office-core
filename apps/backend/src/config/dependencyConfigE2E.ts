@@ -9,7 +9,6 @@ import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
-import PostgresFacilityDataSource from '../datasources/postgres/FacilityDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
@@ -31,6 +30,7 @@ import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActio
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
+import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
@@ -96,7 +96,7 @@ mapClass(
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
-mapClass(Tokens.FacilityDataSource, PostgresFacilityDataSource);
+mapClass(Tokens.TagDataSource, PostgresTagDataSource);
 
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);

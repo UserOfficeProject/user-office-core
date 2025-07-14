@@ -10,10 +10,10 @@ import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import ChangeRole from './common/ChangeRole';
-import FacilityPage from './facility/FacilityPage';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
 import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
+import TagPage from './tag/TagPage';
 import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
@@ -160,8 +160,8 @@ const AppRoutes = () => {
   const isExperimentSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
-  const isFacilitiesEnabled = featureContext.featuresMap.get(
-    FeatureId.FACILITIES
+  const isTagsEnabled = featureContext.featuresMap.get(
+    FeatureId.TAGS
   )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
@@ -235,12 +235,10 @@ const AppRoutes = () => {
             }
           />
         )}
-        {isFacilitiesEnabled && isUserOfficer && (
+        {isTagsEnabled && isUserOfficer && (
           <Route
-            path="/Facility"
-            element={
-              <TitledRoute title="Facility" element={<FacilityPage />} />
-            }
+            path="/Tag"
+            element={<TitledRoute title="Tag" element={<TagPage />} />}
           />
         )}
         <Route

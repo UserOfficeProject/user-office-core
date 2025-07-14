@@ -1,9 +1,0 @@
-mutation removeInstrumentFromFacility(
-  $instrumentId: Int!
-  $facilityId: Int!
-) {
-  removeInstrumentFromFacility(
-    instrumentId: $instrumentId
-    facilityId: $facilityId
-  )
-}

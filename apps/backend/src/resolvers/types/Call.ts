@@ -13,9 +13,9 @@ import {
 import { ResolverContext } from '../../context';
 import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
-import { Facility } from './Facility';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
+import { Tag } from './Tag';
 import { Template } from './Template';
 import { Workflow } from './Workflow';
 
@@ -149,9 +149,9 @@ export class CallInstrumentsResolver {
     return startCall <= now && endCallInternal >= now;
   }
 
-  @FieldResolver(() => Facility)
-  async facilities(@Root() call: Call, @Ctx() context: ResolverContext) {
-    return context.queries.facility.dataSource.getCallsFacilities(call.id);
+  @FieldResolver(() => Tag)
+  async tags(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.tag.dataSource.getCallsTags(call.id);
   }
 }
 

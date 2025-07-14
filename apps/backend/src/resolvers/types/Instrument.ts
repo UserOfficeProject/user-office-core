@@ -13,8 +13,8 @@ import { ResolverContext } from '../../context';
 import { Instrument as InstrumentOrigin } from '../../models/Instrument';
 import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
-import { Facility } from './Facility';
 import { Fap } from './Fap';
+import { Tag } from './Tag';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -95,17 +95,16 @@ export class InstrumentResolver {
     );
   }
 
-  @FieldResolver(() => [Facility], { nullable: true })
-  async facilities(
+  @FieldResolver(() => [Tag], { nullable: true })
+  async tags(
     @Root() instrument: Instrument,
     @Ctx() context: ResolverContext
-  ): Promise<Facility[] | null> {
-    const facilities =
-      context.queries.facility.dataSource.getInstrumentsFacilities(
-        instrument.id
-      );
+  ): Promise<Tag[] | null> {
+    const tags = context.queries.tag.dataSource.getInstrumentsTags(
+      instrument.id
+    );
 
-    return isRejection(facilities) ? [] : facilities;
+    return isRejection(tags) ? [] : tags;
   }
 }
 
