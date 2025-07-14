@@ -62,7 +62,6 @@ export interface StfcBasicPersonDetails {
   orgId: number;
   title: string;
   userNumber: string;
-  workPhone: string;
 }
 
 export function toStfcBasicPersonDetails(
@@ -87,7 +86,6 @@ export function toStfcBasicPersonDetails(
     orgId: 1,
     title: dto.title ?? '',
     userNumber: dto.userNumber ?? '',
-    workPhone: dto.workPhone ?? '',
   };
 }
 
@@ -101,9 +99,7 @@ export function toEssBasicUserDetails(
     stfcUser.firstNameKnownAs ?? stfcUser.givenName,
     stfcUser.orgName ?? '',
     stfcUser.orgId ?? 1,
-    '',
     new Date(),
-    false,
     stfcUser.email ?? '',
     stfcUser.country ?? ''
   );
@@ -115,20 +111,13 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     stfcUser.title ?? '',
     stfcUser.givenName ?? '',
     stfcUser.familyName ?? '',
-    stfcUser.email ?? '',
     stfcUser.firstNameKnownAs ?? stfcUser.givenName,
     '',
     '',
     '',
-    '',
-    new Date('2000-01-01'),
     1,
-    stfcUser.orgName,
-    stfcUser.deptName ?? '',
     '',
     stfcUser.email ?? '',
-    stfcUser.workPhone ?? '',
-    false,
     '2000-01-01 00:00:00.000000+00',
     '2000-01-01 00:00:00.000000+00'
   );
@@ -677,18 +666,12 @@ export class StfcUserDataSource implements UserDataSource {
     user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_refresh_token: string,
     oauth_issuer: string,
-    gender: string,
-    birthdate: Date,
     institution: number,
-    department: string,
-    position: string,
-    email: string,
-    telephone: string
+    email: string
   ): Promise<User> {
     throw new Error('Method not implemented.');
   }

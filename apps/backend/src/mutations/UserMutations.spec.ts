@@ -263,7 +263,6 @@ describe('updateUserByOidcSub', () => {
       {
         oidcSub: dummyUser.oidcSub as string,
         firstname: 'OfficerUpdatedJane',
-        department: 'Updated Department',
         id: dummyUser.id,
       }
     );
@@ -304,8 +303,6 @@ describe('updateUserByOidcSub', () => {
   test('A user can update partial profile data by OIDC sub', async () => {
     const result = await userMutations.updateUserByOidcSub(dummyUserWithRole, {
       oidcSub: dummyUser.oidcSub as string,
-      telephone: '+1-555-9999',
-      position: 'Senior Architect',
       id: dummyUser.id,
     });
 
@@ -363,6 +360,5 @@ describe('updateUserByOidcSub', () => {
     expect(isRejection(result)).toBe(false);
     expect((result as typeof dummyUser).lastname).toBe(dummyUser.lastname);
     expect((result as typeof dummyUser).email).toBe(dummyUser.email);
-    expect((result as typeof dummyUser).department).toBe(dummyUser.department);
   });
 });

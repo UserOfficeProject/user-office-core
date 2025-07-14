@@ -227,23 +227,16 @@ export interface UserRecord {
   readonly user_title: string;
   readonly firstname: string;
   readonly lastname: string;
-  readonly username: string;
   readonly preferredname: string;
   readonly oidc_sub: string | null;
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
-  readonly gender: string;
-  readonly birthdate: Date;
-  readonly department: string;
-  readonly position: string;
   readonly email: string;
-  readonly telephone: string;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
   readonly institution_id: number;
   readonly institution: string;
-  readonly placeholder: boolean;
 }
 
 export interface VisitRegistrationRecord {
@@ -934,20 +927,13 @@ export const createUserObject = (user: UserRecord) => {
     user.user_title,
     user.firstname,
     user.lastname,
-    user.username,
     user.preferredname,
     user.oidc_sub,
     user.oauth_refresh_token,
     user.oauth_issuer,
-    user.gender,
-    user.birthdate,
     user.institution_id,
     user.institution,
-    user.department,
-    user.position,
     user.email,
-    user.telephone,
-    user.placeholder,
     user.created_at.toISOString(),
     user.updated_at.toISOString()
   );
@@ -963,9 +949,7 @@ export const createBasicUserObject = (
     user.preferredname,
     user.institution,
     user.institution_id,
-    user.position,
     user.created_at,
-    user.placeholder,
     user.email,
     user.country
   );

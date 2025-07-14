@@ -168,12 +168,7 @@ context('User administration tests', () => {
         firstname: 'Benjamin',
         lastname: 'Beckley',
         preferredname: 'Ben',
-        gender: 'male',
-        birthdate: new Date('2000/04/02'),
-        department: 'IT deparment',
-        position: 'Management',
         email: 'ben@inbox.com',
-        telephone: '(288) 221-4533',
       });
     }
     cy.login('user2', initialDBData.roles.user);
@@ -217,12 +212,7 @@ context('User administration tests', () => {
         firstname: 'David',
         lastname: 'Dawson',
         preferredname: '',
-        gender: 'male',
-        birthdate: new Date('1995/04/01'),
-        department: 'Maxillofacial surgeon',
-        position: 'Management',
         email: 'david@teleworm.us',
-        telephone: '(288) 221-4533',
       });
     }
 
