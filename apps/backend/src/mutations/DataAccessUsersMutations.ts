@@ -1,7 +1,8 @@
 import { updateDataAccessUsersValidationSchema } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
-import { ProposalAuthorization } from '../auth/ProposalAuthorization';
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { ValidateArgs } from '../decorators';
@@ -18,8 +19,10 @@ export default class DataAccessUsersMutations {
   constructor(
     @inject(Tokens.DataAccessUsersDataSource)
     private dataSource: DataAccessUsersDataSource,
-    @inject(Tokens.ProposalAuthorization)
-    private proposalAuth: ProposalAuthorization
+    @inject(Tokens.DataAccessUsersAuthorization)
+    private dataAccessUsersAuth: DataAccessUsersAuthorization,
+    @inject(Tokens.UserAuthorization)
+    private userAuth: UserAuthorization
   ) {}
 
   @ValidateArgs(updateDataAccessUsersValidationSchema)
@@ -29,10 +32,10 @@ export default class DataAccessUsersMutations {
   ): Promise<BasicUserDetails[] | Rejection> {
     try {
       const { proposalPk, userIds } = args;
-      const hasWriteRights = await this.proposalAuth.hasWriteRights(
-        agent,
-        proposalPk
-      );
+
+      const hasWriteRights =
+        this.userAuth.isApiToken(agent) ||
+        (await this.dataAccessUsersAuth.hasWriteRights(agent, proposalPk));
       if (!hasWriteRights) {
         return rejection('You do not have write rights for this proposal');
       }

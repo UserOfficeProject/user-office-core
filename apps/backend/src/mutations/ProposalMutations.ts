@@ -867,7 +867,10 @@ export default class ProposalMutations {
       );
 
       const proposalUserIds = proposalUsers.map((user) => user.id);
-      if (!proposalUserIds.includes(agent!.id)) {
+      if (
+        !proposalUserIds.includes(agent!.id) &&
+        clonedProposal.proposerId !== agent!.id
+      ) {
         proposalUserIds.push(agent!.id);
       }
 

@@ -2,6 +2,7 @@
 import { ConsoleLogger, setLogger } from '@user-office-software/duo-logger';
 
 import 'reflect-metadata';
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { UserAuthorizationMock } from '../auth/mockups/UserAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -95,6 +96,7 @@ mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
+mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

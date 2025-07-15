@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -103,6 +104,7 @@ mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
+mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
@@ -129,3 +131,4 @@ mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
 mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);

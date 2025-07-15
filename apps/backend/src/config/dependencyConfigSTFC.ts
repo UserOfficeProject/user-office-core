@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+import { DataAccessUsersAuthorization } from '../auth/DataAccessUsersAuthorization';
 import { StfcProposalAuthorization } from '../auth/StfcProposalAuthorization';
 import { StfcUserAuthorization } from '../auth/StfcUserAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -100,6 +101,7 @@ mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);
+mapClass(Tokens.DataAccessUsersAuthorization, DataAccessUsersAuthorization);
 
 mapClass(Tokens.AssetRegistrar, SkipAssetRegistrar);
 

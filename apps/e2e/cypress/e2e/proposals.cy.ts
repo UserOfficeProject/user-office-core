@@ -3,6 +3,7 @@ import {
   AllocationTimeUnits,
   DataType,
   FeatureId,
+  ProposalEndStatus,
   SettingsId,
   TemplateCategoryId,
   TemplateGroupId,
@@ -149,6 +150,38 @@ context('Proposal tests', () => {
           });
         }
       });
+    });
+
+    it('Should be able add user to proposal though data access feature', () => {
+      // if (!featureFlags.getEnabledFeatures().get(FeatureId.DATA_ACCESS_USERS)) {
+      //   this.skip();
+      // }
+      cy.submitProposal({ proposalPk: createdProposalPk });
+
+      cy.updateProposalManagementDecision({
+        proposalPk: createdProposalPk,
+        finalStatus: ProposalEndStatus.ACCEPTED,
+        managementTimeAllocations: [
+          { instrumentId: initialDBData.instrument1.id, value: 5 },
+        ],
+        managementDecisionSubmitted: true,
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.get('[data-testid="PeopleIcon"]').click();
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('#Email-input').type(initialDBData.users.user3.email);
+      cy.get('[data-cy="findUser"]').click();
+      cy.get('[data-cy="assign-selected-users"]').click();
+      cy.get('[data-cy="save-data-access-users-modal"]').click();
+      cy.logout();
+      cy.login('user3', initialDBData.roles.user);
+      cy.get('[data-testid="VisibilityIcon"]').click();
+      cy.get('[data-cy="questionary-details-view"]').contains(
+        createdProposalId
+      );
+      cy.get('[data-cy="questionary-details-view"]').contains(newProposalTitle);
     });
 
     it('Should be able clone proposal to another call', () => {
