@@ -1,5 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import * as _ from 'lodash';
 import { container, inject, injectable } from 'tsyringe';
 
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
@@ -48,7 +49,8 @@ export default class QuestionaryMutations {
     templateId: number,
     questionaryId: number,
     topicId: number,
-    answers: AnswerInput[],
+    allTopicAnswers: AnswerInput[],
+    answersToUpdate: AnswerInput[],
     agent: UserWithRole | null
   ) {
     const templateSteps =
@@ -65,10 +67,6 @@ export default class QuestionaryMutations {
       throw new GraphQLError('Expected to find step, but was not found');
     }
 
-    const questionIds: string[] = stepQuestions.map(
-      (question) => question.question.id
-    );
-
     const genericTemplateQuestions = stepQuestions.filter(
       (step) => step.question.dataType == DataType.GENERIC_TEMPLATE
     );
@@ -79,7 +77,7 @@ export default class QuestionaryMutations {
         (genericTemplateQues) => {
           const notSatisfiedQuestions = genericTemplateQues.dependencies.filter(
             (dependency) => {
-              const answer = answers.find(
+              const answer = allTopicAnswers.find(
                 (answer) => answer.questionId === dependency.dependencyId
               );
 
@@ -108,6 +106,8 @@ export default class QuestionaryMutations {
         );
       }
     }
+
+    const questionIds: string[] = answersToUpdate.map((a) => a.questionId);
 
     await this.dataSource.deleteAnswers(questionaryId, questionIds);
   }
@@ -199,16 +199,29 @@ export default class QuestionaryMutations {
       );
     }
 
+    const oldAnswers = (
+      await this.dataSource.getQuestionarySteps(questionaryId)
+    ).find((step) => step.topic.id === topicId)?.fields;
+
+    const answersToUpdate = answers.filter((answer) => {
+      const oldAnswer = oldAnswers?.find(
+        (old) => old.question.id === answer.questionId
+      );
+
+      return !_.isEqual(oldAnswer?.value, JSON.parse(answer.value).value);
+    });
+
     await this.deleteOldAnswers(
       template.templateId,
       questionaryId,
       topicId,
       answers,
+      answersToUpdate,
       agent
     );
 
     const updatedAnswers: AnswerBasic[] = [];
-    for (const answer of answers) {
+    for (const answer of answersToUpdate) {
       if (answer.value !== undefined) {
         const questionTemplateRelation =
           await this.templateDataSource.getQuestionTemplateRelation(
