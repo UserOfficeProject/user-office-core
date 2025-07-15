@@ -1,4 +1,4 @@
-import { Science, Topic } from '@mui/icons-material';
+import { Science, Topic, Apartment } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -92,6 +92,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
+
+  const isTagsEnabled = context.featuresMap.get(FeatureId.TAGS)?.isEnabled;
 
   const calls = useCallsData(
     {
@@ -224,6 +226,16 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItemButton>
       </Tooltip>
+      {isTagsEnabled && (
+        <Tooltip title="Tag">
+          <ListItemButton component={NavLink} to="/Tag">
+            <ListItemIcon>
+              <Apartment />
+            </ListItemIcon>
+            <ListItemText primary={'Tag'} />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isFapEnabled && (
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">

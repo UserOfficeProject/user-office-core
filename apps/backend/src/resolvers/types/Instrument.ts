@@ -14,6 +14,7 @@ import { Instrument as InstrumentOrigin } from '../../models/Instrument';
 import { isRejection } from '../../models/Rejection';
 import { BasicUserDetails } from './BasicUserDetails';
 import { Fap } from './Fap';
+import { Tag } from './Tag';
 
 @ObjectType()
 @Directive('@key(fields: "id")')
@@ -92,6 +93,18 @@ export class InstrumentResolver {
       context.user,
       instrument.managerUserId
     );
+  }
+
+  @FieldResolver(() => [Tag], { nullable: true })
+  async tags(
+    @Root() instrument: Instrument,
+    @Ctx() context: ResolverContext
+  ): Promise<Tag[] | null> {
+    const tags = context.queries.tag.dataSource.getInstrumentsTags(
+      instrument.id
+    );
+
+    return isRejection(tags) ? [] : tags;
   }
 }
 

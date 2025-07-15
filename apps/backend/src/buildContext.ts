@@ -25,6 +25,7 @@ import SampleMutations from './mutations/SampleMutations';
 import ShipmentMutations from './mutations/ShipmentMutations';
 import StatusActionsLogsMutations from './mutations/StatusActionsLogsMutations';
 import StatusMutations from './mutations/StatusMutations';
+import TagMutations from './mutations/TagMutations';
 import TechniqueMutations from './mutations/TechniqueMutations';
 import TemplateMutations from './mutations/TemplateMutations';
 import UnitMutations from './mutations/UnitMutations';
@@ -55,6 +56,7 @@ import StatusActionQueries from './queries/StatusActionQueries';
 import StatusActionsLogsQueries from './queries/StatusActionsLogsQueries';
 import StatusQueries from './queries/StatusQueries';
 import SystemQueries from './queries/SystemQueries';
+import TagQueries from './queries/TagQueries';
 import TechnicalReviewQueries from './queries/TechnicalReviewQueries';
 import TechniqueQueries from './queries/TechniqueQueries';
 import TemplateQueries from './queries/TemplateQueries';
@@ -94,6 +96,7 @@ const context: BasicResolverContext = {
     workflow: container.resolve(WorkflowQueries),
     statusAction: container.resolve(StatusActionQueries),
     settings: container.resolve(SettingsQueries),
+    tag: container.resolve(TagQueries),
     experiment: container.resolve(ExperimentQueries),
     emailTemplate: container.resolve(EmailTemplateQueries),
   },
@@ -123,6 +126,7 @@ const context: BasicResolverContext = {
     statusActionsLogs: container.resolve(StatusActionsLogsMutations),
     status: container.resolve(StatusMutations),
     workflow: container.resolve(WorkflowMutations),
+    tag: container.resolve(TagMutations),
     experiment: container.resolve(ExperimentMutations),
     emailTemplate: container.resolve(EmailTemplateMutations),
   },
