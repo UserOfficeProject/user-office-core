@@ -201,6 +201,11 @@ export default class QuestionaryMutations {
       await this.dataSource.getQuestionarySteps(questionaryId)
     ).find((step) => step.topic.id === topicId)?.fields;
 
+    const missingAnswers = oldAnswers?.filter(
+      (oldAnswer) =>
+        !answers.some((answer) => answer.questionId === oldAnswer.question.id)
+    );
+
     const answersToUpdate = answers.filter((answer) => {
       const oldAnswer = oldAnswers?.find(
         (old) => old.question.id === answer.questionId
@@ -214,7 +219,9 @@ export default class QuestionaryMutations {
       questionaryId,
       topicId,
       answers,
-      answersToUpdate.map((a) => a.questionId),
+      answersToUpdate
+        .map((a) => a.questionId)
+        .concat(missingAnswers?.map((a) => a.question.id) || []),
       agent
     );
 
