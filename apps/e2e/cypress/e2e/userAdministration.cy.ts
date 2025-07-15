@@ -7,10 +7,7 @@ import initialDBData from '../support/initialDBData';
 context('User administration tests', () => {
   const newFirstName = faker.name.firstName();
   const newLastName = faker.name.lastName();
-  const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
-  const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.number('0##########');
   const newInstitution = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
   const title = faker.lorem.words(2);
@@ -38,12 +35,6 @@ context('User administration tests', () => {
 
     cy.get("[name='preferredname']").clear().type(newPrefferedName);
 
-    cy.get("[name='position']").clear().type(newPosition);
-
-    cy.get("[name='department']").clear().type(newDepartment);
-
-    cy.get("[name='telephone']").clear().type(newTelephone);
-
     cy.get("[name='otherInstitution']").clear().type(newInstitution);
 
     cy.contains('Update Profile').click();
@@ -59,12 +50,6 @@ context('User administration tests', () => {
     cy.get("[name='preferredname']")
       .invoke('val')
       .should('eq', newPrefferedName);
-
-    cy.get("[name='position']").invoke('val').should('eq', newPosition);
-
-    cy.get("[name='department']").invoke('val').should('eq', newDepartment);
-
-    cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
   });
 
   it('Should be able to invite user or fap reviewer by email', function () {

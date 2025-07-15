@@ -270,7 +270,6 @@ describe('updateUserByOidcSub', () => {
     expect(result).toEqual({
       ...dummyUser,
       firstname: 'OfficerUpdatedJane',
-      department: 'Updated Department',
     });
   });
   test('A user cannot update another user by OIDC sub', async () => {
@@ -308,8 +307,6 @@ describe('updateUserByOidcSub', () => {
 
     expect(result).toEqual({
       ...dummyUser,
-      telephone: '+1-555-9999',
-      position: 'Senior Architect',
     });
   });
 
