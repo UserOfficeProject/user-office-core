@@ -149,19 +149,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         user_title: '',
         firstname,
         lastname,
-        username: email,
         preferredname: firstname,
         oidc_sub: '',
         oauth_refresh_token: '',
         oauth_issuer: '',
-        gender: '',
-        birthdate: '2000-01-01',
         institution_id: 1,
-        department: '',
-        position: '',
         email,
-        telephone: '',
-        placeholder: true,
       })
       .returning(['*'])
       .into('users')
@@ -422,17 +415,11 @@ export default class PostgresUserDataSource implements UserDataSource {
       user_title: '',
       firstname: '',
       lastname: '',
-      username: userId.toString(),
       preferredname: '',
       oidc_sub: '',
       oauth_refresh_token: '',
-      gender: '',
-      birthdate: '2000-01-01',
       institution_id: 1,
-      department: '',
-      position: '',
       email: userId.toString(),
-      telephone: '',
     };
   }
 

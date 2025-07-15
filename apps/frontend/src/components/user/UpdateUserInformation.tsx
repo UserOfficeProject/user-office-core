@@ -137,7 +137,6 @@ export default function UpdateUserInformation(
                   type="text"
                   data-cy="preferredname"
                 />
-                {/* Remove gender and birthdate fields */}
               </LocalizationProvider>
             </Grid>
             <Grid item xs={6}>
