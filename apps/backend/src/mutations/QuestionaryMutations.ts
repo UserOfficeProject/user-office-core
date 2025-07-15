@@ -50,7 +50,7 @@ export default class QuestionaryMutations {
     questionaryId: number,
     topicId: number,
     allTopicAnswers: AnswerInput[],
-    answersToUpdate: AnswerInput[],
+    questionsToDelete: string[],
     agent: UserWithRole | null
   ) {
     const templateSteps =
@@ -107,9 +107,7 @@ export default class QuestionaryMutations {
       }
     }
 
-    const questionIds: string[] = answersToUpdate.map((a) => a.questionId);
-
-    await this.dataSource.deleteAnswers(questionaryId, questionIds);
+    await this.dataSource.deleteAnswers(questionaryId, questionsToDelete);
   }
 
   async deleteSubTemplatesAnswers(
@@ -216,7 +214,7 @@ export default class QuestionaryMutations {
       questionaryId,
       topicId,
       answers,
-      answersToUpdate,
+      answersToUpdate.map((a) => a.questionId),
       agent
     );
 
