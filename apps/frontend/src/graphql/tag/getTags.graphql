@@ -1,0 +1,14 @@
+query getTags {
+  tags {
+      id
+      name
+      shortCode
+      instruments {
+        ...instrumentMinimal
+      }
+      calls {
+        id
+        shortCode
+      }
+  }
+}

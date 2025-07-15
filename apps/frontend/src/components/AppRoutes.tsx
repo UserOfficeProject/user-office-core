@@ -14,6 +14,7 @@ import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
 import EmailStatusActionsLogsPage from './statusActionsLogs/EmailStatusActionsLogsPage';
 import ProposalDownloadStatusActionsLogsPage from './statusActionsLogs/ProposalDownloadStatusActionsLogsPage';
+import TagPage from './tag/TagPage';
 import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
@@ -160,6 +161,9 @@ const AppRoutes = () => {
   const isExperimentSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
+  const isTagsEnabled = featureContext.featuresMap.get(
+    FeatureId.TAGS
+  )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
   return (
@@ -230,6 +234,12 @@ const AppRoutes = () => {
             element={
               <TitledRoute title="Experiments" element={<ExperimentPage />} />
             }
+          />
+        )}
+        {isTagsEnabled && isUserOfficer && (
+          <Route
+            path="/Tag"
+            element={<TitledRoute title="Tag" element={<TagPage />} />}
           />
         )}
         <Route
