@@ -30,6 +30,7 @@ import { StatusActionsDataSourceMock } from '../datasources/mockups/StatusAction
 import { StatusActionsLogsDataSourceMock } from '../datasources/mockups/StatusActionsLogsDataSource';
 import { StatusDataSourceMock } from '../datasources/mockups/StatusDataSource';
 import SystemDataSourceMock from '../datasources/mockups/SystemDataSource';
+import { TagDataSourceMock } from '../datasources/mockups/TagDataSource';
 import { TechniqueDataSourceMock } from '../datasources/mockups/TechniqueDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
@@ -90,6 +91,7 @@ mapClass(
   PostgresPredefinedMessageDataSource
 );
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
+mapClass(Tokens.TagDataSource, TagDataSourceMock);
 
 mapClass(Tokens.UserAuthorization, UserAuthorizationMock);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);

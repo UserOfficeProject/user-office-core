@@ -30,3 +30,4 @@ import './predefinedMessages';
 import './settings';
 import './technique';
 import './statusActionLogs';
+import './tag';
