@@ -1,0 +1,13 @@
+mutation createTag(
+  $name: String!
+  $shortCode: String!
+) {
+  createTag(
+    name: $name
+    shortCode: $shortCode
+  ) {
+    id
+    name
+    shortCode
+  }
+}

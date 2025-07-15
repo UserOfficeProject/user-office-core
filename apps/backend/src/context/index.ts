@@ -23,6 +23,7 @@ import SampleMutations from '../mutations/SampleMutations';
 import ShipmentMutations from '../mutations/ShipmentMutations';
 import StatusActionsLogsMutations from '../mutations/StatusActionsLogsMutations';
 import StatusMutations from '../mutations/StatusMutations';
+import TagMutations from '../mutations/TagMutations';
 import TechniqueMutations from '../mutations/TechniqueMutations';
 import TemplateMutations from '../mutations/TemplateMutations';
 import UnitMutations from '../mutations/UnitMutations';
@@ -52,6 +53,7 @@ import StatusActionQueries from '../queries/StatusActionQueries';
 import StatusActionsLogsQueries from '../queries/StatusActionsLogsQueries';
 import StatusQueries from '../queries/StatusQueries';
 import SystemQueries from '../queries/SystemQueries';
+import TagQueries from '../queries/TagQueries';
 import TechnicalReviewQueries from '../queries/TechnicalReviewQueries';
 import TechniqueQueries from '../queries/TechniqueQueries';
 import TemplateQueries from '../queries/TemplateQueries';
@@ -90,6 +92,7 @@ interface ResolverContextQueries {
   settings: SettingsQueries;
   workflow: WorkflowQueries;
   statusAction: StatusActionQueries;
+  tag: TagQueries;
   experiment: ExperimentQueries;
 }
 
@@ -119,6 +122,7 @@ interface ResolverContextMutations {
   statusActionsLogs: StatusActionsLogsMutations;
   status: StatusMutations;
   workflow: WorkflowMutations;
+  tag: TagMutations;
   experiment: ExperimentMutations;
 }
 interface ResolverContextServices {
