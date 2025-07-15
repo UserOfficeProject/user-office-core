@@ -6,6 +6,7 @@ import UsersLoader from './loaders/UsersLoader';
 import PDFServices from './middlewares/factory/factoryServices';
 import AdminMutations from './mutations/AdminMutations';
 import CallMutations from './mutations/CallMutations';
+import EmailTemplateMutations from './mutations/EmailTemplateMutations';
 import ExperimentMutations from './mutations/ExperimentMutation';
 import FapMutations from './mutations/FapMutations';
 import FeedbackMutations from './mutations/FeedbackMutations';
@@ -32,6 +33,7 @@ import VisitMutations from './mutations/VisitMutations';
 import WorkflowMutations from './mutations/WorkflowMutations';
 import AdminQueries from './queries/AdminQueries';
 import CallQueries from './queries/CallQueries';
+import EmailTemplateQueries from './queries/EmailTemplateQueries';
 import EventLogQueries from './queries/EventLogQueries';
 import ExperimentQueries from './queries/ExperimentQueries';
 import FapQueries from './queries/FapQueries';
@@ -93,6 +95,7 @@ const context: BasicResolverContext = {
     statusAction: container.resolve(StatusActionQueries),
     settings: container.resolve(SettingsQueries),
     experiment: container.resolve(ExperimentQueries),
+    emailTemplate: container.resolve(EmailTemplateQueries),
   },
   mutations: {
     admin: container.resolve(AdminMutations),
@@ -121,6 +124,7 @@ const context: BasicResolverContext = {
     status: container.resolve(StatusMutations),
     workflow: container.resolve(WorkflowMutations),
     experiment: container.resolve(ExperimentMutations),
+    emailTemplate: container.resolve(EmailTemplateMutations),
   },
   clients: {
     scheduler: async () => {

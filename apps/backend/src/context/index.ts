@@ -5,6 +5,7 @@ import { Sdk } from '../middlewares/graphqlClient';
 import { UserWithRole } from '../models/User';
 import AdminMutations from '../mutations/AdminMutations';
 import CallMutations from '../mutations/CallMutations';
+import EmailTemplateMutations from '../mutations/EmailTemplateMutations';
 import ExperimentMutations from '../mutations/ExperimentMutation';
 import FapMutations from '../mutations/FapMutations';
 import FeedbackMutations from '../mutations/FeedbackMutations';
@@ -31,6 +32,7 @@ import VisitMutations from '../mutations/VisitMutations';
 import WorkflowMutations from '../mutations/WorkflowMutations';
 import AdminQueries from '../queries/AdminQueries';
 import CallQueries from '../queries/CallQueries';
+import EmailTemplateQueries from '../queries/EmailTemplateQueries';
 import EventLogQueries from '../queries/EventLogQueries';
 import ExperimentQueries from '../queries/ExperimentQueries';
 import FapQueries from '../queries/FapQueries';
@@ -91,6 +93,7 @@ interface ResolverContextQueries {
   workflow: WorkflowQueries;
   statusAction: StatusActionQueries;
   experiment: ExperimentQueries;
+  emailTemplate: EmailTemplateQueries;
 }
 
 interface ResolverContextMutations {
@@ -120,6 +123,7 @@ interface ResolverContextMutations {
   status: StatusMutations;
   workflow: WorkflowMutations;
   experiment: ExperimentMutations;
+  emailTemplate: EmailTemplateMutations;
 }
 interface ResolverContextServices {
   pdfServices: PDFServices;

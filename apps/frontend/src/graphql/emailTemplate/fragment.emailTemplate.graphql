@@ -1,0 +1,8 @@
+fragment emailTemplate on EmailTemplate {
+  id
+  createdByUserId
+  name
+  description
+  subject
+  body
+}

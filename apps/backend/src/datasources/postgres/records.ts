@@ -10,6 +10,7 @@ import {
 } from '../../models/ConditionEvaluator';
 import { CoProposerClaim } from '../../models/CoProposerClaim';
 import { Country } from '../../models/Country';
+import { EmailTemplate } from '../../models/EmailTemplate';
 import { ExperimentStatus } from '../../models/Experiment';
 import { Fap, FapAssignment, FapProposal, FapReviewer } from '../../models/Fap';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
@@ -338,6 +339,15 @@ export interface CallRecord {
   readonly fap_review_template_id: number;
   readonly technical_review_template_id: number;
   readonly is_active: boolean;
+}
+
+export interface EmailTemplateRecord {
+  readonly email_template_id: number;
+  readonly created_by_user_id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly subject: string;
+  readonly body: string;
 }
 
 export interface PageTextRecord {
@@ -1018,6 +1028,19 @@ export const createCallObject = (call: CallRecord) => {
     call.fap_review_template_id,
     call.technical_review_template_id,
     call.is_active
+  );
+};
+
+export const createEmailTemplateObject = (
+  emailTemplate: EmailTemplateRecord
+) => {
+  return new EmailTemplate(
+    emailTemplate.email_template_id,
+    emailTemplate.created_by_user_id,
+    emailTemplate.name,
+    emailTemplate.description,
+    emailTemplate.subject,
+    emailTemplate.body
   );
 };
 

@@ -7,6 +7,7 @@ export const Tokens = {
   ConfigureLogger: Symbol('ConfigureLogger'),
   CoProposerClaimDataSource: Symbol('CoProposerClaimDataSource'),
   EmailEventHandler: Symbol('EmailEventHandler'),
+  EmailTemplateDataSource: Symbol('EmailTemplateDataSource'),
   EventBus: Symbol('EventBus'),
   EventLogsDataSource: Symbol('EventLogsDataSource'),
   FeedbackDataSource: Symbol('FeedbackDataSource'),
