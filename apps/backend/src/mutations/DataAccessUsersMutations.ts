@@ -6,7 +6,9 @@ import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { ValidateArgs } from '../decorators';
-import { rejection, Rejection } from '../models/Rejection';
+import { resolveApplicationEventBus } from '../events';
+import { Event } from '../events/event.enum';
+import { isRejection, rejection, Rejection } from '../models/Rejection';
 import { BasicUserDetails, UserWithRole } from '../models/User';
 
 export interface UpdateDataAccessUsersArgs {
@@ -40,7 +42,24 @@ export default class DataAccessUsersMutations {
         return rejection('You do not have write rights for this proposal');
       }
 
-      return await this.dataSource.updateDataAccessUsers(proposalPk, userIds);
+      const result = await this.dataSource.updateDataAccessUsers(
+        proposalPk,
+        userIds
+      );
+
+      if (!isRejection(result)) {
+        const eventBus = resolveApplicationEventBus();
+
+        await eventBus.publish({
+          type: Event.DATA_ACCESS_USERS_UPDATED,
+          proposalPKey: proposalPk,
+          key: 'proposalPk',
+          loggedInUserId: agent ? agent.id : null,
+          isRejection: false,
+        });
+      }
+
+      return result;
     } catch (error) {
       return rejection('Failed to update data access users', { args }, error);
     }
