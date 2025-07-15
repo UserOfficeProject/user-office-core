@@ -5,6 +5,7 @@ import './internalReview';
 import './invite';
 import './predefinedMessage';
 import './proposal';
+import './statusActionLog';
 import './template';
 import './user';
 import './utils';

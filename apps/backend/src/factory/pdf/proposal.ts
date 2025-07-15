@@ -33,9 +33,15 @@ import { ProposalPdfTemplate } from '../../resolvers/types/ProposalPdfTemplate';
 import { getFileAttachments, Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,
+  collectGenericTemplatePDFDataTokenAccess,
   GenericTemplatePDFData,
 } from './genericTemplates';
-import { collectSamplePDFData, SamplePDFData } from './sample';
+import {
+  collectSamplePDFData,
+  collectSamplePDFDataTokenAccess,
+  SamplePDFData,
+} from './sample';
+
 export type ProposalPDFData = {
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;
@@ -481,7 +487,6 @@ export const collectProposalPDFData = async (
 
 export const collectProposalPDFDataTokenAccess = async (
   proposalPk: number,
-  user: UserWithRole,
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
@@ -566,9 +571,8 @@ export const collectProposalPDFDataTokenAccess = async (
   const samplePDFData = (
     await Promise.all(
       samples.map(async (sample) =>
-        collectSamplePDFData(
+        collectSamplePDFDataTokenAccess(
           sample.id,
-          user,
           undefined,
           sample,
           await getQuestionary(sample.questionaryId),
@@ -595,19 +599,15 @@ export const collectProposalPDFDataTokenAccess = async (
       Tokens.GenericTemplateDataSource
     );
 
-  const genericTemplates = await genericTemplateDataSource.getGenericTemplates(
-    {
-      filter: { proposalPk: proposal.primaryKey },
-    },
-    user
-  );
+  const genericTemplates = await genericTemplateDataSource.getGenericTemplates({
+    filter: { proposalPk: proposal.primaryKey },
+  });
 
   const genericTemplatePDFData = (
     await Promise.all(
       genericTemplates.map(async (genericTemplate) =>
-        collectGenericTemplatePDFData(
+        collectGenericTemplatePDFDataTokenAccess(
           genericTemplate.id,
-          user,
           undefined,
           genericTemplate,
           await getQuestionary(genericTemplate.questionaryId),

@@ -6,6 +6,7 @@ import { StatusActionType } from '../models/StatusAction';
 import { getWorkflowConnectionByStatusId } from '../workflowEngine/experiment';
 import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import { emailActionHandler } from './emailActionHandler';
+import { proposalDownloadActionHandler } from './proposalDownloadActionHandler';
 import { rabbitMQActionHandler } from './rabbitMQHandler';
 import { groupProposalsByProperties } from './statusActionUtils';
 
@@ -59,6 +60,10 @@ export const proposalStatusActionEngine = async (
 
             case StatusActionType.RABBITMQ:
               rabbitMQActionHandler(statusAction, groupedProposals);
+              break;
+
+            case StatusActionType.PROPOSALDOWNLOAD:
+              proposalDownloadActionHandler(statusAction, groupedProposals);
               break;
 
             default:

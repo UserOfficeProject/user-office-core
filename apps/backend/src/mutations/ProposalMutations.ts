@@ -860,6 +860,7 @@ export default class ProposalMutations {
         managementDecisionSubmitted: false,
         submittedDate: null,
         experimentSequence: null,
+        fileId: null,
       });
 
       const proposalUsers = await this.userDataSource.getProposalUsers(
@@ -882,12 +883,9 @@ export default class ProposalMutations {
       }
 
       const proposalGenericTemplates =
-        await this.genericTemplateDataSource.getGenericTemplates(
-          {
-            filter: { proposalPk: sourceProposal.primaryKey },
-          },
-          agent
-        );
+        await this.genericTemplateDataSource.getGenericTemplates({
+          filter: { proposalPk: sourceProposal.primaryKey },
+        });
 
       for await (const genericTemplate of proposalGenericTemplates) {
         const clonedGenericTemplate =

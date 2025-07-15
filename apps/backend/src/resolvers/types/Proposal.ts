@@ -96,6 +96,9 @@ export class Proposal implements Partial<ProposalOrigin> {
 
   @Field(() => Int, { nullable: true })
   public experimentSequence?: number | null;
+
+  @Field(() => String, { nullable: true })
+  public fileId?: string | null;
 }
 
 @Resolver(() => Proposal)

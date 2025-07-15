@@ -69,7 +69,6 @@ export default class FactoryServices implements DownloadTypeServices {
           if (agent?.isApiAccessToken)
             return collectProposalPDFDataTokenAccess(
               proposalPk,
-              agent,
               options,
               indx === 0
                 ? (filename: string) =>

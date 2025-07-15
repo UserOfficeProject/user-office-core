@@ -417,12 +417,9 @@ export const collectExperimentPDFDataTokenAccess = async (
       Tokens.GenericTemplateDataSource
     );
 
-  const genericTemplates = await genericTemplateDataSource.getGenericTemplates(
-    {
-      filter: { proposalPk: proposal.primaryKey },
-    },
-    user
-  );
+  const genericTemplates = await genericTemplateDataSource.getGenericTemplates({
+    filter: { proposalPk: proposal.primaryKey },
+  });
 
   const genericTemplatePDFData = (
     await Promise.all(

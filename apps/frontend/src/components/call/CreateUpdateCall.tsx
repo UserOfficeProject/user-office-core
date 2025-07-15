@@ -113,6 +113,10 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         referenceNumberFormat: call.referenceNumberFormat || '',
         startCall: getDateTimeFromISO(call.startCall),
         endCall: getDateTimeFromISO(call.endCall),
+        startEndDate: {
+          from: getDateTimeFromISO(call.startCall),
+          to: getDateTimeFromISO(call.endCall),
+        },
         startReview: getDateTimeFromISO(call.startReview),
         endReview: getDateTimeFromISO(call.endReview),
         startFapReview: getDateTimeFromISO(call.startFapReview),
@@ -128,6 +132,10 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         shortCode: '',
         startCall: currentDayStart,
         endCall: currentDayEnd,
+        startEndDate: {
+          from: getDateTimeFromISO(currentDayStart.toISO() || ''),
+          to: getDateTimeFromISO(currentDayEnd.toISO() || ''),
+        },
         referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,
@@ -164,12 +172,20 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
           if (call) {
             const { updateCall } = await api({
               toastSuccessMessage: 'Call updated successfully!',
-            }).updateCall(values as UpdateCallInput);
+            }).updateCall({
+              ...(values as UpdateCallInput),
+              startCall: values.startEndDate.from,
+              endCall: values.startEndDate.to,
+            });
             close(updateCall as Call);
           } else {
             const { createCall } = await api({
               toastSuccessMessage: 'Call created successfully!',
-            }).createCall(values as CreateCallInput);
+            }).createCall({
+              ...(values as CreateCallInput),
+              startCall: values.startEndDate.from,
+              endCall: values.startEndDate.to,
+            });
 
             close(createCall as Call);
           }

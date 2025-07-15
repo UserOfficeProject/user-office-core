@@ -42,6 +42,10 @@ type ProposalFilterBarProps = {
     isLoading: boolean;
   };
   instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
+  tags?: {
+    data: { id: number; name: string; shortCode: string }[];
+    isLoading: boolean;
+  };
   proposalStatuses?: { data: Status[]; isLoading: boolean };
   setProposalFilter: (filter: ProposalsFilter) => void;
   filter: ProposalsFilter;

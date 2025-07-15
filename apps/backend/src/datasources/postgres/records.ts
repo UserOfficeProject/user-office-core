@@ -43,6 +43,7 @@ import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { StatusActionType } from '../../models/StatusAction';
 import { StatusActionsLog } from '../../models/StatusActionsLog';
+import { Tag } from '../../models/Tag';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import {
@@ -144,6 +145,7 @@ export interface ProposalRecord {
   readonly management_decision_submitted: boolean;
   readonly submitted_date: Date;
   readonly experiment_sequence: number;
+  readonly file_id: string;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -809,7 +811,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.reference_number_sequence,
     proposal.management_decision_submitted,
     proposal.submitted_date,
-    proposal.experiment_sequence
+    proposal.experiment_sequence,
+    proposal.file_id
   );
 };
 
@@ -1419,6 +1422,20 @@ export interface CoProposerClaimRecord {
 
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
+
+export interface TagRecord {
+  readonly tag_id: number;
+  readonly name: string;
+  readonly short_code: string;
+}
+
+export const createTagObject = (tag: TagRecord) =>
+  new Tag(tag.tag_id, tag.name, tag.short_code);
+
+export interface TagUserRecord {
+  readonly tag_id: number;
+  readonly user_id: number;
+}
 
 export interface ExperimentRecord {
   readonly experiment_pk: number;

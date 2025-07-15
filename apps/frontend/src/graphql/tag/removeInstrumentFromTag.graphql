@@ -1,0 +1,9 @@
+mutation removeInstrumentFromTag(
+  $instrumentId: Int!
+  $tagId: Int!
+) {
+  removeInstrumentFromTag(
+    instrumentId: $instrumentId
+    tagId: $tagId
+  )
+}

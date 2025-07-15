@@ -27,6 +27,7 @@ import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActio
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
+import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
@@ -103,6 +104,8 @@ mapClass(
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
+mapClass(Tokens.TagDataSource, PostgresTagDataSource);
+
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, StfcUserAuthorization);
 mapClass(Tokens.ProposalAuthorization, StfcProposalAuthorization);

@@ -113,6 +113,7 @@ export function createTechnicalReviewStub(
       attachments: { questions: [] },
       experiments: null,
       experimentSequence: null,
+      fileId: null,
     },
   };
 }

@@ -47,7 +47,8 @@ export class Proposal {
     public referenceNumberSequence: number,
     public managementDecisionSubmitted: boolean,
     public submittedDate: Date | null,
-    public experimentSequence: number | null
+    public experimentSequence: number | null,
+    public fileId: string | null
   ) {}
 }
 
