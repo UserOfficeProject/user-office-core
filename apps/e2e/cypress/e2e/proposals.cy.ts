@@ -586,7 +586,7 @@ context('Proposal tests', () => {
 
       cy.get('[aria-label="Edit"]').first().click();
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="allocation-time-unit"]').click();

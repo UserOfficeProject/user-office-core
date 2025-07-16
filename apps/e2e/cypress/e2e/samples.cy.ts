@@ -226,7 +226,7 @@ context('Samples tests', () => {
 
       cy.contains(proposalTemplateName).click();
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="next-step"]').click();

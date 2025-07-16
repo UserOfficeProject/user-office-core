@@ -484,7 +484,7 @@ const CallGeneralInfo = ({
         noOptionsText="No proposal workflows"
         items={proposalWorkflowOptions}
         InputProps={{
-          'data-cy': 'call-workflow',
+          'data-cy': 'proposal-call-workflow',
           endAdornment: <RefreshListIcon onClick={reloadProposalWorkflows} />,
         }}
         required
@@ -496,7 +496,7 @@ const CallGeneralInfo = ({
         noOptionsText="No experiment workflows"
         items={experimentWorkflowOptions}
         InputProps={{
-          'data-cy': 'call-workflow',
+          'data-cy': 'experiment-call-workflow',
           endAdornment: <RefreshListIcon onClick={reloadExperimentWorkflows} />,
         }}
       />
