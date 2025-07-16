@@ -430,7 +430,7 @@ export default class PostgresQuestionaryDataSource
         .filter((record) => {
           if (currentUserRole === null || currentUserRole === Roles.USER) {
             // "user" is a api key or user
-            // If user role is user then proposal must be there own proposal due to prior checks
+            // If user role is user then proposal must be their own proposal due to prior checks
             return true;
           }
 

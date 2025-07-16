@@ -97,9 +97,10 @@ export default class QuestionaryQueries {
       return null;
     }
 
-    const role = agent?.currentRole?.shortCode || null;
-
-    return this.dataSource.getQuestionarySteps(questionaryId, role);
+    return this.dataSource.getQuestionarySteps(
+      questionaryId,
+      agent?.currentRole?.shortCode || null
+    );
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
