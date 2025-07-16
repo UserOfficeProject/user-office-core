@@ -252,6 +252,14 @@ export default class TemplateMutations {
         templateId,
         result.templateId
       );
+    } else if (
+      result &&
+      result.groupId === TemplateGroupId.EXPERIMENT_SAFETY_PDF
+    ) {
+      await this.experimentSafetyPdfTemplateDataSource.clonePdfTemplate(
+        templateId,
+        result.templateId
+      );
     }
 
     return result;

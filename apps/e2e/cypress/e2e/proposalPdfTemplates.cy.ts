@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { TemplateGroupId } from '@user-office-software-libs/shared-types';
 
-context('PDF template tests', () => {
+context('Proposal PDF template tests', () => {
   const templateName = faker.lorem.words(3);
   const templateDesc = faker.lorem.words(3);
   const pdfTemplateData = faker.lorem.paragraphs(1);
@@ -13,12 +13,12 @@ context('PDF template tests', () => {
     cy.viewport(1920, 1080);
   });
 
-  describe('PDF template basic tests', () => {
-    it('User officer can create a PDF template. The template comes with default values - Body, header, Footer, Sample Declaration and Dummy Data', () => {
+  describe('Proposal PDF template basic tests', () => {
+    it('User officer can create a Proposal PDF template. The template comes with default values - Body, header, Footer, Sample Declaration and Dummy Data', () => {
       cy.login('officer');
       cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('PDF');
+      cy.navigateToTemplatesSubmenu('PDF (Proposal)');
 
       cy.get('[data-cy=create-new-button]').click();
 
@@ -88,7 +88,7 @@ context('PDF template tests', () => {
     });
   });
 
-  describe('PDF template advanced tests', () => {
+  describe('Proposal PDF template advanced tests', () => {
     beforeEach(() => {
       cy.createTemplate({
         name: templateName,
@@ -104,7 +104,7 @@ context('PDF template tests', () => {
       cy.login('officer');
       cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('PDF');
+      cy.navigateToTemplatesSubmenu('PDF (Proposal)');
 
       cy.contains(createdTemplateName)
         .parent()
@@ -176,7 +176,7 @@ context('PDF template tests', () => {
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
-      cy.navigateToTemplatesSubmenu('PDF');
+      cy.navigateToTemplatesSubmenu('PDF (Proposal)');
 
       cy.contains(createdTemplateName)
         .parent()
@@ -195,7 +195,7 @@ context('PDF template tests', () => {
       cy.login('officer');
       cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('PDF');
+      cy.navigateToTemplatesSubmenu('PDF (Proposal)');
 
       cy.contains(createdTemplateName)
         .parent()
@@ -222,7 +222,7 @@ context('PDF template tests', () => {
       cy.login('officer');
       cy.visit('/');
 
-      cy.navigateToTemplatesSubmenu('PDF');
+      cy.navigateToTemplatesSubmenu('PDF (Proposal)');
 
       cy.contains(createdTemplateName)
         .parent()
@@ -294,7 +294,7 @@ context('PDF template tests', () => {
 
       cy.notification({ variant: 'success', text: 'successfully' });
 
-      cy.navigateToTemplatesSubmenu('PDF');
+      cy.navigateToTemplatesSubmenu('PDF (Proposal)');
 
       cy.contains(createdTemplateName)
         .parent()
