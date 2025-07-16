@@ -36,6 +36,9 @@ export class Instrument implements Partial<InstrumentOrigin> {
 
   @Field(() => Boolean, { nullable: true })
   public selectable?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  multipleTechReviewsEnabled?: boolean;
 }
 
 @ObjectType()
