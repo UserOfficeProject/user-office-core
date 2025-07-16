@@ -28,6 +28,10 @@ import { Visit } from '../models/Visit';
 import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { markProposalsEventAsDoneAndCallWorkflowEngine } from '../workflowEngine';
 
+export const QUEUE_NAME =
+  (process.env.RABBITMQ_CORE_QUEUE_NAME as Queue) ||
+  'user_office_backend.queue';
+
 export const EXCHANGE_NAME =
   process.env.RABBITMQ_CORE_EXCHANGE_NAME || 'user_office_backend.fanout';
 
@@ -341,35 +345,26 @@ export async function createPostToRabbitMQHandler() {
         );
         break;
       }
-      case Event.VISIT_REGISTRATION_APPROVED: {
-        const { visitregistration: visitRegistration } = event;
-        const user = await userDataSource.getUser(visitRegistration.userId);
-        const jsonMessage = JSON.stringify({
-          startAt: visitRegistration.startsAt,
-          endAt: visitRegistration.endsAt,
-          visitorId: user!.oidcSub,
-        });
-
-        await rabbitMQ.sendMessageToExchange(
-          EXCHANGE_NAME,
-          RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED,
-          jsonMessage
-        );
-        break;
-      }
-
+      case Event.VISIT_REGISTRATION_APPROVED:
       case Event.VISIT_REGISTRATION_CANCELLED: {
         const { visitregistration: visitRegistration } = event;
+        const proposal = await proposalDataSource.getProposalByVisitId(
+          visitRegistration.visitId
+        );
+        const proposalPayload = await getProposalMessageData(proposal);
         const user = await userDataSource.getUser(visitRegistration.userId);
         const jsonMessage = JSON.stringify({
           startAt: visitRegistration.startsAt,
           endAt: visitRegistration.endsAt,
           visitorId: user!.oidcSub,
+          proposal: JSON.parse(proposalPayload),
         });
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,
-          RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
+          event.type === Event.VISIT_REGISTRATION_APPROVED
+            ? RABBITMQ_VISIT_EVENT_TYPE.VISIT_CREATED
+            : RABBITMQ_VISIT_EVENT_TYPE.VISIT_DELETED,
           jsonMessage
         );
         break;
@@ -379,26 +374,11 @@ export async function createPostToRabbitMQHandler() {
 }
 
 export async function createListenToRabbitMQHandler() {
-  const EVENT_SCHEDULING_QUEUE_NAME = process.env
-    .RABBITMQ_SCHEDULER_EXCHANGE_NAME as Queue;
-  const SCHEDULER_EXCHANGE_NAME = process.env.RABBITMQ_SCHEDULER_EXCHANGE_NAME;
-
-  if (!SCHEDULER_EXCHANGE_NAME) {
-    throw new Error(
-      'RABBITMQ_SCHEDULER_EXCHANGE_NAME environment variable not set'
-    );
-  }
-
-  if (!EVENT_SCHEDULING_QUEUE_NAME) {
-    throw new Error('RABBITMQ_SCHEDULER_EXCHANGE_NAME env variable not set');
+  if (!QUEUE_NAME || !EXCHANGE_NAME) {
+    throw new Error('RabbitMQ environment variables not set');
   }
 
   const rabbitMQ = await getRabbitMQMessageBroker();
-
-  rabbitMQ.addQueueToExchangeBinding(
-    EVENT_SCHEDULING_QUEUE_NAME,
-    SCHEDULER_EXCHANGE_NAME
-  );
 
   const experimentDataSource = container.resolve<ExperimentDataSource>(
     Tokens.ExperimentDataSource
@@ -447,18 +427,14 @@ export async function createListenToRabbitMQHandler() {
       }
     }
   };
-
-  rabbitMQ.listenOn(EVENT_SCHEDULING_QUEUE_NAME, async (type, message) => {
+  rabbitMQ.listenOn(QUEUE_NAME, async (type, message) => {
     switch (type) {
       case Event.PROPOSAL_BOOKING_TIME_SLOT_ADDED:
         try {
-          logger.logDebug(
-            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
-            {
-              type,
-              message,
-            }
-          );
+          logger.logDebug(`Listener on ${QUEUE_NAME}: Received event`, {
+            type,
+            message,
+          });
 
           const experimentToAdd = {
             startsAt: message.startsAt,
@@ -483,13 +459,11 @@ export async function createListenToRabbitMQHandler() {
         return;
       case Event.PROPOSAL_BOOKING_TIME_SLOTS_REMOVED:
         try {
-          logger.logDebug(
-            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
-            {
-              type,
-              message,
-            }
-          );
+          logger.logDebug(`Listener on ${QUEUE_NAME}: Received event`, {
+            type,
+            message,
+          });
+
           const scheduledEvents = message.scheduledevents as {
             id: number;
             proposalPk: number;
@@ -522,13 +496,10 @@ export async function createListenToRabbitMQHandler() {
       case Event.PROPOSAL_BOOKING_TIME_UPDATED:
       case Event.PROPOSAL_BOOKING_TIME_REOPENED:
         try {
-          logger.logDebug(
-            `Listener on ${EVENT_SCHEDULING_QUEUE_NAME}: Received event`,
-            {
-              type,
-              message,
-            }
-          );
+          logger.logDebug(`Listener on ${QUEUE_NAME}: Received event`, {
+            type,
+            message,
+          });
 
           await experimentDataSource.updateByScheduledEventId({
             startsAt: message.startsAt,

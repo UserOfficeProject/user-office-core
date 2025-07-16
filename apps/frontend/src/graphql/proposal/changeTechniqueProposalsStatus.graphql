@@ -1,0 +1,8 @@
+mutation changeTechniqueProposalsStatus(
+  $proposalPks: [Int!]!
+  $statusId: Int!
+) {
+  changeTechniqueProposalsStatus(
+    changeProposalsStatusInput: { proposalPks: $proposalPks, statusId: $statusId }
+  )
+}

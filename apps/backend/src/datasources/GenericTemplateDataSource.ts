@@ -1,6 +1,5 @@
 import { GenericTemplate } from '../models/GenericTemplate';
 import { Role } from '../models/Role';
-import { UserWithRole } from '../models/User';
 import { UpdateGenericTemplateArgs } from '../resolvers/mutations/UpdateGenericTemplateMutation';
 import { GenericTemplatesArgs } from '../resolvers/queries/GenericTemplatesQuery';
 
@@ -23,10 +22,7 @@ export interface GenericTemplateDataSource {
   getGenericTemplate(
     genericTemplateId: number
   ): Promise<GenericTemplate | null>;
-  getGenericTemplates(
-    args: GenericTemplatesArgs,
-    agent: UserWithRole | null
-  ): Promise<GenericTemplate[]>;
+  getGenericTemplates(args: GenericTemplatesArgs): Promise<GenericTemplate[]>;
   getGenericTemplatesForCopy(
     userId?: number,
     role?: Role

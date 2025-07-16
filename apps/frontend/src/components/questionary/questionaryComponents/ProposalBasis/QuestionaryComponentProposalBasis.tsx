@@ -36,7 +36,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
-
+  const [hasInvalidChars, setHasInvalidChars] = useState(false);
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -91,7 +91,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       <Box sx={{ margin: theme.spacing(2, 0) }}>
         <Field
           name={`${id}.title`}
-          label="Title"
+          label="Proposal Title"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
               setLocalTitle(event.target.value),
@@ -114,10 +114,17 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
         <Field
           name={`${id}.abstract`}
-          label="Abstract"
+          label="Proposal Abstract"
           inputProps={{
-            onChange: (event: ChangeEvent<HTMLInputElement>) =>
-              setLocalAbstract(event.target.value),
+            onChange: (event: ChangeEvent<HTMLInputElement>) => {
+              const value = event.target.value;
+              const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
+              const hasInvalid = nonPrintableRegex.test(value);
+              const cleanedValue = value.replace(nonPrintableRegex, ' ');
+
+              setHasInvalidChars(hasInvalid);
+              setLocalAbstract(cleanedValue);
+            },
             onBlur: () => {
               dispatch({
                 type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
@@ -137,6 +144,12 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           InputLabelProps={{
             shrink: true,
           }}
+          error={hasInvalidChars}
+          helperText={
+            hasInvalidChars
+              ? 'Non-printable characters have been removed from your input.'
+              : 'Only printable ASCII characters are allowed.'
+          }
         />
       </Box>
       <ProposalParticipant

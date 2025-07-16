@@ -1,7 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 import { container } from 'tsyringe';
 
-import { ProposalAuthorization } from '../../auth/ProposalAuthorization';
 import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
@@ -34,9 +33,15 @@ import { PdfTemplate } from '../../resolvers/types/PdfTemplate';
 import { getFileAttachments, Attachment } from '../util';
 import {
   collectGenericTemplatePDFData,
+  collectGenericTemplatePDFDataTokenAccess,
   GenericTemplatePDFData,
 } from './genericTemplates';
-import { collectSamplePDFData, SamplePDFData } from './sample';
+import {
+  collectSamplePDFData,
+  collectSamplePDFDataTokenAccess,
+  SamplePDFData,
+} from './sample';
+
 export type ProposalPDFData = {
   proposal: Proposal;
   principalInvestigator: BasicUserDetails;
@@ -240,17 +245,10 @@ export const collectProposalPDFData = async (
   user: UserWithRole,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
-  const proposalAuth = container.resolve(ProposalAuthorization);
   const proposal = await baseContext.queries.proposal.get(user, proposalPk);
 
   if (proposal === null) {
     throw new Error('Proposal not found');
-  }
-
-  // Authenticate user
-  const hasReadRights = await proposalAuth.hasReadRights(user, proposal);
-  if (hasReadRights === false) {
-    throw new Error('User was not allowed to download PDF');
   }
 
   const call = await baseContext.queries.call.get(user, proposal.callId);
@@ -486,7 +484,6 @@ export const collectProposalPDFData = async (
 
 export const collectProposalPDFDataTokenAccess = async (
   proposalPk: number,
-  user: UserWithRole,
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<ProposalPDFData> => {
@@ -570,9 +567,8 @@ export const collectProposalPDFDataTokenAccess = async (
   const samplePDFData = (
     await Promise.all(
       samples.map(async (sample) =>
-        collectSamplePDFData(
+        collectSamplePDFDataTokenAccess(
           sample.id,
-          user,
           undefined,
           sample,
           await getQuestionary(sample.questionaryId),
@@ -599,19 +595,15 @@ export const collectProposalPDFDataTokenAccess = async (
       Tokens.GenericTemplateDataSource
     );
 
-  const genericTemplates = await genericTemplateDataSource.getGenericTemplates(
-    {
-      filter: { proposalPk: proposal.primaryKey },
-    },
-    user
-  );
+  const genericTemplates = await genericTemplateDataSource.getGenericTemplates({
+    filter: { proposalPk: proposal.primaryKey },
+  });
 
   const genericTemplatePDFData = (
     await Promise.all(
       genericTemplates.map(async (genericTemplate) =>
-        collectGenericTemplatePDFData(
+        collectGenericTemplatePDFDataTokenAccess(
           genericTemplate.id,
-          user,
           undefined,
           genericTemplate,
           await getQuestionary(genericTemplate.questionaryId),

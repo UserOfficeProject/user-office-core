@@ -22,7 +22,6 @@ import CreateUpdateTechnique from './CreateUpdateTechnique';
 import {
   BasicUserDetails,
   InstrumentFragment,
-  Technique,
   TechniqueFragment,
   UserRole,
 } from '../../generated/sdk';
@@ -148,7 +147,7 @@ const TechniqueTable = () => {
   };
 
   const AssignedInstruments = React.useCallback(
-    ({ rowData }: { rowData: Technique }) => {
+    ({ rowData }: { rowData: TechniqueFragment }) => {
       const removeScientistFromTechnique = async (
         scientistId: number,
         techniqueId: number

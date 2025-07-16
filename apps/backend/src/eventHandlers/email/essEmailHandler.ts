@@ -3,15 +3,16 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { CoProposerClaimDataSource } from '../../datasources/CoProposerClaimDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { VisitDataSource } from '../../datasources/VisitDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
+import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
@@ -27,17 +28,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
     Tokens.UserDataSource
   );
 
-  const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
-    Tokens.RoleClaimDataSource
+  const coProposerDataSource = container.resolve<CoProposerClaimDataSource>(
+    Tokens.CoProposerClaimDataSource
   );
 
   const inviteDataSource = container.resolve<InviteDataSource>(
     Tokens.InviteDataSource
   );
 
-  const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
-    Tokens.RedeemCodesDataSource
-  );
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
@@ -50,71 +48,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.EMAIL_INVITE_LEGACY: {
-      const user = await userDataSource.getUser(
-        event.emailinviteresponse.userId
-      );
-      const inviter = await userDataSource.getBasicUserInfo(
-        event.emailinviteresponse.inviterId
-      );
-
-      if (!user) {
-        logger.logError('Failed email invite. No user found', {
-          event,
-        });
-
-        return;
-      }
-
-      if (!inviter) {
-        logger.logError('Failed email invite. No inviter found', {
-          event,
-        });
-
-        return;
-      }
-
-      const redeemCode = await redeemCodesDataSource.getRedeemCodes({
-        placeholderUserId: user.id,
-      });
-
-      if (!redeemCode[0]?.code) {
-        logger.logError('Failed email invite. No redeem code found', {
-          user,
-          inviter,
-          event,
-        });
-
-        return;
-      }
-
-      const templateId = getTemplateIdForRole(event.emailinviteresponse.role);
-
-      mailService
-        .sendMail({
-          content: {
-            template_id: templateId,
-          },
-          substitution_data: {
-            firstname: user.preferredname,
-            lastname: user.lastname,
-            email: user.email,
-            inviterName: inviter.firstname,
-            inviterLastname: inviter.lastname,
-            inviterOrg: inviter.institution,
-            redeemCode: redeemCode[0].code,
-          },
-          recipients: [{ address: user.email }],
-        })
-        .then((res) => {
-          logger.logInfo('Successful email transmission', { res });
-        })
-        .catch((err: string) => {
-          logger.logException('Failed email transmission', err);
-        });
-
-      return;
-    }
     case Event.EMAIL_INVITE:
     case Event.EMAIL_INVITES: {
       let invites;
@@ -143,11 +76,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
           return;
         }
 
-        const roleInviteClaim = await roleClaimDataSource.findByInviteId(
-          invite.id
-        );
-
-        const templateId = getTemplateIdForRole(roleInviteClaim[0].roleId);
+        const templateId = await getTemplateIdForInvite(invite.id);
 
         mailService
           .sendMail({
@@ -178,6 +107,90 @@ export async function essEmailHandler(event: ApplicationEvent) {
       return;
     }
 
+    case Event.INVITE_ACCEPTED: {
+      const invite: Invite = event.invite;
+
+      const coProposerClaims = await coProposerDataSource.findByInviteId(
+        invite.id
+      );
+      if (!coProposerClaims || coProposerClaims.length === 0) {
+        return;
+      }
+
+      for (const claim of coProposerClaims) {
+        const proposal = await proposalDataSource.get(claim.proposalPk);
+        if (!proposal) {
+          logger.logError(
+            'No proposal found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        const principalInvestigator = await userDataSource.getUser(
+          proposal.proposerId
+        );
+        if (!principalInvestigator) {
+          logger.logError(
+            'No principal investigator found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        const claimer = await userDataSource.getUser(
+          invite.claimedByUserId as number
+        );
+        if (!claimer) {
+          logger.logError(
+            'No claimer found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        mailService
+          .sendMail({
+            content: {
+              template_id: 'co-proposer-invite-accepted',
+            },
+            substitution_data: {
+              piPreferredname: principalInvestigator.preferredname,
+              piLastname: principalInvestigator.lastname,
+              email: invite.email,
+              proposalTitle: proposal.title,
+              proposalId: proposal.proposalId,
+              claimerPreferredname: claimer.preferredname,
+              claimerLastname: claimer.lastname,
+            },
+            recipients: [{ address: principalInvestigator.email }],
+          })
+          .then(async (res) => {
+            logger.logInfo(
+              'Successful email transmission for accepting invite',
+              { res }
+            );
+          })
+          .catch((err: string) => {
+            logger.logException('Failed email transmission', err);
+          });
+      }
+
+      return;
+    }
+
     case Event.PROPOSAL_SUBMITTED: {
       const principalInvestigator = await userDataSource.getUser(
         event.proposal.proposerId
@@ -188,6 +201,10 @@ export async function essEmailHandler(event: ApplicationEvent) {
       }
 
       const participants = await userDataSource.getProposalUsersFull(
+        event.proposal.primaryKey
+      );
+
+      const invites = await inviteDataSource.findCoProposerInvites(
         event.proposal.primaryKey
       );
 
@@ -213,6 +230,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
             return {
               address: {
                 email: partipant.email,
+                header_to: principalInvestigator.email,
+              },
+            };
+          }),
+          ...invites.map((invite) => {
+            return {
+              address: {
+                email: invite.email,
                 header_to: principalInvestigator.email,
               },
             };
@@ -435,13 +460,40 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 }
 
-function getTemplateIdForRole(role: UserRole): string {
-  switch (role) {
-    case UserRole.USER:
-      return 'user-office-registration-invitation';
-    case UserRole.INTERNAL_REVIEWER:
-      return 'user-office-registration-invitation-reviewer';
-    default:
-      throw new Error('No valid user role set for email invitation');
+export async function getTemplateIdForInvite(
+  inviteId: number
+): Promise<string> {
+  // Resolve all necessary data sources in one go
+  const roleClaimDS = container.resolve<RoleClaimDataSource>(
+    Tokens.RoleClaimDataSource
+  );
+  const coProposerDS = container.resolve<CoProposerClaimDataSource>(
+    Tokens.CoProposerClaimDataSource
+  );
+
+  // Fetch all claims concurrently
+  const [coProposerClaim, roleClaims] = await Promise.all([
+    coProposerDS.findByInviteId(inviteId),
+    roleClaimDS.findByInviteId(inviteId),
+  ]);
+
+  if (coProposerClaim.length > 0) {
+    return 'user-office-registration-invitation-co-proposer';
   }
+
+  if (roleClaims.length > 0) {
+    const { roleId } = roleClaims[0];
+    switch (roleId) {
+      case UserRole.INTERNAL_REVIEWER:
+        return 'user-office-registration-invitation-reviewer';
+      case UserRole.USER:
+        return 'user-office-registration-invitation-user';
+      default:
+        throw new Error(
+          `Unsupported role \"${roleId}\" for invite ${inviteId}`
+        );
+    }
+  }
+
+  throw new Error(`No valid claim found for invite ${inviteId}`);
 }

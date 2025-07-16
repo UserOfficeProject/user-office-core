@@ -39,6 +39,7 @@ import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { StatusActionType } from '../../models/StatusAction';
 import { StatusActionsLog } from '../../models/StatusActionsLog';
+import { Tag } from '../../models/Tag';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import {
@@ -126,6 +127,7 @@ export interface ProposalRecord {
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
   readonly submitted_date: Date;
+  readonly file_id: string;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -225,7 +227,6 @@ export interface UserRecord {
   readonly user_id: number;
   readonly user_title: string;
   readonly firstname: string;
-  readonly middlename: string;
   readonly lastname: string;
   readonly username: string;
   readonly preferredname: string;
@@ -233,13 +234,11 @@ export interface UserRecord {
   readonly oauth_refresh_token: string | null;
   readonly oauth_issuer: string | null;
   readonly gender: string;
-  readonly nationality: number;
   readonly birthdate: Date;
   readonly department: string;
   readonly position: string;
   readonly email: string;
   readonly telephone: string;
-  readonly telephone_alt: string;
   readonly created_at: Date;
   readonly updated_at: Date;
   readonly full_count: number;
@@ -274,6 +273,11 @@ export interface ReviewRecord {
   readonly fap_id: number;
   readonly questionary_id: number;
   readonly full_count: number;
+  readonly date_assigned: Date;
+  readonly reassigned: boolean;
+  readonly date_reassigned: Date;
+  readonly email_sent: boolean;
+  readonly rank: number | null;
 }
 
 export interface TechnicalReviewRecord {
@@ -340,11 +344,6 @@ export interface CallRecord {
 export interface PageTextRecord {
   readonly pagetext_id: number;
   readonly content: string;
-}
-
-export interface NationalityRecord {
-  readonly nationality_id: number;
-  readonly nationality: string;
 }
 
 export interface InstitutionRecord {
@@ -479,6 +478,7 @@ export interface InstrumentRecord {
   readonly description: string;
   readonly manager_user_id: number;
   readonly full_count: number;
+  readonly selectable: boolean;
 }
 
 export interface InstrumentHasProposalRecord {
@@ -790,7 +790,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.submitted,
     proposal.reference_number_sequence,
     proposal.management_decision_submitted,
-    proposal.submitted_date
+    proposal.submitted_date,
+    proposal.file_id
   );
 };
 
@@ -803,7 +804,12 @@ export const createReviewObject = (review: ReviewRecord) => {
     review.grade,
     review.status,
     review.fap_id,
-    review.questionary_id
+    review.questionary_id,
+    review.date_assigned,
+    review.reassigned,
+    review.date_reassigned,
+    review.email_sent,
+    review.rank
   );
 };
 
@@ -813,7 +819,8 @@ export const createInstrumentObject = (instrument: InstrumentRecord) => {
     instrument.name,
     instrument.short_code,
     instrument.description,
-    instrument.manager_user_id
+    instrument.manager_user_id,
+    instrument.selectable
   );
 };
 
@@ -927,7 +934,6 @@ export const createUserObject = (user: UserRecord) => {
     user.user_id,
     user.user_title,
     user.firstname,
-    user.middlename,
     user.lastname,
     user.username,
     user.preferredname,
@@ -935,7 +941,6 @@ export const createUserObject = (user: UserRecord) => {
     user.oauth_refresh_token,
     user.oauth_issuer,
     user.gender,
-    user.nationality,
     user.birthdate,
     user.institution_id,
     user.institution,
@@ -943,7 +948,6 @@ export const createUserObject = (user: UserRecord) => {
     user.position,
     user.email,
     user.telephone,
-    user.telephone_alt,
     user.placeholder,
     user.created_at.toISOString(),
     user.updated_at.toISOString()
@@ -1147,12 +1151,10 @@ export const createFapProposalObject = (fapProposal: FapProposalRecord) => {
     fapProposal.fap_meeting_instrument_submitted
   );
 };
-export const createFapAssignmentObject = (
-  fapAssignment: FapAssignmentRecord
-) => {
+export const createFapAssignmentObject = (fapAssignment: ReviewRecord) => {
   return new FapAssignment(
     fapAssignment.proposal_pk,
-    fapAssignment.fap_member_user_id,
+    fapAssignment.user_id,
     fapAssignment.fap_id,
     fapAssignment.date_assigned,
     fapAssignment.reassigned,
@@ -1379,6 +1381,20 @@ export interface CoProposerClaimRecord {
 
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
+
+export interface TagRecord {
+  readonly tag_id: number;
+  readonly name: string;
+  readonly short_code: string;
+}
+
+export const createTagObject = (tag: TagRecord) =>
+  new Tag(tag.tag_id, tag.name, tag.short_code);
+
+export interface TagUserRecord {
+  readonly tag_id: number;
+  readonly user_id: number;
+}
 
 export interface ExperimentRecord {
   readonly experiment_pk: number;

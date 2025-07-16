@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { container, inject, injectable } from 'tsyringe';
 
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -39,7 +40,8 @@ export default class QuestionaryMutations {
     @inject(Tokens.GenericTemplateDataSource)
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   async deleteOldAnswers(
@@ -127,15 +129,12 @@ export default class QuestionaryMutations {
     ).proposals[0];
 
     const genericTemplates =
-      await this.genericTemplateDataSource.getGenericTemplates(
-        {
-          filter: {
-            questionId: questionId,
-            proposalPk: proposal?.primaryKey,
-          },
+      await this.genericTemplateDataSource.getGenericTemplates({
+        filter: {
+          questionId: questionId,
+          proposalPk: proposal?.primaryKey,
         },
-        agent
-      );
+      });
 
     if (!genericTemplates) {
       return;
@@ -190,10 +189,9 @@ export default class QuestionaryMutations {
       );
     }
 
-    const hasRights = await this.questionaryAuth.hasWriteRights(
-      agent,
-      questionaryId
-    );
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.questionaryAuth.hasWriteRights(agent, questionaryId));
     if (!hasRights) {
       return rejection(
         'Can not answer topic because of insufficient permissions',
@@ -285,7 +283,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  async updateAnswer(agent: UserJWT | null, args: UpdateAnswerArgs) {
+  async updateAnswer(agent: UserWithRole | null, args: UpdateAnswerArgs) {
     const hasRights = await this.questionaryAuth.hasWriteRights(
       agent,
       args.questionaryId

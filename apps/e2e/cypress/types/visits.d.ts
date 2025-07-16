@@ -1,4 +1,6 @@
 import {
+  ApproveVisitRegistrationMutation,
+  ApproveVisitRegistrationMutationVariables,
   CreateVisitMutationVariables,
   CreateVisitRegistrationMutation,
   SubmitVisitRegistrationMutation,
@@ -52,6 +54,26 @@ declare global {
       submitVisitRegistration: (
         input: SubmitVisitRegistrationMutationVariables
       ) => Cypress.Chainable<SubmitVisitRegistrationMutation>;
+
+      /**
+       * Approve visit registration
+       *
+       * @returns {typeof approveVisitRegistration}
+       * @memberof Chainable
+       * @example
+       * cy.approveVisitRegistration({
+       *    visitId: visitId,
+       *    userId: userId,
+       *    input: {
+       *      visitRegistrationId: visitRegistrationId,
+       *      visitRegistrationStatus: VisitRegistrationStatus.APPROVED,
+       *     },
+       * });
+       *
+       */
+      approveVisitRegistration: (
+        input: ApproveVisitRegistrationMutationVariables
+      ) => Cypress.Chainable<ApproveVisitRegistrationMutation>;
     }
   }
 }

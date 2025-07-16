@@ -26,7 +26,6 @@ export class User {
     public id: number,
     public user_title: string,
     public firstname: string,
-    public middlename: string | undefined,
     public lastname: string,
     public username: string,
     public preferredname: string | undefined,
@@ -34,7 +33,6 @@ export class User {
     public oauthRefreshToken: string | null,
     public oauthIssuer: string | null,
     public gender: string,
-    public nationality: number,
     public birthdate: Date,
     public institutionId: number,
     public institution: string,
@@ -42,7 +40,6 @@ export class User {
     public position: string,
     public email: string,
     public telephone: string,
-    public telephone_alt: string | undefined,
     public placeholder: boolean,
     public created: string,
     public updated: string

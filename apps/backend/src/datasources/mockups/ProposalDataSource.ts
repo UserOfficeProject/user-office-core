@@ -49,7 +49,8 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
     values?.managementDecisionSubmitted || false,
-    values?.submittedDate || new Date()
+    values?.submittedDate || new Date(),
+    values?.fileId || null
   );
 };
 
@@ -343,6 +344,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposalPks.includes(proposal.primaryKey)
     );
   }
+
+  async getProposalByVisitId(visitId: number): Promise<Proposal> {
+    return dummyProposalFactory();
+  }
+
   async getInstrumentScientistProposals(
     scientist: UserWithRole,
     filter?: ProposalsFilter,

@@ -7,15 +7,17 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, UserRole, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useXpressAccess } from 'hooks/common/useXpressAccess';
+import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
-import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
+import EmailStatusActionsLogsPage from './statusActionsLogs/EmailStatusActionsLogsPage';
+import ProposalDownloadStatusActionsLogsPage from './statusActionsLogs/ProposalDownloadStatusActionsLogsPage';
+import TagPage from './tag/TagPage';
+import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
-import XpressProposalTable from './xpress/XpressProposalTable';
 
 const CallPage = lazy(() => import('./call/CallPage'));
 const ExperimentPage = lazy(() => import('./experiment/ExperimentPage'));
@@ -152,12 +154,15 @@ const AppRoutes = () => {
   const isExperimentSafetyReviewEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
-  const isXpressRouteEnabled = useXpressAccess([
+  const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
   const isExperimentSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
+  )?.isEnabled;
+  const isTagsEnabled = featureContext.featuresMap.get(
+    FeatureId.TAGS
   )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
@@ -211,23 +216,30 @@ const AppRoutes = () => {
           path="/Proposals"
           element={<TitledRoute title="Proposals" element={<ProposalPage />} />}
         />
-        {isXpressRouteEnabled && (isInstrumentScientist || isUserOfficer) && (
-          <Route
-            path="/XpressProposals"
-            element={
-              <TitledRoute
-                title="Xpress Proposals"
-                element={<XpressProposalTable />}
-              />
-            }
-          />
-        )}
+        {isTechniqueProposalsEnabled &&
+          (isInstrumentScientist || isUserOfficer) && (
+            <Route
+              path="/TechniqueProposals"
+              element={
+                <TitledRoute
+                  title={t('Technique Proposals')}
+                  element={<TechniqueProposalTable />}
+                />
+              }
+            />
+          )}
         {isUserOfficer && (
           <Route
             path="/ExperimentPage"
             element={
               <TitledRoute title="Experiments" element={<ExperimentPage />} />
             }
+          />
+        )}
+        {isTagsEnabled && isUserOfficer && (
+          <Route
+            path="/Tag"
+            element={<TitledRoute title="Tag" element={<TagPage />} />}
           />
         )}
         <Route
@@ -242,11 +254,22 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
-            path="/StatusActionsLogs"
+            path="/EmailStatusActionsLogs"
             element={
               <TitledRoute
-                title="StatusActionsLogs"
-                element={<StatusActionsLogsPage />}
+                title="Status Actions Logs"
+                element={<EmailStatusActionsLogsPage />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/ProposalDownloadStatusActionsLogs"
+            element={
+              <TitledRoute
+                title="Status Actions Logs"
+                element={<ProposalDownloadStatusActionsLogsPage />}
               />
             }
           />

@@ -8,7 +8,10 @@ import { Role, Roles } from '../../models/Role';
 import { BasicUserDetails, User } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { Cache } from '../../utils/Cache';
 import PostgresUserDataSource from '../postgres/UserDataSource';
@@ -28,11 +31,11 @@ type StfcRolesToEssRole = { [key: string]: Roles[] };
 const stfcRolesToEssRoleDefinitions: StfcRolesToEssRole = {
   'User Officer': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
   'ISIS Instrument Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF Artemis FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF Artemis FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
   'CLF Artemis Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF HPL FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF HPL FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
   'CLF HPL Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
-  'CLF LSF FAP Secretary': [Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST],
+  'CLF LSF FAP Secretary': [Roles.INSTRUMENT_SCIENTIST],
   'CLF LSF Link Scientist': [Roles.INSTRUMENT_SCIENTIST],
   'FAP Member': [Roles.FAP_REVIEWER],
   'FAP Secretary': [Roles.FAP_SECRETARY],
@@ -111,7 +114,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     Number(stfcUser.userNumber),
     stfcUser.title ?? '',
     stfcUser.givenName ?? '',
-    undefined,
     stfcUser.familyName ?? '',
     stfcUser.email ?? '',
     stfcUser.firstNameKnownAs ?? stfcUser.givenName,
@@ -119,7 +121,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     '',
     '',
     '',
-    1,
     new Date('2000-01-01'),
     1,
     stfcUser.orgName,
@@ -127,7 +128,6 @@ function toEssUser(stfcUser: StfcBasicPersonDetails): User {
     '',
     stfcUser.email ?? '',
     stfcUser.workPhone ?? '',
-    undefined,
     false,
     '2000-01-01 00:00:00.000000+00',
     '2000-01-01 00:00:00.000000+00'
@@ -178,6 +178,8 @@ export class StfcUserDataSource implements UserDataSource {
     userNumbers: string[],
     searchableOnly?: boolean
   ): Promise<StfcBasicPersonDetails[]> {
+    const distinctUserNumbers = Array.from(new Set(userNumbers));
+
     const cache = searchableOnly
       ? this.uowsSearchableBasicUserDetailsCache
       : this.uowsBasicUserDetailsCache;
@@ -185,7 +187,7 @@ export class StfcUserDataSource implements UserDataSource {
     const stfcUserRequests: Promise<StfcBasicPersonDetails | undefined>[] = [];
     const cacheMisses: string[] = [];
 
-    for (const userNumber of userNumbers) {
+    for (const userNumber of distinctUserNumbers) {
       const cachedUser = cache.get(userNumber);
       if (cachedUser) {
         stfcUserRequests.push(cachedUser);
@@ -195,47 +197,72 @@ export class StfcUserDataSource implements UserDataSource {
     }
 
     if (cacheMisses.length > 0) {
-      const uowsRequestTemp: BasicPersonDetailsDTO[] | null = searchableOnly
-        ? await UOWSClient.basicPersonDetails
-            .getSearchableBasicPersonDetails(undefined, undefined, cacheMisses)
-            .catch((error) => {
-              logger.logError(
-                'An error occurred while fetching searchable person details using getSearchableBasicPersonDetails',
-                error
-              );
+      // Create promise that will request a chunk of the missing user details
+      // Requesting too many users at once can cause "414 Request-URI Too Long" errors
+      const chunkSize = 100;
+      const cacheMissChunks = Array.from(
+        { length: Math.ceil(cacheMisses.length / chunkSize) },
+        (_, index) =>
+          cacheMisses.slice(index * chunkSize, (index + 1) * chunkSize)
+      );
 
-              return null;
-            })
-        : await UOWSClient.basicPersonDetails
-            .getBasicPersonDetails(undefined, undefined, undefined, cacheMisses)
-            .catch((error) => {
-              logger.logError(
-                'An error occurred while fetching searchable person details using getBasicPersonDetails',
-                error
-              );
+      const uowsRequests: Array<Promise<Array<StfcBasicPersonDetails | null>>> =
+        [];
 
-              return null;
-            });
+      cacheMissChunks.forEach((cacheMissChunk) => {
+        const request: Promise<Array<StfcBasicPersonDetails | null>> = (
+          searchableOnly
+            ? UOWSClient.basicPersonDetails
+                .getSearchableBasicPersonDetails(
+                  undefined,
+                  undefined,
+                  cacheMissChunk
+                )
+                .catch((error) => {
+                  logger.logError(
+                    'An error occurred while fetching searchable person details using getSearchableBasicPersonDetails',
+                    error
+                  );
 
-      const uowsRequest = uowsRequestTemp
-        ? uowsRequestTemp.map(toStfcBasicPersonDetails)
-        : null;
+                  return [];
+                })
+            : UOWSClient.basicPersonDetails
+                .getBasicPersonDetails(
+                  undefined,
+                  undefined,
+                  undefined,
+                  cacheMissChunk
+                )
+                .catch((error) => {
+                  logger.logError(
+                    'An error occurred while fetching searchable person details using getBasicPersonDetails',
+                    error
+                  );
 
-      if (uowsRequest) {
-        for (const userNumber of cacheMisses) {
-          const userRequest = Promise.resolve(
-            uowsRequest.find((user) => user?.userNumber === userNumber) ||
-              undefined
+                  return [];
+                })
+        ).then((uowsResults) => uowsResults.map(toStfcBasicPersonDetails));
+        uowsRequests.push(request);
+        // Build promises for individual missing users and add them to the cache.
+        // Doing this as soon as possible after creating the requests and before any awaits on them ensures any parallel requests can reuse the promise and don't repeat calls for the same user data
+        for (const userNumber of cacheMissChunk) {
+          const userRequest = request.then(
+            (users) =>
+              users.find((user) => user?.userNumber === userNumber) || undefined
           );
 
           cache.put(userNumber, userRequest);
           stfcUserRequests.push(userRequest);
         }
+      });
 
-        await this.ensureDummyUsersExist(
-          uowsRequest.map((stfcUser) => parseInt(stfcUser!.userNumber))
-        );
-      }
+      // Now that all requests are made and cached, wait for the user data then store it in the database
+      const usersFromUows = await Promise.all(uowsRequests).then((responses) =>
+        responses.flat()
+      );
+      await this.ensureDummyUsersExist(
+        usersFromUows.map((stfcUser) => parseInt(stfcUser!.userNumber))
+      );
     }
 
     const stfcUsers: StfcBasicPersonDetails[] = await Promise.all(
@@ -244,7 +271,7 @@ export class StfcUserDataSource implements UserDataSource {
       users.filter((user): user is StfcBasicPersonDetails => user !== undefined)
     );
     // Uncache any failed lookups
-    userNumbers
+    distinctUserNumbers
       .filter(
         (un) => stfcUsers.find((user) => user.userNumber === un) === undefined
       )
@@ -465,7 +492,13 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.getRoles();
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
     throw new Error('Method not implemented.');
   }
 
@@ -643,7 +676,6 @@ export class StfcUserDataSource implements UserDataSource {
   async create(
     user_title: string | undefined,
     firstname: string,
-    middlename: string | undefined,
     lastname: string,
     username: string,
     preferredname: string | undefined,
@@ -651,14 +683,12 @@ export class StfcUserDataSource implements UserDataSource {
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,
-    nationality: number,
     birthdate: Date,
     institution: number,
     department: string,
     position: string,
     email: string,
-    telephone: string,
-    telephone_alt: string | undefined
+    telephone: string
   ): Promise<User> {
     throw new Error('Method not implemented.');
   }

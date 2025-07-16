@@ -4,6 +4,8 @@ mutation updateInstrument(
   $shortCode: String!
   $description: String!
   $managerUserId: Int!
+  $updateTechReview: Boolean!
+  $selectable: Boolean
 ) {
   updateInstrument(
     id: $id
@@ -11,6 +13,8 @@ mutation updateInstrument(
     shortCode: $shortCode
     description: $description
     managerUserId: $managerUserId
+    updateTechReview: $updateTechReview
+    selectable: $selectable
   ) {
     ...instrument
   }
