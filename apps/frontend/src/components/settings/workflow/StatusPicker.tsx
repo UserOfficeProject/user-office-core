@@ -8,7 +8,10 @@ interface StatusPickerProps {
   onDragStart: (status: Status) => void;
 }
 
-const StatusPicker: React.FC<StatusPickerProps> = ({ statuses, onDragStart }) => {
+const StatusPicker: React.FC<StatusPickerProps> = ({
+  statuses,
+  onDragStart,
+}) => {
   return (
     <Paper style={{ height: '100%', overflow: 'auto', padding: '10px' }}>
       <Typography variant="h6" component="h2" gutterBottom>
@@ -17,14 +20,17 @@ const StatusPicker: React.FC<StatusPickerProps> = ({ statuses, onDragStart }) =>
       <Typography variant="body2" color="textSecondary" paragraph>
         Drag a status into the diagram to add it to the workflow.
       </Typography>
-      <List dense>
+      <List dense style={{ maxHeight: '500px', overflow: 'auto' }}>
         {statuses.map((status) => (
           <ListItem
             key={status.id}
             button
             draggable
             onDragStart={(event) => {
-              event.dataTransfer.setData('application/reactflow', status.id.toString());
+              event.dataTransfer.setData(
+                'application/reactflow',
+                status.id.toString()
+              );
               event.dataTransfer.effectAllowed = 'move';
               onDragStart(status);
             }}

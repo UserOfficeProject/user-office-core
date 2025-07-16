@@ -1,13 +1,9 @@
 import Grid from '@mui/material/Grid';
-import LinearProgress from '@mui/material/LinearProgress';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useRef, useState } from 'react';
-import ReactFlow, {
+import {
   addEdge,
-  Background,
   Connection,
-  ConnectionLineType,
-  Controls,
   Edge,
   MarkerType,
   Node,
@@ -23,16 +19,12 @@ import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { FunctionType } from 'utils/utilTypes';
 
+import LoadingOverlay from './LoadingOverlay';
 import StatusEventsAndActionsDialog from './StatusEventsAndActionsDialog';
-import StatusNode from './StatusNode';
 import StatusPicker from './StatusPicker';
+import WorkflowCanvas from './WorkflowCanvas';
 import WorkflowEditorModel, { Event, EventType } from './WorkflowEditorModel';
 import WorkflowMetadataEditor from './WorkflowMetadataEditor';
-
-// Register custom node types
-const nodeTypes = {
-  statusNode: StatusNode,
-};
 
 interface EdgeData {
   events: string[];
@@ -43,7 +35,7 @@ interface EdgeData {
 const edgeFactory = (edgeData: Edge<EdgeData> | Connection) => {
   return {
     type: 'floating',
-    animated: true,
+    animated: false,
     markerEnd: {
       type: MarkerType.ArrowClosed,
       width: 20,
@@ -250,7 +242,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       // Add the connection to the graph
       const newEdge = edgeFactory({
         ...connection,
-        animated: true,
         data: {
           events: [], // No events initially
           sourceStatusName: sourceStatus.name,
@@ -401,29 +392,14 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
   // Determine if data is loaded
   const dataLoaded = !isLoading && !loadingStatuses && state.id;
 
-  // Style for container based on loading state
-  const getContainerStyle = (): React.CSSProperties => {
-    return !dataLoaded
-      ? {
-          pointerEvents: 'none',
-          userSelect: 'none',
-          opacity: 0.5,
-          minHeight: '380px',
-        }
-      : {};
-  };
-
-  const progressJsx = !dataLoaded ? <LinearProgress /> : null;
-
   return (
     <StyledContainer maxWidth={false}>
       <WorkflowMetadataEditor dispatch={dispatch} workflow={state} />
-      <StyledPaper style={getContainerStyle()}>
-        {progressJsx}
-        <Grid container style={{ height: '600px' }}>
-          <Grid item xs={9}>
-            <div ref={reactFlowWrapper} style={{ height: '100%' }}>
-              <ReactFlow
+      <StyledPaper>
+        <LoadingOverlay isLoading={!dataLoaded}>
+          <Grid container style={{ height: '600px' }}>
+            <Grid item xs={9}>
+              <WorkflowCanvas
                 nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
@@ -433,28 +409,23 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 onDrop={onDrop}
                 onDragOver={onDragOver}
                 onEdgeClick={onEdgeClick}
-                nodeTypes={nodeTypes}
-                fitView
-                connectionLineType={ConnectionLineType.SmoothStep}
-              >
-                <Background color="#aaa" gap={16} />
-                <Controls />
-              </ReactFlow>
-            </div>
+                reactFlowWrapper={reactFlowWrapper}
+              />
+            </Grid>
+            <Grid item xs={3}>
+              <StatusPicker
+                statuses={statusesInThePicker}
+                onDragStart={(status) => {
+                  /* Make status draggable to ReactFlow */
+                  const event = new CustomEvent('statusDragStart', {
+                    detail: status,
+                  });
+                  document.dispatchEvent(event);
+                }}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={3}>
-            <StatusPicker
-              statuses={statusesInThePicker}
-              onDragStart={(status) => {
-                /* Make status draggable to ReactFlow */
-                const event = new CustomEvent('statusDragStart', {
-                  detail: status,
-                });
-                document.dispatchEvent(event);
-              }}
-            />
-          </Grid>
-        </Grid>
+        </LoadingOverlay>
       </StyledPaper>
 
       {/* Status Events and Actions Dialog */}

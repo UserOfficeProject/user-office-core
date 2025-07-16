@@ -1,0 +1,75 @@
+import React from 'react';
+import ReactFlow, {
+  Background,
+  Connection,
+  ConnectionLineType,
+  Controls,
+  Edge,
+  EdgeChange,
+  Node,
+  NodeChange,
+  ReactFlowInstance,
+} from 'reactflow';
+
+import StatusNode from './StatusNode';
+
+// Register custom node types
+const nodeTypes = {
+  statusNode: StatusNode,
+};
+
+interface EdgeData {
+  events: string[];
+  sourceStatusName: string;
+  targetStatusName: string;
+}
+
+interface WorkflowCanvasProps {
+  nodes: Node[];
+  edges: Edge<EdgeData>[];
+  onNodesChange: (changes: NodeChange[]) => void;
+  onEdgesChange: (changes: EdgeChange[]) => void;
+  onConnect: (connection: Connection) => void;
+  onInit: (instance: ReactFlowInstance) => void;
+  onDrop: (event: React.DragEvent) => void;
+  onDragOver: (event: React.DragEvent) => void;
+  onEdgeClick: (event: React.MouseEvent, edge: Edge) => void;
+  reactFlowWrapper: React.RefObject<HTMLDivElement>;
+}
+
+const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onConnect,
+  onInit,
+  onDrop,
+  onDragOver,
+  onEdgeClick,
+  reactFlowWrapper,
+}) => {
+  return (
+    <div ref={reactFlowWrapper} style={{ height: '100%' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onInit={onInit}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onEdgeClick={onEdgeClick}
+        nodeTypes={nodeTypes}
+        fitView
+        connectionLineType={ConnectionLineType.SmoothStep}
+      >
+        <Background color="#aaa" gap={16} />
+        <Controls />
+      </ReactFlow>
+    </div>
+  );
+};
+
+export default WorkflowCanvas;
