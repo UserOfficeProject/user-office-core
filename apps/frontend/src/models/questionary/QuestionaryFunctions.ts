@@ -86,9 +86,6 @@ export function areDependenciesSatisfied(
   questionary: QuestionaryStep[],
   fieldId: string
 ) {
-  console.log(questionary);
-  console.log(fieldId);
-
   const field = getFieldById(questionary, fieldId);
   if (!field || !field.dependencies || field.dependencies.length === 0) {
     return true;
