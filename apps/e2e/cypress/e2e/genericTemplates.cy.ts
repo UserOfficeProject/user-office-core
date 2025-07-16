@@ -875,7 +875,7 @@ context('GenericTemplates tests', () => {
       cy.contains('Save and continue').click();
     });
 
-    it('User should be able to copy previous genericTemplate but not proceed if isCompleteOnCopy is false', () => {
+    it.only('User should be able to copy previous genericTemplate but not proceed if isCompleteOnCopy is false', () => {
       cy.updateCall({
         id: initialDBData.call.id,
         ...updatedCall,

@@ -27,13 +27,20 @@ context('App settings tests', () => {
 
     it('Sub menu should be opened by default on reload of the corresponding page', () => {
       cy.get(`${menuItemSelector}>div>div>span`).contains('Templates').click();
-      cy.get(`${menuItemSelector} a[href="/PdfTemplates"]`)
+      cy.get(`${menuItemSelector} a[href="/ProposalTemplates"]`)
         .should('be.visible')
         .click();
       cy.reload();
-      cy.get(`${menuItemSelector} a[href="/PdfTemplates"]`).should(
+      cy.get(`${menuItemSelector} a[href="/ProposalTemplates"]`).should(
         'be.visible'
       );
+    });
+
+    it('Sub Sub menu should be opened by default on reload of the corresponding page', () => {
+      cy.get(`${menuItemSelector}>div>div>span`).contains('Templates').click();
+      cy.get(`a[href="/PdfTemplates/proposal"]`).should('be.visible').click();
+      cy.reload();
+      cy.get(`a[href="/PdfTemplates/proposal"]`).should('be.visible');
     });
   });
 });
