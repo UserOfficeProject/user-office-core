@@ -463,7 +463,7 @@ export const getOtherAndFormatOutputForEmailSending = async (
       true,
       otherEmail,
       '',
-      'Mr'
+      ''
     );
 
     await getEmailReadyArrayOfUsersAndProposals(
