@@ -141,17 +141,6 @@ export const workflowEngine = async (
   const experimentWithChangedStatuses = (
     await Promise.all(
       args.map(async (experimentSafetyWithEvents) => {
-        const experimentSafety =
-          await experimentDataSource.getExperimentSafetyByExperimentPk(
-            experimentSafetyWithEvents.experimentPk
-          );
-
-        if (!experimentSafety) {
-          throw new Error(
-            `Experiment Safety for the Experiment with Primary Key ${experimentSafetyWithEvents.experimentPk} not found`
-          );
-        }
-
         const experiment = await experimentDataSource.getExperiment(
           experimentSafetyWithEvents.experimentPk
         );
@@ -167,6 +156,16 @@ export const workflowEngine = async (
             `Proposal with id ${experiment.proposalPk} not found`
           );
         }
+
+        const experimentSafety =
+          await experimentDataSource.getExperimentSafetyByExperimentPk(
+            experimentSafetyWithEvents.experimentPk
+          );
+
+        if (!experimentSafety) {
+          return;
+        }
+
         const experimentWorkflow = await getExperimentWorkflowByCallId(
           proposal.callId
         );

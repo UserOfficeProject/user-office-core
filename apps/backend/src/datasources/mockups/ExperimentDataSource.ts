@@ -151,12 +151,7 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
       ExperimentWithNonExistingProposalPk,
     ];
 
-    this.experimentsSafety = [
-      dummyExperimentSafetyFactory({
-        experimentSafetyPk: 1,
-        experimentPk: UpcomingExperimentWithExperiment.experimentPk,
-      }),
-    ];
+    this.experimentsSafety = [];
 
     // Initialize experimentSamples with dummy sample data
     this.experimentSamples = [DummyExperimentSample1];
