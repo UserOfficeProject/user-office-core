@@ -17,7 +17,6 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 import { QuestionFormShell } from '../QuestionFormShell';
 
 export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
-  console.log(props.question.config);
   const field = props.question;
   const naturalKeySchema = useNaturalKeySchema(field.naturalKey);
 

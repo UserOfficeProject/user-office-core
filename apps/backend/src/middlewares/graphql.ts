@@ -133,10 +133,10 @@ const apolloServer = async (app: Express) => {
           });
 
           if (filteredErrors.length > 0) {
-            // logger.logError('GraphQL response contained error(s)', {
-            //   errors: filteredErrors,
-            //   context,
-            // });
+            logger.logError('GraphQL response contained error(s)', {
+              errors: filteredErrors,
+              context,
+            });
           }
         },
       };
