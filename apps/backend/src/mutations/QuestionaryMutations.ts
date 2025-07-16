@@ -45,7 +45,7 @@ export default class QuestionaryMutations {
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  async deleteOldAnswers(
+  async cleanUpAnswers(
     templateId: number,
     questionaryId: number,
     topicId: number,
@@ -197,24 +197,24 @@ export default class QuestionaryMutations {
       );
     }
 
-    const oldAnswers = (
+    const currentAnswers = (
       await this.dataSource.getQuestionarySteps(questionaryId)
     ).find((step) => step.topic.id === topicId)?.fields;
 
-    const missingAnswers = oldAnswers?.filter(
+    const missingAnswers = currentAnswers?.filter(
       (oldAnswer) =>
         !answers.some((answer) => answer.questionId === oldAnswer.question.id)
     );
 
     const answersToUpdate = answers.filter((answer) => {
-      const oldAnswer = oldAnswers?.find(
+      const oldAnswer = currentAnswers?.find(
         (old) => old.question.id === answer.questionId
       );
 
       return !_.isEqual(oldAnswer?.value, JSON.parse(answer.value).value);
     });
 
-    await this.deleteOldAnswers(
+    await this.cleanUpAnswers(
       template.templateId,
       questionaryId,
       topicId,
