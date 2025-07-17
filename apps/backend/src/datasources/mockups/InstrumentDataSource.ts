@@ -48,7 +48,8 @@ export const dummyInstrumentWithManagementTime =
     'instrument_1',
     'This is test instrument.',
     1,
-    10
+    10,
+    false
   );
 
 export const dummyInstruments = [dummyInstrument, dummyInstrument2];
