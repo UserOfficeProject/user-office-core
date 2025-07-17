@@ -5,7 +5,8 @@ export class Instrument {
     public shortCode: string,
     public description: string,
     public managerUserId: number,
-    public selectable?: boolean
+    public selectable?: boolean,
+    public multipleTechReviewsEnabled?: boolean
   ) {}
 }
 
@@ -31,9 +32,17 @@ export class InstrumentWithManagementTime extends Instrument {
     public shortCode: string,
     public description: string,
     public managerUserId: number,
-    public managementTimeAllocation: number
+    public managementTimeAllocation: number,
+    public multipleTechReviewsEnabled?: boolean
   ) {
-    super(id, name, shortCode, description, managerUserId);
+    super(
+      id,
+      name,
+      shortCode,
+      description,
+      managerUserId,
+      multipleTechReviewsEnabled
+    );
   }
 }
 
