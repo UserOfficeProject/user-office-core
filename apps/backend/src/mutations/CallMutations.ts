@@ -1,7 +1,6 @@
 import {
   createCallValidationSchemas,
   removeAssignedInstrumentFromCallValidationSchema,
-  updateCallValidationBackendSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
@@ -19,6 +18,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateFapToCallInstrumentInput,
+  CallOrderInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { mergeValidationSchemas } from '../utils/helperFunctions';
 
@@ -87,7 +87,7 @@ export default class CallMutations {
     }
   }
 
-  @ValidateArgs(updateCallValidationBackendSchema)
+  // @ValidateArgs(updateCallValidationBackendSchema)
   @Authorized([Roles.USER_OFFICER])
   async update(
     agent: UserWithRole | null,
@@ -104,6 +104,16 @@ export default class CallMutations {
         error
       );
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async orderCalls(
+    agent: UserWithRole | null,
+    args: CallOrderInput
+  ): Promise<Call | Rejection> {
+    return this.dataSource.orderCalls(args).catch((err) => {
+      return rejection('Could not update topic', { agent, args }, err);
+    });
   }
 
   // TODO: Need to add validation to duo-validation library

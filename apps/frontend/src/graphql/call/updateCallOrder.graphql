@@ -1,0 +1,13 @@
+mutation updateCallOrder(
+  $data: [CallOrderArray!]
+
+) {
+  updateCallOrder(
+    callOrderInput: {
+      data: $data
+
+    }
+  ) {
+    ...call
+  }
+}

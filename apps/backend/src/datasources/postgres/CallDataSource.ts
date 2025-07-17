@@ -10,6 +10,8 @@ import {
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
   UpdateFapToCallInstrumentInput,
+  CallOrderInput,
+  CallOrderArray,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -414,6 +416,21 @@ export default class PostgresCallDataSource implements CallDataSource {
     });
 
     return createCallObject(call[0]);
+  }
+  async set(data: CallOrderArray): Promise<number> {
+    return await database
+      .update({ sort_order: data.sort_order })
+      .from('call')
+      .where({ call_id: data.id });
+  }
+
+  async orderCalls(data: CallOrderInput): Promise<Call> {
+    data.data.forEach((item) => {
+      this.set(item);
+    });
+    const call: Call = await this.update({ id: data.data[0].id });
+
+    return call;
   }
 
   async assignInstrumentsToCall(

@@ -337,6 +337,7 @@ export interface CallRecord {
   readonly fap_review_template_id: number;
   readonly technical_review_template_id: number;
   readonly is_active: boolean;
+  readonly sort_order: number;
 }
 
 export interface PageTextRecord {
@@ -1015,7 +1016,8 @@ export const createCallObject = (call: CallRecord) => {
     call.pdf_template_id,
     call.fap_review_template_id,
     call.technical_review_template_id,
-    call.is_active
+    call.is_active,
+    call.sort_order
   );
 };
 

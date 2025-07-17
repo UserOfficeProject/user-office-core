@@ -13,6 +13,24 @@ import { AllocationTimeUnits } from '../../models/Call';
 import { Call } from '../types/Call';
 
 @InputType()
+export class CallOrderArray {
+  @Field(() => Int)
+  public id: number;
+
+  @Field(() => String, { nullable: true })
+  public shortCode?: string;
+
+  @Field(() => Int, { nullable: true })
+  public sort_order?: number;
+}
+
+@InputType()
+export class CallOrderInput {
+  @Field(() => [CallOrderArray], { nullable: true })
+  public data: CallOrderArray[];
+}
+
+@InputType()
 export class UpdateCallInput {
   @Field(() => Int)
   public id: number;
@@ -171,6 +189,15 @@ export class UpdateCallMutation {
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.call.update(context.user, updateCallInput);
+  }
+
+  @Mutation(() => Call)
+  updateCallOrder(
+    @Arg('callOrderInput')
+    callOrderInput: CallOrderInput,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.mutations.call.orderCalls(context.user, callOrderInput);
   }
 
   //todo: Create test case

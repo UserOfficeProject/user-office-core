@@ -7,6 +7,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateFapToCallInstrumentInput,
+  CallOrderInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { CallsFilter } from './../resolvers/queries/CallsQuery';
 
@@ -18,6 +19,7 @@ export interface CallDataSource {
   ): Promise<CallHasInstrument[]>;
   create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
+  orderCalls(args: CallOrderInput | undefined): Promise<Call>;
   delete(id: number): Promise<Call>;
   assignInstrumentsToCall(args: AssignInstrumentsToCallInput): Promise<Call>;
   updateFapToCallInstrument(
