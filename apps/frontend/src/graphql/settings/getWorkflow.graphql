@@ -13,6 +13,8 @@ query getWorkflow($workflowId: Int!) {
       }
       nextStatusId
       prevStatusId
+      posX
+      posY
       statusChangingEvents {
         statusChangingEventId
         workflowConnectionId

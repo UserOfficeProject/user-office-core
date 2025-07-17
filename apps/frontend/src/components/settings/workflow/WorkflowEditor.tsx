@@ -289,6 +289,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           })
         ),
         statusActions: [],
+        posX: 0,
+        posY: 0,
       };
 
       setWorkflowConnection(connection);
@@ -320,6 +322,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
+      position.x = Math.round(position.x);
+      position.y = Math.round(position.y);
 
       // Check if status already exists in workflow
       const statusExists = nodes.some((node) => node.id === statusId);
@@ -375,6 +379,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           workflowId: state.id,
           nextStatusId: null,
           prevStatusId: null,
+          posX: position.x,
+          posY: position.y,
         },
       });
     },

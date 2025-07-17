@@ -23,6 +23,8 @@ mutation createWorkflow(
       }
       nextStatusId
       prevStatusId
+      posX
+      posY
       statusChangingEvents {
         statusChangingEventId
         workflowConnectionId

@@ -39,6 +39,12 @@ export class WorkflowConnection
 
   @Field(() => Int, { nullable: true })
   public prevStatusId: number | null;
+
+  @Field(() => Int)
+  public posX: number;
+
+  @Field(() => Int)
+  public posY: number;
 }
 
 @Resolver(() => WorkflowConnection)

@@ -2,6 +2,8 @@ mutation addWorkflowStatus(
   $workflowId: Int!
   $sortOrder: Int!
   $statusId: Int!
+  $posX: Int!
+  $posY: Int!
   $nextStatusId: Int
   $prevStatusId: Int
 ) {
@@ -12,6 +14,8 @@ mutation addWorkflowStatus(
       statusId: $statusId
       nextStatusId: $nextStatusId
       prevStatusId: $prevStatusId
+      posX: $posX
+      posY: $posY
     }
   ) {
     id

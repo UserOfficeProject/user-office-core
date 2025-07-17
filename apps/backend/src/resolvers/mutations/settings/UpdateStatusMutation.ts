@@ -27,12 +27,6 @@ export class UpdateStatusInput {
 
   @Field(() => Boolean, { nullable: true })
   public isDefault?: boolean;
-
-  @Field(() => Int, { nullable: true })
-  public posX?: number;
-
-  @Field(() => Int, { nullable: true })
-  public posY?: number;
 }
 
 @Resolver()

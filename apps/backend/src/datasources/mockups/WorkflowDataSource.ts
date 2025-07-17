@@ -32,16 +32,18 @@ export const dummyWorkflowConnection = new WorkflowConnectionWithStatus(
   1,
   1,
   1,
-  {
-    id: 1,
-    shortCode: 'TEST_STATUS',
-    name: 'Test status',
-    description: 'Test status',
-    isDefault: false,
-    entityType: WorkflowType.PROPOSAL,
-  },
+  new Status(
+    1,
+    'TEST_STATUS',
+    'Test status',
+    'Test status',
+    false,
+    WorkflowType.PROPOSAL
+  ),
   null,
-  null
+  null,
+  100,
+  100
 );
 
 export const anotherDummyWorkflowConnection = new WorkflowConnectionWithStatus(
@@ -49,16 +51,18 @@ export const anotherDummyWorkflowConnection = new WorkflowConnectionWithStatus(
   2,
   1,
   2,
-  {
-    id: 2,
-    shortCode: 'TEST_STATUS_2',
-    name: 'Test status 2',
-    description: 'Test status 2',
-    isDefault: false,
-    entityType: WorkflowType.PROPOSAL,
-  },
+  new Status(
+    2,
+    'TEST_STATUS_2',
+    'Test status 2',
+    'Test status 2',
+    false,
+    WorkflowType.PROPOSAL
+  ),
   null,
-  1
+  1,
+  200,
+  150
 );
 
 export const dummyStatusChangingEvent = new StatusChangingEvent(
@@ -112,10 +116,10 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return dummyWorkflowConnection;
   }
 
-  async updateWorkflowStatuses(
-    workflowStatuses: WorkflowConnectionWithStatus[]
-  ): Promise<WorkflowConnectionWithStatus[]> {
-    return [dummyWorkflowConnection];
+  async updateWorkflowStatus(
+    workflowStatus: WorkflowConnectionWithStatus
+  ): Promise<WorkflowConnectionWithStatus> {
+    return dummyWorkflowConnection;
   }
 
   async deleteWorkflowStatus(

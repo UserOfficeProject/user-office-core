@@ -56,7 +56,9 @@ export function usePersistWorkflowEditorModel() {
       sortOrder: number,
       statusId: number,
       nextStatusId: number,
-      prevStatusId: number
+      prevStatusId: number,
+      posX: number,
+      posY: number
     ) => {
       return api({ toastSuccessMessage: 'Workflow status added successfully' })
         .addWorkflowStatus({
@@ -65,6 +67,8 @@ export function usePersistWorkflowEditorModel() {
           statusId,
           nextStatusId,
           prevStatusId,
+          posY,
+          posX,
         })
         .then((data) => data.addWorkflowStatus);
     };
@@ -177,6 +181,8 @@ export function usePersistWorkflowEditorModel() {
             statusId,
             nextStatusId,
             prevStatusId,
+            posX,
+            posY,
           } = action.payload;
 
           dispatch({
@@ -193,7 +199,9 @@ export function usePersistWorkflowEditorModel() {
                 sortOrder,
                 statusId,
                 nextStatusId,
-                prevStatusId
+                prevStatusId,
+                posX,
+                posY
               );
 
               dispatch({

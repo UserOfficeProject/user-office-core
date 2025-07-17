@@ -38,7 +38,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.workflow_id,
       workflowConnection.status_id,
       workflowConnection.next_status_id,
-      workflowConnection.prev_status_id
+      workflowConnection.prev_status_id,
+      workflowConnection.pos_x,
+      workflowConnection.pos_y
     );
   }
 
@@ -59,7 +61,9 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         entityType: workflowConnection.entity_type,
       },
       workflowConnection.next_status_id,
-      workflowConnection.prev_status_id
+      workflowConnection.prev_status_id,
+      workflowConnection.pos_x,
+      workflowConnection.pos_y
     );
   }
   async createWorkflow(
@@ -112,6 +116,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       prevStatusId: null,
       statusId: defaultStatusId,
       workflowId: workflowRecord.workflow_id,
+      posX: 0,
+      posY: 0,
     });
 
     return this.createWorkflowObject(workflowRecord);
@@ -262,6 +268,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         next_status_id: newWorkflowStatusInput.nextStatusId,
         prev_status_id: newWorkflowStatusInput.prevStatusId,
         sort_order: newWorkflowStatusInput.sortOrder,
+        pos_x: newWorkflowStatusInput.posX,
+        pos_y: newWorkflowStatusInput.posY,
       })
       .into('workflow_connections as wc')
       .returning('*')
@@ -277,46 +285,34 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     );
   }
 
-  async upsertWorkflowStatuses(connections: WorkflowConnection[]) {
-    const dataToInsert = connections.map((connection) => ({
-      workflow_connection_id: connection.id,
-      workflow_id: connection.workflowId,
-      status_id: connection.statusId,
-      next_status_id: connection.nextStatusId,
-      prev_status_id: connection.prevStatusId,
-      sort_order: connection.sortOrder,
-    }));
-
+  async updateWorkflowStatus(connection: WorkflowConnection) {
     const result = await database.raw(
       `? ON CONFLICT (workflow_connection_id)
                   DO UPDATE SET
                   status_id = EXCLUDED.status_id,
                   next_status_id = EXCLUDED.next_status_id,
                   prev_status_id = EXCLUDED.prev_status_id,
-                  sort_order = EXCLUDED.sort_order
+                  sort_order = EXCLUDED.sort_order,
+                  pos_x = EXCLUDED.pos_x,
+                  pos_y = EXCLUDED.pos_y
                 RETURNING *;`,
-      [database('workflow_connections').insert(dataToInsert)]
+      [
+        database('workflow_connections').insert({
+          workflow_connection_id: connection.id,
+          workflow_id: connection.workflowId,
+          status_id: connection.statusId,
+          next_status_id: connection.nextStatusId,
+          prev_status_id: connection.prevStatusId,
+          sort_order: connection.sortOrder,
+          pos_x: connection.posX,
+          pos_y: connection.posY,
+        }),
+      ]
     );
 
-    return result.rows as WorkflowConnectionRecord[];
+    return this.createWorkflowConnectionObject(result.rows[0]);
   }
 
-  async updateWorkflowStatuses(
-    workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnection[]> {
-    const connectionsResult =
-      await this.upsertWorkflowStatuses(workflowStatuses);
-    if (connectionsResult) {
-      // NOTE: Return result as WorkflowConnection[] but do not care about name and description.
-      return connectionsResult.map((connection) =>
-        this.createWorkflowConnectionObject({
-          ...connection,
-        })
-      );
-    } else {
-      return [];
-    }
-  }
   async deleteWorkflowStatus(
     statusId: number,
     workflowId: number,

@@ -24,9 +24,9 @@ export interface WorkflowDataSource {
   addWorkflowStatus(
     newWorkflowStatusInput: Omit<WorkflowConnection, 'id' | 'entityType'>
   ): Promise<WorkflowConnectionWithStatus>;
-  updateWorkflowStatuses(
-    workflowStatuses: WorkflowConnection[]
-  ): Promise<WorkflowConnection[]>;
+  updateWorkflowStatus(
+    workflowStatuses: WorkflowConnection
+  ): Promise<WorkflowConnection>;
   deleteWorkflowStatus(
     statusId: number,
     workflowId: number,
