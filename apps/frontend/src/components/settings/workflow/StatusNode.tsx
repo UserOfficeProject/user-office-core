@@ -46,7 +46,7 @@ interface StatusNodeProps {
 const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
   return (
     <>
-      <StyledHandle type="target" position={Position.Left} />
+      <StyledHandle type="target" position={Position.Top} />
       <Container>
         <Title>
           <Typography variant="subtitle2">{data.status.name}</Typography>
@@ -65,7 +65,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
           {data.status.shortCode} {data.status.description}
         </Description>
       </Container>
-      <StyledHandle type="source" position={Position.Right} />
+      <StyledHandle type="source" position={Position.Bottom} />
     </>
   );
 };

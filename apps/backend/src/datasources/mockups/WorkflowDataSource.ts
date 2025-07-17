@@ -41,8 +41,6 @@ export const dummyWorkflowConnection = new WorkflowConnectionWithStatus(
     entityType: WorkflowType.PROPOSAL,
   },
   null,
-  null,
-  'proposalWorkflowConnections_0',
   null
 );
 
@@ -60,9 +58,7 @@ export const anotherDummyWorkflowConnection = new WorkflowConnectionWithStatus(
     entityType: WorkflowType.PROPOSAL,
   },
   null,
-  1,
-  'proposalWorkflowConnections_0',
-  null
+  1
 );
 
 export const dummyStatusChangingEvent = new StatusChangingEvent(

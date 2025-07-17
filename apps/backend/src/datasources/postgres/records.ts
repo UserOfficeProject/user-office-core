@@ -576,8 +576,6 @@ export interface WorkflowConnectionRecord {
   readonly status_id: number;
   readonly next_status_id: number | null;
   readonly prev_status_id: number | null;
-  readonly droppable_group_id: string;
-  readonly parent_droppable_group_id: string;
 }
 
 export interface StatusChangingEventRecord {

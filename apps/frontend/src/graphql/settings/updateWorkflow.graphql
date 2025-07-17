@@ -5,27 +5,22 @@ mutation updateWorkflow($id: Int!, $name: String!, $description: String!) {
     id
     name
     description
-    workflowConnectionGroups {
-      groupId
-      parentGroupId
-      connections {
+    workflowConnections {
+      id
+      sortOrder
+      workflowId
+      statusId
+      status {
         id
-        sortOrder
-        workflowId
-        statusId
-        status {
-          id
-          name
-          description
-        }
-        nextStatusId
-        prevStatusId
-        droppableGroupId
-        statusChangingEvents {
-          statusChangingEventId
-          workflowConnectionId
-          statusChangingEvent
-        }
+        name
+        description
+      }
+      nextStatusId
+      prevStatusId
+      statusChangingEvents {
+        statusChangingEventId
+        workflowConnectionId
+        statusChangingEvent
       }
     }
   }

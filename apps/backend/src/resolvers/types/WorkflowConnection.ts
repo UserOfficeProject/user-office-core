@@ -39,21 +39,6 @@ export class WorkflowConnection
 
   @Field(() => Int, { nullable: true })
   public prevStatusId: number | null;
-
-  @Field()
-  public droppableGroupId: string;
-}
-
-@ObjectType()
-export class WorkflowConnectionGroup {
-  @Field(() => String)
-  public groupId: string;
-
-  @Field(() => String, { nullable: true })
-  public parentGroupId: string | null;
-
-  @Field(() => [WorkflowConnection])
-  public connections: WorkflowConnection[];
 }
 
 @Resolver(() => WorkflowConnection)

@@ -130,11 +130,7 @@ const WorkflowConnectionsEditor = ({
   };
 
   const isVeryFirstDraftStatus = (workflowConnection: WorkflowConnection) => {
-    return (
-      workflowConnection.sortOrder === 0 &&
-      workflowConnection.droppableGroupId ===
-        `${entityType.toLowerCase()}WorkflowConnections_0`
-    );
+    return workflowConnection.sortOrder === 0;
   };
 
   const getUniqueKey = (workflowConnection: WorkflowConnection) => {
@@ -213,8 +209,7 @@ const WorkflowConnectionsEditor = ({
                                 payload: {
                                   source: {
                                     index,
-                                    droppableId:
-                                      workflowConnection.droppableGroupId,
+                                    droppableId: '',
                                   },
                                 },
                               });

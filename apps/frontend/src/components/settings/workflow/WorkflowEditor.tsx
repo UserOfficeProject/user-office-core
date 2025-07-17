@@ -32,8 +32,10 @@ interface EdgeData {
   targetStatusName: string;
 }
 
-const edgeFactory = (edgeData: Edge<EdgeData> | Connection) => {
-  return {
+const edgeFactory = (
+  edgeData: Edge<EdgeData> | (Connection & { id: string })
+): Edge<EdgeData> => {
+  const base = {
     type: 'floating',
     animated: false,
     markerEnd: {
@@ -42,8 +44,22 @@ const edgeFactory = (edgeData: Edge<EdgeData> | Connection) => {
       height: 20,
     },
     style: { cursor: 'pointer' },
-    ...edgeData,
   };
+
+  // Ensure we have valid source and target
+  if (!edgeData.source || !edgeData.target) {
+    throw new Error('Edge must have source and target');
+  }
+
+  return {
+    ...base,
+    id: edgeData.id,
+    source: edgeData.source,
+    target: edgeData.target,
+    sourceHandle: edgeData.sourceHandle || null,
+    targetHandle: edgeData.targetHandle || null,
+    data: 'data' in edgeData ? edgeData.data : undefined,
+  } as Edge<EdgeData>;
 };
 
 const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
@@ -92,7 +108,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 ...e.data,
                 events: eventIds,
               },
-              label: eventIds.length > 0 ? eventNames : undefined,
+              label: eventIds.length > 0 ? eventIds.join(', ') : undefined,
             };
           }
 
@@ -102,64 +118,69 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     }
   }, [workflowConnection, selectedEdge, setEdges]);
 
-  // Handle status deletion
-  const handleStatusDelete = useCallback(
-    (statusId: string, groupId?: string) => {
-      // Remove the node and connected edges
-      setNodes((nds) => nds.filter((node) => node.id !== statusId));
-      setEdges((eds) =>
-        eds.filter(
-          (edge) => edge.source !== statusId && edge.target !== statusId
-        )
-      );
-
-      // Dispatch action to delete status from workflow model
-      dispatch({
-        type: EventType.DELETE_WORKFLOW_STATUS,
-        payload: {
-          statusId: Number(statusId),
-          groupId,
-        },
-      });
-    },
-    [dispatch, setNodes, setEdges]
-  );
-
   // Convert workflow connections to React Flow nodes and edges when state changes
   React.useEffect(() => {
-    if (
-      !state.workflowConnectionGroups ||
-      state.workflowConnectionGroups.length === 0
-    )
+    if (!state.workflowConnections || state.workflowConnections.length === 0) {
+      setNodes([]);
+      setEdges([]);
+
       return;
+    }
 
     const newNodes: Node[] = [];
     const newEdges: Edge<EdgeData>[] = [];
-    let nodePositionY = 50;
 
-    // Process each group to create nodes and edges
-    state.workflowConnectionGroups.forEach((group) => {
-      let nodePositionX = 250;
+    // Sort connections by sortOrder to maintain proper sequence
+    const sortedConnections = [...state.workflowConnections].sort(
+      (a, b) => a.sortOrder - b.sortOrder
+    );
 
-      group.connections.forEach((connection, index) => {
-        const statusId = connection.status.id.toString();
+    // Create nodes for each connection
+    sortedConnections.forEach((connection, index) => {
+      const statusId = connection.status.id.toString();
+      const nodePositionX = 50 + (index % 4) * 250; // 4 nodes per row
+      const nodePositionY = 50 + Math.floor(index / 4) * 150;
 
-        // Create node for the status
-        newNodes.push({
-          id: statusId,
-          type: 'statusNode',
-          data: {
-            label: connection.status.name,
-            status: connection.status,
-            onDelete: () => handleStatusDelete(statusId, group.groupId),
+      // Create node for the status
+      const newNode = {
+        id: statusId,
+        type: 'statusNode',
+        data: {
+          label: connection.status.name,
+          status: connection.status,
+          onDelete: (deleteStatusId: string) => {
+            // Remove the node and connected edges
+            setNodes((nds) => nds.filter((node) => node.id !== deleteStatusId));
+            setEdges((eds) =>
+              eds.filter(
+                (edge) =>
+                  edge.source !== deleteStatusId &&
+                  edge.target !== deleteStatusId
+              )
+            );
+
+            // Dispatch action to delete status from workflow model
+            dispatch({
+              type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+              payload: {
+                statusId: Number(deleteStatusId),
+              },
+            });
           },
-          position: { x: nodePositionX, y: nodePositionY },
-        });
+        },
+        position: { x: nodePositionX, y: nodePositionY },
+      };
 
-        // If not the first status in the group, create an edge from the previous status
-        if (index > 0) {
-          const prevStatusId =
-            group.connections[index - 1].status.id.toString();
+      newNodes.push(newNode);
+
+      // Create edge from previous status if it exists
+      if (connection.prevStatusId) {
+        const prevStatusId = connection.prevStatusId.toString();
+        const prevConnection = sortedConnections.find(
+          (c) => c.status.id === connection.prevStatusId
+        );
+
+        if (prevConnection) {
           const newEdge = edgeFactory({
             id: `e${prevStatusId}-${statusId}`,
             source: prevStatusId,
@@ -169,50 +190,28 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 connection.statusChangingEvents?.map(
                   (event) => event.statusChangingEvent
                 ) || [],
-              sourceStatusName: group.connections[index - 1].status.name,
+              sourceStatusName: prevConnection.status.name,
               targetStatusName: connection.status.name,
             },
           });
           newEdges.push(newEdge);
         }
-
-        // If there's a parent group and this is the first status, connect from the last status of parent
-        if (index === 0 && group.parentGroupId) {
-          const parentGroup = state.workflowConnectionGroups.find(
-            (g) => g.groupId === group.parentGroupId
-          );
-          if (parentGroup && parentGroup.connections.length > 0) {
-            const parentLastStatus =
-              parentGroup.connections[parentGroup.connections.length - 1]
-                .status;
-            const parentLastStatusId = parentLastStatus.id.toString();
-            const newEdge = edgeFactory({
-              id: `e${parentLastStatusId}-${statusId}`,
-              source: parentLastStatusId,
-              target: statusId,
-              data: {
-                events: connection.previousStatusEvents || [],
-                sourceStatusName: parentLastStatus.name,
-                targetStatusName: connection.status.name,
-              },
-            });
-            newEdges.push(newEdge);
-          }
-        }
-
-        nodePositionX += 200;
-      });
-
-      nodePositionY += 150;
+      }
     });
 
     setNodes(newNodes);
     setEdges(newEdges);
-  }, [state.workflowConnectionGroups, setNodes, setEdges]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.workflowConnections]);
 
   // Handle connecting nodes (adding transitions)
   const onConnect = useCallback(
     (connection: Connection) => {
+      // Validate connection has required properties
+      if (!connection.source || !connection.target) {
+        return;
+      }
+
       // Check if connection already exists
       const connectionExists = edges.some(
         (edge) =>
@@ -241,7 +240,9 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       // Add the connection to the graph
       const newEdge = edgeFactory({
-        ...connection,
+        id: `e${connection.source}-${connection.target}`,
+        source: connection.source,
+        target: connection.target,
         data: {
           events: [], // No events initially
           sourceStatusName: sourceStatus.name,
@@ -251,26 +252,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       setEdges((eds) => addEdge(newEdge, eds));
 
-      // Update the workflow model with the new connection
-      if (sourceStatus && targetStatus) {
-        dispatch({
-          type: EventType.ADD_WORKFLOW_CONNECTION,
-          payload: {
-            sourceStatusId: sourceStatus.id,
-            targetStatusId: targetStatus.id,
-          },
-        });
-
-        // Open the event dialog for the newly created edge
-        const edgeId = `reactflow__edge-${connection.source}-${connection.target}`;
-        setTimeout(() => {
-          const newEdge = edges.find((e) => e.id === edgeId);
-          if (newEdge) {
-            setSelectedEdge(newEdge);
-            setWorkflowConnection(newEdge.data);
-          }
-        }, 100);
-      }
+      // Note: In ReactFlow implementation, we don't need to dispatch ADD_WORKFLOW_CONNECTION
+      // The connection is handled by the visual graph and persisted through other means
     },
     [dispatch, edges, enqueueSnackbar, setEdges, statuses]
   );
@@ -291,18 +274,19 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       if (!sourceStatus || !targetStatus) return;
 
       // Create a WorkflowConnection-like object to pass to the dialog
-      const connection: WorkflowConnection = {
-        id: parseInt(edge.id.replace(/\D/g, '')), // Extract numeric part as ID
+      const connection: any = {
+        id: parseInt(edge.id.replace(/\D/g, '')) || 0,
         workflowId: state.id || 0,
         sortOrder: 0,
-        parentId: null,
         prevProposalStatusId: parseInt(edge.source),
         proposalStatusId: parseInt(edge.target),
         status: targetStatus,
-        statusChangingEvents: (edge.data?.events || []).map((eventId) => ({
-          statusChangingEvent: eventId,
-          workflowConnectionId: 0,
-        })),
+        statusChangingEvents: (edge.data?.events || []).map(
+          (eventId: string) => ({
+            statusChangingEvent: eventId,
+            workflowConnectionId: 0,
+          })
+        ),
         statusActions: [],
       };
 
@@ -354,7 +338,25 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         data: {
           label: status.name,
           status,
-          onDelete: () => handleStatusDelete(statusId),
+          onDelete: (deleteStatusId: string) => {
+            // Remove the node and connected edges
+            setNodes((nds) => nds.filter((node) => node.id !== deleteStatusId));
+            setEdges((eds) =>
+              eds.filter(
+                (edge) =>
+                  edge.source !== deleteStatusId &&
+                  edge.target !== deleteStatusId
+              )
+            );
+
+            // Dispatch action to delete status from workflow model
+            dispatch({
+              type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
+              payload: {
+                statusId: Number(deleteStatusId),
+              },
+            });
+          },
         },
         position,
       };
@@ -368,10 +370,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         payload: {
           statusId: status.id,
           status,
-          sortOrder: nodes.length,
+          sortOrder: 0,
           workflowId: state.id,
-          droppableGroupId: 'WorkflowConnections_0', // Default group
-          parentDroppableGroupId: null,
           nextStatusId: null,
           prevStatusId: null,
         },
@@ -382,10 +382,10 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       statuses,
       nodes,
       setNodes,
+      setEdges,
       dispatch,
       state.id,
       enqueueSnackbar,
-      handleStatusDelete,
     ]
   );
 
@@ -427,7 +427,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           </Grid>
         </LoadingOverlay>
       </StyledPaper>
-
       {/* Status Events and Actions Dialog */}
       {selectedEdge && (
         <StatusEventsAndActionsDialog

@@ -38,9 +38,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.workflow_id,
       workflowConnection.status_id,
       workflowConnection.next_status_id,
-      workflowConnection.prev_status_id,
-      workflowConnection.droppable_group_id,
-      workflowConnection.parent_droppable_group_id
+      workflowConnection.prev_status_id
     );
   }
 
@@ -61,16 +59,13 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         entityType: workflowConnection.entity_type,
       },
       workflowConnection.next_status_id,
-      workflowConnection.prev_status_id,
-      workflowConnection.droppable_group_id,
-      workflowConnection.parent_droppable_group_id
+      workflowConnection.prev_status_id
     );
   }
   async createWorkflow(
     newWorkflowInput: Omit<Workflow, 'id'>
   ): Promise<Workflow> {
     let defaultStatusId: number | null = null;
-    let droppableGroupId: string | null = null;
 
     if (newWorkflowInput.entityType === WorkflowType.PROPOSAL) {
       const defaultProposalStatus = await database()
@@ -81,7 +76,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         .first();
 
       defaultStatusId = defaultProposalStatus?.status_id;
-      droppableGroupId = 'proposalWorkflowConnections_0';
     } else if (newWorkflowInput.entityType === WorkflowType.EXPERIMENT) {
       const defaultExperimentStatus = await database()
         .select('status_id')
@@ -91,18 +85,11 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         .first();
 
       defaultStatusId = defaultExperimentStatus?.status_id;
-      droppableGroupId = 'experimentWorkflowConnections_0';
     }
 
     if (!defaultStatusId) {
       throw new GraphQLError(
         `Could not find default status for ${newWorkflowInput.entityType}`
-      );
-    }
-
-    if (!droppableGroupId) {
-      throw new GraphQLError(
-        `Could not find droppable group id for ${newWorkflowInput.entityType}`
       );
     }
 
@@ -121,10 +108,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
     await this.addWorkflowStatus({
       sortOrder: 0,
-      droppableGroupId: droppableGroupId,
       nextStatusId: null,
       prevStatusId: null,
-      parentDroppableGroupId: null,
       statusId: defaultStatusId,
       workflowId: workflowRecord.workflow_id,
     });
@@ -191,35 +176,19 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       });
   }
   async getWorkflowConnections(
-    workflowId: WorkflowConnection['workflowId'],
-    droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: boolean | undefined
+    workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnectionWithStatus[]> {
-    const andConditionIfDroppableGroupIdDefined = `AND droppable_group_id = '${droppableGroupId}'`;
-    const andConditionIfParentDroppableGroupIdDefined =
-      byParentGroupId &&
-      !!droppableGroupId &&
-      `AND parent_droppable_group_id = '${droppableGroupId}'`;
-    const andWhereCondition =
-      !byParentGroupId && !!droppableGroupId
-        ? andConditionIfDroppableGroupIdDefined
-        : byParentGroupId && !!droppableGroupId
-          ? andConditionIfParentDroppableGroupIdDefined
-          : '';
-
     const getUniqueOrderedWorkflowConnectionsQuery = `
       SELECT * FROM (
-        SELECT DISTINCT ON (wc.status_id, wc.sort_order, wc.droppable_group_id) *
+        SELECT DISTINCT ON (wc.status_id, wc.sort_order) *
         FROM workflow_connections as wc
         LEFT JOIN
           statuses as s
         ON
           s.status_id = wc.status_id
         WHERE workflow_id = ${workflowId}
-        ${andWhereCondition}
       ) t
       ORDER BY
-        droppable_group_id ASC,
         sort_order ASC
     `;
 
@@ -293,9 +262,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         next_status_id: newWorkflowStatusInput.nextStatusId,
         prev_status_id: newWorkflowStatusInput.prevStatusId,
         sort_order: newWorkflowStatusInput.sortOrder,
-        droppable_group_id: newWorkflowStatusInput.droppableGroupId,
-        parent_droppable_group_id:
-          newWorkflowStatusInput.parentDroppableGroupId,
       })
       .into('workflow_connections as wc')
       .returning('*')
@@ -319,8 +285,6 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       next_status_id: connection.nextStatusId,
       prev_status_id: connection.prevStatusId,
       sort_order: connection.sortOrder,
-      droppable_group_id: connection.droppableGroupId,
-      parent_droppable_group_id: connection.parentDroppableGroupId,
     }));
 
     const result = await database.raw(
@@ -329,9 +293,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
                   status_id = EXCLUDED.status_id,
                   next_status_id = EXCLUDED.next_status_id,
                   prev_status_id = EXCLUDED.prev_status_id,
-                  sort_order = EXCLUDED.sort_order,
-                  droppable_group_id = EXCLUDED.droppable_group_id,
-                  parent_droppable_group_id = EXCLUDED.parent_droppable_group_id
+                  sort_order = EXCLUDED.sort_order
                 RETURNING *;`,
       [database('workflow_connections').insert(dataToInsert)]
     );

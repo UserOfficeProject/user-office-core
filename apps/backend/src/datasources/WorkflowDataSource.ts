@@ -14,9 +14,7 @@ export interface WorkflowDataSource {
   updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
   getWorkflowConnections(
-    workflowId: WorkflowConnection['workflowId'],
-    droppableGroupId?: WorkflowConnection['droppableGroupId'],
-    byParentGroupId?: boolean | undefined
+    workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnectionWithStatus[]>;
   getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],

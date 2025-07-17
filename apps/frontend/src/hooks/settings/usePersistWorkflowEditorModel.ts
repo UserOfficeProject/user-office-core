@@ -55,8 +55,6 @@ export function usePersistWorkflowEditorModel() {
     const insertNewStatusInWorkflow = async (
       workflowId: number,
       sortOrder: number,
-      droppableGroupId: string,
-      parentDroppableGroupId: string,
       statusId: number,
       nextStatusId: number,
       prevStatusId: number
@@ -65,8 +63,6 @@ export function usePersistWorkflowEditorModel() {
         .addWorkflowStatus({
           workflowId,
           sortOrder,
-          droppableGroupId,
-          parentDroppableGroupId,
           statusId,
           nextStatusId,
           prevStatusId,
@@ -224,8 +220,6 @@ export function usePersistWorkflowEditorModel() {
             statusId,
             nextStatusId,
             prevStatusId,
-            parentDroppableGroupId,
-            droppableGroupId,
           } = action.payload;
 
           dispatch({
@@ -240,8 +234,6 @@ export function usePersistWorkflowEditorModel() {
               const result = await insertNewStatusInWorkflow(
                 workflowId,
                 sortOrder,
-                droppableGroupId,
-                parentDroppableGroupId,
                 statusId,
                 nextStatusId,
                 prevStatusId
@@ -260,7 +252,7 @@ export function usePersistWorkflowEditorModel() {
               dispatch({
                 type: EventType.WORKFLOW_STATUS_DELETED,
                 payload: {
-                  source: { index: sortOrder, droppableId: droppableGroupId },
+                  source: { index: sortOrder, droppableId: '' },
                 },
               });
             }
