@@ -1,0 +1,9 @@
+mutation assignInstrumentsToTag(
+  $instrumentIds: [Int!]!
+  $tagId: Int!
+) {
+  assignInstrumentsToTag(
+    instrumentIds: $instrumentIds
+    tagId: $tagId
+  )
+}

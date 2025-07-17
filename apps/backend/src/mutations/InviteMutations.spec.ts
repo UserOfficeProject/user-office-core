@@ -292,7 +292,7 @@ describe('Test Invite Mutations', () => {
       .findById((response as Invite[])[0].id)) as Invite;
 
     expect(invite.templateId).toBe(
-      'user-office-registration-invitation-co-proposer'
+      EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
     );
   });
 });

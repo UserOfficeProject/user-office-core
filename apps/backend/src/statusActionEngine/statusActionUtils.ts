@@ -88,12 +88,9 @@ async function stepAnswers(
             Tokens.GenericTemplateDataSource
           );
         const genericTemplates =
-          await genericTemplateDataSource.getGenericTemplates(
-            {
-              filter: { proposalPk: answerProposalPk },
-            },
-            null
-          );
+          await genericTemplateDataSource.getGenericTemplates({
+            filter: { proposalPk: answerProposalPk },
+          });
         const subGenericTemplates = genericTemplates
           .filter(
             (genericTemplate) =>
@@ -537,7 +534,7 @@ export const publishMessageToTheEventBus = async (
 export const statusActionLogger = (args: {
   connectionId: number;
   actionId: number;
-  emailStatusActionRecipient: EmailStatusActionRecipients;
+  emailStatusActionRecipient?: EmailStatusActionRecipients;
   proposalPks: number[];
   statusActionsLogId?: number | null;
 }) => {
@@ -552,6 +549,7 @@ export const statusActionLogger = (args: {
   ) {
     const statusActionsLogsArgs: StatusActionsLogsArgs = {
       ...args,
+      emailStatusActionRecipient: args?.emailStatusActionRecipient,
       statusActionsLogId: args?.statusActionsLogId || null,
       statusActionsSuccessful,
       statusActionsMessage,
