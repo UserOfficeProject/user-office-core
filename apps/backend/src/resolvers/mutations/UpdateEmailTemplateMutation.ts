@@ -16,6 +16,9 @@ export class UpdateEmailTemplateInput {
   @Field(() => Int)
   public id: number;
 
+  @Field(() => Int)
+  public createdByUserId: number;
+
   @Field()
   public name: string;
 

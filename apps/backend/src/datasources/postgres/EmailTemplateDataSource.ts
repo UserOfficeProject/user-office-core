@@ -1,7 +1,6 @@
 import { GraphQLError } from 'graphql';
-import { inject, injectable } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
-import { Tokens } from '../../config/Tokens';
 import { EmailTemplate } from '../../models/EmailTemplate';
 import { EmailTemplatesFilter } from '../../resolvers/queries/EmailTemplatesQuery';
 import { EmailTemplateDataSource } from '../EmailTemplateDataSource';
@@ -12,11 +11,6 @@ import { createEmailTemplateObject, EmailTemplateRecord } from './records';
 export default class PostgresEmailTemplateDataSource
   implements EmailTemplateDataSource
 {
-  constructor(
-    @inject(Tokens.EmailTemplateDataSource)
-    private emailTemplateDataSource: EmailTemplateDataSource
-  ) {}
-
   async getEmailTemplate(id: number): Promise<EmailTemplate | null> {
     return database
       .select()

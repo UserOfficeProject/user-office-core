@@ -34,6 +34,7 @@ export default ({ mode }): UserConfig => {
           return acc;
         }, {}),
       },
+      allowedHosts: ['localhost', 'sajat.eu'],
     },
     resolve: {
       alias: {

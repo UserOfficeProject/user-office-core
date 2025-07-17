@@ -6,6 +6,7 @@ import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthori
 import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/AdminDataSource';
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
+import PostgresEmailTemplateDataSource from '../datasources/postgres/EmailTemplateDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
@@ -124,3 +125,5 @@ mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
 mapClass(Tokens.DownloadService, StfcDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
+
+mapClass(Tokens.EmailTemplateDataSource, PostgresEmailTemplateDataSource);
