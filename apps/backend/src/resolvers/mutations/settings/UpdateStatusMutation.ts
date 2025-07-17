@@ -12,21 +12,27 @@ import { ResolverContext } from '../../../context';
 import { Status } from '../../types/Status';
 
 @InputType()
-export class UpdateStatusInput implements Omit<Status, 'entityType'> {
+export class UpdateStatusInput {
   @Field(() => Int)
   public id: number;
 
   @Field(() => String, { nullable: true })
-  public shortCode: string;
+  public shortCode?: string;
 
-  @Field(() => String)
-  public name: string;
+  @Field(() => String, { nullable: true })
+  public name?: string;
 
-  @Field(() => String)
-  public description: string;
+  @Field(() => String, { nullable: true })
+  public description?: string;
 
   @Field(() => Boolean, { nullable: true })
-  public isDefault: boolean;
+  public isDefault?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public posX?: number;
+
+  @Field(() => Int, { nullable: true })
+  public posY?: number;
 }
 
 @Resolver()
