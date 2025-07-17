@@ -16,6 +16,9 @@ export interface WorkflowDataSource {
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnectionWithStatus[]>;
+  getWorkflowConnection(
+    connectionId: WorkflowConnection['id']
+  ): Promise<WorkflowConnectionWithStatus | null>;
   getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
     statusId: Status['id'],
@@ -26,7 +29,7 @@ export interface WorkflowDataSource {
   ): Promise<WorkflowConnectionWithStatus>;
   updateWorkflowStatus(
     workflowStatuses: WorkflowConnection
-  ): Promise<WorkflowConnection>;
+  ): Promise<WorkflowConnectionWithStatus>;
   deleteWorkflowStatus(
     statusId: number,
     workflowId: number,

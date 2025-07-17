@@ -416,6 +416,21 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 onDrop={onDrop}
                 onDragOver={onDragOver}
                 onEdgeClick={onEdgeClick}
+                onNodeDragStop={(event, node) => {
+                  // Extract statusId from node data
+                  
+                  if (node.data && node.data.status && node.position) {
+                    
+                    dispatch({
+                      type: EventType.UPDATE_WORKFLOW_STATUS_POSITION_REQUESTED,
+                      payload: {
+                        statusId: node.data.status.id,
+                        posX: Math.round(node.position.x),
+                        posY: Math.round(node.position.y),
+                      },
+                    });
+                  }
+                }}
                 reactFlowWrapper={reactFlowWrapper}
               />
             </Grid>

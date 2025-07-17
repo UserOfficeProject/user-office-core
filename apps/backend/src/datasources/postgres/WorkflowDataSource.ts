@@ -209,6 +209,25 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         )
       : [];
   }
+
+  async getWorkflowConnection(
+    connectionId: WorkflowConnection['id']
+  ): Promise<WorkflowConnectionWithStatus | null> {
+    const query = `
+      SELECT wc.*, s.*
+      FROM workflow_connections as wc
+      LEFT JOIN statuses as s ON s.status_id = wc.status_id
+      WHERE wc.workflow_connection_id = ?
+    `;
+
+    const result = await database.raw(query, [connectionId]);
+    const workflowConnection: (WorkflowConnectionRecord & StatusRecord) | null =
+      result.rows[0] || null;
+
+    return workflowConnection
+      ? this.createWorkflowConnectionWithStatusObject(workflowConnection)
+      : null;
+  }
   async getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
     statusId: Status['id'],
@@ -287,30 +306,41 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
 
   async updateWorkflowStatus(connection: WorkflowConnection) {
     const result = await database.raw(
-      `? ON CONFLICT (workflow_connection_id)
-                  DO UPDATE SET
-                  status_id = EXCLUDED.status_id,
-                  next_status_id = EXCLUDED.next_status_id,
-                  prev_status_id = EXCLUDED.prev_status_id,
-                  sort_order = EXCLUDED.sort_order,
-                  pos_x = EXCLUDED.pos_x,
-                  pos_y = EXCLUDED.pos_y
-                RETURNING *;`,
+      `WITH updated AS (
+        INSERT INTO workflow_connections (
+          workflow_connection_id, workflow_id, status_id, next_status_id, 
+          prev_status_id, sort_order, pos_x, pos_y
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (workflow_connection_id)
+        DO UPDATE SET
+          status_id = EXCLUDED.status_id,
+          next_status_id = EXCLUDED.next_status_id,
+          prev_status_id = EXCLUDED.prev_status_id,
+          sort_order = EXCLUDED.sort_order,
+          pos_x = EXCLUDED.pos_x,
+          pos_y = EXCLUDED.pos_y
+        RETURNING *
+      )
+      SELECT wc.*, s.*
+      FROM updated wc
+      LEFT JOIN statuses s ON s.status_id = wc.status_id;`,
       [
-        database('workflow_connections').insert({
-          workflow_connection_id: connection.id,
-          workflow_id: connection.workflowId,
-          status_id: connection.statusId,
-          next_status_id: connection.nextStatusId,
-          prev_status_id: connection.prevStatusId,
-          sort_order: connection.sortOrder,
-          pos_x: connection.posX,
-          pos_y: connection.posY,
-        }),
+        connection.id,
+        connection.workflowId,
+        connection.statusId,
+        connection.nextStatusId,
+        connection.prevStatusId,
+        connection.sortOrder,
+        connection.posX,
+        connection.posY,
       ]
     );
 
-    return this.createWorkflowConnectionObject(result.rows[0]);
+    if (!result.rows[0]) {
+      throw new GraphQLError('Could not update workflow status');
+    }
+
+    return this.createWorkflowConnectionWithStatusObject(result.rows[0]);
   }
 
   async deleteWorkflowStatus(

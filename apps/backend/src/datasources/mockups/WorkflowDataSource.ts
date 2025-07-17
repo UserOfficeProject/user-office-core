@@ -3,6 +3,7 @@ import { StatusChangingEvent } from '../../models/StatusChangingEvent';
 import { Workflow, WorkflowType } from '../../models/Workflow';
 import {
   NextAndPreviousStatuses,
+  WorkflowConnection,
   WorkflowConnectionWithStatus,
 } from '../../models/WorkflowConnections';
 import { AddWorkflowStatusInput } from '../../resolvers/mutations/settings/AddWorkflowStatusMutation';
@@ -102,6 +103,19 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return [dummyWorkflowConnection, anotherDummyWorkflowConnection];
   }
 
+  async getWorkflowConnection(
+    connectionId: number
+  ): Promise<WorkflowConnectionWithStatus | null> {
+    if (connectionId === dummyWorkflowConnection.id) {
+      return dummyWorkflowConnection;
+    }
+    if (connectionId === anotherDummyWorkflowConnection.id) {
+      return anotherDummyWorkflowConnection;
+    }
+
+    return null;
+  }
+
   async getWorkflowConnectionsById(
     workflowId: number,
     workflowConnectionId: number,
@@ -117,7 +131,7 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
   }
 
   async updateWorkflowStatus(
-    workflowStatus: WorkflowConnectionWithStatus
+    workflowStatus: WorkflowConnection
   ): Promise<WorkflowConnectionWithStatus> {
     return dummyWorkflowConnection;
   }

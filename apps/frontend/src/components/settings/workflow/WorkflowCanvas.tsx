@@ -8,6 +8,7 @@ import ReactFlow, {
   EdgeChange,
   Node,
   NodeChange,
+  NodeDragHandler,
   ReactFlowInstance,
 } from 'reactflow';
 
@@ -34,6 +35,7 @@ interface WorkflowCanvasProps {
   onDrop: (event: React.DragEvent) => void;
   onDragOver: (event: React.DragEvent) => void;
   onEdgeClick: (event: React.MouseEvent, edge: Edge) => void;
+  onNodeDragStop?: NodeDragHandler;
   reactFlowWrapper: React.RefObject<HTMLDivElement>;
 }
 
@@ -47,6 +49,7 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   onDrop,
   onDragOver,
   onEdgeClick,
+  onNodeDragStop,
   reactFlowWrapper,
 }) => {
   return (
@@ -61,6 +64,7 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onEdgeClick={onEdgeClick}
+        onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
         fitView
         connectionLineType={ConnectionLineType.SmoothStep}

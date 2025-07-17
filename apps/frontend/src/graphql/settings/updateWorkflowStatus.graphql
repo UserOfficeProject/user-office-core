@@ -1,0 +1,25 @@
+mutation updateWorkflowStatus(
+  $id: Int!
+  $posX: Int
+  $posY: Int
+) {
+  updateWorkflowStatus(
+    updateWorkflowStatusInput: {
+      id: $id
+      posX: $posX
+      posY: $posY
+    }
+  ) {
+    id
+    posX
+    posY
+    workflowId
+    statusId
+    sortOrder
+    nextStatusId
+    prevStatusId
+    status {
+      ...status
+    }
+  }
+}

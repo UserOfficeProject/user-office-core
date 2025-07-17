@@ -174,6 +174,44 @@ export function usePersistWorkflowEditorModel() {
           }
 
           break;
+        case EventType.UPDATE_WORKFLOW_STATUS_POSITION_REQUESTED: {
+          const { statusId, posX, posY } = action.payload;
+
+          // Find the workflow connection to update
+          const workflowConnectionToUpdate = state.workflowConnections.find(
+            (connection) => connection.statusId === statusId
+          );
+
+          console.log( state.workflowConnections, statusId)
+          if (workflowConnectionToUpdate) {
+            return executeAndMonitorCall(async () => {
+              try {
+                const result = await api({
+                  toastSuccessMessage: 'Position updated successfully',
+                })
+                  .updateWorkflowStatus({
+                    id: workflowConnectionToUpdate.id,
+                    posX,
+                    posY,
+                  })
+                  .then((data) => data.updateWorkflowStatus);
+
+                if (result) {
+                  dispatch({
+                    type: EventType.WORKFLOW_STATUS_POSITION_UPDATED,
+                    payload: result,
+                  });
+                }
+
+                return result;
+              } catch (error) {
+                console.error('Failed to update position:', error);
+              }
+            });
+          }
+
+          break;
+        }
         case EventType.ADD_WORKFLOW_STATUS_REQUESTED: {
           const {
             workflowId,

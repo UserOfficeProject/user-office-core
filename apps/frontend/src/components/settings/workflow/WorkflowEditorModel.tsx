@@ -17,6 +17,8 @@ export enum EventType {
   WORKFLOW_STATUS_UPDATED,
   DELETE_WORKFLOW_STATUS_REQUESTED,
   WORKFLOW_STATUS_DELETED,
+  UPDATE_WORKFLOW_STATUS_POSITION_REQUESTED,
+  WORKFLOW_STATUS_POSITION_UPDATED,
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
   ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
@@ -61,6 +63,21 @@ const WorkflowEditorModel = (
         case EventType.WORKFLOW_STATUS_DELETED:
           // For ReactFlow, we don't use the old group system
           return draft;
+        case EventType.UPDATE_WORKFLOW_STATUS_POSITION_REQUESTED:
+          // Position update request will be handled by middleware
+          return draft;
+        case EventType.WORKFLOW_STATUS_POSITION_UPDATED: {
+          // Update the workflowConnection with new position
+          const updatedConnection = action.payload;
+          const connectionIndex = draft.workflowConnections.findIndex(
+            (conn) => conn.id === updatedConnection.id
+          );
+          if (connectionIndex !== -1) {
+            draft.workflowConnections[connectionIndex] = updatedConnection;
+          }
+
+          return draft;
+        }
         case EventType.WORKFLOW_METADATA_UPDATED: {
           return { ...draft, ...action.payload };
         }

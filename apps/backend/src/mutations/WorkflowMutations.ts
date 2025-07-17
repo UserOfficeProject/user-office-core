@@ -27,6 +27,7 @@ import { AddWorkflowStatusInput } from '../resolvers/mutations/settings/AddWorkf
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
+import { UpdateWorkflowStatusInput } from '../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 
 @injectable()
@@ -81,6 +82,47 @@ export default class WorkflowMutations {
       return await this.dataSource.addWorkflowStatus(args);
     } catch (error) {
       return rejection('Could not add workflow status', { agent, args }, error);
+    }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async updateWorkflowStatus(
+    agent: UserWithRole | null,
+    args: UpdateWorkflowStatusInput
+  ): Promise<WorkflowConnection | Rejection> {
+    try {
+      // Get the current workflow connection
+      const currentConnection = await this.dataSource.getWorkflowConnection(
+        args.id
+      );
+      
+      if (!currentConnection) {
+        return rejection(
+          'Workflow connection not found',
+          { agent, args },
+          new Error('Connection not found')
+        );
+      }
+
+      // Create updated connection object
+      const updatedConnection = new WorkflowConnection(
+        currentConnection.id,
+        currentConnection.sortOrder,
+        currentConnection.workflowId,
+        currentConnection.statusId,
+        currentConnection.nextStatusId,
+        currentConnection.prevStatusId,
+        args.posX ?? currentConnection.posX,
+        args.posY ?? currentConnection.posY
+      );
+
+      return await this.dataSource.updateWorkflowStatus(updatedConnection);
+    } catch (error) {
+      return rejection(
+        'Could not update workflow status',
+        { agent, args },
+        error
+      );
     }
   }
 
