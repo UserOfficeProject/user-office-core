@@ -136,10 +136,11 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     );
 
     // Create nodes for each connection
-    sortedConnections.forEach((connection, index) => {
+    sortedConnections.forEach((connection) => {
       const statusId = connection.status.id.toString();
-      const nodePositionX = 50 + (index % 4) * 250; // 4 nodes per row
-      const nodePositionY = 50 + Math.floor(index / 4) * 150;
+      // Use database coordinates if available, otherwise fall back to grid layout
+      const nodePositionX = connection.posX;
+      const nodePositionY = connection.posY;
 
       // Create node for the status
       const newNode = {
@@ -418,9 +419,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 onEdgeClick={onEdgeClick}
                 onNodeDragStop={(event, node) => {
                   // Extract statusId from node data
-                  
+
                   if (node.data && node.data.status && node.position) {
-                    
                     dispatch({
                       type: EventType.UPDATE_WORKFLOW_STATUS_POSITION_REQUESTED,
                       payload: {
