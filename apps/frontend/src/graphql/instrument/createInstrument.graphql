@@ -4,6 +4,7 @@ mutation createInstrument(
   $description: String!
   $managerUserId: Int!
   $selectable: Boolean
+  $multipleTechReviewsEnabled: Boolean
 ) {
   createInstrument(
     name: $name
@@ -11,6 +12,7 @@ mutation createInstrument(
     description: $description
     managerUserId: $managerUserId
     selectable: $selectable
+    multipleTechReviewsEnabled: $multipleTechReviewsEnabled
   ) {
     ...instrument
   }
