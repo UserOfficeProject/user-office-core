@@ -38,7 +38,7 @@ interface StatusNodeProps {
   data: {
     label: string;
     status: Status;
-    onDelete: () => void;
+    onDelete: (statusId: string) => void;
   };
   selected: boolean;
 }
@@ -54,7 +54,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
             size="small"
             onClick={(e) => {
               e.stopPropagation();
-              data.onDelete();
+              data.onDelete(data.status.id.toString());
             }}
             title="Delete status"
           >

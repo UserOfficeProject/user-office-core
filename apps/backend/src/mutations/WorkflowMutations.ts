@@ -1,6 +1,5 @@
 import {
   addStatusActionsToConnectionValidationSchema,
-  addWorkflowStatusValidationSchema,
   createWorkflowValidationSchema,
   deleteWorkflowStatusValidationSchema,
   deleteWorkflowValidationSchema,
@@ -75,7 +74,6 @@ export default class WorkflowMutations {
     });
   }
 
-  @ValidateArgs(addWorkflowStatusValidationSchema)
   @Authorized([Roles.USER_OFFICER])
   async addWorkflowStatus(
     agent: UserWithRole | null,

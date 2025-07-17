@@ -182,13 +182,10 @@ export function usePersistWorkflowEditorModel() {
             payload: action.payload,
           });
 
-          const groupToRemoveFrom = state.workflowConnectionGroups.find(
-            (workflowConnectionGroup) =>
-              workflowConnectionGroup.groupId ===
-              action.payload.source.droppableId
+          // Find the workflow connection to remove based on statusId
+          const workflowConnectionToRemove = state.workflowConnections.find(
+            (connection) => connection.statusId === action.payload.statusId
           );
-          const workflowConnectionToRemove =
-            groupToRemoveFrom?.connections[action.payload.source.index];
 
           if (workflowConnectionToRemove) {
             return executeAndMonitorCall(async () => {
@@ -205,7 +202,6 @@ export function usePersistWorkflowEditorModel() {
                   type: EventType.WORKFLOW_STATUS_ADDED,
                   payload: {
                     ...workflowConnectionToRemove,
-                    source: action.payload.source,
                   },
                 });
               }
