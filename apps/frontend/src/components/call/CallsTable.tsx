@@ -384,6 +384,9 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
 
       {isCallReorderMode && (
         <div>
+          <Typography variant="h6" component="h2">
+            Drag to order calls
+          </Typography>
           <Paper>
             <CallReorder
               items={calls.sort((a, b) =>
