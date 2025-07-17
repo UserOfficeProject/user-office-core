@@ -41,7 +41,7 @@ describe('essEmailHandler', () => {
     jest.clearAllMocks();
   });
 
-  describe('Event.INVITE_ACCEPTED', () => {
+  describe('handling INVITE_ACCEPTED event', () => {
     it('should send co-proposer invite accepted email when invite is accepted', async () => {
       const mockInvite = new Invite(
         1,
@@ -131,8 +131,6 @@ describe('essEmailHandler', () => {
         EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED
       );
 
-      // Temporarily modify the proposal data to simulate proposal not found
-      const originalGet = proposalDataSourceMock.get;
       proposalDataSourceMock.get = jest.fn().mockResolvedValue(null);
 
       const event: ApplicationEvent = {
@@ -147,9 +145,6 @@ describe('essEmailHandler', () => {
       await essEmailHandler(event);
 
       expect(sendMailsSpy).not.toHaveBeenCalled();
-
-      // Restore original method
-      proposalDataSourceMock.get = originalGet;
     });
   });
 });
