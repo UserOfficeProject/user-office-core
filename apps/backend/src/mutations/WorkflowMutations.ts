@@ -3,7 +3,6 @@ import {
   createWorkflowValidationSchema,
   deleteWorkflowStatusValidationSchema,
   deleteWorkflowValidationSchema,
-  moveWorkflowStatusValidationSchema,
   updateWorkflowValidationSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
@@ -27,7 +26,6 @@ import { AddStatusChangingEventsToConnectionInput } from '../resolvers/mutations
 import { AddWorkflowStatusInput } from '../resolvers/mutations/settings/AddWorkflowStatusMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { DeleteWorkflowStatusInput } from '../resolvers/mutations/settings/DeleteWorkflowStatusMutation';
-import { MoveWorkflowStatusInput } from '../resolvers/mutations/settings/MoveWorkflowStatusMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 
@@ -104,29 +102,6 @@ export default class WorkflowMutations {
           error
         );
       });
-  }
-
-  // NOTE: Moving statuses inside workflow is not enabled at the moment so this is not used at all. I keep it if we deceide to use this feature later.
-  @ValidateArgs(moveWorkflowStatusValidationSchema)
-  @Authorized([Roles.USER_OFFICER])
-  async moveWorkflowStatus(
-    agent: UserWithRole | null,
-    args: MoveWorkflowStatusInput
-  ): Promise<WorkflowConnection | Rejection> {
-    try {
-      // Simplified implementation for flat structure
-      const allWorkflowConnections =
-        await this.dataSource.getWorkflowConnections(args.workflowId);
-
-      // For now, just return the first connection as a placeholder
-      return allWorkflowConnections[0] || ({ id: 1 } as WorkflowConnection);
-    } catch (error) {
-      return rejection(
-        'Could not move workflow status',
-        { agent, args },
-        error
-      );
-    }
   }
 
   @ValidateArgs(deleteWorkflowStatusValidationSchema)

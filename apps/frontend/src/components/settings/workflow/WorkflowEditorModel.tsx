@@ -3,7 +3,7 @@ import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Workflow, WorkflowConnection, WorkflowType } from 'generated/sdk';
+import { Workflow, WorkflowType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
   useReducerWithMiddleWares,
@@ -17,8 +17,6 @@ export enum EventType {
   WORKFLOW_STATUS_UPDATED,
   DELETE_WORKFLOW_STATUS_REQUESTED,
   WORKFLOW_STATUS_DELETED,
-  REORDER_WORKFLOW_STATUS_REQUESTED,
-  REORDER_WORKFLOW_STATUS_FAILED,
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
   ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
@@ -60,12 +58,6 @@ const WorkflowEditorModel = (
           // For ReactFlow, we don't need to update workflowConnections here
           return draft;
         }
-        case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
-          // For ReactFlow, we don't use the old reorder system
-          return draft;
-        case EventType.REORDER_WORKFLOW_STATUS_FAILED:
-          // For ReactFlow, we don't use the old reorder system
-          return draft;
         case EventType.WORKFLOW_STATUS_DELETED:
           // For ReactFlow, we don't use the old group system
           return draft;

@@ -59,11 +59,11 @@ const TransitionEventDialog: React.FC<TransitionEventDialogProps> = ({
 
   const handleAddNewEvent = () => {
     if (!newEventName.trim()) return;
-    
+
     // In a real implementation, you would save the new event to your backend
     // and get back an ID. For now, we'll create a temporary ID
     const newEventId = `new-event-${Date.now()}`;
-    
+
     // Add the new event to selected events
     setLocalSelectedEvents((prev) => [...prev, newEventId]);
     setNewEventName('');
@@ -77,18 +77,17 @@ const TransitionEventDialog: React.FC<TransitionEventDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        Configure Transition Events
-      </DialogTitle>
+      <DialogTitle>Configure Transition Events</DialogTitle>
       <DialogContent>
         <Typography variant="subtitle1" gutterBottom>
-          From: <strong>{sourceStatus}</strong> To: <strong>{targetStatus}</strong>
+          From: <strong>{sourceStatus}</strong> To:{' '}
+          <strong>{targetStatus}</strong>
         </Typography>
-        
+
         <Typography variant="subtitle2" sx={{ mt: 2 }}>
           Select events that can trigger this transition:
         </Typography>
-        
+
         {availableEvents.map((event) => (
           <FormControlLabel
             key={event.id}
@@ -111,11 +110,11 @@ const TransitionEventDialog: React.FC<TransitionEventDialogProps> = ({
             }
           />
         ))}
-        
+
         <Typography variant="subtitle2" sx={{ mt: 3 }}>
           Add a new event:
         </Typography>
-        
+
         <TextField
           label="Event Name"
           value={newEventName}
@@ -125,7 +124,7 @@ const TransitionEventDialog: React.FC<TransitionEventDialogProps> = ({
           variant="outlined"
           size="small"
         />
-        
+
         <TextField
           label="Event Description (optional)"
           value={newEventDescription}
@@ -137,7 +136,7 @@ const TransitionEventDialog: React.FC<TransitionEventDialogProps> = ({
           multiline
           rows={2}
         />
-        
+
         <Button
           variant="outlined"
           color="primary"

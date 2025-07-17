@@ -6,7 +6,6 @@ import {
 } from 'components/settings/workflow/WorkflowEditorModel';
 import {
   ConnectionHasActionsInput,
-  IndexWithGroupId,
   WorkflowConnection,
   Workflow,
 } from 'generated/sdk';
@@ -68,22 +67,6 @@ export function usePersistWorkflowEditorModel() {
           prevStatusId,
         })
         .then((data) => data.addWorkflowStatus);
-    };
-
-    const reorderStatusesInWorkflow = async (
-      from: IndexWithGroupId,
-      to: IndexWithGroupId,
-      workflowId: number
-    ) => {
-      return api({
-        toastSuccessMessage: 'Workflow statuses reordered successfully',
-      })
-        .moveWorkflowStatus({
-          from,
-          to,
-          workflowId,
-        })
-        .then((data) => data.moveWorkflowStatus);
     };
 
     const deleteWorkflowStatus = async (
@@ -154,28 +137,6 @@ export function usePersistWorkflowEditorModel() {
             return result;
           });
         }
-        case EventType.REORDER_WORKFLOW_STATUS_REQUESTED:
-          const { source, destination } = action.payload;
-
-          return executeAndMonitorCall(async () => {
-            try {
-              const result = await reorderStatusesInWorkflow(
-                source,
-                destination,
-                state.id
-              );
-
-              return result;
-            } catch (error) {
-              dispatch({
-                type: EventType.REORDER_WORKFLOW_STATUS_FAILED,
-                payload: {
-                  source: destination,
-                  destination: source,
-                },
-              });
-            }
-          });
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
           dispatch({
             type: EventType.WORKFLOW_STATUS_DELETED,

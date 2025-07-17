@@ -274,12 +274,13 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       if (!sourceStatus || !targetStatus) return;
 
       // Create a WorkflowConnection-like object to pass to the dialog
-      const connection: any = {
+      const connection: WorkflowConnection = {
         id: parseInt(edge.id.replace(/\D/g, '')) || 0,
         workflowId: state.id || 0,
         sortOrder: 0,
-        prevProposalStatusId: parseInt(edge.source),
-        proposalStatusId: parseInt(edge.target),
+        prevStatusId: parseInt(edge.source),
+        nextStatusId: parseInt(edge.target),
+        statusId: parseInt(edge.target),
         status: targetStatus,
         statusChangingEvents: (edge.data?.events || []).map(
           (eventId: string) => ({
@@ -430,7 +431,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       {/* Status Events and Actions Dialog */}
       {selectedEdge && (
         <StatusEventsAndActionsDialog
-          workflowConnection={workflowConnection as any}
+          workflowConnection={workflowConnection}
           setWorkflowConnection={setWorkflowConnection}
           dispatch={dispatch}
           isLoading={isLoading}

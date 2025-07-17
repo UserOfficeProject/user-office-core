@@ -576,6 +576,8 @@ export interface WorkflowConnectionRecord {
   readonly status_id: number;
   readonly next_status_id: number | null;
   readonly prev_status_id: number | null;
+  readonly pos_x: number;
+  readonly pos_y: number;
 }
 
 export interface StatusChangingEventRecord {

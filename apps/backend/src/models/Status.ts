@@ -23,8 +23,6 @@ export class Status {
     public name: string,
     public description: string,
     public isDefault: boolean,
-    public entityType: WorkflowType,
-    public posX?: number,
-    public posY?: number
+    public entityType: WorkflowType
   ) {}
 }

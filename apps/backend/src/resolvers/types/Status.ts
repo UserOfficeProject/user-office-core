@@ -22,10 +22,4 @@ export class Status implements Partial<StatusOrigin> {
 
   @Field(() => WorkflowType)
   public entityType: WorkflowType;
-
-  @Field(() => Int, { nullable: true })
-  public posX?: number;
-
-  @Field(() => Int, { nullable: true })
-  public posY?: number;
 }
