@@ -15,6 +15,7 @@ import TemplateDataSource from '../../datasources/postgres/TemplateDataSource';
 import { AllocationTimeUnits, Call as CallOrigin } from '../../models/Call';
 import { Fap } from './Fap';
 import { InstrumentWithAvailabilityTime } from './Instrument';
+import { Tag } from './Tag';
 import { Template } from './Template';
 import { Workflow } from './Workflow';
 
@@ -149,6 +150,11 @@ export class CallInstrumentsResolver {
     const endCallInternal = new Date(call.endCallInternal);
 
     return startCall <= now && endCallInternal >= now;
+  }
+
+  @FieldResolver(() => Tag)
+  async tags(@Root() call: Call, @Ctx() context: ResolverContext) {
+    return context.queries.tag.dataSource.getCallsTags(call.id);
   }
 }
 

@@ -603,13 +603,12 @@ const FapProposalsAndAssignmentsTable = ({
       onClick: handleAssignMembersToFapProposals,
       position: 'toolbarOnSelect',
     });
-  hasRightToAssignReviewers &&
-    tableActions.push({
-      icon: () => <GetAppIcon data-cy="download-fap-proposals" />,
-      tooltip: 'Download proposals',
-      onClick: handleBulkDownloadClick,
-      position: 'toolbarOnSelect',
-    });
+  tableActions.push({
+    icon: () => <GetAppIcon data-cy="download-fap-proposals" />,
+    tooltip: 'Download proposals',
+    onClick: handleBulkDownloadClick,
+    position: 'toolbarOnSelect',
+  });
   hasRightToRemoveAssignedProposal &&
     tableActions.push({
       icon: () => <DeleteOutline data-cy="remove-assigned-fap-proposal" />,

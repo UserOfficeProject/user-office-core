@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -9,10 +10,16 @@ import { Authorized } from '../decorators';
 import { Proposal } from '../models/Proposal';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
+import { StatusActionType } from '../models/StatusAction';
 import { StatusActionsLog } from '../models/StatusActionsLog';
 import { UserWithRole } from '../models/User';
+import {
+  ReplayStatusActionsLogsResult,
+  ReplayStatusLogFailure,
+} from '../resolvers/mutations/ReplayStatusActionsLogMutation';
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 import { emailActionHandler } from '../statusActionEngine/emailActionHandler';
+import { proposalDownloadActionHandler } from '../statusActionEngine/proposalDownloadActionHandler';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 
 @injectable()
@@ -103,12 +110,33 @@ export default class StatusActionsLogsMutations {
       );
     }
 
-    emailActionHandler(statusAction, workflowEngineProposals, {
-      statusActionsLogId: statusActionsLog.statusActionsLogId,
-      loggedInUserId: agent?.id,
-      statusActionRecipients:
-        statusActionsLog.emailStatusActionRecipient as EmailStatusActionRecipients,
-    });
+    switch (statusAction.type) {
+      case StatusActionType.EMAIL:
+        await emailActionHandler(statusAction, workflowEngineProposals, {
+          statusActionsLogId: statusActionsLog.statusActionsLogId,
+          loggedInUserId: agent?.id,
+          statusActionRecipients:
+            statusActionsLog.emailStatusActionRecipient as EmailStatusActionRecipients,
+        });
+
+        break;
+      case StatusActionType.PROPOSALDOWNLOAD:
+        await proposalDownloadActionHandler(
+          statusAction,
+          workflowEngineProposals,
+          {
+            statusActionsLogId: statusActionsLog.statusActionsLogId,
+            loggedInUserId: agent?.id,
+          }
+        );
+
+        break;
+      default:
+        return rejection('Status action type does not support replay', {
+          statusActionsLog,
+          statusAction,
+        });
+    }
 
     return true;
   }
@@ -118,6 +146,11 @@ export default class StatusActionsLogsMutations {
     agent: UserWithRole | null,
     statusActionsLogId: number
   ): Promise<boolean | Rejection> {
+    logger.logInfo(`Replaying status action log: ${statusActionsLogId}`, {
+      agent,
+      statusActionsLogId,
+    });
+
     const statusActionsLog =
       await this.statusActionsLogsDataSource.getStatusActionsLog(
         statusActionsLogId
@@ -130,6 +163,43 @@ export default class StatusActionsLogsMutations {
       });
     }
 
-    return this.executeStatusActionsLog(statusActionsLog, agent);
+    return await this.executeStatusActionsLog(statusActionsLog, agent);
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async replayStatusActionsLogs(
+    agent: UserWithRole | null,
+    statusActionsLogIds: number[]
+  ): Promise<ReplayStatusActionsLogsResult> {
+    const successful: number[] = [];
+    const failed: ReplayStatusLogFailure[] = [];
+
+    logger.logInfo(
+      `Starting replay of ${statusActionsLogIds.length} status action logs.`,
+      {}
+    );
+
+    for (const logId of statusActionsLogIds) {
+      const result = await this.replayStatusActionsLog(agent, logId);
+
+      if (result instanceof Rejection) {
+        failed.push({ logId, error: result.message });
+      } else {
+        successful.push(logId);
+      }
+    }
+
+    const results: ReplayStatusActionsLogsResult = {
+      totalRequested: statusActionsLogIds.length,
+      successful,
+      failed,
+    };
+
+    logger.logInfo(
+      `Completed replay of ${statusActionsLogIds.length} status action logs. Successful: ${results.successful.length}. Failed: ${results.failed.length}.`,
+      { results }
+    );
+
+    return results;
   }
 }

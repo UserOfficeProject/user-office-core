@@ -32,6 +32,8 @@ export type RowObj = {
   timeRequested?: number;
   reviews?: (string | number)[][] | null;
   piCountry?: string | null;
+  piOrg?: string | null;
+  accessRoute?: string | null;
 };
 
 const fapDataRow = container.resolve<typeof getDataRow | typeof getStfcDataRow>(
