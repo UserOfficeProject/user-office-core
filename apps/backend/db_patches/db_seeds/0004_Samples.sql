@@ -8,15 +8,15 @@ BEGIN
 	
 INSERT INTO public.topics(
 	 topic_title, is_enabled, sort_order, template_id)
-	VALUES ('New sample', true, 0, 6);
+	VALUES ('New sample', true, 0, 7);
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_basis', 6, 6, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('sample_basis', 7, 7, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
 	
 INSERT INTO public.questions(
 	question_id, data_type, question, default_config, created_at, updated_at, natural_key, category_id)
-	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":6,"esiTemplateId":5,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":""}',
+	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":7,"esiTemplateId":6,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":""}',
 			'2021-07-20 13:53:29.246687+00', '2021-07-20 13:53:29.246687+00', 'sample_declaration_question', 1);
 	
 INSERT INTO public.topics(
@@ -25,11 +25,11 @@ INSERT INTO public.topics(
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_declaration_question', 1, 7, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":6,"esiTemplateId":5,"small_label":"","required":false,"minEntries":null,"maxEntries":null}', 'AND');
+	VALUES ('sample_declaration_question', 1, 8, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":7,"esiTemplateId":6,"small_label":"","required":false,"minEntries":null,"maxEntries":null}', 'AND');
 
 INSERT INTO public.questionaries(
 	template_id, created_at, creator_id)
-	VALUES ( 6, '2021-07-20 13:59:08.597908+00', 2);
+	VALUES ( 7, '2021-07-20 13:59:08.597908+00', 2);
 	
 INSERT INTO public.samples(
 	title, creator_id, questionary_id, safety_status, created_at, safety_comment, proposal_pk, question_id, shipment_id)
@@ -37,7 +37,7 @@ INSERT INTO public.samples(
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)
-	VALUES (4, 6, true);
+	VALUES (4, 7, true);
 	
 INSERT INTO public.topic_completenesses(
 	questionary_id, topic_id, is_complete)

@@ -54,7 +54,7 @@ export default {
     id: 1,
     name: 'default template',
     topic: {
-      id: 7,
+      id: 8,
       title: 'Topic title',
     },
   },

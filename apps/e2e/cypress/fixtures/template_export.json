@@ -48,7 +48,7 @@
             },
             {
                 "topic": {
-                    "id": 7,
+                    "id": 8,
                     "title": "Topic title",
                     "templateId": 1,
                     "sortOrder": 1,
@@ -65,21 +65,21 @@
                             "config": {
                                 "addEntryButtonLabel": "Add",
                                 "templateCategory": "SAMPLE_DECLARATION",
-                                "templateId": 6,
-                                "esiTemplateId": 5,
+                                "templateId": 7,
+                                "esiTemplateId": 6,
                                 "small_label": "",
                                 "required": false,
                                 "maxEntries": null,
                                 "minEntries": null
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 0,
                         "config": {
                             "addEntryButtonLabel": "Add",
                             "templateCategory": "SAMPLE_DECLARATION",
-                            "templateId": 6,
-                            "esiTemplateId": 5,
+                            "templateId": 7,
+                            "esiTemplateId": 6,
                             "small_label": "",
                             "required": false,
                             "maxEntries": null,
@@ -118,7 +118,7 @@
                                 "numberValueConstraint": null
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 2,
                         "config": {
                             "small_label": "",
@@ -158,7 +158,7 @@
                                 "tooltip": ""
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 3,
                         "config": {
                             "small_label": "",
@@ -190,7 +190,7 @@
                                 ]
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 4,
                         "config": {
                             "small_label": "",
@@ -223,7 +223,7 @@
                                 "includeTime": false
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 5,
                         "config": {
                             "small_label": "",
@@ -254,7 +254,7 @@
                                 ]
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 6,
                         "config": {
                             "small_label": "",
@@ -291,7 +291,7 @@
                                 "isMultipleSelect": true
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 6,
                         "config": {
                             "small_label": "",
@@ -326,7 +326,7 @@
                                 "apiCallRequestHeaders": []
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 6,
                         "config": {
                             "required": false,
@@ -362,7 +362,7 @@
                                 ]
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 6,
                         "config": {
                             "small_label": "",
@@ -400,7 +400,7 @@
                                 "isCounterHidden": false
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 7,
                         "config": {
                             "required": false,
@@ -438,7 +438,7 @@
                                 "omitFromPdf": false
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 8,
                         "config": {
                             "small_label": "",
@@ -471,7 +471,7 @@
                                 "allowImages": false
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 8,
                         "config": {
                             "required": false,
@@ -499,7 +499,7 @@
                                 "small_label": ""
                             }
                         },
-                        "topicId": 7,
+                        "topicId": 8,
                         "sortOrder": 9,
                         "config": {
                             "html": "",
@@ -537,8 +537,8 @@
                 "config": {
                     "addEntryButtonLabel": "Add",
                     "templateCategory": "SAMPLE_DECLARATION",
-                    "templateId": 6,
-                    "esiTemplateId": 5,
+                    "templateId": 7,
+                    "esiTemplateId": 6,
                     "small_label": "",
                     "required": false,
                     "maxEntries": null,
@@ -767,7 +767,7 @@
         "subTemplates": [
             {
                 "template": {
-                    "templateId": 6,
+                    "templateId": 7,
                     "groupId": "SAMPLE",
                     "name": "default sample template",
                     "description": "default sample template",
@@ -776,9 +776,9 @@
                 "templateSteps": [
                     {
                         "topic": {
-                            "id": 6,
+                            "id": 7,
                             "title": "New sample",
-                            "templateId": 6,
+                            "templateId": 7,
                             "sortOrder": 0,
                             "isEnabled": true
                         },
@@ -797,7 +797,7 @@
                                         "small_label": ""
                                     }
                                 },
-                                "topicId": 6,
+                                "topicId": 7,
                                 "sortOrder": 0,
                                 "config": {
                                     "titlePlaceholder": "Title",
