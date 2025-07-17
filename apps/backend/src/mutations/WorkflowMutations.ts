@@ -110,8 +110,8 @@ export default class WorkflowMutations {
         currentConnection.sortOrder,
         currentConnection.workflowId,
         currentConnection.statusId,
-        currentConnection.nextStatusId,
-        currentConnection.prevStatusId,
+        args.nextStatusId ?? currentConnection.nextStatusId,
+        args.prevStatusId ?? currentConnection.prevStatusId,
         args.posX ?? currentConnection.posX,
         args.posY ?? currentConnection.posY
       );

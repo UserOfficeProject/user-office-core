@@ -253,8 +253,28 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       setEdges((eds) => addEdge(newEdge, eds));
 
-      // Note: In ReactFlow implementation, we don't need to dispatch ADD_WORKFLOW_CONNECTION
-      // The connection is handled by the visual graph and persisted through other means
+      // Dispatch update events to persist the connection in the database
+      // We need to update BOTH nodes: source gets nextStatusId, target gets prevStatusId
+      
+      // Update source node (A) - set its nextStatusId to target (B)
+      dispatch({
+        type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
+        payload: {
+          statusId: connection.source, // Update the source status
+          nextStatusId: parseInt(connection.target), // Set the next status
+        },
+      });
+
+      // Update target node (B) - set its prevStatusId to source (A)
+      dispatch({
+        type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
+        payload: {
+          statusId: connection.target, // Update the target status
+          prevStatusId: parseInt(connection.source), // Set the previous status
+        },
+      });
+
+      // Note: Connection is persisted by updating both source and target statuses
     },
     [dispatch, edges, enqueueSnackbar, setEdges, statuses]
   );
@@ -422,7 +442,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
                   if (node.data && node.data.status && node.position) {
                     dispatch({
-                      type: EventType.UPDATE_WORKFLOW_STATUS_POSITION_REQUESTED,
+                      type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
                       payload: {
                         statusId: node.data.status.id,
                         posX: Math.round(node.position.x),

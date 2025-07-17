@@ -2,12 +2,16 @@ mutation updateWorkflowStatus(
   $id: Int!
   $posX: Int
   $posY: Int
+  $prevStatusId: Int
+  $nextStatusId: Int
 ) {
   updateWorkflowStatus(
     updateWorkflowStatusInput: {
       id: $id
       posX: $posX
       posY: $posY
+      prevStatusId: $prevStatusId
+      nextStatusId: $nextStatusId
     }
   ) {
     id

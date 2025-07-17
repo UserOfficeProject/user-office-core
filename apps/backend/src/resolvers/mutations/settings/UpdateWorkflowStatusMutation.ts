@@ -21,6 +21,12 @@ export class UpdateWorkflowStatusInput {
 
   @Field(() => Int, { nullable: true })
   public posY?: number;
+
+  @Field(() => Int, { nullable: true })
+  public prevStatusId?: number;
+
+  @Field(() => Int, { nullable: true })
+  public nextStatusId?: number;
 }
 
 @Resolver()
