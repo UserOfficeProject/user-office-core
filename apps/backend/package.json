@@ -73,7 +73,7 @@
     "luxon": "^3.4.4",
     "magic-bytes.js": "^1.10.0",
     "muhammara": "^5.3.0",
-    "multer": "^1.4.4",
+    "multer": "^2.0.2",
     "openapi-typescript-codegen": "^0.29.0",
     "openid-client": "^5.6.4",
     "pg": "^8.11.5",
