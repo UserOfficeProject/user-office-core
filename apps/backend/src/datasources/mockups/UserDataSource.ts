@@ -28,7 +28,7 @@ export const basicDummyUser = new BasicUserDetails(
   false,
   'test@email.com',
   '',
-  'Mr'
+  ''
 );
 
 export const basicDummyUserNotOnProposal = new BasicUserDetails(
@@ -43,7 +43,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   false,
   'test@email.com',
   '',
-  'Mr'
+  ''
 );
 
 export const dummyUserOfficer = new User(
@@ -300,7 +300,7 @@ export class UserDataSourceMock implements UserDataSource {
       false,
       'test@email.com',
       '',
-      'Mr'
+      ''
     );
   }
 
