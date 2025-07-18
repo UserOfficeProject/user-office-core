@@ -4,12 +4,11 @@ import i18n from 'i18n';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { BasicUserDetails, UserRole } from 'generated/sdk';
-import { Technique } from 'generated/sdk';
+import { BasicUserDetails, TechniqueFragment, UserRole } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
 import { tableIcons } from 'utils/materialIcons';
 type AssignedScientistsTableProps = {
-  technique: Technique;
+  technique: TechniqueFragment;
   removeScientistFromTechnique: (
     scientistId: number,
     techniqueId: number

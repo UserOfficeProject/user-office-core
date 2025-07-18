@@ -60,6 +60,7 @@ describe('Test Instrument Mutations', () => {
       description: 'Test instrument description',
       managerUserId: 1,
       selectable: true,
+      multipleTechReviewsEnabled: false,
     };
 
     return expect(
@@ -76,6 +77,7 @@ describe('Test Instrument Mutations', () => {
       managerUserId: 1,
       updateTechReview: true,
       selectable: true,
+      multipleTechReviewsEnabled: false,
     };
 
     return expect(
