@@ -731,17 +731,24 @@ export const collectProposalPregeneratedPdfData = async (
       }_${proposal.created.getUTCFullYear()}.pdf`
     );
 
+    logger.logInfo(`Pregenerated PDF found for proposal PK ${proposalPk}`, {
+      proposalPk: proposal.primaryKey,
+      proposalId: proposal.proposalId,
+      fileId: proposal.fileId,
+    });
+
     return {
       proposal: {
         primaryKey: proposal.primaryKey,
         proposalId: proposal.proposalId,
         fileId: proposal.fileId,
+        created: proposal.created,
       },
       principalInvestigator: pi,
       type: 'pregenerated',
     } as PregeneratedProposalPDFData;
   } else {
-    logger.logInfo(`No pregenerated PDF found for proposal PK ${proposalPk}`, {
+    logger.logInfo(`Pregenerated PDF not found for proposal PK ${proposalPk}`, {
       proposalPk: proposal.primaryKey,
       proposalId: proposal.proposalId,
     });
@@ -802,17 +809,24 @@ export const collectProposalPregeneratedPdfDataTokenAccess = async (
       }_${proposal.created.getUTCFullYear()}.pdf`
     );
 
+    logger.logInfo(`Pregenerated PDF found for proposal PK ${proposalPk}`, {
+      proposalPk: proposal.primaryKey,
+      proposalId: proposal.proposalId,
+      fileId: proposal.fileId,
+    });
+
     return {
       proposal: {
         primaryKey: proposal.primaryKey,
         proposalId: proposal.proposalId,
         fileId: proposal.fileId,
+        created: proposal.created,
       },
       principalInvestigator: pi,
       type: 'pregenerated',
     } as PregeneratedProposalPDFData;
   } else {
-    logger.logInfo(`No pregenerated PDF found for proposal PK ${proposalPk}`, {
+    logger.logInfo(`Pregenerated PDF not found for proposal PK ${proposalPk}`, {
       proposalPk: proposal.primaryKey,
       proposalId: proposal.proposalId,
     });

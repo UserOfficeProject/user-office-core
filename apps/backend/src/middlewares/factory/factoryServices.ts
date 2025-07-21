@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -92,6 +93,13 @@ export default class FactoryServices implements DownloadTypeServices {
     if (!agent) {
       return [];
     }
+
+    logger.logInfo(
+      `Collecting pregenerated proposal PDF data for ${proposalPks.length} proposals`,
+      {
+        proposalPks: proposalPks,
+      }
+    );
 
     const allProposalData = await Promise.all(
       proposalPks.map((proposalPk, indx) => {

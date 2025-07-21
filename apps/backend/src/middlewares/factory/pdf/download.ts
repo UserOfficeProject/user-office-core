@@ -96,7 +96,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
       data.push(...fullProposalPdfData);
     }
 
-    if (!data) {
+    if (!data || data.length === 0) {
       throw new Error('Could not get proposal details');
     }
 
