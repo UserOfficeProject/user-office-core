@@ -78,7 +78,7 @@ export class QuestionaryAuthorization {
       container.resolve(TechnicalReviewQuestionaryAuthorizer)
     );
     this.authorizers.set(
-      TemplateGroupId.EXP_SAFETY_REVIEW,
+      TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
       container.resolve(ExperimentSafetyReviewQuestionaryAuthorizer)
     );
   }

@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-    IF register_patch('CorrectESFApprovedSpelling.sql', 'Yoganandan Pandiyan', 'Corrects the spelling of ESF APROVED to ESF APPROVED in the statuses table for experiment workflows.', '2025-04-30') THEN
+    IF register_patch('CorrectESFApprovedSpelling.sql', 'Yoganandan Pandiyan', 'Corrects the spelling of ESF APROVED to ESF APPROVED in the statuses table for experiment workflows.', '2025-07-28') THEN
 
       IF EXISTS (
         SELECT 1 FROM statuses WHERE name = 'ESF APROVED' OR short_code = 'ESF_APROVED' OR description ILIKE '%ESF aproved%'

@@ -14,7 +14,7 @@ export class ExperimentSafetyReviewSubmissionState extends QuestionarySubmission
     public isPreviewMode?: boolean
   ) {
     super(
-      TemplateGroupId.EXP_SAFETY_REVIEW,
+      TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
       {
         questionary: experimentSafety.safetyReviewQuestionary,
       },

@@ -131,7 +131,7 @@ export class ExperimentSafetyResolver {
       await context.queries.questionary.getQuestionaryOrDefault(
         context.user,
         experimentSafety.safetyReviewQuestionaryId ?? 0,
-        TemplateCategoryId.EXP_SAFETY_REVIEW
+        TemplateCategoryId.EXPERIMENT_SAFETY_REVIEW
       );
 
     return questionary;

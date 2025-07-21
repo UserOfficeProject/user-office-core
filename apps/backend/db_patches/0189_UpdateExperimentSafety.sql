@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-  IF register_patch('UpdateExperimentSafety', 'Yoganandan Pandiyan', 'Reconstructing Experiment Safety review in accordance with the new requirement', '2025-04-08') THEN
+  IF register_patch('UpdateExperimentSafety', 'Yoganandan Pandiyan', 'Reconstructing Experiment Safety review in accordance with the new requirement', '2025-07-28') THEN
     ALTER TABLE experiment_safety ADD COLUMN IF NOT EXISTS "instrument_scientist_decision" integer;
     ALTER TABLE experiment_safety ADD COLUMN IF NOT EXISTS "instrument_scientist_decision_comment" text;
     ALTER TABLE experiment_safety ADD COLUMN IF NOT EXISTS "experiment_safety_reviewer_decision" integer;

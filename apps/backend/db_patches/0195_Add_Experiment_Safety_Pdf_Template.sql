@@ -1,7 +1,7 @@
 DO
 $$
 BEGIN
-    IF register_patch('Add_Experiment_Safety_Pdf_Template.sql', 'Yoganandan Pandiyan', 'Add experiment_safety_pdf_templates table with same structure as proposal_pdf_templates', '2025-04-22') THEN
+    IF register_patch('Add_Experiment_Safety_Pdf_Template.sql', 'Yoganandan Pandiyan', 'Add experiment_safety_pdf_templates table with same structure as proposal_pdf_templates', '2025-07-28') THEN
 
     -- Create experiment_safety_pdf_templates table with the same structure as proposal_pdf_templates
     CREATE TABLE experiment_safety_pdf_templates (

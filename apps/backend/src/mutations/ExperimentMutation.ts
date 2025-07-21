@@ -195,7 +195,7 @@ export default class ExperimentMutations {
     // Create questionary for the active template for Experiment Safety Review
     const activeExperimentSafetyReviewTemplateId =
       await this.templateDataSource.getActiveTemplateId(
-        TemplateGroupId.EXP_SAFETY_REVIEW
+        TemplateGroupId.EXPERIMENT_SAFETY_REVIEW
       );
 
     if (!activeExperimentSafetyReviewTemplateId) {

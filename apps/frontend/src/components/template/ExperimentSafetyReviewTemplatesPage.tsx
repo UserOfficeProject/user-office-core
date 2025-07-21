@@ -8,7 +8,7 @@ import DefaultTemplatesTable from './DefaultTemplatesTable';
 import withMarkTemplateAsActiveAction from './withMarkTemplateAsActiveAction';
 
 export default function ExperimentSafetyReviewTemplatesPage() {
-  const templateGroup = TemplateGroupId.EXP_SAFETY_REVIEW;
+  const templateGroup = TemplateGroupId.EXPERIMENT_SAFETY_REVIEW;
   const itemCountLabel = '# Reviews';
 
   const TableComponent = withMarkTemplateAsActiveAction(DefaultTemplatesTable);

@@ -2,9 +2,9 @@ import { ExperimentSafetyReviewBasisConfig } from '../../resolvers/types/FieldCo
 import { DataType } from '../Template';
 import { Question } from './QuestionRegistry';
 
-export const experimentSafetyReviewBasisDefinition: Question<DataType.EXP_SAFETY_REVIEW_BASIS> =
+export const experimentSafetyReviewBasisDefinition: Question<DataType.EXPERIMENT_SAFETY_REVIEW_BASIS> =
   {
-    dataType: DataType.EXP_SAFETY_REVIEW_BASIS,
+    dataType: DataType.EXPERIMENT_SAFETY_REVIEW_BASIS,
     createBlankConfig: (): ExperimentSafetyReviewBasisConfig => {
       return new ExperimentSafetyReviewBasisConfig();
     },

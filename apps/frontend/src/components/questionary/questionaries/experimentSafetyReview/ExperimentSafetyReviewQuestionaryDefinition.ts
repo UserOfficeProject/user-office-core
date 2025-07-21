@@ -11,7 +11,7 @@ import { QuestionaryDefinition } from '../../QuestionaryRegistry';
 
 export const experimentSafetyReviewQuestionaryDefinition: QuestionaryDefinition =
   {
-    groupId: TemplateGroupId.EXP_SAFETY_REVIEW,
+    groupId: TemplateGroupId.EXPERIMENT_SAFETY_REVIEW,
     displayElementFactory: new DefaultStepDisplayElementFactory(
       ExperimentSafetyReviewSummary
     ),

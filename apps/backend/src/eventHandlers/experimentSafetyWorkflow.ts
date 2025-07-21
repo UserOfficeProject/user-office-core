@@ -108,17 +108,8 @@ export default function createExperimentSafetyWorkflowHandler() {
       experimentInformationObject?.[experimentInformationKey as keyof object];
     if (experimentInformationValue) {
       switch (experimentInformationKey) {
-        // case ExperimentInformationKeys.ExperimentPks:
         case ExperimentInformationKeys.ExperimentPk:
           handleWorkflowEngineChange(event, experimentInformationValue);
-
-          break;
-          // case ExperimentInformationKeys.Experiment:
-          // handleWorkflowEngineChange(
-          //   event,
-          //   (proposalInformationValue as Proposal).primaryKey
-          // );
-
           break;
         default:
           break;

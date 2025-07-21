@@ -29,20 +29,20 @@ services:
       - ./rabbitmq-definitions.json:/etc/rabbitmq/definitions.json
     command: bash -c "rabbitmq-server & while ! rabbitmqctl status >/dev/null 2>&1; do sleep 1; done; rabbitmqctl import_definitions /etc/rabbitmq/definitions.json; wait"
 
-  # factory:
-  #   image: ghcr.io/userofficeproject/user-office-factory:develop
-  #   init: true
-  #   environment:
-  #     NODE_ENV: development
-  #     DATABASE_HOSTNAME: db
-  #     DATABASE_PORT: 5432
-  #     DATABASE_USER: duouser
-  #     DATABASE_PASSWORD: duopassword
-  #     DATABASE_DATABASE: duo
-  #   ports:
-  #     - 4500:4500
-  #   cap_add:
-  #     - SYS_ADMIN
+  factory:
+    image: ghcr.io/userofficeproject/user-office-factory:develop
+    init: true
+    environment:
+      NODE_ENV: development
+      DATABASE_HOSTNAME: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: duouser
+      DATABASE_PASSWORD: duopassword
+      DATABASE_DATABASE: duo
+    ports:
+      - 4500:4500
+    cap_add:
+      - SYS_ADMIN
 
   duo-development-authorization-server:
     image: "ghcr.io/userofficeproject/user-office-development-authorization-server:develop"

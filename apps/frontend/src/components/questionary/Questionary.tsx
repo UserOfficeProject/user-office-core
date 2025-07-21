@@ -95,7 +95,6 @@ function Questionary({
 
   const getStepContent = () => {
     const currentStep = state.wizardSteps[state.stepIndex];
-    console.log({ state });
     const stepMetadata = currentStep.getMetadata(state, currentStep.payload);
 
     if (!currentStep) {

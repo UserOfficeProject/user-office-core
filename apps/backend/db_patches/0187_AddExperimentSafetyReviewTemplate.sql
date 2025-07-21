@@ -5,13 +5,20 @@ DECLARE
     exp_safety_review_topic_id_var int;
     questionary_id_var int;
 BEGIN
-    IF register_patch('AddExperimentSafetyReviewTemplate.sql', 'Yoganandan Pandiyan', 'Add Experiment Safety review template', '2025-03-03') THEN
+    IF register_patch('AddExperimentSafetyReviewTemplate.sql', 'Yoganandan Pandiyan', 'Add Experiment Safety review template', '2025-07-28') THEN
+
+        -- Increase template_group_id column size to 50
+        ALTER TABLE template_groups ALTER COLUMN template_group_id TYPE VARCHAR(50);
+        
+        -- Also update the foreign key columns to match
+        ALTER TABLE templates ALTER COLUMN group_id TYPE VARCHAR(50);
+        ALTER TABLE active_templates ALTER COLUMN group_id TYPE VARCHAR(50);
 
         INSERT INTO template_categories(template_category_id, name) VALUES(12, 'Experiment Safety Review');
         
-        INSERT INTO template_groups (template_group_id, category_id) VALUES('EXP_SAFETY_REVIEW_TEMPLATE', 12);
+        INSERT INTO template_groups (template_group_id, category_id) VALUES('EXPERIMENT_SAFETY_REVIEW_TEMPLATE', 12);
         
-        INSERT INTO question_datatypes(question_datatype_id) VALUES('EXP_SAFETY_REVIEW_BASIS');
+        INSERT INTO question_datatypes(question_datatype_id) VALUES('EXPERIMENT_SAFETY_REVIEW_BASIS');
 
         INSERT INTO questions(
                     question_id,
@@ -23,7 +30,7 @@ BEGIN
                 )
             VALUES(
                     'exp_safety_review_basis'
-                    , 'EXP_SAFETY_REVIEW_BASIS'
+                    , 'EXPERIMENT_SAFETY_REVIEW_BASIS'
                     , 'Experiment Safety review basic information'
                     , '{"required":false,"small_label":"","tooltip":""}'
                     , 'exp_safety_review_basis'
@@ -31,7 +38,7 @@ BEGIN
                 );
 
         INSERT INTO templates(name, description, is_archived, group_id) VALUES 
-        ('default experiment safety review template', 'default experiment safety review template', false, 'EXP_SAFETY_REVIEW_TEMPLATE');
+        ('default experiment safety review template', 'default experiment safety review template', false, 'EXPERIMENT_SAFETY_REVIEW_TEMPLATE');
 
         SELECT templates.template_id 
         INTO exp_safety_review_template_id_var

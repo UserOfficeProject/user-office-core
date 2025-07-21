@@ -88,7 +88,7 @@ export type QuestionDataTypeConfigMapping<T extends DataType> =
                               ? RichTextInputConfig
                               : T extends DataType.VISIT_BASIS
                                 ? VisitBasisConfig
-                                : T extends DataType.EXP_SAFETY_REVIEW_BASIS
+                                : T extends DataType.EXPERIMENT_SAFETY_REVIEW_BASIS
                                   ? ExperimentSafetyReviewBasisConfig
                                   : T extends DataType.FAP_REVIEW_BASIS
                                     ? FapReviewBasisConfig

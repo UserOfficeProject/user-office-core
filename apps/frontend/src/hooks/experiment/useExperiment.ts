@@ -22,7 +22,11 @@ export function useExperiment(experimentPk: number) {
         if (experiment) {
           setExperiment(experiment);
         }
-        setLoading(false);
+      })
+      .finally(() => {
+        if (!unmounted) {
+          setLoading(false);
+        }
       });
 
     return () => {

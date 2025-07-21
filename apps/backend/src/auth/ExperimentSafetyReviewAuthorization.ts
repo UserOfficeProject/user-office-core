@@ -7,7 +7,6 @@ import { UserWithRole } from '../models/User';
 import { ProposalAuthorization } from './ProposalAuthorization';
 import { UserAuthorization } from './UserAuthorization';
 
-// TODO: This needs to be filled up
 @injectable()
 export class ExperimentSafetyReviewAuthorization {
   constructor(

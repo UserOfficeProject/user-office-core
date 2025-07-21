@@ -4,7 +4,7 @@
 -- Date: 2025-04-30
 DO $$
 BEGIN
-  IF register_patch('ExperimentSafetyStatusRefactor', 'Yoganandan Pandiyan', 'experiment_safety.status_id now references statuses.status_id', '2025-04-30') THEN
+  IF register_patch('ExperimentSafetyStatusRefactor', 'Yoganandan Pandiyan', 'experiment_safety.status_id now references statuses.status_id', '2025-07-28') THEN
     ALTER TABLE experiment_safety
       ADD CONSTRAINT experiment_safety_status_id_fkey FOREIGN KEY (status_id) REFERENCES statuses(status_id) ON UPDATE CASCADE;
   END IF;

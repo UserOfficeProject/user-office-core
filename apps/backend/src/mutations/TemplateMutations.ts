@@ -167,7 +167,7 @@ export default class TemplateMutations {
         });
         break;
 
-      case TemplateGroupId.EXP_SAFETY_REVIEW:
+      case TemplateGroupId.EXPERIMENT_SAFETY_REVIEW:
         await this.createInitialTopic(
           newTemplate.templateId,
           0,

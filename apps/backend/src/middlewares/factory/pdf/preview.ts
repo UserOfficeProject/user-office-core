@@ -131,30 +131,6 @@ router.get(`/${PDFType.EXPERIMENT_SAFETY}`, async (req, res, next) => {
 
     let payload = null;
 
-    // const proposalPkNumber = parseInt(proposalPk as string);
-    // if (!isNaN(proposalPkNumber)) {
-    //   const proposalPdfData = await factoryServices.getPdfProposals(
-    //     userWithRole,
-    //     [proposalPkNumber],
-    //     meta,
-    //     {
-    //       filter: req.query?.filter?.toString(),
-    //     }
-    //   );
-
-    //   if (!proposalPdfData) {
-    //     throw new Error('Could not get proposal details');
-    //   }
-
-    //   const userRole = req.user.currentRole;
-
-    //   payload = {
-    //     data: proposalPdfData,
-    //     meta,
-    //     userRole,
-    //   };
-    // }
-
     const pdfTemplateIdNumber = parseInt(pdfTemplateId as string);
     if (!isNaN(pdfTemplateIdNumber)) {
       const pdfTemplate = await factoryServices.getExperimentSafetyPdfTemplate(

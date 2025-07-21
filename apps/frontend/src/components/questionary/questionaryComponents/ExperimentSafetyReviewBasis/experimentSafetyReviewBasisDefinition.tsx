@@ -11,7 +11,7 @@ import { QuestionTemplateRelationExperimentSafetyReviewBasisForm } from './Quest
 
 export const experimentSafetyReviewBasisDefinition: QuestionaryComponentDefinition =
   {
-    dataType: DataType.EXP_SAFETY_REVIEW_BASIS,
+    dataType: DataType.EXPERIMENT_SAFETY_REVIEW_BASIS,
     name: 'Experiment Safety Basis',
     questionaryComponent: QuestionaryComponentExperimentSafetyReviewBasis,
     questionForm: () => QuestionExperimentSafetyReviewBasisForm,

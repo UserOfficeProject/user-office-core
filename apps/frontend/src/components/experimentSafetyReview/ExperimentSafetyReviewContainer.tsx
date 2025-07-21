@@ -82,7 +82,9 @@ export default function ExperimentSafetyReviewContainer(
     )
   );
 
-  const eventHandlers = useEventHandlers(TemplateGroupId.EXP_SAFETY_REVIEW);
+  const eventHandlers = useEventHandlers(
+    TemplateGroupId.EXPERIMENT_SAFETY_REVIEW
+  );
 
   const { state, dispatch } = QuestionarySubmissionModel(
     initialState,

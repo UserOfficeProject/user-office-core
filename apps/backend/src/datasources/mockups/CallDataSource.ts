@@ -86,12 +86,12 @@ export const dummyCall = new Call(
   AllocationTimeUnits.Day,
   '',
   '',
-  1, // proposalPdfTemplateId
-  undefined, // experimentSafetyPdfTemplateId
-  1, // fapReviewTemplateId
-  1, // technicalReviewTemplateId
-  true, // isActive
-  1 // experimentWorkflowId
+  1,
+  undefined,
+  1,
+  1,
+  true,
+  1
 );
 
 export const anotherDummyCall = new Call(

@@ -393,7 +393,7 @@ export const experimentDummyData = `{
                 "categoryId": 12,
                 "id": "exp_safety_review_basis",
                 "naturalKey": "exp_safety_review_basis",
-                "dataType": "EXP_SAFETY_REVIEW_BASIS",
+                "dataType": "EXPERIMENT_SAFETY_REVIEW_BASIS",
                 "question": "Experiment Safety review basic information",
                 "config": {
                   "tooltip": "",
