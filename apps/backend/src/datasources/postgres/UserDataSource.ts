@@ -33,6 +33,8 @@ import {
   createUserObject,
 } from './records';
 
+const escapeLike = (s: string) => s.replace(/[%_]/g, '\\$&');
+
 export default class PostgresUserDataSource implements UserDataSource {
   async delete(id: number): Promise<User | null> {
     return database('users')
@@ -314,11 +316,13 @@ export default class PostgresUserDataSource implements UserDataSource {
     email: string,
     role?: UserRole
   ): Promise<BasicUserDetails | null> {
+    const escapedEmail = escapeLike(email.trim());
+
     return database
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .where('email', 'ilike', email)
+      .where('email', 'ilike', escapedEmail)
       .modify((query) => {
         if (role) {
           query.join('role_user', 'role_user.user_id', '=', 'u.user_id');
@@ -488,11 +492,12 @@ export default class PostgresUserDataSource implements UserDataSource {
       .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
+          const escapedFilter = escapeLike(filter.trim());
           query.andWhere((qb) => {
-            qb.where('institution', 'ilike', `%${filter}%`)
-              .orWhere('firstname', 'ilike', `%${filter}%`)
-              .orWhere('preferredname', 'ilike', `%${filter}%`)
-              .orWhere('lastname', 'ilike', `%${filter}%`);
+            qb.where('institution', 'ilike', `%${escapedFilter}%`)
+              .orWhere('firstname', 'ilike', `%${escapedFilter}%`)
+              .orWhere('preferredname', 'ilike', `%${escapedFilter}%`)
+              .orWhere('lastname', 'ilike', `%${escapedFilter}%`);
           });
         }
         if (first) {
