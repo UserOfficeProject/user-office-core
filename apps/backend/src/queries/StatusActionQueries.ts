@@ -65,6 +65,7 @@ export default class StatusActionQueries {
         const emailTemplates = sparkPostEmailTemplates.results.map((item) => ({
           id: item.id,
           name: item.name,
+          emailTemplateId: 0,
         }));
 
         return new EmailActionDefaultConfig(allEmailRecipients, emailTemplates);

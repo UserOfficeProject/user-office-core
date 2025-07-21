@@ -344,7 +344,7 @@ export interface CallRecord {
 
 export interface EmailTemplateRecord {
   readonly email_template_id: number;
-  readonly created_by_user_id: number;
+  readonly created_by: number;
   readonly name: string;
   readonly description: string;
   readonly subject: string;
@@ -1039,7 +1039,7 @@ export const createEmailTemplateObject = (
 ) => {
   return new EmailTemplate(
     emailTemplate.email_template_id,
-    emailTemplate.created_by_user_id,
+    emailTemplate.created_by,
     emailTemplate.name,
     emailTemplate.description,
     emailTemplate.subject,

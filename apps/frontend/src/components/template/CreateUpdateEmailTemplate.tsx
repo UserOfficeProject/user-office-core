@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import TextField from 'components/common/FormikUITextField';
 import UOLoader from 'components/common/UOLoader';
+import { getCurrentUser } from 'context/UserContextProvider';
 import { EmailTemplateFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
@@ -28,7 +29,10 @@ const CreateUpdateEmailTemplate = ({
     description: emailTemplate?.description || '',
     subject: emailTemplate?.subject || '',
     body: emailTemplate?.body || '',
-    createdByUserId: emailTemplate?.createdByUserId || 0,
+    createdByUserId:
+      emailTemplate?.createdByUserId ||
+      (getCurrentUser()?.user.id as number) ||
+      0,
   };
 
   return (

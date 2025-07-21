@@ -8,6 +8,7 @@ fragment connectionStatusActionConfig on StatusActionConfig {
       emailTemplate {
         id
         name
+        emailTemplateId
       }
       otherRecipientEmails
       combineEmails

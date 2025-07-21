@@ -1,4 +1,4 @@
-import { Field, ObjectType, createUnionType } from 'type-graphql';
+import { Field, Int, ObjectType, createUnionType } from 'type-graphql';
 
 export enum EmailStatusActionRecipients {
   PI = 'PI',
@@ -55,8 +55,11 @@ export class EmailStatusActionRecipient {
 }
 @ObjectType()
 export class EmailStatusActionEmailTemplate {
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   public id: string;
+
+  @Field(() => Int)
+  public emailTemplateId: number;
 
   @Field(() => String)
   public name?: string;

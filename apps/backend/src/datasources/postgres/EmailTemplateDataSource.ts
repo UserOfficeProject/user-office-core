@@ -15,7 +15,7 @@ export default class PostgresEmailTemplateDataSource
     return database
       .select()
       .from('email_templates')
-      .where('email_templaet_id', id)
+      .where('email_template_id', id)
       .first()
       .then((emailTemplate: EmailTemplateRecord) => {
         return emailTemplate ? createEmailTemplateObject(emailTemplate) : null;
