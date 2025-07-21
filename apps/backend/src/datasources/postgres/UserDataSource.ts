@@ -33,7 +33,7 @@ import {
   createUserObject,
 } from './records';
 
-const escapeLike = (s: string) => s.replace(/[%_]/g, '\\$&');
+const escapeLike = (s: string) => s.replace(/[\\%_]/g, '\\$&');
 
 export default class PostgresUserDataSource implements UserDataSource {
   async delete(id: number): Promise<User | null> {
