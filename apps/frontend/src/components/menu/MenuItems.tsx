@@ -1,4 +1,4 @@
-import { Science, Topic, History } from '@mui/icons-material';
+import { Science, Topic, Apartment } from '@mui/icons-material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -31,6 +31,7 @@ import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
+import { StatusActionLogsMenuListItem } from './StatusActionLogsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
 import BoxIcon from '../common/icons/BoxIcon';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
@@ -91,6 +92,8 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
+
+  const isTagsEnabled = context.featuresMap.get(FeatureId.TAGS)?.isEnabled;
 
   const calls = useCallsData(
     {
@@ -194,14 +197,7 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Calls" />
         </ListItemButton>
       </Tooltip>
-      <Tooltip title="Status Actions Logs">
-        <ListItemButton component={NavLink} to="/StatusActionsLogs">
-          <ListItemIcon>
-            <History />
-          </ListItemIcon>
-          <ListItemText primary="Status Actions Logs" />
-        </ListItemButton>
-      </Tooltip>
+      <StatusActionLogsMenuListItem />
       {isUserManagementEnabled && (
         <Tooltip title="People">
           <ListItemButton component={NavLink} to="/People">
@@ -230,6 +226,16 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('Technique'), 'plural')} />
         </ListItemButton>
       </Tooltip>
+      {isTagsEnabled && (
+        <Tooltip title="Tag">
+          <ListItemButton component={NavLink} to="/Tag">
+            <ListItemIcon>
+              <Apartment />
+            </ListItemIcon>
+            <ListItemText primary={'Tag'} />
+          </ListItemButton>
+        </Tooltip>
+      )}
       {isFapEnabled && (
         <Tooltip title={i18n.format(t('Facility access panel'), 'plural')}>
           <ListItemButton component={NavLink} to="/Faps">

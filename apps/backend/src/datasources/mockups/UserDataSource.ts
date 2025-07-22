@@ -9,7 +9,10 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 
@@ -266,10 +269,14 @@ export class UserDataSourceMock implements UserDataSource {
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
     throw new Error('Method not implemented.');
   }
-  async getBasicUserInfo(
-    id: number
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
-    throw new Error('Method not implemented.');
+  async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
+    if (id === dummyUser.id) {
+      return basicDummyUser;
+    } else if (id === dummyUserNotOnProposal.id) {
+      return basicDummyUserNotOnProposal;
+    }
+
+    return null;
   }
   async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
     throw new Error('Method not implemented.');
@@ -278,7 +285,7 @@ export class UserDataSourceMock implements UserDataSource {
   async getBasicUserDetailsByEmail(
     email: string,
     role?: UserRole
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
+  ): Promise<BasicUserDetails> {
     return new BasicUserDetails(
       1,
       'John',
@@ -370,8 +377,19 @@ export class UserDataSourceMock implements UserDataSource {
     ];
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
     return dummyUser;
+  }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
+    if (dummyUser.oidcSub === args.oidcSub) {
+      return { ...dummyUser, ...args };
+    }
+
+    // User not found
+    return null;
   }
 
   async me(id: number) {

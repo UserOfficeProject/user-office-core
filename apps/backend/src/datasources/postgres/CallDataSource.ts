@@ -511,6 +511,7 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     return records.map(createCallObject);
   }
+
   public async isCallEnded(callId: number): Promise<boolean>;
   public async isCallEnded(
     callId: number,

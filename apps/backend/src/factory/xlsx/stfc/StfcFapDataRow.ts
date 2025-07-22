@@ -47,12 +47,21 @@ export async function getStfcDataRow(
       )
     : null;
 
+  // If the proposal templates update these question keys we will need to update these to match
   const timeRequested = proposalAnswers
     ?.flatMap((step) => step.fields)
     .find(
       (answer) =>
         answer.question.naturalKey === 'days_requested' ||
         answer.question.naturalKey === 'Weeks_Requested'
+    )?.value.value;
+
+  const accessRoute = proposalAnswers
+    ?.flatMap((step) => step.fields)
+    .find(
+      (answer) =>
+        answer.question.naturalKey === 'Proposed_Route' ||
+        answer.question.naturalKey === 'direct_access_route'
     )?.value.value;
 
   const piDetails = await stfcUserDataSource.getStfcBasicPeopleByUserNumbers([
@@ -62,6 +71,10 @@ export async function getStfcDataRow(
   const piCountry = piDetails.find(
     (user) => user.userNumber === proposer_id?.toString()
   )?.country;
+
+  const piOrg = piDetails.find(
+    (user) => user.userNumber === proposer_id?.toString()
+  )?.orgName;
 
   return {
     ...getDataRow(
@@ -77,9 +90,11 @@ export async function getStfcDataRow(
       technicalReviewComment,
       propFapRankOrder
     ),
-    timeRequested: timeRequested,
+    accessRoute,
+    timeRequested,
     reviews: individualReviews,
-    piCountry: piCountry,
+    piCountry,
+    piOrg,
   };
 }
 
@@ -92,8 +107,10 @@ export function populateStfcRow(row: RowObj) {
 
   return [
     row.propShortCode ?? '<missing>',
+    row.accessRoute ?? '<missing>',
     row.principalInv ?? '<missing>',
     row.piCountry ?? '<missing>',
+    row.piOrg ?? '<missing>',
     row.instrName ?? '<missing>',
     row.timeRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
@@ -111,8 +128,10 @@ export function callFapStfcPopulateRow(row: CallRowObj): (string | number)[] {
 
   return [
     row.propShortCode ?? '<missing>',
+    row.accessRoute ?? '<missing>',
     row.principalInv ?? '<missing>',
     row.piCountry ?? '<missing>',
+    row.piOrg ?? '<missing>',
     row.instrName ?? '<missing>',
     row.timeRequested ?? '<missing>',
     row.propTitle ?? '<missing>',
