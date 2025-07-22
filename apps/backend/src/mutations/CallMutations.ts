@@ -1,6 +1,7 @@
 import {
   createCallValidationSchemas,
   removeAssignedInstrumentFromCallValidationSchema,
+  updateCallValidationBackendSchema,
 } from '@user-office-software/duo-validation';
 import { inject, injectable } from 'tsyringe';
 
@@ -87,7 +88,7 @@ export default class CallMutations {
     }
   }
 
-  // @ValidateArgs(updateCallValidationBackendSchema)
+  @ValidateArgs(updateCallValidationBackendSchema)
   @Authorized([Roles.USER_OFFICER])
   async update(
     agent: UserWithRole | null,
@@ -112,7 +113,7 @@ export default class CallMutations {
     args: CallOrderInput
   ): Promise<Call | Rejection> {
     return this.dataSource.orderCalls(args).catch((err) => {
-      return rejection('Could not update topic', { agent, args }, err);
+      return rejection('Could not reorder calls', { agent, args }, err);
     });
   }
 

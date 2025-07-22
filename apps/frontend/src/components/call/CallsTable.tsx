@@ -64,7 +64,6 @@ const getFilterStatus = (
     };
   } else {
     return {
-      //open/upcoming
       isEndedInternal: false,
       isCallEndedByEvent: false,
       isActive: archived,
