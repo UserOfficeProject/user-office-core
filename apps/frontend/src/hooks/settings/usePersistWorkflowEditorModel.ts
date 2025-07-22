@@ -226,6 +226,7 @@ export function usePersistWorkflowEditorModel() {
             posY,
           } = action.payload;
 
+          // Immediately add to state so it shows up in the UI
           dispatch({
             type: EventType.WORKFLOW_STATUS_ADDED,
             payload: {
@@ -245,22 +246,20 @@ export function usePersistWorkflowEditorModel() {
                 posY
               );
 
+              // Update the connection with the real ID from the API
               dispatch({
                 type: EventType.WORKFLOW_STATUS_UPDATED,
-                payload: {
-                  ...action.payload,
-                  id: result.id,
-                },
+                payload: { ...action.payload, ...result },
               });
 
               return result;
             } catch (error) {
+              // Remove from state if API call failed
               dispatch({
                 type: EventType.WORKFLOW_STATUS_DELETED,
-                payload: {
-                  source: { index: sortOrder, droppableId: '' },
-                },
+                payload: { ...action.payload },
               });
+              throw error;
             }
           });
         }

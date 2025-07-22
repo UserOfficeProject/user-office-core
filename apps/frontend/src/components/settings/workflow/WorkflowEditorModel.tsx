@@ -51,8 +51,28 @@ const WorkflowEditorModel = (
         case EventType.READY:
           return action.payload;
         case EventType.WORKFLOW_STATUS_ADDED: {
-          // For ReactFlow, we don't need to add to workflowConnections here
-          // The actual visual representation is handled by ReactFlow nodes/edges
+          // Add the new workflow connection to the state
+          if (
+            action.payload &&
+            action.payload.statusId &&
+            action.payload.status
+          ) {
+            const newConnection = {
+              id: action.payload.id || 0, // Will be updated when API response comes back
+              workflowId: action.payload.workflowId,
+              statusId: action.payload.statusId,
+              status: action.payload.status,
+              sortOrder: action.payload.sortOrder,
+              prevStatusId: action.payload.prevStatusId,
+              nextStatusId: action.payload.nextStatusId,
+              posX: action.payload.posX,
+              posY: action.payload.posY,
+              statusChangingEvents: [],
+              statusActions: [],
+            };
+            draft.workflowConnections.push(newConnection);
+          }
+
           return draft;
         }
         case EventType.WORKFLOW_STATUS_UPDATED: {
@@ -60,7 +80,7 @@ const WorkflowEditorModel = (
           if (action.payload && action.payload.id) {
             const updatedConnection = action.payload;
             const connectionIndex = draft.workflowConnections.findIndex(
-              (conn) => conn.id === updatedConnection.id
+              (conn) => conn.statusId === updatedConnection.statusId
             );
             if (connectionIndex !== -1) {
               draft.workflowConnections[connectionIndex] = updatedConnection;
@@ -70,9 +90,16 @@ const WorkflowEditorModel = (
 
           return draft;
         }
-        case EventType.WORKFLOW_STATUS_DELETED:
-          // For ReactFlow, we don't use the old group system
+        case EventType.WORKFLOW_STATUS_DELETED: {
+          // Remove the workflow connection by statusId
+          if (action.payload && action.payload.statusId) {
+            draft.workflowConnections = draft.workflowConnections.filter(
+              (conn) => conn.statusId !== action.payload.statusId
+            );
+          }
+
           return draft;
+        }
         case EventType.WORKFLOW_METADATA_UPDATED: {
           return { ...draft, ...action.payload };
         }

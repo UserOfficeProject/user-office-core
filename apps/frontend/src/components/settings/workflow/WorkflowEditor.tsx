@@ -203,7 +203,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     setNodes(newNodes);
     setEdges(newEdges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.workflowConnections]);
+  }, [state.workflowConnections, setNodes, setEdges]);
 
   // Handle connecting nodes (adding transitions)
   const onConnect = useCallback(
@@ -255,7 +255,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       // Dispatch update events to persist the connection in the database
       // We need to update BOTH nodes: source gets nextStatusId, target gets prevStatusId
-      
+
       // Update source node (A) - set its nextStatusId to target (B)
       dispatch({
         type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
