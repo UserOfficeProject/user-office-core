@@ -214,7 +214,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
         emailReadyUsersWithProposals.push({
           id: recipientsWithEmailTemplate.recipient.name,
           proposals: [proposal],
-          template: recipientsWithEmailTemplate.emailTemplate.id,
+          template: recipientsWithEmailTemplate.emailTemplate.name,
           email: recipient.email,
           firstName: recipient.firstname,
           lastName: recipient.lastname,

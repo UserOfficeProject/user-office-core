@@ -1,5 +1,7 @@
 import { Field, Int, ObjectType, createUnionType } from 'type-graphql';
 
+import { EmailTemplate } from './EmailTemplate';
+
 export enum EmailStatusActionRecipients {
   PI = 'PI',
   CO_PROPOSERS = 'CO_PROPOSERS',
@@ -70,8 +72,8 @@ export class EmailStatusActionRecipientsWithTemplate {
   @Field(() => EmailStatusActionRecipient)
   recipient: EmailStatusActionRecipient;
 
-  @Field(() => EmailStatusActionEmailTemplate)
-  emailTemplate: EmailStatusActionEmailTemplate;
+  @Field(() => EmailTemplate)
+  emailTemplate: EmailTemplate;
 
   @Field(() => [String], { nullable: true })
   otherRecipientEmails?: string[];
@@ -105,7 +107,7 @@ export const StatusActionConfig = createUnionType({
 export class EmailActionDefaultConfig extends StatusActionConfigBase {
   constructor(
     recipients: EmailStatusActionRecipient[],
-    emailTemplates: EmailStatusActionEmailTemplate[]
+    emailTemplates: EmailTemplate[]
   ) {
     super();
     this.recipients = recipients;
@@ -115,8 +117,8 @@ export class EmailActionDefaultConfig extends StatusActionConfigBase {
   @Field(() => [EmailStatusActionRecipient])
   recipients: EmailStatusActionRecipient[];
 
-  @Field(() => [EmailStatusActionEmailTemplate])
-  emailTemplates: EmailStatusActionEmailTemplate[];
+  @Field(() => [EmailTemplate])
+  emailTemplates: EmailTemplate[];
 }
 
 @ObjectType()

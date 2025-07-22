@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { EmailTemplateDataSource } from '../datasources/EmailTemplateDataSource';
 import { StatusActionsDataSource } from '../datasources/StatusActionsDataSource';
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
@@ -21,7 +22,9 @@ export default class StatusActionQueries {
     @inject(Tokens.StatusActionsDataSource)
     public dataSource: StatusActionsDataSource,
     @inject(Tokens.MailService)
-    public emailService: MailService
+    public emailService: MailService,
+    @inject(Tokens.EmailTemplateDataSource)
+    public emailTemplateDataSource: EmailTemplateDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -59,16 +62,13 @@ export default class StatusActionQueries {
           description: EmailStatusActionRecipientsWithDescription.get(item),
         }));
 
-        const sparkPostEmailTemplates =
-          await this.emailService.getEmailTemplates();
+        const emailTemplatesResult =
+          await this.emailTemplateDataSource.getEmailTemplates();
 
-        const emailTemplates = sparkPostEmailTemplates.results.map((item) => ({
-          id: item.id,
-          name: item.name,
-          emailTemplateId: 0,
-        }));
-
-        return new EmailActionDefaultConfig(allEmailRecipients, emailTemplates);
+        return new EmailActionDefaultConfig(
+          allEmailRecipients,
+          emailTemplatesResult.emailTemplates
+        );
 
       case StatusActionType.RABBITMQ:
         // NOTE: For now we return just the default exchange.

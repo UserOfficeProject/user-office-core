@@ -16,16 +16,16 @@ import {
 } from '../resolvers/types/StatusActionConfig';
 import { WorkflowEngineProposalType } from '../workflowEngine';
 import {
+  constructProposalStatusChangeEvent,
   EmailReadyType,
   getCoProposersAndFormatOutputForEmailSending,
-  getInstrumentScientistsAndFormatOutputForEmailSending,
-  getPIAndFormatOutputForEmailSending,
-  getFapReviewersAndFormatOutputForEmailSending,
   getFapChairSecretariesAndFormatOutputForEmailSending,
-  statusActionLogger,
+  getFapReviewersAndFormatOutputForEmailSending,
+  getInstrumentScientistsAndFormatOutputForEmailSending,
   getOtherAndFormatOutputForEmailSending,
+  getPIAndFormatOutputForEmailSending,
   getTechniqueScientistsAndFormatOutputForEmailSending,
-  constructProposalStatusChangeEvent,
+  statusActionLogger,
 } from './statusActionUtils';
 
 export const emailActionHandler = async (
@@ -90,7 +90,7 @@ export const emailStatusActionRecipient = async (
   loggedInUserId?: number | null
 ) => {
   const proposalPks = proposals.map((proposal) => proposal.primaryKey);
-  const templateMessage = recipientWithTemplate.emailTemplate.id;
+  const templateMessage = recipientWithTemplate.emailTemplate.name;
   const successfulMessage = !!statusActionsLogId
     ? 'Email successfully sent on status action replay'
     : 'Email successfully sent';
@@ -248,7 +248,7 @@ export const emailStatusActionRecipient = async (
             id: recipientWithTemplate.recipient.name,
             email: userOfficeEmail,
             proposals: proposals,
-            template: recipientWithTemplate.emailTemplate.id,
+            template: recipientWithTemplate.emailTemplate.name,
           },
         ];
       } else {
@@ -260,7 +260,7 @@ export const emailStatusActionRecipient = async (
           id: recipientWithTemplate.recipient.name,
           email: userOfficeEmail,
           proposals: [proposal],
-          template: recipientWithTemplate.emailTemplate.id,
+          template: recipientWithTemplate.emailTemplate.name,
           instruments: await instrumentDataSource.getInstrumentsByProposalPk(
             proposal.primaryKey
           ),
@@ -346,7 +346,7 @@ export const emailStatusActionRecipient = async (
             id: recipientWithTemplate.recipient.name,
             email: experimentSafetyEmail,
             proposals: proposals,
-            template: recipientWithTemplate.emailTemplate.id,
+            template: recipientWithTemplate.emailTemplate.name,
           },
         ];
       } else {

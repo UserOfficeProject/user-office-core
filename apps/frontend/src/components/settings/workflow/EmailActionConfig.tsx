@@ -9,20 +9,21 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { FieldArray, FieldArrayRenderProps } from 'formik';
-import React, { useState, KeyboardEvent } from 'react';
+import { KeyboardEvent, useState } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import {
   EmailActionConfig as EmailActionConfigType,
-  EmailStatusActionEmailTemplate,
   EmailStatusActionRecipient,
   EmailStatusActionRecipients,
+  EmailTemplate,
 } from 'generated/sdk';
 
 type EmailActionConfigProps = {
   emailStatusActionConfig: EmailActionConfigType;
   recipients: EmailStatusActionRecipient[];
-  emailTemplates: EmailStatusActionEmailTemplate[];
+  emailTemplates: EmailTemplate[];
   isRecipientRequired?: boolean;
   isEmailTemplateRequired?: boolean;
 };
