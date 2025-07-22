@@ -274,6 +274,7 @@ export class ProposalAuthorization {
       case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
+
       default:
         hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }

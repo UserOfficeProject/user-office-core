@@ -48,6 +48,7 @@ query getProposal($primaryKey: Int!) {
         preferredname
       }
       managementTimeAllocation
+      multipleTechReviewsEnabled
     }
     call {
       id
