@@ -35,18 +35,7 @@ export type XLSXMetaBase = MetaBase & { columns: string[] };
 
 const ENDPOINT = process.env.USER_OFFICE_FACTORY_ENDPOINT;
 
-export interface DownloadService {
-  callFactoryService<TData, TMeta extends MetaBase>(
-    downloadType: DownloadType,
-    type: PDFType | XLSXType | ZIPType,
-    properties: { data: TData[]; meta: TMeta; userRole: Role },
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void>;
-}
-
-export async function fetchDataAndStreamResponse<TData, TMeta extends MetaBase>(
+export default async function callFactoryService<TData, TMeta extends MetaBase>(
   downloadType: DownloadType,
   type: PDFType | XLSXType | ZIPType,
   properties: { data: TData[]; meta: TMeta; userRole: Role },

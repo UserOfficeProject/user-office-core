@@ -4,16 +4,15 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import {
-  DownloadService,
-  DownloadType,
-  MetaBase,
-  ZIPType,
-} from '../../factory/DownloadService';
-import {
   FullProposalPDFData,
   PregeneratedProposalPDFData,
   ProposalPDFData,
 } from '../../factory/pdf/proposal';
+import callFactoryService, {
+  DownloadType,
+  MetaBase,
+  ZIPType,
+} from '../../factory/service';
 import { getCurrentTimestamp } from '../../factory/util';
 import { ProposalAttachmentData } from '../../factory/zip/attachment';
 import { FeatureId } from '../../models/Feature';
@@ -21,9 +20,6 @@ import FactoryServices, { DownloadTypeServices } from './factoryServices';
 
 const router = express.Router();
 
-const downloadService = container.resolve<DownloadService>(
-  Tokens.DownloadService
-);
 const adminDataSource = container.resolve<AdminDataSource>(
   Tokens.AdminDataSource
 );
@@ -66,7 +62,7 @@ router.get(`/${ZIPType.ATTACHMENT}/:proposal_pks`, async (req, res, next) => {
       return res.status(404).send('NO_ATTACHMENTS');
     }
 
-    downloadService.callFactoryService<ProposalAttachmentData, MetaBase>(
+    callFactoryService<ProposalAttachmentData, MetaBase>(
       DownloadType.ZIP,
       ZIPType.ATTACHMENT,
       {
@@ -160,7 +156,7 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     meta.singleFilename = `proposals_${getCurrentTimestamp()}.zip`;
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService<ProposalPDFData, MetaBase>(
+    callFactoryService<ProposalPDFData, MetaBase>(
       DownloadType.ZIP,
       ZIPType.PROPOSAL,
       { data, meta, userRole },

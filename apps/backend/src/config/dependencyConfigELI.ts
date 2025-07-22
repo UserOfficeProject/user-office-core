@@ -43,7 +43,6 @@ import {
   createPostToRabbitMQHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
 import {
   callFapPopulateRow,
@@ -123,7 +122,5 @@ mapValue(
   isProduction ? () => {} : configureELIDevelopmentEnvironment
 );
 mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
-
-mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);

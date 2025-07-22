@@ -1,22 +1,13 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../../config/Tokens';
-import {
-  PDFType,
-  MetaBase,
-  DownloadType,
-  DownloadService,
-} from '../../../factory/DownloadService';
 import { FullProposalPDFData } from '../../../factory/pdf/proposal';
+import { PDFType, MetaBase, DownloadType } from '../../../factory/service';
+import callFactoryService from '../../../factory/service';
 import { Role } from '../../../models/Role';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
-
-const downloadService = container.resolve<DownloadService>(
-  Tokens.DownloadService
-);
 
 router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
   try {
@@ -93,7 +84,7 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       throw new Error('Invalid request');
     }
 
-    downloadService.callFactoryService<FullProposalPDFData, MetaBase>(
+    callFactoryService<FullProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
       payload,

@@ -4,27 +4,23 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../../config/Tokens';
 import { AdminDataSource } from '../../../datasources/AdminDataSource';
 import {
-  PDFType,
-  MetaBase,
-  DownloadType,
-  DownloadService,
-} from '../../../factory/DownloadService';
-import {
   FullProposalPDFData,
   PregeneratedProposalPDFData,
   ProposalPDFData,
 } from '../../../factory/pdf/proposal';
 import { collectSamplePDFData } from '../../../factory/pdf/sample';
 import { collectShipmentPDFData } from '../../../factory/pdf/shipmentLabel';
+import callFactoryService, {
+  PDFType,
+  MetaBase,
+  DownloadType,
+} from '../../../factory/service';
 import { getCurrentTimestamp } from '../../../factory/util';
 import { FeatureId } from '../../../models/Feature';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
 
-const downloadService = container.resolve<DownloadService>(
-  Tokens.DownloadService
-);
 const factoryServices =
   container.resolve<DownloadTypeServices>(FactoryServices);
 const adminDataSource = container.resolve<AdminDataSource>(
@@ -101,7 +97,7 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     }
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService<ProposalPDFData, MetaBase>(
+    callFactoryService<ProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
       { data, meta, userRole },
@@ -146,7 +142,7 @@ router.get(`/${PDFType.SAMPLE}/:sample_ids`, async (req, res, next) => {
     );
 
     const userRole = req.user.currentRole;
-    downloadService.callFactoryService(
+    callFactoryService(
       DownloadType.PDF,
       PDFType.SAMPLE,
       { data, meta, userRole },
@@ -193,7 +189,7 @@ router.get(
       );
 
       const userRole = req.user.currentRole;
-      downloadService.callFactoryService(
+      callFactoryService(
         DownloadType.PDF,
         PDFType.SHIPMENT_LABEL,
         { data, meta, userRole },
