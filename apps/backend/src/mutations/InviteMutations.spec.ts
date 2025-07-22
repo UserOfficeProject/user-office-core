@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
 import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
+import { InviteDataSource } from '../datasources/InviteDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
@@ -13,6 +14,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
@@ -257,5 +259,30 @@ describe('Test Invite Mutations', () => {
     await new Promise((resolve) => setTimeout(resolve, 200));
 
     expect(setEventInDataSourceSpy).toHaveBeenCalled();
+  });
+
+  test('Invite should have the templateId set', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const invite = (await container
+      .resolve<InviteDataSource>(Tokens.InviteDataSource)
+      .findById((response as Invite[])[0].id)) as Invite;
+
+    expect(invite.templateId).toBe(
+      EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+    );
   });
 });
