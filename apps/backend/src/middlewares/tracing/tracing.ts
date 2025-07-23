@@ -22,22 +22,15 @@ const collectorOptions = {
 const collectorTraceExporter = new OTLPTraceExporter(collectorOptions);
 
 class AttributeFilterProcessor implements SpanProcessor {
-  private blocklist: string[];
   private masklist: string[];
 
-  constructor(blocklist: string[], masklist: string[]) {
-    this.blocklist = blocklist;
+  constructor(masklist: string[]) {
     this.masklist = masklist;
   }
 
   onStart(): void {}
 
   onEnd(span: ReadableSpan): void {
-    // Remove blocked attributes
-    for (const key of this.blocklist) {
-      delete span.attributes[key];
-    }
-
     // Mask specified attributes
     for (const key of this.masklist) {
       const value = span.attributes[key];
@@ -64,8 +57,10 @@ class AttributeFilterProcessor implements SpanProcessor {
   }
 }
 
-const attributeBlocklist = ['graphql.variables.externalToken'];
-const attributeMasklist = ['graphql.variables.token'];
+const attributeMasklist = [
+  'graphql.variables.token',
+  'graphql.variables.externalToken',
+];
 
 const otelSDK = new NodeSDK({
   traceExporter: collectorTraceExporter,
@@ -73,7 +68,7 @@ const otelSDK = new NodeSDK({
     ['service.name']: process.env.OTEL_SERVICE_NAME || 'proposal-backend',
   }),
   spanProcessors: [
-    new AttributeFilterProcessor(attributeBlocklist, attributeMasklist),
+    new AttributeFilterProcessor(attributeMasklist),
     new BatchSpanProcessor(collectorTraceExporter, {
       maxQueueSize: 1024,
       maxExportBatchSize: 1024,
