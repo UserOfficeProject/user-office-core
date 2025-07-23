@@ -86,7 +86,7 @@ async function enableDefaultStfcFeatures() {
       FeatureId.USER_SEARCH_FILTER,
       FeatureId.TAGS,
       FeatureId.TECHNIQUE_PROPOSALS,
-      FeatureId.PREFER_PREGENERATED_PROPOSAL_DOWNLOAD,
+      FeatureId.PREGENERATED_PROPOSALS,
     ],
     true
   );

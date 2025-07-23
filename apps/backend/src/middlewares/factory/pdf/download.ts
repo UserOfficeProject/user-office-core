@@ -52,15 +52,14 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
 
     const features = await adminDataSource.getFeatures();
 
-    const isPreferPregeneratedPdfsEnabled = features.find(
-      (feature) =>
-        feature.id === FeatureId.PREFER_PREGENERATED_PROPOSAL_DOWNLOAD
+    const isPregeneratedProposalsEnabled = features.find(
+      (feature) => feature.id === FeatureId.PREGENERATED_PROPOSALS
     )?.isEnabled;
 
     const data: ProposalPDFData[] = [];
     const pregeneratedPks = new Set<number>();
 
-    if (isPreferPregeneratedPdfsEnabled) {
+    if (isPregeneratedProposalsEnabled) {
       const pregeneratedProposalPdfData: PregeneratedProposalPDFData[] =
         await factoryServices.getPregeneratedPdfProposals(
           userWithRole,
