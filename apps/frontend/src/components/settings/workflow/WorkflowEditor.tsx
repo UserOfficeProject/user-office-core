@@ -150,7 +150,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           label: connection.status.name,
           status: connection.status,
           onDelete: (deleteStatusId: string) => {
-  
             // Dispatch action to delete status from workflow model
             // The useEffect will handle removing the node from UI when state updates
             dispatch({

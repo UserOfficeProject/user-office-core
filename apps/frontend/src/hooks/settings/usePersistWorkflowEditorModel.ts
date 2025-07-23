@@ -142,11 +142,6 @@ export function usePersistWorkflowEditorModel() {
           });
         }
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
-          dispatch({
-            type: EventType.WORKFLOW_STATUS_DELETED,
-            payload: action.payload,
-          });
-
           // Find the workflow connection to remove based on statusId
           const workflowConnectionToRemove = state.workflowConnections.find(
             (connection) => connection.statusId === action.payload.statusId
@@ -154,22 +149,18 @@ export function usePersistWorkflowEditorModel() {
 
           if (workflowConnectionToRemove) {
             return executeAndMonitorCall(async () => {
-              try {
-                const result = await deleteWorkflowStatus(
-                  workflowConnectionToRemove.statusId,
-                  workflowConnectionToRemove.workflowId,
-                  workflowConnectionToRemove.sortOrder
-                );
+              const result = await deleteWorkflowStatus(
+                workflowConnectionToRemove.statusId,
+                workflowConnectionToRemove.workflowId,
+                workflowConnectionToRemove.sortOrder
+              );
 
-                return result;
-              } catch (error) {
-                dispatch({
-                  type: EventType.WORKFLOW_STATUS_ADDED,
-                  payload: {
-                    ...workflowConnectionToRemove,
-                  },
-                });
-              }
+              dispatch({
+                type: EventType.WORKFLOW_STATUS_DELETED,
+                payload: action.payload,
+              });
+
+              return result;
             });
           }
 
