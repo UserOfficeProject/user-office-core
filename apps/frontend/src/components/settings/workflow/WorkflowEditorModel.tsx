@@ -80,7 +80,9 @@ const WorkflowEditorModel = (
           if (action.payload && action.payload.id) {
             const updatedConnection = action.payload;
             const connectionIndex = draft.workflowConnections.findIndex(
-              (conn) => conn.statusId === updatedConnection.statusId
+              (conn) =>
+                conn.id === updatedConnection.id ||
+                (conn.id === 0 && conn.statusId === updatedConnection.statusId)
             );
             if (connectionIndex !== -1) {
               draft.workflowConnections[connectionIndex] = updatedConnection;

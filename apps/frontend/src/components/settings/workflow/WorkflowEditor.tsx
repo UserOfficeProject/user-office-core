@@ -150,17 +150,9 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           label: connection.status.name,
           status: connection.status,
           onDelete: (deleteStatusId: string) => {
-            // Remove the node and connected edges
-            setNodes((nds) => nds.filter((node) => node.id !== deleteStatusId));
-            setEdges((eds) =>
-              eds.filter(
-                (edge) =>
-                  edge.source !== deleteStatusId &&
-                  edge.target !== deleteStatusId
-              )
-            );
-
+  
             // Dispatch action to delete status from workflow model
+            // The useEffect will handle removing the node from UI when state updates
             dispatch({
               type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
               payload: {
@@ -365,17 +357,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           label: status.name,
           status,
           onDelete: (deleteStatusId: string) => {
-            // Remove the node and connected edges
-            setNodes((nds) => nds.filter((node) => node.id !== deleteStatusId));
-            setEdges((eds) =>
-              eds.filter(
-                (edge) =>
-                  edge.source !== deleteStatusId &&
-                  edge.target !== deleteStatusId
-              )
-            );
-
             // Dispatch action to delete status from workflow model
+            // The useEffect will handle removing the node from UI when state updates
             dispatch({
               type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
               payload: {
@@ -410,7 +393,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       statuses,
       nodes,
       setNodes,
-      setEdges,
       dispatch,
       state.id,
       enqueueSnackbar,
