@@ -2,16 +2,16 @@ import React from 'react';
 
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 
-import StatusActionsLogsTable from './StatusActionsLogsTable';
+import TagTable from './TagTable';
 
-const StatusActionsLogsPage = () => {
+const TagPage = () => {
   return (
     <StyledContainer maxWidth={false}>
       <StyledPaper>
-        <StatusActionsLogsTable />
+        <TagTable />
       </StyledPaper>
     </StyledContainer>
   );
 };
 
-export default StatusActionsLogsPage;
+export default TagPage;

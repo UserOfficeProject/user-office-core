@@ -1,9 +1,13 @@
 [
-  { "Proposal Reference Number": "Central lavender" },
+  {
+    "Proposal Reference Number": "Central lavender"
+  },
   {
     "Proposal Reference Number": "567122",
+    "Access Route": "<missing>",
     "Principal Investigator": "Carl Carlsson",
     "PI Country": "UNITED KINGDOM",
+    "PI Organisation": "STFC",
     "Instrument Name": "Central lavender",
     "Requested Time": "<missing>",
     "Proposal Title": "lumen proofread hertz",
@@ -25,8 +29,10 @@
   },
   {
     "Proposal Reference Number": "701367",
+    "Access Route": "<missing>",
     "Principal Investigator": "Carl Carlsson",
     "PI Country": "UNITED KINGDOM",
+    "PI Organisation": "STFC",
     "Instrument Name": "Central lavender",
     "Requested Time": "<missing>",
     "Proposal Title": "web Connecticut driver",

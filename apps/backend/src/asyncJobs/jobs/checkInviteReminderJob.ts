@@ -4,9 +4,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { AdminDataSource } from '../../datasources/AdminDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
-import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { getTemplateIdForRole } from '../../eventHandlers/email/essEmailHandler';
 import { MailService } from '../../eventHandlers/MailService/MailService';
 import { SettingsId } from '../../models/Settings';
 
@@ -27,9 +25,6 @@ const checkInviteReminder = async () => {
   );
   const inviteDataSource = container.resolve<InviteDataSource>(
     Tokens.InviteDataSource
-  );
-  const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
-    Tokens.RoleClaimDataSource
   );
   const mailService = container.resolve<MailService>(Tokens.MailService);
   const settingsDataSource = container.resolve<AdminDataSource>(
@@ -114,18 +109,17 @@ const checkInviteReminder = async () => {
         continue;
       }
 
-      const roleInviteClaims = await roleClaimDataSource.findByInviteId(
-        invite.id
-      );
-
-      if (!roleInviteClaims.length) {
-        logger.logError('No role claims found for invite', {
-          inviteId: invite.id,
-        });
+      const { templateId } = invite;
+      if (!templateId) {
+        logger.logError(
+          'Invite does not have a template ID, skipping reminder email',
+          {
+            inviteId: invite.id,
+            email: invite.email,
+          }
+        );
         continue;
       }
-
-      const templateId = getTemplateIdForRole(roleInviteClaims[0].roleId);
 
       try {
         await mailService.sendMail({

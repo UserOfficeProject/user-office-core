@@ -129,15 +129,12 @@ export default class QuestionaryMutations {
     ).proposals[0];
 
     const genericTemplates =
-      await this.genericTemplateDataSource.getGenericTemplates(
-        {
-          filter: {
-            questionId: questionId,
-            proposalPk: proposal?.primaryKey,
-          },
+      await this.genericTemplateDataSource.getGenericTemplates({
+        filter: {
+          questionId: questionId,
+          proposalPk: proposal?.primaryKey,
         },
-        agent
-      );
+      });
 
     if (!genericTemplates) {
       return;
@@ -286,7 +283,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  async updateAnswer(agent: UserJWT | null, args: UpdateAnswerArgs) {
+  async updateAnswer(agent: UserWithRole | null, args: UpdateAnswerArgs) {
     const hasRights = await this.questionaryAuth.hasWriteRights(
       agent,
       args.questionaryId

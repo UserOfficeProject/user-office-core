@@ -13,18 +13,12 @@ import { ResolverContext } from '../../context';
 import { User } from '../types/User';
 
 @ArgsType()
-export class UpdateUserArgs {
-  @Field(() => Int)
-  public id: number;
-
+class UpdateUserArgs {
   @Field(() => String, { nullable: true })
   public user_title?: string;
 
   @Field(() => String, { nullable: true })
   public firstname?: string;
-
-  @Field(() => String, { nullable: true })
-  public middlename?: string;
 
   @Field(() => String, { nullable: true })
   public lastname?: string;
@@ -37,9 +31,6 @@ export class UpdateUserArgs {
 
   @Field(() => String, { nullable: true })
   public gender?: string;
-
-  @Field(() => Int, { nullable: true })
-  public nationality?: number;
 
   @Field({ nullable: true })
   public birthdate?: Date;
@@ -60,9 +51,6 @@ export class UpdateUserArgs {
   public telephone?: string;
 
   @Field(() => String, { nullable: true })
-  public telephone_alt?: string;
-
-  @Field(() => String, { nullable: true })
   public placeholder?: boolean;
 
   @Field(() => [Int], { nullable: true })
@@ -71,7 +59,22 @@ export class UpdateUserArgs {
   public oauthAccessToken?: string | null;
   public oauthIssuer?: string | null;
   public oauthRefreshToken?: string | null;
+}
+
+@ArgsType()
+export class UpdateUserByIdArgs extends UpdateUserArgs {
+  @Field(() => Int!)
+  public id: number;
+
   public oidcSub?: string | null;
+}
+
+@ArgsType()
+export class UpdateUserByOidcSubArgs extends UpdateUserArgs {
+  @Field(() => String!)
+  public oidcSub: string;
+
+  public id: number;
 }
 
 @ArgsType()
@@ -86,7 +89,10 @@ export class UpdateUserRolesArgs {
 @Resolver()
 export class UpdateUserMutation {
   @Mutation(() => User)
-  updateUser(@Args() args: UpdateUserArgs, @Ctx() context: ResolverContext) {
+  updateUser(
+    @Args() args: UpdateUserByIdArgs,
+    @Ctx() context: ResolverContext
+  ) {
     return context.mutations.user.update(context.user, args);
   }
 
@@ -104,5 +110,13 @@ export class UpdateUserMutation {
     @Ctx() context: ResolverContext
   ) {
     return context.mutations.user.setUserNotPlaceholder(context.user, id);
+  }
+
+  @Mutation(() => User)
+  updateUserByOidcSub(
+    @Args() input: UpdateUserByOidcSubArgs,
+    @Ctx() context: ResolverContext
+  ) {
+    return context.mutations.user.updateUserByOidcSub(context.user, input);
   }
 }
