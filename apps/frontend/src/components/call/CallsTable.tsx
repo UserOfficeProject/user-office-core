@@ -47,7 +47,11 @@ const getFilterStatus = (
   archived: boolean
 ): Partial<
   Record<
-    'isEnded' | 'isEndedInternal' | 'isCallEndedByEvent' | 'isActive',
+    | 'isEnded'
+    | 'isEndedInternal'
+    | 'isCallEndedByEvent'
+    | 'isActive'
+    | 'isCallUpcoming',
     boolean
   >
 > => {
@@ -64,8 +68,7 @@ const getFilterStatus = (
     };
   } else {
     return {
-      isEndedInternal: false,
-      isCallEndedByEvent: false,
+      isCallUpcoming: true,
       isActive: archived,
     };
   }
@@ -358,7 +361,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <CallStatusFilter
-            show={isArchivedTab}
+            show={isArchivedTab && !isCallReorderMode}
             callStatus={callStatus ?? CallStatus.ALL}
             onChange={handleStatusFilterChange}
           />
