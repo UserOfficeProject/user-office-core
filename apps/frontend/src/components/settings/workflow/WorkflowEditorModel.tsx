@@ -20,7 +20,6 @@ export enum EventType {
   WORKFLOW_STATUS_DELETED,
   UPDATE_WORKFLOW_METADATA_REQUESTED,
   WORKFLOW_METADATA_UPDATED,
-  ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS,
   NEXT_STATUS_EVENTS_ADDED,
   ADD_NEXT_STATUS_EVENTS_REQUESTED,
   ADD_STATUS_ACTION_REQUESTED,
@@ -85,7 +84,10 @@ const WorkflowEditorModel = (
                 (conn.id === 0 && conn.statusId === updatedConnection.statusId)
             );
             if (connectionIndex !== -1) {
-              draft.workflowConnections[connectionIndex] = updatedConnection;
+              draft.workflowConnections[connectionIndex] = {
+                ...draft.workflowConnections[connectionIndex],
+                ...updatedConnection,
+              };
             }
           }
           // Otherwise, this is just a request that will be handled by middleware
@@ -106,16 +108,20 @@ const WorkflowEditorModel = (
           return { ...draft, ...action.payload };
         }
         case EventType.NEXT_STATUS_EVENTS_ADDED: {
-          // For ReactFlow, we don't use the old group system
+          const { workflowConnection, statusChangingEvents } = action.payload;
+          const connectionIndex = draft.workflowConnections.findIndex(
+            (conn) => conn.id === workflowConnection.id
+          );
+          if (connectionIndex !== -1) {
+            draft.workflowConnections[
+              connectionIndex
+            ].statusChangingEvents!.push(...statusChangingEvents);
+          }
+
           return draft;
         }
         case EventType.STATUS_ACTION_ADDED: {
-          // For ReactFlow, we don't use the old group system
-          return draft;
-        }
-        case EventType.ADD_NEW_ROW_WITH_MULTIPLE_COLUMNS: {
-          // For ReactFlow, we don't use the old group system
-          return draft;
+          return { ...draft, ...action.payload };
         }
       }
     });

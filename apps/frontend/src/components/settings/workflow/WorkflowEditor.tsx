@@ -173,19 +173,27 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         );
 
         if (prevConnection) {
+          const events =
+            connection.statusChangingEvents?.map(
+              (event) => event.statusChangingEvent
+            ) || [];
+          
           const newEdge = edgeFactory({
-            id: `e${prevStatusId}-${statusId}`,
+            id: connection.id.toString(), // Use the actual workflow connection ID
             source: prevStatusId,
             target: statusId,
             data: {
-              events:
-                connection.statusChangingEvents?.map(
-                  (event) => event.statusChangingEvent
-                ) || [],
+              events,
               sourceStatusName: prevConnection.status.name,
               targetStatusName: connection.status.name,
             },
           });
+          
+          // Add label to the edge if there are events
+          if (events.length > 0) {
+            newEdge.label = events.join(', ');
+          }
+          
           newEdges.push(newEdge);
         }
       }
@@ -232,7 +240,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       // Add the connection to the graph
       const newEdge = edgeFactory({
-        id: `e${connection.source}-${connection.target}`,
+        id: `temp-${connection.source}-${connection.target}`, // Temporary ID until persisted
         source: connection.source,
         target: connection.target,
         data: {
@@ -285,9 +293,13 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       if (!sourceStatus || !targetStatus) return;
 
+      // Determine if this is a temporary edge (new connection) or existing one
+      const isTemporaryEdge = edge.id.startsWith('temp-');
+      const workflowConnectionId = isTemporaryEdge ? 0 : parseInt(edge.id);
+
       // Create a WorkflowConnection-like object to pass to the dialog
       const connection: WorkflowConnection = {
-        id: parseInt(edge.id.replace(/\D/g, '')) || 0,
+        id: workflowConnectionId,
         workflowId: state.id || 0,
         sortOrder: 0,
         prevStatusId: parseInt(edge.source),
@@ -297,7 +309,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         statusChangingEvents: (edge.data?.events || []).map(
           (eventId: string) => ({
             statusChangingEvent: eventId,
-            workflowConnectionId: 0,
+            workflowConnectionId: workflowConnectionId,
           })
         ),
         statusActions: [],
