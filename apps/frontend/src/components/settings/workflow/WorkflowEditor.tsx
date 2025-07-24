@@ -30,13 +30,14 @@ interface EdgeData {
   events: string[];
   sourceStatusName: string;
   targetStatusName: string;
+  workflowConnectionId?: number;
 }
 
 const edgeFactory = (
   edgeData: Edge<EdgeData> | (Connection & { id: string })
 ): Edge<EdgeData> => {
   const base = {
-    type: 'floating',
+    type: 'smoothstep', // Use valid ReactFlow edge type
     animated: false,
     markerEnd: {
       type: MarkerType.ArrowClosed,
@@ -173,28 +174,73 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         );
 
         if (prevConnection) {
-          const events =
-            connection.statusChangingEvents?.map(
-              (event) => event.statusChangingEvent
-            ) || [];
-          
-          const newEdge = edgeFactory({
-            id: connection.id.toString(), // Use the actual workflow connection ID
-            source: prevStatusId,
-            target: statusId,
-            data: {
-              events,
-              sourceStatusName: prevConnection.status.name,
-              targetStatusName: connection.status.name,
-            },
-          });
-          
-          // Add label to the edge if there are events
-          if (events.length > 0) {
-            newEdge.label = events.join(', ');
+          const edgeId = `edge-${prevStatusId}-${statusId}`;
+          const edgeAlreadyExists = newEdges.some((edge) => edge.id === edgeId);
+
+          if (!edgeAlreadyExists) {
+            const events =
+              connection.statusChangingEvents?.map(
+                (event) => event.statusChangingEvent
+              ) || [];
+
+            const newEdge = edgeFactory({
+              id: edgeId, // Use consistent edge ID based on source-target
+              source: prevStatusId,
+              target: statusId,
+              data: {
+                events,
+                sourceStatusName: prevConnection.status.name,
+                targetStatusName: connection.status.name,
+                workflowConnectionId: connection.id, // Use target connection ID (destination)
+              },
+            });
+
+            // Add label to the edge if there are events
+            if (events.length > 0) {
+              newEdge.label = events.join(', ');
+            }
+
+            newEdges.push(newEdge);
           }
-          
-          newEdges.push(newEdge);
+        }
+      }
+
+      // Create edge to next status if it exists
+      if (connection.nextStatusId) {
+        const nextStatusId = connection.nextStatusId.toString();
+        const nextConnection = sortedConnections.find(
+          (c) => c.status.id === connection.nextStatusId
+        );
+
+        if (nextConnection) {
+          const edgeId = `edge-${statusId}-${nextStatusId}`;
+          const edgeAlreadyExists = newEdges.some((edge) => edge.id === edgeId);
+
+          if (!edgeAlreadyExists) {
+            const events =
+              nextConnection.statusChangingEvents?.map(
+                (event) => event.statusChangingEvent
+              ) || [];
+
+            const newEdge = edgeFactory({
+              id: edgeId, // Use consistent edge ID based on source-target
+              source: statusId,
+              target: nextStatusId,
+              data: {
+                events,
+                sourceStatusName: connection.status.name,
+                targetStatusName: nextConnection.status.name,
+                workflowConnectionId: nextConnection.id, // Use target connection ID (destination)
+              },
+            });
+
+            // Add label to the edge if there are events
+            if (events.length > 0) {
+              newEdge.label = events.join(', ');
+            }
+
+            newEdges.push(newEdge);
+          }
         }
       }
     });
@@ -293,9 +339,11 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       if (!sourceStatus || !targetStatus) return;
 
-      // Determine if this is a temporary edge (new connection) or existing one
+      // Get the workflow connection ID from edge data
       const isTemporaryEdge = edge.id.startsWith('temp-');
-      const workflowConnectionId = isTemporaryEdge ? 0 : parseInt(edge.id);
+      const workflowConnectionId = isTemporaryEdge
+        ? 0
+        : edge.data?.workflowConnectionId || 0;
 
       // Create a WorkflowConnection-like object to pass to the dialog
       const connection: WorkflowConnection = {
