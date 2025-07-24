@@ -186,7 +186,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   ): Promise<WorkflowConnectionWithStatus[]> {
     const getUniqueOrderedWorkflowConnectionsQuery = `
       SELECT * FROM (
-        SELECT DISTINCT ON (wc.status_id, wc.sort_order) *
+        SELECT *
         FROM workflow_connections as wc
         LEFT JOIN
           statuses as s

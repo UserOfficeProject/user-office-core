@@ -197,6 +197,24 @@ export function usePersistWorkflowEditorModel() {
                   });
                 }
 
+                const workflowConnectionsWithSameStatusId =
+                  state.workflowConnections.filter(
+                    (connection) => connection.statusId === parseInt(statusId)
+                  );
+
+                // Update all connections with the same statusId to the same posX and posY
+                // This is necessary because of existing data structure where the same status can have multiple rows in the db
+                workflowConnectionsWithSameStatusId.forEach((connection) => {
+                  dispatch({
+                    type: EventType.WORKFLOW_STATUS_UPDATED,
+                    payload: {
+                      id: connection.id,
+                      posX: result.posX,
+                      posY: result.posY,
+                    },
+                  });
+                });
+
                 return result;
               } catch (error) {
                 console.error('Failed to update workflow status:', error);

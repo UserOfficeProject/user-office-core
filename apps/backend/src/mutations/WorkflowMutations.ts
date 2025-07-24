@@ -85,6 +85,58 @@ export default class WorkflowMutations {
     }
   }
 
+  private async updateXYForNodesWithStatusId(
+    workflowId: number,
+    statusId: number,
+    posX: number,
+    posY: number
+  ): Promise<void> {
+    const connectionsWithSameStatusId =
+      await this.dataSource.getWorkflowConnectionsById(
+        workflowId,
+        statusId,
+        {}
+      );
+
+    for (const connection of connectionsWithSameStatusId) {
+      connection.posX = posX;
+      connection.posY = posY;
+      await this.dataSource.updateWorkflowStatus(connection);
+    }
+  }
+
+  private async getExistingOrCreateNewWFConnection(
+    args: UpdateWorkflowStatusInput
+  ): Promise<WorkflowConnection | null> {
+    const currentConnection = await this.dataSource.getWorkflowConnection(
+      args.id
+    );
+
+    if (!currentConnection) {
+      return null;
+    }
+
+    if (
+      args.prevStatusId === undefined ||
+      currentConnection.prevStatusId === null ||
+      args.prevStatusId === currentConnection.prevStatusId
+    ) {
+      return currentConnection;
+    }
+
+    const newWorkflowConnection = await this.dataSource.addWorkflowStatus({
+      workflowId: currentConnection.workflowId,
+      statusId: currentConnection.statusId,
+      prevStatusId: args.prevStatusId,
+      nextStatusId: currentConnection.nextStatusId,
+      posX: args.posX ?? currentConnection.posX,
+      posY: args.posY ?? currentConnection.posY,
+      sortOrder: currentConnection.sortOrder,
+    });
+
+    return newWorkflowConnection;
+  }
+
   @Authorized([Roles.USER_OFFICER])
   async updateWorkflowStatus(
     agent: UserWithRole | null,
@@ -92,11 +144,9 @@ export default class WorkflowMutations {
   ): Promise<WorkflowConnection | Rejection> {
     try {
       // Get the current workflow connection
-      const currentConnection = await this.dataSource.getWorkflowConnection(
-        args.id
-      );
-      
-      if (!currentConnection) {
+      const connection = await this.getExistingOrCreateNewWFConnection(args);
+
+      if (!connection) {
         return rejection(
           'Workflow connection not found',
           { agent, args },
@@ -104,16 +154,22 @@ export default class WorkflowMutations {
         );
       }
 
-      // Create updated connection object
+      await this.updateXYForNodesWithStatusId(
+        connection.workflowId,
+        connection.statusId,
+        args.posX ?? connection.posX,
+        args.posY ?? connection.posY
+      );
+
       const updatedConnection = new WorkflowConnection(
-        currentConnection.id,
-        currentConnection.sortOrder,
-        currentConnection.workflowId,
-        currentConnection.statusId,
-        args.nextStatusId ?? currentConnection.nextStatusId,
-        args.prevStatusId ?? currentConnection.prevStatusId,
-        args.posX ?? currentConnection.posX,
-        args.posY ?? currentConnection.posY
+        connection.id,
+        connection.sortOrder,
+        connection.workflowId,
+        connection.statusId,
+        args.nextStatusId ?? connection.nextStatusId,
+        args.prevStatusId ?? connection.prevStatusId,
+        args.posX ?? connection.posX,
+        args.posY ?? connection.posY
       );
 
       return await this.dataSource.updateWorkflowStatus(updatedConnection);
