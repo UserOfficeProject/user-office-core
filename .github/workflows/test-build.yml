@@ -39,15 +39,11 @@ jobs:
             echo $found
           }
 
-          echo "Current branch name (github.head_ref): $BRANCH_NAME" 
-
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
-          echo "FACTORY_TAGS after checking user-office-factory branches: $FACTORY_TAGS"
-
-          GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
+          GHCR_TOKEN="${{ secrets.GITHUB_TOKEN }}"
 
           CHECK_IF_IMAGE_EXISTS=$(curl -H "Authorization: Bearer $GHCR_TOKEN" https://ghcr.io/v2/userofficeproject/user-office-factory/tags/list | jq --arg TAG ${{ github.head_ref }} '.tags as $t | $TAG | IN($t[])')
 
