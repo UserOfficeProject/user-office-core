@@ -97,10 +97,10 @@ export default class QuestionaryQueries {
       return null;
     }
 
-    return this.dataSource.getQuestionarySteps(
-      questionaryId,
-      agent?.currentRole?.shortCode || null
-    );
+    const questionary =
+      await this.dataSource.getQuestionarySteps(questionaryId);
+
+    return this.filterQuestionaryForReadPermissions(agent, questionary);
   }
 
   @Authorized([Roles.USER_OFFICER, Roles.INSTRUMENT_SCIENTIST])
@@ -129,20 +129,14 @@ export default class QuestionaryQueries {
     agent: UserWithRole | null,
     templateId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionarySteps(
-      templateId,
-      agent?.currentRole?.shortCode || null
-    );
+    return this.dataSource.getBlankQuestionarySteps(templateId);
   }
 
   async getBlankQuestionaryStepsByCallId(
     agent: UserWithRole | null,
     callId: number
   ): Promise<QuestionaryStep[]> {
-    return this.dataSource.getBlankQuestionaryStepsByCallId(
-      callId,
-      agent?.currentRole?.shortCode || null
-    );
+    return this.dataSource.getBlankQuestionaryStepsByCallId(callId);
   }
 
   async getQuestionaryStepsOrDefault(
@@ -153,7 +147,7 @@ export default class QuestionaryQueries {
     const steps = await this.getQuestionarySteps(agent, questionaryId);
 
     if (steps) {
-      return steps;
+      return this.filterQuestionaryForReadPermissions(agent, steps);
     }
 
     return this.getBlankQuestionarySteps(agent, templateId);
@@ -187,5 +181,30 @@ export default class QuestionaryQueries {
     return new ProposalAttachments(
       await this.dataSource.getProposalAttachments(proposalPk)
     );
+  }
+
+  filterQuestionaryForReadPermissions(
+    user: UserWithRole | null,
+    questionary: QuestionaryStep[]
+  ) {
+    if (this.userAuth.isApiToken(user)) {
+      return questionary;
+    }
+
+    const questionaryWithReadRights = questionary.map((step) => {
+      return {
+        ...step,
+        fields: step.fields.filter((field) => {
+          return (
+            field.config.readPermissions.length === 0 ||
+            field.config.readPermissions?.some((right) => {
+              return right === user?.currentRole?.shortCode;
+            })
+          );
+        }),
+      };
+    });
+
+    return questionaryWithReadRights;
   }
 }

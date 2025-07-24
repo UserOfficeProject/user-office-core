@@ -5,7 +5,6 @@ import baseContext from '../../buildContext';
 import { Tokens } from '../../config/Tokens';
 import { GenericTemplateDataSource } from '../../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { QuestionaryDataSource } from '../../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../../datasources/SampleDataSource';
 import { TemplateDataSource } from '../../datasources/TemplateDataSource';
 import { DownloadOptions } from '../../middlewares/factory/factoryServices';
@@ -174,14 +173,12 @@ const init = (user: UserWithRole) => {
       };
     })(),
     getQuestionarySteps: (() => {
-      return (questionaryId: number) => {
+      return async (questionaryId: number) => {
         if (user.isApiAccessToken) {
-          return container
-            .resolve<QuestionaryDataSource>(Tokens.QuestionaryDataSource)
-            .getQuestionarySteps(
-              questionaryId,
-              user.currentRole?.shortCode ?? null
-            );
+          return await baseContext.queries.questionary.getQuestionarySteps(
+            null,
+            questionaryId
+          );
         }
 
         return baseContext.queries.questionary.getQuestionarySteps(

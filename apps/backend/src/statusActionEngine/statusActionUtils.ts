@@ -100,8 +100,7 @@ async function stepAnswers(
         for (const sTemplate of subGenericTemplates) {
           const stQuestionarySteps =
             await questionaryDataSource.getQuestionarySteps(
-              sTemplate.questionaryId,
-              null
+              sTemplate.questionaryId
             );
           for (const stStep of stQuestionarySteps) {
             const stFields = stStep.fields.map((field) => field);
@@ -186,8 +185,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           const questionaryDataSource: QuestionaryDataSource =
             container.resolve(Tokens.QuestionaryDataSource);
           const questionarySteps = questionaryDataSource.getQuestionarySteps(
-            proposal.questionaryId,
-            null
+            proposal.questionaryId
           );
           for (const step of await questionarySteps) {
             const stepFields = step.fields.map((field) => field);

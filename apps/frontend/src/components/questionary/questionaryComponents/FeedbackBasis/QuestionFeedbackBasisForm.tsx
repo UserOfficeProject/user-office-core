@@ -4,7 +4,6 @@ import * as Yup from 'yup';
 
 import TextField from 'components/common/FormikUITextField';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
@@ -43,10 +42,6 @@ export const QuestionFeedbackBasisForm = (props: QuestionFormProps) => {
             component={TextField}
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
-          />
-          <QuestionReadPermissionsConfig
-            config={props.question.config}
-            rolesData={props.rolesData}
           />
         </>
       )}

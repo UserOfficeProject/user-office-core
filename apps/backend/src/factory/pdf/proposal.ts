@@ -80,15 +80,13 @@ const getTechnicalReviewHumanReadableStatus = (
 
 const getSampleQuestionarySteps = async (
   questionaryId: number,
-  role: string | null
+  user: UserWithRole | null
 ): Promise<QuestionaryStep[]> => {
-  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
-    Tokens.QuestionaryDataSource
-  );
-  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
-    questionaryId,
-    role
-  );
+  const questionarySteps =
+    await baseContext.queries.questionary.getQuestionarySteps(
+      user,
+      questionaryId
+    );
   if (!questionarySteps) {
     throw new Error(
       `Questionary steps for Questionary ID '${questionaryId}' not found, or the user has insufficient rights`
@@ -528,14 +526,11 @@ export const collectProposalPDFDataTokenAccess = async (
     )[0];
   }
 
-  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
-    Tokens.QuestionaryDataSource
-  );
-
-  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
-    proposal.questionaryId,
-    null
-  );
+  const questionarySteps =
+    await baseContext.queries.questionary.getQuestionarySteps(
+      null,
+      proposal.questionaryId
+    );
 
   if (isRejection(questionarySteps) || questionarySteps == null) {
     logger.logError('Could not fetch questionary steps', {

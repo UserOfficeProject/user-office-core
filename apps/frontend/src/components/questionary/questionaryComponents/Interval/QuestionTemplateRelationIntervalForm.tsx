@@ -15,7 +15,6 @@ import { useUnitsData } from 'hooks/settings/useUnitData';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 
 export const QuestionTemplateRelationIntervalForm = (
   props: QuestionTemplateRelationFormProps
@@ -90,10 +89,6 @@ export const QuestionTemplateRelationIntervalForm = (
               template={props.template}
             />
           </TitledContainer>
-          <QuestionReadPermissionsConfig
-            config={props.questionRel.config}
-            rolesData={props.rolesData}
-          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

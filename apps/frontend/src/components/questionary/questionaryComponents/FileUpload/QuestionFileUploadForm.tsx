@@ -7,7 +7,6 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { FileUploadConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -164,10 +163,6 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
                 />
               )}
             </TitledContainer>
-            <QuestionReadPermissionsConfig
-              config={props.question.config}
-              rolesData={props.rolesData}
-            />
           </>
         );
       }}

@@ -6,7 +6,6 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { TextInputConfig } from 'generated/sdk';
 
 import QuestionDependencyList from '../QuestionDependencyList';
@@ -72,10 +71,6 @@ export const QuestionTemplateRelationRichTextInputForm = (
               template={props.template}
             />
           </TitledContainer>
-          <QuestionReadPermissionsConfig
-            config={props.questionRel.config}
-            rolesData={props.rolesData}
-          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

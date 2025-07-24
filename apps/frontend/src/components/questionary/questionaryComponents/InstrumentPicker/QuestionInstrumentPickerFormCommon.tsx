@@ -5,8 +5,7 @@ import React, { useState } from 'react';
 import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import Select from 'components/common/FormikUISelect';
 import TitledContainer from 'components/common/TitledContainer';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
-import { GetRolesQuery, InstrumentPickerConfig } from 'generated/sdk';
+import { InstrumentPickerConfig } from 'generated/sdk';
 
 const availableVariantOptions = [
   { label: 'Radio', value: 'radio' },
@@ -15,10 +14,8 @@ const availableVariantOptions = [
 
 export const QuestionInstrumentPickerFormCommon = ({
   config,
-  rolesData,
 }: {
   config: InstrumentPickerConfig;
-  rolesData: GetRolesQuery['roles'];
 }) => {
   const [showIsMultipleSelectCheckbox, setShowIsMultipleSelectCheckbox] =
     useState(config.variant === 'dropdown');
@@ -78,7 +75,6 @@ export const QuestionInstrumentPickerFormCommon = ({
           data-cy="request-time"
         />
       </TitledContainer>
-      <QuestionReadPermissionsConfig config={config} rolesData={rolesData} />
     </>
   );
 };

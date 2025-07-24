@@ -45,7 +45,7 @@ it('Field config "required=false" should make field not required', async () => {
 });
 
 it('Dependencies should be satisfied if value matches', async () => {
-  const questionarySteps = await dataSource.getQuestionarySteps(1, null);
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
   const dependee = getFieldById(
     questionarySteps,
     'has_links_with_industry'
@@ -67,7 +67,7 @@ it('Dependencies should be satisfied if value matches', async () => {
 });
 
 it('Multiple choice dependencies should be satisfied if value matches', async () => {
-  const questionarySteps = await dataSource.getQuestionarySteps(1, null);
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
   const dependee = getFieldById(
     questionarySteps,
     'has_links_with_industry'
@@ -91,7 +91,7 @@ it('Multiple choice dependencies should be satisfied if value matches', async ()
 });
 
 it('Multiple choice dependencies with multiple selected', async () => {
-  const questionarySteps = await dataSource.getQuestionarySteps(1, null);
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
   const dependee = getFieldById(questionarySteps, 'multiple_choice') as Answer;
   const depender = getFieldById(
     questionarySteps,
@@ -112,7 +112,7 @@ it('Multiple choice dependencies with multiple selected', async () => {
 });
 
 it('OR dependency allows some satisfied', async () => {
-  const questionarySteps = await dataSource.getQuestionarySteps(1, null);
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
   const dependee1 = getFieldById(questionarySteps, 'or_dependee_1') as Answer;
   const dependee2 = getFieldById(questionarySteps, 'or_dependee_2') as Answer;
   const depender = getFieldById(questionarySteps, 'or_depender') as Answer;
@@ -140,7 +140,7 @@ it('OR dependency allows some satisfied', async () => {
 });
 
 it('AND dependency requires all satisfied', async () => {
-  const questionarySteps = await dataSource.getQuestionarySteps(1, null);
+  const questionarySteps = await dataSource.getQuestionarySteps(1);
   const dependee1 = getFieldById(questionarySteps, 'and_dependee_1') as Answer;
   const dependee2 = getFieldById(questionarySteps, 'and_dependee_2') as Answer;
   const depender = getFieldById(questionarySteps, 'and_depender') as Answer;

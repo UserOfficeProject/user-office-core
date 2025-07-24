@@ -125,8 +125,7 @@ export async function collectGenericTemplatePDFDataTokenAccess(
   const questionarySteps =
     newQuestionarySteps ||
     (await questionaryDataSource.getQuestionarySteps(
-      genericTemplate.questionaryId,
-      null
+      genericTemplate.questionaryId
     ));
 
   if (!questionarySteps) {

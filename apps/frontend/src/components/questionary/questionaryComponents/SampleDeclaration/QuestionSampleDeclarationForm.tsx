@@ -9,7 +9,6 @@ import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   FeatureId,
@@ -187,10 +186,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               }
             />
           </TitledContainer>
-          <QuestionReadPermissionsConfig
-            config={props.question.config}
-            rolesData={props.rolesData}
-          />
         </>
       )}
     </QuestionFormShell>

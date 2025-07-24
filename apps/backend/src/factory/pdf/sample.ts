@@ -133,11 +133,10 @@ export async function collectSamplePDFDataTokenAccess(
   }
 
   const questionarySteps =
-    newQuestionarySteps ||
-    (await questionaryDataSource.getQuestionarySteps(
-      sample.questionaryId,
-      null
-    ));
+    await baseContext.queries.questionary.getQuestionarySteps(
+      null,
+      sample.questionaryId
+    );
 
   if (!questionarySteps) {
     throw new Error(

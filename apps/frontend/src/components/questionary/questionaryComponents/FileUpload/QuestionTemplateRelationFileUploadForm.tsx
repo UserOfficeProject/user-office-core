@@ -7,7 +7,6 @@ import Select from 'components/common/FormikUISelect';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { FileUploadConfig } from 'generated/sdk';
 
 import QuestionDependencyList from '../QuestionDependencyList';
@@ -152,10 +151,6 @@ export const QuestionTemplateRelationFileUploadForm = (
                   template={props.template}
                 />
               </TitledContainer>
-              <QuestionReadPermissionsConfig
-                config={props.questionRel.config}
-                rolesData={props.rolesData}
-              />
             </>
           );
         }

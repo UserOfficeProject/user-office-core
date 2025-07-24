@@ -320,8 +320,7 @@ const createProposals = async () => {
       createUniqueIntArray(3, MAX_USERS)
     );
     const questionarySteps = await questionaryDataSource.getQuestionarySteps(
-      questionary.questionaryId!,
-      null
+      questionary.questionaryId!
     );
     for (const step of questionarySteps) {
       for (const question of step.fields) {

@@ -9,7 +9,6 @@ import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionFormShell } from 'components/questionary/questionaryComponents/QuestionFormShell';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { IntervalConfig } from 'generated/sdk';
 import { useUnitsData } from 'hooks/settings/useUnitData';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
@@ -98,10 +97,6 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
               data-cy="units"
             />
           </TitledContainer>
-          <QuestionReadPermissionsConfig
-            config={props.question.config}
-            rolesData={props.rolesData}
-          />
         </>
       )}
     </QuestionFormShell>

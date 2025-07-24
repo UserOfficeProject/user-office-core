@@ -26,7 +26,6 @@ export const QuestionTemplateRelationInstrumentPickerForm = (
           <QuestionExcerpt question={props.questionRel.question} />
           <QuestionInstrumentPickerFormCommon
             config={props.questionRel.question.config as InstrumentPickerConfig}
-            rolesData={props.rolesData}
           />
         </>
       )}

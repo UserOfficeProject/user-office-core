@@ -6,7 +6,6 @@ import CheckboxWithLabel from 'components/common/FormikUICheckboxWithLabel';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionTemplateRelationFormProps } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionExcerpt } from 'components/questionary/questionaryComponents/QuestionExcerpt';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 
 import QuestionDependencyList from '../QuestionDependencyList';
 import { QuestionTemplateRelationFormShell } from '../QuestionTemplateRelationFormShell';
@@ -44,10 +43,6 @@ export const QuestionTemplateRelationBooleanForm = (
               template={props.template}
             />
           </TitledContainer>
-          <QuestionReadPermissionsConfig
-            config={props.questionRel.config}
-            rolesData={props.rolesData}
-          />
         </>
       )}
     </QuestionTemplateRelationFormShell>

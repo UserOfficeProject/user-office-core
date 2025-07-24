@@ -9,7 +9,6 @@ import FormikUICustomEditor from 'components/common/FormikUICustomEditor';
 import TextField from 'components/common/FormikUITextField';
 import TitledContainer from 'components/common/TitledContainer';
 import { QuestionFormProps } from 'components/questionary/QuestionaryComponentRegistry';
-import { QuestionReadPermissionsConfig } from 'components/questionary/QuestionReadPermissionsConfig';
 import { TextInputConfig } from 'generated/sdk';
 import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
@@ -176,10 +175,6 @@ export const QuestionTextInputForm = (props: QuestionFormProps) => {
               />
             </Collapse>
           </TitledContainer>
-          <QuestionReadPermissionsConfig
-            config={props.question.config}
-            rolesData={props.rolesData}
-          />
         </>
       )}
     </QuestionFormShell>
