@@ -45,7 +45,9 @@ jobs:
 
           GHCR_TOKEN="${{ secrets.GITHUB_TOKEN }}"
 
-          CHECK_IF_IMAGE_EXISTS=$(curl -H "Authorization: Bearer $GHCR_TOKEN" https://ghcr.io/v2/userofficeproject/user-office-factory/tags/list | jq --arg TAG ${{ github.head_ref }} '.tags as $t | $TAG | IN($t[])')
+          curl -v -H "Authorization: Bearer $GHCR_TOKEN" https://ghcr.io/v2/userofficeproject/user-office-factory/tags/list
+
+          CHECK_IF_IMAGE_EXISTS=$(curl -v -H "Authorization: Bearer $GHCR_TOKEN" https://ghcr.io/v2/userofficeproject/user-office-factory/tags/list | jq --arg TAG ${{ github.head_ref }} '.tags as $t | $TAG | IN($t[])')
 
           echo $CHECK_IF_IMAGE_EXISTS
 
