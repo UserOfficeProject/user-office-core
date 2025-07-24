@@ -117,9 +117,9 @@ export default class WorkflowMutations {
     }
 
     if (
-      args.prevStatusId === undefined ||
-      currentConnection.prevStatusId === null ||
-      args.prevStatusId === currentConnection.prevStatusId
+      args.nextStatusId === undefined ||
+      currentConnection.nextStatusId === null ||
+      args.nextStatusId === currentConnection.nextStatusId
     ) {
       return currentConnection;
     }
@@ -127,8 +127,8 @@ export default class WorkflowMutations {
     const newWorkflowConnection = await this.dataSource.addWorkflowStatus({
       workflowId: currentConnection.workflowId,
       statusId: currentConnection.statusId,
-      prevStatusId: args.prevStatusId,
-      nextStatusId: currentConnection.nextStatusId,
+      prevStatusId: currentConnection.prevStatusId,
+      nextStatusId: args.nextStatusId,
       posX: args.posX ?? currentConnection.posX,
       posY: args.posY ?? currentConnection.posY,
       sortOrder: currentConnection.sortOrder,
