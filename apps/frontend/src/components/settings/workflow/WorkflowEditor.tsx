@@ -109,7 +109,10 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 ...e.data,
                 events: eventIds,
               },
-              label: eventIds.length > 0 ? eventIds.join(', ') : undefined,
+              label:
+                eventIds.length > 0
+                  ? eventIds.join(', ') + e.data?.workflowConnectionId
+                  : e.data?.workflowConnectionId,
             };
           }
 
@@ -174,7 +177,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         );
 
         if (prevConnection) {
-          const edgeId = `edge-${prevStatusId}-${statusId}`;
+          // Use connection ID in edge ID to ensure uniqueness when multiple connections exist between same statuses
+          const edgeId = `edge-${prevStatusId}-${statusId}-${connection.id}`;
           const edgeAlreadyExists = newEdges.some((edge) => edge.id === edgeId);
 
           if (!edgeAlreadyExists) {
@@ -184,7 +188,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
               ) || [];
 
             const newEdge = edgeFactory({
-              id: edgeId, // Use consistent edge ID based on source-target
+              id: edgeId, // Use connection ID to ensure unique edge identification
               source: prevStatusId,
               target: statusId,
               data: {
@@ -192,45 +196,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 sourceStatusName: prevConnection.status.name,
                 targetStatusName: connection.status.name,
                 workflowConnectionId: connection.id, // Use target connection ID (destination)
-              },
-            });
-
-            // Add label to the edge if there are events
-            if (events.length > 0) {
-              newEdge.label = events.join(', ');
-            }
-
-            newEdges.push(newEdge);
-          }
-        }
-      }
-
-      // Create edge to next status if it exists
-      if (connection.nextStatusId) {
-        const nextStatusId = connection.nextStatusId.toString();
-        const nextConnection = sortedConnections.find(
-          (c) => c.status.id === connection.nextStatusId
-        );
-
-        if (nextConnection) {
-          const edgeId = `edge-${statusId}-${nextStatusId}`;
-          const edgeAlreadyExists = newEdges.some((edge) => edge.id === edgeId);
-
-          if (!edgeAlreadyExists) {
-            const events =
-              nextConnection.statusChangingEvents?.map(
-                (event) => event.statusChangingEvent
-              ) || [];
-
-            const newEdge = edgeFactory({
-              id: edgeId, // Use consistent edge ID based on source-target
-              source: statusId,
-              target: nextStatusId,
-              data: {
-                events,
-                sourceStatusName: connection.status.name,
-                targetStatusName: nextConnection.status.name,
-                workflowConnectionId: nextConnection.id, // Use target connection ID (destination)
               },
             });
 
@@ -261,7 +226,9 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       // Check if connection already exists
       const connectionExists = edges.some(
         (edge) =>
-          edge.source === connection.source && edge.target === connection.target
+          edge.source === connection.source &&
+          edge.target === connection.target &&
+          !edge.id.startsWith('temp-') // Don't count temporary edges as existing connections
       );
       if (connectionExists) {
         enqueueSnackbar('Connection already exists', {

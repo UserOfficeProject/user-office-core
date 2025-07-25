@@ -49,7 +49,9 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
       <StyledHandle type="target" position={Position.Top} />
       <Container>
         <Title>
-          <Typography variant="subtitle2">{data.status.name}</Typography>
+          <Typography variant="subtitle2">
+            {data.status.name} (id: {data.status.id})
+          </Typography>
           <IconButton
             size="small"
             onClick={(e) => {

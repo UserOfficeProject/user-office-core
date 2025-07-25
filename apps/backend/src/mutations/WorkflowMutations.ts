@@ -117,24 +117,42 @@ export default class WorkflowMutations {
     }
 
     if (
-      args.nextStatusId === undefined ||
-      currentConnection.nextStatusId === null ||
-      args.nextStatusId === currentConnection.nextStatusId
+      args.nextStatusId !== undefined &&
+      currentConnection.nextStatusId !== null &&
+      args.nextStatusId !== currentConnection.nextStatusId
     ) {
-      return currentConnection;
+      const newWorkflowConnection = await this.dataSource.addWorkflowStatus({
+        workflowId: currentConnection.workflowId,
+        statusId: currentConnection.statusId,
+        prevStatusId: currentConnection.prevStatusId,
+        nextStatusId: args.nextStatusId,
+        posX: args.posX ?? currentConnection.posX,
+        posY: args.posY ?? currentConnection.posY,
+        sortOrder: currentConnection.sortOrder,
+      });
+
+      return newWorkflowConnection;
     }
 
-    const newWorkflowConnection = await this.dataSource.addWorkflowStatus({
-      workflowId: currentConnection.workflowId,
-      statusId: currentConnection.statusId,
-      prevStatusId: currentConnection.prevStatusId,
-      nextStatusId: args.nextStatusId,
-      posX: args.posX ?? currentConnection.posX,
-      posY: args.posY ?? currentConnection.posY,
-      sortOrder: currentConnection.sortOrder,
-    });
+    if (
+      args.prevStatusId !== undefined &&
+      currentConnection.prevStatusId !== null &&
+      args.prevStatusId !== currentConnection.prevStatusId
+    ) {
+      const newWorkflowConnection = await this.dataSource.addWorkflowStatus({
+        workflowId: currentConnection.workflowId,
+        statusId: currentConnection.statusId,
+        prevStatusId: args.prevStatusId,
+        nextStatusId: currentConnection.nextStatusId,
+        posX: args.posX ?? currentConnection.posX,
+        posY: args.posY ?? currentConnection.posY,
+        sortOrder: currentConnection.sortOrder,
+      });
 
-    return newWorkflowConnection;
+      return newWorkflowConnection;
+    }
+
+    return currentConnection;
   }
 
   @Authorized([Roles.USER_OFFICER])
