@@ -2,16 +2,38 @@ import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
+import { styled } from '@mui/system';
 import { updateWorkflowValidationSchema } from '@user-office-software/duo-validation/lib/Workflow';
 import { Field, Form, Formik } from 'formik';
 import React, { useState } from 'react';
+import { ConnectionLineType } from 'reactflow';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
-import TextField from 'components/common/FormikUITextField';
+import FormikUISelect from 'components/common/FormikUISelect';
+import FormikUITextField from 'components/common/FormikUITextField';
 import { Workflow } from 'generated/sdk';
 import { StyledButtonContainer } from 'styles/StyledComponents';
 
 import { Event, EventType } from './WorkflowEditorModel';
+
+// Connection line type options for the dropdown
+const CONNECTION_LINE_TYPE_OPTIONS = [
+  { value: ConnectionLineType.Bezier, text: 'Bezier' },
+  { value: ConnectionLineType.Straight, text: 'Straight' },
+  { value: ConnectionLineType.Step, text: 'Step' },
+  { value: ConnectionLineType.SmoothStep, text: 'Smooth Step' },
+  { value: ConnectionLineType.SimpleBezier, text: 'Simple Bezier' },
+];
+
+const StyledButton = styled(Button)({
+  margin: '25px 10px 0 10px',
+  '&:first-of-type': {
+    marginLeft: '0',
+  },
+  '&:last-of-type': {
+    marginRight: '0',
+  },
+});
 
 const WorkflowMetadataEditor = ({
   workflow,
@@ -31,22 +53,13 @@ const WorkflowMetadataEditor = ({
         {workflow.description}
       </Box>
       <StyledButtonContainer>
-        <Button
+        <StyledButton
           startIcon={<EditIcon />}
           onClick={() => setIsEditMode(true)}
-          sx={{
-            margin: '25px 10px 0 10px',
-            '&:first-of-type': {
-              marginLeft: '0',
-            },
-            '&:last-of-type': {
-              marginRight: '0',
-            },
-          }}
           data-cy="Edit-button"
         >
           Edit
-        </Button>
+        </StyledButton>
       </StyledButtonContainer>
     </div>
   );
@@ -67,9 +80,9 @@ const WorkflowMetadataEditor = ({
           <Field
             name="name"
             id="name"
-            label="Name"
+            text="Name"
             type="text"
-            component={TextField}
+            component={FormikUITextField}
             value={values.name}
             onChange={handleChange}
             fullWidth
@@ -79,48 +92,42 @@ const WorkflowMetadataEditor = ({
           <Field
             name="description"
             id="description"
-            label="Description"
+            text="Description"
             type="text"
-            component={TextField}
+            component={FormikUITextField}
             value={values.description}
             onChange={handleChange}
             fullWidth
             data-cy="description"
           />
+
+          <Field
+            name="connectionLineType"
+            id="connectionLineType"
+            text="Connection Line Type"
+            component={FormikUISelect}
+            value={values.connectionLineType || ConnectionLineType.Bezier}
+            options={CONNECTION_LINE_TYPE_OPTIONS}
+            onChange={handleChange}
+            fullWidth
+            data-cy="connectionLineType"
+          />
           <ActionButtonContainer>
-            <Button
+            <StyledButton
               disabled={isSubmitting}
               variant="text"
               color="secondary"
               onClick={() => setIsEditMode(false)}
-              sx={{
-                margin: '25px 10px 0 10px',
-                '&:first-of-type': {
-                  marginLeft: '0',
-                },
-                '&:last-of-type': {
-                  marginRight: '0',
-                },
-              }}
             >
               Cancel
-            </Button>
-            <Button
+            </StyledButton>
+            <StyledButton
               disabled={isSubmitting}
               data-cy="submit"
               type="submit"
-              sx={{
-                margin: '25px 10px 0 10px',
-                '&:first-of-type': {
-                  marginLeft: '0',
-                },
-                '&:last-of-type': {
-                  marginRight: '0',
-                },
-              }}
             >
               Update
-            </Button>
+            </StyledButton>
           </ActionButtonContainer>
         </Form>
       )}

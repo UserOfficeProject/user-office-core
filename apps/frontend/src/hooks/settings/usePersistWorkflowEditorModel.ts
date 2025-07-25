@@ -21,7 +21,8 @@ export function usePersistWorkflowEditorModel() {
   const updateWorkflowMetadata = async (
     id: number,
     name: string,
-    description: string
+    description: string,
+    connectionLineType: string
   ) => {
     return api({
       toastSuccessMessage: 'Workflow updated successfully!',
@@ -30,6 +31,7 @@ export function usePersistWorkflowEditorModel() {
         id,
         name,
         description,
+        connectionLineType,
       })
       .then((data) => data.updateWorkflow);
   };
@@ -126,10 +128,10 @@ export function usePersistWorkflowEditorModel() {
 
       switch (action.type) {
         case EventType.UPDATE_WORKFLOW_METADATA_REQUESTED: {
-          const { id, name, description } = action.payload;
+          const { id, name, description, connectionLineType } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await updateWorkflowMetadata(id, name, description);
+            const result = await updateWorkflowMetadata(id, name, description, connectionLineType);
 
             if (result) {
               dispatch({

@@ -13,6 +13,7 @@ mutation createWorkflow(
     id
     name
     description
+    connectionLineType
     workflowConnections {
       id
       sortOrder

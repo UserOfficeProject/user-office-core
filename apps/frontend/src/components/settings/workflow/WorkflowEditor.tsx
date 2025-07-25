@@ -4,6 +4,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import {
   addEdge,
   Connection,
+  ConnectionLineType,
   Edge,
   MarkerType,
   Node,
@@ -37,7 +38,6 @@ const edgeFactory = (
   edgeData: Edge<EdgeData> | (Connection & { id: string })
 ): Edge<EdgeData> => {
   const base = {
-    type: 'smoothstep', // Use valid ReactFlow edge type
     animated: false,
     markerEnd: {
       type: MarkerType.ArrowClosed,
@@ -471,6 +471,9 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                   }
                 }}
                 reactFlowWrapper={reactFlowWrapper}
+                connectionLineType={
+                  state.connectionLineType as ConnectionLineType
+                }
               />
             </Grid>
             <Grid item xs={3}>

@@ -1,10 +1,11 @@
-mutation updateWorkflow($id: Int!, $name: String!, $description: String!) {
+mutation updateWorkflow($id: Int!, $name: String!, $description: String!, $connectionLineType: String) {
   updateWorkflow(
-    updatedWorkflowInput: { id: $id, name: $name, description: $description }
+    updatedWorkflowInput: { id: $id, name: $name, description: $description, connectionLineType: $connectionLineType }
   ) {
     id
     name
     description
+    connectionLineType
     workflowConnections {
       id
       sortOrder

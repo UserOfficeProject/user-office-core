@@ -37,6 +37,7 @@ interface WorkflowCanvasProps {
   onEdgeClick: (event: React.MouseEvent, edge: Edge) => void;
   onNodeDragStop?: NodeDragHandler;
   reactFlowWrapper: React.RefObject<HTMLDivElement>;
+  connectionLineType: ConnectionLineType;
 }
 
 const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
@@ -51,9 +52,11 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   onEdgeClick,
   onNodeDragStop,
   reactFlowWrapper,
+  connectionLineType,
 }) => {
   return (
     <div ref={reactFlowWrapper} style={{ height: '100%' }}>
+      {connectionLineType}
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -66,8 +69,10 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
         onEdgeClick={onEdgeClick}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
+        defaultEdgeOptions={{
+          type: connectionLineType || 'default',
+        }}
         fitView
-        connectionLineType={ConnectionLineType.SmoothStep}
       >
         <Background color="#aaa" gap={16} />
         <Controls />

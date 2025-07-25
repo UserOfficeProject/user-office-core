@@ -570,6 +570,7 @@ export interface WorkflowRecord {
   readonly description: string;
   readonly full_count: number;
   readonly entity_type: WorkflowType;
+  readonly connection_line_type: string;
 }
 
 export interface WorkflowConnectionRecord {

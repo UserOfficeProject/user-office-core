@@ -25,7 +25,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflow.workflow_id,
       workflow.name,
       workflow.description,
-      workflow.entity_type
+      workflow.entity_type,
+      workflow.connection_line_type
     );
   }
 
@@ -153,6 +154,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
           workflow_id: workflow.id,
           name: workflow.name,
           description: workflow.description,
+          connection_line_type: workflow.connectionLineType,
         },
         ['*']
       )

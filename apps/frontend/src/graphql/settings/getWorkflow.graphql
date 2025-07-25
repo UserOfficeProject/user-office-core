@@ -3,6 +3,7 @@ query getWorkflow($workflowId: Int!) {
     id
     name
     description
+    connectionLineType
     workflowConnections {
       id
       sortOrder

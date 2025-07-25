@@ -12,7 +12,7 @@ import { ResolverContext } from '../../../context';
 import { Workflow } from '../../types/Workflow';
 
 @InputType()
-export class UpdateWorkflowInput implements Omit<Workflow, 'entityType'> {
+export class UpdateWorkflowInput {
   @Field(() => Int)
   public id: number;
 
@@ -21,6 +21,9 @@ export class UpdateWorkflowInput implements Omit<Workflow, 'entityType'> {
 
   @Field(() => String)
   public description: string;
+
+  @Field(() => String, { nullable: true })
+  public connectionLineType?: string;
 }
 
 @Resolver()

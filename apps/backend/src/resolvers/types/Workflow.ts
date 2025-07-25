@@ -30,6 +30,9 @@ export class Workflow implements Partial<WorkflowOrigin> {
 
   @Field(() => WorkflowType)
   public entityType: WorkflowType;
+
+  @Field(() => String)
+  public connectionLineType: string;
 }
 
 @Resolver(() => Workflow)
