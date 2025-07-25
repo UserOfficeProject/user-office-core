@@ -1,5 +1,12 @@
-import { List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
-import React from 'react';
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
+import React, { useState } from 'react';
 
 import { Status } from 'generated/sdk';
 
@@ -12,6 +19,16 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
   statuses,
   onDragStart,
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter statuses based on search term
+  const filteredStatuses = statuses.filter(
+    (status) =>
+      status.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (status.description &&
+        status.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   return (
     <Paper style={{ height: '100%', overflow: 'auto', padding: '10px' }}>
       <Typography variant="h6" component="h2" gutterBottom>
@@ -20,8 +37,19 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
       <Typography variant="body2" color="textSecondary" paragraph>
         Drag a status into the diagram to add it to the workflow.
       </Typography>
-      <List dense style={{ maxHeight: '500px', overflow: 'auto' }}>
-        {statuses.map((status) => (
+
+      <TextField
+        fullWidth
+        size="small"
+        placeholder="Search statuses..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginBottom: '10px' }}
+        variant="outlined"
+      />
+
+      <List dense style={{ maxHeight: '400px', overflow: 'auto' }}>
+        {filteredStatuses.map((status) => (
           <ListItem
             key={status.id}
             button
@@ -49,6 +77,11 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
             />
           </ListItem>
         ))}
+        {filteredStatuses.length === 0 && searchTerm && (
+          <Typography color="textSecondary">
+            No statuses match your search
+          </Typography>
+        )}
       </List>
     </Paper>
   );
