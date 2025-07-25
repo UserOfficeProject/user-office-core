@@ -89,7 +89,18 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     reducerMiddleware,
   ]);
 
-  const statusesInThePicker = state.id ? statuses : [];
+  // Filter statuses to only show those not already used in the workflow
+  const statusesInThePicker = React.useMemo(() => {
+    if (!state.id) {
+      return [];
+    }
+
+    const usedStatusIds = new Set(
+      state.workflowConnections?.map((connection) => connection.status.id) || []
+    );
+
+    return statuses.filter((status) => !usedStatusIds.has(status.id));
+  }, [state.id, state.workflowConnections, statuses]);
 
   // Effect to update edge labels when workflowConnection changes
   React.useEffect(() => {

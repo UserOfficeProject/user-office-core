@@ -43,7 +43,7 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
           >
             <ListItemText
               primary={status.name}
-              secondary={`ID: ${status.id}`}
+              secondary={status.description}
               primaryTypographyProps={{ variant: 'subtitle2' }}
               secondaryTypographyProps={{ variant: 'caption' }}
             />

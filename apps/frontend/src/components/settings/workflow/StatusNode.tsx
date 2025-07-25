@@ -79,9 +79,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
         <Title>
           <TitleContent onClick={handleToggleExpand}>
             <ExpandIcon expanded={expanded} />
-            <Typography variant="subtitle2">
-              {data.status.name} ({data.status.id})
-            </Typography>
+            <Typography variant="subtitle2">{data.status.name}</Typography>
           </TitleContent>
           <IconButton
             size="small"
