@@ -36,10 +36,10 @@ const WorkflowMetadataEditor = ({
           onClick={() => setIsEditMode(true)}
           sx={{
             margin: '25px 10px 0 10px',
-            '&:first-child': {
+            '&:first-of-type': {
               marginLeft: '0',
             },
-            '&:last-child': {
+            '&:last-of-type': {
               marginRight: '0',
             },
           }}
@@ -95,10 +95,10 @@ const WorkflowMetadataEditor = ({
               onClick={() => setIsEditMode(false)}
               sx={{
                 margin: '25px 10px 0 10px',
-                '&:first-child': {
+                '&:first-of-type': {
                   marginLeft: '0',
                 },
-                '&:last-child': {
+                '&:last-of-type': {
                   marginRight: '0',
                 },
               }}
@@ -111,10 +111,10 @@ const WorkflowMetadataEditor = ({
               type="submit"
               sx={{
                 margin: '25px 10px 0 10px',
-                '&:first-child': {
+                '&:first-of-type': {
                   marginLeft: '0',
                 },
-                '&:last-child': {
+                '&:last-of-type': {
                   marginRight: '0',
                 },
               }}
