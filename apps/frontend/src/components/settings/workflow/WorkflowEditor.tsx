@@ -197,7 +197,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
             // Add label to the edge if there are events
             if (events.length > 0) {
-              newEdge.label = events.join(', ');
+              newEdge.label = events.join(' && ');
             }
 
             newEdges.push(newEdge);

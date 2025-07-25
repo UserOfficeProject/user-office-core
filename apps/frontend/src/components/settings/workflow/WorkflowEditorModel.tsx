@@ -113,9 +113,8 @@ const WorkflowEditorModel = (
             (conn) => conn.id === workflowConnection.id
           );
           if (connectionIndex !== -1) {
-            draft.workflowConnections[
-              connectionIndex
-            ].statusChangingEvents!.push(...statusChangingEvents);
+            draft.workflowConnections[connectionIndex].statusChangingEvents =
+              statusChangingEvents;
           }
 
           return draft;

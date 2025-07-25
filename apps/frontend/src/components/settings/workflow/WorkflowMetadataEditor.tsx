@@ -52,6 +52,9 @@ const WorkflowMetadataEditor = ({
       <Box sx={{ fontSize: '16px', whiteSpace: 'pre-wrap' }}>
         {workflow.description}
       </Box>
+      <Box sx={{ fontSize: '13px', color: 'grey' }}>
+        Connection line style: {workflow.connectionLineType}
+      </Box>
       <StyledButtonContainer>
         <StyledButton
           startIcon={<EditIcon />}
