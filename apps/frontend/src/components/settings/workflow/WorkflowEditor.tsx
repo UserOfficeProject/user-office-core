@@ -109,10 +109,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 ...e.data,
                 events: eventIds,
               },
-              label:
-                eventIds.length > 0
-                  ? eventIds.join(', ') + e.data?.workflowConnectionId
-                  : e.data?.workflowConnectionId,
+              label: eventIds.length > 0 ? eventIds.join(', ') : undefined,
             };
           }
 
@@ -177,7 +174,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         );
 
         if (prevConnection) {
-          // Use connection ID in edge ID to ensure uniqueness when multiple connections exist between same statuses
           const edgeId = `edge-${prevStatusId}-${statusId}-${connection.id}`;
           const edgeAlreadyExists = newEdges.some((edge) => edge.id === edgeId);
 
@@ -447,16 +443,31 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 onEdgeClick={onEdgeClick}
                 onNodeDragStop={(event, node) => {
                   // Extract statusId from node data
-
                   if (node.data && node.data.status && node.position) {
-                    dispatch({
-                      type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
-                      payload: {
-                        statusId: node.data.status.id,
-                        posX: Math.round(node.position.x),
-                        posY: Math.round(node.position.y),
-                      },
-                    });
+                    const statusId = node.data.status.id;
+                    const newPosX = Math.round(node.position.x);
+                    const newPosY = Math.round(node.position.y);
+
+                    // Find the workflow connection for this status to check current position
+                    const workflowConnection = state.workflowConnections.find(
+                      (connection) => connection.statusId === statusId
+                    );
+
+                    // Only dispatch update if position has actually changed
+                    if (
+                      workflowConnection &&
+                      (workflowConnection.posX !== newPosX ||
+                        workflowConnection.posY !== newPosY)
+                    ) {
+                      dispatch({
+                        type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
+                        payload: {
+                          statusId: statusId,
+                          posX: newPosX,
+                          posY: newPosY,
+                        },
+                      });
+                    }
                   }
                 }}
                 reactFlowWrapper={reactFlowWrapper}
