@@ -13,10 +13,15 @@ import ReactFlow, {
 } from 'reactflow';
 
 import StatusNode from './StatusNode';
+import WorkflowEdge from './WorkflowEdge';
 
-// Register custom node types
+// Register custom node and edge types
 const nodeTypes = {
   statusNode: StatusNode,
+};
+
+const edgeTypes = {
+  workflow: WorkflowEdge,
 };
 
 interface EdgeData {
@@ -69,8 +74,9 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
         onEdgeClick={onEdgeClick}
         onNodeDragStop={onNodeDragStop}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         defaultEdgeOptions={{
-          type: connectionLineType || 'default',
+          type: 'workflow',
         }}
         fitView
       >

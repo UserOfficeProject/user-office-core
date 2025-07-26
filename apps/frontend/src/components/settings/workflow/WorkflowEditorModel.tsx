@@ -2,6 +2,7 @@
 import produce from 'immer';
 import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { ConnectionLineType } from 'reactflow';
 
 import { Workflow, WorkflowType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
@@ -41,7 +42,8 @@ const WorkflowEditorModel = (
     name: '',
     description: '',
     workflowConnections: [],
-    entityType: entityType, // NOTE: This is hardcoded for now
+    connectionLineType: ConnectionLineType.Bezier,
+    entityType: entityType,
   };
 
   function reducer(state: Workflow, action: Event): Workflow {

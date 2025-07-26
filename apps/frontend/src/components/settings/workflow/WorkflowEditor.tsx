@@ -14,7 +14,11 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { WorkflowConnection, WorkflowType } from 'generated/sdk';
+import {
+  ConnectionStatusAction,
+  WorkflowConnection,
+  WorkflowType,
+} from 'generated/sdk';
 import { usePersistWorkflowEditorModel } from 'hooks/settings/usePersistWorkflowEditorModel';
 import { useStatusesData } from 'hooks/settings/useStatusesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
@@ -32,6 +36,8 @@ interface EdgeData {
   sourceStatusName: string;
   targetStatusName: string;
   workflowConnectionId?: number;
+  statusActions: ConnectionStatusAction[];
+  connectionLineType?: ConnectionLineType;
 }
 
 const edgeFactory = (
@@ -119,8 +125,11 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
               data: {
                 ...e.data,
                 events: eventIds,
+                statusActions:
+                  (workflowConnection.statusActions?.length || 0) > 0,
+                connectionLineType:
+                  state.connectionLineType as ConnectionLineType,
               },
-              label: eventIds.length > 0 ? eventIds.join(', ') : undefined,
             };
           }
 
@@ -128,7 +137,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         })
       );
     }
-  }, [workflowConnection, selectedEdge, setEdges]);
+  }, [workflowConnection, selectedEdge, setEdges, state.connectionLineType]);
 
   // Convert workflow connections to React Flow nodes and edges when state changes
   React.useEffect(() => {
@@ -198,18 +207,17 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
               id: edgeId, // Use connection ID to ensure unique edge identification
               source: prevStatusId,
               target: statusId,
+              type: 'workflow', // Use custom workflow edge type
               data: {
                 events,
                 sourceStatusName: prevConnection.status.name,
                 targetStatusName: connection.status.name,
                 workflowConnectionId: connection.id, // Use target connection ID (destination)
+                statusActions: connection.statusActions || [],
+                connectionLineType:
+                  state.connectionLineType as ConnectionLineType,
               },
             });
-
-            // Add label to the edge if there are events
-            if (events.length > 0) {
-              newEdge.label = events.join(' && ');
-            }
 
             newEdges.push(newEdge);
           }
@@ -220,7 +228,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     setNodes(newNodes);
     setEdges(newEdges);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.workflowConnections, setNodes, setEdges]);
+  }, [state.workflowConnections, state.connectionLineType, setNodes, setEdges]);
 
   // Handle connecting nodes (adding transitions)
   const onConnect = useCallback(
@@ -263,10 +271,13 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         id: `temp-${connection.source}-${connection.target}`, // Temporary ID until persisted
         source: connection.source,
         target: connection.target,
+        type: 'workflow', // Use custom workflow edge type
         data: {
           events: [], // No events initially
           sourceStatusName: sourceStatus.name,
           targetStatusName: targetStatus.name,
+          statusActions: [],
+          connectionLineType: state.connectionLineType as ConnectionLineType,
         },
       });
 
@@ -295,7 +306,14 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       // Note: Connection is persisted by updating both source and target statuses
     },
-    [dispatch, edges, enqueueSnackbar, setEdges, statuses]
+    [
+      dispatch,
+      edges,
+      enqueueSnackbar,
+      setEdges,
+      statuses,
+      state.connectionLineType,
+    ]
   );
 
   // Handle edge click to open the transition event dialog

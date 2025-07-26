@@ -20,7 +20,6 @@ import { Event, EventType } from './WorkflowEditorModel';
 const CONNECTION_LINE_TYPE_OPTIONS = [
   { value: ConnectionLineType.Bezier, text: 'Bezier' },
   { value: ConnectionLineType.Straight, text: 'Straight' },
-  { value: ConnectionLineType.Step, text: 'Step' },
   { value: ConnectionLineType.SmoothStep, text: 'Smooth Step' },
   { value: ConnectionLineType.SimpleBezier, text: 'Simple Bezier' },
 ];
