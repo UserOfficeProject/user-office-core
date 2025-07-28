@@ -187,7 +187,8 @@ export default class QuestionaryQueries {
     user: UserWithRole | null,
     questionary: QuestionaryStep[]
   ) {
-    if (this.userAuth.isApiToken(user)) {
+    // If user is null it means the call came from a API token e.g. collectSamplePDFDataTokenAccess
+    if (user === null || this.userAuth.isApiToken(user)) {
       return questionary;
     }
 
