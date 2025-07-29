@@ -3,6 +3,7 @@ import {
   ExperimentSafetyPdfTemplateRecord,
 } from 'knex/types/tables';
 
+import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -991,7 +992,8 @@ export const createBasicUserObject = (
     user.created_at,
     user.placeholder,
     user.email,
-    user.country
+    user.country,
+    user.user_title
   );
 };
 
@@ -1393,6 +1395,7 @@ export interface InviteRecord {
   readonly claimed_at: Date | null;
   readonly is_email_sent: boolean;
   readonly expires_at: Date | null;
+  readonly template_id: EmailTemplateId | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>
@@ -1405,7 +1408,8 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.claimed_at,
     invite.claimed_by,
     invite.is_email_sent,
-    invite.expires_at
+    invite.expires_at,
+    invite.template_id as EmailTemplateId | null
   );
 
 export interface RoleClaimRecord {
