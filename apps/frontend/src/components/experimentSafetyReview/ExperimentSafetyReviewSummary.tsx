@@ -80,6 +80,9 @@ function ExperimentSafetyReviewSummary({
   const [isFormLocked, setIsFormLocked] = useState<boolean>(
     getInitialDecision !== ''
   );
+  const [isDownloadEnabled, setIsDownloadEnabled] = useState<boolean>(
+    state?.experimentSafety.status?.shortCode === 'ESF_APPROVED'
+  );
 
   const downloadExperimentSafety = useDownloadPDFExperimentSafety();
 
@@ -102,13 +105,13 @@ function ExperimentSafetyReviewSummary({
           Review
         </InputLabel>{' '}
         <Select
-          id="technique-select"
+          id="experimentSafetyReviewMakeDecision"
           aria-labelledby="exp-safety-review"
           onChange={(e) => {
             setDecision(e.target.value as 'ACCEPTED' | 'REJECTED' | '');
           }}
           value={decision}
-          data-cy="safety-review-decision"
+          data-cy="experiment-safety-review-make-decision"
           displayEmpty
           disabled={isFormLocked}
         >
@@ -125,14 +128,14 @@ function ExperimentSafetyReviewSummary({
 
       <FormControl fullWidth sx={{ mt: 2 }}>
         <TextField
-          id="safety-review-comment"
+          id="experimentSafetyReviewComment"
           label="Comments"
           multiline
           rows={4}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           variant="outlined"
-          data-cy="safety-review-comment"
+          data-cy="experiment-safety-review-comment"
           disabled={isFormLocked}
         />
       </FormControl>
@@ -183,6 +186,12 @@ function ExperimentSafetyReviewSummary({
                         itemWithQuestionary:
                           submitInstrumentScientistExperimentSafetyReview,
                       });
+
+                      // Update download enabled state based on the actual status
+                      setIsDownloadEnabled(
+                        submitInstrumentScientistExperimentSafetyReview?.status
+                          ?.shortCode === 'ESF_APPROVED'
+                      );
                     } else {
                       // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
                       const {
@@ -208,6 +217,12 @@ function ExperimentSafetyReviewSummary({
                         itemWithQuestionary:
                           submitExperimentSafetyReviewerExperimentSafetyReview,
                       });
+
+                      // Update download enabled state based on the actual status
+                      setIsDownloadEnabled(
+                        submitExperimentSafetyReviewerExperimentSafetyReview
+                          ?.status?.shortCode === 'ESF_APPROVED'
+                      );
                     }
                     // Lock the form after successful submission
                     setIsFormLocked(true);
@@ -237,7 +252,7 @@ function ExperimentSafetyReviewSummary({
             )
           }
           color="secondary"
-          disabled={state.experimentSafety.status?.shortCode !== 'ESF_APPROVED'}
+          disabled={!isDownloadEnabled}
         >
           Download Safety Review Document
         </Button>

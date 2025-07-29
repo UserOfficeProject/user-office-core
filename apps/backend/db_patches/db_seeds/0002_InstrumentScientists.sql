@@ -18,6 +18,12 @@ BEGIN
     telephone, created_at, updated_at, institution_id, placeholder)
     VALUES (102, '', 'Not', 'Scientist', 'not.instr.sci', '-', 'not.instr.sci.oauthsub', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'not.instr.sci@local.host', '', NOW(), NOW(), 1, false);
 
+  -- user account with experiment safety reviewer
+  INSERT INTO users(
+    user_id, user_title, firstname, lastname, username, preferredname, oidc_sub, oauth_refresh_token, gender, birthdate, department, "position", email, 
+    telephone, created_at, updated_at, institution_id, placeholder)
+    VALUES (103, '', 'Experiment', 'Safety', 'experiment.safety', '-', 'experiment.safety.oauthsub', 'dummy-refresh-token', 'e2e user', '2020-10-10', 'IT', '', 'experiment.safety@local.host', '', NOW(), NOW(), 1, false);
+
   INSERT INTO role_user(
     role_id, user_id)
     VALUES (7, 100), (7, 101);
@@ -33,6 +39,10 @@ BEGIN
   INSERT INTO instrument_has_scientists(
     instrument_id, user_id)
     VALUES (2, 101);
+
+  INSERT INTO role_user(
+    role_id, user_id)
+    VALUES (8, 103);
 
 END;
 $DO$
