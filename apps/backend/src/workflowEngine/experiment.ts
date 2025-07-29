@@ -285,11 +285,6 @@ export const workflowEngine = async (
       (p): p is WorkflowEngineExperimentType => !!p
     );
 
-  // NOTE: Call the actions engine here
-  // if (filteredExperimentsWithChangedStatuses.length) {
-  //   proposalStatusActionEngine(filteredExperimentsWithChangedStatuses);
-  // }
-
   return filteredExperimentsWithChangedStatuses;
 };
 
