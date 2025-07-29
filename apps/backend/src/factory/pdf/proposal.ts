@@ -526,11 +526,13 @@ export const collectProposalPDFDataTokenAccess = async (
     )[0];
   }
 
-  const questionarySteps =
-    await baseContext.queries.questionary.getQuestionarySteps(
-      null,
-      proposal.questionaryId
-    );
+  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
+  );
+
+  const questionarySteps = await questionaryDataSource.getQuestionarySteps(
+    proposal.questionaryId
+  );
 
   if (isRejection(questionarySteps) || questionarySteps == null) {
     logger.logError('Could not fetch questionary steps', {
