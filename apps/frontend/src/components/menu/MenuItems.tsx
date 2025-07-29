@@ -60,9 +60,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
   )?.isEnabled;
-  // const isExperimentSafetyReviewEnabled = context.featuresMap.get(
-  //   FeatureId.EXPERIMENT_SAFETY_REVIEW
-  // )?.isEnabled; // TODO: This needs to be removed or used somewhere. It make sense to just have isSchedulerEnabled to enable Safety Reviews. Need to be checked with the team.
 
   const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
     UserRole.USER_OFFICER,

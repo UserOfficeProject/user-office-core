@@ -8,7 +8,6 @@ import { useNaturalKeySchema } from 'utils/userFieldValidationSchema';
 
 import { QuestionFormShell } from '../QuestionFormShell';
 
-// TODO: this needs to be tested
 export const QuestionExperimentSafetyReviewBasisForm = (
   props: QuestionFormProps
 ) => {
