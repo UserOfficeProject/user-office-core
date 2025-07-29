@@ -27,6 +27,7 @@ export const basicDummyUser = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   false,
   'test@email.com',
+  '',
   ''
 );
 
@@ -41,6 +42,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   false,
   'test@email.com',
+  '',
   ''
 );
 
@@ -297,6 +299,7 @@ export class UserDataSourceMock implements UserDataSource {
       new Date('2019-07-17 08:25:12.23043+00'),
       false,
       'test@email.com',
+      '',
       ''
     );
   }
