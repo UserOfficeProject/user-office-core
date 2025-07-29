@@ -1,6 +1,7 @@
 import { logger } from '@user-office-software/duo-logger';
 
 import { BasicPersonDetailsDTO } from '../../../generated/models/BasicPersonDetailsDTO';
+import { PermissionUserGroupDTO } from '../../../generated/models/PermissionUserGroupDTO';
 import { RoleDTO } from '../../../generated/models/RoleDTO';
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
@@ -105,7 +106,8 @@ export function toEssBasicUserDetails(
     new Date(),
     false,
     stfcUser.email ?? '',
-    stfcUser.country ?? ''
+    stfcUser.country ?? '',
+    stfcUser.title ?? ''
   );
 }
 
@@ -729,6 +731,38 @@ export class StfcUserDataSource implements UserDataSource {
     return await postgresUserDataSource.checkTechniqueScientistToProposal(
       userId,
       proposalPk
+    );
+  }
+
+  roleAssignmentMap = new Map<number, string>([
+    [50, 'FAP Chair'],
+    [51, 'FAP Secretary'],
+    [52, 'FAP Member'],
+    [53, 'Internal Reviewer'],
+  ]);
+
+  async assignSTFCRoleToUser(userId: number, roleId: number) {
+    const fapReviewerGroup: PermissionUserGroupDTO = {
+      id: roleId,
+      groupName: this.roleAssignmentMap.get(roleId) ?? '',
+    };
+
+    this.stfcRolesCache.remove(String(userId));
+    this.uopRolesCache.remove(String(userId));
+
+    return UOWSClient.groupMemberships.addPersonToFapGroup({
+      userNumber: userId,
+      groups: [fapReviewerGroup],
+    });
+  }
+
+  async removeFapRoleFromUser(userId: number, roleId: number) {
+    this.stfcRolesCache.remove(String(userId));
+    this.uopRolesCache.remove(String(userId));
+
+    return UOWSClient.groupMemberships.removePersonFromFapGroup(
+      userId,
+      this.roleAssignmentMap.get(roleId) ?? ''
     );
   }
 }

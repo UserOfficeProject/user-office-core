@@ -117,8 +117,8 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
   constructor() {
     this.init();
   }
-  getAllExperiments(
-    //TODO: This needs to be implemented
+
+  async getAllExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
@@ -126,14 +126,19 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     sortDirection?: string,
     searchText?: string
   ): Promise<{ totalCount: number; experiments: Experiment[] }> {
-    throw new Error('Method not implemented.');
+    return {
+      totalCount: this.experiments.length,
+      experiments: this.experiments,
+    };
   }
+
   async markEventAsDoneOnExperimentSafeties(
     event: Event,
     experimentPks: number[]
   ): Promise<ExperimentSafetyEventsRecord[] | null> {
     return [dummyExperimentSafetyEvents];
   }
+
   async getExperimentSafetyEvents(
     experimentPk: number
   ): Promise<ExperimentSafetyEventsRecord | null> {
