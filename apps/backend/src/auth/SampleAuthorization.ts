@@ -75,10 +75,7 @@ export class SampleAuthorization {
       sample.proposalPk
     );
 
-    // const isPostProposalSubmission = sample.isPostProposalSubmission === true;
-
     return (
-      // (isMemberOfProposal && isPostProposalSubmission) ||
       isMemberOfProposal || this.userAuth.isExperimentSafetyReviewer(agent)
     );
   }
