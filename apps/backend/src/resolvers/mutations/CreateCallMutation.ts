@@ -17,6 +17,9 @@ export class CreateCallInput {
   @Field()
   public shortCode: string;
 
+  @Field(() => Int, { nullable: true })
+  public sort_order?: number;
+
   @Field()
   public startCall: Date;
 

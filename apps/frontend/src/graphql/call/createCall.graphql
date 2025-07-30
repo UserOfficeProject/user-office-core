@@ -1,5 +1,6 @@
 mutation createCall(
   $shortCode: String!
+  $sort_order: Int
   $startCall: DateTime!
   $endCall: DateTime!
   $endCallInternal: DateTime
@@ -29,6 +30,7 @@ mutation createCall(
   createCall(
     createCallInput: {
       shortCode: $shortCode
+      sort_order: $sort_order
       startCall: $startCall
       endCall: $endCall
       endCallInternal: $endCallInternal

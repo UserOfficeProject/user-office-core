@@ -38,6 +38,7 @@ context('Calls tests', () => {
 
   const newCall = {
     shortCode: faker.random.alphaNumeric(15),
+    sort_order: 0,
     startCall: DateTime.fromJSDate(faker.date.past()),
     endCall: DateTime.fromJSDate(faker.date.future()),
     startReview: currentDayStart,
@@ -62,6 +63,7 @@ context('Calls tests', () => {
 
   const newInactiveCall = {
     shortCode: faker.random.alphaNumeric(15),
+    sort_order: 0,
     startCall: twoDaysAgo.toISO(),
     endCall: yesterday.toISO(),
     startReview: currentDayStart,
@@ -694,7 +696,7 @@ context('Calls tests', () => {
 
       cy.contains(newCall.shortCode)
         .parent()
-        .find('[aria-label="Deactivate call"]')
+        .find('[aria-label="Archive call"]')
         .click();
 
       cy.get('[data-cy="confirm-ok"]').click();
@@ -704,31 +706,6 @@ context('Calls tests', () => {
         'not.contain',
         newCall.shortCode
       );
-
-      cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Inactive').click();
-
-      cy.finishedLoading();
-
-      cy.contains(newCall.shortCode)
-        .parent()
-        .find('[aria-label="Activate call"]')
-        .click();
-
-      cy.get('[data-cy="confirm-ok"]').click();
-      cy.notification({ variant: 'success', text: 'successfully' });
-
-      cy.get('[data-cy="calls-table"]').should(
-        'not.contain',
-        newCall.shortCode
-      );
-
-      cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
-
-      cy.finishedLoading();
-
-      cy.get('[data-cy="calls-table"]').should('contain', newCall.shortCode);
     });
 
     it('A user-officer should not be able to set negative or too high availability time on instrument per call', () => {
@@ -868,7 +845,7 @@ context('Calls tests', () => {
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
 
       cy.finishedLoading();
 
@@ -878,7 +855,7 @@ context('Calls tests', () => {
       cy.contains(newCall.shortCode);
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Inactive').click();
+      cy.get('[role="listbox"]').contains('Closed').click();
 
       cy.finishedLoading();
 
@@ -898,7 +875,7 @@ context('Calls tests', () => {
       ).should('have.length', 3);
     });
 
-    it('User officer can filter active internal calls by their status', function () {
+    it('User officer can filter active calls by their status', function () {
       if (featureFlags.getEnabledFeatures().get(FeatureId.OAUTH)) {
         this.skip();
       }
@@ -936,7 +913,7 @@ context('Calls tests', () => {
       }).then(() => {
         cy.reload();
         cy.get('[data-cy="call-status-filter"]').click();
-        cy.get('[role="listbox"]').contains('Active Internal').click();
+        cy.get('[role="listbox"]').contains('Open/Upcoming').click();
         cy.get(
           '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
         ).should('have.length', 1);
@@ -947,7 +924,7 @@ context('Calls tests', () => {
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Active').click();
+      cy.get('[role="listbox"]').contains('Closed').click();
 
       cy.contains(newCall.shortCode)
         .parent()

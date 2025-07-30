@@ -1,6 +1,7 @@
 mutation updateCall(
   $id: Int!
   $shortCode: String
+  $sort_order: Int
   $startCall: DateTime
   $endCall: DateTime
   $endCallInternal: DateTime
@@ -33,6 +34,7 @@ mutation updateCall(
     updateCallInput: {
       id: $id
       shortCode: $shortCode
+      sort_order: $sort_order
       startCall: $startCall
       endCall: $endCall
       endCallInternal: $endCallInternal

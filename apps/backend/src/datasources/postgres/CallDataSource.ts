@@ -187,6 +187,9 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async create(args: CreateCallInput): Promise<Call> {
+    if (!args.sort_order) {
+      args.sort_order = 0;
+    }
     const [call]: CallRecord[] = await database.transaction(async (trx) => {
       try {
         const createdCall: CallRecord[] = await database
@@ -217,6 +220,7 @@ export default class PostgresCallDataSource implements CallDataSource {
             allocation_time_unit: args.allocationTimeUnit,
             title: args.title,
             description: args.description,
+            sort_order: args.sort_order,
           })
           .into('call')
           .returning('*')

@@ -38,6 +38,9 @@ export class UpdateCallInput {
   @Field(() => String, { nullable: true })
   public shortCode?: string;
 
+  @Field(() => Int, { nullable: true })
+  public sort_order?: number;
+
   @Field(() => Date, { nullable: true })
   public startCall?: Date;
 
