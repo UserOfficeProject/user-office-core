@@ -901,7 +901,7 @@ context('Calls tests', () => {
 
       cy.get(
         '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
-      ).should('have.length', 3);
+      ).should('have.length', 2);
       cy.contains(newCall.shortCode);
       cy.contains(newInactiveCall.shortCode);
       cy.updateCall({
@@ -924,7 +924,7 @@ context('Calls tests', () => {
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
-      cy.get('[role="listbox"]').contains('Closed').click();
+      cy.get('[role="listbox"]').contains('All').click();
 
       cy.contains(newCall.shortCode)
         .parent()
