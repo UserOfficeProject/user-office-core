@@ -972,7 +972,8 @@ export const createBasicUserObject = (
     user.created_at,
     user.placeholder,
     user.email,
-    user.country
+    user.country,
+    user.user_title
   );
 };
 
