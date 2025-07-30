@@ -45,6 +45,8 @@ jobs:
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
+          TAG_TO_CHECK="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+
           echo "Checking if GHCR tag '$TAG_TO_CHECK' exists"
           if gh api \
             -H "Accept: application/vnd.github+json" \
