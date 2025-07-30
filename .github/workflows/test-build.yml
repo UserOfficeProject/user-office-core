@@ -43,12 +43,9 @@ jobs:
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
-          GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
+          GH_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
 
           echo "Checking if GHCR tag '$TAG_TO_CHECK' exists"
-
-          CHECK_IF_IMAGE_EXISTS=$(curl -H "Authorization: Bearer $GHCR_TOKEN" https://ghcr.io/v2/userofficeproject/user-office-factory/tags/list | jq --arg TAG ${{ github.head_ref }} '.tags as $t | $TAG | IN($t[])')
-
           if gh api \
             -H "Accept: application/vnd.github+json" \
             --paginate \
