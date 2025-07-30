@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Resolve required repositories
         id: resolve_rep
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         run: |
           # this assumes the result is an array, and .name property is used
           check_feature() {
@@ -42,8 +44,6 @@ jobs:
           FACTORY_TAGS=$(check_feature ${{ github.head_ref }} \
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
-
-          GH_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
 
           echo "Checking if GHCR tag '$TAG_TO_CHECK' exists"
           if gh api \
