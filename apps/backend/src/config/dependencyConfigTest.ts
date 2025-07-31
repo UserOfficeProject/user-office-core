@@ -20,6 +20,7 @@ import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataS
 import { InternalReviewDataSourceMock } from '../datasources/mockups/InternalReviewDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
 import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
+import PredefinedMessageDataSourceMock from '../datasources/mockups/PredefinedMessageDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
@@ -38,7 +39,6 @@ import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSourc
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
-import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
@@ -89,10 +89,7 @@ mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
-mapClass(
-  Tokens.PredefinedMessageDataSource,
-  PostgresPredefinedMessageDataSource
-);
+mapClass(Tokens.PredefinedMessageDataSource, PredefinedMessageDataSourceMock);
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
 mapClass(Tokens.TagDataSource, TagDataSourceMock);
 
