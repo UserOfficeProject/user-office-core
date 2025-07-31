@@ -3,6 +3,8 @@ import { faker } from '@faker-js/faker';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
+import { EventLogsDataSource } from '../datasources/EventLogsDataSource';
+import { InviteDataSource } from '../datasources/InviteDataSource';
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
@@ -12,6 +14,8 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
+import { MailService } from '../eventHandlers/MailService/MailService';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
 import InviteMutations from './InviteMutations';
@@ -199,5 +203,86 @@ describe('Test Invite Mutations', () => {
     );
 
     expect(response).toBeInstanceOf(Rejection);
+  });
+
+  test('A co-proposer should receive an invite email when co-proposer invite is created', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    const mailService = container.resolve<MailService>(Tokens.MailService);
+    const sendMailSpy = jest.spyOn(mailService, 'sendMail');
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    // wait 200ms for the email to be sent
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(sendMailSpy).toHaveBeenCalledTimes(1);
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipients: [{ address: email }],
+        content: {
+          template_id: 'user-office-registration-invitation-co-proposer',
+        },
+      })
+    );
+  });
+
+  test('A log should be added when co-proposer invite is sent', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    // Get the exact same instance that the logging handler will use
+    const eventLogDataSource = container.resolve<EventLogsDataSource>(
+      Tokens.EventLogsDataSource
+    );
+    const setEventInDataSourceSpy = jest.spyOn(eventLogDataSource, 'set');
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    // wait 200ms for the email to be sent
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(setEventInDataSourceSpy).toHaveBeenCalled();
+  });
+
+  test('Invite should have the templateId set', async () => {
+    const email = faker.internet.email();
+    const proposalPk = 1;
+
+    const response = await inviteMutations.setCoProposerInvites(
+      dummyUserWithRole,
+      {
+        proposalPk,
+        emails: [email],
+      }
+    );
+
+    expect(response).not.toBeInstanceOf(Rejection);
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    const invite = (await container
+      .resolve<InviteDataSource>(Tokens.InviteDataSource)
+      .findById((response as Invite[])[0].id)) as Invite;
+
+    expect(invite.templateId).toBe(
+      EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+    );
   });
 });

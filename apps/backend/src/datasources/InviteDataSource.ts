@@ -13,6 +13,7 @@ export interface InviteDataSource {
     code: string;
     email: string;
     expiresAt: Date | null;
+    templateId?: string | null;
   }): Promise<Invite>;
 
   findByCode(code: string): Promise<Invite | null>;
@@ -32,6 +33,7 @@ export interface InviteDataSource {
     claimedByUserId?: number | null;
     isEmailSent?: boolean;
     expiresAt?: Date | null;
+    templateId?: string | null;
   }): Promise<Invite>;
 
   delete(id: number): Promise<void>;

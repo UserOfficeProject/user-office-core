@@ -24,7 +24,7 @@ export class ConnectionHasActionsInput {
   public actionType: StatusActionType;
 
   @Field(() => String, { nullable: true })
-  public config: string;
+  public config?: string;
 }
 
 @InputType()

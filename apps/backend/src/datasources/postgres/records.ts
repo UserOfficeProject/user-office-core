@@ -1,5 +1,6 @@
 import { PdfTemplateRecord } from 'knex/types/tables';
 
+import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';
@@ -39,6 +40,7 @@ import { Settings, SettingsId } from '../../models/Settings';
 import { Shipment, ShipmentStatus } from '../../models/Shipment';
 import { StatusActionType } from '../../models/StatusAction';
 import { StatusActionsLog } from '../../models/StatusActionsLog';
+import { Tag } from '../../models/Tag';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import {
@@ -126,6 +128,7 @@ export interface ProposalRecord {
   readonly reference_number_sequence: number;
   readonly management_decision_submitted: boolean;
   readonly submitted_date: Date;
+  readonly file_id: string;
 }
 export interface ProposalViewRecord {
   readonly proposal_pk: number;
@@ -477,6 +480,7 @@ export interface InstrumentRecord {
   readonly manager_user_id: number;
   readonly full_count: number;
   readonly selectable: boolean;
+  readonly multiple_tech_reviews_enabled: boolean;
 }
 
 export interface InstrumentHasProposalRecord {
@@ -516,6 +520,7 @@ export interface InstrumentWithManagementTimeRecord {
   readonly manager_user_id: number;
   readonly management_time_allocation: number;
   readonly submitted: boolean;
+  readonly multiple_tech_reviews_enabled: boolean;
 }
 
 export interface TemplateCategoryRecord {
@@ -788,7 +793,8 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.submitted,
     proposal.reference_number_sequence,
     proposal.management_decision_submitted,
-    proposal.submitted_date
+    proposal.submitted_date,
+    proposal.file_id
   );
 };
 
@@ -965,7 +971,8 @@ export const createBasicUserObject = (
     user.created_at,
     user.placeholder,
     user.email,
-    user.country
+    user.country,
+    user.user_title
   );
 };
 
@@ -1347,6 +1354,7 @@ export interface InviteRecord {
   readonly claimed_at: Date | null;
   readonly is_email_sent: boolean;
   readonly expires_at: Date | null;
+  readonly template_id: EmailTemplateId | null;
 }
 
 export const createInviteObject = (invite: InviteRecord) =>
@@ -1359,7 +1367,8 @@ export const createInviteObject = (invite: InviteRecord) =>
     invite.claimed_at,
     invite.claimed_by,
     invite.is_email_sent,
-    invite.expires_at
+    invite.expires_at,
+    invite.template_id as EmailTemplateId | null
   );
 
 export interface RoleClaimRecord {
@@ -1378,6 +1387,20 @@ export interface CoProposerClaimRecord {
 
 export const createCoProposerClaimRecord = (invite: CoProposerClaimRecord) =>
   new CoProposerClaim(invite.invite_id, invite.proposal_pk);
+
+export interface TagRecord {
+  readonly tag_id: number;
+  readonly name: string;
+  readonly short_code: string;
+}
+
+export const createTagObject = (tag: TagRecord) =>
+  new Tag(tag.tag_id, tag.name, tag.short_code);
+
+export interface TagUserRecord {
+  readonly tag_id: number;
+  readonly user_id: number;
+}
 
 export interface ExperimentRecord {
   readonly experiment_pk: number;
