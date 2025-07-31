@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  FeatureUpdateAction,
   SettingsId,
   TechnicalReviewStatus,
   TemplateCategoryId,
@@ -933,6 +934,11 @@ context('Proposal administration tests', () => {
   describe('Proposal administration advanced search tests', () => {
     beforeEach(() => {
       cy.resetDB(true);
+
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.PREGENERATED_PROPOSALS],
+      });
 
       cy.viewport(1920, 1080);
 

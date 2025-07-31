@@ -1057,4 +1057,52 @@ context('Pregenerated PDF tests', () => {
       });
     });
   });
+
+  it('API token can download pregenerated proposal', function () {
+    const accessTokenName = faker.lorem.words(2);
+    cy.createApiAccessToken({
+      name: accessTokenName,
+      accessPermissions: '{"FactoryServices.getPregeneratedPdfProposals":true}',
+    });
+
+    cy.contains('Settings').click();
+    cy.contains('API access tokens').click();
+
+    cy.contains(accessTokenName).parent().find('[aria-label="Edit"]').click();
+
+    cy.finishedLoading();
+
+    cy.contains('Other Services').click();
+
+    cy.contains('FactoryServices.getPdfProposals');
+    cy.get('#accessToken')
+      .invoke('val')
+      .then((value) => {
+        const accessToken = value as string;
+        cy.request({
+          url: `/download/pdf/proposal/${proposalPk1}`,
+          method: 'GET',
+          headers: {
+            authorization: accessToken,
+          },
+        }).then((response) => {
+          expect(response.headers['content-type']).to.be.equal(
+            'application/pdf'
+          );
+          expect(response.status).to.be.equal(200);
+        });
+        cy.request({
+          url: `/download/pdf/proposal/${proposalId1}?filter=id`,
+          method: 'GET',
+          headers: {
+            authorization: accessToken,
+          },
+        }).then((response) => {
+          expect(response.headers['content-type']).to.be.equal(
+            'application/pdf'
+          );
+          expect(response.status).to.be.equal(200);
+        });
+      });
+  });
 });
