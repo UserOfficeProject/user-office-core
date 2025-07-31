@@ -1059,6 +1059,9 @@ context('Pregenerated PDF tests', () => {
   });
 
   it('API token can download pregenerated proposal', function () {
+    cy.login('officer');
+    cy.visit('/');
+
     const accessTokenName = faker.lorem.words(2);
     cy.createApiAccessToken({
       name: accessTokenName,
