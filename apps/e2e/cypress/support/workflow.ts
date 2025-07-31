@@ -66,11 +66,12 @@ const addConnectionStatusActions = (
 const addFeasibilityReviewToDefaultWorkflow =
   (): Cypress.Chainable<AddWorkflowStatusMutation> => {
     return cy.addWorkflowStatus({
-      droppableGroupId: 'proposalWorkflowConnections_0',
       statusId: initialDBData.proposalStatuses.feasibilityReview.id,
       workflowId: 1,
       sortOrder: 1,
       prevStatusId: 1,
+      posX: 0,
+      posY: 0,
     });
   };
 

@@ -128,11 +128,12 @@ context('Calls tests', () => {
       const workflow = result.createWorkflow;
       if (workflow) {
         cy.addWorkflowStatus({
-          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
           statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
           workflowId: workflow.id,
           sortOrder: 1,
-          prevStatusId: workflow.workflowConnectionGroups[0].connections[0].id,
+          prevStatusId: workflow.workflowConnections[0].id,
+          posX: 0,
+          posY: 0,
         }).then((result) => {
           if (result.addWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({

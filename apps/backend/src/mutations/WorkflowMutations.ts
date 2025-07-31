@@ -79,6 +79,21 @@ export default class WorkflowMutations {
     args: AddWorkflowStatusInput
   ): Promise<WorkflowConnection | Rejection> {
     try {
+      if (args.prevStatusId) {
+        const previousWorkflowConnection =
+          await this.dataSource.getWorkflowConnectionsById(
+            args.workflowId,
+            args.prevStatusId,
+            {}
+          );
+        if (previousWorkflowConnection.length > 0) {
+          // If there is a previous connection, we need to update its nextStatusId
+          const updatedConnection = previousWorkflowConnection[0];
+          updatedConnection.nextStatusId = args.statusId;
+          await this.dataSource.updateWorkflowStatus(updatedConnection);
+        }
+      }
+
       return await this.dataSource.addWorkflowStatus(args);
     } catch (error) {
       return rejection('Could not add workflow status', { agent, args }, error);

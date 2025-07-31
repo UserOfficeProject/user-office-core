@@ -43,11 +43,12 @@ context('Status actions tests', () => {
   describe('Status actions workflow tests', () => {
     it('User Officer should be able to add a status action to workflow connection', () => {
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 0,
       });
       cy.login('officer');
       cy.visit('/ProposalWorkflowEditor/1');
@@ -131,11 +132,12 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 0,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -221,11 +223,12 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 0,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -291,11 +294,12 @@ context('Status actions tests', () => {
       const validEmail = faker.internet.email();
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 0,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -440,11 +444,12 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 0,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -562,11 +567,12 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 0,
       }).then((result) => {
         cy.addConnectionStatusActions({
           actions: [
@@ -682,11 +688,12 @@ context('Status actions tests', () => {
       };
 
       cy.addWorkflowStatus({
-        droppableGroupId: initialDBData.workflows.defaultDroppableGroup,
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: initialDBData.workflows.defaultWorkflow.id,
         sortOrder: 1,
         prevStatusId: initialDBData.proposalStatuses.draft.id,
+        posX: 0,
+        posY: 0,
       }).then((result) => {
         const connection = result.addWorkflowStatus;
         if (connection) {

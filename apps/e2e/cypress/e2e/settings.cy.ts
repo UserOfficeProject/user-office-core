@@ -150,7 +150,6 @@ context('Settings tests', () => {
       description: faker.random.words(5),
       managerUserId: initialDBData.users.user1.id,
     };
-    let workflowDroppableGroupId: string;
     let createdWorkflowId: number;
     let prevStatusId: number;
     let createdEsiTemplateId: number;
@@ -171,9 +170,10 @@ context('Settings tests', () => {
 
     const addMultipleStatusesToProposalWorkflowWithChangingEvents = () => {
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -186,9 +186,10 @@ context('Settings tests', () => {
         }
       });
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.fapSelection.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 2,
         prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
       }).then((result) => {
@@ -203,9 +204,10 @@ context('Settings tests', () => {
         }
       });
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.fapReview.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 3,
         prevStatusId: initialDBData.proposalStatuses.fapSelection.id,
       }).then((result) => {
@@ -217,9 +219,10 @@ context('Settings tests', () => {
         }
       });
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.fapMeeting.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 4,
         prevStatusId: initialDBData.proposalStatuses.fapReview.id,
       }).then((result) => {
@@ -235,9 +238,10 @@ context('Settings tests', () => {
     const addMultipleStatusesToMultiColumnProposalWorkflowWithChangingEvents =
       () => {
         cy.addWorkflowStatus({
-          droppableGroupId: 'proposalWorkflowConnections_0',
           statusId: initialDBData.proposalStatuses.feasibilityReview.id,
           workflowId: createdWorkflowId,
+          posX: 0,
+          posY: 0,
           sortOrder: 1,
           prevStatusId: prevStatusId,
         }).then((result) => {
@@ -250,12 +254,12 @@ context('Settings tests', () => {
           }
         });
         cy.addWorkflowStatus({
-          droppableGroupId: 'proposalWorkflowConnections_1',
           statusId: initialDBData.proposalStatuses.fapSelection.id,
           workflowId: createdWorkflowId,
+          posX: 0,
+          posY: 0,
           sortOrder: 0,
           prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-          parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
           if (result.addWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
@@ -267,12 +271,12 @@ context('Settings tests', () => {
           }
         });
         cy.addWorkflowStatus({
-          droppableGroupId: 'proposalWorkflowConnections_2',
           statusId: initialDBData.proposalStatuses.notFeasible.id,
           workflowId: createdWorkflowId,
+          posX: 0,
+          posY: 0,
           sortOrder: 0,
           prevStatusId: initialDBData.proposalStatuses.feasibilityReview.id,
-          parentDroppableGroupId: 'proposalWorkflowConnections_0',
         }).then((result) => {
           if (result.addWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({
@@ -296,9 +300,7 @@ context('Settings tests', () => {
         const workflow = result.createWorkflow;
         if (workflow) {
           createdWorkflowId = workflow.id;
-          prevStatusId = workflow.workflowConnectionGroups[0].connections[0].id;
-          workflowDroppableGroupId =
-            workflow.workflowConnectionGroups[0].groupId;
+          prevStatusId = workflow.workflowConnections[0].statusId!;
 
           cy.createTemplate({
             name: 'default esi template',
@@ -325,9 +327,10 @@ context('Settings tests', () => {
       const proposalTitle = faker.random.words(3);
       const editedProposalTitle = faker.random.words(3);
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -410,9 +413,10 @@ context('Settings tests', () => {
       const currentDayStart = DateTime.now().startOf('day');
       const editedProposalTitle = faker.random.words(3);
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -503,9 +507,10 @@ context('Settings tests', () => {
       const proposalTitle = faker.random.words(3);
       const currentDayStart = DateTime.now().startOf('day');
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -588,9 +593,10 @@ context('Settings tests', () => {
       const internalProposalTitle = faker.lorem.words(3);
       const currentDayStart = DateTime.now().startOf('day');
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -602,9 +608,10 @@ context('Settings tests', () => {
         }
       });
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 2,
         prevStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
       }).then((result) => {
@@ -751,9 +758,10 @@ context('Settings tests', () => {
 
     it('User Officer should be able to select events that are triggering change to workflow status', () => {
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       });
@@ -1504,9 +1512,10 @@ context('Settings tests', () => {
       });
 
       cy.addWorkflowStatus({
-        droppableGroupId: workflowDroppableGroupId,
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
+        posX: 0,
+        posY: 0,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {

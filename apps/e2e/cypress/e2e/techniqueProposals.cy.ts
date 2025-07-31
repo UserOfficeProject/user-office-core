@@ -256,10 +256,11 @@ context('Technique Proposal tests', () => {
 
       if (result.createWorkflow) {
         cy.addWorkflowStatus({
-          droppableGroupId: workflow.workflowConnectionGroups[0].groupId,
           statusId: quickReviewStatus.id as number,
           workflowId: callWorkflowId,
           sortOrder: 1,
+          posX: 0,
+          posY: 0,
         });
       }
 
