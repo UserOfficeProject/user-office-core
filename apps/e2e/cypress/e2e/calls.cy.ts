@@ -4,7 +4,6 @@ import {
   CreateInstrumentMutationVariables,
   FeatureId,
   TemplateGroupId,
-  UpdateCallInput,
   WorkflowType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
@@ -706,6 +705,11 @@ context('Calls tests', () => {
         'not.contain',
         newCall.shortCode
       );
+      cy.contains('Archived').click();
+      cy.contains(newCall.shortCode)
+        .parent()
+        .find('[aria-label="Unarchive call"]')
+        .click();
     });
 
     it('A user-officer should not be able to set negative or too high availability time on instrument per call', () => {
@@ -828,20 +832,75 @@ context('Calls tests', () => {
         });
     });
 
+    it('User officer can reorder how calls appear to a user', () => {
+      cy.createCall({
+        ...newInactiveCall,
+        esiTemplateId: esiTemplateId,
+        proposalWorkflowId: workflowId,
+      });
+      let firstTableRowTextBeforeSorting: string;
+      let firstTableRowTextAfterSorting: string;
+      cy.contains('Calls').click();
+      cy.get('[data-cy="call-status-filter"]').click();
+      cy.get('[role="listbox"]').contains('Open/Upcoming').click();
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="order-calls-button"]').first().click();
+      cy.contains('Drag to order calls');
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .then((element) => {
+          firstTableRowTextBeforeSorting = element.text();
+        });
+      //reorder
+      cy.get('[data-cy="call-list-drag-item"]')
+        .first()
+        .dragElement([
+          { direction: 'left', length: 0 },
+          { direction: 'down', length: 1 },
+        ]);
+
+      cy.get('[data-cy="call-list-drag-item"]')
+        .last()
+        .then((element) => {
+          firstTableRowTextAfterSorting = element.text();
+          expect(firstTableRowTextBeforeSorting).not.equal(
+            firstTableRowTextAfterSorting
+          );
+        });
+
+      //Open calls
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newCall,
+        proposalWorkflowId: initialDBData.proposal.id,
+        startCall: yesterday,
+        endCall: DateTime.now().plus({ days: 5 }),
+        endCallInternal: DateTime.now().plus({ days: 6 }),
+      });
+      cy.updateCall({
+        id: initialDBData.call.id,
+        ...newInactiveCall,
+        shortCode: initialDBData.call.shortCode,
+        endCall: DateTime.now().plus({ days: 31, hours: 1 }),
+        proposalWorkflowId: initialDBData.proposal.id,
+      });
+      //check order for users
+      cy.logout();
+      cy.login('user2', initialDBData.roles.user);
+      cy.contains('New Proposal').click();
+
+      cy.get('[data-cy="call-list"]').find('li:first-child');
+      cy.contains(newCall.shortCode);
+    });
+
     it('User officer can filter calls by their status', () => {
       cy.createCall({
         ...newInactiveCall,
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
-      }).then((result) => {
-        if (result.createCall.id) {
-          cy.updateCall({
-            ...result.createCall,
-            isActive: false,
-          } as UpdateCallInput);
-        }
       });
-
       cy.contains('Calls').click();
 
       cy.get('[data-cy="call-status-filter"]').click();
@@ -883,13 +942,6 @@ context('Calls tests', () => {
         ...newInactiveCall,
         esiTemplateId: esiTemplateId,
         proposalWorkflowId: workflowId,
-      }).then((result) => {
-        if (result.createCall.id) {
-          cy.updateCall({
-            ...result.createCall,
-            isActive: false,
-          } as UpdateCallInput);
-        }
       });
 
       cy.contains('Calls').click();
@@ -901,7 +953,7 @@ context('Calls tests', () => {
 
       cy.get(
         '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
-      ).should('have.length', 2);
+      ).should('have.length', 3);
       cy.contains(newCall.shortCode);
       cy.contains(newInactiveCall.shortCode);
       cy.updateCall({
