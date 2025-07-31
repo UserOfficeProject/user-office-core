@@ -1074,7 +1074,7 @@ context('Pregenerated PDF tests', () => {
 
     cy.contains('Other Services').click();
 
-    cy.contains('FactoryServices.getPdfProposals');
+    cy.contains('FactoryServices.getPregeneratedPdfProposals');
     cy.get('#accessToken')
       .invoke('val')
       .then((value) => {

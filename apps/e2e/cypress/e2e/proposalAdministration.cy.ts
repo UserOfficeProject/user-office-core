@@ -935,11 +935,6 @@ context('Proposal administration tests', () => {
     beforeEach(() => {
       cy.resetDB(true);
 
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.PREGENERATED_PROPOSALS],
-      });
-
       cy.viewport(1920, 1080);
 
       cy.login('officer');
@@ -1255,6 +1250,11 @@ context('Proposal administration tests', () => {
             proposalPk: createdProposalPk,
           });
         }
+      });
+
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.PREGENERATED_PROPOSALS],
       });
 
       cy.login('officer');
