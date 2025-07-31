@@ -257,6 +257,7 @@ export class StfcUserAuthorization extends UserAuthorization {
         !uniqueRoles.find(
           (role) =>
             role.name === 'ISIS Instrument Scientist' ||
+            role.name === 'CLF LSF Link Scientist' ||
             role.name === 'User Officer'
         )
       );
