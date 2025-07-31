@@ -1,4 +1,4 @@
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import { styled } from '@mui/system';
 import React from 'react';
 import {
   BaseEdge,
@@ -11,7 +11,6 @@ import {
   ConnectionLineType,
 } from 'reactflow';
 
-import ProposalSettingsIcon from 'components/common/icons/ProposalSettingsIcon';
 import { ConnectionStatusAction } from 'generated/sdk';
 
 interface WorkflowEdgeData {
@@ -22,6 +21,25 @@ interface WorkflowEdgeData {
   statusActions: ConnectionStatusAction[];
   connectionLineType?: ConnectionLineType;
 }
+
+const List = styled('ul')({
+  padding: '0px 5px',
+  margin: '0',
+  listStyleType: 'none',
+  fontSize: '11px',
+  color: '#333',
+  lineHeight: '1.6',
+  backgroundColor: '#FFF',
+  textAlign: 'center',
+});
+
+const EventList = styled(List)(({ theme }) => ({
+  color: theme.palette.primary.main,
+}));
+
+const ActionList = styled(List)(({ theme }) => ({
+  color: theme.palette.secondary.main,
+}));
 
 const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
   id,
@@ -83,43 +101,23 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
           style={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            background: '#FFFFFFAA',
           }}
           className="nodrag nopan"
         >
-          <ul
-            style={{
-              padding: '5px',
-              listStyleType: 'none',
-              fontSize: '11px',
-              fontWeight: 500,
-              color: '#333',
-              lineHeight: '1.6',
-            }}
-          >
-            {events.map((e) => (
-              <li key={e}>
-                <ProposalSettingsIcon
-                  style={{ marginRight: '6px', fontSize: '12px' }}
-                />
-                {e}
-              </li>
-            ))}
-            {statusActions.map((e) => (
-              <li
-                key={e.actionId}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <PendingActionsIcon
-                  style={{ marginRight: '6px', fontSize: '12px' }}
-                />
-                {e.action.name}
-              </li>
-            ))}
-          </ul>
+          {events.length > 0 && (
+            <EventList>
+              {events.map((e) => (
+                <li key={e}>{e}</li>
+              ))}
+            </EventList>
+          )}
+          {statusActions.length > 0 && (
+            <ActionList>
+              {statusActions.map((e) => (
+                <li key={e.actionId}>{e.action.name}</li>
+              ))}
+            </ActionList>
+          )}
         </div>
       </EdgeLabelRenderer>
     </>

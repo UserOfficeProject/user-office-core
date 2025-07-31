@@ -249,9 +249,8 @@ export default class WorkflowMutations {
     connectionId: number
   ): Promise<WorkflowConnection | Rejection> {
     try {
-      const deletedConnection = await this.dataSource.deleteWorkflowConnection(
-        connectionId
-      );
+      const deletedConnection =
+        await this.dataSource.deleteWorkflowConnection(connectionId);
 
       if (!deletedConnection) {
         return rejection(
