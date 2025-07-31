@@ -373,6 +373,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
           style={{ justifyContent: 'flex-end', paddingBottom: '25px' }}
         >
           <FormControlLabel
+            data-cy="order-calls-button"
             control={
               <Switch
                 checked={isCallReorderMode}
