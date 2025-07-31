@@ -25,6 +25,8 @@ export enum EventType {
   ADD_NEXT_STATUS_EVENTS_REQUESTED,
   ADD_STATUS_ACTION_REQUESTED,
   STATUS_ACTION_ADDED,
+  DELETE_WORKFLOW_CONNECTION_REQUESTED,
+  WORKFLOW_CONNECTION_DELETED,
 }
 
 export interface Event {
@@ -123,6 +125,16 @@ const WorkflowEditorModel = (
         }
         case EventType.STATUS_ACTION_ADDED: {
           return { ...draft, ...action.payload };
+        }
+        case EventType.WORKFLOW_CONNECTION_DELETED: {
+          // Remove the workflow connection by connectionId
+          if (action.payload && action.payload.connectionId) {
+            draft.workflowConnections = draft.workflowConnections.filter(
+              (conn) => conn.id !== action.payload.connectionId
+            );
+          }
+
+          return draft;
         }
       }
     });

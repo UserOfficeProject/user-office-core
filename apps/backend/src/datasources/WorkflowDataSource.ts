@@ -13,6 +13,9 @@ export interface WorkflowDataSource {
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]>;
   updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
+  deleteWorkflowConnection(
+    connectionId: number
+  ): Promise<WorkflowConnection | null>;
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId']
   ): Promise<WorkflowConnectionWithStatus[]>;

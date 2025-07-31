@@ -57,11 +57,9 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   onEdgeClick,
   onNodeDragStop,
   reactFlowWrapper,
-  connectionLineType,
 }) => {
   return (
     <div ref={reactFlowWrapper} style={{ height: '100%' }}>
-      {connectionLineType}
       <ReactFlow
         nodes={nodes}
         edges={edges}

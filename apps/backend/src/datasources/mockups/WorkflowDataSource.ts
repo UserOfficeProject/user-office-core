@@ -145,6 +145,19 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return dummyWorkflowConnection;
   }
 
+  async deleteWorkflowConnection(
+    connectionId: number
+  ): Promise<WorkflowConnection | null> {
+    if (connectionId === dummyWorkflowConnection.id) {
+      return dummyWorkflowConnection;
+    }
+    if (connectionId === anotherDummyWorkflowConnection.id) {
+      return anotherDummyWorkflowConnection;
+    }
+
+    return null;
+  }
+
   async addStatusChangingEventsToConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]

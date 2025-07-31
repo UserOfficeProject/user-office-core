@@ -105,6 +105,16 @@ export function usePersistWorkflowEditorModel() {
         .then((data) => data.addStatusChangingEventsToConnection);
     };
 
+    const deleteWorkflowConnection = async (connectionId: number) => {
+      return api({
+        toastSuccessMessage: 'Workflow connection deleted successfully!',
+      })
+        .deleteWorkflowConnection({
+          connectionId,
+        })
+        .then((data) => data.deleteWorkflowConnection);
+    };
+
     const addStatusActionToConnection = async (
       statusActions: ConnectionHasActionsInput[],
       workflowConnection: WorkflowConnection
@@ -131,7 +141,12 @@ export function usePersistWorkflowEditorModel() {
           const { id, name, description, connectionLineType } = action.payload;
 
           return executeAndMonitorCall(async () => {
-            const result = await updateWorkflowMetadata(id, name, description, connectionLineType);
+            const result = await updateWorkflowMetadata(
+              id,
+              name,
+              description,
+              connectionLineType
+            );
 
             if (result) {
               dispatch({
@@ -309,6 +324,22 @@ export function usePersistWorkflowEditorModel() {
               payload: {
                 workflowConnection: workflowConnection,
                 statusActions: result,
+              },
+            });
+
+            return result;
+          });
+        }
+        case EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED: {
+          const { connectionId } = action.payload;
+
+          return executeAndMonitorCall(async () => {
+            const result = await deleteWorkflowConnection(connectionId);
+
+            dispatch({
+              type: EventType.WORKFLOW_CONNECTION_DELETED,
+              payload: {
+                connectionId,
               },
             });
 

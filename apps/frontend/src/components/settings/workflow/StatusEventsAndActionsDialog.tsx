@@ -90,6 +90,15 @@ const StatusEventsAndActionsDialog = ({
                 },
               })
             }
+            deleteWorkflowConnection={() =>
+              dispatch({
+                type: EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED,
+                payload: {
+                  connectionId: workflowConnection?.id,
+                },
+              })
+            }
+            onClose={close}
             isLoading={isLoading}
             entityType={entityType}
           />

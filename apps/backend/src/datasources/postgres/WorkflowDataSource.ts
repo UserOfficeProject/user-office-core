@@ -345,6 +345,23 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     return this.createWorkflowConnectionWithStatusObject(result.rows[0]);
   }
 
+  async deleteWorkflowConnection(
+    connectionId: number
+  ): Promise<WorkflowConnection | null> {
+    const deletedConnection: WorkflowConnectionRecord[] = await database(
+      'workflow_connections'
+    )
+      .where('workflow_connection_id', connectionId)
+      .del()
+      .returning('*');
+
+    if (deletedConnection.length === 0) {
+      return null;
+    }
+
+    return this.createWorkflowConnectionObject(deletedConnection[0]);
+  }
+
   async deleteWorkflowStatus(
     statusId: number,
     workflowId: number,

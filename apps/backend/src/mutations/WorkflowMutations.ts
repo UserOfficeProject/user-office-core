@@ -243,6 +243,34 @@ export default class WorkflowMutations {
     }
   }
 
+  @Authorized([Roles.USER_OFFICER])
+  async deleteWorkflowConnection(
+    agent: UserWithRole | null,
+    connectionId: number
+  ): Promise<WorkflowConnection | Rejection> {
+    try {
+      const deletedConnection = await this.dataSource.deleteWorkflowConnection(
+        connectionId
+      );
+
+      if (!deletedConnection) {
+        return rejection(
+          'Workflow connection not found',
+          { agent, connectionId },
+          new Error('Connection not found')
+        );
+      }
+
+      return deletedConnection;
+    } catch (error) {
+      return rejection(
+        'Could not delete workflow connection',
+        { agent, connectionId },
+        error
+      );
+    }
+  }
+
   @ValidateArgs(
     addStatusActionsToConnectionValidationSchema<
       StatusActionType,
