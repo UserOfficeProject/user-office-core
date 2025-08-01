@@ -34,7 +34,8 @@ export interface DownloadTypeServices {
   getPregeneratedPdfProposals(
     agent: UserWithRole,
     proposalPks: number[],
-    proposalFileMeta: MetaBase
+    proposalFileMeta: MetaBase,
+    options?: DownloadOptions
   ): Promise<PregeneratedProposalPDFData[]>;
   getProposalAttachments(
     agent: UserWithRole,
@@ -88,7 +89,8 @@ export default class FactoryServices implements DownloadTypeServices {
   async getPregeneratedPdfProposals(
     agent: UserWithRole | null,
     proposalPks: number[],
-    proposalFileMeta: MetaBase
+    proposalFileMeta: MetaBase,
+    options?: DownloadOptions
   ): Promise<PregeneratedProposalPDFData[]> {
     if (!agent) {
       return [];
@@ -106,6 +108,7 @@ export default class FactoryServices implements DownloadTypeServices {
         if (agent?.isApiAccessToken)
           return collectProposalPregeneratedPdfDataTokenAccess(
             proposalPk,
+            options,
             indx === 0
               ? (filename: string) =>
                   (proposalFileMeta.singleFilename = filename)

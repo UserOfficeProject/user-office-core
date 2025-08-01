@@ -121,7 +121,10 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
         await factoryServices.getPregeneratedPdfProposals(
           userWithRole,
           requestedPks,
-          meta
+          meta,
+          {
+            filter: req.query?.filter?.toString(),
+          }
         );
 
       pregeneratedProposalPdfData.forEach((propData) => {

@@ -1065,7 +1065,8 @@ context('Pregenerated PDF tests', () => {
     const accessTokenName = faker.lorem.words(2);
     cy.createApiAccessToken({
       name: accessTokenName,
-      accessPermissions: '{"FactoryServices.getPregeneratedPdfProposals":true}',
+      accessPermissions:
+        '{"FactoryServices.getPregeneratedPdfProposals":true, "FactoryServices.getPdfProposals":true}',
     });
 
     cy.contains('Settings').click();
