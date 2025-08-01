@@ -535,7 +535,7 @@ context('Pregenerated PDF tests', () => {
         expect(result.success).to.be.true;
       });
 
-      const extractedFilesDir = `${downloadsFolder}/proposals_extracted_01`;
+      const extractedFilesDir = `${downloadsFolder}/uo_proposals_extracted_01`;
 
       cy.task('unzip', {
         source: downloadFilePath,
@@ -598,7 +598,7 @@ context('Pregenerated PDF tests', () => {
             expect(result.success).to.be.true;
           });
 
-          const extractedFilesDir = `${downloadsFolder}/proposals_extracted_02`;
+          const extractedFilesDir = `${downloadsFolder}/uo_proposals_extracted_02`;
 
           cy.task('unzip', {
             source: downloadFilePath,
@@ -949,7 +949,7 @@ context('Pregenerated PDF tests', () => {
         expect(result.success).to.be.true;
       });
 
-      const extractedFilesDir = `${downloadsFolder}/proposals_extracted_01`;
+      const extractedFilesDir = `${downloadsFolder}/sc_proposals_extracted_01`;
 
       cy.task('unzip', {
         source: downloadFilePath,
@@ -1014,7 +1014,7 @@ context('Pregenerated PDF tests', () => {
             expect(result.success).to.be.true;
           });
 
-          const extractedFilesDir = `${downloadsFolder}/proposals_extracted_02`;
+          const extractedFilesDir = `${downloadsFolder}/sc_proposals_extracted_02`;
 
           cy.task('unzip', {
             source: downloadFilePath,
