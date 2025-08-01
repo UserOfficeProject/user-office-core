@@ -217,6 +217,11 @@ context('Pregenerated PDF tests', () => {
                     Number(proposalPk3),
                   ],
                   instrumentIds: [instrumentId],
+                }).then(() => {
+                  cy.assignScientistsToInstrument({
+                    instrumentId: instrumentId,
+                    scientistIds: [initialDBData.users.user2.id],
+                  });
                 });
               });
             });
@@ -540,8 +545,6 @@ context('Pregenerated PDF tests', () => {
       const pdfFilePath1 = `${extractedFilesDir}/${proposalId1}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
       const pdfFilePath2 = `${extractedFilesDir}/${proposalId2}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
       const pdfFilePath3 = `${extractedFilesDir}/${proposalId3}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
-
-      cy.log(proposalTitle1);
 
       cy.task('readPdf', pdfFilePath1).then((args) => {
         const { text } = args as PdfParse.Result;
