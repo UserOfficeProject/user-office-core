@@ -18,7 +18,7 @@ const Title = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '2px 10px 0 10px',
+  padding: '4px 10px 2px 10px',
   lineHeight: '1',
 }));
 
@@ -73,13 +73,13 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
   };
 
   return (
-    <>
+    <div data-cy={`connection_${data.status.name}`}>
       <StyledHandle type="target" position={Position.Top} />
       <Container>
         <Title>
           <TitleContent onClick={handleToggleExpand}>
             <ExpandIcon expanded={expanded} />
-            <Typography variant="subtitle2">{data.status.name}</Typography>
+            <Typography variant="subtitle1" color={'black'}>{data.status.name}</Typography>
           </TitleContent>
           {data.status.name !== 'DRAFT' && (
             <IconButton
@@ -89,8 +89,12 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
                 data.onDelete(data.status.id.toString());
               }}
               title="Delete status"
+
             >
-              <DeleteIcon fontSize="small" sx={{ color: 'grey' }} />
+              <DeleteIcon
+                fontSize="small"
+                data-cy="remove-workflow-status-button"
+              />
             </IconButton>
           )}
         </Title>
@@ -99,7 +103,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
         </Description>
       </Container>
       <StyledHandle type="source" position={Position.Bottom} />
-    </>
+    </div>
   );
 };
 

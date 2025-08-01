@@ -33,13 +33,6 @@ const List = styled('ul')({
   textAlign: 'center',
 });
 
-const EventList = styled(List)(({ theme }) => ({
-  color: theme.palette.primary.main,
-}));
-
-const ActionList = styled(List)(({ theme }) => ({
-  color: theme.palette.secondary.main,
-}));
 
 const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
   id,
@@ -105,18 +98,18 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
           className="nodrag nopan"
         >
           {events.length > 0 && (
-            <EventList>
+            <List>
               {events.map((e) => (
                 <li key={e}>{e}</li>
               ))}
-            </EventList>
+            </List>
           )}
           {statusActions.length > 0 && (
-            <ActionList>
+            <List>
               {statusActions.map((e) => (
-                <li key={e.actionId}>{e.action.name}</li>
+                <li key={e.actionId}>{`⚡ ${e.action.name}`}</li>
               ))}
-            </ActionList>
+            </List>
           )}
         </div>
       </EdgeLabelRenderer>
