@@ -81,16 +81,18 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
             <ExpandIcon expanded={expanded} />
             <Typography variant="subtitle2">{data.status.name}</Typography>
           </TitleContent>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              data.onDelete(data.status.id.toString());
-            }}
-            title="Delete status"
-          >
-            <DeleteIcon fontSize="small" sx={{ color: 'grey' }} />
-          </IconButton>
+          {data.status.name !== 'DRAFT' && (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                data.onDelete(data.status.id.toString());
+              }}
+              title="Delete status"
+            >
+              <DeleteIcon fontSize="small" sx={{ color: 'grey' }} />
+            </IconButton>
+          )}
         </Title>
         <Description expanded={expanded}>
           {data.status.shortCode} {data.status.description}
