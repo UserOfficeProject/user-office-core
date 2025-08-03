@@ -38,7 +38,6 @@ export enum Event {
   CALL_ENDED_INTERNAL = 'CALL_ENDED_INTERNAL',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_FAP_REVIEW_ENDED = 'CALL_FAP_REVIEW_ENDED',
-  INVITE_ACCEPTED = 'INVITE_ACCEPTED',
   USER_UPDATED = 'USER_UPDATED',
   USER_ROLE_UPDATED = 'USER_ROLE_UPDATED',
   USER_DELETED = 'USER_DELETED',
@@ -67,6 +66,9 @@ export enum Event {
   PROPOSAL_CO_PROPOSER_INVITES_UPDATED = 'PROPOSAL_CO_PROPOSER_INVITES_UPDATED',
   PROPOSAL_CO_PROPOSER_INVITE_SENT = 'PROPOSAL_CO_PROPOSER_INVITE_SENT',
   PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED = 'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED',
+  PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED = 'PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED',
+  PROPOSAL_VISIT_REGISTRATION_INVITE_SENT = 'PROPOSAL_VISIT_REGISTRATION_INVITE_SENT',
+  PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED = 'PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED',
   INSTRUMENT_CREATED = 'INSTRUMENT_CREATED',
   INSTRUMENT_UPDATED = 'INSTRUMENT_UPDATED',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
@@ -90,6 +92,7 @@ export enum Event {
   EXPERIMENT_ESF_REJECTED_BY_IS = 'EXPERIMENT_ESF_REJECTED_BY_IS',
   EXPERIMENT_ESF_APPROVED_BY_ESR = 'EXPERIMENT_ESF_APPROVED_BY_ESR',
   EXPERIMENT_ESF_REJECTED_BY_ESR = 'EXPERIMENT_ESF_REJECTED_BY_ESR',
+  VISIT_CREATED = 'VISIT_CREATED',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -273,6 +276,22 @@ export const EventLabel = new Map<Event, string>([
     'Event occurs when co-proposer invite is sent to a user',
   ],
   [
+    Event.PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED,
+    'Event occurs when user accepts the co-proposer claim for a proposal',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITES_UPDATED,
+    'Event occurs when visit registration invites are updated for a proposal',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITE_SENT,
+    'Event occurs when visit registration invite is sent to a user',
+  ],
+  [
+    Event.PROPOSAL_VISIT_REGISTRATION_INVITE_ACCEPTED,
+    'Event occurs when user accepts the visit registration claim for a proposal',
+  ],
+  [
     Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
     'Event occurs when the proposal status was changed by the workflow engine',
   ],
@@ -348,6 +367,7 @@ export const EventLabel = new Map<Event, string>([
     Event.PROPOSAL_ASSIGNED_TO_TECHNIQUES,
     'Event occurs when a proposal is assigned to techniques',
   ],
+  [Event.VISIT_CREATED, 'Event occurs when visit is created'],
   [
     Event.VISIT_REGISTRATION_APPROVED,
     'Event occurs when visit registration is approved',

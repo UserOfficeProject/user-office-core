@@ -40,6 +40,9 @@ query getUserExperiments($filter: UserExperimentsFilter) {
             ...basicUserDetails
           }
         }
+        registrationInvites {
+          ...invite
+        }
       }
       experimentSafety {
         ...experimentSafety

@@ -43,12 +43,17 @@ class PostgresVisitDataSource implements VisitDataSource {
       .then((visit) => (visit ? createVisitObject(visit) : null));
   }
 
-  getRegistration(userId: number, visitId: number): Promise<VisitRegistration> {
+  getRegistration(
+    userId: number,
+    visitId: number
+  ): Promise<VisitRegistration | null> {
     return database('visits_has_users')
       .where({ visit_id: visitId })
       .andWhere({ user_id: userId })
       .first()
-      .then((registration) => createVisitRegistrationObject(registration));
+      .then((registration) =>
+        registration ? createVisitRegistrationObject(registration) : null
+      );
   }
 
   getRegistrations(
