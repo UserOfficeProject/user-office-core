@@ -11,7 +11,6 @@ import PostgresExperimentDataSource from '../datasources/postgres/ExperimentData
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
 import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTemplateDataSource';
-import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
 import PostgresInviteDataSource from '../datasources/postgres/InviteDataSource';
 import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
@@ -33,6 +32,7 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import StfcFapDataSource from '../datasources/stfc/StfcFapDataSource';
 import StfcInstrumentDataSource from '../datasources/stfc/StfcInstrumentDataSource';
+import StfcInternalReviewDataSource from '../datasources/stfc/StfcInternalReviewDataSource';
 import StfcProposalDataSource from '../datasources/stfc/StfcProposalDataSource';
 import StfcTechniqueDataSource from '../datasources/stfc/StfcTechniqueDataSource';
 import { StfcUserDataSource } from '../datasources/stfc/StfcUserDataSource';
@@ -87,7 +87,7 @@ mapClass(Tokens.UnitDataSource, PostgresUnitDataSource);
 mapClass(Tokens.UserDataSource, StfcUserDataSource);
 mapClass(Tokens.VisitDataSource, PostgresVisitDataSource);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
-mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
+mapClass(Tokens.InternalReviewDataSource, StfcInternalReviewDataSource);
 mapClass(Tokens.TechniqueDataSource, StfcTechniqueDataSource);
 mapClass(
   Tokens.PredefinedMessageDataSource,
