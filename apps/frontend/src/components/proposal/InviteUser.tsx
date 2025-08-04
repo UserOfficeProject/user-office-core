@@ -74,7 +74,6 @@ function InviteUser({
         subtractUsers: excludedUserIds,
       });
 
-      console.log(previousCollaborators);
       setOptions(previousCollaborators?.users || []);
 
       return;

@@ -7,3 +7,12 @@ declare global {
     interface User extends AuthJwtPayloadUnionType {}
   }
 }
+
+declare module 'knex' {
+  namespace Knex {
+    interface QueryBuilder {
+      whereILikeEscaped(column: string, userInput: string): QueryBuilder;
+      orWhereILikeEscaped(column: string, userInput: string): QueryBuilder;
+    }
+  }
+}

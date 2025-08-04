@@ -33,9 +33,6 @@ import {
   createUserObject,
 } from './records';
 
-const escapeLike = (s: string) =>
-  s.replace(/\\/g, '\\\\').replace(/[%_]/g, '\\$&');
-
 export default class PostgresUserDataSource implements UserDataSource {
   async delete(id: number): Promise<User | null> {
     return database('users')
@@ -70,7 +67,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users')
-      .where('email', 'ilike', email)
+      .whereILikeEscaped('email', email)
       .andWhere('placeholder', false)
       .first()
       .then((user: UserRecord) => (user ? true : false));
@@ -317,13 +314,11 @@ export default class PostgresUserDataSource implements UserDataSource {
     email: string,
     role?: UserRole
   ): Promise<BasicUserDetails | null> {
-    const escapedEmail = escapeLike(email.trim());
-
     return database
       .select()
       .from('users as u')
       .join('institutions as i', { 'u.institution_id': 'i.institution_id' })
-      .where('email', 'ilike', escapedEmail)
+      .whereILikeEscaped('email', email)
       .modify((query) => {
         if (role) {
           query.join('role_user', 'role_user.user_id', '=', 'u.user_id');
@@ -363,7 +358,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     return database
       .select()
       .from('users')
-      .where('email', 'ilike', email)
+      .whereILikeEscaped('email', email)
       .first()
       .then((user: UserRecord) => (!user ? null : createUserObject(user)));
   }
@@ -493,12 +488,11 @@ export default class PostgresUserDataSource implements UserDataSource {
       .orderBy('users.user_id', orderDirection)
       .modify((query) => {
         if (filter) {
-          const escapedFilter = escapeLike(filter.trim());
           query.andWhere((qb) => {
-            qb.where('institution', 'ilike', `%${escapedFilter}%`)
-              .orWhere('firstname', 'ilike', `%${escapedFilter}%`)
-              .orWhere('preferredname', 'ilike', `%${escapedFilter}%`)
-              .orWhere('lastname', 'ilike', `%${escapedFilter}%`);
+            qb.whereILikeEscaped('institution', `%${filter}%`)
+              .orWhereILikeEscaped('firstname', `%${filter}%`)
+              .orWhereILikeEscaped('preferredname', `%${filter}%`)
+              .orWhereILikeEscaped('lastname', `%${filter}%`);
           });
         }
         if (first) {
@@ -561,10 +555,10 @@ export default class PostgresUserDataSource implements UserDataSource {
       .modify((query) => {
         if (filter) {
           query.andWhere((qb) => {
-            qb.where('institution', 'ilike', `%${filter}%`)
-              .orWhere('firstname', 'ilike', `%${filter}%`)
-              .orWhere('preferredname', 'ilike', `%${filter}%`)
-              .orWhere('lastname', 'ilike', `%${filter}%`);
+            qb.whereILikeEscaped('institution', `%${filter}%`)
+              .orWhereILikeEscaped('firstname', `%${filter}%`)
+              .orWhereILikeEscaped('preferredname', `%${filter}%`)
+              .orWhereILikeEscaped('lastname', `%${filter}%`);
           });
         }
         if (first) {
