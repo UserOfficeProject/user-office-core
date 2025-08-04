@@ -320,6 +320,10 @@ export default {
       id: 15,
       name: 'EDITABLE_SUBMITTED_INTERNAL',
     },
+    esfIsReview: {
+      id: 18,
+      name: 'ESF_IS_REVIEW',
+    },
     quickReview: {
       id: 22,
       name: 'QUICK_REVIEW',

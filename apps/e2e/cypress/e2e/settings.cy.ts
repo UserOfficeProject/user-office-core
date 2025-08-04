@@ -15,6 +15,9 @@ import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
+const { feasibilityReview, fapSelection, notFeasible, draft, esfIsReview } =
+  initialDBData.proposalStatuses;
+
 context('Settings tests', () => {
   beforeEach(() => {
     cy.resetDB();
@@ -724,7 +727,6 @@ context('Settings tests', () => {
     });
 
     it('User Officer should be able to add more statuses in proposal workflow', () => {
-      const { feasibilityReview } = initialDBData.proposalStatuses;
       cy.login('officer');
       cy.visit('/');
 
@@ -735,7 +737,7 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
-      cy.addReactFlowStatus(feasibilityReview, {
+      cy.dragStatusIntoWorkflow(feasibilityReview, {
         clientX: 0,
         clientY: 100,
       });
@@ -1306,10 +1308,10 @@ context('Settings tests', () => {
       cy.login('officer');
       cy.visit(`/ProposalWorkflowEditor/${createdWorkflowId}`);
 
-      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 1 },
-      ]);
+      cy.dragStatusIntoWorkflow(feasibilityReview, {
+        clientX: 100,
+        clientY: 100,
+      });
 
       cy.notification({
         variant: 'success',
@@ -1330,18 +1332,20 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="droppable-group"]').should('have.length', 3);
 
-      cy.get('[data-cy^="status_FAP_SELECTION"]').dragElement([
-        { direction: 'left', length: 2 },
-      ]);
+      cy.dragStatusIntoWorkflow(fapSelection, {
+        clientX: 300,
+        clientY: 300,
+      });
 
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy^="status_NOT_FEASIBLE"]').dragElement([
-        { direction: 'left', length: 1 },
-      ]);
+      cy.dragStatusIntoWorkflow(notFeasible, {
+        clientX: 300,
+        clientY: 400,
+      });
 
       cy.notification({
         variant: 'success',
@@ -1361,10 +1365,7 @@ context('Settings tests', () => {
       cy.login('officer');
       cy.visit(`/ProposalWorkflowEditor/${createdWorkflowId}`);
 
-      const { feasibilityReview, fapSelection, notFeasible, draft } =
-        initialDBData.proposalStatuses;
-
-      cy.addReactFlowStatus(feasibilityReview, {
+      cy.dragStatusIntoWorkflow(feasibilityReview, {
         clientX: 600,
         clientY: 700,
       });
@@ -1378,7 +1379,7 @@ context('Settings tests', () => {
         'FEASIBILITY_REVIEW'
       );
 
-      cy.addReactFlowStatus(fapSelection, {
+      cy.dragStatusIntoWorkflow(fapSelection, {
         clientX: 300,
         clientY: 800,
       });
@@ -1392,7 +1393,7 @@ context('Settings tests', () => {
         'FAP_SELECTION'
       );
 
-      cy.addReactFlowStatus(notFeasible, {
+      cy.dragStatusIntoWorkflow(notFeasible, {
         clientX: 900,
         clientY: 800,
       });
@@ -1721,20 +1722,21 @@ context('Settings tests', () => {
       cy.contains(workflowName).parent().find('[aria-label="Edit"]').click();
 
       cy.finishedLoading();
-      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 1 },
-      ]);
-      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should(
-        'contain.text',
-        'ESF IS REVIEW'
-      );
+
+      cy.dragStatusIntoWorkflow(esfIsReview, {
+        clientX: 300,
+        clientY: 300,
+      });
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
+      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should(
+        'contain.text',
+        'ESF IS REVIEW'
+      );
 
-      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('exist');
+      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('not.exist');
     });
 
     it('User Officer should be able to select events that are triggering change to workflow status', () => {
