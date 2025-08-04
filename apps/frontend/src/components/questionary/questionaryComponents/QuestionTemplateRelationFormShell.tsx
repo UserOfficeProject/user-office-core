@@ -13,6 +13,8 @@ import {
 import { FieldDependencyInput, QuestionTemplateRelation } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
+import { QuestionReadPermissionsConfig } from '../QuestionReadPermissionsConfig';
+
 // Have this until GQL accepts Union types
 // https://github.com/graphql/graphql-spec/blob/master/rfcs/InputUnion.md
 const prepareDependencies = (dependency: FieldDependencyInput) => {
@@ -112,6 +114,10 @@ export const QuestionTemplateRelationFormShell = (
         {(formikProps) => (
           <Form style={{ flexGrow: 1 }}>
             {props.children?.(formikProps)}
+            <QuestionReadPermissionsConfig
+              config={props.questionRel.config}
+              rolesData={props.rolesData}
+            />
             <ActionButtonContainer>
               <Button
                 type="button"
