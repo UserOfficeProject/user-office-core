@@ -63,7 +63,6 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -75,7 +74,6 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
               data-cy="required"
             />
           </TitledContainer>
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.variant" shrink>
@@ -111,7 +109,6 @@ export const QuestionMultipleChoiceForm = (props: QuestionFormProps) => {
               />
             )}
           </TitledContainer>
-
           <TitledContainer label="Items">
             <Field
               title=""

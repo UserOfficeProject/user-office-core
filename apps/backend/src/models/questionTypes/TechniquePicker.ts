@@ -38,6 +38,7 @@ export const techniquePickerDefinition: Question<DataType.TECHNIQUE_PICKER> = {
     config.variant = 'dropdown';
     config.techniques = [];
     config.isMultipleSelect = false;
+    config.readPermissions = [];
 
     return config;
   },
