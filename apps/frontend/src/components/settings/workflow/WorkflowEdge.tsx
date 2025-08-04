@@ -98,14 +98,14 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
           className="nodrag nopan"
         >
           {events.length > 0 && (
-            <List>
+            <List data-cy="edge-label-events-list">
               {events.map((e) => (
                 <li key={e}>{e}</li>
               ))}
             </List>
           )}
           {statusActions.length > 0 && (
-            <List>
+            <List data-cy="edge-label-actions-list">
               {statusActions.map((e) => (
                 <li key={e.actionId}>{`⚡ ${e.action.name}`}</li>
               ))}

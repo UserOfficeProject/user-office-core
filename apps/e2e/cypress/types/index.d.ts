@@ -5,6 +5,7 @@ import './internalReview';
 import './invite';
 import './predefinedMessage';
 import './proposal';
+import './react-flow';
 import './statusActionLog';
 import './template';
 import './user';

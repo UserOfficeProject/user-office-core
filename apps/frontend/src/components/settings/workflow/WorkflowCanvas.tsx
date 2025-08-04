@@ -59,7 +59,11 @@ const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
   reactFlowWrapper,
 }) => {
   return (
-    <div ref={reactFlowWrapper} style={{ height: '100%' }}>
+    <div
+      ref={reactFlowWrapper}
+      style={{ height: '100%' }}
+      data-cy="react-flow-canvas"
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}

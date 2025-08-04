@@ -298,8 +298,8 @@ export default {
       id: 2,
       name: 'FEASIBILITY_REVIEW',
     },
-    notFeasible: { id: 3 },
-    fapSelection: { id: 4 },
+    notFeasible: { id: 3, name: 'NOT_FEASIBLE' },
+    fapSelection: { id: 4, name: 'FAP_SELECTION' },
     fapReview: {
       id: 5,
       name: 'FAP_REVIEW',

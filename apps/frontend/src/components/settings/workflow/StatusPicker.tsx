@@ -1,6 +1,6 @@
 import {
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   Paper,
   TextField,
@@ -50,9 +50,8 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
 
       <List dense style={{ maxHeight: '400px', overflow: 'auto' }}>
         {filteredStatuses.map((status) => (
-          <ListItem
+          <ListItemButton
             key={status.id}
-            button
             draggable
             onDragStart={(event) => {
               event.dataTransfer.setData(
@@ -62,6 +61,7 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
               event.dataTransfer.effectAllowed = 'move';
               onDragStart(status);
             }}
+            data-cy={`status_${status.name}`}
             style={{
               marginBottom: '5px',
               border: '1px solid #e0e0e0',
@@ -75,7 +75,7 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
               primaryTypographyProps={{ variant: 'subtitle2' }}
               secondaryTypographyProps={{ variant: 'caption' }}
             />
-          </ListItem>
+          </ListItemButton>
         ))}
         {filteredStatuses.length === 0 && searchTerm && (
           <Typography color="textSecondary">

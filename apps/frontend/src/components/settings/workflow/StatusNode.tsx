@@ -79,7 +79,9 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
         <Title>
           <TitleContent onClick={handleToggleExpand}>
             <ExpandIcon expanded={expanded} />
-            <Typography variant="subtitle1" color={'black'}>{data.status.name}</Typography>
+            <Typography variant="subtitle1" color="black" fontSize={'13px'}>
+              {data.status.name}
+            </Typography>
           </TitleContent>
           {data.status.name !== 'DRAFT' && (
             <IconButton
@@ -89,7 +91,11 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
                 data.onDelete(data.status.id.toString());
               }}
               title="Delete status"
-
+              sx={{
+                position: 'absolute',
+                right: '10px',
+                background: '#EEE',
+              }}
             >
               <DeleteIcon
                 fontSize="small"
