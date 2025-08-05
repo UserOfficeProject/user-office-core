@@ -5,6 +5,18 @@ $DO$
     INSERT INTO experiments(
       experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)
       VALUES (996,'000001', 996, '2030-01-07 10:00:00', '2030-01-07 11:00:00', 1, 'ACTIVE', 1, 1);
+   
+    INSERT INTO experiments(
+    experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, instrument_id)
+    VALUES (997, '000002', 997, '2020-01-07 10:00:00', '2020-01-07 11:00:00', 1, 'ACTIVE', 1);
+
+    INSERT INTO experiments(
+    experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)
+    VALUES (998, '000003', 998, '2030-01-07 12:00:00', '2030-01-07 13:00:00', 1, 'DRAFT', 1, 2);
+
+    INSERT INTO experiments(
+    experiment_pk, experiment_id, scheduled_event_id, starts_at, ends_at, proposal_pk, status, local_contact_id, instrument_id)
+    VALUES (999, '000004', 999, '2030-02-07 12:00:00', '2030-02-07 13:00:00', 1, 'COMPLETED', 1, 1);
 
       -- Insert Questions for Experiment Safety Review (ESR) Template
       -- BOOLEAN Question for Experiment Safety Review (ESR) Template
@@ -19,7 +31,8 @@ $DO$
         '{
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions":[]
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
@@ -34,7 +47,8 @@ $DO$
         'experiment_safety_review_boolean_question', 4, 4, 3, '{
                 "tooltip": "",
                 "required": false,
-                "small_label": ""
+                "small_label": "",
+                "readPermissions":[]
             }'
       );
 
@@ -50,7 +64,8 @@ $DO$
         '{
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions":[]
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
@@ -62,7 +77,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_date_question', 4, 4, 4, '{ "tooltip": "","required": false,"small_label": "" }'
+        'experiment_safety_review_date_question', 4, 4, 4, '{ "tooltip": "","required": false,"small_label": "" , "readPermissions":[]}'
       );
 
     -- INTERVAL Question for Experiment Safety Review (ESR) Template
@@ -87,7 +102,8 @@ $DO$
             ],
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions":[]
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
@@ -111,7 +127,8 @@ $DO$
             ],
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions":[]
           }'
       );
     -- NUMBER INPUT Question for Experiment Safety Review (ESR) Template
@@ -143,7 +160,8 @@ $DO$
             "tooltip": "",
             "required": false,
             "small_label": "",
-            "numberValueConstraint": null
+            "numberValueConstraint": null,
+            "readPermissions": []
             }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
@@ -175,7 +193,8 @@ $DO$
             "tooltip": "",
             "required": false,
             "small_label": "",
-            "numberValueConstraint": null
+            "numberValueConstraint": null,
+            "readPermissions": []
           }'
       );
     -- Rich text input Question for Experiment Safety Review (ESR) Template
@@ -188,7 +207,7 @@ $DO$
       (
         'experiment_safety_review_rich_text_input_question', 'RICH_TEXT_INPUT', 
         'Experiment Safety Review Rich text input question from seeds', 
-        '{ "tooltip": "","required": false,"small_label": "" }', 
+        '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
         'experiment_safety_review_rich_text_input_question', 12
@@ -200,7 +219,7 @@ $DO$
     VALUES 
       (
         'experiment_safety_review_rich_text_input_question', 4, 4, 
-        8, '{ "tooltip": "", "required": false, "small_label": "" }'
+        8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
       );
     -- Selection from options Question for Experiment Safety Review (ESR) Template
     INSERT INTO questions(
@@ -212,7 +231,7 @@ $DO$
       (
         'experiment_safety_review_selection_from_options_question', 
         'SELECTION_FROM_OPTIONS', 'Experiment Safety Review Selection from options question from seeds', 
-        '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}', 
+        '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
         'experiment_safety_review_selection_from_options_question', 12
@@ -224,7 +243,7 @@ $DO$
     VALUES 
       (
         'experiment_safety_review_selection_from_options_question', 
-        4, 4, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+        4, 4, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
       );
 
     -- Text input Question for Experiment Safety Review (ESR) Template
@@ -237,7 +256,7 @@ $DO$
       (
         'experiment_safety_review_text_input_question', 'TEXT_INPUT', 
         'Experiment Safety Review Text input question from seeds', 
-        '{ "tooltip": "","required": false,"small_label": "" }', 
+        '{ "tooltip": "","required": false,"small_label": "","readPermissions":[] }', 
         '2022-02-08 10:23:10.285415+00', 
         '2022-02-08 10:23:10.285415+00', 
         'experiment_safety_review_text_input_question', 12
@@ -248,7 +267,7 @@ $DO$
     ) 
     VALUES 
       (
-        'experiment_safety_review_text_input_question', 4, 4, 11, '{ "tooltip": "", "required": false, "small_label": "" }'
+        'experiment_safety_review_text_input_question', 4, 4, 11, '{ "tooltip": "", "required": false, "small_label": "","readPermissions":[] }'
       );
   END;
 $DO$

@@ -636,7 +636,7 @@ context('Template Delete, Archive, Unarchive', () => {
                       cy.updateQuestion({
                         id: createdSampleQuestionId,
                         question: sampleQuestionaryQuestion,
-                        config: `{"addEntryButtonLabel":"Add","minEntries":"1","maxEntries":"2","templateId":${createdSampleTemplateId},"templateCategory":"${TemplateCategoryId.SAMPLE_DECLARATION}"}`,
+                        config: `{"addEntryButtonLabel":"Add","minEntries":"1","maxEntries":"2","templateId":${createdSampleTemplateId},"templateCategory":"${TemplateCategoryId.SAMPLE_DECLARATION}","readPermissions":[]}`,
                       });
 
                       cy.createQuestionTemplateRelation({
@@ -1042,7 +1042,7 @@ context('Template Delete, Archive, Unarchive', () => {
                 id: createdQuestion.id,
                 question: faker.lorem.words(5),
                 naturalKey: faker.lorem.word(5),
-                config: `{"required":false,"multiline":false}`,
+                config: `{"required":false,"multiline":false,"readPermissions":[]}`,
               });
               cy.createQuestionTemplateRelation({
                 questionId: createdQuestion.id,
@@ -1087,7 +1087,7 @@ context('Template Delete, Archive, Unarchive', () => {
                         cy.updateQuestion({
                           id: createdQuestion1Id,
                           question: genericTemplateQuestion,
-                          config: `{"addEntryButtonLabel":"${addButtonLabel}","minEntries":"1","maxEntries":"2","templateId":${genericTemplateID},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":""}`,
+                          config: `{"addEntryButtonLabel":"${addButtonLabel}","minEntries":"1","maxEntries":"2","templateId":${genericTemplateID},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":"","readPermissions":[]}`,
                         });
 
                         cy.createQuestionTemplateRelation({

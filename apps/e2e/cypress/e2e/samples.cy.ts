@@ -89,7 +89,7 @@ context('Samples tests', () => {
                     cy.updateQuestion({
                       id: createdSampleQuestionId,
                       question: sampleQuestionaryQuestion,
-                      config: `{"addEntryButtonLabel":"Add","minEntries":"1","maxEntries":"2","templateId":${createdSampleTemplateId},"templateCategory":"${TemplateCategoryId.SAMPLE_DECLARATION}"}`,
+                      config: `{"addEntryButtonLabel":"Add","minEntries":"1","maxEntries":"2","templateId":${createdSampleTemplateId},"templateCategory":"${TemplateCategoryId.SAMPLE_DECLARATION}","readPermissions":[]}`,
                     });
 
                     cy.createQuestionTemplateRelation({

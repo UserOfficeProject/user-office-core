@@ -18,7 +18,7 @@ BEGIN
 
 	INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('proposal_esi_basis', proposal_esi_template_id, proposal_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('proposal_esi_basis', proposal_esi_template_id, proposal_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"","readPermissions":[]}', 'AND');
 
 	INSERT INTO templates(name, description, is_archived, group_id) VALUES 
 	('default sample esi template', 'default sample esi template', false, 'SAMPLE_ESI')
@@ -31,7 +31,7 @@ BEGIN
 
 	INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_esi_basis', sample_esi_template_id, sample_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('sample_esi_basis', sample_esi_template_id, sample_esi_template_topic_id, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"", "readPermissions":[]}', 'AND');
 
 	UPDATE public.call SET esi_template_id=proposal_esi_template_id;
 
@@ -48,7 +48,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions":[]
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -63,7 +64,8 @@ VALUES
     'proposal_esi_boolean_question', 5, 5, 3, '{
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions": []
         }'
   );
 
@@ -79,7 +81,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -91,7 +94,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_date_question', 5, 5, 4, '{ "tooltip": "","required": false,"small_label": "" }'
+    'proposal_esi_date_question', 5, 5, 4, '{ "tooltip": "","required": false,"small_label": "","readPermissions": [] }'
   );
 
 -- INTERVAL Question for Proposal ESI Template
@@ -116,7 +119,8 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -140,7 +144,8 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
       }'
   );
 -- NUMBER INPUT Question for Proposal ESI Template
@@ -172,7 +177,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -204,7 +210,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions": []
       }'
   );
 -- Rich text input Question for Proposal ESI Template
@@ -217,7 +224,7 @@ VALUES
   (
     'proposal_esi_rich_text_input_question', 'RICH_TEXT_INPUT', 
     'Proposal ESI Rich text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'proposal_esi_rich_text_input_question', 1
@@ -229,7 +236,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'proposal_esi_rich_text_input_question', 5, 5, 
-    8, '{ "tooltip": "", "required": false, "small_label": "" }'
+    8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 -- Selection from options Question for Proposal ESI Template
 INSERT INTO questions(
@@ -241,7 +248,7 @@ VALUES
   (
     'proposal_esi_selection_from_options_question', 
     'SELECTION_FROM_OPTIONS', 'Proposal ESI Selection from options question from seeds', 
-    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}', 
+    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'proposal_esi_selection_from_options_question', 
@@ -254,7 +261,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'proposal_esi_selection_from_options_question', 
-    5, 5, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+    5, 5, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
   );
 
 -- Text input Question for Proposal ESI Template
@@ -267,7 +274,7 @@ VALUES
   (
     'proposal_esi_text_input_question', 'TEXT_INPUT', 
     'Proposal ESI Text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "","readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'proposal_esi_text_input_question', 1
@@ -278,7 +285,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'proposal_esi_text_input_question', 5, 5, 11, '{ "tooltip": "", "required": false, "small_label": "" }'
+    'proposal_esi_text_input_question', 5, 5, 11, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 
 -- 	-- Insert Questions for Sample ESI template
@@ -294,7 +301,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -309,7 +317,8 @@ VALUES
     'sample_esi_boolean_question', 6, 6, 3, '{
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions": []
         }'
   );
 
@@ -325,7 +334,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -337,7 +347,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_date_question', 6, 6, 4, '{ "tooltip": "","required": false,"small_label": "" }'
+    'sample_esi_date_question', 6, 6, 4, '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }'
   );
 
 -- INTERVAL Question for Sample ESI Template
@@ -362,8 +372,9 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
-        }', 
+        "small_label": "",
+        "readPermissions": []
+      }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_esi_interval_question', 2
@@ -386,7 +397,8 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
       }'
   );
 -- NUMBER INPUT Question for Sample ESI Template
@@ -418,7 +430,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -450,7 +463,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions": []
       }'
   );
 -- Rich text input Question for Sample ESI Template
@@ -463,7 +477,7 @@ VALUES
   (
     'sample_esi_rich_text_input_question', 'RICH_TEXT_INPUT', 
     'Sample ESI Rich text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "","readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_esi_rich_text_input_question', 2
@@ -475,7 +489,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'sample_esi_rich_text_input_question', 6, 6, 
-    8, '{ "tooltip": "", "required": false, "small_label": "" }'
+    8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 -- Selection from options Question for Sample ESI Template
 INSERT INTO questions(
@@ -487,7 +501,7 @@ VALUES
   (
     'sample_esi_selection_from_options_question', 
     'SELECTION_FROM_OPTIONS', 'Sample ESI Selection from options question from seeds', 
-    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}', 
+    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_esi_selection_from_options_question', 
@@ -500,7 +514,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'sample_esi_selection_from_options_question', 
-    6, 6, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+    6, 6, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true,"readPermissions":[]}'
   );
 
 
@@ -515,7 +529,7 @@ VALUES
   (
     'sample_esi_text_input_question', 'TEXT_INPUT', 
     'Sample ESI Text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "", "readPermissions": [] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_esi_text_input_question', 2
@@ -526,7 +540,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_esi_text_input_question', 6, 6, 11, '{ "tooltip": "", "required": false, "small_label": "" }'
+    'sample_esi_text_input_question', 6, 6, 11, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 
 	

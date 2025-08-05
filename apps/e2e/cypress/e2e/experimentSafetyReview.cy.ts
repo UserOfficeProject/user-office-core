@@ -307,7 +307,10 @@ function submitESFByUser() {
   cy.contains(TEST_CONSTANTS.EXPERIMENT.ID).should('exist');
   cy.get('[data-cy=finish-experiment-safety-form-icon]').should('exist');
   cy.testActionButton('finish-experiment-safety-form-icon', 'active');
-  cy.get('[data-cy=finish-experiment-safety-form-icon]').click();
+  cy.contains(TEST_CONSTANTS.EXPERIMENT.ID)
+    .parent()
+    .find('[data-cy=finish-experiment-safety-form-icon]')
+    .click();
 
   // Fill Sample ESI
   cy.finishedLoading();

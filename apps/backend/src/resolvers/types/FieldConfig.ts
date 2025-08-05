@@ -25,12 +25,18 @@ export class ConfigBase {
 
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
 export class SampleBasisConfig {
   @Field(() => String)
   titlePlaceholder: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -40,6 +46,9 @@ export class GenericTemplateBasisConfig {
 
   @Field(() => String)
   questionLabel: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -82,6 +91,9 @@ export class EmbellishmentConfig {
 
   @Field(() => String)
   plain: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -209,7 +221,10 @@ export class TextInputConfig extends ConfigBase {
 export class ShipmentBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class FeedbackBasisConfig extends ConfigBase {}
+export class FeedbackBasisConfig extends ConfigBase {
+  @Field(() => [String])
+  readPermissions: string[];
+}
 
 @ObjectType()
 export class SubTemplateBaseConfig {
@@ -233,6 +248,9 @@ export class SubTemplateBaseConfig {
 
   @Field(() => Boolean)
   required: boolean;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
@@ -282,18 +300,27 @@ export class NumberInputConfig extends ConfigBase {
 export class ProposalBasisConfig {
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
 export class ProposalEsiBasisConfig {
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()
 export class SampleEsiBasisConfig {
   @Field(() => String)
   tooltip: string;
+
+  @Field(() => [String])
+  readPermissions: string[];
 }
 
 @ObjectType()

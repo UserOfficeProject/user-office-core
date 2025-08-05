@@ -1,4 +1,4 @@
-import FormControl from '@mui/material/FormControl';
+import { FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import { ChangeEvent, default as React, useContext } from 'react';
@@ -64,7 +64,6 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
       {(formikProps) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
-
           <TitledContainer label="Options">
             <Field
               name="config.addEntryButtonLabel"
@@ -125,7 +124,6 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
               </FormControl>
             )}
           </TitledContainer>
-
           <TitledContainer label="Constraints">
             <Field
               name="config.minEntries"
@@ -171,7 +169,6 @@ export const QuestionTemplateRelationSampleDeclarationForm = (
               }
             />
           </TitledContainer>
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}

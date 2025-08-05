@@ -32,7 +32,7 @@ BEGIN
                     'exp_safety_review_basis'
                     , 'EXPERIMENT_SAFETY_REVIEW_BASIS'
                     , 'Experiment Safety review basic information'
-                    , '{"required":false,"small_label":"","tooltip":""}'
+                    , '{"required":false,"small_label":"","tooltip":"","readPermissions":[]}'
                     , 'exp_safety_review_basis'
                     , 12
                 );
@@ -52,7 +52,7 @@ BEGIN
         FROM topics
         WHERE topic_title='New experiment safety review';
 
-        INSERT INTO templates_has_questions (question_id, template_id, topic_id, sort_order, config) VALUES('exp_safety_review_basis', exp_safety_review_template_id_var, exp_safety_review_topic_id_var, 0, '{"required":false,"small_label":"","tooltip":""}');
+        INSERT INTO templates_has_questions (question_id, template_id, topic_id, sort_order, config) VALUES('exp_safety_review_basis', exp_safety_review_template_id_var, exp_safety_review_topic_id_var, 0, '{"required":false,"small_label":"","tooltip":"","readPermissions":[]}');
 
     END IF;
 END;

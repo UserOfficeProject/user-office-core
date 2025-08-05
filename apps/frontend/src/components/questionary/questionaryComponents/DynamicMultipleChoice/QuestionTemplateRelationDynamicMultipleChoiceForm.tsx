@@ -64,7 +64,6 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
               data-cy="required"
             />
           </TitledContainer>
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.variant" shrink>
@@ -99,7 +98,6 @@ export const QuestionTemplateRelationDynamicMultipleChoiceForm = (
               />
             )}
           </TitledContainer>
-
           <TitledContainer label="Dynamic URL">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.url" shrink>

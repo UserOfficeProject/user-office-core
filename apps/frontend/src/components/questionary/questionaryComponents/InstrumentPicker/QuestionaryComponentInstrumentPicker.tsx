@@ -52,7 +52,7 @@ export function processInstrumentPickerValue(
     return instrumentExists ? answer.value : null;
   }
 
-  return undefined;
+  return null;
 }
 export function QuestionaryComponentInstrumentPicker(
   props: BasicComponentProps

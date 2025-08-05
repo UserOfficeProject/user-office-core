@@ -27,7 +27,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions":[]
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -42,7 +43,8 @@ VALUES
     'sample_boolean_question', 7, 7, 3, '{
             "tooltip": "",
             "required": false,
-            "small_label": ""
+            "small_label": "",
+            "readPermissions":[]
         }'
   );
 INSERT INTO answers(
@@ -65,7 +67,8 @@ VALUES
     '{
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions":[]
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -77,7 +80,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_date_question', 7, 7, 4, '{ "tooltip": "","required": false,"small_label": "" }'
+    'sample_date_question', 7, 7, 4, '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -97,7 +100,7 @@ VALUES
   (
     'sample_file_upload_question', 'FILE_UPLOAD', 
     'Sample file upload question from seeds', 
-    '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}', 
+    '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_file_upload_question', 2
@@ -108,7 +111,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_file_upload_question', 7, 7, 5, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": ""}'
+    'sample_file_upload_question', 7, 7, 5, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -140,7 +143,8 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -164,7 +168,8 @@ VALUES
         ],
         "tooltip": "",
         "required": false,
-        "small_label": ""
+        "small_label": "",
+        "readPermissions": []
       }'
   );
 INSERT INTO answers(
@@ -209,7 +214,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions": []
         }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
@@ -241,7 +247,8 @@ VALUES
         "tooltip": "",
         "required": false,
         "small_label": "",
-        "numberValueConstraint": null
+        "numberValueConstraint": null,
+        "readPermissions": []
       }'
   );
 INSERT INTO answers(
@@ -273,7 +280,7 @@ VALUES
   (
     'sample_rich_text_input_question', 'RICH_TEXT_INPUT', 
     'Sample Rich text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_rich_text_input_question', 2
@@ -285,7 +292,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'sample_rich_text_input_question', 7, 7, 
-    8, '{ "tooltip": "", "required": false, "small_label": "" }'
+    8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -304,7 +311,7 @@ VALUES
   (
     'sample_selection_from_options_question', 
     'SELECTION_FROM_OPTIONS', 'Sample Selection from options question from seeds', 
-    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}', 
+    '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_selection_from_options_question', 
@@ -317,7 +324,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'sample_selection_from_options_question', 
-    7, 7, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true}'
+    7, 7, 9, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -338,7 +345,8 @@ VALUES
   (
     'sample_dynamic_multiple_choice_question', 
     'DYNAMIC_MULTIPLE_CHOICE', 'Sample Dynamic multiple choice question from seeds', 
-    '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}', 
+    '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],  
+      "readPermissions":[]}', 
     '2023-02-08 10:23:10.285415+00', 
     '2023-02-08 10:23:10.285415+00', 
     'sample_dynamic_multiple_choice_question', 
@@ -351,7 +359,8 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'sample_dynamic_multiple_choice_question', 
-    7, 7, 10, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[]}'
+    7, 7, 10, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[], 
+      "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -372,7 +381,7 @@ VALUES
   (
     'sample_text_input_question', 'TEXT_INPUT', 
     'Sample Text input question from seeds', 
-    '{ "tooltip": "","required": false,"small_label": "" }', 
+    '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }', 
     '2022-02-08 10:23:10.285415+00', 
     '2022-02-08 10:23:10.285415+00', 
     'sample_text_input_question', 2
@@ -383,7 +392,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'sample_text_input_question', 7, 7, 11, '{ "tooltip": "", "required": false, "small_label": "" }'
+    'sample_text_input_question', 7, 7, 11, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions": [] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -395,11 +404,11 @@ VALUES
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_basis', 7, 7, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":""}', 'AND');
+	VALUES ('sample_basis', 7, 7, 0, '{"titlePlaceholder":"Title","required":false,"small_label":"","tooltip":"", "readPermissions":[]}', 'AND');
 	
 INSERT INTO public.questions(
 	question_id, data_type, question, default_config, created_at, updated_at, natural_key, category_id)
-	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":7,"esiTemplateId":6,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":""}',
+	VALUES ('sample_declaration_question', 'SAMPLE_DECLARATION', 'Add samples', '{"addEntryButtonLabel":"Add","minEntries":null,"maxEntries":null,"templateId":7,"esiTemplateId":6,"templateCategory":"SAMPLE_DECLARATION","required":false,"small_label":"","readPermissions":[]}',
 			'2021-07-20 13:53:29.246687+00', '2021-07-20 13:53:29.246687+00', 'sample_declaration_question', 1);
 	
 INSERT INTO public.topics(
@@ -408,7 +417,11 @@ INSERT INTO public.topics(
 	
 INSERT INTO public.templates_has_questions(
 	question_id, template_id, topic_id, sort_order, config, dependencies_operator)
-	VALUES ('sample_declaration_question', 1, 8, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":7,"esiTemplateId":6,"small_label":"","required":false,"minEntries":null,"maxEntries":null}', 'AND');
+	VALUES ('sample_declaration_question', 1, 8, 0, '{"addEntryButtonLabel":"Add","templateCategory":"SAMPLE_DECLARATION","templateId":7,"esiTemplateId":6,"small_label":"","required":false,"minEntries":null,"maxEntries":null, "readPermissions":[]}', 'AND');
+
+INSERT INTO public.questionaries(
+	template_id, created_at, creator_id)
+	VALUES ( 7, '2021-07-20 13:59:08.597908+00', 2);
 	
 INSERT INTO public.samples(
 	title, creator_id, questionary_id, safety_status, created_at, safety_comment, proposal_pk, question_id, shipment_id)
