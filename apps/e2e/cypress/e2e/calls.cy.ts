@@ -968,7 +968,7 @@ context('Calls tests', () => {
         cy.get('[role="listbox"]').contains('Open/Upcoming').click();
         cy.get(
           '[data-cy="calls-table"] [aria-label="Detail panel visibility toggle"]'
-        ).should('have.length', 1);
+        ).should('have.length', 2);
       });
     });
 
