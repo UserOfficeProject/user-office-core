@@ -4043,7 +4043,7 @@ context(
             cy.updateQuestion({
               id: result.createQuestion.id,
               question: instrumentPickerQuestion,
-              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false}`,
+              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false,"readPermissions":[]}`,
             });
             cy.createQuestionTemplateRelation({
               questionId: instrumentPickerQuestionId,
@@ -4106,7 +4106,7 @@ context(
       cy.updateQuestionTemplateRelationSettings({
         questionId: instrumentPickerQuestionId,
         templateId: initialDBData.template.id,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false}`,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
         dependencies: [],
       });
 

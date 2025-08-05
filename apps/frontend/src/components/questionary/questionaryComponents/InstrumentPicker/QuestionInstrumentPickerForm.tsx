@@ -47,7 +47,6 @@ export const QuestionInstrumentPickerForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <QuestionInstrumentPickerFormCommon config={config} />
         </>
       )}
