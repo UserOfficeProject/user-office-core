@@ -110,7 +110,9 @@ export default class PostgresCallDataSource implements CallDataSource {
     } else if (filter?.isEnded === true) {
       query.where('end_call', '<=', currentDate);
     } else if (filter?.isCallUpcoming === true) {
-      query.where('end_call', '>=', currentDate);
+      query
+        .where('end_call', '>=', currentDate)
+        .orWhere('end_call_internal', '>=', currentDate);
     } else if (filter?.isEnded === false) {
       query
         .where('start_call', '<=', currentDate)
