@@ -8,6 +8,7 @@ import { SearchCriteriaInputProps } from 'components/proposal/SearchCriteriaInpu
 import {
   Answer,
   DataType,
+  GetRolesQuery,
   Question,
   QuestionTemplateRelation,
   Sdk,
@@ -47,6 +48,7 @@ export type FormChildren<ValueObjectType> = (
 
 export interface QuestionFormProps {
   question: Question;
+  rolesData: GetRolesQuery['roles'];
   closeMe?: () => unknown;
   onUpdated?: (question: Question) => unknown;
   onDeleted?: (question: Question) => unknown;
@@ -55,6 +57,7 @@ export interface QuestionFormProps {
 export interface QuestionTemplateRelationFormProps {
   questionRel: QuestionTemplateRelation;
   template: Template;
+  rolesData: GetRolesQuery['roles'];
   closeMe?: () => unknown;
   onUpdated?: (template: TemplateFragment) => unknown;
   onDeleted?: (template: TemplateFragment) => unknown;

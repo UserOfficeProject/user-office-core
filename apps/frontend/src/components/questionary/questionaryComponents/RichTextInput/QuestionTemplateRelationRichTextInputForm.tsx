@@ -27,7 +27,6 @@ export const QuestionTemplateRelationRichTextInputForm = (
       {(formikProps) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -66,7 +65,6 @@ export const QuestionTemplateRelationRichTextInputForm = (
               value={(formikProps.values.config as TextInputConfig).max ?? ''}
             />
           </TitledContainer>
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}

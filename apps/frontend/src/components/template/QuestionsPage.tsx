@@ -22,6 +22,7 @@ import {
 } from 'generated/sdk';
 import ButtonWithDialog from 'hooks/common/ButtonWithDialog';
 import { QuestionWithUsage } from 'hooks/template/useQuestions';
+import { useRolesData } from 'hooks/user/useRolesData';
 import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import { setSortDirectionOnSortField } from 'utils/helperFunctions';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
@@ -65,6 +66,7 @@ let columns: Column<QuestionWithUsage>[] = [
 function QuestionsPage() {
   const [searchParams, setSearchParam] = useSearchParams();
   const category = searchParams.get('category') as TemplateCategoryId;
+  const { rolesData } = useRolesData();
 
   const type = searchParams.get('type') as DataType;
   const [filter, setFilter] = React.useState<QuestionsFilter>({
@@ -132,6 +134,7 @@ function QuestionsPage() {
               <>
                 {createQuestionForm({
                   question: selectedQuestion,
+                  rolesData,
                   onUpdated: () => {
                     setIsEditQuestionModalOpen(false);
                     tableRef.current && tableRef.current.onQueryChange({});
