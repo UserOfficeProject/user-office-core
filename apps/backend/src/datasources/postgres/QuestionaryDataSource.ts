@@ -401,6 +401,8 @@ export default class PostgresQuestionaryDataSource
           answers.question_id
         AND
           answers.questionary_id=${questionaryId}
+        WHERE
+          templates_has_questions.template_id = ${templateId}
         ORDER BY
           templates_has_questions.sort_order`)
     ).rows;
@@ -415,6 +417,7 @@ export default class PostgresQuestionaryDataSource
         const questionDependencies = dependencies.filter(
           (dependency) => dependency.questionId === record.question_id
         );
+
         const questionTemplateRelation =
           await createQuestionTemplateRelationObject(
             record,

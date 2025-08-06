@@ -25,6 +25,7 @@ export const selectionFromOptionsDefinition: Question<DataType.SELECTION_FROM_OP
       config.variant = 'radio';
       config.options = [];
       config.isMultipleSelect = false;
+      config.readPermissions = [];
 
       return config;
     },

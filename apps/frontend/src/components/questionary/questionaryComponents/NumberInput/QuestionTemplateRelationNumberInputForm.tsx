@@ -117,7 +117,6 @@ export const QuestionTemplateRelationNumberForm = (
                 ]}
               />
             </TitledContainer>
-
             <TitledContainer label="Dependencies">
               <QuestionDependencyList
                 form={formikProps}
