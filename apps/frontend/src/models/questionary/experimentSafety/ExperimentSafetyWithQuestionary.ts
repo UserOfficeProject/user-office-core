@@ -1,4 +1,4 @@
-import { GetExperimentSafetyQuery } from 'generated/sdk';
+import { GetExperimentSafetyQuery } from '../../../generated/sdk';
 
 export type ExperimentSafetyWithQuestionary = NonNullable<
   GetExperimentSafetyQuery['experimentSafety']

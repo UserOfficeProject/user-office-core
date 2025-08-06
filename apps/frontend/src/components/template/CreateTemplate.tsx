@@ -8,12 +8,6 @@ import { TemplateGroupId, TemplateMetadataFragment } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 import {
-  experimentBody as defaultExperimentBody,
-  experimentHeader as defaultExperimentHeader,
-  experimentFooter as defaultExperimentFooter,
-  experimentDummyData as defaultExperimentDummyData,
-} from './ExperimentPdfTemplateDefaultData';
-import {
   body as defaultProposalBody,
   header as defaultProposalHeader,
   footer as defaultProposalFooter,
@@ -40,35 +34,20 @@ const CreateTemplate = (props: {
             ...values,
             groupId,
           });
+
           if (
-            createTemplate.groupId == TemplateGroupId.PROPOSAL_PDF &&
-            createTemplate.proposalPdfTemplate
+            createTemplate.groupId == TemplateGroupId.PDF_TEMPLATE &&
+            createTemplate.pdfTemplate
           ) {
             await api({
               toastSuccessMessage: 'Template updated successfully!',
-            }).updateProposalPdfTemplate({
-              proposalPdfTemplateId:
-                createTemplate.proposalPdfTemplate.proposalPdfTemplateId,
+            }).updatePdfTemplate({
+              pdfTemplateId: createTemplate.pdfTemplate.pdfTemplateId,
               templateData: defaultProposalBody,
               templateHeader: defaultProposalHeader,
               templateFooter: defaultProposalFooter,
               templateSampleDeclaration: defaultProposalSampleDeclaration,
               dummyData: defaultProposalDummyData,
-            });
-          } else if (
-            createTemplate.groupId == TemplateGroupId.EXPERIMENT_SAFETY_PDF &&
-            createTemplate.experimentSafetyPdfTemplate
-          ) {
-            await api({
-              toastSuccessMessage: 'Template updated successfully!',
-            }).updateExperimentSafetyPdfTemplate({
-              experimentSafetyPdfTemplateId:
-                createTemplate.experimentSafetyPdfTemplate
-                  .experimentSafetyPdfTemplateId,
-              templateData: defaultExperimentBody,
-              templateHeader: defaultExperimentHeader,
-              templateFooter: defaultExperimentFooter,
-              dummyData: defaultExperimentDummyData,
             });
           }
 

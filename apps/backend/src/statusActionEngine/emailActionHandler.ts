@@ -14,7 +14,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+import { WorkflowEngineProposalType } from '../workflowEngine';
 import {
   EmailReadyType,
   getCoProposersAndFormatOutputForEmailSending,

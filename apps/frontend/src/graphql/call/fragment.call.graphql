@@ -16,11 +16,9 @@ fragment call on Call {
   surveyComment
   referenceNumberFormat
   proposalWorkflowId
-  experimentWorkflowId
   templateId
   esiTemplateId
-  proposalPdfTemplateId
-  experimentSafetyPdfTemplateId
+  pdfTemplateId
   fapReviewTemplateId
   technicalReviewTemplateId
   allocationTimeUnit
@@ -48,12 +46,7 @@ fragment call on Call {
     id
     code
   }
-  proposalWorkflow {
-    id
-    name
-    description
-  }
-  experimentWorkflow {
+  workflow {
     id
     name
     description

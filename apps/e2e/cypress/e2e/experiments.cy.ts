@@ -31,7 +31,7 @@ context('Experiments tests', () => {
       ],
       managementDecisionSubmitted: true,
     });
-    cy.createExperimentSafety({
+    cy.createOrGetExperimentSafety({
       experimentPk: initialDBData.experiments.upcoming.experimentPk,
     });
     cy.createVisit({
@@ -82,6 +82,18 @@ context('Experiments tests', () => {
       cy.contains('1-4 of 4');
     });
 
+    it('Can view Experiment Safety', () => {
+      cy.login('officer');
+      cy.visit('/');
+      cy.get('[data-cy=officer-menu-items]').contains('Experiments').click();
+      cy.get('[value=NONE]').click();
+
+      cy.get('[data-cy=officer-scheduled-events-table]')
+        .contains('View Experiment Safety')
+        .click();
+      cy.get('[role=dialog]').contains(initialDBData.proposal.title);
+    });
+
     it('Can view visits', () => {
       cy.login('officer');
       cy.visit('/');
@@ -93,8 +105,9 @@ context('Experiments tests', () => {
       cy.get('[data-cy=officer-scheduled-events-table] Table button')
         .first()
         .click();
-      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
-      cy.contains(initialDBData.users.user1.lastName);
+      cy.get('[data-cy=officer-scheduled-events-table]').contains(
+        initialDBData.users.user1.lastName
+      );
     });
 
     it('All the columns in visit table are sortable', () => {
@@ -108,7 +121,7 @@ context('Experiments tests', () => {
       cy.get('[data-cy=officer-scheduled-events-table] Table button')
         .first()
         .click();
-      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
       let tableValue: string[] = [];
       cy.get('[data-cy=visit-registrations-table] tbody td')
         .each(($el) => {
@@ -231,7 +244,10 @@ context('Experiments tests', () => {
             );
 
             // Reset the table to original order. How? Click on Hide button first and Expand button then.
-            cy.reload();
+            cy.get('[data-cy=officer-scheduled-events-table] Table button')
+              .first()
+              .click()
+              .click();
           }
         });
     });

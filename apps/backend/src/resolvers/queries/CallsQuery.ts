@@ -15,10 +15,7 @@ export class CallsFilter {
   public templateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
-  public proposalPdfTemplateIds?: number[];
-
-  @Field(() => [Int], { nullable: true })
-  public experimentSafetyPdfTemplateIds?: number[];
+  public pdfTemplateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
   public esiTemplateIds?: number[];

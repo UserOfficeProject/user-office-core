@@ -15,8 +15,7 @@ import {
   Template as TemplateOrigin,
   TemplateGroupId,
 } from '../../models/Template';
-import { ExperimentSafetyPdfTemplate } from './ExperimentSafetyPdfTemplate';
-import { ProposalPdfTemplate } from './ProposalPdfTemplate';
+import { PdfTemplate } from './PdfTemplate';
 import { Question } from './Question';
 import { TemplateGroup } from './TemplateGroup';
 import { TemplateStep } from './TemplateStep';
@@ -75,24 +74,12 @@ export class TemplateResolver {
   }
 
   @FieldResolver(() => Int, { nullable: true })
-  async proposalPdfCallCount(
+  async pdfCallCount(
     @Root() template: Template,
     @Ctx() context: ResolverContext
   ): Promise<number> {
     return context.queries.call
-      .getAll(context.user, { proposalPdfTemplateIds: [template.templateId] })
-      .then((result) => result?.length || 0);
-  }
-
-  @FieldResolver(() => Int, { nullable: true })
-  async experimentSafetyPdfCallCount(
-    @Root() template: Template,
-    @Ctx() context: ResolverContext
-  ): Promise<number> {
-    return context.queries.call
-      .getAll(context.user, {
-        experimentSafetyPdfTemplateIds: [template.templateId],
-      })
+      .getAll(context.user, { pdfTemplateIds: [template.templateId] })
       .then((result) => result?.length || 0);
   }
 
@@ -124,34 +111,17 @@ export class TemplateResolver {
     );
   }
 
-  @FieldResolver(() => ProposalPdfTemplate, { nullable: true })
-  async proposalPdfTemplate(
+  @FieldResolver(() => PdfTemplate, { nullable: true })
+  async pdfTemplate(
     @Root() template: Template,
     @Ctx() context: ResolverContext
-  ): Promise<ProposalPdfTemplate | null> {
-    const templates =
-      await context.queries.proposalPdfTemplate.getProposalPdfTemplates(
-        context.user,
-        {
-          filter: { templateIds: [template.templateId] },
-        }
-      );
-
-    return templates?.length ? templates[0] : null;
-  }
-
-  @FieldResolver(() => ExperimentSafetyPdfTemplate, { nullable: true })
-  async experimentSafetyPdfTemplate(
-    @Root() template: Template,
-    @Ctx() context: ResolverContext
-  ): Promise<ExperimentSafetyPdfTemplate | null> {
-    const templates =
-      await context.queries.experimentSafetyPdfTemplate.getExperimentSafetyPdfTemplates(
-        context.user,
-        {
-          filter: { templateIds: [template.templateId] },
-        }
-      );
+  ): Promise<PdfTemplate | null> {
+    const templates = await context.queries.pdfTemplate.getPdfTemplates(
+      context.user,
+      {
+        filter: { templateIds: [template.templateId] },
+      }
+    );
 
     return templates?.length ? templates[0] : null;
   }

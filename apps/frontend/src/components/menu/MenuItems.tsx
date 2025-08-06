@@ -13,24 +13,45 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import i18n from 'i18n';
+import { DateTime } from 'luxon';
 import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
+import {
+  DEFAULT_DATE_FORMAT,
+  getRelativeDatesFromToday,
+} from 'components/experiment/DateFilter';
+import { TimeSpan } from 'components/experiment/PresetDateSelector';
 import { FeatureContext } from 'context/FeatureContextProvider';
-import { FeatureId, UserRole } from 'generated/sdk';
+import { FeatureId, SettingsId, UserRole } from 'generated/sdk';
+import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import SettingsMenuListItem from './SettingsMenuListItem';
 import { StatusActionLogsMenuListItem } from './StatusActionLogsMenuListItem';
 import { TemplateMenuListItem } from './TemplateMenuListItem';
+import BoxIcon from '../common/icons/BoxIcon';
 import CommentQuestionIcon from '../common/icons/CommentQuestionIcon';
 import ScienceIcon from '../common/icons/ScienceIcon';
 
 type MenuItemsProps = {
   currentRole: UserRole | null;
+};
+
+const ExperimentSafetyReviewMenuListItem = () => {
+  return (
+    <Tooltip title="Experiment Safety Review">
+      <ListItemButton component={NavLink} to="/ExperimentSafetyReview">
+        <ListItemIcon>
+          <BoxIcon />
+        </ListItemIcon>
+        <ListItemText primary="Experiment Safety" />
+      </ListItemButton>
+    </Tooltip>
+  );
 };
 
 const ProposalsMenuListItem = () => {
@@ -49,6 +70,9 @@ const ProposalsMenuListItem = () => {
 const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const context = useContext(FeatureContext);
   const { t } = useTranslation();
+  const { format } = useFormattedDateTime({
+    settingsFormatToUse: SettingsId.DATE_FORMAT,
+  });
 
   const isSchedulerEnabled = context.featuresMap.get(
     FeatureId.SCHEDULER
@@ -59,6 +83,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
   const isFapEnabled = context.featuresMap.get(FeatureId.FAP_REVIEW)?.isEnabled;
   const isUserManagementEnabled = context.featuresMap.get(
     FeatureId.USER_MANAGEMENT
+  )?.isEnabled;
+  const isExperimentSafetyReviewEnabled = context.featuresMap.get(
+    FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
 
   const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
@@ -81,6 +108,13 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
     openCall && openCall.id
       ? `/TechniqueProposals?call=${openCall?.id}`
       : '/TechniqueProposals';
+
+  const { from, to } = getRelativeDatesFromToday(TimeSpan.NEXT_30_DAYS);
+
+  const formattedDate = (value?: Date) =>
+    value
+      ? DateTime.fromJSDate(value).toFormat(format || DEFAULT_DATE_FORMAT)
+      : undefined;
 
   const user = (
     <div data-cy="user-menu-items">
@@ -144,7 +178,10 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
       )}
       {isSchedulerEnabled && (
         <Tooltip title="Experiments">
-          <ListItemButton component={NavLink} to={`/Experiments`}>
+          <ListItemButton
+            component={NavLink}
+            to={`/ExperimentPage?from=${formattedDate(from)}&to=${formattedDate(to)}`}
+          >
             <ListItemIcon>
               <EventIcon />
             </ListItemIcon>
@@ -236,6 +273,9 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary="Questions" />
         </ListItemButton>
       </Tooltip>
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
       <SettingsMenuListItem />
     </div>
   );
@@ -275,16 +315,6 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={t('Technique Proposals')} />
         </ListItemButton>
       )}
-      {isSchedulerEnabled && (
-        <Tooltip title="Experiments">
-          <ListItemButton component={NavLink} to={`/Experiments`}>
-            <ListItemIcon>
-              <EventIcon />
-            </ListItemIcon>
-            <ListItemText primary="Experiments" />
-          </ListItemButton>
-        </Tooltip>
-      )}
       {isInstrumentManagementEnabled && (
         <ListItemButton component={NavLink} to="/Instruments">
           <ListItemIcon>
@@ -293,20 +323,16 @@ const MenuItems = ({ currentRole }: MenuItemsProps) => {
           <ListItemText primary={i18n.format(t('instrument'), 'plural')} />
         </ListItemButton>
       )}
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
+      )}
     </div>
   );
 
   const ExperimentSafetyReviewPageReviewer = (
     <div data-cy="reviewer-menu-items">
-      {isSchedulerEnabled && (
-        <Tooltip title="Experiments">
-          <ListItemButton component={NavLink} to={`/Experiments`}>
-            <ListItemIcon>
-              <EventIcon />
-            </ListItemIcon>
-            <ListItemText primary="Experiments" />
-          </ListItemButton>
-        </Tooltip>
+      {isExperimentSafetyReviewEnabled && (
+        <ExperimentSafetyReviewMenuListItem />
       )}
     </div>
   );

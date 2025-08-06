@@ -48,8 +48,8 @@ export abstract class QuestionaryWizardStep implements WizardStep {
   public payload?: any;
 
   constructor(
-    protected step: QuestionaryStep,
-    protected index: number
+    private step: QuestionaryStep,
+    private index: number
   ) {
     this.payload = {
       topicId: this.step.topic.id,
@@ -67,7 +67,7 @@ export abstract class QuestionaryWizardStep implements WizardStep {
   ): boolean;
 
   getMetadata(state: QuestionarySubmissionState) {
-    const check = {
+    return {
       title: this.step.topic.title,
       isCompleted: this.step.isCompleted,
       isReadonly:
@@ -75,8 +75,6 @@ export abstract class QuestionaryWizardStep implements WizardStep {
         (this.index > 0 &&
           state.questionary.steps[this.index - 1].isCompleted === false),
     };
-
-    return check;
   }
 }
 

@@ -11,8 +11,8 @@ import {
   SubmitProposalMutation,
   SubmitExperimentSafetyMutationVariables,
   SubmitExperimentSafetyMutation,
-  createExperimentSafetyMutationVariables,
-  createExperimentSafetyMutation,
+  CreateOrGetExperimentSafetyMutationVariables,
+  CreateOrGetExperimentSafetyMutation,
   CloneProposalsMutationVariables,
   CloneProposalsMutation,
 } from '@user-office-software-libs/shared-types';
@@ -112,11 +112,11 @@ declare global {
        * @returns {typeof createEsi}
        * @memberof Chainable
        * @example
-       *        cy.createEsi(createEsiInput: createExperimentSafetyMutationVariables);
+       *        cy.createEsi(createEsiInput: CreateOrGetExperimentSafetyMutationVariables);
        */
-      createExperimentSafety: (
-        createExperimentSafetyInput: createExperimentSafetyMutationVariables
-      ) => Cypress.Chainable<createExperimentSafetyMutation>;
+      createOrGetExperimentSafety: (
+        createOrGetExperimentSafetyInput: CreateOrGetExperimentSafetyMutationVariables
+      ) => Cypress.Chainable<CreateOrGetExperimentSafetyMutation>;
     }
   }
 }

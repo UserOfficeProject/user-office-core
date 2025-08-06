@@ -41,8 +41,8 @@ import { ImportProposalArgs } from '../resolvers/mutations/ImportProposalMutatio
 import { UpdateProposalArgs } from '../resolvers/mutations/UpdateProposalMutation';
 import { UpdateProposalScientistCommentArgs } from '../resolvers/mutations/UpdateProposalScientistCommentMutation';
 import { ProposalScientistComment } from '../resolvers/types/ProposalView';
-import { proposalStatusActionEngine } from '../statusActionEngine/proposal';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+import { statusActionEngine } from '../statusActionEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine';
 import { ProposalAuthorization } from './../auth/ProposalAuthorization';
 import { CallDataSource } from './../datasources/CallDataSource';
 import { CloneUtils } from './../utils/CloneUtils';
@@ -593,7 +593,7 @@ export default class ProposalMutations {
       );
 
       // NOTE: After proposal status change we need to run the status engine and execute the actions on the selected status.
-      proposalStatusActionEngine(statusEngineReadyProposals);
+      statusActionEngine(statusEngineReadyProposals);
     } else {
       rejection('Could not change statuses to all of the selected proposals', {
         result,
@@ -859,7 +859,6 @@ export default class ProposalMutations {
         referenceNumberSequence: 0,
         managementDecisionSubmitted: false,
         submittedDate: null,
-        experimentSequence: null,
         fileId: null,
       });
 

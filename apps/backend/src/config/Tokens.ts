@@ -18,10 +18,7 @@ export const Tokens = {
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   LoggingHandler: Symbol('LoggingHandler'),
   MailService: Symbol('MailService'),
-  ProposalPdfTemplateDataSource: Symbol('ProposalPdfTemplateDataSource'),
-  ExperimentSafetyPdfTemplateDataSource: Symbol(
-    'ExperimentSafetyPdfTemplateDataSource'
-  ),
+  PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   ProposalDataSource: Symbol('ProposalDataSource'),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),

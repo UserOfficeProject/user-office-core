@@ -6,10 +6,7 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { Roles } from '../models/Role';
 import { UserWithRole } from '../models/User';
 import { ExperimentSampleArgs } from '../resolvers/queries/ExperimentSampleQuery';
-import {
-  ExperimentsArgs,
-  ExperimentsFilter,
-} from '../resolvers/queries/ExperimentsQuery';
+import { ExperimentsArgs } from '../resolvers/queries/ExperimentsQuery';
 import { Experiment } from '../resolvers/types/Experiment';
 import { ExperimentHasSample } from '../resolvers/types/ExperimentHasSample';
 import { ExperimentSafety } from '../resolvers/types/ExperimentSafety';
@@ -72,26 +69,6 @@ export default class ExperimentQueries {
     args: ExperimentsArgs
   ): Promise<Experiment[]> {
     return this.dataSource.getExperiments(args);
-  }
-
-  @Authorized(Roles.USER_OFFICER)
-  async getAllExperiments(
-    user: UserWithRole | null,
-    filter?: ExperimentsFilter,
-    first?: number,
-    offset?: number,
-    sortField?: string,
-    sortDirection?: string,
-    searchText?: string
-  ) {
-    return this.dataSource.getAllExperiments(
-      filter,
-      first,
-      offset,
-      sortField,
-      sortDirection,
-      searchText
-    );
   }
 
   @Authorized(Roles.USER_OFFICER)

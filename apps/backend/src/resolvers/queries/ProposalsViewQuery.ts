@@ -18,7 +18,6 @@ import { ProposalsFilter } from './ProposalsQuery';
 class ProposalsViewArgs {
   @Field(() => ProposalsFilter, { nullable: true })
   public filter?: ProposalsFilter;
-
   @Field(() => Int, { nullable: true })
   public first?: number;
 

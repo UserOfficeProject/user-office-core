@@ -99,7 +99,6 @@ export function createFapReviewStub(
       techniques: [],
       attachments: { questions: [] },
       experiments: null,
-      experimentSequence: null,
       fileId: null,
     },
   };

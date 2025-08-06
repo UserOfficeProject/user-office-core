@@ -22,7 +22,6 @@ function compose(
   );
 }
 
-//TODO: Learn more about this
 export function useReducerWithMiddleWares<R extends Reducer<any, any>>(
   reducer: R,
   initialState: ReducerState<R>,
@@ -54,6 +53,6 @@ export interface MiddlewareInputParams<S, A> {
   getState: () => S;
   dispatch: React.Dispatch<A>;
 }
-export type ReducerMiddleware<State, Action> = (
-  params: MiddlewareInputParams<State, Action>
-) => (next: FunctionType) => (action: Action) => void;
+export type ReducerMiddleware<S, A> = (
+  params: MiddlewareInputParams<S, A>
+) => (next: FunctionType) => (action: A) => void;

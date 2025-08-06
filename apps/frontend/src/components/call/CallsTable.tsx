@@ -125,11 +125,6 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       emptyValue: '-',
     },
     {
-      title: 'Experiment Workflow',
-      field: 'experimentWorkflow.name',
-      emptyValue: '-',
-    },
-    {
       title: 'Proposal template',
       field: 'template.name',
       emptyValue: '-',

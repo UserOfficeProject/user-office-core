@@ -2,30 +2,23 @@ import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { injectable } from 'tsyringe';
 
-import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
   ExperimentSafety,
-  ExperimentSafetyReviewerDecisionEnum,
-  InstrumentScientistDecisionEnum,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   ExperimentsArgs,
-  ExperimentsFilter,
   UserExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
 import database from './database';
 import {
-  ExperimentSafetyEventsRecord,
   ExperimentHasSampleRecord,
   ExperimentRecord,
   ExperimentSafetyRecord,
-  ExperimentPaginatedRecord,
-  createExperimentPaginatedObject,
 } from './records';
 
 export function createExperimentObject(record: ExperimentRecord) {
@@ -40,8 +33,7 @@ export function createExperimentObject(record: ExperimentRecord) {
     record.local_contact_id,
     record.instrument_id,
     record.created_at,
-    record.updated_at,
-    record.reference_number_sequence
+    record.updated_at
   );
 }
 
@@ -52,15 +44,11 @@ export function createExperimentSafetyObject(record: ExperimentSafetyRecord) {
     record.esi_questionary_id,
     record.esi_questionary_submitted_at,
     record.created_by,
-    record.status_id,
+    record.status,
     record.safety_review_questionary_id,
     record.reviewed_by,
     record.created_at,
-    record.updated_at,
-    record.instrument_scientist_decision,
-    record.instrument_scientist_decision_comment,
-    record.experiment_safety_reviewer_decision,
-    record.experiment_safety_reviewer_decision_comment
+    record.updated_at
   );
 }
 
@@ -77,17 +65,6 @@ export function createExperimentHasSampleObject(
   );
 }
 
-function generateExperimentId(
-  proposalNumber: number,
-  sequence: number | null
-): string {
-  return `${proposalNumber}-${sequence ?? 0}`;
-}
-
-const fieldMap: { [key: string]: string } = {
-  experimentId: 'experiment_id',
-};
-
 @injectable()
 export default class PostgresExperimentDataSource
   implements ExperimentDataSource
@@ -95,76 +72,35 @@ export default class PostgresExperimentDataSource
   constructor() {}
 
   async create(
-    createExperimentPayload: Omit<
+    experiment: Omit<
       Experiment,
       'createdAt' | 'updatedAt' | 'experimentPk' | 'experimentId'
     >
   ): Promise<Experiment> {
-    const experiment: ExperimentRecord[] | undefined =
-      await database.transaction(async (trx) => {
-        try {
-          const proposal = await database('proposals')
-            .select('proposal_id', 'experiment_sequence')
-            .where('proposal_pk', createExperimentPayload.proposalPk)
-            .first()
-            .forUpdate()
-            .transacting(trx);
-
-          if (!proposal) {
-            logger.logError('Could not find proposal for experiment', {
-              experiment,
-            });
-            throw new GraphQLError('Failed to find proposal for experiment');
-          }
-          const { proposal_id: proposalNumber, experiment_sequence: sequence } =
-            proposal;
-          const experimentId = await generateExperimentId(
-            proposalNumber,
-            sequence ?? 1
-          );
-
-          await database('proposals')
-            .where('proposal_pk', createExperimentPayload.proposalPk)
-            .update({
-              experiment_sequence: sequence ? sequence + 1 : 2,
-            })
-            .transacting(trx);
-
-          const experimentCreate = await database('experiments')
-            .insert(
-              {
-                experiment_id: experimentId,
-                starts_at: createExperimentPayload.startsAt,
-                ends_at: createExperimentPayload.endsAt,
-                scheduled_event_id: createExperimentPayload.scheduledEventId,
-                proposal_pk: createExperimentPayload.proposalPk,
-                status: createExperimentPayload.status,
-                local_contact_id: createExperimentPayload.localContactId,
-                instrument_id: createExperimentPayload.instrumentId,
-                reference_number_sequence: sequence ?? 1,
-              },
-              '*'
-            )
-            .transacting(trx);
-
-          return await trx.commit(experimentCreate);
-        } catch (error) {
-          await trx.rollback();
-          logger.logError('Failed to create Experiment', {
-            error,
+    return database('experiments')
+      .insert(
+        {
+          experiment_id: experiment.scheduledEventId.toString(),
+          starts_at: experiment.startsAt,
+          ends_at: experiment.endsAt,
+          scheduled_event_id: experiment.scheduledEventId,
+          proposal_pk: experiment.proposalPk,
+          status: experiment.status,
+          local_contact_id: experiment.localContactId,
+          instrument_id: experiment.instrumentId,
+        },
+        '*'
+      )
+      .then((records: ExperimentRecord[]) => {
+        if (records.length !== 1) {
+          logger.logError('Could not create experiment', {
+            experiment,
           });
+          throw new GraphQLError('Failed to insert experiment');
         }
-      });
 
-    if (!experiment || experiment.length === 0) {
-      logger.logError('Failed to create Experiment', {
-        experiment,
+        return createExperimentObject(records[0]);
       });
-      throw new GraphQLError('Failed to create experiment');
-    }
-    const createdExperiment = experiment[0];
-
-    return createExperimentObject(createdExperiment);
   }
 
   async updateByScheduledEventId(
@@ -320,81 +256,6 @@ export default class PostgresExperimentDataSource
     return createExperimentSafetyObject(result);
   }
 
-  async updateExperimentSafety(
-    experimentSafetyPk: number,
-    updateFields: Partial<{
-      safetyReviewQuestionaryId: number;
-      esiQuestionarySubmittedAt: Date | null;
-      instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
-      instrumentScientistComment: string | null;
-      experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
-      experimentSafetyReviewerComment: string | null;
-      reviewedBy: number;
-    }>
-  ): Promise<ExperimentSafety> {
-    // Create an object for database update with proper column names
-    const updateObject: Record<string, any> = {};
-    // Map the update fields to database column names
-    if (updateFields.safetyReviewQuestionaryId !== undefined) {
-      updateObject.safety_review_questionary_id =
-        updateFields.safetyReviewQuestionaryId;
-    }
-    if (updateFields.esiQuestionarySubmittedAt !== undefined) {
-      updateObject.esi_questionary_submitted_at =
-        updateFields.esiQuestionarySubmittedAt;
-    }
-    if (updateFields.instrumentScientistDecision !== undefined) {
-      updateObject.instrument_scientist_decision =
-        updateFields.instrumentScientistDecision;
-    }
-    if (updateFields.instrumentScientistComment !== undefined) {
-      updateObject.instrument_scientist_decision_comment =
-        updateFields.instrumentScientistComment;
-    }
-    if (updateFields.experimentSafetyReviewerDecision !== undefined) {
-      updateObject.experiment_safety_reviewer_decision =
-        updateFields.experimentSafetyReviewerDecision;
-    }
-    if (updateFields.experimentSafetyReviewerComment !== undefined) {
-      updateObject.experiment_safety_reviewer_decision_comment =
-        updateFields.experimentSafetyReviewerComment;
-    }
-    if (updateFields.reviewedBy !== undefined) {
-      updateObject.reviewed_by = updateFields.reviewedBy;
-    }
-
-    // Always update the updated_at timestamp
-    updateObject.updated_at = new Date();
-    const result = await database('experiment_safety')
-      .update(updateObject)
-      .where('experiment_safety_pk', experimentSafetyPk)
-      .returning('*');
-
-    if (!result || result.length === 0) {
-      throw new Error('Could not update experiment safety');
-    }
-
-    return createExperimentSafetyObject(result[0]);
-  }
-
-  async updateExperimentSafetyStatus(
-    experimentSafetyPk: number,
-    statusId: number
-  ): Promise<ExperimentSafety> {
-    const result = await database('experiment_safety')
-      .update({
-        status_id: statusId,
-      })
-      .where('experiment_safety_pk', experimentSafetyPk)
-      .returning('*');
-
-    if (!result || result.length === 0) {
-      throw new Error('Could not update experiment safety status');
-    }
-
-    return createExperimentSafetyObject(result[0]);
-  }
-
   async getExperimentSafetyByExperimentPk(
     experimentPk: number
   ): Promise<ExperimentSafety | null> {
@@ -415,15 +276,14 @@ export default class PostgresExperimentDataSource
   async createExperimentSafety(
     experimentPk: number,
     questionaryId: number,
-    creatorId: number,
-    statusId: number
+    creatorId: number
   ): Promise<ExperimentSafety | Rejection> {
     return database
       .insert({
         experiment_pk: experimentPk,
         esi_questionary_id: questionaryId,
         created_by: creatorId,
-        status_id: statusId,
+        status: '', //todo: add status
         reviewed_by: creatorId, //todo: add reviewed_by
       })
       .into('experiment_safety')
@@ -567,123 +427,27 @@ export default class PostgresExperimentDataSource
       );
   }
 
-  async getAllExperiments(
-    filter?: ExperimentsFilter,
-    first?: number,
-    offset?: number,
-    sortField?: string,
-    sortDirection?: string,
-    searchText?: string
-  ): Promise<{ totalCount: number; experiments: Experiment[] }> {
-    return database('experiments')
-      .select(['*', database.raw('count(*) OVER() AS full_count')])
-      .join(
-        'proposals',
-        'proposals.proposal_pk',
-        '=',
-        'experiments.proposal_pk'
-      )
-      .modify((query) => {
-        if (filter?.experimentEndDate) {
-          query.where('ends_at', '<=', filter.experimentEndDate);
-        }
-        if (filter?.experimentStartDate) {
-          query.where('starts_at', '>=', filter.experimentStartDate);
-        }
-        if (filter?.instrumentId) {
-          query.where('instrument_id', filter.instrumentId);
-        }
-        if (filter?.experimentSafetyStatusId) {
-          query
-            .leftJoin(
-              'experiment_safety',
-              'experiments.experiment_pk',
-              'experiment_safety.experiment_pk'
-            )
-            .where(
-              'experiment_safety.status_id',
-              filter?.experimentSafetyStatusId
-            );
-        }
-        if (filter?.callId) {
-          query.where('proposals.call_id', filter.callId);
-        }
-        const { from, to } = filter?.overlaps || {};
-        if (from && to) {
-          query.where((builder) =>
-            builder
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.starts_at', '>=', from)
-                  .andWhere('experiments.starts_at', '<=', to)
-              )
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.ends_at', '>=', from)
-                  .andWhere('experiments.ends_at', '<=', to)
-              )
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.starts_at', '<=', from)
-                  .andWhere('experiments.ends_at', '>=', from)
-              )
-              .orWhere((subBuilder) =>
-                subBuilder
-                  .where('experiments.starts_at', '<=', to)
-                  .andWhere('experiments.ends_at', '>=', to)
-              )
-          );
-        }
-
-        if (
-          searchText !== '' &&
-          searchText !== null &&
-          searchText !== undefined
-        ) {
-          query.andWhere((qb) =>
-            qb
-              .orWhereRaw('experiment_id ILIKE ?', `%${searchText}%`)
-              .orWhereRaw('proposal_id ILIKE ?', `%${searchText}%`)
-          );
-        }
-
-        if (sortField && sortDirection) {
-          if (!fieldMap.hasOwnProperty(sortField)) {
-            throw new GraphQLError(`Bad sort field given: ${sortField}`);
-          }
-          sortField = fieldMap[sortField];
-          query.orderByRaw(`${sortField} ${sortDirection}`);
-        }
-
-        if (first) {
-          query.limit(first);
-        }
-        if (offset) {
-          query.offset(offset);
-        }
-      })
-      .then((experiments: ExperimentPaginatedRecord[]) => {
-        return {
-          totalCount: experiments[0] ? experiments[0].full_count : 0,
-          experiments: experiments.map((experiment) =>
-            createExperimentPaginatedObject(experiment)
-          ),
-        };
-      });
-  }
-
   async getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]> {
     return database('experiments')
       .select('*')
       .modify((query) => {
-        if (filter?.experimentEndDate) {
-          query.where('ends_at', '<=', filter.experimentEndDate);
+        if (filter?.endsBefore) {
+          query.where('ends_at', '<', filter.endsBefore);
         }
-        if (filter?.experimentStartDate) {
-          query.where('starts_at', '>=', filter.experimentStartDate);
+        if (filter?.endsAfter) {
+          query.where('ends_at', '>', filter.endsAfter);
+        }
+        if (filter?.startsBefore) {
+          query.where('starts_at', '<', filter.startsBefore);
+        }
+        if (filter?.startsAfter) {
+          query.where('starts_at', '>', filter.startsAfter);
         }
         if (filter?.instrumentId) {
           query.where('instrument_id', filter.instrumentId);
+        }
+        if (filter?.status) {
+          query.whereIn('status', filter.status);
         }
         if (filter?.callId) {
           query
@@ -733,43 +497,5 @@ export default class PostgresExperimentDataSource
       .then((rows: ExperimentRecord[]) =>
         rows.map((row) => createExperimentObject(row))
       );
-  }
-
-  async markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null> {
-    const dataToInsert = experimentPks.map((experimentPk) => ({
-      experiment_pk: experimentPk,
-      [event.toLowerCase()]: true,
-    }));
-    const result = await database.raw(
-      `? ON CONFLICT (experiment_pk)
-        DO UPDATE SET
-        ${event.toLowerCase()} = true
-        RETURNING *;`,
-      [database('experiment_safety_events').insert(dataToInsert)]
-    );
-
-    if (result.rows && result.rows.length) {
-      return result.rows;
-    } else {
-      return null;
-    }
-  }
-  async getExperimentSafetyEvents(
-    experimentPk: number
-  ): Promise<ExperimentSafetyEventsRecord | null> {
-    const result = await database
-      .select()
-      .from('experiment_events')
-      .where('experiment_pk', experimentPk)
-      .first();
-
-    if (!result) {
-      return null;
-    }
-
-    return result;
   }
 }

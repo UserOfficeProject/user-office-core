@@ -243,8 +243,7 @@ function QuestionaryComponentExperimentSafetyBasis(
                     });
                     dispatch({
                       type: 'SAMPLE_ADDED_TO_EXPERIMENT',
-                      experimentSample:
-                        cloneExperimentSample as ExperimentSampleWithQuestionary,
+                      experimentSample: cloneExperimentSample,
                     });
                     form.setFieldValue(answerId, [
                       ...field.value,

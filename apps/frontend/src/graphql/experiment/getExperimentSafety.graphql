@@ -5,10 +5,6 @@ query getExperimentSafety($experimentSafetyPk: Int!) {
       isCompleted
       ...questionary
     }
-    safetyReviewQuestionary {
-      isCompleted
-      ...questionary
-    }
     samples {
       sample {
         ...sample

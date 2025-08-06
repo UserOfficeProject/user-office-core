@@ -55,9 +55,6 @@ export class GenericTemplateBasisConfig {
 export class VisitBasisConfig extends ConfigBase {}
 
 @ObjectType()
-export class ExperimentSafetyReviewBasisConfig extends ConfigBase {}
-
-@ObjectType()
 export class FapReviewBasisConfig extends ConfigBase {}
 
 @ObjectType()
@@ -378,7 +375,6 @@ export const FieldConfigType = createUnionType({
     TechnicalReviewBasisConfig,
     GenericTemplateBasisConfig,
     FeedbackBasisConfig,
-    ExperimentSafetyReviewBasisConfig,
     InstrumentPickerConfig,
     TechniquePickerConfig,
   ], // function that returns array of object types classes

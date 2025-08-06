@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
+import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSource';
 import {
   dummyUserOfficerWithRole,
@@ -31,9 +31,7 @@ const mutations = container.resolve(TemplateMutations);
 
 beforeEach(() => {
   container
-    .resolve<ProposalPdfTemplateDataSourceMock>(
-      Tokens.ProposalPdfTemplateDataSource
-    )
+    .resolve<PdfTemplateDataSourceMock>(Tokens.PdfTemplateDataSource)
     .init();
   container.resolve<TemplateDataSourceMock>(Tokens.TemplateDataSource).init();
   mockCloneTemplate.mockClear();
@@ -72,13 +70,13 @@ test('An userofficer can create template', async () => {
 
 test('A userofficer can create PDF template', async () => {
   const mockCreatePdfTemplate = jest.spyOn(
-    ProposalPdfTemplateDataSourceMock.prototype,
+    PdfTemplateDataSourceMock.prototype,
     'createPdfTemplate'
   );
 
   const name = 'The name';
   const description = 'The description';
-  const groupId = TemplateGroupId.PROPOSAL_PDF;
+  const groupId = TemplateGroupId.PDF_TEMPLATE;
 
   const template = await mutations.createTemplate(dummyUserOfficerWithRole, {
     groupId,
@@ -295,17 +293,17 @@ test('User officer can clone template', async () => {
 
 test('User officer can clone PDF template', async () => {
   const mockCreatePdfTemplate = jest.spyOn(
-    ProposalPdfTemplateDataSourceMock.prototype,
+    PdfTemplateDataSourceMock.prototype,
     'createPdfTemplate'
   );
   const mockClonePdfTemplate = jest.spyOn(
-    ProposalPdfTemplateDataSourceMock.prototype,
+    PdfTemplateDataSourceMock.prototype,
     'clonePdfTemplate'
   );
   mockCloneTemplate.mockImplementation((templateId: number) =>
     Promise.resolve({
       templateId: templateId,
-      groupId: TemplateGroupId.PROPOSAL_PDF,
+      groupId: TemplateGroupId.PDF_TEMPLATE,
       name: 'PDF Template',
       description: 'PDF Template',
       isArchived: false,

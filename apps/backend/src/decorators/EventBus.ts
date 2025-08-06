@@ -17,7 +17,6 @@ const EventBusDecorator = (eventType: Event) => {
       ) => Promise<Rejection | any>;
     }
   ) => {
-    // NOTE: This decorator is used to log the events to the event bus.
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args) {

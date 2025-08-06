@@ -15,13 +15,11 @@ import ProposalContainer from './ProposalContainer';
 type GeneralInformationProps = {
   data: ProposalWithQuestionary;
   onProposalChanged?: (newProposal: ProposalWithQuestionary) => void;
-  canEditProposal?: boolean;
 };
 
 const GeneralInformation = ({
   data,
   onProposalChanged,
-  canEditProposal,
 }: GeneralInformationProps) => {
   const [isEditable, setIsEditable] = useState(false);
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
@@ -34,7 +32,7 @@ const GeneralInformation = ({
 
   return (
     <div>
-      {isUserOfficer && canEditProposal && (
+      {isUserOfficer && (
         <FormControlLabel
           style={{ display: 'block', textAlign: 'right' }}
           control={

@@ -20,7 +20,7 @@ import {
 import { EmailStatusActionRecipients } from '../resolvers/types/StatusActionConfig';
 import { emailActionHandler } from '../statusActionEngine/emailActionHandler';
 import { proposalDownloadActionHandler } from '../statusActionEngine/proposalDownloadActionHandler';
-import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
+import { WorkflowEngineProposalType } from '../workflowEngine';
 
 @injectable()
 export default class StatusActionsLogsMutations {

@@ -101,6 +101,7 @@ export default function TemplateQuestionEditor(props: {
       </ul>
     </div>
   ) : null;
+
   const questionDefinition = getQuestionaryComponentDefinition(
     props.data.dataType
   );

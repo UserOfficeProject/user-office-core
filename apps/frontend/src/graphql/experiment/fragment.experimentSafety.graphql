@@ -4,16 +4,9 @@ fragment experimentSafety on ExperimentSafety {
   esiQuestionaryId
   esiQuestionarySubmittedAt
   createdBy
-  statusId
+  status
   safetyReviewQuestionaryId
   reviewedBy
   createdAt
   updatedAt
-  instrumentScientistDecision
-  instrumentScientistComment
-  experimentSafetyReviewerDecision
-  experimentSafetyReviewerComment
-  status {
-    ...status
-  }
 }

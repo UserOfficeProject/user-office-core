@@ -1,11 +1,8 @@
-import { Event } from '../../events/event.enum';
 import {
   Experiment,
   ExperimentSafety,
   ExperimentHasSample,
   ExperimentStatus,
-  InstrumentScientistDecisionEnum,
-  ExperimentSafetyReviewerDecisionEnum,
 } from '../../models/Experiment';
 import { Rejection } from '../../models/Rejection';
 import { User } from '../../models/User';
@@ -13,10 +10,8 @@ import { SubmitExperimentSafetyArgs } from '../../resolvers/mutations/SubmitExpe
 import {
   UserExperimentsFilter,
   ExperimentsArgs,
-  ExperimentsFilter,
 } from '../../resolvers/queries/ExperimentsQuery';
 import { ExperimentDataSource } from '../ExperimentDataSource';
-import { ExperimentSafetyEventsRecord } from '../postgres/records';
 
 const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
   return new Experiment(
@@ -30,8 +25,7 @@ const dummyExperimentFactory = (values?: Partial<Experiment>): Experiment => {
     values?.localContactId ?? null,
     values?.instrumentId ?? 1,
     values?.createdAt ?? new Date(),
-    values?.updatedAt ?? new Date(),
-    values?.referenceNumberSequence ?? null
+    values?.updatedAt ?? new Date()
   );
 };
 
@@ -44,15 +38,11 @@ const dummyExperimentSafetyFactory = (
     values?.esiQuestionaryId ?? 1,
     values?.esiQuestionarySubmittedAt ?? null,
     values?.createdBy ?? 1,
-    values?.statusId ?? null,
+    values?.status ?? 'PENDING',
     values?.safetyReviewQuestionaryId ?? 1,
     values?.reviewedBy ?? null,
     values?.createdAt ?? new Date(),
-    values?.updatedAt ?? new Date(),
-    values?.instrumentScientistDecision ?? null,
-    values?.instrumentScientistComment ?? null,
-    values?.experimentSafetyReviewerDecision ?? null,
-    values?.experimentSafetyReviewerComment ?? null
+    values?.updatedAt ?? new Date()
   );
 };
 
@@ -97,17 +87,6 @@ export const ExperimentWithNonExistingProposalPk = dummyExperimentFactory({
   proposalPk: 9999,
 });
 
-const dummyExperimentSafetyEvents = {
-  experiment_pk: 1,
-  experiment_safety_management_decision_submitted_by_is: true,
-  experiment_safety_management_decision_submitted_by_esr: true,
-  experiment_esf_submitted: true,
-  experiment_esf_approved_by_is: true,
-  experiment_esf_rejected_by_is: true,
-  experiment_esf_approved_by_esr: true,
-  experiment_esf_rejected_by_esr: true,
-};
-
 export class ExperimentDataSourceMock implements ExperimentDataSource {
   private experiments: Experiment[] = [];
   private experimentsSafety: ExperimentSafety[] = [];
@@ -116,33 +95,6 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
 
   constructor() {
     this.init();
-  }
-
-  async getAllExperiments(
-    filter?: ExperimentsFilter,
-    first?: number,
-    offset?: number,
-    sortField?: string,
-    sortDirection?: string,
-    searchText?: string
-  ): Promise<{ totalCount: number; experiments: Experiment[] }> {
-    return {
-      totalCount: this.experiments.length,
-      experiments: this.experiments,
-    };
-  }
-
-  async markEventAsDoneOnExperimentSafeties(
-    event: Event,
-    experimentPks: number[]
-  ): Promise<ExperimentSafetyEventsRecord[] | null> {
-    return [dummyExperimentSafetyEvents];
-  }
-
-  async getExperimentSafetyEvents(
-    experimentPk: number
-  ): Promise<ExperimentSafetyEventsRecord | null> {
-    return dummyExperimentSafetyEvents;
   }
 
   init(): void {
@@ -156,7 +108,12 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
       ExperimentWithNonExistingProposalPk,
     ];
 
-    this.experimentsSafety = [];
+    this.experimentsSafety = [
+      // dummyExperimentSafetyFactory({
+      //   experimentSafetyPk: 1,
+      //   experimentPk: UpcomingExperimentWithExperiment.experimentPk,
+      // }),
+    ];
 
     // Initialize experimentSamples with dummy sample data
     this.experimentSamples = [DummyExperimentSample1];
@@ -192,14 +149,6 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
 
     return Promise.resolve(sortedExperiments);
   }
-
-  addExperimentSafetyReviewQuestionaryToExperimentSafety(
-    experimentSafetyPk: number,
-    questionaryId: number
-  ): Promise<ExperimentSafety> {
-    throw new Error('Method not implemented.');
-  }
-
   getExperiment(experimentPk: number): Promise<Experiment | null> {
     return new Promise((resolve) => {
       const experiment = this.experiments.find(
@@ -344,89 +293,5 @@ export class ExperimentDataSourceMock implements ExperimentDataSource {
     return Promise.resolve(
       this.experiments.filter((exp) => exp.proposalPk === proposalPk)
     );
-  }
-
-  updateExperimentSafety(
-    experimentSafetyPk: number,
-    updateFields: Partial<{
-      safetyReviewQuestionaryId: number;
-      esiQuestionarySubmittedAt: Date | null;
-      instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
-      instrumentScientistComment: string | null;
-      experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
-      experimentSafetyReviewerComment: string | null;
-      reviewedBy: number;
-    }>
-  ): Promise<ExperimentSafety> {
-    return new Promise((resolve) => {
-      const safety = this.experimentsSafety.find(
-        (safety) => safety.experimentSafetyPk === experimentSafetyPk
-      );
-
-      if (safety) {
-        const updatedSafety = new ExperimentSafety(
-          safety.experimentSafetyPk,
-          safety.experimentPk,
-          safety.esiQuestionaryId,
-          updateFields.esiQuestionarySubmittedAt !== undefined
-            ? updateFields.esiQuestionarySubmittedAt
-            : safety.esiQuestionarySubmittedAt,
-          safety.createdBy,
-          safety.statusId,
-          updateFields.safetyReviewQuestionaryId !== undefined
-            ? updateFields.safetyReviewQuestionaryId
-            : safety.safetyReviewQuestionaryId,
-          updateFields.reviewedBy !== undefined
-            ? updateFields.reviewedBy
-            : safety.reviewedBy,
-          safety.createdAt,
-          new Date(),
-          updateFields.instrumentScientistDecision !== undefined
-            ? updateFields.instrumentScientistDecision
-            : safety.instrumentScientistDecision,
-          updateFields.instrumentScientistComment !== undefined
-            ? updateFields.instrumentScientistComment
-            : safety.instrumentScientistComment,
-          updateFields.experimentSafetyReviewerDecision !== undefined
-            ? updateFields.experimentSafetyReviewerDecision
-            : safety.experimentSafetyReviewerDecision,
-          updateFields.experimentSafetyReviewerComment !== undefined
-            ? updateFields.experimentSafetyReviewerComment
-            : safety.experimentSafetyReviewerComment
-        );
-
-        // Update the safety in the array
-        const index = this.experimentsSafety.findIndex(
-          (s) => s.experimentSafetyPk === experimentSafetyPk
-        );
-        if (index !== -1) {
-          this.experimentsSafety[index] = updatedSafety;
-        }
-
-        resolve(updatedSafety);
-      } else {
-        // For mock, create a new one if not found
-        const newSafety = dummyExperimentSafetyFactory({
-          experimentSafetyPk,
-          ...updateFields,
-        });
-        this.experimentsSafety.push(newSafety);
-        resolve(newSafety);
-      }
-    });
-  }
-
-  async updateExperimentSafetyStatus(
-    experimentSafetyPk: number,
-    statusId: number
-  ): Promise<ExperimentSafety> {
-    const experimentSafety = await this.getExperimentSafety(experimentSafetyPk);
-
-    if (!experimentSafety) {
-      throw new Error('Experiment does not exist');
-    }
-    experimentSafety.statusId = statusId;
-
-    return experimentSafety;
   }
 }

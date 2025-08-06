@@ -71,9 +71,6 @@ export class CreateCallInput {
   @Field(() => Int)
   public proposalWorkflowId: number;
 
-  @Field(() => Int, { nullable: true })
-  public experimentWorkflowId?: number;
-
   @Field(() => Int)
   public templateId: number;
 
@@ -90,10 +87,7 @@ export class CreateCallInput {
   public faps?: number[];
 
   @Field(() => Int, { nullable: true })
-  public proposalPdfTemplateId?: number;
-
-  @Field(() => Int, { nullable: true })
-  public experimentSafetyPdfTemplateId?: number;
+  public pdfTemplateId?: number;
 
   @Field(() => Int, { nullable: true })
   public fapReviewTemplateId?: number;

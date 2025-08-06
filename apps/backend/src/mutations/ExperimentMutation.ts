@@ -8,21 +8,11 @@ import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { SampleDataSource } from '../datasources/SampleDataSource';
-import { StatusDataSource } from '../datasources/StatusDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
-import { Authorized, EventBus } from '../decorators';
-import { Event } from '../events/event.enum';
-import {
-  ExperimentHasSample,
-  ExperimentStatus,
-  InstrumentScientistDecisionEnum,
-  ExperimentSafetyReviewerDecisionEnum,
-} from '../models/Experiment';
+import { Authorized } from '../decorators';
+import { ExperimentHasSample, ExperimentStatus } from '../models/Experiment';
 import { rejection, Rejection } from '../models/Rejection';
-import { Roles } from '../models/Role';
-import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
-import { WorkflowType } from '../models/Workflow';
 import { AddSampleToExperimentInput } from '../resolvers/mutations/AddSampleToExperimentMutation';
 import { CloneExperimentSampleInput } from '../resolvers/mutations/CloneExperimentSampleMutation';
 import { RemoveSampleFromExperimentInput } from '../resolvers/mutations/RemoveSampleFromExperimentMutation';
@@ -53,15 +43,13 @@ export default class ExperimentMutations {
     private sampleDataSource: SampleDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    @inject(Tokens.StatusDataSource)
-    private statusDataSource: StatusDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization
   ) {}
 
   @Authorized()
-  async createExperimentSafety(
+  async createOrGetExperimentSafety(
     agent: UserWithRole | null,
     experimentPk: number
   ): Promise<ExperimentSafety | Rejection> {
@@ -109,7 +97,7 @@ export default class ExperimentMutations {
       await this.dataSource.getExperimentSafetyByExperimentPk(experimentPk);
 
     if (experimentSafety) {
-      return rejection('Experiment Safety already exists for this experiment');
+      return experimentSafety;
     }
 
     const call = (await this.callDataSource.getCall(proposal.callId))!;
@@ -118,34 +106,23 @@ export default class ExperimentMutations {
         'Can not create Experiment Safety, because system has no Experiment Safety template configured'
       );
     }
-
-    const experimentSafetyWorkflowDefaultStatus =
-      await this.statusDataSource.getDefaultStatus(WorkflowType.EXPERIMENT);
-    if (!experimentSafetyWorkflowDefaultStatus) {
-      return rejection(
-        'Can not create Experiment Safety, because system has no default status for Experiment Safety'
-      );
-    }
-
-    const newEsiQuestionary = await this.questionaryDataSource.create(
+    const newQuestionary = await this.questionaryDataSource.create(
       agent!.id,
       call.esiTemplateId
     );
-    // Copying the answers from the Proposal Questionary to the new Experiment Safety(Proposal ESI) Questionary
+    const newQuestionaryId = newQuestionary.questionaryId;
     await this.questionaryDataSource.copyAnswers(
       proposal.questionaryId,
-      newEsiQuestionary.questionaryId
+      newQuestionaryId
     );
 
     return await this.dataSource.createExperimentSafety(
       experimentPk,
-      newEsiQuestionary.questionaryId,
-      agent!.id,
-      experimentSafetyWorkflowDefaultStatus.id
+      newQuestionaryId,
+      agent!.id
     );
   }
 
-  @EventBus(Event.EXPERIMENT_ESF_SUBMITTED)
   @Authorized()
   async submitExperimentSafety(
     agent: UserWithRole | null,
@@ -160,127 +137,7 @@ export default class ExperimentMutations {
       );
     }
 
-    return this.dataSource.updateExperimentSafety(args.experimentSafetyPk, {
-      esiQuestionarySubmittedAt: args.isSubmitted ? new Date() : null,
-    });
-  }
-
-  @Authorized([
-    Roles.USER_OFFICER,
-    Roles.EXPERIMENT_SAFETY_REVIEWER,
-    Roles.INSTRUMENT_SCIENTIST,
-  ])
-  async reviewExperimentSafety(
-    user: UserWithRole | null,
-    args: SubmitExperimentSafetyArgs
-  ) {
-    if (!user) {
-      return rejection('User not found');
-    }
-
-    const { experimentSafetyPk } = args;
-
-    const experimentSafety =
-      await this.dataSource.getExperimentSafety(experimentSafetyPk);
-
-    if (!experimentSafety) {
-      return rejection('No experiment safety found');
-    }
-
-    // Check if the Safety Review is already started
-    if (experimentSafety.safetyReviewQuestionaryId) {
-      return experimentSafety;
-    }
-
-    // Create questionary for the active template for Experiment Safety Review
-    const activeExperimentSafetyReviewTemplateId =
-      await this.templateDataSource.getActiveTemplateId(
-        TemplateGroupId.EXPERIMENT_SAFETY_REVIEW
-      );
-
-    if (!activeExperimentSafetyReviewTemplateId) {
-      return rejection('No active experiment safety review template found');
-    }
-
-    const experimentSafetyReviewQuestionary =
-      await this.questionaryDataSource.create(
-        user.id,
-        activeExperimentSafetyReviewTemplateId
-      );
-
-    return this.dataSource.updateExperimentSafety(experimentSafetyPk, {
-      safetyReviewQuestionaryId:
-        experimentSafetyReviewQuestionary.questionaryId,
-    });
-  }
-
-  @EventBus(Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS)
-  @Authorized([Roles.INSTRUMENT_SCIENTIST])
-  async submitInstrumentScientistExperimentSafetyReview(
-    user: UserWithRole | null,
-    args: {
-      experimentSafetyPk: number;
-      decision: InstrumentScientistDecisionEnum | null;
-      comment: string | null;
-    }
-  ): Promise<ExperimentSafety | Rejection> {
-    if (!user) {
-      return rejection('User not found');
-    }
-
-    const { experimentSafetyPk, decision, comment } = args;
-
-    const experimentSafety =
-      await this.dataSource.getExperimentSafety(experimentSafetyPk);
-
-    if (!experimentSafety) {
-      return rejection('No experiment safety found');
-    }
-
-    // Check if the experiment safety has been reviewed already
-    if (experimentSafety.esiQuestionarySubmittedAt === null) {
-      return rejection('Experiment safety has not been submitted yet');
-    }
-
-    return this.dataSource.updateExperimentSafety(experimentSafetyPk, {
-      instrumentScientistDecision: decision,
-      instrumentScientistComment: comment,
-      reviewedBy: user.id,
-    });
-  }
-
-  @EventBus(Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR)
-  @Authorized([Roles.EXPERIMENT_SAFETY_REVIEWER, Roles.USER_OFFICER])
-  async submitExperimentSafetyReviewerExperimentSafetyReview(
-    user: UserWithRole | null,
-    args: {
-      experimentSafetyPk: number;
-      decision: ExperimentSafetyReviewerDecisionEnum | null;
-      comment: string | null;
-    }
-  ): Promise<ExperimentSafety | Rejection> {
-    if (!user) {
-      return rejection('User not found');
-    }
-    const { experimentSafetyPk, decision, comment } = args;
-
-    const experimentSafety =
-      await this.dataSource.getExperimentSafety(experimentSafetyPk);
-
-    if (!experimentSafety) {
-      return rejection('No experiment safety found');
-    }
-
-    // Check if the experiment safety has been reviewed already
-    if (experimentSafety.esiQuestionarySubmittedAt === null) {
-      return rejection('Experiment safety has not been submitted yet');
-    }
-
-    return this.dataSource.updateExperimentSafety(experimentSafetyPk, {
-      experimentSafetyReviewerDecision: decision,
-      experimentSafetyReviewerComment: comment,
-      reviewedBy: user.id,
-    });
+    return this.dataSource.submitExperimentSafety(args);
   }
 
   @Authorized()
@@ -329,7 +186,6 @@ export default class ExperimentMutations {
       );
     }
 
-    // Fetching the Sample
     const sample = await this.sampleDataSource.getSample(args.sampleId);
     if (!sample) {
       return rejection('No sample found', { args });
@@ -350,13 +206,11 @@ export default class ExperimentMutations {
       return rejection('Esi template is not defined', { args });
     }
 
-    // Creating a new Questionary for the Sample using the ESI Template
     const newQuestionary = await this.questionaryDataSource.create(
       agent!.id,
       templateId!
     );
 
-    // Copying the answers from the Sample Questionary to the new Sample ESI Questionary
     await this.questionaryDataSource.copyAnswers(
       sample.questionaryId,
       newQuestionary.questionaryId

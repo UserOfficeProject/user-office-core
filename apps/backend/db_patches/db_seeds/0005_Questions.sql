@@ -30,7 +30,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'boolean_question', 1, 8, 3, '{
+    'boolean_question', 1, 7, 3, '{
             "tooltip": "",
             "required": false,
             "small_label": "",
@@ -69,7 +69,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'date_question', 1, 8, 5, '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }'
+    'date_question', 1, 7, 5, '{ "tooltip": "","required": false,"small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -99,7 +99,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'embellishment_question', 1, 8, 9, 
+    'embellishment_question', 1, 7, 9, 
     '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
@@ -130,7 +130,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'file_upload_question', 1, 8, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}'
+    'file_upload_question', 1, 7, 8, '{"tooltip": "", "required": false,"file_type": [".pdf",".doc",".docx"],"max_files": 0,"small_label": "", "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -175,7 +175,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'interval_question', 1, 8, 4, '{
+    'interval_question', 1, 7, 4, '{
         "units": [
             {
                 "id": "meter",
@@ -246,7 +246,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'number_question', 1, 8, 2, '{
+    'number_question', 1, 7, 2, '{
         "units": [
             {
                 "id": "meter",
@@ -310,7 +310,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'rich_text_input_question', 1, 8, 
+    'rich_text_input_question', 1, 7, 
     8, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
@@ -343,7 +343,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'selection_from_options_question', 
-    1, 8, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}'
+    1, 7, 6, '{"variant":"dropdown","options":["One","Two","Three"],"isMultipleSelect":true, "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -377,7 +377,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'dynamic_multiple_choice_question', 
-    1, 8, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],"readPermissions":[]}'
+    1, 7, 6, '{"variant":"dropdown", "url":"", "jsonPath":"","isMultipleSelect":true, "apiCallRequestHeaders":[],"readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -409,7 +409,7 @@ INSERT INTO templates_has_questions(
 ) 
 VALUES 
   (
-    'text_input_question', 1, 8, 7, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
+    'text_input_question', 1, 7, 7, '{ "tooltip": "", "required": false, "small_label": "", "readPermissions":[] }'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -444,7 +444,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'instrument_picker_question', 
-    1, 8, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
+    1, 7, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer
@@ -479,7 +479,7 @@ INSERT INTO templates_has_questions(
 VALUES 
   (
     'technique_picker_question', 
-    1, 8, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
+    1, 7, 6, '{"variant":"dropdown","options":[1, 2], "readPermissions":[]}'
   );
 INSERT INTO answers(
   questionary_id, question_id, answer

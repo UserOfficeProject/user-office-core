@@ -6,11 +6,7 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../models/ConditionEvaluator';
-import {
-  ExperimentSafetyReviewerDecisionEnum,
-  ExperimentStatus,
-  InstrumentScientistDecisionEnum,
-} from '../models/Experiment';
+import { ExperimentStatus } from '../models/Experiment';
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
@@ -93,10 +89,4 @@ export const registerEnums = () => {
     name: 'StatusActionType',
   });
   registerEnumType(WorkflowType, { name: 'WorkflowType' });
-  registerEnumType(ExperimentSafetyReviewerDecisionEnum, {
-    name: 'ExperimentSafetyReviewerDecisionEnum',
-  });
-  registerEnumType(InstrumentScientistDecisionEnum, {
-    name: 'InstrumentScientistDecisionEnum',
-  });
 };

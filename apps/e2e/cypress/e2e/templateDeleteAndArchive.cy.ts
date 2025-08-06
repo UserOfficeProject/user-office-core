@@ -160,211 +160,101 @@ context('Template Delete, Archive, Unarchive', () => {
     cy.contains(templateName);
   };
 
-  describe('Proposal PDF Templates Delete, Archive, Unarchive', () => {
-    it('Proposal PDF Template can be deleted if it is not associated with a call', () => {
+  describe('PDF Templates Delete, Archive, Unarchive', () => {
+    it('PDF Template can be deleted if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       });
 
-      shouldDeleteTemplate(templateName, '/PDFTemplates/Proposal');
+      shouldDeleteTemplate(templateName, '/PDFTemplates');
     });
 
-    it('Proposal PDF Template can not be deleted if it is associated with a call', () => {
+    it('PDF Template can not be deleted if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          proposalPdfTemplateId: result.createTemplate.templateId,
+          pdfTemplateId: result.createTemplate.templateId,
         });
 
-        shouldNotDeleteTemplate(templateName, '/PDFTemplates/Proposal');
+        shouldNotDeleteTemplate(templateName, '/PDFTemplates');
       });
     });
 
-    it('Archived Proposal PDF Template can be deleted if it is not associated with a call', () => {
+    it('Archived PDF Template can be deleted if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       });
 
-      shouldDeleteArchivedTemplate(templateName, '/PDFTemplates/Proposal');
+      shouldDeleteArchivedTemplate(templateName, '/PDFTemplates');
     });
 
-    it('Archived Proposal PDF Template can not be deleted if it is associated with a call', () => {
+    it('Archived PDF Template can not be deleted if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          proposalPdfTemplateId: result.createTemplate.templateId,
+          pdfTemplateId: result.createTemplate.templateId,
         });
 
-        shouldNotDeleteArchivedTemplate(templateName, '/PDFTemplates/Proposal');
+        shouldNotDeleteArchivedTemplate(templateName, '/PDFTemplates');
       });
     });
 
-    it('Proposal PDF Template can be archived if it is associated with a call', () => {
+    it('PDF Template can be archived if it is associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          proposalPdfTemplateId: result.createTemplate.templateId,
+          pdfTemplateId: result.createTemplate.templateId,
         });
       });
 
-      shouldArchiveTemplate(templateName, '/PDFTemplates/Proposal');
+      shouldArchiveTemplate(templateName, '/PDFTemplates');
     });
 
-    it('Proposal PDF Template can be archived if it is not associated with a call', () => {
+    it('PDF Template can be archived if it is not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       });
 
-      shouldArchiveTemplate(templateName, '/PDFTemplates/Proposal');
+      shouldArchiveTemplate(templateName, '/PDFTemplates');
     });
 
-    it('Proposal PDF Template can be unarchived if archived and associated with a call', () => {
+    it('PDF Template can be unarchived if archived and associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       }).then((result) => {
         cy.createCall({
           ...newCall,
           proposalWorkflowId: workflowId,
-          proposalPdfTemplateId: result.createTemplate.templateId,
+          pdfTemplateId: result.createTemplate.templateId,
         });
       });
 
-      shouldUnarchiveArchivedTemplate(templateName, '/PDFTemplates/Proposal');
+      shouldUnarchiveArchivedTemplate(templateName, '/PDFTemplates');
     });
 
-    it('Proposal PDF Template can be unarchived if archived and not associated with a call', () => {
+    it('PDF Template can be unarchived if archived and not associated with a call', () => {
       cy.createTemplate({
         name: templateName,
-        groupId: TemplateGroupId.PROPOSAL_PDF,
+        groupId: TemplateGroupId.PDF_TEMPLATE,
       });
 
-      shouldUnarchiveArchivedTemplate(templateName, '/PDFTemplates/Proposal');
-    });
-  });
-
-  describe.only('ExperimentSafety PDF Templates Delete, Archive, Unarchive', () => {
-    it('ExperimentSafety PDF Template can be deleted if it is not associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      });
-
-      shouldDeleteTemplate(templateName, '/PDFTemplates/ExperimentSafety');
-    });
-
-    it.only('ExperimentSafety PDF Template can not be deleted if it is associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      }).then((result) => {
-        cy.createCall({
-          ...newCall,
-          proposalWorkflowId: workflowId,
-          experimentSafetyPdfTemplateId: result.createTemplate.templateId,
-        });
-
-        shouldNotDeleteTemplate(templateName, '/PDFTemplates/ExperimentSafety');
-      });
-    });
-
-    it('Archived ExperimentSafety PDF Template can be deleted if it is not associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      });
-
-      shouldDeleteArchivedTemplate(
-        templateName,
-        '/PDFTemplates/ExperimentSafety'
-      );
-    });
-
-    it('Archived ExperimentSafety PDF Template can not be deleted if it is associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      }).then((result) => {
-        cy.createCall({
-          ...newCall,
-          proposalWorkflowId: workflowId,
-          experimentSafetyPdfTemplateId: result.createTemplate.templateId,
-        });
-
-        shouldNotDeleteArchivedTemplate(
-          templateName,
-          '/PDFTemplates/ExperimentSafety'
-        );
-      });
-    });
-
-    it('ExperimentSafety PDF Template can be archived if it is associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      }).then((result) => {
-        cy.createCall({
-          ...newCall,
-          proposalWorkflowId: workflowId,
-          experimentSafetyPdfTemplateId: result.createTemplate.templateId,
-        });
-      });
-
-      shouldArchiveTemplate(templateName, '/PDFTemplates/ExperimentSafety');
-    });
-
-    it('ExperimentSafety PDF Template can be archived if it is not associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      });
-
-      shouldArchiveTemplate(templateName, '/PDFTemplates/ExperimentSafety');
-    });
-
-    it('ExperimentSafety PDF Template can be unarchived if archived and associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      }).then((result) => {
-        cy.createCall({
-          ...newCall,
-          proposalWorkflowId: workflowId,
-          experimentSafetyPdfTemplateId: result.createTemplate.templateId,
-        });
-      });
-
-      shouldUnarchiveArchivedTemplate(
-        templateName,
-        '/PDFTemplates/ExperimentSafety'
-      );
-    });
-
-    it('ExperimentSafety PDF Template can be unarchived if archived and not associated with a call', () => {
-      cy.createTemplate({
-        name: templateName,
-        groupId: TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-      });
-
-      shouldUnarchiveArchivedTemplate(
-        templateName,
-        '/PDFTemplates/ExperimentSafety'
-      );
+      shouldUnarchiveArchivedTemplate(templateName, '/PDFTemplates');
     });
   });
 

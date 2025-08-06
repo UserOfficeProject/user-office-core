@@ -69,11 +69,7 @@ const StatusEventsAndActionsDialog = ({
         }}
       >
         <SimpleTabs
-          tabNames={
-            entityType === WorkflowType.PROPOSAL
-              ? ['Next status events', 'Status actions']
-              : ['Next status events']
-          }
+          tabNames={['Next status events', 'Status actions']}
           tabPanelPadding={theme.spacing(0, 3)}
         >
           <AddStatusChangingEventsToConnection
@@ -97,22 +93,20 @@ const StatusEventsAndActionsDialog = ({
             isLoading={isLoading}
             entityType={entityType}
           />
-          {entityType == WorkflowType.PROPOSAL && (
-            <AddStatusActionsToConnection
-              addStatusActionsToConnection={(statusActions) => {
-                dispatch({
-                  type: EventType.ADD_STATUS_ACTION_REQUESTED,
-                  payload: {
-                    statusActions,
-                    workflowConnection,
-                  },
-                });
-              }}
-              connectionStatusActions={workflowConnection?.statusActions}
-              statusName={workflowConnection?.status.name}
-              isLoading={isLoading}
-            />
-          )}
+          <AddStatusActionsToConnection
+            addStatusActionsToConnection={(statusActions) => {
+              dispatch({
+                type: EventType.ADD_STATUS_ACTION_REQUESTED,
+                payload: {
+                  statusActions,
+                  workflowConnection,
+                },
+              });
+            }}
+            connectionStatusActions={workflowConnection?.statusActions}
+            statusName={workflowConnection?.status.name}
+            isLoading={isLoading}
+          />
         </SimpleTabs>
       </DialogContent>
     </Dialog>

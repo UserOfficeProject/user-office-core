@@ -28,12 +28,10 @@ export class Call {
     public allocationTimeUnit: AllocationTimeUnits,
     public title: string,
     public description: string,
-    public proposalPdfTemplateId: number | undefined,
-    public experimentSafetyPdfTemplateId: number | undefined,
+    public pdfTemplateId: number | undefined,
     public fapReviewTemplateId: number,
     public technicalReviewTemplateId: number,
-    public isActive: boolean,
-    public experimentWorkflowId: number | undefined
+    public isActive: boolean
   ) {}
 }
 

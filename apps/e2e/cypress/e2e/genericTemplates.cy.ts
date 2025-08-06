@@ -891,7 +891,7 @@ context('GenericTemplates tests', () => {
 
       cy.updateQuestionTemplateRelationSettings({
         questionId: createdQuestion1Id,
-        templateId: createdTemplateId,
+        templateId: 5,
         config: `{"addEntryButtonLabel":"${addButtonLabel[0]}","copyButtonLabel":"${copyButtonLabel}","canCopy":true,"isMultipleCopySelect":true,"isCompleteOnCopy":false,"minEntries":"1","maxEntries":"2","templateId":${createdGenericTemplateId},"templateCategory":"GENERIC_TEMPLATE","required":false,"small_label":"","readPermissions":[]}`,
         dependencies: [],
       });
@@ -1653,13 +1653,13 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy=title-input] textarea').first().clear();
 
-      const firstLongTitle = faker.lorem.paragraph(5);
+      let longTitle = faker.lorem.paragraph(5);
 
       cy.get('[data-cy=title-input] textarea')
         .first()
         .clear()
-        .type(firstLongTitle)
-        .should('have.value', firstLongTitle)
+        .type(longTitle)
+        .should('have.value', longTitle)
         .blur();
 
       cy.get(
@@ -1676,13 +1676,13 @@ context('GenericTemplates tests', () => {
 
       cy.get('[data-cy=title-input] textarea').first().clear();
 
-      const secondLongTitle = faker.lorem.paragraph(5);
+      longTitle = faker.lorem.paragraph(5);
 
       cy.get('[data-cy=title-input] textarea')
         .first()
         .clear()
-        .type(secondLongTitle)
-        .should('have.value', secondLongTitle)
+        .type(longTitle)
+        .should('have.value', longTitle)
         .blur();
 
       cy.get(

@@ -188,13 +188,6 @@ fragment fieldConfig on FieldConfig {
     readPermissions
   }
 
-  ... on ExperimentSafetyReviewBasisConfig {
-    small_label
-    required
-    tooltip
-    readPermissions
-  }
-
   ... on InstrumentPickerConfig {
     variant
     small_label

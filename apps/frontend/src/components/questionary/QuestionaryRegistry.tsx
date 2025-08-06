@@ -4,7 +4,6 @@ import { ItemWithQuestionary } from 'models/questionary/QuestionarySubmissionSta
 
 import { StepDisplayElementFactory } from './DefaultStepDisplayElementFactory';
 import { esiQuestionaryDefinition } from './questionaries/esi/EsiQuestionaryDefinition';
-import { experimentSafetyReviewQuestionaryDefinition } from './questionaries/experimentSafetyReview/ExperimentSafetyReviewQuestionaryDefinition';
 import { experimentSampleQuestionaryDefinition } from './questionaries/experimentSample/experimentSampleQuestionaryDefinition';
 import { fapReviewQuestionaryDefinition } from './questionaries/fapReview/FapReviewQuestionaryDefinition';
 import { feedbackQuestionaryDefinition } from './questionaries/feedback/FeedbackQuestionaryDefinition';
@@ -53,7 +52,6 @@ const registry = [
   shipmentQuestionaryDefinition,
   technicalReviewQuestionaryDefinition,
   visitRegistrationQuestionaryDefinition,
-  experimentSafetyReviewQuestionaryDefinition,
 ];
 
 Object.freeze(registry);

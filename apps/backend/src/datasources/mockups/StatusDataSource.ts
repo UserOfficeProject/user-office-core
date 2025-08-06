@@ -36,9 +36,4 @@ export class StatusDataSourceMock implements StatusDataSource {
       1
     )[0];
   }
-  async getDefaultStatus(
-    entityType: Status['entityType']
-  ): Promise<Status | null> {
-    return dummyStatuses[0];
-  }
 }

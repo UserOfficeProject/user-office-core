@@ -40,21 +40,8 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
   const { templates: proposalEsiTemplates, refreshTemplates: reloadEsi } =
     useActiveTemplates(TemplateGroupId.PROPOSAL_ESI, call?.esiTemplateId);
 
-  const {
-    templates: proposalPdfTemplates,
-    refreshTemplates: reloadProposalPdfTemplates,
-  } = useActiveTemplates(
-    TemplateGroupId.PROPOSAL_PDF,
-    call?.proposalPdfTemplateId
-  );
-
-  const {
-    templates: experimentSafetyPdfTemplates,
-    refreshTemplates: reloadExperimentSafetyPdfTemplates,
-  } = useActiveTemplates(
-    TemplateGroupId.EXPERIMENT_SAFETY_PDF,
-    call?.experimentSafetyPdfTemplateId
-  );
+  const { templates: pdfTemplates, refreshTemplates: reloadPdfTemplates } =
+    useActiveTemplates(TemplateGroupId.PDF_TEMPLATE, call?.pdfTemplateId);
 
   const {
     templates: fapReviewTemplates,
@@ -74,12 +61,6 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
     loadingWorkflows: loadingProposalWorkflows,
     refreshWorkflows: reloadProposalWorkflows,
   } = useWorkflowsData(WorkflowType.PROPOSAL);
-
-  const {
-    workflows: experimentWorkflows,
-    loadingWorkflows: loadingExperimentWorkflows,
-    refreshWorkflows: reloadExperimentWorkflows,
-  } = useWorkflowsData(WorkflowType.EXPERIMENT);
 
   const currentDayStart = DateTime.now()
     .setZone(timezone || undefined)
@@ -105,8 +86,7 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         description: call.description || '',
         templateId: call.templateId,
         esiTemplateId: call.esiTemplateId,
-        proposalPdfTemplateId: call.proposalPdfTemplateId,
-        experimentSafetyPdfTemplateId: call.experimentSafetyPdfTemplateId,
+        pdfTemplateId: call.pdfTemplateId,
         fapReviewTemplateId: call.fapReviewTemplateId,
         technicalReviewTemplateId: call.technicalReviewTemplateId,
         proposalWorkflowId: call.proposalWorkflowId,
@@ -168,7 +148,6 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
       <Wizard
         initialValues={initialValues}
         onSubmit={async (values) => {
-          console.log({ values });
           if (call) {
             const { updateCall } = await api({
               toastSuccessMessage: 'Call updated successfully!',
@@ -203,25 +182,18 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
           <CallGeneralInfo
             reloadTemplates={reloadProposal}
             reloadEsi={reloadEsi}
-            reloadProposalPdfTemplates={reloadProposalPdfTemplates}
-            reloadExperimentSafetyPdfTemplates={
-              reloadExperimentSafetyPdfTemplates
-            }
+            reloadPdfTemplates={reloadPdfTemplates}
             reloadFapReviewTemplates={reloadFapReviewTemplates}
             reloadTechnicalReviewTemplates={reloadTechnicalReviewTemplates}
             reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
-            proposalPdfTemplates={proposalPdfTemplates}
-            experimentSafetyPdfTemplates={experimentSafetyPdfTemplates}
+            pdfTemplates={pdfTemplates}
             fapReviewTemplates={fapReviewTemplates}
             technicalReviewTemplates={technicalReviewTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}
-            experimentWorkflows={experimentWorkflows}
-            loadingExperimentWorkflows={loadingExperimentWorkflows}
-            reloadExperimentWorkflows={reloadExperimentWorkflows}
           />
         </WizardStep>
         <WizardStep

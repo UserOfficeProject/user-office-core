@@ -1,4 +1,4 @@
-mutation createExperimentSafety($experimentPk: Int!) {
+mutation createOrGetExperimentSafety($experimentPk: Int!) {
   createExperimentSafety(experimentPk: $experimentPk) {
     ...experimentSafety
     questionary {
