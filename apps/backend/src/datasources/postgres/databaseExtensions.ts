@@ -7,18 +7,20 @@ const addExtensions = () => {
   // Add the custom methods
   Knex.QueryBuilder.extend(
     'whereILikeEscaped',
-    function (column: string, userInput: string) {
+    function (column: string, query: string, userInput: string) {
       const escapedInput = escapeLike(userInput);
+      const finalQuery = query.replace(/\?/g, escapedInput);
 
-      return this.whereILike(column, escapedInput);
+      return this.whereILike(column, finalQuery);
     }
   );
   Knex.QueryBuilder.extend(
     'orWhereILikeEscaped',
-    function (column: string, userInput: string) {
+    function (column: string, query: string, userInput: string) {
       const escapedInput = escapeLike(userInput);
+      const finalQuery = query.replace(/\?/g, escapedInput);
 
-      return this.orWhereILike(column, escapedInput);
+      return this.orWhereILike(column, finalQuery);
     }
   );
 };
