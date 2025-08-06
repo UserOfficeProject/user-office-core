@@ -152,10 +152,10 @@ context('Proposal tests', () => {
       });
     });
 
-    it('Should be able add user to proposal though data access feature', () => {
-      // if (!featureFlags.getEnabledFeatures().get(FeatureId.DATA_ACCESS_USERS)) {
-      //   this.skip();
-      // }
+    it('Should be able add user to proposal though data access feature', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.DATA_ACCESS_USERS)) {
+        this.skip();
+      }
       cy.submitProposal({ proposalPk: createdProposalPk });
 
       cy.updateProposalManagementDecision({
