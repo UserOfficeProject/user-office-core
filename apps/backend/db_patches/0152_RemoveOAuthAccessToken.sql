@@ -5,6 +5,7 @@ BEGIN
 
     ALTER TABLE IF EXISTS users DROP COLUMN IF EXISTS oauth_access_token;
 
+
     END IF;
 END;
 $$
