@@ -27,7 +27,7 @@ export default class PostgresProposalInternalCommentsDataSource
           .returning('*');
       if (!proposalInternalComment) {
         throw new GraphQLError(
-          'Proposal internal comment could not be created'
+          'Proposal internal comment could not be created...'
         );
       }
 
