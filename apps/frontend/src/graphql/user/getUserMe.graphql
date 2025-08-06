@@ -1,18 +1,11 @@
 query getUserMe {
   me {
     user_title
-    username
     firstname
     lastname
     preferredname
-    gender
-    birthdate
     institutionId
-    department
-    position
     email
-    telephone
     oidcSub
-    placeholder
   }
 }

@@ -44,7 +44,7 @@ export default class RedeemCodesMutations {
     const placeholderUserId = redeemCode.placeholderUserId;
 
     const placeholderUser = await this.dataSource.getUser(placeholderUserId);
-    if (!placeholderUser || !placeholderUser.placeholder) {
+    if (!placeholderUser) {
       return rejection('Could not find placeholder user', {
         code: ApolloServerErrorCodeExtended.NOT_FOUND,
         user: placeholderUser,

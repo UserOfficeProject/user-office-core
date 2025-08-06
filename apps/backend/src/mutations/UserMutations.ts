@@ -99,7 +99,7 @@ export default class UserMutations {
     }
     // Check if email exist in database and if user has been invited before
     const user = await this.dataSource.getByEmail(args.email);
-    if (user && user.placeholder) {
+    if (user) {
       userId = user.id;
 
       return this.createEmailInviteResponse(userId, agent.id, role);
@@ -412,8 +412,6 @@ export default class UserMutations {
           lastname: user.lastname,
           oidcSub: user.oidcSub,
           institutionId: user.institutionId,
-          placeholder: user.placeholder,
-          position: user.position,
           preferredname: user.preferredname,
         },
         roles,

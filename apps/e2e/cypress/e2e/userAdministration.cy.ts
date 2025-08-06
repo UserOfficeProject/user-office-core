@@ -7,10 +7,7 @@ import initialDBData from '../support/initialDBData';
 context('User administration tests', () => {
   const newFirstName = faker.name.firstName();
   const newLastName = faker.name.lastName();
-  const newDepartment = faker.commerce.department();
   const newPrefferedName = faker.hacker.noun();
-  const newPosition = faker.random.word().split(' ')[0];
-  const newTelephone = faker.phone.number('0##########');
   const newInstitution = faker.company.name();
   const placeholderUser = initialDBData.users.placeholderUser;
   const title = faker.lorem.words(2);
@@ -38,12 +35,6 @@ context('User administration tests', () => {
 
     cy.get("[name='preferredname']").clear().type(newPrefferedName);
 
-    cy.get("[name='position']").clear().type(newPosition);
-
-    cy.get("[name='department']").clear().type(newDepartment);
-
-    cy.get("[name='telephone']").clear().type(newTelephone);
-
     cy.get("[name='otherInstitution']").clear().type(newInstitution);
 
     cy.contains('Update Profile').click();
@@ -59,12 +50,6 @@ context('User administration tests', () => {
     cy.get("[name='preferredname']")
       .invoke('val')
       .should('eq', newPrefferedName);
-
-    cy.get("[name='position']").invoke('val').should('eq', newPosition);
-
-    cy.get("[name='department']").invoke('val').should('eq', newDepartment);
-
-    cy.get("[name='telephone']").invoke('val').should('eq', newTelephone);
   });
 
   it('Should be able to invite user or fap reviewer by email', function () {
@@ -168,12 +153,7 @@ context('User administration tests', () => {
         firstname: 'Benjamin',
         lastname: 'Beckley',
         preferredname: 'Ben',
-        gender: 'male',
-        birthdate: new Date('2000/04/02'),
-        department: 'IT deparment',
-        position: 'Management',
         email: 'ben@inbox.com',
-        telephone: '(288) 221-4533',
       });
     }
     cy.login('user2', initialDBData.roles.user);
@@ -217,12 +197,7 @@ context('User administration tests', () => {
         firstname: 'David',
         lastname: 'Dawson',
         preferredname: '',
-        gender: 'male',
-        birthdate: new Date('1995/04/01'),
-        department: 'Maxillofacial surgeon',
-        position: 'Management',
         email: 'david@teleworm.us',
-        telephone: '(288) 221-4533',
       });
     }
 

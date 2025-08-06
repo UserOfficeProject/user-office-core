@@ -60,18 +60,12 @@ export interface UserDataSource {
     user_title: string | undefined,
     firstname: string,
     lastname: string,
-    username: string,
     preferredname: string | undefined,
     oidc_sub: string,
     oauth_refreshtoken: string,
     oauth_issuer: string,
-    gender: string,
-    birthdate: Date,
     institution: number,
-    department: string,
-    position: string,
-    email: string,
-    telephone: string
+    email: string
   ): Promise<User>;
   ensureDummyUserExists(userId: number): Promise<User>;
   ensureDummyUsersExist(userIds: number[]): Promise<User[]>;

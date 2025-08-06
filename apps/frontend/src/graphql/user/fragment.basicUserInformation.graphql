@@ -5,9 +5,7 @@ fragment basicUserDetails on BasicUserDetails {
   preferredname
   institution
   institutionId
-  position
   created
-  placeholder
   email
   country
 }

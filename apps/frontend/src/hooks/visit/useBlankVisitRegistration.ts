@@ -30,8 +30,6 @@ function createRegistrationStub(
       created: new Date(),
       institution: '',
       institutionId: 1,
-      placeholder: false,
-      position: '',
       email: '',
       country: '',
     },
