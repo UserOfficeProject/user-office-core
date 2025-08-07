@@ -40,7 +40,7 @@ import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
-import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
+import { SparkPostMailService } from '../eventHandlers/MailService/SparkPostMailService';
 import {
   createListenToRabbitMQHandler,
   createPostToRabbitMQHandler,
@@ -115,7 +115,7 @@ mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 
 mapClass(Tokens.AssetRegistrar, EAMAssetRegistrar);
 
-mapClass(Tokens.MailService, SkipSendMailService);
+mapClass(Tokens.MailService, SparkPostMailService);
 
 mapValue(Tokens.FapDataColumns, FapDataColumns);
 mapValue(Tokens.FapDataRow, getDataRow);
