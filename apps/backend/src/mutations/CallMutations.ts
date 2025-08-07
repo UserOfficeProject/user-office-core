@@ -114,7 +114,7 @@ export default class CallMutations {
   async orderCalls(
     agent: UserWithRole | null,
     args: CallOrderInput
-  ): Promise<Call | Rejection> {
+  ): Promise<boolean | Rejection> {
     return this.dataSource.orderCalls(args).catch((err) => {
       return rejection('Could not reorder calls', { agent, args }, err);
     });

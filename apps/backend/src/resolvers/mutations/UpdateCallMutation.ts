@@ -15,10 +15,7 @@ import { Call } from '../types/Call';
 @InputType()
 export class CallOrderArray {
   @Field(() => Int)
-  public id: number;
-
-  @Field(() => String, { nullable: true })
-  public shortCode?: string;
+  public callId: number;
 
   @Field(() => Int, { nullable: true })
   public sort_order?: number;
@@ -200,7 +197,7 @@ export class UpdateCallMutation {
     return context.mutations.call.update(context.user, updateCallInput);
   }
 
-  @Mutation(() => Call)
+  @Mutation(() => Boolean)
   updateCallOrder(
     @Arg('callOrderInput')
     callOrderInput: CallOrderInput,

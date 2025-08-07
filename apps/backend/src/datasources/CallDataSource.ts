@@ -19,7 +19,7 @@ export interface CallDataSource {
   ): Promise<CallHasInstrument[]>;
   create(args: CreateCallInput): Promise<Call>;
   update(args: UpdateCallInput): Promise<Call>;
-  orderCalls(args: CallOrderInput | undefined): Promise<Call>;
+  orderCalls(args: CallOrderInput | undefined): Promise<boolean>;
   delete(id: number): Promise<Call>;
   assignInstrumentsToCall(args: AssignInstrumentsToCallInput): Promise<Call>;
   updateFapToCallInstrument(

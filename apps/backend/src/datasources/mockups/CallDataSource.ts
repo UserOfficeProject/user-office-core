@@ -183,8 +183,8 @@ export class CallDataSourceMock implements CallDataSource {
     return dummyCalls[indexOfCallToUpdate];
   }
 
-  async orderCalls(data: CallOrderInput): Promise<Call> {
-    return { ...dummyCall, ...data };
+  async orderCalls(data: CallOrderInput): Promise<boolean> {
+    return true;
   }
 
   async assignInstrumentsToCall(args: AssignInstrumentsToCallInput) {

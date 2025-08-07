@@ -351,8 +351,7 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
     );
     setCalls(callsWithUpdatedOrder);
     const callOrderList = callsWithUpdatedOrder.map((item, index) => ({
-      id: item.id,
-      shortCode: item.shortCode,
+      callId: item.id,
       sort_order: index,
     }));
 

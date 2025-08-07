@@ -437,20 +437,23 @@ export default class PostgresCallDataSource implements CallDataSource {
 
     return createCallObject(call[0]);
   }
-  async set(data: CallOrderArray): Promise<number> {
+  async setNewSortOrder(data: CallOrderArray): Promise<number> {
     return await database
       .update({ sort_order: data.sort_order })
       .from('call')
-      .where({ call_id: data.id });
+      .where({ call_id: data.callId });
   }
 
-  async orderCalls(data: CallOrderInput): Promise<Call> {
-    data.data.forEach((item) => {
-      this.set(item);
-    });
-    const call: Call = await this.update({ id: data.data[0].id });
+  async orderCalls(data: CallOrderInput): Promise<boolean> {
+    try {
+      data.data.forEach((item) => {
+        this.setNewSortOrder(item);
+      });
+    } catch {
+      throw new GraphQLError('Could not update call order');
+    }
 
-    return call;
+    return true;
   }
 
   async assignInstrumentsToCall(
