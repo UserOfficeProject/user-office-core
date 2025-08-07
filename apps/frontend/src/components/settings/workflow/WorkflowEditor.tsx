@@ -325,15 +325,13 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     (event: React.MouseEvent, edge: Edge) => {
       setSelectedEdge(edge);
 
-      // Create a workflowConnection object from the edge data that matches what StatusEventsAndActionsDialog expects
-      const sourceStatus = statuses.find(
-        (s) => s.id.toString() === edge.source
-      );
-      const targetStatus = statuses.find(
-        (s) => s.id.toString() === edge.target
+      const targetWorkflowConnection = state.workflowConnections.find(
+        (connection) => connection.id.toString() === edge.target
       );
 
-      if (!sourceStatus || !targetStatus) return;
+      if (!targetWorkflowConnection) {
+        return;
+      }
 
       // Get the workflow connection ID from edge data
       const isTemporaryEdge = edge.id.startsWith('temp-');
@@ -349,7 +347,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         prevStatusId: parseInt(edge.source),
         nextStatusId: parseInt(edge.target),
         statusId: parseInt(edge.target),
-        status: targetStatus,
+        status: targetWorkflowConnection.status,
         statusChangingEvents: (edge.data?.events || []).map(
           (eventId: string) => ({
             statusChangingEvent: eventId,
@@ -467,13 +465,12 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 onNodeDragStop={(event, node) => {
                   // Extract statusId from node data
                   if (node.data && node.data.status && node.position) {
-                    const statusId = node.data.status.id;
                     const newPosX = Math.round(node.position.x);
                     const newPosY = Math.round(node.position.y);
 
                     // Find the workflow connection for this status to check current position
                     const workflowConnection = state.workflowConnections.find(
-                      (connection) => connection.statusId === statusId
+                      (connection) => connection.id === parseInt(node.id)
                     );
 
                     // Only dispatch update if position has actually changed

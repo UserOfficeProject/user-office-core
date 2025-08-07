@@ -100,64 +100,13 @@ export default class WorkflowMutations {
     }
   }
 
-  private async getExistingOrCreateNewWFConnection(
-    args: UpdateWorkflowStatusInput
-  ): Promise<WorkflowConnection | null> {
-    const currentConnection = await this.dataSource.getWorkflowConnection(
-      args.id
-    );
-
-    if (!currentConnection) {
-      return null;
-    }
-
-    if (
-      args.nextStatusId !== undefined &&
-      currentConnection.nextStatusId !== null &&
-      args.nextStatusId !== currentConnection.nextStatusId
-    ) {
-      const newWorkflowConnection = await this.dataSource.addWorkflowStatus({
-        workflowId: currentConnection.workflowId,
-        statusId: currentConnection.statusId,
-        prevStatusId: currentConnection.prevStatusId,
-        nextStatusId: args.nextStatusId,
-        posX: args.posX ?? currentConnection.posX,
-        posY: args.posY ?? currentConnection.posY,
-        sortOrder: currentConnection.sortOrder,
-      });
-
-      return newWorkflowConnection;
-    }
-
-    if (
-      args.prevStatusId !== undefined &&
-      currentConnection.prevStatusId !== null &&
-      args.prevStatusId !== currentConnection.prevStatusId
-    ) {
-      const newWorkflowConnection = await this.dataSource.addWorkflowStatus({
-        workflowId: currentConnection.workflowId,
-        statusId: currentConnection.statusId,
-        prevStatusId: args.prevStatusId,
-        nextStatusId: currentConnection.nextStatusId,
-        posX: args.posX ?? currentConnection.posX,
-        posY: args.posY ?? currentConnection.posY,
-        sortOrder: currentConnection.sortOrder,
-      });
-
-      return newWorkflowConnection;
-    }
-
-    return currentConnection;
-  }
-
   @Authorized([Roles.USER_OFFICER])
   async updateWorkflowStatus(
     agent: UserWithRole | null,
     args: UpdateWorkflowStatusInput
   ): Promise<WorkflowConnection | Rejection> {
     try {
-      // Get the current workflow connection
-      const connection = await this.getExistingOrCreateNewWFConnection(args);
+      const connection = await this.dataSource.getWorkflowConnection(args.id);
 
       if (!connection) {
         return rejection(
