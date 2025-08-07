@@ -19,9 +19,11 @@ mutation updateCall(
   $allocationTimeUnit: AllocationTimeUnits
   $referenceNumberFormat: String
   $proposalWorkflowId: Int
+  $experimentWorkflowId: Int
   $templateId: Int
   $esiTemplateId: Int
-  $pdfTemplateId: Int
+  $proposalPdfTemplateId: Int
+  $experimentSafetyPdfTemplateId: Int
   $fapReviewTemplateId: Int
   $technicalReviewTemplateId: Int
   $title: String
@@ -52,9 +54,11 @@ mutation updateCall(
       allocationTimeUnit: $allocationTimeUnit
       referenceNumberFormat: $referenceNumberFormat
       proposalWorkflowId: $proposalWorkflowId
+      experimentWorkflowId: $experimentWorkflowId
       templateId: $templateId
       esiTemplateId: $esiTemplateId
-      pdfTemplateId: $pdfTemplateId
+      proposalPdfTemplateId: $proposalPdfTemplateId
+      experimentSafetyPdfTemplateId: $experimentSafetyPdfTemplateId
       fapReviewTemplateId: $fapReviewTemplateId
       technicalReviewTemplateId: $technicalReviewTemplateId
       title: $title

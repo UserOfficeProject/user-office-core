@@ -191,7 +191,7 @@ context('visits tests', () => {
   });
 
   it('Co-proposer should see that risk assessment is completed', () => {
-    cy.createOrGetExperimentSafety({
+    cy.createExperimentSafety({
       experimentPk: existingExperimentPk,
     }).then((result) => {
       if (result.createExperimentSafety) {

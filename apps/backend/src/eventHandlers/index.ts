@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { ApplicationEvent } from '../events/applicationEvents';
 import createCustomHandler from './customHandler';
+import createExperimentSafetyWorkflowHandler from './experimentSafetyWorkflow';
 import createProposalWorkflowHandler from './proposalWorkflow';
 
 export default function createEventHandlers() {
@@ -23,6 +24,7 @@ export default function createEventHandlers() {
     loggingHandler,
     postToQueueHandler,
     createProposalWorkflowHandler(),
+    createExperimentSafetyWorkflowHandler(),
     createCustomHandler(),
   ];
 }

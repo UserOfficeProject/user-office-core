@@ -33,4 +33,5 @@ export interface CallDataSource {
   isCallEnded(callId: number): Promise<boolean>;
   getCallByAnswerIdProposal(answerId: number): Promise<Call>;
   getProposalWorkflowByCall(callId: number): Promise<Workflow | null>;
+  getExperimentWorkflowByCall(callId: number): Promise<Workflow | null>;
 }

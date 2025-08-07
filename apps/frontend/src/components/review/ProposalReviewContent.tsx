@@ -96,6 +96,7 @@ const ProposalReviewContent = ({
           call: proposalData.call,
         })
       }
+      canEditProposal={true}
     />
   );
 

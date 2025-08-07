@@ -164,6 +164,11 @@ const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
       emptyValue: '-',
     },
     {
+      title: 'Experiment Workflow',
+      field: 'experimentWorkflow.name',
+      emptyValue: '-',
+    },
+    {
       title: 'Proposal template',
       field: 'template.name',
       emptyValue: '-',

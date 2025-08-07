@@ -91,14 +91,13 @@ context('visits tests', () => {
 
     it('User officer should be able request changes', () => {
       cy.login('officer');
-      cy.visit('/ExperimentPage');
-
+      cy.visit('/Experiments');
       cy.finishedLoading();
+
       cy.get('[data-cy=preset-date-selector]').contains('All').click();
-      cy.get('[data-testid="ChevronRightIcon"]')
-        .first()
-        .closest('button')
-        .click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
       cy.get('[data-cy="request-visit-registration-changes-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
       cy.get('[data-cy="request-visit-registration-changes-button"]').should(
@@ -170,14 +169,13 @@ context('visits tests', () => {
 
     it('User officer should be able to cancel visit registration', () => {
       cy.login('officer');
-      cy.visit('/ExperimentPage');
-
+      cy.visit('/Experiments');
       cy.finishedLoading();
-      cy.get('[data-cy=preset-date-selector]').contains('All').click();
 
-      cy.get(
-        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
-      ).click();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
       cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
       cy.get('[data-cy="cancel-visit-registration-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
@@ -189,14 +187,13 @@ context('visits tests', () => {
 
     it('User officer should be able to approve visit registration', () => {
       cy.login('officer');
-      cy.visit('/ExperimentPage');
-
+      cy.visit('/Experiments');
       cy.finishedLoading();
-      cy.get('[data-cy=preset-date-selector]').contains('All').click();
 
-      cy.get(
-        '[index="0"] > .MuiTableCell-paddingNone > div > .MuiButtonBase-root > [data-testid="ChevronRightIcon"]'
-      ).click();
+      cy.get('[data-cy=preset-date-selector]').contains('All').click();
+      cy.get("[data-cy='view-experiment']").first().click();
+      cy.get('button[role="tab"]').contains('Visit').click({ force: true });
+
       cy.get('[data-cy="visit-status"]').should('have.text', 'SUBMITTED');
       cy.get('[data-cy="approve-visit-registration-button"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
