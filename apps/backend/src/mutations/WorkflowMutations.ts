@@ -100,26 +100,6 @@ export default class WorkflowMutations {
     }
   }
 
-  private async updateXYForNodesWithStatusId(
-    workflowId: number,
-    statusId: number,
-    posX: number,
-    posY: number
-  ): Promise<void> {
-    const connectionsWithSameStatusId =
-      await this.dataSource.getWorkflowConnectionsById(
-        workflowId,
-        statusId,
-        {}
-      );
-
-    for (const connection of connectionsWithSameStatusId) {
-      connection.posX = posX;
-      connection.posY = posY;
-      await this.dataSource.updateWorkflowStatus(connection);
-    }
-  }
-
   private async getExistingOrCreateNewWFConnection(
     args: UpdateWorkflowStatusInput
   ): Promise<WorkflowConnection | null> {
@@ -186,13 +166,6 @@ export default class WorkflowMutations {
           new Error('Connection not found')
         );
       }
-
-      await this.updateXYForNodesWithStatusId(
-        connection.workflowId,
-        connection.statusId,
-        args.posX ?? connection.posX,
-        args.posY ?? connection.posY
-      );
 
       const updatedConnection = new WorkflowConnection(
         connection.id,

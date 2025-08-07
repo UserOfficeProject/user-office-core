@@ -9,6 +9,8 @@ import {
   NextAndPreviousStatuses,
   WorkflowConnectionWithStatus,
 } from '../../models/WorkflowConnections';
+import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
+import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 import database from './database';
 import {
@@ -68,7 +70,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
     );
   }
   async createWorkflow(
-    newWorkflowInput: Omit<Workflow, 'id'>
+    newWorkflowInput: CreateWorkflowInput
   ): Promise<Workflow> {
     let defaultStatusId: number | null = null;
 
@@ -145,9 +147,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         return workflows.map((workflow) => this.createWorkflowObject(workflow));
       });
   }
-  async updateWorkflow(
-    workflow: Omit<Workflow, 'entityType'>
-  ): Promise<Workflow> {
+  async updateWorkflow(workflow: UpdateWorkflowInput): Promise<Workflow> {
     return database
       .update(
         {

@@ -8,6 +8,7 @@ import {
 } from '../../models/WorkflowConnections';
 import { AddWorkflowStatusInput } from '../../resolvers/mutations/settings/AddWorkflowStatusMutation';
 import { CreateWorkflowInput } from '../../resolvers/mutations/settings/CreateWorkflowMutation';
+import { UpdateWorkflowInput } from '../../resolvers/mutations/settings/UpdateWorkflowMutation';
 import { WorkflowDataSource } from '../WorkflowDataSource';
 
 export const dummyStatuses = [
@@ -90,7 +91,7 @@ export class WorkflowDataSourceMock implements WorkflowDataSource {
     return [dummyWorkflow];
   }
 
-  async updateWorkflow(Workflow: Workflow): Promise<Workflow> {
+  async updateWorkflow(Workflow: UpdateWorkflowInput): Promise<Workflow> {
     return dummyWorkflow;
   }
 
