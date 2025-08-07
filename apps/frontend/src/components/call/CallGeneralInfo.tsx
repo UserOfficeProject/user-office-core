@@ -64,33 +64,43 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const CallGeneralInfo = ({
   loadingProposalWorkflows,
   proposalWorkflows,
+  experimentWorkflows,
   templates,
   esiTemplates,
-  pdfTemplates,
+  proposalPdfTemplates,
+  experimentSafetyPdfTemplates,
   fapReviewTemplates,
   technicalReviewTemplates,
   loadingTemplates,
   reloadTemplates,
   reloadEsi,
-  reloadPdfTemplates,
+  reloadProposalPdfTemplates,
+  reloadExperimentSafetyPdfTemplates,
   reloadFapReviewTemplates,
   reloadTechnicalReviewTemplates,
   reloadProposalWorkflows,
+  reloadExperimentWorkflows,
+  loadingExperimentWorkflows,
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
-  reloadPdfTemplates: () => void;
+  reloadProposalPdfTemplates: () => void;
+  reloadExperimentSafetyPdfTemplates: () => void;
   reloadFapReviewTemplates: () => void;
   reloadTechnicalReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
+  reloadExperimentWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
-  pdfTemplates: GetTemplatesQuery['templates'];
+  proposalPdfTemplates: GetTemplatesQuery['templates'];
+  experimentSafetyPdfTemplates: GetTemplatesQuery['templates'];
   fapReviewTemplates: GetTemplatesQuery['templates'];
   technicalReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: Workflow[];
+  experimentWorkflows: Workflow[];
   loadingProposalWorkflows: boolean;
+  loadingExperimentWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, timezone } = useFormattedDateTime();
@@ -114,8 +124,14 @@ const CallGeneralInfo = ({
       value: template.templateId,
     })) || [];
 
-  const pdfTemplateOptions =
-    pdfTemplates?.map((template) => ({
+  const proposalPdfTemplateOptions =
+    proposalPdfTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const experimentSafetyPdfTemplateOptions =
+    experimentSafetyPdfTemplates?.map((template) => ({
       text: template.name,
       value: template.templateId,
     })) || [];
@@ -136,6 +152,12 @@ const CallGeneralInfo = ({
     proposalWorkflows.map((proposalWorkflow) => ({
       text: proposalWorkflow.name,
       value: proposalWorkflow.id,
+    })) || [];
+
+  const experimentWorkflowOptions =
+    experimentWorkflows.map((experimentWorkflow) => ({
+      text: experimentWorkflow.name,
+      value: experimentWorkflow.id,
     })) || [];
 
   const allocationTimeUnitOptions = Object.values(AllocationTimeUnits).map(
@@ -404,14 +426,29 @@ const CallGeneralInfo = ({
         </FormControl>
       )}
       <FormikUIAutocomplete
-        name="pdfTemplateId"
-        label="PDF template"
+        name="proposalPdfTemplateId"
+        label="Proposal PDF template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={pdfTemplateOptions}
+        items={proposalPdfTemplateOptions}
         InputProps={{
-          'data-cy': 'call-pdf-template',
-          endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
+          'data-cy': 'call-proposal-pdf-template',
+          endAdornment: (
+            <RefreshListIcon onClick={reloadProposalPdfTemplates} />
+          ),
+        }}
+      />
+      <FormikUIAutocomplete
+        name="experimentSafetyPdfTemplateId"
+        label="Experiment Safety PDF template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={experimentSafetyPdfTemplateOptions}
+        InputProps={{
+          'data-cy': 'call-experiment-safety-pdf-template',
+          endAdornment: (
+            <RefreshListIcon onClick={reloadExperimentSafetyPdfTemplates} />
+          ),
         }}
       />
       <FormikUIAutocomplete
@@ -447,10 +484,21 @@ const CallGeneralInfo = ({
         noOptionsText="No proposal workflows"
         items={proposalWorkflowOptions}
         InputProps={{
-          'data-cy': 'call-workflow',
+          'data-cy': 'proposal-call-workflow',
           endAdornment: <RefreshListIcon onClick={reloadProposalWorkflows} />,
         }}
         required
+      />
+      <FormikUIAutocomplete
+        name="experimentWorkflowId"
+        label="Experiment workflow"
+        loading={loadingExperimentWorkflows}
+        noOptionsText="No experiment workflows"
+        items={experimentWorkflowOptions}
+        InputProps={{
+          'data-cy': 'experiment-call-workflow',
+          endAdornment: <RefreshListIcon onClick={reloadExperimentWorkflows} />,
+        }}
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
         {internalCallDate.showField && (
