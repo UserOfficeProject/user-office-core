@@ -10,7 +10,10 @@ BEGIN
       -- Add position columns to workflow_connections
       ALTER TABLE workflow_connections ADD COLUMN IF NOT EXISTS pos_x INTEGER DEFAULT 0;
       ALTER TABLE workflow_connections ADD COLUMN IF NOT EXISTS pos_y INTEGER DEFAULT 0;
-      
+      ALTER TABLE workflow_connections ADD COLUMN IF NOT EXISTS prev_connection_id INTEGER DEFAULT NULL 
+        REFERENCES workflow_connections(workflow_connection_id) 
+        ON DELETE SET NULL;
+
       -- Add connection line type column to workflows table
       ALTER TABLE workflows ADD COLUMN IF NOT EXISTS connection_line_type VARCHAR(50) DEFAULT 'default';
 

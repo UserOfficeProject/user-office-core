@@ -4,6 +4,7 @@ mutation updateWorkflowStatus(
   $posY: Int
   $prevStatusId: Int
   $nextStatusId: Int
+  $prevConnectionId: Int
 ) {
   updateWorkflowStatus(
     updateWorkflowStatusInput: {
@@ -12,6 +13,7 @@ mutation updateWorkflowStatus(
       posY: $posY
       prevStatusId: $prevStatusId
       nextStatusId: $nextStatusId
+      prevConnectionId: $prevConnectionId
     }
   ) {
     id
@@ -22,6 +24,7 @@ mutation updateWorkflowStatus(
     sortOrder
     nextStatusId
     prevStatusId
+    prevConnectionId
     status {
       ...status
     }

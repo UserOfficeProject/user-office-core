@@ -175,7 +175,8 @@ export default class WorkflowMutations {
         args.nextStatusId ?? connection.nextStatusId,
         args.prevStatusId ?? connection.prevStatusId,
         args.posX ?? connection.posX,
-        args.posY ?? connection.posY
+        args.posY ?? connection.posY,
+        args.prevConnectionId ?? connection.prevConnectionId
       );
 
       return await this.dataSource.updateWorkflowStatus(updatedConnection);

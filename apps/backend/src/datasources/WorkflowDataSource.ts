@@ -6,12 +6,14 @@ import {
   WorkflowConnection,
   WorkflowConnectionWithStatus,
 } from '../models/WorkflowConnections';
+import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
+import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
 
 export interface WorkflowDataSource {
-  createWorkflow(newWorkflowInput: Omit<Workflow, 'id'>): Promise<Workflow>;
+  createWorkflow(newWorkflowInput: CreateWorkflowInput): Promise<Workflow>;
   getWorkflow(workflowId: number): Promise<Workflow | null>;
   getAllWorkflows(entityType: Workflow['entityType']): Promise<Workflow[]>;
-  updateWorkflow(workflow: Omit<Workflow, 'entityType'>): Promise<Workflow>;
+  updateWorkflow(workflow: UpdateWorkflowInput): Promise<Workflow>;
   deleteWorkflow(workflowId: number): Promise<Workflow>;
   deleteWorkflowConnection(
     connectionId: number
@@ -28,7 +30,10 @@ export interface WorkflowDataSource {
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]>;
   addWorkflowStatus(
-    newWorkflowStatusInput: Omit<WorkflowConnection, 'id' | 'entityType'>
+    newWorkflowStatusInput: Omit<
+      WorkflowConnection,
+      'id' | 'entityType' | 'prevConnectionId'
+    >
   ): Promise<WorkflowConnectionWithStatus>;
   updateWorkflowStatus(
     workflowStatuses: WorkflowConnection

@@ -183,61 +183,43 @@ export function usePersistWorkflowEditorModel() {
 
           break;
         case EventType.WORKFLOW_STATUS_UPDATE_REQUESTED: {
-          const { statusId, posX, posY, prevStatusId, nextStatusId } =
-            action.payload;
+          const {
+            connectionId,
+            posX,
+            posY,
+            prevStatusId,
+            nextStatusId,
+            prevConnectionId,
+          } = action.payload;
 
-          // Find the workflow connection to update (target connection)
-          const workflowConnectionToUpdate = state.workflowConnections.find(
-            (connection) => connection.statusId === parseInt(statusId)
-          );
-
-          if (workflowConnectionToUpdate) {
-            return executeAndMonitorCall(async () => {
-              try {
-                const result = await api({
-                  toastErrorMessage: 'Failed to update workflow status',
+          return executeAndMonitorCall(async () => {
+            try {
+              const result = await api({
+                toastErrorMessage: 'Failed to update workflow status',
+              })
+                .updateWorkflowStatus({
+                  id: connectionId,
+                  posX,
+                  posY,
+                  prevStatusId,
+                  nextStatusId,
+                  prevConnectionId,
                 })
-                  .updateWorkflowStatus({
-                    id: workflowConnectionToUpdate.id,
-                    posX,
-                    posY,
-                    prevStatusId,
-                    nextStatusId,
-                  })
-                  .then((data) => data.updateWorkflowStatus);
+                .then((data) => data.updateWorkflowStatus);
 
-                if (result) {
-                  // Dispatch the result to update the state
-                  dispatch({
-                    type: EventType.WORKFLOW_STATUS_UPDATED,
-                    payload: result,
-                  });
-                }
-
-                const workflowConnectionsWithSameStatusId =
-                  state.workflowConnections.filter(
-                    (connection) => connection.statusId === parseInt(statusId)
-                  );
-
-                // Update all connections with the same statusId to the same posX and posY
-                // This is necessary because of existing data structure where the same status can have multiple rows in the db
-                workflowConnectionsWithSameStatusId.forEach((connection) => {
-                  dispatch({
-                    type: EventType.WORKFLOW_STATUS_UPDATED,
-                    payload: {
-                      id: connection.id,
-                      posX: result.posX,
-                      posY: result.posY,
-                    },
-                  });
+              if (result) {
+                // Dispatch the result to update the state
+                dispatch({
+                  type: EventType.WORKFLOW_STATUS_UPDATED,
+                  payload: result,
                 });
-
-                return result;
-              } catch (error) {
-                console.error('Failed to update workflow status:', error);
               }
-            });
-          }
+
+              return result;
+            } catch (error) {
+              console.error('Failed to update workflow status:', error);
+            }
+          });
 
           break;
         }

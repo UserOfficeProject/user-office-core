@@ -23,6 +23,9 @@ export class UpdateWorkflowStatusInput {
   public posY?: number;
 
   @Field(() => Int, { nullable: true })
+  public prevConnectionId?: number;
+
+  @Field(() => Int, { nullable: true })
   public prevStatusId?: number;
 
   @Field(() => Int, { nullable: true })

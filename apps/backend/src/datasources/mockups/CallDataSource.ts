@@ -15,7 +15,8 @@ export const dummyWorkflow = new Workflow(
   1,
   'Test workflow',
   'This is description',
-  WorkflowType.PROPOSAL
+  WorkflowType.PROPOSAL,
+  'default'
 );
 
 export const dummyCallFactory = (values?: Partial<Call>) => {

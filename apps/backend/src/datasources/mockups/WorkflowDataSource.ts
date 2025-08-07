@@ -46,7 +46,8 @@ export const dummyWorkflowConnection = new WorkflowConnectionWithStatus(
   null,
   null,
   100,
-  100
+  100,
+  null
 );
 
 export const anotherDummyWorkflowConnection = new WorkflowConnectionWithStatus(
@@ -65,7 +66,8 @@ export const anotherDummyWorkflowConnection = new WorkflowConnectionWithStatus(
   null,
   1,
   200,
-  150
+  150,
+  null
 );
 
 export const dummyStatusChangingEvent = new StatusChangingEvent(

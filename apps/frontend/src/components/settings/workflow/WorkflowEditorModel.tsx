@@ -70,6 +70,7 @@ const WorkflowEditorModel = (
               nextStatusId: action.payload.nextStatusId,
               posX: action.payload.posX,
               posY: action.payload.posY,
+              prevConnectionId: action.payload.prevConnectionId || null,
               statusChangingEvents: [],
               statusActions: [],
             };

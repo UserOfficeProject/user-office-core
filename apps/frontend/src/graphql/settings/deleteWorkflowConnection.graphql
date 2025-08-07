@@ -6,6 +6,7 @@ mutation deleteWorkflowConnection($connectionId: Int!) {
     statusId
     nextStatusId
     prevStatusId
+    prevConnectionId
     posX
     posY
   }

@@ -43,7 +43,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.next_status_id,
       workflowConnection.prev_status_id,
       workflowConnection.pos_x,
-      workflowConnection.pos_y
+      workflowConnection.pos_y,
+      workflowConnection.prev_connection_id
     );
   }
 
@@ -66,7 +67,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowConnection.next_status_id,
       workflowConnection.prev_status_id,
       workflowConnection.pos_x,
-      workflowConnection.pos_y
+      workflowConnection.pos_y,
+      workflowConnection.prev_connection_id
     );
   }
   async createWorkflow(
@@ -121,6 +123,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       workflowId: workflowRecord.workflow_id,
       posX: 0,
       posY: 0,
+      prevConnectionId: null,
     });
 
     return this.createWorkflowObject(workflowRecord);
@@ -311,8 +314,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
       `WITH updated AS (
         INSERT INTO workflow_connections (
           workflow_connection_id, workflow_id, status_id, next_status_id, 
-          prev_status_id, sort_order, pos_x, pos_y
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          prev_status_id, sort_order, pos_x, pos_y, prev_connection_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (workflow_connection_id)
         DO UPDATE SET
           status_id = EXCLUDED.status_id,
@@ -320,7 +323,8 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
           prev_status_id = EXCLUDED.prev_status_id,
           sort_order = EXCLUDED.sort_order,
           pos_x = EXCLUDED.pos_x,
-          pos_y = EXCLUDED.pos_y
+          pos_y = EXCLUDED.pos_y,
+          prev_connection_id = EXCLUDED.prev_connection_id
         RETURNING *
       )
       SELECT wc.*, s.*
@@ -335,6 +339,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         connection.sortOrder,
         connection.posX,
         connection.posY,
+        connection.prevConnectionId,
       ]
     );
 

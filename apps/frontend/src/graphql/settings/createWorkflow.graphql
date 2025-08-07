@@ -24,6 +24,7 @@ mutation createWorkflow(
       }
       nextStatusId
       prevStatusId
+      prevConnectionId
       posX
       posY
       statusChangingEvents {

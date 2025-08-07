@@ -15,7 +15,8 @@ export class WorkflowConnection {
     public nextStatusId: number | null,
     public prevStatusId: number | null,
     public posX: number,
-    public posY: number
+    public posY: number,
+    public prevConnectionId: number | null
   ) {}
 }
 
@@ -29,6 +30,7 @@ export class WorkflowConnectionWithStatus {
     public nextStatusId: number | null,
     public prevStatusId: number | null,
     public posX: number,
-    public posY: number
+    public posY: number,
+    public prevConnectionId: number | null
   ) {}
 }

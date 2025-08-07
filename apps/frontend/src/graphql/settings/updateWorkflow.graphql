@@ -18,6 +18,7 @@ mutation updateWorkflow($id: Int!, $name: String!, $description: String!, $conne
       }
       nextStatusId
       prevStatusId
+      prevConnectionId
       posX
       posY
       statusChangingEvents {

@@ -38,6 +38,7 @@ interface EdgeData {
   workflowConnectionId?: number;
   statusActions: ConnectionStatusAction[];
   connectionLineType?: ConnectionLineType;
+  prevConnectionId: number | null;
 }
 
 const edgeFactory = (
@@ -95,19 +96,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     reducerMiddleware,
   ]);
 
-  // Filter statuses to only show those not already used in the workflow
-  const statusesInThePicker = React.useMemo(() => {
-    if (!state.id) {
-      return [];
-    }
-
-    const usedStatusIds = new Set(
-      state.workflowConnections?.map((connection) => connection.status.id) || []
-    );
-
-    return statuses.filter((status) => !usedStatusIds.has(status.id));
-  }, [state.id, state.workflowConnections, statuses]);
-
   // Effect to update edge labels when workflowConnection changes
   React.useEffect(() => {
     if (selectedEdge && workflowConnection) {
@@ -159,17 +147,19 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
     // Create nodes for each connection
     sortedConnections.forEach((connection) => {
       const statusId = connection.status.id.toString();
+      const nodeId = connection.id.toString();
       // Use database coordinates if available, otherwise fall back to grid layout
       const nodePositionX = connection.posX;
       const nodePositionY = connection.posY;
 
       // Create node for the status
       const newNode = {
-        id: statusId,
+        id: nodeId,
         type: 'statusNode',
         data: {
           label: connection.status.name,
           status: connection.status,
+          statusId: statusId,
           onDelete: (deleteStatusId: string) => {
             // Dispatch action to delete status from workflow model
             // The useEffect will handle removing the node from UI when state updates
@@ -186,11 +176,11 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       newNodes.push(newNode);
 
-      // Create edge from previous status if it exists
-      if (connection.prevStatusId) {
-        const prevStatusId = connection.prevStatusId.toString();
+      // Create edge from previous connection id if it exists because node can have only one parrent
+      if (connection.prevConnectionId) {
+        const prevStatusId = connection.prevStatusId!.toString();
         const prevConnection = sortedConnections.find(
-          (c) => c.status.id === connection.prevStatusId
+          (c) => c.id === connection.prevConnectionId
         );
 
         if (prevConnection) {
@@ -205,8 +195,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
             const newEdge = edgeFactory({
               id: edgeId, // Use connection ID to ensure unique edge identification
-              source: prevStatusId,
-              target: statusId,
+              source: connection.prevConnectionId.toString(),
+              target: connection.id.toString(),
               type: 'workflow', // Use custom workflow edge type
               data: {
                 events,
@@ -216,6 +206,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                 statusActions: connection.statusActions || [],
                 connectionLineType:
                   state.connectionLineType as ConnectionLineType,
+                prevConnectionId: connection.prevConnectionId || null,
               },
             });
 
@@ -254,12 +245,23 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         return;
       }
 
-      // Find source and target status names for the edge data
-      const sourceStatus = statuses.find(
+      const sourceConnection = state.workflowConnections.find(
         (s) => s.id.toString() === connection.source
       );
-      const targetStatus = statuses.find(
+      const targetConnection = state.workflowConnections.find(
         (s) => s.id.toString() === connection.target
+      );
+
+      if (!sourceConnection || !targetConnection) {
+        return;
+      }
+
+      // Find source and target status names for the edge data
+      const sourceStatus = statuses.find(
+        (s) => s.id === sourceConnection.statusId
+      );
+      const targetStatus = statuses.find(
+        (s) => s.id === targetConnection.statusId
       );
 
       if (!sourceStatus || !targetStatus) {
@@ -278,29 +280,31 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           targetStatusName: targetStatus.name,
           statusActions: [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
+          prevConnectionId: sourceConnection.id,
         },
       });
 
       setEdges((eds) => addEdge(newEdge, eds));
 
       // Dispatch update events to persist the connection in the database
-      // We need to update BOTH nodes: source gets nextStatusId, target gets prevStatusId
+      // We need to update BOTH nodes: source gets nextStatusId, target gets prevStatusId and prevConnectionId
 
       // Update source node (A) - set its nextStatusId to target (B)
       dispatch({
         type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
         payload: {
-          statusId: connection.source, // Update the source status
-          nextStatusId: parseInt(connection.target), // Set the next status
+          connectionId: sourceConnection.id, // Use connection ID for persistence
+          nextStatusId: targetConnection.statusId,
         },
       });
 
-      // Update target node (B) - set its prevStatusId to source (A)
+      // Update target node (B) - set its prevStatusId to source (A) and prevConnectionId to source connection ID
       dispatch({
         type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
         payload: {
-          statusId: connection.target, // Update the target status
-          prevStatusId: parseInt(connection.source), // Set the previous status
+          connectionId: targetConnection.id, // Use connection ID for persistence
+          prevStatusId: sourceConnection.statusId,
+          prevConnectionId: sourceConnection.id, // Store the previous connection ID
         },
       });
 
@@ -355,6 +359,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         statusActions: [],
         posX: 0,
         posY: 0,
+        prevConnectionId: edge.data?.prevConnectionId || null,
       };
 
       setWorkflowConnection(connection);
@@ -388,17 +393,6 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       });
       position.x = Math.round(position.x);
       position.y = Math.round(position.y);
-
-      // Check if status already exists in workflow
-      const statusExists = nodes.some((node) => node.id === statusId);
-      if (statusExists) {
-        enqueueSnackbar('Status already exists in workflow', {
-          variant: 'info',
-          className: 'snackbar-info',
-        });
-
-        return;
-      }
 
       // Create new node
       const newNode: Node = {
@@ -491,7 +485,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
                       dispatch({
                         type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED,
                         payload: {
-                          statusId: statusId,
+                          connectionId: workflowConnection.id,
                           posX: newPosX,
                           posY: newPosY,
                         },
@@ -507,7 +501,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
             </Grid>
             <Grid item xs={3}>
               <StatusPicker
-                statuses={statusesInThePicker}
+                statuses={statuses}
                 onDragStart={(status) => {
                   /* Make status draggable to ReactFlow */
                   const event = new CustomEvent('statusDragStart', {
