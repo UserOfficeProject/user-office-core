@@ -10,7 +10,11 @@ export const QuestionTemplateRelationFapReviewBasisForm = (
 ) => {
   return (
     <QuestionTemplateRelationFormShell {...props} validationSchema={null}>
-      {() => <QuestionExcerpt question={props.questionRel.question} />}
+      {() => (
+        <>
+          <QuestionExcerpt question={props.questionRel.question} />
+        </>
+      )}
     </QuestionTemplateRelationFormShell>
   );
 };
