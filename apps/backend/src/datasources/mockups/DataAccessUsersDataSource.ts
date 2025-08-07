@@ -13,7 +13,8 @@ export const dummyDataAccessUser = new BasicUserDetails(
   new Date('2023-01-15 10:30:00+00'),
   false,
   'jane.smith@dataaccess.org',
-  'United States'
+  'United States',
+  'Ms.'
 );
 
 export const dummyDataAccessUser2 = new BasicUserDetails(
@@ -27,7 +28,8 @@ export const dummyDataAccessUser2 = new BasicUserDetails(
   new Date('2023-02-20 14:15:00+00'),
   false,
   'bob.johnson@research.org',
-  'Canada'
+  'Canada',
+  'Mr.'
 );
 
 export default class MockDataAccessUsersDataSource
