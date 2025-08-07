@@ -111,10 +111,9 @@ export class Call implements Partial<CallOrigin> {
 
   @Field(() => Int)
   public sort_order: number;
-  
+
   @Field(() => Int, { nullable: true })
   public experimentWorkflowId?: number;
-
 }
 
 @Resolver(() => Call)
