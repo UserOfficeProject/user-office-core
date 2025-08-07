@@ -211,7 +211,7 @@ context('Calls tests', () => {
         cy.get('[role="presentation"]').contains(esiTemplateName).click();
       }
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="next-step"]').click();
@@ -264,7 +264,7 @@ context('Calls tests', () => {
 
       cy.contains('Create').click();
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.contains('Loading...').should('not.exist');
 
       cy.get('[role="presentation"]')

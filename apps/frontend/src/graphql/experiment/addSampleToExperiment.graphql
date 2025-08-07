@@ -7,6 +7,10 @@ mutation addSampleToExperiment($sampleId: Int!, $experimentPk: Int!) {
     }
     sample {
       ...sample
+      questionary {
+        isCompleted
+        ...questionary
+      }
     }
   }
 }

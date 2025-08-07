@@ -92,4 +92,17 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return this.createStatusObject(removedStatus);
   }
+
+  async getDefaultStatus(
+    entityType: Status['entityType']
+  ): Promise<Status | null> {
+    const status: StatusRecord = await database
+      .select()
+      .from('statuses')
+      .where('entity_type', entityType)
+      .andWhere('is_default', true)
+      .first();
+
+    return status ? this.createStatusObject(status) : null;
+  }
 }

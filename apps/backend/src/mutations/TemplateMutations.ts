@@ -16,7 +16,8 @@ import {
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { PdfTemplateDataSource } from '../datasources/PdfTemplateDataSource';
+import { ExperimentSafetyPdfTemplateDataSource } from '../datasources/ExperimentSafetyPdfTemplateDataSource';
+import { ProposalPdfTemplateDataSource } from '../datasources/ProposalPdfTemplateDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { Authorized, ValidateArgs } from '../decorators';
 import { getQuestionDefinition } from '../models/questionTypes/QuestionRegistry';
@@ -48,8 +49,10 @@ import { TemplateExport } from './../models/Template';
 export default class TemplateMutations {
   constructor(
     @inject(Tokens.TemplateDataSource) private dataSource: TemplateDataSource,
-    @inject(Tokens.PdfTemplateDataSource)
-    private pdfTemplateDataSource: PdfTemplateDataSource
+    @inject(Tokens.ProposalPdfTemplateDataSource)
+    private proposalpdfTemplateDataSource: ProposalPdfTemplateDataSource,
+    @inject(Tokens.ExperimentSafetyPdfTemplateDataSource)
+    private experimentSafetyPdfTemplateDataSource: ExperimentSafetyPdfTemplateDataSource
   ) {}
 
   @ValidateArgs(createTemplateValidationSchema)
@@ -141,8 +144,8 @@ export default class TemplateMutations {
           'feedback_basis'
         );
         break;
-      case TemplateGroupId.PDF_TEMPLATE:
-        await this.pdfTemplateDataSource.createPdfTemplate({
+      case TemplateGroupId.PROPOSAL_PDF:
+        await this.proposalpdfTemplateDataSource.createPdfTemplate({
           templateId: newTemplate.templateId,
           templateData: '',
           templateHeader: '',
@@ -151,6 +154,27 @@ export default class TemplateMutations {
           dummyData: '',
           creatorId: (agent as UserWithRole).id,
         });
+        break;
+      case TemplateGroupId.EXPERIMENT_SAFETY_PDF:
+        await this.experimentSafetyPdfTemplateDataSource.createPdfTemplate({
+          templateId: newTemplate.templateId,
+          templateData: '',
+          templateHeader: '',
+          templateFooter: '',
+          templateSampleDeclaration: '',
+          dummyData: '',
+          creatorId: (agent as UserWithRole).id,
+        });
+        break;
+
+      case TemplateGroupId.EXPERIMENT_SAFETY_REVIEW:
+        await this.createInitialTopic(
+          newTemplate.templateId,
+          0,
+          'New experiment safety review',
+          'exp_safety_review_basis'
+        );
+        break;
     }
 
     const activeTemplateTypes = [
@@ -223,8 +247,16 @@ export default class TemplateMutations {
       .cloneTemplate(templateId)
       .then((result) => result);
 
-    if (result && result.groupId === TemplateGroupId.PDF_TEMPLATE) {
-      await this.pdfTemplateDataSource.clonePdfTemplate(
+    if (result && result.groupId === TemplateGroupId.PROPOSAL_PDF) {
+      await this.proposalpdfTemplateDataSource.clonePdfTemplate(
+        templateId,
+        result.templateId
+      );
+    } else if (
+      result &&
+      result.groupId === TemplateGroupId.EXPERIMENT_SAFETY_PDF
+    ) {
+      await this.experimentSafetyPdfTemplateDataSource.clonePdfTemplate(
         templateId,
         result.templateId
       );
