@@ -56,7 +56,6 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.isActive || true,
     values?.sort_order || 0,
     values?.experimentWorkflowId ?? 1
-
   );
 };
 
@@ -96,7 +95,6 @@ export const dummyCall = new Call(
   true,
   0,
   1
-
 );
 
 export const anotherDummyCall = new Call(
