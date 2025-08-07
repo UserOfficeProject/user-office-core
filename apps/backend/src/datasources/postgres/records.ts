@@ -361,7 +361,6 @@ export interface CallRecord {
   readonly is_active: boolean;
   readonly sort_order: number;
   readonly experiment_workflow_id: number;
-
 }
 
 export interface PageTextRecord {
@@ -1049,7 +1048,6 @@ export const createCallObject = (call: CallRecord) => {
     call.is_active,
     call.sort_order,
     call.experiment_workflow_id
-
   );
 };
 
