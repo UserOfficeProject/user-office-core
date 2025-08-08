@@ -244,6 +244,23 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         return;
       }
 
+      // Check if target node already has a parent (restrict to only one parent)
+      const targetHasParentInEdges = edges.some(
+        (edge) => edge.target === connection.target
+      );
+
+      if (targetHasParentInEdges) {
+        enqueueSnackbar(
+          'Node can only have one parent connection. Try adding another status of the same type instead.',
+          {
+            variant: 'warning',
+            className: 'snackbar-warning',
+          }
+        );
+
+        return;
+      }
+
       const sourceConnection = state.workflowConnections.find(
         (s) => s.id.toString() === connection.source
       );
