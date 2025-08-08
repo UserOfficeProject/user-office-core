@@ -6,8 +6,6 @@ export const body = `<html lang="en">
   <link
     href="http://localhost:4500/static/css/bootstrap.min.css"
     rel="stylesheet"
-    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
-    crossorigin="anonymous"
   />
 
   <link href="http://localhost:4500/fonts/segoeui" rel="stylesheet">
@@ -429,11 +427,11 @@ export const sampleDeclaration = `<html lang='en'>
 
     <!-- Bootstrap CSS -->
     <link
-      href='http://localhost:4501/static/css/bootstrap.min.css'
+      href='http://localhost:4500/static/css/bootstrap.min.css'
       rel='stylesheet'
     />
 
-    <link href='http://localhost:4501/fonts/segoeui' rel='stylesheet' />
+    <link href='http://localhost:4500/fonts/segoeui' rel='stylesheet' />
 
     <style>
       body { font-size: 16px; line-height: 2; font-family: SegoeUI; } td, td h6

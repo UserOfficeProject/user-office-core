@@ -26,6 +26,7 @@ export enum PDFType {
   PROPOSAL = 'proposal',
   SAMPLE = 'sample',
   SHIPMENT_LABEL = 'shipment-label',
+  EXPERIMENT_SAFETY = 'experiment-safety',
 }
 export enum ZIPType {
   ATTACHMENT = 'attachment',

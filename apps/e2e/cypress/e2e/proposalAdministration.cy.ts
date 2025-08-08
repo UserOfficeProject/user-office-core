@@ -188,8 +188,6 @@ context('Proposal administration tests', () => {
         return false;
       });
 
-      cy.contains('Proposal information').click();
-
       cy.get('[data-cy="is-management-decision-submitted"]').click();
 
       cy.get('[data-cy="save-admin-decision"]').click();
