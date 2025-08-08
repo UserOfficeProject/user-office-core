@@ -26,7 +26,7 @@ export interface WorkflowDataSource {
   ): Promise<WorkflowConnectionWithStatus | null>;
   getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
-    statusId: Status['id'],
+    statusId: Status['id'] | undefined,
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]>;
   addWorkflowStatus(

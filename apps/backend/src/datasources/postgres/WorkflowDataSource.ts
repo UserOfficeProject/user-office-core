@@ -235,7 +235,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
   }
   async getWorkflowConnectionsById(
     workflowId: WorkflowConnection['workflowId'],
-    statusId: Status['id'],
+    statusId: Status['id'] | undefined,
     { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
   ): Promise<WorkflowConnectionWithStatus[]> {
     const workflowConnectionRecords: (WorkflowConnectionRecord &
@@ -246,8 +246,11 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         's.status_id': 'wc.status_id',
       })
       .where('workflow_id', workflowId)
-      .andWhere('wc.status_id', statusId)
       .modify((query) => {
+        if (statusId) {
+          query.andWhere('wc.status_id', statusId);
+        }
+
         if (nextStatusId) {
           query.andWhere('wc.next_status_id', nextStatusId);
         }
