@@ -160,13 +160,12 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           label: connection.status.name,
           status: connection.status,
           statusId: statusId,
-          onDelete: (deleteStatusId: string) => {
-            // Dispatch action to delete status from workflow model
-            // The useEffect will handle removing the node from UI when state updates
+          onDelete: (connectionId: string) => {
+            // Since the node ID is the connection ID, use it directly
             dispatch({
               type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
               payload: {
-                statusId: Number(deleteStatusId),
+                connectionId: Number(connectionId),
               },
             });
           },
@@ -317,6 +316,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       setEdges,
       statuses,
       state.connectionLineType,
+      state.workflowConnections,
     ]
   );
 
@@ -362,7 +362,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       setWorkflowConnection(connection);
     },
-    [statuses, state.id]
+    [state.id, state.workflowConnections]
   );
 
   // Handle status drag from picker to flow area
@@ -399,13 +399,11 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         data: {
           label: status.name,
           status,
-          onDelete: (deleteStatusId: string) => {
-            // Dispatch action to delete status from workflow model
-            // The useEffect will handle removing the node from UI when state updates
+          onDelete: (connectionId: string) => {
             dispatch({
               type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED,
               payload: {
-                statusId: Number(deleteStatusId),
+                connectionId: Number(connectionId),
               },
             });
           },
@@ -431,15 +429,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         },
       });
     },
-    [
-      reactFlowInstance,
-      statuses,
-      nodes,
-      setNodes,
-      dispatch,
-      state.id,
-      enqueueSnackbar,
-    ]
+    [reactFlowInstance, statuses, setNodes, dispatch, state.id]
   );
 
   // Determine if data is loaded

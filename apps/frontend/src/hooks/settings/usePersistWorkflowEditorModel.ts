@@ -75,22 +75,6 @@ export function usePersistWorkflowEditorModel() {
         .then((data) => data.addWorkflowStatus);
     };
 
-    const deleteWorkflowStatus = async (
-      statusId: number,
-      workflowId: number,
-      sortOrder: number
-    ) => {
-      return api({
-        toastSuccessMessage: 'Workflow status removed successfully',
-      })
-        .deleteWorkflowStatus({
-          statusId,
-          workflowId,
-          sortOrder,
-        })
-        .then((data) => data.deleteWorkflowStatus);
-    };
-
     const addStatusChangingEventsToConnection = async (
       workflowConnectionId: number,
       statusChangingEvents: string[]
@@ -159,17 +143,15 @@ export function usePersistWorkflowEditorModel() {
           });
         }
         case EventType.DELETE_WORKFLOW_STATUS_REQUESTED:
-          // Find the workflow connection to remove based on statusId
+          // Find the workflow connection to remove based on connectionId
           const workflowConnectionToRemove = state.workflowConnections.find(
-            (connection) => connection.statusId === action.payload.statusId
+            (connection) => connection.id === action.payload.connectionId
           );
 
           if (workflowConnectionToRemove) {
             return executeAndMonitorCall(async () => {
-              const result = await deleteWorkflowStatus(
-                workflowConnectionToRemove.statusId,
-                workflowConnectionToRemove.workflowId,
-                workflowConnectionToRemove.sortOrder
+              const result = await deleteWorkflowConnection(
+                workflowConnectionToRemove.id
               );
 
               dispatch({

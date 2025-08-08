@@ -56,15 +56,16 @@ const StyledHandle = styled(Handle)({
 });
 
 interface StatusNodeProps {
+  id: string; // Node ID from React Flow
   data: {
     label: string;
     status: Status;
-    onDelete: (statusId: string) => void;
+    onDelete: (connectionId: string) => void;
   };
   selected: boolean;
 }
 
-const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
+const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleToggleExpand = (e: React.MouseEvent) => {
@@ -88,7 +89,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ data }) => {
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                data.onDelete(data.status.id.toString());
+                data.onDelete(id); // Pass the node ID instead of status ID
               }}
               title="Delete status"
               sx={{

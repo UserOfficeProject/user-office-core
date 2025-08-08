@@ -100,10 +100,10 @@ const WorkflowEditorModel = (
           return draft;
         }
         case EventType.WORKFLOW_STATUS_DELETED: {
-          // Remove the workflow connection by statusId
-          if (action.payload && action.payload.statusId) {
+          // Remove the workflow connection by connectionId
+          if (action.payload.connectionId) {
             draft.workflowConnections = draft.workflowConnections.filter(
-              (conn) => conn.statusId !== action.payload.statusId
+              (conn) => conn.id !== action.payload.connectionId
             );
           }
 
