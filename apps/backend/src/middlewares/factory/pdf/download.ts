@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../../config/Tokens';
 import { AdminDataSource } from '../../../datasources/AdminDataSource';
+import { ExperimentSafetyPDFData } from '../../../factory/pdf/experimentSafety';
 import {
   FullProposalPDFData,
   PregeneratedProposalPDFData,
@@ -194,6 +195,51 @@ router.get(
       callFactoryService(
         DownloadType.PDF,
         PDFType.SHIPMENT_LABEL,
+        { data, meta, userRole },
+        req,
+        res,
+        next
+      );
+    } catch (e) {
+      next(e);
+    }
+  }
+);
+
+router.get(
+  `/${PDFType.EXPERIMENT_SAFETY}/:experiment_pks`,
+  async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new Error('Not authorized');
+      }
+
+      const factoryServices =
+        container.resolve<DownloadTypeServices>(FactoryServices);
+
+      const userWithRole = {
+        ...res.locals.agent,
+      };
+      const experimentPks: number[] = req.params.experiment_pks
+        .split(',')
+        .map((n: string) => parseInt(n))
+        .filter((id: number) => !isNaN(id));
+      const meta: MetaBase = {
+        collectionFilename: `experiment_safety_${getCurrentTimestamp()}.pdf`,
+        singleFilename: '',
+      };
+      const data = await factoryServices.getPdfExperimentsSafety(
+        userWithRole,
+        experimentPks,
+        meta
+      );
+      if (!data) {
+        throw new Error('Could not get Experiment details');
+      }
+      const userRole = req.user.currentRole;
+      callFactoryService<ExperimentSafetyPDFData, MetaBase>(
+        DownloadType.PDF,
+        PDFType.EXPERIMENT_SAFETY,
         { data, meta, userRole },
         req,
         res,

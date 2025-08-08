@@ -10,6 +10,7 @@ import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
+import { ExperimentSafetyPdfTemplateDataSourceMock } from '../datasources/mockups/ExperimentSafetyPdfTemplateDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
@@ -17,10 +18,10 @@ import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTem
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { InternalReviewDataSourceMock } from '../datasources/mockups/InternalReviewDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
-import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
 import PredefinedMessageDataSourceMock from '../datasources/mockups/PredefinedMessageDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
+import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
@@ -62,7 +63,14 @@ mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.InviteDataSource, InviteDataSourceMock);
 mapClass(Tokens.RoleClaimDataSource, RoleClaimDataSourceMock);
 mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
-mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
+mapClass(
+  Tokens.ProposalPdfTemplateDataSource,
+  ProposalPdfTemplateDataSourceMock
+);
+mapClass(
+  Tokens.ExperimentSafetyPdfTemplateDataSource,
+  ExperimentSafetyPdfTemplateDataSourceMock
+);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,

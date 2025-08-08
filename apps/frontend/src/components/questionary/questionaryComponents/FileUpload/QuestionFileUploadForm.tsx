@@ -68,7 +68,6 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
               fullWidth
               inputProps={{ 'data-cy': 'question' }}
             />
-
             <TitledContainer label="Options">
               <Field
                 name="config.small_label"
@@ -81,7 +80,6 @@ export const QuestionFileUploadForm = (props: QuestionFormProps) => {
                 data-cy="small_label"
               />
             </TitledContainer>
-
             <TitledContainer label="Constraints">
               <Field
                 name="config.required"

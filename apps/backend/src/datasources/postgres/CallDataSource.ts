@@ -57,8 +57,15 @@ export default class PostgresCallDataSource implements CallDataSource {
       query.whereIn('template_id', filter.templateIds);
     }
 
-    if (filter?.pdfTemplateIds) {
-      query.whereIn('pdf_template_id', filter.pdfTemplateIds);
+    if (filter?.proposalPdfTemplateIds) {
+      query.whereIn('proposal_pdf_template_id', filter.proposalPdfTemplateIds);
+    }
+
+    if (filter?.experimentSafetyPdfTemplateIds) {
+      query.whereIn(
+        'experiment_safety_pdf_template_id',
+        filter.experimentSafetyPdfTemplateIds
+      );
     }
 
     if (filter?.fapReviewTemplateIds) {
@@ -163,9 +170,9 @@ export default class PostgresCallDataSource implements CallDataSource {
         .distinctOn('call.call_id');
     }
 
-    return query.then((callDB: CallRecord[]) =>
-      callDB.map((call) => createCallObject(call))
-    );
+    return query.then((callDB: CallRecord[]) => {
+      return callDB.map((call) => createCallObject(call));
+    });
   }
 
   async getCallHasInstrumentsByInstrumentIds(
@@ -205,9 +212,12 @@ export default class PostgresCallDataSource implements CallDataSource {
             reference_number_format: args.referenceNumberFormat,
             proposal_sequence: args.proposalSequence,
             proposal_workflow_id: args.proposalWorkflowId,
+            experiment_workflow_id: args.experimentWorkflowId,
             template_id: args.templateId,
             esi_template_id: args.esiTemplateId,
-            pdf_template_id: args.pdfTemplateId,
+            proposal_pdf_template_id: args.proposalPdfTemplateId,
+            experiment_safety_pdf_template_id:
+              args.experimentSafetyPdfTemplateId,
             fap_review_template_id: args.fapReviewTemplateId,
             technical_review_template_id: args.technicalReviewTemplateId,
             allocation_time_unit: args.allocationTimeUnit,
@@ -352,7 +362,6 @@ export default class PostgresCallDataSource implements CallDataSource {
           */
           return previousFlagValue;
         };
-
         const callUpdate = await database
           .update(
             {
@@ -373,6 +382,7 @@ export default class PostgresCallDataSource implements CallDataSource {
               submission_message: args.submissionMessage,
               survey_comment: args.surveyComment,
               proposal_workflow_id: args.proposalWorkflowId,
+              experiment_workflow_id: args.experimentWorkflowId,
               call_ended: determineCallEndedFlag(
                 args.callEnded,
                 preUpdateCall.call_ended,
@@ -387,7 +397,9 @@ export default class PostgresCallDataSource implements CallDataSource {
               call_fap_review_ended: args.callFapReviewEnded,
               template_id: args.templateId,
               esi_template_id: args.esiTemplateId,
-              pdf_template_id: args.pdfTemplateId,
+              proposal_pdf_template_id: args.proposalPdfTemplateId,
+              experiment_safety_pdf_template_id:
+                args.experimentSafetyPdfTemplateId,
               fap_review_template_id: args.fapReviewTemplateId,
               technical_review_template_id: args.technicalReviewTemplateId,
               allocation_time_unit: args.allocationTimeUnit,
@@ -563,6 +575,22 @@ export default class PostgresCallDataSource implements CallDataSource {
       .then((proposalWorkflow: WorkflowRecord | null) =>
         proposalWorkflow
           ? this.createProposalWorkflowObject(proposalWorkflow)
+          : null
+      );
+  }
+
+  async getExperimentWorkflowByCall(callId: number): Promise<Workflow | null> {
+    return database
+      .select()
+      .from('call as c')
+      .join('workflows as w', {
+        'w.workflow_id': 'c.experiment_workflow_id',
+      })
+      .where('c.call_id', callId)
+      .first()
+      .then((experimentWorkflow: WorkflowRecord | null) =>
+        experimentWorkflow
+          ? this.createProposalWorkflowObject(experimentWorkflow)
           : null
       );
   }

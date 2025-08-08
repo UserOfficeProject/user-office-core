@@ -7,6 +7,7 @@ import React, { useContext } from 'react';
 import UOLoader from 'components/common/UOLoader';
 import ExperimentSafetyContainer from 'components/experimentSafety/ExperimentSafetyContainer';
 import { createExperimentSafetyStub } from 'components/experimentSafety/ExperimentSafetyContainer';
+import ExperimentSafetyReviewContainer from 'components/experimentSafetyReview/ExperimentSafetyReviewContainer';
 import ProposalContainer from 'components/proposal/ProposalContainer';
 import { createProposalStub } from 'components/proposal/ProposalCreate';
 import { GenericTemplateContainer } from 'components/questionary/questionaryComponents/GenericTemplate/GenericTemplateContainer';
@@ -126,6 +127,16 @@ const PreviewTemplateModal = ({
               user as unknown as BasicUserDetails
             )}
             previewMode={true}
+          />
+        );
+      case TemplateGroupId.EXPERIMENT_SAFETY_REVIEW:
+        return (
+          <ExperimentSafetyReviewContainer
+            previewMode={true}
+            experimentSafety={createExperimentSafetyStub(
+              templateId,
+              questionarySteps
+            )}
           />
         );
     }

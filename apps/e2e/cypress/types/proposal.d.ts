@@ -12,8 +12,8 @@ import {
   SubmitProposalMutation,
   SubmitExperimentSafetyMutationVariables,
   SubmitExperimentSafetyMutation,
-  CreateOrGetExperimentSafetyMutationVariables,
-  CreateOrGetExperimentSafetyMutation,
+  createExperimentSafetyMutationVariables,
+  createExperimentSafetyMutation,
   CloneProposalsMutationVariables,
   CloneProposalsMutation,
   GetProposalsQueryVariables,
@@ -126,11 +126,11 @@ declare global {
        * @returns {typeof createEsi}
        * @memberof Chainable
        * @example
-       *        cy.createEsi(createEsiInput: CreateOrGetExperimentSafetyMutationVariables);
+       *        cy.createEsi(createEsiInput: createExperimentSafetyMutationVariables);
        */
-      createOrGetExperimentSafety: (
-        createOrGetExperimentSafetyInput: CreateOrGetExperimentSafetyMutationVariables
-      ) => Cypress.Chainable<CreateOrGetExperimentSafetyMutation>;
+      createExperimentSafety: (
+        createExperimentSafetyInput: createExperimentSafetyMutationVariables
+      ) => Cypress.Chainable<createExperimentSafetyMutation>;
     }
   }
 }
