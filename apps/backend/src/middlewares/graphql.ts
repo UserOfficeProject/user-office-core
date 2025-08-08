@@ -117,6 +117,24 @@ const apolloServer = async (app: Express) => {
           };
 
           const filteredErrors = errors.filter((error) => {
+            const exception = error.extensions?.exception;
+            if (
+              exception &&
+              typeof exception === 'object' &&
+              'name' in exception &&
+              (exception as { name: string }).name === 'TokenExpiredError'
+            ) {
+              logger.logWarn(
+                'GraphQL response contained error(s) due to jwt expired',
+                {
+                  message: (exception as { message?: string }).message,
+                  expiredAt: (exception as { expiredAt?: string }).expiredAt,
+                  context,
+                }
+              );
+
+              return false;
+            }
             if (error.extensions.code === 'EXTERNAL_TOKEN_INVALID') {
               logger.logInfo(
                 'GraphQL response contained error(s) due to expired or invalid external token',
