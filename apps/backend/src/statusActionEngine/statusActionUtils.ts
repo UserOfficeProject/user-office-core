@@ -23,7 +23,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 
 interface GroupedObjectType {
   [key: string]: WorkflowEngineProposalType[];
@@ -462,6 +462,7 @@ export const getOtherAndFormatOutputForEmailSending = async (
       new Date(),
       true,
       otherEmail,
+      '',
       ''
     );
 

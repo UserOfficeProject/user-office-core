@@ -89,6 +89,7 @@ export const fileUploadDefinition: Question<DataType.FILE_UPLOAD> = {
     config.pdf_page_limit = 0; // Unlimited
     config.max_files = 0; // Unlimited
     config.omitFromPdf = false;
+    config.readPermissions = [];
 
     return config;
   },

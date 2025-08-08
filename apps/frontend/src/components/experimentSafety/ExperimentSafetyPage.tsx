@@ -7,16 +7,16 @@ import { StyledContainer, StyledPaper } from 'styles/StyledComponents';
 import ExperimentSafety from './ExperimentSafety';
 
 function ExperimentSafetyPage() {
-  const { experimentPk } = useParams<{ experimentPk: string }>();
+  const { experimentSafetyPk } = useParams<{ experimentSafetyPk: string }>();
 
-  if (!experimentPk) {
+  if (!experimentSafetyPk) {
     return <NotFound />;
   }
 
   return (
     <StyledContainer>
       <StyledPaper data-cy="create-proposal-esi-table">
-        <ExperimentSafety experimentPk={+experimentPk} />
+        <ExperimentSafety experimentSafetyPk={+experimentSafetyPk} />
       </StyledPaper>
     </StyledContainer>
   );

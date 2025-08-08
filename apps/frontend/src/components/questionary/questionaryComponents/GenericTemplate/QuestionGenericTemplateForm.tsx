@@ -59,7 +59,6 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
-
           <Field
             name="question"
             id="Question-Input"
@@ -69,7 +68,6 @@ export const QuestionGenericTemplateForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <FormikUIAutocomplete

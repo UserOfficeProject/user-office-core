@@ -10,6 +10,7 @@ import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
+import { ExperimentSafetyPdfTemplateDataSourceMock } from '../datasources/mockups/ExperimentSafetyPdfTemplateDataSource';
 import { FapDataSourceMock } from '../datasources/mockups/FapDataSource';
 import { FeedbackDataSourceMock } from '../datasources/mockups/FeedbackDataSource';
 import FileDataSourceMock from '../datasources/mockups/FileDataSource';
@@ -17,9 +18,10 @@ import { GenericTemplateDataSourceMock } from '../datasources/mockups/GenericTem
 import { InstrumentDataSourceMock } from '../datasources/mockups/InstrumentDataSource';
 import { InternalReviewDataSourceMock } from '../datasources/mockups/InternalReviewDataSource';
 import { InviteDataSourceMock } from '../datasources/mockups/InviteDataSource';
-import { PdfTemplateDataSourceMock } from '../datasources/mockups/PdfTemplateDataSource';
+import PredefinedMessageDataSourceMock from '../datasources/mockups/PredefinedMessageDataSource';
 import { ProposalDataSourceMock } from '../datasources/mockups/ProposalDataSource';
 import { PostgresProposalInternalCommentsDataSourceMock } from '../datasources/mockups/ProposalInternalCommentsDataSource';
+import { ProposalPdfTemplateDataSourceMock } from '../datasources/mockups/ProposalPdfTemplateDataSource';
 import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import { RedeemDataSourceMock } from '../datasources/mockups/RedeemDataSource';
 import { ReviewDataSourceMock } from '../datasources/mockups/ReviewDataSource';
@@ -36,7 +38,6 @@ import { TemplateDataSourceMock } from '../datasources/mockups/TemplateDataSourc
 import { UnitDataSourceMock } from '../datasources/mockups/UnitDataSource';
 import { UserDataSourceMock } from '../datasources/mockups/UserDataSource';
 import { WorkflowDataSourceMock } from '../datasources/mockups/WorkflowDataSource';
-import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import { essEmailHandler } from '../eventHandlers/email/essEmailHandler';
 import createLoggingHandler from '../eventHandlers/logging';
 import { SkipSendMailService } from '../eventHandlers/MailService/SkipSendMailService';
@@ -63,7 +64,14 @@ mapClass(Tokens.InstrumentDataSource, InstrumentDataSourceMock);
 mapClass(Tokens.InviteDataSource, InviteDataSourceMock);
 mapClass(Tokens.RoleClaimDataSource, RoleClaimDataSourceMock);
 mapClass(Tokens.InternalReviewDataSource, InternalReviewDataSourceMock);
-mapClass(Tokens.PdfTemplateDataSource, PdfTemplateDataSourceMock);
+mapClass(
+  Tokens.ProposalPdfTemplateDataSource,
+  ProposalPdfTemplateDataSourceMock
+);
+mapClass(
+  Tokens.ExperimentSafetyPdfTemplateDataSource,
+  ExperimentSafetyPdfTemplateDataSourceMock
+);
 mapClass(Tokens.ProposalDataSource, ProposalDataSourceMock);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
@@ -86,10 +94,7 @@ mapClass(Tokens.UnitDataSource, UnitDataSourceMock);
 mapClass(Tokens.UserDataSource, UserDataSourceMock);
 mapClass(Tokens.VisitDataSource, VisitDataSourceMock);
 mapClass(Tokens.VisitRegistrationAuthorization, VisitRegistrationAuthorization);
-mapClass(
-  Tokens.PredefinedMessageDataSource,
-  PostgresPredefinedMessageDataSource
-);
+mapClass(Tokens.PredefinedMessageDataSource, PredefinedMessageDataSourceMock);
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSourceMock);
 mapClass(Tokens.TagDataSource, TagDataSourceMock);
 

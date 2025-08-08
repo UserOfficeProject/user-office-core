@@ -15,6 +15,7 @@ import {
 import { ResolverContext } from '../../context';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { ReviewerFilter, ReviewStatus } from '../../models/Review';
+import { Roles } from '../../models/Role';
 import { User as UserOrigin } from '../../models/User';
 import { UserExperimentsFilter } from '../queries/ExperimentsQuery';
 import { Experiment } from './Experiment';
@@ -182,7 +183,7 @@ export class UserResolver {
 
     return context.queries.fap.dataSource.getUserFaps(
       user.id,
-      context.user.currentRole
+      context.user.currentRole.shortCode as Roles
     );
   }
 

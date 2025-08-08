@@ -8,6 +8,9 @@ export const QuestionTemplateRelationFeedbackBasisForm = (
   props: QuestionTemplateRelationFormProps
 ) => {
   return (
-    <QuestionTemplateRelationFormShell {...props} validationSchema={null} />
+    <QuestionTemplateRelationFormShell
+      {...props}
+      validationSchema={null}
+    ></QuestionTemplateRelationFormShell>
   );
 };
