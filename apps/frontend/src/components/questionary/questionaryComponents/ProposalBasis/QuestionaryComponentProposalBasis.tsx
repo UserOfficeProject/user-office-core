@@ -144,7 +144,6 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           InputLabelProps={{
             shrink: true,
           }}
-          error={hasInvalidChars}
           helperText={
             hasInvalidChars
               ? 'Non-printable characters have been removed from your input.'
