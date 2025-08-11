@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import DateTimePicker from 'components/common/FormikUIDateTimePicker';
+import DayTimeRangePicker from 'components/common/FormikUIDayTimeRangePicker';
 import TextField from 'components/common/FormikUITextField';
 import RefreshListIcon from 'components/common/RefresListIcon';
 import StyledDialog from 'components/common/StyledDialog';
@@ -63,33 +64,43 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const CallGeneralInfo = ({
   loadingProposalWorkflows,
   proposalWorkflows,
+  experimentWorkflows,
   templates,
   esiTemplates,
-  pdfTemplates,
+  proposalPdfTemplates,
+  experimentSafetyPdfTemplates,
   fapReviewTemplates,
   technicalReviewTemplates,
   loadingTemplates,
   reloadTemplates,
   reloadEsi,
-  reloadPdfTemplates,
+  reloadProposalPdfTemplates,
+  reloadExperimentSafetyPdfTemplates,
   reloadFapReviewTemplates,
   reloadTechnicalReviewTemplates,
   reloadProposalWorkflows,
+  reloadExperimentWorkflows,
+  loadingExperimentWorkflows,
 }: {
   reloadTemplates: () => void;
   reloadEsi: () => void;
-  reloadPdfTemplates: () => void;
+  reloadProposalPdfTemplates: () => void;
+  reloadExperimentSafetyPdfTemplates: () => void;
   reloadFapReviewTemplates: () => void;
   reloadTechnicalReviewTemplates: () => void;
   reloadProposalWorkflows: () => void;
+  reloadExperimentWorkflows: () => void;
   templates: GetTemplatesQuery['templates'];
   esiTemplates: GetTemplatesQuery['templates'];
-  pdfTemplates: GetTemplatesQuery['templates'];
+  proposalPdfTemplates: GetTemplatesQuery['templates'];
+  experimentSafetyPdfTemplates: GetTemplatesQuery['templates'];
   fapReviewTemplates: GetTemplatesQuery['templates'];
   technicalReviewTemplates: GetTemplatesQuery['templates'];
   loadingTemplates: boolean;
   proposalWorkflows: Workflow[];
+  experimentWorkflows: Workflow[];
   loadingProposalWorkflows: boolean;
+  loadingExperimentWorkflows: boolean;
 }) => {
   const { featuresMap } = useContext(FeatureContext);
   const { format: dateTimeFormat, timezone } = useFormattedDateTime();
@@ -113,8 +124,14 @@ const CallGeneralInfo = ({
       value: template.templateId,
     })) || [];
 
-  const pdfTemplateOptions =
-    pdfTemplates?.map((template) => ({
+  const proposalPdfTemplateOptions =
+    proposalPdfTemplates?.map((template) => ({
+      text: template.name,
+      value: template.templateId,
+    })) || [];
+
+  const experimentSafetyPdfTemplateOptions =
+    experimentSafetyPdfTemplates?.map((template) => ({
       text: template.name,
       value: template.templateId,
     })) || [];
@@ -137,6 +154,12 @@ const CallGeneralInfo = ({
       value: proposalWorkflow.id,
     })) || [];
 
+  const experimentWorkflowOptions =
+    experimentWorkflows.map((experimentWorkflow) => ({
+      text: experimentWorkflow.name,
+      value: experimentWorkflow.id,
+    })) || [];
+
   const allocationTimeUnitOptions = Object.values(AllocationTimeUnits).map(
     (key) => ({
       text: key,
@@ -145,11 +168,13 @@ const CallGeneralInfo = ({
   );
 
   const formik = useFormikContext<
-    CreateCallMutationVariables | UpdateCallMutationVariables
+    (CreateCallMutationVariables | UpdateCallMutationVariables) & {
+      startEndDate: { from: string; to: string };
+    }
   >();
 
   const { values, setValues } = formik;
-  const { startCall, endCall, proposalWorkflowId, templateId, esiTemplateId } =
+  const { startEndDate, proposalWorkflowId, templateId, esiTemplateId } =
     values;
 
   useEffect(() => {
@@ -170,17 +195,20 @@ const CallGeneralInfo = ({
       setInternalCallDate({ showField: result, isValueSet: true });
     }
   }, [proposalWorkflowId, proposalWorkflows]);
-
   useEffect(() => {
-    if (internalCallDate.isValueSet && !internalCallDate.showField && endCall) {
+    if (
+      internalCallDate.isValueSet &&
+      !internalCallDate.showField &&
+      startEndDate.to
+    ) {
       setValues((prevState) => {
-        const endCallInternal = endCall;
+        const endCallInternal = startEndDate.to;
+        const endCall = startEndDate.to;
 
-        return { ...prevState, endCallInternal };
+        return { ...prevState, endCallInternal, endCall };
       });
     }
-  }, [setValues, endCall, setInternalCallDate, internalCallDate]);
-
+  }, [setValues, startEndDate, setInternalCallDate, internalCallDate]);
   function validateRefNumFormat(input: string) {
     let errorMessage;
     const regExp = /^[a-z|\d]+{digits:[1-9]+}$/;
@@ -232,44 +260,23 @@ const CallGeneralInfo = ({
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
         <Field
-          name="startCall"
-          label={`Start (${timezone})`}
-          id="start-call-input"
+          name="startEndDate"
+          label={`Start and End date (${timezone})`}
+          id="start-end-call-input"
           format={dateTimeFormat}
           ampm={false}
-          component={DateTimePicker}
+          component={DayTimeRangePicker}
           inputProps={{ placeholder: dateTimeFormat }}
           allowSameDateSelection
           textField={{
             fullWidth: true,
             required: true,
-            'data-cy': 'start-date',
+            'data-cy': 'start-end-date',
           }}
           // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions  https://stackoverflow.com/a/69986695/5619063
           desktopModeMediaQuery={theme.breakpoints.up('sm')}
           required
         />
-        <Field
-          name="endCall"
-          label={`End (${timezone})`}
-          id="end-call-input"
-          format={dateTimeFormat}
-          ampm={false}
-          allowSameDateSelection
-          component={DateTimePicker}
-          inputProps={{ placeholder: dateTimeFormat }}
-          textField={{
-            fullWidth: true,
-            required: true,
-            'data-cy': 'end-date',
-          }}
-          // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
-          // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
-          desktopModeMediaQuery={theme.breakpoints.up('sm')}
-          minDate={startCall}
-          required
-        />
-
         <Field
           name="referenceNumberFormat"
           validate={validateRefNumFormat}
@@ -419,14 +426,29 @@ const CallGeneralInfo = ({
         </FormControl>
       )}
       <FormikUIAutocomplete
-        name="pdfTemplateId"
-        label="PDF template"
+        name="proposalPdfTemplateId"
+        label="Proposal PDF template"
         loading={loadingTemplates}
         noOptionsText="No templates"
-        items={pdfTemplateOptions}
+        items={proposalPdfTemplateOptions}
         InputProps={{
-          'data-cy': 'call-pdf-template',
-          endAdornment: <RefreshListIcon onClick={reloadPdfTemplates} />,
+          'data-cy': 'call-proposal-pdf-template',
+          endAdornment: (
+            <RefreshListIcon onClick={reloadProposalPdfTemplates} />
+          ),
+        }}
+      />
+      <FormikUIAutocomplete
+        name="experimentSafetyPdfTemplateId"
+        label="Experiment Safety PDF template"
+        loading={loadingTemplates}
+        noOptionsText="No templates"
+        items={experimentSafetyPdfTemplateOptions}
+        InputProps={{
+          'data-cy': 'call-experiment-safety-pdf-template',
+          endAdornment: (
+            <RefreshListIcon onClick={reloadExperimentSafetyPdfTemplates} />
+          ),
         }}
       />
       <FormikUIAutocomplete
@@ -462,10 +484,21 @@ const CallGeneralInfo = ({
         noOptionsText="No proposal workflows"
         items={proposalWorkflowOptions}
         InputProps={{
-          'data-cy': 'call-workflow',
+          'data-cy': 'proposal-call-workflow',
           endAdornment: <RefreshListIcon onClick={reloadProposalWorkflows} />,
         }}
         required
+      />
+      <FormikUIAutocomplete
+        name="experimentWorkflowId"
+        label="Experiment workflow"
+        loading={loadingExperimentWorkflows}
+        noOptionsText="No experiment workflows"
+        items={experimentWorkflowOptions}
+        InputProps={{
+          'data-cy': 'experiment-call-workflow',
+          endAdornment: <RefreshListIcon onClick={reloadExperimentWorkflows} />,
+        }}
       />
       <LocalizationProvider dateAdapter={DateAdapter}>
         {internalCallDate.showField && (
@@ -486,7 +519,7 @@ const CallGeneralInfo = ({
             // NOTE: This is needed just because Cypress testing a Material-UI datepicker is not working on Github actions
             // https://stackoverflow.com/a/69986695/5619063 and https://github.com/cypress-io/cypress/issues/970
             desktopModeMediaQuery={theme.breakpoints.up('sm')}
-            minDate={endCall}
+            minDate={startEndDate.to}
             required
           />
         )}

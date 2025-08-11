@@ -156,6 +156,12 @@ const AddStatusActionsToConnection = ({
                 config: JSON.stringify(rabbitMQStatusActionConfig),
               };
             }
+            case StatusActionType.PROPOSALDOWNLOAD: {
+              return {
+                actionId: action.id,
+                actionType: action.type,
+              };
+            }
           }
         });
 
@@ -221,7 +227,11 @@ const AddStatusActionsToConnection = ({
                         data-cy={`accordion-${statusAction.type}`}
                       >
                         <AccordionSummary
-                          expandIcon={<ExpandMoreIcon />}
+                          expandIcon={
+                            statusAction.defaultConfig ? (
+                              <ExpandMoreIcon />
+                            ) : null
+                          }
                           aria-controls={`panel${index}- header`}
                           id={`panel${index}-header`}
                         >
@@ -259,9 +269,11 @@ const AddStatusActionsToConnection = ({
                             }
                           />
                         </AccordionSummary>
-                        <AccordionDetails>
-                          {renderActionsConfig(statusAction, values)}
-                        </AccordionDetails>
+                        {statusAction.defaultConfig && (
+                          <AccordionDetails>
+                            {renderActionsConfig(statusAction, values)}
+                          </AccordionDetails>
+                        )}
                       </Accordion>
                     ))}
                   </>

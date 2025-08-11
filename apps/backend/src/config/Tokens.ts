@@ -18,7 +18,10 @@ export const Tokens = {
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
   LoggingHandler: Symbol('LoggingHandler'),
   MailService: Symbol('MailService'),
-  PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),
+  ProposalPdfTemplateDataSource: Symbol('ProposalPdfTemplateDataSource'),
+  ExperimentSafetyPdfTemplateDataSource: Symbol(
+    'ExperimentSafetyPdfTemplateDataSource'
+  ),
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   ProposalDataSource: Symbol('ProposalDataSource'),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),
@@ -55,4 +58,5 @@ export const Tokens = {
   StatusDataSource: Symbol('StatusDataSource'),
   ExperimentDataSource: Symbol('ExperimentDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
+  TagDataSource: Symbol('TagDataSource'),
 };

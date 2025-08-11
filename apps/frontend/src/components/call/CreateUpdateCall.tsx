@@ -40,8 +40,21 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
   const { templates: proposalEsiTemplates, refreshTemplates: reloadEsi } =
     useActiveTemplates(TemplateGroupId.PROPOSAL_ESI, call?.esiTemplateId);
 
-  const { templates: pdfTemplates, refreshTemplates: reloadPdfTemplates } =
-    useActiveTemplates(TemplateGroupId.PDF_TEMPLATE, call?.pdfTemplateId);
+  const {
+    templates: proposalPdfTemplates,
+    refreshTemplates: reloadProposalPdfTemplates,
+  } = useActiveTemplates(
+    TemplateGroupId.PROPOSAL_PDF,
+    call?.proposalPdfTemplateId
+  );
+
+  const {
+    templates: experimentSafetyPdfTemplates,
+    refreshTemplates: reloadExperimentSafetyPdfTemplates,
+  } = useActiveTemplates(
+    TemplateGroupId.EXPERIMENT_SAFETY_PDF,
+    call?.experimentSafetyPdfTemplateId
+  );
 
   const {
     templates: fapReviewTemplates,
@@ -61,6 +74,12 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
     loadingWorkflows: loadingProposalWorkflows,
     refreshWorkflows: reloadProposalWorkflows,
   } = useWorkflowsData(WorkflowType.PROPOSAL);
+
+  const {
+    workflows: experimentWorkflows,
+    loadingWorkflows: loadingExperimentWorkflows,
+    refreshWorkflows: reloadExperimentWorkflows,
+  } = useWorkflowsData(WorkflowType.EXPERIMENT);
 
   const currentDayStart = DateTime.now()
     .setZone(timezone || undefined)
@@ -86,13 +105,18 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         description: call.description || '',
         templateId: call.templateId,
         esiTemplateId: call.esiTemplateId,
-        pdfTemplateId: call.pdfTemplateId,
+        proposalPdfTemplateId: call.proposalPdfTemplateId,
+        experimentSafetyPdfTemplateId: call.experimentSafetyPdfTemplateId,
         fapReviewTemplateId: call.fapReviewTemplateId,
         technicalReviewTemplateId: call.technicalReviewTemplateId,
         proposalWorkflowId: call.proposalWorkflowId,
         referenceNumberFormat: call.referenceNumberFormat || '',
         startCall: getDateTimeFromISO(call.startCall),
         endCall: getDateTimeFromISO(call.endCall),
+        startEndDate: {
+          from: getDateTimeFromISO(call.startCall),
+          to: getDateTimeFromISO(call.endCall),
+        },
         startReview: getDateTimeFromISO(call.startReview),
         endReview: getDateTimeFromISO(call.endReview),
         startFapReview: getDateTimeFromISO(call.startFapReview),
@@ -108,6 +132,10 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
         shortCode: '',
         startCall: currentDayStart,
         endCall: currentDayEnd,
+        startEndDate: {
+          from: getDateTimeFromISO(currentDayStart.toISO() || ''),
+          to: getDateTimeFromISO(currentDayEnd.toISO() || ''),
+        },
         referenceNumberFormat: '',
         startReview: currentDayStart,
         endReview: currentDayEnd,
@@ -140,15 +168,24 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
       <Wizard
         initialValues={initialValues}
         onSubmit={async (values) => {
+          console.log({ values });
           if (call) {
             const { updateCall } = await api({
               toastSuccessMessage: 'Call updated successfully!',
-            }).updateCall(values as UpdateCallInput);
+            }).updateCall({
+              ...(values as UpdateCallInput),
+              startCall: values.startEndDate.from,
+              endCall: values.startEndDate.to,
+            });
             close(updateCall as Call);
           } else {
             const { createCall } = await api({
               toastSuccessMessage: 'Call created successfully!',
-            }).createCall(values as CreateCallInput);
+            }).createCall({
+              ...(values as CreateCallInput),
+              startCall: values.startEndDate.from,
+              endCall: values.startEndDate.to,
+            });
 
             close(createCall as Call);
           }
@@ -166,18 +203,25 @@ const CreateUpdateCall = ({ call, close }: CreateUpdateCallProps) => {
           <CallGeneralInfo
             reloadTemplates={reloadProposal}
             reloadEsi={reloadEsi}
-            reloadPdfTemplates={reloadPdfTemplates}
+            reloadProposalPdfTemplates={reloadProposalPdfTemplates}
+            reloadExperimentSafetyPdfTemplates={
+              reloadExperimentSafetyPdfTemplates
+            }
             reloadFapReviewTemplates={reloadFapReviewTemplates}
             reloadTechnicalReviewTemplates={reloadTechnicalReviewTemplates}
             reloadProposalWorkflows={reloadProposalWorkflows}
             templates={proposalTemplates}
             esiTemplates={proposalEsiTemplates}
-            pdfTemplates={pdfTemplates}
+            proposalPdfTemplates={proposalPdfTemplates}
+            experimentSafetyPdfTemplates={experimentSafetyPdfTemplates}
             fapReviewTemplates={fapReviewTemplates}
             technicalReviewTemplates={technicalReviewTemplates}
             loadingTemplates={!proposalTemplates || !proposalEsiTemplates}
             proposalWorkflows={proposalWorkflows}
             loadingProposalWorkflows={loadingProposalWorkflows}
+            experimentWorkflows={experimentWorkflows}
+            loadingExperimentWorkflows={loadingExperimentWorkflows}
+            reloadExperimentWorkflows={reloadExperimentWorkflows}
           />
         </WizardStep>
         <WizardStep

@@ -39,6 +39,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       config.instruments = [];
       config.isMultipleSelect = false;
       config.requestTime = false;
+      config.readPermissions = [];
 
       return config;
     },

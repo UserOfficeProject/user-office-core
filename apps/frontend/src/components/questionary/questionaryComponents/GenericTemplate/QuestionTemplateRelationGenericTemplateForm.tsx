@@ -106,7 +106,6 @@ export const QuestionTemplateRelationGenericTemplateForm = (
               />
             </Collapse>
           </TitledContainer>
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -137,7 +136,6 @@ export const QuestionTemplateRelationGenericTemplateForm = (
               data-cy="max-entries"
             />
           </TitledContainer>
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <FormikUIAutocomplete
@@ -154,7 +152,6 @@ export const QuestionTemplateRelationGenericTemplateForm = (
               </Link>
             </FormControl>
           </TitledContainer>
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}

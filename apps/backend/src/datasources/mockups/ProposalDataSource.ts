@@ -49,7 +49,9 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
     values?.managementDecisionSubmitted || false,
-    values?.submittedDate || new Date()
+    values?.submittedDate || new Date(),
+    values?.experimentSequence || 0,
+    values?.fileId || null
   );
 };
 

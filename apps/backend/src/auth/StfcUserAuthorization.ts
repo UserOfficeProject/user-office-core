@@ -386,4 +386,8 @@ export class StfcUserAuthorization extends UserAuthorization {
       (await this.userDataSource.isSearchableUser(id))
     );
   }
+
+  async canBeAssignedToFap(userId: number): Promise<boolean> {
+    return true;
+  }
 }

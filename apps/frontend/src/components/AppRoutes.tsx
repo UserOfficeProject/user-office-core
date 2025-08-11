@@ -12,13 +12,15 @@ import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAcc
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
-import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
+import EmailStatusActionsLogsPage from './statusActionsLogs/EmailStatusActionsLogsPage';
+import ProposalDownloadStatusActionsLogsPage from './statusActionsLogs/ProposalDownloadStatusActionsLogsPage';
+import TagPage from './tag/TagPage';
 import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
 
 const CallPage = lazy(() => import('./call/CallPage'));
-const ExperimentPage = lazy(() => import('./experiment/ExperimentPage'));
+const ExperimentsPage = lazy(() => import('./experiment/ExperimentsPage'));
 const FapPage = lazy(() => import('./fap/FapPage'));
 const FapsPage = lazy(() => import('./fap/FapsPage'));
 const CreateFeedbackPage = lazy(() => import('./feedback/CreateFeedbackPage'));
@@ -76,8 +78,22 @@ const GenericTemplatesPage = lazy(
 const ImportTemplatePage = lazy(
   () => import('./template/import/ImportTemplatePage')
 );
-const PdfTemplateEditor = lazy(() => import('./template/PdfTemplateEditor'));
-const PdfTemplatesPage = lazy(() => import('./template/PdfTemplatesPage'));
+const ProposalPdfTemplateEditor = lazy(
+  () => import('./template/pdf/proposal/PdfTemplateEditor')
+);
+const ProposalPdfTemplatesPage = lazy(
+  () => import('./template/pdf/proposal/PdfTemplatesPage')
+);
+const ExperimentSafetyPdfTemplateEditor = lazy(
+  () => import('./template/pdf/experimentSafety/PdfTemplateEditor')
+);
+const ExperimentSafetyPdfTemplatesPage = lazy(
+  () => import('./template/pdf/experimentSafety/PdfTemplatesPage')
+);
+const ExperimentSafetyReviewTemplatesPage = lazy(
+  () => import('./template/ExperimentSafetyReviewTemplatesPage')
+);
+
 const ProposalTemplatesPage = lazy(
   () => import('./template/ProposalTemplatesPage')
 );
@@ -159,6 +175,9 @@ const AppRoutes = () => {
   const isExperimentSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
+  const isTagsEnabled = featureContext.featuresMap.get(
+    FeatureId.TAGS
+  )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
   return (
@@ -223,12 +242,20 @@ const AppRoutes = () => {
               }
             />
           )}
-        {isUserOfficer && (
+        {(isUserOfficer ||
+          isInstrumentScientist ||
+          isExperimentSafetyReviewer) && (
           <Route
-            path="/ExperimentPage"
+            path="/Experiments"
             element={
-              <TitledRoute title="Experiments" element={<ExperimentPage />} />
+              <TitledRoute title="Experiments" element={<ExperimentsPage />} />
             }
+          />
+        )}
+        {isTagsEnabled && isUserOfficer && (
+          <Route
+            path="/Tag"
+            element={<TitledRoute title="Tag" element={<TagPage />} />}
           />
         )}
         <Route
@@ -243,11 +270,22 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
-            path="/StatusActionsLogs"
+            path="/EmailStatusActionsLogs"
             element={
               <TitledRoute
-                title="StatusActionsLogs"
-                element={<StatusActionsLogsPage />}
+                title="Status Actions Logs"
+                element={<EmailStatusActionsLogsPage />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/ProposalDownloadStatusActionsLogs"
+            element={
+              <TitledRoute
+                title="Status Actions Logs"
+                element={<ProposalDownloadStatusActionsLogsPage />}
               />
             }
           />
@@ -321,18 +359,48 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/PdfTemplateEditor/:templateId"
+          path="/PdfTemplateEditor/Proposal/:templateId"
           element={
             <TitledRoute
-              title="PDF Template Editor"
-              element={<PdfTemplateEditor />}
+              title="Proposal PDF Template Editor"
+              element={<ProposalPdfTemplateEditor />}
             />
           }
         />
         <Route
-          path="/PdfTemplates"
+          path="/PdfTemplates/Proposal"
           element={
-            <TitledRoute title="PDF Templates" element={<PdfTemplatesPage />} />
+            <TitledRoute
+              title="Proposal PDF Templates"
+              element={<ProposalPdfTemplatesPage />}
+            />
+          }
+        />
+        <Route
+          path="/PdfTemplateEditor/ExperimentSafety/:templateId"
+          element={
+            <TitledRoute
+              title="Experiment Safety PDF Template Editor"
+              element={<ExperimentSafetyPdfTemplateEditor />}
+            />
+          }
+        />
+        <Route
+          path="/PdfTemplates/ExperimentSafety"
+          element={
+            <TitledRoute
+              title="Experiment Safety PDF Templates"
+              element={<ExperimentSafetyPdfTemplatesPage />}
+            />
+          }
+        />
+        <Route
+          path="/ExperimentSafetyReviewTemplates"
+          element={
+            <TitledRoute
+              title="Experiment Safety Review Templates"
+              element={<ExperimentSafetyReviewTemplatesPage />}
+            />
           }
         />
         <Route
@@ -581,7 +649,7 @@ const AppRoutes = () => {
           />
         )}
         <Route
-          path="/ExperimentSafety/:experimentPk"
+          path="/ExperimentSafety/:experimentSafetyPk"
           element={
             <TitledRoute
               title="Experiment Safety"
@@ -634,9 +702,7 @@ const AppRoutes = () => {
         ) : isExperimentSafetyReviewer ? (
           <Route
             path="/"
-            element={
-              <TitledRoute title="" element={<ExperimentSafetyReviewPage />} />
-            }
+            element={<TitledRoute title="" element={<ExperimentsPage />} />}
           />
         ) : (
           <Route
