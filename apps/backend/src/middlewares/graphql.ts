@@ -122,7 +122,9 @@ const apolloServer = async (app: Express) => {
               | TokenExpiredError
               | undefined;
 
-            if (exception?.name === 'TokenExpiredError') {
+            const isTokenExpiredError = exception?.name === 'TokenExpiredError';
+
+            if (isTokenExpiredError) {
               logger.logWarn(
                 'GraphQL response contained error(s) due to jwt expired',
                 {
