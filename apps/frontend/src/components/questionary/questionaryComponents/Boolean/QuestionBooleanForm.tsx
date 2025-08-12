@@ -44,7 +44,6 @@ export const QuestionBooleanForm = (props: QuestionFormProps) => {
             inputProps={{ 'data-cy': 'question' }}
             id="boolean-question-input"
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"

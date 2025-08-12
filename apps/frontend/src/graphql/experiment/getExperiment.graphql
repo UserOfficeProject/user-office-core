@@ -1,5 +1,27 @@
 query getExperiment($experimentPk: Int!) {
   experiment(experimentPk: $experimentPk) {
     ...experiment
+    proposal {
+      ...proposal
+      proposer {
+        ...basicUserDetails
+      }
+    }
+    experimentSafety {
+      ...experimentSafety
+    }
+    visit {
+      registrations {
+        ...visitRegistration
+        startsAt
+        endsAt
+        user {
+          ...basicUserDetails
+        }
+      }
+      teamLead {
+        ...basicUserDetails
+      }
+    }
   }
 }

@@ -1,0 +1,13 @@
+mutation submitInstrumentScientistExperimentSafetyReview(
+  $experimentSafetyPk: Int!
+  $decision: InstrumentScientistDecisionEnum
+  $comment: String
+) {
+  submitInstrumentScientistExperimentSafetyReview(
+    experimentSafetyPk: $experimentSafetyPk
+    decision: $decision
+    comment: $comment
+  ) {
+    ...experimentSafety
+  }
+}
