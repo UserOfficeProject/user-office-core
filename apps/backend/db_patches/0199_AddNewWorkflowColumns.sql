@@ -1,13 +1,17 @@
 DO
 $$
 BEGIN
-  IF register_patch('RemoveWorkflowUnusedColumns', 'Jekabs', 'Remove Workflow Unused Columns and Add Connection Line Type', '2025-07-16') THEN
+  IF register_patch('Add new workflow columns', 'Jekabs', 'Add position and prev_connection_id columns to workflow_connections', '2025-07-16') THEN
     BEGIN
-      -- Remove unused columns from workflow_connections
-      ALTER TABLE workflow_connections DROP COLUMN IF EXISTS droppable_group_id;
-      ALTER TABLE workflow_connections DROP COLUMN IF EXISTS parent_droppable_group_id;
+      -- Allow these to be nullable. We will drop the columns later as they are not used anymore.
+      ALTER TABLE public.workflow_connections
+      ALTER COLUMN droppable_group_id DROP NOT NULL;
+
+      ALTER TABLE public.workflow_connections
+      ALTER COLUMN parent_droppable_group_id DROP NOT NULL;
+
       
-      -- Add position columns to workflow_connections
+      -- Add position and prev_connection_id columns to workflow_connections
       ALTER TABLE workflow_connections ADD COLUMN IF NOT EXISTS pos_x INTEGER DEFAULT 0;
       ALTER TABLE workflow_connections ADD COLUMN IF NOT EXISTS pos_y INTEGER DEFAULT 0;
       ALTER TABLE workflow_connections ADD COLUMN IF NOT EXISTS prev_connection_id INTEGER DEFAULT NULL 
