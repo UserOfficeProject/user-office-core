@@ -867,12 +867,6 @@ export default class ProposalMutations {
         }
       }
 
-      logger.logInfo('Cloned proposal and assigned instrument', {
-        clonedProposalId: clonedProposal.proposalId,
-        sourceProposalId: sourceProposal.proposalId,
-        userId: clonedProposal.proposerId,
-      });
-
       // TODO: Check if we need to also clone the technical review when cloning the proposal.
       clonedProposal = await this.proposalDataSource.update({
         primaryKey: clonedProposal.primaryKey,
