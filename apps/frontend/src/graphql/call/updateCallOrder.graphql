@@ -1,5 +1,5 @@
 mutation updateCallOrder(
-  $data: [CallOrderArray!]
+  $data: [CallOrderArray!]!
 
 ) {
   updateCallOrder(

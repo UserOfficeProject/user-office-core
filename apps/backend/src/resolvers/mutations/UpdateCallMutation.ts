@@ -17,13 +17,13 @@ export class CallOrderArray {
   @Field(() => Int)
   public callId: number;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int)
   public sort_order?: number;
 }
 
 @InputType()
 export class CallOrderInput {
-  @Field(() => [CallOrderArray], { nullable: true })
+  @Field(() => [CallOrderArray])
   public data: CallOrderArray[];
 }
 
