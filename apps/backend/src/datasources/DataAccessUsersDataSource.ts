@@ -1,8 +1,19 @@
+import { Country } from '../models/Country';
+import { Institution } from '../models/Institution';
 import { Rejection } from '../models/Rejection';
-import { BasicUserDetails } from '../models/User';
+import { BasicUserDetails, User } from '../models/User';
+
+export type UserWithInstitution = {
+  user: User;
+  institution: Institution;
+  country: Country;
+};
 
 export interface DataAccessUsersDataSource {
   findByProposalPk(proposalPk: number): Promise<BasicUserDetails[]>;
+  getDataAccessUsersWithInstitution(
+    proposalPk: number
+  ): Promise<UserWithInstitution[]>;
   updateDataAccessUsers(
     proposalPk: number,
     userIds: number[]

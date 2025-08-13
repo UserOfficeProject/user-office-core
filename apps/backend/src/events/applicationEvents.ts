@@ -401,6 +401,11 @@ interface VisitRegistrationCancelledEvent extends GeneralEvent {
   visitregistration: VisitRegistration;
 }
 
+interface UserDataAccessUpdatedEvent extends GeneralEvent {
+  type: Event.DATA_ACCESS_USERS_UPDATED;
+  proposalPKey: number;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -475,4 +480,5 @@ export type ApplicationEvent =
   | InternalReviewUpdated
   | InternalReviewDeleted
   | VisitRegistrationApprovedEvent
-  | VisitRegistrationCancelledEvent;
+  | VisitRegistrationCancelledEvent
+  | UserDataAccessUpdatedEvent;
