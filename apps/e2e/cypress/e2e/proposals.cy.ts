@@ -610,7 +610,7 @@ context('Proposal tests', () => {
         .should('contain.text', newCall.shortCode);
     });
 
-    it.only('Cloned proposals should be assigned the source proposals instruments', () => {
+    it('Should be able clone proposal to another call. Cloned proposals should be assigned the source proposals instruments', () => {
       cy.createCall({
         ...newCall,
         proposalWorkflowId: createdWorkflowId,
