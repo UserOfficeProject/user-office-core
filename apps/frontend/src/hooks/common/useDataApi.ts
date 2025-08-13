@@ -74,7 +74,8 @@ class UnauthorizedGraphQLClient extends GraphQLClient {
           notifyAndLog(
             this.enqueueSnackbar,
             'No response received from server',
-            error
+            error,
+            false
           );
         } else if (
           error.response.error &&
@@ -152,7 +153,8 @@ class AuthorizedGraphQLClient extends GraphQLClient {
           notifyAndLog(
             this.enqueueSnackbar,
             'No response received from server',
-            error
+            error,
+            false
           );
         } else if (
           error.response.error &&
