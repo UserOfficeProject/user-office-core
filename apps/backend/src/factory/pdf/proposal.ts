@@ -82,11 +82,15 @@ const getSampleQuestionarySteps = async (
   questionaryId: number,
   user: UserWithRole | null
 ): Promise<QuestionaryStep[]> => {
-  const questionarySteps =
-    await baseContext.queries.questionary.getQuestionarySteps(
-      user,
-      questionaryId
-    );
+  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
+  );
+  const questionarySteps = user
+    ? await baseContext.queries.questionary.getQuestionarySteps(
+        user,
+        questionaryId
+      )
+    : await questionaryDataSource.getQuestionarySteps(questionaryId);
   if (!questionarySteps) {
     throw new Error(
       `Questionary steps for Questionary ID '${questionaryId}' not found, or the user has insufficient rights`
