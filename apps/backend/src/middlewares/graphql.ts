@@ -18,6 +18,7 @@ import { json } from 'body-parser';
 import cors from 'cors';
 import { Express } from 'express';
 import { GraphQLError } from 'graphql';
+import { TokenExpiredError } from 'jsonwebtoken';
 import { container } from 'tsyringe';
 
 import 'reflect-metadata';
@@ -117,6 +118,24 @@ const apolloServer = async (app: Express) => {
           };
 
           const filteredErrors = errors.filter((error) => {
+            const exception = error.extensions?.exception as
+              | TokenExpiredError
+              | undefined;
+
+            const isTokenExpiredError = exception?.name === 'TokenExpiredError';
+
+            if (isTokenExpiredError) {
+              logger.logWarn(
+                'GraphQL response contained error(s) due to jwt expired',
+                {
+                  message: exception.message,
+                  expiredAt: exception.expiredAt,
+                  context,
+                }
+              );
+
+              return false;
+            }
             if (error.extensions.code === 'EXTERNAL_TOKEN_INVALID') {
               logger.logInfo(
                 'GraphQL response contained error(s) due to expired or invalid external token',
