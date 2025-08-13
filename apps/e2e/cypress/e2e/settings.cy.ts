@@ -15,8 +15,16 @@ import initialDBData from '../support/initialDBData';
 import settings from '../support/settings';
 import { updatedCall } from '../support/utils';
 
-const { feasibilityReview, fapSelection, notFeasible, draft, esfIsReview } =
-  initialDBData.proposalStatuses;
+const {
+  feasibilityReview,
+  fapSelection,
+  notFeasible,
+  draft,
+  esfIsReview,
+  awaitingEsf,
+  esfEsrReview,
+  esfRejected,
+} = initialDBData.proposalStatuses;
 
 context('Settings tests', () => {
   beforeEach(() => {
@@ -155,6 +163,7 @@ context('Settings tests', () => {
     };
     let createdWorkflowId: number;
     let prevStatusId: number;
+    let prevConnectionId: number;
     let createdEsiTemplateId: number;
     let createdInstrumentId: number;
 
@@ -301,6 +310,7 @@ context('Settings tests', () => {
         if (workflow) {
           createdWorkflowId = workflow.id;
           prevStatusId = workflow.workflowConnections[0].statusId!;
+          prevConnectionId = workflow.workflowConnections[0].id;
 
           cy.createTemplate({
             name: 'default esi template',
@@ -752,10 +762,10 @@ context('Settings tests', () => {
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should('not.exist');
+      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should('exist');
     });
 
-    it('User Officer should be able to select events that are triggering change to workflow status', () => {
+    it('User Officer should be able to select events that are triggering change to proposal workflow status', () => {
       cy.addWorkflowStatus({
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
@@ -763,6 +773,7 @@ context('Settings tests', () => {
         posY: 150,
         sortOrder: 1,
         prevStatusId: prevStatusId,
+        prevConnectionId: prevConnectionId,
       });
       cy.login('officer');
       cy.visit('/');
@@ -772,9 +783,7 @@ context('Settings tests', () => {
 
       cy.contains(workflowName).parent().find('[aria-label="Edit"]').click();
 
-      const edgeAriaLabel = `Edge from ${initialDBData.proposalStatuses.draft.id} to ${initialDBData.proposalStatuses.feasibilityReview.id}`;
-
-      cy.get(`[aria-label="${edgeAriaLabel}"]`).click();
+      cy.get("[aria-label='Edge from DRAFT to FEASIBILITY_REVIEW']").click();
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
 
@@ -789,7 +798,7 @@ context('Settings tests', () => {
 
       cy.closeModal();
 
-      cy.get(`[aria-label="${edgeAriaLabel}"]`).click();
+      cy.get("[aria-label='Edge from DRAFT to FEASIBILITY_REVIEW']").click();
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
 
@@ -1291,11 +1300,6 @@ context('Settings tests', () => {
 
       cy.get('[data-cy="remove-workflow-status-button"]').first().click();
 
-      cy.get('[data-cy^="status_FEASIBILITY_REVIEW"]').should(
-        'contain.text',
-        initialDBData.proposalStatuses.feasibilityReview.name
-      );
-
       cy.notification({
         variant: 'success',
         text: 'Workflow status removed successfully',
@@ -1304,70 +1308,13 @@ context('Settings tests', () => {
       cy.get('[data-cy^="connection_FEASIBILITY_REVIEW"]').should('not.exist');
     });
 
-    it('User Officer should be able to create multi-column proposal workflow', () => {
-      cy.login('officer');
-      cy.visit(`/ProposalWorkflowEditor/${createdWorkflowId}`);
-
-      cy.dragStatusIntoWorkflow(feasibilityReview, {
-        clientX: 100,
-        clientY: 100,
-      });
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-
-      cy.contains('Add multi-column row').click();
-
-      cy.get('#selectedParentDroppableId-input').click();
-      cy.get('[data-cy="selectParentDroppableGroup-options"] li')
-        .first()
-        .click();
-
-      cy.get('[data-cy="numberOfColumns"]').click();
-      cy.get('[data-cy="numberOfColumnsOptions"] li[data-value="2"]').click();
-
-      cy.contains('Add row').click();
-
-      cy.get('[data-cy="droppable-group"]').should('have.length', 3);
-
-      cy.dragStatusIntoWorkflow(fapSelection, {
-        clientX: 300,
-        clientY: 300,
-      });
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-
-      cy.dragStatusIntoWorkflow(notFeasible, {
-        clientX: 300,
-        clientY: 400,
-      });
-
-      cy.notification({
-        variant: 'success',
-        text: 'Workflow status added successfully',
-      });
-
-      cy.reload();
-
-      cy.get('[data-cy="droppable-group"]').should('have.length', 3);
-
-      cy.get(
-        '[data-cy="workflow-connections"] .MuiGrid-container .MuiGrid-grid-xs-6'
-      ).should('have.length', 2);
-    });
-
-    it('User Officer should be able to create workflow with branches', () => {
+    it('User Officer should be able to create proposal workflow with branches', () => {
       cy.login('officer');
       cy.visit(`/ProposalWorkflowEditor/${createdWorkflowId}`);
 
       cy.dragStatusIntoWorkflow(feasibilityReview, {
         clientX: 600,
-        clientY: 700,
+        clientY: 400,
       });
       cy.finishedLoading();
       cy.notification({
@@ -1381,7 +1328,7 @@ context('Settings tests', () => {
 
       cy.dragStatusIntoWorkflow(fapSelection, {
         clientX: 300,
-        clientY: 800,
+        clientY: 500,
       });
       cy.finishedLoading();
       cy.notification({
@@ -1395,7 +1342,7 @@ context('Settings tests', () => {
 
       cy.dragStatusIntoWorkflow(notFeasible, {
         clientX: 900,
-        clientY: 800,
+        clientY: 500,
       });
       cy.finishedLoading();
       cy.notification({
@@ -1409,22 +1356,24 @@ context('Settings tests', () => {
 
       cy.finishedLoading();
 
+      cy.get('[title="fit view"]').click();
+
       cy.connectReactFlowNodes(draft, feasibilityReview);
       cy.finishedLoading();
-      cy.get(
-        `[aria-label="Edge from ${draft.id} to ${feasibilityReview.id}"]`
-      ).should('exist');
+      cy.get('[aria-label="Edge from DRAFT to FEASIBILITY_REVIEW"]').should(
+        'exist'
+      );
 
       cy.connectReactFlowNodes(feasibilityReview, fapSelection);
       cy.finishedLoading();
       cy.get(
-        `[aria-label="Edge from ${feasibilityReview.id} to ${fapSelection.id}"]`
+        `[aria-label="Edge from FEASIBILITY_REVIEW to FAP_SELECTION"]`
       ).should('exist');
 
       cy.connectReactFlowNodes(feasibilityReview, notFeasible);
       cy.finishedLoading();
       cy.get(
-        `[aria-label="Edge from ${feasibilityReview.id} to ${notFeasible.id}"]`
+        `[aria-label="Edge from FEASIBILITY_REVIEW to NOT_FEASIBLE"]`
       ).should('exist');
     });
 
@@ -1682,10 +1631,7 @@ context('Settings tests', () => {
       cy.notification({ variant: 'success', text: 'created successfully' });
       cy.finishedLoading();
 
-      cy.get('[data-cy^="connection_AWAITING_ESF"]').should(
-        'contain.text',
-        'AWAITING_ESF'
-      );
+      cy.get('[data-cy^="connection_AWAITING_ESF"]').should('exist');
       cy.get('[data-cy^="status_AWAITING_ESF"]').should('exist');
 
       cy.get('[data-cy="remove-workflow-status-button"]').should('not.exist');
@@ -1712,7 +1658,7 @@ context('Settings tests', () => {
         .should('contain.text', updatedWorkflowDescription);
     });
 
-    it('User Officer should be able to add more statuses in experiment workflow', function () {
+    it('User Officer should be able to add more statuses of the same type in experiment workflow', function () {
       cy.login('officer');
       cy.visit('/');
 
@@ -1736,10 +1682,10 @@ context('Settings tests', () => {
         'ESF IS REVIEW'
       );
 
-      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('not.exist');
+      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('exist');
     });
 
-    it('User Officer should be able to select events that are triggering change to workflow status', () => {
+    it('User Officer should be able to select events that are triggering change to ESF workflow status', () => {
       cy.login('officer');
       cy.visit('/');
 
@@ -1749,25 +1695,24 @@ context('Settings tests', () => {
       cy.contains(workflowName).parent().find('[aria-label="Edit"]').click();
 
       cy.finishedLoading();
-      // Note: This appears to be adding ESF_IS_REVIEW status based on the expectations below
-      // Using a generic approach since this specific status may not be in initialDBData
-      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 1 },
-      ]);
 
-      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should(
-        'contain.text',
-        'ESF IS REVIEW'
-      );
+      cy.dragStatusIntoWorkflow(esfIsReview, {
+        clientX: 300,
+        clientY: 300,
+      });
+
+      cy.get('[data-cy^="connection_ESF_IS_REVIEW"]').should('exist');
+
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
 
-      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').should('exist');
+      cy.connectReactFlowNodes(awaitingEsf, esfIsReview);
 
-      cy.get(`[data-cy^="connection_ESF_IS_REVIEW"]`).click();
+      cy.reload();
+
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click();
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.contains(Event.EXPERIMENT_ESF_SUBMITTED).click();
@@ -1780,7 +1725,11 @@ context('Settings tests', () => {
 
       cy.closeModal();
 
-      cy.get(`[data-cy^="connection_ESF_IS_REVIEW"]`).click();
+      cy.get('[data-cy="edge-label-events-list"]')
+        .contains(Event.EXPERIMENT_ESF_SUBMITTED)
+        .should('exist');
+
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).click();
 
       cy.get('[data-cy="status-events-and-actions-modal"]').should('exist');
       cy.contains(Event.EXPERIMENT_ESF_APPROVED_BY_IS).click();
@@ -1791,62 +1740,79 @@ context('Settings tests', () => {
         text: 'Status changing events added successfully!',
       });
 
-      cy.contains(
-        `${Event.EXPERIMENT_ESF_SUBMITTED} & ${Event.EXPERIMENT_ESF_APPROVED_BY_IS}`
+      cy.get('[data-cy="edge-label-events-list"]').should(
+        'have.text',
+        'EXPERIMENT_ESF_SUBMITTEDEXPERIMENT_ESF_APPROVED_BY_IS'
       );
     });
 
-    it('User Officer should be able to create multi-column experiment workflow', () => {
+    it('User Officer should be able to create experiment workflow with branches', () => {
       cy.login('officer');
       cy.visit(`/ExperimentWorkflowEditor/${createdWorkflowId}`);
 
-      cy.get('[data-cy^="status_ESF_IS_REVIEW"]').dragElement([
-        { direction: 'left', length: 1 },
-        { direction: 'down', length: 1 },
-      ]);
-
+      cy.dragStatusIntoWorkflow(esfIsReview, {
+        clientX: 600,
+        clientY: 400,
+      });
+      cy.finishedLoading();
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
+      cy.get('[data-cy="connection_ESF_IS_REVIEW"]').should(
+        'contain.text',
+        esfIsReview.name
+      );
 
-      cy.contains('Add multi-column row').click();
-
-      cy.get('#selectedParentDroppableId-input').click();
-      cy.get('[data-cy="selectParentDroppableGroup-options"] li')
-        .first()
-        .click();
-
-      cy.get('[data-cy="numberOfColumns"]').click();
-      cy.get('[data-cy="numberOfColumnsOptions"] li[data-value="2"]').click();
-
-      cy.contains('Add row').click();
-
-      cy.get('[data-cy="droppable-group"]').should('have.length', 3);
-      cy.get('[data-cy^="status_ESF_ESR_REVIEW"]').dragElement([
-        { direction: 'left', length: 2 },
-      ]);
-
+      cy.dragStatusIntoWorkflow(esfEsrReview, {
+        clientX: 300,
+        clientY: 500,
+      });
+      cy.finishedLoading();
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
+      cy.get('[data-cy="connection_ESF_ESR_REVIEW"]').should(
+        'contain.text',
+        esfEsrReview.name
+      );
 
-      cy.get('[data-cy^="status_ESF_REJECTED"]').dragElement([
-        { direction: 'left', length: 1 },
-      ]);
-
+      cy.dragStatusIntoWorkflow(esfRejected, {
+        clientX: 900,
+        clientY: 500,
+      });
+      cy.finishedLoading();
       cy.notification({
         variant: 'success',
         text: 'Workflow status added successfully',
       });
+      cy.get('[data-cy="connection_ESF_REJECTED"]').should(
+        'contain.text',
+        esfRejected.name
+      );
 
-      cy.reload();
-      cy.get('[data-cy="droppable-group"]').should('have.length', 3);
+      cy.finishedLoading();
 
-      cy.get(
-        '[data-cy="workflow-connections"] .MuiGrid-container .MuiGrid-grid-xs-6'
-      ).should('have.length', 2);
+      cy.get('[title="fit view"]').click();
+
+      cy.connectReactFlowNodes(awaitingEsf, esfIsReview);
+      cy.finishedLoading();
+      cy.get(`[aria-label="Edge from AWAITING_ESF to ESF_IS_REVIEW"]`).should(
+        'exist'
+      );
+
+      cy.connectReactFlowNodes(esfIsReview, esfEsrReview);
+      cy.finishedLoading();
+      cy.get(`[aria-label="Edge from ESF_IS_REVIEW to ESF_ESR_REVIEW"]`).should(
+        'exist'
+      );
+
+      cy.connectReactFlowNodes(esfIsReview, esfRejected);
+      cy.finishedLoading();
+      cy.get(`[aria-label="Edge from ESF_IS_REVIEW to ESF_REJECTED"]`).should(
+        'exist'
+      );
     });
   });
 

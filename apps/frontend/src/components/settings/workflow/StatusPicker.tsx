@@ -63,7 +63,7 @@ const StatusPicker: React.FC<StatusPickerProps> = ({
               event.dataTransfer.effectAllowed = 'move';
               onDragStart(status);
             }}
-            data-cy={`status_${status.name}`}
+            data-cy={`status_${status.shortCode}`}
             style={{
               marginBottom: '5px',
               border: '1px solid #e0e0e0',

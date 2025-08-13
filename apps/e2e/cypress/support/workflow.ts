@@ -100,7 +100,7 @@ function createDataTransferMock() {
  */
 
 function dragStatusIntoWorkflow(
-  status: Pick<Status, 'name' | 'id'>,
+  status: Pick<Status, 'shortCode' | 'id'>,
   options: {
     clientX?: number;
     clientY?: number;
@@ -108,7 +108,7 @@ function dragStatusIntoWorkflow(
 ) {
   const { clientX = 500, clientY = 300 } = options;
 
-  const sourceSelector = `[data-cy="status_${status.name}"]`;
+  const sourceSelector = `[data-cy="status_${status.shortCode}"]`;
   const targetSelector = '[data-testid="rf__background"]';
   cy.get(sourceSelector).then(($element) => {
     const sourceElement = $element[0];
@@ -147,14 +147,14 @@ function dragStatusIntoWorkflow(
  * @param options - Additional options for the connection operation
  */
 function connectReactFlowNodes(
-  sourceStatus: Pick<Status, 'name'>,
-  targetStatus: Pick<Status, 'name'>,
+  sourceStatus: Pick<Status, 'shortCode'>,
+  targetStatus: Pick<Status, 'shortCode'>,
   options?: {
     force?: boolean;
   }
 ) {
-  const sourceNodeSelector = `[data-cy="connection_${sourceStatus.name}"] [data-handlepos="bottom"]`;
-  const targetNodeSelector = `[data-cy="connection_${targetStatus.name}"] [data-handlepos="top"]`;
+  const sourceNodeSelector = `[data-cy="connection_${sourceStatus.shortCode}"] [data-handlepos="bottom"]`;
+  const targetNodeSelector = `[data-cy="connection_${targetStatus.shortCode}"] [data-handlepos="top"]`;
   cy.get(sourceNodeSelector).click(options);
   cy.get(targetNodeSelector).click(options);
 }

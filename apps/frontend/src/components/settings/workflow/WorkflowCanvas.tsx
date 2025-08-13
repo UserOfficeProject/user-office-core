@@ -26,8 +26,8 @@ const edgeTypes = {
 
 interface EdgeData {
   events: string[];
-  sourceStatusName: string;
-  targetStatusName: string;
+  sourceStatusShortCode: string;
+  targetStatusShortCode: string;
 }
 
 interface WorkflowCanvasProps {

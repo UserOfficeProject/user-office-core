@@ -15,8 +15,8 @@ import { ConnectionStatusAction } from 'generated/sdk';
 
 interface WorkflowEdgeData {
   events: string[];
-  sourceStatusName: string;
-  targetStatusName: string;
+  sourceStatusShortCode: string;
+  targetStatusShortCode: string;
   workflowConnectionId?: number;
   statusActions: ConnectionStatusAction[];
   connectionLineType?: ConnectionLineType;
@@ -32,7 +32,6 @@ const List = styled('ul')({
   backgroundColor: '#FFF',
   textAlign: 'center',
 });
-
 
 const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
   id,

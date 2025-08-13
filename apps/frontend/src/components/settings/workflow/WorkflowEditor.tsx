@@ -33,8 +33,8 @@ import WorkflowMetadataEditor from './WorkflowMetadataEditor';
 
 interface EdgeData {
   events: string[];
-  sourceStatusName: string;
-  targetStatusName: string;
+  sourceStatusShortCode: string;
+  targetStatusShortCode: string;
   workflowConnectionId?: number;
   statusActions: ConnectionStatusAction[];
   connectionLineType?: ConnectionLineType;
@@ -42,7 +42,7 @@ interface EdgeData {
 }
 
 const edgeFactory = (
-  edgeData: Edge<EdgeData> | (Connection & { id: string })
+  edgeData: Edge<EdgeData> & { data: EdgeData }
 ): Edge<EdgeData> => {
   const base = {
     animated: false,
@@ -67,6 +67,7 @@ const edgeFactory = (
     sourceHandle: edgeData.sourceHandle || null,
     targetHandle: edgeData.targetHandle || null,
     data: 'data' in edgeData ? edgeData.data : undefined,
+    ariaLabel: `Edge from ${edgeData.data.sourceStatusShortCode} to ${edgeData.data.targetStatusShortCode}`,
   } as Edge<EdgeData>;
 };
 
@@ -199,8 +200,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
               type: 'workflow', // Use custom workflow edge type
               data: {
                 events,
-                sourceStatusName: prevConnection.status.name,
-                targetStatusName: connection.status.name,
+                sourceStatusShortCode: prevConnection.status.shortCode,
+                targetStatusShortCode: connection.status.shortCode,
                 workflowConnectionId: connection.id, // Use target connection ID (destination)
                 statusActions: connection.statusActions || [],
                 connectionLineType:
@@ -292,8 +293,8 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         type: 'workflow', // Use custom workflow edge type
         data: {
           events: [], // No events initially
-          sourceStatusName: sourceStatus.name,
-          targetStatusName: targetStatus.name,
+          sourceStatusShortCode: sourceStatus.shortCode,
+          targetStatusShortCode: targetStatus.shortCode,
           statusActions: [],
           connectionLineType: state.connectionLineType as ConnectionLineType,
           prevConnectionId: sourceConnection.id,
@@ -413,6 +414,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
       const newNode: Node = {
         id: statusId,
         type: 'statusNode',
+        ariaLabel: `connection_${status.shortCode}`,
         data: {
           label: status.name,
           status,

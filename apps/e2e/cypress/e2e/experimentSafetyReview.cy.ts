@@ -152,11 +152,12 @@ function createWorkflowForInstrumentScientist() {
 
       return cy
         .addWorkflowStatus({
-          droppableGroupId: workflowData.workflowConnectionGroups[0].groupId,
           statusId: TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
           workflowId: workflowData.id,
           sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
           prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
+          posX: 0,
+          posY: 0,
         })
         .then((result) => {
           if (result.addWorkflowStatus) {
@@ -168,12 +169,12 @@ function createWorkflowForInstrumentScientist() {
               .then(() => {
                 return cy
                   .addWorkflowStatus({
-                    droppableGroupId:
-                      workflowData.workflowConnectionGroups[0].groupId,
                     statusId: TEST_CONSTANTS.WORKFLOW_STATUS.APPROVED,
                     workflowId: workflowData.id,
                     sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
                     prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
+                    posX: 0,
+                    posY: 0,
                   })
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {
@@ -216,11 +217,12 @@ function createWorkflowForESR() {
 
       return cy
         .addWorkflowStatus({
-          droppableGroupId: workflowData.workflowConnectionGroups[0].groupId,
           statusId: TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
           workflowId: workflowData.id,
           sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
           prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
+          posX: 0,
+          posY: 0,
         })
         .then((result) => {
           if (result.addWorkflowStatus) {
@@ -232,12 +234,12 @@ function createWorkflowForESR() {
               .then(() => {
                 return cy
                   .addWorkflowStatus({
-                    droppableGroupId:
-                      workflowData.workflowConnectionGroups[0].groupId,
                     statusId: TEST_CONSTANTS.WORKFLOW_STATUS.APPROVED,
                     workflowId: workflowData.id,
                     sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
                     prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
+                    posX: 0,
+                    posY: 0,
                   })
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {

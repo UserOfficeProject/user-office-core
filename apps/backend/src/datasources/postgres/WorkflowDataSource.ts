@@ -297,6 +297,7 @@ export default class PostgresWorkflowDataSource implements WorkflowDataSource {
         sort_order: newWorkflowStatusInput.sortOrder,
         pos_x: newWorkflowStatusInput.posX,
         pos_y: newWorkflowStatusInput.posY,
+        prev_connection_id: newWorkflowStatusInput.prevConnectionId,
       })
       .into('workflow_connections as wc')
       .returning('*')

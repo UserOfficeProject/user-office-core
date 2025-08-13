@@ -91,7 +91,7 @@ export function usePersistWorkflowEditorModel() {
 
     const deleteWorkflowConnection = async (connectionId: number) => {
       return api({
-        toastSuccessMessage: 'Workflow connection deleted successfully!',
+        toastSuccessMessage: 'Workflow status removed successfully',
       })
         .deleteWorkflowConnection({
           connectionId,

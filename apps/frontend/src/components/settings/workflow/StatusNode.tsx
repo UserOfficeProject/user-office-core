@@ -74,7 +74,7 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
   };
 
   return (
-    <div data-cy={`connection_${data.status.name}`}>
+    <div data-cy={`connection_${data.status.shortCode}`}>
       <StyledHandle type="target" position={Position.Top} />
       <Container>
         <Title>
@@ -84,7 +84,8 @@ const StatusNode: React.FC<StatusNodeProps> = ({ id, data }) => {
               {data.status.name}
             </Typography>
           </TitleContent>
-          {data.status.name !== 'DRAFT' && (
+          {['DRAFT', 'AWAITING_ESF'].includes(data.status.shortCode) ===
+            false && (
             <IconButton
               size="small"
               onClick={(e) => {

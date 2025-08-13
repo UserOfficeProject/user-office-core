@@ -27,7 +27,6 @@ import './visits';
 import './workflow';
 import './fap';
 import './predefinedMessages';
-import './react-flow';
 import './settings';
 import './technique';
 import './statusActionLogs';

@@ -6,6 +6,7 @@ mutation addWorkflowStatus(
   $posY: Int!
   $nextStatusId: Int
   $prevStatusId: Int
+  $prevConnectionId: Int
 ) {
   addWorkflowStatus(
     newWorkflowStatusInput: {
@@ -16,6 +17,7 @@ mutation addWorkflowStatus(
       prevStatusId: $prevStatusId
       posX: $posX
       posY: $posY
+      prevConnectionId: $prevConnectionId
     }
   ) {
     id

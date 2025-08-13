@@ -9,6 +9,7 @@ import {
   AddWorkflowStatusMutation,
   AddConnectionStatusActionsMutation,
   AddConnectionStatusActionsMutationVariables,
+  Status,
 } from '@user-office-software-libs/shared-types';
 
 declare global {
@@ -97,7 +98,7 @@ declare global {
        * );
        */
       dragStatusIntoWorkflow(
-        sourceSelector: Pick<Status, 'name' | 'id'>,
+        sourceSelector: Pick<Status, 'shortCode' | 'id'>,
         options?: {
           clientX?: number;
           clientY?: number;
@@ -117,8 +118,8 @@ declare global {
        * );
        */
       connectReactFlowNodes(
-        sourceStatus: Pick<Status, 'name'>,
-        targetStatus: Pick<Status, 'name'>,
+        sourceStatus: Pick<Status, 'shortCode'>,
+        targetStatus: Pick<Status, 'shortCode'>,
         options?: {
           force?: boolean;
         }
