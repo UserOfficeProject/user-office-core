@@ -16,6 +16,7 @@ export const genericTemplateDefinition: Question<DataType.GENERIC_TEMPLATE> = {
     config.templateId = null;
     config.small_label = '';
     config.required = false;
+    config.readPermissions = [];
 
     return config;
   },

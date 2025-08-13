@@ -74,7 +74,7 @@ export const dummyQuestionTemplateRelationFactory = (
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
-    values?.config || new BooleanConfig(),
+    values?.config || { ...new BooleanConfig(), readPermissions: [] },
     values?.dependencies as FieldDependency[],
     values?.dependenciesOperator as DependenciesLogicOperator
   );

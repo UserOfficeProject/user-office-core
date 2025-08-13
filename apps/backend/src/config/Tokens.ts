@@ -57,4 +57,5 @@ export const Tokens = {
   StatusDataSource: Symbol('StatusDataSource'),
   ExperimentDataSource: Symbol('ExperimentDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
+  TagDataSource: Symbol('TagDataSource'),
 };

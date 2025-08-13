@@ -46,7 +46,6 @@ export const QuestionRichTextInputForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"

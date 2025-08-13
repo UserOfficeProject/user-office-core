@@ -567,6 +567,10 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
           query.whereIn('proposals.proposal_id', filter.referenceNumbers);
         }
 
+        if (filter?.excludeProposalStatusIds) {
+          query.where('status_id', 'not in', filter?.excludeProposalStatusIds);
+        }
+
         if (first) {
           query.limit(first);
         }
@@ -642,10 +646,17 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         }
         if (filter?.reviewer === ReviewerFilter.ME) {
           // NOTE: Using jsonpath we check the jsonb (technical_reviews) field if it contains object with id equal to user.id
-          query.whereRaw(
-            'jsonb_path_exists(technical_reviews, \'$[*].technicalReviewAssignee.id \\? (@.type() == "number" && @ == :userId:)\')',
-            { userId: user.id }
-          );
+          query.where(function () {
+            this.whereRaw(
+              'jsonb_path_exists(technical_reviews, \'$[*].technicalReviewAssignee.id \\? (@.type() == "number" && @ == :userId:)\')',
+              { userId: user.id }
+            ).orWhereRaw(
+              // This query finds proposals where the current user is a scientist on an instrument that allows multiple technical reviews
+              // eslint-disable-next-line prettier/prettier
+              'jsonb_path_exists(instruments, \'$[*] \\? (@.multipleTechReviewsEnabled == true && @.scientists[*].id == :userId:)\')',
+              { userId: user.id }
+            );
+          });
         }
 
         if (filter?.instrumentFilter?.showMultiInstrumentProposals) {

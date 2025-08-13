@@ -44,7 +44,6 @@ export const QuestionTemplateRelationEmbellishmentForm = (
             }}
             data-cy="html"
           />
-
           <Field
             name="config.plain"
             label="Plain description"
@@ -54,7 +53,6 @@ export const QuestionTemplateRelationEmbellishmentForm = (
             fullWidth
             data-cy="plain"
           />
-
           <Field
             name="config.omitFromPdf"
             component={CheckboxWithLabel}
@@ -64,7 +62,6 @@ export const QuestionTemplateRelationEmbellishmentForm = (
             }}
             data-cy="omit"
           />
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}

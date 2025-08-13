@@ -365,7 +365,7 @@ context('Technique tests', () => {
       cy.updateQuestion({
         id: techniquePickerQuestionId,
         question: techniquePickerQuestion,
-        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
+        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"readPermissions":[]}`,
       });
 
       cy.createQuestionTemplateRelation({
@@ -412,7 +412,7 @@ context('Technique tests', () => {
       cy.updateQuestion({
         id: techniquePickerQuestionId,
         question: techniquePickerQuestion,
-        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true}`,
+        config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"readPermissions":[],"readPermissions":[]}`,
       });
 
       cy.createQuestionTemplateRelation({
@@ -486,7 +486,7 @@ context('Technique tests', () => {
       cy.updateQuestion({
         id: techniquePickerQuestionId,
         question: techniquePickerQuestion,
-        config: `{"variant":"radio","isMultipleSelect":false,"required":true}`,
+        config: `{"variant":"radio","isMultipleSelect":false,"required":true,"readPermissions":[]}`,
       });
 
       cy.createQuestionTemplateRelation({
@@ -524,7 +524,7 @@ context('Technique tests', () => {
       cy.updateQuestion({
         id: techniquePickerQuestionId,
         question: techniquePickerQuestion,
-        config: `{"variant":"radio","isMultipleSelect":false,"required":true}`,
+        config: `{"variant":"radio","isMultipleSelect":false,"required":true,"readPermissions":[]}`,
       });
 
       cy.createQuestionTemplateRelation({
@@ -580,7 +580,7 @@ context('Technique tests', () => {
       cy.updateQuestion({
         id: techniquePickerQuestionId,
         question: techniquePickerQuestion,
-        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true}`,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"readPermissions":[]}`,
       });
 
       cy.createQuestionTemplateRelation({
