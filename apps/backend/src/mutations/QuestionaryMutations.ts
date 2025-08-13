@@ -1,8 +1,10 @@
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
+import * as _ from 'lodash';
 import { container, inject, injectable } from 'tsyringe';
 
 import { QuestionaryAuthorization } from '../auth/QuestionaryAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
@@ -39,14 +41,16 @@ export default class QuestionaryMutations {
     @inject(Tokens.GenericTemplateDataSource)
     private genericTemplateDataSource: GenericTemplateDataSource,
     @inject(Tokens.ProposalDataSource)
-    private proposalDataSource: ProposalDataSource
+    private proposalDataSource: ProposalDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
-  async deleteOldAnswers(
+  async cleanUpAnswers(
     templateId: number,
     questionaryId: number,
     topicId: number,
-    answers: AnswerInput[],
+    allTopicAnswers: AnswerInput[],
+    questionsToDelete: string[],
     agent: UserWithRole | null
   ) {
     const templateSteps =
@@ -63,10 +67,6 @@ export default class QuestionaryMutations {
       throw new GraphQLError('Expected to find step, but was not found');
     }
 
-    const questionIds: string[] = stepQuestions.map(
-      (question) => question.question.id
-    );
-
     const genericTemplateQuestions = stepQuestions.filter(
       (step) => step.question.dataType == DataType.GENERIC_TEMPLATE
     );
@@ -77,7 +77,7 @@ export default class QuestionaryMutations {
         (genericTemplateQues) => {
           const notSatisfiedQuestions = genericTemplateQues.dependencies.filter(
             (dependency) => {
-              const answer = answers.find(
+              const answer = allTopicAnswers.find(
                 (answer) => answer.questionId === dependency.dependencyId
               );
 
@@ -107,7 +107,7 @@ export default class QuestionaryMutations {
       }
     }
 
-    await this.dataSource.deleteAnswers(questionaryId, questionIds);
+    await this.dataSource.deleteAnswers(questionaryId, questionsToDelete);
   }
 
   async deleteSubTemplatesAnswers(
@@ -127,15 +127,12 @@ export default class QuestionaryMutations {
     ).proposals[0];
 
     const genericTemplates =
-      await this.genericTemplateDataSource.getGenericTemplates(
-        {
-          filter: {
-            questionId: questionId,
-            proposalPk: proposal?.primaryKey,
-          },
+      await this.genericTemplateDataSource.getGenericTemplates({
+        filter: {
+          questionId: questionId,
+          proposalPk: proposal?.primaryKey,
         },
-        agent
-      );
+      });
 
     if (!genericTemplates) {
       return;
@@ -190,10 +187,9 @@ export default class QuestionaryMutations {
       );
     }
 
-    const hasRights = await this.questionaryAuth.hasWriteRights(
-      agent,
-      questionaryId
-    );
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.questionaryAuth.hasWriteRights(agent, questionaryId));
     if (!hasRights) {
       return rejection(
         'Can not answer topic because of insufficient permissions',
@@ -201,16 +197,36 @@ export default class QuestionaryMutations {
       );
     }
 
-    await this.deleteOldAnswers(
+    const currentAnswers = (
+      await this.dataSource.getQuestionarySteps(questionaryId)
+    ).find((step) => step.topic.id === topicId)?.fields;
+
+    const missingAnswers = currentAnswers?.filter(
+      (oldAnswer) =>
+        !answers.some((answer) => answer.questionId === oldAnswer.question.id)
+    );
+
+    const answersToUpdate = answers.filter((answer) => {
+      const oldAnswer = currentAnswers?.find(
+        (old) => old.question.id === answer.questionId
+      );
+
+      return !_.isEqual(oldAnswer?.value, JSON.parse(answer.value).value);
+    });
+
+    await this.cleanUpAnswers(
       template.templateId,
       questionaryId,
       topicId,
       answers,
+      answersToUpdate
+        .map((a) => a.questionId)
+        .concat(missingAnswers?.map((a) => a.question.id) || []),
       agent
     );
 
     const updatedAnswers: AnswerBasic[] = [];
-    for (const answer of answers) {
+    for (const answer of answersToUpdate) {
       if (answer.value !== undefined) {
         const questionTemplateRelation =
           await this.templateDataSource.getQuestionTemplateRelation(
@@ -285,7 +301,7 @@ export default class QuestionaryMutations {
   }
 
   @Authorized()
-  async updateAnswer(agent: UserJWT | null, args: UpdateAnswerArgs) {
+  async updateAnswer(agent: UserWithRole | null, args: UpdateAnswerArgs) {
     const hasRights = await this.questionaryAuth.hasWriteRights(
       agent,
       args.questionaryId

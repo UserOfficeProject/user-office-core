@@ -401,6 +401,8 @@ export default class PostgresQuestionaryDataSource
           answers.question_id
         AND
           answers.questionary_id=${questionaryId}
+        WHERE
+          templates_has_questions.template_id = ${templateId}
         ORDER BY
           templates_has_questions.sort_order`)
     ).rows;
@@ -415,6 +417,7 @@ export default class PostgresQuestionaryDataSource
         const questionDependencies = dependencies.filter(
           (dependency) => dependency.questionId === record.question_id
         );
+
         const questionTemplateRelation =
           await createQuestionTemplateRelationObject(
             record,
@@ -526,6 +529,7 @@ export default class PostgresQuestionaryDataSource
 
   async clone(
     questionaryId: number,
+    targetTemplateId?: number,
     reviewBeforeSubmit?: boolean
   ): Promise<Questionary> {
     const sourceQuestionary = await this.getQuestionary(questionaryId);
@@ -539,7 +543,7 @@ export default class PostgresQuestionaryDataSource
     }
     const clonedQuestionary = await this.create(
       sourceQuestionary.creatorId,
-      sourceQuestionary.templateId
+      targetTemplateId ?? sourceQuestionary.templateId
     );
 
     // Clone answers
@@ -558,10 +562,16 @@ export default class PostgresQuestionaryDataSource
         answers
       WHERE
         questionary_id = :sourceQuestionaryId
+        AND question_id IN (
+          SELECT question_id 
+          FROM templates_has_questions
+          WHERE template_id = :targetTemplateId
+        )
       `,
       {
         clonedQuestionaryId: clonedQuestionary.questionaryId,
         sourceQuestionaryId: sourceQuestionary.questionaryId,
+        targetTemplateId: targetTemplateId ?? sourceQuestionary.templateId,
       }
     );
 

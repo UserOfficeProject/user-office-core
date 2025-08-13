@@ -5,14 +5,14 @@ import {
   ChangeProposalsStatusMutationVariables,
   CloneProposalsMutation,
   CloneProposalsMutationVariables,
-  CreateEsiMutation,
-  CreateEsiMutationVariables,
+  CreateExperimentSafetyMutationVariables,
+  CreateExperimentSafetyMutation,
   CreateProposalMutation,
   CreateProposalMutationVariables,
+  SubmitExperimentSafetyMutation,
+  SubmitExperimentSafetyMutationVariables,
   SubmitProposalMutation,
   SubmitProposalMutationVariables,
-  UpdateEsiMutation,
-  UpdateEsiMutationVariables,
   UpdateProposalMutation,
   UpdateProposalMutationVariables,
 } from '@user-office-software-libs/shared-types';
@@ -73,20 +73,20 @@ const updateProposalManagementDecision = (
   return cy.wrap(request);
 };
 
-const createEsi = (
-  createEsiInput: CreateEsiMutationVariables
-): Cypress.Chainable<CreateEsiMutation> => {
+const createExperimentSafety = (
+  createExperimentSafetyInput: CreateExperimentSafetyMutationVariables
+): Cypress.Chainable<CreateExperimentSafetyMutation> => {
   const api = getE2EApi();
-  const request = api.createEsi(createEsiInput);
+  const request = api.createExperimentSafety(createExperimentSafetyInput);
 
   return cy.wrap(request);
 };
 
-const updateEsi = (
-  updateEsiInput: UpdateEsiMutationVariables
-): Cypress.Chainable<UpdateEsiMutation> => {
+const submitExperimentSafety = (
+  submitExperimentSafetyInput: SubmitExperimentSafetyMutationVariables
+): Cypress.Chainable<SubmitExperimentSafetyMutation> => {
   const api = getE2EApi();
-  const request = api.updateEsi(updateEsiInput);
+  const request = api.submitExperimentSafety(submitExperimentSafetyInput);
 
   return cy.wrap(request);
 };
@@ -101,5 +101,5 @@ Cypress.Commands.add(
   updateProposalManagementDecision
 );
 
-Cypress.Commands.add('createEsi', createEsi);
-Cypress.Commands.add('updateEsi', updateEsi);
+Cypress.Commands.add('createExperimentSafety', createExperimentSafety);
+Cypress.Commands.add('submitExperimentSafety', submitExperimentSafety);

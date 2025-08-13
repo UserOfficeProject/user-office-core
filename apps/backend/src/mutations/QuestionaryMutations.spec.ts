@@ -2,17 +2,21 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
-import { QuestionaryDataSourceMock } from '../datasources/mockups/QuestionaryDataSource';
 import {
-  dummyUser,
-  dummyUserWithRole,
-} from '../datasources/mockups/UserDataSource';
+  QuestionaryDataSourceMock,
+  dummyQuestionTemplateRelationFactory,
+} from '../datasources/mockups/QuestionaryDataSource';
+import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
+import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { isRejection } from '../models/Rejection';
 import QuestionaryQueries from '../queries/QuestionaryQueries';
 import QuestionaryMutations from './QuestionaryMutations';
 
 const mutations = container.resolve(QuestionaryMutations);
 const queries = container.resolve(QuestionaryQueries);
+const templateDataSource = container.resolve<TemplateDataSource>(
+  Tokens.TemplateDataSource
+);
 
 const USER_QUESTIONARY_ID = 1;
 
@@ -34,6 +38,9 @@ beforeEach(() => {
 });
 
 it('User should answer topic questions', async () => {
+  jest
+    .spyOn(templateDataSource, 'getQuestionTemplateRelation')
+    .mockResolvedValue(dummyQuestionTemplateRelationFactory());
   const { firstAnswer, firstStep, questionaryId } =
     await getDummyUsersProposal();
   const result = await mutations.answerTopic(dummyUserWithRole, {
@@ -68,7 +75,7 @@ it('User should not be able to answer topic questions if proposal has no active 
 it('User should update question', async () => {
   const NEW_ANSWER = 'NEW_ANSWER';
   const { firstAnswer, questionaryId } = await getDummyUsersProposal();
-  const result = await mutations.updateAnswer(dummyUser, {
+  const result = await mutations.updateAnswer(dummyUserWithRole, {
     questionaryId,
     answer: {
       questionId: firstAnswer.question.id,

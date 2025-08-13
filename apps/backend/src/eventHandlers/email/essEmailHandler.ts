@@ -3,17 +3,34 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { CoProposerClaimDataSource } from '../../datasources/CoProposerClaimDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
+import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
-import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
+import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { VisitDataSource } from '../../datasources/VisitDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
+import { Invite } from '../../models/Invite';
 import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
+export enum EmailTemplateId {
+  CO_PROPOSER_INVITE_ACCEPTED = 'co-proposer-invite-accepted',
+  PROPOSAL_SUBMITTED = 'proposal-submitted',
+  ACCEPTED_PROPOSAL = 'Accepted-Proposal',
+  REJECTED_PROPOSAL = 'Rejected-Proposal',
+  RESERVED_PROPOSAL = 'Reserved-Proposal',
+  REVIEW_REMINDER = 'review-reminder',
+  VISIT_REGISTRATION_APPROVED = 'visit-registration-approved',
+  VISIT_REGISTRATION_CANCELLED = 'visit-registration-cancelled',
+  USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER = 'user-office-registration-invitation-co-proposer',
+  USER_OFFICE_REGISTRATION_INVITATION_VISIT_REGISTRATION = 'user-office-registration-invitation-visit-registration',
+  USER_OFFICE_REGISTRATION_INVITATION_REVIEWER = 'user-office-registration-invitation-reviewer',
+  USER_OFFICE_REGISTRATION_INVITATION_USER = 'user-office-registration-invitation-user',
+}
 
 export async function essEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
@@ -24,9 +41,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
   );
-  const redeemCodesDataSource = container.resolve<RedeemCodesDataSource>(
-    Tokens.RedeemCodesDataSource
+
+  const coProposerDataSource = container.resolve<CoProposerClaimDataSource>(
+    Tokens.CoProposerClaimDataSource
   );
+
+  const inviteDataSource = container.resolve<InviteDataSource>(
+    Tokens.InviteDataSource
+  );
+
   const callDataSource = container.resolve<CallDataSource>(
     Tokens.CallDataSource
   );
@@ -39,59 +62,151 @@ export async function essEmailHandler(event: ApplicationEvent) {
   }
 
   switch (event.type) {
-    case Event.EMAIL_INVITE: {
-      const user = await userDataSource.getUser(
-        event.emailinviteresponse.userId
-      );
-      const inviter = await userDataSource.getBasicUserInfo(
-        event.emailinviteresponse.inviterId
-      );
+    case Event.EMAIL_INVITE:
+    case Event.EMAIL_INVITES: {
+      let invites;
+      if ('invite' in event) {
+        // single invite in response
+        invites = [event.invite];
+      } else {
+        // multiple invites in response
+        invites = event.array;
+      }
 
-      if (!user || !inviter) {
-        logger.logError('Failed email invite', { user, inviter, event });
+      for (const invite of invites) {
+        if (invite.isEmailSent) {
+          continue;
+        }
+        const inviter = await userDataSource.getBasicUserInfo(
+          invite.createdByUserId
+        );
 
+        if (!inviter) {
+          logger.logError('No inviter found when trying to send email', {
+            inviter,
+            event,
+          });
+
+          return;
+        }
+
+        const templateId = await getTemplateIdForInvite(invite.id);
+
+        mailService
+          .sendMail({
+            content: {
+              template_id: templateId,
+            },
+            substitution_data: {
+              email: invite.email,
+              inviterName: inviter.firstname,
+              inviterLastname: inviter.lastname,
+              inviterOrg: inviter.institution,
+              redeemCode: invite.code,
+            },
+            recipients: [{ address: invite.email }],
+          })
+          .then(async (res) => {
+            await inviteDataSource.update({
+              id: invite.id,
+              isEmailSent: true,
+            });
+            logger.logInfo('Successful email transmission', { res });
+          })
+          .catch((err: string) => {
+            logger.logException('Failed email transmission', err);
+          })
+          .finally(() => {
+            inviteDataSource.update({
+              id: invite.id,
+              templateId: templateId,
+            });
+          });
+      }
+
+      return;
+    }
+
+    case Event.INVITE_ACCEPTED: {
+      const invite: Invite = event.invite;
+
+      const coProposerClaims = await coProposerDataSource.findByInviteId(
+        invite.id
+      );
+      if (!coProposerClaims || coProposerClaims.length === 0) {
         return;
       }
 
-      const redeemCode = await redeemCodesDataSource.getRedeemCodes({
-        placeholderUserId: user.id,
-      });
+      for (const claim of coProposerClaims) {
+        const proposal = await proposalDataSource.get(claim.proposalPk);
+        if (!proposal) {
+          logger.logError(
+            'No proposal found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
 
-      if (!redeemCode[0]?.code) {
-        logger.logError('Failed email invite. No redeem code found', {
-          user,
-          inviter,
-          event,
-        });
+          return;
+        }
 
-        return;
+        const principalInvestigator = await userDataSource.getUser(
+          proposal.proposerId
+        );
+        if (!principalInvestigator) {
+          logger.logError(
+            'No principal investigator found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        const claimer = await userDataSource.getUser(
+          invite.claimedByUserId as number
+        );
+        if (!claimer) {
+          logger.logError(
+            'No claimer found when trying to send invite accepted email',
+            {
+              claim,
+              event,
+            }
+          );
+
+          return;
+        }
+
+        mailService
+          .sendMail({
+            content: {
+              template_id: EmailTemplateId.CO_PROPOSER_INVITE_ACCEPTED,
+            },
+            substitution_data: {
+              piPreferredname: principalInvestigator.preferredname,
+              piLastname: principalInvestigator.lastname,
+              email: invite.email,
+              proposalTitle: proposal.title,
+              proposalId: proposal.proposalId,
+              claimerPreferredname: claimer.preferredname,
+              claimerLastname: claimer.lastname,
+            },
+            recipients: [{ address: principalInvestigator.email }],
+          })
+          .then(async (res) => {
+            logger.logInfo(
+              'Successful email transmission for accepting invite',
+              { res }
+            );
+          })
+          .catch((err: string) => {
+            logger.logException('Failed email transmission', err);
+          });
       }
-
-      mailService
-        .sendMail({
-          content: {
-            template_id:
-              event.emailinviteresponse.role === UserRole.USER
-                ? 'user-office-registration-invitation'
-                : 'user-office-registration-invitation-reviewer',
-          },
-          substitution_data: {
-            firstname: user.preferredname,
-            lastname: user.lastname,
-            email: user.email,
-            inviterName: inviter.firstname,
-            inviterLastname: inviter.lastname,
-            inviterOrg: inviter.institution,
-            redeemCode: redeemCode[0].code,
-          },
-          recipients: [{ address: user.email }],
-        })
-        .then((res) => {
-          logger.logInfo('Successful email transmission', { res });
-        })
-        .catch((err: string) => {
-          logger.logException('Failed email transmission', err);
-        });
 
       return;
     }
@@ -109,11 +224,15 @@ export async function essEmailHandler(event: ApplicationEvent) {
         event.proposal.primaryKey
       );
 
+      const invites = await inviteDataSource.findCoProposerInvites(
+        event.proposal.primaryKey
+      );
+
       const call = await callDataSource.getCall(event.proposal.callId);
 
       const options: EmailSettings = {
         content: {
-          template_id: 'proposal-submitted',
+          template_id: EmailTemplateId.PROPOSAL_SUBMITTED,
         },
         substitution_data: {
           piPreferredname: principalInvestigator.preferredname,
@@ -131,6 +250,14 @@ export async function essEmailHandler(event: ApplicationEvent) {
             return {
               address: {
                 email: partipant.email,
+                header_to: principalInvestigator.email,
+              },
+            };
+          }),
+          ...invites.map((invite) => {
+            return {
+              address: {
+                email: invite.email,
                 header_to: principalInvestigator.email,
               },
             };
@@ -167,11 +294,11 @@ export async function essEmailHandler(event: ApplicationEvent) {
       const { finalStatus } = event.proposal;
       let templateId = '';
       if (finalStatus === ProposalEndStatus.ACCEPTED) {
-        templateId = 'Accepted-Proposal';
+        templateId = EmailTemplateId.ACCEPTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.REJECTED) {
-        templateId = 'Rejected-Proposal';
+        templateId = EmailTemplateId.REJECTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.RESERVED) {
-        templateId = 'Reserved-Proposal';
+        templateId = EmailTemplateId.RESERVED_PROPOSAL;
       } else {
         logger.logError('Failed email notification', { event });
 
@@ -230,7 +357,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
       mailService
         .sendMail({
           content: {
-            template_id: 'review-reminder',
+            template_id: EmailTemplateId.REVIEW_REMINDER,
           },
           substitution_data: {
             fapReviewerPreferredName: fapReviewer.preferredname,
@@ -304,8 +431,8 @@ export async function essEmailHandler(event: ApplicationEvent) {
 
       const templateId =
         event.type === Event.VISIT_REGISTRATION_APPROVED
-          ? 'visit-registration-approved'
-          : 'visit-registration-cancelled';
+          ? EmailTemplateId.VISIT_REGISTRATION_APPROVED
+          : EmailTemplateId.VISIT_REGISTRATION_CANCELLED;
 
       mailService
         .sendMail({
@@ -351,4 +478,42 @@ export async function essEmailHandler(event: ApplicationEvent) {
       return;
     }
   }
+}
+
+export async function getTemplateIdForInvite(
+  inviteId: number
+): Promise<string> {
+  // Resolve all necessary data sources in one go
+  const roleClaimDS = container.resolve<RoleClaimDataSource>(
+    Tokens.RoleClaimDataSource
+  );
+  const coProposerDS = container.resolve<CoProposerClaimDataSource>(
+    Tokens.CoProposerClaimDataSource
+  );
+
+  // Fetch all claims concurrently
+  const [coProposerClaim, roleClaims] = await Promise.all([
+    coProposerDS.findByInviteId(inviteId),
+    roleClaimDS.findByInviteId(inviteId),
+  ]);
+
+  if (coProposerClaim.length > 0) {
+    return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER;
+  }
+
+  if (roleClaims.length > 0) {
+    const { roleId } = roleClaims[0];
+    switch (roleId) {
+      case UserRole.INTERNAL_REVIEWER:
+        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
+      case UserRole.USER:
+        return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER;
+      default:
+        throw new Error(
+          `Unsupported role \"${roleId}\" for invite ${inviteId}`
+        );
+    }
+  }
+
+  throw new Error(`No valid claim found for invite ${inviteId}`);
 }

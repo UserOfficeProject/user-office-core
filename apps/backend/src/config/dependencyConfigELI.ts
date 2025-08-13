@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 
-import { InviteAuthorization } from '../auth/InviteAuthorizer';
 import { OAuthAuthorization } from '../auth/OAuthAuthorization';
 import { ProposalAuthorization } from '../auth/ProposalAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
@@ -8,6 +7,8 @@ import { PostgresAdminDataSourceWithAutoUpgrade } from '../datasources/postgres/
 import PostgresCallDataSource from '../datasources/postgres/CallDataSource';
 import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoProposerClaimDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
+import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
+import PostgresExperimentSafetyPdfTemplateDataSource from '../datasources/postgres/ExperimentSafetyPdfTemplateDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
@@ -15,23 +16,21 @@ import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTe
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
 import PostgresInviteDataSource from '../datasources/postgres/InviteDataSource';
-import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
-import PostgresProposalEsiDataSource from '../datasources/postgres/ProposalEsiDataSource';
 import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
+import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/ProposalPdfTemplateDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
 import PostgresRoleClaimDataSource from '../datasources/postgres/RoleClaimsDataSource';
 import PostgresSampleDataSource from '../datasources/postgres/SampleDataSource';
-import PostgresSampleEsiDataSource from '../datasources/postgres/SampleEsiDataSource';
-import PostgresScheduledEventDataSource from '../datasources/postgres/ScheduledEventDataSource';
 import PostgresShipmentDataSource from '../datasources/postgres/ShipmentDataSource';
 import PostgresStatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import StatusActionsLogsDataSource from '../datasources/postgres/StatusActionsLogsDataSource';
 import PostgresStatusDataSource from '../datasources/postgres/StatusDataSource';
 import PostgresSystemDataSource from '../datasources/postgres/SystemDataSource';
+import PostgresTagDataSource from '../datasources/postgres/TagDataSource';
 import PostgresTechniqueDataSource from '../datasources/postgres/TechniqueDataSource';
 import PostgresTemplateDataSource from '../datasources/postgres/TemplateDataSource';
 import PostgresUnitDataSource from '../datasources/postgres/UnitDataSource';
@@ -39,6 +38,7 @@ import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
 import PostgresVisitDataSource from '../datasources/postgres/VisitDataSource';
 import PostgresWorkflowDataSource from '../datasources/postgres/WorkflowDataSource';
 import { eliEmailHandler } from '../eventHandlers/email/eliEmailHandler';
+import createLoggingHandler from '../eventHandlers/logging';
 import { SMTPMailService } from '../eventHandlers/MailService/SMTPMailService';
 import {
   createListenToRabbitMQHandler,
@@ -71,10 +71,15 @@ mapClass(Tokens.GenericTemplateDataSource, PostgresGenericTemplateDataSource);
 mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
 mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
 mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
-mapClass(Tokens.InviteAuthorization, InviteAuthorization);
-mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
+mapClass(
+  Tokens.ProposalPdfTemplateDataSource,
+  PostgresProposalPdfTemplateDataSource
+);
+mapClass(
+  Tokens.ExperimentSafetyPdfTemplateDataSource,
+  PostgresExperimentSafetyPdfTemplateDataSource
+);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
-mapClass(Tokens.ProposalEsiDataSource, PostgresProposalEsiDataSource);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
   PostgresProposalInternalCommentsDataSource
@@ -85,8 +90,6 @@ mapClass(Tokens.RedeemCodesDataSource, PostgresRedeemCodesDataSource);
 mapClass(Tokens.ReviewDataSource, PostgresReviewDataSource);
 mapClass(Tokens.FapDataSource, PostgresFapDataSource);
 mapClass(Tokens.SampleDataSource, PostgresSampleDataSource);
-mapClass(Tokens.SampleEsiDataSource, PostgresSampleEsiDataSource);
-mapClass(Tokens.ScheduledEventDataSource, PostgresScheduledEventDataSource);
 mapClass(Tokens.ShipmentDataSource, PostgresShipmentDataSource);
 mapClass(Tokens.SystemDataSource, PostgresSystemDataSource);
 
@@ -104,6 +107,9 @@ mapClass(
 mapClass(Tokens.StatusActionsLogsDataSource, StatusActionsLogsDataSource);
 mapClass(Tokens.WorkflowDataSource, PostgresWorkflowDataSource);
 mapClass(Tokens.StatusDataSource, PostgresStatusDataSource);
+mapClass(Tokens.TagDataSource, PostgresTagDataSource);
+
+mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.UserAuthorization, OAuthAuthorization);
 mapClass(Tokens.ProposalAuthorization, ProposalAuthorization);
 
@@ -119,6 +125,7 @@ mapValue(Tokens.PopulateCallRow, callFapPopulateRow);
 mapValue(Tokens.EmailEventHandler, eliEmailHandler);
 
 mapValue(Tokens.PostToMessageQueue, createPostToRabbitMQHandler());
+mapValue(Tokens.LoggingHandler, createLoggingHandler());
 mapValue(Tokens.EventBus, createApplicationEventBus());
 mapValue(Tokens.ListenToMessageQueue, createListenToRabbitMQHandler());
 

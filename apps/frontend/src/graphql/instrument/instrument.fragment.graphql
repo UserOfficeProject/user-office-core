@@ -4,6 +4,8 @@ fragment instrument on Instrument {
   shortCode
   description
   managerUserId
+  selectable
+  multipleTechReviewsEnabled
   instrumentContact {
     ...basicUserDetails
   }

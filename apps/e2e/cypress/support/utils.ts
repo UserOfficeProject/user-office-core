@@ -222,7 +222,7 @@ const getTinyMceContent = (tinyMceId: string) => {
 const getIconByCyTag = (cyTag: string) => {
   return cy
     .get('[data-cy=upcoming-experiments]')
-    .contains(initialDBData.scheduledEvents.upcoming.startsAt)
+    .contains(initialDBData.experiments.upcoming.startsAt)
     .closest('TR')
     .find(`[data-cy="${cyTag}"]`);
 };
@@ -231,7 +231,14 @@ const getButtonByIconCyTag = (cyTag: string) =>
 
 const testActionButton = (
   iconCyTag: string,
-  state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
+  state:
+    | 'completed'
+    | 'active'
+    | 'inactive'
+    | 'neutral'
+    | 'invisible'
+    | 'pending'
+    | 'cancelled'
 ) => {
   switch (state) {
     case 'completed':
@@ -253,6 +260,12 @@ const testActionButton = (
       getButtonByIconCyTag(iconCyTag)
         .find('.MuiBadge-badge')
         .should('not.have.css', 'background-color', 'rgb(235, 26, 108)');
+      break;
+
+    case 'pending':
+      getButtonByIconCyTag(iconCyTag)
+        .find('.MuiBadge-badge')
+        .should('have.css', 'background-color', 'rgb(255, 153, 0)');
       break;
 
     case 'inactive':

@@ -12,9 +12,9 @@ const visitor = initialDBData.users.user3;
 const PI = initialDBData.users.user1;
 const existingProposalId = initialDBData.proposal.id;
 const acceptedStatus = ProposalEndStatus.ACCEPTED;
-const existingScheduledEventId = initialDBData.scheduledEvents.upcoming.id;
+const existingExperimentPk = initialDBData.experiments.upcoming.experimentPk;
 
-const proposalEsiIconCyTag = 'finish-safety-input-form-icon';
+const proposalEsiIconCyTag = 'finish-experiment-safety-form-icon';
 
 const sampleTitle = /My sample title/i;
 const newSampleTitle = faker.lorem.words(2);
@@ -52,7 +52,7 @@ context('visits tests', () => {
     cy.createVisit({
       team: [coProposer.id, visitor.id],
       teamLeadUserId: coProposer.id,
-      scheduledEventId: existingScheduledEventId,
+      experimentPk: existingExperimentPk,
     });
   });
 
@@ -82,7 +82,7 @@ context('visits tests', () => {
     cy.visit('/');
 
     cy.get('[data-cy=upcoming-experiments]')
-      .contains(initialDBData.scheduledEvents.upcoming.startsAt)
+      .contains(initialDBData.experiments.upcoming.startsAt)
       .closest('tr')
       .find(`[data-cy='${proposalEsiIconCyTag}']`)
       .closest('button')
@@ -191,13 +191,16 @@ context('visits tests', () => {
   });
 
   it('Co-proposer should see that risk assessment is completed', () => {
-    cy.createEsi({ scheduledEventId: existingScheduledEventId }).then(
-      (result) => {
-        if (result.createEsi) {
-          cy.updateEsi({ esiId: result.createEsi.id, isSubmitted: true });
-        }
+    cy.createExperimentSafety({
+      experimentPk: existingExperimentPk,
+    }).then((result) => {
+      if (result.createExperimentSafety) {
+        cy.submitExperimentSafety({
+          experimentSafetyPk: result.createExperimentSafety.experimentSafetyPk,
+          isSubmitted: true,
+        });
       }
-    );
+    });
     cy.login(coProposer);
     cy.visit('/');
 

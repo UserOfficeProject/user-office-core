@@ -193,5 +193,17 @@ export abstract class UserAuthorization {
 
   abstract logout(token: AuthJwtPayload): Promise<string | Rejection>;
 
-  abstract isExternalTokenValid(externalToken: string): Promise<boolean>;
+  abstract isExternalTokenValid(
+    externalToken: string | undefined
+  ): Promise<boolean>;
+
+  async canBeAssignedToFap(userId: number): Promise<boolean> {
+    const userRoles = await this.userDataSource.getUserRoles(userId);
+
+    const isFapReviewer = userRoles.some(
+      (role) => role.shortCode === Roles.FAP_REVIEWER
+    );
+
+    return isFapReviewer;
+  }
 }

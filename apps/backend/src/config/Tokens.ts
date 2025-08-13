@@ -14,11 +14,14 @@ export const Tokens = {
   GenericTemplateDataSource: Symbol('GenericTemplateDataSource'),
   InstrumentDataSource: Symbol('InstrumentDataSource'),
   InviteDataSource: Symbol('InviteDataSource'),
-  InviteAuthorization: Symbol('InviteAuthorization'),
   TechniqueDataSource: Symbol('TechniqueDataSource'),
   ListenToMessageQueue: Symbol('ListenToMessageQueue'),
+  LoggingHandler: Symbol('LoggingHandler'),
   MailService: Symbol('MailService'),
-  PdfTemplateDataSource: Symbol('PdfTemplateDataSource'),
+  ProposalPdfTemplateDataSource: Symbol('ProposalPdfTemplateDataSource'),
+  ExperimentSafetyPdfTemplateDataSource: Symbol(
+    'ExperimentSafetyPdfTemplateDataSource'
+  ),
   PostToMessageQueue: Symbol('PostToMessageQueue'),
   ProposalDataSource: Symbol('ProposalDataSource'),
   ProposalEsiDataSource: Symbol('ProposalEsiDataSource'),
@@ -31,7 +34,6 @@ export const Tokens = {
   FapDataSource: Symbol('FapDataSource'),
   SampleDataSource: Symbol('SampleDataSource'),
   SampleEsiDataSource: Symbol('SampleEsiDataSource'),
-  ScheduledEventDataSource: Symbol('ScheduledEventDataSource'),
   ShipmentDataSource: Symbol('ShipmentDataSource'),
   SystemDataSource: Symbol('SystemDataSource'),
   TemplateDataSource: Symbol('TemplateDataSource'),
@@ -54,5 +56,7 @@ export const Tokens = {
   ),
   WorkflowDataSource: Symbol('WorkflowDataSource'),
   StatusDataSource: Symbol('StatusDataSource'),
+  ExperimentDataSource: Symbol('ExperimentDataSource'),
   BasicUserDetailsLoader: Symbol('BasicUserDetailsLoader'),
+  TagDataSource: Symbol('TagDataSource'),
 };

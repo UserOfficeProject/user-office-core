@@ -7,18 +7,20 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { UserContext } from 'context/UserContextProvider';
 import { FeatureId, UserRole, WorkflowType } from 'generated/sdk';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
-import { useXpressAccess } from 'hooks/common/useXpressAccess';
+import { useTechniqueProposalAccess } from 'hooks/common/useTechniqueProposalAccess';
 
 import ChangeRole from './common/ChangeRole';
 import OverviewPage from './pages/OverviewPage';
 import ProposalPage from './proposal/ProposalPage';
-import StatusActionsLogsPage from './statusActionsLogs/StatusActionsLogsPage';
+import EmailStatusActionsLogsPage from './statusActionsLogs/EmailStatusActionsLogsPage';
+import ProposalDownloadStatusActionsLogsPage from './statusActionsLogs/ProposalDownloadStatusActionsLogsPage';
+import TagPage from './tag/TagPage';
+import TechniqueProposalTable from './techniqueProposal/TechniqueProposalTable';
 import TitledRoute from './TitledRoute';
 import ExternalAuth, { getCurrentUrlValues } from './user/ExternalAuth';
-import XpressProposalTable from './xpress/XpressProposalTable';
 
 const CallPage = lazy(() => import('./call/CallPage'));
-const ExperimentPage = lazy(() => import('./experiment/ExperimentPage'));
+const ExperimentsPage = lazy(() => import('./experiment/ExperimentsPage'));
 const FapPage = lazy(() => import('./fap/FapPage'));
 const FapsPage = lazy(() => import('./fap/FapsPage'));
 const CreateFeedbackPage = lazy(() => import('./feedback/CreateFeedbackPage'));
@@ -34,17 +36,12 @@ const PageEditor = lazy(() => import('./pages/PageEditor'));
 const ProposalChooseCall = lazy(() => import('./proposal/ProposalChooseCall'));
 const ProposalCreate = lazy(() => import('./proposal/ProposalCreate'));
 const ProposalEdit = lazy(() => import('./proposal/ProposalEdit'));
-const InstrSciUpcomingExperimentTimesTable = lazy(
-  () => import('./proposalBooking/InstrSciUpcomingExperimentTimesTable')
-);
+
 const UserExperimentTimesTable = lazy(
   () => import('./proposalBooking/UserExperimentsTable')
 );
-const CreateProposalEsiPage = lazy(
-  () => import('./proposalEsi/CreateProposalEsiPage')
-);
-const UpdateProposalEsiPage = lazy(
-  () => import('./proposalEsi/UpdateProposalEsiPage')
+const ExperimentSafetyPage = lazy(
+  () => import('./experimentSafety/ExperimentSafetyPage')
 );
 const ExperimentSafetyReviewPage = lazy(
   () => import('./experimentSafetyReview/ExperimentSafetyReviewPage')
@@ -61,7 +58,7 @@ const ProposalStatusesPage = lazy(
 );
 const WorkflowEditor = lazy(() => import('./settings/workflow/WorkflowEditor'));
 const ProposalWorkflowsPage = lazy(
-  () => import('./settings/proposalWorkflow/ProposalWorkflowsPage')
+  () => import('./settings/workflow/ProposalWorkflowsPage')
 );
 
 const ExperimentWorkflowsPage = lazy(
@@ -81,8 +78,22 @@ const GenericTemplatesPage = lazy(
 const ImportTemplatePage = lazy(
   () => import('./template/import/ImportTemplatePage')
 );
-const PdfTemplateEditor = lazy(() => import('./template/PdfTemplateEditor'));
-const PdfTemplatesPage = lazy(() => import('./template/PdfTemplatesPage'));
+const ProposalPdfTemplateEditor = lazy(
+  () => import('./template/pdf/proposal/PdfTemplateEditor')
+);
+const ProposalPdfTemplatesPage = lazy(
+  () => import('./template/pdf/proposal/PdfTemplatesPage')
+);
+const ExperimentSafetyPdfTemplateEditor = lazy(
+  () => import('./template/pdf/experimentSafety/PdfTemplateEditor')
+);
+const ExperimentSafetyPdfTemplatesPage = lazy(
+  () => import('./template/pdf/experimentSafety/PdfTemplatesPage')
+);
+const ExperimentSafetyReviewTemplatesPage = lazy(
+  () => import('./template/ExperimentSafetyReviewTemplatesPage')
+);
+
 const ProposalTemplatesPage = lazy(
   () => import('./template/ProposalTemplatesPage')
 );
@@ -157,12 +168,15 @@ const AppRoutes = () => {
   const isExperimentSafetyReviewEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
   )?.isEnabled;
-  const isXpressRouteEnabled = useXpressAccess([
+  const isTechniqueProposalsEnabled = useTechniqueProposalAccess([
     UserRole.USER_OFFICER,
     UserRole.INSTRUMENT_SCIENTIST,
   ]);
   const isExperimentSafetyEnabled = featureContext.featuresMap.get(
     FeatureId.EXPERIMENT_SAFETY_REVIEW
+  )?.isEnabled;
+  const isTagsEnabled = featureContext.featuresMap.get(
+    FeatureId.TAGS
   )?.isEnabled;
   const { currentRole } = useContext(UserContext);
 
@@ -216,23 +230,32 @@ const AppRoutes = () => {
           path="/Proposals"
           element={<TitledRoute title="Proposals" element={<ProposalPage />} />}
         />
-        {isXpressRouteEnabled && (isInstrumentScientist || isUserOfficer) && (
+        {isTechniqueProposalsEnabled &&
+          (isInstrumentScientist || isUserOfficer) && (
+            <Route
+              path="/TechniqueProposals"
+              element={
+                <TitledRoute
+                  title={t('Technique Proposals')}
+                  element={<TechniqueProposalTable />}
+                />
+              }
+            />
+          )}
+        {(isUserOfficer ||
+          isInstrumentScientist ||
+          isExperimentSafetyReviewer) && (
           <Route
-            path="/XpressProposals"
+            path="/Experiments"
             element={
-              <TitledRoute
-                title="Xpress Proposals"
-                element={<XpressProposalTable />}
-              />
+              <TitledRoute title="Experiments" element={<ExperimentsPage />} />
             }
           />
         )}
-        {isUserOfficer && (
+        {isTagsEnabled && isUserOfficer && (
           <Route
-            path="/ExperimentPage"
-            element={
-              <TitledRoute title="Experiments" element={<ExperimentPage />} />
-            }
+            path="/Tag"
+            element={<TitledRoute title="Tag" element={<TagPage />} />}
           />
         )}
         <Route
@@ -247,11 +270,22 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
-            path="/StatusActionsLogs"
+            path="/EmailStatusActionsLogs"
             element={
               <TitledRoute
-                title="StatusActionsLogs"
-                element={<StatusActionsLogsPage />}
+                title="Status Actions Logs"
+                element={<EmailStatusActionsLogsPage />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
+            path="/ProposalDownloadStatusActionsLogs"
+            element={
+              <TitledRoute
+                title="Status Actions Logs"
+                element={<ProposalDownloadStatusActionsLogsPage />}
               />
             }
           />
@@ -325,18 +359,48 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/PdfTemplateEditor/:templateId"
+          path="/PdfTemplateEditor/Proposal/:templateId"
           element={
             <TitledRoute
-              title="PDF Template Editor"
-              element={<PdfTemplateEditor />}
+              title="Proposal PDF Template Editor"
+              element={<ProposalPdfTemplateEditor />}
             />
           }
         />
         <Route
-          path="/PdfTemplates"
+          path="/PdfTemplates/Proposal"
           element={
-            <TitledRoute title="PDF Templates" element={<PdfTemplatesPage />} />
+            <TitledRoute
+              title="Proposal PDF Templates"
+              element={<ProposalPdfTemplatesPage />}
+            />
+          }
+        />
+        <Route
+          path="/PdfTemplateEditor/ExperimentSafety/:templateId"
+          element={
+            <TitledRoute
+              title="Experiment Safety PDF Template Editor"
+              element={<ExperimentSafetyPdfTemplateEditor />}
+            />
+          }
+        />
+        <Route
+          path="/PdfTemplates/ExperimentSafety"
+          element={
+            <TitledRoute
+              title="Experiment Safety PDF Templates"
+              element={<ExperimentSafetyPdfTemplatesPage />}
+            />
+          }
+        />
+        <Route
+          path="/ExperimentSafetyReviewTemplates"
+          element={
+            <TitledRoute
+              title="Experiment Safety Review Templates"
+              element={<ExperimentSafetyReviewTemplatesPage />}
+            />
           }
         />
         <Route
@@ -472,6 +536,17 @@ const AppRoutes = () => {
         )}
         {isUserOfficer && (
           <Route
+            path="/ExperimentWorkflows"
+            element={
+              <TitledRoute
+                title="Experiment Workflows"
+                element={<ExperimentWorkflowsPage />}
+              />
+            }
+          />
+        )}
+        {isUserOfficer && (
+          <Route
             path="/ProposalWorkflowEditor/:workflowId"
             element={
               <TitledRoute
@@ -546,17 +621,6 @@ const AppRoutes = () => {
             }
           />
         )}
-        {isSchedulerEnabled && (
-          <Route
-            path="/UpcomingExperimentTimes"
-            element={
-              <TitledRoute
-                title="Upcoming Experiment Times"
-                element={<InstrSciUpcomingExperimentTimesTable />}
-              />
-            }
-          />
-        )}
         {isUserOfficer && (
           <Route
             path="/Questions"
@@ -585,25 +649,16 @@ const AppRoutes = () => {
           />
         )}
         <Route
-          path="/CreateEsi/:scheduledEventId"
+          path="/ExperimentSafety/:experimentSafetyPk"
           element={
             <TitledRoute
-              title="Create ESI Proposal"
-              element={<CreateProposalEsiPage />}
+              title="Experiment Safety"
+              element={<ExperimentSafetyPage />}
             />
           }
         />
         <Route
-          path="/UpdateEsi/:esiId"
-          element={
-            <TitledRoute
-              title="Update ESI Proposal"
-              element={<UpdateProposalEsiPage />}
-            />
-          }
-        />
-        <Route
-          path="/CreateFeedback/:scheduledEventId"
+          path="/CreateFeedback/:experimentPk"
           element={
             <TitledRoute
               title="Create Feedback"
@@ -621,7 +676,7 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="/DeclareShipments/:scheduledEventId"
+          path="/DeclareShipments/:experimentPk"
           element={
             <TitledRoute
               title="Declare Shipments"
@@ -647,9 +702,7 @@ const AppRoutes = () => {
         ) : isExperimentSafetyReviewer ? (
           <Route
             path="/"
-            element={
-              <TitledRoute title="" element={<ExperimentSafetyReviewPage />} />
-            }
+            element={<TitledRoute title="" element={<ExperimentsPage />} />}
           />
         ) : (
           <Route

@@ -74,7 +74,7 @@ export const dummyQuestionTemplateRelationFactory = (
     dummyQuestionFactory(values?.question),
     values?.sortOrder || Math.round(Math.random() * 100),
     values?.topicId || Math.round(Math.random() * 10),
-    values?.config || new BooleanConfig(),
+    values?.config || { ...new BooleanConfig(), readPermissions: [] },
     values?.dependencies as FieldDependency[],
     values?.dependenciesOperator as DependenciesLogicOperator
   );
@@ -399,7 +399,11 @@ export class QuestionaryDataSourceMock implements QuestionaryDataSource {
     return dummyQuestionarySteps.every((step) => step.isCompleted);
   }
 
-  async clone(questionaryId: number): Promise<Questionary> {
+  async clone(
+    questionaryId: number,
+    targetTemplateId?: number,
+    reviewBeforeSubmit?: boolean
+  ): Promise<Questionary> {
     return createDummyQuestionary({ questionaryId: questionaryId + 1 });
   }
 

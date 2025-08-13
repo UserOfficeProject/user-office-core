@@ -39,6 +39,7 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
       config.instruments = [];
       config.isMultipleSelect = false;
       config.requestTime = false;
+      config.readPermissions = [];
 
       return config;
     },
@@ -64,9 +65,10 @@ export const instrumentPickerDefinition: Question<DataType.INSTRUMENT_PICKER> =
           Tokens.InstrumentDataSource
         );
 
-        const instruments = await instrumentDataSource.getInstrumentsByCallId([
-          callId,
-        ]);
+        const instruments = await instrumentDataSource.getInstrumentsByCallId(
+          [callId],
+          true
+        );
 
         return {
           ...config,

@@ -54,7 +54,7 @@ export default {
     id: 1,
     name: 'default template',
     topic: {
-      id: 7,
+      id: 8,
       title: 'Topic title',
     },
   },
@@ -73,6 +73,10 @@ export default {
       id: 6,
       title: 'Topic title',
     },
+  },
+  experimentSafetyReviewTemplate: {
+    id: 4,
+    name: 'default experiment safety review template',
   },
   questions: {
     boolean: {
@@ -288,6 +292,20 @@ export default {
       email: 'unverified-user@example.com',
       password: '',
     },
+    instrumentScientist1: {
+      id: 100,
+      firstName: 'Instrument',
+      lastName: 'Scientist1',
+      email: 'instr.sci1@local.host',
+      password: 'Test1234!',
+    },
+    experimentSafetyReviewer1: {
+      id: 103,
+      firstName: 'Experiment',
+      lastName: 'Safety',
+      email: 'experiment.safety@local.host',
+      password: 'Test1234!',
+    },
   },
   proposalStatuses: {
     draft: {
@@ -320,10 +338,30 @@ export default {
       id: 15,
       name: 'EDITABLE_SUBMITTED_INTERNAL',
     },
+    quickReview: {
+      id: 22,
+      name: 'QUICK_REVIEW',
+    },
+    underReview: {
+      id: 23,
+      name: 'UNDER_REVIEW',
+    },
+    approved: {
+      id: 24,
+      name: 'APPROVED',
+    },
+    unsuccessful: {
+      id: 25,
+      name: 'UNSUCCESSFUL',
+    },
+    finished: {
+      id: 26,
+      name: 'FINISHED',
+    },
   },
-  scheduledEvents: {
+  experiments: {
     upcoming: {
-      id: 996,
+      experimentPk: 996,
       startsAt: '07-01-2030 10:00',
       endsAt: '07-01-2030 11:00',
     },
@@ -366,5 +404,12 @@ export default {
       id: 1,
     },
     defaultDroppableGroup: 'proposalWorkflowConnections_0',
+  },
+  sample1: {
+    sampleId: 1,
+    title: 'My sample title',
+    questionaryId: 4,
+    proposalPk: 1,
+    questionId: 'sample_declaration_question',
   },
 };

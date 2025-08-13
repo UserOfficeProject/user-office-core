@@ -20,6 +20,7 @@ query getInstrumentScientistProposals(
       instruments {
         id
         name
+        multipleTechReviewsEnabled
       }
       technicalReviews {
         id
@@ -31,6 +32,7 @@ query getInstrumentScientistProposals(
         timeAllocation
         status
         submitted
+        instrumentId
       }
       faps {
         code

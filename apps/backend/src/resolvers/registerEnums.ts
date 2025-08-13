@@ -6,6 +6,11 @@ import {
   DependenciesLogicOperator,
   EvaluatorOperator,
 } from '../models/ConditionEvaluator';
+import {
+  ExperimentSafetyReviewerDecisionEnum,
+  ExperimentStatus,
+  InstrumentScientistDecisionEnum,
+} from '../models/Experiment';
 import { FeatureId, FeatureUpdateAction } from '../models/Feature';
 import { FeedbackStatus } from '../models/Feedback';
 import { PageName } from '../models/Page';
@@ -29,11 +34,6 @@ import { VisitRegistrationStatus } from '../models/VisitRegistration';
 import { WorkflowType } from '../models/Workflow';
 import { QueryMutationAndServicesGroups } from './queries/GetAllQueryMutationAndServicesMethodsQuery';
 import { NumberValueConstraint } from './types/FieldConfig';
-import {
-  EquipmentAssignmentStatus,
-  ProposalBookingStatusCore,
-  ScheduledEventBookingType,
-} from './types/ProposalBooking';
 import { EmailStatusActionRecipients } from './types/StatusActionConfig';
 
 export const registerEnums = () => {
@@ -65,14 +65,8 @@ export const registerEnums = () => {
   registerEnumType(TemplateGroupId, {
     name: 'TemplateGroupId',
   });
-  registerEnumType(ScheduledEventBookingType, {
-    name: 'ScheduledEventBookingType',
-  });
-  registerEnumType(ProposalBookingStatusCore, {
-    name: 'ProposalBookingStatusCore',
-  });
-  registerEnumType(EquipmentAssignmentStatus, {
-    name: 'EquipmentAssignmentStatus',
+  registerEnumType(ExperimentStatus, {
+    name: 'ExperimentStatus',
   });
   registerEnumType(FeedbackStatus, {
     name: 'FeedbackStatus',
@@ -99,4 +93,10 @@ export const registerEnums = () => {
     name: 'StatusActionType',
   });
   registerEnumType(WorkflowType, { name: 'WorkflowType' });
+  registerEnumType(ExperimentSafetyReviewerDecisionEnum, {
+    name: 'ExperimentSafetyReviewerDecisionEnum',
+  });
+  registerEnumType(InstrumentScientistDecisionEnum, {
+    name: 'InstrumentScientistDecisionEnum',
+  });
 };

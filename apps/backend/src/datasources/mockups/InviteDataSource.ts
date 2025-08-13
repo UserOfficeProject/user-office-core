@@ -1,12 +1,34 @@
-import { Invite } from '../../models/Invite';
-import { UpdateInviteInput } from '../../resolvers/mutations/UpdateInviteMutation';
-import { InviteDataSource } from '../InviteDataSource';
+import { inject, injectable } from 'tsyringe';
 
+import { Tokens } from '../../config/Tokens';
+import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { Invite } from '../../models/Invite';
+import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
+import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';
+
+@injectable()
 export class InviteDataSourceMock implements InviteDataSource {
   private invites: Invite[];
 
-  constructor() {
+  constructor(
+    @inject(Tokens.CoProposerClaimDataSource)
+    private coProposerDataSource: CoProposerClaimDataSource
+  ) {
     this.init();
+  }
+
+  async findCoProposerInvites(proposalPk: number): Promise<Invite[]> {
+    const coProposerClaims =
+      await this.coProposerDataSource.findByProposalPk(proposalPk);
+
+    const invites = await Promise.all(
+      coProposerClaims.map((claim) => this.findById(claim.inviteId))
+    );
+
+    return invites.filter((invite) => invite !== null) as Invite[];
+  }
+  async delete(id: number): Promise<void> {
+    this.invites = this.invites.filter((invite) => invite.id !== id);
   }
 
   async findById(id: number): Promise<Invite | null> {
@@ -17,33 +39,39 @@ export class InviteDataSourceMock implements InviteDataSource {
     this.invites = [
       new Invite(
         1,
-        'code1',
+        'invite-code',
         'test1@example.com',
-        'note1',
         new Date(),
         1,
         null,
-        null
+        null,
+        true,
+        null,
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER
       ),
       new Invite(
         2,
-        'code2',
+        'claimed-invite-code',
         'test2@example.com',
-        'note2',
         new Date(),
         2,
         null,
-        null
+        1,
+        true,
+        null,
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
       ),
       new Invite(
         3,
-        'code3',
+        'expired-invite-code',
         'test3@example.com',
-        'note3',
         new Date(),
         3,
         new Date(),
-        1001
+        null,
+        false,
+        new Date('2022-01-01'),
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
       ),
     ];
   }
@@ -52,20 +80,64 @@ export class InviteDataSourceMock implements InviteDataSource {
     return this.invites.find((invite) => invite.code === code) || null;
   }
 
-  async create(
-    createdByUserId: number,
-    code: string,
-    email: string
-  ): Promise<Invite> {
+  getInvites(filter: GetInvitesFilter): Promise<Invite[]> {
+    return new Promise((resolve) => {
+      const filteredInvites = this.invites.filter((invite) => {
+        if (filter.createdBefore) {
+          if (invite.createdAt >= filter.createdBefore) {
+            return false;
+          }
+        }
+
+        if (filter.createdAfter) {
+          if (invite.createdAt <= filter.createdAfter) {
+            return false;
+          }
+        }
+
+        if (filter.isClaimed !== undefined) {
+          if (invite.claimedAt === null && filter.isClaimed) {
+            return false;
+          }
+          if (invite.claimedAt !== null && !filter.isClaimed) {
+            return false;
+          }
+        }
+
+        if (filter.isExpired) {
+          if (invite.expiresAt && invite.expiresAt < new Date()) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      resolve(filteredInvites);
+    });
+  }
+
+  async create(args: {
+    code: string;
+    email: string;
+    note: string;
+    createdByUserId: number;
+    expiresAt: Date | null;
+    templateId?: EmailTemplateId | null;
+  }): Promise<Invite> {
+    const { code, email, createdByUserId, expiresAt, templateId } = args;
+
     const newInvite = new Invite(
       this.invites.length + 1, // Generate new ID
       code,
       email,
-      '', // Default note to an empty string
       new Date(),
       createdByUserId,
       null,
-      null
+      null,
+      false,
+      expiresAt ?? null,
+      templateId ?? (null as EmailTemplateId | null)
     );
 
     this.invites.push(newInvite);
@@ -73,17 +145,23 @@ export class InviteDataSourceMock implements InviteDataSource {
     return newInvite;
   }
 
-  async update(
-    args: UpdateInviteInput & Pick<Invite, 'claimedAt' | 'claimedByUserId'>
-  ): Promise<Invite> {
+  async update(args: {
+    id: number;
+    code?: string;
+    email?: string;
+    note?: string;
+    claimedAt?: Date | null;
+    claimedByUserId?: number | null;
+    isEmailSent?: boolean;
+    expiresAt?: Date | null;
+    templateId?: string | null;
+  }): Promise<Invite> {
     const invite = await this.findById(args.id);
     if (!invite) {
       throw new Error('Invite code not found');
     }
 
-    invite.email = args.email || invite.email;
-    invite.claimedAt = args.claimedAt || invite.claimedAt;
-    invite.claimedByUserId = args.claimedByUserId || invite.claimedByUserId;
+    Object.assign(invite, { ...args });
 
     return invite;
   }

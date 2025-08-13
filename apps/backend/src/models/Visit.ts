@@ -6,7 +6,7 @@ export class Visit {
     public proposalPk: number,
     public creatorId: number,
     public teamLeadUserId: number,
-    public scheduledEventId: number,
-    public created: Date
+    public created: Date,
+    public experimentPk: number
   ) {}
 }

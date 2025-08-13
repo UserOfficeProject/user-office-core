@@ -84,7 +84,8 @@ async function enableDefaultStfcFeatures() {
       FeatureId.TECHNICAL_REVIEW,
       FeatureId.FAP_REVIEW,
       FeatureId.USER_SEARCH_FILTER,
-      FeatureId.STFC_XPRESS_MANAGEMENT,
+      FeatureId.TAGS,
+      FeatureId.TECHNIQUE_PROPOSALS,
     ],
     true
   );
@@ -139,23 +140,21 @@ async function setSTFCRoleNames() {
 
   await db.waitForDBUpgrade();
 
-  await db.updateRoleTitle({
-    shortCode: Roles.INSTRUMENT_SCIENTIST,
+  await db.updateRole(Roles.INSTRUMENT_SCIENTIST, {
     title: 'Experiment Scientist',
+    description:
+      'Edit and view your technical feasibility reviews and view proposals for your experimental area',
   });
 
-  await db.updateRoleTitle({
-    shortCode: Roles.FAP_CHAIR,
+  await db.updateRole(Roles.FAP_CHAIR, {
     title: 'FAP Chair',
   });
 
-  await db.updateRoleTitle({
-    shortCode: Roles.FAP_REVIEWER,
+  await db.updateRole(Roles.FAP_REVIEWER, {
     title: 'FAP Reviewer',
   });
 
-  await db.updateRoleTitle({
-    shortCode: Roles.FAP_SECRETARY,
+  await db.updateRole(Roles.FAP_SECRETARY, {
     title: 'FAP Secretary',
   });
 }

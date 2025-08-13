@@ -1,0 +1,11 @@
+fragment invite on Invite {
+  id
+  code
+  email
+  createdAt
+  createdByUserId
+  claimedAt
+  claimedByUserId
+  isEmailSent
+  expiresAt
+}

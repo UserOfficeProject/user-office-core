@@ -4,19 +4,12 @@ import { AllocationTimeUnits, Call } from '../../models/Call';
 import { FapMeetingDecision } from '../../models/FapMeetingDecision';
 import { Proposal, ProposalEndStatus, Proposals } from '../../models/Proposal';
 import { ProposalView } from '../../models/ProposalView';
-import { ScheduledEventCore } from '../../models/ScheduledEventCore';
 import {
   TechnicalReview,
   TechnicalReviewStatus,
 } from '../../models/TechnicalReview';
 import { UserWithRole } from '../../models/User';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
-import {
-  ProposalBookingFilter,
-  ProposalBookingScheduledEventFilterCore,
-  ProposalBookingStatusCore,
-  ScheduledEventBookingType,
-} from '../../resolvers/types/ProposalBooking';
 import { ProposalEventsRecord } from '../postgres/records';
 import { ProposalDataSource } from '../ProposalDataSource';
 import { ProposalsFilter } from './../../resolvers/queries/ProposalsQuery';
@@ -56,7 +49,9 @@ const dummyProposalFactory = (values?: Partial<Proposal>) => {
     values?.submitted || false,
     values?.referenceNumberSequence || 0,
     values?.managementDecisionSubmitted || false,
-    values?.submittedDate || new Date()
+    values?.submittedDate || new Date(),
+    values?.experimentSequence || 0,
+    values?.fileId || null
   );
 };
 
@@ -68,18 +63,6 @@ export const dummyFapMeetingDecision = new FapMeetingDecision(
   'Dummy comment for management',
   true,
   1,
-  1,
-  1
-);
-
-const dummyScheduledEventCore = new ScheduledEventCore(
-  1,
-  ScheduledEventBookingType.USER_OPERATIONS,
-  new Date(),
-  new Date(),
-  1,
-  1,
-  ProposalBookingStatusCore.ACTIVE,
   1,
   1
 );
@@ -207,6 +190,7 @@ export class ProposalDataSourceMock implements ProposalDataSource {
             firstname: 'Carl',
             lastname: 'Carlsson',
           },
+          instrumentId: 1,
         },
       ],
       [{ id: 1, code: 'fap code' }],
@@ -361,6 +345,11 @@ export class ProposalDataSourceMock implements ProposalDataSource {
       proposalPks.includes(proposal.primaryKey)
     );
   }
+
+  async getProposalByVisitId(visitId: number): Promise<Proposal> {
+    return dummyProposalFactory();
+  }
+
   async getInstrumentScientistProposals(
     scientist: UserWithRole,
     filter?: ProposalsFilter,
@@ -408,38 +397,6 @@ export class ProposalDataSourceMock implements ProposalDataSource {
     });
 
     return { proposals: proposals };
-  }
-
-  async getProposalBookingsByProposalPk(
-    proposalPk: number,
-    filter?: ProposalBookingFilter
-  ): Promise<{ ids: number[] } | null> {
-    return { ids: [1] };
-  }
-
-  async getAllProposalBookingsScheduledEvents(
-    proposalBookingIds: number[],
-    filter?: ProposalBookingScheduledEventFilterCore
-  ): Promise<ScheduledEventCore[] | null> {
-    return [dummyScheduledEventCore];
-  }
-
-  async addProposalBookingScheduledEvent(
-    eventMessage: ScheduledEventCore
-  ): Promise<void> {
-    return;
-  }
-
-  async removeProposalBookingScheduledEvents(
-    eventMessage: ScheduledEventCore[]
-  ): Promise<void> {
-    return;
-  }
-
-  async updateProposalBookingScheduledEvent(
-    eventMessage: ScheduledEventCore
-  ): Promise<void> {
-    return;
   }
 
   async getRelatedUsersOnProposals(id: number): Promise<number[]> {

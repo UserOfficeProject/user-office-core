@@ -257,6 +257,7 @@ export class StfcUserAuthorization extends UserAuthorization {
         !uniqueRoles.find(
           (role) =>
             role.name === 'ISIS Instrument Scientist' ||
+            role.name === 'CLF LSF Link Scientist' ||
             role.name === 'User Officer'
         )
       );
@@ -309,7 +310,11 @@ export class StfcUserAuthorization extends UserAuthorization {
     }
   }
 
-  async isExternalTokenValid(token: string): Promise<boolean> {
+  async isExternalTokenValid(token: string | undefined): Promise<boolean> {
+    if (token === undefined) {
+      return false;
+    }
+
     const cachedValidity = await this.uowsTokenCache.get(token);
     if (cachedValidity !== undefined) {
       if (!cachedValidity) {
@@ -380,5 +385,9 @@ export class StfcUserAuthorization extends UserAuthorization {
       readableUsers.includes(id) ||
       (await this.userDataSource.isSearchableUser(id))
     );
+  }
+
+  async canBeAssignedToFap(userId: number): Promise<boolean> {
+    return true;
   }
 }

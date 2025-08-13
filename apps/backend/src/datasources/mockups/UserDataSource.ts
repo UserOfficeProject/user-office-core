@@ -9,7 +9,10 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 
@@ -24,6 +27,7 @@ export const basicDummyUser = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   false,
   'test@email.com',
+  '',
   ''
 );
 
@@ -38,6 +42,7 @@ export const basicDummyUserNotOnProposal = new BasicUserDetails(
   new Date('2019-07-17 08:25:12.23043+00'),
   false,
   'test@email.com',
+  '',
   ''
 );
 
@@ -45,7 +50,6 @@ export const dummyUserOfficer = new User(
   4,
   'Mr.',
   'John',
-  'Smith',
   'Doe',
   'JoDo',
   'Hailey',
@@ -53,7 +57,6 @@ export const dummyUserOfficer = new User(
   '683142616',
   'issuer',
   'male',
-  12,
   new Date('1990-01-25'),
   3,
   'Other',
@@ -61,7 +64,6 @@ export const dummyUserOfficer = new User(
   'Producer',
   'Dorris83@gmail.com',
   '+46700568256',
-  '',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -69,14 +71,19 @@ export const dummyUserOfficer = new User(
 
 export const dummyUserOfficerWithRole: UserWithRole = {
   ...dummyUserOfficer,
-  currentRole: { id: 2, title: 'User Officer', shortCode: 'user_officer' },
+  currentRole: {
+    id: 2,
+    title: 'User Officer',
+    shortCode: 'user_officer',
+    description: '',
+  },
+  externalTokenValid: true,
 };
 
 export const dummyUser = new User(
   2,
   'Dr.',
   'Jane',
-  '',
   'Doe',
   'JaDa',
   'Meta',
@@ -84,7 +91,6 @@ export const dummyUser = new User(
   '568567353',
   'issuer',
   'male',
-  2,
   new Date('1981-05-04'),
   3,
   'Other',
@@ -92,7 +98,6 @@ export const dummyUser = new User(
   'Architect',
   'Cleve30@yahoo.com',
   '+38978414058',
-  '+46700568256',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -101,27 +106,52 @@ export const dummyUser = new User(
 export const dummyPrincipalInvestigatorWithRole: UserWithRole = {
   ...dummyUser,
   id: 1,
-  currentRole: { id: 1, title: 'Principal investigator', shortCode: 'user' },
+  currentRole: {
+    id: 1,
+    title: 'Principal investigator',
+    shortCode: 'user',
+    description: '',
+  },
+  externalTokenValid: true,
 };
 
 export const dummyUserWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 1, title: 'User', shortCode: 'user' },
+  currentRole: { id: 1, title: 'User', shortCode: 'user', description: '' },
+  externalTokenValid: true,
 };
 
 export const dummyFapChairWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 4, title: 'Fap Chair', shortCode: 'fap_chair' },
+  currentRole: {
+    id: 4,
+    title: 'Fap Chair',
+    shortCode: 'fap_chair',
+    description: '',
+  },
+  externalTokenValid: true,
 };
 
 export const dummyFapSecretaryWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 5, title: 'Fap Secretary', shortCode: 'fap_secretary' },
+  currentRole: {
+    id: 5,
+    title: 'Fap Secretary',
+    shortCode: 'fap_secretary',
+    description: '',
+  },
+  externalTokenValid: true,
 };
 
 export const dummyFapReviewerWithRole: UserWithRole = {
   ...dummyUser,
-  currentRole: { id: 6, title: 'Fap Reviewer', shortCode: 'fap_reviewer' },
+  currentRole: {
+    id: 6,
+    title: 'Fap Reviewer',
+    shortCode: 'fap_reviewer',
+    description: '',
+  },
+  externalTokenValid: true,
 };
 
 export const dummySampleReviewer: UserWithRole = {
@@ -130,7 +160,9 @@ export const dummySampleReviewer: UserWithRole = {
     id: 9,
     title: 'Experiment Safety Reviewer',
     shortCode: 'experiment_safety_reviewer',
+    description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyInternalReviewer: UserWithRole = {
@@ -139,6 +171,7 @@ export const dummyInternalReviewer: UserWithRole = {
     id: 1,
     title: 'Internal Reviewer',
     shortCode: 'internal_reviewer',
+    description: '',
   },
 };
 
@@ -149,7 +182,9 @@ export const dummyInstrumentScientist: UserWithRole = {
     id: 1,
     title: 'Instrument Scientist',
     shortCode: 'instrument_scientist',
+    description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyVisitorWithRole: UserWithRole = {
@@ -159,14 +194,15 @@ export const dummyVisitorWithRole: UserWithRole = {
     id: 1,
     title: 'Visitor',
     shortCode: 'user',
+    description: '',
   },
+  externalTokenValid: true,
 };
 
 export const dummyPlaceHolderUser = new User(
   5,
   'Dr.',
   'Jane',
-  '',
   'Doe',
   'JaDa',
   'Meta',
@@ -174,7 +210,6 @@ export const dummyPlaceHolderUser = new User(
   '568567353',
   'issuer',
   'male',
-  2,
   new Date('1981-05-04'),
   3,
   'Other',
@@ -182,7 +217,6 @@ export const dummyPlaceHolderUser = new User(
   'Architect',
   'placeholder@ess.se',
   '+46700568256',
-  '',
   true,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -192,7 +226,6 @@ export const dummyUserNotOnProposal = new User(
   3,
   'Dr.',
   'Noel',
-  '',
   'Doe',
   'NoDO',
   'Damion',
@@ -200,7 +233,6 @@ export const dummyUserNotOnProposal = new User(
   'Apricot',
   'issuer',
   'female',
-  3,
   new Date('1991-11-08'),
   5,
   'Other',
@@ -208,7 +240,6 @@ export const dummyUserNotOnProposal = new User(
   'Facilitator',
   'Tyrique41@hotmail.com',
   '+46700568256',
-  '',
   false,
   '2019-07-17 08:25:12.23043+00',
   '2019-07-17 08:25:12.23043+00'
@@ -216,7 +247,8 @@ export const dummyUserNotOnProposal = new User(
 
 export const dummyUserNotOnProposalWithRole: UserWithRole = {
   ...dummyUserNotOnProposal,
-  currentRole: { id: 1, title: 'User', shortCode: 'user' },
+  currentRole: { id: 1, title: 'User', shortCode: 'user', description: '' },
+  externalTokenValid: true,
 };
 
 export class UserDataSourceMock implements UserDataSource {
@@ -239,10 +271,14 @@ export class UserDataSourceMock implements UserDataSource {
   async getProposalUsersFull(proposalPk: number): Promise<User[]> {
     throw new Error('Method not implemented.');
   }
-  async getBasicUserInfo(
-    id: number
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
-    throw new Error('Method not implemented.');
+  async getBasicUserInfo(id: number): Promise<BasicUserDetails | null> {
+    if (id === dummyUser.id) {
+      return basicDummyUser;
+    } else if (id === dummyUserNotOnProposal.id) {
+      return basicDummyUserNotOnProposal;
+    }
+
+    return null;
   }
   async getBasicUsersInfo(ids: readonly number[]): Promise<BasicUserDetails[]> {
     throw new Error('Method not implemented.');
@@ -251,7 +287,7 @@ export class UserDataSourceMock implements UserDataSource {
   async getBasicUserDetailsByEmail(
     email: string,
     role?: UserRole
-  ): Promise<import('../../models/User').BasicUserDetails | null> {
+  ): Promise<BasicUserDetails> {
     return new BasicUserDetails(
       1,
       'John',
@@ -263,6 +299,7 @@ export class UserDataSourceMock implements UserDataSource {
       new Date('2019-07-17 08:25:12.23043+00'),
       false,
       'test@email.com',
+      '',
       ''
     );
   }
@@ -296,33 +333,66 @@ export class UserDataSourceMock implements UserDataSource {
   }
   async getUserRoles(id: number): Promise<Role[]> {
     if (id == dummyUserOfficer.id) {
-      return [{ id: 1, shortCode: 'user_officer', title: 'User Officer' }];
+      return [
+        {
+          id: 1,
+          shortCode: 'user_officer',
+          title: 'User Officer',
+          description: '',
+        },
+      ];
     } else if (id === dummyInstrumentScientist.id) {
       return [
         {
           id: 1,
           title: 'Instrument Scientist',
           shortCode: 'instrument_scientist',
+          description: '',
         },
       ];
     } else if (id === 1001) {
-      return [{ id: 2, shortCode: 'fap_reviewer', title: 'Fap Reviewer' }];
+      return [
+        {
+          id: 2,
+          shortCode: 'fap_reviewer',
+          title: 'Fap Reviewer',
+          description: '',
+        },
+      ];
     } else if (id === dummyFapChairWithRole.id) {
-      return [{ id: 4, shortCode: 'fap_chair', title: 'Fap Chair' }];
+      return [
+        { id: 4, shortCode: 'fap_chair', title: 'Fap Chair', description: '' },
+      ];
     } else {
-      return [{ id: 2, shortCode: 'user', title: 'User' }];
+      return [{ id: 2, shortCode: 'user', title: 'User', description: '' }];
     }
   }
 
   async getRoles(): Promise<Role[]> {
     return [
-      { id: 1, shortCode: 'user_officer', title: 'User Officer' },
-      { id: 2, shortCode: 'user', title: 'User' },
+      {
+        id: 1,
+        shortCode: 'user_officer',
+        title: 'User Officer',
+        description: '',
+      },
+      { id: 2, shortCode: 'user', title: 'User', description: '' },
     ];
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
     return dummyUser;
+  }
+
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
+    if (dummyUser.oidcSub === args.oidcSub) {
+      return { ...dummyUser, ...args };
+    }
+
+    // User not found
+    return null;
   }
 
   async me(id: number) {
@@ -426,7 +496,12 @@ export class UserDataSourceMock implements UserDataSource {
   }
 
   async getRoleByShortCode(roleShortCode: Roles): Promise<Role> {
-    return { id: 1, shortCode: 'user_officer', title: 'User Officer' };
+    return {
+      id: 1,
+      shortCode: 'user_officer',
+      title: 'User Officer',
+      description: '',
+    };
   }
 
   async externalTokenLogin(token: string): Promise<User> {

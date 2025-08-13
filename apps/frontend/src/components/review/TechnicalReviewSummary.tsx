@@ -53,7 +53,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
     state.technicalReview.proposal?.call?.endCall
   );
   const isCallActiveInternal =
-    state.technicalReview?.call?.isActiveInternal ?? true;
+    state.technicalReview.call?.isActiveInternal ?? true;
   const [loadingSubmitMessage, setLoadingSubmitMessage] =
     useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,7 +92,7 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
     if (isInstrumentScientist) {
       //reviewers should not be able to submit a grade for proposals on which they are not a reviewer
       submissionDisabled =
-        technicalReview.reviewer?.id !== user.id ? true : false;
+        technicalReview.technicalReviewAssignee?.id !== user.id ? true : false;
     }
 
     return submissionDisabled;
@@ -181,18 +181,18 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                     const { addTechnicalReview } = await api({
                       toastSuccessMessage: 'Updated',
                     }).addTechnicalReview({
-                      proposalPk: state?.technicalReview.proposalPk,
+                      proposalPk: state.technicalReview.proposalPk,
                       timeAllocation: +(
-                        state?.technicalReview.timeAllocation || 0
+                        state.technicalReview.timeAllocation || 0
                       ),
-                      comment: state?.technicalReview.comment,
-                      publicComment: state?.technicalReview.publicComment,
-                      status: state?.technicalReview.status,
-                      submitted: state?.technicalReview.submitted,
+                      comment: state.technicalReview.comment,
+                      publicComment: state.technicalReview.publicComment,
+                      status: state.technicalReview.status,
+                      submitted: state.technicalReview.submitted,
                       reviewerId: user.id,
-                      files: state?.technicalReview.files,
-                      instrumentId: state?.technicalReview.instrumentId,
-                      questionaryId: state?.technicalReview.questionaryId,
+                      files: state.technicalReview.files,
+                      instrumentId: state.technicalReview.instrumentId,
+                      questionaryId: state.technicalReview.questionaryId,
                     });
 
                     dispatch({
@@ -219,18 +219,18 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                       setIsSubmitting(true);
                       try {
                         const submittedTechnicalReview = {
-                          proposalPk: state?.technicalReview.proposalPk,
+                          proposalPk: state.technicalReview.proposalPk,
                           timeAllocation: +(
-                            state?.technicalReview.timeAllocation || 0
+                            state.technicalReview.timeAllocation || 0
                           ),
-                          comment: state?.technicalReview.comment,
-                          publicComment: state?.technicalReview.publicComment,
-                          status: state?.technicalReview.status,
+                          comment: state.technicalReview.comment,
+                          publicComment: state.technicalReview.publicComment,
+                          status: state.technicalReview.status,
                           submitted: true,
                           reviewerId: user.id,
-                          files: state?.technicalReview.files,
-                          instrumentId: state?.technicalReview.instrumentId,
-                          questionaryId: state?.technicalReview.questionaryId,
+                          files: state.technicalReview.files,
+                          instrumentId: state.technicalReview.instrumentId,
+                          questionaryId: state.technicalReview.questionaryId,
                         };
 
                         const submittedTechnicalReviewsInput: SubmitTechnicalReviewInput[] =
@@ -268,7 +268,8 @@ function TechnicalReviewSummary({ confirm }: TechnicalReviewSummaryProps) {
                 disabled={
                   isSubmitting ||
                   technicalReview.submitted ||
-                  isInternalReviewer
+                  isInternalReviewer ||
+                  submitDisabled
                 }
                 isBusy={isSubmitting}
                 data-cy="button-submit-technical-review"

@@ -2,6 +2,7 @@ import { GraphQLError } from 'graphql';
 import { container, inject, injectable } from 'tsyringe';
 
 import { FeedbackAuthorization } from '../auth/FeedbackAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
@@ -26,7 +27,8 @@ export default class FeedbackQueries {
     @inject(Tokens.QuestionaryDataSource)
     public questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
-    public templateDataSource: TemplateDataSource
+    public templateDataSource: TemplateDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -35,7 +37,9 @@ export default class FeedbackQueries {
     if (!feedback) {
       return null;
     }
-    const hasRights = await this.feedbackAuth.hasReadRights(agent, feedback);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.feedbackAuth.hasReadRights(agent, feedback));
     if (hasRights === false) {
       return null;
     }
@@ -49,16 +53,18 @@ export default class FeedbackQueries {
   }
 
   @Authorized()
-  async getFeedbackByScheduledEventId(
+  async getFeedbackByExperimentPk(
     agent: UserWithRole | null,
-    eventId: number
+    experimentPk: number
   ) {
     const feedback =
-      await this.dataSource.getFeedbackByScheduledEventId(eventId);
+      await this.dataSource.getFeedbackByExperimentPk(experimentPk);
     if (!feedback) {
       return null;
     }
-    const hasRights = await this.feedbackAuth.hasReadRights(agent, feedback);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.feedbackAuth.hasReadRights(agent, feedback));
     if (hasRights === false) {
       return null;
     }

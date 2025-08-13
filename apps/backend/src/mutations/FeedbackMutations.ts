@@ -3,12 +3,14 @@ import moment from 'moment';
 import { container, inject, injectable } from 'tsyringe';
 
 import { FeedbackAuthorization } from '../auth/FeedbackAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { FeedbackDataSource } from '../datasources/FeedbackDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { Authorized } from '../decorators';
 import { MailService } from '../eventHandlers/MailService/MailService';
+import { ExperimentStatus } from '../models/Experiment';
 import { Feedback, FeedbackStatus } from '../models/Feedback';
 import { rejection } from '../models/Rejection';
 import { Rejection } from '../models/Rejection';
@@ -18,8 +20,7 @@ import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
 import { CreateFeedbackArgs } from '../resolvers/mutations/CreateFeedbackMutation';
 import { UpdateFeedbackArgs } from '../resolvers/mutations/UpdateFeedbackMutation';
-import { ProposalBookingStatusCore } from '../resolvers/types/ProposalBooking';
-import { ScheduledEventCore } from '../resolvers/types/ScheduledEvent';
+import { Experiment } from '../resolvers/types/Experiment';
 import { AdminDataSource } from './../datasources/AdminDataSource';
 import { TemplateDataSource } from './../datasources/TemplateDataSource';
 import { UserDataSource } from './../datasources/UserDataSource';
@@ -39,25 +40,26 @@ export default class FeedbackMutations {
     private templateDataSource: TemplateDataSource,
     @inject(Tokens.QuestionaryDataSource)
     private questionaryDataSource: QuestionaryDataSource,
-    @inject(Tokens.ScheduledEventDataSource)
-    private scheduledEventDataSource: ScheduledEventDataSource,
     @inject(Tokens.UserDataSource)
     private userDataSource: UserDataSource,
     @inject(Tokens.AdminDataSource)
     private adminDataSource: AdminDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource,
     @inject(Tokens.MailService)
-    private mailService: MailService
+    private mailService: MailService,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
   async createFeedback(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: CreateFeedbackArgs
   ): Promise<Feedback | Rejection> {
     const feedbackAlreadyExists =
       (
         await this.dataSource.getFeedbacks({
-          scheduledEventId: args.scheduledEventId,
+          experimentPk: args.experimentPk,
         })
       ).length > 0;
 
@@ -68,47 +70,46 @@ export default class FeedbackMutations {
       );
     }
 
-    const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEventCore(
-        args.scheduledEventId
-      );
-    if (!scheduledEvent) {
+    const experiment = await this.experimentDataSource.getExperiment(
+      args.experimentPk
+    );
+    if (!experiment) {
       return rejection(
-        'Can not create feedback because scheduled event does not exist',
+        'Can not create feedback because experiment does not exist',
         {
           args,
-          agent: user,
+          agent: agent,
         }
       );
     }
 
-    if (scheduledEvent.status !== ProposalBookingStatusCore.COMPLETED) {
+    if (experiment.status !== ExperimentStatus.COMPLETED) {
       return rejection(
-        'Can not create feedback because scheduled event is not completed',
+        'Can not create feedback because experiment is not completed',
         {
           args,
-          agent: user,
+          agent: agent,
         }
       );
     }
 
-    const visit = await this.visitDataSource.getVisitByScheduledEventId(
-      scheduledEvent.id
+    const visit = await this.visitDataSource.getVisitByExperimentPk(
+      experiment.experimentPk
     );
 
     if (visit === null) {
       return rejection('Can not create feedback because visit does not exist', {
         args,
-        agent: user,
+        agent: agent,
       });
     }
 
-    const isTeamlead = visit.teamLeadUserId === user!.id;
+    const isTeamlead = visit.teamLeadUserId === agent!.id;
 
     if (isTeamlead === false) {
       return rejection(
         'Can not create feedback because only teamlead can do that',
-        { args, agent: user }
+        { args, agent: agent }
       );
     }
 
@@ -120,16 +121,16 @@ export default class FeedbackMutations {
       if (activeTemplateId === null) {
         return rejection(
           'Can not create feedback because feedback template is not configured',
-          { args, agent: user }
+          { args, agent: agent }
         );
       }
       const questionary = await this.questionaryDataSource.create(
-        user!.id,
+        agent!.id,
         activeTemplateId
       );
       const feedback = await this.dataSource.createFeedback({
         ...args,
-        creatorId: user!.id,
+        creatorId: agent!.id,
         questionaryId: questionary.questionaryId,
       });
 
@@ -145,10 +146,10 @@ export default class FeedbackMutations {
 
   @Authorized()
   async updateFeedback(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: UpdateFeedbackArgs
   ): Promise<Feedback | Rejection> {
-    if (!user) {
+    if (!agent) {
       return rejection(
         'Could not update feedback because request is not authorized',
         { args }
@@ -163,12 +164,14 @@ export default class FeedbackMutations {
       );
     }
 
-    const hasRights = await this.feedbackAuth.hasWriteRights(user, feedback);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.feedbackAuth.hasWriteRights(agent, feedback));
 
     if (hasRights === false) {
       return rejection(
         'Can not update feedback because of insufficient permissions',
-        { args, agent: user }
+        { args, agent: agent }
       );
     }
 
@@ -177,14 +180,16 @@ export default class FeedbackMutations {
 
   @Authorized()
   async deleteFeedback(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     feedbackId: number
   ): Promise<Feedback | Rejection> {
-    const hasRights = await this.feedbackAuth.hasWriteRights(user, feedbackId);
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.feedbackAuth.hasWriteRights(agent, feedbackId));
     if (hasRights === false) {
       return rejection(
         'Can not delete feedback because of insufficient permissions',
-        { user, feedbackId }
+        { user: agent, feedbackId }
       );
     }
 
@@ -192,23 +197,23 @@ export default class FeedbackMutations {
   }
 
   /**
-   * Checks if the scheduled event is too old to have feedback
-   * @param scheduledEvent event
+   * Checks if the experiment is too old to have feedback
+   * @param experiment Experiment
    * @returns true if event is too old
    */
-  async isEventTooOld(scheduledEvent: ScheduledEventCore) {
+  async isEventTooOld(experiment: Experiment) {
     const FEEDBACK_EXHAUST_DAYS =
       await this.adminDataSource.getSettingOrDefault(
         SettingsId.FEEDBACK_EXHAUST_DAYS,
         30
       );
 
-    return moment(scheduledEvent.endsAt).isBefore(
+    return moment(experiment.endsAt).isBefore(
       moment().subtract(FEEDBACK_EXHAUST_DAYS, 'days')
     );
   }
 
-  async hasAlreadyRequested(scheduledEvent: ScheduledEventCore) {
+  async hasAlreadyRequested(experiment: Experiment) {
     const FEEDBACK_MAX_REQUESTS =
       await this.adminDataSource.getSettingOrDefault(
         SettingsId.FEEDBACK_MAX_REQUESTS,
@@ -216,7 +221,7 @@ export default class FeedbackMutations {
       );
 
     const feedbackRequests = await this.dataSource.getFeedbackRequests(
-      scheduledEvent.id
+      experiment.experimentPk
     );
 
     if (feedbackRequests.length >= FEEDBACK_MAX_REQUESTS) {
@@ -242,12 +247,12 @@ export default class FeedbackMutations {
 
   /**
    * Checks if feedback is already provided
-   * @param scheduledEvent event
+   * @param experiment Experiment
    * @returns true if feedback is already provided
    */
-  async hasProvidedFeedback(scheduledEvent: ScheduledEventCore) {
+  async hasProvidedFeedback(experiment: Experiment) {
     const feedbacks = await this.dataSource.getFeedbacks({
-      scheduledEventId: scheduledEvent.id,
+      experimentPk: experiment.experimentPk,
     });
 
     if (feedbacks.length === 0) {
@@ -260,29 +265,27 @@ export default class FeedbackMutations {
   @Authorized([Roles.USER_OFFICER])
   async requestFeedback(
     user: UserWithRole | null,
-    scheduledEventId: number
+    experimentPk: number
   ): Promise<FeedbackRequest | Rejection> {
-    // Check if scheduled event exists
-    const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEventCore(
-        scheduledEventId
-      );
-    if (!scheduledEvent) {
+    // Check if experiment exists
+    const experiment =
+      await this.experimentDataSource.getExperiment(experimentPk);
+    if (!experiment) {
       return rejection(
-        'Can not create feedback because scheduled event does not exist',
+        'Can not create feedback because experiment does not exist',
         {
-          args: { scheduledEventId },
+          args: { experimentPk },
         }
       );
     }
 
     // Check if visit exists
-    const visit = await this.visitDataSource.getVisitByScheduledEventId(
-      scheduledEvent.id
+    const visit = await this.visitDataSource.getVisitByExperimentPk(
+      experiment.experimentPk
     );
     if (visit === null) {
       return rejection('Can not create feedback because visit does not exist', {
-        args: { scheduledEventId },
+        args: { experimentPk },
       });
     }
 
@@ -292,31 +295,31 @@ export default class FeedbackMutations {
       return rejection(
         'Can not create feedback because teamlead does not exist or it has no email',
         {
-          args: { scheduledEventId, teamLead },
+          args: { experimentPk, teamLead },
         }
       );
     }
 
-    if (await this.hasProvidedFeedback(scheduledEvent)) {
+    if (await this.hasProvidedFeedback(experiment)) {
       return rejection(
         'Will not ask for feedback because already been provided',
         {
-          args: { scheduledEventId },
+          args: { experimentPk },
         }
       );
     }
 
-    if (await this.isEventTooOld(scheduledEvent)) {
+    if (await this.isEventTooOld(experiment)) {
       return rejection('Will not ask for feedback because it is too old', {
-        args: { scheduledEventId, teamLead },
+        args: { experimentPk, teamLead },
       });
     }
 
-    if (await this.hasAlreadyRequested(scheduledEvent)) {
+    if (await this.hasAlreadyRequested(experiment)) {
       return rejection(
         'Will not ask for feedback because already recently requested',
         {
-          args: { scheduledEventId, teamLead },
+          args: { experimentPk, teamLead },
         }
       );
     }
@@ -329,7 +332,7 @@ export default class FeedbackMutations {
         substitution_data: {
           teamleadPreferredname: teamLead.preferredname,
           teamleadLastname: teamLead.lastname,
-          feedbackurl: `${process.env.baseURL}/CreateFeedback/${scheduledEventId}`,
+          feedbackurl: `${process.env.baseURL}/CreateFeedback/${experimentPk}`,
         },
         recipients: [{ address: teamLead.email }],
       });
@@ -337,7 +340,7 @@ export default class FeedbackMutations {
       if (results.total_rejected_recipients === 0) {
         logger.logInfo('Feedback request email success', { results });
 
-        return this.dataSource.createFeedbackRequest(scheduledEvent.id);
+        return this.dataSource.createFeedbackRequest(experiment.experimentPk);
       } else {
         return rejection('Could not send feedback request email', { results });
       }
@@ -346,7 +349,7 @@ export default class FeedbackMutations {
 
       return rejection(
         'Could not create feedback request because of an error',
-        { args: { scheduledEventId } },
+        { args: { experimentPk } },
         error
       );
     }

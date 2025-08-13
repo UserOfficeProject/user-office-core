@@ -1,0 +1,15 @@
+mutation updateTag(
+  $id: Int!
+  $name: String!
+  $shortCode: String!
+) {
+  updateTag(
+    id: $id
+    name: $name
+    shortCode: $shortCode
+  ) {
+    id
+    name
+    shortCode
+  }
+}

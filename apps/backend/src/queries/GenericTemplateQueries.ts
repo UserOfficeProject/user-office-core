@@ -2,6 +2,7 @@ import { logger } from '@user-office-software/duo-logger';
 import { container, inject, injectable } from 'tsyringe';
 
 import { GenericTemplateAuthorization } from '../auth/GenericTemplateAuthorization';
+import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
 import { GenericTemplateDataSource } from '../datasources/GenericTemplateDataSource';
 import { Authorized } from '../decorators';
@@ -14,7 +15,8 @@ export default class GenericTemplateQueries {
 
   constructor(
     @inject(Tokens.GenericTemplateDataSource)
-    private dataSource: GenericTemplateDataSource
+    private dataSource: GenericTemplateDataSource,
+    @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization
   ) {}
 
   @Authorized()
@@ -23,6 +25,7 @@ export default class GenericTemplateQueries {
     genericTemplateId: number
   ) {
     if (
+      this.userAuth.isApiToken(agent) ||
       (await this.genericTemplateAuth.hasReadRights(
         agent,
         genericTemplateId
@@ -44,14 +47,13 @@ export default class GenericTemplateQueries {
     agent: UserWithRole | null,
     args: GenericTemplatesArgs
   ) {
-    let genericTemplates = await this.dataSource.getGenericTemplates(
-      args,
-      agent
-    );
+    let genericTemplates = await this.dataSource.getGenericTemplates(args);
 
     genericTemplates = await Promise.all(
-      genericTemplates.map((genericTemplate) =>
-        this.genericTemplateAuth.hasReadRights(agent, genericTemplate.id)
+      genericTemplates.map(
+        (genericTemplate) =>
+          this.userAuth.isApiToken(agent) ||
+          this.genericTemplateAuth.hasReadRights(agent, genericTemplate.id)
       )
     ).then((results) => genericTemplates.filter((_v, index) => results[index]));
 
@@ -66,8 +68,10 @@ export default class GenericTemplateQueries {
     );
 
     genericTemplates = await Promise.all(
-      genericTemplates.map((genericTemplate) =>
-        this.genericTemplateAuth.hasReadRights(agent, genericTemplate.id)
+      genericTemplates.map(
+        (genericTemplate) =>
+          this.userAuth.isApiToken(agent) ||
+          this.genericTemplateAuth.hasReadRights(agent, genericTemplate.id)
       )
     ).then((results) => genericTemplates.filter((_v, index) => results[index]));
 

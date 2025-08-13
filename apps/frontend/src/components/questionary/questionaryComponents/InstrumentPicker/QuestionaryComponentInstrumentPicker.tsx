@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react';
 
 import MultiMenuItem from 'components/common/MultiMenuItem';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
-import { InstrumentPickerConfig } from 'generated/sdk';
+import { Answer, InstrumentPickerConfig } from 'generated/sdk';
 
 /* InstrumentIdAndTime is used to save the 
 instrument id and requested time in database*/
@@ -32,7 +32,28 @@ interface InstrumentIdNameAndTime {
   instrumentName?: string;
   timeRequested?: string;
 }
+export function processInstrumentPickerValue(
+  answer: Answer,
+  config: InstrumentPickerConfig
+) {
+  if (Array.isArray(answer.value)) {
+    return answer.value.filter((answer) =>
+      answer?.instrumentId
+        ? config.instruments.some(
+            (instrument) => instrument.id.toString() === answer.instrumentId
+          )
+        : false
+    );
+  } else if (config?.instruments && answer.value?.instrumentId) {
+    const instrumentExists = config.instruments.some(
+      (instrument) => instrument.id.toString() === answer.value.instrumentId
+    );
 
+    return instrumentExists ? answer.value : null;
+  }
+
+  return null;
+}
 export function QuestionaryComponentInstrumentPicker(
   props: BasicComponentProps
 ) {
@@ -45,11 +66,11 @@ export function QuestionaryComponentInstrumentPicker(
     question: { id, question, naturalKey },
     value,
   } = answer;
-  const [stateValue, setStateValue] = useState<
-    Array<InstrumentIdAndTime> | InstrumentIdAndTime
-  >(value);
 
   const config = answer.config as InstrumentPickerConfig;
+  const [stateValue, setStateValue] = useState<
+    Array<InstrumentIdAndTime> | InstrumentIdAndTime
+  >(() => processInstrumentPickerValue(answer, config));
   const fieldError = getIn(errors, id);
   const isError = getIn(touched, id) && !!fieldError;
   const getValueWithInstrumentName = () => {
@@ -77,7 +98,12 @@ export function QuestionaryComponentInstrumentPicker(
     Array<InstrumentIdNameAndTime> | InstrumentIdNameAndTime
   >(getValueWithInstrumentName());
   useEffect(() => {
-    setStateValue(answer.value);
+    setStateValue((prevState) => {
+      const processedValue = processInstrumentPickerValue(answer, config);
+
+      return processedValue !== undefined ? processedValue : prevState;
+    });
+
     setRequestTimeForInstrument(getValueWithInstrumentName());
   }, [answer, config.instruments.length]);
 
@@ -95,50 +121,53 @@ export function QuestionaryComponentInstrumentPicker(
 
   const handleOnChange = (event: SelectChangeEvent<string | string[]>) => {
     const newValue = event.target.value;
-    let newInstrumentTime: InstrumentIdAndTime[] | InstrumentIdAndTime =
-      [] || {};
     if (
       Array.isArray(newValue) &&
       newValue.length > 0 &&
       Array.isArray(requestTimeForInstrument)
     ) {
-      newInstrumentTime = newValue.map((id) => {
-        return {
-          instrumentId: id,
-          timeRequested: requestTimeForInstrument.filter(
-            (value) => value.instrumentId === id
-          )
-            ? requestTimeForInstrument.find(
-                (value) => value.instrumentId === id
-              )?.timeRequested
-            : '0',
-        };
-      });
+      onComplete(
+        newValue.map((id) => {
+          return {
+            instrumentId: id,
+            timeRequested: requestTimeForInstrument.filter(
+              (value) => value.instrumentId === id
+            )
+              ? requestTimeForInstrument.find(
+                  (value) => value.instrumentId === id
+                )?.timeRequested
+              : '0',
+          };
+        })
+      );
+
+      return;
     } else if (typeof newValue === 'string') {
-      newInstrumentTime = {
+      onComplete({
         instrumentId: newValue,
         timeRequested: '0',
-      };
+      });
+
+      return;
     }
-    onComplete(newInstrumentTime);
+    onComplete([]);
   };
 
   const handleTimeInput = (time: string, id: string) => {
-    let newInstrumentTime: InstrumentIdAndTime[] | InstrumentIdAndTime =
-      [] || {};
-    newInstrumentTime = Array.isArray(requestTimeForInstrument)
-      ? requestTimeForInstrument.map((obj) => {
-          if (obj.instrumentId === id) {
-            return { instrumentId: obj.instrumentId, timeRequested: time };
-          } else {
-            return {
-              instrumentId: obj.instrumentId,
-              timeRequested: obj.timeRequested,
-            };
-          }
-        })
-      : { instrumentId: id, timeRequested: time };
-    onComplete(newInstrumentTime);
+    onComplete(
+      Array.isArray(requestTimeForInstrument)
+        ? requestTimeForInstrument.map((obj) => {
+            if (obj.instrumentId === id) {
+              return { instrumentId: obj.instrumentId, timeRequested: time };
+            } else {
+              return {
+                instrumentId: obj.instrumentId,
+                timeRequested: obj.timeRequested,
+              };
+            }
+          })
+        : { instrumentId: id, timeRequested: time }
+    );
   };
   const DynamicTimeFields = () => {
     const requestTime = Array.isArray(requestTimeForInstrument)

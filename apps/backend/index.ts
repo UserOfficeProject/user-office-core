@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/order, @typescript-eslint/no-unused-vars
+import startTracing from './src/middlewares/tracing/tracing';
 import { logger } from '@user-office-software/duo-logger';
 import express from 'express';
 import 'reflect-metadata';
@@ -31,8 +33,7 @@ async function bootstrap() {
     .use(factory())
     .use(healthCheck())
     .use(readinessCheck())
-    .use(exceptionHandler())
-    .use(express.json({ limit: '5mb' }));
+    .use(exceptionHandler());
 
   await apolloServer(app);
 
@@ -47,9 +48,9 @@ async function bootstrap() {
     {}
   );
 
-  startAsyncJobs();
+  startAsyncJobs(); // TODO: Should we do this here? Or those jobs should be started in a separate process?
   container.resolve<(() => void) | undefined>(Tokens.ConfigureLogger)?.();
   container.resolve<() => void>(Tokens.ConfigureEnvironment)();
 }
-
+startTracing();
 bootstrap();

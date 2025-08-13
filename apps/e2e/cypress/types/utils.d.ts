@@ -115,9 +115,16 @@ declare global {
           | 'register-visit-icon'
           | 'finish-training-icon'
           | 'declare-shipment-icon'
-          | 'finish-safety-input-form-icon'
+          | 'finish-experiment-safety-form-icon'
           | 'provide-feedback-icon',
-        state: 'completed' | 'active' | 'inactive' | 'neutral' | 'invisible'
+        state:
+          | 'completed'
+          | 'active'
+          | 'inactive'
+          | 'neutral'
+          | 'invisible'
+          | 'pending'
+          | 'cancelled'
       ) => void;
 
       /**

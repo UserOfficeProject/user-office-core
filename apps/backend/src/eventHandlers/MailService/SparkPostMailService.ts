@@ -1,6 +1,6 @@
 import { logger } from '@user-office-software/duo-logger';
 
-import { isProduction } from '../../utils/helperFunctions';
+import { isProduction, isStaging } from '../../utils/helperFunctions';
 import EmailSettings from './EmailSettings';
 import { MailService } from './MailService';
 import { SparkPost } from './SparkPost';
@@ -28,7 +28,7 @@ export class SparkPostMailService extends MailService {
     return {
       ...options,
       recipients: options.recipients.map((recipient) =>
-        isProduction
+        isProduction || isStaging
           ? recipient
           : typeof recipient.address === 'string'
             ? {
@@ -49,7 +49,7 @@ export class SparkPostMailService extends MailService {
 
   sendMail = (options: EmailSettings) => {
     // NOTE: If it is not production and there is no sinkEmail we are not sending emails.
-    if (!isProduction && !this.sinkEmail) {
+    if (!isProduction && !isStaging && !this.sinkEmail) {
       logger.logInfo('Pretending to send an email', { ...options });
 
       return Promise.resolve({

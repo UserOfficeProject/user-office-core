@@ -11,6 +11,8 @@ import {
   SettingsId,
   Event,
   WorkflowType,
+  TemplateCategoryId,
+  DataType,
 } from '@user-office-software-libs/shared-types';
 
 import featureFlags from '../support/featureFlags';
@@ -452,6 +454,77 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.get('[data-cy="fap-assignments-table"] thead').contains('Deviation');
+    });
+
+    it('Table selection and parameters should be saved between tab navigation', () => {
+      for (let index = 0; index < 6; index++) {
+        cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
+          const createdProposal = result.createProposal;
+          cy.wrap(createdProposal.proposalId).as(`proposal${index}Id`);
+          if (createdProposal) {
+            cy.updateProposal({
+              proposalPk: createdProposal.primaryKey,
+              title: faker.lorem.words(3),
+              abstract: faker.lorem.words(3),
+              proposerId: initialDBData.users.user1.id,
+            });
+
+            cy.submitProposal({ proposalPk: createdProposal.primaryKey });
+
+            // Manually changing the proposal status to be shown in the Faps. -------->
+            cy.changeProposalsStatus({
+              statusId: initialDBData.proposalStatuses.fapReview.id,
+              proposalPks: [createdProposal.primaryKey],
+            });
+
+            cy.assignProposalsToInstruments({
+              instrumentIds: [newlyCreatedInstrumentId],
+              proposalPks: [createdProposal.primaryKey],
+            });
+
+            cy.assignProposalsToFaps({
+              fapInstruments: [
+                { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+              ],
+              proposalPks: [createdProposal.primaryKey],
+            });
+          }
+        });
+      }
+
+      cy.assignProposalsToFaps({
+        fapInstruments: [
+          { instrumentId: newlyCreatedInstrumentId, fapId: createdFapId },
+        ],
+        proposalPks: [firstCreatedProposalPk],
+      });
+
+      cy.login('officer');
+      cy.visit(`/FapPage/${createdFapId}?tab=3&page=1&pageSize=5`);
+      //should go straight to the second page
+      cy.contains(proposal1.title).should('not.exist');
+      cy.contains('5 rows');
+      cy.contains('Documents').click();
+      cy.contains('Proposals and Assignments').click();
+
+      //should go straught to the second page on navigating back
+      cy.contains(proposal1.title).should('not.exist');
+      cy.contains('5 rows');
+
+      //Table page navigation buttons dont have good selectors so just remove them from query parameters
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.contains('7 rows');
+      cy.contains(proposal1.title).parent().find('[type="checkbox"]').check();
+
+      cy.contains('Documents').click();
+
+      cy.contains('Proposals and Assignments').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[type="checkbox"]')
+        .should('be.checked');
     });
 
     it('Officer should be able to filter instrument', () => {
@@ -1080,6 +1153,17 @@ context('Fap reviews tests', () => {
         fapId: createdFapId,
         memberIds: [fapMembers.reviewer.id],
       });
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 0,
+        instrumentId: newlyCreatedInstrumentId,
+        comment: comment1,
+        publicComment: comment2,
+        questionaryId: initialDBData.technicalReview.questionaryId,
+      });
 
       cy.login(fapMembers.chair);
       cy.changeActiveRole(initialDBData.roles.fapChair);
@@ -1200,6 +1284,23 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
       cy.contains('1 / 1').should('be.visible');
     });
+
+    it('Fap Chair should not be able to see private technical comments', () => {
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="view-proposal"]')
+        .click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]').contains('Technical review').click();
+
+      cy.contains(comment1).should('not.exist');
+    });
   });
 
   describe('Fap Secretary role', () => {
@@ -1240,10 +1341,8 @@ context('Fap reviews tests', () => {
           ...loggedInUserParsed,
           institutionId: 1,
           telephone: faker.phone.number('+4670#######'),
-          telephone_alt: faker.phone.number('+4670#######'),
           user_title: 'Dr.',
           gender: 'male',
-          nationality: 1,
           birthdate: new Date('2000/01/01'),
           department: 'IT',
           position: 'Dirrector',
@@ -1382,6 +1481,62 @@ context('Fap reviews tests', () => {
         text: 'Saved',
       });
     });
+
+    it('Fap Secretary should be able to see private internal comments', () => {
+      cy.addProposalTechnicalReview({
+        proposalPk: firstCreatedProposalPk,
+        status: TechnicalReviewStatus.FEASIBLE,
+        timeAllocation: firstProposalTimeAllocation,
+        submitted: true,
+        reviewerId: 6,
+        comment: comment1,
+        publicComment: comment2,
+        instrumentId: newlyCreatedInstrumentId,
+        questionaryId: 4,
+      });
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[data-cy="view-proposal"]').click();
+      cy.contains('Technical reviews').click();
+      cy.contains(comment1).should('exist');
+
+      cy.visit(`/FapPage/${createdFapId}?tab=3`);
+
+      cy.finishedLoading();
+
+      cy.get('[type="checkbox"]').first().check();
+      cy.get('[data-cy="assign-fap-members"]').click();
+
+      cy.finishedLoading();
+
+      cy.get('[role="dialog"]')
+        .contains(fapMembers.secretary.lastName)
+        .parent()
+        .find('input[type="checkbox"]')
+        .click();
+      cy.contains('1 user(s) selected');
+      cy.contains('Update').click();
+
+      clickConfirmOk();
+
+      cy.notification({
+        variant: 'success',
+        text: 'Member assigned',
+      });
+
+      cy.contains('Review Proposals').click();
+
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
+
+      cy.contains('Technical reviews').click();
+      cy.contains(comment1).should('exist');
+    });
   });
 
   describe('Fap Reviewer role', () => {
@@ -1463,6 +1618,18 @@ context('Fap reviews tests', () => {
             title: proposal3.title,
             abstract: proposal3.abstract,
             proposerId: initialDBData.users.user1.id,
+          });
+
+          cy.addProposalTechnicalReview({
+            proposalPk: firstCreatedProposalPk,
+            status: TechnicalReviewStatus.FEASIBLE,
+            timeAllocation: firstProposalTimeAllocation,
+            submitted: true,
+            reviewerId: 0,
+            instrumentId: newlyCreatedInstrumentId,
+            comment: comment1,
+            publicComment: comment2,
+            questionaryId: initialDBData.technicalReview.questionaryId,
           });
 
           cy.assignProposalsToInstruments({
@@ -1558,6 +1725,8 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.closeModal();
+
+      cy.contains(proposal1.title).closest('tr').contains('Submitted');
 
       cy.get('[data-cy="submit-proposal-reviews"]').click();
       cy.get('[data-cy="confirm-ok"]').click();
@@ -1657,6 +1826,17 @@ context('Fap reviews tests', () => {
       cy.finishedLoading();
 
       cy.contains(fapMembers.reviewer.lastName).parent().contains('SUBMITTED');
+    });
+
+    it('Fap Reviewer should not be able to see private technical comments', () => {
+      cy.contains(proposal1.title)
+        .parent()
+        .find('[data-cy="grade-proposal-icon"]')
+        .click();
+
+      cy.contains('Technical reviews').click();
+
+      cy.contains(comment1).should('not.exist');
     });
   });
 });
@@ -3775,6 +3955,213 @@ context('Automatic Fap assignment to Proposal', () => {
   });
 });
 
+context(
+  'Automatic Fap assignment to Proposal through Instrument Picker',
+  () => {
+    const title = faker.lorem.words(2);
+    const abstract = faker.lorem.words(3);
+    const proposalWorkflow = {
+      name: faker.random.words(2),
+      description: faker.random.words(5),
+    };
+
+    const instrumentPickerQuestion = 'Select your Instrument';
+    const instrument = {
+      name: 'Instrument 1',
+      shortCode: 'Instrument 1',
+      description: 'Instrument 1',
+      managerUserId: initialDBData.users.user1.id,
+    };
+    const instrument2 = {
+      name: 'Instrument 2',
+      shortCode: 'Instrument 2',
+      description: 'Instrument 2',
+      managerUserId: initialDBData.users.user1.id,
+    };
+
+    let topicId: number;
+    let instrumentPickerQuestionId: string;
+
+    beforeEach(() => {
+      // NOTE: Stop the web application and clearly separate the end-to-end tests by visiting the blank about page after each test.
+      // This prevents flaky tests with some long-running network requests from one test to finish in the next and unexpectedly update the app.
+      cy.window().then((win) => {
+        win.location.href = 'about:blank';
+      });
+      cy.resetDB();
+      cy.getAndStoreFeaturesEnabled();
+      initializationBeforeTests();
+      cy.createTemplate({
+        name: 'Proposal Template with Instrument Picker',
+        groupId: TemplateGroupId.PROPOSAL_ESI,
+      });
+      cy.createWorkflow({
+        name: proposalWorkflow.name,
+        description: proposalWorkflow.description,
+        entityType: WorkflowType.PROPOSAL,
+      }).then((result) => {
+        if (result.createWorkflow) {
+          createdWorkflowId = result.createWorkflow.id;
+        }
+      });
+      cy.createInstrument(instrument).then((result) => {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [
+            {
+              instrumentId: result.createInstrument.id,
+              fapId: initialDBData.fap.id,
+            },
+          ],
+        });
+      });
+      cy.createInstrument(instrument2).then((result) => {
+        cy.assignInstrumentToCall({
+          callId: initialDBData.call.id,
+          instrumentFapIds: [
+            {
+              instrumentId: result.createInstrument.id,
+              fapId: createdFapId,
+            },
+          ],
+        });
+      });
+      cy.createTopic({
+        templateId: initialDBData.template.id,
+        sortOrder: 1,
+      }).then((topicResult) => {
+        if (topicResult.createTopic) {
+          topicId =
+            topicResult.createTopic.steps[
+              topicResult.createTopic.steps.length - 1
+            ].topic.id;
+          cy.createQuestion({
+            categoryId: TemplateCategoryId.PROPOSAL_QUESTIONARY,
+            dataType: DataType.INSTRUMENT_PICKER,
+          }).then((result) => {
+            instrumentPickerQuestionId = result.createQuestion.id;
+            cy.updateQuestion({
+              id: result.createQuestion.id,
+              question: instrumentPickerQuestion,
+              config: `{"variant":"dropdown","isMultipleSelect":false,"required":true,"requestTime":false,"readPermissions":[]}`,
+            });
+            cy.createQuestionTemplateRelation({
+              questionId: instrumentPickerQuestionId,
+              templateId: initialDBData.template.id,
+              sortOrder: 0,
+              topicId: topicId,
+            });
+          });
+        }
+      });
+    });
+
+    it('Automatic FAP assignment to Proposal, when an Instrument is assigned to a Proposal using Instrument Picker', () => {
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+      cy.contains('td', initialDBData.fap.code).should('exist');
+    });
+
+    it('Automatic FAPs assignment to Proposal, when multiple Instruments are assigned to a Proposal using Instrument Picker', () => {
+      cy.updateQuestionTemplateRelationSettings({
+        questionId: instrumentPickerQuestionId,
+        templateId: initialDBData.template.id,
+        config: `{"variant":"dropdown","isMultipleSelect":true,"required":true,"requestTime":false,"readPermissions":[]}`,
+        dependencies: [],
+      });
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=principal-investigator] input').should(
+        'contain.value',
+        'Carl'
+      );
+      cy.finishedLoading();
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+      cy.get('[data-cy=title] input').type(title).should('have.value', title);
+      cy.get('[data-cy=abstract] textarea')
+        .first()
+        .type(abstract)
+        .should('have.value', abstract);
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.get('[data-natural-key^="instrument_picker"]').click();
+      cy.get('[role="option"]').contains('Instrument 1').click();
+      cy.get('[role="option"]').contains('Instrument 2').click();
+      cy.get('body').type('{esc}');
+      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.finishedLoading();
+      cy.notification({ variant: 'success', text: 'Saved' });
+      cy.contains('Dashboard').click();
+      cy.contains(title).parent().contains('draft');
+      cy.contains(title)
+        .parent()
+        .find('[aria-label="Edit proposal"]')
+        .should('exist')
+        .click();
+      cy.contains('Submit').click();
+      cy.contains('OK').click();
+      cy.contains('Dashboard').click();
+      cy.contains(title);
+      cy.contains('submitted');
+      cy.get('[aria-label="View proposal"]').should('exist');
+      cy.login('officer');
+      cy.visit('/');
+      cy.contains('Proposals').click();
+      cy.contains(title).parent().contains(instrument.name);
+      cy.contains(title).parent().contains(instrument2.name);
+      cy.contains(title).parent().find('[aria-label="View proposal"]').click();
+      cy.contains('td', instrument.name).should('exist');
+      cy.contains('td', instrument2.name).should('exist');
+      cy.contains('td', initialDBData.fap.code).should('exist');
+      cy.contains('td', fap1.code).should('exist');
+    });
+  }
+);
+
 context('Fap meeting exports test', () => {
   let createdInstrumentId: number;
   let proposalPK: number;
@@ -4015,9 +4402,11 @@ context('Fap meeting exports test', () => {
     cy.visit('/FapPage/2?tab=4&call=1');
 
     cy.get('button[aria-label="Export in Excel"]').click();
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
 
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4030,6 +4419,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Officer should be able to download all FAP meetings in excel', function () {
@@ -4047,8 +4438,11 @@ context('Fap meeting exports test', () => {
       .find('[aria-label="Export Fap Data"]')
       .click();
 
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
+
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `${updatedCall.shortCode}_FAP_Results.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4061,6 +4455,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Officer should be able to download a summary of the FAP meeting stfc', function () {
@@ -4073,9 +4469,11 @@ context('Fap meeting exports test', () => {
     cy.visit('/FapPage/2?tab=4&call=1');
 
     cy.get('button[aria-label="Export in Excel"]').click();
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
 
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4088,6 +4486,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Officer should be able to download all FAP meetings in excel stfc', function () {
@@ -4105,8 +4505,11 @@ context('Fap meeting exports test', () => {
       .find('[aria-label="Export Fap Data"]')
       .click();
 
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
+
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `${updatedCall.shortCode}_FAP_Results.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4121,6 +4524,8 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 
   it('Expired proposals should not appear in exports', function () {
@@ -4139,9 +4544,11 @@ context('Fap meeting exports test', () => {
     cy.visit('/FapPage/2?tab=4&call=1');
 
     cy.get('button[aria-label="Export in Excel"]').click();
+    cy.get('[data-cy=preparing-download-dialog').should('not.exist');
 
     const downloadsFolder = Cypress.config('downloadsFolder');
     const fileName = `Fap-${fap1.code}-${updatedCall.shortCode}.xlsx`;
+    const fileUri = `${downloadsFolder}/${fileName}`;
 
     cy.readFile(`${downloadsFolder}/${fileName}`)
       .should('exist')
@@ -4156,5 +4563,7 @@ context('Fap meeting exports test', () => {
           }
         );
       });
+
+    cy.task('deleteFile', fileUri);
   });
 });

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import CancelBadge from './CancelBadge';
 import CheckBadge from './CheckBadge';
 import DotBadge from './DotBadge';
 
@@ -9,7 +10,8 @@ export type ActionButtonState =
   | 'inactive'
   | 'neutral'
   | 'pending'
-  | 'invisible';
+  | 'invisible'
+  | 'cancelled';
 
 interface ActionButtonProps {
   children: React.ReactNode;
@@ -53,7 +55,7 @@ const ActionButton = ({ children, variant: state }: ActionButtonProps) => {
       return (
         <DotBadge
           sx={{
-            color: '#BBB',
+            color: '#bbb',
           }}
         >
           {children}
@@ -72,22 +74,38 @@ const ActionButton = ({ children, variant: state }: ActionButtonProps) => {
       );
     case 'pending':
       return (
-        <CheckBadge
+        <DotBadge
           sx={{
             color: '#000',
             marginRight: '2px',
+            '& .MuiBadge-dot': {
+              background: '#ff9900',
+              boxShadow: '-1px 1px 0 white',
+            },
+          }}
+        >
+          {children}
+        </DotBadge>
+      );
+    case 'invisible':
+      return <DotBadge />;
+    case 'cancelled':
+      return (
+        <CancelBadge
+          sx={{
+            color: '#bbb',
+            marginRight: '2px',
+            marginTop: '2px',
             '& .MuiBadge-badge': {
               fontSize: '17px',
-              color: '#4ba322',
+              color: '#bbb',
               textShadow: '-1px 2px 0 white',
             },
           }}
         >
           {children}
-        </CheckBadge>
+        </CancelBadge>
       );
-    case 'invisible':
-      return <DotBadge />;
   }
 };
 

@@ -14,7 +14,7 @@ import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
-import { BasicUserDetails } from 'generated/sdk';
+import { BasicUserDetails, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
 import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
@@ -36,12 +36,12 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
 
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
-
+  const [hasInvalidChars, setHasInvalidChars] = useState(false);
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposer, users } = state.proposal;
+  const { proposer, users, coProposerInvites } = state.proposal;
   const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
   const [piData, setPIData] = useState<BasicUserDetails | null>(null);
 
@@ -59,6 +59,14 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
     dispatch({
       type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
       itemWithQuestionary: { users: users },
+    });
+  };
+
+  const invitesChanged = (invites: Invite[]) => {
+    formikProps.setFieldValue(`${id}.coProposerInvites`, { ...invites });
+    dispatch({
+      type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+      itemWithQuestionary: { coProposerInvites: invites },
     });
   };
 
@@ -83,7 +91,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       <Box sx={{ margin: theme.spacing(2, 0) }}>
         <Field
           name={`${id}.title`}
-          label="Title"
+          label="Proposal Title"
           inputProps={{
             onChange: (event: ChangeEvent<HTMLInputElement>) =>
               setLocalTitle(event.target.value),
@@ -106,10 +114,17 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         />
         <Field
           name={`${id}.abstract`}
-          label="Abstract"
+          label="Proposal Abstract"
           inputProps={{
-            onChange: (event: ChangeEvent<HTMLInputElement>) =>
-              setLocalAbstract(event.target.value),
+            onChange: (event: ChangeEvent<HTMLInputElement>) => {
+              const value = event.target.value;
+              const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
+              const hasInvalid = nonPrintableRegex.test(value);
+              const cleanedValue = value.replace(nonPrintableRegex, ' ');
+
+              setHasInvalidChars(hasInvalid);
+              setLocalAbstract(cleanedValue);
+            },
             onBlur: () => {
               dispatch({
                 type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
@@ -129,6 +144,12 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           InputLabelProps={{
             shrink: true,
           }}
+          error={hasInvalidChars}
+          helperText={
+            hasInvalidChars
+              ? 'Non-printable characters have been removed from your input.'
+              : 'Only printable ASCII characters are allowed.'
+          }
         />
       </Box>
       <ProposalParticipant
@@ -147,6 +168,8 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         // QuickFix for material table changing immutable state
         // https://github.com/mbrn/material-table/issues/666
         users={JSON.parse(JSON.stringify(users))}
+        invites={coProposerInvites}
+        setInvites={invitesChanged}
         loadingPrincipalInvestigator={loading}
       />
       <ErrorMessage name={`${id}.users`} />
@@ -171,11 +194,19 @@ const proposalBasisPreSubmit =
         proposerId: proposer?.id,
       });
 
+      const invites = await api.setCoProposerInvites({
+        input: {
+          proposalPk: result.updateProposal.primaryKey,
+          emails: proposal.coProposerInvites.map((invite) => invite.email),
+        },
+      });
+
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_LOADED',
         itemWithQuestionary: {
           ...proposal,
           ...result.updateProposal,
+          ...{ coProposerInvites: invites.setCoProposerInvites },
         },
       });
     } else {
@@ -189,12 +220,20 @@ const proposalBasisPreSubmit =
         users: users.map((user) => user.id),
         proposerId: proposer?.id,
       });
+
+      const invites = await api.setCoProposerInvites({
+        input: {
+          proposalPk: updateProposal.primaryKey,
+          emails: proposal.coProposerInvites.map((invite) => invite.email),
+        },
+      });
       dispatch({
         type: 'ITEM_WITH_QUESTIONARY_CREATED',
         itemWithQuestionary: {
           ...proposal,
           ...createProposal,
           ...updateProposal,
+          ...{ coProposerInvites: invites.setCoProposerInvites },
         },
       });
       returnValue = createProposal.questionaryId;

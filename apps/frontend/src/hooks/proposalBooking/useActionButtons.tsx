@@ -11,25 +11,24 @@ import ActionButton, {
   ActionButtonState,
 } from 'components/proposalBooking/ActionButton';
 import CreateUpdateVisit from 'components/proposalBooking/CreateUpdateVisit';
-import CreateUpdateVisitRegistration from 'components/visit/CreateUpdateVisitRegistration';
+import CreateUpdateCancelVisitRegistration from 'components/visit/CreateUpdateCancelVisitRegistration';
 import { UserContext } from 'context/UserContextProvider';
 import {
   FeedbackStatus,
-  ProposalBookingStatusCore,
   ProposalEndStatus,
   UserJwt,
   VisitRegistrationStatus,
 } from 'generated/sdk';
-
-import { ProposalScheduledEvent } from './useProposalBookingsScheduledEvents';
+import { UserExperiment } from 'hooks/experiment/useUserExperiments';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const getParticipationRole = (
   user: UserJwt,
-  event: ProposalScheduledEvent
+  event: UserExperiment
 ): 'PI' | 'co-proposer' | 'visitor' | null => {
-  if (event.proposal.proposer?.id === user.id) {
+  if (event.proposal?.proposer?.id === user.id) {
     return 'PI';
-  } else if (event.proposal.users.map((user) => user.id).includes(user.id)) {
+  } else if (event.proposal?.users.map((user) => user.id).includes(user.id)) {
     return 'co-proposer';
   } else if (
     event.visit?.registrations
@@ -42,13 +41,13 @@ const getParticipationRole = (
   }
 };
 
-const isPiOrCoProposer = (user: UserJwt, event: ProposalScheduledEvent) => {
+const isPiOrCoProposer = (user: UserJwt, event: UserExperiment) => {
   const role = getParticipationRole(user, event);
 
   return role === 'PI' || role === 'co-proposer';
 };
 
-const isTeamlead = (user: UserJwt, event: ProposalScheduledEvent) =>
+const isTeamlead = (user: UserJwt, event: UserExperiment) =>
   event.visit && event.visit.teamLead.id === user.id;
 
 const createActionButton = (
@@ -56,12 +55,11 @@ const createActionButton = (
   icon: JSX.Element,
   state: ActionButtonState,
   onClick: () => void | undefined
-): Action<ProposalScheduledEvent> => ({
+): Action<UserExperiment> => ({
   tooltip,
   // eslint-disable-next-line
   icon: () => <ActionButton variant={state}>{icon}</ActionButton>,
   hidden: state === 'invisible',
-  disabled: state === 'inactive',
   onClick: ['completed', 'active', 'neutral', 'pending'].includes(state)
     ? onClick
     : () => {},
@@ -70,14 +68,15 @@ const createActionButton = (
 interface UseActionButtonsArgs {
   openModal: (contents: ReactNode) => void;
   closeModal: () => void;
-  eventUpdated: (updatedEvent: ProposalScheduledEvent) => void;
+  eventUpdated: (updatedEvent: UserExperiment) => void;
 }
 export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const { api } = useDataApiWithFeedback();
   const { openModal, closeModal, eventUpdated } = args;
 
-  const formTeamAction = (event: ProposalScheduledEvent) => {
+  const formTeamAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
@@ -118,16 +117,20 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     );
   };
 
-  const finishEsi = (event: ProposalScheduledEvent) => {
+  // TODO: This flow should be reworked completely
+  const finishEsi = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
-
     if (isPiOrCoProposer(user, event)) {
       if (
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
       ) {
-        if (event.esi?.isSubmitted) {
+        if (
+          event.experimentSafety &&
+          event.experimentSafety.esiQuestionarySubmittedAt
+        ) {
+          // TODO: This needs to be worked on. There is no is_submitted field unlike in experiment_safety_input. Instead we have status field in the new experiment_safety table. The status is not finalized yet. We will work on it, when we get in here
           buttonState = 'completed';
         } else {
           buttonState = 'active';
@@ -142,20 +145,32 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Finish safety input form ${stateReason ? '(' + stateReason + ')' : ''}`,
-      <EsiIcon data-cy="finish-safety-input-form-icon" />,
+      `Finish experiment safety form ${stateReason ? '(' + stateReason + ')' : ''}`,
+      <EsiIcon data-cy="finish-experiment-safety-form-icon" />,
       buttonState,
       () => {
-        if (event?.esi) {
-          navigate(`/UpdateEsi/${event.esi.id}`);
+        if (event.experimentSafety) {
+          // If experiment safety already exists, navigate directly
+          navigate(
+            `/ExperimentSafety/${event.experimentSafety.experimentSafetyPk}`
+          );
         } else {
-          navigate(`/CreateEsi/${event.id}`);
+          // Create experiment safety first, then navigate
+          api()
+            .createExperimentSafety({ experimentPk: event.experimentPk })
+            .then((result) => {
+              if (result.createExperimentSafety) {
+                navigate(
+                  `/ExperimentSafety/${result.createExperimentSafety.experimentSafetyPk}`
+                );
+              }
+            });
         }
       }
     );
   };
 
-  const registerVisitAction = (event: ProposalScheduledEvent) => {
+  const registerVisitAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
     let stateReason: string | null = null;
 
@@ -168,8 +183,11 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       } else {
         switch (registration.status) {
           case VisitRegistrationStatus.DRAFTED:
+            buttonState = 'active';
+            break;
           case VisitRegistrationStatus.CHANGE_REQUESTED:
             buttonState = 'active';
+            stateReason = 'Changes are requested for your registration';
             break;
           case VisitRegistrationStatus.SUBMITTED:
             buttonState = 'pending';
@@ -180,9 +198,9 @@ export function useActionButtons(args: UseActionButtonsArgs) {
             break;
           case VisitRegistrationStatus.CANCELLED_BY_USER:
           case VisitRegistrationStatus.CANCELLED_BY_FACILITY:
-            buttonState = 'inactive';
+            buttonState = 'cancelled';
             stateReason =
-              'This action is disabled because registration is cancelled';
+              'This action is disabled because your registration for visit is cancelled';
             break;
         }
       }
@@ -192,12 +210,12 @@ export function useActionButtons(args: UseActionButtonsArgs) {
     }
 
     return createActionButton(
-      `Define your own visit ${stateReason ? '(' + stateReason + ')' : ''}`,
+      `Define your visit ${stateReason ? '(' + stateReason + ')' : ''}`,
       <FlightTakeoffIcon data-cy="register-visit-icon" />,
       buttonState,
       () => {
         openModal(
-          <CreateUpdateVisitRegistration
+          <CreateUpdateCancelVisitRegistration
             registration={
               event.visit!.registrations.find(
                 (registration) => registration.userId === user.id
@@ -216,13 +234,27 @@ export function useActionButtons(args: UseActionButtonsArgs) {
               });
               closeModal();
             }}
+            onCancelled={(cancelledRegistration) => {
+              const updatedRegistrations = event.visit!.registrations.map(
+                (registration) =>
+                  registration.userId === cancelledRegistration.userId
+                    ? cancelledRegistration
+                    : registration
+              );
+              eventUpdated({
+                ...event,
+                visit: { ...event.visit!, registrations: updatedRegistrations },
+              });
+              closeModal();
+            }}
+            onClose={closeModal}
           />
         );
       }
     );
   };
 
-  const declareShipmentAction = (event: ProposalScheduledEvent) => {
+  const declareShipmentAction = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
 
     if (
@@ -239,16 +271,17 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <BoxIcon data-cy="declare-shipment-icon" />,
       buttonState,
       () => {
-        navigate(`/DeclareShipments/${event.id}`);
+        navigate(`/DeclareShipments/${event.experimentPk}`);
       }
     );
   };
 
-  const giveFeedback = (event: ProposalScheduledEvent) => {
+  const giveFeedback = (event: UserExperiment) => {
     let buttonState: ActionButtonState;
 
     if (isTeamlead(user, event)) {
-      if (event.status === ProposalBookingStatusCore.COMPLETED) {
+      if (event.status === 'COMPLETED') {
+        //todo: Needs to be changed to ExperimentStatus.COMPLETED
         if (event.feedback?.status === FeedbackStatus.SUBMITTED) {
           buttonState = 'completed';
         } else {
@@ -269,7 +302,7 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         if (event?.feedback) {
           navigate(`/UpdateFeedback/${event.feedback.id}`);
         } else {
-          navigate(`/CreateFeedback/${event.id}`);
+          navigate(`/CreateFeedback/${event.experimentPk}`);
         }
       }
     );

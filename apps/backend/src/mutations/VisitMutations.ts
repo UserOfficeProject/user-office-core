@@ -3,17 +3,16 @@ import { container, inject, injectable } from 'tsyringe';
 import { VisitAuthorization } from '../auth/VisitAuthorization';
 import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthorization';
 import { Tokens } from '../config/Tokens';
+import { ExperimentDataSource } from '../datasources/ExperimentDataSource';
 import { ProposalDataSource } from '../datasources/ProposalDataSource';
 import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
-import { ScheduledEventDataSource } from '../datasources/ScheduledEventDataSource';
 import { TemplateDataSource } from '../datasources/TemplateDataSource';
 import { VisitDataSource } from '../datasources/VisitDataSource';
 import { Authorized, EventBus } from '../decorators';
 import { resolveApplicationEventBus } from '../events';
 import { Event } from '../events/event.enum';
 import { ProposalEndStatus } from '../models/Proposal';
-import { rejection } from '../models/Rejection';
-import { Rejection } from '../models/Rejection';
+import { rejection, Rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
 import { TemplateGroupId } from '../models/Template';
 import { UserWithRole } from '../models/User';
@@ -25,6 +24,7 @@ import {
 import { ApproveVisitRegistrationInput } from '../resolvers/mutations/ApproveVisitRegistrationMutations';
 import { CancelVisitRegistrationInput } from '../resolvers/mutations/CancelVisitRegistrationMutation';
 import { CreateVisitArgs } from '../resolvers/mutations/CreateVisitMutation';
+import { RequestVisitRegistrationChangesInput } from '../resolvers/mutations/RequestVisitRegistrationChangesMutation';
 import { SubmitVisitRegistrationArgs } from '../resolvers/mutations/SubmitVisitRegistration';
 import { UpdateVisitArgs } from '../resolvers/mutations/UpdateVisitMutation';
 import { UpdateVisitRegistrationArgs } from '../resolvers/mutations/UpdateVisitRegistrationMutation';
@@ -44,8 +44,8 @@ export default class VisitMutations {
     private questionaryDataSource: QuestionaryDataSource,
     @inject(Tokens.TemplateDataSource)
     private templateDataSource: TemplateDataSource,
-    @inject(Tokens.ScheduledEventDataSource)
-    private scheduledEventDataSource: ScheduledEventDataSource,
+    @inject(Tokens.ExperimentDataSource)
+    private experimentDataSource: ExperimentDataSource,
     @inject(Tokens.UserAuthorization) private userAuth: UserAuthorization,
     @inject(Tokens.ProposalAuthorization)
     private proposalAuth: ProposalAuthorization
@@ -53,13 +53,13 @@ export default class VisitMutations {
 
   @Authorized()
   async createVisit(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: CreateVisitArgs
   ): Promise<Visit | Rejection> {
     const visitAlreadyExists =
       (
         await this.dataSource.getVisits({
-          scheduledEventId: args.scheduledEventId,
+          experimentPk: args.experimentPk,
         })
       ).length > 0;
 
@@ -70,40 +70,28 @@ export default class VisitMutations {
       );
     }
 
-    const scheduledEvent =
-      await this.scheduledEventDataSource.getScheduledEventCore(
-        args.scheduledEventId
-      );
-    if (!scheduledEvent) {
-      return rejection(
-        'Can not create visit because scheduled event does not exist',
-        {
-          args,
-          agent: user,
-        }
-      );
-    }
-
-    if (scheduledEvent.proposalPk === null) {
-      return rejection(
-        'Can not create visit because scheduled event does not have a proposal associated with',
-        {
-          args,
-          agent: user,
-        }
-      );
-    }
-
-    const proposal = await this.proposalDataSource.get(
-      scheduledEvent.proposalPk
+    const experiment = await this.experimentDataSource.getExperiment(
+      args.experimentPk
     );
+
+    if (!experiment) {
+      return rejection(
+        'Can not create visit because experiment does not exist',
+        {
+          args,
+          agent,
+        }
+      );
+    }
+
+    const proposal = await this.proposalDataSource.get(experiment.proposalPk);
 
     if (proposal === null) {
       return rejection(
         'Can not create visit, proposal for the scheduled event does not exist',
         {
           args,
-          agent: user,
+          agent,
         }
       );
     }
@@ -116,19 +104,18 @@ export default class VisitMutations {
         'Can not create visit because the proposal is not yet accepted',
         {
           args,
-          agent: user,
+          agent,
         }
       );
     }
 
-    const isProposalOwner = await this.proposalAuth.hasReadRights(
-      user,
-      proposal
-    );
-    if (isProposalOwner === false) {
+    const hasReadRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.proposalAuth.hasReadRights(agent, proposal));
+    if (hasReadRights === false) {
       return rejection(
         'Can not create visit for proposal that does not belong to you',
-        { args, agent: user }
+        { args, agent }
       );
     }
 
@@ -141,14 +128,14 @@ export default class VisitMutations {
         'Can not create visit because team lead is not part of the team',
         {
           args,
-          agent: user,
+          agent,
         }
       );
     }
     try {
       const visit = await this.dataSource.createVisit(
         args,
-        user!.id,
+        agent!.id,
         proposal.primaryKey
       );
 
@@ -172,10 +159,10 @@ export default class VisitMutations {
 
   @Authorized()
   async updateVisit(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: UpdateVisitArgs
   ): Promise<Visit | Rejection> {
-    if (!user) {
+    if (!agent) {
       return rejection(
         'Could not update visit because request is not authorized',
         { args }
@@ -190,11 +177,13 @@ export default class VisitMutations {
       );
     }
 
-    const hasRights = await this.visitAuth.hasWriteRights(user, visit);
-    if (hasRights === false) {
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitAuth.hasWriteRights(agent, visit));
+    if (!hasRights) {
       return rejection(
         'Can not update visit because of insufficient permissions',
-        { args, agent: user }
+        { args, agent }
       );
     }
 
@@ -203,14 +192,16 @@ export default class VisitMutations {
 
   @Authorized()
   async deleteVisit(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     visitId: number
   ): Promise<Visit | Rejection> {
-    const hasRights = await this.visitAuth.hasWriteRights(user, visitId);
-    if (hasRights === false) {
+    const hasRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.visitAuth.hasWriteRights(agent, visitId));
+    if (!hasRights) {
       return rejection(
         'Can not update visit because of insufficient permissions',
-        { user, visitId }
+        { user: agent, visitId }
       );
     }
 
@@ -218,17 +209,21 @@ export default class VisitMutations {
   }
   @Authorized()
   async createVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     visitId: number,
     userId: number
   ): Promise<VisitRegistration | Rejection> {
-    if (!user) {
+    if (!agent) {
       return rejection(
         'Can not create visit registration, because the request is not authorized'
       );
     }
 
-    if (!this.userAuth.isUserOfficer(user) && user.id !== userId) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !this.userAuth.isUserOfficer(agent) &&
+      agent.id !== userId
+    ) {
       return rejection(
         'Can not create visit registration, because the request is not authorized'
       );
@@ -257,7 +252,7 @@ export default class VisitMutations {
 
   @Authorized()
   async updateVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: UpdateVisitRegistrationArgs
   ): Promise<VisitRegistration | Rejection> {
     const visitRegistration = await this.dataSource.getRegistration(
@@ -271,14 +266,29 @@ export default class VisitMutations {
       );
     }
 
-    const hasWriteRights = await this.registrationAuth.hasWriteRights(
-      user,
-      args
-    );
-    if (hasWriteRights === false) {
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.registrationAuth.hasWriteRights(agent, args));
+    if (!hasWriteRights) {
       return rejection(
-        'Chould not update Visit Registration due to insufficient permissions',
-        { args, user }
+        'Could not update Visit Registration due to insufficient permissions',
+        { args, user: agent }
+      );
+    }
+    const TODAY_MIDNIGT = new Date(new Date().setHours(0, 0, 0, 0));
+
+    if (args.startsAt && args.startsAt < TODAY_MIDNIGT) {
+      return rejection(
+        'Could not update Visit Registration because the start date is in the past',
+        { args }
+      );
+    }
+
+    const startsAt = args.startsAt ?? visitRegistration.startsAt;
+    if (startsAt && args.endsAt && args.endsAt <= startsAt) {
+      return rejection(
+        'Could not update Visit Registration because the end date is before the start date',
+        { args }
       );
     }
 
@@ -318,17 +328,16 @@ export default class VisitMutations {
 
   @Authorized()
   async submitVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     args: SubmitVisitRegistrationArgs
   ) {
-    const hasWriteRights = await this.registrationAuth.hasWriteRights(
-      user,
-      args
-    );
+    const hasWriteRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.registrationAuth.hasWriteRights(agent, args));
     if (hasWriteRights === false) {
       return rejection(
-        'Chould not submit Visit Registration due to insufficient permissions',
-        { args, user }
+        'Could not submit Visit Registration due to insufficient permissions',
+        { args, user: agent }
       );
     }
 
@@ -341,17 +350,16 @@ export default class VisitMutations {
 
   @Authorized()
   async cancelVisitRegistration(
-    user: UserWithRole | null,
+    agent: UserWithRole | null,
     input: CancelVisitRegistrationInput
   ) {
-    const hasCancelRights = await this.registrationAuth.hasCancelRights(
-      user,
-      input
-    );
+    const hasCancelRights =
+      this.userAuth.isApiToken(agent) ||
+      (await this.registrationAuth.hasCancelRights(agent, input));
     if (!hasCancelRights) {
       return rejection(
-        'Chould not cancel Visit Registration due to insufficient permissions',
-        { args: input, user }
+        'Could not cancel Visit Registration due to insufficient permissions',
+        { args: input, user: agent }
       );
     }
 
@@ -369,7 +377,7 @@ export default class VisitMutations {
 
     const oldStatus = registration.status;
     const newStatus =
-      input.userId === user!.id
+      input.userId === agent!.id
         ? VisitRegistrationStatus.CANCELLED_BY_USER
         : VisitRegistrationStatus.CANCELLED_BY_FACILITY;
 
@@ -381,7 +389,7 @@ export default class VisitMutations {
         type: Event.VISIT_REGISTRATION_CANCELLED,
         visitregistration: registration,
         key: 'visitregistration',
-        loggedInUserId: user ? user.id : null,
+        loggedInUserId: agent ? agent.id : null,
         isRejection: false,
       });
     }
@@ -390,6 +398,36 @@ export default class VisitMutations {
       userId: input.userId,
       visitId: input.visitId,
       status: newStatus,
+    });
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async requestVisitRegistrationChanges(
+    user: UserWithRole | null,
+    input: RequestVisitRegistrationChangesInput
+  ) {
+    const visitRegistration = await this.dataSource.getRegistration(
+      input.userId,
+      input.visitId
+    );
+    if (!visitRegistration) {
+      return rejection(
+        'Could not request changes for visit registration because specified registration does not exist',
+        { visitRegistration: input }
+      );
+    }
+
+    if (visitRegistration.status !== VisitRegistrationStatus.SUBMITTED) {
+      return rejection(
+        'Could not request changes to visit registration because registration is not in submitted state',
+        { visitRegistration: input }
+      );
+    }
+
+    return this.dataSource.updateRegistration({
+      userId: input.userId,
+      visitId: input.visitId,
+      status: VisitRegistrationStatus.CHANGE_REQUESTED,
     });
   }
 }

@@ -8,7 +8,7 @@ import {
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { Review, ReviewStatus } from '../models/Review';
-import { Role } from '../models/Role';
+import { Role, Roles } from '../models/Role';
 import { BasicUserDetails } from '../models/User';
 import {
   UpdateMemberFapArgs,
@@ -49,7 +49,7 @@ export interface FapDataSource {
     role: Role,
     fapId?: number
   ): Promise<Fap[]>;
-  getUserFaps(id: number, role: Role): Promise<Fap[]>;
+  getUserFaps(id: number, roleShortCode: Roles): Promise<Fap[]>;
   getFapsByCallId(callId: number): Promise<Fap[]>;
   // TODO: This should be removed as we have getFapsByProposalPk and getFapsByProposalPks
   getFapByProposalPk(proposalPk: number): Promise<Fap | null>;
@@ -83,7 +83,10 @@ export interface FapDataSource {
   getFapProposalCount(fapId: number): Promise<number>;
   getCurrentFapProposalCount(fapId: number): Promise<number>;
   getFapReviewerProposalCount(reviewerId: number): Promise<number>;
-  getCurrentFapReviewerProposalCount(reviewerId: number): Promise<number>;
+  getCurrentFapReviewerProposalCount(
+    reviewerId: number,
+    fapId: number
+  ): Promise<number>;
   getFapProposal(
     fapId: number,
     proposalPk: number,
@@ -131,6 +134,10 @@ export interface FapDataSource {
     userId: number,
     proposalPk: number
   ): Promise<boolean>;
+  isSecretaryForFapProposal(
+    userId: number,
+    proposalPk: number
+  ): Promise<boolean>;
   saveFapMeetingDecision(
     saveFapMeetingDecisionInput: SaveFapMeetingDecisionInput,
     submittedBy?: number | null
@@ -149,7 +156,7 @@ export interface FapDataSource {
     instrumentId?: number | null
   ): Promise<boolean>;
   setReviewerRank(
-    proposalPk: number,
+    fapReviewId: number,
     reviewerId: number,
     rank: number
   ): Promise<boolean>;

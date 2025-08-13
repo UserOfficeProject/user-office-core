@@ -63,7 +63,6 @@ export const QuestionTemplateRelationFileUploadForm = (
                   data-cy="small_label"
                 />
               </TitledContainer>
-
               <TitledContainer label="Constraints">
                 <Field
                   name="config.required"
@@ -146,7 +145,6 @@ export const QuestionTemplateRelationFileUploadForm = (
                   />
                 )}
               </TitledContainer>
-
               <TitledContainer label="Dependencies">
                 <QuestionDependencyList
                   form={formikProps}

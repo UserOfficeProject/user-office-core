@@ -22,7 +22,7 @@ import { QuestionaryDataSource } from '../datasources/QuestionaryDataSource';
 import { UserDataSource } from '../datasources/UserDataSource';
 import { EventBus, ValidateArgs, Authorized } from '../decorators';
 import { Event } from '../events/event.enum';
-import { Fap, FapProposal, FapReviewer } from '../models/Fap';
+import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
 import { ProposalPks } from '../models/Proposal';
 import { rejection, Rejection } from '../models/Rejection';
@@ -129,15 +129,11 @@ export default class FapMutations {
     agent: UserWithRole | null,
     args: AssignChairOrSecretaryToFapArgs
   ): Promise<Fap | Rejection> {
-    const userRoles = await this.userDataSource.getUserRoles(
-      args.assignChairOrSecretaryToFapInput.userId
-    );
-
-    // only users with fap reviewer role can be chair or secretary
-    const isFapReviewer = userRoles.some(
-      (role) => role.shortCode === Roles.FAP_REVIEWER
-    );
-    if (!isFapReviewer) {
+    if (
+      !(await this.userAuth.canBeAssignedToFap(
+        args.assignChairOrSecretaryToFapInput.userId
+      ))
+    ) {
       return rejection(
         'Can not assign to Fap, because only users with fap reviewer role can be chair or secretary',
         { args, agent }
@@ -148,7 +144,7 @@ export default class FapMutations {
       .assignChairOrSecretaryToFap(args.assignChairOrSecretaryToFapInput)
       .catch((error) => {
         return rejection(
-          'Could not assign chair or secretary to Fap please ensure they have the correct roles',
+          'Could not assign chair or secretary to Fap, please ensure they have the correct roles',
           { agent },
           error
         );
@@ -163,7 +159,7 @@ export default class FapMutations {
     args: AssignReviewersToFapArgs
   ): Promise<Fap | Rejection> {
     if (
-      !agent?.isApiAccessToken &&
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -195,12 +191,9 @@ export default class FapMutations {
       args.fapId
     );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isApiAccessToken = this.userAuth.isApiToken(agent);
 
-    if (
-      !agent?.isApiAccessToken &&
-      !isUserOfficer &&
-      !isChairOrSecretaryOfFap
-    ) {
+    if (!isApiAccessToken && !isUserOfficer && !isChairOrSecretaryOfFap) {
       return rejection(
         'Could not remove member from Fap because of insufficient permissions',
         { agent, args }
@@ -234,7 +227,7 @@ export default class FapMutations {
 
     // Fap Chair and Fap Secretary can not
     // modify Fap Chair and Fap Secretary members
-    if (isChairOrSecretaryOfFap && !isUserOfficer) {
+    if (isChairOrSecretaryOfFap && !isUserOfficer && !isApiAccessToken) {
       if (isMemberToRemoveChairOrSecretaryOfFap) {
         return rejection(
           `Could not remove member from Fap because Fap Chair and 
@@ -435,7 +428,7 @@ export default class FapMutations {
     args: AssignFapReviewersToProposalsArgs
   ): Promise<Fap | Rejection> {
     if (
-      !agent?.isApiAccessToken &&
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -495,43 +488,6 @@ export default class FapMutations {
     );
   }
 
-  async getReviewerWithMinNumReviews(
-    reviewersAssignedReviewsMap: Map<FapReviewer, number>,
-    pendingAssignments: Map<FapReviewer, FapProposal[]>,
-    proposalPk: number,
-    fapId: number
-  ): Promise<FapReviewer> {
-    let fapReviewerWithMinNumReviews = [
-      ...reviewersAssignedReviewsMap.keys(),
-    ][0];
-    let minReviews = Number.MAX_VALUE;
-
-    for (const fapReviewer of [...reviewersAssignedReviewsMap.keys()]) {
-      const numReviews = reviewersAssignedReviewsMap.get(fapReviewer) ?? 0;
-      const numPendingReviews = (pendingAssignments.get(fapReviewer) ?? [])
-        .length;
-      const totalReviews = numReviews + numPendingReviews;
-      const isAssigned =
-        (pendingAssignments.get(fapReviewer) ?? []).some(
-          (fapProposal) => fapProposal.proposalPk === proposalPk
-        ) ||
-        (
-          await this.dataSource.getFapProposalAssignments(
-            fapId,
-            proposalPk,
-            fapReviewer.userId
-          )
-        ).length > 0;
-
-      if (totalReviews < minReviews && !isAssigned) {
-        minReviews = totalReviews;
-        fapReviewerWithMinNumReviews = fapReviewer;
-      }
-    }
-
-    return fapReviewerWithMinNumReviews;
-  }
-
   @ValidateArgs(assignFapMemberToProposalValidationSchema)
   @Authorized([Roles.USER_OFFICER, Roles.FAP_SECRETARY, Roles.FAP_CHAIR])
   @EventBus(Event.FAP_MEMBER_REMOVED_FROM_PROPOSAL)
@@ -540,7 +496,7 @@ export default class FapMutations {
     args: RemoveFapReviewerFromProposalArgs
   ): Promise<Fap | Rejection> {
     if (
-      !agent?.isApiAccessToken &&
+      !this.userAuth.isApiToken(agent) &&
       !this.userAuth.isUserOfficer(agent) &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, args.fapId))
     ) {
@@ -573,7 +529,10 @@ export default class FapMutations {
     }: UpdateFapTimeAllocationArgs
   ) {
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
+    const isApiAccessToken = this.userAuth.isApiToken(agent);
+
     if (
+      !isApiAccessToken &&
       !isUserOfficer &&
       !(await this.userAuth.isChairOrSecretaryOfFap(agent, fapId))
     ) {
@@ -589,7 +548,11 @@ export default class FapMutations {
         instrumentId
       );
 
-    if (isFapProposalInstrumentSubmitted && !isUserOfficer) {
+    if (
+      isFapProposalInstrumentSubmitted &&
+      !isUserOfficer &&
+      !isApiAccessToken
+    ) {
       return rejection(
         'Could not update the time allocation because the instrument is submitted',
         { agent, fapId, proposalPk }
@@ -624,7 +587,11 @@ export default class FapMutations {
       );
     const isUserOfficer = this.userAuth.isUserOfficer(agent);
 
-    if (!isChairOrSecretaryOfProposal && !isUserOfficer) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !isChairOrSecretaryOfProposal &&
+      !isUserOfficer
+    ) {
       return rejection(
         'Can not save Fap meeting decision because of insufficient permissions',
         { agent, args }
@@ -731,7 +698,7 @@ export default class FapMutations {
   ): Promise<boolean | Rejection> {
     try {
       return await this.dataSource.setReviewerRank(
-        args.proposalPk,
+        args.fapReviewId,
         args.reviewerId,
         args.rank
       );

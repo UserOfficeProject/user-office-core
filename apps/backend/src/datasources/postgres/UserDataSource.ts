@@ -14,7 +14,10 @@ import {
 } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
-import { UpdateUserArgs } from '../../resolvers/mutations/UpdateUserMutation';
+import {
+  UpdateUserByIdArgs,
+  UpdateUserByOidcSubArgs,
+} from '../../resolvers/mutations/UpdateUserMutation';
 import { UsersArgs } from '../../resolvers/queries/UsersQuery';
 import { UserDataSource } from '../UserDataSource';
 import database from './database';
@@ -70,22 +73,19 @@ export default class PostgresUserDataSource implements UserDataSource {
       .then((user: UserRecord) => (user ? true : false));
   }
 
-  async update(user: UpdateUserArgs): Promise<User> {
+  async update(user: UpdateUserByIdArgs): Promise<User> {
     const {
       firstname,
       user_title,
-      middlename,
       lastname,
       preferredname,
       gender,
-      nationality,
       birthdate,
       institutionId,
       department,
       position,
       email,
       telephone,
-      telephone_alt,
       placeholder,
       oidcSub,
       oauthRefreshToken,
@@ -96,18 +96,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .update({
         firstname,
         user_title,
-        middlename,
         lastname,
         preferredname,
         gender,
-        nationality,
         birthdate,
         institution_id: institutionId,
         department,
         position,
         email,
         telephone,
-        telephone_alt,
         placeholder,
         oidc_sub: oidcSub,
         oauth_refresh_token: oauthRefreshToken,
@@ -119,6 +116,55 @@ export default class PostgresUserDataSource implements UserDataSource {
 
     return createUserObject(userRecord);
   }
+  async updateUserByOidcSub(
+    args: UpdateUserByOidcSubArgs
+  ): Promise<User | null> {
+    const {
+      firstname,
+      user_title,
+      lastname,
+      preferredname,
+      gender,
+      birthdate,
+      institutionId,
+      department,
+      position,
+      email,
+      telephone,
+      placeholder,
+      oauthRefreshToken,
+      oauthIssuer,
+    } = args;
+
+    const [userRecord]: UserRecord[] = await database
+      .update({
+        firstname,
+        user_title,
+        lastname,
+        preferredname,
+        gender,
+        birthdate,
+        institution_id: institutionId,
+        department,
+        position,
+        email,
+        telephone,
+        placeholder,
+        oauth_refresh_token: oauthRefreshToken,
+        oauth_issuer: oauthIssuer,
+        updated_at: new Date(),
+      })
+      .from('users')
+      .where('oidc_sub', args.oidcSub)
+      .returning(['*']);
+
+    if (!userRecord) {
+      return null;
+    }
+
+    return createUserObject(userRecord);
+  }
+
   async createInviteUser(args: CreateUserByEmailInviteArgs): Promise<number> {
     const { firstname, lastname, email } = args;
 
@@ -126,7 +172,6 @@ export default class PostgresUserDataSource implements UserDataSource {
       .insert({
         user_title: '',
         firstname,
-        middlename: '',
         lastname,
         username: email,
         preferredname: firstname,
@@ -134,14 +179,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         oauth_refresh_token: '',
         oauth_issuer: '',
         gender: '',
-        nationality: null,
         birthdate: '2000-01-01',
         institution_id: 1,
         department: '',
         position: '',
         email,
         telephone: '',
-        telephone_alt: '',
         placeholder: true,
       })
       .returning(['*'])
@@ -154,7 +197,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .select()
       .from('roles')
       .then((roles: RoleRecord[]) =>
-        roles.map((role) => new Role(role.role_id, role.short_code, role.title))
+        roles.map(
+          (role) =>
+            new Role(
+              role.role_id,
+              role.short_code,
+              role.title,
+              role.description
+            )
+        )
       );
   }
 
@@ -166,7 +217,15 @@ export default class PostgresUserDataSource implements UserDataSource {
       .join('users as u', { 'u.user_id': 'rc.user_id' })
       .where('u.user_id', id)
       .then((roles: RoleRecord[]) =>
-        roles.map((role) => new Role(role.role_id, role.short_code, role.title))
+        roles.map(
+          (role) =>
+            new Role(
+              role.role_id,
+              role.short_code,
+              role.title,
+              role.description
+            )
+        )
       );
   }
 
@@ -308,7 +367,6 @@ export default class PostgresUserDataSource implements UserDataSource {
   async create(
     user_title: string | undefined,
     firstname: string,
-    middlename: string | undefined,
     lastname: string,
     username: string,
     preferredname: string | undefined,
@@ -316,20 +374,17 @@ export default class PostgresUserDataSource implements UserDataSource {
     oauth_refresh_token: string,
     oauth_issuer: string,
     gender: string,
-    nationality: number,
     birthdate: Date,
     institution_id: number,
     department: string,
     position: string,
     email: string,
-    telephone: string,
-    telephone_alt: string | undefined
+    telephone: string
   ): Promise<User> {
     return database
       .insert({
         user_title,
         firstname,
-        middlename,
         lastname,
         username,
         preferredname,
@@ -337,14 +392,12 @@ export default class PostgresUserDataSource implements UserDataSource {
         oauth_refresh_token,
         oauth_issuer,
         gender,
-        nationality,
         birthdate,
         institution_id,
         department,
         position,
         email,
         telephone,
-        telephone_alt,
       })
       .returning(['*'])
       .into('users')
@@ -404,21 +457,18 @@ export default class PostgresUserDataSource implements UserDataSource {
       user_id: userId,
       user_title: '',
       firstname: '',
-      middlename: '',
       lastname: '',
       username: userId.toString(),
       preferredname: '',
       oidc_sub: '',
       oauth_refresh_token: '',
       gender: '',
-      nationality: 1,
       birthdate: '2000-01-01',
       institution_id: 1,
       department: '',
       position: '',
       email: userId.toString(),
       telephone: '',
-      telephone_alt: '',
     };
   }
 
@@ -750,7 +800,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       .first()
       .then(
         (role: RoleRecord) =>
-          new Role(role.role_id, role.short_code, role.title)
+          new Role(role.role_id, role.short_code, role.title, role.description)
       );
   }
 

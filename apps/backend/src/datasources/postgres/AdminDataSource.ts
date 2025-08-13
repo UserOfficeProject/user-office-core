@@ -34,7 +34,6 @@ import {
   createSettingsObject,
   FeatureRecord,
   InstitutionRecord,
-  NationalityRecord,
   PageTextRecord,
   SettingsRecord,
   TokensAndPermissionsRecord,
@@ -190,17 +189,6 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     }
 
     return createPageObject(pagetextRecord);
-  }
-
-  async getNationalities(): Promise<Entry[]> {
-    return database
-      .select()
-      .from('nationalities')
-      .then((natDB: NationalityRecord[]) =>
-        natDB.map((nat) => {
-          return { id: nat.nationality_id, value: nat.nationality };
-        })
-      );
   }
 
   async getInstitutions(filter: InstitutionsFilter): Promise<Institution[]> {
@@ -658,15 +646,11 @@ export default class PostgresAdminDataSource implements AdminDataSource {
     });
   }
 
-  async updateRoleTitle(rolesToUpdate: {
-    shortCode: string;
-    title: string;
-  }): Promise<void> {
-    const { shortCode, title } = rolesToUpdate;
-
-    await database('roles')
-      .update({ title: title })
-      .where('short_code', shortCode);
+  async updateRole(
+    role: string,
+    update: { title?: string; description?: string }
+  ): Promise<void> {
+    await database('roles').update(update).where('short_code', role);
   }
 }
 

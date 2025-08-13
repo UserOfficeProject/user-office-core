@@ -1,0 +1,19 @@
+fragment experimentSafety on ExperimentSafety {
+  experimentSafetyPk
+  experimentPk
+  esiQuestionaryId
+  esiQuestionarySubmittedAt
+  createdBy
+  statusId
+  safetyReviewQuestionaryId
+  reviewedBy
+  createdAt
+  updatedAt
+  instrumentScientistDecision
+  instrumentScientistComment
+  experimentSafetyReviewerDecision
+  experimentSafetyReviewerComment
+  status {
+    ...status
+  }
+}

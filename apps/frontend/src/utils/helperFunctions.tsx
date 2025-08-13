@@ -80,6 +80,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
       name: instrument?.name,
       managerUserId: instrument?.managerUserId,
       managementTimeAllocation: instrument?.managementTimeAllocation,
+      multipleTechReviewsEnabled: instrument?.multipleTechReviewsEnabled,
     })),
     technicalReviews:
       proposal.technicalReviews.map((tr) => ({
@@ -87,6 +88,7 @@ export const fromProposalToProposalView = (proposal: Proposal) =>
         status: getTranslation(tr.status as ResourceId),
         submitted: tr.submitted,
         timeAllocation: tr.timeAllocation,
+        instrumentId: tr.instrumentId,
         technicalReviewAssignee: {
           id: tr.technicalReviewAssignee?.id,
           firstname: tr.technicalReviewAssignee?.firstname,

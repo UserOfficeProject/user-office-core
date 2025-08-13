@@ -49,6 +49,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         disableToolbar
         autoOk={true}
         required
+        minDate={DateTime.now()}
         textField={{
           fullWidth: true,
           required: true,
@@ -75,6 +76,7 @@ function QuestionaryComponentVisitBasis({ answer }: BasicComponentProps) {
         disableToolbar
         autoOk={true}
         required
+        minDate={state.registration.startsAt}
         textField={{
           fullWidth: true,
           required: true,

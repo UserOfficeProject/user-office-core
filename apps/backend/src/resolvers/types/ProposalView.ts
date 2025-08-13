@@ -42,6 +42,9 @@ export class ProposalViewInstrument {
 
   @Field(() => Int, { nullable: true })
   managementTimeAllocation: number;
+
+  @Field(() => Boolean, { nullable: true })
+  multipleTechReviewsEnabled?: boolean;
 }
 
 @ObjectType()
@@ -96,6 +99,9 @@ export class ProposalViewTechnicalReview {
 
   @Field(() => ProposalViewTechnicalReviewAssignee, { nullable: true })
   technicalReviewAssignee: ProposalViewTechnicalReviewAssignee;
+
+  @Field(() => Int, { nullable: true })
+  instrumentId: number;
 }
 @ObjectType()
 export class ProposalScientistComment extends ProposalInternalComment {}

@@ -38,11 +38,14 @@ export enum Event {
   CALL_ENDED_INTERNAL = 'CALL_ENDED_INTERNAL',
   CALL_REVIEW_ENDED = 'CALL_REVIEW_ENDED',
   CALL_FAP_REVIEW_ENDED = 'CALL_FAP_REVIEW_ENDED',
+  INVITE_ACCEPTED = 'INVITE_ACCEPTED',
   USER_UPDATED = 'USER_UPDATED',
   USER_ROLE_UPDATED = 'USER_ROLE_UPDATED',
   USER_DELETED = 'USER_DELETED',
   USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
+  EMAIL_INVITE_LEGACY = 'EMAIL_INVITE_LEGACY',
   EMAIL_INVITE = 'EMAIL_INVITE',
+  EMAIL_INVITES = 'EMAIL_INVITES',
   FAP_CREATED = 'FAP_CREATED',
   FAP_UPDATED = 'FAP_UPDATED',
   FAP_MEMBERS_ASSIGNED = 'FAP_MEMBERS_ASSIGNED',
@@ -63,6 +66,8 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
   PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
+  PROPOSAL_CO_PROPOSER_CLAIM_SENT = 'PROPOSAL_CO_PROPOSER_CLAIM_SENT',
+  PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED = 'PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED',
   INSTRUMENT_CREATED = 'INSTRUMENT_CREATED',
   INSTRUMENT_UPDATED = 'INSTRUMENT_UPDATED',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
@@ -86,6 +91,10 @@ export enum Event {
   EXPERIMENT_ESF_REJECTED_BY_IS = 'EXPERIMENT_ESF_REJECTED_BY_IS',
   EXPERIMENT_ESF_APPROVED_BY_ESR = 'EXPERIMENT_ESF_APPROVED_BY_ESR',
   EXPERIMENT_ESF_REJECTED_BY_ESR = 'EXPERIMENT_ESF_REJECTED_BY_ESR',
+  EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS = 'EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS',
+  EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR = 'EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR',
+  EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER',
+  EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW = 'EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW',
 }
 
 export const EventLabel = new Map<Event, string>([
@@ -227,7 +236,15 @@ export const EventLabel = new Map<Event, string>([
     Event.USER_PASSWORD_RESET_EMAIL,
     'Event occurs when user password is reset by email',
   ],
-  [Event.EMAIL_INVITE, 'Event occurs when user is created using email invite'],
+  [
+    Event.EMAIL_INVITE_LEGACY,
+    '[Deprecated] Event occurs when user is created using email invite',
+  ],
+  [Event.EMAIL_INVITE, 'Event occurs when user is invited by email'],
+  [
+    Event.EMAIL_INVITES,
+    'Event occurs when multiple users are invited by email',
+  ],
   [Event.FAP_CREATED, 'Event occurs when FAP is created'],
   [Event.FAP_UPDATED, 'Event occurs when FAP is updated'],
   [Event.FAP_MEMBERS_ASSIGNED, 'Event occurs when we assign member/s to a FAP'],
@@ -360,5 +377,21 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.EXPERIMENT_ESF_REJECTED_BY_ESR,
     'Event occurs when experiment ESF is rejected by ESR',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_IS,
+    'Event occurs when experiment safety management decision is submitted by IS',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_MANAGEMENT_DECISION_SUBMITTED_BY_ESR,
+    'Event occurs when experiment safety management decision is submitted by ESR',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_USER,
+    'Event occurs when experiment safety status is changed by user',
+  ],
+  [
+    Event.EXPERIMENT_SAFETY_STATUS_CHANGED_BY_WORKFLOW,
+    'Event occurs when experiment safety status is changed by workflow',
   ],
 ]);

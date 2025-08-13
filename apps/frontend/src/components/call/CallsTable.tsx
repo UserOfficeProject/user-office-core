@@ -125,6 +125,11 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       emptyValue: '-',
     },
     {
+      title: 'Experiment Workflow',
+      field: 'experimentWorkflow.name',
+      emptyValue: '-',
+    },
+    {
       title: 'Proposal template',
       field: 'template.name',
       emptyValue: '-',
@@ -287,6 +292,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     />
   );
 
+  const search = searchParam.get('search');
+
   return (
     <div data-cy="calls-table">
       <Grid container spacing={2}>
@@ -343,7 +350,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           },
         ]}
         options={{
-          search: false,
+          search: true,
+          searchText: search || undefined,
         }}
         actions={[
           {

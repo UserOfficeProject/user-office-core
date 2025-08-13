@@ -6,7 +6,7 @@ import ProposalQuestionaryDetails from 'components/proposal/ProposalQuestionaryD
 import { TableRowData } from 'components/questionary/QuestionaryDetails';
 import { BasicUserDetails } from 'generated/sdk';
 import { ProposalWithQuestionary } from 'models/questionary/proposal/ProposalWithQuestionary';
-import { getFullUserNameWithEmail } from 'utils/user';
+import { getFullUserNameWithBasicDetails } from 'utils/user';
 
 export default function ProposalQuestionaryReview(
   props: {
@@ -34,14 +34,24 @@ export default function ProposalQuestionaryReview(
     { label: 'Abstract', value: data.abstract },
     {
       label: 'Principal Investigator',
-      value: getFullUserNameWithEmail(data.proposer),
+      value: getFullUserNameWithBasicDetails(data.proposer),
     },
     {
       label: 'Co-Proposers',
       value: users
-        .map((user: BasicUserDetails) => getFullUserNameWithEmail(user))
+        .map((user: BasicUserDetails) => getFullUserNameWithBasicDetails(user))
         .join(', '),
     },
+    ...(data.coProposerInvites?.length > 0
+      ? [
+          {
+            label: 'Invited',
+            value: data.coProposerInvites
+              .map((invite) => invite.email)
+              .join(', '),
+          },
+        ]
+      : []),
   ];
 
   return (

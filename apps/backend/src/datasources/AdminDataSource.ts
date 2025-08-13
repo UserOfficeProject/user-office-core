@@ -29,7 +29,6 @@ export interface AdminDataSource {
   getInstitutionByName(institutionName: string): Promise<Institution | null>;
   getInstitutionUsers(id: number): Promise<BasicUserDetails[]>;
   getCountries(): Promise<Entry[]>;
-  getNationalities(): Promise<Entry[]>;
   get(id: number): Promise<string | null>;
   setPageText(id: number, text: string): Promise<Page>;
   resetDB(includeSeeds: boolean): Promise<string[]>;
@@ -54,8 +53,11 @@ export interface AdminDataSource {
   getAllTokensAndPermissions(): Promise<Permissions[]>;
   deleteApiAccessToken(accessTokenId: string): Promise<boolean>;
   waitForDBUpgrade(): Promise<void>;
-  updateRoleTitle(rolesToUpdate: {
-    shortCode: string;
-    title: string;
-  }): Promise<void>;
+  updateRole(
+    role: string,
+    update: {
+      title?: string;
+      description?: string;
+    }
+  ): Promise<void>;
 }

@@ -192,6 +192,14 @@ export class ProposalAuthorization {
     );
   }
 
+  async isSecretaryForFapProposal(agent: UserJWT | null, proposalPk: number) {
+    if (!agent?.id || !proposalPk) {
+      return false;
+    }
+
+    return this.fapDataSource.isSecretaryForFapProposal(agent.id, proposalPk);
+  }
+
   async isInternalReviewer(agent: UserWithRole, proposalPk: number) {
     const technicalReviews =
       await this.reviewDataSource.getTechnicalReviews(proposalPk);
@@ -266,6 +274,7 @@ export class ProposalAuthorization {
       case Roles.EXPERIMENT_SAFETY_REVIEWER:
         hasAccess = true;
         break;
+
       default:
         hasAccess = this.userAuth.hasGetAccessByToken(agent);
     }

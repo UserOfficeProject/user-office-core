@@ -58,6 +58,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return statuses.map((status) => this.createStatusObject(status));
   }
+
   async updateStatus(status: Omit<Status, 'entityType'>): Promise<Status> {
     const [updatedStatus]: StatusRecord[] = await database
       .update(
@@ -76,6 +77,7 @@ export default class PostgresStatusDataSource implements StatusDataSource {
 
     return this.createStatusObject(updatedStatus);
   }
+
   async deleteStatus(statusId: number): Promise<Status> {
     const [removedStatus]: StatusRecord[] = await database('statuses')
       .where('status_id', statusId)
@@ -88,5 +90,18 @@ export default class PostgresStatusDataSource implements StatusDataSource {
     }
 
     return this.createStatusObject(removedStatus);
+  }
+
+  async getDefaultStatus(
+    entityType: Status['entityType']
+  ): Promise<Status | null> {
+    const status: StatusRecord = await database
+      .select()
+      .from('statuses')
+      .where('entity_type', entityType)
+      .andWhere('is_default', true)
+      .first();
+
+    return status ? this.createStatusObject(status) : null;
   }
 }

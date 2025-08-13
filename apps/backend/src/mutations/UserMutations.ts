@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import {
   addUserRoleValidationSchema,
   createUserByEmailInviteValidationSchema,
@@ -8,6 +9,7 @@ import {
 } from '@user-office-software/duo-validation';
 import * as bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
+import { Args } from 'type-graphql';
 
 import { UserAuthorization } from '../auth/UserAuthorization';
 import { Tokens } from '../config/Tokens';
@@ -28,8 +30,9 @@ import {
 import { AddUserRoleArgs } from '../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
-  UpdateUserArgs,
   UpdateUserRolesArgs,
+  UpdateUserByOidcSubArgs,
+  UpdateUserByIdArgs,
 } from '../resolvers/mutations/UpdateUserMutation';
 import { signToken, verifyToken } from '../utils/jwt';
 import { ApolloServerErrorCodeExtended } from '../utils/utilTypes';
@@ -79,7 +82,7 @@ export default class UserMutations {
 
   @ValidateArgs(createUserByEmailInviteValidationSchema(UserRole))
   @Authorized()
-  @EventBus(Event.EMAIL_INVITE)
+  @EventBus(Event.EMAIL_INVITE_LEGACY)
   async createUserByEmailInvite(
     agent: UserWithRole | null,
     args: CreateUserByEmailInviteArgs
@@ -109,7 +112,7 @@ export default class UserMutations {
 
     if (
       args.userRole === UserRole.FAP_REVIEWER &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
 
@@ -130,20 +133,20 @@ export default class UserMutations {
       role = UserRole.USER;
     } else if (
       args.userRole === UserRole.FAP_CHAIR &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       // NOTE: For inviting FAP_CHAIR and FAP_SECRETARY we do not setUserRoles because they are set right after in separate call.
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.FAP_CHAIR;
     } else if (
       args.userRole === UserRole.FAP_SECRETARY &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.FAP_SECRETARY;
     } else if (
       args.userRole === UserRole.INSTRUMENT_SCIENTIST &&
-      this.userAuth.isUserOfficer(agent)
+      (this.userAuth.isApiToken(agent) || this.userAuth.isUserOfficer(agent))
     ) {
       userId = await this.dataSource.createInviteUser(args);
       role = UserRole.INSTRUMENT_SCIENTIST;
@@ -165,10 +168,14 @@ export default class UserMutations {
   @EventBus(Event.USER_UPDATED)
   async update(
     agent: UserWithRole | null,
-    args: UpdateUserArgs
+    args: UpdateUserByIdArgs
   ): Promise<User | Rejection> {
     const isUpdatingOwnUser = agent?.id === args.id;
-    if (!this.userAuth.isUserOfficer(agent) && !isUpdatingOwnUser) {
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !this.userAuth.isUserOfficer(agent) &&
+      !isUpdatingOwnUser
+    ) {
       return rejection(
         'Can not update user because of insufficient permissions',
         {
@@ -234,6 +241,49 @@ export default class UserMutations {
       });
   }
 
+  @Authorized()
+  @EventBus(Event.USER_UPDATED)
+  async updateUserByOidcSub(
+    agent: UserWithRole | null,
+    @Args() args: UpdateUserByOidcSubArgs
+  ): Promise<User | Rejection> {
+    const isUpdatingOwnUser = agent?.oidcSub === args.oidcSub;
+    if (
+      !this.userAuth.isApiToken(agent) &&
+      !this.userAuth.isUserOfficer(agent) &&
+      !isUpdatingOwnUser
+    ) {
+      return rejection(
+        'Can not update user because of insufficient permissions',
+        {
+          args,
+          agent,
+          code: ApolloServerErrorCodeExtended.INSUFFICIENT_PERMISSIONS,
+        }
+      );
+    }
+
+    try {
+      const updatedUser = await this.dataSource.updateUserByOidcSub(args);
+
+      if (!updatedUser) {
+        return rejection(
+          'USER_NOT_FOUND',
+          { oidcSub: args.oidcSub },
+          new Error(`User with OIDC sub ${args.oidcSub} not found`)
+        );
+      }
+
+      return updatedUser;
+    } catch (error) {
+      return rejection(
+        'INTERNAL_ERROR',
+        { agent, args },
+        error instanceof Error ? error : new Error(String(error))
+      );
+    }
+  }
+
   @ValidateArgs(getTokenForUserValidationSchema)
   @Authorized()
   async getTokenForUser(
@@ -282,9 +332,14 @@ export default class UserMutations {
       roles,
       currentRole: roles[0],
       isInternalUser: false,
+      externalToken: agent?.externalToken,
       impersonatingUserId:
         isUserOfficer && shouldImpersonateUser ? agent?.id : undefined,
     });
+
+    if (isUserOfficer && shouldImpersonateUser && agent) {
+      logger.logInfo(`userId: ${agent.id} impersonating userId: ${userId}`, {});
+    }
 
     return token;
   }

@@ -28,6 +28,15 @@ export class UpdateInstrumentArgs {
 
   @Field(() => Int)
   public managerUserId: number;
+
+  @Field(() => Boolean)
+  public updateTechReview: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public selectable?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public multipleTechReviewsEnabled?: boolean;
 }
 
 @ArgsType()

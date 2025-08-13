@@ -35,7 +35,6 @@ export const QuestionTemplateRelationTextInputForm = (
       {(formikProps) => (
         <>
           <QuestionExcerpt question={props.questionRel.question} />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"
@@ -155,7 +154,6 @@ export const QuestionTemplateRelationTextInputForm = (
               />
             </Collapse>
           </TitledContainer>
-
           <TitledContainer label="Dependencies">
             <QuestionDependencyList
               form={formikProps}

@@ -38,9 +38,10 @@ export class AdminDataSourceMock implements AdminDataSource {
   init() {
     this.settings = [
       new Settings(SettingsId.EXTERNAL_AUTH_LOGIN_URL, '', ''),
-      new Settings(SettingsId.FEEDBACK_MAX_REQUESTS, '', '2'),
-      new Settings(SettingsId.FEEDBACK_EXHAUST_DAYS, '', '90'),
-      new Settings(SettingsId.FEEDBACK_FREQUENCY_DAYS, '', '14'),
+      new Settings(SettingsId.FEEDBACK_MAX_REQUESTS, '2', ''),
+      new Settings(SettingsId.FEEDBACK_EXHAUST_DAYS, '90', ''),
+      new Settings(SettingsId.FEEDBACK_FREQUENCY_DAYS, '14', ''),
+      new Settings(SettingsId.INVITE_VALIDITY_PERIOD_DAYS, '365', ''),
     ];
   }
   async setFeatures(
@@ -120,9 +121,7 @@ export class AdminDataSourceMock implements AdminDataSource {
   async getCountries(): Promise<Entry[]> {
     throw new Error('Method not implemented.');
   }
-  async getNationalities(): Promise<Entry[]> {
-    throw new Error('Method not implemented.');
-  }
+
   async get(id: number): Promise<string | null> {
     return 'HELLO WORLD';
   }
@@ -229,10 +228,10 @@ export class AdminDataSourceMock implements AdminDataSource {
     throw new Error('Method not implemented.');
   }
 
-  updateRoleTitle(rolesToUpdate: {
-    shortCode: string;
-    title: string;
-  }): Promise<void> {
+  updateRole(
+    role: string,
+    update: { title?: string; description?: string }
+  ): Promise<void> {
     throw new Error('Method not implemented.');
   }
 }

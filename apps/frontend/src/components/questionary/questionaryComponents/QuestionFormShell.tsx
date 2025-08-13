@@ -13,6 +13,8 @@ import { Question } from 'generated/sdk';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
+import { QuestionReadPermissionsConfig } from '../QuestionReadPermissionsConfig';
+
 interface QuestionFormShellProps extends QuestionFormProps {
   validationSchema: unknown;
   confirm: WithConfirmType;
@@ -90,7 +92,10 @@ export const QuestionFormShell = withConfirm(
           {(formikProps) => (
             <Form style={{ flexGrow: 1 }}>
               {children?.(formikProps)}
-
+              <QuestionReadPermissionsConfig
+                config={props.question.config}
+                rolesData={props.rolesData}
+              />
               <ActionButtonContainer>
                 <Button
                   type="button"

@@ -7,6 +7,7 @@ import {
 import DoneAll from '@mui/icons-material/DoneAll';
 import Edit from '@mui/icons-material/Edit';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import ReduceCapacityIcon from '@mui/icons-material/ReduceCapacity';
 import Visibility from '@mui/icons-material/Visibility';
 import { Box, Button, Dialog, DialogContent, Grid } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
@@ -25,6 +26,9 @@ import ProposalReviewModal from 'components/review/ProposalReviewModal';
 import ReviewerFilterComponent, {
   reviewFilter,
 } from 'components/review/ReviewerFilter';
+import TechnicalBulkReassignModal, {
+  ReviewData,
+} from 'components/review/TechnicalBulkReassignModal';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { SettingsContext } from 'context/SettingsContextProvider';
 import { UserContext } from 'context/UserContextProvider';
@@ -72,8 +76,9 @@ import TableActionsDropdownMenu, {
 
 type QueryParameters = {
   query: {
-    first?: number;
+    first: number;
     offset?: number;
+    refetch: boolean;
   };
   searchText?: string | undefined;
 };
@@ -330,6 +335,7 @@ const ProposalTableInstrumentScientist = ({
     query: {
       first: PREFETCH_SIZE,
       offset: 0,
+      refetch: false,
     },
     searchText: search ?? undefined,
   });
@@ -356,6 +362,7 @@ const ProposalTableInstrumentScientist = ({
     );
 
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
+  const [bulkReassignData, setBulkReassignData] = useState<ReviewData[]>([]);
   const [preselectedProposalsData, setPreselectedProposalsData] = useState<
     ProposalViewData[]
   >([]);
@@ -450,9 +457,15 @@ const ProposalTableInstrumentScientist = ({
         ?.map((tr) => tr.technicalReviewAssignee?.id)
         .includes(user.id);
 
+    const isMultipleTechReviewsEnabled =
+      isInstrumentScientist &&
+      rowData.instruments?.some((i) => i.multipleTechReviewsEnabled);
+
     const showView =
       rowData.technicalReviews?.every((tr) => tr.submitted) ||
-      (isCurrentUserTechnicalReviewAssignee === false && !isInternalReviewer);
+      (isCurrentUserTechnicalReviewAssignee === false &&
+        !isInternalReviewer &&
+        !isMultipleTechReviewsEnabled);
 
     return (
       <>
@@ -601,6 +614,7 @@ const ProposalTableInstrumentScientist = ({
   ) => {
     setActionsMenuAnchorElement(event.currentTarget);
   };
+
   const handleClose = (selectedOption: string) => {
     if (selectedOption === PdfDownloadMenuOption.PDF) {
       downloadPDFProposal(
@@ -621,24 +635,44 @@ const ProposalTableInstrumentScientist = ({
 
   const handleBulkTechnicalReviewsSubmit = async () => {
     const invalid = [];
+    // Proposals with at least one submitted technical review (cannot be re-submitted)
+    const technicalReviewAlreadySubmitted = selectedProposals.filter(
+      (proposal) =>
+        proposal.technicalReviews?.some(
+          (technicalReview) => technicalReview.submitted
+        )
+    );
+    // Proposals where the current user is not the assignee for any unsubmitted technical review (cannot be submitted)
+    const notAPrimaryReviewerOfProposal = selectedProposals.filter((proposal) =>
+      proposal.technicalReviews?.some(
+        (technicalReview) =>
+          technicalReview.technicalReviewAssignee?.id !== user.id &&
+          !technicalReview.submitted
+      )
+    );
 
-    for await (const proposal of selectedProposals) {
-      const { technicalReviews } = proposal;
-      if (technicalReviews?.length) {
-        const isValidSchema = (
-          await Promise.all(
-            technicalReviews.map(
-              async (tr) =>
-                await proposalTechnicalReviewValidationSchema.isValid({
-                  status: tr.status,
-                  timeAllocation: tr.timeAllocation,
-                })
+    if (
+      technicalReviewAlreadySubmitted.length == 0 &&
+      notAPrimaryReviewerOfProposal.length == 0
+    ) {
+      for await (const proposal of selectedProposals) {
+        const { technicalReviews } = proposal;
+        if (technicalReviews?.length) {
+          const isValidSchema = (
+            await Promise.all(
+              technicalReviews.map(
+                async (tr) =>
+                  await proposalTechnicalReviewValidationSchema.isValid({
+                    status: tr.status,
+                    timeAllocation: tr.timeAllocation,
+                  })
+              )
             )
-          )
-        ).every(Boolean);
+          ).every(Boolean);
 
-        if (!isValidSchema) {
-          invalid.push(proposal);
+          if (!isValidSchema) {
+            invalid.push(proposal);
+          }
         }
       }
     }
@@ -652,13 +686,49 @@ const ProposalTableInstrumentScientist = ({
         description:
           'No further changes to technical reviews are possible after submission. Are you sure you want to submit the selected proposals technical reviews?',
         alertText:
-          invalid.length > 0
-            ? `Some of the selected proposals are missing some required input. Please correct the status and time allocation for the proposal(s) with ID: ${invalid
-                .map((proposal) => proposal.proposalId)
-                .join(', ')}`
-            : '',
+          technicalReviewAlreadySubmitted.length > 0
+            ? `These proposals ${technicalReviewAlreadySubmitted.map((proposal) => proposal.proposalId).join(',')} are already submitted`
+            : notAPrimaryReviewerOfProposal.length > 0
+              ? `You are attempting to submit reviews for proposals where you are not the assigned technical reviewer. Please contact the designated reviewer to submit the proposals with ID : ${notAPrimaryReviewerOfProposal.map((proposal) => proposal.proposalId).join(',')}`
+              : invalid.length > 0
+                ? `Some of the selected proposals are missing some required input. Please correct the status and time allocation for the proposal(s) with ID: ${invalid
+                    .map((proposal) => proposal.proposalId)
+                    .join(', ')}`
+                : '',
       }
     )();
+  };
+
+  const handleBulkTechnicalReviewsReassign = () => {
+    const currentUserAssignedSelectTechReviews: ReviewData[] = [];
+
+    for (const proposal of selectedProposals) {
+      const { technicalReviews } = proposal;
+      if (technicalReviews?.length) {
+        for (const techReview of technicalReviews) {
+          const instrument = proposal.instruments?.find(
+            (inst) => inst.id === techReview.instrumentId
+          );
+
+          if (
+            instrument &&
+            (techReview.technicalReviewAssignee?.id === user.id ||
+              instrument?.managerUserId === user.id)
+          ) {
+            currentUserAssignedSelectTechReviews.push({
+              review: techReview,
+              instrument: instrument,
+              proposal: {
+                proposalPk: proposal.primaryKey,
+                proposalId: proposal.proposalId,
+                title: proposal.title,
+              },
+            });
+          }
+        }
+      }
+    }
+    setBulkReassignData(currentUserAssignedSelectTechReviews);
   };
 
   // NOTE: We are remapping only the hidden field because functions like `render` can not be stringified.
@@ -695,6 +765,9 @@ const ProposalTableInstrumentScientist = ({
   );
   const DoneAllIcon = (): JSX.Element => (
     <DoneAll data-cy="submit-proposal-reviews" />
+  );
+  const ReduceCapacityIconComponent = (): JSX.Element => (
+    <ReduceCapacityIcon data-cy="bulk-reassign-reviews" />
   );
 
   const proposalToReview = preselectedProposalsData.find(
@@ -764,6 +837,12 @@ const ProposalTableInstrumentScientist = ({
       onClick: handleBulkTechnicalReviewsSubmit,
       position: 'toolbarOnSelect',
     });
+    tableActions.push({
+      icon: ReduceCapacityIconComponent,
+      tooltip: 'Reassign selected Techniqual Reviews',
+      onClick: handleBulkTechnicalReviewsReassign,
+      position: 'toolbarOnSelect',
+    });
   }
 
   return (
@@ -787,6 +866,7 @@ const ProposalTableInstrumentScientist = ({
                         status: technicalReview.status,
                         submitted: technicalReview.submitted,
                         timeAllocation: technicalReview.timeAllocation,
+                        instrumentId: technicalReview.instrumentId,
                         technicalReviewAssignee: technicalReviewAssignee,
                       };
                     }
@@ -851,6 +931,36 @@ const ProposalTableInstrumentScientist = ({
         event={actionsMenuAnchorElement}
         handleClose={handleClose}
       />
+      {!!bulkReassignData.length && (
+        <TechnicalBulkReassignModal
+          reviews={bulkReassignData}
+          setReviews={(refetch, resetSelection) => {
+            setBulkReassignData([]);
+            refetch &&
+              setQueryParameters({
+                query: {
+                  ...queryParameters.query,
+                  refetch: !queryParameters.query.refetch,
+                },
+                searchText: queryParameters.searchText,
+              });
+            resetSelection &&
+              setSearchParams((searchParam) => {
+                searchParam.delete('selection');
+
+                return searchParam;
+              });
+          }}
+          instrumentIds={Array.from(
+            new Set(bulkReassignData.map((rev) => rev.instrument.id))
+          )}
+          removeReview={(reviewId) =>
+            setBulkReassignData(
+              bulkReassignData.filter((rev) => rev.review.id !== reviewId)
+            )
+          }
+        ></TechnicalBulkReassignModal>
+      )}
       {isInstrumentScientist && (
         <Grid container spacing={2}>
           <Grid item sm={2} xs={12}>
@@ -885,17 +995,12 @@ const ProposalTableInstrumentScientist = ({
           Toolbar: ToolbarWithSelectAllPrefetched,
         }}
         onPageChange={(page, pageSize) => {
-          const newOffset =
-            Math.floor((pageSize * page) / PREFETCH_SIZE) * PREFETCH_SIZE;
-          if (
-            page !== currentPage &&
-            newOffset != queryParameters.query.offset
-          ) {
+          if ((page + 1) * pageSize >= queryParameters.query.first) {
             setQueryParameters({
               searchText: queryParameters.searchText,
               query: {
                 ...queryParameters.query,
-                offset: newOffset,
+                first: queryParameters.query.first + PREFETCH_SIZE,
               },
             });
           }
