@@ -350,36 +350,9 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
         return;
       }
 
-      // // Get the workflow connection ID from edge data
-      // const isTemporaryEdge = edge.id.startsWith('temp-');
-      // const workflowConnectionId = isTemporaryEdge
-      //   ? 0
-      //   : edge.data?.workflowConnectionId || 0;
-
-      // // Create a WorkflowConnection-like object to pass to the dialog
-      // const connection: WorkflowConnection = {
-      //   id: workflowConnectionId,
-      //   workflowId: state.id || 0,
-      //   sortOrder: 0,
-      //   prevStatusId: parseInt(edge.source),
-      //   nextStatusId: parseInt(edge.target),
-      //   statusId: parseInt(edge.target),
-      //   status: targetWorkflowConnection.status,
-      //   statusChangingEvents: (edge.data?.events || []).map(
-      //     (eventId: string) => ({
-      //       statusChangingEvent: eventId,
-      //       workflowConnectionId: workflowConnectionId,
-      //     })
-      //   ),
-      //   statusActions: [],
-      //   posX: 0,
-      //   posY: 0,
-      //   prevConnectionId: edge.data?.prevConnectionId || null,
-      // };
-
       setWorkflowConnection(targetWorkflowConnection);
     },
-    [state.id, state.workflowConnections]
+    [state.workflowConnections]
   );
 
   // Handle status drag from picker to flow area

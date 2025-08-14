@@ -260,7 +260,7 @@ context('Technique Proposal tests', () => {
           workflowId: callWorkflowId,
           sortOrder: 1,
           posX: 0,
-          posY: 0,
+          posY: 200,
         });
       }
 

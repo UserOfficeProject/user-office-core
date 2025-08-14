@@ -340,7 +340,7 @@ context('Settings tests', () => {
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 0,
+        posY: 200,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -426,7 +426,7 @@ context('Settings tests', () => {
         statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 0,
+        posY: 200,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -520,7 +520,7 @@ context('Settings tests', () => {
         statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 0,
+        posY: 200,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -606,7 +606,7 @@ context('Settings tests', () => {
         statusId: initialDBData.proposalStatuses.editableSubmitted.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 0,
+        posY: 200,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -621,7 +621,7 @@ context('Settings tests', () => {
         statusId: initialDBData.proposalStatuses.editableSubmittedInternal.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 0,
+        posY: 200,
         sortOrder: 2,
         prevStatusId: initialDBData.proposalStatuses.editableSubmitted.id,
       }).then((result) => {
@@ -811,12 +811,12 @@ context('Settings tests', () => {
         text: 'Status changing events added successfully!',
       });
 
-      cy.get('[data-cy="edge-label-events-list"]').contains(
-        `${Event.PROPOSAL_SUBMITTED}`
-      );
-      cy.get('[data-cy="edge-label-events-list"]').contains(
-        `${Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE}`
-      );
+      cy.get(
+        '[data-cy="edge-label-events-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains(`${Event.PROPOSAL_SUBMITTED}`);
+      cy.get(
+        '[data-cy="edge-label-events-list-DRAFT-FEASIBILITY_REVIEW"]'
+      ).contains(`${Event.PROPOSAL_FEASIBILITY_REVIEW_FEASIBLE}`);
     });
 
     it('Proposal should follow the selected workflow', function () {
@@ -1530,7 +1530,7 @@ context('Settings tests', () => {
         statusId: initialDBData.proposalStatuses.feasibilityReview.id,
         workflowId: createdWorkflowId,
         posX: 0,
-        posY: 0,
+        posY: 200,
         sortOrder: 1,
         prevStatusId: prevStatusId,
       }).then((result) => {
@@ -1725,7 +1725,7 @@ context('Settings tests', () => {
 
       cy.closeModal();
 
-      cy.get('[data-cy="edge-label-events-list"]')
+      cy.get('[data-cy="edge-label-events-list-AWAITING_ESF-ESF_IS_REVIEW"]')
         .contains(Event.EXPERIMENT_ESF_SUBMITTED)
         .should('exist');
 
@@ -1740,7 +1740,9 @@ context('Settings tests', () => {
         text: 'Status changing events added successfully!',
       });
 
-      cy.get('[data-cy="edge-label-events-list"]').should(
+      cy.get(
+        '[data-cy="edge-label-events-list-AWAITING_ESF-ESF_IS_REVIEW"]'
+      ).should(
         'have.text',
         'EXPERIMENT_ESF_SUBMITTEDEXPERIMENT_ESF_APPROVED_BY_IS'
       );

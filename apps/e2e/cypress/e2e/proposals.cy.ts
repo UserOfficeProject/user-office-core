@@ -133,7 +133,7 @@ context('Proposal tests', () => {
             sortOrder: 1,
             prevStatusId: 1,
             posX: 0,
-            posY: 0,
+            posY: 200,
           });
           createdWorkflowId = result.createWorkflow.id;
         }

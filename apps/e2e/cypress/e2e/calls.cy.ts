@@ -133,7 +133,7 @@ context('Calls tests', () => {
           sortOrder: 1,
           prevStatusId: workflow.workflowConnections[0].id,
           posX: 0,
-          posY: 0,
+          posY: 200,
         }).then((result) => {
           if (result.addWorkflowStatus) {
             cy.addStatusChangingEventsToConnection({

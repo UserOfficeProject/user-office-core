@@ -72,7 +72,7 @@ const addFeasibilityReviewToDefaultWorkflow =
       sortOrder: 1,
       prevStatusId: 1,
       posX: 0,
-      posY: 0,
+      posY: 200,
     });
   };
 /**

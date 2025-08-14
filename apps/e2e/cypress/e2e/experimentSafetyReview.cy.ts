@@ -157,7 +157,7 @@ function createWorkflowForInstrumentScientist() {
           sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
           prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
           posX: 0,
-          posY: 0,
+          posY: 200,
         })
         .then((result) => {
           if (result.addWorkflowStatus) {
@@ -174,7 +174,7 @@ function createWorkflowForInstrumentScientist() {
                     sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
                     prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.IS_REVIEW,
                     posX: 0,
-                    posY: 0,
+                    posY: 200,
                   })
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {
@@ -222,7 +222,7 @@ function createWorkflowForESR() {
           sortOrder: TEST_CONSTANTS.SORT_ORDER.FIRST,
           prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.INITIAL,
           posX: 0,
-          posY: 0,
+          posY: 200,
         })
         .then((result) => {
           if (result.addWorkflowStatus) {
@@ -239,7 +239,7 @@ function createWorkflowForESR() {
                     sortOrder: TEST_CONSTANTS.SORT_ORDER.SECOND,
                     prevStatusId: TEST_CONSTANTS.WORKFLOW_STATUS.ESR_REVIEW,
                     posX: 0,
-                    posY: 0,
+                    posY: 200,
                   })
                   .then((secondResult) => {
                     if (secondResult.addWorkflowStatus) {
