@@ -21,8 +21,8 @@ const menuMap = {
 
 export function StatusActionLogsMenuListItem() {
   const featureContext = useContext(FeatureContext);
-  const isPregeneratedProposalsEnabled = featureContext.featuresMap.get(
-    FeatureId.PREGENERATED_PROPOSALS
+  const isPregeneratedProposalPdfsEnabled = featureContext.featuresMap.get(
+    FeatureId.PREGENERATED_PROPOSAL_PDF
   )?.isEnabled;
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -36,7 +36,7 @@ export function StatusActionLogsMenuListItem() {
   }
 
   // Single menu item
-  if (!isPregeneratedProposalsEnabled) {
+  if (!isPregeneratedProposalPdfsEnabled) {
     return (
       <Tooltip title="Status Action Logs">
         <ListItemButton component={NavLink} to={menuMap['email']}>

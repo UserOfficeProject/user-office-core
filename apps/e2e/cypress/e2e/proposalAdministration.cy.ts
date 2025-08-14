@@ -1252,7 +1252,7 @@ context('Proposal administration tests', () => {
 
       cy.updateFeature({
         action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.PREGENERATED_PROPOSALS],
+        featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
       });
 
       cy.login('officer');

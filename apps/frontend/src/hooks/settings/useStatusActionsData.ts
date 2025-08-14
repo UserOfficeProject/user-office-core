@@ -19,8 +19,8 @@ export function useStatusActionsData(): {
   const [loadingStatusActions, setLoadingStatusActions] = useState(true);
 
   const featureContext = useContext(FeatureContext);
-  const isPregeneratedProposalsEnabled = featureContext.featuresMap.get(
-    FeatureId.PREGENERATED_PROPOSALS
+  const isPregeneratedProposalPdfsEnabled = featureContext.featuresMap.get(
+    FeatureId.PREGENERATED_PROPOSAL_PDF
   )?.isEnabled;
 
   const api = useDataApi();
@@ -37,7 +37,7 @@ export function useStatusActionsData(): {
         }
 
         if (data.statusActions) {
-          if (!isPregeneratedProposalsEnabled) {
+          if (!isPregeneratedProposalPdfsEnabled) {
             data.statusActions = data.statusActions.filter(
               (action) => action.type !== StatusActionType.PROPOSALDOWNLOAD
             );

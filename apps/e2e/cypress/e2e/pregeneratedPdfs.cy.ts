@@ -96,7 +96,7 @@ context('Pregenerated PDF tests', () => {
 
     cy.updateFeature({
       action: FeatureUpdateAction.ENABLE,
-      featureIds: [FeatureId.PREGENERATED_PROPOSALS],
+      featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
     });
 
     /*
