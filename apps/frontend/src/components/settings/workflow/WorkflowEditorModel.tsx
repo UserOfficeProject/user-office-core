@@ -125,7 +125,16 @@ const WorkflowEditorModel = (
           return draft;
         }
         case EventType.STATUS_ACTION_ADDED: {
-          return { ...draft, ...action.payload };
+          const { workflowConnection, statusActions } = action.payload;
+          const connectionIndex = draft.workflowConnections.findIndex(
+            (conn) => conn.id === workflowConnection.id
+          );
+          if (connectionIndex !== -1) {
+            draft.workflowConnections[connectionIndex].statusActions =
+              statusActions;
+          }
+
+          return draft;
         }
         case EventType.WORKFLOW_CONNECTION_DELETED: {
           // Remove the workflow connection by connectionId

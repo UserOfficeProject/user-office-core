@@ -188,18 +188,16 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
           const edgeAlreadyExists = newEdges.some((edge) => edge.id === edgeId);
 
           if (!edgeAlreadyExists) {
-            const events =
-              connection.statusChangingEvents?.map(
-                (event) => event.statusChangingEvent
-              ) || [];
-
             const newEdge = edgeFactory({
               id: edgeId, // Use connection ID to ensure unique edge identification
               source: connection.prevConnectionId.toString(),
               target: connection.id.toString(),
               type: 'workflow', // Use custom workflow edge type
               data: {
-                events,
+                events:
+                  connection.statusChangingEvents?.map(
+                    (e) => e.statusChangingEvent
+                  ) || [],
                 sourceStatusShortCode: prevConnection.status.shortCode,
                 targetStatusShortCode: connection.status.shortCode,
                 workflowConnectionId: connection.id, // Use target connection ID (destination)

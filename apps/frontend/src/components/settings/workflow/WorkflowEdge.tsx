@@ -78,13 +78,6 @@ const WorkflowEdge: React.FC<EdgeProps<WorkflowEdgeData>> = ({
   const events = data?.events || [];
   const statusActions = data?.statusActions || [];
 
-  // Don't render label if there are no events
-  if (events.length === 0) {
-    return (
-      <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
-    );
-  }
-
   return (
     <>
       <BaseEdge id={id} path={edgePath} style={style} markerEnd={markerEnd} />
