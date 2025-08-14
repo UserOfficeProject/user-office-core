@@ -10,7 +10,7 @@ import { ApplicationEvent } from '../events/applicationEvents';
 import type { ProposalPDFData } from '../factory/pdf/proposal';
 import { FileMetadata } from '../models/Blob';
 import { ConnectionHasStatusAction } from '../models/StatusAction';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import {
   constructProposalStatusChangeEvent,
   statusActionLogger,

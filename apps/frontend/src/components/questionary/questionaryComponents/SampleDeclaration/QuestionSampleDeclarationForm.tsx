@@ -1,4 +1,4 @@
-import FormControl from '@mui/material/FormControl';
+import { FormControl } from '@mui/material';
 import Link from '@mui/material/Link';
 import { Field } from 'formik';
 import React, { useContext, ChangeEvent } from 'react';
@@ -57,6 +57,7 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
           addEntryButtonLabel: Yup.string().required(),
           minEntries: Yup.number().min(0).nullable(),
           maxEntries: Yup.number().min(1).nullable(),
+          readPermissions: Yup.array().of(Yup.string()),
         }),
       })}
     >
@@ -71,7 +72,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'natural_key' }}
           />
-
           <Field
             name="question"
             id="Question-Input"
@@ -142,7 +142,6 @@ export const QuestionSampleDeclarationForm = (props: QuestionFormProps) => {
               </FormControl>
             )}
           </TitledContainer>
-
           <TitledContainer label="Constraints">
             <Field
               name="config.minEntries"

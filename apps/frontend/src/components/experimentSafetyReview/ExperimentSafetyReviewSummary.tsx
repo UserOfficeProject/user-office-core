@@ -1,0 +1,264 @@
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import ListSubheader from '@mui/material/ListSubheader';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import React, { useContext, useMemo, useState } from 'react';
+
+import { NavigButton } from 'components/common/NavigButton';
+import NavigationFragment from 'components/questionary/NavigationFragment';
+import { QuestionaryContext } from 'components/questionary/QuestionaryContext';
+import { UserContext } from 'context/UserContextProvider';
+import {
+  ExperimentSafetyReviewerDecisionEnum,
+  InstrumentScientistDecisionEnum,
+  UserRole,
+} from 'generated/sdk';
+import { useDownloadPDFExperimentSafety } from 'hooks/experiment/useDownloadPDFExperimentSafety';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
+import withConfirm, { WithConfirmType } from 'utils/withConfirm';
+
+import { ExperimentSafetyReviewContextType } from './ExperimentSafetyReviewContainer';
+import ExperimentSafetyReviewQuestionaryReview from './ExperimentSafetyReviewQuestionaryReview';
+type ExperimentSafetyReviewSummaryProps = {
+  confirm: WithConfirmType;
+};
+
+function ExperimentSafetyReviewSummary({
+  confirm,
+}: ExperimentSafetyReviewSummaryProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { api } = useDataApiWithFeedback();
+  const { currentRole } = useContext(UserContext);
+
+  const { state, dispatch } = useContext(
+    QuestionaryContext
+  ) as ExperimentSafetyReviewContextType;
+
+  // Initialize decision and comment based on current role and existing data
+  const getInitialDecision = useMemo(() => {
+    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+      const decision = state?.experimentSafety.instrumentScientistDecision;
+      if (decision === InstrumentScientistDecisionEnum.ACCEPTED)
+        return 'ACCEPTED';
+      if (decision === InstrumentScientistDecisionEnum.REJECTED)
+        return 'REJECTED';
+    } else {
+      const decision = state?.experimentSafety.experimentSafetyReviewerDecision;
+      if (decision === ExperimentSafetyReviewerDecisionEnum.ACCEPTED)
+        return 'ACCEPTED';
+      if (decision === ExperimentSafetyReviewerDecisionEnum.REJECTED)
+        return 'REJECTED';
+    }
+
+    return '';
+  }, [
+    currentRole,
+    state?.experimentSafety.instrumentScientistDecision,
+    state?.experimentSafety.experimentSafetyReviewerDecision,
+  ]);
+
+  const getInitialComment = useMemo(() => {
+    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+      return state?.experimentSafety.instrumentScientistComment || '';
+    } else {
+      return state?.experimentSafety.experimentSafetyReviewerComment || '';
+    }
+  }, [
+    currentRole,
+    state?.experimentSafety.instrumentScientistComment,
+    state?.experimentSafety.experimentSafetyReviewerComment,
+  ]);
+
+  const [decision, setDecision] = useState<'ACCEPTED' | 'REJECTED' | ''>(
+    getInitialDecision
+  );
+  const [comment, setComment] = useState<string>(getInitialComment);
+  const [isFormLocked, setIsFormLocked] = useState<boolean>(
+    getInitialDecision !== ''
+  );
+  const [isDownloadEnabled, setIsDownloadEnabled] = useState<boolean>(
+    state?.experimentSafety.status?.shortCode === 'ESF_APPROVED'
+  );
+
+  const downloadExperimentSafety = useDownloadPDFExperimentSafety();
+
+  if (!state?.experimentSafety) {
+    throw new Error('Experiment safety review not found');
+  }
+
+  if (!state.experimentSafety.safetyReviewQuestionaryId) {
+    throw new Error('Experiment safety review questionary not found');
+  }
+
+  return (
+    <>
+      <ExperimentSafetyReviewQuestionaryReview
+        experimentSafety={state.experimentSafety}
+      />
+      <Divider sx={{ margin: '1rem 0' }} />
+      <FormControl fullWidth>
+        <InputLabel id="exp-safety-review" shrink>
+          Review
+        </InputLabel>{' '}
+        <Select
+          id="experimentSafetyReviewMakeDecision"
+          aria-labelledby="exp-safety-review"
+          onChange={(e) => {
+            setDecision(e.target.value as 'ACCEPTED' | 'REJECTED' | '');
+          }}
+          value={decision}
+          data-cy="experiment-safety-review-make-decision"
+          displayEmpty
+          disabled={isFormLocked}
+        >
+          <MenuItem value="" disabled>
+            <em>Make a Decision</em>
+          </MenuItem>
+          <ListSubheader sx={{ lineHeight: 1 }}>
+            <Divider>Decision</Divider>
+          </ListSubheader>
+          <MenuItem value={'ACCEPTED'}>ACCEPTED</MenuItem>
+          <MenuItem value={'REJECTED'}>REJECTED</MenuItem>
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth sx={{ mt: 2 }}>
+        <TextField
+          id="experimentSafetyReviewComment"
+          label="Comments"
+          multiline
+          rows={4}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          variant="outlined"
+          data-cy="experiment-safety-review-comment"
+          disabled={isFormLocked}
+        />
+      </FormControl>
+
+      <Divider sx={{ margin: '1rem 0' }} />
+      <NavigationFragment>
+        <NavigButton
+          onClick={() => dispatch({ type: 'BACK_CLICKED' })}
+          disabled={state.stepIndex === 0}
+        >
+          Back
+        </NavigButton>
+        {isFormLocked ? (
+          <NavigButton
+            onClick={() => setIsFormLocked(false)}
+            data-cy="button-change-decision"
+          >
+            Change Decision
+          </NavigButton>
+        ) : (
+          <NavigButton
+            onClick={() => {
+              confirm(
+                async () => {
+                  setIsSubmitting(true);
+                  try {
+                    if (currentRole === UserRole.INSTRUMENT_SCIENTIST) {
+                      // Call the instrument scientist mutation
+                      const {
+                        submitInstrumentScientistExperimentSafetyReview,
+                      } = await api({
+                        toastSuccessMessage:
+                          'Safety review submitted successfully',
+                      }).submitInstrumentScientistExperimentSafetyReview({
+                        experimentSafetyPk:
+                          state.experimentSafety.experimentSafetyPk,
+                        decision: decision as InstrumentScientistDecisionEnum,
+                        comment: comment,
+                      });
+
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                        itemWithQuestionary:
+                          submitInstrumentScientistExperimentSafetyReview,
+                      });
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                        itemWithQuestionary:
+                          submitInstrumentScientistExperimentSafetyReview,
+                      });
+
+                      // Update download enabled state based on the actual status
+                      setIsDownloadEnabled(
+                        submitInstrumentScientistExperimentSafetyReview?.status
+                          ?.shortCode === 'ESF_APPROVED'
+                      );
+                    } else {
+                      // For USER_OFFICER, EXPERIMENT_SAFETY_REVIEWER, and others
+                      const {
+                        submitExperimentSafetyReviewerExperimentSafetyReview,
+                      } = await api({
+                        toastSuccessMessage:
+                          'Safety review submitted successfully',
+                      }).submitExperimentSafetyReviewerExperimentSafetyReview({
+                        experimentSafetyPk:
+                          state.experimentSafety.experimentSafetyPk,
+                        decision:
+                          decision as ExperimentSafetyReviewerDecisionEnum,
+                        comment: comment,
+                      });
+
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                        itemWithQuestionary:
+                          submitExperimentSafetyReviewerExperimentSafetyReview,
+                      });
+                      dispatch({
+                        type: 'ITEM_WITH_QUESTIONARY_SUBMITTED',
+                        itemWithQuestionary:
+                          submitExperimentSafetyReviewerExperimentSafetyReview,
+                      });
+
+                      // Update download enabled state based on the actual status
+                      setIsDownloadEnabled(
+                        submitExperimentSafetyReviewerExperimentSafetyReview
+                          ?.status?.shortCode === 'ESF_APPROVED'
+                      );
+                    }
+                    // Lock the form after successful submission
+                    setIsFormLocked(true);
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                },
+                {
+                  title: 'Please confirm',
+                  description:
+                    'Are you sure want to submit the Experiment Safety Review?',
+                }
+              )();
+            }}
+            isBusy={isSubmitting}
+            disabled={!decision}
+            data-cy="button-submit-experiment-safety-review"
+          >
+            {false ? '✔ Submitted' : 'Submit'}
+          </NavigButton>
+        )}
+        <Button
+          onClick={() =>
+            downloadExperimentSafety(
+              [state.experimentSafety.experimentPk],
+              'Experiment Safety Review'
+            )
+          }
+          color="secondary"
+          disabled={!isDownloadEnabled}
+        >
+          Download Safety Review Document
+        </Button>
+      </NavigationFragment>
+    </>
+  );
+}
+
+export default withConfirm(ExperimentSafetyReviewSummary);
