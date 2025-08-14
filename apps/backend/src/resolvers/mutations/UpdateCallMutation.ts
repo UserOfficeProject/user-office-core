@@ -18,7 +18,7 @@ export class CallOrderArray {
   public callId: number;
 
   @Field(() => Int)
-  public sort_order?: number;
+  public sort_order: number;
 }
 
 @InputType()
