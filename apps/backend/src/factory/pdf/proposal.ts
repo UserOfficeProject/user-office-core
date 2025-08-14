@@ -88,14 +88,13 @@ const getTechnicalReviewHumanReadableStatus = (
 };
 
 const getSampleQuestionarySteps = async (
-  questionaryId: number,
-  user: UserWithRole | null
+  questionaryId: number
 ): Promise<QuestionaryStep[]> => {
+  const questionaryDataSource = container.resolve<QuestionaryDataSource>(
+    Tokens.QuestionaryDataSource
+  );
   const questionarySteps =
-    await baseContext.queries.questionary.getQuestionarySteps(
-      user,
-      questionaryId
-    );
+    await questionaryDataSource.getQuestionarySteps(questionaryId);
   if (!questionarySteps) {
     throw new Error(
       `Questionary steps for Questionary ID '${questionaryId}' not found, or the user has insufficient rights`
@@ -587,7 +586,7 @@ export const collectProposalPDFDataTokenAccess = async (
           undefined,
           sample,
           await getQuestionary(sample.questionaryId),
-          await getSampleQuestionarySteps(sample.questionaryId, null)
+          await getSampleQuestionarySteps(sample.questionaryId)
         )
       )
     )
@@ -622,7 +621,7 @@ export const collectProposalPDFDataTokenAccess = async (
           undefined,
           genericTemplate,
           await getQuestionary(genericTemplate.questionaryId),
-          await getSampleQuestionarySteps(genericTemplate.questionaryId, null)
+          await getSampleQuestionarySteps(genericTemplate.questionaryId)
         )
       )
     )
