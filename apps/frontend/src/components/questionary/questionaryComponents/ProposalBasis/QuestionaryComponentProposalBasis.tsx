@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import InputAdornment from '@mui/material/InputAdornment';
 import { useTheme } from '@mui/material/styles';
 import { Field } from 'formik';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
@@ -37,6 +38,9 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
   const [hasInvalidChars, setHasInvalidChars] = useState(false);
+  const [textLen, setTextLen] = useState(
+    state?.proposal.abstract ? (state?.proposal.abstract as string).length : 0
+  );
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
@@ -85,6 +89,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         .concat(proposer as BasicUserDetails)
     );
   };
+  const counter = `Characters: ${textLen}/1500`;
 
   return (
     <div>
@@ -121,7 +126,7 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
               const nonPrintableRegex = /[^\x20-\x7E\n\r\t]/g;
               const hasInvalid = nonPrintableRegex.test(value);
               const cleanedValue = value.replace(nonPrintableRegex, ' ');
-
+              setTextLen(event.target.value.length);
               setHasInvalidChars(hasInvalid);
               setLocalAbstract(cleanedValue);
             },
@@ -151,6 +156,16 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
           }
         />
       </Box>
+      <InputAdornment
+        position="end"
+        sx={(theme) => ({
+          display: 'flex',
+          justifyContent: 'right',
+          marginBottom: -theme.spacing(50),
+        })}
+      >
+        {counter}
+      </InputAdornment>
       <ProposalParticipant
         principalInvestigator={piData}
         setPrincipalInvestigator={principalInvestigatorChanged}
