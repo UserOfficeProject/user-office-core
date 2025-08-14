@@ -61,13 +61,13 @@ export type FullProposalPDFData = {
     >
   >;
   pdfTemplate: ProposalPdfTemplate | null;
-  type: 'full';
+  isPregeneratedPdfData: false;
 };
 
 export type PregeneratedProposalPDFData = {
   proposal: Pick<Proposal, 'created' | 'primaryKey' | 'proposalId' | 'fileId'>;
   principalInvestigator: BasicUserDetails;
-  type: 'pregenerated';
+  isPregeneratedPdfData: true;
 };
 
 export type ProposalPDFData = FullProposalPDFData | PregeneratedProposalPDFData;
@@ -369,7 +369,7 @@ export const collectProposalPDFData = async (
     samples: samplePDFData,
     genericTemplates: genericTemplatePDFData,
     pdfTemplate,
-    type: 'full',
+    isPregeneratedPdfData: false,
   };
 
   // Information from each topic in proposal
@@ -652,7 +652,7 @@ export const collectProposalPDFDataTokenAccess = async (
       samples: samplePDFData,
       genericTemplates: genericTemplatePDFData,
       pdfTemplate,
-      type: 'full',
+      isPregeneratedPdfData: false,
     },
     questionarySteps,
     samples,
@@ -750,8 +750,8 @@ export const collectProposalPregeneratedPdfData = async (
         created: proposal.created,
       },
       principalInvestigator: pi,
-      type: 'pregenerated',
-    } as PregeneratedProposalPDFData;
+      isPregeneratedPdfData: true,
+    };
   } else {
     logger.logInfo(`Pregenerated PDF not found for proposal PK ${proposalPk}`, {
       proposalPk: proposal.primaryKey,
@@ -841,8 +841,8 @@ export const collectProposalPregeneratedPdfDataTokenAccess = async (
         created: proposal.created,
       },
       principalInvestigator: pi,
-      type: 'pregenerated',
-    } as PregeneratedProposalPDFData;
+      isPregeneratedPdfData: true,
+    };
   } else {
     logger.logInfo(
       `Pregenerated PDF not found for proposal PK ${proposal.primaryKey}`,
