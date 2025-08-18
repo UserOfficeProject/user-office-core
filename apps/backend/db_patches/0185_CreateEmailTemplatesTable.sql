@@ -21,47 +21,47 @@ BEGIN
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'clf-proposal-submitted-pi', 'CLF PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
+                  (0, 'CLF PI Co-I Submission Email', 'CLF PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'isis-proposal-submitted-pi', 'ISIS PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
+                  (0, 'ISIS PI Co-I Submission Email', 'ISIS PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'isis-rapid-proposal-submitted-pi', 'ISIS Rapid PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
+                  (0, 'ISIS Rapid PI Co-I Submission Email', 'ISIS Rapid PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'isis-rapid-proposal-submitted-uo', 'ISIS Rapid User Office Submission Email', 'Proposal submitted', 'Proposal submitted');
+                  (0, 'ISIS Rapid User Office Submission Email', 'ISIS Rapid User Office Submission Email', 'Proposal submitted', 'Proposal submitted');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'xpress-proposal-submitted-pi', 'ISIS Xpress PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
+                  (0, 'ISIS Xpress PI Co-I Submission Email', 'ISIS Xpress PI Co-I Submission Email', 'Proposal submitted', 'Proposal submitted');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'xpress-proposal-submitted-sc', 'ISIS Xpress Scientist Submission Email', 'Proposal submitted', 'Proposal submitted');
+                  (0, 'ISIS Xpress Scientist Submission Email', 'ISIS Xpress Scientist Submission Email', 'Proposal submitted', 'Proposal submitted');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'xpress-proposal-under-review', 'ISIS Xpress PI Co-I Under Review Email', 'Proposal under review', 'Proposal under review');
+                  (0, 'ISIS Xpress PI Co-I Under Review Email', 'ISIS Xpress PI Co-I Under Review Email', 'Proposal under review', 'Proposal under review');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'xpress-proposal-approved', 'ISIS Xpress PI Co-I Approval Email', 'Proposal approved', 'Proposal approved');
+                  (0, 'ISIS Xpress PI Co-I Approval Email', 'ISIS Xpress PI Co-I Approval Email', 'Proposal approved', 'Proposal approved');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'xpress-proposal-sra', 'ISIS Xpress SRA Request Email', 'Proposal SRA request', 'Proposal SRA request');
+                  (0, 'ISIS Xpress SRA Request Email', 'ISIS Xpress SRA Request Email', 'Proposal SRA request', 'Proposal SRA request');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'xpress-proposal-unsuccessful', 'ISIS Xpress PI Co-I Reject Email', 'Proposal unsuccessful', 'Proposal unsuccessful');
+                  (0, 'ISIS Xpress PI Co-I Reject Email', 'ISIS Xpress PI Co-I Reject Email', 'Proposal unsuccessful', 'Proposal unsuccessful');
 
             INSERT INTO email_templates (created_by, name, description, subject, body)
             VALUES
-                  (0, 'xpress-proposal-finished', 'ISIS Xpress PI Co-I Finish Email', 'Proposal finished', 'Proposal finished');
+                  (0, 'ISIS Xpress PI Co-I Finish Email', 'ISIS Xpress PI Co-I Finish Email', 'Proposal finished', 'Proposal finished');
 
             FOR connection_loop_var IN
                   SELECT * FROM workflow_connection_has_actions
@@ -70,7 +70,7 @@ BEGIN
                         SELECT jsonb_array_length(connection_loop_var.config->'recipientsWithEmailTemplate') INTO array_size_var;
 
                         FOR array_loop_var IN 0..array_size_var-1 LOOP
-                              SELECT connection_loop_var.config->'recipientsWithEmailTemplate'->array_loop_var->'emailTemplate'->>'id' INTO template_name;
+                              SELECT connection_loop_var.config->'recipientsWithEmailTemplate'->array_loop_var->'emailTemplate'->>'name' INTO template_name;
 
                               IF template_name IS NOT NULL THEN
                                     -- RAISE NOTICE 'Processing connection % % with template % to %', array_loop_var, connection_loop_var.connection_id, template_name,  update_config;

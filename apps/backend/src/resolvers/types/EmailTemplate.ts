@@ -7,7 +7,7 @@ export class EmailTemplate implements Partial<EmailTemplateOrigin> {
   @Field(() => Int)
   public id: number;
 
-  @Field()
+  @Field(() => Int)
   public createdByUserId: number;
 
   @Field()

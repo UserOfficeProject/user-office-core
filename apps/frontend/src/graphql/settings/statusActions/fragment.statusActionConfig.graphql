@@ -4,8 +4,10 @@ fragment statusActionDefaultConfig on StatusActionDefaultConfig {
       name
       description
     }
+
     emailTemplates {
-      ...emailTemplate
+      id
+      name
     }
   }
   ... on RabbitMQActionDefaultConfig {
