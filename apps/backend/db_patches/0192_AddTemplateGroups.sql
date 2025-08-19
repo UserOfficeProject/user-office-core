@@ -20,6 +20,9 @@ BEGIN
     -- Now update the references in the templates table
     UPDATE templates SET group_id = 'PROPOSAL_PDF' WHERE group_id = 'PDF_TEMPLATE';
 
+    -- Remove any active templates associated with the old group ID
+    DELETE FROM active_templates WHERE group_id = 'PDF_TEMPLATE';
+
     -- Finally, delete the old template group ID
     DELETE FROM template_groups WHERE template_group_id = 'PDF_TEMPLATE';
 
