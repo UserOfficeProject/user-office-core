@@ -1,17 +1,21 @@
+import { Info } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import {
   Autocomplete,
   Button,
   CircularProgress,
   DialogContent,
+  IconButton,
   MenuItem,
   TextField,
+  Tooltip,
 } from '@mui/material';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { isValidEmail, ValidEmailAddress } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
@@ -59,6 +63,17 @@ function InviteUser({
     BasicUserDetails | undefined
   >();
   const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>([]);
+  const featureContext = useContext(FeatureContext);
+  const isEmailSearchOnly = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_SEARCH
+  )?.isEnabled;
+  const isInviteEnabled = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
+
+  const labelText = isEmailSearchOnly
+    ? 'Enter a full email address'
+    : 'ex. Nathalie or john@gmail.com';
 
   const fetchUserSearchResults = useCallback(async () => {
     setExactEmailMatch(undefined);
@@ -74,7 +89,6 @@ function InviteUser({
         subtractUsers: excludedUserIds,
       });
 
-      console.log(previousCollaborators);
       setOptions(previousCollaborators?.users || []);
 
       return;
@@ -108,6 +122,11 @@ function InviteUser({
           );
         }
       } else {
+        if (isEmailSearchOnly) {
+          // Disallow partial name search
+          return;
+        }
+
         const excludedUserIds = [
           ...(excludeUserIds ?? []),
           ...categorizeSelectedItems(selectedItems).users.map(
@@ -123,7 +142,6 @@ function InviteUser({
         setOptions(users?.users || []);
       }
     } catch (error) {
-      console.error('Error fetching results:', error);
       setOptions([]);
     } finally {
       setLoading(false);
@@ -199,10 +217,14 @@ function InviteUser({
       if (exactEmailMatch) {
         addToSelectedItems(exactEmailMatch);
         setExactEmailMatch(undefined);
-      } else if (options.length === 1) {
-        addToSelectedItems(options[0]);
-      } else if (isValidEmail(query)) {
-        addValidEmailToSelection(query);
+      }
+
+      if (isInviteEnabled) {
+        if (options.length === 1) {
+          addToSelectedItems(options[0]);
+        } else if (isValidEmail(query)) {
+          addValidEmailToSelection(query);
+        }
       }
     }
   };
@@ -221,7 +243,24 @@ function InviteUser({
       fullWidth
       maxWidth="md"
       onClose={handleClose}
-      title="Add people to proposal"
+      title="Add co-proposers to proposal"
+      tooltip={
+        isEmailSearchOnly && (
+          <Tooltip
+            title={
+              <span>
+                Click to see your previous collaborators or start typing to
+                search by email address. Click a user to add them to the
+                proposal.
+              </span>
+            }
+          >
+            <IconButton>
+              <Info />
+            </IconButton>
+          </Tooltip>
+        )
+      }
     >
       <DialogContent
         dividers
@@ -242,7 +281,7 @@ function InviteUser({
           renderInput={(params) => (
             <TextField
               {...params}
-              label="ex. Nathalie or john@gmail.com"
+              label={labelText}
               variant="outlined"
               InputProps={{
                 ...params.InputProps,
@@ -275,6 +314,7 @@ function InviteUser({
                   categorizeSelectedItems(selectedItems).invites
                 ) || []
               }
+              isEmailSearchOnly={isEmailSearchOnly}
             />
           }
         />
