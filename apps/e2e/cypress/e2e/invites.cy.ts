@@ -7,6 +7,10 @@ import {
 import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 
+/*
+ * Tests relating to the InviteUser component that is
+ * currently used when adding co-proposers.
+ */
 context('Invites tests', () => {
   describe('Creating invites', () => {
     beforeEach(() => {
@@ -104,7 +108,12 @@ context('Invites tests', () => {
       cy.get('[data-cy="add-participant-button"]').click();
 
       cy.get('[data-cy="invite-user-autocomplete"]').type(email);
-      cy.get('[role=menuitem]').contains(lastName);
+      cy.get('[role=presentation]').contains(lastName).click();
+
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+      cy.get('[data-cy="co-proposers"]').contains(lastName);
     });
 
     it('Should not be able to invite same email twice', function () {
@@ -163,6 +172,211 @@ context('Invites tests', () => {
           initialDBData.users.user3.lastName
         );
       });
+    });
+  });
+
+  describe('Showing previous collaborators', () => {
+    beforeEach(() => {
+      cy.resetDB();
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
+      cy.getAndStoreFeaturesEnabled();
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+    });
+
+    it('Should show previous collaborators', function () {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+      cy.get('[role=presentation]').should('not.contain', lastName);
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+
+      cy.get('#title-input').type(faker.lorem.words(2));
+      cy.get('#abstract-input').type(faker.lorem.words(3));
+
+      cy.get('[data-cy="save-and-continue-button"]').click();
+      cy.notification({ variant: 'success', text: 'Saved' });
+
+      cy.contains('Submit').click();
+      cy.get('[data-cy=confirm-ok]').click();
+
+      cy.contains('Dashboard').click();
+
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+
+      cy.get('[data-cy=add-participant-button]').click();
+      cy.get('[data-cy="invite-user-autocomplete"]').click();
+
+      cy.get('[role=presentation]').contains(lastName);
+    });
+  });
+
+  describe('Adding co-proposers', () => {
+    beforeEach(() => {
+      cy.resetDB();
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
+      cy.getAndStoreFeaturesEnabled();
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+    });
+
+    it('Should not be able to add duplicate co-proposer in modal', () => {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
+
+    it('Should not be able to add duplicate co-proposer already on proposal', () => {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
+
+    it('Should not be able to add duplicate co-proposer when co-proposer is PI', () => {
+      const email = initialDBData.users.user1.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
+  });
+
+  describe('Invites disabled with email search enabled', () => {
+    beforeEach(() => {
+      cy.resetDB(true);
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE],
+      });
+      cy.updateFeature({
+        action: FeatureUpdateAction.ENABLE,
+        featureIds: [FeatureId.EMAIL_SEARCH],
+      });
+      cy.getAndStoreFeaturesEnabled();
+
+      cy.login('user1', initialDBData.roles.user);
+      cy.visit('/');
+      cy.contains('New Proposal').click();
+      cy.get('[data-cy=call-list]').find('li:first-child').click();
+    });
+
+    it('Should be able to add user by knowing exact email', function () {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+
+      cy.get('[data-cy="co-proposers"]').contains(lastName);
+    });
+
+    it('Should not be able to invite a user', function () {
+      const invalidEmail = 'invalid-email@email.com';
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(invalidEmail);
+      cy.get('[role=presentation]').contains(
+        `No results found for "${invalidEmail}"`
+      );
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[role=presentation]').contains(
+        `No results found for "${invalidEmail}"`
+      );
+      cy.get('.MuiChip-label').should('not.exist');
+    });
+
+    it('Should not be able to use partial user lookup', function () {
+      const name = initialDBData.users.user2.lastName;
+      const partialName = name.substring(0, 3);
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(partialName);
+      cy.get('[role=presentation]').contains('Enter a full email address');
+    });
+
+    it('Should show correct messages when typing searches', function () {
+      const invalidEmail = 'invalid-email@email.com';
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(invalidEmail);
+      cy.get('[role=presentation]').contains(
+        `No results found for "${invalidEmail}"`
+      );
+    });
+
+    it('Should not be able to add an email address when the user does not exist', function () {
+      const invalidEmail = 'invalid-email@email.com';
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]')
+        .type(invalidEmail)
+        .type('{enter}');
+
+      cy.get('[role=presentation]').contains(
+        `No results found for "${invalidEmail}"`
+      );
+      cy.get('[data-cy="invite-user-submit-button"]').should('be.disabled');
+      cy.get('.MuiChip-label').should('not.exist');
     });
   });
 });
