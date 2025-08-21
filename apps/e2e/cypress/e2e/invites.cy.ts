@@ -175,7 +175,7 @@ context('Invites tests', () => {
     });
   });
 
-  describe('Showing previous collaborators', () => {
+  describe('Adding co-proposers', () => {
     beforeEach(() => {
       cy.resetDB();
       cy.updateFeature({
@@ -221,22 +221,6 @@ context('Invites tests', () => {
       cy.get('[data-cy="invite-user-autocomplete"]').click();
 
       cy.get('[role=presentation]').contains(lastName);
-    });
-  });
-
-  describe('Adding co-proposers', () => {
-    beforeEach(() => {
-      cy.resetDB();
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
-      cy.getAndStoreFeaturesEnabled();
-
-      cy.login('user1', initialDBData.roles.user);
-      cy.visit('/');
-      cy.contains('New Proposal').click();
-      cy.get('[data-cy=call-list]').find('li:first-child').click();
     });
 
     it('Should not be able to add duplicate co-proposer in modal', () => {
@@ -325,23 +309,6 @@ context('Invites tests', () => {
       cy.get('[data-cy="co-proposers"]').contains(lastName);
     });
 
-    it('Should not be able to invite a user', function () {
-      const invalidEmail = 'invalid-email@email.com';
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(invalidEmail);
-      cy.get('[role=presentation]').contains(
-        `No results found for "${invalidEmail}"`
-      );
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
-      cy.get('[role=presentation]').contains(
-        `No results found for "${invalidEmail}"`
-      );
-      cy.get('.MuiChip-label').should('not.exist');
-    });
-
     it('Should not be able to use partial user lookup', function () {
       const name = initialDBData.users.user2.lastName;
       const partialName = name.substring(0, 3);
@@ -352,29 +319,16 @@ context('Invites tests', () => {
       cy.get('[role=presentation]').contains('Enter a full email address');
     });
 
-    it('Should show correct messages when typing searches', function () {
-      const invalidEmail = 'invalid-email@email.com';
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(invalidEmail);
-      cy.get('[role=presentation]').contains(
-        `No results found for "${invalidEmail}"`
-      );
-    });
-
     it('Should not be able to add an email address when the user does not exist', function () {
-      const invalidEmail = 'invalid-email@email.com';
+      const email = 'unknown-user@email.com';
 
       cy.get('[data-cy="add-participant-button"]').click();
 
-      cy.get('[data-cy="invite-user-autocomplete"]')
-        .type(invalidEmail)
-        .type('{enter}');
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(`No results found for "${email}"`);
 
-      cy.get('[role=presentation]').contains(
-        `No results found for "${invalidEmail}"`
-      );
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('[role=presentation]').contains(`No results found for "${email}"`);
       cy.get('[data-cy="invite-user-submit-button"]').should('be.disabled');
       cy.get('.MuiChip-label').should('not.exist');
     });
