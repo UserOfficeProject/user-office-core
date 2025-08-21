@@ -20,6 +20,7 @@ import {
   VisitRegistrationStatus,
 } from 'generated/sdk';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
+import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 
 const getParticipationRole = (
   user: UserJwt,
@@ -72,6 +73,7 @@ interface UseActionButtonsArgs {
 export function useActionButtons(args: UseActionButtonsArgs) {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
+  const { api } = useDataApiWithFeedback();
   const { openModal, closeModal, eventUpdated } = args;
 
   const formTeamAction = (event: UserExperiment) => {
@@ -124,7 +126,10 @@ export function useActionButtons(args: UseActionButtonsArgs) {
         event.proposal.finalStatus === ProposalEndStatus.ACCEPTED &&
         event.proposal.managementDecisionSubmitted
       ) {
-        if (event.experimentSafety) {
+        if (
+          event.experimentSafety &&
+          event.experimentSafety.esiQuestionarySubmittedAt
+        ) {
           // TODO: This needs to be worked on. There is no is_submitted field unlike in experiment_safety_input. Instead we have status field in the new experiment_safety table. The status is not finalized yet. We will work on it, when we get in here
           buttonState = 'completed';
         } else {
@@ -144,7 +149,23 @@ export function useActionButtons(args: UseActionButtonsArgs) {
       <EsiIcon data-cy="finish-experiment-safety-form-icon" />,
       buttonState,
       () => {
-        navigate(`/ExperimentSafety/${event.experimentPk}`);
+        if (event.experimentSafety) {
+          // If experiment safety already exists, navigate directly
+          navigate(
+            `/ExperimentSafety/${event.experimentSafety.experimentSafetyPk}`
+          );
+        } else {
+          // Create experiment safety first, then navigate
+          api()
+            .createExperimentSafety({ experimentPk: event.experimentPk })
+            .then((result) => {
+              if (result.createExperimentSafety) {
+                navigate(
+                  `/ExperimentSafety/${result.createExperimentSafety.experimentSafetyPk}`
+                );
+              }
+            });
+        }
       }
     );
   };

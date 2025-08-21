@@ -184,7 +184,7 @@ const createTopicWithQuestionsAndRelations = (
           cy.updateQuestion({
             id: createdQuestion.id,
             question: textQuestion.title,
-            config: `{"max":"${textQuestion.maxChars}","multiline":true,"required":true}`,
+            config: `{"max":"${textQuestion.maxChars}","multiline":true,"required":true,"readPermissions":[]}`,
           });
 
           if (shouldAddQuestionsToTemplate) {
@@ -238,7 +238,7 @@ const createTopicWithQuestionsAndRelations = (
                             "quantity": "thermodynamic temperature",
                             "siConversionFormula": "x"
                         }
-        ]}`,
+        ], "readPermissions":[]}`,
       });
 
       if (shouldAddQuestionsToTemplate) {
@@ -277,7 +277,7 @@ const createTopicWithQuestionsAndRelations = (
             "quantity": "thermodynamic temperature",
             "siConversionFormula": "x"
         }
-        ]}`,
+        ], "readPermissions":[]}`,
       });
 
       if (shouldAddQuestionsToTemplate) {
@@ -302,7 +302,7 @@ const createTopicWithQuestionsAndRelations = (
       cy.updateQuestion({
         id: createdQuestion.id,
         question: multipleChoiceQuestion.title,
-        config: `{"variant":"dropdown","options":["${multipleChoiceQuestion.answers[0]}","${multipleChoiceQuestion.answers[1]}","${multipleChoiceQuestion.answers[2]}"],"isMultipleSelect":true}`,
+        config: `{"variant":"dropdown","options":["${multipleChoiceQuestion.answers[0]}","${multipleChoiceQuestion.answers[1]}","${multipleChoiceQuestion.answers[2]}"],"isMultipleSelect":true, "readPermissions":[]}`,
       });
 
       if (shouldAddQuestionsToTemplate) {
@@ -326,7 +326,7 @@ const createTopicWithQuestionsAndRelations = (
       cy.updateQuestion({
         id: createdQuestion.id,
         question: dateQuestion.title,
-        config: `{"required":false, "includeTime": false,"tooltip": "${dateQuestion.tooltip}"}`,
+        config: `{"required":false, "includeTime": false,"tooltip": "${dateQuestion.tooltip}","readPermissions":[]}`,
       });
 
       if (shouldAddQuestionsToTemplate) {
@@ -372,7 +372,7 @@ const createTopicWithQuestionsAndRelations = (
       cy.updateQuestion({
         id: createdQuestion.id,
         question: fileQuestion,
-        config: `{"file_type":[".pdf",".docx","image/*"]}`,
+        config: `{"file_type":[".pdf",".docx","image/*"], "readPermissions":[]}`,
       });
 
       if (shouldAddQuestionsToTemplate) {
@@ -396,7 +396,7 @@ const createTopicWithQuestionsAndRelations = (
       cy.updateQuestion({
         id: createdQuestion.id,
         question: richTextInputQuestion.title,
-        config: `{"max":"${richTextInputQuestion.maxChars}", "allowImages": ${richTextInputQuestion.allowImages}}`,
+        config: `{"max":"${richTextInputQuestion.maxChars}", "allowImages": ${richTextInputQuestion.allowImages}, "readPermissions":[]}`,
       });
 
       if (shouldAddQuestionsToTemplate) {
@@ -420,7 +420,7 @@ const createTopicWithQuestionsAndRelations = (
       cy.updateQuestion({
         id: createdQuestion.id,
         question: richTextInputQuestionAllowImages.title,
-        config: `{"max":"${richTextInputQuestionAllowImages.maxChars}", "allowImages": ${richTextInputQuestionAllowImages.allowImages}}`,
+        config: `{"max":"${richTextInputQuestionAllowImages.maxChars}", "allowImages": ${richTextInputQuestionAllowImages.allowImages}, "readPermissions":[]}`,
       });
 
       if (shouldAddQuestionsToTemplate) {

@@ -60,7 +60,6 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'question' }}
           />
-
           <Field
             name="config.small_label"
             label="Small label"
@@ -70,7 +69,6 @@ export const QuestionIntervalForm = (props: QuestionFormProps) => {
             fullWidth
             inputProps={{ 'data-cy': 'small-label' }}
           />
-
           <TitledContainer label="Constraints">
             <Field
               name="config.required"

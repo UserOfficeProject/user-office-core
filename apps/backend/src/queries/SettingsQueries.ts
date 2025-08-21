@@ -27,14 +27,14 @@ export default class SettingsQueries {
 
       return allProposalEvents;
     } else if (entityType === WorkflowType.EXPERIMENT) {
-      const allExperimentEvents = allEventsArray
+      const allExperimentSafetyEvents = allEventsArray
         .filter((eventItem) => eventItem.startsWith('EXPERIMENT_'))
         .map((eventItem) => ({
           name: eventItem,
           description: EventLabel.get(eventItem),
         }));
 
-      return allExperimentEvents;
+      return allExperimentSafetyEvents;
     } else {
       return [];
     }

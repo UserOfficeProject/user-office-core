@@ -15,7 +15,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 import {
   constructProposalStatusChangeEvent,
   EmailReadyType,
@@ -256,6 +256,7 @@ export const emailStatusActionRecipient = async (
             email: userOfficeEmail,
             proposals: proposals,
             template: recipientWithTemplate.emailTemplate.name,
+            templateId: recipientWithTemplate.emailTemplate.id,
           },
         ];
       } else {
@@ -268,6 +269,7 @@ export const emailStatusActionRecipient = async (
           email: userOfficeEmail,
           proposals: [proposal],
           template: recipientWithTemplate.emailTemplate.name,
+          templateId: recipientWithTemplate.emailTemplate.id,
           instruments: await instrumentDataSource.getInstrumentsByProposalPk(
             proposal.primaryKey
           ),
@@ -356,6 +358,7 @@ export const emailStatusActionRecipient = async (
             email: experimentSafetyEmail,
             proposals: proposals,
             template: recipientWithTemplate.emailTemplate.name,
+            templateId: recipientWithTemplate.emailTemplate.id,
           },
         ];
       } else {
@@ -473,6 +476,7 @@ const sendMail = async (
           const res = await mailService.sendMail({
             content: {
               template_id: recipientWithData.template,
+              db_template_id: recipientWithData.templateId,
               email_rfc822: '',
             },
             substitution_data: {

@@ -54,7 +54,6 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
               data-cy="required"
             />
           </TitledContainer>
-
           <TitledContainer label="Options">
             <FormControl fullWidth>
               <InputLabel htmlFor="config.variant" shrink>
@@ -89,7 +88,6 @@ export const QuestionTemplateRelationMultipleChoiceForm = (
               />
             )}
           </TitledContainer>
-
           <TitledContainer label="Items">
             <Field
               title=""

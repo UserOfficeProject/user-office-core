@@ -7,6 +7,7 @@ import {
   ArgsType,
   Int,
   InputType,
+  ObjectType,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../context';
@@ -25,16 +26,10 @@ class TimeSpan {
 @InputType()
 export class ExperimentsFilter {
   @Field({ nullable: true })
-  endsBefore?: Date;
+  experimentStartDate?: Date;
 
   @Field({ nullable: true })
-  endsAfter?: Date;
-
-  @Field({ nullable: true })
-  startsBefore?: Date;
-
-  @Field({ nullable: true })
-  startsAfter?: Date;
+  experimentEndDate?: Date;
 
   @Field(() => Int, { nullable: true })
   callId?: number;
@@ -45,8 +40,8 @@ export class ExperimentsFilter {
   @Field(() => TimeSpan, { nullable: true })
   overlaps?: TimeSpan;
 
-  @Field(() => [ExperimentStatus], { nullable: true })
-  status?: ExperimentStatus[] | null;
+  @Field(() => Int, { nullable: true })
+  public experimentSafetyStatusId?: number;
 }
 
 @ArgsType()
@@ -55,10 +50,19 @@ export class ExperimentsArgs {
   filter?: ExperimentsFilter;
 
   @Field(() => Int, { nullable: true })
-  first?: number;
+  public first?: number;
 
   @Field(() => Int, { nullable: true })
-  offset?: number;
+  public offset?: number;
+
+  @Field({ nullable: true })
+  public sortField?: string;
+
+  @Field({ nullable: true })
+  public sortDirection?: string;
+
+  @Field({ nullable: true })
+  public searchText?: string;
 }
 
 @InputType()
@@ -79,13 +83,30 @@ export class UserExperimentsArgs {
   filter?: UserExperimentsFilter;
 }
 
+@ObjectType()
+class ExperimentsQueryResult {
+  @Field(() => Int)
+  public totalCount: number;
+
+  @Field(() => [Experiment])
+  public experiments: Experiment[];
+}
+
 @Resolver()
 export class ExperimentsQuery {
-  @Query(() => [Experiment])
-  async experiments(
+  @Query(() => ExperimentsQueryResult, { nullable: true })
+  async allExperiments(
     @Args() args: ExperimentsArgs,
     @Ctx() context: ResolverContext
-  ): Promise<Experiment[]> {
-    return context.queries.experiment.getExperiments(context.user, args);
+  ): Promise<ExperimentsQueryResult> {
+    return context.queries.experiment.getAllExperiments(
+      context.user,
+      args.filter,
+      args.first,
+      args.offset,
+      args.sortField,
+      args.sortDirection,
+      args.searchText
+    );
   }
 }

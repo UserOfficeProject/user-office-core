@@ -150,6 +150,7 @@ export interface CreateTransmission {
     | InlineContent
     | {
         template_id: string;
+        db_template_id?: number;
         email_rfc822?: string;
         use_draft_template?: boolean;
       };
@@ -159,9 +160,11 @@ export default interface EmailSettings extends CreateTransmission {
   content:
     | {
         template_id: string;
+        db_template_id?: number;
       }
     | {
         template_id: string;
+        db_template_id?: number;
         email_rfc822: string;
       };
   recipients: (

@@ -23,7 +23,9 @@ import { FeatureContext } from 'context/FeatureContextProvider';
 import { FeatureId } from 'generated/sdk';
 
 const menuMap = {
-  PdfTemplates: '/PdfTemplates',
+  ProposalPdfTemplates: '/PdfTemplates/proposal',
+  ExperimentSafetyPdfTemplates: '/PdfTemplates/experimentSafety',
+  ExperimentSafetyReviewTemplates: '/ExperimentSafetyReviewTemplates',
   ProposalTemplates: '/ProposalTemplates',
   FapReviewTemplates: '/FapReviewTemplates',
   TechnicalReviewTemplates: '/TechnicalReviewTemplates',
@@ -86,6 +88,61 @@ function EsiTemplatesMenuListItem() {
   );
 }
 
+function PdfTemplatesMenuListItem() {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  return (
+    <>
+      <Tooltip title="PDF Templates">
+        <ListItemButton onClick={() => setIsExpanded(!isExpanded)}>
+          <ListItemIcon>
+            <PictureAsPdfIcon />
+            {isExpanded ? (
+              <ExpandLess fontSize="small" />
+            ) : (
+              <ExpandMore fontSize="small" />
+            )}
+          </ListItemIcon>
+          <ListItemText primary="PDF" />
+        </ListItemButton>
+      </Tooltip>
+
+      <Collapse
+        in={isExpanded}
+        timeout="auto"
+        unmountOnExit
+        style={{ marginLeft: '10px' }}
+      >
+        <Tooltip title="PDF (Proposal)">
+          <ListItemButton
+            component={NavLink}
+            to={menuMap['ProposalPdfTemplates']}
+          >
+            <ListItemIcon>
+              <DescriptionIcon />
+            </ListItemIcon>
+            <ListItemText primary="Proposal" title="Proposal" />
+          </ListItemButton>
+        </Tooltip>
+        <Tooltip title="PDF (Experiment Safety)">
+          <ListItemButton
+            component={NavLink}
+            to={menuMap['ExperimentSafetyPdfTemplates']}
+          >
+            <ListItemIcon>
+              <InboxIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Experiment Safety"
+              title="Experiment Safety"
+            />
+          </ListItemButton>
+        </Tooltip>
+      </Collapse>
+    </>
+  );
+}
+
 export function TemplateMenuListItem() {
   const location = useLocation();
   const { t } = useTranslation();
@@ -127,12 +184,15 @@ export function TemplateMenuListItem() {
       </Tooltip>
 
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <Tooltip title="PDF">
-          <ListItemButton component={NavLink} to={menuMap['PdfTemplates']}>
+        <Tooltip title="Experiment Safety Review">
+          <ListItemButton
+            component={NavLink}
+            to={menuMap['ExperimentSafetyReviewTemplates']}
+          >
             <ListItemIcon>
-              <PictureAsPdfIcon />
+              <DescriptionIcon />
             </ListItemIcon>
-            <ListItemText primary="PDF" />
+            <ListItemText primary="Exp Safety Review" />
           </ListItemButton>
         </Tooltip>
 
@@ -224,7 +284,7 @@ export function TemplateMenuListItem() {
         )}
 
         {isRiskAssessmentFeatureEnabled && <EsiTemplatesMenuListItem />}
-
+        <PdfTemplatesMenuListItem />
         <Tooltip title="Feedback">
           <ListItemButton component={NavLink} to={menuMap['FeedbackTemplates']}>
             <ListItemIcon>

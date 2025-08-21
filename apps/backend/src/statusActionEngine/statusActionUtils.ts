@@ -23,7 +23,7 @@ import {
   EmailStatusActionRecipients,
   EmailStatusActionRecipientsWithTemplate,
 } from '../resolvers/types/StatusActionConfig';
-import { WorkflowEngineProposalType } from '../workflowEngine';
+import { WorkflowEngineProposalType } from '../workflowEngine/proposal';
 
 interface GroupedObjectType {
   [key: string]: WorkflowEngineProposalType[];
@@ -59,6 +59,7 @@ export const groupProposalsByProperties = (
 export type EmailReadyType = {
   id: EmailStatusActionRecipients;
   proposals: WorkflowEngineProposalType[];
+  templateId: number;
   template: string;
   email: string;
   firstName?: string;
@@ -215,6 +216,7 @@ export const getEmailReadyArrayOfUsersAndProposals = async (
           id: recipientsWithEmailTemplate.recipient.name,
           proposals: [proposal],
           template: recipientsWithEmailTemplate.emailTemplate.name,
+          templateId: recipientsWithEmailTemplate.emailTemplate.id,
           email: recipient.email,
           firstName: recipient.firstname,
           lastName: recipient.lastname,
@@ -462,6 +464,7 @@ export const getOtherAndFormatOutputForEmailSending = async (
       new Date(),
       true,
       otherEmail,
+      '',
       ''
     );
 

@@ -17,8 +17,6 @@ import { MailService, STFCEmailTemplate, SendMailResults } from './MailService';
 import { ResultsPromise } from './SparkPost';
 
 export class SMTPMailService extends MailService {
-  private emailTemplates: EmailTemplates<any>;
-
   constructor() {
     super();
 
@@ -69,13 +67,6 @@ export class SMTPMailService extends MailService {
     });
   }
 
-  private getEmailTemplatePath(type: string, template: string): string {
-    return path.join(
-      process.env.EMAIL_TEMPLATE_PATH || '',
-      `${template}.${type}`
-    );
-  }
-
   private getSmtpAuthOptions() {
     if (process.env.EMAIL_AUTH_USERNAME && process.env.EMAIL_AUTH_PASSWORD) {
       return {
@@ -115,15 +106,12 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    const template =
-      this.getEmailTemplatePath('html', options.content.template_id) + '.pug';
+    const templateId = await this.getTemplateId(options);
 
-    if (
-      !(await (this.emailTemplates as any).templateExists(template)) &&
-      process.env.NODE_ENV !== 'test'
-    ) {
-      logger.logError('Template does not exist', {
-        templateId: template,
+    if (!templateId) {
+      logger.logError('Email template not found', {
+        templateId: options.content.db_template_id,
+        dbTemplateId: options.content.db_template_id,
       });
 
       return { results: sendMailResults };
@@ -132,7 +120,7 @@ export class SMTPMailService extends MailService {
     options.recipients.forEach((participant) => {
       emailPromises.push(
         this.emailTemplates.send({
-          template: options.content.template_id,
+          template: templateId,
           message: {
             ...(typeof participant.address !== 'string'
               ? {

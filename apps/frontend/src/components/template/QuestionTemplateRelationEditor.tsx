@@ -4,6 +4,7 @@ import React from 'react';
 import StyledDialog from 'components/common/StyledDialog';
 import { createQuestionTemplateRelationForm } from 'components/questionary/QuestionaryComponentRegistry';
 import { QuestionTemplateRelation, Template } from 'generated/sdk';
+import { useRolesData } from 'hooks/user/useRolesData';
 import { Event, EventType } from 'models/questionary/QuestionaryEditorModel';
 
 import TemplateEditLabel from './QuestionTemplateLabel';
@@ -14,6 +15,8 @@ export default function QuestionTemplateRelationEditor(props: {
   closeMe: () => void;
   template: Template;
 }) {
+  const { rolesData } = useRolesData();
+
   if (props.field === null) {
     return null;
   }
@@ -32,6 +35,7 @@ export default function QuestionTemplateRelationEditor(props: {
 
         {createQuestionTemplateRelationForm({
           questionRel: props.field,
+          rolesData: rolesData,
           onOpenQuestionClicked: (question) => {
             props.dispatch({
               type: EventType.OPEN_QUESTION_EDITOR,

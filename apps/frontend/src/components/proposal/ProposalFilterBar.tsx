@@ -3,8 +3,8 @@ import React from 'react';
 
 import CallFilter from 'components/common/proposalFilters/CallFilter';
 import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
-import ProposalStatusFilter from 'components/common/proposalFilters/ProposalStatusFilter';
 import QuestionaryFilter from 'components/common/proposalFilters/QuestionaryFilter';
+import ProposalStatusFilter from 'components/common/proposalFilters/StatusFilter';
 import {
   Call,
   DataType,
@@ -101,8 +101,8 @@ const ProposalFilterBar = ({
 
       <Grid item sm={4} xs={12}>
         <ProposalStatusFilter
-          proposalStatusId={filter.proposalStatusId as number}
-          proposalStatuses={proposalStatuses?.data}
+          statusId={filter.proposalStatusId as number}
+          statuses={proposalStatuses?.data}
           isLoading={proposalStatuses?.isLoading}
           shouldShowAll={true}
           hiddenStatuses={filter.excludeProposalStatusIds as number[]}

@@ -257,6 +257,7 @@ export class StfcUserAuthorization extends UserAuthorization {
         !uniqueRoles.find(
           (role) =>
             role.name === 'ISIS Instrument Scientist' ||
+            role.name === 'CLF LSF Link Scientist' ||
             role.name === 'User Officer'
         )
       );
@@ -384,5 +385,9 @@ export class StfcUserAuthorization extends UserAuthorization {
       readableUsers.includes(id) ||
       (await this.userDataSource.isSearchableUser(id))
     );
+  }
+
+  async canBeAssignedToFap(userId: number): Promise<boolean> {
+    return true;
   }
 }
