@@ -38,9 +38,14 @@ describe('DataAccessUsersAuthorization', () => {
       ).resolves.toEqual(false);
     });
 
-    test('Returns false when proposal does not exist', async () => {
+    test('A user does not have rights to manage a non-existent proposal', async () => {
+      const nonExistentProposalId = 999;
+
       return expect(
-        dataAccessUsersAuth.hasWriteRights(dummyUserOfficerWithRole, 999)
+        dataAccessUsersAuth.hasWriteRights(
+          dummyUserOfficerWithRole,
+          nonExistentProposalId
+        )
       ).resolves.toEqual(false);
     });
   });
