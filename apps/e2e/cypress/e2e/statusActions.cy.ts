@@ -4,6 +4,8 @@ import {
   EmailStatusActionRecipients,
   StatusActionType,
   AllocationTimeUnits,
+  FeatureUpdateAction,
+  FeatureId,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -39,7 +41,13 @@ context('Status actions tests', () => {
   beforeEach(function () {
     cy.resetDB();
     cy.getAndStoreFeaturesEnabled();
+
+    cy.updateFeature({
+      action: FeatureUpdateAction.ENABLE,
+      featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
+    });
   });
+
   describe('Status actions workflow tests', () => {
     it('User Officer should be able to add a status action to workflow connection', () => {
       cy.addWorkflowStatus({
