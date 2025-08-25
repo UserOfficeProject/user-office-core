@@ -36,9 +36,8 @@ export class DataAccessUsersAuthorization {
     if (agent == null || proposal == null) {
       return false;
     }
-    if (agent.id === proposal.proposerId) {
-      return true;
-    }
+
+    return agent.id === proposal.proposerId;
   }
 
   public async hasWriteRights(
@@ -57,6 +56,6 @@ export class DataAccessUsersAuthorization {
       this.userAuth.isUserOfficer(agent) ||
       this.isPrincipalInvestigatorOfProposal(agent, proposal);
 
-    return hasAccess ?? false;
+    return hasAccess;
   }
 }
