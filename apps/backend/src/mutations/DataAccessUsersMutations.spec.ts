@@ -5,8 +5,9 @@ import { Tokens } from '../config/Tokens';
 import { DataAccessUsersDataSource } from '../datasources/DataAccessUsersDataSource';
 import { dummyProposalSubmitted } from '../datasources/mockups/ProposalDataSource';
 import {
-  basicDummyUser,
+  basicDummyUserNotOnProposal,
   dummyPrincipalInvestigatorWithRole,
+  dummyUser,
   dummyUserNotOnProposalWithRole,
 } from '../datasources/mockups/UserDataSource';
 import { Rejection } from '../models/Rejection';
@@ -30,8 +31,8 @@ describe('DataAccessUsersMutations', () => {
   describe('updateDataAccessUsers', () => {
     it('PI should be able to update data access users successfully', async () => {
       const proposalPk = dummyProposalSubmitted.primaryKey;
-      const dataAccessUserIds = [basicDummyUser.id];
-      const expectedDataAccessUsers = [basicDummyUser];
+      const dataAccessUserIds = [basicDummyUserNotOnProposal.id];
+      const expectedDataAccessUsers = [basicDummyUserNotOnProposal];
 
       jest.spyOn(mockDataSource, 'updateDataAccessUsers');
 
@@ -50,14 +51,14 @@ describe('DataAccessUsersMutations', () => {
     });
 
     it('User not on proposal should NOT be able to update data access users', async () => {
-      const proposalPk = dummyProposalSubmitted.primaryKey;
-      const dataAccessUserIds = [basicDummyUser.id];
-
       jest.spyOn(mockDataSource, 'updateDataAccessUsers');
 
       const result = await dataAccessUsersMutations.updateDataAccessUsers(
         dummyUserNotOnProposalWithRole,
-        { proposalPk, userIds: dataAccessUserIds }
+        {
+          proposalPk: dummyProposalSubmitted.primaryKey,
+          userIds: [basicDummyUserNotOnProposal.id],
+        }
       );
 
       expect(mockDataSource.updateDataAccessUsers).toHaveBeenCalledTimes(0);
@@ -65,21 +66,34 @@ describe('DataAccessUsersMutations', () => {
     });
 
     it('Should handle data source errors', async () => {
-      const proposalPk = dummyProposalSubmitted.primaryKey;
-      const dataAccessUserIds = [basicDummyUser.id];
-      const error = new Error('Database error');
-
       const updateSpy = jest.spyOn(mockDataSource, 'updateDataAccessUsers');
-      updateSpy.mockRejectedValue(error);
+      updateSpy.mockRejectedValue(new Error('Database error'));
 
       const result = await dataAccessUsersMutations.updateDataAccessUsers(
         dummyPrincipalInvestigatorWithRole,
-        { proposalPk, userIds: dataAccessUserIds }
+        { proposalPk: dummyProposalSubmitted.primaryKey, userIds: [] }
       );
 
       expect(result).toBeInstanceOf(Rejection);
       expect((result as Rejection).reason).toBe(
         'Failed to update data access users'
+      );
+    });
+
+    it('Should not be able to add data access users if already a member of the proposal', async () => {
+      const userOnProposal = dummyUser;
+
+      const result = await dataAccessUsersMutations.updateDataAccessUsers(
+        dummyPrincipalInvestigatorWithRole,
+        {
+          proposalPk: dummyProposalSubmitted.primaryKey,
+          userIds: [userOnProposal.id],
+        }
+      );
+
+      expect(result).toBeInstanceOf(Rejection);
+      expect((result as Rejection).reason).toBe(
+        'User can not be symultaneously a data access user and a member of the proposal'
       );
     });
   });

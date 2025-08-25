@@ -1,7 +1,7 @@
 import { Rejection } from '../../models/Rejection';
 import { BasicUserDetails } from '../../models/User';
 import { DataAccessUsersDataSource } from '../DataAccessUsersDataSource';
-import { basicDummyUser } from './UserDataSource';
+import { basicDummyUser, basicDummyUserNotOnProposal } from './UserDataSource';
 
 export default class MockDataAccessUsersDataSource
   implements DataAccessUsersDataSource
@@ -15,6 +15,10 @@ export default class MockDataAccessUsersDataSource
     const users: BasicUserDetails[] = [];
     if (userIds.includes(basicDummyUser.id)) {
       users.push(basicDummyUser);
+    }
+
+    if (userIds.includes(basicDummyUserNotOnProposal.id)) {
+      users.push(basicDummyUserNotOnProposal);
     }
 
     return users;
