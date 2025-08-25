@@ -1,4 +1,4 @@
-import { Field, ObjectType, createUnionType } from 'type-graphql';
+import { Field, Int, ObjectType, createUnionType } from 'type-graphql';
 
 import { EmailTemplate } from './EmailTemplate';
 
@@ -55,22 +55,22 @@ export class EmailStatusActionRecipient {
   @Field(() => String, { nullable: true })
   public description?: string;
 }
-// @ObjectType()
-// export class EmailStatusActionEmailTemplate {
-//   @Field(() => Int)
-//   public id: number;
+@ObjectType()
+export class EmailStatusActionEmailTemplate {
+  @Field(() => Int)
+  public id: number;
 
-//   @Field(() => String)
-//   public name: string;
-// }
+  @Field(() => String)
+  public name: string;
+}
 
 @ObjectType()
 export class EmailStatusActionRecipientsWithTemplate {
   @Field(() => EmailStatusActionRecipient)
   recipient: EmailStatusActionRecipient;
 
-  @Field(() => EmailTemplate)
-  emailTemplate: EmailTemplate;
+  @Field(() => EmailStatusActionEmailTemplate)
+  emailTemplate: EmailStatusActionEmailTemplate;
 
   @Field(() => [String], { nullable: true })
   otherRecipientEmails?: string[];

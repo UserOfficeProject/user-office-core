@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { logger } from '@user-office-software/duo-logger';
 import { GraphQLError } from 'graphql';
 import { inject, injectable } from 'tsyringe';
@@ -12,8 +13,8 @@ import {
 import { AddConnectionStatusActionsInput } from '../../resolvers/mutations/settings/AddConnectionStatusActionsMutation';
 import {
   EmailActionConfig,
-  StatusActionConfig,
   RabbitMQActionConfig,
+  StatusActionConfig,
 } from '../../resolvers/types/StatusActionConfig';
 import { StatusActionsDataSource } from '../StatusActionsDataSource';
 import { WorkflowDataSource } from '../WorkflowDataSource';
@@ -128,6 +129,18 @@ export default class PostgresStatusActionsDataSource
     }
 
     return this.createConnectionStatusActionObject(statusActionRecord);
+  }
+
+  async hasEmailTemplateIdConnectionStatusAction(
+    emailTemplateId: number
+  ): Promise<boolean> {
+    const fromClause = "config->'recipientsWithEmailTemplate'";
+    const pattern = `\'[{"emailTemplate": {"id": ${emailTemplateId}}}]\'`;
+    const countResult = await database.raw(
+      `select count(*) from workflow_connection_has_actions where ${fromClause} @> ${pattern}`
+    );
+
+    return Number(countResult.rows[0].count) > 0;
   }
 
   async updateConnectionStatusAction(

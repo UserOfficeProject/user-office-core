@@ -3,6 +3,7 @@ import { Authorized } from 'type-graphql';
 
 import { Tokens } from '../config/Tokens';
 import { EmailTemplateDataSource } from '../datasources/EmailTemplateDataSource';
+import StatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
 import { EmailTemplate } from '../models/EmailTemplate';
 import { Rejection, rejection } from '../models/Rejection';
 import { Roles } from '../models/Role';
@@ -14,7 +15,9 @@ import { UpdateEmailTemplateInput } from '../resolvers/mutations/UpdateEmailTemp
 export default class EmailTemplateMutations {
   constructor(
     @inject(Tokens.EmailTemplateDataSource)
-    private dataSource: EmailTemplateDataSource
+    private dataSource: EmailTemplateDataSource,
+    @inject(Tokens.StatusActionsDataSource)
+    private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
   @Authorized([Roles.USER_OFFICER])
@@ -68,6 +71,18 @@ export default class EmailTemplateMutations {
     agent: UserWithRole | null,
     { emailTemplateId }: { emailTemplateId: number }
   ): Promise<EmailTemplate | Rejection> {
+    const has =
+      await this.statusActionsDataSource.hasEmailTemplateIdConnectionStatusAction(
+        emailTemplateId
+      );
+
+    if (has) {
+      return rejection(
+        'Could not delete email template (used in status actions)',
+        { emailTemplateId }
+      );
+    }
+
     const emailTemplate =
       await this.dataSource.getEmailTemplate(emailTemplateId);
 
