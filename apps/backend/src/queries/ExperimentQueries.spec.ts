@@ -95,8 +95,8 @@ describe('ExperimentQueries', () => {
     test('returns an array of experiments', async () => {
       // Use the experiments generated in init()
       const dummyExperiments = (dataSource as any).experiments;
-      dataSource.getExperiments = () => Promise.resolve(dummyExperiments);
-      const result = await queries.getExperiments(null, { filter: {} });
+      dataSource.getAllExperiments = () => Promise.resolve(dummyExperiments);
+      const result = await queries.getAllExperiments(null, {});
       expect(result).toEqual(dummyExperiments);
     });
   });
