@@ -45,7 +45,6 @@ import {
   createSkipListeningHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { StfcDownloadService } from '../factory/StfcDownloadService';
 import { StfcFapDataColumns } from '../factory/xlsx/stfc/StfcFapDataColumns';
 import {
   callFapStfcPopulateRow,
@@ -128,7 +127,5 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureSTFCEnvironment);
 mapValue(Tokens.ConfigureLogger, configureSTFCWinstonLogger);
-
-mapClass(Tokens.DownloadService, StfcDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);

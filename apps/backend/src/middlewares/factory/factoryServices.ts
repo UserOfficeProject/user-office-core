@@ -1,10 +1,10 @@
+import { logger } from '@user-office-software/duo-logger';
 import { container, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { ExperimentSafetyPdfTemplateDataSource } from '../../datasources/ExperimentSafetyPdfTemplateDataSource';
 import { ProposalPdfTemplateDataSource } from '../../datasources/ProposalPdfTemplateDataSource';
 import { FactoryServicesAuthorized } from '../../decorators';
-import { MetaBase } from '../../factory/DownloadService';
 import {
   collectExperimentPDFData,
   collectExperimentPDFDataTokenAccess,
@@ -13,8 +13,12 @@ import {
 import {
   collectProposalPDFData,
   collectProposalPDFDataTokenAccess,
-  ProposalPDFData,
+  collectProposalPregeneratedPdfData,
+  collectProposalPregeneratedPdfDataTokenAccess,
+  FullProposalPDFData,
+  PregeneratedProposalPDFData,
 } from '../../factory/pdf/proposal';
+import { MetaBase } from '../../factory/service';
 import {
   collectProposalAttachmentData,
   ProposalAttachmentData,
@@ -33,7 +37,13 @@ export interface DownloadTypeServices {
     proposalPks: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
-  ): Promise<ProposalPDFData[] | null>;
+  ): Promise<FullProposalPDFData[] | null>;
+  getPregeneratedPdfProposals(
+    agent: UserWithRole,
+    proposalPks: number[],
+    proposalFileMeta: MetaBase,
+    options?: DownloadOptions
+  ): Promise<PregeneratedProposalPDFData[]>;
   getPdfExperimentsSafety(
     agent: UserWithRole,
     experimentPks: number[],
@@ -61,7 +71,7 @@ export default class FactoryServices implements DownloadTypeServices {
     proposalPks: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
-  ): Promise<ProposalPDFData[] | null> {
+  ): Promise<FullProposalPDFData[] | null> {
     let data = null;
     if (agent) {
       data = await Promise.all(
@@ -92,6 +102,52 @@ export default class FactoryServices implements DownloadTypeServices {
   }
 
   @FactoryServicesAuthorized()
+  async getPregeneratedPdfProposals(
+    agent: UserWithRole | null,
+    proposalPks: number[],
+    proposalFileMeta: MetaBase,
+    options?: DownloadOptions
+  ): Promise<PregeneratedProposalPDFData[]> {
+    if (!agent) {
+      return [];
+    }
+
+    logger.logInfo(
+      `Collecting pregenerated proposal PDF data for ${proposalPks.length} proposals`,
+      {
+        proposalPks: proposalPks,
+      }
+    );
+
+    const allProposalData = await Promise.all(
+      proposalPks.map((proposalPk, indx) => {
+        if (agent?.isApiAccessToken)
+          return collectProposalPregeneratedPdfDataTokenAccess(
+            proposalPk,
+            options,
+            indx === 0
+              ? (filename: string) =>
+                  (proposalFileMeta.singleFilename = filename)
+              : undefined
+          );
+
+        return collectProposalPregeneratedPdfData(
+          proposalPk,
+          agent,
+          indx === 0
+            ? (filename: string) => (proposalFileMeta.singleFilename = filename)
+            : undefined
+        );
+      })
+    );
+
+    const pregeneratedProposalData = allProposalData.filter(
+      (item): item is PregeneratedProposalPDFData => item !== null
+    );
+
+    return pregeneratedProposalData;
+  }
+
   async getPdfExperimentsSafety(
     agent: UserWithRole,
     experimentPks: number[],
