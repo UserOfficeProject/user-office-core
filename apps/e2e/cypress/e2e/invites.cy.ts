@@ -176,7 +176,7 @@ context('Invites tests', () => {
     });
   });
 
-  describe('Adding co-proposers', () => {
+  describe('Showing previous collaborators', () => {
     beforeEach(() => {
       cy.resetDB();
       cy.updateFeature({
@@ -222,52 +222,6 @@ context('Invites tests', () => {
       cy.get('[data-cy="invite-user-autocomplete"]').click();
 
       cy.get('[role=presentation]').contains(lastName);
-    });
-
-    it('Should not be able to add duplicate co-proposer in modal', () => {
-      const lastName = initialDBData.users.user2.lastName;
-      const email = initialDBData.users.user2.email;
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
-      cy.get('[role=presentation]').contains(lastName).click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
-      cy.get('[role=presentation]')
-        .contains(`No results found for "${email}"`)
-        .should('exist');
-    });
-
-    it('Should not be able to add duplicate co-proposer already on proposal', () => {
-      const lastName = initialDBData.users.user2.lastName;
-      const email = initialDBData.users.user2.email;
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
-      cy.get('[role=presentation]').contains(lastName).click();
-      cy.get('[data-cy="invite-user-submit-button"]')
-        .should('be.enabled')
-        .click();
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
-      cy.get('[role=presentation]')
-        .contains(`No results found for "${email}"`)
-        .should('exist');
-    });
-
-    it('Should not be able to add duplicate co-proposer when co-proposer is PI', () => {
-      const email = initialDBData.users.user1.email;
-
-      cy.get('[data-cy="add-participant-button"]').click();
-
-      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
-      cy.get('[role=presentation]')
-        .contains(`No results found for "${email}"`)
-        .should('exist');
     });
   });
 
@@ -332,6 +286,52 @@ context('Invites tests', () => {
       cy.get('[role=presentation]').contains(`No results found for "${email}"`);
       cy.get('[data-cy="invite-user-submit-button"]').should('be.disabled');
       cy.get('.MuiChip-label').should('not.exist');
+    });
+
+    it('Should not be able to add duplicate co-proposer in modal', () => {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
+
+    it('Should not be able to add duplicate co-proposer already on proposal', () => {
+      const lastName = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]').contains(lastName).click();
+      cy.get('[data-cy="invite-user-submit-button"]')
+        .should('be.enabled')
+        .click();
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
+    });
+
+    it('Should not be able to add duplicate co-proposer when co-proposer is PI', () => {
+      const email = initialDBData.users.user1.email;
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.get('[role=presentation]')
+        .contains(`No results found for "${email}"`)
+        .should('exist');
     });
   });
 });
