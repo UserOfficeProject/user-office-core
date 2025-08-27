@@ -109,11 +109,11 @@ context('Invites tests', () => {
 
       cy.get('[data-cy="invite-user-autocomplete"]').type(email);
       cy.get('[role=presentation]').contains(lastName).click();
-      cy.get('.MuiChip-label').should('not.exist');
-
       cy.get('[data-cy="invite-user-submit-button"]')
         .should('be.enabled')
         .click();
+
+      cy.get('.MuiChip-label').should('not.exist');
       cy.get('[data-cy="co-proposers"]').contains(lastName);
     });
 
@@ -261,6 +261,7 @@ context('Invites tests', () => {
         .should('be.enabled')
         .click();
 
+      cy.get('.MuiChip-label').should('not.exist');
       cy.get('[data-cy="co-proposers"]').contains(lastName);
     });
 
