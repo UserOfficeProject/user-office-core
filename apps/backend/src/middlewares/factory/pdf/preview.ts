@@ -1,23 +1,14 @@
 import express from 'express';
 import { container } from 'tsyringe';
 
-import { Tokens } from '../../../config/Tokens';
-import {
-  PDFType,
-  MetaBase,
-  DownloadType,
-  DownloadService,
-} from '../../../factory/DownloadService';
 import { ExperimentSafetyPDFData } from '../../../factory/pdf/experimentSafety';
-import { ProposalPDFData } from '../../../factory/pdf/proposal';
+import { FullProposalPDFData } from '../../../factory/pdf/proposal';
+import { PDFType, MetaBase, DownloadType } from '../../../factory/service';
+import callFactoryService from '../../../factory/service';
 import { Role } from '../../../models/Role';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
-
-const downloadService = container.resolve<DownloadService>(
-  Tokens.DownloadService
-);
 
 router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
   try {
@@ -78,7 +69,7 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       }
 
       const dummyData = JSON.parse(pdfTemplate.dummyData) as {
-        data: ProposalPDFData;
+        data: FullProposalPDFData;
         userRole: Role;
       };
 
@@ -93,7 +84,7 @@ router.get(`/${PDFType.PROPOSAL}`, async (req, res, next) => {
       throw new Error('Invalid request');
     }
 
-    downloadService.callFactoryService<ProposalPDFData, MetaBase>(
+    callFactoryService<FullProposalPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.PROPOSAL,
       payload,
@@ -156,7 +147,7 @@ router.get(`/${PDFType.EXPERIMENT_SAFETY}`, async (req, res, next) => {
     if (!payload) {
       throw new Error('Invalid request');
     }
-    downloadService.callFactoryService<ExperimentSafetyPDFData, MetaBase>(
+    callFactoryService<ExperimentSafetyPDFData, MetaBase>(
       DownloadType.PDF,
       PDFType.EXPERIMENT_SAFETY,
       payload,
