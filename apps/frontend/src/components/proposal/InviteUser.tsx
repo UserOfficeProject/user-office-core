@@ -67,9 +67,6 @@ function InviteUser({
   const isEmailSearchOnly = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH
   )?.isEnabled;
-  const isInviteEnabled = !!featureContext.featuresMap.get(
-    FeatureId.EMAIL_INVITE
-  )?.isEnabled;
 
   const labelText = isEmailSearchOnly
     ? 'Enter a full email address'
@@ -217,12 +214,10 @@ function InviteUser({
       if (exactEmailMatch) {
         addToSelectedItems(exactEmailMatch);
         setExactEmailMatch(undefined);
-      }
-
-      if (isInviteEnabled) {
+      } else {
         if (options.length === 1) {
           addToSelectedItems(options[0]);
-        } else if (isValidEmail(query)) {
+        } else if (isValidEmail(query) && !isEmailSearchOnly) {
           addValidEmailToSelection(query);
         }
       }
