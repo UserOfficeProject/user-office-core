@@ -1,15 +1,19 @@
+import { Event } from '../events/event.enum';
 import {
   Experiment,
   ExperimentHasSample,
   ExperimentSafety,
+  InstrumentScientistDecisionEnum,
+  ExperimentSafetyReviewerDecisionEnum,
 } from '../models/Experiment';
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
-import { SubmitExperimentSafetyArgs } from '../resolvers/mutations/SubmitExperimentSafetyMutation';
 import {
   ExperimentsArgs,
+  ExperimentsFilter,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
+import { ExperimentSafetyEventsRecord } from './postgres/records';
 
 export interface ExperimentDataSource {
   create(
@@ -36,14 +40,28 @@ export interface ExperimentDataSource {
   getExperimentSafety(
     experimentSafetyPk: number
   ): Promise<ExperimentSafety | null>;
+  updateExperimentSafety(
+    experimentSafetyPk: number,
+    updateFields: Partial<{
+      safetyReviewQuestionaryId: number;
+      esiQuestionarySubmittedAt: Date | null;
+      instrumentScientistDecision: InstrumentScientistDecisionEnum | null;
+      instrumentScientistComment: string | null;
+      experimentSafetyReviewerDecision: ExperimentSafetyReviewerDecisionEnum | null;
+      experimentSafetyReviewerComment: string | null;
+      reviewedBy: number;
+    }>
+  ): Promise<ExperimentSafety>;
+  updateExperimentSafetyStatus(
+    experimentSafetyPk: number,
+    statusId: number
+  ): Promise<ExperimentSafety>;
   createExperimentSafety(
     experimentPk: number,
     questionaryId: number,
-    creatorId: number
+    creatorId: number,
+    statusId: number
   ): Promise<ExperimentSafety | Rejection>;
-  submitExperimentSafety(
-    args: SubmitExperimentSafetyArgs
-  ): Promise<ExperimentSafety>;
   getExperimentSafetyByESIQuestionaryId(
     esiQuestionaryId: number
   ): Promise<ExperimentSafety | null>;
@@ -67,5 +85,23 @@ export interface ExperimentDataSource {
     isSubmitted: boolean
   ): Promise<ExperimentHasSample>;
   getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]>;
+  getAllExperiments(
+    filter?: ExperimentsFilter,
+    first?: number,
+    offset?: number,
+    sortField?: string,
+    sortDirection?: string,
+    searchText?: string
+  ): Promise<{
+    totalCount: number;
+    experiments: Experiment[];
+  }>;
   getExperimentsByProposalPk(proposalPk: number): Promise<Experiment[]>;
+  markEventAsDoneOnExperimentSafeties(
+    event: Event,
+    experimentPks: number[]
+  ): Promise<ExperimentSafetyEventsRecord[] | null>;
+  getExperimentSafetyEvents(
+    experimentPk: number
+  ): Promise<ExperimentSafetyEventsRecord | null>;
 }

@@ -1,0 +1,39 @@
+mutation reviewExperimentSafety($experimentSafetyPk: Int!) {
+  reviewExperimentSafety(experimentSafetyPk: $experimentSafetyPk) {
+    ...experimentSafety
+    questionary {
+      isCompleted
+      ...questionary
+    }
+    safetyReviewQuestionary {
+      isCompleted
+      ...questionary
+    }
+    samples {
+      sample {
+        ...sample
+      }
+      # ...sampleEsi
+      questionary {
+        isCompleted
+      }
+      experimentPk
+      sampleId
+      isEsiSubmitted
+      sampleEsiQuestionaryId
+      createdAt
+      updatedAt
+    }
+    proposal {
+      primaryKey
+      proposalId
+      title
+      samples {
+        ...sample
+      }
+      questionary {
+        ...questionary
+      }
+    }
+  }
+}

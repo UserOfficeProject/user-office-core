@@ -3,64 +3,125 @@ import { DateTime } from 'luxon';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import CallFilter from 'components/common/proposalFilters/CallFilter';
-import InstrumentFilter from 'components/common/proposalFilters/InstrumentFilter';
-import { useCallsData } from 'hooks/call/useCallsData';
-import { useInstrumentsMinimalData } from 'hooks/instrument/useInstrumentsMinimalData';
+import {
+  CallFilter,
+  DateFilter,
+  ExperimentSafetyStatusFilter,
+  InstrumentFilter,
+} from 'components/common/experimentFilters';
+import { Call, InstrumentMinimalFragment, Status } from 'generated/sdk';
 
-import DateFilter from './DateFilter';
+import { ExperimentsFilter } from '../experiment/ExperimentsPage';
 
-function ExperimentFilterBar() {
+type ExperimentFilterBarProps = {
+  calls?: {
+    data: Pick<Call, 'shortCode' | 'id' | 'templateId'>[];
+    isLoading: boolean;
+  };
+  instruments?: { data: InstrumentMinimalFragment[]; isLoading: boolean };
+  experimentStatuses?: { data: Status[]; isLoading: boolean };
+  setExperimentFilter: (filter: ExperimentsFilter) => void;
+  filter: ExperimentsFilter;
+};
+
+function ExperimentFilterBar({
+  calls,
+  instruments,
+  experimentStatuses,
+  setExperimentFilter,
+  filter,
+}: ExperimentFilterBarProps) {
   const [searchParams, setSearchParam] = useSearchParams();
-  const call = searchParams.get('call');
-  const instrument = searchParams.get('instrument');
-  const experimentFromDate = searchParams.get('from');
-  const experimentToDate = searchParams.get('to');
+  const experimentStartDate = searchParams.get('experimentStartDate');
+  const experimentEndDate = searchParams.get('experimentEndDate');
 
-  const { instruments, loadingInstruments } = useInstrumentsMinimalData();
-  const { calls, loadingCalls } = useCallsData();
-
-  const handleOnChange = (format: string, from?: Date, to?: Date) => {
+  const handleOnChange = (
+    format: string,
+    experimentStartDate?: Date,
+    experimentEndDate?: Date
+  ) => {
     setSearchParam((searchParam) => {
-      searchParam.delete('from');
-      searchParam.delete('to');
+      searchParam.delete('experimentStartDate');
+      searchParam.delete('experimentEndDate');
 
-      if (from) {
-        searchParam.set('from', DateTime.fromJSDate(from).toFormat(format));
+      if (experimentStartDate) {
+        searchParam.set(
+          'experimentStartDate',
+          DateTime.fromJSDate(experimentStartDate).toFormat(format)
+        );
       }
 
-      if (to) {
-        searchParam.set('to', DateTime.fromJSDate(to).toFormat(format));
+      if (experimentEndDate) {
+        searchParam.set(
+          'experimentEndDate',
+          DateTime.fromJSDate(experimentEndDate).toFormat(format)
+        );
       }
 
       return searchParam;
+    });
+
+    // Update the filter with the new experimentStartDate and experimentEndDate
+    setExperimentFilter({
+      ...filter,
+      experimentStartDate: experimentStartDate
+        ? DateTime.fromJSDate(experimentStartDate)
+        : undefined,
+      experimentEndDate: experimentEndDate
+        ? DateTime.fromJSDate(experimentEndDate)
+        : undefined,
     });
   };
 
   return (
     <Grid container spacing={2}>
-      <Grid item sm={3} xs={12}>
+      <Grid item sm={4} xs={12}>
         <CallFilter
-          callId={call ? +call : null}
-          calls={calls}
-          isLoading={loadingCalls}
+          callId={filter.callId as number}
+          calls={calls?.data}
+          isLoading={calls?.isLoading}
           shouldShowAll={true}
-          data-cy="call-filter"
+          onChange={(callId) => {
+            setExperimentFilter({
+              ...filter,
+              callId,
+            });
+          }}
         />
       </Grid>
-      <Grid item sm={3} xs={12}>
+      <Grid item sm={4} xs={12}>
         <InstrumentFilter
-          instrumentId={instrument ? +instrument : null}
-          instruments={instruments}
-          isLoading={loadingInstruments}
+          instrumentId={filter.instrumentId}
+          instruments={instruments?.data}
+          isLoading={instruments?.isLoading}
           shouldShowAll={true}
-          data-cy="instrument-filter"
+          onChange={(instrumentFilterValue) => {
+            setExperimentFilter({
+              ...filter,
+              instrumentId: instrumentFilterValue.instrumentId,
+            });
+          }}
+        />
+      </Grid>
+      <Grid item sm={4} xs={12}>
+        <ExperimentSafetyStatusFilter
+          statusId={filter.experimentSafetyStatusId as number}
+          statuses={experimentStatuses?.data}
+          isLoading={experimentStatuses?.isLoading}
+          shouldShowAll={true}
+          hiddenStatuses={[]}
+          onChange={(experimentSafetyStatusId: number) => {
+            setExperimentFilter({
+              ...filter,
+              experimentSafetyStatusId,
+            });
+          }}
         />
       </Grid>
       <Grid item xs={12}>
         <DateFilter
-          from={experimentFromDate ?? undefined}
-          to={experimentToDate ?? undefined}
+          experimentStartDate={experimentStartDate ?? undefined}
+          experimentEndDate={experimentEndDate ?? undefined}
           onChange={handleOnChange}
           data-cy="date-filter"
         />

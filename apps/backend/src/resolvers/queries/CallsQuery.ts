@@ -15,7 +15,10 @@ export class CallsFilter {
   public templateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
-  public pdfTemplateIds?: number[];
+  public proposalPdfTemplateIds?: number[];
+
+  @Field(() => [Int], { nullable: true })
+  public experimentSafetyPdfTemplateIds?: number[];
 
   @Field(() => [Int], { nullable: true })
   public esiTemplateIds?: number[];
@@ -52,6 +55,9 @@ export class CallsFilter {
 
   @Field(() => Boolean, { nullable: true })
   public isCallEndedByEvent?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isCallUpcoming?: boolean;
 }
 
 @Resolver()

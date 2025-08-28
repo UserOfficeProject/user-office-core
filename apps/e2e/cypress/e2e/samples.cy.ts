@@ -3,11 +3,9 @@ import {
   DataType,
   TemplateCategoryId,
   TemplateGroupId,
-  FeatureId,
   WorkflowType,
 } from '@user-office-software-libs/shared-types';
 
-import featureFlags from '../support/featureFlags';
 import initialDBData from '../support/initialDBData';
 import { updatedCall } from '../support/utils';
 
@@ -19,7 +17,6 @@ context('Samples tests', () => {
   const sampleTemplateDescription = faker.lorem.words(4);
   const sampleQuestion = faker.lorem.words(4);
   const proposalTitle = faker.lorem.words(2);
-  const safetyComment = faker.lorem.words(5);
   const sampleTitle = faker.lorem.words(2);
   const sampleQuestionaryQuestion = faker.lorem.words(2);
   const proposalWorkflow = {
@@ -226,7 +223,7 @@ context('Samples tests', () => {
 
       cy.contains(proposalTemplateName).click();
 
-      cy.get('[data-cy="call-workflow"]').click();
+      cy.get('[data-cy="proposal-call-workflow"]').click();
       cy.get('[role="presentation"]').contains(proposalWorkflow.name).click();
 
       cy.get('[data-cy="next-step"]').click();
@@ -415,7 +412,6 @@ context('Samples tests', () => {
   });
 
   describe('Samples advanced tests', () => {
-    let createdProposalId: string;
     let createdProposalPk: number;
 
     beforeEach(() => {
@@ -429,7 +425,6 @@ context('Samples tests', () => {
       cy.createProposal({ callId: initialDBData.call.id }).then((result) => {
         if (result.createProposal) {
           createdProposalPk = result.createProposal.primaryKey;
-          createdProposalId = result.createProposal.proposalId;
 
           cy.updateProposal({
             proposalPk: createdProposalPk,
@@ -562,228 +557,6 @@ context('Samples tests', () => {
       cy.contains('Submit').click();
 
       cy.contains('OK').click();
-    });
-
-    it('Officer should be able to evaluate sample', function () {
-      if (
-        !featureFlags
-          .getEnabledFeatures()
-          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
-      ) {
-        this.skip();
-      }
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
-      });
-      cy.submitProposal({ proposalPk: createdProposalPk });
-      cy.visit('/');
-
-      cy.contains('Experiment Safety').click();
-
-      cy.get('[data-cy=experiment-safety-forms-table]').contains(
-        createdProposalId
-      );
-
-      cy.get('[placeholder=Search]').click().clear().type(createdProposalId);
-
-      cy.get('[data-cy=experiment-safety-forms-table]').contains(
-        createdProposalId
-      );
-
-      cy.get('[data-cy=experiment-safety-forms-table]').should(
-        'not.contain',
-        '999999'
-      );
-
-      cy.get('[placeholder=Search]').click().clear();
-
-      cy.get('[data-cy=experiment-safety-forms-table]').contains('999999');
-
-      cy.contains(createdProposalId)
-        .last()
-        .parent()
-        .find('[aria-label="Experiment Safety Review"]')
-        .click();
-
-      cy.get('[data-cy="safety-status"]').click();
-
-      cy.get('[role=presentation]').contains('Low risk').click();
-
-      cy.get('[data-cy="safety-comment"]').type(safetyComment);
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({ variant: 'success', text: 'submitted' });
-
-      cy.reload();
-
-      cy.contains(createdProposalId)
-        .last()
-        .parent()
-        .find('[aria-label="Experiment Safety Review"]')
-        .last()
-        .click();
-
-      cy.contains(safetyComment); // test if comment entered is present after reload
-
-      cy.get('[data-cy="safety-status"]').click();
-
-      cy.contains('High risk').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.contains('HIGH_RISK'); // test if status has changed
-    });
-
-    it('Experiment Safety Reviewer should be able to evaluate sample', function () {
-      if (
-        !featureFlags
-          .getEnabledFeatures()
-          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
-      ) {
-        this.skip();
-      }
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
-      });
-      cy.submitProposal({ proposalPk: createdProposalPk });
-
-      const experimentSafetyReviewer = initialDBData.users.user1;
-
-      cy.updateUserRoles({
-        id: experimentSafetyReviewer.id,
-
-        roles: [initialDBData.roles.experimentSafetyReviewer],
-      });
-
-      cy.login(experimentSafetyReviewer);
-
-      cy.visit('/');
-
-      cy.contains('Experiment Safety').click();
-
-      cy.get('[data-cy=experiment-safety-forms-table]').contains(
-        createdProposalId
-      );
-
-      cy.get('[placeholder=Search]').click().clear().type(createdProposalId);
-
-      cy.get('[data-cy=experiment-safety-forms-table]').contains(
-        createdProposalId
-      );
-
-      cy.get('[data-cy=experiment-safety-forms-table]').should(
-        'not.contain',
-        '999999'
-      );
-
-      cy.get('[placeholder=Search]').click().clear();
-
-      cy.get('[data-cy=experiment-safety-forms-table]').contains('999999');
-
-      cy.contains(createdProposalId)
-        .last()
-        .parent()
-        .find('[aria-label="Experiment Safety Review"]')
-        .click();
-
-      cy.get('[data-cy="safety-status"]').click();
-
-      cy.get('[role=presentation]').contains('Low risk').click();
-
-      cy.get('[data-cy="safety-comment"]').type(safetyComment);
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.notification({ variant: 'success', text: 'submitted' });
-
-      cy.reload();
-
-      cy.contains(createdProposalId)
-        .last()
-        .parent()
-        .find('[aria-label="Experiment Safety Review"]')
-        .last()
-        .click();
-
-      cy.contains(safetyComment); // test if comment entered is present after reload
-
-      cy.get('[data-cy="safety-status"]').click();
-
-      cy.contains('High risk').click();
-
-      cy.get('[data-cy="submit"]').click();
-
-      cy.contains('HIGH_RISK'); // test if status has changed
-    });
-
-    it('Download samples is working with dialog window showing up', function () {
-      if (
-        !featureFlags
-          .getEnabledFeatures()
-          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
-      ) {
-        this.skip();
-      }
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
-      });
-      cy.visit('/');
-
-      cy.contains('Experiment Safety').click();
-
-      cy.get('[data-cy=experiment-safety-forms-table]')
-        .contains(sampleTitle)
-        .first()
-        .closest('tr')
-        .find('[data-cy="download-sample"]')
-        .click();
-
-      cy.get('[data-cy="preparing-download-dialog"]').should('exist');
-      cy.get('[data-cy="preparing-download-dialog-item"]').contains(
-        sampleTitle
-      );
-    });
-
-    it('Should be able to download sample pdf', function () {
-      if (
-        !featureFlags
-          .getEnabledFeatures()
-          .get(FeatureId.EXPERIMENT_SAFETY_REVIEW)
-      ) {
-        this.skip();
-      }
-      cy.createSample({
-        proposalPk: createdProposalPk,
-        templateId: createdSampleTemplateId,
-        questionId: createdSampleQuestionId,
-        title: sampleTitle,
-      });
-      cy.visit('/');
-
-      cy.contains('Experiment Safety').click();
-
-      const token = window.localStorage.getItem('token');
-
-      cy.request({
-        url: '/download/pdf/sample/1',
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      }).then((response) => {
-        expect(response.headers['content-type']).to.be.equal('application/pdf');
-        expect(response.status).to.be.equal(200);
-      });
     });
   });
 });

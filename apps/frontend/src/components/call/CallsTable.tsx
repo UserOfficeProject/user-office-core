@@ -1,12 +1,18 @@
+import { DropResult } from '@hello-pangea/dnd';
 import { Column } from '@material-table/core';
 import Archive from '@mui/icons-material/Archive';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import Unarchive from '@mui/icons-material/Unarchive';
-import { DialogContent } from '@mui/material';
+import { Paper } from '@mui/material';
+import DialogContent from '@mui/material/DialogContent';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
 import Grid from '@mui/material/Grid';
+import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import i18n from 'i18n';
-import React, { useCallback, useState } from 'react';
+import { useCallback, ReactElement } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -14,12 +20,10 @@ import ScienceIcon from 'components/common/icons/ScienceIcon';
 import StyledDialog from 'components/common/StyledDialog';
 import SuperMaterialTable from 'components/common/SuperMaterialTable';
 import {
-  Call,
-  InstrumentWithAvailabilityTime,
-  UserRole,
   UpdateCallInput,
   AssignInstrumentsToCallMutation,
 } from 'generated/sdk';
+import { InstrumentWithAvailabilityTime, UserRole, Call } from 'generated/sdk';
 import { useFormattedDateTime } from 'hooks/admin/useFormattedDateTime';
 import { CallsDataQuantity, useCallsData } from 'hooks/call/useCallsData';
 import { useCheckAccess } from 'hooks/common/useCheckAccess';
@@ -27,32 +31,62 @@ import { useDownloadXLSXCallFap } from 'hooks/fap/useDownloadXLSXCallFap';
 import { tableIcons } from 'utils/materialIcons';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { FunctionType } from 'utils/utilTypes';
-import withConfirm, { WithConfirmProps } from 'utils/withConfirm';
+import withConfirm from 'utils/withConfirm';
 
 import AssignedInstrumentsTable from './AssignedInstrumentsTable';
 import AssignInstrumentsToCall from './AssignInstrumentsToCall';
+import CallReorder from './CallOrderEditor';
+// eslint-disable-next-line import/order
 import CallStatusFilter, {
   CallStatus,
   CallStatusFilters,
 } from './CallStatusFilter';
 import CreateUpdateCall from './CreateUpdateCall';
 const getFilterStatus = (
-  callStatus: CallStatusFilters
-): Partial<Record<'isActive' | 'isActiveInternal', boolean>> => {
+  callStatus: CallStatusFilters,
+  archived: boolean
+): Partial<
+  Record<
+    | 'isEnded'
+    | 'isEndedInternal'
+    | 'isCallEndedByEvent'
+    | 'isActive'
+    | 'isCallUpcoming',
+    boolean
+  >
+> => {
   if (callStatus === CallStatus.ALL) {
-    return {}; // if set to ALL we don't filter by status
+    return {
+      isActive: archived,
+    }; // if set to ALL we don't filter by status
   }
 
-  if (callStatus === CallStatus.ACTIVE || callStatus === CallStatus.INACTIVE) {
+  if (callStatus === CallStatus.CLOSED) {
     return {
-      isActive: callStatus === CallStatus.ACTIVE,
+      isEnded: callStatus === CallStatus.CLOSED,
+      isActive: archived,
     };
   } else {
-    return { isActiveInternal: callStatus === CallStatus.ACTIVEINTERNAL };
+    return {
+      isCallUpcoming: true,
+      isActive: archived,
+    };
   }
 };
+interface Options {
+  title: string;
+  description: ReactElement | string | null;
+}
 
-const CallsTable = ({ confirm }: WithConfirmProps) => {
+export type WithConfirmType = (
+  callback: FunctionType,
+  params: Options
+) => FunctionType;
+export interface CallTableProps {
+  isArchivedTab: boolean;
+  confirm: WithConfirmType;
+}
+const CallsTable = ({ confirm, isArchivedTab }: CallTableProps) => {
   const { api } = useDataApiWithFeedback();
   const { t } = useTranslation();
   const { timezone, toFormattedDateTime } = useFormattedDateTime({
@@ -64,13 +98,17 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   const isUserOfficer = useCheckAccess([UserRole.USER_OFFICER]);
 
   const [searchParam, setSearchParam] = useSearchParams({
-    callStatus: CallStatus.ACTIVE,
+    callStatus: CallStatus.ALL,
   });
 
   const exportFapData = useDownloadXLSXCallFap();
+  const search = searchParam.get('search');
+  const [isCallReorderMode, setIsCallReorderMode] = useState(false);
+  let callStatus = searchParam.get('callStatus');
 
-  const callStatus = searchParam.get('callStatus');
-
+  if (!isArchivedTab) {
+    callStatus = CallStatus.ALL;
+  }
   const {
     loadingCalls,
     calls,
@@ -79,7 +117,8 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
   } = useCallsData(
     {
       ...getFilterStatus(
-        (callStatus as CallStatusFilters) ?? CallStatus.ACTIVE
+        (callStatus as CallStatusFilters) ?? CallStatus.ALL,
+        isArchivedTab
       ),
     },
     CallsDataQuantity.EXTENDED
@@ -93,7 +132,7 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     });
 
     setCallsFilter(() => ({
-      ...getFilterStatus(callStatus as CallStatusFilters),
+      ...getFilterStatus(callStatus as CallStatusFilters, isArchivedTab),
     }));
   };
 
@@ -122,6 +161,11 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
     {
       title: 'Proposal Workflow',
       field: 'proposalWorkflow.name',
+      emptyValue: '-',
+    },
+    {
+      title: 'Experiment Workflow',
+      field: 'experimentWorkflow.name',
       emptyValue: '-',
     },
     {
@@ -286,19 +330,81 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
       }}
     />
   );
+  const reorder = (
+    list: Call[],
+    startIndex: number,
+    endIndex: number
+  ): Call[] => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
 
-  const search = searchParam.get('search');
+    return result;
+  };
+
+  const onDragEnd = (result: DropResult): void => {
+    if (!result.destination) return;
+    const callsWithUpdatedOrder = reorder(
+      calls,
+      result.source.index,
+      result.destination.index
+    );
+    setCalls(callsWithUpdatedOrder);
+    const callOrderList = callsWithUpdatedOrder.map((item, index) => ({
+      callId: item.id,
+      sort_order: index,
+    }));
+
+    api().updateCallOrder({
+      data: callOrderList,
+    });
+  };
 
   return (
     <div data-cy="calls-table">
       <Grid container spacing={2}>
         <Grid item sm={3} xs={12}>
           <CallStatusFilter
-            callStatus={callStatus ?? CallStatus.ACTIVE}
+            show={isArchivedTab && !isCallReorderMode}
+            callStatus={callStatus ?? CallStatus.ALL}
             onChange={handleStatusFilterChange}
           />
         </Grid>
       </Grid>
+      {callStatus === CallStatus.OPENUPCOMING && (
+        <FormGroup
+          row
+          style={{ justifyContent: 'flex-end', paddingBottom: '25px' }}
+        >
+          <FormControlLabel
+            data-cy="order-calls-button"
+            control={
+              <Switch
+                checked={isCallReorderMode}
+                onChange={(): void => setIsCallReorderMode(!isCallReorderMode)}
+              />
+            }
+            label="Order calls mode"
+          />
+        </FormGroup>
+      )}
+
+      {isCallReorderMode && (
+        <div>
+          <Typography variant="h6" component="h2">
+            Drag to order calls
+          </Typography>
+          <Paper>
+            <CallReorder
+              items={calls.sort((a, b) =>
+                a.sort_order > b.sort_order ? 1 : -1
+              )}
+              onDragEnd={onDragEnd}
+            />
+          </Paper>
+        </div>
+      )}
+
       {assigningInstrumentsCallId && (
         <StyledDialog
           aria-labelledby="simple-modal-title"
@@ -320,57 +426,59 @@ const CallsTable = ({ confirm }: WithConfirmProps) => {
           </DialogContent>
         </StyledDialog>
       )}
-      <SuperMaterialTable
-        createModal={createModal}
-        setData={setCalls}
-        delete={deleteCall}
-        hasAccess={{
-          create: isUserOfficer && callStatus !== CallStatus.INACTIVE,
-          update: isUserOfficer,
-          remove: isUserOfficer,
-        }}
-        icons={tableIcons}
-        title={
-          <Typography variant="h6" component="h2">
-            Calls
-          </Typography>
-        }
-        columns={columns}
-        data={calls}
-        isLoading={loadingCalls}
-        detailPanel={[
-          {
-            tooltip: 'Show ' + i18n.format(t('instrument'), 'plural'),
-            render: AssignedInstruments,
-          },
-        ]}
-        options={{
-          search: true,
-          searchText: search || undefined,
-        }}
-        actions={[
-          {
-            icon: ScienceIconComponent,
-            tooltip: 'Assign ' + t('instrument'),
-            onClick: (event, rowData): void =>
-              setAssigningInstrumentsCallId((rowData as Call).id),
-            position: 'row',
-          },
-          (rowData) => ({
-            icon: rowData.isActive ? Archive : Unarchive,
-            tooltip: `${rowData.isActive ? 'Deactivate' : 'Activate'} call`,
-            onClick: (): void => changeCallActiveStatus(rowData as Call),
-            position: 'row',
-          }),
-          (rowData) => ({
-            icon: GridOnIcon,
-            tooltip: `Export ${t('Fap')} Data`,
-            onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
-            position: 'row',
-          }),
-        ]}
-        persistUrlQueryParams={true}
-      />
+      {!isCallReorderMode && (
+        <SuperMaterialTable
+          createModal={createModal}
+          setData={setCalls}
+          delete={deleteCall}
+          hasAccess={{
+            create: isUserOfficer && isArchivedTab,
+            update: isUserOfficer,
+            remove: isUserOfficer,
+          }}
+          icons={tableIcons}
+          title={
+            <Typography variant="h6" component="h2">
+              Calls
+            </Typography>
+          }
+          columns={columns}
+          data={calls}
+          isLoading={loadingCalls}
+          detailPanel={[
+            {
+              tooltip: 'Show ' + i18n.format(t('instrument'), 'plural'),
+              render: AssignedInstruments,
+            },
+          ]}
+          options={{
+            search: true,
+            searchText: search || undefined,
+          }}
+          actions={[
+            {
+              icon: ScienceIconComponent,
+              tooltip: 'Assign ' + t('instrument'),
+              onClick: (event, rowData): void =>
+                setAssigningInstrumentsCallId((rowData as Call).id),
+              position: 'row',
+            },
+            (rowData) => ({
+              icon: rowData.isActive ? Archive : Unarchive,
+              tooltip: `${rowData.isActive ? 'Archive' : 'Unarchive'} call`,
+              onClick: (): void => changeCallActiveStatus(rowData as Call),
+              position: 'row',
+            }),
+            (rowData) => ({
+              icon: GridOnIcon,
+              tooltip: `Export ${t('Fap')} Data`,
+              onClick: (): void => exportFapData(rowData.id, rowData.shortCode),
+              position: 'row',
+            }),
+          ]}
+          persistUrlQueryParams={true}
+        />
+      )}
     </div>
   );
 };

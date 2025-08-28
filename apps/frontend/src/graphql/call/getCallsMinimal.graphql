@@ -11,5 +11,6 @@ query getCallsMinimal($filter: CallsFilter) {
     cycleComment
     allocationTimeUnit
     isActive
+    sort_order
   }
 }

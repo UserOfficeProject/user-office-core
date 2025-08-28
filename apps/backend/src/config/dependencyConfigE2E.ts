@@ -11,6 +11,7 @@ import PostgresCoProposerClaimDataSource from '../datasources/postgres/CoPropose
 import PostgresDataAccessUsersDataSource from '../datasources/postgres/DataAccessUsersDataSource';
 import PostgresEventLogsDataSource from '../datasources/postgres/EventLogsDataSource';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
+import PostgresExperimentSafetyPdfTemplateDataSource from '../datasources/postgres/ExperimentSafetyPdfTemplateDataSource';
 import PostgresFapDataSource from '../datasources/postgres/FapDataSource';
 import PostgresFeedbackDataSource from '../datasources/postgres/FeedbackDataSource';
 import PostgresFileDataSource from '../datasources/postgres/FileDataSource';
@@ -18,10 +19,10 @@ import PostgresGenericTemplateDataSource from '../datasources/postgres/GenericTe
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import PostgresInternalReviewDataSource from '../datasources/postgres/InternalReviewDataSource';
 import PostgresInviteDataSource from '../datasources/postgres/InviteDataSource';
-import PostgresPdfTemplateDataSource from '../datasources/postgres/PdfTemplateDataSource';
 import PostgresPredefinedMessageDataSource from '../datasources/postgres/PredefinedMessageDataSource';
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import PostgresProposalInternalCommentsDataSource from '../datasources/postgres/ProposalInternalCommentsDataSource';
+import PostgresProposalPdfTemplateDataSource from '../datasources/postgres/ProposalPdfTemplateDataSource';
 import PostgresQuestionaryDataSource from '../datasources/postgres/QuestionaryDataSource';
 import PostgresRedeemCodesDataSource from '../datasources/postgres/RedeemCodesDataSource';
 import PostgresReviewDataSource from '../datasources/postgres/ReviewDataSource';
@@ -47,7 +48,6 @@ import {
   createSkipPostingHandler,
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
-import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
 import {
   callFapPopulateRow,
@@ -72,7 +72,14 @@ mapClass(Tokens.InstrumentDataSource, PostgresInstrumentDataSource);
 mapClass(Tokens.InviteDataSource, PostgresInviteDataSource);
 mapClass(Tokens.RoleClaimDataSource, PostgresRoleClaimDataSource);
 mapClass(Tokens.InternalReviewDataSource, PostgresInternalReviewDataSource);
-mapClass(Tokens.PdfTemplateDataSource, PostgresPdfTemplateDataSource);
+mapClass(
+  Tokens.ProposalPdfTemplateDataSource,
+  PostgresProposalPdfTemplateDataSource
+);
+mapClass(
+  Tokens.ExperimentSafetyPdfTemplateDataSource,
+  PostgresExperimentSafetyPdfTemplateDataSource
+);
 mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(
   Tokens.ProposalInternalCommentsDataSource,
@@ -124,7 +131,5 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureESSDevelopmentEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
-
-mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
