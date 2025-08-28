@@ -177,7 +177,7 @@ const WorkflowEditor = ({ entityType }: { entityType: WorkflowType }) => {
 
       newNodes.push(newNode);
 
-      // Create edge from previous connection id if it exists because node can have only one parrent
+      // Create edge from previous connection id if it exists because node can have only one parent
       if (connection.prevConnectionId) {
         const prevStatusId = connection.prevStatusId!.toString();
         const prevConnection = sortedConnections.find(
