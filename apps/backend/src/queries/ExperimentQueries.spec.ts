@@ -7,6 +7,7 @@ import {
   ExperimentDataSourceMock,
   UpcomingExperimentWithExperiment,
 } from '../datasources/mockups/ExperimentDataSource';
+import { dummyUserOfficerWithRole } from '../datasources/mockups/UserDataSource';
 import { ExperimentSafety } from '../models/Experiment';
 import ExperimentQueries from './ExperimentQueries';
 
@@ -31,14 +32,17 @@ describe('ExperimentQueries', () => {
         1
       );
       const result = await queries.getExperimentSafetyByExperimentPk(
-        null,
+        dummyUserOfficerWithRole,
         UpcomingExperimentWithExperiment.experimentPk
       );
       expect(result).toEqual(createdSafety);
     });
 
     test('returns null when safety does not exist', async () => {
-      const result = await queries.getExperimentSafetyByExperimentPk(null, 999);
+      const result = await queries.getExperimentSafetyByExperimentPk(
+        dummyUserOfficerWithRole,
+        999
+      );
       expect(result).toBeNull();
     });
   });
@@ -51,14 +55,17 @@ describe('ExperimentQueries', () => {
         2
       )) as ExperimentSafety;
       const result = await queries.getExperimentSafety(
-        null,
+        dummyUserOfficerWithRole,
         createdSafety.experimentSafetyPk
       );
       expect(result).toEqual(createdSafety);
     });
 
     test('returns null when safety pk does not exist', async () => {
-      const result = await queries.getExperimentSafety(null, 999);
+      const result = await queries.getExperimentSafety(
+        dummyUserOfficerWithRole,
+        999
+      );
       expect(result).toBeNull();
     });
   });
@@ -66,19 +73,25 @@ describe('ExperimentQueries', () => {
   describe('getExperimentSample', () => {
     test('returns experiment sample when available', async () => {
       // Override the method to return a dummy sample
-      const result = await queries.getExperimentSample(null, {
-        experimentPk: 1,
-        sampleId: 1,
-      });
+      const result = await queries.getExperimentSample(
+        dummyUserOfficerWithRole,
+        {
+          experimentPk: 1,
+          sampleId: 1,
+        }
+      );
       expect(result).toEqual(DummyExperimentSample1);
     });
 
     test('returns null when sample is not found', async () => {
       dataSource.getExperimentSample = () => Promise.resolve(null);
-      const result = await queries.getExperimentSample(null, {
-        experimentPk: 1,
-        sampleId: 999,
-      });
+      const result = await queries.getExperimentSample(
+        dummyUserOfficerWithRole,
+        {
+          experimentPk: 1,
+          sampleId: 999,
+        }
+      );
       expect(result).toBeNull();
     });
   });
@@ -86,7 +99,10 @@ describe('ExperimentQueries', () => {
   describe('getExperimentSamples', () => {
     test('returns an array of experiment samples', async () => {
       const dummySamples = [DummyExperimentSample1];
-      const result = await queries.getExperimentSamples(null, 1);
+      const result = await queries.getExperimentSamples(
+        dummyUserOfficerWithRole,
+        1
+      );
       expect(result).toEqual(dummySamples);
     });
   });
@@ -96,7 +112,10 @@ describe('ExperimentQueries', () => {
       // Use the experiments generated in init()
       const dummyExperiments = (dataSource as any).experiments;
       dataSource.getAllExperiments = () => Promise.resolve(dummyExperiments);
-      const result = await queries.getAllExperiments(null, {});
+      const result = await queries.getAllExperiments(
+        dummyUserOfficerWithRole,
+        {}
+      );
       expect(result).toEqual(dummyExperiments);
     });
   });
@@ -107,12 +126,15 @@ describe('ExperimentQueries', () => {
       const expected = (dataSource as any).experiments.find(
         (exp: any) => exp.experimentPk === experimentPk
       );
-      const result = await queries.getExperiment(null, experimentPk);
+      const result = await queries.getExperiment(
+        dummyUserOfficerWithRole,
+        experimentPk
+      );
       expect(result).toEqual(expected);
     });
 
     test('returns null when experiment not found', async () => {
-      const result = await queries.getExperiment(null, 999);
+      const result = await queries.getExperiment(dummyUserOfficerWithRole, 999);
       expect(result).toBeNull();
     });
   });

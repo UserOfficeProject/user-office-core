@@ -2,50 +2,47 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import React, { useContext } from 'react';
-
-import { UserContext } from 'context/UserContextProvider';
+import React from 'react';
 
 export enum CallStatus {
   ALL = 'all',
-  ACTIVE = 'active',
-  ACTIVEINTERNAL = 'activeinternal',
-  INACTIVE = 'inactive',
+  OPENUPCOMING = 'open',
+  CLOSED = 'closed',
 }
 
-export type CallStatusFilters =
-  | 'all'
-  | 'active'
-  | 'activeinternal'
-  | 'inactive';
+export type CallStatusFilters = 'all' | 'open' | 'closed';
 
 type CallStatusFilterProps = {
   callStatus: string;
+  show: boolean;
   onChange: (callStatus: CallStatus) => void;
 };
 
-const CallStatusFilter = ({ callStatus, onChange }: CallStatusFilterProps) => {
-  const { isInternalUser } = useContext(UserContext);
-
-  return (
-    <FormControl fullWidth>
-      <InputLabel id="call-status-select-label">Status</InputLabel>
-      <Select
-        id="call-status-select"
-        labelId="call-status-select-label"
-        onChange={(e) => onChange(e.target.value as CallStatus)}
-        value={callStatus}
-        data-cy="call-status-filter"
-      >
-        <MenuItem value={CallStatus.ALL}>All</MenuItem>
-        <MenuItem value={CallStatus.ACTIVE}>Active</MenuItem>
-        {isInternalUser ? (
-          <MenuItem value={CallStatus.ACTIVEINTERNAL}>Active Internal</MenuItem>
-        ) : null}
-        <MenuItem value={CallStatus.INACTIVE}>Inactive</MenuItem>
-      </Select>
-    </FormControl>
-  );
+const CallStatusFilter = ({
+  callStatus,
+  show,
+  onChange,
+}: CallStatusFilterProps) => {
+  if (show) {
+    return (
+      <FormControl fullWidth>
+        <InputLabel id="call-status-select-label">Status</InputLabel>
+        <Select
+          id="call-status-select"
+          labelId="call-status-select-label"
+          onChange={(e) => onChange(e.target.value as CallStatus)}
+          value={callStatus}
+          data-cy="call-status-filter"
+        >
+          <MenuItem value={CallStatus.ALL}>All</MenuItem>
+          <MenuItem value={CallStatus.OPENUPCOMING}>Open/Upcoming</MenuItem>
+          <MenuItem value={CallStatus.CLOSED}>Closed</MenuItem>
+        </Select>
+      </FormControl>
+    );
+  } else {
+    return <FormControl fullWidth></FormControl>;
+  }
 };
 
 export default CallStatusFilter;
