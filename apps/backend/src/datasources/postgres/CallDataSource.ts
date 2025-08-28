@@ -10,6 +10,8 @@ import {
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
   UpdateFapToCallInstrumentInput,
+  CallOrderInput,
+  CallOrderArray,
 } from '../../resolvers/mutations/UpdateCallMutation';
 import { CallDataSource } from '../CallDataSource';
 import { CallsFilter } from './../../resolvers/queries/CallsQuery';
@@ -114,6 +116,10 @@ export default class PostgresCallDataSource implements CallDataSource {
         .andWhere('end_call_internal', '>=', currentDate);
     } else if (filter?.isEnded === true) {
       query.where('end_call', '<=', currentDate);
+    } else if (filter?.isCallUpcoming === true) {
+      query
+        .where('end_call', '>=', currentDate)
+        .orWhere('end_call_internal', '>=', currentDate);
     } else if (filter?.isEnded === false) {
       query
         .where('start_call', '<=', currentDate)
@@ -190,6 +196,9 @@ export default class PostgresCallDataSource implements CallDataSource {
   }
 
   async create(args: CreateCallInput): Promise<Call> {
+    if (!args.sort_order) {
+      args.sort_order = 0;
+    }
     const [call]: CallRecord[] = await database.transaction(async (trx) => {
       try {
         const createdCall: CallRecord[] = await database
@@ -223,6 +232,7 @@ export default class PostgresCallDataSource implements CallDataSource {
             allocation_time_unit: args.allocationTimeUnit,
             title: args.title,
             description: args.description,
+            sort_order: args.sort_order,
           })
           .into('call')
           .returning('*')
@@ -426,6 +436,24 @@ export default class PostgresCallDataSource implements CallDataSource {
     });
 
     return createCallObject(call[0]);
+  }
+  async setNewSortOrder(data: CallOrderArray): Promise<number> {
+    return await database
+      .update({ sort_order: data.sort_order })
+      .from('call')
+      .where({ call_id: data.callId });
+  }
+
+  async orderCalls(data: CallOrderInput): Promise<boolean> {
+    try {
+      data.data.forEach((item) => {
+        this.setNewSortOrder(item);
+      });
+    } catch {
+      throw new GraphQLError('Could not update call order');
+    }
+
+    return true;
   }
 
   async assignInstrumentsToCall(

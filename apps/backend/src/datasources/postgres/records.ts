@@ -359,6 +359,7 @@ export interface CallRecord {
   readonly fap_review_template_id: number;
   readonly technical_review_template_id: number;
   readonly is_active: boolean;
+  readonly sort_order: number;
   readonly experiment_workflow_id: number;
 }
 
@@ -1047,6 +1048,7 @@ export const createCallObject = (call: CallRecord) => {
     call.fap_review_template_id,
     call.technical_review_template_id,
     call.is_active,
+    call.sort_order,
     call.experiment_workflow_id
   );
 };
