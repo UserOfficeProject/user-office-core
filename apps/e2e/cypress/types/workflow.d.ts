@@ -85,17 +85,11 @@ declare global {
       addFeasibilityReviewToDefaultWorkflow: () => Cypress.Chainable<AddWorkflowStatusMutation>;
 
       /**
-       * Simulates dragging a ReactFlow status element to a drop target
-       * @param sourceSelector - Cypress selector for the draggable element
-       * @param targetSelector - Cypress selector for the drop target
-       * @param statusId - The status ID to be transferred via DataTransfer
+       * Drags a status element into the workflow canvas area
+       * @param sourceSelector - Status object representing the status to be dragged
        * @param options - Additional options for the drag operation
        * @example
-       * cy.dragReactFlowStatus(
-       *   '[data-cy^="status_FEASIBILITY_REVIEW"]',
-       *   '[data-testid="rf__background"]',
-       *   initialDBData.proposalStatuses.feasibilityReview.id
-       * );
+       * cy.dragStatusIntoWorkflow(initialDBData.proposalStatuses.draft, { clientX: 100, clientY: 200 });
        */
       dragStatusIntoWorkflow(
         sourceSelector: Pick<Status, 'shortCode' | 'id'>,
