@@ -75,7 +75,7 @@ export default function createLoggingHandler() {
 
           break;
         }
-        case Event.PROPOSAL_CO_PROPOSER_INVITE_SENT: {
+        case Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT: {
           const { invite, proposalPKey } = event;
 
           eventLogsDataSource.set(

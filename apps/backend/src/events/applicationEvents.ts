@@ -224,7 +224,7 @@ interface ProposalCoProposerInvitesUpdatedEvent extends GeneralEvent {
 }
 
 interface ProposalCoProposerInviteSentEvent extends GeneralEvent {
-  type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT;
+  type: Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT;
   invite: Invite;
   proposalPKey: number;
 }

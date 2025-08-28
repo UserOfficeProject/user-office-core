@@ -263,7 +263,7 @@ describe('Test Invite Mutations', () => {
     expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
     expect(setEventInDataSourceSpy).toHaveBeenCalledWith(
       dummyUserWithRole.id, // changedBy (userId)
-      expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_INVITE_SENT), // eventType
+      expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT), // eventType
       expect.stringContaining(email), // rowData (JSON string containing the email)
       expect.any(String), // changedObjectId (should be the invite ID)
       expect.stringContaining(`Co-proposer invite sent to: ${email}`), // description

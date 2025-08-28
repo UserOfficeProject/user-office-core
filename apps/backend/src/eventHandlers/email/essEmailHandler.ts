@@ -309,7 +309,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         ).then(async () => {
           await eventBus.publish({
             ...event,
-            type: Event.PROPOSAL_CO_PROPOSER_INVITE_SENT,
+            type: Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT,
             invite,
           });
         });
