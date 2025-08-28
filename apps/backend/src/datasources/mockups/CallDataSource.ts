@@ -4,6 +4,7 @@ import { Workflow, WorkflowType } from '../../models/Workflow';
 import { CreateCallInput } from '../../resolvers/mutations/CreateCallMutation';
 import {
   AssignInstrumentsToCallInput,
+  CallOrderInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateCallInput,
   UpdateFapToCallInstrumentInput,
@@ -52,7 +53,8 @@ export const dummyCallFactory = (values?: Partial<Call>) => {
     values?.experimentSafetyPdfTemplateId,
     values?.fapReviewTemplateId || 1,
     values?.technicalReviewTemplateId || 1,
-    values?.isActive ?? true,
+    values?.isActive || true,
+    values?.sort_order || 0,
     values?.experimentWorkflowId ?? 1
   );
 };
@@ -91,6 +93,7 @@ export const dummyCall = new Call(
   1,
   1,
   true,
+  0,
   1
 );
 
@@ -128,6 +131,7 @@ export const anotherDummyCall = new Call(
   1, // fapReviewTemplateId
   1, // technicalReviewTemplateId
   true, // isActive
+  0, //sort_order
   1 // experimentWorkflowId
 );
 
@@ -177,6 +181,10 @@ export class CallDataSourceMock implements CallDataSource {
     dummyCalls[indexOfCallToUpdate] = { ...dummyCall, ...args };
 
     return dummyCalls[indexOfCallToUpdate];
+  }
+
+  async orderCalls(data: CallOrderInput): Promise<boolean> {
+    return true;
   }
 
   async assignInstrumentsToCall(args: AssignInstrumentsToCallInput) {
