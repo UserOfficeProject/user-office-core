@@ -55,6 +55,9 @@ export class CallsFilter {
 
   @Field(() => Boolean, { nullable: true })
   public isCallEndedByEvent?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  public isCallUpcoming?: boolean;
 }
 
 @Resolver()

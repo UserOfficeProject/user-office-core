@@ -22,8 +22,8 @@ export default class EmailTemplateMutations {
     private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
-  @EventBus(Event.EMAIL_TEMPLATE_CREATED)
   @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.EMAIL_TEMPLATE_CREATED)
   async create(
     agent: UserWithRole | null,
     args: CreateEmailTemplateInput
@@ -47,6 +47,7 @@ export default class EmailTemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.EMAIL_TEMPLATE_CREATED)
   async update(
     agent: UserWithRole | null,
     args: UpdateEmailTemplateInput
@@ -70,6 +71,7 @@ export default class EmailTemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
+  @EventBus(Event.EMAIL_TEMPLATE_CREATED)
   async delete(
     agent: UserWithRole | null,
     { emailTemplateId }: { emailTemplateId: number }

@@ -1,17 +1,11 @@
 import { container } from 'tsyringe';
 
-import { Tokens } from '../config/Tokens';
-import { EmailTemplateDataSourceMock } from '../datasources/mockups/EmailTemplateDataSource';
 import { dummyUserWithRole } from '../datasources/mockups/UserDataSource';
 import EmailTemplateMutations from './EmailTemplateMutations';
 
 const emailTemplateMutations = container.resolve(EmailTemplateMutations);
 
-beforeEach(() => {
-  container
-    .resolve<EmailTemplateDataSourceMock>(Tokens.EmailTemplateDataSource)
-    .init();
-});
+beforeEach(() => {});
 
 describe('Test Email Template Mutations', () => {
   test('A user can not create an email template', () => {

@@ -1,6 +1,13 @@
-import { useEffect, useState, SetStateAction, Dispatch } from 'react';
+import {
+  useEffect,
+  useState,
+  SetStateAction,
+  Dispatch,
+  useContext,
+} from 'react';
 
-import { StatusAction } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { FeatureId, StatusAction, StatusActionType } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 
 export function useStatusActionsData(): {
@@ -10,6 +17,11 @@ export function useStatusActionsData(): {
 } {
   const [statusActions, setStatusActions] = useState<StatusAction[]>([]);
   const [loadingStatusActions, setLoadingStatusActions] = useState(true);
+
+  const featureContext = useContext(FeatureContext);
+  const isPregeneratedProposalPdfsEnabled = featureContext.featuresMap.get(
+    FeatureId.PREGENERATED_PROPOSAL_PDF
+  )?.isEnabled;
 
   const api = useDataApi();
 
@@ -25,6 +37,11 @@ export function useStatusActionsData(): {
         }
 
         if (data.statusActions) {
+          if (!isPregeneratedProposalPdfsEnabled) {
+            data.statusActions = data.statusActions.filter(
+              (action) => action.type !== StatusActionType.PROPOSALDOWNLOAD
+            );
+          }
           setStatusActions(data.statusActions);
         }
         setLoadingStatusActions(false);
