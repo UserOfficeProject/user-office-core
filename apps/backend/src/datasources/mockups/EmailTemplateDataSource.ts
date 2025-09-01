@@ -13,6 +13,24 @@ export const dummyEmailTemplate = {
 };
 
 export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
+  emailTemplates: EmailTemplate[];
+  constructor() {
+    this.init();
+  }
+
+  public init() {
+    this.emailTemplates = [
+      new EmailTemplate(
+        1,
+        1,
+        'Dummy Email Template',
+        'This is a dummy email template for testing purposes.',
+        'Welcome to Our Service',
+        'Hello, thank you for signing up for our service. We are excited to have you on board!'
+      ),
+    ];
+  }
+
   async delete(id: number): Promise<EmailTemplate> {
     return dummyEmailTemplate;
   }

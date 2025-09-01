@@ -7,7 +7,7 @@ DECLARE
       array_loop_var int;
       template_name varchar(200);
 BEGIN
-	IF register_patch('CreateEmailTemplatesTable.sql', 'Gergely Nyiri', 'Create emails table', '2025-07-15') THEN
+	IF register_patch('CreateEmailTemplatesTable.sql', 'Gergely Nyiri', 'Create email templates table', '2025-07-15') THEN
 
             CREATE TABLE IF NOT EXISTS email_templates (
                   email_template_id serial PRIMARY KEY,

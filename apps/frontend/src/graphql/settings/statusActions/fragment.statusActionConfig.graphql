@@ -6,12 +6,7 @@ fragment statusActionDefaultConfig on StatusActionDefaultConfig {
     }
 
     emailTemplates {
-      id
-      name
-      createdByUserId
-      description
-      subject
-      body
+      ...emailTemplate
     }
   }
   ... on RabbitMQActionDefaultConfig {

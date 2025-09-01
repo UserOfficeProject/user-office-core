@@ -1,4 +1,5 @@
 import { Call } from '../models/Call';
+import { EmailTemplate } from '../models/EmailTemplate';
 import { ExperimentSafety } from '../models/Experiment';
 import { Fap, FapProposal } from '../models/Fap';
 import { FapMeetingDecision } from '../models/FapMeetingDecision';
@@ -443,6 +444,21 @@ interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
   experimentsafety: ExperimentSafety;
 }
 
+interface EmailTemplateCreatedEvent extends GeneralEvent {
+  type: Event.EMAIL_TEMPLATE_CREATED;
+  emailTemplate: EmailTemplate;
+}
+
+interface EmailTemplateUpdatedEvent extends GeneralEvent {
+  type: Event.EMAIL_TEMPLATE_UPDATED;
+  emailTemplate: EmailTemplate;
+}
+
+interface EmailTemplateDeletedEvent extends GeneralEvent {
+  type: Event.EMAIL_TEMPLATE_DELETED;
+  emailTemplate: EmailTemplate;
+}
+
 export type ApplicationEvent =
   | ProposalAcceptedEvent
   | ProposalUpdatedEvent
@@ -525,4 +541,7 @@ export type ApplicationEvent =
   | ExperimentSafetyManagementDecisionSubmittedByISEvent
   | ExperimentSafetyManagementDecisionSubmittedByESREvent
   | ExperimentSafetyStatusChangedByWorkflowEvent
-  | ExperimentSafetyStatusChangedByUserEvent;
+  | ExperimentSafetyStatusChangedByUserEvent
+  | EmailTemplateCreatedEvent
+  | EmailTemplateUpdatedEvent
+  | EmailTemplateDeletedEvent;
