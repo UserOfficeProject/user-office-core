@@ -154,7 +154,7 @@ function InviteUser({
       isPendingSearch.current = false;
       setLoading(false);
     }
-  }, [api, query, excludeUserIds, selectedItems]);
+  }, [api, query, excludeUserIds, selectedItems, isEmailSearchOnly]);
 
   // Debounce effect for search queries
   useEffect(() => {
