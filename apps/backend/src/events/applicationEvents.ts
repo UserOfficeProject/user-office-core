@@ -446,17 +446,17 @@ interface ExperimentSafetyStatusChangedByUserEvent extends GeneralEvent {
 
 interface EmailTemplateCreatedEvent extends GeneralEvent {
   type: Event.EMAIL_TEMPLATE_CREATED;
-  emailTemplate: EmailTemplate;
+  emailtemplate: EmailTemplate;
 }
 
 interface EmailTemplateUpdatedEvent extends GeneralEvent {
   type: Event.EMAIL_TEMPLATE_UPDATED;
-  emailTemplate: EmailTemplate;
+  emailtemplate: EmailTemplate;
 }
 
 interface EmailTemplateDeletedEvent extends GeneralEvent {
   type: Event.EMAIL_TEMPLATE_DELETED;
-  emailTemplate: EmailTemplate;
+  emailtemplate: EmailTemplate;
 }
 
 export type ApplicationEvent =

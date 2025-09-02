@@ -17,6 +17,7 @@ import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
 import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
+import { EmailTemplateId } from './emailTemplateId';
 
 export async function eliEmailHandler(event: ApplicationEvent) {
   const mailService = container.resolve<MailService>(Tokens.MailService);
@@ -87,8 +88,8 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
       const templateId =
         event.emailinviteresponse.role === UserRole.USER
-          ? 'user-office-registration-invitation'
-          : 'user-office-registration-invitation-reviewer';
+          ? EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER
+          : EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
 
       const emailTemplate =
         await emailTemplateDataSource.getEmailTemplateByName(templateId);
@@ -202,7 +203,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const templateId = 'proposal-created';
+      const templateId = EmailTemplateId.PROPOSAL_CREATED;
 
       const emailTemplate =
         await emailTemplateDataSource.getEmailTemplateByName(templateId);
@@ -250,11 +251,11 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       const { finalStatus } = event.proposal;
       let templateId = '';
       if (finalStatus === ProposalEndStatus.ACCEPTED) {
-        templateId = 'proposal-accepted';
+        templateId = EmailTemplateId.ACCEPTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.REJECTED) {
-        templateId = 'proposal-rejected';
+        templateId = EmailTemplateId.REJECTED_PROPOSAL;
       } else if (finalStatus === ProposalEndStatus.RESERVED) {
-        templateId = 'proposal-reserved';
+        templateId = EmailTemplateId.RESERVED_PROPOSAL;
       } else {
         logger.logError('Failed email notification', { event });
 
@@ -302,7 +303,7 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const templateId = 'reviewer-reminder';
+      const templateId = EmailTemplateId.REVIEW_REMINDER;
       const emailTemplate =
         await emailTemplateDataSource.getEmailTemplateByName(templateId);
 
@@ -384,12 +385,12 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         }
       }
 
-      let templateId = 'internal-review-created';
+      let templateId = EmailTemplateId.INTERNAL_REVIEW_CREATED;
 
       if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
-        templateId = 'internal-review-updated';
+        templateId = EmailTemplateId.INTERNAL_REVIEW_UPDATED;
       } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
-        templateId = 'internal-review-deleted';
+        templateId = EmailTemplateId.INTERNAL_REVIEW_DELETED;
       }
 
       const emailTemplate =
@@ -432,9 +433,9 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 function getTemplateIdForRole(role: UserRole): string {
   switch (role) {
     case UserRole.USER:
-      return 'user-office-registration-invitation';
+      return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER;
     case UserRole.INTERNAL_REVIEWER:
-      return 'user-office-registration-invitation-reviewer';
+      return EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER;
     default:
       throw new Error('No valid user role set for email invitation');
   }

@@ -9,6 +9,7 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { UserRole } from '../../models/User';
 import { eliEmailHandler } from './eliEmailHandler';
+import { EmailTemplateId } from './emailTemplateId';
 import { getTemplateIdForInvite } from './essEmailHandler';
 
 // Mock MailService
@@ -61,7 +62,9 @@ describe('eliEmailHandler', () => {
 
       const result = await getTemplateIdForInvite(inviteId);
 
-      expect(result).toBe('user-office-registration-invitation-co-proposer');
+      expect(result).toBe(
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
+      );
     });
 
     test('should return reviewer template when internal reviewer role claim exists', async () => {
@@ -84,7 +87,9 @@ describe('eliEmailHandler', () => {
 
       const result = await getTemplateIdForInvite(inviteId);
 
-      expect(result).toBe('user-office-registration-invitation-reviewer');
+      expect(result).toBe(
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
+      );
     });
 
     test('should return user template when user role claim exists', async () => {
@@ -107,7 +112,9 @@ describe('eliEmailHandler', () => {
 
       const result = await getTemplateIdForInvite(inviteId);
 
-      expect(result).toBe('user-office-registration-invitation-user');
+      expect(result).toBe(
+        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER
+      );
     });
 
     test('should use template proposal-created', async () => {
@@ -132,7 +139,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'proposal-created',
+            template_id: EmailTemplateId.PROPOSAL_CREATED,
           },
         })
       );
@@ -162,7 +169,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'proposal-accepted',
+            template_id: EmailTemplateId.ACCEPTED_PROPOSAL,
           },
         })
       );
@@ -192,7 +199,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'proposal-rejected',
+            template_id: EmailTemplateId.REJECTED_PROPOSAL,
           },
         })
       );
@@ -222,7 +229,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'proposal-reserved',
+            template_id: EmailTemplateId.RESERVED_PROPOSAL,
           },
         })
       );
@@ -248,7 +255,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'reviewer-reminder',
+            template_id: EmailTemplateId.REVIEW_REMINDER,
           },
         })
       );
@@ -282,7 +289,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'internal-review-created',
+            template_id: EmailTemplateId.INTERNAL_REVIEW_CREATED,
           },
         })
       );
@@ -316,7 +323,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'internal-review-updated',
+            template_id: EmailTemplateId.INTERNAL_REVIEW_UPDATED,
           },
         })
       );
@@ -350,7 +357,7 @@ describe('eliEmailHandler', () => {
         expect.objectContaining({
           content: {
             db_template_id: 1,
-            template_id: 'internal-review-deleted',
+            template_id: EmailTemplateId.INTERNAL_REVIEW_DELETED,
           },
         })
       );

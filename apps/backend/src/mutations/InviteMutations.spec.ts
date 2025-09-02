@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../config/Tokens';
@@ -14,7 +14,7 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-import { EmailTemplateId } from '../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';

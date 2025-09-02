@@ -275,7 +275,7 @@ export async function createPostToRabbitMQHandler() {
       case Event.EMAIL_TEMPLATE_CREATED:
       case Event.EMAIL_TEMPLATE_UPDATED:
       case Event.EMAIL_TEMPLATE_DELETED: {
-        const jsonMessage = JSON.stringify(event.emailTemplate);
+        const jsonMessage = JSON.stringify(event.emailtemplate);
 
         await rabbitMQ.sendMessageToExchange(
           EXCHANGE_NAME,

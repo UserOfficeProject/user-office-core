@@ -172,6 +172,21 @@ const EmailActionConfig = ({
     }
   };
 
+  const getEmailTemplate = (foundRecipientWithEmailTemplateIndex: number) => {
+    if (foundRecipientWithEmailTemplateIndex !== -1) {
+      return (
+        emailTemplates.find(
+          (template) =>
+            template.id ===
+            recipientsWithEmailTemplate[foundRecipientWithEmailTemplateIndex]
+              .emailTemplate.id
+        ) || null
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <>
       <Typography variant="h6" color="black">
@@ -262,11 +277,9 @@ const EmailActionConfig = ({
                             newTemplateValue
                           );
                         }}
-                        value={
-                          recipientsWithEmailTemplate[
-                            foundRecipientWithEmailTemplateIndex
-                          ].emailTemplate || null
-                        }
+                        value={getEmailTemplate(
+                          foundRecipientWithEmailTemplateIndex
+                        )}
                         data-cy={`${recipient.name}-email-template`}
                       />
                       {recipient.name === EmailStatusActionRecipients.OTHER && (

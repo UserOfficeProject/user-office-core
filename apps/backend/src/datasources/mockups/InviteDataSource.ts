@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
-import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Invite } from '../../models/Invite';
 import { CoProposerClaimDataSource } from '../CoProposerClaimDataSource';
 import { GetInvitesFilter, InviteDataSource } from '../InviteDataSource';

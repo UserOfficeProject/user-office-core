@@ -46,7 +46,7 @@ export default class EmailTemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.EMAIL_TEMPLATE_CREATED)
+  @EventBus(Event.EMAIL_TEMPLATE_UPDATED)
   async update(
     agent: UserWithRole | null,
     args: UpdateEmailTemplateInput
@@ -70,7 +70,7 @@ export default class EmailTemplateMutations {
   }
 
   @Authorized([Roles.USER_OFFICER])
-  @EventBus(Event.EMAIL_TEMPLATE_CREATED)
+  @EventBus(Event.EMAIL_TEMPLATE_DELETED)
   async delete(
     agent: UserWithRole | null,
     { emailTemplateId }: { emailTemplateId: number }

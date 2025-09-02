@@ -3,7 +3,7 @@ import {
   ProposalPdfTemplateRecord,
 } from 'knex/types/tables';
 
-import { EmailTemplateId } from '../../eventHandlers/email/essEmailHandler';
+import { EmailTemplateId } from '../../eventHandlers/email/emailTemplateId';
 import { Page } from '../../models/Admin';
 import { FileMetadata } from '../../models/Blob';
 import { AllocationTimeUnits, Call } from '../../models/Call';

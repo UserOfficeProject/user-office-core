@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -11,7 +11,8 @@ import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
 import { MailService } from '../MailService/MailService';
-import { EmailTemplateId, essEmailHandler } from './essEmailHandler';
+import { EmailTemplateId } from './emailTemplateId';
+import { essEmailHandler } from './essEmailHandler';
 
 describe('essEmailHandler', () => {
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
