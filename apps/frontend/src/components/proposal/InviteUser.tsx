@@ -315,6 +315,11 @@ function InviteUser({
               {...params}
               label={labelText}
               variant="outlined"
+              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === 'Backspace') {
+                  event.stopPropagation();
+                }
+              }}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (

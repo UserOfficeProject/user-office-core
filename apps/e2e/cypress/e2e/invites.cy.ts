@@ -184,6 +184,27 @@ context('Invites tests', () => {
         .find('.MuiChip-label')
         .should('not.exist');
     });
+
+    it('Should not be able to delete added users with backspace', function () {
+      const name = initialDBData.users.user2.lastName;
+      const email = initialDBData.users.user2.email;
+      const threeLetterQuery = 'abc';
+
+      cy.get('[data-cy="add-participant-button"]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(email);
+      cy.contains(name);
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.get('.MuiChip-label').should('contain.text', name);
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(threeLetterQuery);
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        '{backspace}{backspace}{backspace}{backspace}{backspace}'
+      ); // 5 backspaces
+
+      cy.get('.MuiChip-label').should('contain.text', name);
+      cy.get('[data-cy="invite-user-autocomplete"] input').should('be.empty');
+    });
   });
 
   describe('Accepting invites', () => {
