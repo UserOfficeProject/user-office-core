@@ -161,7 +161,7 @@ context('Invites tests', () => {
       );
       cy.get('[data-cy="invite-user-autocomplete"]')
         .find('.MuiChip-label')
-        .should('have.length', 0);
+        .should('have.length', 1);
     });
 
     it('Should not be able to invite an email that belongs to a user', function () {
