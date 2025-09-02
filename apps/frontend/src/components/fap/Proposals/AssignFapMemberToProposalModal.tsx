@@ -9,8 +9,11 @@ import PeopleTable from 'components/user/PeopleTable';
 import { BasicUserDetails, Maybe, Role } from 'generated/sdk';
 import { useFapMembersData } from 'hooks/fap/useFapMembersData';
 
+import { MultiRankAssignmentDialog } from './MultiRankAssignmentDialog';
+
 export type FapAssignedMember = BasicUserDetails & {
   role?: Maybe<Pick<Role, 'id' | 'shortCode' | 'title'>>;
+  rank?: number | null;
 };
 
 type AssignFapMemberToProposalModalProps = {
@@ -44,6 +47,7 @@ const AssignFapMemberToProposalModal = ({
     BasicUserDetails[]
   >([]);
   const { loadingMembers, FapMembersData } = useFapMembersData(fapId, false);
+  const [rankSelectorOpen, setRankSelectorOpen] = useState(false);
 
   useEffect(() => {
     if (proposalPks.length === 0) {
@@ -98,8 +102,26 @@ const AssignFapMemberToProposalModal = ({
           disabled={selectedParticipants.length === 0}
           data-cy="assign-selected-users"
         >
-          Update
+          Update without rank
         </Button>
+        <Button
+          type="button"
+          onClick={() => {
+            setRankSelectorOpen(true);
+          }}
+          color="primary"
+          data-cy="assign-selected-users-with-rank"
+        >
+          Assign Ranks
+        </Button>
+        {rankSelectorOpen && (
+          <MultiRankAssignmentDialog
+            users={selectedParticipants ? selectedParticipants : []}
+            open={rankSelectorOpen}
+            setOpen={setRankSelectorOpen}
+            assign={assignMembersToFapProposals}
+          />
+        )}
       </DialogActions>
     </Dialog>
   );
