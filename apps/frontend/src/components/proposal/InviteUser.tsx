@@ -10,7 +10,13 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
 import { FeatureContext } from 'context/FeatureContextProvider';
@@ -63,6 +69,7 @@ function InviteUser({
     BasicUserDetails | undefined
   >();
   const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>([]);
+  const isPendingSearch = useRef(false);
   const featureContext = useContext(FeatureContext);
   const isEmailSearchOnly = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_SEARCH
@@ -87,6 +94,7 @@ function InviteUser({
       });
 
       setOptions(previousCollaborators?.users || []);
+      isPendingSearch.current = false;
 
       return;
     }
@@ -94,10 +102,12 @@ function InviteUser({
     if (query.length < MIN_SEARCH_LENGTH) {
       setOptions([]);
       setLoading(false);
+      isPendingSearch.current = false;
 
       return;
     }
 
+    setOptions([]);
     setLoading(true);
     try {
       if (isValidEmail(query)) {
@@ -141,25 +151,46 @@ function InviteUser({
     } catch (error) {
       setOptions([]);
     } finally {
+      isPendingSearch.current = false;
       setLoading(false);
     }
-  }, [api, query, excludeUserIds]);
+  }, [api, query, excludeUserIds, selectedItems]);
 
   // Debounce effect for search queries
   useEffect(() => {
+    isPendingSearch.current = true;
+
     const debounceFetch = setTimeout(fetchUserSearchResults, 300);
 
     return () => clearTimeout(debounceFetch);
-  }, [fetchUserSearchResults]);
+  }, [query, fetchUserSearchResults]);
 
-  const addToSelectedItems = (user: UserOrEmail) =>
+  const addToSelectedItems = (user: UserOrEmail) => {
     setSelectedItems((prev) => [...prev, user]);
+
+    setExactEmailMatch(undefined);
+    setOptions([]);
+    setQuery('');
+  };
 
   const addValidEmailToSelection = (email: string) => {
     if (isValidEmail(email)) {
       const lowerCaseEmail = email.toLowerCase();
+
+      /*
+       * Duplicate invites are still possible at this point, as invites are
+       * not fetched and therefore do not go through the associated duplicate
+       * filtering.
+       */
+      if (
+        excludeEmails
+          ?.concat(categorizeSelectedItems(selectedItems).invites)
+          .includes(lowerCaseEmail)
+      ) {
+        return;
+      }
+
       addToSelectedItems(lowerCaseEmail);
-      setQuery('');
     }
   };
 
@@ -211,9 +242,13 @@ function InviteUser({
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ' || event.key === ',') {
       event.preventDefault();
+
+      if (isPendingSearch.current) {
+        return;
+      }
+
       if (exactEmailMatch) {
         addToSelectedItems(exactEmailMatch);
-        setExactEmailMatch(undefined);
       } else {
         if (options.length === 1) {
           addToSelectedItems(options[0]);
@@ -231,6 +266,8 @@ function InviteUser({
 
   const getOptionKey = (option: UserOrEmail) =>
     isValidEmail(option) ? option : option.id;
+
+  const isLoading = loading || isPendingSearch.current;
 
   return (
     <StyledDialog
@@ -265,7 +302,7 @@ function InviteUser({
           multiple
           fullWidth
           options={options}
-          loading={loading}
+          loading={isLoading}
           getOptionLabel={getOptionLabel}
           value={selectedItems}
           onChange={(_, newValue) => setSelectedItems(newValue)}
@@ -282,7 +319,9 @@ function InviteUser({
                 ...params.InputProps,
                 endAdornment: (
                   <>
-                    {loading && <CircularProgress color="inherit" size={20} />}
+                    {isLoading && (
+                      <CircularProgress color="inherit" size={20} />
+                    )}
                     {params.InputProps.endAdornment}
                   </>
                 ),
@@ -295,22 +334,22 @@ function InviteUser({
             </MenuItem>
           )}
           noOptionsText={
-            <NoOptionsText
-              query={query}
-              onAddEmail={(email) => addValidEmailToSelection(email)}
-              exactEmailMatch={exactEmailMatch}
-              onAddUser={(user) => {
-                addToSelectedItems(user);
-                setExactEmailMatch(undefined);
-                setQuery('');
-              }}
-              excludeEmails={
-                excludeEmails?.concat(
-                  categorizeSelectedItems(selectedItems).invites
-                ) || []
-              }
-              isEmailSearchOnly={isEmailSearchOnly}
-            />
+            !isLoading ? (
+              <NoOptionsText
+                query={query}
+                onAddEmail={(email) => addValidEmailToSelection(email)}
+                exactEmailMatch={exactEmailMatch}
+                onAddUser={(user) => {
+                  addToSelectedItems(user);
+                }}
+                excludeEmails={
+                  excludeEmails?.concat(
+                    categorizeSelectedItems(selectedItems).invites
+                  ) || []
+                }
+                isEmailSearchOnly={isEmailSearchOnly}
+              />
+            ) : null
           }
         />
 
