@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -131,6 +131,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
+            db_template_id: 1,
             template_id: 'proposal-created',
           },
         })
@@ -160,7 +161,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Accepted-Proposal',
+            db_template_id: 1,
+            template_id: 'proposal-accepted',
           },
         })
       );
@@ -189,7 +191,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Rejected-Proposal',
+            db_template_id: 1,
+            template_id: 'proposal-rejected',
           },
         })
       );
@@ -218,13 +221,14 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Reserved-Proposal',
+            db_template_id: 1,
+            template_id: 'proposal-reserved',
           },
         })
       );
     });
 
-    test('should use template review-reminder', async () => {
+    test('should use template reviewer-reminder', async () => {
       // Create a mock event for FAP_REVIEWER_NOTIFIED
       const mockEvent: ApplicationEvent = {
         type: Event.FAP_REVIEWER_NOTIFIED,
@@ -243,7 +247,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'review-reminder',
+            db_template_id: 1,
+            template_id: 'reviewer-reminder',
           },
         })
       );
@@ -276,6 +281,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
+            db_template_id: 1,
             template_id: 'internal-review-created',
           },
         })
@@ -309,6 +315,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
+            db_template_id: 1,
             template_id: 'internal-review-updated',
           },
         })
@@ -342,6 +349,7 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
+            db_template_id: 1,
             template_id: 'internal-review-deleted',
           },
         })

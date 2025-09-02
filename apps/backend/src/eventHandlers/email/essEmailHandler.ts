@@ -20,9 +20,9 @@ import { MailService } from '../MailService/MailService';
 export enum EmailTemplateId {
   CO_PROPOSER_INVITE_ACCEPTED = 'co-proposer-invite-accepted',
   PROPOSAL_SUBMITTED = 'proposal-submitted',
-  ACCEPTED_PROPOSAL = 'Accepted-Proposal',
-  REJECTED_PROPOSAL = 'Rejected-Proposal',
-  RESERVED_PROPOSAL = 'Reserved-Proposal',
+  ACCEPTED_PROPOSAL = 'proposal-accepted',
+  REJECTED_PROPOSAL = 'proposal-rejected',
+  RESERVED_PROPOSAL = 'proposal-reserved',
   REVIEW_REMINDER = 'review-reminder',
   VISIT_REGISTRATION_APPROVED = 'visit-registration-approved',
   VISIT_REGISTRATION_CANCELLED = 'visit-registration-cancelled',

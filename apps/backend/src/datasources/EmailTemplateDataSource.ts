@@ -3,6 +3,7 @@ import { EmailTemplatesFilter } from '../resolvers/queries/EmailTemplatesQuery';
 
 export interface EmailTemplateDataSource {
   getEmailTemplate(id: number): Promise<EmailTemplate | null>;
+  getEmailTemplateByName(name: string): Promise<EmailTemplate | null>;
   getEmailTemplates(
     filter?: EmailTemplatesFilter
   ): Promise<{ totalCount: number; emailTemplates: EmailTemplate[] }>;

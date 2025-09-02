@@ -22,6 +22,17 @@ export default class PostgresEmailTemplateDataSource
       });
   }
 
+  async getEmailTemplateByName(name: string): Promise<EmailTemplate | null> {
+    return database
+      .select()
+      .from('email_templates')
+      .where('name', name)
+      .first()
+      .then((emailTemplate: EmailTemplateRecord) => {
+        return emailTemplate ? createEmailTemplateObject(emailTemplate) : null;
+      });
+  }
+
   async getEmailTemplates(
     filter?: EmailTemplatesFilter
   ): Promise<{ totalCount: number; emailTemplates: EmailTemplate[] }> {

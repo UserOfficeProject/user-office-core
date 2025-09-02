@@ -475,7 +475,7 @@ const sendMail = async (
         try {
           const res = await mailService.sendMail({
             content: {
-              template_id: recipientWithData.template,
+              template_id: '',
               db_template_id: recipientWithData.templateId,
               email_rfc822: '',
             },

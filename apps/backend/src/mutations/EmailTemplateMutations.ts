@@ -1,10 +1,9 @@
 import { inject, injectable } from 'tsyringe';
-import { Authorized } from 'type-graphql';
 
 import { Tokens } from '../config/Tokens';
 import { EmailTemplateDataSource } from '../datasources/EmailTemplateDataSource';
 import StatusActionsDataSource from '../datasources/postgres/StatusActionsDataSource';
-import { EventBus } from '../decorators';
+import { Authorized, EventBus } from '../decorators';
 import { Event } from '../events/event.enum';
 import { EmailTemplate } from '../models/EmailTemplate';
 import { Rejection, rejection } from '../models/Rejection';
@@ -22,8 +21,8 @@ export default class EmailTemplateMutations {
     private statusActionsDataSource: StatusActionsDataSource
   ) {}
 
-  @Authorized([Roles.USER_OFFICER])
   @EventBus(Event.EMAIL_TEMPLATE_CREATED)
+  @Authorized([Roles.USER_OFFICER])
   async create(
     agent: UserWithRole | null,
     args: CreateEmailTemplateInput

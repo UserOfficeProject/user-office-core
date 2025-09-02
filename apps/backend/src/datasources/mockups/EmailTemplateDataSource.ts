@@ -9,7 +9,7 @@ export const dummyEmailTemplate = {
   description: 'This is a dummy email template for testing purposes.',
   subject: 'Welcome to Our Service',
   body: 'Hello, thank you for signing up for our service. We are excited to have you on board!',
-  createdAt: new Date().toISOString(),
+  createdAt: '',
 };
 
 export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
@@ -41,6 +41,10 @@ export class EmailTemplateDataSourceMock implements EmailTemplateDataSource {
   }
 
   async getEmailTemplate(id: number): Promise<EmailTemplate> {
+    return dummyEmailTemplate;
+  }
+
+  async getEmailTemplateByName(name: string): Promise<EmailTemplate> {
     return dummyEmailTemplate;
   }
 

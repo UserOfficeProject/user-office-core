@@ -149,7 +149,7 @@ export interface CreateTransmission {
   content:
     | InlineContent
     | {
-        template_id: string;
+        template_id?: string;
         db_template_id?: number;
         email_rfc822?: string;
         use_draft_template?: boolean;

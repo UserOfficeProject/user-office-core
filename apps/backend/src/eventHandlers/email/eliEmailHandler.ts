@@ -3,6 +3,7 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CallDataSource } from '../../datasources/CallDataSource';
+import { EmailTemplateDataSource } from '../../datasources/EmailTemplateDataSource';
 import { FapDataSource } from '../../datasources/FapDataSource';
 import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
@@ -12,7 +13,9 @@ import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
+import { ProposalEndStatus } from '../../models/Proposal';
 import { UserRole } from '../../models/User';
+import EmailSettings from '../MailService/EmailSettings';
 import { MailService } from '../MailService/MailService';
 
 export async function eliEmailHandler(event: ApplicationEvent) {
@@ -43,6 +46,10 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
   const technicalReviewDataSource = container.resolve<ReviewDataSource>(
     Tokens.ReviewDataSource
+  );
+
+  const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+    Tokens.EmailTemplateDataSource
   );
 
   if (event.isRejection) {
@@ -78,13 +85,19 @@ export async function eliEmailHandler(event: ApplicationEvent) {
         return;
       }
 
+      const templateId =
+        event.emailinviteresponse.role === UserRole.USER
+          ? 'user-office-registration-invitation'
+          : 'user-office-registration-invitation-reviewer';
+
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(templateId);
+
       mailService
         .sendMail({
           content: {
-            template_id:
-              event.emailinviteresponse.role === UserRole.USER
-                ? 'user-office-registration-invitation'
-                : 'user-office-registration-invitation-reviewer',
+            template_id: templateId,
+            db_template_id: emailTemplate ? emailTemplate.id : undefined,
           },
           substitution_data: {
             firstname: user.preferredname,
@@ -140,10 +153,14 @@ export async function eliEmailHandler(event: ApplicationEvent) {
 
         const templateId = getTemplateIdForRole(roleInviteClaim[0].roleId);
 
+        const emailTemplate =
+          await emailTemplateDataSource.getEmailTemplateByName(templateId);
+
         mailService
           .sendMail({
             content: {
               template_id: templateId,
+              db_template_id: emailTemplate ? emailTemplate.id : undefined,
             },
             substitution_data: {
               email: invite.email,
@@ -174,282 +191,241 @@ export async function eliEmailHandler(event: ApplicationEvent) {
       return;
     }
 
-    // case Event.PROPOSAL_CREATED: {
-    //   const principalInvestigator = await userDataSource.getUser(
-    //     event.proposal.proposerId
-    //   );
+    case Event.PROPOSAL_CREATED: {
+      const principalInvestigator = await userDataSource.getUser(
+        event.proposal.proposerId
+      );
 
-    //   const call = await callDataSource.getCall(event.proposal.callId);
+      const call = await callDataSource.getCall(event.proposal.callId);
 
-    //   if (!principalInvestigator || !call) {
-    //     return;
-    //   }
+      if (!principalInvestigator || !call) {
+        return;
+      }
 
-    //   const options: EmailSettings = {
-    //     content: {
-    //       template_id: 'proposal-created',
-    //     },
-    //     substitution_data: {
-    //       piPreferredname: principalInvestigator.preferredname,
-    //       piLastname: principalInvestigator.lastname,
-    //       proposalNumber: event.proposal.proposalId,
-    //       proposalTitle: event.proposal.title,
-    //       callShortCode: call.shortCode,
-    //     },
-    //     recipients: [{ address: principalInvestigator.email }],
-    //   };
+      const templateId = 'proposal-created';
 
-    //   mailService
-    //     .sendMail(options)
-    //     .then((res: any) => {
-    //       logger.logInfo('Emails sent on proposal submission:', {
-    //         result: res,
-    //         event,
-    //       });
-    //     })
-    //     .catch((err: string) => {
-    //       logger.logError('Could not send email(s) on proposal submission:', {
-    //         error: err,
-    //         event,
-    //       });
-    //     });
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(templateId);
 
-    //   return;
-    // }
+      const options: EmailSettings = {
+        content: {
+          template_id: templateId,
+          db_template_id: emailTemplate ? emailTemplate.id : undefined,
+        },
+        substitution_data: {
+          preferredName: principalInvestigator.preferredname,
+          lastName: principalInvestigator.lastname,
+          firstName: principalInvestigator.firstname,
+          proposal: event.proposal,
+          call: call,
+        },
+        recipients: [{ address: principalInvestigator.email }],
+      };
 
-    // case Event.PROPOSAL_SUBMITTED: {
-    //   const principalInvestigator = await userDataSource.getUser(
-    //     event.proposal.proposerId
-    //   );
-    //   const participants = await userDataSource.getProposalUsersFull(
-    //     event.proposal.primaryKey
-    //   );
-    //   if (!principalInvestigator) {
-    //     return;
-    //   }
+      mailService
+        .sendMail(options)
+        .then((res: any) => {
+          logger.logInfo('Emails sent on proposal creation:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email(s) on proposal creation:', {
+            error: err,
+            event,
+          });
+        });
 
-    //   const options: EmailSettings = {
-    //     content: {
-    //       template_id: 'proposal-submitted',
-    //     },
-    //     substitution_data: {
-    //       piPreferredname: principalInvestigator.preferredname,
-    //       piLastname: principalInvestigator.lastname,
-    //       proposalNumber: event.proposal.proposalId,
-    //       proposalTitle: event.proposal.title,
-    //       coProposers: participants.map(
-    //         (partipant) => `${partipant.preferredname} ${partipant.lastname} `
-    //       ),
-    //       call: '',
-    //     },
-    //     recipients: [
-    //       { address: principalInvestigator.email },
-    //       ...participants.map((partipant) => {
-    //         return {
-    //           address: {
-    //             email: partipant.email,
-    //             header_to: principalInvestigator.email,
-    //           },
-    //         };
-    //       }),
-    //     ],
-    //   };
+      return;
+    }
 
-    //   mailService
-    //     .sendMail(options)
-    //     .then((res: any) => {
-    //       logger.logInfo('Emails sent on proposal submission:', {
-    //         result: res,
-    //         event,
-    //       });
-    //     })
-    //     .catch((err: string) => {
-    //       logger.logError('Could not send email(s) on proposal submission:', {
-    //         error: err,
-    //         event,
-    //       });
-    //     });
+    case Event.PROPOSAL_NOTIFIED: {
+      const principalInvestigator = await userDataSource.getUser(
+        event.proposal.proposerId
+      );
+      if (!principalInvestigator) {
+        return;
+      }
+      const { finalStatus } = event.proposal;
+      let templateId = '';
+      if (finalStatus === ProposalEndStatus.ACCEPTED) {
+        templateId = 'proposal-accepted';
+      } else if (finalStatus === ProposalEndStatus.REJECTED) {
+        templateId = 'proposal-rejected';
+      } else if (finalStatus === ProposalEndStatus.RESERVED) {
+        templateId = 'proposal-reserved';
+      } else {
+        logger.logError('Failed email notification', { event });
 
-    //   return;
-    // }
+        return;
+      }
 
-    // case Event.PROPOSAL_NOTIFIED: {
-    //   const principalInvestigator = await userDataSource.getUser(
-    //     event.proposal.proposerId
-    //   );
-    //   if (!principalInvestigator) {
-    //     return;
-    //   }
-    //   const { finalStatus } = event.proposal;
-    //   let templateId = '';
-    //   if (finalStatus === ProposalEndStatus.ACCEPTED) {
-    //     templateId = 'Accepted-Proposal';
-    //   } else if (finalStatus === ProposalEndStatus.REJECTED) {
-    //     templateId = 'Rejected-Proposal';
-    //   } else if (finalStatus === ProposalEndStatus.RESERVED) {
-    //     templateId = 'Reserved-Proposal';
-    //   } else {
-    //     logger.logError('Failed email notification', { event });
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(templateId);
 
-    //     return;
-    //   }
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+            db_template_id: emailTemplate ? emailTemplate.id : undefined,
+          },
+          substitution_data: {
+            preferredName: principalInvestigator.preferredname,
+            lastName: principalInvestigator.lastname,
+            firstName: principalInvestigator.firstname,
+            proposal: event.proposal,
+          },
+          recipients: [{ address: principalInvestigator.email }],
+        })
+        .then((res: any) => {
+          logger.logInfo('Email sent on proposal notify:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on proposal notify:', {
+            error: err,
+            event,
+          });
+        });
 
-    //   mailService
-    //     .sendMail({
-    //       content: {
-    //         template_id: templateId,
-    //       },
-    //       substitution_data: {
-    //         piPreferredname: principalInvestigator.preferredname,
-    //         piLastname: principalInvestigator.lastname,
-    //         proposalNumber: event.proposal.proposalId,
-    //         proposalTitle: event.proposal.title,
-    //         commentForUser: event.proposal.commentForUser,
-    //       },
-    //       recipients: [{ address: principalInvestigator.email }],
-    //     })
-    //     .then((res: any) => {
-    //       logger.logInfo('Email sent on proposal notify:', {
-    //         result: res,
-    //         event,
-    //       });
-    //     })
-    //     .catch((err: string) => {
-    //       logger.logError('Could not send email on proposal notify:', {
-    //         error: err,
-    //         event,
-    //       });
-    //     });
+      return;
+    }
+    case Event.FAP_REVIEWER_NOTIFIED: {
+      const { id: reviewId, userID, proposalPk } = event.fapReview;
+      const fapReviewer = await userDataSource.getUser(userID);
+      const proposal = await proposalDataSource.get(proposalPk);
 
-    //   return;
-    // }
-    // case Event.FAP_REVIEWER_NOTIFIED: {
-    //   const { id: reviewId, userID, proposalPk } = event.fapReview;
-    //   const fapReviewer = await userDataSource.getUser(userID);
-    //   const proposal = await proposalDataSource.get(proposalPk);
+      if (!fapReviewer || !proposal) {
+        return;
+      }
 
-    //   if (!fapReviewer || !proposal) {
-    //     return;
-    //   }
+      const templateId = 'reviewer-reminder';
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(templateId);
 
-    //   mailService
-    //     .sendMail({
-    //       content: {
-    //         template_id: 'review-reminder',
-    //       },
-    //       substitution_data: {
-    //         fapReviewerPreferredName: fapReviewer.preferredname,
-    //         fapReviewerLastName: fapReviewer.lastname,
-    //         proposalNumber: proposal.proposalId,
-    //         proposalTitle: proposal.title,
-    //         commentForUser: proposal.commentForUser,
-    //       },
-    //       recipients: [{ address: fapReviewer.email }],
-    //     })
-    //     .then(async (res: any) => {
-    //       await fapDataSource.setFapReviewNotificationEmailSent(
-    //         reviewId,
-    //         userID,
-    //         proposalPk
-    //       );
-    //       logger.logInfo('Email sent on FAP reviewer notify:', {
-    //         result: res,
-    //         event,
-    //       });
-    //     })
-    //     .catch((err: string) => {
-    //       logger.logError('Could not send email on FAP reviewer notify:', {
-    //         error: err,
-    //         event,
-    //       });
-    //     });
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+            db_template_id: emailTemplate ? emailTemplate.id : undefined,
+          },
+          substitution_data: {
+            preferredName: fapReviewer.preferredname,
+            lastName: fapReviewer.lastname,
+            proposal: proposal,
+          },
+          recipients: [{ address: fapReviewer.email }],
+        })
+        .then(async (res: any) => {
+          await fapDataSource.setFapReviewNotificationEmailSent(
+            reviewId,
+            userID,
+            proposalPk
+          );
+          logger.logInfo('Email sent on FAP reviewer notify:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on FAP reviewer notify:', {
+            error: err,
+            event,
+          });
+        });
 
-    //   return;
-    // }
+      return;
+    }
 
-    // case Event.INTERNAL_REVIEW_CREATED:
-    // case Event.INTERNAL_REVIEW_UPDATED:
-    // case Event.INTERNAL_REVIEW_DELETED: {
-    //   const assignedBy = await userDataSource.getUser(
-    //     event.internalreview.assignedBy
-    //   );
+    case Event.INTERNAL_REVIEW_CREATED:
+    case Event.INTERNAL_REVIEW_UPDATED:
+    case Event.INTERNAL_REVIEW_DELETED: {
+      const assignedBy = await userDataSource.getUser(
+        event.internalreview.assignedBy
+      );
 
-    //   const reviewer = await userDataSource.getUser(
-    //     event.internalreview.reviewerId
-    //   );
+      const reviewer = await userDataSource.getUser(
+        event.internalreview.reviewerId
+      );
 
-    //   const technicalReview =
-    //     await technicalReviewDataSource.getTechnicalReviewById(
-    //       event.internalreview.technicalReviewId
-    //     );
+      const technicalReview =
+        await technicalReviewDataSource.getTechnicalReviewById(
+          event.internalreview.technicalReviewId
+        );
 
-    //   if (!assignedBy || !reviewer || !technicalReview) {
-    //     logger.logError('Failed email invite', { event });
+      if (!assignedBy || !reviewer || !technicalReview) {
+        logger.logError('Failed email invite', { event });
 
-    //     return;
-    //   }
+        return;
+      }
 
-    //   const proposal = await proposalDataSource.get(technicalReview.proposalPk);
+      const proposal = await proposalDataSource.get(technicalReview.proposalPk);
 
-    //   if (!proposal) {
-    //     logger.logError('Failed email invite', { event });
+      if (!proposal) {
+        logger.logError('Failed email invite', { event });
 
-    //     return;
-    //   }
+        return;
+      }
 
-    //   let technicalReviewerPreferredName = undefined;
-    //   let technicalReviewerLastname = '<N/A>';
+      let technicalReviewerPreferredName = undefined;
+      let technicalReviewerLastname = '<N/A>';
 
-    //   if (technicalReview.technicalReviewAssigneeId) {
-    //     const technicalReviewer = await userDataSource.getUser(
-    //       technicalReview.technicalReviewAssigneeId
-    //     );
+      if (technicalReview.technicalReviewAssigneeId) {
+        const technicalReviewer = await userDataSource.getUser(
+          technicalReview.technicalReviewAssigneeId
+        );
 
-    //     if (technicalReviewer) {
-    //       technicalReviewerPreferredName = technicalReviewer.preferredname;
-    //       technicalReviewerLastname = technicalReviewer.lastname;
-    //     }
-    //   }
+        if (technicalReviewer) {
+          technicalReviewerPreferredName = technicalReviewer.preferredname;
+          technicalReviewerLastname = technicalReviewer.lastname;
+        }
+      }
 
-    //   let templateId = 'internal-review-created';
+      let templateId = 'internal-review-created';
 
-    //   if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
-    //     templateId = 'internal-review-updated';
-    //   } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
-    //     templateId = 'internal-review-deleted';
-    //   }
+      if (event.type === Event.INTERNAL_REVIEW_UPDATED) {
+        templateId = 'internal-review-updated';
+      } else if (event.type === Event.INTERNAL_REVIEW_DELETED) {
+        templateId = 'internal-review-deleted';
+      }
 
-    //   mailService
-    //     .sendMail({
-    //       content: {
-    //         template_id: templateId,
-    //       },
-    //       substitution_data: {
-    //         assignedByPreferredName: assignedBy.preferredname,
-    //         assignedByLastname: assignedBy.lastname,
-    //         reviewerPreferredName: reviewer.preferredname,
-    //         reviewerLastname: reviewer.lastname,
-    //         technicalReviewerPreferredName: technicalReviewerPreferredName,
-    //         technicalReviewerLastname: technicalReviewerLastname,
-    //         proposalTitle: proposal.title,
-    //         proposalNumber: proposal.proposalId,
-    //         reviewTitle: event.internalreview.title,
-    //       },
-    //       recipients: [{ address: reviewer.email }],
-    //     })
-    //     .then((res: any) => {
-    //       logger.logInfo('Email sent on internal review change:', {
-    //         result: res,
-    //         event,
-    //       });
-    //     })
-    //     .catch((err: string) => {
-    //       logger.logError('Could not send email on internal review change:', {
-    //         error: err,
-    //         event,
-    //       });
-    //     });
-    // }
+      const emailTemplate =
+        await emailTemplateDataSource.getEmailTemplateByName(templateId);
+
+      mailService
+        .sendMail({
+          content: {
+            template_id: templateId,
+            db_template_id: emailTemplate ? emailTemplate.id : undefined,
+          },
+          substitution_data: {
+            assignedByPreferredName: assignedBy.preferredname,
+            assignedByLastname: assignedBy.lastname,
+            reviewerPreferredName: reviewer.preferredname,
+            reviewerLastname: reviewer.lastname,
+            technicalReviewerPreferredName: technicalReviewerPreferredName,
+            technicalReviewerLastname: technicalReviewerLastname,
+            proposal: proposal,
+            reviewTitle: event.internalreview.title,
+          },
+          recipients: [{ address: reviewer.email }],
+        })
+        .then((res: any) => {
+          logger.logInfo('Email sent on internal review change:', {
+            result: res,
+            event,
+          });
+        })
+        .catch((err: string) => {
+          logger.logError('Could not send email on internal review change:', {
+            error: err,
+            event,
+          });
+        });
+    }
   }
 }
 
