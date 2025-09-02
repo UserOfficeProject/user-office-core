@@ -1,13 +1,14 @@
-import { Status } from '../models/Status';
 import { StatusChangingEvent } from '../models/StatusChangingEvent';
-import { Workflow } from '../models/Workflow';
 import {
-  NextAndPreviousStatuses,
+  Workflow,
   WorkflowConnection,
-  WorkflowConnectionWithStatus,
-} from '../models/WorkflowConnections';
+  WorkflowStatus,
+} from '../models/Workflow';
+import { AddStatusToWorkflowArgs } from '../resolvers/mutations/settings/AddStatusToWorkflowMutation';
+import { CreateWorkflowConnectionArgs } from '../resolvers/mutations/settings/CreateWorkflowConnectionMutation';
 import { CreateWorkflowInput } from '../resolvers/mutations/settings/CreateWorkflowMutation';
 import { UpdateWorkflowInput } from '../resolvers/mutations/settings/UpdateWorkflowMutation';
+import { UpdateWorkflowStatusArgs } from '../resolvers/mutations/settings/UpdateWorkflowStatusMutation';
 
 export interface WorkflowDataSource {
   createWorkflow(newWorkflowInput: CreateWorkflowInput): Promise<Workflow>;
@@ -20,29 +21,24 @@ export interface WorkflowDataSource {
   ): Promise<WorkflowConnection | null>;
   getWorkflowConnections(
     workflowId: WorkflowConnection['workflowId']
-  ): Promise<WorkflowConnectionWithStatus[]>;
+  ): Promise<WorkflowConnection[]>;
+  getWorkflowStatuses(proposalWorkflowId: number): Promise<WorkflowStatus[]>;
   getWorkflowConnection(
     connectionId: WorkflowConnection['id']
-  ): Promise<WorkflowConnectionWithStatus | null>;
-  getWorkflowConnectionsById(
-    workflowId: WorkflowConnection['workflowId'],
-    statusId: Status['id'] | undefined,
-    { nextStatusId, prevStatusId, sortOrder }: NextAndPreviousStatuses
-  ): Promise<WorkflowConnectionWithStatus[]>;
-  addWorkflowStatus(
-    newWorkflowStatusInput: Omit<
-      WorkflowConnection,
-      'id' | 'entityType' | 'prevConnectionId'
-    >
-  ): Promise<WorkflowConnectionWithStatus>;
+  ): Promise<WorkflowConnection | null>;
+  addStatusToWorkflow(input: AddStatusToWorkflowArgs): Promise<WorkflowStatus>;
+  removeStatusFromWorkflow(workflowStatusId: number): Promise<WorkflowStatus>;
   updateWorkflowStatus(
-    workflowStatuses: WorkflowConnection
-  ): Promise<WorkflowConnectionWithStatus>;
+    input: UpdateWorkflowStatusArgs
+  ): Promise<WorkflowStatus>;
+  createWorkflowConnection(
+    args: CreateWorkflowConnectionArgs
+  ): Promise<WorkflowConnection>;
   deleteWorkflowStatus(
     statusId: number,
     workflowId: number,
     sortOrder: number
-  ): Promise<WorkflowConnection>;
+  ): Promise<WorkflowStatus>;
   addStatusChangingEventsToConnection(
     workflowConnectionId: number,
     statusChangingEvents: string[]

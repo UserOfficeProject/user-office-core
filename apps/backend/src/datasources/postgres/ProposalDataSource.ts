@@ -16,7 +16,6 @@ import { SettingsId } from '../../models/Settings';
 import { TechnicalReview } from '../../models/TechnicalReview';
 import { Technique } from '../../models/Technique';
 import { UserWithRole } from '../../models/User';
-import { WorkflowConnectionWithStatus } from '../../models/WorkflowConnections';
 import { UpdateTechnicalReviewAssigneeInput } from '../../resolvers/mutations/UpdateTechnicalReviewAssigneeMutation';
 import { UserProposalsFilter } from '../../resolvers/types/User';
 import { AdminDataSource } from '../AdminDataSource';
@@ -40,6 +39,7 @@ import {
   TechnicalReviewRecord,
   TechniqueRecord,
   createProposalViewObjectWithTechniques,
+  StatusRecord,
 } from './records';
 
 const fieldMap: { [key: string]: string } = {
@@ -1035,6 +1035,16 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       return true;
     }
 
+    const techReviewOptionalWorkflowStatus = (await database
+      .select('status_id')
+      .from('workflow_status')
+      .where('workflow_id', workflowStatus)
+      .first()) as StatusRecord | undefined;
+
+    if (!techReviewOptionalWorkflowStatus) {
+      return true;
+    }
+
     const proposalWorkflowId: number = await database
       .select('c.proposal_workflow_id')
       .from('proposals as p')
@@ -1043,11 +1053,11 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       .first()
       .then((value) => value.proposal_workflow_id);
 
-    const proposalStatus: WorkflowConnectionWithStatus[] =
-      await this.workflowDataSource.getWorkflowConnections(proposalWorkflowId);
+    const proposalStatus =
+      await this.workflowDataSource.getWorkflowStatuses(proposalWorkflowId);
 
-    return !!proposalStatus.find((status) =>
-      status.status.shortCode.match(workflowStatus)
+    return !!proposalStatus.find(
+      (status) => status.statusId === techReviewOptionalWorkflowStatus.status_id
     );
   }
 

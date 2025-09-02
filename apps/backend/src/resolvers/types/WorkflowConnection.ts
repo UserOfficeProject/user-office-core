@@ -10,44 +10,23 @@ import {
 
 import { ResolverContext } from '../../context';
 import { isRejection } from '../../models/Rejection';
-import { WorkflowConnectionWithStatus as WorkflowConnectionWithStatusOrigin } from '../../models/WorkflowConnections';
+import { WorkflowConnection as WorkflowConnectionOrigin } from '../../models/Workflow';
 import { ConnectionStatusAction } from './ConnectionStatusAction';
-import { Status } from './Status';
 import { StatusChangingEvent } from './StatusChangingEvent';
 
 @ObjectType()
-export class WorkflowConnection
-  implements Partial<WorkflowConnectionWithStatusOrigin>
-{
+export class WorkflowConnection implements Partial<WorkflowConnectionOrigin> {
   @Field(() => Int)
   public id: number;
-
-  @Field(() => Int)
-  public sortOrder: number;
 
   @Field(() => Int)
   public workflowId: number;
 
   @Field(() => Int)
-  public statusId: number;
-
-  @Field(() => Status)
-  public status: Status;
-
-  @Field(() => Int, { nullable: true })
-  public nextStatusId: number | null;
-
-  @Field(() => Int, { nullable: true })
-  public prevStatusId: number | null;
+  public nextWorkflowStatusId: number;
 
   @Field(() => Int)
-  public posX: number;
-
-  @Field(() => Int)
-  public posY: number;
-
-  @Field(() => Int, { nullable: true })
-  public prevConnectionId: number | null;
+  public prevWorkflowStatusId: number;
 }
 
 @Resolver(() => WorkflowConnection)

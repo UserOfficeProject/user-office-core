@@ -1,48 +1,34 @@
 import {
+  Args,
+  ArgsType,
   Ctx,
+  Field,
+  Int,
   Mutation,
   Resolver,
-  Field,
-  InputType,
-  Arg,
-  Int,
 } from 'type-graphql';
 
 import { ResolverContext } from '../../../context';
-import { WorkflowConnection } from '../../types/WorkflowConnection';
-
-@InputType()
-export class UpdateWorkflowStatusInput {
+import { WorkflowStatus } from '../../types/WorkflowStatus';
+@ArgsType()
+export class UpdateWorkflowStatusArgs {
   @Field(() => Int)
-  public id: number;
+  workflowStatusId: number;
 
   @Field(() => Int, { nullable: true })
-  public posX?: number;
+  posX?: number;
 
   @Field(() => Int, { nullable: true })
-  public posY?: number;
-
-  @Field(() => Int, { nullable: true })
-  public prevConnectionId?: number;
-
-  @Field(() => Int, { nullable: true })
-  public prevStatusId?: number;
-
-  @Field(() => Int, { nullable: true })
-  public nextStatusId?: number;
+  posY?: number;
 }
 
 @Resolver()
 export class UpdateWorkflowStatusMutation {
-  @Mutation(() => WorkflowConnection)
-  async updateWorkflowStatus(
-    @Ctx() context: ResolverContext,
-    @Arg('updateWorkflowStatusInput')
-    updateWorkflowStatusInput: UpdateWorkflowStatusInput
+  @Mutation(() => WorkflowStatus)
+  updateWorkflowStatus(
+    @Args() args: UpdateWorkflowStatusArgs,
+    @Ctx() context: ResolverContext
   ) {
-    return context.mutations.workflow.updateWorkflowStatus(
-      context.user,
-      updateWorkflowStatusInput
-    );
+    return context.mutations.workflow.updateWorkflowStatus(context.user, args);
   }
 }

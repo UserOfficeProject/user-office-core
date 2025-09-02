@@ -12,3 +12,22 @@ export class Workflow {
     public connectionLineType: string
   ) {}
 }
+
+export class WorkflowStatus {
+  constructor(
+    public id: number,
+    public workflowId: number,
+    public statusId: number,
+    public posX: number,
+    public posY: number
+  ) {}
+}
+
+export class WorkflowConnection {
+  constructor(
+    public id: number,
+    public workflowId: number,
+    public prevWorkflowStatusId: number,
+    public nextWorkflowStatusId: number
+  ) {}
+}

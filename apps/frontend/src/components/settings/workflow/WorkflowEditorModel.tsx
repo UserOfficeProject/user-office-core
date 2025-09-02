@@ -4,7 +4,13 @@ import { Reducer, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ConnectionLineType } from 'reactflow';
 
-import { Workflow, WorkflowType } from 'generated/sdk';
+import {
+  ConnectionStatusAction,
+  ConnectionHasActionsInput,
+  WorkflowConnection,
+  Workflow,
+  WorkflowType,
+} from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import {
   useReducerWithMiddleWares,
@@ -15,7 +21,6 @@ export enum EventType {
   READY,
   ADD_WORKFLOW_STATUS_REQUESTED,
   WORKFLOW_STATUS_ADDED,
-  WORKFLOW_STATUS_UPDATE_REQUESTED,
   WORKFLOW_STATUS_UPDATED,
   DELETE_WORKFLOW_STATUS_REQUESTED,
   WORKFLOW_STATUS_DELETED,
@@ -25,14 +30,120 @@ export enum EventType {
   ADD_NEXT_STATUS_EVENTS_REQUESTED,
   ADD_STATUS_ACTION_REQUESTED,
   STATUS_ACTION_ADDED,
+  WORKFLOW_STATUS_UPDATE_REQUESTED,
   DELETE_WORKFLOW_CONNECTION_REQUESTED,
   WORKFLOW_CONNECTION_DELETED,
 }
 
-export interface Event {
-  type: EventType;
-  payload: any;
-}
+export type Event =
+  | {
+      type: EventType.READY;
+      payload: any; // API response may not match Workflow type exactly
+    }
+  | {
+      type: EventType.ADD_WORKFLOW_STATUS_REQUESTED;
+      payload: {
+        workflowId: number;
+        statusId: number;
+        posX: number;
+        posY: number;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_ADDED;
+      payload: {
+        id?: number;
+        workflowId: number;
+        statusId: number;
+        status: any;
+        posX: number;
+        posY: number;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_UPDATE_REQUESTED;
+      payload: {
+        connectionId: number;
+        posX: number;
+        posY: number;
+        prevStatusId: number;
+        nextStatusId: number;
+        prevConnectionId: number;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_UPDATED;
+      payload: {
+        id: number;
+        statusId?: number;
+        [key: string]: any;
+      };
+    }
+  | {
+      type: EventType.DELETE_WORKFLOW_STATUS_REQUESTED;
+      payload: {
+        connectionId: number;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_STATUS_DELETED;
+      payload: {
+        connectionId: number;
+      };
+    }
+  | {
+      type: EventType.UPDATE_WORKFLOW_METADATA_REQUESTED;
+      payload: {
+        id: number;
+        name: string;
+        description: string;
+        connectionLineType: string;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_METADATA_UPDATED;
+      payload: Partial<Workflow>;
+    }
+  | {
+      type: EventType.NEXT_STATUS_EVENTS_ADDED;
+      payload: {
+        workflowConnection: { id: number };
+        statusChangingEvents: any[];
+      };
+    }
+  | {
+      type: EventType.ADD_NEXT_STATUS_EVENTS_REQUESTED;
+      payload: {
+        workflowConnection: { id: number };
+        statusChangingEvents: string[];
+      };
+    }
+  | {
+      type: EventType.ADD_STATUS_ACTION_REQUESTED;
+      payload: {
+        workflowConnection: WorkflowConnection;
+        statusActions: ConnectionHasActionsInput[];
+      };
+    }
+  | {
+      type: EventType.STATUS_ACTION_ADDED;
+      payload: {
+        workflowConnection: { id: number };
+        statusActions: ConnectionStatusAction[] | null;
+      };
+    }
+  | {
+      type: EventType.DELETE_WORKFLOW_CONNECTION_REQUESTED;
+      payload: {
+        connectionId: number;
+      };
+    }
+  | {
+      type: EventType.WORKFLOW_CONNECTION_DELETED;
+      payload: {
+        connectionId: number;
+      };
+    };
 
 const WorkflowEditorModel = (
   entityType: WorkflowType,
@@ -52,7 +163,7 @@ const WorkflowEditorModel = (
     return produce(state, (draft) => {
       switch (action.type) {
         case EventType.READY:
-          return action.payload;
+          return action.payload || draft;
         case EventType.WORKFLOW_STATUS_ADDED: {
           // Add the new workflow connection to the state
           if (
@@ -65,12 +176,8 @@ const WorkflowEditorModel = (
               workflowId: action.payload.workflowId,
               statusId: action.payload.statusId,
               status: action.payload.status,
-              sortOrder: action.payload.sortOrder,
-              prevStatusId: action.payload.prevStatusId,
-              nextStatusId: action.payload.nextStatusId,
               posX: action.payload.posX,
               posY: action.payload.posY,
-              prevConnectionId: action.payload.prevConnectionId || null,
               statusChangingEvents: [],
               statusActions: [],
             };
