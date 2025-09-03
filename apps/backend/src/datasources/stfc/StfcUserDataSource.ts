@@ -6,7 +6,7 @@ import { RoleDTO } from '../../../generated/models/RoleDTO';
 import { Country } from '../../models/Country';
 import { Institution } from '../../models/Institution';
 import { Role, Roles } from '../../models/Role';
-import { BasicUserDetails, User } from '../../models/User';
+import { BasicUserDetails, User, UserRole } from '../../models/User';
 import { AddUserRoleArgs } from '../../resolvers/mutations/AddUserRoleMutation';
 import { CreateUserByEmailInviteArgs } from '../../resolvers/mutations/CreateUserByEmailInviteMutation';
 import {
@@ -380,9 +380,13 @@ export class StfcUserDataSource implements UserDataSource {
   }
 
   async getBasicUserDetailsByEmail(
-    email: string
+    email: string,
+    role?: UserRole,
+    currentRole?: UserRole | undefined
   ): Promise<BasicUserDetails | null> {
-    return this.getStfcBasicPersonByEmail(email, true).then((stfcUser) =>
+    const searchable = currentRole !== UserRole.USER_OFFICER;
+
+    return this.getStfcBasicPersonByEmail(email, searchable).then((stfcUser) =>
       stfcUser ? toEssBasicUserDetails(stfcUser) : null
     );
   }

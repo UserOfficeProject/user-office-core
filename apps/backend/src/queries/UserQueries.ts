@@ -86,7 +86,11 @@ export default class UserQueries {
     email: string,
     role?: UserRole
   ) {
-    const user = await this.dataSource.getBasicUserDetailsByEmail(email, role);
+    const user = await this.dataSource.getBasicUserDetailsByEmail(
+      email,
+      role,
+      agent?.currentRole?.id
+    );
     if (!user) {
       return null;
     }
