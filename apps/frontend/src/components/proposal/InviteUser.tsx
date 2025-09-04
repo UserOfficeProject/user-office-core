@@ -30,6 +30,7 @@ interface InviteUserProps {
   }) => void;
   excludeUserIds?: number[];
   excludeEmails?: string[];
+  allowInviteByEmail?: boolean;
 }
 
 const categorizeSelectedItems = (items: UserOrEmail[]) => ({
@@ -49,6 +50,7 @@ function InviteUser({
   onAddParticipants,
   excludeUserIds,
   excludeEmails,
+  allowInviteByEmail,
   confirm,
 }: InviteUserProps & WithConfirmProps) {
   const api = useDataApi();
@@ -74,7 +76,6 @@ function InviteUser({
         subtractUsers: excludedUserIds,
       });
 
-      console.log(previousCollaborators);
       setOptions(previousCollaborators?.users || []);
 
       return;
@@ -103,9 +104,7 @@ function InviteUser({
             .includes(basicUserDetailsByEmail.id);
 
         if (userAlreadyExists === false) {
-          setExactEmailMatch(
-            basicUserDetailsByEmail ? basicUserDetailsByEmail : undefined
-          );
+          setExactEmailMatch(basicUserDetailsByEmail || undefined);
         }
       } else {
         const excludedUserIds = [
@@ -275,6 +274,7 @@ function InviteUser({
                   categorizeSelectedItems(selectedItems).invites
                 ) || []
               }
+              allowInviteByEmail={allowInviteByEmail}
             />
           }
         />

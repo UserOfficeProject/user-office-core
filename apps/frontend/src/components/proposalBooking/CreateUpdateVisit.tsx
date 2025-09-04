@@ -1,13 +1,14 @@
 import { Button, Typography } from '@mui/material';
 import { Form, Formik } from 'formik';
-import React from 'react';
+import React, { useContext } from 'react';
 import * as Yup from 'yup';
 
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FormikUIAutocomplete from 'components/common/FormikUIAutocomplete';
 import UserManagementTable from 'components/common/UserManagementTable';
-import { BasicUserDetails } from 'generated/sdk';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { BasicUserDetails, FeatureId } from 'generated/sdk';
 import { UserExperiment } from 'hooks/experiment/useUserExperiments';
 import useDataApiWithFeedback from 'utils/useDataApiWithFeedback';
 import { getFullUserName } from 'utils/user';
@@ -19,12 +20,17 @@ interface CreateUpdateVisitProps {
 function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
   const { api } = useDataApiWithFeedback();
 
-  const visit = event.visit;
+  const { visit } = event;
 
   const initialValues = {
     team: visit?.registrations.map((registration) => registration.user!) || [],
     teamLeadUserId: visit?.teamLead.id || null,
   };
+
+  const featureContext = useContext(FeatureContext);
+  const allowInviteByEmail = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_INVITE
+  )?.isEnabled;
 
   return (
     <Formik
@@ -87,6 +93,7 @@ function CreateUpdateVisit({ event, close }: CreateUpdateVisitProps) {
               setFieldValue('team', team);
             }}
             users={values.team || []}
+            allowInviteByEmail={allowInviteByEmail}
           />
           <ErrorMessage name="team" />
 
