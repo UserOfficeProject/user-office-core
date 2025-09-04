@@ -1,21 +1,23 @@
 mutation addWorkflowStatus(
   $workflowId: Int!
   $sortOrder: Int!
-  $droppableGroupId: String!
-  $parentDroppableGroupId: String
   $statusId: Int!
+  $posX: Int!
+  $posY: Int!
   $nextStatusId: Int
   $prevStatusId: Int
+  $prevConnectionId: Int
 ) {
   addWorkflowStatus(
     newWorkflowStatusInput: {
       workflowId: $workflowId
       sortOrder: $sortOrder
-      droppableGroupId: $droppableGroupId
-      parentDroppableGroupId: $parentDroppableGroupId
       statusId: $statusId
       nextStatusId: $nextStatusId
       prevStatusId: $prevStatusId
+      posX: $posX
+      posY: $posY
+      prevConnectionId: $prevConnectionId
     }
   ) {
     id

@@ -3,11 +3,9 @@ query getWorkflows($entityType: WorkflowType!) {
     id
     name
     description
-    workflowConnectionGroups {
-      connections {
-        status {
-          shortCode
-        }
+    workflowConnections {
+      status {
+        shortCode
       }
     }
   }

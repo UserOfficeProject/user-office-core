@@ -19,12 +19,6 @@ export class AddWorkflowStatusInput implements Partial<WorkflowConnection> {
   @Field(() => Int)
   public sortOrder: number;
 
-  @Field(() => String)
-  public droppableGroupId: string;
-
-  @Field(() => String, { nullable: true })
-  public parentDroppableGroupId: string | null;
-
   @Field(() => Int)
   public statusId: number;
 
@@ -33,6 +27,15 @@ export class AddWorkflowStatusInput implements Partial<WorkflowConnection> {
 
   @Field(() => Int, { nullable: true })
   public prevStatusId: number | null;
+
+  @Field(() => Int)
+  public posX: number;
+
+  @Field(() => Int)
+  public posY: number;
+
+  @Field(() => Int, { nullable: true })
+  public prevConnectionId: number | null;
 }
 
 @Resolver()

@@ -25,6 +25,8 @@ const addStatusChangingEventsToConnectionValidationSchema = yup.object().shape({
 
 type AddStatusChangingEventsToConnectionProps = {
   addStatusChangingEventsToConnection: (statusChangingEvents: string[]) => void;
+  deleteWorkflowConnection: () => void;
+  onClose: () => void;
   statusChangingEvents?: Event[];
   statusName?: string;
   isLoading: boolean;
@@ -34,6 +36,8 @@ type AddStatusChangingEventsToConnectionProps = {
 const AddStatusChangingEventsToConnection = ({
   statusChangingEvents,
   addStatusChangingEventsToConnection,
+  deleteWorkflowConnection,
+  onClose,
   statusName,
   isLoading,
   entityType,
@@ -45,6 +49,11 @@ const AddStatusChangingEventsToConnection = ({
     selectedStatusChangingEvents: Event[];
   } = {
     selectedStatusChangingEvents: statusChangingEvents || [],
+  };
+
+  const deleteClickHandler = () => {
+    deleteWorkflowConnection();
+    onClose();
   };
 
   return (
@@ -146,6 +155,15 @@ const AddStatusChangingEventsToConnection = ({
               <ErrorMessage name="selectedStatusChangingEvents" />
             </Grid>
             <Grid item>
+              <Button
+                variant="outlined"
+                color="error"
+                disabled={isSubmitting || loadingEvents || isLoading}
+                onClick={deleteClickHandler}
+                sx={{ marginRight: 1 }}
+              >
+                Delete connection
+              </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting || loadingEvents || isLoading}
