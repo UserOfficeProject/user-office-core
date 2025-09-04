@@ -61,26 +61,63 @@ BEGIN
     )
     VALUES 
     (
-       'Test proposal'    -- title
-     , 'Lorem ipsum'      -- abstract
-     , 8                  -- status_id
-     , 1                  -- proposer_id
-     , NOW()              -- created_at
-     , NOW()              -- updated_at
-     , '999999'           -- proposal_id
-     , 1                  -- final_status
-     , 1                  -- call_id
-     , questionary_id_var -- questionary_id
-     , NULL               -- comment_for_management
-     , NULL               -- comment_for_user
-     , true               -- notified
-     , true               -- submitted
+       'Test proposal'   
+     , 'Lorem ipsum'     
+     , 8                 
+     , 1                 
+     , NOW()             
+     , NOW()             
+     , '999999'          
+     , 1                 
+     , 1                 
+     , questionary_id_var
+     , NULL              
+     , NULL              
+     , true              
+     , true              
     );
 
   INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (1, 1);
 
   INSERT INTO technical_review(technical_review_id, proposal_pk, comment, time_allocation, status, public_comment, reviewer_id, technical_review_assignee_id, instrument_id, questionary_id) 
   VALUES (1, 1, '', 2, 0, '', 0, 0, 1, technical_review_questionary_id_var);
+
+  INSERT INTO proposals 
+    (
+       title
+     , abstract
+     , status_id
+     , proposer_id
+     , created_at
+     , updated_at
+     , proposal_id
+     , final_status
+     , call_id
+     , questionary_id
+     , comment_for_management
+     , comment_for_user
+     , notified
+     , submitted
+    )
+    VALUES 
+    (
+       'Test proposal 2'   
+     , 'Lorem ipsum 2'     
+     , 8                 
+     , 1                 
+     , NOW()             
+     , NOW()             
+     , '222222'          
+     , 1                 
+     , 1                 
+     , questionary_id_var
+     , NULL              
+     , NULL              
+     , true              
+     , true              
+    );
+
+  INSERT INTO instrument_has_proposals(instrument_id, proposal_pk) VALUES (2, 2);
 
 END;
 $DO$

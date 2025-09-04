@@ -299,6 +299,13 @@ export default {
       email: 'instr.sci1@local.host',
       password: 'Test1234!',
     },
+    instrumentScientist2: {
+      id: 101,
+      firstName: 'Instrument',
+      lastName: 'Scientist2',
+      email: 'instr.sci2@local.host',
+      password: 'Test1234!',
+    },
     experimentSafetyReviewer1: {
       id: 103,
       firstName: 'Experiment',

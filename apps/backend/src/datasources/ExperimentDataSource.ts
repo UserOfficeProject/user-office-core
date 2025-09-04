@@ -9,7 +9,6 @@ import {
 import { Rejection } from '../models/Rejection';
 import { User } from '../models/User';
 import {
-  ExperimentsArgs,
   ExperimentsFilter,
   UserExperimentsFilter,
 } from '../resolvers/queries/ExperimentsQuery';
@@ -84,14 +83,14 @@ export interface ExperimentDataSource {
     sampleId: number,
     isSubmitted: boolean
   ): Promise<ExperimentHasSample>;
-  getExperiments({ filter }: ExperimentsArgs): Promise<Experiment[]>;
   getAllExperiments(
     filter?: ExperimentsFilter,
     first?: number,
     offset?: number,
     sortField?: string,
     sortDirection?: string,
-    searchText?: string
+    searchText?: string,
+    instrumentScientistUserId?: number
   ): Promise<{
     totalCount: number;
     experiments: Experiment[];
