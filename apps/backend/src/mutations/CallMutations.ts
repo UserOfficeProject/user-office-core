@@ -20,6 +20,7 @@ import {
   AssignInstrumentsToCallInput,
   RemoveAssignedInstrumentFromCallInput,
   UpdateFapToCallInstrumentInput,
+  CallOrderInput,
 } from '../resolvers/mutations/UpdateCallMutation';
 import { mergeValidationSchemas } from '../utils/helperFunctions';
 
@@ -107,6 +108,16 @@ export default class CallMutations {
         error
       );
     }
+  }
+
+  @Authorized([Roles.USER_OFFICER])
+  async orderCalls(
+    agent: UserWithRole | null,
+    args: CallOrderInput
+  ): Promise<boolean | Rejection> {
+    return this.dataSource.orderCalls(args).catch((err) => {
+      return rejection('Could not reorder calls', { agent, args }, err);
+    });
   }
 
   // TODO: Need to add validation to duo-validation library
