@@ -185,6 +185,32 @@ context('Invites tests', () => {
         .should('not.exist');
     });
 
+    it.only('Should not be able to invite the email of the current user', function () {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.EMAIL_INVITE)) {
+        this.skip();
+      }
+
+      const currentUserEmail = initialDBData.users.user1.email;
+
+      cy.get('[data-cy=add-participant-button]').click();
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type(
+        `${currentUserEmail}`
+      );
+      cy.contains('Loading...').should('not.exist');
+      cy.contains(`${currentUserEmail} has already been invited`).should(
+        'exist'
+      );
+
+      cy.get('[data-cy="invite-user-autocomplete"]').type('{enter}');
+      cy.contains(`${currentUserEmail} has already been invited`).should(
+        'exist'
+      );
+      cy.get('[data-cy="invite-user-autocomplete"]')
+        .find('.MuiChip-label')
+        .should('not.exist');
+    });
+
     it('Should not be able to delete added users with backspace', function () {
       const name = initialDBData.users.user2.lastName;
       const email = initialDBData.users.user2.email;
