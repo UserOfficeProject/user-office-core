@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Resolve required repositories
         id: resolve_rep
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         run: |
           # this assumes the result is an array, and .name property is used
           check_feature() {
@@ -43,17 +45,24 @@ jobs:
             https://api.github.com/repos/UserOfficeProject/user-office-factory/branches?per_page=100
           )
 
-          GHCR_TOKEN=$(echo ${{ secrets.GITHUB_TOKEN }} | base64)
+          TAG_TO_CHECK="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
 
-          CHECK_IF_IMAGE_EXISTS=$(curl -H "Authorization: Bearer $GHCR_TOKEN" https://ghcr.io/v2/userofficeproject/user-office-factory/tags/list | jq --arg TAG ${{ github.head_ref }} '.tags as $t | $TAG | IN($t[])')
+          echo "Checking if GHCR tag '$TAG_TO_CHECK' exists"
+          if gh api \
+            -H "Accept: application/vnd.github+json" \
+            --paginate \
+            /orgs/userofficeproject/packages/container/user-office-factory/versions \
+            | jq -e --arg TAG "$TAG_TO_CHECK" '.[] | select(.metadata.container.tags[]? == $TAG)' > /dev/null; then
+            CHECK_IF_IMAGE_EXISTS=true
+          else
+            CHECK_IF_IMAGE_EXISTS=false
+          fi
 
-          echo $CHECK_IF_IMAGE_EXISTS
+          echo "CHECK_IF_IMAGE_EXISTS=$CHECK_IF_IMAGE_EXISTS"
 
           if [[ $CHECK_IF_IMAGE_EXISTS == true ]]; then
               FACTORY_TAGS=$((FACTORY_TAGS+1))
           fi
-
-          echo $CHECK_IF_IMAGE_EXISTS
 
           if [[ $CHECK_IF_IMAGE_EXISTS == null  ]]; then 
               FACTORY_TAGS=$((FACTORY_TAGS+1))

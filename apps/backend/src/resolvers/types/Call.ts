@@ -109,6 +109,9 @@ export class Call implements Partial<CallOrigin> {
   @Field(() => Boolean)
   public isActive: boolean;
 
+  @Field(() => Int)
+  public sort_order: number;
+
   @Field(() => Int, { nullable: true })
   public experimentWorkflowId?: number;
 }
