@@ -7,10 +7,12 @@ import { ListItemButton } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import Tooltip from 'components/common/MenuTooltip';
+import { FeatureContext } from 'context/FeatureContextProvider';
+import { FeatureId } from 'generated/sdk';
 
 const menuMap = {
   email: '/EmailStatusActionsLogs',
@@ -18,6 +20,11 @@ const menuMap = {
 };
 
 export function StatusActionLogsMenuListItem() {
+  const featureContext = useContext(FeatureContext);
+  const isPregeneratedProposalPdfsEnabled = featureContext.featuresMap.get(
+    FeatureId.PREGENERATED_PROPOSAL_PDF
+  )?.isEnabled;
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   React.useEffect(() => {
@@ -28,6 +35,21 @@ export function StatusActionLogsMenuListItem() {
     setIsExpanded(!isExpanded);
   }
 
+  // Single menu item
+  if (!isPregeneratedProposalPdfsEnabled) {
+    return (
+      <Tooltip title="Status Action Logs">
+        <ListItemButton component={NavLink} to={menuMap['email']}>
+          <ListItemIcon>
+            <MailIcon />
+          </ListItemIcon>
+          <ListItemText primary="Status Action Logs" />
+        </ListItemButton>
+      </Tooltip>
+    );
+  }
+
+  // Expandable menu with sub-items
   return (
     <>
       <Tooltip title="Status Action Logs">

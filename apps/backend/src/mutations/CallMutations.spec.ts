@@ -17,6 +17,7 @@ describe('Test Call Mutations', () => {
     return expect(
       callMutations.create(dummyUserWithRole, {
         shortCode: '2019-02-19',
+        sort_order: 0,
         startCall: new Date('2019-02-19'),
         endCall: new Date('2019-02-19'),
         endCallInternal: new Date('2019-02-19'),
@@ -54,6 +55,7 @@ describe('Test Call Mutations', () => {
     return expect(
       callMutations.create(null, {
         shortCode: '2019-02-19',
+        sort_order: 0,
         startCall: new Date('2019-02-19'),
         endCall: new Date('2019-02-19'),
         endCallInternal: new Date('2019-02-19'),
@@ -82,6 +84,7 @@ describe('Test Call Mutations', () => {
   test('A logged in user officer can not create a call with invalid dates', () => {
     const callToCreate = {
       shortCode: '2019-02-19',
+      sort_order: 0,
       startCall: new Date('2019-02-19'),
       endCall: new Date('2019-02-18'),
       endCallInternal: new Date('2019-02-19'),
@@ -113,6 +116,7 @@ describe('Test Call Mutations', () => {
   test('A logged in user officer can create a call', () => {
     const callToCreate: CreateCallInput = {
       shortCode: '2019-02-19',
+      sort_order: 0,
       startCall: new Date('2019-02-19'),
       endCall: new Date('2019-02-19'),
       endCallInternal: new Date('2019-02-19'),
@@ -161,6 +165,7 @@ describe('Test Call Mutations', () => {
       callMutations.update(dummyUserWithRole, {
         id: 1,
         shortCode: '2020-06-18',
+        sort_order: 0,
         startCall: new Date('2020-06-18'),
         endCall: new Date('2020-06-18'),
         endCallInternal: new Date('2020-06-18'),
@@ -190,6 +195,7 @@ describe('Test Call Mutations', () => {
     const updatedCall = {
       id: 1,
       shortCode: '2020-06-18',
+      sort_order: 0,
       startCall: new Date('2020-06-18'),
       endCall: new Date('2020-06-18'),
       endCallInternal: new Date('2020-06-18'),

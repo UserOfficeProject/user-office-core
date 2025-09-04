@@ -50,7 +50,6 @@ import {
 } from '../eventHandlers/messageBroker';
 import { createApplicationEventBus } from '../events';
 import { ApplicationEvent } from '../events/applicationEvents';
-import { DefaultDownloadService } from '../factory/DefaultDownloadService';
 import { FapDataColumns } from '../factory/xlsx/FapDataColumns';
 import {
   callFapPopulateRow,
@@ -137,7 +136,5 @@ mapValue(Tokens.ListenToMessageQueue, createSkipListeningHandler());
 
 mapValue(Tokens.ConfigureEnvironment, configureBaseEnvironment);
 mapValue(Tokens.ConfigureLogger, () => setLogger(new ConsoleLogger()));
-
-mapClass(Tokens.DownloadService, DefaultDownloadService);
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);

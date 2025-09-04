@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import {
   DataType,
   FeatureId,
+  FeatureUpdateAction,
   SettingsId,
   TechnicalReviewStatus,
   TemplateCategoryId,
@@ -1247,6 +1248,11 @@ context('Proposal administration tests', () => {
             proposalPk: createdProposalPk,
           });
         }
+      });
+
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.PREGENERATED_PROPOSAL_PDF],
       });
 
       cy.login('officer');
