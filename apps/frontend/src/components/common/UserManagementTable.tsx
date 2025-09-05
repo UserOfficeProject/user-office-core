@@ -1,7 +1,7 @@
 import { ScheduleSend } from '@mui/icons-material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SendIcon from '@mui/icons-material/Send';
-import { Chip } from '@mui/material';
+import { Chip, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -28,6 +28,7 @@ export type UserManagementTableProps = {
   title: string;
   preserveSelf?: boolean;
   addButtonLabel?: string;
+  addButtonTooltip?: string;
   /** Disable the add button */
   disabled?: boolean;
   /** Custom actions to be passed to PeopleTable */
@@ -45,6 +46,7 @@ const UserManagementTable = ({
   title,
   preserveSelf,
   addButtonLabel = 'Add',
+  addButtonTooltip = 'Add a participant',
   disabled = false,
   onUserAction,
   excludeUserIds = [],
@@ -189,16 +191,18 @@ const UserManagementTable = ({
               marginTop: theme.spacing(1),
             })}
           >
-            <Button
-              variant="outlined"
-              onClick={openModal}
-              data-cy="add-participant-button"
-              size="small"
-              startIcon={<PersonAddIcon />}
-              disabled={disabled}
-            >
-              {addButtonLabel}
-            </Button>
+            <Tooltip title={addButtonTooltip}>
+              <Button
+                variant="outlined"
+                onClick={openModal}
+                data-cy="add-participant-button"
+                size="small"
+                startIcon={<PersonAddIcon />}
+                disabled={disabled}
+              >
+                {addButtonLabel}
+              </Button>
+            </Tooltip>
           </ActionButtonContainer>
         </div>
       </FormControl>

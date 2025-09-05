@@ -30,6 +30,7 @@ const ProposalParticipants = ({
   return (
     <UserManagementTable
       {...props}
+      addButtonTooltip="Add a co-proposer"
       disabled={loadingPrincipalInvestigator}
       onUserAction={setPrincipalInvestigator ? handleUserAction : undefined}
       excludeUserIds={principalInvestigator ? [principalInvestigator.id] : []}
