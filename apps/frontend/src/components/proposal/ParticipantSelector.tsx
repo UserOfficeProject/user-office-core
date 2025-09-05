@@ -21,7 +21,7 @@ import NoOptionsText from './NoOptionsText';
 
 type UserOrEmail = BasicUserDetails | ValidEmailAddress;
 
-interface InviteUserProps {
+interface ParticipantSelectorProps {
   modalOpen: boolean;
   onClose?: () => void;
   onAddParticipants?: (data: {
@@ -43,14 +43,14 @@ const categorizeSelectedItems = (items: UserOrEmail[]) => ({
 
 const MIN_SEARCH_LENGTH = 3;
 
-function InviteUser({
+function ParticipantSelector({
   modalOpen,
   onClose,
   onAddParticipants,
   excludeUserIds,
   excludeEmails,
   confirm,
-}: InviteUserProps & WithConfirmProps) {
+}: ParticipantSelectorProps & WithConfirmProps) {
   const api = useDataApi();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,7 +74,6 @@ function InviteUser({
         subtractUsers: excludedUserIds,
       });
 
-      console.log(previousCollaborators);
       setOptions(previousCollaborators?.users || []);
 
       return;
@@ -294,4 +293,4 @@ function InviteUser({
   );
 }
 
-export default withConfirm(InviteUser);
+export default withConfirm(ParticipantSelector);

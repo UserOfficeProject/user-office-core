@@ -14,8 +14,8 @@ import PeopleTable from 'components/user/PeopleTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
 import { BasicUserDetails, FeatureId, Invite, UserRole } from 'generated/sdk';
 
-import InviteUser from '../proposal/InviteUser';
 import ParticipantModal from '../proposal/ParticipantModal';
+import ParticipantSelector from '../proposal/ParticipantSelector';
 
 export type UserManagementTableProps = {
   /** Basic user details array to be shown in the table. */
@@ -85,7 +85,7 @@ const UserManagementTable = ({
   };
 
   const InviteComponent = (
-    <InviteUser
+    <ParticipantSelector
       modalOpen={modalOpen}
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
