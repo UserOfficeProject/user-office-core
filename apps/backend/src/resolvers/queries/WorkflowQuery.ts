@@ -8,6 +8,9 @@ import { Workflow, WorkflowEvent } from '../types/Workflow';
 export class WorkflowArgs {
   @Field(() => Int)
   workflowId: number;
+
+  @Field(() => WorkflowType)
+  entityType: WorkflowType;
 }
 
 @ArgsType()
@@ -20,7 +23,11 @@ export class WorkflowsArgs {
 export class WorkflowQuery {
   @Query(() => Workflow, { nullable: true })
   workflow(@Args() args: WorkflowArgs, @Ctx() context: ResolverContext) {
-    return context.queries.workflow.getWorkflow(context.user, args.workflowId);
+    return context.queries.workflow.getWorkflow(
+      context.user,
+      args.workflowId,
+      args.entityType
+    );
   }
 
   @Query(() => [Workflow], { nullable: true })

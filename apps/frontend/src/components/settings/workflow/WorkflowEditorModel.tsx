@@ -50,7 +50,7 @@ const WorkflowEditorModel = (
     name: '',
     description: '',
     workflowConnectionGroups: [],
-    entityType: entityType, // NOTE: This is hardcoded for now
+    entityType: entityType,
   };
 
   const findGroupIndexByGroupId = (
@@ -304,6 +304,7 @@ const WorkflowEditorModel = (
     api()
       .getWorkflow({
         workflowId: parseInt(workflowId),
+        entityType: entityType,
       })
       .then((data) => {
         // NOTE: Push at least one group to have initial droppable if new proposal workflow
