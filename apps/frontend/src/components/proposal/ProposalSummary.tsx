@@ -194,7 +194,7 @@ function ProposalReview({ confirm }: ProposalSummaryProps) {
           onClick={() =>
             downloadPDFProposal([proposal.primaryKey], proposal.title)
           }
-          disabled={!allStepsComplete || isSubmitting}
+          disabled={!allStepsComplete || isSubmitting || !proposal.submitted}
           color="secondary"
         >
           Download PDF
