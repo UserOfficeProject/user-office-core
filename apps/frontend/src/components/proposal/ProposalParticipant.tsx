@@ -7,11 +7,11 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import React, { useState } from 'react';
 
-import { BasicUserDetails, UserRole } from 'generated/sdk';
+import { BasicUserDetails } from 'generated/sdk';
 import { BasicUserData } from 'hooks/user/useUserData';
 import { getFullUserNameWithInstitution } from 'utils/user';
 
-import ParticipantModal from './ParticipantModal';
+import ParticipantSelector from './ParticipantSelector';
 
 export default function ProposalParticipant(props: {
   principalInvestigator: BasicUserData | null | undefined;
@@ -23,22 +23,17 @@ export default function ProposalParticipant(props: {
 
   return (
     <Box sx={props.sx}>
-      <ParticipantModal
-        show={isPickerOpen}
-        userRole={UserRole.USER}
+      <ParticipantSelector
+        modalOpen={isPickerOpen}
         title={'Set Principal Investigator'}
-        close={() => {
+        onClose={() => setIsPickerOpen(false)}
+        onAddParticipants={(participants) => {
+          props.setPrincipalInvestigator(participants.users[0]);
           setIsPickerOpen(false);
         }}
-        selectedUsers={
-          !!props.principalInvestigator ? [props.principalInvestigator?.id] : []
-        }
-        addParticipants={(users: BasicUserDetails[]) => {
-          props.setPrincipalInvestigator(users[0]);
-          setIsPickerOpen(false);
-        }}
-        participant={true}
+        // TODO exclude co-proposers
       />
+
       <FormControl
         sx={{
           flexDirection: 'row',

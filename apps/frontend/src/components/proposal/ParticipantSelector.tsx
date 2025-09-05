@@ -23,6 +23,7 @@ type UserOrEmail = BasicUserDetails | ValidEmailAddress;
 
 interface ParticipantSelectorProps {
   modalOpen: boolean;
+  title?: string;
   onClose?: () => void;
   onAddParticipants?: (data: {
     users: BasicUserDetails[];
@@ -45,6 +46,7 @@ const MIN_SEARCH_LENGTH = 3;
 
 function ParticipantSelector({
   modalOpen,
+  title,
   onClose,
   onAddParticipants,
   excludeUserIds,
@@ -220,7 +222,7 @@ function ParticipantSelector({
       fullWidth
       maxWidth="md"
       onClose={handleClose}
-      title="Add people to proposal"
+      title={title || 'Add Participant(s)'}
     >
       <DialogContent
         dividers
