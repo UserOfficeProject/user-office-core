@@ -21,6 +21,23 @@ import NoOptionsText from './NoOptionsText';
 
 type UserOrEmail = BasicUserDetails | ValidEmailAddress;
 
+const isSameParticipants = (a: UserOrEmail[], b: UserOrEmail[]): boolean => {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  return a.every((value, index) => {
+    if (isValidEmail(value) && isValidEmail(b[index])) {
+      return value.toLowerCase() === b[index].toLowerCase();
+    }
+    if (!isValidEmail(value) && !isValidEmail(b[index])) {
+      return value.id === (b[index] as BasicUserDetails).id;
+    }
+
+    return false;
+  });
+};
+
 interface ParticipantSelectorProps {
   modalOpen: boolean;
   title?: string;
@@ -31,6 +48,9 @@ interface ParticipantSelectorProps {
   }) => void;
   excludeUserIds?: number[];
   excludeEmails?: string[];
+  preset?: UserOrEmail[];
+  singleSelection?: boolean;
+  enableEmailInvites?: boolean;
 }
 
 const categorizeSelectedItems = (items: UserOrEmail[]) => ({
@@ -52,6 +72,9 @@ function ParticipantSelector({
   excludeUserIds,
   excludeEmails,
   confirm,
+  preset,
+  singleSelection,
+  enableEmailInvites,
 }: ParticipantSelectorProps & WithConfirmProps) {
   const api = useDataApi();
   const [query, setQuery] = useState('');
@@ -60,7 +83,9 @@ function ParticipantSelector({
   const [exactEmailMatch, setExactEmailMatch] = useState<
     BasicUserDetails | undefined
   >();
-  const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>([]);
+  const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>(
+    preset || []
+  );
 
   const fetchUserSearchResults = useCallback(async () => {
     setExactEmailMatch(undefined);
@@ -104,9 +129,7 @@ function ParticipantSelector({
             .includes(basicUserDetailsByEmail.id);
 
         if (userAlreadyExists === false) {
-          setExactEmailMatch(
-            basicUserDetailsByEmail ? basicUserDetailsByEmail : undefined
-          );
+          setExactEmailMatch(basicUserDetailsByEmail || undefined);
         }
       } else {
         const excludedUserIds = [
@@ -129,7 +152,7 @@ function ParticipantSelector({
     } finally {
       setLoading(false);
     }
-  }, [api, query, excludeUserIds]);
+  }, [api, query, excludeUserIds, selectedItems]);
 
   // Debounce effect for search queries
   useEffect(() => {
@@ -139,12 +162,16 @@ function ParticipantSelector({
   }, [fetchUserSearchResults]);
 
   const addToSelectedItems = (user: UserOrEmail) =>
-    setSelectedItems((prev) => [...prev, user]);
+    setSelectedItems((prev) => (singleSelection ? [user] : [...prev, user]));
 
   const addValidEmailToSelection = (email: string) => {
     if (isValidEmail(email)) {
       const lowerCaseEmail = email.toLowerCase();
-      addToSelectedItems(lowerCaseEmail);
+      if (singleSelection) {
+        setSelectedItems([lowerCaseEmail]);
+      } else {
+        addToSelectedItems(lowerCaseEmail);
+      }
       setQuery('');
     }
   };
@@ -172,7 +199,7 @@ function ParticipantSelector({
   };
 
   const handleClose = () => {
-    if (selectedItems.length > 0) {
+    if (isSameParticipants(selectedItems, preset || []) === false) {
       confirm(
         async () => {
           onClose?.();
@@ -182,7 +209,7 @@ function ParticipantSelector({
         {
           title: 'Please confirm',
           description:
-            'User(s) have not yet been added to the proposal. Are you sure you want to close the dialog?',
+            'Are you sure you want to close the dialog? Your changes will be lost.',
         }
       )();
 
@@ -195,6 +222,11 @@ function ParticipantSelector({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (selectedItems.length === 1 && singleSelection) {
+      event.preventDefault();
+
+      return;
+    }
     if (event.key === 'Enter' || event.key === ' ' || event.key === ',') {
       event.preventDefault();
       if (exactEmailMatch) {
@@ -203,7 +235,15 @@ function ParticipantSelector({
       } else if (options.length === 1) {
         addToSelectedItems(options[0]);
       } else if (isValidEmail(query)) {
-        addValidEmailToSelection(query);
+        if (singleSelection) {
+          if (isValidEmail(query)) {
+            const lowerCaseEmail = query.toLowerCase();
+            setSelectedItems([lowerCaseEmail]);
+            setQuery('');
+          }
+        } else {
+          addValidEmailToSelection(query);
+        }
       }
     }
   };
@@ -222,7 +262,9 @@ function ParticipantSelector({
       fullWidth
       maxWidth="md"
       onClose={handleClose}
-      title={title || 'Add Participant(s)'}
+      title={
+        title || (singleSelection ? 'Select Participant' : 'Add Participant(s)')
+      }
     >
       <DialogContent
         dividers
@@ -276,6 +318,7 @@ function ParticipantSelector({
                   categorizeSelectedItems(selectedItems).invites
                 ) || []
               }
+              enableEmailInvites={enableEmailInvites}
             />
           }
         />
@@ -285,10 +328,13 @@ function ParticipantSelector({
           onClick={handleSubmit}
           sx={{ margin: '16px 0 8px 0' }}
           startIcon={<AddIcon />}
-          disabled={!selectedItems.length}
+          disabled={
+            !selectedItems.length ||
+            isSameParticipants(selectedItems, preset || [])
+          }
           data-cy="invite-user-submit-button"
         >
-          Add
+          {singleSelection ? 'Select' : 'Add'}
         </Button>
       </DialogContent>
     </StyledDialog>

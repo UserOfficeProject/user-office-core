@@ -13,6 +13,7 @@ interface NoOptionsTextProps {
   exactEmailMatch?: BasicUserDetails;
   excludeEmails?: string[];
   minSearchLength?: number;
+  enableEmailInvites?: boolean;
 }
 
 function NoOptionsText({
@@ -22,11 +23,16 @@ function NoOptionsText({
   exactEmailMatch,
   excludeEmails = [],
   minSearchLength = 3,
+  enableEmailInvites,
 }: NoOptionsTextProps) {
   const featureContext = useContext(FeatureContext);
-  const isEmailInviteEnabled = !!featureContext.featuresMap.get(
+  const isEmailInviteFeatureEnabled = !!featureContext.featuresMap.get(
     FeatureId.EMAIL_INVITE
   )?.isEnabled;
+
+  // email invite will be enabled if both the prop and the feature flag are true
+  const isEmailInviteEnabled =
+    enableEmailInvites && isEmailInviteFeatureEnabled;
 
   if (exactEmailMatch) {
     return (

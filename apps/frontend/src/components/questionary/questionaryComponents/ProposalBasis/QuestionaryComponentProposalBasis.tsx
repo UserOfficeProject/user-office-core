@@ -2,22 +2,21 @@ import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useTheme } from '@mui/material/styles';
 import { Field } from 'formik';
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useContext, useState } from 'react';
 
 import ErrorMessage from 'components/common/ErrorMessage';
 import TextField from 'components/common/FormikUITextField';
 import withPreventSubmit from 'components/common/withPreventSubmit';
+import CoProposers from 'components/proposal/CoProposers';
 import { BasicComponentProps } from 'components/proposal/IBasicComponentProps';
+import PrincipalInvestigator from 'components/proposal/PrincipalInvestigator';
 import { ProposalContextType } from 'components/proposal/ProposalContainer';
-import ProposalParticipant from 'components/proposal/ProposalParticipant';
-import Participants from 'components/proposal/ProposalParticipants';
 import {
   createMissingContextErrorMessage,
   QuestionaryContext,
 } from 'components/questionary/QuestionaryContext';
 import { BasicUserDetails, Invite } from 'generated/sdk';
 import { SubmitActionDependencyContainer } from 'hooks/questionary/useSubmitActions';
-import { useBasicUserData } from 'hooks/user/useUserData';
 import { ProposalSubmissionState } from 'models/questionary/proposal/ProposalSubmissionState';
 
 const TextFieldNoSubmit = withPreventSubmit(TextField);
@@ -38,24 +37,15 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
   const [localTitle, setLocalTitle] = useState(state?.proposal.title);
   const [localAbstract, setLocalAbstract] = useState(state?.proposal.abstract);
   const [hasInvalidChars, setHasInvalidChars] = useState(false);
-  const [textLen, setTextLen] = useState(
-    state?.proposal.abstract ? (state?.proposal.abstract as string).length : 0
-  );
+  const [textLen, setTextLen] = useState(state?.proposal.abstract ?? 0);
+
   if (!state || !dispatch) {
     throw new Error(createMissingContextErrorMessage());
   }
 
-  const { proposer, users, coProposerInvites } = state.proposal;
-  const { loading, userData } = useBasicUserData(state?.proposal.proposer?.id);
-  const [piData, setPIData] = useState<BasicUserDetails | null>(null);
+  const { proposer, users } = state.proposal;
 
-  useEffect(() => {
-    if (userData !== null) {
-      setPIData(userData);
-    }
-  }, [userData]);
-
-  const coInvestigatorChanged = (users: BasicUserDetails[]) => {
+  const coProposersChanged = (users: BasicUserDetails[]) => {
     formikProps.setFieldValue(
       `${id}.users`,
       users.map((user) => user.id)
@@ -82,8 +72,9 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
         proposer: user,
       },
     });
-    setPIData(user);
-    coInvestigatorChanged(
+
+    // Remove the new PI from the co-proposers list (if present) and add the old PI (if present) to the co-proposers list
+    coProposersChanged(
       users
         .filter((coInvestigator) => coInvestigator.id !== user.id)
         .concat(proposer as BasicUserDetails)
@@ -166,25 +157,13 @@ function QuestionaryComponentProposalBasis(props: BasicComponentProps) {
       >
         {counter}
       </InputAdornment>
-      <ProposalParticipant
-        principalInvestigator={piData}
+      <PrincipalInvestigator
         setPrincipalInvestigator={principalInvestigatorChanged}
-        sx={{ margin: theme.spacing(2, 0) }}
-        loadingPrincipalInvestigator={loading}
       />
-      <Participants
-        title="Co-Proposers"
-        sx={{ margin: theme.spacing(2, 0) }}
-        principalInvestigator={piData}
+      <CoProposers
         setPrincipalInvestigator={principalInvestigatorChanged}
-        setUsers={coInvestigatorChanged}
-        preserveSelf={true}
-        // QuickFix for material table changing immutable state
-        // https://github.com/mbrn/material-table/issues/666
-        users={JSON.parse(JSON.stringify(users))}
-        invites={coProposerInvites}
+        setUsers={coProposersChanged}
         setInvites={invitesChanged}
-        loadingPrincipalInvestigator={loading}
       />
       <ErrorMessage name={`${id}.users`} />
     </div>
