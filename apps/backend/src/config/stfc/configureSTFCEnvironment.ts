@@ -116,7 +116,7 @@ async function enableDefaultStfcFeatures() {
   });
   await db.updateSettings({
     settingsId: SettingsId.GRADE_PRECISION,
-    settingsValue: '0.01',
+    settingsValue: '0.1',
   });
   await db.updateSettings({
     settingsId: SettingsId.TECH_REVIEW_OPTIONAL_WORKFLOW_STATUS,
