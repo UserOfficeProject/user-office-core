@@ -1,8 +1,8 @@
 import react from '@vitejs/plugin-react';
 import {
   defineConfig,
-  splitVendorChunkPlugin,
   loadEnv,
+  splitVendorChunkPlugin,
   UserConfig,
 } from 'vite';
 
@@ -34,7 +34,6 @@ export default ({ mode }): UserConfig => {
           return acc;
         }, {}),
       },
-      allowedHosts: ['localhost', 'sajat.eu'],
     },
     resolve: {
       alias: {
