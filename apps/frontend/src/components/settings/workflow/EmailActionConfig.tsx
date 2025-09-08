@@ -179,7 +179,7 @@ const EmailActionConfig = ({
           (template) =>
             template.id ===
             recipientsWithEmailTemplate[foundRecipientWithEmailTemplateIndex]
-              .emailTemplate.id
+              ?.emailTemplate?.id
         ) || null
       );
     } else {

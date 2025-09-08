@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker';
 import {
-  Event as PROPOSAL_EVENTS,
-  EmailStatusActionRecipients,
-  StatusActionType,
   AllocationTimeUnits,
-  FeatureUpdateAction,
+  EmailStatusActionRecipients,
   FeatureId,
+  FeatureUpdateAction,
+  Event as PROPOSAL_EVENTS,
+  StatusActionType,
 } from '@user-office-software-libs/shared-types';
 import { DateTime } from 'luxon';
 
@@ -132,7 +132,7 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: { id: 1, name: 'template-name-1' },
             combineEmails: true,
           },
         ],
@@ -223,7 +223,7 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: { id: 1, name: 'template-name-1' },
           },
         ],
       };
@@ -291,7 +291,7 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: { id: 1, name: 'template-name-1' },
           },
         ],
       };
@@ -441,7 +441,7 @@ context('Status actions tests', () => {
               description:
                 'Other email recipients manually added by their email',
             },
-            emailTemplate: { id: 'my-first-email', name: 'My First Email' },
+            emailTemplate: { id: 2, name: 'template-name-2' },
             otherRecipientEmails: [faker.internet.email()],
           },
         ],
@@ -557,8 +557,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: 2,
+              name: 'template-name-2',
             },
             otherRecipientEmails: [statusActionEmail],
           },
@@ -668,7 +668,7 @@ context('Status actions tests', () => {
               name: EmailStatusActionRecipients.PI,
               description: '',
             },
-            emailTemplate: { id: 'pi-template', name: 'PI template' },
+            emailTemplate: { id: 1, name: 'template-name-1' },
           },
           {
             recipient: {
@@ -677,8 +677,8 @@ context('Status actions tests', () => {
                 'Other email recipients manually added by their email',
             },
             emailTemplate: {
-              id: 'status-actions-test-template',
-              name: 'Status actions test template',
+              id: 2,
+              name: 'template-name-2',
             },
             otherRecipientEmails: [faker.internet.email()],
           },
