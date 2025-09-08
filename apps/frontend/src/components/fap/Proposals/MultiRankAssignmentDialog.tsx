@@ -134,7 +134,6 @@ export const MultiRankAssignmentDialog = ({
         <Button
           onClick={() => {
             assign(usersWithRank);
-            // Modify assignment to include ranks optionally
           }}
           color="primary"
           data-cy="save-ranks"
@@ -145,5 +144,3 @@ export const MultiRankAssignmentDialog = ({
     </Dialog>
   );
 };
-
-// export default withConfirm(MultiRankAssignmentDialog);
