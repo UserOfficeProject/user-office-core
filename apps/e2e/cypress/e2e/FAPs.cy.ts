@@ -736,7 +736,8 @@ context('Fap reviews tests', () => {
 
       clickConfirmOk();
 
-      cy.contains(firstCreatedProposalId)
+      //Do second one first as the first chevron tooltip covers the second one
+      cy.contains(secondCreatedProposalId)
         .closest('tr')
         .find('[data-testid="ChevronRightIcon"]')
         .click();
@@ -744,12 +745,12 @@ context('Fap reviews tests', () => {
       cy.contains(fapMembers.reviewer.lastName).parent().contains('1');
       cy.contains(fapMembers.reviewer2.lastName).parent().contains('2');
 
-      cy.contains(firstCreatedProposalId)
+      cy.contains(secondCreatedProposalId)
         .closest('tr')
         .find('[data-testid="ChevronRightIcon"]')
         .click();
 
-      cy.contains(secondCreatedProposalId)
+      cy.contains(firstCreatedProposalId)
         .closest('tr')
         .find('[data-testid="ChevronRightIcon"]')
         .click();
