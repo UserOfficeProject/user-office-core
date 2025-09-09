@@ -43,10 +43,7 @@ export default function PrincipalInvestigator(
             props.setPrincipalInvestigator(participants.users[0]);
             setIsPickerOpen(false);
           }}
-          excludeUserIds={[
-            users.map((u) => u.id),
-            proposer ? [proposer.id] : [],
-          ].flat()}
+          excludeUserIds={[users.map((u) => u.id)].flat()}
           preset={proposer ? [proposer] : []}
           multiple={false}
           allowEmailInvites={false}
