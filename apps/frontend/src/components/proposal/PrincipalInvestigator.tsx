@@ -48,8 +48,8 @@ export default function PrincipalInvestigator(
             proposer ? [proposer.id] : [],
           ].flat()}
           preset={proposer ? [proposer] : []}
-          singleSelection={true}
-          enableEmailInvites={false}
+          multiple={false}
+          allowEmailInvites={false}
         />
       )}
 

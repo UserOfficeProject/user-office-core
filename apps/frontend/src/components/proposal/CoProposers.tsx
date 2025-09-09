@@ -45,6 +45,7 @@ const CoProposers = ({
       // https://github.com/mbrn/material-table/issues/666
       users={JSON.parse(JSON.stringify(users))}
       invites={coProposerInvites}
+      allowEmailInvites={true}
     />
   );
 };

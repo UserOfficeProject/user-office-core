@@ -13,7 +13,10 @@ interface NoOptionsTextProps {
   exactEmailMatch?: BasicUserDetails;
   excludeEmails?: string[];
   minSearchLength?: number;
-  enableEmailInvites?: boolean;
+  /* If true, if no user with email is found show invite option */
+  allowEmailInvites?: boolean;
+  /* If true, only allow searching users by entering their email */
+  isEmailSearchOnly: boolean;
 }
 
 function NoOptionsText({
@@ -23,7 +26,8 @@ function NoOptionsText({
   exactEmailMatch,
   excludeEmails = [],
   minSearchLength = 3,
-  enableEmailInvites,
+  allowEmailInvites,
+  isEmailSearchOnly,
 }: NoOptionsTextProps) {
   const featureContext = useContext(FeatureContext);
   const isEmailInviteFeatureEnabled = !!featureContext.featuresMap.get(
@@ -31,8 +35,7 @@ function NoOptionsText({
   )?.isEnabled;
 
   // email invite will be enabled if both the prop and the feature flag are true
-  const isEmailInviteEnabled =
-    enableEmailInvites && isEmailInviteFeatureEnabled;
+  const isEmailInviteEnabled = allowEmailInvites && isEmailInviteFeatureEnabled;
 
   if (exactEmailMatch) {
     return (
@@ -40,6 +43,14 @@ function NoOptionsText({
         {getFullUserNameWithInstitution(exactEmailMatch)}
       </MenuItem>
     );
+  }
+
+  if (isEmailSearchOnly) {
+    if (isValidEmail(query)) {
+      return <>No results found for &quot;{query}&quot;</>;
+    } else {
+      return <>Enter a full email address</>;
+    }
   }
 
   if ((query as string).length < minSearchLength) {

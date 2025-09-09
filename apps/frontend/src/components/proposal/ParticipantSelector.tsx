@@ -1,17 +1,27 @@
+import { Info } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import {
   Autocomplete,
   Button,
   CircularProgress,
   DialogContent,
+  IconButton,
   MenuItem,
   TextField,
+  Tooltip,
 } from '@mui/material';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import StyledDialog from 'components/common/StyledDialog';
+import { FeatureContext } from 'context/FeatureContextProvider';
 import { getCurrentUser } from 'context/UserContextProvider';
-import { BasicUserDetails, Invite } from 'generated/sdk';
+import { BasicUserDetails, FeatureId, Invite } from 'generated/sdk';
 import { useDataApi } from 'hooks/common/useDataApi';
 import { isValidEmail, ValidEmailAddress } from 'utils/net';
 import { getFullUserNameWithInstitution } from 'utils/user';
@@ -49,8 +59,8 @@ interface ParticipantSelectorProps {
   excludeUserIds?: number[];
   excludeEmails?: string[];
   preset?: UserOrEmail[];
-  singleSelection?: boolean;
-  enableEmailInvites?: boolean;
+  multiple?: boolean;
+  allowEmailInvites?: boolean;
 }
 
 const categorizeSelectedItems = (items: UserOrEmail[]) => ({
@@ -72,10 +82,11 @@ function ParticipantSelector({
   excludeUserIds,
   excludeEmails,
   confirm,
-  preset,
-  singleSelection,
-  enableEmailInvites,
+  preset = [],
+  multiple = true,
+  allowEmailInvites = false,
 }: ParticipantSelectorProps & WithConfirmProps) {
+  // multiple selection enabled by default
   const api = useDataApi();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -83,9 +94,16 @@ function ParticipantSelector({
   const [exactEmailMatch, setExactEmailMatch] = useState<
     BasicUserDetails | undefined
   >();
-  const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>(
-    preset || []
-  );
+  const [selectedItems, setSelectedItems] = useState<UserOrEmail[]>(preset);
+  const isPendingSearch = useRef(false);
+  const featureContext = useContext(FeatureContext);
+  const isEmailSearchOnly = !!featureContext.featuresMap.get(
+    FeatureId.EMAIL_SEARCH
+  )?.isEnabled;
+
+  const labelText = isEmailSearchOnly
+    ? 'Enter a full email address'
+    : 'ex. Nathalie or john@gmail.com';
 
   const fetchUserSearchResults = useCallback(async () => {
     setExactEmailMatch(undefined);
@@ -102,6 +120,7 @@ function ParticipantSelector({
       });
 
       setOptions(previousCollaborators?.users || []);
+      isPendingSearch.current = false;
 
       return;
     }
@@ -109,10 +128,12 @@ function ParticipantSelector({
     if (query.length < MIN_SEARCH_LENGTH) {
       setOptions([]);
       setLoading(false);
+      isPendingSearch.current = false;
 
       return;
     }
 
+    setOptions([]);
     setLoading(true);
     try {
       if (isValidEmail(query)) {
@@ -132,6 +153,11 @@ function ParticipantSelector({
           setExactEmailMatch(basicUserDetailsByEmail || undefined);
         }
       } else {
+        if (isEmailSearchOnly) {
+          // Disallow partial name search
+          return;
+        }
+
         const excludedUserIds = [
           ...(excludeUserIds ?? []),
           ...categorizeSelectedItems(selectedItems).users.map(
@@ -147,32 +173,48 @@ function ParticipantSelector({
         setOptions(users?.users || []);
       }
     } catch (error) {
-      console.error('Error fetching results:', error);
       setOptions([]);
     } finally {
+      isPendingSearch.current = false;
       setLoading(false);
     }
-  }, [api, query, excludeUserIds, selectedItems]);
+  }, [api, query, excludeUserIds, selectedItems, isEmailSearchOnly]);
 
   // Debounce effect for search queries
   useEffect(() => {
+    isPendingSearch.current = true;
+
     const debounceFetch = setTimeout(fetchUserSearchResults, 300);
 
     return () => clearTimeout(debounceFetch);
-  }, [fetchUserSearchResults]);
+  }, [query, fetchUserSearchResults]);
 
-  const addToSelectedItems = (user: UserOrEmail) =>
-    setSelectedItems((prev) => (singleSelection ? [user] : [...prev, user]));
+  const addToSelectedItems = (user: UserOrEmail) => {
+    setSelectedItems((prev) => (multiple ? [...prev, user] : [user]));
+
+    setExactEmailMatch(undefined);
+    setOptions([]);
+    setQuery('');
+  };
 
   const addValidEmailToSelection = (email: string) => {
     if (isValidEmail(email)) {
       const lowerCaseEmail = email.toLowerCase();
-      if (singleSelection) {
-        setSelectedItems([lowerCaseEmail]);
-      } else {
-        addToSelectedItems(lowerCaseEmail);
+
+      /*
+       * Duplicate invites are still possible at this point, as invites are
+       * not fetched and therefore do not go through the associated duplicate
+       * filtering.
+       */
+      if (
+        excludeEmails
+          ?.concat(categorizeSelectedItems(selectedItems).invites)
+          .includes(lowerCaseEmail)
+      ) {
+        return;
       }
-      setQuery('');
+
+      addToSelectedItems(lowerCaseEmail);
     }
   };
 
@@ -222,28 +264,27 @@ function ParticipantSelector({
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (selectedItems.length === 1 && singleSelection) {
+    if (!multiple && selectedItems.length === 1) {
+      // Prevent further input when single selection is made
       event.preventDefault();
 
       return;
     }
+
     if (event.key === 'Enter' || event.key === ' ' || event.key === ',') {
       event.preventDefault();
+
+      if (isPendingSearch.current) {
+        return;
+      }
+
       if (exactEmailMatch) {
         addToSelectedItems(exactEmailMatch);
         setExactEmailMatch(undefined);
       } else if (options.length === 1) {
         addToSelectedItems(options[0]);
-      } else if (isValidEmail(query)) {
-        if (singleSelection) {
-          if (isValidEmail(query)) {
-            const lowerCaseEmail = query.toLowerCase();
-            setSelectedItems([lowerCaseEmail]);
-            setQuery('');
-          }
-        } else {
-          addValidEmailToSelection(query);
-        }
+      } else if (isValidEmail(query) && !isEmailSearchOnly) {
+        addValidEmailToSelection(query);
       }
     }
   };
@@ -256,14 +297,31 @@ function ParticipantSelector({
   const getOptionKey = (option: UserOrEmail) =>
     isValidEmail(option) ? option : option.id;
 
+  const isLoading = loading || isPendingSearch.current;
+
   return (
     <StyledDialog
       open={modalOpen}
       fullWidth
       maxWidth="md"
       onClose={handleClose}
-      title={
-        title || (singleSelection ? 'Select Participant' : 'Add Participant(s)')
+      title={title || (multiple ? 'Add Participant(s)' : 'Select Participant')}
+      tooltip={
+        isEmailSearchOnly && (
+          <Tooltip
+            title={
+              <span>
+                Click to see your previous collaborators or start typing to
+                search by email address. Click a user to add them to the
+                proposal.
+              </span>
+            }
+          >
+            <IconButton>
+              <Info />
+            </IconButton>
+          </Tooltip>
+        )
       }
     >
       <DialogContent
@@ -271,13 +329,27 @@ function ParticipantSelector({
         sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}
       >
         <Autocomplete
-          multiple
+          multiple={multiple}
           fullWidth
           options={options}
-          loading={loading}
+          loading={isLoading}
           getOptionLabel={getOptionLabel}
-          value={selectedItems}
-          onChange={(_, newValue) => setSelectedItems(newValue)}
+          value={
+            multiple
+              ? selectedItems
+              : selectedItems.length
+                ? selectedItems[0]
+                : undefined
+          }
+          onChange={(_, newValue) =>
+            setSelectedItems(
+              newValue
+                ? multiple
+                  ? (newValue as UserOrEmail[])
+                  : [newValue as UserOrEmail]
+                : []
+            )
+          }
           filterSelectedOptions
           onInputChange={(_, newValue) => setQuery(newValue)}
           onKeyDown={handleKeyDown}
@@ -285,13 +357,20 @@ function ParticipantSelector({
           renderInput={(params) => (
             <TextField
               {...params}
-              label="ex. Nathalie or john@gmail.com"
+              label={labelText}
               variant="outlined"
+              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                if (event.key === 'Backspace') {
+                  event.stopPropagation();
+                }
+              }}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
                   <>
-                    {loading && <CircularProgress color="inherit" size={20} />}
+                    {isLoading && (
+                      <CircularProgress color="inherit" size={20} />
+                    )}
                     {params.InputProps.endAdornment}
                   </>
                 ),
@@ -304,22 +383,29 @@ function ParticipantSelector({
             </MenuItem>
           )}
           noOptionsText={
-            <NoOptionsText
-              query={query}
-              onAddEmail={(email) => addValidEmailToSelection(email)}
-              exactEmailMatch={exactEmailMatch}
-              onAddUser={(user) => {
-                addToSelectedItems(user);
-                setExactEmailMatch(undefined);
-                setQuery('');
-              }}
-              excludeEmails={
-                excludeEmails?.concat(
-                  categorizeSelectedItems(selectedItems).invites
-                ) || []
-              }
-              enableEmailInvites={enableEmailInvites}
-            />
+            !isLoading ? (
+              <NoOptionsText
+                query={query}
+                onAddEmail={(email) =>
+                  allowEmailInvites
+                    ? addValidEmailToSelection(email)
+                    : undefined
+                }
+                exactEmailMatch={exactEmailMatch}
+                onAddUser={(user) => {
+                  multiple
+                    ? addToSelectedItems(user)
+                    : setSelectedItems([user]);
+                }}
+                excludeEmails={
+                  excludeEmails?.concat(
+                    categorizeSelectedItems(selectedItems).invites
+                  ) || []
+                }
+                isEmailSearchOnly={isEmailSearchOnly}
+                allowEmailInvites={allowEmailInvites}
+              />
+            ) : null
           }
         />
 
@@ -334,7 +420,7 @@ function ParticipantSelector({
           }
           data-cy="invite-user-submit-button"
         >
-          {singleSelection ? 'Select' : 'Add'}
+          {multiple ? 'Add' : 'Select'}
         </Button>
       </DialogContent>
     </StyledDialog>

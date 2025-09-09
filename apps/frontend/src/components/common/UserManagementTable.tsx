@@ -12,6 +12,7 @@ import React, { useContext, useState } from 'react';
 import { ActionButtonContainer } from 'components/common/ActionButtonContainer';
 import PeopleTable from 'components/user/PeopleTable';
 import { FeatureContext } from 'context/FeatureContextProvider';
+import { UserContext } from 'context/UserContextProvider';
 import { BasicUserDetails, FeatureId, Invite, UserRole } from 'generated/sdk';
 
 import ParticipantModal from '../proposal/ParticipantModal';
@@ -23,7 +24,7 @@ export type UserManagementTableProps = {
   /** Function for setting up the users. */
   setUsers: (users: BasicUserDetails[]) => void;
   invites: Invite[];
-  setInvites: (invites: Invite[]) => void;
+  setInvites?: (invites: Invite[]) => void;
   sx?: SxProps<Theme>;
   title: string;
   preserveSelf?: boolean;
@@ -35,6 +36,8 @@ export type UserManagementTableProps = {
   onUserAction?: (action: string, user: BasicUserDetails) => void;
   /** Additional excluded user IDs for invite flow */
   excludeUserIds?: number[];
+  /** If true, allows to add users by entering their email. Set this to true and listen to setInvites */
+  allowEmailInvites?: boolean;
 };
 
 const UserManagementTable = ({
@@ -50,12 +53,14 @@ const UserManagementTable = ({
   disabled = false,
   onUserAction,
   excludeUserIds = [],
+  allowEmailInvites = false,
 }: UserManagementTableProps) => {
   const [modalOpen, setOpen] = useState(false);
   const { featuresMap } = useContext(FeatureContext);
   const isLegacyInviteFlow = featuresMap.get(
     FeatureId.EMAIL_INVITE_LEGACY
   )?.isEnabled;
+  const currentUser = useContext(UserContext)?.user;
 
   const removeUser = (user: BasicUserDetails) => {
     const newUsers = users.filter((u) => u.id !== user.id);
@@ -71,7 +76,7 @@ const UserManagementTable = ({
     invites: Invite[];
   }) => {
     setUsers([...users, ...props.users]);
-    setInvites([...invites, ...props.invites]);
+    setInvites?.([...invites, ...props.invites]);
     setOpen(false);
   };
 
@@ -83,7 +88,7 @@ const UserManagementTable = ({
   };
 
   const handleDeleteInvite = (invite: Invite) => {
-    setInvites(invites.filter((i) => i.email !== invite.email));
+    setInvites?.(invites.filter((i) => i.email !== invite.email));
   };
 
   const InviteComponent = (
@@ -93,7 +98,11 @@ const UserManagementTable = ({
       onClose={() => setOpen(false)}
       onAddParticipants={handleAddParticipants}
       excludeUserIds={[...users.map((user) => user.id), ...excludeUserIds]}
-      excludeEmails={invites.map((invite) => invite.email)}
+      allowEmailInvites={allowEmailInvites}
+      excludeEmails={[
+        ...(invites?.map((invite) => invite.email) || []),
+        ...(currentUser.email ? [currentUser.email.toLowerCase()] : []),
+      ]}
     />
   );
 
