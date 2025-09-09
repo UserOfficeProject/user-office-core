@@ -49,7 +49,7 @@ export abstract class MailService {
       writeFileSync(
         path.join(
           process.env.EMAIL_TEMPLATE_PATH || '',
-          templateId + '.html.pug'
+          path.join('/tmp', templateId + '.html.pug')
         ),
         emailTemplate.body
       );
@@ -57,7 +57,7 @@ export abstract class MailService {
       writeFileSync(
         path.join(
           process.env.EMAIL_TEMPLATE_PATH || '',
-          templateId + '.subject.pug'
+          path.join('/tmp', templateId + '.subject.pug')
         ),
         '= `' + emailTemplate.subject + '`'
       );
