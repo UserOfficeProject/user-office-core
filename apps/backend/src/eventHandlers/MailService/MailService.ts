@@ -70,6 +70,8 @@ export abstract class MailService {
           logger.logWarn('Could not create email template', {
             error: err,
           });
+
+          return templateId;
         }
       }
 
