@@ -1,6 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { logger } from '@user-office-software/duo-logger';
 import EmailTemplates from 'email-templates';
 import { container } from 'tsyringe';
 
@@ -46,21 +47,31 @@ export abstract class MailService {
         return null;
       }
 
-      writeFileSync(
-        path.join(
-          process.env.EMAIL_TEMPLATE_PATH || '',
-          path.join('/tmp', templateId + '.html.pug')
-        ),
-        emailTemplate.body
-      );
+      try {
+        writeFileSync(
+          path.join(
+            process.env.EMAIL_TEMPLATE_PATH || '',
+            templateId + '.html.pug'
+          ),
+          emailTemplate.body
+        );
 
-      writeFileSync(
-        path.join(
-          process.env.EMAIL_TEMPLATE_PATH || '',
-          path.join('/tmp', templateId + '.subject.pug')
-        ),
-        '= `' + emailTemplate.subject + '`'
-      );
+        writeFileSync(
+          path.join(
+            process.env.EMAIL_TEMPLATE_PATH || '',
+            templateId + '.subject.pug'
+          ),
+          '= `' + emailTemplate.subject + '`'
+        );
+      } catch (err) {
+        if (process.env.EMAIL_TEMPLATE_PATH !== '/config/emails') {
+          throw err;
+        } else {
+          logger.logWarn('Could not create email template', {
+            error: err,
+          });
+        }
+      }
 
       return templateId;
     } else {
