@@ -64,7 +64,7 @@ export abstract class MailService {
           '= `' + emailTemplate.subject + '`'
         );
       } catch (err) {
-        if (process.env.EMAIL_TEMPLATE_PATH !== '/config/emails') {
+        if (process.env.EMAIL_TEMPLATE_PATH !== '/config/emails/') {
           throw err;
         } else {
           logger.logWarn('Could not create email template', {
