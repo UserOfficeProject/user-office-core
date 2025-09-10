@@ -83,7 +83,7 @@ Instructions for building high-quality backend services with Node.js, Express, G
 - Create consistent error responses using GraphQL errors
 - Use custom rejection types for domain-specific errors
 - Log errors with proper context information
-- Handle async errors with try/catch or await-to-js
+- Handle async errors with try/catch
 - Return meaningful error messages to clients
 - Handle errors in mutation layer by logging and returning to client
 
