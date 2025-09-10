@@ -3,6 +3,7 @@ import {
   AllocationTimeUnits,
   DataType,
   FeatureId,
+  FeatureUpdateAction,
   SettingsId,
   TemplateCategoryId,
   TemplateGroupId,
@@ -116,6 +117,10 @@ context('Proposal tests', () => {
       });
 
       cy.resetDB();
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
       cy.getAndStoreFeaturesEnabled();
       cy.createTemplate({
         name: 'default esi template',
@@ -198,14 +203,15 @@ context('Proposal tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy=email]').type('ben@inbox.com');
+      cy.get('[data-cy="invite-user-autocomplete"] input[type="text"]')
+        .type('{backspace}')
+        .type(initialDBData.users.user2.email);
 
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.users.user2.lastName)
         .click();
+
+      cy.get('[data-testid="AddIcon"]').click();
 
       cy.get('[data-cy="save-and-continue-button"]').focus().click();
 
@@ -1081,9 +1087,12 @@ context('Proposal tests', () => {
       cy.window().then((win) => {
         win.location.href = 'about:blank';
       });
-
-      cy.getAndStoreFeaturesEnabled();
       cy.resetDB();
+      cy.updateFeature({
+        action: FeatureUpdateAction.DISABLE,
+        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
+      });
+      cy.getAndStoreFeaturesEnabled();
       cy.createTemplate({
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
@@ -1125,16 +1134,15 @@ context('Proposal tests', () => {
 
       cy.finishedLoading();
 
-      cy.get('[data-cy=email]').type('ben@inbox.com');
+      cy.get('[data-cy="invite-user-autocomplete"] input[type="text"]')
+        .type('{backspace}')
+        .type(initialDBData.users.user2.email);
 
-      cy.get('[data-cy=findUser]').click();
-
-      cy.contains('Benjamin')
-        .parent()
-        .find("[aria-label='Select user']")
+      cy.get('[role="presentation"]')
+        .contains(initialDBData.users.user2.lastName)
         .click();
 
-      cy.get('[data-cy="save-and-continue-button"]').focus().click();
+      cy.get('[data-testid="AddIcon"]').click();
 
       cy.contains('Proposal Title is required');
       cy.contains('Proposal Abstract is required');
