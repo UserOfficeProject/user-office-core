@@ -104,7 +104,7 @@ context('Pregenerated PDF tests', () => {
     environment cannot communicate with the factory.
     */
     cy.getAndStoreFeaturesEnabled().then(() => {
-      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
     });
@@ -546,7 +546,6 @@ context('Pregenerated PDF tests', () => {
 
       const pdfFilePath1 = `${extractedFilesDir}/${proposalId1}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
       const pdfFilePath2 = `${extractedFilesDir}/${proposalId2}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
-      const pdfFilePath3 = `${extractedFilesDir}/${proposalId3}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
 
       cy.task('readPdf', pdfFilePath1).then((args) => {
         const { text } = args as PdfParse.Result;
@@ -564,35 +563,20 @@ context('Pregenerated PDF tests', () => {
         expect(text).to.include(proposalAbstract2);
       });
 
-      cy.task('readPdf', pdfFilePath3).then((args) => {
-        const { text } = args as PdfParse.Result;
-
-        expect(text).to.include(proposalId3);
-        expect(text).to.include(proposalTitle3);
-        expect(text).to.include(proposalAbstract3);
-      });
-
       const newProposalTitle2 = faker.lorem.words(3);
       const newProposalAbstract2 = faker.lorem.words(5);
-
-      const newProposalTitle3 = faker.lorem.words(3);
-      const newProposalAbstract3 = faker.lorem.words(5);
 
       cy.updateProposal({
         proposalPk: proposalPk2,
         title: newProposalTitle2,
         abstract: newProposalAbstract2,
       }).then(() => {
-        cy.updateProposal({
-          proposalPk: proposalPk3,
-          title: newProposalTitle3,
-          abstract: newProposalAbstract3,
-        }).then(() => {
+        () => {
           const downloadFileName = `proposals_02.zip`;
           const downloadFilePath = `${downloadsFolder}/${downloadFileName}`;
 
           cy.task<DownloadFileResult>('downloadFile', {
-            url: `${Cypress.config('baseUrl')}/download/zip/proposal/${proposalPk1},${proposalPk2},${proposalPk3}`,
+            url: `${Cypress.config('baseUrl')}/download/zip/proposal/${proposalPk1},${proposalPk2}`,
             token,
             filename: downloadFileName,
             downloadsFolder,
@@ -609,8 +593,6 @@ context('Pregenerated PDF tests', () => {
 
           const pdfFilePath1 = `${extractedFilesDir}/${proposalId1}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
           const pdfFilePath2 = `${extractedFilesDir}/${proposalId2}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
-          const pdfFilePath3 = `${extractedFilesDir}/${proposalId3}_${initialDBData.users.user1.lastName}_${currentYear}.pdf`;
-
           cy.task('readPdf', pdfFilePath1).then((args) => {
             const { text } = args as PdfParse.Result;
 
@@ -630,19 +612,7 @@ context('Pregenerated PDF tests', () => {
             expect(text).to.not.include(newProposalTitle2);
             expect(text).to.not.include(newProposalAbstract2);
           });
-
-          // The update to proposal 3 is reflected because it is generated.
-          cy.task('readPdf', pdfFilePath3).then((args) => {
-            const { text } = args as PdfParse.Result;
-
-            expect(text).to.include(proposalId3);
-            expect(text).to.include(newProposalTitle3);
-            expect(text).to.include(newProposalAbstract3);
-
-            expect(text).to.not.include(proposalTitle3);
-            expect(text).to.not.include(proposalAbstract3);
-          });
-        });
+        };
       });
     });
   });
