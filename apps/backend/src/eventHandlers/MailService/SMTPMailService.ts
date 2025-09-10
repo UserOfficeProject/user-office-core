@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import path from 'path';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -23,11 +24,17 @@ export class SMTPMailService extends MailService {
     const attachments = [];
 
     if (process.env.EMAIL_FOOTER_IMAGE_PATH !== undefined) {
-      attachments.push({
-        filename: 'logo.png',
-        path: process.env.EMAIL_FOOTER_IMAGE_PATH,
-        cid: 'logo1',
-      });
+      if (existsSync(process.env.EMAIL_FOOTER_IMAGE_PATH)) {
+        attachments.push({
+          filename: 'logo.png',
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+          cid: 'logo1',
+        });
+      } else {
+        logger.logWarn('Email footer image path does not exist', {
+          path: process.env.EMAIL_FOOTER_IMAGE_PATH,
+        });
+      }
     }
 
     let smtpTransport:
