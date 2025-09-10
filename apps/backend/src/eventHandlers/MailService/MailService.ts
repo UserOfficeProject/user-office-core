@@ -1,4 +1,5 @@
-import { writeFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { logger } from '@user-office-software/duo-logger';
@@ -27,18 +28,18 @@ export abstract class MailService {
     );
   }
 
-  async getTemplateId(options: EmailSettings): Promise<string | null> {
+  async getEmailTemplate(
+    options: EmailSettings
+  ): Promise<{ name: string; path: string } | null> {
     const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
       Tokens.EmailTemplateDataSource
     );
 
     if (process.env.NODE_ENV === 'test') {
-      return options.content.template_id;
+      return { name: options.content.template_id, path: '' };
     }
 
     if (options.content.db_template_id) {
-      const templateId = 'temp_template';
-
       const emailTemplate = await emailTemplateDataSource.getEmailTemplate(
         options.content.db_template_id
       );
@@ -47,44 +48,42 @@ export abstract class MailService {
         return null;
       }
 
+      const tempDirPath = path.join(tmpdir(), 'email-templates');
+
       try {
-        writeFileSync(
-          path.join(
-            process.env.EMAIL_TEMPLATE_PATH || '',
-            templateId + '.html.pug'
-          ),
-          emailTemplate.body
-        );
+        const tempDir = mkdtempSync(tempDirPath);
+        const tempFilePath = path.join(tempDir, emailTemplate.name);
+
+        writeFileSync(tempFilePath + '.html.pug', emailTemplate.body);
 
         writeFileSync(
-          path.join(
-            process.env.EMAIL_TEMPLATE_PATH || '',
-            templateId + '.subject.pug'
-          ),
+          tempFilePath + '.subject.pug',
           '= `' + emailTemplate.subject + '`'
         );
+
+        return { name: emailTemplate.name, path: tempFilePath };
       } catch (err) {
-        if (process.env.EMAIL_TEMPLATE_PATH !== '/config/emails/') {
-          throw err;
-        } else {
-          logger.logWarn('Could not create email template', {
-            error: err,
-          });
+        logger.logWarn('Could not create email template', {
+          error: err,
+        });
 
-          return templateId;
-        }
+        return null;
       }
-
-      return templateId;
     } else {
-      const template =
+      const templatePath =
         this.getEmailTemplatePath('html', options.content.template_id) + '.pug';
 
-      if (!(await (this.emailTemplates as any).templateExists(template))) {
+      if (!(await (this.emailTemplates as any).templateExists(templatePath))) {
         return null;
       }
 
-      return options.content.template_id;
+      return {
+        name: options.content.template_id,
+        path: path.join(
+          process.env.EMAIL_TEMPLATE_PATH || '',
+          options.content.template_id
+        ),
+      };
     }
   }
 }

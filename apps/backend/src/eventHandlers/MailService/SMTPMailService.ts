@@ -63,7 +63,9 @@ export class SMTPMailService extends MailService {
           relativeTo: path.resolve(process.env.EMAIL_TEMPLATE_PATH || ''),
         },
       },
-      getPath: this.getEmailTemplatePath,
+      getPath: (type, template) => {
+        return `${template}.${type}`;
+      },
     });
   }
 
@@ -106,9 +108,9 @@ export class SMTPMailService extends MailService {
       sendMailResults.id = 'test';
     }
 
-    const templateId = await this.getTemplateId(options);
+    const template = await this.getEmailTemplate(options);
 
-    if (!templateId) {
+    if (!template) {
       logger.logError('Email template not found', {
         templateId: options.content.db_template_id,
         dbTemplateId: options.content.db_template_id,
@@ -120,7 +122,7 @@ export class SMTPMailService extends MailService {
     options.recipients.forEach((participant) => {
       emailPromises.push(
         this.emailTemplates.send({
-          template: templateId,
+          template: template.path,
           message: {
             ...(typeof participant.address !== 'string'
               ? {
