@@ -522,8 +522,7 @@ context('Pregenerated PDF tests', () => {
       if (!token) {
         throw new Error('Token not provided');
       }
-      cy.submitProposal({ proposalPk: proposalPk1 });
-      cy.submitProposal({ proposalPk: proposalPk2 });
+
       cy.submitProposal({ proposalPk: proposalPk3 });
 
       const downloadFileName = `proposals_01.zip`;
