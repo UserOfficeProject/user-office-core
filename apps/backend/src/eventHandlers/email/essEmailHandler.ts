@@ -220,11 +220,7 @@ export async function essEmailHandler(event: ApplicationEvent) {
         return;
       }
 
-      const participants = await userDataSource.getProposalUsersFull(
-        event.proposal.primaryKey
-      );
-
-      const invites = await inviteDataSource.findCoProposerInvites(
+      const participants = await userDataSource.getProposalUsers(
         event.proposal.primaryKey
       );
 
@@ -250,14 +246,6 @@ export async function essEmailHandler(event: ApplicationEvent) {
             return {
               address: {
                 email: partipant.email,
-                header_to: principalInvestigator.email,
-              },
-            };
-          }),
-          ...invites.map((invite) => {
-            return {
-              address: {
-                email: invite.email,
                 header_to: principalInvestigator.email,
               },
             };

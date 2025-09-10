@@ -4,9 +4,16 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoProposerClaimDataSource';
-import { ProposalDataSourceMock } from '../../datasources/mockups/ProposalDataSource';
+import { InviteDataSourceMock } from '../../datasources/mockups/InviteDataSource';
+import {
+  ProposalDataSourceMock,
+  dummyProposal,
+} from '../../datasources/mockups/ProposalDataSource';
 import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
-import { dummyUser } from '../../datasources/mockups/UserDataSource';
+import {
+  basicDummyUser,
+  dummyUser,
+} from '../../datasources/mockups/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { Invite } from '../../models/Invite';
@@ -17,6 +24,7 @@ describe('essEmailHandler', () => {
   let coProposerDataSourceMock: CoProposerClaimDataSourceMock;
   let roleClaimDataSourceMock: RoleClaimDataSourceMock;
   let proposalDataSourceMock: ProposalDataSourceMock;
+  let inviteDataSourceMock: InviteDataSourceMock;
   let mailService: MailService;
 
   beforeEach(() => {
@@ -145,6 +153,37 @@ describe('essEmailHandler', () => {
       await essEmailHandler(event);
 
       expect(sendMailsSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handling PROPOSAL_SUBMITTED event', () => {
+    it('Should have PI and CoProposals in the payload', async () => {
+      const event: ApplicationEvent = {
+        type: Event.PROPOSAL_SUBMITTED,
+        proposal: dummyProposal,
+        key: 'proposal',
+        loggedInUserId: 1,
+        isRejection: false,
+      };
+
+      const sendMailsSpy = jest.spyOn(mailService, 'sendMail');
+
+      await essEmailHandler(event);
+
+      expect(sendMailsSpy).toHaveBeenCalledTimes(1);
+      const arg = sendMailsSpy.mock.calls[0][0];
+      expect(arg.content.template_id).toBe(EmailTemplateId.PROPOSAL_SUBMITTED);
+
+      // Recipients: first is PI, rest are co-proposers with header_to pointing to PI
+      expect(arg.recipients).toEqual([
+        { address: dummyUser.email },
+        {
+          address: {
+            email: basicDummyUser.email,
+            header_to: dummyUser.email,
+          },
+        },
+      ]);
     });
   });
 });
