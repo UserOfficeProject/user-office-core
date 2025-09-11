@@ -1087,12 +1087,9 @@ context('Proposal tests', () => {
       cy.window().then((win) => {
         win.location.href = 'about:blank';
       });
-      cy.resetDB();
-      cy.updateFeature({
-        action: FeatureUpdateAction.DISABLE,
-        featureIds: [FeatureId.EMAIL_INVITE_LEGACY],
-      });
+
       cy.getAndStoreFeaturesEnabled();
+      cy.resetDB();
       cy.createTemplate({
         name: 'default esi template',
         groupId: TemplateGroupId.PROPOSAL_ESI,
