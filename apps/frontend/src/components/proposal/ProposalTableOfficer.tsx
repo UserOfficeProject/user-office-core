@@ -48,12 +48,12 @@ import TechnicalBulkReassignModal, {
 import { FeatureContext } from 'context/FeatureContextProvider';
 import {
   Call,
-  ProposalsFilter,
-  InstrumentMinimalFragment,
-  FeatureId,
-  FapInstrumentInput,
   FapInstrument,
+  FapInstrumentInput,
+  FeatureId,
+  InstrumentMinimalFragment,
   ProposalViewInstrument,
+  ProposalsFilter,
   Status,
 } from 'generated/sdk';
 import { useLocalStorage } from 'hooks/common/useLocalStorage';
@@ -75,6 +75,7 @@ import withConfirm, { WithConfirmType } from 'utils/withConfirm';
 
 import CallSelectModalOnProposalsClone from './CallSelectModalOnProposalClone';
 import ChangeProposalStatus from './ChangeProposalStatus';
+import NotifyProposal from './NotifyProposal';
 import ProposalAttachmentDownload from './ProposalAttachmentDownload';
 import TableActionsDropdownMenu, {
   DownloadMenuOption,
@@ -332,6 +333,7 @@ const ProposalTableOfficer = ({
     useState(false);
   const [openChangeProposalStatus, setOpenChangeProposalStatus] =
     useState(false);
+  const [openNotifiyProposal, setOpenNotifyProposal] = useState(false);
   const [tableData, setTableData] = useState<ProposalViewData[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [openCallSelection, setOpenCallSelection] = useState(false);
@@ -477,12 +479,13 @@ const ProposalTableOfficer = ({
   };
 
   // TODO: Maybe it will be good to make notifyProposal and deleteProposal bulk functions where we can sent array of proposal ids.
-  const emailProposals = (): void => {
+  const emailProposals = (setNotified: boolean): void => {
     getSelectedProposalPks().forEach(async (proposalPk) => {
       await api({
         toastSuccessMessage: 'Notification sent successfully',
       }).notifyProposal({
         proposalPk,
+        setNotified,
       });
 
       refreshTableData();
@@ -833,16 +836,17 @@ const ProposalTableOfficer = ({
       icon: EmailIcon,
       tooltip: 'Notify users final result',
       onClick: () => {
-        confirm(
-          () => {
-            emailProposals();
-          },
-          {
-            title: 'Notify results',
-            description:
-              'This action will trigger emails to be sent to principal investigators.',
-          }
-        )();
+        // confirm(
+        //   () => {
+        //     emailProposals(true);
+        //   },
+        //   {
+        //     title: 'Notify results',
+        //     description:
+        //       'This action will trigger emails to be sent to principal investigators.',
+        //   }
+        // )();
+        setOpenNotifyProposal(true);
       },
       position: 'toolbarOnSelect',
     },
@@ -972,6 +976,21 @@ const ProposalTableOfficer = ({
                 )
               )
               .flat()}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={openNotifiyProposal}
+        maxWidth="xs"
+        onClose={(): void => setOpenNotifyProposal(false)}
+        fullWidth
+      >
+        <DialogContent>
+          <NotifyProposal
+            close={(): void => setOpenNotifyProposal(false)}
+            notifyProposals={emailProposals}
           />
         </DialogContent>
       </Dialog>
