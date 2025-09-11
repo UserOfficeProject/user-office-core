@@ -14,8 +14,13 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
+
 import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
+
+import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
+
 import { MailService } from '../eventHandlers/MailService/MailService';
+import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
 import { Rejection } from '../models/Rejection';
 import InviteMutations from './InviteMutations';
@@ -32,6 +37,11 @@ describe('Test Invite Mutations', () => {
       .resolve<CoProposerClaimDataSourceMock>(Tokens.CoProposerClaimDataSource)
       .init();
     container.resolve<AdminDataSourceMock>(Tokens.AdminDataSource).init();
+    container.resolve<VisitDataSourceMock>(Tokens.VisitDataSource).init();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   test('A user can accept valid invite code', () => {
@@ -222,15 +232,13 @@ describe('Test Invite Mutations', () => {
 
     expect(response).not.toBeInstanceOf(Rejection);
 
-    // wait 200ms for the email to be sent
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
     expect(sendMailSpy).toHaveBeenCalledTimes(1);
     expect(sendMailSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         recipients: [{ address: email }],
         content: {
-          template_id: 'user-office-registration-invitation-co-proposer',
+          template_id:
+            EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER,
         },
       })
     );
@@ -255,10 +263,15 @@ describe('Test Invite Mutations', () => {
     );
     expect(response).not.toBeInstanceOf(Rejection);
 
-    // wait 200ms for the email to be sent
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    expect(setEventInDataSourceSpy).toHaveBeenCalled();
+    expect(setEventInDataSourceSpy).toHaveBeenCalledTimes(1);
+    expect(setEventInDataSourceSpy).toHaveBeenCalledWith(
+      dummyUserWithRole.id, // changedBy (userId)
+      expect.stringMatching(Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT), // eventType
+      expect.stringContaining(email), // rowData (JSON string containing the email)
+      expect.any(String), // changedObjectId (should be the invite ID)
+      expect.stringContaining(`Co-proposer invite sent to: ${email}`), // description
+      undefined
+    );
   });
 
   test('Invite should have the templateId set', async () => {

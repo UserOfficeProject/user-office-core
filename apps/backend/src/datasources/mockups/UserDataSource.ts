@@ -399,7 +399,7 @@ export class UserDataSourceMock implements UserDataSource {
     return dummyUser;
   }
 
-  async getUser(id: number) {
+  async getUser(id: number): Promise<User | null> {
     if (id === dummyPlaceHolderUser.id) {
       return dummyPlaceHolderUser;
     }

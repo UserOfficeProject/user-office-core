@@ -44,8 +44,6 @@ export enum Event {
   USER_DELETED = 'USER_DELETED',
   USER_PASSWORD_RESET_EMAIL = 'USER_PASSWORD_RESET_EMAIL',
   EMAIL_INVITE_LEGACY = 'EMAIL_INVITE_LEGACY',
-  EMAIL_INVITE = 'EMAIL_INVITE',
-  EMAIL_INVITES = 'EMAIL_INVITES',
   FAP_CREATED = 'FAP_CREATED',
   FAP_UPDATED = 'FAP_UPDATED',
   FAP_MEMBERS_ASSIGNED = 'FAP_MEMBERS_ASSIGNED',
@@ -66,8 +64,9 @@ export enum Event {
   PROPOSAL_BOOKING_TIME_COMPLETED = 'PROPOSAL_BOOKING_TIME_COMPLETED',
   PROPOSAL_BOOKING_TIME_UPDATED = 'PROPOSAL_BOOKING_TIME_UPDATED',
   PROPOSAL_BOOKING_TIME_REOPENED = 'PROPOSAL_BOOKING_TIME_REOPENED',
-  PROPOSAL_CO_PROPOSER_CLAIM_SENT = 'PROPOSAL_CO_PROPOSER_CLAIM_SENT',
-  PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED = 'PROPOSAL_CO_PROPOSER_CLAIM_ACCEPTED',
+  PROPOSAL_CO_PROPOSER_INVITES_UPDATED = 'PROPOSAL_CO_PROPOSER_INVITES_UPDATED',
+  PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT = 'PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT',
+  PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED = 'PROPOSAL_CO_PROPOSER_INVITE_ACCEPTED',
   INSTRUMENT_CREATED = 'INSTRUMENT_CREATED',
   INSTRUMENT_UPDATED = 'INSTRUMENT_UPDATED',
   INSTRUMENT_DELETED = 'INSTRUMENT_DELETED',
@@ -243,11 +242,6 @@ export const EventLabel = new Map<Event, string>([
     Event.EMAIL_INVITE_LEGACY,
     '[Deprecated] Event occurs when user is created using email invite',
   ],
-  [Event.EMAIL_INVITE, 'Event occurs when user is invited by email'],
-  [
-    Event.EMAIL_INVITES,
-    'Event occurs when multiple users are invited by email',
-  ],
   [Event.FAP_CREATED, 'Event occurs when FAP is created'],
   [Event.FAP_UPDATED, 'Event occurs when FAP is updated'],
   [Event.FAP_MEMBERS_ASSIGNED, 'Event occurs when we assign member/s to a FAP'],
@@ -276,6 +270,14 @@ export const EventLabel = new Map<Event, string>([
   [
     Event.PROPOSAL_STATUS_ACTION_EXECUTED,
     'Event occurs when the proposal status action is being executed in the status engine',
+  ],
+  [
+    Event.PROPOSAL_CO_PROPOSER_INVITES_UPDATED,
+    'Event occurs when co-proposer invites are updated for a proposal',
+  ],
+  [
+    Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT,
+    'Event occurs when co-proposer invite is sent to a user',
   ],
   [
     Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,

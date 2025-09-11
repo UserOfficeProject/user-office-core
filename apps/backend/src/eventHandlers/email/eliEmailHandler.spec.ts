@@ -7,10 +7,11 @@ import { CoProposerClaimDataSourceMock } from '../../datasources/mockups/CoPropo
 import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
-import { UserRole } from '../../models/User';
 import { eliEmailHandler } from './eliEmailHandler';
+
 import { EmailTemplateId } from './emailTemplateId';
 import { getTemplateIdForInvite } from './essEmailHandler';
+
 
 // Mock MailService
 const mockMailService = {
