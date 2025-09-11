@@ -546,7 +546,7 @@ function createNumberInputQuestion(
 
 function createIntervalQuestion(
   question: string,
-  options?: { units?: string[] }
+  options?: { units?: string[]; valueConstraint?: string }
 ) {
   openQuestionsMenu();
 
@@ -559,6 +559,11 @@ function createIntervalQuestion(
       cy.get('[data-cy=units]').find('[aria-label=Open]').click();
       cy.contains(unit).click();
     }
+  }
+
+  if (options?.valueConstraint) {
+    cy.get('[data-cy="numberValueConstraint"]').click();
+    cy.contains(options?.valueConstraint).click();
   }
 
   cy.contains('Save').click();
