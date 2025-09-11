@@ -104,7 +104,7 @@ context('Pregenerated PDF tests', () => {
     environment cannot communicate with the factory.
     */
     cy.getAndStoreFeaturesEnabled().then(() => {
-      if (featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
+      if (!featureFlags.getEnabledFeatures().get(FeatureId.SCHEDULER)) {
         this.skip();
       }
     });
