@@ -9,6 +9,7 @@ import { InviteDataSource } from '../../datasources/InviteDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { RedeemCodesDataSource } from '../../datasources/RedeemCodesDataSource';
 import { ReviewDataSource } from '../../datasources/ReviewDataSource';
+import { RoleClaimDataSource } from '../../datasources/RoleClaimDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
@@ -28,6 +29,14 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   const fapDataSource = container.resolve<FapDataSource>(Tokens.FapDataSource);
   const userDataSource = container.resolve<UserDataSource>(
     Tokens.UserDataSource
+  );
+
+  const roleClaimDataSource = container.resolve<RoleClaimDataSource>(
+    Tokens.RoleClaimDataSource
+  );
+
+  const inviteDataSource = container.resolve<InviteDataSource>(
+    Tokens.InviteDataSource
   );
 
   const callDataSource = container.resolve<CallDataSource>(
@@ -136,46 +145,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           return;
         }
 
-
-        const roleInviteClaim = await roleClaimDataSource.findByInviteId(
-          invite.id
-        );
-
-        const templateId = getTemplateIdForRole(roleInviteClaim[0].roleId);
-
-        const emailTemplate =
-          await emailTemplateDataSource.getEmailTemplateByName(templateId);
-
-        mailService
-          .sendMail({
-            content: {
-              template_id: templateId,
-              db_template_id: emailTemplate ? emailTemplate.id : undefined,
-            },
-            substitution_data: {
-              email: invite.email,
-              inviterName: inviter.firstname,
-              inviterLastname: inviter.lastname,
-              redeemCode: invite.code,
-            },
-            recipients: [{ address: invite.email }],
-          })
-          .then(async (res) => {
-            await inviteDataSource.update({
-              id: invite.id,
-              isEmailSent: true,
-            });
-            logger.logInfo('Successful email transmission', { res });
-          })
-          .catch((err: string) => {
-            logger.logException('Failed email transmission', err);
-          })
-          .finally(() => {
-            inviteDataSource.update({
-              id: invite.id,
-              templateId: templateId,
-            });
-
         await sendInviteEmail(
           invite,
           inviter,
@@ -184,10 +153,11 @@ export async function eliEmailHandler(event: ApplicationEvent) {
           await eventBus.publish({
             ...event,
             type: Event.PROPOSAL_CO_PROPOSER_INVITE_EMAIL_SENT,
-
+            invite,
           });
         });
       }
+
       break;
     }
 
@@ -429,7 +399,6 @@ export async function eliEmailHandler(event: ApplicationEvent) {
   }
 }
 
-
 function getTemplateIdForRole(role: UserRole): string {
   switch (role) {
     case UserRole.USER:
@@ -439,6 +408,8 @@ function getTemplateIdForRole(role: UserRole): string {
     default:
       throw new Error('No valid user role set for email invitation');
   }
+}
+
 async function sendInviteEmail(
   invite: Invite,
   inviter: BasicUserDetails,
@@ -448,11 +419,18 @@ async function sendInviteEmail(
   const inviteDataSource = container.resolve<InviteDataSource>(
     Tokens.InviteDataSource
   );
+  const emailTemplateDataSource = container.resolve<EmailTemplateDataSource>(
+    Tokens.EmailTemplateDataSource
+  );
+
+  const emailTemplate =
+    await emailTemplateDataSource.getEmailTemplateByName(templateId);
 
   return mailService
     .sendMail({
       content: {
         template_id: templateId,
+        db_template_id: emailTemplate?.id,
       },
       substitution_data: {
         email: invite.email,
@@ -474,5 +452,4 @@ async function sendInviteEmail(
     .catch((err: string) => {
       logger.logException('Failed email transmission', err);
     });
-
 }

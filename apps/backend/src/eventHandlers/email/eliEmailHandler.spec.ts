@@ -8,10 +8,7 @@ import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimData
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { eliEmailHandler } from './eliEmailHandler';
-
 import { EmailTemplateId } from './emailTemplateId';
-import { getTemplateIdForInvite } from './essEmailHandler';
-
 
 // Mock MailService
 const mockMailService = {
@@ -44,80 +41,6 @@ describe('eliEmailHandler', () => {
   });
 
   describe('getTemplateIdForInvite', () => {
-    test('should return co-proposer template when co-proposer claim exists', async () => {
-      const inviteId = faker.number.int();
-      const mockCoProposerClaim = {
-        inviteId,
-        proposalPk: faker.number.int(),
-      };
-
-      // Mock co-proposer claim exists
-      jest
-        .spyOn(coProposerDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([mockCoProposerClaim]);
-
-      // Mock no role claims
-      jest
-        .spyOn(roleClaimDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([]);
-
-      const result = await getTemplateIdForInvite(inviteId);
-
-      expect(result).toBe(
-        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_CO_PROPOSER
-      );
-    });
-
-    test('should return reviewer template when internal reviewer role claim exists', async () => {
-      const inviteId = faker.number.int();
-      const mockRoleClaim = {
-        roleClaimId: faker.number.int(),
-        inviteId,
-        roleId: UserRole.INTERNAL_REVIEWER,
-      };
-
-      // Mock no co-proposer claims
-      jest
-        .spyOn(coProposerDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([]);
-
-      // Mock internal reviewer role claim
-      jest
-        .spyOn(roleClaimDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([mockRoleClaim]);
-
-      const result = await getTemplateIdForInvite(inviteId);
-
-      expect(result).toBe(
-        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_REVIEWER
-      );
-    });
-
-    test('should return user template when user role claim exists', async () => {
-      const inviteId = faker.number.int();
-      const mockRoleClaim = {
-        roleClaimId: faker.number.int(),
-        inviteId,
-        roleId: UserRole.USER,
-      };
-
-      // Mock no co-proposer claims
-      jest
-        .spyOn(coProposerDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([]);
-
-      // Mock user role claim
-      jest
-        .spyOn(roleClaimDataSourceMock, 'findByInviteId')
-        .mockResolvedValue([mockRoleClaim]);
-
-      const result = await getTemplateIdForInvite(inviteId);
-
-      expect(result).toBe(
-        EmailTemplateId.USER_OFFICE_REGISTRATION_INVITATION_USER
-      );
-    });
-
     test('should use template proposal-created', async () => {
       // Create a mock event for PROPOSAL_CREATED
       const mockEvent: ApplicationEvent = {

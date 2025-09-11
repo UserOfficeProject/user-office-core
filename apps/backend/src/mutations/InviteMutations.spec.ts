@@ -14,11 +14,8 @@ import {
   dummyUserOfficerWithRole,
   dummyUserWithRole,
 } from '../datasources/mockups/UserDataSource';
-
-import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
-
 import { VisitDataSourceMock } from '../datasources/mockups/VisitDataSource';
-
+import { EmailTemplateId } from '../eventHandlers/email/emailTemplateId';
 import { MailService } from '../eventHandlers/MailService/MailService';
 import { Event } from '../events/event.enum';
 import { Invite } from '../models/Invite';
