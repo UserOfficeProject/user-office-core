@@ -102,17 +102,18 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
             }
             setLocalComment(content);
           }}
-          onBlur={() =>
-            dispatch({
+          onBlur={() => {
+            return dispatch({
               type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
               itemWithQuestionary: { comment: localComment },
-            })
-          }
+            });
+          }}
         />
         <FormHelperText>
           Characters: {numberOfChars} / {6000}
         </FormHelperText>
         <ErrorMessage name={commentFieldId} />
+        <>localComment: {localComment}</>
         <TitledContainer label="Grade">
           {config.nonNumericOptions.length > 0 && (
             <ToggleButtonGroup
@@ -122,10 +123,13 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
               onChange={(_, v) => {
                 setGradeType(v);
                 setLocalGrade(undefined);
+                dispatch({
+                  type: 'ITEM_WITH_QUESTIONARY_MODIFIED',
+                  itemWithQuestionary: { grade: undefined },
+                });
               }}
               title="Select grade type"
               size="small"
-              // label="Grade Type"
             >
               <ToggleButton value="Number">Number</ToggleButton>
               <ToggleButton value="Classification">Classification</ToggleButton>
@@ -138,7 +142,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
               label={
                 gradeType === 'Classification' ? 'Classification' : 'Grade'
               }
-              value={localGrade}
+              value={localGrade || ''}
               component={
                 gradeType === 'Classification' || config.decimalPoints === 0
                   ? Select
@@ -181,7 +185,7 @@ function QuestionaryComponentFapReviewBasis(props: BasicComponentProps) {
                   : config.decimalPoints === 0
                     ? [...Array(10)].map((e, i) => ({
                         text: (i + 1).toString(),
-                        value: i + 1,
+                        value: (i + 1).toString(),
                       }))
                     : undefined
               }
