@@ -8,6 +8,7 @@ import { VisitRegistrationAuthorization } from '../auth/VisitRegistrationAuthori
 import { AdminDataSourceMock } from '../datasources/mockups/AdminDataSource';
 import { CallDataSourceMock } from '../datasources/mockups/CallDataSource';
 import { CoProposerClaimDataSourceMock } from '../datasources/mockups/CoProposerClaimDataSource';
+import { EmailTemplateDataSourceMock } from '../datasources/mockups/EmailTemplateDataSource';
 import { EventLogsDataSourceMock } from '../datasources/mockups/EventLogsDataSource';
 import { ExperimentDataSourceMock } from '../datasources/mockups/ExperimentDataSource';
 import { ExperimentSafetyPdfTemplateDataSourceMock } from '../datasources/mockups/ExperimentSafetyPdfTemplateDataSource';
@@ -117,3 +118,5 @@ mapValue(Tokens.ConfigureLogger, () =>
 
 mapClass(Tokens.BasicUserDetailsLoader, BasicUserDetailsLoader);
 mapValue(Tokens.EventBus, createApplicationEventBus());
+
+mapClass(Tokens.EmailTemplateDataSource, EmailTemplateDataSourceMock);

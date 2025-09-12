@@ -9,20 +9,21 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { FieldArray, FieldArrayRenderProps } from 'formik';
-import React, { useState, KeyboardEvent } from 'react';
+import { KeyboardEvent, useState } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 
 import {
   EmailActionConfig as EmailActionConfigType,
-  EmailStatusActionEmailTemplate,
   EmailStatusActionRecipient,
   EmailStatusActionRecipients,
+  EmailTemplate,
 } from 'generated/sdk';
 
 type EmailActionConfigProps = {
   emailStatusActionConfig: EmailActionConfigType;
   recipients: EmailStatusActionRecipient[];
-  emailTemplates: EmailStatusActionEmailTemplate[];
+  emailTemplates: EmailTemplate[];
   isRecipientRequired?: boolean;
   isEmailTemplateRequired?: boolean;
 };
@@ -171,6 +172,21 @@ const EmailActionConfig = ({
     }
   };
 
+  const getEmailTemplate = (foundRecipientWithEmailTemplateIndex: number) => {
+    if (foundRecipientWithEmailTemplateIndex !== -1) {
+      return (
+        emailTemplates.find(
+          (template) =>
+            template.id ===
+            recipientsWithEmailTemplate[foundRecipientWithEmailTemplateIndex]
+              ?.emailTemplate?.id
+        ) || null
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <>
       <Typography variant="h6" color="black">
@@ -261,11 +277,9 @@ const EmailActionConfig = ({
                             newTemplateValue
                           );
                         }}
-                        value={
-                          recipientsWithEmailTemplate[
-                            foundRecipientWithEmailTemplateIndex
-                          ].emailTemplate || null
-                        }
+                        value={getEmailTemplate(
+                          foundRecipientWithEmailTemplateIndex
+                        )}
                         data-cy={`${recipient.name}-email-template`}
                       />
                       {recipient.name === EmailStatusActionRecipients.OTHER && (

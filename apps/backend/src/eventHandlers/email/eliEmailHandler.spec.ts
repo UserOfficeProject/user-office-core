@@ -1,5 +1,5 @@
-import 'reflect-metadata';
 import { faker } from '@faker-js/faker';
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -8,6 +8,7 @@ import { RoleClaimDataSourceMock } from '../../datasources/mockups/RoleClaimData
 import { ApplicationEvent } from '../../events/applicationEvents';
 import { Event } from '../../events/event.enum';
 import { eliEmailHandler } from './eliEmailHandler';
+import { EmailTemplateId } from './emailTemplateId';
 
 // Mock MailService
 const mockMailService = {
@@ -61,7 +62,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'proposal-created',
+            db_template_id: 1,
+            template_id: EmailTemplateId.PROPOSAL_CREATED,
           },
         })
       );
@@ -90,7 +92,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Accepted-Proposal',
+            db_template_id: 1,
+            template_id: EmailTemplateId.ACCEPTED_PROPOSAL,
           },
         })
       );
@@ -119,7 +122,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Rejected-Proposal',
+            db_template_id: 1,
+            template_id: EmailTemplateId.REJECTED_PROPOSAL,
           },
         })
       );
@@ -148,13 +152,14 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'Reserved-Proposal',
+            db_template_id: 1,
+            template_id: EmailTemplateId.RESERVED_PROPOSAL,
           },
         })
       );
     });
 
-    test('should use template review-reminder', async () => {
+    test('should use template reviewer-reminder', async () => {
       // Create a mock event for FAP_REVIEWER_NOTIFIED
       const mockEvent: ApplicationEvent = {
         type: Event.FAP_REVIEWER_NOTIFIED,
@@ -173,7 +178,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'review-reminder',
+            db_template_id: 1,
+            template_id: EmailTemplateId.REVIEW_REMINDER,
           },
         })
       );
@@ -206,7 +212,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'internal-review-created',
+            db_template_id: 1,
+            template_id: EmailTemplateId.INTERNAL_REVIEW_CREATED,
           },
         })
       );
@@ -239,7 +246,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'internal-review-updated',
+            db_template_id: 1,
+            template_id: EmailTemplateId.INTERNAL_REVIEW_UPDATED,
           },
         })
       );
@@ -272,7 +280,8 @@ describe('eliEmailHandler', () => {
       expect(mockMailService.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           content: {
-            template_id: 'internal-review-deleted',
+            db_template_id: 1,
+            template_id: EmailTemplateId.INTERNAL_REVIEW_DELETED,
           },
         })
       );
