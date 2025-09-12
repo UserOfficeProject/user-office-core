@@ -20,6 +20,9 @@ export class FapReviewAssignmentInput {
 
   @Field(() => Int)
   public proposalPk: number;
+
+  @Field(() => Int, { nullable: true })
+  public rank?: number;
 }
 
 @ArgsType()
