@@ -1,0 +1,13 @@
+mutation deleteWorkflowConnection($connectionId: Int!) {
+  deleteWorkflowConnection(connectionId: $connectionId) {
+    id
+    sortOrder
+    workflowId
+    statusId
+    nextStatusId
+    prevStatusId
+    prevConnectionId
+    posX
+    posY
+  }
+}

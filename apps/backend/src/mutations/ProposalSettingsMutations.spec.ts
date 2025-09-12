@@ -193,4 +193,13 @@ describe('Test Proposal settings mutations', () => {
       })
     ).resolves.toStrictEqual(true);
   });
+
+  test('A userofficer can delete workflow connection', () => {
+    return expect(
+      workflowMutationsInstance.deleteWorkflowConnection(
+        dummyUserOfficerWithRole,
+        1
+      )
+    ).resolves.toStrictEqual(dummyWorkflowConnection);
+  });
 });
