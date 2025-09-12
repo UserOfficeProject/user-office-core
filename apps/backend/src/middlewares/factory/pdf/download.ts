@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import express from 'express';
 import { container } from 'tsyringe';
 
@@ -18,6 +19,7 @@ import callFactoryService, {
 } from '../../../factory/service';
 import { getCurrentTimestamp } from '../../../factory/util';
 import { FeatureId } from '../../../models/Feature';
+import { UserWithRole } from '../../../models/User';
 import FactoryServices, { DownloadTypeServices } from '../factoryServices';
 
 const router = express.Router();
@@ -28,22 +30,45 @@ const adminDataSource = container.resolve<AdminDataSource>(
   Tokens.AdminDataSource
 );
 
-router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
+router.get(`/${PDFType.PROPOSAL}/:proposal_keys`, async (req, res, next) => {
   try {
     if (!req.user) {
       throw new Error('Not authorized');
     }
 
-    const userWithRole = {
+    const userWithRole: UserWithRole = {
       ...res.locals.agent,
     };
-    const requestedPks: number[] = Array.from(
+    const requestedKeys: number[] = Array.from(
       new Set(
-        req.params.proposal_pks
+        req.params.proposal_keys
           .split(',')
           .map((n: string) => parseInt(n))
           .filter((id: number) => !isNaN(id))
       )
+    );
+
+    const numRequestedKeys = requestedKeys.length;
+    if (numRequestedKeys === 0) {
+      throw new Error('No valid proposals provided');
+    }
+
+    const isIdFiltered = req.query?.filter?.toString() === 'id';
+
+    const requesterContext = {
+      role: userWithRole.isApiAccessToken
+        ? 'API key'
+        : userWithRole?.currentRole?.title,
+      userId: userWithRole?.id,
+    };
+
+    logger.logInfo(
+      `Proposal PDF download for ${numRequestedKeys} proposals requested`,
+      {
+        requestedProps: requestedKeys,
+        propsIdentifier: isIdFiltered ? 'ID' : 'PK',
+        requestedBy: requesterContext,
+      }
     );
 
     const meta: MetaBase = {
@@ -58,13 +83,13 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     )?.isEnabled;
 
     const data: ProposalPDFData[] = [];
-    const pregeneratedPks = new Set<number>();
+    const pregeneratedKeys = new Set<number>();
 
     if (isPregeneratedProposalPdfsEnabled) {
       const pregeneratedProposalPdfData: PregeneratedProposalPDFData[] =
         await factoryServices.getPregeneratedPdfProposals(
           userWithRole,
-          requestedPks,
+          requestedKeys,
           meta,
           {
             filter: req.query?.filter?.toString(),
@@ -73,18 +98,22 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
 
       pregeneratedProposalPdfData.forEach((propData) => {
         data.push({ ...propData });
-        pregeneratedPks.add(propData.proposal.primaryKey);
+        pregeneratedKeys.add(
+          isIdFiltered
+            ? Number(propData.proposal.proposalId)
+            : propData.proposal.primaryKey
+        );
       });
     }
 
-    const pksToFetchFullData = requestedPks.filter(
-      (pk) => !pregeneratedPks.has(pk)
+    const keysToFetchFullData = requestedKeys.filter(
+      (key) => !pregeneratedKeys.has(key)
     );
 
     const fullProposalPdfData: FullProposalPDFData[] | null =
       await factoryServices.getPdfProposals(
         userWithRole,
-        pksToFetchFullData,
+        keysToFetchFullData,
         meta,
         {
           filter: req.query?.filter?.toString(),
@@ -98,6 +127,30 @@ router.get(`/${PDFType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     if (!data || data.length === 0) {
       throw new Error('Could not get proposal details');
     }
+
+    const propsToGenerate: number[] = [];
+    const propsToPregenerate: number[] = [];
+
+    for (const d of data) {
+      const primaryKey = d.proposal.primaryKey;
+      const proposalId = Number(d.proposal.proposalId);
+      if (d.isPregeneratedPdfData) {
+        propsToPregenerate.push(isIdFiltered ? proposalId : primaryKey);
+      } else {
+        propsToGenerate.push(isIdFiltered ? proposalId : primaryKey);
+      }
+    }
+
+    logger.logInfo(
+      `Collected proposal PDF download data for ${data.length} proposals`,
+      {
+        requestedProps: requestedKeys,
+        propsIdentifier: isIdFiltered ? 'ID' : 'PK',
+        propsToGenerate,
+        ...(isPregeneratedProposalPdfsEnabled && { propsToPregenerate }),
+        requestedBy: requesterContext,
+      }
+    );
 
     const userRole = req.user.currentRole;
     callFactoryService<ProposalPDFData, MetaBase>(

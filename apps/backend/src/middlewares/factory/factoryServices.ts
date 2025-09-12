@@ -1,4 +1,3 @@
-import { logger } from '@user-office-software/duo-logger';
 import { container, injectable } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
@@ -34,13 +33,13 @@ export type DownloadOptions = {
 export interface DownloadTypeServices {
   getPdfProposals(
     agent: UserWithRole,
-    proposalPks: number[],
+    proposalKeys: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
   ): Promise<FullProposalPDFData[] | null>;
   getPregeneratedPdfProposals(
     agent: UserWithRole,
-    proposalPks: number[],
+    proposalKeys: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
   ): Promise<PregeneratedProposalPDFData[]>;
@@ -68,17 +67,17 @@ export default class FactoryServices implements DownloadTypeServices {
   @FactoryServicesAuthorized()
   async getPdfProposals(
     agent: UserWithRole | null,
-    proposalPks: number[],
+    proposalKeys: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
   ): Promise<FullProposalPDFData[] | null> {
     let data = null;
     if (agent) {
       data = await Promise.all(
-        proposalPks.map((proposalPk, indx) => {
+        proposalKeys.map((proposalKey, indx) => {
           if (agent?.isApiAccessToken)
             return collectProposalPDFDataTokenAccess(
-              proposalPk,
+              proposalKey,
               options,
               indx === 0
                 ? (filename: string) =>
@@ -87,7 +86,7 @@ export default class FactoryServices implements DownloadTypeServices {
             );
 
           return collectProposalPDFData(
-            proposalPk,
+            proposalKey,
             agent,
             indx === 0
               ? (filename: string) =>
@@ -104,7 +103,7 @@ export default class FactoryServices implements DownloadTypeServices {
   @FactoryServicesAuthorized()
   async getPregeneratedPdfProposals(
     agent: UserWithRole | null,
-    proposalPks: number[],
+    proposalKeys: number[],
     proposalFileMeta: MetaBase,
     options?: DownloadOptions
   ): Promise<PregeneratedProposalPDFData[]> {
@@ -112,18 +111,11 @@ export default class FactoryServices implements DownloadTypeServices {
       return [];
     }
 
-    logger.logInfo(
-      `Collecting pregenerated proposal PDF data for ${proposalPks.length} proposals`,
-      {
-        proposalPks: proposalPks,
-      }
-    );
-
     const allProposalData = await Promise.all(
-      proposalPks.map((proposalPk, indx) => {
+      proposalKeys.map((proposalKey, indx) => {
         if (agent?.isApiAccessToken)
           return collectProposalPregeneratedPdfDataTokenAccess(
-            proposalPk,
+            proposalKey,
             options,
             indx === 0
               ? (filename: string) =>
@@ -132,7 +124,7 @@ export default class FactoryServices implements DownloadTypeServices {
           );
 
         return collectProposalPregeneratedPdfData(
-          proposalPk,
+          proposalKey,
           agent,
           indx === 0
             ? (filename: string) => (proposalFileMeta.singleFilename = filename)
