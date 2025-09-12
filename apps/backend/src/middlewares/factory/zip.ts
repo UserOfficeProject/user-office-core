@@ -1,3 +1,4 @@
+import { logger } from '@user-office-software/duo-logger';
 import express from 'express';
 import { container } from 'tsyringe';
 
@@ -16,6 +17,7 @@ import callFactoryService, {
 import { getCurrentTimestamp } from '../../factory/util';
 import { ProposalAttachmentData } from '../../factory/zip/attachment';
 import { FeatureId } from '../../models/Feature';
+import { UserWithRole } from '../../models/User';
 import FactoryServices, { DownloadTypeServices } from './factoryServices';
 
 const router = express.Router();
@@ -90,7 +92,7 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_keys`, async (req, res, next) => {
     const factoryServices =
       container.resolve<DownloadTypeServices>(FactoryServices);
 
-    const userWithRole = {
+    const userWithRole: UserWithRole = {
       ...res.locals.agent,
     };
     const requestedKeys: number[] = Array.from(
@@ -100,6 +102,29 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_keys`, async (req, res, next) => {
           .map((n: string) => parseInt(n))
           .filter((id: number) => !isNaN(id))
       )
+    );
+
+    const numRequestedKeys = requestedKeys.length;
+    if (numRequestedKeys === 0) {
+      throw new Error('No valid proposals provided');
+    }
+
+    const isIdFiltered = req.query?.filter?.toString() === 'id';
+
+    const requesterContext = {
+      role: userWithRole.isApiAccessToken
+        ? 'API key'
+        : userWithRole?.currentRole?.title,
+      userId: userWithRole?.id,
+    };
+
+    logger.logInfo(
+      `Proposal ZIP download for ${numRequestedKeys} proposals requested`,
+      {
+        requestedProps: requestedKeys,
+        propsIdentifier: isIdFiltered ? 'ID' : 'PK',
+        requestedBy: requesterContext,
+      }
     );
 
     const meta: MetaBase = {
@@ -155,9 +180,33 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_keys`, async (req, res, next) => {
       data.push(...fullProposalPdfData);
     }
 
-    if (!data) {
+    if (!data || data.length === 0) {
       throw new Error('Could not get proposal details');
     }
+
+    const propsToGenerate: number[] = [];
+    const propsToPregenerate: number[] = [];
+
+    for (const d of data) {
+      const primaryKey = d.proposal.primaryKey;
+      const proposalId = Number(d.proposal.proposalId);
+      if (d.isPregeneratedPdfData) {
+        propsToPregenerate.push(isIdFiltered ? proposalId : primaryKey);
+      } else {
+        propsToGenerate.push(isIdFiltered ? proposalId : primaryKey);
+      }
+    }
+
+    logger.logInfo(
+      `Collected proposal ZIP download data for ${data.length} proposals`,
+      {
+        requestedProps: requestedKeys,
+        propsIdentifier: isIdFiltered ? 'ID' : 'PK',
+        propsToGenerate,
+        ...(isPregeneratedProposalPdfsEnabled && { propsToPregenerate }),
+        requestedBy: requesterContext,
+      }
+    );
 
     meta.singleFilename = `proposals_${getCurrentTimestamp()}.zip`;
 
