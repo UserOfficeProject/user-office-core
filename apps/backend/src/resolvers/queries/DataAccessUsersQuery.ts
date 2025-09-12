@@ -10,7 +10,9 @@ export class DataAccessUsersQuery {
     @Ctx() context: ResolverContext,
     @Arg('proposalPk', () => Int) proposalPk: number
   ): Promise<BasicUserDetails[]> {
-    // TODO: This is a placeholder implementation. Replace with actual data fetching logic.
-    return [];
+    return context.queries.dataAccessUsers.findByProposalPk(
+      context.user,
+      proposalPk
+    );
   }
 }

@@ -271,11 +271,14 @@ const ProposalTable = ({
             },
           },
           (rowData) => {
+            const isPI = rowData.proposerId === userContext.user.id;
+
             return {
               icon: PeopleIcon,
               tooltip: 'View data access users',
               hidden:
-                isDataAccessUsersEnabled !== true ||
+                isDataAccessUsersEnabled === false ||
+                isPI === false ||
                 rowData.publicStatus !== ProposalPublicStatus.ACCEPTED,
               onClick: (_event, rowData) => {
                 setSelectedProposalPk(
