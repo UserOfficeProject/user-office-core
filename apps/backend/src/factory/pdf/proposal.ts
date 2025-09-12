@@ -21,6 +21,7 @@ import { getTopicActiveAnswers } from '../../models/ProposalModelFunctions';
 import { Answer, QuestionaryStep } from '../../models/Questionary';
 import { isRejection } from '../../models/Rejection';
 import { Review } from '../../models/Review';
+import { Roles } from '../../models/Role';
 import { Sample } from '../../models/Sample';
 import {
   TechnicalReview,
@@ -258,6 +259,9 @@ export const collectProposalPDFData = async (
 
   if (proposal === null) {
     throw new Error('Proposal not found');
+  }
+  if (!proposal.submitted && user.currentRole?.shortCode == Roles.USER) {
+    throw new Error('PDF cannot be downloaded pre submission ');
   }
 
   const call = await baseContext.queries.call.get(user, proposal.callId);
