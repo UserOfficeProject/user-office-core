@@ -546,13 +546,25 @@ function createNumberInputQuestion(
 
 function createIntervalQuestion(
   question: string,
-  options?: { units?: string[]; valueConstraint?: string }
+  options?: {
+    key?: string;
+    isRequired?: boolean;
+    units?: string[];
+    valueConstraint?: string;
+    firstTopic?: boolean;
+  }
 ) {
-  openQuestionsMenu();
+  openQuestionsMenu({
+    firstTopic: options?.firstTopic,
+  });
 
   cy.contains('Add Interval').click();
 
   cy.get('[data-cy=question]').clear().type(question);
+
+  if (options?.key) {
+    cy.get('[data-cy=natural_key]').clear().type(options.key);
+  }
 
   if (options?.units && options.units.length > 0) {
     for (const unit of options.units) {
