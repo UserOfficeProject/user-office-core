@@ -290,8 +290,11 @@ const ProposalTable = ({
 
             return {
               icon: GetAppIcon,
-              tooltip: 'Download proposal',
-              hidden: !isSubmitted,
+              tooltip: !isSubmitted
+                ? 'Only submitted proposals can be downloaded'
+                : 'Download Proposal',
+              disabled: !isSubmitted,
+
               onClick: (event, rowData) =>
                 downloadPDFProposal(
                   [(rowData as PartialProposalsDataType).primaryKey],
