@@ -31,22 +31,11 @@ import NoOptionsText from './NoOptionsText';
 
 type UserOrEmail = BasicUserDetails | ValidEmailAddress;
 
-const isSameParticipants = (a: UserOrEmail[], b: UserOrEmail[]): boolean => {
-  if (a.length !== b.length) {
-    return false;
-  }
+const keyOf = (u: UserOrEmail) =>
+  typeof u === 'string' ? `email:${u.toLowerCase()}` : `id:${String(u.id)}`;
 
-  return a.every((value, index) => {
-    if (isValidEmail(value) && isValidEmail(b[index])) {
-      return value.toLowerCase() === b[index].toLowerCase();
-    }
-    if (!isValidEmail(value) && !isValidEmail(b[index])) {
-      return value.id === (b[index] as BasicUserDetails).id;
-    }
-
-    return false;
-  });
-};
+const isSameParticipants = (a: UserOrEmail[], b: UserOrEmail[]): boolean =>
+  a.length === b.length && a.every((v, i) => keyOf(v) === keyOf(b[i]));
 
 interface ParticipantSelectorProps {
   modalOpen: boolean;
