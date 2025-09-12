@@ -496,7 +496,7 @@ export const collectProposalPDFData = async (
 };
 
 export const collectProposalPDFDataTokenAccess = async (
-  proposalPk: number,
+  proposalKey: number,
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<FullProposalPDFData> => {
@@ -508,9 +508,9 @@ export const collectProposalPDFDataTokenAccess = async (
   let proposal = null;
   const proposalFilter = options?.filter ?? null;
   if (proposalFilter && proposalFilter === 'id') {
-    proposal = await proposalDataSource.getProposalById(proposalPk.toString());
+    proposal = await proposalDataSource.getProposalById(proposalKey.toString());
   } else {
-    proposal = await proposalDataSource.get(proposalPk);
+    proposal = await proposalDataSource.get(proposalKey);
   }
 
   if (proposal === null) {
@@ -752,7 +752,7 @@ export const collectProposalPregeneratedPdfData = async (
 };
 
 export const collectProposalPregeneratedPdfDataTokenAccess = async (
-  proposalPk: number,
+  proposalKey: number,
   options?: DownloadOptions,
   notify?: CallableFunction
 ): Promise<PregeneratedProposalPDFData | null> => {
@@ -763,25 +763,25 @@ export const collectProposalPregeneratedPdfDataTokenAccess = async (
   let proposal = null;
   const proposalFilter = options?.filter ?? null;
   if (proposalFilter && proposalFilter === 'id') {
-    proposal = await proposalDataSource.getProposalById(proposalPk.toString());
+    proposal = await proposalDataSource.getProposalById(proposalKey.toString());
   } else {
-    proposal = await proposalDataSource.get(proposalPk);
+    proposal = await proposalDataSource.get(proposalKey);
   }
 
   const propIdentifier = proposalFilter === 'id' ? 'ID' : 'PK';
 
   if (!proposal || isRejection(proposal)) {
     logger.logError(
-      `Could not fetch proposal with ${propIdentifier} ${proposalPk} for pregenerated proposal download`,
+      `Could not fetch proposal with ${propIdentifier} ${proposalKey} for pregenerated proposal download`,
       {
         reason: proposal?.reason || 'Proposal is null',
-        proposal: proposalPk,
+        proposal: proposalKey,
         requestedBy: 'API key',
       }
     );
 
     throw new Error(
-      `Could not fetch proposal with ${propIdentifier} ${proposalPk} for pregenerated proposal download`
+      `Could not fetch proposal with ${propIdentifier} ${proposalKey} for pregenerated proposal download`
     );
   }
 

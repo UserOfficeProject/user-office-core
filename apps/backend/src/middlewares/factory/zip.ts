@@ -82,7 +82,7 @@ router.get(`/${ZIPType.ATTACHMENT}/:proposal_pks`, async (req, res, next) => {
   }
 });
 
-router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
+router.get(`/${ZIPType.PROPOSAL}/:proposal_keys`, async (req, res, next) => {
   try {
     if (!req.user) {
       throw new Error('Not authorized');
@@ -93,9 +93,9 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     const userWithRole = {
       ...res.locals.agent,
     };
-    const requestedPks: number[] = Array.from(
+    const requestedKeys: number[] = Array.from(
       new Set(
-        req.params.proposal_pks
+        req.params.proposal_keys
           .split(',')
           .map((n: string) => parseInt(n))
           .filter((id: number) => !isNaN(id))
@@ -114,13 +114,13 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
     )?.isEnabled;
 
     const data: ProposalPDFData[] = [];
-    const pregeneratedPks = new Set<number>();
+    const pregeneratedKeys = new Set<number>();
 
     if (isPregeneratedProposalPdfsEnabled) {
       const pregeneratedProposalPdfData: PregeneratedProposalPDFData[] =
         await factoryServices.getPregeneratedPdfProposals(
           userWithRole,
-          requestedPks,
+          requestedKeys,
           meta,
           {
             filter: req.query?.filter?.toString(),
@@ -129,18 +129,22 @@ router.get(`/${ZIPType.PROPOSAL}/:proposal_pks`, async (req, res, next) => {
 
       pregeneratedProposalPdfData.forEach((propData) => {
         data.push({ ...propData });
-        pregeneratedPks.add(propData.proposal.primaryKey);
+        pregeneratedKeys.add(
+          isIdFiltered
+            ? Number(propData.proposal.proposalId)
+            : propData.proposal.primaryKey
+        );
       });
     }
 
-    const pksToFetchFullData = requestedPks.filter(
-      (pk) => !pregeneratedPks.has(pk)
+    const keysToFetchFullData = requestedKeys.filter(
+      (key) => !pregeneratedKeys.has(key)
     );
 
     const fullProposalPdfData: FullProposalPDFData[] | null =
       await factoryServices.getPdfProposals(
         userWithRole,
-        pksToFetchFullData,
+        keysToFetchFullData,
         meta,
         {
           filter: req.query?.filter?.toString(),
